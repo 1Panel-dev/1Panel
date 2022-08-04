@@ -13,5 +13,6 @@ func Routers() *gin.Engine {
 	r.SetFuncMap(template.FuncMap{
 		"Localize": ginI18n.GetMessage,
 	})
+	r.Use(middlerware.JwtAuth())
 	return r
 }

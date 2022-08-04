@@ -5,4 +5,5 @@ type ServerConfig struct {
 	Mysql     Mysql     `mapstructure:"mysql"`
 	System    System    `mapstructure:"system"`
 	LogConfig LogConfig `mapstructure:"log"`
+	JWT       JWT       `mapstructure:"jwt"`
 }
