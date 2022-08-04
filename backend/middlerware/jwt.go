@@ -11,7 +11,7 @@ import (
 
 func JwtAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token := c.Request.Header.Get("x-token")
+		token := c.Request.Header.Get("Authorization")
 		re := result.NewResult(c)
 		if token == "" {
 			re.Error(errres.JwtNotFound)

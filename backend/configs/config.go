@@ -6,4 +6,5 @@ type ServerConfig struct {
 	System    System    `mapstructure:"system"`
 	LogConfig LogConfig `mapstructure:"log"`
 	JWT       JWT       `mapstructure:"jwt"`
+	CORS      CORS      `mapstructure:"cors"`
 }
