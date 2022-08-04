@@ -1,6 +1,7 @@
 package result
 
 import (
+	"github.com/1Panel-dev/1Panel/app/i18n"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -22,7 +23,7 @@ func NewResult(ctx *gin.Context) *Result {
 func NewError(code int, msg string) ResultCont {
 	return ResultCont{
 		Code: code,
-		Msg:  msg,
+		Msg:  i18n.GetMsg(msg),
 		Data: gin.H{},
 	}
 }
@@ -41,9 +42,8 @@ func (r *Result) Success(data interface{}) {
 func (r *Result) ErrorCode(code int, msg string) {
 	res := ResultCont{}
 	res.Code = code
-	res.Msg = msg
+	res.Msg = i18n.GetMsg(msg)
 	res.Data = gin.H{}
-	//if (code == http.StatusBadRequest)
 	r.Ctx.JSON(http.StatusOK, res)
 	r.Ctx.Abort()
 }
