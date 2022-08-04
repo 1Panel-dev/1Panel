@@ -1,6 +1,7 @@
 package migrations
 
 import (
+	"github.com/1Panel-dev/1Panel/app/entity"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
 )

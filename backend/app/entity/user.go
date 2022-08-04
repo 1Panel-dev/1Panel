@@ -1,6 +1,6 @@
 package entity
 
-import "github.com/1Panel-dev/1Panel/internal/entity/common"
+import "github.com/1Panel-dev/1Panel/app/entity/common"
 
 type User struct {
 	common.BaseModel
