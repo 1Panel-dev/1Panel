@@ -1,0 +1,25 @@
+system:
+  port: 9999
+  db_type: 'mysql'
+
+mysql:
+  path: '127.0.0.1'
+  port: '3306'
+  db_name: '1panel'
+  username: 'root'
+  password: 'Calong@2015'
+  max_idle_conns: 10
+  max_open_conns: 100
+
+sqlite:
+  path: "/opt/1Panel/data/db"
+  db_file: "1Panel.db"
+
+log:
+  level: "info"
+  path: "/opt/1Panel/log"
+  log_name: "1Panel"
+  log_suffix: ".log"
+  log_size: 50    #日志文件大小，单位是 MB
+  log_backup: 10  #最大过期日志保留个数
+  log_data: 7     #保留过期文件最大时间，单位 天
