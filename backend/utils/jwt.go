@@ -1,10 +1,11 @@
 package utils
 
 import (
-	"1Panel/app/dto"
-	"1Panel/constant/errres"
-	"1Panel/global"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/app/dto"
+	"github.com/1Panel-dev/1Panel/constant/errres"
+	"github.com/1Panel-dev/1Panel/global"
 
 	"github.com/golang-jwt/jwt/v4"
 )

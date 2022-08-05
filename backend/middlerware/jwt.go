@@ -1,11 +1,12 @@
 package middlerware
 
 import (
-	"1Panel/app/dto"
-	"1Panel/constant/errres"
-	"1Panel/utils"
 	"errors"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/app/dto"
+	"github.com/1Panel-dev/1Panel/constant/errres"
+	"github.com/1Panel-dev/1Panel/utils"
 
 	"github.com/gin-gonic/gin"
 )

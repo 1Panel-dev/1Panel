@@ -1,7 +1,7 @@
 package router
 
 import (
-	rou "1Panel/router"
+	rou "github.com/1Panel-dev/1Panel/router"
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,7 +1,7 @@
 package router
 
 import (
-	v1 "1Panel/app/api/v1"
+	v1 "github.com/1Panel-dev/1Panel/app/api/v1"
 	"github.com/gin-gonic/gin"
 )
 

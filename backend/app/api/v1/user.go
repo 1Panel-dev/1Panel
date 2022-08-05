@@ -1,9 +1,10 @@
 package v1
 
 import (
-	"1Panel/app/dto"
-	"1Panel/global"
 	"strconv"
+
+	"github.com/1Panel-dev/1Panel/app/dto"
+	"github.com/1Panel-dev/1Panel/global"
 
 	"github.com/gin-gonic/gin"
 )

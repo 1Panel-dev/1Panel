@@ -1,8 +1,9 @@
 package dto
 
 import (
-	"1Panel/i18n"
 	"net/http"
+
+	"github.com/1Panel-dev/1Panel/i18n"
 
 	"github.com/gin-gonic/gin"
 )

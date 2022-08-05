@@ -1,9 +1,10 @@
 package log
 
 import (
-	"1Panel/configs"
-	"1Panel/global"
 	"path"
+
+	"github.com/1Panel-dev/1Panel/configs"
+	"github.com/1Panel-dev/1Panel/global"
 
 	"github.com/natefinch/lumberjack"
 	"github.com/sirupsen/logrus"

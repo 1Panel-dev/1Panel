@@ -1,7 +1,7 @@
 package global
 
 import (
-	"1Panel/configs"
+	"github.com/1Panel-dev/1Panel/configs"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"

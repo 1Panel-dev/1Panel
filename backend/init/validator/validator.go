@@ -1,9 +1,10 @@
 package validator
 
 import (
-	"1Panel/global"
 	"regexp"
 	"unicode"
+
+	"github.com/1Panel-dev/1Panel/global"
 
 	"github.com/go-playground/validator/v10"
 )

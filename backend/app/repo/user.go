@@ -1,8 +1,8 @@
 package repo
 
 import (
-	"1Panel/app/model"
-	"1Panel/global"
+	"github.com/1Panel-dev/1Panel/app/model"
+	"github.com/1Panel-dev/1Panel/global"
 )
 
 type UserRepo struct{}

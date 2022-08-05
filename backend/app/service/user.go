@@ -1,10 +1,11 @@
 package service
 
 import (
-	"1Panel/app/dto"
-	"1Panel/app/model"
-	"1Panel/global"
 	"errors"
+
+	"github.com/1Panel-dev/1Panel/app/dto"
+	"github.com/1Panel-dev/1Panel/app/model"
+	"github.com/1Panel-dev/1Panel/global"
 
 	"gorm.io/gorm"
 )

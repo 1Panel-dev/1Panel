@@ -1,8 +1,9 @@
 package errres
 
 import (
-	"1Panel/app/dto"
 	"errors"
+
+	"github.com/1Panel-dev/1Panel/app/dto"
 )
 
 const (

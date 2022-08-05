@@ -1,6 +1,6 @@
 package service
 
-import "1Panel/app/repo"
+import "github.com/1Panel-dev/1Panel/app/repo"
 
 type ServiceGroup struct {
 	UserService

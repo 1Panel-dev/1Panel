@@ -1,8 +1,9 @@
 package dto
 
 import (
-	"1Panel/app/model"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/app/model"
 )
 
 type UserCreate struct {

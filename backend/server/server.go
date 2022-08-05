@@ -1,15 +1,16 @@
 package server
 
 import (
-	"1Panel/global"
-	"1Panel/init/db"
-	"1Panel/init/log"
-	"1Panel/init/migration"
-	"1Panel/init/router"
-	"1Panel/init/validator"
-	"1Panel/init/viper"
 	"fmt"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/init/db"
+	"github.com/1Panel-dev/1Panel/init/log"
+	"github.com/1Panel-dev/1Panel/init/migration"
+	"github.com/1Panel-dev/1Panel/init/router"
+	"github.com/1Panel-dev/1Panel/init/validator"
+	"github.com/1Panel-dev/1Panel/init/viper"
 
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
