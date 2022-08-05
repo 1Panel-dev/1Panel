@@ -2,7 +2,6 @@ package global
 
 import (
 	"github.com/1Panel-dev/1Panel/configs"
-
 	"github.com/go-playground/validator/v10"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"

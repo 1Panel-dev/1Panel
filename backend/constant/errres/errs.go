@@ -16,7 +16,7 @@ const (
 )
 
 var (
-	OK           = dto.NewSuccess(Success, "Ok")
+	OK           = dto.NewError(Success, "Ok")
 	InvalidParam = dto.NewError(InvalidParams, "InvalidParams")
 	JwtExpired   = dto.NewError(InvalidJwtExpired, "JwtExpired")
 	JwtNotFound  = dto.NewError(InvalidJwtNotFound, "JwtNotFound")

@@ -1,4 +1,4 @@
-package middlerware
+package middleware
 
 import (
 	"github.com/1Panel-dev/1Panel/app/model"

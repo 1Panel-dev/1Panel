@@ -1,0 +1,3 @@
+#common
+InvalidParams = "参数错误: {.detail}"
+JwtNotFound = "需要jwt校验"
