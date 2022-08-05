@@ -54,7 +54,6 @@ func CorsByRules() gin.HandlerFunc {
 
 func checkCors(currentOrigin string) *configs.CORSWhiteList {
 	for _, whitelist := range global.Config.CORS.WhiteList {
-		// 遍历配置中的跨域头，寻找匹配项
 		if currentOrigin == whitelist.AllowOrigin {
 			return &whitelist
 		}
