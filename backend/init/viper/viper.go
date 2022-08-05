@@ -1,9 +1,10 @@
 package viper
 
 import (
+	"1Panel/configs"
+	"1Panel/global"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/configs"
-	"github.com/1Panel-dev/1Panel/global"
+
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )

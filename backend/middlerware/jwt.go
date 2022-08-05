@@ -1,18 +1,19 @@
 package middlerware
 
 import (
+	"1Panel/app/dto"
+	"1Panel/constant/errres"
+	"1Panel/utils"
 	"errors"
-	"github.com/1Panel-dev/1Panel/app/constant/errres"
-	"github.com/1Panel-dev/1Panel/app/result"
-	"github.com/1Panel-dev/1Panel/utils"
-	"github.com/gin-gonic/gin"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func JwtAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.Request.Header.Get("Authorization")
-		re := result.NewResult(c)
+		re := dto.NewResult(c)
 		if token == "" {
 			re.Error(errres.JwtNotFound)
 			return

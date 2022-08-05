@@ -1,8 +1,8 @@
 package errres
 
 import (
+	"1Panel/app/dto"
 	"errors"
-	"github.com/1Panel-dev/1Panel/app/result"
 )
 
 const (
@@ -15,10 +15,10 @@ const (
 )
 
 var (
-	OK           = result.NewSuccess(Success, "Ok")
-	InvalidParam = result.NewError(InvalidParams, "InvalidParams")
-	JwtExpired   = result.NewError(InvalidJwtExpired, "JwtExpired")
-	JwtNotFound  = result.NewError(InvalidJwtNotFound, "JwtNotFound")
+	OK           = dto.NewSuccess(Success, "Ok")
+	InvalidParam = dto.NewError(InvalidParams, "InvalidParams")
+	JwtExpired   = dto.NewError(InvalidJwtExpired, "JwtExpired")
+	JwtNotFound  = dto.NewError(InvalidJwtNotFound, "JwtNotFound")
 )
 
 var (

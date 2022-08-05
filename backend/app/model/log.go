@@ -1,9 +1,9 @@
-package entity
+package model
 
-import "github.com/1Panel-dev/1Panel/app/entity/common"
+import "gorm.io/gorm"
 
 type OperateLog struct {
-	common.BaseModel
+	gorm.Model
 	Name      string `gorm:"type:varchar(64)"`
 	Type      string `gorm:"type:varchar(64)"`
 	User      string `gorm:"type:varchar(64)"`

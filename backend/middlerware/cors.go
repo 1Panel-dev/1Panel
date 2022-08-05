@@ -1,10 +1,11 @@
 package middlerware
 
 import (
-	"github.com/1Panel-dev/1Panel/configs"
-	"github.com/1Panel-dev/1Panel/global"
-	"github.com/gin-gonic/gin"
+	"1Panel/configs"
+	"1Panel/global"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func Cors() gin.HandlerFunc {

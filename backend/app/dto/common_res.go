@@ -1,10 +1,16 @@
-package result
+package dto
 
 import (
-	"github.com/1Panel-dev/1Panel/app/i18n"
-	"github.com/gin-gonic/gin"
+	"1Panel/i18n"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
+
+type PageResult struct {
+	Total int64       `json:"total"`
+	Items interface{} `json:"items"`
+}
 
 type Response struct {
 	Code int         `json:"code"` //提示代码

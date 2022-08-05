@@ -1,11 +1,12 @@
 package log
 
 import (
-	"github.com/1Panel-dev/1Panel/configs"
-	"github.com/1Panel-dev/1Panel/global"
+	"1Panel/configs"
+	"1Panel/global"
+	"path"
+
 	"github.com/natefinch/lumberjack"
 	"github.com/sirupsen/logrus"
-	"path"
 )
 
 func Init() {

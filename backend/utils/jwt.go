@@ -1,11 +1,12 @@
 package utils
 
 import (
-	"github.com/1Panel-dev/1Panel/app/constant/errres"
-	"github.com/1Panel-dev/1Panel/app/dto"
-	"github.com/1Panel-dev/1Panel/global"
-	"github.com/golang-jwt/jwt/v4"
+	"1Panel/app/dto"
+	"1Panel/constant/errres"
+	"1Panel/global"
 	"time"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 type JWT struct {

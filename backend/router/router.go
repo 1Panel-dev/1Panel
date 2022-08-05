@@ -1,10 +1,11 @@
 package router
 
 import (
-	"github.com/1Panel-dev/1Panel/middlerware"
+	"1Panel/middlerware"
+	"html/template"
+
 	ginI18n "github.com/gin-contrib/i18n"
 	"github.com/gin-gonic/gin"
-	"html/template"
 )
 
 func Routers() *gin.Engine {

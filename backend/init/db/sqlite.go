@@ -1,7 +1,8 @@
 package db
 
 import (
-	"github.com/1Panel-dev/1Panel/global"
+	"1Panel/global"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )

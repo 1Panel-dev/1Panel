@@ -1,7 +1,8 @@
 package migrations
 
 import (
-	"github.com/1Panel-dev/1Panel/app/entity"
+	"1Panel/app/model"
+
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
 )
@@ -9,12 +10,12 @@ import (
 var InitTable = &gormigrate.Migration{
 	ID: "20220803-init-table",
 	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(&entity.User{})
+		return tx.AutoMigrate(&model.User{})
 	},
 }
 
-var user = entity.User{
-	Name: "admin", Email: "admin@fit2cloud.com", NickName: "admin", Password: "Calong@2015",
+var user = model.User{
+	Name: "admin", Email: "admin@fit2cloud.com", Password: "Calong@2015",
 }
 
 var AddData = &gormigrate.Migration{

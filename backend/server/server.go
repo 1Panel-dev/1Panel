@@ -1,16 +1,18 @@
 package server
 
 import (
+	"1Panel/global"
+	"1Panel/init/db"
+	"1Panel/init/log"
+	"1Panel/init/migration"
+	"1Panel/init/router"
+	"1Panel/init/validator"
+	"1Panel/init/viper"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/global"
-	"github.com/1Panel-dev/1Panel/init/db"
-	"github.com/1Panel-dev/1Panel/init/log"
-	"github.com/1Panel-dev/1Panel/init/migration"
-	"github.com/1Panel-dev/1Panel/init/viper"
-	"github.com/1Panel-dev/1Panel/router"
+	"time"
+
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
-	"time"
 )
 
 func Start() {
@@ -18,6 +20,7 @@ func Start() {
 	log.Init()
 	db.Init()
 	migration.Init()
+	validator.Init()
 	routers := router.Routers()
 	address := fmt.Sprintf(":%d", global.Config.System.Port)
 	s := initServer(address, routers)

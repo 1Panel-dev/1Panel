@@ -10,11 +10,11 @@ jwt:
 
 
 mysql:
-  path: '127.0.0.1'
+  path: 'localhost'
   port: '3306'
-  db_name: '1panel'
+  db_name: '1Panel'
   username: 'root'
-  password: 'Calong@2015'
+  password: 'KubeOperator123@mysql'
   max_idle_conns: 10
   max_open_conns: 100
 

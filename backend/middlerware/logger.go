@@ -1,20 +1,21 @@
 package middlerware
 
 import (
-	"github.com/1Panel-dev/1Panel/app/entity"
-	"github.com/1Panel-dev/1Panel/global"
+	"1Panel/app/model"
+	"1Panel/global"
+
 	"github.com/gin-gonic/gin"
 )
 
 func Logger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		path := c.Request.URL.Path
-		operateLog := entity.OperateLog{
+		operateLog := model.OperateLog{
 			Path:      path,
 			IP:        c.ClientIP(),
 			UserAgent: c.Request.UserAgent(),
 		}
-		global.DB.Model(entity.OperateLog{}).Save(&operateLog)
+		global.DB.Model(model.OperateLog{}).Save(&operateLog)
 		c.Next()
 	}
 }
