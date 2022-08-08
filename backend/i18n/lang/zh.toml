@@ -1,3 +1,8 @@
 #common
-InvalidParams = "参数错误: {.detail}"
-JwtNotFound = "需要jwt校验"
+ErrInvalidParams = "请求参数错误: {.detail}"
+ErrTokenTimeOut = "登陆信息已过期: {.detail}"
+ErrCaptchaCode = "错误的验证码信息"
+ErrRecordExist = "记录已存在: {.detail}"
+ErrRecordNotFound = "记录未能找到: {.detail}"
+ErrStructTransform = "类型转换失败: {.detail}"
+ErrInternalServer = "服务内部错误: {.detail}"

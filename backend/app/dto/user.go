@@ -2,14 +2,17 @@ package dto
 
 import (
 	"time"
-
-	"github.com/1Panel-dev/1Panel/app/model"
 )
 
 type UserCreate struct {
 	Name     string `json:"name" validate:"name,required"`
 	Password string `json:"password" validate:"password,required"`
 	Email    string `json:"email" validate:"required,email"`
+}
+
+type CaptchaResponse struct {
+	CaptchaID string `json:"captchaID"`
+	ImagePath string `json:"imagePath"`
 }
 
 type UserUpdate struct {
@@ -22,10 +25,7 @@ type UserBack struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
-func (u UserCreate) UserCreateToMo() model.User {
-	return model.User{
-		Name:     u.Name,
-		Password: u.Password,
-		Email:    u.Email,
-	}
+type UserLoginInfo struct {
+	Name  string `json:"name"`
+	Token string `json:"token"`
 }

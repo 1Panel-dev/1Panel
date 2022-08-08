@@ -21,7 +21,7 @@ func Init() {
 	v.WatchConfig()
 	v.OnConfigChange(func(e fsnotify.Event) {
 		fmt.Println("config file changed:", e.Name)
-		if err := v.Unmarshal(&global.Config); err != nil {
+		if err := v.Unmarshal(&global.CONF); err != nil {
 			panic(err)
 		}
 	})
@@ -29,5 +29,5 @@ func Init() {
 	if err := v.Unmarshal(&serverConfig); err != nil {
 		panic(err)
 	}
-	global.Config = serverConfig
+	global.CONF = serverConfig
 }

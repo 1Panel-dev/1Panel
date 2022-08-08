@@ -12,8 +12,8 @@ import (
 
 func Init() {
 	l := logrus.New()
-	setOutput(l, global.Config.LogConfig)
-	global.Logger = l
+	setOutput(l, global.CONF.LogConfig)
+	global.LOG = l
 }
 
 func setOutput(log *logrus.Logger, config configs.LogConfig) {

@@ -13,8 +13,8 @@ func Init() {
 		migrations.AddData,
 	})
 	if err := m.Migrate(); err != nil {
-		global.Logger.Error(err)
+		global.LOG.Error(err)
 		panic(err)
 	}
-	global.Logger.Infof("Migration did run successfully")
+	global.LOG.Infof("Migration did run successfully")
 }

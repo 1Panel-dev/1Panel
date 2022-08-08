@@ -27,7 +27,7 @@ func Cors() gin.HandlerFunc {
 }
 
 func CorsByRules() gin.HandlerFunc {
-	mode := global.Config.CORS.Mode
+	mode := global.CONF.CORS.Mode
 	if mode == "allow-all" {
 		return Cors()
 	}
@@ -55,7 +55,7 @@ func CorsByRules() gin.HandlerFunc {
 }
 
 func checkCors(currentOrigin string) *configs.CORSWhiteList {
-	for _, whitelist := range global.Config.CORS.WhiteList {
+	for _, whitelist := range global.CONF.CORS.WhiteList {
 		if currentOrigin == whitelist.AllowOrigin {
 			return &whitelist
 		}

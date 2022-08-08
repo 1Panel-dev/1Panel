@@ -1,67 +1,80 @@
 package v1
 
 import (
-	"github.com/1Panel-dev/1Panel/constant/errres"
-	"strconv"
+	"errors"
 
+	"github.com/1Panel-dev/1Panel/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/app/dto"
+	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
-
+	"github.com/1Panel-dev/1Panel/utils/captcha"
 	"github.com/gin-gonic/gin"
 )
 
 type BaseApi struct{}
 
 func (b *BaseApi) Login(c *gin.Context) {
+	var req dto.Login
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamInReqBody, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamValid, err)
+		return
+	}
+	if err := captcha.VerifyCode(req.CaptchaID, req.Captcha); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamInReqBody, errors.New("captcha code error"))
+		return
+	}
 
+	user, err := userService.Login(c, req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, user)
+}
+
+func (b *BaseApi) Captcha(c *gin.Context) {
+	captcha, err := captcha.CreateCaptcha()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+	}
+	helper.SuccessWithData(c, captcha)
 }
 
 func (b *BaseApi) Register(c *gin.Context) {
 	var req dto.UserCreate
-	_ = c.ShouldBindJSON(&req)
-	res := dto.NewResult(c)
-
-	if err := global.Validator.Struct(req); err != nil {
-		res.ErrorWithDetail(errres.InvalidParam, err.Error())
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamInReqBody, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamValid, err)
 		return
 	}
 	if err := userService.Register(req); err != nil {
-		dto.NewResult(c).ErrorCode(500, err.Error())
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	res.Success()
+	helper.SuccessWithData(c, nil)
 }
 
 func (b *BaseApi) GetUserList(c *gin.Context) {
-	// 这里到时候一起拦截一下
-	p, ok1 := c.GetQuery("page")
-	ps, ok2 := c.GetQuery("pageSize")
-	res := dto.NewResult(c)
-
-	if !(ok1 && ok2) {
-		res.Error(errres.InvalidParam)
-		return
-	}
-	page, err := strconv.Atoi(p)
-	if err != nil {
-		global.Logger.Error("获取失败!", err)
-		dto.NewResult(c).ErrorCode(500, err.Error())
-		return
-	}
-	pageSize, err := strconv.Atoi(ps)
-	if err != nil {
-		global.Logger.Error("获取失败!", err)
-		dto.NewResult(c).ErrorCode(500, err.Error())
+	pagenation, isOK := helper.GeneratePaginationFromReq(c)
+	if !isOK {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamInReqQuery, constant.ErrPageParam)
 		return
 	}
 
-	total, list, err := userService.Page(page, pageSize)
+	total, list, err := userService.Page(pagenation.Page, pagenation.PageSize)
 	if err != nil {
-		global.Logger.Error("获取失败!", err)
-		dto.NewResult(c).ErrorCode(500, err.Error())
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	res.SuccessWithData(dto.PageResult{
+
+	helper.SuccessWithData(c, dto.PageResult{
 		Items: list,
 		Total: total,
 	})
@@ -69,54 +82,53 @@ func (b *BaseApi) GetUserList(c *gin.Context) {
 
 func (b *BaseApi) DeleteUser(c *gin.Context) {
 	var req dto.OperationWithName
-	_ = c.ShouldBindJSON(&req)
-	res := dto.NewResult(c)
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamInReqBody, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamValid, err)
+		return
+	}
 
-	if err := global.Validator.Struct(req); err != nil {
-		res.Error(errres.InvalidParam)
-		return
-	}
 	if err := userService.Delete(req.Name); err != nil {
-		global.Logger.Error("删除失败!", err)
-		dto.NewResult(c).ErrorCode(500, err.Error())
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	dto.NewResult(c).Success()
+	helper.SuccessWithData(c, nil)
 }
 
 func (b *BaseApi) UpdateUser(c *gin.Context) {
 	var req dto.UserUpdate
-	_ = c.ShouldBindJSON(&req)
-	res := dto.NewResult(c)
-
-	if err := global.Validator.Struct(req); err != nil {
-		res.Error(errres.InvalidParam)
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamInReqBody, err)
 		return
 	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamValid, err)
+		return
+	}
+
 	upMap := make(map[string]interface{})
 	upMap["email"] = req.Email
 	if err := userService.Update(upMap); err != nil {
-		global.Logger.Error("更新失败!", err)
-		dto.NewResult(c).ErrorCode(500, err.Error())
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	dto.NewResult(c).Success()
+	helper.SuccessWithData(c, nil)
 }
 
 func (b *BaseApi) GetUserInfo(c *gin.Context) {
 	name, ok := c.Params.Get("name")
-	res := dto.NewResult(c)
-
 	if !ok {
-		res.Error(errres.InvalidParam)
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamInReqQuery, errors.New("error name"))
 		return
 	}
 
 	user, err := userService.Get(name)
 	if err != nil {
-		global.Logger.Error("更新失败!", err)
-		dto.NewResult(c).ErrorCode(500, err.Error())
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	dto.NewResult(c).SuccessWithData(user)
+	helper.SuccessWithData(c, user)
 }

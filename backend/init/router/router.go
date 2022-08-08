@@ -1,6 +1,8 @@
 package router
 
 import (
+	"html/template"
+
 	"github.com/1Panel-dev/1Panel/docs"
 	"github.com/1Panel-dev/1Panel/i18n"
 	"github.com/1Panel-dev/1Panel/middleware"
@@ -9,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"html/template"
 )
 
 func Routers() *gin.Engine {

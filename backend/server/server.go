@@ -9,6 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/init/log"
 	"github.com/1Panel-dev/1Panel/init/migration"
 	"github.com/1Panel-dev/1Panel/init/router"
+	"github.com/1Panel-dev/1Panel/init/session"
 	"github.com/1Panel-dev/1Panel/init/validator"
 	"github.com/1Panel-dev/1Panel/init/viper"
 
@@ -22,12 +23,13 @@ func Start() {
 	db.Init()
 	migration.Init()
 	validator.Init()
+	session.Init()
 	routers := router.Routers()
-	address := fmt.Sprintf(":%d", global.Config.System.Port)
+	address := fmt.Sprintf(":%d", global.CONF.System.Port)
 	s := initServer(address, routers)
-	global.Logger.Info(fmt.Sprintf("server run success on %d", global.Config.System.Port))
+	global.LOG.Infof("server run success on %d", global.CONF.System.Port)
 	if err := s.ListenAndServe(); err != nil {
-		global.Logger.Error(err)
+		global.LOG.Error(err)
 		panic(err)
 	}
 }

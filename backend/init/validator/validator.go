@@ -20,14 +20,14 @@ func Init() {
 	if err := validator.RegisterValidation("password", checkPasswordPattern); err != nil {
 		panic(err)
 	}
-	global.Validator = validator
+	global.VALID = validator
 }
 
 func checkNamePattern(fl validator.FieldLevel) bool {
 	value := fl.Field().String()
 	result, err := regexp.MatchString("^[a-zA-Z\u4e00-\u9fa5]{1}[a-zA-Z0-9_\u4e00-\u9fa5]{0,30}$", value)
 	if err != nil {
-		global.Logger.Errorf("regexp matchString failed, %v", err)
+		global.LOG.Errorf("regexp matchString failed, %v", err)
 	}
 	return result
 }
@@ -36,7 +36,7 @@ func checkIpPattern(fl validator.FieldLevel) bool {
 	value := fl.Field().String()
 	result, err := regexp.MatchString(`^((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}$`, value)
 	if err != nil {
-		global.Logger.Errorf("regexp check ip matchString failed, %v", err)
+		global.LOG.Errorf("regexp check ip matchString failed, %v", err)
 	}
 	return result
 }
