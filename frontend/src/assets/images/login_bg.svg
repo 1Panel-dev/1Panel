@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" baseProfile="full" width="100%" height="100%" viewBox="0 0 1400 800">
+
+  <rect x="1300" y="400" rx="40" ry="40" width="150" height="150" stroke="rgb(129, 201, 149)" fill="rgb(129, 201, 149)">
+    <animateTransform attributeType="XML" attributeName="transform" begin="0s" dur="35s" type="rotate" from="0 1450 550" to="360 1450 550" repeatCount="indefinite"/>
+  </rect>
+
+  <path d="M 100 350 A 150 150 0 1 1 400 350 Q400 370 380 370 L 250 370 L 120 370 Q100 370 100 350" fill="#a2b3ff">
+    <animateMotion path="M 800 -200 L 800 -300 L 800 -200" dur="20s" begin="0s" repeatCount="indefinite"/>
+    <animateTransform attributeType="XML" attributeName="transform" begin="0s" dur="30s" type="rotate" values="0 210 530 ; -30 210 530 ; 0 210 530" keyTimes="0 ; 0.5 ; 1" repeatCount="indefinite"/>
+  </path>
+
+  <circle cx="150" cy="150" r="180" stroke="#85FFBD" fill="#85FFBD">
+    <animateMotion path="M 0 0 L 40 20 Z" dur="5s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- 三角形 -->
+  <path d="M 165 580 L 270 580 Q275 578 270 570 L 223 483 Q220 480 217 483 L 165 570 Q160 578 165 580"  fill="#a2b3ff">
+    <animateTransform attributeType="XML" attributeName="transform" begin="0s" dur="35s" type="rotate" from="0 210 530" to="360 210 530" repeatCount="indefinite"/>
+  </path>
+
+<!--  <circle cx="1200" cy="600" r="30" stroke="rgb(241, 243, 244)" fill="rgb(241, 243, 244)">-->
+<!--    <animateMotion path="M 0 0 L -20 40 Z" dur="9s" repeatCount="indefinite"/>-->
+<!--  </circle>-->
+
+  <path d="M 100 350 A 40 40 0 1 1 180 350 L 180 430 A 40 40 0 1 1 100 430 Z" fill="#3054EB">
+    <animateMotion path="M 140 390 L 180 360 L 140 390" dur="20s" begin="0s" repeatCount="indefinite"/>
+    <animateTransform attributeType="XML" attributeName="transform" begin="0s" dur="30s" type="rotate" values="0 140 390; -60 140 390; 0 140 390" keyTimes="0 ; 0.5 ; 1" repeatCount="indefinite"/>
+  </path>
+
+  <rect x="400" y="600" rx="40" ry="40" width="100" height="100" stroke="rgb(129, 201, 149)" fill="#3054EB">
+    <animateTransform attributeType="XML" attributeName="transform" begin="0s" dur="35s" type="rotate" from="-30 550 750" to="330 550 750" repeatCount="indefinite"/>
+  </rect>
+</svg>
