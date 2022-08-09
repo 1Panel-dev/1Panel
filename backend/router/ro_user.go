@@ -12,10 +12,11 @@ type UserRouter struct{}
 func (s *UserRouter) InitUserRouter(Router *gin.RouterGroup) {
 	userRouter := Router.Group("users")
 	userRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
+	withRecordRouter := userRouter.Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		userRouter.POST("", baseApi.Register)
-		userRouter.DELETE("", baseApi.DeleteUser)
+		withRecordRouter.POST("", baseApi.Register)
+		withRecordRouter.DELETE("", baseApi.DeleteUser)
 		userRouter.GET("", baseApi.GetUserList)
 		userRouter.GET(":name", baseApi.GetUserInfo)
 	}

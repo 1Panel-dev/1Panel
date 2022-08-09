@@ -9,6 +9,7 @@ type ServiceGroup struct {
 var ServiceGroupApp = new(ServiceGroup)
 
 var (
-	userRepo   = repo.RepoGroupApp.UserRepo
-	commonRepo = repo.RepoGroupApp.CommonRepo
+	userRepo      = repo.RepoGroupApp.UserRepo
+	operationRepo = repo.RepoGroupApp.OperationRepo
+	commonRepo    = repo.RepoGroupApp.CommonRepo
 )

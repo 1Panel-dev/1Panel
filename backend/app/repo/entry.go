@@ -2,6 +2,7 @@ package repo
 
 type RepoGroup struct {
 	UserRepo
+	OperationRepo
 	CommonRepo
 }
 

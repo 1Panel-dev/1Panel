@@ -24,3 +24,10 @@ var AddData = &gormigrate.Migration{
 		return tx.Create(&user).Error
 	},
 }
+
+var AddTableOperationLog = &gormigrate.Migration{
+	ID: "20200809-add-table-operation-log",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.OperationLog{})
+	},
+}

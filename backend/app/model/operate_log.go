@@ -1,15 +1,27 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"time"
 
-type OperateLog struct {
+	"gorm.io/gorm"
+)
+
+type OperationLog struct {
 	gorm.Model
-	Name      string `gorm:"type:varchar(64)"`
-	Type      string `gorm:"type:varchar(64)"`
-	User      string `gorm:"type:varchar(64)"`
-	Path      string `gorm:"type:varchar(64)"`
-	IP        string `gorm:"type:varchar(64)"`
-	UserAgent string `gorm:"type:varchar(64)"`
-	Source    string `gorm:"type:varchar(64)"`
-	Detail    string `gorm:"type:longText"`
+	Group  string `gorm:"type:varchar(64)" json:"type"`
+	Source string `gorm:"type:varchar(64)" json:"source"`
+	Action string `gorm:"type:varchar(64)" json:"action"`
+
+	IP        string `gorm:"type:varchar(64)" json:"ip"`
+	Path      string `gorm:"type:varchar(64)" json:"path"`
+	Method    string `gorm:"type:varchar(64)" json:"method"`
+	UserAgent string `gorm:"type:varchar(64)" json:"userAgent"`
+	Body      string `gorm:"type:text(65535)" json:"body"`
+	Resp      string `gorm:"type:text(65535)" json:"resp"`
+
+	Status       int           `gorm:"type:varchar(64)" json:"status"`
+	Latency      time.Duration `gorm:"type:varchar(64)" json:"latency"`
+	ErrorMessage string        `gorm:"type:varchar(256)" json:"errorMessage"`
+
+	Detail string `gorm:"type:longText" json:"detail"`
 }
