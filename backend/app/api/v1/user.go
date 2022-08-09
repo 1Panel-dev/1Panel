@@ -1,7 +1,7 @@
 package v1
 
 import (
-	"errors"
+	"github.com/pkg/errors"
 
 	"github.com/1Panel-dev/1Panel/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/app/dto"
@@ -16,15 +16,15 @@ type BaseApi struct{}
 func (b *BaseApi) Login(c *gin.Context) {
 	var req dto.Login
 	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamInReqBody, err)
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamValid, err)
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 	if err := captcha.VerifyCode(req.CaptchaID, req.Captcha); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamInReqBody, errors.New("captcha code error"))
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 
@@ -47,11 +47,11 @@ func (b *BaseApi) Captcha(c *gin.Context) {
 func (b *BaseApi) Register(c *gin.Context) {
 	var req dto.UserCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamInReqBody, err)
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamValid, err)
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 	if err := userService.Register(req); err != nil {
@@ -64,7 +64,7 @@ func (b *BaseApi) Register(c *gin.Context) {
 func (b *BaseApi) GetUserList(c *gin.Context) {
 	pagenation, isOK := helper.GeneratePaginationFromReq(c)
 	if !isOK {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamInReqQuery, constant.ErrPageParam)
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, constant.ErrPageGenerate)
 		return
 	}
 
@@ -83,11 +83,11 @@ func (b *BaseApi) GetUserList(c *gin.Context) {
 func (b *BaseApi) DeleteUser(c *gin.Context) {
 	var req dto.OperationWithName
 	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamInReqBody, err)
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamValid, err)
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 
@@ -101,11 +101,11 @@ func (b *BaseApi) DeleteUser(c *gin.Context) {
 func (b *BaseApi) UpdateUser(c *gin.Context) {
 	var req dto.UserUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamInReqBody, err)
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamValid, err)
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 
@@ -121,7 +121,7 @@ func (b *BaseApi) UpdateUser(c *gin.Context) {
 func (b *BaseApi) GetUserInfo(c *gin.Context) {
 	name, ok := c.Params.Get("name")
 	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeParamInReqQuery, errors.New("error name"))
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error name"))
 		return
 	}
 

@@ -1,3 +1,0 @@
-#common
-InvalidParams = "parameter validation error {.detail}"
-JwtNotFound = ""

@@ -23,7 +23,7 @@ func JwtAuth() gin.HandlerFunc {
 		j := jwtUtils.NewJWT()
 		claims, err := j.ParseToken(token)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeToken, err)
+			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeInternalServer, err)
 			return
 		}
 		if claims.ExpiresAt.Unix()-time.Now().Unix() < claims.BufferTime {

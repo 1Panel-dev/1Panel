@@ -62,24 +62,11 @@ func (j *JWT) ParseToken(tokenStr string) (*JwtRequest, error) {
 	token, err := jwt.ParseWithClaims(tokenStr, &JwtRequest{}, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil
 	})
-	if err != nil {
-		if ve, ok := err.(*jwt.ValidationError); ok {
-			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
-				return nil, constant.ErrTokenMalformed
-			} else if ve.Errors&jwt.ValidationErrorExpired != 0 {
-				return nil, constant.ErrTokenExpired
-			} else if ve.Errors&jwt.ValidationErrorNotValidYet != 0 {
-				return nil, constant.ErrTokenNotValidYet
-			} else {
-				return nil, constant.ErrTokenInvalid
-			}
-		}
-	}
-	if token == nil {
-		return nil, constant.ErrTokenInvalid
+	if err != nil || token == nil {
+		return nil, constant.ErrTokenParse
 	}
 	if claims, ok := token.Claims.(*JwtRequest); ok && token.Valid {
 		return claims, nil
 	}
-	return nil, constant.ErrTokenInvalid
+	return nil, constant.ErrTokenParse
 }

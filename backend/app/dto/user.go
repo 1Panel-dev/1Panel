@@ -6,7 +6,7 @@ import (
 
 type UserCreate struct {
 	Name     string `json:"name" validate:"name,required"`
-	Password string `json:"password" validate:"password,required"`
+	Password string `json:"password" validate:"required"`
 	Email    string `json:"email" validate:"required,email"`
 }
 

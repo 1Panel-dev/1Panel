@@ -14,24 +14,22 @@ const (
 	CodeErrHeader         = 406
 )
 
+// internal
 var (
-	ErrTypeToken        = "ErrToken"
-	ErrTypeTokenExpired = "ErrTokenExpired"
+	ErrCaptchaCode     = errors.New("ErrCaptchaCode")
+	ErrRecordExist     = errors.New("ErrRecordExist")
+	ErrRecordNotFound  = errors.New("ErrRecordNotFound")
+	ErrStructTransform = errors.New("ErrStructTransform")
 
-	ErrTypeParamInReqBody  = "ErrParamInReqBody"
-	ErrTypeParamInReqQuery = "ErrParamInReqQuery"
-	ErrTypeInternalServer  = "ErrInternalServer"
-	ErrTypeParamValid      = "ErrParamValid"
+	ErrTokenParse = errors.New("ErrTokenParse")
+
+	ErrPageGenerate = errors.New("generate page info failed")
 )
 
+// api
 var (
-	ErrTokenExpired     = errors.New("token is expired")
-	ErrTokenNotValidYet = errors.New("token not active yet")
-	ErrTokenMalformed   = errors.New("that's not even a token")
-	ErrTokenInvalid     = errors.New("couldn't handle this token")
-
-	ErrCaptchaCode   = errors.New("captcha code error")
-	ErrPageParam     = errors.New("paging parameter error")
-	ErrRecordExist   = errors.New("record already exists")
-	ErrCopyTransform = errors.New("type conversion failure")
+	ErrTypeInternalServer = "ErrInternalServer"
+	ErrTypeInvalidParams  = "ErrInvalidParams"
+	ErrTypeToken          = "ErrToken"
+	ErrTypeTokenTimeOut   = "ErrTokenTimeOut"
 )

@@ -1,7 +1,7 @@
 package service
 
 import (
-	"errors"
+	"github.com/pkg/errors"
 
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/app/model"
@@ -11,8 +11,6 @@ import (
 	"github.com/1Panel-dev/1Panel/utils/jwt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
-
-	"gorm.io/gorm"
 )
 
 type UserService struct{}
@@ -38,7 +36,7 @@ func (u *UserService) Get(name string) (*dto.UserBack, error) {
 	}
 	var dtoUser dto.UserBack
 	if err := copier.Copy(&dtoUser, &user); err != nil {
-		return nil, constant.ErrCopyTransform
+		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 	return &dtoUser, err
 }
@@ -49,7 +47,7 @@ func (u *UserService) Page(page, size int) (int64, interface{}, error) {
 	for _, user := range users {
 		var item dto.UserBack
 		if err := copier.Copy(&item, &user); err != nil {
-			return 0, nil, constant.ErrCopyTransform
+			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
 		dtoUsers = append(dtoUsers, item)
 	}
@@ -59,10 +57,11 @@ func (u *UserService) Page(page, size int) (int64, interface{}, error) {
 func (u *UserService) Register(userDto dto.UserCreate) error {
 	var user model.User
 	if err := copier.Copy(&user, &userDto); err != nil {
-		return constant.ErrCopyTransform
+		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
-	if !errors.Is(global.DB.Where("name = ?", user.Name).First(&user).Error, gorm.ErrRecordNotFound) {
-		return constant.ErrRecordExist
+	_ = global.DB.Where("name = ?", user.Name).First(&user).Error
+	if user.ID != 0 {
+		return errors.Wrap(constant.ErrRecordExist, "data exist")
 	}
 	return userRepo.Create(&user)
 }
@@ -70,7 +69,7 @@ func (u *UserService) Register(userDto dto.UserCreate) error {
 func (u *UserService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error) {
 	user, err := userRepo.Get(commonRepo.WithByName(info.Name))
 	if err != nil {
-		return nil, err
+		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
 	}
 	pass, err := encrypt.StringDecrypt(user.Password)
 	if err != nil {

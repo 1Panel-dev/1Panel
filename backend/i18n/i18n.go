@@ -6,8 +6,8 @@ import (
 	ginI18n "github.com/gin-contrib/i18n"
 	"github.com/gin-gonic/gin"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"github.com/pelletier/go-toml/v2"
 	"golang.org/x/text/language"
+	"gopkg.in/yaml.v2"
 )
 
 func GetMsg(msg string) string {
@@ -40,8 +40,8 @@ func GinI18nLocalize() gin.HandlerFunc {
 			RootPath:         "./lang",
 			AcceptLanguage:   []language.Tag{language.Chinese, language.English},
 			DefaultLanguage:  language.Chinese,
-			FormatBundleFile: "toml",
-			UnmarshalFunc:    toml.Unmarshal,
+			FormatBundleFile: "yaml",
+			UnmarshalFunc:    yaml.Unmarshal,
 			Loader:           &ginI18n.EmbedLoader{FS: fs},
 		}),
 		ginI18n.WithGetLngHandle(

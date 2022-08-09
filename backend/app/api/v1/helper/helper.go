@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/pkg/errors"
+
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/i18n"
@@ -32,7 +34,23 @@ func GeneratePaginationFromReq(c *gin.Context) (dto.PageInfo, bool) {
 func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 	res := dto.Response{
 		Code: code,
-		Msg:  i18n.GetMsgWithMap(msgKey, map[string]interface{}{"detail": err}),
+		Msg:  "",
+	}
+	if msgKey == constant.ErrTypeInternalServer {
+		switch {
+		case errors.Is(err, constant.ErrRecordExist):
+			res.Msg = i18n.GetMsgWithMap("ErrRecordExist", map[string]interface{}{"detail": err})
+		case errors.Is(constant.ErrRecordNotFound, err):
+			res.Msg = i18n.GetMsgWithMap("ErrRecordNotFound", map[string]interface{}{"detail": err})
+		case errors.Is(constant.ErrStructTransform, err):
+			res.Msg = i18n.GetMsgWithMap("ErrStructTransform", map[string]interface{}{"detail": err})
+		case errors.Is(constant.ErrCaptchaCode, err):
+			res.Msg = i18n.GetMsgWithMap("ErrCaptchaCode", map[string]interface{}{"detail": err})
+		default:
+			res.Msg = i18n.GetMsgWithMap(msgKey, map[string]interface{}{"detail": err})
+		}
+	} else {
+		res.Msg = i18n.GetMsgWithMap(msgKey, map[string]interface{}{"detail": err})
 	}
 	ctx.JSON(http.StatusOK, res)
 	ctx.Abort()
