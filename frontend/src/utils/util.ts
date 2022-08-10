@@ -205,3 +205,26 @@ export function filterEnum(
     if (type == 'tag') return filterData?.tagType ? filterData.tagType : '';
     return filterData ? filterData[label] : '--';
 }
+/**
+ * 对日期进行格式化，默认yyyy-MM-dd HH:mm:ss
+ * @param dataStr 要格式化的日期
+ * @return String
+ */
+
+export function dateFromat(row: number, col: number, dataStr: any) {
+    const date = new Date(dataStr);
+    const y = date.getFullYear();
+    let m: string | number = date.getMonth() + 1;
+    m = m < 10 ? `0${String(m)}` : m;
+    let d: string | number = date.getDate();
+    d = d < 10 ? `0${String(d)}` : d;
+    let h: string | number = date.getHours();
+    h = h < 10 ? `0${String(h)}` : h;
+    let minute: string | number = date.getMinutes();
+    minute = minute < 10 ? `0${String(minute)}` : minute;
+    let second: string | number = date.getSeconds();
+    second = second < 10 ? `0${String(second)}` : second;
+    return `${String(y)}-${String(m)}-${String(d)}   ${String(h)}:${String(
+        minute,
+    )}:${String(second)}`;
+}

@@ -23,12 +23,12 @@
             box-sizing: border-box;
             width: 100%;
             height: 100%;
-            padding: 20px;
+            padding: 15px;
             overflow: auto;
             overflow-x: hidden !important;
             background-color: #ffffff;
             border-radius: 4px;
-            box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+            // box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
             &::-webkit-scrollbar {
                 background-color: white;
             }

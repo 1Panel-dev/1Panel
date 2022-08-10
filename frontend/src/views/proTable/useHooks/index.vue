@@ -268,9 +268,9 @@ import { genderType } from '@/utils/serviceDict';
 import { defaultFormat } from '@/utils/util';
 import { User } from '@/api/interface';
 import { useDownload } from '@/hooks/useDownload';
-import { useHandleData } from '@/hooks/useHandleData';
+import { useHandleData } from '@/hooks/useDeleteData';
 import { useSelection } from '@/hooks/useSelection';
-import { useAuthButtons } from '@/hooks/useAuthButtons';
+// import { useAuthButtons } from '@/hooks/useAuthButtons';
 import { useTable } from '@/hooks/useTable';
 import ImportExcel from '@/components/ImportExcel/index.vue';
 import UserDrawer from '@/views/proTable/components/UserDrawer.vue';
@@ -325,8 +325,15 @@ const { isSelected, selectedListIds, selectionChange, getRowKeys } =
     useSelection();
 
 // 页面按钮权限
-const { BUTTONS } = useAuthButtons();
+// const { BUTTONS } = useAuthButtons();
 
+const BUTTONS = {
+    status: true,
+    view: true,
+    reset: true,
+    edit: true,
+    delete: true,
+};
 // 设置搜索表单默认参数
 searchInitParam.value = {
     createTime: ['2022-04-05 00:00:00', '2022-05-10 23:59:59'],

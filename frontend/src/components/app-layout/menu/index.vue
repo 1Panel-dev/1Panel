@@ -2,7 +2,6 @@
     <div
         class="menu"
         :style="{ width: isCollapse ? '65px' : '220px' }"
-        v-loading="loading"
         element-loading-text="Loading..."
         :element-loading-spinner="loadingSvg"
         element-loading-svg-view-box="-10, -10, 50, 50"

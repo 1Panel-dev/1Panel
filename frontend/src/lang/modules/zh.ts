@@ -1,6 +1,27 @@
 export default {
+    commons: {
+        button: {
+            create: '创建',
+            delete: '删除',
+            edit: '编辑',
+            confirm: '确认',
+            cancel: '取消',
+        },
+        table: {
+            name: '名称',
+            createdAt: '创建时间',
+            updatedAt: '更新时间',
+            operate: '操作',
+        },
+        msg: {
+            delete: '此操作不可回滚,是否继续',
+            title: '删除',
+            deleteSuccess: '删除成功',
+        },
+    },
     menu: {
         home: '概览',
+        demo: '样例',
     },
 
     home: {

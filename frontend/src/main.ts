@@ -5,6 +5,7 @@ import '@/styles/common.scss';
 import '@/assets/iconfont/iconfont.scss';
 import '@/assets/fonts/font.scss';
 import ElementPlus from 'element-plus';
+import Fit2CloudPlus from 'fit2cloud-ui-plus';
 import * as Icons from '@element-plus/icons-vue';
 import 'element-plus/dist/index.css';
 import 'element-plus/theme-chalk/dark/css-vars.css';
@@ -26,4 +27,5 @@ app.use(router)
     .use(pinia)
     .use(directives)
     .use(ElementPlus)
+    .use(Fit2CloudPlus)
     .mount('#app');

@@ -107,7 +107,7 @@ import { ref, reactive } from 'vue';
 import { ElMessage } from 'element-plus';
 import { User } from '@/api/interface';
 import { ColumnProps } from '@/components/ProTable/interface';
-import { useHandleData } from '@/hooks/useHandleData';
+import { useHandleData } from '@/hooks/useDeleteData';
 import { useDownload } from '@/hooks/useDownload';
 import ProTable from '@/components/ProTable/index.vue';
 import ImportExcel from '@/components/ImportExcel/index.vue';

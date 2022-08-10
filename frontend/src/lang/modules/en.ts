@@ -1,6 +1,27 @@
 export default {
+    commons: {
+        button: {
+            create: 'Create',
+            delete: 'Delete',
+            edit: 'Edit',
+            confirm: 'Confirm',
+            cancel: 'Cancel',
+        },
+        table: {
+            name: 'Name',
+            createdAt: 'Creation Time',
+            updatedAt: 'Update Time',
+            operate: 'Operations',
+        },
+        msg: {
+            delete: 'This operation cannot be rolled back. Do you want to continue',
+            title: 'Delete',
+            deleteSuccess: 'Delete Success',
+        },
+    },
     menu: {
         home: 'Dashboard',
+        demo: 'Demo',
     },
     home: {
         welcome: 'Welcome',

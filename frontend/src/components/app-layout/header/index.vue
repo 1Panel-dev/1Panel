@@ -21,7 +21,6 @@
         </div>
     </div>
 </template>
-
 <script setup lang="ts">
 import { computed } from 'vue';
 import CollapseIcon from './components/CollapseIcon.vue';

@@ -12,6 +12,7 @@ import importToCDN from 'vite-plugin-cdn-import';
 // import AutoImport from "unplugin-auto-import/vite";
 // import Components from "unplugin-vue-components/vite";
 // import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
+import DefineOptions from 'unplugin-vue-define-options/vite';
 
 // @see: https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
@@ -31,7 +32,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         css: {
             preprocessorOptions: {
                 scss: {
-                    additionalData: `@import "@/styles/var.scss";`,
+                    additionalData: `@use "@/styles/var.scss" as *;`,
                 },
             },
         },
@@ -62,6 +63,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
                     },
                 },
             }),
+            DefineOptions(),
             // * EsLint 报错信息显示在浏览器界面上
             eslintPlugin(),
             // * vite 可以使用 jsx/tsx 语法
