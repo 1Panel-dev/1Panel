@@ -49,12 +49,7 @@ func (j *JWT) CreateClaims(baseClaims BaseClaims) CustomClaims {
 }
 
 func (j *JWT) CreateToken(request CustomClaims) (string, error) {
-	request.RegisteredClaims = jwt.RegisteredClaims{
-		Issuer:    global.CONF.JWT.Issuer,
-		NotBefore: jwt.NewNumericDate(time.Now()),
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(global.CONF.JWT.ExpiresTime))),
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, &request)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &request)
 	return token.SignedString(j.SigningKey)
 }
 

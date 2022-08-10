@@ -20,7 +20,7 @@ router.beforeEach((to, from, next) => {
 
     // * 判断是否有Token
     const globalStore = GlobalStore();
-    if (!globalStore.token) {
+    if (!globalStore.isLogin) {
         next({
             path: '/login',
         });

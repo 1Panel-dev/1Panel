@@ -2,6 +2,7 @@ package i18n
 
 import (
 	"embed"
+	"strings"
 
 	ginI18n "github.com/gin-contrib/i18n"
 	"github.com/gin-gonic/gin"
@@ -20,10 +21,18 @@ func GetMsg(msg string) string {
 }
 
 func GetMsgWithMap(msg string, maps map[string]interface{}) string {
-	content := ginI18n.MustGetMessage(&i18n.LocalizeConfig{
-		MessageID:    msg,
-		TemplateData: maps,
-	})
+	content := ""
+	if maps == nil {
+		content = ginI18n.MustGetMessage(&i18n.LocalizeConfig{
+			MessageID: msg,
+		})
+	} else {
+		content = ginI18n.MustGetMessage(&i18n.LocalizeConfig{
+			MessageID:    msg,
+			TemplateData: maps,
+		})
+	}
+	content = strings.ReplaceAll(content, ": <no value>", "")
 	if content == "" {
 		return msg
 	} else {

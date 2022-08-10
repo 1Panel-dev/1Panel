@@ -13,7 +13,7 @@ export interface ThemeConfigProp {
 
 /* GlobalState */
 export interface GlobalState {
-    token: string;
+    isLogin: boolean;
     userInfo: any;
     assemblySize: string;
     language: string;

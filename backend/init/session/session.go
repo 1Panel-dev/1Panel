@@ -16,3 +16,8 @@ func Init() {
 	}
 	global.SESSION = cs
 }
+
+type SessionUser struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+}

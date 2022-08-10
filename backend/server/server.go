@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/gob"
 	"fmt"
 	"time"
 
@@ -23,6 +24,7 @@ func Start() {
 	db.Init()
 	migration.Init()
 	validator.Init()
+	gob.Register(session.SessionUser{})
 	session.Init()
 	routers := router.Routers()
 	address := fmt.Sprintf(":%d", global.CONF.System.Port)

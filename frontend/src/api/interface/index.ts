@@ -1,12 +1,14 @@
 // * 请求响应参数(不包含data)
 export interface Result {
-    code: string;
-    msg: string;
+    code: number;
+    message: string;
 }
 
 // * 请求响应参数(包含data)
-export interface ResultData<T = any> extends Result {
-    data?: T;
+export interface ResultData {
+    code: number;
+    message: string;
+    data: any;
 }
 
 // * 分页响应参数
@@ -31,11 +33,25 @@ export interface CommonModel {
 // * 登录模块
 export namespace Login {
     export interface ReqLoginForm {
-        username: string;
+        name: string;
         password: string;
+        captcha: string;
+        captchaID: string;
+        authMethod: string;
     }
     export interface ResLogin {
-        access_token: string;
+        code: number;
+        data: logInfo;
+        message: string;
+    }
+    export interface logInfo {
+        name: string;
+        token: string;
+    }
+    export interface ResCaptcha {
+        imagePath: string;
+        captchaID: string;
+        captchaLength: number;
     }
     export interface ResAuthButtons {
         [propName: string]: any;

@@ -7,6 +7,7 @@ import (
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/init/session"
 	"github.com/1Panel-dev/1Panel/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/utils/jwt"
 	"github.com/gin-gonic/gin"
@@ -95,12 +96,15 @@ func (u *UserService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo,
 	if sID != "" {
 		c.SetCookie(global.CONF.Session.SessionName, "", -1, "", "", false, false)
 	}
-	session, err := global.SESSION.New(c.Request, global.CONF.Session.SessionName)
+	sessionItem, err := global.SESSION.Get(c.Request, global.CONF.Session.SessionName)
 	if err != nil {
 		return nil, err
 	}
-	session.Values[global.CONF.Session.SessionUserKey] = user
-	if err := global.SESSION.Save(c.Request, c.Writer, session); err != nil {
+	sessionItem.Values[global.CONF.Session.SessionUserKey] = session.SessionUser{
+		ID:   user.ID,
+		Name: user.Name,
+	}
+	if err := global.SESSION.Save(c.Request, c.Writer, sessionItem); err != nil {
 		return nil, err
 	}
 
