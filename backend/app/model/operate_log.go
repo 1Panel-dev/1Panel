@@ -15,7 +15,7 @@ type OperationLog struct {
 	IP        string `gorm:"type:varchar(64)" json:"ip"`
 	Path      string `gorm:"type:varchar(64)" json:"path"`
 	Method    string `gorm:"type:varchar(64)" json:"method"`
-	UserAgent string `gorm:"type:varchar(64)" json:"userAgent"`
+	UserAgent string `gorm:"type:text(65535)" json:"userAgent"`
 	Body      string `gorm:"type:text(65535)" json:"body"`
 	Resp      string `gorm:"type:text(65535)" json:"resp"`
 
