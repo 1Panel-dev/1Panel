@@ -23,12 +23,7 @@ export function wrapperEnv(envConf: Recordable): ViteEnv {
 
     for (const envName of Object.keys(envConf)) {
         let realName = envConf[envName].replace(/\\n/g, '\n');
-        realName =
-            realName === 'true'
-                ? true
-                : realName === 'false'
-                ? false
-                : realName;
+        realName = realName === 'true' ? true : realName === 'false' ? false : realName;
 
         if (envName === 'VITE_PORT') {
             realName = Number(realName);
@@ -49,16 +44,11 @@ export function wrapperEnv(envConf: Recordable): ViteEnv {
  * @param match prefix
  * @param confFiles ext
  */
-export function getEnvConfig(
-    match = 'VITE_GLOB_',
-    confFiles = ['.env', '.env.production'],
-) {
+export function getEnvConfig(match = 'VITE_GLOB_', confFiles = ['.env', '.env.production']) {
     let envConfig = {};
     confFiles.forEach((item) => {
         try {
-            const env = dotenv.parse(
-                fs.readFileSync(path.resolve(process.cwd(), item)),
-            );
+            const env = dotenv.parse(fs.readFileSync(path.resolve(process.cwd(), item)));
             envConfig = { ...envConfig, ...env };
         } catch (error) {
             console.error(`Error in parsing ${item}`, error);

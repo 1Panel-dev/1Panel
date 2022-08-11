@@ -1,32 +1,16 @@
 <template>
     <LayoutContent :header="'样例'">
-        <ComplexTable
-            :pagination-config="paginationConfig"
-            v-model:selects="selects"
-            :data="data"
-            @search="search"
-        >
+        <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
             <template #toolbar>
-                <el-button type="primary">{{
-                    $t('commons.button.create')
-                }}</el-button>
+                <el-button type="primary">{{ $t('commons.button.create') }}</el-button>
                 <el-button type="primary" plain>{{ '其他操作' }}</el-button>
-                <el-button
-                    type="danger"
-                    plain
-                    :disabled="selects.length === 0"
-                    @click="batchDelete"
-                    >{{ $t('commons.button.delete') }}</el-button
-                >
+                <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete">{{
+                    $t('commons.button.delete')
+                }}</el-button>
             </template>
             <el-table-column type="selection" fix />
             <el-table-column label="ID" min-width="100" prop="ID" fix />
-            <el-table-column
-                :label="$t('commons.table.name')"
-                min-width="100"
-                prop="name"
-                fix
-            >
+            <el-table-column :label="$t('commons.table.name')" min-width="100" prop="name" fix>
                 <template #default="{ row }">
                     <fu-input-rw-switch v-model="row.name" size="mini" />
                 </template>
@@ -39,11 +23,7 @@
                 show-overflow-tooltip
                 width="200"
             />
-            <fu-table-operations
-                :buttons="buttons"
-                :label="$t('commons.table.operate')"
-                fix
-            />
+            <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
         </ComplexTable>
     </LayoutContent>
 </template>
@@ -101,11 +81,7 @@ const batchDelete = async () => {
     selects.value.forEach((item: User.User) => {
         ids.push(item.ID);
     });
-    await useDeleteData(
-        deleteUser,
-        { ids: ids },
-        i18n.global.t('commons.msg.delete'),
-    );
+    await useDeleteData(deleteUser, { ids: ids }, i18n.global.t('commons.msg.delete'));
 };
 
 const search = async () => {

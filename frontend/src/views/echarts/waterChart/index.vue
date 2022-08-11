@@ -10,9 +10,7 @@ import 'echarts-liquidfill';
 
 const echartsRef = ref<HTMLElement>();
 onMounted(() => {
-    let myChart: echarts.ECharts = echarts.init(
-        echartsRef.value as HTMLElement,
-    );
+    let myChart: echarts.ECharts = echarts.init(echartsRef.value as HTMLElement);
     let value = 0.5;
     let data = [value, value, value];
     let option: echarts.EChartsCoreOption = {
@@ -145,22 +143,16 @@ onMounted(() => {
                         value: 100,
                         itemStyle: {
                             normal: {
-                                color: new echarts.graphic.LinearGradient(
-                                    0,
-                                    0,
-                                    0,
-                                    1,
-                                    [
-                                        {
-                                            offset: 0,
-                                            color: '#fefefe',
-                                        },
-                                        {
-                                            offset: 1,
-                                            color: '#e7e8ea',
-                                        },
-                                    ],
-                                ),
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    {
+                                        offset: 0,
+                                        color: '#fefefe',
+                                    },
+                                    {
+                                        offset: 1,
+                                        color: '#e7e8ea',
+                                    },
+                                ]),
                             },
                         },
                     },
@@ -248,22 +240,16 @@ onMounted(() => {
                         value: 100,
                         itemStyle: {
                             normal: {
-                                color: new echarts.graphic.LinearGradient(
-                                    0,
-                                    0,
-                                    0,
-                                    1,
-                                    [
-                                        {
-                                            offset: 0,
-                                            color: '#fefefe',
-                                        },
-                                        {
-                                            offset: 1,
-                                            color: '#e7e8ea',
-                                        },
-                                    ],
-                                ),
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    {
+                                        offset: 0,
+                                        color: '#fefefe',
+                                    },
+                                    {
+                                        offset: 1,
+                                        color: '#e7e8ea',
+                                    },
+                                ]),
                             },
                         },
                     },

@@ -1,9 +1,6 @@
 <template>
     <template v-for="subItem in menuList" :key="subItem.path">
-        <el-sub-menu
-            v-if="subItem.children && subItem.children.length > 1"
-            :index="subItem.path"
-        >
+        <el-sub-menu v-if="subItem.children && subItem.children.length > 1" :index="subItem.path">
             <template #title>
                 <el-icon>
                     <component :is="subItem.meta?.icon"></component>
@@ -12,10 +9,7 @@
             </template>
             <SubItem :menuList="subItem.children" />
         </el-sub-menu>
-        <el-menu-item
-            v-else-if="subItem.children && subItem.children.length === 1"
-            :index="subItem.children[0].path"
-        >
+        <el-menu-item v-else-if="subItem.children && subItem.children.length === 1" :index="subItem.children[0].path">
             <el-icon>
                 <component :is="subItem.meta?.icon"></component>
             </el-icon>
@@ -31,9 +25,7 @@
                 <span>{{ subItem.meta?.title }}</span>
             </template>
             <template v-else #title>
-                <a class="menu-href" :href="subItem.isLink" target="_blank">{{
-                    subItem.meta?.title
-                }}</a>
+                <a class="menu-href" :href="subItem.isLink" target="_blank">{{ subItem.meta?.title }}</a>
             </template>
         </el-menu-item>
     </template>

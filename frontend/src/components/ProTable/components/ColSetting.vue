@@ -5,10 +5,7 @@
             <el-table height="575" :data="colSetting" :border="true">
                 <el-table-column prop="label" label="列名" />
                 <el-table-column prop="name" label="显示" v-slot="scope">
-                    <el-switch
-                        v-model="scope.row.isShow"
-                        @click="switchShow"
-                    ></el-switch>
+                    <el-switch v-model="scope.row.isShow" @click="switchShow"></el-switch>
                 </el-table-column>
                 <template #empty>
                     <div class="table-empty">

@@ -1,11 +1,7 @@
 <template>
     <div>
         <el-tooltip effect="dark" content="布局设置" placement="bottom">
-            <i
-                :class="'iconfont icon-zhuti'"
-                class="icon-style"
-                @click="openDrawer"
-            ></i>
+            <i :class="'iconfont icon-zhuti'" class="icon-style" @click="openDrawer"></i>
         </el-tooltip>
         <el-drawer v-model="drawerVisible" title="布局设置" size="300px">
             <el-divider class="divider" content-position="center">
@@ -14,11 +10,7 @@
             </el-divider>
             <div class="theme-item">
                 <span>主题颜色</span>
-                <el-color-picker
-                    v-model="themeConfig.primary"
-                    :predefine="colorList"
-                    @change="changePrimary"
-                >
+                <el-color-picker v-model="themeConfig.primary" :predefine="colorList" @change="changePrimary">
                 </el-color-picker>
             </div>
             <div class="theme-item">

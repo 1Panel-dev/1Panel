@@ -73,9 +73,7 @@ const initChart = (data: any): ECharts => {
                     fontSize: 14,
                     formatter: function (name: string) {
                         undefined;
-                        return name.length > 8
-                            ? name.slice(0, 8) + '...'
-                            : name;
+                        return name.length > 8 ? name.slice(0, 8) + '...' : name;
                     },
                 },
                 axisLine: {

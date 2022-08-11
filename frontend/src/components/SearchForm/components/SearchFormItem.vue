@@ -9,11 +9,7 @@
         ></el-input>
     </template>
     <!-- 下拉选择框 -->
-    <template
-        v-if="
-            item.searchType == 'select' || item.searchType == 'multipleSelect'
-        "
-    >
+    <template v-if="item.searchType == 'select' || item.searchType == 'multipleSelect'">
         <el-select
             v-model="searchParam[item.prop!]"
             v-bind="item.searchProps"
@@ -31,12 +27,7 @@
         </el-select>
     </template>
     <!-- 下拉树形选择框 -->
-    <template
-        v-if="
-            item.searchType == 'treeSelect' ||
-            item.searchType == 'multipleTreeSelect'
-        "
-    >
+    <template v-if="item.searchType == 'treeSelect' || item.searchType == 'multipleTreeSelect'">
         <el-tree-select
             v-model="searchParam[item.prop!]"
             v-bind="item.searchProps"

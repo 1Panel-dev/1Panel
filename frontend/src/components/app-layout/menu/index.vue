@@ -58,10 +58,8 @@ const listeningWindow = () => {
     window.onresize = () => {
         return (() => {
             screenWidth.value = document.body.clientWidth;
-            if (isCollapse.value === false && screenWidth.value < 1200)
-                menuStore.setCollapse();
-            if (isCollapse.value === true && screenWidth.value > 1200)
-                menuStore.setCollapse();
+            if (isCollapse.value === false && screenWidth.value < 1200) menuStore.setCollapse();
+            if (isCollapse.value === true && screenWidth.value > 1200) menuStore.setCollapse();
         })();
     };
 };

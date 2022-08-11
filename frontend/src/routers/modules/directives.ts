@@ -24,8 +24,7 @@ const directivesRouter = {
         {
             path: '/directives/watermarkDirect',
             name: 'watermarkDirect',
-            component: () =>
-                import('@/views/directives/watermarkDirect/index.vue'),
+            component: () => import('@/views/directives/watermarkDirect/index.vue'),
             meta: {
                 keepAlive: true,
                 requiresAuth: true,
@@ -47,8 +46,7 @@ const directivesRouter = {
         {
             path: '/directives/debounceDirect',
             name: 'debounceDirect',
-            component: () =>
-                import('@/views/directives/debounceDirect/index.vue'),
+            component: () => import('@/views/directives/debounceDirect/index.vue'),
             meta: {
                 keepAlive: true,
                 requiresAuth: true,
@@ -59,8 +57,7 @@ const directivesRouter = {
         {
             path: '/directives/throttleDirect',
             name: 'throttleDirect',
-            component: () =>
-                import('@/views/directives/throttleDirect/index.vue'),
+            component: () => import('@/views/directives/throttleDirect/index.vue'),
             meta: {
                 keepAlive: true,
                 requiresAuth: true,
@@ -71,8 +68,7 @@ const directivesRouter = {
         {
             path: '/directives/longpressDirect',
             name: 'longpressDirect',
-            component: () =>
-                import('@/views/directives/longpressDirect/index.vue'),
+            component: () => import('@/views/directives/longpressDirect/index.vue'),
             meta: {
                 keepAlive: true,
                 requiresAuth: true,

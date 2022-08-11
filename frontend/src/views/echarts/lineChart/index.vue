@@ -8,9 +8,7 @@ import * as echarts from 'echarts';
 import { useEcharts } from '@/hooks/useEcharts';
 const echartsRef = ref<HTMLElement>();
 onMounted(() => {
-    let myChart: echarts.ECharts = echarts.init(
-        echartsRef.value as HTMLElement,
-    );
+    let myChart: echarts.ECharts = echarts.init(echartsRef.value as HTMLElement);
     let option: echarts.EChartsOption = {
         title: {
             text: 'Stacked Area Chart',
@@ -28,13 +26,7 @@ onMounted(() => {
             },
         },
         legend: {
-            data: [
-                'Email',
-                'Union Ads',
-                'Video Ads',
-                'Direct',
-                'Search Engine',
-            ],
+            data: ['Email', 'Union Ads', 'Video Ads', 'Direct', 'Search Engine'],
             textStyle: {
                 color: '#a1a1a1',
             },

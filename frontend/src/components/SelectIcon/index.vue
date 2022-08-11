@@ -1,28 +1,12 @@
 <template>
     <div class="icon-box">
-        <el-input
-            v-model="iconValue"
-            placeholder="请选择图标"
-            @focus="openDialog"
-            readonly
-            ref="inputRef"
-        >
+        <el-input v-model="iconValue" placeholder="请选择图标" @focus="openDialog" readonly ref="inputRef">
             <template #append>
                 <el-button :icon="customIcons[iconValue]" />
             </template>
         </el-input>
-        <el-dialog
-            v-model="dialogVisible"
-            title="请选择图标"
-            top="50px"
-            width="1280px"
-        >
-            <div
-                v-for="(item, index) in Icons"
-                :key="index"
-                class="icon-item"
-                @click="selectIcon(item)"
-            >
+        <el-dialog v-model="dialogVisible" title="请选择图标" top="50px" width="1280px">
+            <div v-for="(item, index) in Icons" :key="index" class="icon-item" @click="selectIcon(item)">
                 <component :is="item"></component>
                 <span>{{ item.name }}</span>
             </div>

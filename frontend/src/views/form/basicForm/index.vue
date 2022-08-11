@@ -5,27 +5,17 @@
                 <el-input v-model="formData.name" />
             </el-form-item>
             <el-form-item label="Activity zone :">
-                <el-select
-                    v-model="formData.region"
-                    placeholder="please select your zone"
-                >
+                <el-select v-model="formData.region" placeholder="please select your zone">
                     <el-option label="Zone one" value="shanghai" />
                     <el-option label="Zone two" value="beijing" />
                 </el-select>
             </el-form-item>
             <el-form-item label="Activity time :">
-                <el-date-picker
-                    v-model="formData.date1"
-                    type="date"
-                    placeholder="Pick a date"
-                />
+                <el-date-picker v-model="formData.date1" type="date" placeholder="Pick a date" />
                 <el-col :span="1" class="text-center">
                     <span class="text-gray-500">-</span>
                 </el-col>
-                <el-time-picker
-                    v-model="formData.date2"
-                    placeholder="Pick a time"
-                />
+                <el-time-picker v-model="formData.date2" placeholder="Pick a time" />
             </el-form-item>
             <el-form-item label="Instant delivery :">
                 <el-switch v-model="formData.delivery" />

@@ -2,10 +2,7 @@
     <div class="header">
         <div class="header-lf flx-center">
             <CollapseIcon id="collapseIcon"></CollapseIcon>
-            <Breadcrumb
-                id="breadcrumb"
-                v-if="themeConfig.breadcrumb"
-            ></Breadcrumb>
+            <Breadcrumb id="breadcrumb" v-if="themeConfig.breadcrumb"></Breadcrumb>
         </div>
         <div class="header-ri flx-center">
             <div class="header-icon">

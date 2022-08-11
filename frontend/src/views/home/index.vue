@@ -2,17 +2,8 @@
     <div class="dataVisualize-box">
         <div class="top-box">
             <div class="top-title">概览</div>
-            <el-tabs
-                v-model="data.activeName"
-                class="demo-tabs"
-                @tab-click="handleClick"
-            >
-                <el-tab-pane
-                    v-for="item in tab"
-                    :key="item.name"
-                    :label="item.label"
-                    :name="item.name"
-                ></el-tab-pane>
+            <el-tabs v-model="data.activeName" class="demo-tabs" @tab-click="handleClick">
+                <el-tab-pane v-for="item in tab" :key="item.name" :label="item.label" :name="item.name"></el-tab-pane>
             </el-tabs>
             <div class="top-content">
                 <div class="item-left sle">
@@ -63,11 +54,7 @@
         <div class="bottom-box">
             <div class="bottom-title">数据来源</div>
             <div class="bottom-tabs">
-                <el-tabs
-                    v-model="data.activeName"
-                    class="demo-tabs"
-                    @tab-click="handleClick"
-                >
+                <el-tabs v-model="data.activeName" class="demo-tabs" @tab-click="handleClick">
                     <el-tab-pane
                         v-for="item in tab"
                         :key="item.name"

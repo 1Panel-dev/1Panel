@@ -26,8 +26,7 @@
                 position: relative;
                 width: 567px;
                 height: 100%;
-                background: url('./images/dataScreen-header-left-bg.png')
-                    no-repeat;
+                background: url('./images/dataScreen-header-left-bg.png') no-repeat;
                 background-size: 100% 100%;
             }
             .header-ct {
@@ -46,8 +45,7 @@
                     color: #05e8fe;
                     text-align: center;
                     letter-spacing: 4px;
-                    background: url('./images/dataScreen-header-center-bg.png')
-                        no-repeat;
+                    background: url('./images/dataScreen-header-center-bg.png') no-repeat;
                     background-size: 100% 100%;
                     .header-ct-warning {
                         position: absolute;
@@ -62,8 +60,7 @@
                         color: #ffffff;
                         text-align: center;
                         letter-spacing: 1px;
-                        background: url('./images/dataScreen-header-warn-bg.png')
-                            no-repeat;
+                        background: url('./images/dataScreen-header-warn-bg.png') no-repeat;
                         background-size: 100% 100%;
                         transform: translateX(-50%);
                     }
@@ -86,15 +83,13 @@
                 color: #29fcff;
                 text-align: center;
                 cursor: pointer;
-                background: url('./images/dataScreen-header-btn-bg-l.png')
-                    no-repeat;
+                background: url('./images/dataScreen-header-btn-bg-l.png') no-repeat;
                 background-size: 100% 100%;
             }
             .header-download {
                 left: 0;
                 padding-right: 0;
-                background: url('./images/dataScreen-header-btn-bg-r.png')
-                    no-repeat;
+                background: url('./images/dataScreen-header-btn-bg-r.png') no-repeat;
             }
             .header-time {
                 position: absolute;
@@ -187,8 +182,7 @@
                         height: 76px;
                         padding: 2px 30px;
                         overflow: hidden;
-                        background: url('./images/dataScreen-warn-bg.png')
-                            no-repeat;
+                        background: url('./images/dataScreen-warn-bg.png') no-repeat;
                         background-size: 100% 100%;
                         .map-item {
                             display: flex;

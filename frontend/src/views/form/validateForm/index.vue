@@ -1,25 +1,14 @@
 <template>
     <div class="content-box">
-        <el-form
-            ref="ruleFormRef"
-            :model="ruleForm"
-            :rules="rules"
-            label-width="140px"
-        >
+        <el-form ref="ruleFormRef" :model="ruleForm" :rules="rules" label-width="140px">
             <el-form-item label="Activity name" prop="name">
                 <el-input v-model="ruleForm.name" />
             </el-form-item>
             <el-form-item label="Activity phone" prop="phone">
-                <el-input
-                    v-model="ruleForm.phone"
-                    placeholder="Activity phone"
-                />
+                <el-input v-model="ruleForm.phone" placeholder="Activity phone" />
             </el-form-item>
             <el-form-item label="Activity zone" prop="region">
-                <el-select
-                    v-model="ruleForm.region"
-                    placeholder="Activity zone"
-                >
+                <el-select v-model="ruleForm.region" placeholder="Activity zone">
                     <el-option label="Zone one" value="shanghai" />
                     <el-option label="Zone two" value="beijing" />
                 </el-select>
@@ -37,11 +26,7 @@
                     <span class="text-gray-500">-</span>
                 </el-col>
                 <el-form-item prop="date2">
-                    <el-time-picker
-                        v-model="ruleForm.date2"
-                        placeholder="Pick a time"
-                        style="width: 100%"
-                    />
+                    <el-time-picker v-model="ruleForm.date2" placeholder="Pick a time" style="width: 100%" />
                 </el-form-item>
             </el-form-item>
             <el-form-item label="Instant delivery" prop="delivery">
@@ -57,9 +42,7 @@
                 <el-input v-model="ruleForm.desc" type="textarea" />
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="submitForm(ruleFormRef)"
-                    >Create</el-button
-                >
+                <el-button type="primary" @click="submitForm(ruleFormRef)">Create</el-button>
                 <el-button @click="resetForm(ruleFormRef)">Reset</el-button>
             </el-form-item>
         </el-form>

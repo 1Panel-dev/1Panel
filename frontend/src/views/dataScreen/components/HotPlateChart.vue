@@ -70,20 +70,10 @@ const initChart = (data: any = {}): ECharts => {
                 axisLabel: {
                     color: '#fff',
                     formatter: function (value: any) {
-                        let str =
-                            value.length > 6
-                                ? value.slice(0, 6) + '...'
-                                : value;
-                        let index =
-                            data.data
-                                .map((item: ChartProp) => item.name)
-                                .indexOf(value) + 1;
+                        let str = value.length > 6 ? value.slice(0, 6) + '...' : value;
+                        let index = data.data.map((item: ChartProp) => item.name).indexOf(value) + 1;
                         return [
-                            '{' +
-                                (index > 3 ? 'lg' : 'lg' + index) +
-                                '|NO.' +
-                                index +
-                                '}',
+                            '{' + (index > 3 ? 'lg' : 'lg' + index) + '|NO.' + index + '}',
                             '{title|' + str + '}',
                         ].join(' ');
                     },
@@ -150,9 +140,7 @@ const initChart = (data: any = {}): ECharts => {
                     // align: "right",
                     margin: 20,
                     formatter: (value: any) => {
-                        return value >= 10000
-                            ? (value / 10000).toFixed(2) + 'w'
-                            : value;
+                        return value >= 10000 ? (value / 10000).toFixed(2) + 'w' : value;
                     },
                 },
                 axisLine: {

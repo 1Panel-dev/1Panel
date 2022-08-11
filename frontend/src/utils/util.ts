@@ -72,11 +72,7 @@ export function deepCopy<T>(obj: any): T {
 export function isType(val: any) {
     if (val === null) return 'null';
     if (typeof val !== 'object') return typeof val;
-    else
-        return Object.prototype.toString
-            .call(val)
-            .slice(8, -1)
-            .toLocaleLowerCase();
+    else return Object.prototype.toString.call(val).slice(8, -1).toLocaleLowerCase();
 }
 
 /**
@@ -95,9 +91,7 @@ export function randomNum(min: number, max: number): number {
  * @return string
  */
 export function getBrowserLang() {
-    let browserLang = navigator.language
-        ? navigator.language
-        : navigator.browserLanguage;
+    let browserLang = navigator.language ? navigator.language : navigator.browserLanguage;
     let defaultBrowserLang = '';
     if (
         browserLang.toLowerCase() === 'cn' ||
@@ -133,15 +127,10 @@ export function getTabPane<T, U>(menuList: any[], path: U): T {
  * @param {Array} newArr 菜单的一维数组
  * @return array
  */
-export function handleRouter(
-    routerList: RouteRecordRaw[],
-    newArr: string[] = [],
-) {
+export function handleRouter(routerList: RouteRecordRaw[], newArr: string[] = []) {
     routerList.forEach((item: RouteRecordRaw) => {
         typeof item === 'object' && item.path && newArr.push(item.path);
-        item.children &&
-            item.children.length &&
-            handleRouter(item.children, newArr);
+        item.children && item.children.length && handleRouter(item.children, newArr);
     });
     return newArr;
 }
@@ -154,8 +143,7 @@ export function handleRouter(
 export function getFlatArr(arr: any) {
     return arr.reduce((pre: any, current: any) => {
         let flatArr = [...pre, current];
-        if (current.children)
-            flatArr = [...flatArr, ...getFlatArr(current.children)];
+        if (current.children) flatArr = [...flatArr, ...getFlatArr(current.children)];
         return flatArr;
     }, []);
 }
@@ -169,8 +157,7 @@ export function getFlatArr(arr: any) {
  * */
 export function defaultFormat(row: number, col: number, callValue: any) {
     // 如果当前值为数组,使用 / 拼接（根据需求自定义）
-    if (isArray(callValue))
-        return callValue.length ? callValue.join(' / ') : '--';
+    if (isArray(callValue)) return callValue.length ? callValue.join(' / ') : '--';
     return callValue ?? '--';
 }
 
@@ -181,8 +168,7 @@ export function defaultFormat(row: number, col: number, callValue: any) {
  * */
 export function formatValue(callValue: any) {
     // 如果当前值为数组,使用 / 拼接（根据需求自定义）
-    if (isArray(callValue))
-        return callValue.length ? callValue.join(' / ') : '--';
+    if (isArray(callValue)) return callValue.length ? callValue.join(' / ') : '--';
     return callValue ?? '--';
 }
 
@@ -193,12 +179,7 @@ export function formatValue(callValue: any) {
  * @param {String} type 过滤类型（目前只有 tag）
  * @return string
  * */
-export function filterEnum(
-    callValue: any,
-    enumData: any,
-    searchProps?: { [key: string]: any },
-    type?: string,
-): string {
+export function filterEnum(callValue: any, enumData: any, searchProps?: { [key: string]: any }, type?: string): string {
     const value = searchProps?.value ?? 'value';
     const label = searchProps?.label ?? 'label';
     let filterData = enumData.find((item: any) => item[value] === callValue);
@@ -224,7 +205,5 @@ export function dateFromat(row: number, col: number, dataStr: any) {
     minute = minute < 10 ? `0${String(minute)}` : minute;
     let second: string | number = date.getSeconds();
     second = second < 10 ? `0${String(second)}` : second;
-    return `${String(y)}-${String(m)}-${String(d)}   ${String(h)}:${String(
-        minute,
-    )}:${String(second)}`;
+    return `${String(y)}-${String(m)}-${String(d)}   ${String(h)}:${String(minute)}:${String(second)}`;
 }

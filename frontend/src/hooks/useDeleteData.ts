@@ -17,16 +17,12 @@ export const useDeleteData = <P = any, R = any>(
     confirmType: HandleData.MessageType = 'error',
 ) => {
     return new Promise((resolve, reject) => {
-        ElMessageBox.confirm(
-            i18n.global.t(`${message}`) + '?',
-            i18n.global.t('commons.msg.title'),
-            {
-                confirmButtonText: i18n.global.t('commons.button.confirm'),
-                cancelButtonText: i18n.global.t('commons.button.cancel'),
-                type: confirmType,
-                draggable: true,
-            },
-        ).then(async () => {
+        ElMessageBox.confirm(i18n.global.t(`${message}`) + '?', i18n.global.t('commons.msg.title'), {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: confirmType,
+            draggable: true,
+        }).then(async () => {
             const res = await api(params);
             if (!res) return reject(false);
             ElMessage({

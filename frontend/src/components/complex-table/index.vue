@@ -27,10 +27,7 @@
             </fu-table>
         </div>
 
-        <div
-            class="complex-table__pagination"
-            v-if="$slots.pagination || paginationConfig"
-        >
+        <div class="complex-table__pagination" v-if="$slots.pagination || paginationConfig">
             <slot name="pagination">
                 <fu-table-pagination
                     v-model:current-page="paginationConfig.currentPage"

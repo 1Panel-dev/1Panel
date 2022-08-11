@@ -32,8 +32,7 @@ export const useDownload = async (
         // });
         const blob = new Blob([res]);
         // 兼容edge不支持createObjectURL方法
-        if ('msSaveOrOpenBlob' in navigator)
-            return window.navigator.msSaveOrOpenBlob(blob, tempName + fileType);
+        if ('msSaveOrOpenBlob' in navigator) return window.navigator.msSaveOrOpenBlob(blob, tempName + fileType);
         const blobUrl = window.URL.createObjectURL(blob);
         const exportFile = document.createElement('a');
         exportFile.style.display = 'none';

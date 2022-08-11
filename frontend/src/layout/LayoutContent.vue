@@ -2,12 +2,7 @@
     <div class="main-box">
         <div class="content-container__header" v-if="slots.header || header">
             <slot name="header">
-                <back-button
-                    :path="backPath"
-                    :name="backName"
-                    :to="backTo"
-                    v-if="showBack"
-                ></back-button>
+                <back-button :path="backPath" :name="backName" :to="backTo" v-if="showBack"></back-button>
                 {{ header }}
             </slot>
         </div>

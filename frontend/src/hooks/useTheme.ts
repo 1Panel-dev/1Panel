@@ -29,10 +29,7 @@ export const useTheme = () => {
             '--el-color-primary-dark-2',
             `${getDarkColor(themeConfig.value.primary, 0.1)}`,
         );
-        document.documentElement.style.setProperty(
-            '--el-color-primary',
-            themeConfig.value.primary,
-        );
+        document.documentElement.style.setProperty('--el-color-primary', themeConfig.value.primary);
         // 颜色变浅
         for (let i = 1; i <= 9; i++) {
             document.documentElement.style.setProperty(

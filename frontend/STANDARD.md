@@ -196,15 +196,7 @@ npm i stylelint stylelint-config-html stylelint-config-recommended-scss stylelin
     "editor.codeActionsOnSave": {
         "source.fixAll.stylelint": true
     },
-    "stylelint.validate": [
-        "css",
-        "less",
-        "postcss",
-        "scss",
-        "vue",
-        "sass",
-        "html"
-    ],
+    "stylelint.validate": ["css", "less", "postcss", "scss", "vue", "sass", "html"],
     "files.eol": "\n"
 }
 ```
@@ -431,17 +423,13 @@ module.exports = {
             type: "Select the type of change that you're committing:",
             scope: 'Denote the SCOPE of this change (optional):',
             customScope: 'Denote the SCOPE of this change:',
-            subject:
-                'Write a SHORT, IMPERATIVE tense description of the change:\n',
+            subject: 'Write a SHORT, IMPERATIVE tense description of the change:\n',
             body: 'Provide a LONGER description of the change (optional). Use "|" to break new line:\n',
-            breaking:
-                'List any BREAKING CHANGES (optional). Use "|" to break new line:\n',
-            footerPrefixsSelect:
-                'Select the ISSUES type of changeList by this change (optional):',
+            breaking: 'List any BREAKING CHANGES (optional). Use "|" to break new line:\n',
+            footerPrefixsSelect: 'Select the ISSUES type of changeList by this change (optional):',
             customFooterPrefixs: 'Input ISSUES prefix:',
             footer: 'List any ISSUES by this change. E.g.: #31, #34:\n',
-            confirmCommit:
-                'Are you sure you want to proceed with the commit above?',
+            confirmCommit: 'Are you sure you want to proceed with the commit above?',
             // 中文版
             // type: "选择你要提交的类型 :",
             // scope: "选择一个提交范围（可选）:",
@@ -536,9 +524,7 @@ module.exports = {
         breaklineNumber: 100,
         breaklineChar: '|',
         skipQuestions: [],
-        issuePrefixs: [
-            { value: 'closed', name: 'closed:   ISSUES has been processed' },
-        ],
+        issuePrefixs: [{ value: 'closed', name: 'closed:   ISSUES has been processed' }],
         customIssuePrefixsAlign: 'top',
         emptyIssuePrefixsAlias: 'skip',
         customIssuePrefixsAlias: 'custom',

@@ -23,11 +23,7 @@
         <div class="el-upload__tip">
             <slot name="tip"></slot>
         </div>
-        <el-image-viewer
-            v-if="dialogVisible"
-            @close="imageView"
-            :url-list="[imageUrl]"
-        />
+        <el-image-viewer v-if="dialogVisible" @close="imageView" :url-list="[imageUrl]" />
     </div>
 </template>
 

@@ -14,23 +14,12 @@
         <!-- 表格头部 操作按钮 -->
         <div class="table-header">
             <div class="header-button-lf">
-                <slot
-                    name="tableHeader"
-                    :ids="selectedListIds"
-                    :isSelected="isSelected"
-                ></slot>
+                <slot name="tableHeader" :ids="selectedListIds" :isSelected="isSelected"></slot>
             </div>
             <div class="header-button-ri" v-if="toolButton">
-                <el-button :icon="Refresh" circle @click="getTableList">
-                </el-button>
-                <el-button :icon="Operation" circle @click="openColSetting">
-                </el-button>
-                <el-button
-                    :icon="Search"
-                    circle
-                    v-if="searchColumns.length"
-                    @click="isShowSearch = !isShowSearch"
-                >
+                <el-button :icon="Refresh" circle @click="getTableList"> </el-button>
+                <el-button :icon="Operation" circle @click="openColSetting"> </el-button>
+                <el-button :icon="Search" circle v-if="searchColumns.length" @click="isShowSearch = !isShowSearch">
                 </el-button>
             </div>
         </div>
@@ -83,8 +72,7 @@
                 >
                     <!-- 自定义 header (使用组件渲染 tsx 语法) -->
                     <template #header v-if="item.renderHeader">
-                        <component :is="item.renderHeader" :row="item">
-                        </component>
+                        <component :is="item.renderHeader" :row="item"> </component>
                     </template>
 
                     <!-- 自定义配置每一列 slot（使用作用域插槽） -->
@@ -137,12 +125,7 @@
             :handleCurrentChange="handleCurrentChange"
         ></Pagination>
         <!-- 列设置 -->
-        <ColSetting
-            v-if="toolButton"
-            ref="colRef"
-            :tableRef="tableRef"
-            :colSetting="colSetting"
-        ></ColSetting>
+        <ColSetting v-if="toolButton" ref="colRef" :tableRef="tableRef" :colSetting="colSetting"></ColSetting>
     </div>
 </template>
 
@@ -187,8 +170,7 @@ const props = withDefaults(defineProps<ProTableProps>(), {
 });
 
 // 表格多选 Hooks
-const { selectionChange, getRowKeys, selectedListIds, isSelected } =
-    useSelection();
+const { selectionChange, getRowKeys, selectedListIds, isSelected } = useSelection();
 
 // 表格操作 Hooks
 const {
@@ -201,12 +183,7 @@ const {
     reset,
     handleSizeChange,
     handleCurrentChange,
-} = useTable(
-    props.requestApi,
-    props.initParam,
-    props.pagination,
-    props.dataCallback,
-);
+} = useTable(props.requestApi, props.initParam, props.pagination, props.dataCallback);
 
 // 监听页面 initParam 改化，重新获取表格数据
 watch(
@@ -238,10 +215,7 @@ tableColumns.value.forEach(async (item) => {
 const searchColumns = tableColumns.value.filter((item) => item.search);
 // 设置搜索表单的默认值
 searchColumns.forEach((column) => {
-    if (
-        column.searchInitParam !== undefined &&
-        column.searchInitParam !== null
-    ) {
+    if (column.searchInitParam !== undefined && column.searchInitParam !== null) {
         searchInitParam.value[column.prop!] = column.searchInitParam;
     }
 });

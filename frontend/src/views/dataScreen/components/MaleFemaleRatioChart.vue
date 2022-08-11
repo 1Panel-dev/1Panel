@@ -26,9 +26,7 @@ interface ChartProp {
 }
 const initChart = (data: ChartProp): ECharts => {
     /* 获取容器 */
-    const charEle = document.getElementById(
-        'MaleFemaleRatioChart',
-    ) as HTMLElement;
+    const charEle = document.getElementById('MaleFemaleRatioChart') as HTMLElement;
     /* 生成echarts */
     const charEch: ECharts = init(charEle);
     const option: EChartsOption = {

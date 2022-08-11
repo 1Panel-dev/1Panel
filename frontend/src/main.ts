@@ -15,17 +15,15 @@ import directives from '@/directives/index';
 import router from '@/routers/index';
 import I18n from '@/lang/index';
 import pinia from '@/store/index';
-import { tr } from '@/utils/i18n/tr';
 const app = createApp(App);
-app.config.globalProperties.$tr = tr;
+app.use(ElementPlus);
+app.use(Fit2CloudPlus);
 Object.keys(Icons).forEach((key) => {
     app.component(key, Icons[key as keyof typeof Icons]);
 });
 
-app.use(router)
-    .use(I18n)
-    .use(pinia)
-    .use(directives)
-    .use(ElementPlus)
-    .use(Fit2CloudPlus)
-    .mount('#app');
+app.use(router);
+app.use(I18n);
+app.use(pinia);
+app.use(directives);
+app.mount('#app');

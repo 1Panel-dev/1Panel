@@ -29,9 +29,7 @@ export const useSelection = () => {
      * @return void
      */
     const selectionChange = (rowArr: any) => {
-        rowArr.length === 0
-            ? (isSelected.value = false)
-            : (isSelected.value = true);
+        rowArr.length === 0 ? (isSelected.value = false) : (isSelected.value = true);
         selectedList.value = rowArr;
     };
 

@@ -1,25 +1,12 @@
 <template>
     <div class="table-box">
         <div class="table-search" v-show="isShowSearch">
-            <el-form
-                ref="formRef"
-                :model="searchParam"
-                :inline="true"
-                label-width="100px"
-            >
+            <el-form ref="formRef" :model="searchParam" :inline="true" label-width="100px">
                 <el-form-item label="用户姓名 :">
-                    <el-input
-                        v-model="searchParam.username"
-                        placeholder="请输入"
-                        clearable
-                    ></el-input>
+                    <el-input v-model="searchParam.username" placeholder="请输入" clearable></el-input>
                 </el-form-item>
                 <el-form-item label="性别 :">
-                    <el-select
-                        v-model="searchParam.gender"
-                        placeholder="请选择"
-                        clearable
-                    >
+                    <el-select v-model="searchParam.gender" placeholder="请选择" clearable>
                         <el-option
                             v-for="item in genderType"
                             :key="item.value"
@@ -29,18 +16,10 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="身份证号 :">
-                    <el-input
-                        v-model="searchParam.idCard"
-                        placeholder="请输入"
-                        clearable
-                    ></el-input>
+                    <el-input v-model="searchParam.idCard" placeholder="请输入" clearable></el-input>
                 </el-form-item>
                 <el-form-item label="邮箱 :">
-                    <el-input
-                        v-model="searchParam.email"
-                        placeholder="请输入"
-                        clearable
-                    ></el-input>
+                    <el-input v-model="searchParam.email" placeholder="请输入" clearable></el-input>
                 </el-form-item>
                 <div class="more-item" v-show="searchShow">
                     <el-form-item label="创建时间 :">
@@ -55,48 +34,25 @@
                 </div>
             </el-form>
             <div class="search-operation">
-                <el-button type="primary" :icon="Search" @click="search"
-                    >搜索</el-button
-                >
+                <el-button type="primary" :icon="Search" @click="search">搜索</el-button>
                 <el-button :icon="Delete" @click="reset">重置</el-button>
-                <el-button
-                    type="primary"
-                    link
-                    class="search-isOpen"
-                    @click="searchShow = !searchShow"
-                >
+                <el-button type="primary" link class="search-isOpen" @click="searchShow = !searchShow">
                     {{ searchShow ? '合并' : '展开' }}
                     <el-icon class="el-icon--right">
-                        <component
-                            :is="searchShow ? ArrowUp : ArrowDown"
-                        ></component>
+                        <component :is="searchShow ? ArrowUp : ArrowDown"></component>
                     </el-icon>
                 </el-button>
             </div>
         </div>
         <div class="table-header">
             <div class="header-button-lf">
-                <el-button
-                    type="primary"
-                    :icon="CirclePlus"
-                    @click="openDrawer('新增')"
-                    v-if="BUTTONS.add"
+                <el-button type="primary" :icon="CirclePlus" @click="openDrawer('新增')" v-if="BUTTONS.add"
                     >新增用户</el-button
                 >
-                <el-button
-                    type="primary"
-                    :icon="Upload"
-                    plain
-                    @click="batchAdd"
-                    v-if="BUTTONS.batchAdd"
+                <el-button type="primary" :icon="Upload" plain @click="batchAdd" v-if="BUTTONS.batchAdd"
                     >批量添加用户</el-button
                 >
-                <el-button
-                    type="primary"
-                    :icon="Download"
-                    plain
-                    @click="downloadFile"
-                    v-if="BUTTONS.export"
+                <el-button type="primary" :icon="Download" plain @click="downloadFile" v-if="BUTTONS.export"
                     >导出用户数据</el-button
                 >
                 <el-button
@@ -111,14 +67,8 @@
                 </el-button>
             </div>
             <div class="header-button-ri">
-                <el-button :icon="Refresh" circle @click="getTableList">
-                </el-button>
-                <el-button
-                    :icon="Search"
-                    circle
-                    @click="isShowSearch = !isShowSearch"
-                >
-                </el-button>
+                <el-button :icon="Refresh" circle @click="getTableList"> </el-button>
+                <el-button :icon="Search" circle @click="isShowSearch = !isShowSearch"> </el-button>
             </div>
         </div>
         <el-table
@@ -136,13 +86,7 @@
                 show-overflow-tooltip
                 width="140"
             ></el-table-column>
-            <el-table-column
-                prop="gender"
-                label="性别"
-                show-overflow-tooltip
-                width="140"
-                v-slot="scope"
-            >
+            <el-table-column prop="gender" label="性别" show-overflow-tooltip width="140" v-slot="scope">
                 {{ scope.row.gender == 1 ? '男' : '女' }}
             </el-table-column>
             <el-table-column
@@ -171,12 +115,7 @@
                 show-overflow-tooltip
                 width="200"
             ></el-table-column>
-            <el-table-column
-                prop="status"
-                label="用户状态"
-                width="180"
-                v-slot="scope"
-            >
+            <el-table-column prop="status" label="用户状态" width="180" v-slot="scope">
                 <el-switch
                     :value="scope.row.status"
                     :active-text="scope.row.status === 1 ? '启用' : '禁用'"
@@ -185,25 +124,12 @@
                     @change="changeStatus($event, scope.row)"
                     v-if="BUTTONS.status"
                 />
-                <el-tag
-                    :type="scope.row.status === 1 ? 'success' : 'danger'"
-                    v-else
-                >
+                <el-tag :type="scope.row.status === 1 ? 'success' : 'danger'" v-else>
                     {{ scope.row.status === 1 ? '启用' : '禁用' }}</el-tag
                 >
             </el-table-column>
-            <el-table-column
-                label="操作"
-                fixed="right"
-                width="330"
-                v-slot="scope"
-            >
-                <el-button
-                    type="primary"
-                    link
-                    :icon="View"
-                    @click="openDrawer('查看', scope.row)"
-                    v-if="BUTTONS.view"
+            <el-table-column label="操作" fixed="right" width="330" v-slot="scope">
+                <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)" v-if="BUTTONS.view"
                     >查看</el-button
                 >
                 <el-button
@@ -214,31 +140,13 @@
                     v-if="BUTTONS.edit"
                     >编辑</el-button
                 >
-                <el-button
-                    type="primary"
-                    link
-                    :icon="Refresh"
-                    @click="resetPass(scope.row)"
-                    v-if="BUTTONS.reset"
+                <el-button type="primary" link :icon="Refresh" @click="resetPass(scope.row)" v-if="BUTTONS.reset"
                     >重置密码</el-button
                 >
-                <el-button
-                    type="primary"
-                    link
-                    :icon="Delete"
-                    @click="deleteAccount(scope.row)"
-                    v-if="BUTTONS.delete"
+                <el-button type="primary" link :icon="Delete" @click="deleteAccount(scope.row)" v-if="BUTTONS.delete"
                     >删除</el-button
                 >
-                <span
-                    v-if="
-                        !BUTTONS.view &&
-                        !BUTTONS.edit &&
-                        !BUTTONS.reset &&
-                        !BUTTONS.delete
-                    "
-                    >--</span
-                >
+                <span v-if="!BUTTONS.view && !BUTTONS.edit && !BUTTONS.reset && !BUTTONS.delete">--</span>
             </el-table-column>
             <template #empty>
                 <div class="table-empty">
@@ -321,8 +229,7 @@ const {
 } = useTable(getUserList, initParam);
 
 // 数据多选
-const { isSelected, selectedListIds, selectionChange, getRowKeys } =
-    useSelection();
+const { isSelected, selectedListIds, selectionChange, getRowKeys } = useSelection();
 
 // 页面按钮权限
 // const { BUTTONS } = useAuthButtons();
@@ -341,41 +248,25 @@ searchInitParam.value = {
 
 // 删除用户信息
 const deleteAccount = async (params: User.ResUserList) => {
-    await useHandleData(
-        deleteUser,
-        { id: [params.id] },
-        `删除【${params.username}】用户`,
-    );
+    await useHandleData(deleteUser, { id: [params.id] }, `删除【${params.username}】用户`);
     getTableList();
 };
 
 // 重置用户密码
 const resetPass = async (params: User.ResUserList) => {
-    await useHandleData(
-        resetUserPassWord,
-        { id: params.id },
-        `重置【${params.username}】用户密码`,
-    );
+    await useHandleData(resetUserPassWord, { id: params.id }, `重置【${params.username}】用户密码`);
     getTableList();
 };
 
 // 切换用户状态
 const changeStatus = async (val: number, params: User.ResUserList) => {
-    await useHandleData(
-        changeUserStatus,
-        { id: params.id, status: val },
-        `切换【${params.username}】用户状态`,
-    );
+    await useHandleData(changeUserStatus, { id: params.id, status: val }, `切换【${params.username}】用户状态`);
     getTableList();
 };
 
 // 批量删除用户信息
 const batchDelete = async () => {
-    await useHandleData(
-        deleteUser,
-        { id: selectedListIds.value },
-        '删除所选用户信息',
-    );
+    await useHandleData(deleteUser, { id: selectedListIds.value }, '删除所选用户信息');
     getTableList();
 };
 
@@ -404,10 +295,7 @@ interface DrawerExpose {
     acceptParams: (params: any) => void;
 }
 const drawerRef = ref<DrawerExpose>();
-const openDrawer = (
-    title: string,
-    rowData: Partial<User.ResUserList> = { avatar: '' },
-) => {
+const openDrawer = (title: string, rowData: Partial<User.ResUserList> = { avatar: '' }) => {
     let params = {
         title,
         rowData: { ...rowData },

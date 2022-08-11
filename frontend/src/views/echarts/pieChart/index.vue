@@ -8,9 +8,7 @@ import * as echarts from 'echarts';
 import { useEcharts } from '@/hooks/useEcharts';
 const echartsRef = ref<HTMLElement>();
 onMounted(() => {
-    let myChart: echarts.ECharts = echarts.init(
-        echartsRef.value as HTMLElement,
-    );
+    let myChart: echarts.ECharts = echarts.init(echartsRef.value as HTMLElement);
     let option: echarts.EChartsOption = {
         tooltip: {
             trigger: 'item',
@@ -19,16 +17,7 @@ onMounted(() => {
         legend: {
             left: 'center',
             top: 'bottom',
-            data: [
-                'rose 1',
-                'rose 2',
-                'rose 3',
-                'rose 4',
-                'rose 5',
-                'rose 6',
-                'rose 7',
-                'rose 8',
-            ],
+            data: ['rose 1', 'rose 2', 'rose 3', 'rose 4', 'rose 5', 'rose 6', 'rose 7', 'rose 8'],
             textStyle: {
                 color: '#a1a1a1',
             },

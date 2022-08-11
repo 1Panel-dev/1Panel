@@ -16,14 +16,7 @@ const initChart = (data: any): ECharts => {
     const charEle = document.getElementById('AgeRatioChart') as HTMLElement;
     const charEch: ECharts = init(charEle);
     /* echarts colors */
-    const colors = [
-        '#F6C95C',
-        '#EF7D33',
-        '#1F9393',
-        '#184EA1',
-        '#81C8EF',
-        '#9270CA',
-    ];
+    const colors = ['#F6C95C', '#EF7D33', '#1F9393', '#184EA1', '#81C8EF', '#9270CA'];
     const option: EChartsOption = {
         color: colors,
         tooltip: {

@@ -1,9 +1,7 @@
 <template>
     <div class="content-box">
         <span class="text">批量上传数据 🍓🍇🍈🍉</span>
-        <el-button type="primary" :icon="Upload" @click="batchAdd"
-            >批量上传数据</el-button
-        >
+        <el-button type="primary" :icon="Upload" @click="batchAdd">批量上传数据</el-button>
         <ImportExcel ref="importRef"></ImportExcel>
     </div>
 </template>

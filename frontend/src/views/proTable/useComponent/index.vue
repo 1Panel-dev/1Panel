@@ -9,27 +9,13 @@
         >
             <!-- 表格 header 按钮 -->
             <template #tableHeader="scope">
-                <el-button
-                    type="primary"
-                    :icon="CirclePlus"
-                    @click="openDrawer('新增')"
-                    v-if="BUTTONS.add"
+                <el-button type="primary" :icon="CirclePlus" @click="openDrawer('新增')" v-if="BUTTONS.add"
                     >新增用户</el-button
                 >
-                <el-button
-                    type="primary"
-                    :icon="Upload"
-                    plain
-                    @click="batchAdd"
-                    v-if="BUTTONS.batchAdd"
+                <el-button type="primary" :icon="Upload" plain @click="batchAdd" v-if="BUTTONS.batchAdd"
                     >批量添加用户</el-button
                 >
-                <el-button
-                    type="primary"
-                    :icon="Download"
-                    plain
-                    @click="downloadFile"
-                    v-if="BUTTONS.export"
+                <el-button type="primary" :icon="Download" plain @click="downloadFile" v-if="BUTTONS.export"
                     >导出用户数据</el-button
                 >
                 <el-button
@@ -58,43 +44,16 @@
                         :inactive-value="0"
                     />
                 </div>
-                <el-tag
-                    :type="scope.row.status === 1 ? 'success' : 'danger'"
-                    v-else
-                >
+                <el-tag :type="scope.row.status === 1 ? 'success' : 'danger'" v-else>
                     {{ scope.row.status === 1 ? '启用' : '禁用' }}
                 </el-tag>
             </template>
             <!-- 表格操作 -->
             <template #operation="scope">
-                <el-button
-                    type="primary"
-                    link
-                    :icon="View"
-                    @click="openDrawer('查看', scope.row)"
-                    >查看</el-button
-                >
-                <el-button
-                    type="primary"
-                    link
-                    :icon="EditPen"
-                    @click="openDrawer('编辑', scope.row)"
-                    >编辑</el-button
-                >
-                <el-button
-                    type="primary"
-                    link
-                    :icon="Refresh"
-                    @click="resetPass(scope.row)"
-                    >重置密码</el-button
-                >
-                <el-button
-                    type="primary"
-                    link
-                    :icon="Delete"
-                    @click="deleteAccount(scope.row)"
-                    >删除</el-button
-                >
+                <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
+                <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)">编辑</el-button>
+                <el-button type="primary" link :icon="Refresh" @click="resetPass(scope.row)">重置密码</el-button>
+                <el-button type="primary" link :icon="Delete" @click="deleteAccount(scope.row)">删除</el-button>
             </template>
         </ProTable>
         <UserDrawer ref="drawerRef"></UserDrawer>
@@ -112,15 +71,7 @@ import { useDownload } from '@/hooks/useDownload';
 import ProTable from '@/components/ProTable/index.vue';
 import ImportExcel from '@/components/ImportExcel/index.vue';
 import UserDrawer from '@/views/proTable/components/UserDrawer.vue';
-import {
-    CirclePlus,
-    Delete,
-    EditPen,
-    Download,
-    Upload,
-    View,
-    Refresh,
-} from '@element-plus/icons-vue';
+import { CirclePlus, Delete, EditPen, Download, Upload, View, Refresh } from '@element-plus/icons-vue';
 import {
     getUserList,
     deleteUser,
@@ -228,11 +179,7 @@ const columns: Partial<ColumnProps>[] = [
 
 // 删除用户信息
 const deleteAccount = async (params: User.ResUserList) => {
-    await useHandleData(
-        deleteUser,
-        { id: [params.id] },
-        `删除【${params.username}】用户`,
-    );
+    await useHandleData(deleteUser, { id: [params.id] }, `删除【${params.username}】用户`);
     proTable.value.refresh();
 };
 
@@ -244,11 +191,7 @@ const batchDelete = async (id: string[]) => {
 
 // 重置用户密码
 const resetPass = async (params: User.ResUserList) => {
-    await useHandleData(
-        resetUserPassWord,
-        { id: params.id },
-        `重置【${params.username}】用户密码`,
-    );
+    await useHandleData(resetUserPassWord, { id: params.id }, `重置【${params.username}】用户密码`);
     proTable.value.refresh();
 };
 
@@ -287,10 +230,7 @@ interface DrawerExpose {
     acceptParams: (params: any) => void;
 }
 const drawerRef = ref<DrawerExpose>();
-const openDrawer = (
-    title: string,
-    rowData: Partial<User.ResUserList> = { avatar: '' },
-) => {
+const openDrawer = (title: string, rowData: Partial<User.ResUserList> = { avatar: '' }) => {
     let params = {
         title,
         rowData: { ...rowData },

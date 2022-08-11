@@ -8,9 +8,7 @@
                 <div class="header-ct">
                     <div class="header-ct-title">
                         <span>智慧旅游可视化大数据展示平台</span>
-                        <div class="header-ct-warning">
-                            平台高峰预警信息（2条）
-                        </div>
+                        <div class="header-ct-warning">平台高峰预警信息（2条）</div>
                     </div>
                 </div>
                 <div class="header-rg">
@@ -268,54 +266,15 @@ let platFromData = [
 let annualData = [
     {
         label: new Date().getFullYear() - 2 + '年',
-        value: [
-            '184',
-            '90',
-            '120',
-            '0',
-            '30',
-            '100',
-            '80',
-            '40',
-            '20',
-            '510',
-            '350',
-            '180',
-        ],
+        value: ['184', '90', '120', '0', '30', '100', '80', '40', '20', '510', '350', '180'],
     },
     {
         label: new Date().getFullYear() - 1 + '年',
-        value: [
-            '118',
-            '509',
-            '366',
-            '162',
-            '380',
-            '123',
-            '321',
-            '158',
-            '352',
-            '474',
-            '154',
-            '22',
-        ],
+        value: ['118', '509', '366', '162', '380', '123', '321', '158', '352', '474', '154', '22'],
     },
     {
         label: new Date().getFullYear() + '年',
-        value: [
-            '548',
-            '259',
-            '113',
-            '90',
-            '69',
-            '512',
-            '23',
-            '49',
-            '28',
-            '420',
-            '313',
-            '156',
-        ],
+        value: ['548', '259', '113', '90', '69', '512', '23', '49', '28', '420', '313', '156'],
     },
 ];
 let mapData = [
@@ -392,20 +351,7 @@ const initCharts = (): void => {
     dataScreen.chart3 = AnnualUseRef.value?.initChart({
         data: annualData,
         unit: annualData.map((val) => val.label),
-        columns: [
-            '1',
-            '2',
-            '3',
-            '4',
-            '5',
-            '6',
-            '7',
-            '8',
-            '9',
-            '10',
-            '11',
-            '12',
-        ],
+        columns: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
         colors: ['#FFA600', '#007AFE', '#FF4B7A'],
     }) as ECharts;
     dataScreen.chart4 = HotPlateRef.value?.initChart({
@@ -425,16 +371,7 @@ const initCharts = (): void => {
     }) as ECharts;
     dataScreen.chart7 = PlatformSourceRef.value?.initChart({
         data: platFromData,
-        colors: [
-            '#078dbc',
-            '#6ad40b',
-            '#6172fc',
-            '#1786ff',
-            '#ffbe2f',
-            '#4dc89d',
-            '#b797df',
-            '#ffd3aa',
-        ],
+        colors: ['#078dbc', '#6ad40b', '#6172fc', '#1786ff', '#ffbe2f', '#4dc89d', '#b797df', '#ffd3aa'],
     }) as ECharts;
     dataScreen.mapChart = MapchartRef.value?.initChart(mapData) as ECharts;
 };
