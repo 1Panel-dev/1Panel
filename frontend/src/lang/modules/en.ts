@@ -20,6 +20,7 @@ export default {
             title: 'Delete',
             deleteSuccess: 'Delete Success',
             loginSuccss: 'Login Success',
+            requestTimeout: 'The request timed out, please try again later',
         },
         login: {
             captchaHelper: 'Please enter the verification code',

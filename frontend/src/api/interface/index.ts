@@ -5,10 +5,10 @@ export interface Result {
 }
 
 // * 请求响应参数(包含data)
-export interface ResultData {
+export interface ResultData<T = any> {
     code: number;
     message: string;
-    data: any;
+    data: T;
 }
 
 // * 分页响应参数
@@ -40,11 +40,6 @@ export namespace Login {
         authMethod: string;
     }
     export interface ResLogin {
-        code: number;
-        data: logInfo;
-        message: string;
-    }
-    export interface logInfo {
         name: string;
         token: string;
     }

@@ -20,6 +20,7 @@ export default {
             title: '删除',
             deleteSuccess: '删除成功',
             loginSuccss: '登陆成功',
+            requestTimeout: '请求超时,请稍后重试',
         },
         login: {
             captchaHelper: '请输入验证码',
