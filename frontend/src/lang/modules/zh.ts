@@ -28,6 +28,14 @@ export default {
         rule: {
             username: '请输入用户名',
             password: '请输入密码',
+            required: '请填写必填项',
+            commonName: '支持英文、中文、数字、.-_,长度1-30',
+        },
+    },
+    business: {
+        user: {
+            username: '用户名',
+            email: '邮箱',
         },
     },
     menu: {

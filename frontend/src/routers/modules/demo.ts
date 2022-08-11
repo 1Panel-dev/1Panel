@@ -7,17 +7,27 @@ const demoRouter = {
     component: Layout,
     redirect: '/demos/table',
     meta: {
+        icon: 'apple',
         title: 'menu.demo',
     },
     children: [
         {
             path: '/demos/table',
-            name: 'table',
+            name: 'Table',
             component: () => import('@/views/demos/table/index.vue'),
             meta: {
                 keepAlive: true,
-                requiresAuth: true,
-                key: 'table',
+            },
+        },
+        {
+            path: '/demos/table/:op',
+            name: 'DemoCreate',
+            props: true,
+            hidden: true,
+            component: () => import('@/views/demos/table/operate/index.vue'),
+            meta: {
+                activeMenu: '/demos/table',
+                keepAlive: true,
             },
         },
     ],

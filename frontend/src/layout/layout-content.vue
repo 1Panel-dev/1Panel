@@ -2,12 +2,24 @@
     <div class="main-box">
         <div class="content-container__header" v-if="slots.header || header">
             <slot name="header">
-                <back-button :path="backPath" :name="backName" :to="backTo" v-if="showBack"></back-button>
-                {{ header }}
+                <back-button
+                    :path="backPath"
+                    :name="backName"
+                    :to="backTo"
+                    :header="header"
+                    v-if="showBack"
+                ></back-button>
+                <!-- {{ header }} -->
             </slot>
         </div>
         <div class="content-container__toolbar" v-if="slots.toolbar">
             <slot name="toolbar"></slot>
+        </div>
+        <div class="content-container_form">
+            <slot name="form"> </slot>
+            <div class="form-button">
+                <slot name="button"></slot>
+            </div>
         </div>
         <slot></slot>
     </div>
@@ -43,5 +55,14 @@ const showBack = computed(() => {
 .content-container__toolbar {
     @include flex-row(space-between, center);
     margin-bottom: 10px;
+}
+
+.content-container_form {
+    text-align: -webkit-center;
+    width: 80%;
+    margin-left: 10%;
+    .form-button {
+        float: right;
+    }
 }
 </style>

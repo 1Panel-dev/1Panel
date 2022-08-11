@@ -2,7 +2,7 @@
     <LayoutContent :header="'样例'">
         <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
             <template #toolbar>
-                <el-button type="primary">{{ $t('commons.button.create') }}</el-button>
+                <el-button type="primary" @click="openOperate({})">{{ $t('commons.button.create') }}</el-button>
                 <el-button type="primary" plain>{{ '其他操作' }}</el-button>
                 <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete">{{
                     $t('commons.button.delete')
@@ -35,6 +35,9 @@ import { User } from '@/api/interface/user';
 import { deleteUser, getUserList } from '@/api/modules/user';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import { useDeleteData } from '@/hooks/use-delete-data';
+import i18n from '@/lang';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
@@ -48,7 +51,7 @@ const userSearch = reactive({
 });
 const buttons = [
     {
-        label: '编辑',
+        label: i18n.global.t('commons.button.edit'),
         click: edit,
     },
     // {
@@ -79,10 +82,30 @@ function edit(row: User.User) {
     console.log(row);
 }
 
+// interface OperateOpen {
+//     acceptParams: (params: any) => void;
+// }
+// const operateRef = ref<OperateOpen>();
+
+const openOperate = (row: User.User) => {
+    console.log(row);
+    // let title = 'commons.button.create';
+    // if (row != null) {
+    //     title = 'commons.button.edit';
+    // }
+    // let params = {
+    //     titke: title,
+    //     row: row,
+    // };
+    // operateRef.value!.acceptParams(params);
+    router.push({ name: 'DemoCreate', params: { op: 'create' } });
+    // router.push({ name: 'operate', params: { operate: 'create' } });
+};
+
 const batchDelete = async () => {
     let ids: Array<number> = [];
     selects.value.forEach((item: User.User) => {
-        ids.push(item.ID);
+        ids.push(item.id);
     });
     await useDeleteData(deleteUser, { ids: ids }, 'commons.msg.delete');
 };

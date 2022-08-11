@@ -24,8 +24,8 @@ export interface ReqPage {
 }
 export interface CommonModel {
     id: number;
-    CreatedAt: string;
-    UpdatedAt: string;
+    CreatedAt?: string;
+    UpdatedAt?: string;
 }
 
 // * 登录模块

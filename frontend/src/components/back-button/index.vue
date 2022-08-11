@@ -1,7 +1,8 @@
 <template>
-    <el-icon class="back-button" @click="jump">
+    <!-- <el-icon class="back-button" @click="jump">
         <Back />
-    </el-icon>
+    </el-icon> -->
+    <el-page-header :content="header" @back="jump" />
 </template>
 
 <script setup lang="ts">
@@ -11,6 +12,7 @@ const props = defineProps({
     path: String,
     name: String,
     to: Object,
+    header: String,
 });
 function jump() {
     const { path, name, to } = props;
@@ -27,13 +29,13 @@ function jump() {
 </script>
 
 <style lang="scss">
-.back-button {
-    cursor: pointer;
-    margin-right: 10px;
-    font-weight: 600;
+// .back-button {
+//     cursor: pointer;
+//     margin-right: 10px;
+//     font-weight: 600;
 
-    &:active {
-        transform: scale(0.85);
-    }
-}
+//     &:active {
+//         transform: scale(0.85);
+//     }
+// }
 </style>

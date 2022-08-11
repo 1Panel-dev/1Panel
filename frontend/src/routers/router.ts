@@ -3,6 +3,24 @@ import { Layout } from '@/routers/constant';
 
 const modules = import.meta.globEager('./modules/*.ts');
 
+const homeRouter: RouteRecordRaw = {
+    path: '/',
+    component: Layout,
+    redirect: '/home/index',
+    meta: {
+        keepAlive: true,
+        title: 'menu.home',
+        icon: 'home-filled',
+    },
+    children: [
+        {
+            path: '/home/index',
+            name: 'home',
+            component: () => import('@/views/home/index.vue'),
+        },
+    ],
+};
+
 export const routerArray: RouteRecordRaw[] = [];
 
 export const rolesRoutes = [
@@ -19,30 +37,23 @@ rolesRoutes.forEach((item) => {
     const menu = item as RouteRecordRaw;
     routerArray.push(menu);
 });
+
+export const menuList: RouteRecordRaw[] = [];
+rolesRoutes.forEach((item) => {
+    let menuItem = JSON.parse(JSON.stringify(item));
+    let menuChildren: RouteRecordRaw[] = [];
+    menuItem.children.forEach((child: any) => {
+        if (child.hidden == null || child.hidden == false) {
+            menuChildren.push(child);
+        }
+    });
+    menuItem.children = menuChildren as RouteRecordRaw[];
+    menuList.push(menuItem);
+});
+menuList.unshift(homeRouter);
+
 export const routes: RouteRecordRaw[] = [
-    // {
-    //     path: '/',
-    //     redirect: { name: 'login' },
-    // },
-    {
-        path: '/',
-        component: Layout,
-        redirect: '/home/index',
-        meta: {
-            keepAlive: true,
-            requiresAuth: true,
-            title: 'menu.home',
-            key: 'home',
-            icon: 'home-filled',
-        },
-        children: [
-            {
-                path: '/home/index',
-                name: 'home',
-                component: () => import('@/views/home/index.vue'),
-            },
-        ],
-    },
+    homeRouter,
     {
         path: '/login',
         name: 'login',
@@ -63,7 +74,6 @@ const router = createRouter({
     history: createWebHashHistory(),
     routes: routes as RouteRecordRaw[],
     strict: false,
-    // 切换页面，滚动到最顶部
     scrollBehavior: () => ({ left: 0, top: 0 }),
 });
 

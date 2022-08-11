@@ -29,31 +29,29 @@
 import { ref, computed, onMounted } from 'vue';
 import { RouteRecordRaw, useRoute } from 'vue-router';
 import { MenuStore } from '@/store/modules/menu';
-import { AuthStore } from '@/store/modules/auth';
-import { handleRouter } from '@/utils/util';
 import { loadingSvg } from '@/utils/svg';
-import Logo from './components/Logo.vue';
-import SubItem from './components/SubItem.vue';
-import { routes } from '@/routers/router';
+import Logo from './components/logo.vue';
+import SubItem from './components/sub-item.vue';
+import { menuList } from '@/routers/router';
 const route = useRoute();
 const menuStore = MenuStore();
-const authStore = AuthStore();
 
 onMounted(async () => {
-    // 获取菜单列
-
-    menuStore.setMenuList(routes);
-
-    const dynamicRouter = handleRouter(routes);
-    authStore.setAuthRouter(dynamicRouter);
+    menuStore.setMenuList(menuList);
 });
 
-const activeMenu = computed((): string => route.path);
+// const activeMenu = computed((): string => route.path);
+const activeMenu = computed(() => {
+    const { meta, path } = route;
+    if (meta.activeMenu) {
+        return meta.activeMenu;
+    }
+    return path;
+});
 const isCollapse = computed((): boolean => menuStore.isCollapse);
 const routerMenus = computed((): RouteRecordRaw[] => menuStore.menuList);
-// aside 自适应
+
 const screenWidth = ref<number>(0);
-// 监听窗口大小变化，合并 aside
 const listeningWindow = () => {
     window.onresize = () => {
         return (() => {

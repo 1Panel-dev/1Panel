@@ -28,6 +28,14 @@ export default {
         rule: {
             username: 'Please enter a username',
             password: 'Please enter a password',
+            required: 'Please enter the required fields',
+            commonName: 'Support English, Chinese, numbers, .-_, length 1-30',
+        },
+    },
+    business: {
+        user: {
+            username: 'Username',
+            email: 'Email',
         },
     },
     menu: {
