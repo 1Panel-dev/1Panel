@@ -6,6 +6,8 @@ export default {
             edit: '编辑',
             confirm: '确认',
             cancel: '取消',
+            reset: '重置',
+            login: '登陆',
         },
         table: {
             name: '名称',
@@ -17,6 +19,14 @@ export default {
             delete: '此操作不可回滚,是否继续',
             title: '删除',
             deleteSuccess: '删除成功',
+            loginSuccss: '登陆成功',
+        },
+        login: {
+            captchaHelper: '请输入验证码',
+        },
+        rule: {
+            username: '请输入用户名',
+            password: '请输入密码',
         },
     },
     menu: {

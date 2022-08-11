@@ -6,6 +6,8 @@ export default {
             edit: 'Edit',
             confirm: 'Confirm',
             cancel: 'Cancel',
+            reset: 'Reset',
+            login: 'Login',
         },
         table: {
             name: 'Name',
@@ -17,6 +19,14 @@ export default {
             delete: 'This operation cannot be rolled back. Do you want to continue',
             title: 'Delete',
             deleteSuccess: 'Delete Success',
+            loginSuccss: 'Login Success',
+        },
+        login: {
+            captchaHelper: 'Please enter the verification code',
+        },
+        rule: {
+            username: 'Please enter a username',
+            password: 'Please enter a password',
         },
     },
     menu: {

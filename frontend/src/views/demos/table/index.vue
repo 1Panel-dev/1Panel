@@ -35,7 +35,6 @@ import { User } from '@/api/interface/user';
 import { deleteUser, getUserList } from '@/api/modules/user';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import { useDeleteData } from '@/hooks/useDeleteData';
-import i18n from '@/lang';
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
@@ -81,7 +80,7 @@ const batchDelete = async () => {
     selects.value.forEach((item: User.User) => {
         ids.push(item.ID);
     });
-    await useDeleteData(deleteUser, { ids: ids }, i18n.global.t('commons.msg.delete'));
+    await useDeleteData(deleteUser, { ids: ids }, 'commons.msg.delete');
 };
 
 const search = async () => {
