@@ -12,23 +12,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GeneratePaginationFromReq(c *gin.Context) (dto.PageInfo, bool) {
+func GeneratePaginationFromReq(c *gin.Context) (*dto.PageInfo, bool) {
 	p, ok1 := c.GetQuery("page")
 	ps, ok2 := c.GetQuery("pageSize")
 	if !(ok1 && ok2) {
-		return dto.PageInfo{Page: 1, PageSize: 10}, false
+		return nil, false
 	}
 
 	page, err := strconv.Atoi(p)
 	if err != nil {
-		return dto.PageInfo{Page: 1, PageSize: 10}, false
+		return nil, false
 	}
 	pageSize, err := strconv.Atoi(ps)
 	if err != nil {
-		return dto.PageInfo{Page: 1, PageSize: 10}, false
+		return nil, false
 	}
 
-	return dto.PageInfo{Page: page, PageSize: pageSize}, false
+	return &dto.PageInfo{Page: page, PageSize: pageSize}, true
 }
 
 func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {

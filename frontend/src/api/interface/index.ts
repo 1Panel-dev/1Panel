@@ -5,7 +5,7 @@ export interface Result {
 }
 
 // * 请求响应参数(包含data)
-export interface ResultData<T = any> {
+export interface ResultData<T> {
     code: number;
     message: string;
     data: T;

@@ -20,10 +20,6 @@ rolesRoutes.forEach((item) => {
     routerArray.push(menu);
 });
 export const routes: RouteRecordRaw[] = [
-    // {
-    //     path: '/',
-    //     redirect: { name: 'login' },
-    // },
     {
         path: '/',
         component: Layout,
@@ -54,7 +50,6 @@ export const routes: RouteRecordRaw[] = [
     },
     ...routerArray,
     {
-        // 找不到路由重定向到404页面
         path: '/:pathMatch(.*)',
         redirect: { name: '404' },
     },
@@ -63,7 +58,6 @@ const router = createRouter({
     history: createWebHashHistory(),
     routes: routes as RouteRecordRaw[],
     strict: false,
-    // 切换页面，滚动到最顶部
     scrollBehavior: () => ({ left: 0, top: 0 }),
 });
 

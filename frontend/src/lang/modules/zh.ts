@@ -12,15 +12,20 @@ export default {
         table: {
             name: '名称',
             createdAt: '创建时间',
+            date: '时间',
             updatedAt: '更新时间',
             operate: '操作',
+            message: '信息',
         },
         msg: {
             delete: '此操作不可回滚,是否继续',
-            title: '删除',
+            deleteTitle: '删除',
             deleteSuccess: '删除成功',
-            loginSuccss: '登陆成功',
+            loginSuccess: '登陆成功',
+            operationSuccess: '操作成功',
             requestTimeout: '请求超时,请稍后重试',
+            infoTitle: '提示',
+            sureLogOut: '您是否确认退出登录?',
         },
         login: {
             captchaHelper: '请输入验证码',
@@ -33,6 +38,7 @@ export default {
     menu: {
         home: '概览',
         demo: '样例',
+        operations: '操作记录',
     },
 
     home: {
@@ -58,5 +64,20 @@ export default {
         personalData: '个人资料',
         changePassword: '修改密码',
         logout: '退出登录',
+    },
+    operations: {
+        detail: {
+            users: '用户',
+            auth: '用户',
+            post: '创建',
+            update: '更新',
+            delete: '删除',
+            login: '登录',
+            logout: '退出',
+        },
+        operatoin: '操作',
+        status: '状态',
+        request: '请求',
+        response: '响应',
     },
 };
