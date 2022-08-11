@@ -11,11 +11,8 @@ func Copy(to, from interface{}) error {
 	if err != nil {
 		return errors.Wrap(err, "marshal from data err")
 	}
-
-	err = json.Unmarshal(b, to)
-	if err != nil {
+	if err = json.Unmarshal(b, to); err != nil {
 		return errors.Wrap(err, "unmarshal to data err")
 	}
-
 	return nil
 }

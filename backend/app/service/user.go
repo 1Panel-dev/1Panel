@@ -34,7 +34,7 @@ func NewIUserService() IUserService {
 func (u *UserService) Get(name string) (*dto.UserBack, error) {
 	user, err := userRepo.Get(commonRepo.WithByName(name))
 	if err != nil {
-		return nil, err
+		return nil, constant.ErrRecordNotFound
 	}
 	var dtoUser dto.UserBack
 	if err := copier.Copy(&dtoUser, &user); err != nil {
@@ -59,7 +59,7 @@ func (u *UserService) Page(search dto.UserPage) (int64, interface{}, error) {
 func (u *UserService) Register(userDto dto.UserCreate) error {
 	user, _ := userRepo.Get(commonRepo.WithByName(userDto.Name))
 	if user.ID != 0 {
-		return errors.Wrap(constant.ErrRecordExist, "data exist")
+		return constant.ErrRecordExist
 	}
 	if err := copier.Copy(&user, &userDto); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
