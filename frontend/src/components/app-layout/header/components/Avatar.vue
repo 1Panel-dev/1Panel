@@ -21,8 +21,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import InfoDialog from './InfoDialog.vue';
-import PasswordDialog from './PasswordDialog.vue';
+import InfoDialog from './info-dialog.vue';
+import PasswordDialog from './password-dialog.vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { GlobalStore } from '@/store';
@@ -38,7 +38,7 @@ const logout = () => {
         type: 'warning',
     }).then(() => {
         router.push({ name: 'login' });
-        globalStore.setToken('');
+        globalStore.setUserInfo('');
         ElMessage({
             type: 'success',
             message: '退出登录成功！',

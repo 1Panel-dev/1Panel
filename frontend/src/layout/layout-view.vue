@@ -9,5 +9,5 @@
 </template>
 
 <script setup lang="ts">
-import cacheRouter from '@/routers/cacheRouter';
+import cacheRouter from '@/routers/cache-router';
 </script>

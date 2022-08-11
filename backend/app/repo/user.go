@@ -49,7 +49,7 @@ func (u *UserRepo) Page(page, size int, opts ...DBOption) (int64, []model.User, 
 	}
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Limit(page).Offset(size * (page - 1)).Find(&users).Error
+	err := db.Limit(size).Offset(size * (page - 1)).Find(&users).Error
 	return count, users, err
 }
 

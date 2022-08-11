@@ -27,11 +27,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import Menu from './LayoutMenu.vue';
-import Header from './LayoutHeader.vue';
-import Footer from './LayoutFooter.vue';
-import View from './LayoutView.vue';
-import Content from './LayoutContent.vue';
+import Menu from './layout-menu.vue';
+import Header from './layout-header.vue';
+import Footer from './layout-footer.vue';
+import View from './layout-view.vue';
+import Content from './layout-content.vue';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 const themeConfig = computed(() => globalStore.themeConfig);

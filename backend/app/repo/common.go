@@ -24,6 +24,12 @@ func (c *CommonRepo) WithByName(name string) DBOption {
 	}
 }
 
+func (c *CommonRepo) WithLikeName(name string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("name like ?", "%"+name+"%")
+	}
+}
+
 func (c *CommonRepo) WithOrderBy(orderStr string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Order(orderStr)

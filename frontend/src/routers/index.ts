@@ -2,7 +2,7 @@ import router from '@/routers/router';
 import NProgress from '@/config/nprogress';
 import { HOME_URL } from '@/config/config';
 import { GlobalStore } from '@/store';
-import { AxiosCanceler } from '@/api/helper/axiosCancel';
+import { AxiosCanceler } from '@/api/helper/axios-cancel';
 import { AuthStore } from '@/store/modules/auth';
 
 const axiosCanceler = new AxiosCanceler();

@@ -24,8 +24,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useTheme } from '@/hooks/useTheme';
-import SwitchDark from '@/components/SwitchDark/index.vue';
+import { useTheme } from '@/hooks/use-theme';
+import SwitchDark from '@/components/switch-dark/index.vue';
 import { GlobalStore } from '@/store';
 
 // 预定义主题颜色

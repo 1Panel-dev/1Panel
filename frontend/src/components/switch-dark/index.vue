@@ -14,7 +14,7 @@
 import { computed } from 'vue';
 import { GlobalStore } from '@/store';
 import { Sunny, Moon } from '@element-plus/icons-vue';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/hooks/use-theme';
 const globalStore = GlobalStore();
 
 const { switchDark } = useTheme();

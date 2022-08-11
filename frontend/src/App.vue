@@ -11,7 +11,7 @@ import { GlobalStore } from '@/store';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import en from 'element-plus/es/locale/lang/en';
 // 使用主题
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from '@/hooks/use-theme';
 useTheme();
 
 const globalStore = GlobalStore();

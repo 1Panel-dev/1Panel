@@ -15,17 +15,15 @@ export interface ResultData<T = any> {
 export interface ResPage<T> {
     items: T[];
     total: number;
-    code: number;
-    msg?: '';
 }
 
 // * 分页请求参数
 export interface ReqPage {
-    currentPage: number;
+    page: number;
     pageSize: number;
 }
 export interface CommonModel {
-    ID: number;
+    id: number;
     CreatedAt: string;
     UpdatedAt: string;
 }

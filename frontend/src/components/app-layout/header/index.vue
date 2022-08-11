@@ -20,11 +20,11 @@
 </template>
 <script setup lang="ts">
 import { computed } from 'vue';
-import CollapseIcon from './components/CollapseIcon.vue';
-import Breadcrumb from './components/Breadcrumb.vue';
-import Language from './components/Language.vue';
-import Theme from './components/Theme.vue';
-import Avatar from './components/Avatar.vue';
+import CollapseIcon from './components/collapseicon.vue';
+import Breadcrumb from './components/breadcrumb.vue';
+import Language from './components/language.vue';
+import Theme from './components/theme.vue';
+import Avatar from './components/avatar.vue';
 import { GlobalStore } from '@/store';
 
 const globalStore = GlobalStore();

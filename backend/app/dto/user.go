@@ -10,6 +10,11 @@ type UserCreate struct {
 	Email    string `json:"email" validate:"required,email"`
 }
 
+type UserPage struct {
+	PageInfo
+	Name string `json:"name"  validate:"required"`
+}
+
 type CaptchaResponse struct {
 	CaptchaID string `json:"captchaID"`
 	ImagePath string `json:"imagePath"`
@@ -20,6 +25,7 @@ type UserUpdate struct {
 }
 
 type UserBack struct {
+	ID        uint      `json:"id"`
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`
 	CreatedAt time.Time `json:"createdAt"`

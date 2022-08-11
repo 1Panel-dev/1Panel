@@ -1,5 +1,5 @@
 import { Upload } from '@/api/interface/index';
-import { PORT1 } from '@/api/config/servicePort';
+import { PORT1 } from '@/api/config/service-port';
 
 import http from '@/api';
 

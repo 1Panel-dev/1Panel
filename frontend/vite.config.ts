@@ -2,7 +2,7 @@ import { defineConfig, loadEnv, ConfigEnv, UserConfig } from 'vite';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
-import { wrapperEnv } from './src/utils/getEnv';
+import { wrapperEnv } from './src/utils/get-env';
 import { visualizer } from 'rollup-plugin-visualizer';
 import viteCompression from 'vite-plugin-compression';
 import VueSetupExtend from 'vite-plugin-vue-setup-extend';

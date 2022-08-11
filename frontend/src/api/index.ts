@@ -1,9 +1,9 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { showFullScreenLoading, tryHideFullScreenLoading } from '@/config/serviceLoading';
-import { AxiosCanceler } from './helper/axiosCancel';
+import { showFullScreenLoading, tryHideFullScreenLoading } from '@/config/service-loading';
+import { AxiosCanceler } from './helper/axios-cancel';
 import { ResultData } from '@/api/interface';
-import { ResultEnum } from '@/enums/httpEnum';
-import { checkStatus } from './helper/checkStatus';
+import { ResultEnum } from '@/enums/http-enum';
+import { checkStatus } from './helper/check-status';
 import { ElMessage } from 'element-plus';
 import router from '@/routers';
 import i18n from '@/lang';

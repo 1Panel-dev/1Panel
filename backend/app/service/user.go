@@ -18,7 +18,7 @@ type UserService struct{}
 
 type IUserService interface {
 	Get(name string) (*dto.UserBack, error)
-	Page(page, size int) (int64, interface{}, error)
+	Page(search dto.UserPage) (int64, interface{}, error)
 	Register(userDto dto.UserCreate) error
 	Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error)
 	Delete(name string) error
@@ -42,8 +42,8 @@ func (u *UserService) Get(name string) (*dto.UserBack, error) {
 	return &dtoUser, err
 }
 
-func (u *UserService) Page(page, size int) (int64, interface{}, error) {
-	total, users, err := userRepo.Page(page, size)
+func (u *UserService) Page(search dto.UserPage) (int64, interface{}, error) {
+	total, users, err := userRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Name))
 	var dtoUsers []dto.UserBack
 	for _, user := range users {
 		var item dto.UserBack

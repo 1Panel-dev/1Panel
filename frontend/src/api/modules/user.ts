@@ -1,16 +1,15 @@
 import http from '@/api';
+import { ResPage } from '../interface';
 import { User } from '../interface/user';
-import UserDataList from '@/assets/json/user.json';
+// import UserDataList from '@/assets/json/user.json';
 
 /**
  * @name 用户管理模块
  */
 // * 获取用户列表
 export const getUserList = (params: User.ReqGetUserParams) => {
-    console.log(params);
-
-    return UserDataList;
-    // return http.post<ResPage<User.User>>(`/users/list`, params);
+    // return UserDataList;
+    return http.post<ResPage<User.User>>(`/users/search`, params);
 };
 
 // * 新增用户

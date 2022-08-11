@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { MenuState } from '../interface';
-import piniaPersistConfig from '@/config/piniaPersist';
+import piniaPersistConfig from '@/config/pinia-persist';
 import { RouteRecordRaw } from 'vue-router';
 const whiteList = ['/login', '/error'];
 

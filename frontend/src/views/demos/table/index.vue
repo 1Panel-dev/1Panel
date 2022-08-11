@@ -9,7 +9,7 @@
                 }}</el-button>
             </template>
             <el-table-column type="selection" fix />
-            <el-table-column label="ID" min-width="100" prop="ID" fix />
+            <el-table-column label="ID" min-width="100" prop="id" fix />
             <el-table-column :label="$t('commons.table.name')" min-width="100" prop="name" fix>
                 <template #default="{ row }">
                     <fu-input-rw-switch v-model="row.name" size="mini" />
@@ -28,19 +28,23 @@
     </LayoutContent>
 </template>
 <script setup lang="ts">
-import LayoutContent from '@/layout/LayoutContent.vue';
+import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { dateFromat } from '@/utils/util';
 import { User } from '@/api/interface/user';
 import { deleteUser, getUserList } from '@/api/modules/user';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
-import { useDeleteData } from '@/hooks/useDeleteData';
+import { useDeleteData } from '@/hooks/use-delete-data';
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
-    currentPage: 1,
+    page: 1,
     pageSize: 5,
     total: 0,
+});
+const userSearch = reactive({
+    page: 1,
+    pageSize: 5,
 });
 const buttons = [
     {
@@ -84,10 +88,11 @@ const batchDelete = async () => {
 };
 
 const search = async () => {
-    const { currentPage, pageSize } = paginationConfig;
-    const res = getUserList({ currentPage, pageSize });
-    data.value = res.items;
-    paginationConfig.total = res.total;
+    userSearch.page = paginationConfig.page;
+    userSearch.pageSize = paginationConfig.pageSize;
+    const res = await getUserList(userSearch);
+    data.value = res.data.items;
+    paginationConfig.total = res.data.total;
 };
 
 onMounted(() => {

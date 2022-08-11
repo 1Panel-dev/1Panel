@@ -1,6 +1,6 @@
 import { App } from 'vue';
 import copy from './modules/copy';
-import waterMarker from './modules/waterMarker';
+import waterMarker from './modules/water-marker';
 import draggable from './modules/draggable';
 import debounce from './modules/debounce';
 import throttle from './modules/throttle';
