@@ -6,7 +6,14 @@ import { ResultEnum } from '@/enums/http-enum';
 import { checkStatus } from './helper/check-status';
 import { ElMessage } from 'element-plus';
 import router from '@/routers';
-import i18n from '@/lang';
+
+/**
+ * pinia 错误使用说明示例
+ * https://github.com/vuejs/pinia/discussions/971
+ * https://github.com/vuejs/pinia/discussions/664#discussioncomment-1329898
+ * https://pinia.vuejs.org/core-concepts/outside-component-usage.html#single-page-applications
+ */
+// const globalStore = GlobalStore();
 
 const axiosCanceler = new AxiosCanceler();
 
@@ -34,10 +41,6 @@ class RequestHttp {
             },
         );
 
-        /**
-         * @description 响应拦截器
-         *  服务器换返回信息 -> [拦截统一处理] -> 客户端JS获取到信息
-         */
         this.service.interceptors.response.use(
             (response: AxiosResponse) => {
                 const { data, config } = response;
@@ -59,8 +62,7 @@ class RequestHttp {
             async (error: AxiosError) => {
                 const { response } = error;
                 tryHideFullScreenLoading();
-                if (error.message.indexOf('timeout') !== -1)
-                    ElMessage.error(i18n.global.t('commons.msg.requestTimeout'));
+                if (error.message.indexOf('timeout') !== -1) ElMessage.error('请求超时！请您稍后重试');
                 if (response) checkStatus(response.status);
                 if (!window.navigator.onLine) router.replace({ path: '/500' });
                 return Promise.reject(error);
@@ -68,7 +70,6 @@ class RequestHttp {
         );
     }
 
-    // * 常用请求方法封装
     get<T>(url: string, params?: object, _object = {}): Promise<ResultData<T>> {
         return this.service.get(url, { params, ..._object });
     }

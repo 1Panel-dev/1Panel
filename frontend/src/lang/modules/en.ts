@@ -14,12 +14,13 @@ export default {
             createdAt: 'Creation Time',
             updatedAt: 'Update Time',
             operate: 'Operations',
+            message: 'message',
         },
         msg: {
             delete: 'This operation cannot be rolled back. Do you want to continue',
             title: 'Delete',
             deleteSuccess: 'Delete Success',
-            loginSuccss: 'Login Success',
+            loginSuccess: 'Login Success',
             requestTimeout: 'The request timed out, please try again later',
         },
         login: {
@@ -41,6 +42,7 @@ export default {
     menu: {
         home: 'Dashboard',
         demo: 'Demo',
+        operations: 'Operation logs',
     },
     home: {
         welcome: 'Welcome',
@@ -65,5 +67,20 @@ export default {
         personalData: 'Personal Data',
         changePassword: 'Change Password',
         logout: 'Logout',
+    },
+    operations: {
+        detail: {
+            users: 'User',
+            auth: 'User',
+            login: ' login',
+            logout: ' logout',
+            post: ' create',
+            update: ' update',
+            delete: ' delete',
+        },
+        operatoin: 'operatoin',
+        status: 'status',
+        request: 'request',
+        response: 'response',
     },
 };

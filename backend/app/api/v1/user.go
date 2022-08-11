@@ -36,6 +36,14 @@ func (b *BaseApi) Login(c *gin.Context) {
 	helper.SuccessWithData(c, user)
 }
 
+func (b *BaseApi) LogOut(c *gin.Context) {
+	if err := userService.LogOut(c); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
 func (b *BaseApi) Captcha(c *gin.Context) {
 	captcha, err := captcha.CreateCaptcha()
 	if err != nil {

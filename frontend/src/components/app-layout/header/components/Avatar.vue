@@ -13,9 +13,7 @@
             </el-dropdown-menu>
         </template>
     </el-dropdown>
-    <!-- infoDialog -->
     <InfoDialog ref="infoRef"></InfoDialog>
-    <!-- passwordDialog -->
     <PasswordDialog ref="passwordRef"></PasswordDialog>
 </template>
 
@@ -26,24 +24,30 @@ import PasswordDialog from './password-dialog.vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { GlobalStore } from '@/store';
+import { logOutApi } from '@/api/modules/login';
+import i18n from '@/lang';
 
 const router = useRouter();
 const globalStore = GlobalStore();
 
-// 退出登录
 const logout = () => {
-    ElMessageBox.confirm('您是否确认退出登录?', '温馨提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+    ElMessageBox.confirm(i18n.global.t('commons.msg.sureLogOut'), i18n.global.t('commons.msg.infoTitle'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'warning',
     }).then(() => {
+        systemLogOut();
         router.push({ name: 'login' });
-        globalStore.setUserInfo('');
+        globalStore.setLogStatus(false);
         ElMessage({
             type: 'success',
-            message: '退出登录成功！',
+            message: i18n.global.t('commons.msg.operationSuccess'),
         });
     });
+};
+
+const systemLogOut = async () => {
+    await logOutApi();
 };
 
 interface DialogExpose {
@@ -51,7 +55,7 @@ interface DialogExpose {
 }
 const infoRef = ref<null | DialogExpose>(null);
 const passwordRef = ref<null | DialogExpose>(null);
-// 打开修改密码和个人信息弹窗
+
 const openDialog = (refName: string) => {
     if (refName == 'infoRef') return infoRef.value?.openDialog();
     passwordRef.value?.openDialog();

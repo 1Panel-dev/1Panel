@@ -41,10 +41,10 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             open: viteEnv.VITE_OPEN,
             // https: false,
             proxy: {
-                '/api': {
+                '/api/v1': {
                     target: 'http://localhost:9999',
                     changeOrigin: true,
-                    rewrite: (path) => path.replace(/^\/api/, ''),
+                    // rewrite: (path) => path.replace(/^\/api/, ''),
                 },
             },
         },

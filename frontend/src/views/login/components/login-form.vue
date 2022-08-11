@@ -97,7 +97,7 @@ const login = (formEl: FormInstance | undefined) => {
             globalStore.setUserInfo(res.data.name);
             globalStore.setLogStatus(true);
             menuStore.setMenuList([]);
-            ElMessage.success(i18n.global.t('commons.msg.loginSuccss'));
+            ElMessage.success(i18n.global.t('commons.msg.loginSuccess'));
             router.push({ name: 'home' });
         } catch (error) {
             loginVerify();

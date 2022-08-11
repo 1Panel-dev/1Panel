@@ -33,12 +33,11 @@ func Routers() *gin.Engine {
 			c.JSON(200, "ok")
 		})
 	}
+	PrivateGroup := Router.Group("/api/v1")
 	{
-		systemRouter.InitBaseRouter(PublicGroup) // 注册基础功能路由 不做鉴权
-	}
-	PrivateGroup := Router.Group("")
-	{
-		systemRouter.InitUserRouter(PrivateGroup) // 注册用户路由
+		systemRouter.InitBaseRouter(PrivateGroup)
+		systemRouter.InitUserRouter(PrivateGroup)
+		systemRouter.InitOperationLogRouter(PrivateGroup)
 	}
 
 	return Router

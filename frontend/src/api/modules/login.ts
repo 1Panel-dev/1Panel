@@ -8,3 +8,7 @@ export const loginApi = (params: Login.ReqLoginForm) => {
 export const getCaptcha = () => {
     return http.get<Login.ResCaptcha>(`/auth/captcha`);
 };
+
+export const logOutApi = () => {
+    return http.post<any>(`/auth/logout`);
+};

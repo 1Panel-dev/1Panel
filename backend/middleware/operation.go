@@ -2,10 +2,8 @@ package middleware
 
 import (
 	"bytes"
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
@@ -18,26 +16,17 @@ import (
 func OperationRecord() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var body []byte
-		if c.Request.Method != http.MethodGet {
-			var err error
-			body, err = ioutil.ReadAll(c.Request.Body)
-			if err != nil {
-				global.LOG.Errorf("read body from request failed, err: %v", err)
-			} else {
-				c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
-			}
+		if c.Request.Method == http.MethodGet || strings.Contains(c.Request.URL.Path, "search") {
+			c.Next()
+			return
+		}
+
+		var err error
+		body, err = ioutil.ReadAll(c.Request.Body)
+		if err != nil {
+			global.LOG.Errorf("read body from request failed, err: %v", err)
 		} else {
-			query := c.Request.URL.RawQuery
-			query, _ = url.QueryUnescape(query)
-			split := strings.Split(query, "&")
-			m := make(map[string]string)
-			for _, v := range split {
-				kv := strings.Split(v, "=")
-				if len(kv) == 2 {
-					m[kv[0]] = kv[1]
-				}
-			}
-			body, _ = json.Marshal(&m)
+			c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
 		}
 		pathInfo := loadLogInfo(c.Request.URL.Path)
 
@@ -62,8 +51,6 @@ func OperationRecord() gin.HandlerFunc {
 		c.Next()
 
 		latency := time.Since(now)
-		record.ErrorMessage = c.Errors.ByType(gin.ErrorTypePrivate).String()
-		record.Status = c.Writer.Status()
 		record.Latency = latency
 		record.Resp = writer.body.String()
 
@@ -90,6 +77,7 @@ type pathInfo struct {
 }
 
 func loadLogInfo(path string) pathInfo {
+	path = strings.ReplaceAll(path, "/api/v1", "")
 	if !strings.Contains(path, "/") {
 		return pathInfo{}
 	}
