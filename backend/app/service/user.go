@@ -17,22 +17,22 @@ import (
 type UserService struct{}
 
 type IUserService interface {
-	Get(name string) (*dto.UserBack, error)
+	Get(name uint) (*dto.UserBack, error)
 	Page(search dto.UserPage) (int64, interface{}, error)
 	Register(userDto dto.UserCreate) error
 	Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error)
 	LogOut(c *gin.Context) error
 	Delete(name string) error
 	Save(req model.User) error
-	Update(upMap map[string]interface{}) error
+	Update(id uint, upMap map[string]interface{}) error
 }
 
 func NewIUserService() IUserService {
 	return &UserService{}
 }
 
-func (u *UserService) Get(name string) (*dto.UserBack, error) {
-	user, err := userRepo.Get(commonRepo.WithByName(name))
+func (u *UserService) Get(id uint) (*dto.UserBack, error) {
+	user, err := userRepo.Get(commonRepo.WithByID(id))
 	if err != nil {
 		return nil, constant.ErrRecordNotFound
 	}
@@ -136,6 +136,6 @@ func (u *UserService) Save(req model.User) error {
 	return userRepo.Save(req)
 }
 
-func (u *UserService) Update(upMap map[string]interface{}) error {
-	return userRepo.Update(upMap)
+func (u *UserService) Update(id uint, upMap map[string]interface{}) error {
+	return userRepo.Update(id, upMap)
 }

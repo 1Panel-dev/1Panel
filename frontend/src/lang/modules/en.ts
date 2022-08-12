@@ -22,6 +22,12 @@ export default {
             deleteSuccess: 'Delete Success',
             loginSuccess: 'Login Success',
             requestTimeout: 'The request timed out, please try again later',
+            deleteTitle: 'Delete',
+            operationSuccess: 'Successful operation',
+            infoTitle: 'Hint',
+            sureLogOut: 'Are you sure you want to log out?',
+            createSuccess: 'Create Success',
+            updateSuccess: 'Update Success',
         },
         login: {
             captchaHelper: 'Please enter the verification code',
@@ -31,12 +37,14 @@ export default {
             password: 'Please enter a password',
             required: 'Please enter the required fields',
             commonName: 'Support English, Chinese, numbers, .-_, length 1-30',
+            email: 'Email format error',
         },
     },
     business: {
         user: {
             username: 'Username',
             email: 'Email',
+            password: 'Password',
         },
     },
     menu: {

@@ -20,7 +20,7 @@ const demoRouter = {
             },
         },
         {
-            path: '/demos/table/:op',
+            path: '/demos/table/:op/:id?',
             name: 'DemoCreate',
             props: true,
             hidden: true,

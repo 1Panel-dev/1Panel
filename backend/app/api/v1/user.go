@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/pkg/errors"
+	"strconv"
 
 	"github.com/1Panel-dev/1Panel/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/app/dto"
@@ -125,7 +126,8 @@ func (b *BaseApi) UpdateUser(c *gin.Context) {
 
 	upMap := make(map[string]interface{})
 	upMap["email"] = req.Email
-	if err := userService.Update(upMap); err != nil {
+	upMap["name"] = req.Name
+	if err := userService.Update(req.ID, upMap); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -133,13 +135,14 @@ func (b *BaseApi) UpdateUser(c *gin.Context) {
 }
 
 func (b *BaseApi) GetUserInfo(c *gin.Context) {
-	name, ok := c.Params.Get("name")
+	idParam, ok := c.Params.Get("id")
 	if !ok {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error name"))
 		return
 	}
+	intNum, _ := strconv.Atoi(idParam)
 
-	user, err := userService.Get(name)
+	user, err := userService.Get(uint(intNum))
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

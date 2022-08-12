@@ -2,7 +2,7 @@
     <LayoutContent :header="'样例'">
         <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
             <template #toolbar>
-                <el-button type="primary" @click="openOperate({})">{{ $t('commons.button.create') }}</el-button>
+                <el-button type="primary" @click="openOperate(null)">{{ $t('commons.button.create') }}</el-button>
                 <el-button type="primary" plain>{{ '其他操作' }}</el-button>
                 <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete">{{
                     $t('commons.button.delete')
@@ -49,10 +49,22 @@ const userSearch = reactive({
     page: 1,
     pageSize: 5,
 });
+
+const openOperate = (row: User.User | null) => {
+    let params: { [key: string]: any } = {
+        op: 'create',
+    };
+    if (row !== null) {
+        params.op = 'edit';
+        params.id = row.id;
+    }
+
+    router.push({ name: 'DemoCreate', params });
+};
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
-        click: edit,
+        click: openOperate,
     },
     // {
     //     label: '执行',
@@ -72,36 +84,6 @@ const buttons = [
     //     click: buttonClick,
     // },
 ];
-
-// function select(row: any) {
-//     console.log(row);
-//     selects.value.push(row.ID);
-//     console.log(selects);
-// }
-function edit(row: User.User) {
-    console.log(row);
-}
-
-// interface OperateOpen {
-//     acceptParams: (params: any) => void;
-// }
-// const operateRef = ref<OperateOpen>();
-
-const openOperate = (row: User.User) => {
-    console.log(row);
-    // let title = 'commons.button.create';
-    // if (row != null) {
-    //     title = 'commons.button.edit';
-    // }
-    // let params = {
-    //     titke: title,
-    //     row: row,
-    // };
-    // operateRef.value!.acceptParams(params);
-    router.push({ name: 'DemoCreate', params: { op: 'create' } });
-    // router.push({ name: 'operate', params: { operate: 'create' } });
-};
-
 const batchDelete = async () => {
     let ids: Array<number> = [];
     selects.value.forEach((item: User.User) => {

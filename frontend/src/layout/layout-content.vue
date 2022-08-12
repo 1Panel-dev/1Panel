@@ -16,10 +16,11 @@
             <slot name="toolbar"></slot>
         </div>
         <div class="content-container_form">
-            <slot name="form"> </slot>
-            <div class="form-button">
-                <slot name="button"></slot>
-            </div>
+            <slot name="form">
+                <form-button>
+                    <slot name="button"></slot>
+                </form-button>
+            </slot>
         </div>
         <slot></slot>
     </div>
@@ -28,6 +29,7 @@
 <script setup lang="ts">
 import { computed, useSlots } from 'vue';
 import BackButton from '@/components/back-button/index.vue';
+import FormButton from './form-button.vue';
 defineOptions({ name: 'LayoutContent' }); // 组件名
 const slots = useSlots();
 const prop = defineProps({
@@ -59,8 +61,8 @@ const showBack = computed(() => {
 
 .content-container_form {
     text-align: -webkit-center;
-    width: 80%;
-    margin-left: 10%;
+    width: 60%;
+    margin-left: 15%;
     .form-button {
         float: right;
     }

@@ -4,6 +4,7 @@ import { FormItemRule } from 'element-plus';
 interface CommonRule {
     required: FormItemRule;
     name: FormItemRule;
+    email: FormItemRule;
 }
 
 export const Rules: CommonRule = {
@@ -19,5 +20,10 @@ export const Rules: CommonRule = {
         message: i18n.global.t('commons.rule.commonName'),
         trigger: 'blur',
         pattern: '/^[a-zA-Z0-9\u4e00-\u9fa5]{1}[a-zA-Z0-9_.\u4e00-\u9fa5-]{0,30}$/',
+    },
+    email: {
+        type: 'email',
+        message: i18n.global.t('commons.rule.email'),
+        trigger: 'blur',
     },
 };

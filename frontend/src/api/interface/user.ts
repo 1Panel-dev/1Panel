@@ -2,8 +2,9 @@ import { CommonModel, ReqPage } from '.';
 
 export namespace User {
     export interface User extends CommonModel {
-        username: string;
+        name: string;
         email: string;
+        password: string;
     }
     export interface UserCreate {
         username: string;
@@ -11,7 +12,7 @@ export namespace User {
     }
 
     export interface ReqGetUserParams extends ReqPage {
-        username?: string;
+        name?: string;
         email?: string;
     }
 }

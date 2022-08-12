@@ -12,7 +12,7 @@ type IUserRepo interface {
 	GetList(opts ...DBOption) ([]model.User, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.User, error)
 	Create(user *model.User) error
-	Update(vars map[string]interface{}) error
+	Update(id uint, vars map[string]interface{}) error
 	Save(user model.User) error
 	Delete(opts ...DBOption) error
 }
@@ -57,8 +57,8 @@ func (u *UserRepo) Create(user *model.User) error {
 	return global.DB.Create(user).Error
 }
 
-func (u *UserRepo) Update(vars map[string]interface{}) error {
-	return global.DB.Model(&model.User{}).Updates(vars).Error
+func (u *UserRepo) Update(id uint, vars map[string]interface{}) error {
+	return global.DB.Model(&model.User{}).Where("id = ?", id).Updates(vars).Error
 }
 
 func (u *UserRepo) Save(user model.User) error {

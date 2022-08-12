@@ -26,6 +26,8 @@ export default {
             requestTimeout: '请求超时,请稍后重试',
             infoTitle: '提示',
             sureLogOut: '您是否确认退出登录?',
+            createSuccess: '新建成功',
+            updateSuccess: '更新成功',
         },
         login: {
             captchaHelper: '请输入验证码',
@@ -35,12 +37,14 @@ export default {
             password: '请输入密码',
             required: '请填写必填项',
             commonName: '支持英文、中文、数字、.-_,长度1-30',
+            email: '邮箱格式错误',
         },
     },
     business: {
         user: {
             username: '用户名',
             email: '邮箱',
+            password: '密码',
         },
     },
     menu: {
