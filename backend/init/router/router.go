@@ -15,6 +15,8 @@ import (
 
 func Routers() *gin.Engine {
 	Router := gin.Default()
+	Router.Use(middleware.CSRF())
+	Router.Use(middleware.LoadCsrfToken())
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

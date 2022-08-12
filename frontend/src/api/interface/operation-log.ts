@@ -1,6 +1,7 @@
 import { DateTimeFormats } from '@intlify/core-base';
 
 export interface ResOperationLog {
+    id: number;
     group: string;
     source: string;
     action: string;

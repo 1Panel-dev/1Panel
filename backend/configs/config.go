@@ -10,4 +10,5 @@ type ServerConfig struct {
 	CORS      CORS      `mapstructure:"cors"`
 	Captcha   Captcha   `mapstructure:"captcha"`
 	Encrypt   Encrypt   `mapstructure:"encrypt"`
+	Csrf      Csrf      `mapstructure:"csrf"`
 }

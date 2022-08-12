@@ -10,6 +10,7 @@ type OperationRepo struct{}
 type IOperationRepo interface {
 	Create(user *model.OperationLog) error
 	Page(limit, offset int, opts ...DBOption) (int64, []model.OperationLog, error)
+	Delete(opts ...DBOption) error
 }
 
 func NewIOperationService() IOperationRepo {
@@ -30,4 +31,13 @@ func (u *OperationRepo) Page(page, size int, opts ...DBOption) (int64, []model.O
 	db = db.Count(&count)
 	err := db.Limit(size).Offset(size * (page - 1)).Find(&ops).Error
 	return count, ops, err
+}
+
+func (u *OperationRepo) Delete(opts ...DBOption) error {
+	db := global.DB
+	for _, opt := range opts {
+		db = opt(db)
+	}
+
+	return db.Delete(&model.OperationLog{}).Error
 }

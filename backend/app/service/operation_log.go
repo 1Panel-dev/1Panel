@@ -16,6 +16,7 @@ type OperationService struct{}
 type IOperationService interface {
 	Page(page, size int) (int64, interface{}, error)
 	Create(operation model.OperationLog) error
+	BatchDelete(ids []uint) error
 }
 
 func NewIOperationService() IOperationService {
@@ -48,6 +49,10 @@ func (u *OperationService) Page(page, size int) (int64, interface{}, error) {
 		dtoOps = append(dtoOps, item)
 	}
 	return total, dtoOps, err
+}
+
+func (u *OperationService) BatchDelete(ids []uint) error {
+	return operationRepo.Delete(commonRepo.WithIdsIn(ids))
 }
 
 func filterSensitive(vars string) string {

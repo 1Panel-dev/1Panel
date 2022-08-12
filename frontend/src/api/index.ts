@@ -6,15 +6,9 @@ import { ResultEnum } from '@/enums/http-enum';
 import { checkStatus } from './helper/check-status';
 import { ElMessage } from 'element-plus';
 import router from '@/routers';
+import { GlobalStore } from '@/store';
 
-/**
- * pinia 错误使用说明示例
- * https://github.com/vuejs/pinia/discussions/971
- * https://github.com/vuejs/pinia/discussions/664#discussioncomment-1329898
- * https://pinia.vuejs.org/core-concepts/outside-component-usage.html#single-page-applications
- */
-// const globalStore = GlobalStore();
-
+const globalStore = GlobalStore();
 const axiosCanceler = new AxiosCanceler();
 
 const config = {
@@ -30,6 +24,12 @@ class RequestHttp {
         this.service = axios.create(config);
         this.service.interceptors.request.use(
             (config: AxiosRequestConfig) => {
+                if (config.method != 'get') {
+                    config.headers = {
+                        'X-CSRF-TOKEN': globalStore.csrfToken,
+                        ...config.headers,
+                    };
+                }
                 axiosCanceler.addPending(config);
                 config.headers!.noLoading || showFullScreenLoading();
                 return {
@@ -44,6 +44,9 @@ class RequestHttp {
         this.service.interceptors.response.use(
             (response: AxiosResponse) => {
                 const { data, config } = response;
+                if (response.headers['x-csrf-token']) {
+                    globalStore.setCsrfToken(response.headers['x-csrf-token']);
+                }
                 axiosCanceler.removePending(config);
                 tryHideFullScreenLoading();
                 if (data.code == ResultEnum.OVERDUE) {

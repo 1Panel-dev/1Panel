@@ -5,6 +5,7 @@ import (
 )
 
 type OperationLogBack struct {
+	ID     uint   `json:"id"`
 	Group  string `json:"group"`
 	Source string `json:"source"`
 	Action string `json:"action"`

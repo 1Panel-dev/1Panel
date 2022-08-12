@@ -15,6 +15,7 @@ export interface ThemeConfigProp {
 export interface GlobalState {
     isLogin: boolean;
     userInfo: any;
+    csrfToken: string;
     assemblySize: string;
     language: string;
     themeConfig: ThemeConfigProp;

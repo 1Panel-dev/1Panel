@@ -68,19 +68,13 @@ func (b *BaseApi) Register(c *gin.Context) {
 }
 
 func (b *BaseApi) PageUsers(c *gin.Context) {
-	var req dto.UserPage
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	pagenation, isOK := helper.GeneratePaginationFromReq(c)
+	if !isOK {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, constant.ErrPageGenerate)
 		return
 	}
 
-	//pagenation, isOK := helper.GeneratePaginationFromReq(c)
-	//if !isOK {
-	//	helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, constant.ErrPageGenerate)
-	//	return
-	//}
-
-	total, list, err := userService.Page(req)
+	total, list, err := userService.Page(pagenation.Page, pagenation.PageSize)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

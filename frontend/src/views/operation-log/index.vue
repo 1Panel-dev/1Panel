@@ -1,6 +1,7 @@
 <template>
     <LayoutContent :header="$t('menu.operations')">
-        <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
+        <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
+            <el-table-column type="selection" fix />
             <el-table-column :label="$t('operations.operatoin')" fix>
                 <template #default="{ row }">
                     {{ fmtOperation(row) }}
@@ -61,6 +62,7 @@
                 :formatter="dateFromat"
                 show-overflow-tooltip
             />
+            <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
         </ComplexTable>
     </LayoutContent>
 </template>
@@ -69,9 +71,10 @@
 import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { dateFromat } from '@/utils/util';
-import { getOperationList } from '@/api/modules/operation-log';
+import { getOperationList, deleteOperation } from '@/api/modules/operation-log';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import { ResOperationLog } from '@/api/interface/operation-log';
+import { useDeleteData } from '@/hooks/use-delete-data';
 import i18n from '@/lang';
 
 const data = ref();
@@ -80,6 +83,30 @@ const paginationConfig = reactive({
     pageSize: 5,
     total: 0,
 });
+
+const selects = ref<any>([]);
+const batchDelete = async (row: ResOperationLog | null) => {
+    let ids: Array<number> = [];
+
+    if (row === null) {
+        selects.value.forEach((item: ResOperationLog) => {
+            ids.push(item.id);
+        });
+    } else {
+        ids.push(row.id);
+    }
+    console.log(ids);
+    await useDeleteData(deleteOperation, { ids: ids }, 'commons.msg.delete');
+    search();
+};
+
+const buttons = [
+    {
+        label: i18n.global.t('commons.button.delete'),
+        type: 'danger',
+        click: batchDelete,
+    },
+];
 
 const search = async () => {
     const { currentPage, pageSize } = paginationConfig;

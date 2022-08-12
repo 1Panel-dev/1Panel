@@ -41,13 +41,9 @@ const router = useRouter();
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
-    page: 1,
+    currentPage: 1,
     pageSize: 5,
     total: 0,
-});
-const userSearch = reactive({
-    page: 1,
-    pageSize: 5,
 });
 
 const openOperate = (row: User.User | null) => {
@@ -88,9 +84,8 @@ const buttons = [
 ];
 
 const search = async () => {
-    userSearch.page = paginationConfig.page;
-    userSearch.pageSize = paginationConfig.pageSize;
-    const res = await getUserList(userSearch);
+    const { currentPage, pageSize } = paginationConfig;
+    const res = await getUserList(currentPage, pageSize);
     data.value = res.data.items;
     paginationConfig.total = res.data.total;
 };

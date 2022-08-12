@@ -15,5 +15,6 @@ func (s *OperationLogRouter) InitOperationLogRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		operationRouter.GET("", baseApi.GetOperationList)
+		operationRouter.POST("/del", baseApi.DeleteOperation)
 	}
 }
