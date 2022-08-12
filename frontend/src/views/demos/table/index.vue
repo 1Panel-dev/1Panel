@@ -72,7 +72,6 @@ const batchDelete = async (row: User.User | null) => {
     } else {
         ids.push(row.id);
     }
-    console.log(ids);
     await useDeleteData(deleteUser, { ids: ids }, 'commons.msg.delete');
     search();
 };

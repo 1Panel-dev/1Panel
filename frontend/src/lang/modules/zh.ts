@@ -86,6 +86,7 @@ export default {
             delete: '删除',
             login: '登录',
             logout: '退出',
+            del: '删除',
         },
         operatoin: '操作',
         status: '状态',

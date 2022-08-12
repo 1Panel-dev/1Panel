@@ -85,6 +85,7 @@ export default {
             post: ' create',
             update: ' update',
             delete: ' delete',
+            del: 'delete',
         },
         operatoin: 'operatoin',
         status: 'status',

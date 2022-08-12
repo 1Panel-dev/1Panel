@@ -41,7 +41,7 @@ let demoForm = ref<User.User>({
 
 interface OperateProps {
     op: string;
-    id: number;
+    id: string;
 }
 
 const props = withDefaults(defineProps<OperateProps>(), {
@@ -81,7 +81,7 @@ const getUser = async (id: number) => {
 onMounted(() => {
     if (props.op == 'edit') {
         console.log(props);
-        getUser(props.id).catch(() => {
+        getUser(Number(props.id)).catch(() => {
             router.back();
         });
     }
