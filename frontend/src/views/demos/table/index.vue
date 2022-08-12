@@ -4,7 +4,7 @@
             <template #toolbar>
                 <el-button type="primary" @click="openOperate(null)">{{ $t('commons.button.create') }}</el-button>
                 <el-button type="primary" plain>{{ '其他操作' }}</el-button>
-                <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete">{{
+                <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete(null)">{{
                     $t('commons.button.delete')
                 }}</el-button>
             </template>
@@ -72,7 +72,7 @@ const batchDelete = async (row: User.User | null) => {
     } else {
         ids.push(row.id);
     }
-
+    console.log(ids);
     await useDeleteData(deleteUser, { ids: ids }, 'commons.msg.delete');
     search();
 };
