@@ -16,7 +16,7 @@ func (s *UserRouter) InitUserRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		withRecordRouter.POST("", baseApi.Register)
-		withRecordRouter.DELETE("", baseApi.DeleteUser)
+		withRecordRouter.POST("/del", baseApi.DeleteUser)
 		userRouter.POST("/search", baseApi.PageUsers)
 		userRouter.GET(":id", baseApi.GetUserInfo)
 		userRouter.POST(":id", baseApi.UpdateUser)

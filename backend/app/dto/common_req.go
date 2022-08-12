@@ -10,6 +10,10 @@ type OperationWithName struct {
 	Name string `json:"name" validate:"required"`
 }
 
+type BatchDeleteReq struct {
+	Ids []uint `json:"ids" validate:"required"`
+}
+
 type OperationWithNameAndType struct {
 	Name string `json:"name" validate:"required"`
 	Type string `json:"type" validate:"required"`

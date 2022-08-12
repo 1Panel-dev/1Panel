@@ -67,3 +67,12 @@ func SuccessWithData(ctx *gin.Context, data interface{}) {
 	ctx.JSON(http.StatusOK, res)
 	ctx.Abort()
 }
+
+func GetParamID(c *gin.Context) (uint, error) {
+	idParam, ok := c.Params.Get("id")
+	if !ok {
+		return 0, errors.New("error name")
+	}
+	intNum, _ := strconv.Atoi(idParam)
+	return uint(intNum), nil
+}

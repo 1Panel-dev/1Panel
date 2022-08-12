@@ -59,38 +59,34 @@ const openOperate = (row: User.User | null) => {
         params.id = row.id;
     }
 
-    router.push({ name: 'DemoCreate', params });
+    router.push({ name: 'DemoOperate', params });
+};
+
+const batchDelete = async (row: User.User | null) => {
+    let ids: Array<number> = [];
+
+    if (row === null) {
+        selects.value.forEach((item: User.User) => {
+            ids.push(item.id);
+        });
+    } else {
+        ids.push(row.id);
+    }
+
+    await useDeleteData(deleteUser, { ids: ids }, 'commons.msg.delete');
+    search();
 };
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         click: openOperate,
     },
-    // {
-    //     label: '执行',
-    //     click: buttonClick,
-    // },
-    // {
-    //     label: '删除',
-    //     type: 'danger',
-    //     click: buttonClick,
-    // },
-    // {
-    //     label: '复制',
-    //     click: buttonClick,
-    // },
-    // {
-    //     label: '定时任务',
-    //     click: buttonClick,
-    // },
+    {
+        label: i18n.global.t('commons.button.delete'),
+        type: 'danger',
+        click: batchDelete,
+    },
 ];
-const batchDelete = async () => {
-    let ids: Array<number> = [];
-    selects.value.forEach((item: User.User) => {
-        ids.push(item.id);
-    });
-    await useDeleteData(deleteUser, { ids: ids }, 'commons.msg.delete');
-};
 
 const search = async () => {
     userSearch.page = paginationConfig.page;

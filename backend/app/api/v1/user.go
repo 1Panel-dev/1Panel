@@ -1,9 +1,6 @@
 package v1
 
 import (
-	"github.com/pkg/errors"
-	"strconv"
-
 	"github.com/1Panel-dev/1Panel/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/constant"
@@ -96,7 +93,7 @@ func (b *BaseApi) PageUsers(c *gin.Context) {
 }
 
 func (b *BaseApi) DeleteUser(c *gin.Context) {
-	var req dto.OperationWithName
+	var req dto.BatchDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -106,7 +103,7 @@ func (b *BaseApi) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	if err := userService.Delete(req.Name); err != nil {
+	if err := userService.BatchDelete(req.Ids); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -123,11 +120,16 @@ func (b *BaseApi) UpdateUser(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
 
 	upMap := make(map[string]interface{})
 	upMap["email"] = req.Email
 	upMap["name"] = req.Name
-	if err := userService.Update(req.ID, upMap); err != nil {
+	if err := userService.Update(id, upMap); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -135,14 +137,12 @@ func (b *BaseApi) UpdateUser(c *gin.Context) {
 }
 
 func (b *BaseApi) GetUserInfo(c *gin.Context) {
-	idParam, ok := c.Params.Get("id")
-	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error name"))
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	intNum, _ := strconv.Atoi(idParam)
-
-	user, err := userService.Get(uint(intNum))
+	user, err := userService.Get(id)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

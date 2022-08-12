@@ -8,6 +8,8 @@ type ICommonRepo interface {
 	WithByID(id uint) DBOption
 	WithByName(name string) DBOption
 	WithOrderBy(orderStr string) DBOption
+	WithLikeName(name string) DBOption
+	WithIdsIn(ids []uint) DBOption
 }
 
 type CommonRepo struct{}
@@ -33,5 +35,11 @@ func (c *CommonRepo) WithLikeName(name string) DBOption {
 func (c *CommonRepo) WithOrderBy(orderStr string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Order(orderStr)
+	}
+}
+
+func (c *CommonRepo) WithIdsIn(ids []uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("id in (?)", ids)
 	}
 }

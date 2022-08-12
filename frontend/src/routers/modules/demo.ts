@@ -21,7 +21,7 @@ const demoRouter = {
         },
         {
             path: '/demos/table/:op/:id?',
-            name: 'DemoCreate',
+            name: 'DemoOperate',
             props: true,
             hidden: true,
             component: () => import('@/views/demos/table/operate/index.vue'),

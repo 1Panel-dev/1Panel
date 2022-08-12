@@ -25,6 +25,7 @@ type IUserService interface {
 	Delete(name string) error
 	Save(req model.User) error
 	Update(id uint, upMap map[string]interface{}) error
+	BatchDelete(ids []uint) error
 }
 
 func NewIUserService() IUserService {
@@ -130,6 +131,10 @@ func (u *UserService) LogOut(c *gin.Context) error {
 
 func (u *UserService) Delete(name string) error {
 	return userRepo.Delete(commonRepo.WithByName(name))
+}
+
+func (u *UserService) BatchDelete(ids []uint) error {
+	return userRepo.Delete(commonRepo.WithIdsIn(ids))
 }
 
 func (u *UserService) Save(req model.User) error {

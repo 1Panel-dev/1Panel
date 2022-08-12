@@ -27,5 +27,5 @@ export const editUser = (params: User.User) => {
 
 // * 批量删除用户
 export const deleteUser = (params: { ids: number[] }) => {
-    return http.post(`/users/delete`, params);
+    return http.post(`/users/del`, params);
 };

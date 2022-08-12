@@ -77,10 +77,10 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 const getUser = async (id: number) => {
     const res = await getUserById(id);
     demoForm.value = res.data;
-    console.log(demoForm);
 };
 onMounted(() => {
     if (props.op == 'edit') {
+        console.log(props);
         getUser(props.id).catch(() => {
             router.back();
         });
