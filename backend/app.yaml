@@ -10,7 +10,6 @@ jwt:
   issuer: 1Panel
 
 session:
-  session_key: 1panel-session
   session_name: psession
   expires_time: 604800
 
