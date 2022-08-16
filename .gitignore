@@ -14,6 +14,3 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
-
-.idea
-backend/__debug_bin
