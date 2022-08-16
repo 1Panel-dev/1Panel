@@ -14,7 +14,7 @@ import (
 type OperationService struct{}
 
 type IOperationService interface {
-	Page(page, size int) (int64, interface{}, error)
+	Page(search dto.PageInfo) (int64, interface{}, error)
 	Create(operation model.OperationLog) error
 	BatchDelete(ids []uint) error
 }
@@ -27,8 +27,8 @@ func (u *OperationService) Create(operation model.OperationLog) error {
 	return operationRepo.Create(&operation)
 }
 
-func (u *OperationService) Page(page, size int) (int64, interface{}, error) {
-	total, ops, err := operationRepo.Page(page, size, commonRepo.WithOrderBy("created_at desc"))
+func (u *OperationService) Page(search dto.PageInfo) (int64, interface{}, error) {
+	total, ops, err := operationRepo.Page(search.Page, search.PageSize, commonRepo.WithOrderBy("created_at desc"))
 	var dtoOps []dto.OperationLogBack
 	for _, op := range ops {
 		var item dto.OperationLogBack
@@ -57,7 +57,7 @@ func (u *OperationService) BatchDelete(ids []uint) error {
 
 func filterSensitive(vars string) string {
 	var Sensitives = []string{"password", "Password"}
-	ops := make(map[string]string)
+	ops := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(vars), &ops); err != nil {
 		return vars
 	}

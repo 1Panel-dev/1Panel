@@ -50,6 +50,7 @@ export default {
     menu: {
         home: 'Dashboard',
         demo: 'Demo',
+        terminal: 'Terminal',
         operations: 'Operation logs',
     },
     home: {
@@ -83,6 +84,7 @@ export default {
             login: ' login',
             logout: ' logout',
             post: ' create',
+            put: ' update',
             update: ' update',
             delete: ' delete',
             del: 'delete',

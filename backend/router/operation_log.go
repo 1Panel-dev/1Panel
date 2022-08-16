@@ -14,7 +14,7 @@ func (s *OperationLogRouter) InitOperationLogRouter(Router *gin.RouterGroup) {
 	operationRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		operationRouter.GET("", baseApi.GetOperationList)
+		operationRouter.POST("", baseApi.GetOperationList)
 		operationRouter.POST("/del", baseApi.DeleteOperation)
 	}
 }

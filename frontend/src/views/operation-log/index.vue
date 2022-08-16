@@ -84,6 +84,11 @@ const paginationConfig = reactive({
     total: 0,
 });
 
+const logSearch = reactive({
+    page: 1,
+    pageSize: 5,
+});
+
 const selects = ref<any>([]);
 const batchDelete = async (row: ResOperationLog | null) => {
     let ids: Array<number> = [];
@@ -95,7 +100,6 @@ const batchDelete = async (row: ResOperationLog | null) => {
     } else {
         ids.push(row.id);
     }
-    console.log(ids);
     await useDeleteData(deleteOperation, { ids: ids }, 'commons.msg.delete');
     search();
 };
@@ -109,20 +113,35 @@ const buttons = [
 ];
 
 const search = async () => {
-    const { currentPage, pageSize } = paginationConfig;
-    const res = await getOperationList(currentPage, pageSize);
+    logSearch.page = paginationConfig.currentPage;
+    logSearch.pageSize = paginationConfig.pageSize;
+    const res = await getOperationList(logSearch);
     data.value = res.data.items;
     paginationConfig.total = res.data.total;
 };
 
 const fmtOperation = (row: ResOperationLog) => {
-    if (row.source == '' && row.action == '') {
+    if (row.method.toLocaleLowerCase() !== 'put') {
+        if (row.source == '' && row.action == '') {
+            return (
+                i18n.global.t('operations.detail.' + row.group.toLocaleLowerCase()) +
+                i18n.global.t('operations.detail.' + row.method.toLocaleLowerCase())
+            );
+        }
+        if (row.action == '') {
+            return (
+                i18n.global.t('operations.detail.' + row.group.toLocaleLowerCase()) +
+                i18n.global.t('operations.detail.' + row.source.toLocaleLowerCase())
+            );
+        }
+        return;
+    }
+    if (row.action == '') {
         return (
             i18n.global.t('operations.detail.' + row.group.toLocaleLowerCase()) +
             i18n.global.t('operations.detail.' + row.method.toLocaleLowerCase())
         );
-    }
-    if (row.action == '') {
+    } else {
         return (
             i18n.global.t('operations.detail.' + row.group.toLocaleLowerCase()) +
             i18n.global.t('operations.detail.' + row.source.toLocaleLowerCase())
