@@ -1,0 +1,66 @@
+system:
+  port: 9999
+  db_type: mysql
+
+jwt:
+  header_name: Authorization
+  signing_key: 1panelKey
+  expires_time: 604800 #过期时间
+  buffer_time: 86400 #缓冲时间 缓冲时间内会获取新的token刷新令牌
+  issuer: 1Panel
+
+session:
+  session_name: psession
+  expires_time: 604800
+
+captcha:
+  enable: true
+  source: "1234567890QWERTYUIOPLKJHGFDSAZXCVBNMqwertyuioplkjhgfdsazxcvbnm"
+  length: 4
+  noise-count: 0
+  img-width: 120
+  img-height: 50
+
+mysql:
+  path: localhost
+  port: 3306
+  db_name: 1Panel
+  username: root
+  password: KubeOperator123@mysql
+  max_idle_conns: 10
+  max_open_conns: 100
+
+sqlite:
+  path: /opt/1Panel/data/db
+  db_file: 1Panel.db
+
+log:
+  level: info
+  path: /opt/1Panel/log
+  log_name: 1Panel
+  log_suffix: .log
+  log_size: 50    #日志文件大小，单位是 MB
+  log_backup: 10  #最大过期日志保留个数
+  log_data: 7     #保留过期文件最大时间，单位 天
+
+cache:
+  path: /opt/1Panel/data/cache
+
+# 跨域配置
+cors:
+  mode: whitelist # 放行模式: allow-all, 放行全部; whitelist, 白名单模式, 来自白名单内域名的请求添加 cors 头; strict-whitelist 严格白名单模式, 白名单外的请求一律拒绝
+  whitelist:
+    - allow-origin: example1.com
+      allow-headers: content-type
+      allow-methods: GET, POST
+      expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type
+      allow-credentials: true # 布尔值
+    - allow-origin: example2.com
+      allow-headers: content-type
+      allow-methods: GET, POST
+      expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type
+      allow-credentials: true # 布尔值
+
+# 加密设置
+encrypt:
+  key: 1Panel123@2022!
