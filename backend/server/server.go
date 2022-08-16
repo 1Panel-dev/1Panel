@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/init/binary"
 	"github.com/1Panel-dev/1Panel/init/db"
 	"github.com/1Panel-dev/1Panel/init/log"
 	"github.com/1Panel-dev/1Panel/init/migration"
@@ -29,6 +30,7 @@ func Start() {
 	gob.Register(psession.SessionUser{})
 	cache.Init()
 	session.Init()
+	binary.StartTTY()
 	routers := router.Routers()
 	address := fmt.Sprintf(":%d", global.CONF.System.Port)
 	s := initServer(address, routers)

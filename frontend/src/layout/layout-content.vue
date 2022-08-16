@@ -9,7 +9,7 @@
                     :header="header"
                     v-if="showBack"
                 ></back-button>
-                <!-- {{ header }} -->
+                {{ header }}
             </slot>
         </div>
         <div class="content-container__toolbar" v-if="slots.toolbar">

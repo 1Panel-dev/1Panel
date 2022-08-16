@@ -1,7 +1,7 @@
 import { Layout } from '@/routers/constant';
 
 const operationRouter = {
-    sort: 2,
+    sort: 3,
     path: '/operations',
     component: Layout,
     redirect: '/operation',

@@ -50,6 +50,7 @@ export default {
     menu: {
         home: '概览',
         demo: '样例',
+        terminal: '终端管理',
         operations: '操作记录',
     },
 
@@ -82,6 +83,7 @@ export default {
             users: '用户',
             auth: '用户',
             post: '创建',
+            put: '更新',
             update: '更新',
             delete: '删除',
             login: '登录',
