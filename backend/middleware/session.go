@@ -12,12 +12,12 @@ func SessionAuth() gin.HandlerFunc {
 		if method, exist := c.Get("authMethod"); exist && method == constant.AuthMethodJWT {
 			c.Next()
 		}
-		sess, err := global.SESSION.Get(c.Request, global.CONF.Session.SessionName)
+		sId, err := c.Cookie(global.CONF.Session.SessionName)
 		if err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeToken, nil)
 			return
 		}
-		if _, ok := sess.Values[global.CONF.Session.SessionUserKey]; !ok {
+		if _, err := global.SESSION.Get(sId); err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeToken, nil)
 			return
 		}

@@ -44,6 +44,9 @@ log:
   log_backup: 10  #最大过期日志保留个数
   log_data: 7     #保留过期文件最大时间，单位 天
 
+cache:
+  path: /opt/1Panel/data/cache
+
 # 跨域配置
 cors:
   mode: whitelist # 放行模式: allow-all, 放行全部; whitelist, 白名单模式, 来自白名单内域名的请求添加 cors 头; strict-whitelist 严格白名单模式, 白名单外的请求一律拒绝

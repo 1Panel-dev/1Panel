@@ -11,4 +11,5 @@ type ServerConfig struct {
 	Captcha   Captcha   `mapstructure:"captcha"`
 	Encrypt   Encrypt   `mapstructure:"encrypt"`
 	Csrf      Csrf      `mapstructure:"csrf"`
+	Cache     Cache     `mapstructure:"cache"`
 }

@@ -1,17 +1,17 @@
 package service
 
 import (
-	"github.com/pkg/errors"
-
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
-	"github.com/1Panel-dev/1Panel/init/session"
+	"github.com/1Panel-dev/1Panel/init/session/psession"
 	"github.com/1Panel-dev/1Panel/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/utils/jwt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
+	"github.com/pkg/errors"
+	uuid "github.com/satori/go.uuid"
 )
 
 type UserService struct{}
@@ -92,40 +92,38 @@ func (u *UserService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo,
 		}
 		return &dto.UserLoginInfo{Name: user.Name, Token: token}, err
 	}
-
-	sID, _ := c.Cookie(global.CONF.Session.SessionName)
-	if sID != "" {
-		c.SetCookie(global.CONF.Session.SessionName, "", -1, "", "", false, false)
-	}
-	sessionItem, err := global.SESSION.Get(c.Request, global.CONF.Session.SessionName)
-	if err != nil {
-		return nil, err
-	}
-	sessionItem.Values[global.CONF.Session.SessionUserKey] = session.SessionUser{
+	sessionUser := psession.SessionUser{
 		ID:   user.ID,
 		Name: user.Name,
 	}
-	if err := global.SESSION.Save(c.Request, c.Writer, sessionItem); err != nil {
+	lifeTime := global.CONF.Session.ExpiresTime
+	sID, _ := c.Cookie(global.CONF.Session.SessionName)
+	sessionUser, err = global.SESSION.Get(sID)
+	if err != nil {
+		sID = uuid.NewV4().String()
+		c.SetCookie(global.CONF.Session.SessionName, sID, lifeTime, "", "", false, false)
+		err := global.SESSION.Set(sID, sessionUser, lifeTime)
+		if err != nil {
+			return nil, err
+		}
+		return &dto.UserLoginInfo{Name: user.Name}, nil
+	}
+	if err := global.SESSION.Set(sID, sessionUser, lifeTime); err != nil {
 		return nil, err
 	}
 
-	return &dto.UserLoginInfo{Name: user.Name}, err
+	return &dto.UserLoginInfo{Name: user.Name}, nil
 }
 
 func (u *UserService) LogOut(c *gin.Context) error {
 	sID, _ := c.Cookie(global.CONF.Session.SessionName)
 	if sID != "" {
-		c.SetCookie(global.CONF.Session.SessionName, "", -1, "", "", false, false)
+		c.SetCookie(global.CONF.Session.SessionName, sID, -1, "", "", false, false)
+		err := global.SESSION.Delete(sID)
+		if err != nil {
+			return err
+		}
 	}
-	sessionItem, err := global.SESSION.Get(c.Request, global.CONF.Session.SessionName)
-	if err != nil {
-		return err
-	}
-	sessionItem.Options.MaxAge = -1
-	if err := global.SESSION.Save(c.Request, c.Writer, sessionItem); err != nil {
-		return err
-	}
-
 	return nil
 }
 

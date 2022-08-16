@@ -3,6 +3,9 @@ package server
 import (
 	"encoding/gob"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/init/cache"
+	"github.com/1Panel-dev/1Panel/init/session"
+	"github.com/1Panel-dev/1Panel/init/session/psession"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/global"
@@ -10,7 +13,6 @@ import (
 	"github.com/1Panel-dev/1Panel/init/log"
 	"github.com/1Panel-dev/1Panel/init/migration"
 	"github.com/1Panel-dev/1Panel/init/router"
-	"github.com/1Panel-dev/1Panel/init/session"
 	"github.com/1Panel-dev/1Panel/init/validator"
 	"github.com/1Panel-dev/1Panel/init/viper"
 
@@ -24,7 +26,8 @@ func Start() {
 	db.Init()
 	migration.Init()
 	validator.Init()
-	gob.Register(session.SessionUser{})
+	gob.Register(psession.SessionUser{})
+	cache.Init()
 	session.Init()
 	routers := router.Routers()
 	address := fmt.Sprintf(":%d", global.CONF.System.Port)
