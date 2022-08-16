@@ -1,0 +1,116 @@
+/* 常用 flex */
+.flx-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.flx-justify-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.flx-align-center {
+    display: flex;
+    align-items: center;
+}
+
+/* 清除浮动 */
+.clearfix::after {
+    display: block;
+    height: 0;
+    overflow: hidden;
+    clear: both;
+    content: '';
+}
+
+/* 文字单行省略号 */
+.sle {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 文字多行省略号 */
+.mle {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+/* 文字多了自動換行 */
+.break-word {
+    word-break: break-all;
+    word-wrap: break-word;
+}
+
+/* fade-transform */
+.fade-transform-leave-active,
+.fade-transform-enter-active {
+    transition: all 0.2s;
+}
+.fade-transform-enter-from {
+    opacity: 0;
+    transition: all 0.2s;
+    transform: translateX(-30px);
+}
+.fade-transform-leave-to {
+    opacity: 0;
+    transition: all 0.2s;
+    transform: translateX(30px);
+}
+
+/* Breadcrumb */
+.breadcrumb-enter-active,
+.breadcrumb-leave-active {
+    transition: all 0.2s ease;
+}
+.breadcrumb-enter-from,
+.breadcrumb-leave-active {
+    opacity: 0;
+    transform: translateX(10px);
+}
+.breadcrumb-leave-active {
+    position: absolute;
+    z-index: -1;
+}
+
+/* scroll bar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background-color: white;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #dddee0;
+    border-radius: 20px;
+    box-shadow: inset 0 0 0 white;
+}
+.content-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    .text {
+        margin: 30px 0;
+        font-size: 23px;
+        font-weight: bold;
+        color: rgb(88 88 88);
+    }
+}
+
+/* nprogress样式 */
+#nprogress .bar {
+    background: $primary-color !important;
+}
+#nprogress .spinner-icon {
+    border-top-color: $primary-color !important;
+    border-left-color: $primary-color !important;
+}
+#nprogress .peg {
+    box-shadow: 0 0 10px $primary-color, 0 0 5px $primary-color !important;
+}
+
+.form-button {
+    float: right;
+}
