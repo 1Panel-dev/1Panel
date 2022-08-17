@@ -15,7 +15,7 @@ func CSRF() gin.HandlerFunc {
 		csrf.ErrorHandler(http.HandlerFunc(
 			func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusForbidden)
-				_, _ = w.Write([]byte("message: csrf token invalid"))
+				_, _ = w.Write([]byte("csrf token invalid"))
 			})),
 	)
 	return adapter.Wrap(csrfMd)

@@ -14,11 +14,11 @@ func SessionAuth() gin.HandlerFunc {
 		}
 		sId, err := c.Cookie(global.CONF.Session.SessionName)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeToken, nil)
+			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeNotLogin, nil)
 			return
 		}
 		if _, err := global.SESSION.Get(sId); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeToken, nil)
+			helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrTypeNotLogin, nil)
 			return
 		}
 		c.Next()

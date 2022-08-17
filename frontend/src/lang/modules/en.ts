@@ -39,6 +39,13 @@ export default {
             commonName: 'Support English, Chinese, numbers, .-_, length 1-30',
             email: 'Email format error',
         },
+        res: {
+            paramError: 'The request failed, please try again later!',
+            forbidden: 'The current user has no permission',
+            serverError: 'Service exception',
+            notFound: 'The resource does not exist',
+            commonError: 'The request failed',
+        },
     },
     business: {
         user: {
