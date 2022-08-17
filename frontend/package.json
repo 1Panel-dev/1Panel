@@ -27,6 +27,7 @@
         "echarts-liquidfill": "^3.1.0",
         "element-plus": "^2.2.6",
         "fit2cloud-ui-plus": "^0.0.1-beta.12",
+        "js-base64": "^3.7.2",
         "js-md5": "^0.7.3",
         "nprogress": "^0.2.0",
         "pinia": "^2.0.12",
@@ -37,7 +38,9 @@
         "vue": "^3.2.25",
         "vue-i18n": "^9.1.9",
         "vue-router": "^4.0.12",
-        "vue3-seamless-scroll": "^1.2.0"
+        "vue3-seamless-scroll": "^1.2.0",
+        "xterm": "^4.19.0",
+        "xterm-addon-attach": "^0.6.0"
     },
     "devDependencies": {
         "@commitlint/cli": "^17.0.1",
