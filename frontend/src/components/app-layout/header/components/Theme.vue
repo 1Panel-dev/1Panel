@@ -1,20 +1,20 @@
 <template>
     <div>
-        <el-tooltip effect="dark" content="布局设置" placement="bottom">
-            <i :class="'iconfont icon-zhuti'" class="icon-style" @click="openDrawer"></i>
+        <el-tooltip effect="dark" :content="$t('commons.header.theme')" placement="bottom">
+            <i :class="'panel p-theme'" class="icon-style" @click="openDrawer"></i>
         </el-tooltip>
-        <el-drawer v-model="drawerVisible" title="布局设置" size="300px">
+        <el-drawer v-model="drawerVisible" :title="$t('commons.header.theme')" size="300px">
             <el-divider class="divider" content-position="center">
                 <el-icon><ColdDrink /></el-icon>
-                全局主题
+                {{ $t('commons.header.globalTheme') }}
             </el-divider>
             <div class="theme-item">
-                <span>主题颜色</span>
+                <span>{{ $t('commons.header.themeColor') }}</span>
                 <el-color-picker v-model="themeConfig.primary" :predefine="colorList" @change="changePrimary">
                 </el-color-picker>
             </div>
             <div class="theme-item">
-                <span>暗黑模式</span>
+                <span>{{ $t('commons.header.darkTheme') }}</span>
                 <SwitchDark></SwitchDark>
             </div>
             <br />
