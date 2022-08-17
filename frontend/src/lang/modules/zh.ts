@@ -39,6 +39,13 @@ export default {
             commonName: '支持英文、中文、数字、.-_,长度1-30',
             email: '邮箱格式错误',
         },
+        res: {
+            paramError: '请求失败,请稍后重试!',
+            forbidden: '当前用户无权限',
+            serverError: '服务异常',
+            notFound: '资源不存在',
+            commonError: '请求失败',
+        },
     },
     business: {
         user: {

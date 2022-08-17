@@ -49,7 +49,7 @@ class RequestHttp {
                 }
                 axiosCanceler.removePending(config);
                 tryHideFullScreenLoading();
-                if (data.code == ResultEnum.OVERDUE) {
+                if (data.code == ResultEnum.OVERDUE || data.code == ResultEnum.FORBIDDEN) {
                     ElMessage.error(data.msg);
                     router.replace({
                         path: '/login',
