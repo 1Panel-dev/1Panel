@@ -31,6 +31,8 @@ func Start() {
 	cache.Init()
 	session.Init()
 	binary.StartTTY()
+	gin.SetMode(global.CONF.System.Level)
+
 	routers := router.Routers()
 	address := fmt.Sprintf(":%d", global.CONF.System.Port)
 	s := initServer(address, routers)
