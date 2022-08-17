@@ -6,14 +6,10 @@
         </div>
         <div class="header-ri flx-center">
             <div class="header-icon">
-                <!-- Language -->
                 <Language id="language"></Language>
-                <!-- Theme -->
                 <Theme id="theme"></Theme>
             </div>
-            <!-- User name -->
             <span class="username">1Panel</span>
-            <!-- Avatar -->
             <Avatar></Avatar>
         </div>
     </div>
