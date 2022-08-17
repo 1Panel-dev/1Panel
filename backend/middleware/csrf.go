@@ -12,6 +12,7 @@ import (
 func CSRF() gin.HandlerFunc {
 	csrfMd := csrf.Protect(
 		[]byte(global.CONF.Csrf.Key),
+		csrf.Path("/api"),
 		csrf.ErrorHandler(http.HandlerFunc(
 			func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusForbidden)
