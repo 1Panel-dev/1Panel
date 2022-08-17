@@ -1,7 +1,7 @@
 <template>
     <div
         class="menu"
-        :style="{ width: isCollapse ? '65px' : '220px' }"
+        :style="{ width: isCollapse ? '65px' : '180px' }"
         element-loading-text="Loading..."
         :element-loading-spinner="loadingSvg"
         element-loading-svg-view-box="-10, -10, 50, 50"
@@ -22,6 +22,9 @@
                 <SubItem :menuList="routerMenus"></SubItem>
             </el-menu>
         </el-scrollbar>
+        <div class="menu-footer">
+            <CollapseIcon></CollapseIcon>
+        </div>
     </div>
 </template>
 
@@ -33,6 +36,7 @@ import { loadingSvg } from '@/utils/svg';
 import Logo from './components/logo.vue';
 import SubItem from './components/sub-item.vue';
 import { menuList } from '@/routers/router';
+import CollapseIcon from '../header/components/collapseicon.vue';
 const route = useRoute();
 const menuStore = MenuStore();
 
