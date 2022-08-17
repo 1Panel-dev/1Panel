@@ -46,6 +46,18 @@ export default {
             notFound: 'The resource does not exist',
             commonError: 'The request failed',
         },
+        header: {
+            language: 'Internationalization',
+            zh: '简体中文',
+            en: 'English',
+            theme: 'Layout Settings',
+            globalTheme: 'Global',
+            themeColor: 'Theme Color',
+            darkTheme: 'Dark Theme',
+            personalData: 'Personal Data',
+            changePassword: 'Change Password',
+            logout: 'Logout',
+        },
     },
     business: {
         user: {
@@ -59,6 +71,7 @@ export default {
         demo: 'Demo',
         terminal: 'Terminal',
         operations: 'Operation logs',
+        files: 'File Management',
     },
     home: {
         welcome: 'Welcome',
@@ -68,21 +81,6 @@ export default {
         closeCurrent: 'Close current',
         closeOther: 'Close other',
         closeAll: 'Close All',
-    },
-    header: {
-        componentSize: 'Component size',
-        language: 'Language',
-        theme: 'theme',
-        layoutConfig: 'Layout config',
-        primary: 'primary',
-        darkMode: 'Dark Mode',
-        greyMode: 'Grey mode',
-        weakMode: 'Weak mode',
-        fullScreen: 'Full Screen',
-        exitFullScreen: 'Exit Full Screen',
-        personalData: 'Personal Data',
-        changePassword: 'Change Password',
-        logout: 'Logout',
     },
     operations: {
         detail: {
