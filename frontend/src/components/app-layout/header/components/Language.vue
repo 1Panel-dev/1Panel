@@ -1,14 +1,18 @@
 <template>
     <el-dropdown trigger="click" @command="handleSetLanguage">
         <span>
-            <el-tooltip effect="dark" content="国际化" placement="bottom">
-                <i :class="'iconfont icon-zhongyingwen'" class="icon-style"></i>
+            <el-tooltip effect="dark" :content="$t('commons.header.language')" placement="bottom">
+                <i :class="'panel p-language'" class="icon-style"></i>
             </el-tooltip>
         </span>
         <template #dropdown>
             <el-dropdown-menu>
-                <el-dropdown-item :disabled="language && language === 'zh'" command="zh">简体中文</el-dropdown-item>
-                <el-dropdown-item :disabled="language === 'en'" command="en">English</el-dropdown-item>
+                <el-dropdown-item :disabled="language && language === 'zh'" command="zh">{{
+                    $t('commons.header.zh')
+                }}</el-dropdown-item>
+                <el-dropdown-item :disabled="language === 'en'" command="en">{{
+                    $t('commons.header.en')
+                }}</el-dropdown-item>
             </el-dropdown-menu>
         </template>
     </el-dropdown>
