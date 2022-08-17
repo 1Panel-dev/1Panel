@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="dialogVisible" title="个人资料" width="500px" draggable>
+    <el-dialog v-model="dialogVisible" :title="$t('commons.header.personalData')" width="500px" draggable>
         <span>This is userInfo</span>
     </el-dialog>
 </template>

@@ -53,6 +53,18 @@ export default {
             notFound: 'The resource does not exist',
             commonError: 'The request failed',
         },
+        header: {
+            language: 'Internationalization',
+            zh: '简体中文',
+            en: 'English',
+            theme: 'Layout Settings',
+            globalTheme: 'Global',
+            themeColor: 'Theme Color',
+            darkTheme: 'Dark Theme',
+            personalData: 'Personal Data',
+            changePassword: 'Change Password',
+            logout: 'Logout',
+        },
     },
     business: {
         user: {
@@ -66,6 +78,7 @@ export default {
         demo: 'Demo',
         terminal: 'Terminal',
         operations: 'Operation logs',
+        files: 'File Management',
     },
     home: {
         welcome: 'Welcome',

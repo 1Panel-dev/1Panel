@@ -1,0 +1,44 @@
+@font-face {
+  font-family: "panel"; /* Project id 3575356 */
+  src: url('iconfont.woff2?t=1660728283223') format('woff2'),
+       url('iconfont.woff?t=1660728283223') format('woff'),
+       url('iconfont.ttf?t=1660728283223') format('truetype'),
+       url('iconfont.svg?t=1660728283223#panel') format('svg');
+}
+
+.panel {
+  font-family: "panel" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.p-language:before {
+  content: "\e605";
+}
+
+.p-theme:before {
+  content: "\e638";
+}
+
+.p-file-folder:before {
+  content: "\66";
+}
+
+.p-file-unknown:before {
+  content: "\233";
+}
+
+.p-file-txt:before {
+  content: "\74";
+}
+
+.p-file-normal:before {
+  content: "\e7ac";
+}
+
+.p-file-zip:before {
+  content: "\e606";
+}
+
