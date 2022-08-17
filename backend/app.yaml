@@ -1,6 +1,7 @@
 system:
   port: 9999
   db_type: mysql
+  level: debug
 
 jwt:
   header_name: Authorization
