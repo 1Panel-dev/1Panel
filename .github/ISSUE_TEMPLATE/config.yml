@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 对 1Panel 项目有其他问题
+    url: https://1panel.cn
+    about: 如果想要进一步了解 1Panel 项目，欢迎发送邮件到 support@fit2cloud.com 进行提问。
+  - name: 反馈安全问题 (Report Security Bug)
+    url: mailto://support@fit2cloud.com
+    about: 请通过邮箱 support@fit2cloud.com 反馈安全问题 (Please report security vulnerabilities to support@fit2cloud.com)
