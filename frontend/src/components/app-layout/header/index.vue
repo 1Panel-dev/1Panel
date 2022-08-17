@@ -4,27 +4,12 @@
             <CollapseIcon id="collapseIcon"></CollapseIcon>
             <Breadcrumb id="breadcrumb" v-if="themeConfig.breadcrumb"></Breadcrumb>
         </div>
-        <div class="header-ri flx-center">
-            <div class="header-icon">
-                <!-- Language -->
-                <Language id="language"></Language>
-                <!-- Theme -->
-                <Theme id="theme"></Theme>
-            </div>
-            <!-- User name -->
-            <span class="username">1Panel</span>
-            <!-- Avatar -->
-            <Avatar></Avatar>
-        </div>
     </div>
 </template>
 <script setup lang="ts">
 import { computed } from 'vue';
 import CollapseIcon from './components/collapseicon.vue';
 import Breadcrumb from './components/breadcrumb.vue';
-import Language from './components/language.vue';
-import Theme from './components/theme.vue';
-import Avatar from './components/avatar.vue';
 import { GlobalStore } from '@/store';
 
 const globalStore = GlobalStore();

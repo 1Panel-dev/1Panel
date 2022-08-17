@@ -10,8 +10,11 @@
             </el-divider>
             <div class="theme-item">
                 <span>{{ $t('commons.header.themeColor') }}</span>
-                <el-color-picker v-model="themeConfig.primary" :predefine="colorList" @change="changePrimary">
-                </el-color-picker>
+                <el-color-picker
+                    v-model="themeConfig.primary"
+                    :predefine="colorList"
+                    @change="changePrimary"
+                ></el-color-picker>
             </div>
             <div class="theme-item">
                 <span>{{ $t('commons.header.darkTheme') }}</span>

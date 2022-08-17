@@ -1,6 +1,6 @@
 <template>
     <svg :class="svgClass" aria-hidden="true">
-        <use :xlink:href="iconClassName" :fill="color" />
+        <use :xlink:href="iconClassName" />
     </svg>
 </template>
 <script setup lang="ts">
@@ -33,15 +33,15 @@ const svgClass = computed(() => {
 </script>
 <style scoped>
 .svg-icon {
-    width: 1.5em;
-    height: 1.5em;
+    width: 2.5em;
+    height: 2.5em;
     position: relative;
     fill: currentColor;
     vertical-align: -2px;
-    padding-top: 0.3em;
-    padding-bottom: 0.3em;
-    padding-left: 0.3em;
-    padding-right: 0.3em;
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+    padding-left: 0.1em;
+    padding-right: 0.1em;
 }
 .table-icon {
     width: 1.5em;
