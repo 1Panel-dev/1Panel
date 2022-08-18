@@ -22,7 +22,7 @@
         </template>
 
         <div class="complex-table__body">
-            <fu-table v-bind="$attrs" @selection-change="handleSelectionChange">
+            <fu-table v-bind="$attrs" @selection-change="handleSelectionChange" height="67vh">
                 <slot></slot>
             </fu-table>
         </div>
@@ -81,7 +81,6 @@ function handleSelectionChange(row: any) {
             width: auto;
         }
     }
-
     .complex-table__pagination {
         margin-top: 20px;
         @include flex-row(flex-end);
