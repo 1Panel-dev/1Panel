@@ -42,12 +42,12 @@ const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
     page: 1,
-    pageSize: 5,
+    pageSize: 20,
     total: 0,
 });
 const userSearch = reactive({
     page: 1,
-    pageSize: 5,
+    pageSize: 20,
 });
 
 const openOperate = (row: User.User | null) => {
