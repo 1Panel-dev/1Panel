@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/utils/copier"
 	"github.com/1Panel-dev/1Panel/utils/ssh"
 	"github.com/1Panel-dev/1Panel/utils/terminal"
 	"github.com/gin-gonic/gin"
@@ -13,20 +14,26 @@ import (
 )
 
 func (b *BaseApi) WsSsh(c *gin.Context) {
-	host := ssh.ConnInfo{
-		Addr:     "172.16.10.111",
-		Port:     22,
-		User:     "root",
-		AuthMode: "password",
-		Password: "Calong@2015",
-	}
-
 	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		global.LOG.Errorf("gin context http handler failed, err: %v", err)
 		return
 	}
 	defer wsConn.Close()
+
+	id, err := strconv.Atoi(c.Query("id"))
+	if wshandleError(wsConn, err) {
+		return
+	}
+	host, err := hostService.GetConnInfo(uint(id))
+	if wshandleError(wsConn, err) {
+		return
+	}
+	var connInfo ssh.ConnInfo
+	err = copier.Copy(&connInfo, &host)
+	if wshandleError(wsConn, err) {
+		return
+	}
 
 	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
 	if wshandleError(wsConn, err) {
@@ -37,18 +44,18 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 		return
 	}
 
-	client, err := host.NewClient()
+	client, err := connInfo.NewClient()
 	if wshandleError(wsConn, err) {
 		return
 	}
 	defer client.Close()
-	ssConn, err := host.NewSshConn(cols, rows)
+	ssConn, err := connInfo.NewSshConn(cols, rows)
 	if wshandleError(wsConn, err) {
 		return
 	}
 	defer ssConn.Close()
 
-	sws, err := terminal.NewLogicSshWsSession(cols, rows, true, host.Client, wsConn)
+	sws, err := terminal.NewLogicSshWsSession(cols, rows, true, connInfo.Client, wsConn)
 	if wshandleError(wsConn, err) {
 		return
 	}

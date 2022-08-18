@@ -26,7 +26,7 @@ type UserUpdate struct {
 	Email string `json:"email" validate:"required,email"`
 }
 
-type UserBack struct {
+type UserInfo struct {
 	ID        uint      `json:"id"`
 	Name      string    `json:"name"`
 	Email     string    `json:"email"`

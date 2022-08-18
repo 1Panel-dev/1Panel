@@ -1,23 +1,19 @@
-// * 请求响应参数(不包含data)
 export interface Result {
     code: number;
     message: string;
 }
 
-// * 请求响应参数(包含data)
 export interface ResultData<T> {
     code: number;
     message: string;
     data: T;
 }
 
-// * 分页响应参数
 export interface ResPage<T> {
     items: T[];
     total: number;
 }
 
-// * 分页请求参数
 export interface ReqPage {
     page: number;
     pageSize: number;

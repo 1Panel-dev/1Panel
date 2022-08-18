@@ -13,7 +13,7 @@ const terminalRouter = {
         {
             path: '/terminal',
             name: 'Terminal',
-            component: () => import('@/views/terminal/index2.vue'),
+            component: () => import('@/views/terminal/index.vue'),
             meta: {
                 keepAlive: true,
                 requiresAuth: true,

@@ -31,3 +31,10 @@ var AddTableOperationLog = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.OperationLog{})
 	},
 }
+
+var AddTableHost = &gormigrate.Migration{
+	ID: "20200818-add-table-host",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.Host{})
+	},
+}

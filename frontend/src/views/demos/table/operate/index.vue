@@ -49,9 +49,9 @@ const props = withDefaults(defineProps<OperateProps>(), {
 });
 
 const rules = reactive<FormRules>({
-    name: [Rules.required, Rules.name],
-    email: [Rules.required, Rules.email],
-    password: [Rules.required],
+    name: [Rules.requiredInput, Rules.name],
+    email: [Rules.requiredInput, Rules.email],
+    password: [Rules.requiredInput],
 });
 
 const submitForm = async (formEl: FormInstance | undefined) => {

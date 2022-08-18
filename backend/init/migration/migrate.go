@@ -12,6 +12,7 @@ func Init() {
 		migrations.InitTable,
 		migrations.AddData,
 		migrations.AddTableOperationLog,
+		migrations.AddTableHost,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
