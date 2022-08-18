@@ -35,9 +35,12 @@ export default {
         rule: {
             username: 'Please enter a username',
             password: 'Please enter a password',
-            required: 'Please enter the required fields',
+            requiredInput: 'Please enter the required fields',
+            requiredSelect: 'Please select the required fields',
             commonName: 'Support English, Chinese, numbers, .-_, length 1-30',
             email: 'Email format error',
+            ip: 'Please enter the correct IP address',
+            port: 'Please enter the correct port',
         },
         res: {
             paramError: 'The request failed, please try again later!',
@@ -87,6 +90,7 @@ export default {
     operations: {
         detail: {
             users: 'User',
+            hosts: 'Host',
             auth: 'User',
             login: ' login',
             logout: ' logout',
