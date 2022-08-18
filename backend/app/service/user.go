@@ -17,7 +17,7 @@ import (
 type UserService struct{}
 
 type IUserService interface {
-	Get(name uint) (*dto.UserBack, error)
+	Get(id uint) (*dto.UserInfo, error)
 	Page(search dto.UserPage) (int64, interface{}, error)
 	Register(userDto dto.UserCreate) error
 	Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error)
@@ -32,12 +32,12 @@ func NewIUserService() IUserService {
 	return &UserService{}
 }
 
-func (u *UserService) Get(id uint) (*dto.UserBack, error) {
+func (u *UserService) Get(id uint) (*dto.UserInfo, error) {
 	user, err := userRepo.Get(commonRepo.WithByID(id))
 	if err != nil {
 		return nil, constant.ErrRecordNotFound
 	}
-	var dtoUser dto.UserBack
+	var dtoUser dto.UserInfo
 	if err := copier.Copy(&dtoUser, &user); err != nil {
 		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
@@ -46,9 +46,9 @@ func (u *UserService) Get(id uint) (*dto.UserBack, error) {
 
 func (u *UserService) Page(search dto.UserPage) (int64, interface{}, error) {
 	total, users, err := userRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Name))
-	var dtoUsers []dto.UserBack
+	var dtoUsers []dto.UserInfo
 	for _, user := range users {
-		var item dto.UserBack
+		var item dto.UserInfo
 		if err := copier.Copy(&item, &user); err != nil {
 			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
