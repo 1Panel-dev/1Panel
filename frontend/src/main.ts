@@ -3,6 +3,7 @@ import App from './App.vue';
 import '@/styles/reset.scss';
 import '@/styles/common.scss';
 import '@/assets/iconfont/iconfont.css';
+import '@/assets/iconfont/iconfont.js';
 import ElementPlus from 'element-plus';
 import Fit2CloudPlus from 'fit2cloud-ui-plus';
 import * as Icons from '@element-plus/icons-vue';
@@ -14,7 +15,9 @@ import directives from '@/directives/index';
 import router from '@/routers/index';
 import I18n from '@/lang/index';
 import pinia from '@/store/index';
+import SvgIcon from './components/svg-icon/svg-icon.vue';
 const app = createApp(App);
+app.component('SvgIcon', SvgIcon);
 app.use(ElementPlus);
 app.use(Fit2CloudPlus);
 Object.keys(Icons).forEach((key) => {
