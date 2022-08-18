@@ -35,9 +35,12 @@ export default {
         rule: {
             username: '请输入用户名',
             password: '请输入密码',
-            required: '请填写必填项',
+            requiredInput: '请填写必填项',
+            requiredSelect: '请选择必选项',
             commonName: '支持英文、中文、数字、.-_,长度1-30',
             email: '邮箱格式错误',
+            ip: '请输入正确的 IP 地址',
+            port: '请输入正确的端口',
         },
         res: {
             paramError: '请求失败,请稍后重试!',
@@ -88,6 +91,7 @@ export default {
     operations: {
         detail: {
             users: '用户',
+            hosts: '主机',
             auth: '用户',
             post: '创建',
             put: '更新',
