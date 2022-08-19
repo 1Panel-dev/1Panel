@@ -43,4 +43,11 @@ const svgClass = computed(() => {
     padding-left: 0.3em;
     padding-right: 0.3em;
 }
+.table-icon {
+    width: 1.5em;
+    height: 1.5em;
+    position: relative;
+    fill: currentColor;
+    vertical-align: middle;
+}
 </style>
