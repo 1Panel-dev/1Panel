@@ -8,6 +8,7 @@ export default {
             cancel: 'Cancel',
             reset: 'Reset',
             login: 'Login',
+            conn: 'Connect',
         },
         table: {
             name: 'Name',
@@ -86,6 +87,19 @@ export default {
         personalData: 'Personal Data',
         changePassword: 'Change Password',
         logout: 'Logout',
+    },
+    terminal: {
+        connHistory: 'historys',
+        hostHistory: 'History record',
+        addHost: 'Add Host',
+        name: 'Name',
+        port: 'Port',
+        user: 'User',
+        authMode: 'Auth Mode',
+        passwordMode: 'password',
+        keyMode: 'PrivateKey',
+        password: 'Password',
+        key: 'Private Key',
     },
     operations: {
         detail: {

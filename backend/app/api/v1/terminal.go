@@ -5,15 +5,44 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/app/api/v1/helper"
+	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
 	"github.com/1Panel-dev/1Panel/utils/copier"
 	"github.com/1Panel-dev/1Panel/utils/ssh"
 	"github.com/1Panel-dev/1Panel/utils/terminal"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/pkg/errors"
 )
 
 func (b *BaseApi) WsSsh(c *gin.Context) {
+	id, err := strconv.Atoi(c.Query("id"))
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	host, err := hostService.GetConnInfo(uint(id))
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	var connInfo ssh.ConnInfo
+	if err := copier.Copy(&connInfo, &host); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, constant.ErrStructTransform)
+		return
+	}
+
 	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		global.LOG.Errorf("gin context http handler failed, err: %v", err)
@@ -21,31 +50,8 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 	}
 	defer wsConn.Close()
 
-	id, err := strconv.Atoi(c.Query("id"))
-	if wshandleError(wsConn, err) {
-		return
-	}
-	host, err := hostService.GetConnInfo(uint(id))
-	if wshandleError(wsConn, err) {
-		return
-	}
-	var connInfo ssh.ConnInfo
-	err = copier.Copy(&connInfo, &host)
-	if wshandleError(wsConn, err) {
-		return
-	}
-
-	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
-	if wshandleError(wsConn, err) {
-		return
-	}
-	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
-	if wshandleError(wsConn, err) {
-		return
-	}
-
 	client, err := connInfo.NewClient()
-	if wshandleError(wsConn, err) {
+	if wshandleError(wsConn, errors.WithMessage(err, "  Failed to set up the connection. Please check the host information")) {
 		return
 	}
 	defer client.Close()

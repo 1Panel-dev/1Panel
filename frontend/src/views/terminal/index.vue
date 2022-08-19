@@ -1,8 +1,25 @@
 <template>
     <LayoutContent :header="$t('menu.terminal')">
+        <el-button class="drawer-container" icon="arrowLeftBold" @click="hostDrawer = true">
+            {{ $t('terminal.connHistory') }}
+        </el-button>
+
         <div>
-            <el-tabs editable type="card" v-model="terminalValue" @edit="handleTabsEdit">
+            <el-tabs
+                type="card"
+                editable
+                style="background-color: #efefef"
+                v-model="terminalValue"
+                @edit="handleTabsEdit"
+            >
                 <el-tab-pane :key="item.name" v-for="item in terminalTabs" :label="item.title" :name="item.name">
+                    <template #label>
+                        <span class="custom-tabs-label">
+                            <el-icon color="#67C23A" v-if="item.status === 'online'"><circleCheck /></el-icon>
+                            <el-icon color="#F56C6C" v-if="item.status === 'closed'"><circleClose /></el-icon>
+                            <span> &nbsp;{{ item.title }}&nbsp;&nbsp;</span>
+                        </span>
+                    </template>
                     <iframe
                         v-if="item.type === 'local'"
                         id="iframeTerminal"
@@ -15,14 +32,16 @@
                 </el-tab-pane>
             </el-tabs>
         </div>
-        <el-button class="term-tool-button" icon="arrowLeftBold" @click="hostDrawer = true"></el-button>
 
-        <el-drawer :size="320" v-model="hostDrawer" title="历史主机信息" direction="rtl">
-            <el-button @click="onAddHost">添加主机</el-button>
+        <el-drawer :size="320" v-model="hostDrawer" :title="$t('terminal.hostHistory')" direction="rtl">
+            <el-button @click="onAddHost">{{ $t('terminal.addHost') }}</el-button>
             <div v-infinite-scroll="nextPage" style="overflow: auto">
                 <div v-for="(item, index) in data" :key="item.id" @mouseover="hover = index" @mouseleave="hover = null">
                     <el-card @click="onConn(item)" style="margin-top: 5px" :title="item.name" shadow="hover">
                         <div :inline="true">
+                            <div>
+                                <span>{{ item.name }}</span>
+                            </div>
                             <span style="font-size: 14px; line-height: 25px">
                                 [ {{ item.addr + ':' + item.port }} ]
                                 <el-button
@@ -41,6 +60,9 @@
                                     v-if="hover === index"
                                     icon="edit"
                                 ></el-button>
+                                <div v-if="item.description && hover === index">
+                                    <span style="font-size: 12px">{{ item.description }}</span>
+                                </div>
                             </span>
                         </div>
                     </el-card>
@@ -48,40 +70,47 @@
             </div>
         </el-drawer>
 
-        <el-dialog v-model="connVisiable" title="添加主机信息" width="30%">
+        <el-dialog v-model="connVisiable" :title="$t('terminal.addHost')" width="30%">
             <el-form ref="hostInfoRef" label-width="80px" :model="hostInfo" :rules="rules">
-                <el-form-item label="名称" prop="name">
+                <el-form-item :label="$t('commons.table.name')" prop="name">
                     <el-input v-model="hostInfo.name" style="width: 80%" />
                 </el-form-item>
-                <el-form-item label="addr" prop="addr">
+                <el-form-item label="IP" prop="addr">
                     <el-input v-model="hostInfo.addr" style="width: 80%" />
                 </el-form-item>
-                <el-form-item label="端口" prop="port">
+                <el-form-item :label="$t('terminal.port')" prop="port">
                     <el-input v-model="hostInfo.port" style="width: 80%" />
                 </el-form-item>
-                <el-form-item label="用户" prop="user">
+                <el-form-item :label="$t('terminal.user')" prop="user">
                     <el-input v-model="hostInfo.user" style="width: 80%" />
                 </el-form-item>
-                <el-form-item label="认证方式" prop="authMode">
+                <el-form-item :label="$t('terminal.authMode')" prop="authMode">
                     <el-radio-group v-model="hostInfo.authMode">
-                        <el-radio label="password">密码输入</el-radio>
-                        <el-radio label="key">密钥输入</el-radio>
+                        <el-radio label="password">{{ $t('terminal.passwordMode') }}</el-radio>
+                        <el-radio label="key">{{ $t('terminal.keyMode') }}</el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item label="密码" show-password v-if="hostInfo.authMode === 'password'" prop="password">
+                <el-form-item
+                    :label="$t('terminal.password')"
+                    show-password
+                    v-if="hostInfo.authMode === 'password'"
+                    prop="password"
+                >
                     <el-input type="password" v-model="hostInfo.password" style="width: 80%" />
                 </el-form-item>
-                <el-form-item label="密钥" v-if="hostInfo.authMode === 'key'" prop="password">
+                <el-form-item :label="$t('terminal.key')" v-if="hostInfo.authMode === 'key'" prop="privateKey">
                     <el-input type="textarea" v-model="hostInfo.privateKey" style="width: 80%" />
                 </el-form-item>
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="connVisiable = false">取消</el-button>
+                    <el-button @click="connVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
                     <el-button v-if="operation === 'conn'" type="primary" @click="submitAddHost(hostInfoRef)">
-                        连 接
+                        {{ $t('commons.button.conn') }}
                     </el-button>
-                    <el-button v-else type="primary" @click="submitAddHost(hostInfoRef)"> 提 交 </el-button>
+                    <el-button v-else type="primary" @click="submitAddHost(hostInfoRef)">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
                 </span>
             </template>
         </el-dialog>
@@ -89,7 +118,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, nextTick, reactive, getCurrentInstance } from 'vue';
+import { onMounted, onBeforeMount, ref, nextTick, reactive, getCurrentInstance } from 'vue';
 import { Rules } from '@/global/form-rues';
 import { getHostList, addHost, editHost, deleteHost } from '@/api/modules/host';
 import { useDeleteData } from '@/hooks/use-delete-data';
@@ -100,10 +129,12 @@ import { Host } from '@/api/interface/host';
 import { ElMessage } from 'element-plus';
 import Terminal from '@/views/terminal/terminal.vue';
 
+let timer: NodeJS.Timer | null = null;
+
 const terminalValue = ref();
 const terminalTabs = ref([]) as any;
-const hostDrawer = ref(false);
 const data = ref();
+const hostDrawer = ref(false);
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -220,6 +251,7 @@ const submitAddHost = (formEl: FormInstance | undefined) => {
                         title: res.data.addr,
                         wsID: res.data.id,
                         type: 'remote',
+                        status: 'online',
                     });
                     terminalValue.value = res.data.addr;
             }
@@ -238,6 +270,7 @@ const onConn = (row: Host.Host) => {
         title: row.addr,
         wsID: row.id,
         type: 'remote',
+        status: 'online',
     });
     terminalValue.value = row.addr;
     hostDrawer.value = false;
@@ -252,32 +285,98 @@ const onDeleteHost = async (row: Host.Host) => {
 function changeFrameHeight() {
     let ifm = document.getElementById('iframeTerminal') as HTMLInputElement | null;
     if (ifm) {
-        ifm.style.height = document.documentElement.clientHeight - 280 + 'px';
+        ifm.style.height = document.documentElement.clientHeight - 300 + 'px';
+    }
+}
+
+function syncTerminal() {
+    for (const terminal of terminalTabs.value) {
+        if (terminal.type === 'remote') {
+            if (ctx && ctx.refs[`Ref${terminal.name}`]) {
+                terminal.status = ctx.refs[`Ref${terminal.name}`][0].isWsOpen() ? 'online' : 'closed';
+                console.log(terminal.status);
+            }
+        }
     }
 }
 
 onMounted(() => {
-    terminalTabs.value.push({ name: '本地服务器', title: '本地服务器', src: 'http://localhost:8080', type: 'local' });
-    terminalValue.value = '本地服务器';
+    terminalTabs.value.push({
+        name: '127.0.0.1',
+        title: '127.0.0.1',
+        src: 'http://localhost:8080',
+        type: 'local',
+        status: 'online',
+    });
+    terminalValue.value = '127.0.0.1';
     nextTick(() => {
         changeFrameHeight();
         window.addEventListener('resize', changeFrameHeight);
     });
     loadHost();
+    timer = setInterval(() => {
+        syncTerminal();
+    }, 1000 * 8);
+});
+onBeforeMount(() => {
+    clearInterval(Number(timer));
 });
 </script>
 <style lang="scss" scoped>
-.term-tool-button {
-    position: absolute;
-    right: -7px;
-    top: 50%;
-    width: 28px;
-    height: 60px;
-    background-color: #565656;
-    border-top-left-radius: 30px;
-    border-bottom-left-radius: 30px;
-    cursor: pointer;
+.drawer-container {
+    transition: all 0.2s;
+    &:hover {
+        right: 0;
+    }
+    position: fixed;
+    right: -90px;
+    top: 15%;
+    height: 40px;
+    width: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     z-index: 999;
-    margin-top: -30px;
+    border-radius: 4px 0 0 4px;
+    cursor: pointer;
+}
+.el-tabs {
+    ::v-deep .el-tabs__header {
+        padding: 0;
+        position: relative;
+        margin: 0 0 3px 0;
+    }
+    ::v-deep .el-tabs__nav {
+        white-space: nowrap;
+        position: relative;
+        transition: transform var(--el-transition-duration);
+        float: left;
+        z-index: calc(var(--el-index-normal) + 1);
+    }
+    ::v-deep .el-tabs__item {
+        color: #575758;
+        padding: 0 0px;
+    }
+    ::v-deep .el-tabs__item.is-active {
+        color: #ebeef5;
+        background-color: #575758;
+    }
+    ::v-deep .el-tabs__new-tab {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        float: right;
+        border: 1pxsolidvar (--el-border-color);
+        height: 20px;
+        width: 20px;
+        line-height: 20px;
+        margin: 10px 30px 10px 10px;
+        border-radius: 3px;
+        text-align: center;
+        font-size: 24px;
+        color: var(--el-text-color-primary);
+        cursor: pointer;
+        transition: all 0.15s;
+    }
 }
 </style>

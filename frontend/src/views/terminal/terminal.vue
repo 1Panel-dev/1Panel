@@ -49,8 +49,8 @@ const errorRealTerminal = (ex: any) => {
     console.log('err');
 };
 
-const closeRealTerminal = () => {
-    console.log('close');
+const closeRealTerminal = (ev: CloseEvent) => {
+    term.write(ev.reason);
 };
 
 const initTerm = () => {
@@ -60,7 +60,7 @@ const initTerm = () => {
         fontSize: 12,
         fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
         theme: {
-            background: '#181d28',
+            background: '#000000',
         },
         cursorBlink: true,
         cursorStyle: 'underline',
@@ -71,6 +71,7 @@ const initTerm = () => {
     });
     if (ifm) {
         term.open(ifm);
+        term.write('\n');
         terminalSocket = new WebSocket(
             `ws://localhost:9999/api/v1/terminals?id=${props.id}&cols=${term.cols}&rows=${term.rows}`,
         );
@@ -121,6 +122,7 @@ function changeTerminalSize() {
 
 defineExpose({
     onClose,
+    isWsOpen,
 });
 
 onMounted(() => {

@@ -8,6 +8,7 @@ export default {
             cancel: '取消',
             reset: '重置',
             login: '登陆',
+            conn: '连接',
         },
         table: {
             name: '名称',
@@ -87,6 +88,19 @@ export default {
         personalData: '个人资料',
         changePassword: '修改密码',
         logout: '退出登录',
+    },
+    terminal: {
+        connHistory: '历史连接',
+        hostHistory: '历史主机信息',
+        addHost: '添加主机',
+        name: '名称',
+        port: '端口',
+        user: '用户',
+        authMode: '认证方式',
+        passwordMode: '密码输入',
+        keyMode: '密钥输入',
+        password: '密码',
+        key: '密钥',
     },
     operations: {
         detail: {
