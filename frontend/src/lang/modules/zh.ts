@@ -1,6 +1,7 @@
 export default {
     commons: {
         button: {
+            create: '新建',
             create: '创建',
             add: '添加',
             delete: '删除',
@@ -150,5 +151,28 @@ export default {
         status: '状态',
         request: '请求',
         response: '响应',
+    },
+    file: {
+        dir: '文件夹',
+        upload: '上传',
+        download: '下载',
+        fileName: '文件名',
+        search: '查找',
+        mode: '权限',
+        owner: '所有者',
+        file: '文件',
+        remoteFile: '远程下载',
+        share: '分享',
+        sync: '数据同步',
+        size: '大小',
+        updateTime: '修改时间',
+        open: '打开',
+        rename: '重命名',
+        role: '权限',
+        info: '属性',
+        linkFile: '软连接文件',
+        terminal: '终端',
+        shareList: '分享列表',
+        zip: '压缩',
     },
 };

@@ -140,6 +140,20 @@ html.dark {
         }
     }
 
+    .el-table {
+        --el-table-border-color: #696969;
+        //fit2cloud-ui 自定义
+        --el-table-text-color: #cfcfcf;
+
+        // $table-header-bgColor: #f5f6f7 !default;
+        .fu-table-header th {
+            border-top: 1px solid var(--el-table-border-color);
+            font-weight: 500 !important;
+            color: var(--el-text-color-regular) !important;
+            background-color: var(--el-bg-color) !important;
+        }
+    }
+
     // el-drawer
     .el-drawer {
         .el-drawer__header {
