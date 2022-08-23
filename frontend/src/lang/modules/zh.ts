@@ -93,6 +93,7 @@ export default {
         connHistory: '历史连接',
         hostHistory: '历史主机信息',
         addHost: '添加主机',
+        localhost: '本地服务器',
         name: '名称',
         port: '端口',
         user: '用户',
@@ -101,6 +102,7 @@ export default {
         keyMode: '密钥输入',
         password: '密码',
         key: '密钥',
+        emptyTerminal: '暂无终端连接',
     },
     operations: {
         detail: {

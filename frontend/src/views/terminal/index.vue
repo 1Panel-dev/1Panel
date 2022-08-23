@@ -12,7 +12,7 @@
                 v-model="terminalValue"
                 @edit="handleTabsEdit"
             >
-                <el-tab-pane :key="item.name" v-for="item in terminalTabs" :label="item.title" :name="item.name">
+                <el-tab-pane :key="item.key" v-for="item in terminalTabs" :label="item.title" :name="item.key">
                     <template #label>
                         <span class="custom-tabs-label">
                             <el-icon color="#67C23A" v-if="item.status === 'online'"><circleCheck /></el-icon>
@@ -20,24 +20,40 @@
                             <span> &nbsp;{{ item.title }}&nbsp;&nbsp;</span>
                         </span>
                     </template>
-                    <iframe
-                        v-if="item.type === 'local'"
-                        id="iframeTerminal"
-                        name="iframeTerminal"
-                        width="100%"
-                        frameborder="0"
-                        :src="item.src"
-                    />
-                    <Terminal v-else :ref="'Ref' + item.name" :id="item.wsID"></Terminal>
+                    <Terminal
+                        style="height: calc(100vh - 265px); background-color: #000"
+                        :ref="'Ref' + item.key"
+                        :wsID="item.wsID"
+                        :terminalID="item.key"
+                    ></Terminal>
                 </el-tab-pane>
+                <div v-if="terminalTabs.length === 0">
+                    <el-empty
+                        style="background-color: #000; height: calc(100vh - 265px)"
+                        :description="$t('terminal.emptyTerminal')"
+                    ></el-empty>
+                </div>
             </el-tabs>
         </div>
 
         <el-drawer :size="320" v-model="hostDrawer" :title="$t('terminal.hostHistory')" direction="rtl">
             <el-button @click="onAddHost">{{ $t('terminal.addHost') }}</el-button>
             <div v-infinite-scroll="nextPage" style="overflow: auto">
+                <el-card
+                    @click="onConnLocal()"
+                    style="margin-top: 5px; cursor: pointer"
+                    :title="$t('terminal.localhost')"
+                    shadow="hover"
+                >
+                    <div :inline="true">
+                        <div>
+                            <span>{{ $t('terminal.localhost') }}</span>
+                        </div>
+                        <span style="font-size: 14px; line-height: 25px"> [ 127.0.0.1 ]</span>
+                    </div>
+                </el-card>
                 <div v-for="(item, index) in data" :key="item.id" @mouseover="hover = index" @mouseleave="hover = null">
-                    <el-card @click="onConn(item)" style="margin-top: 5px" :title="item.name" shadow="hover">
+                    <el-card @click="onConn(item)" style="margin-top: 5px; cursor: pointer" shadow="hover">
                         <div :inline="true">
                             <div>
                                 <span>{{ item.name }}</span>
@@ -79,7 +95,7 @@
                     <el-input v-model="hostInfo.addr" style="width: 80%" />
                 </el-form-item>
                 <el-form-item :label="$t('terminal.port')" prop="port">
-                    <el-input v-model="hostInfo.port" style="width: 80%" />
+                    <el-input v-model.number="hostInfo.port" style="width: 80%" />
                 </el-form-item>
                 <el-form-item :label="$t('terminal.user')" prop="user">
                     <el-input v-model="hostInfo.user" style="width: 80%" />
@@ -90,13 +106,8 @@
                         <el-radio label="key">{{ $t('terminal.keyMode') }}</el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item
-                    :label="$t('terminal.password')"
-                    show-password
-                    v-if="hostInfo.authMode === 'password'"
-                    prop="password"
-                >
-                    <el-input type="password" v-model="hostInfo.password" style="width: 80%" />
+                <el-form-item :label="$t('terminal.password')" v-if="hostInfo.authMode === 'password'" prop="password">
+                    <el-input show-password type="password" v-model="hostInfo.password" style="width: 80%" />
                 </el-form-item>
                 <el-form-item :label="$t('terminal.key')" v-if="hostInfo.authMode === 'key'" prop="privateKey">
                     <el-input type="textarea" v-model="hostInfo.privateKey" style="width: 80%" />
@@ -133,12 +144,13 @@ let timer: NodeJS.Timer | null = null;
 
 const terminalValue = ref();
 const terminalTabs = ref([]) as any;
+let tabIndex = 0;
 const data = ref();
 const hostDrawer = ref(false);
 
 const paginationConfig = reactive({
     currentPage: 1,
-    pageSize: 10,
+    pageSize: 8,
     total: 0,
 });
 
@@ -175,6 +187,9 @@ const handleTabsEdit = (targetName: string, action: 'remove' | 'add') => {
     if (action === 'add') {
         connVisiable.value = true;
         operation.value = 'conn';
+        if (hostInfoRef.value) {
+            hostInfoRef.value.resetFields();
+        }
     } else if (action === 'remove') {
         if (ctx) {
             ctx.refs[`Ref${targetName}`] && ctx.refs[`Ref${targetName}`][0].onClose();
@@ -183,22 +198,23 @@ const handleTabsEdit = (targetName: string, action: 'remove' | 'add') => {
         let activeName = terminalValue.value;
         if (activeName === targetName) {
             tabs.forEach((tab: any, index: any) => {
-                if (tab.name === targetName) {
+                if (tab.key === targetName) {
                     const nextTab = tabs[index + 1] || tabs[index - 1];
                     if (nextTab) {
-                        activeName = nextTab.name;
+                        activeName = nextTab.key;
                     }
                 }
             });
         }
         terminalValue.value = activeName;
-        terminalTabs.value = tabs.filter((tab: any) => tab.name !== targetName);
+        terminalTabs.value = tabs.filter((tab: any) => tab.key !== targetName);
     }
 };
 
 const loadHost = async () => {
     const res = await getHostList({ page: paginationConfig.currentPage, pageSize: paginationConfig.pageSize });
     data.value = res.data.items;
+    paginationConfig.total = res.data.total;
 };
 
 const nextPage = () => {
@@ -247,17 +263,15 @@ const submitAddHost = (formEl: FormInstance | undefined) => {
                 case 'conn':
                     const res = await addHost(hostInfo);
                     terminalTabs.value.push({
-                        name: res.data.addr,
+                        key: `${res.data.addr}-${++tabIndex}`,
                         title: res.data.addr,
                         wsID: res.data.id,
-                        type: 'remote',
                         status: 'online',
                     });
-                    terminalValue.value = res.data.addr;
+                    terminalValue.value = `${res.data.addr}-${tabIndex}`;
             }
             connVisiable.value = false;
             loadHost();
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         } catch (error) {
             ElMessage.success(i18n.global.t('commons.msg.loginSuccess') + ':' + error);
         }
@@ -266,13 +280,23 @@ const submitAddHost = (formEl: FormInstance | undefined) => {
 
 const onConn = (row: Host.Host) => {
     terminalTabs.value.push({
-        name: row.addr,
+        key: `${row.addr}-${++tabIndex}`,
         title: row.addr,
         wsID: row.id,
-        type: 'remote',
         status: 'online',
     });
-    terminalValue.value = row.addr;
+    terminalValue.value = `${row.addr}-${tabIndex}`;
+    hostDrawer.value = false;
+};
+
+const onConnLocal = () => {
+    terminalTabs.value.push({
+        key: `127.0.0.1-${++tabIndex}`,
+        title: '127.0.0.1',
+        wsID: 0,
+        status: 'online',
+    });
+    terminalValue.value = `127.0.0.1-${tabIndex}`;
     hostDrawer.value = false;
 };
 
@@ -291,24 +315,14 @@ function changeFrameHeight() {
 
 function syncTerminal() {
     for (const terminal of terminalTabs.value) {
-        if (terminal.type === 'remote') {
-            if (ctx && ctx.refs[`Ref${terminal.name}`]) {
-                terminal.status = ctx.refs[`Ref${terminal.name}`][0].isWsOpen() ? 'online' : 'closed';
-                console.log(terminal.status);
-            }
+        if (ctx && ctx.refs[`Ref${terminal.key}`]) {
+            terminal.status = ctx.refs[`Ref${terminal.key}`][0].isWsOpen() ? 'online' : 'closed';
         }
     }
 }
 
 onMounted(() => {
-    terminalTabs.value.push({
-        name: '127.0.0.1',
-        title: '127.0.0.1',
-        src: 'http://localhost:8080',
-        type: 'local',
-        status: 'online',
-    });
-    terminalValue.value = '127.0.0.1';
+    onConnLocal();
     nextTick(() => {
         changeFrameHeight();
         window.addEventListener('resize', changeFrameHeight);
@@ -341,27 +355,27 @@ onBeforeMount(() => {
     cursor: pointer;
 }
 .el-tabs {
-    ::v-deep .el-tabs__header {
+    :deep .el-tabs__header {
         padding: 0;
         position: relative;
         margin: 0 0 3px 0;
     }
-    ::v-deep .el-tabs__nav {
+    :deep .el-tabs__nav {
         white-space: nowrap;
         position: relative;
         transition: transform var(--el-transition-duration);
         float: left;
         z-index: calc(var(--el-index-normal) + 1);
     }
-    ::v-deep .el-tabs__item {
+    :deep .el-tabs__item {
         color: #575758;
         padding: 0 0px;
     }
-    ::v-deep .el-tabs__item.is-active {
+    :deep .el-tabs__item.is-active {
         color: #ebeef5;
         background-color: #575758;
     }
-    ::v-deep .el-tabs__new-tab {
+    :deep .el-tabs__new-tab {
         display: flex;
         align-items: center;
         justify-content: center;

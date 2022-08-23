@@ -92,6 +92,7 @@ export default {
         connHistory: 'historys',
         hostHistory: 'History record',
         addHost: 'Add Host',
+        localhost: 'Localhost',
         name: 'Name',
         port: 'Port',
         user: 'User',
@@ -100,6 +101,7 @@ export default {
         keyMode: 'PrivateKey',
         password: 'Password',
         key: 'Private Key',
+        emptyTerminal: 'No terminal is currently connected',
     },
     operations: {
         detail: {

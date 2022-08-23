@@ -192,10 +192,6 @@ func (sws *LogicSshWsSession) Wait(quitChan chan bool) {
 	}
 }
 
-func (sws *LogicSshWsSession) LogString() string {
-	return sws.logBuff.buffer.String()
-}
-
 func setQuit(ch chan bool) {
 	ch <- true
 }

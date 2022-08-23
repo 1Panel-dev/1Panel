@@ -3,7 +3,7 @@ package dto
 import "time"
 
 type HostCreate struct {
-	Name       string `json:"name" validate:"required,name"`
+	Name       string `json:"name" validate:"required"`
 	Addr       string `json:"addr" validate:"required,ip"`
 	Port       uint   `json:"port" validate:"required,number,max=65535,min=1"`
 	User       string `json:"user" validate:"required"`
@@ -27,7 +27,7 @@ type HostInfo struct {
 }
 
 type HostUpdate struct {
-	Name       string `json:"name" validate:"required,name"`
+	Name       string `json:"name" validate:"required"`
 	Addr       string `json:"addr" validate:"required,ip"`
 	Port       uint   `json:"port" validate:"required,number,max=65535,min=1"`
 	User       string `json:"user" validate:"required"`
