@@ -1,5 +1,5 @@
 <template>
-    <div :id="'terminal' + props.id"></div>
+    <div :id="'terminal' + props.terminalID"></div>
 </template>
 
 <script setup lang="ts">
@@ -8,13 +8,17 @@ import { Terminal } from 'xterm';
 import { AttachAddon } from 'xterm-addon-attach';
 import { Base64 } from 'js-base64';
 import 'xterm/css/xterm.css';
+import { FitAddon } from 'xterm-addon-fit';
 
 interface WsProps {
-    id: number;
+    terminalID: string;
+    wsID: number;
 }
 const props = withDefaults(defineProps<WsProps>(), {
-    id: 0,
+    terminalID: '',
+    wsID: 0,
 });
+const fitAddon = new FitAddon();
 const loading = ref(true);
 let terminalSocket = ref(null) as unknown as WebSocket;
 let term = ref(null) as unknown as Terminal;
@@ -54,7 +58,7 @@ const closeRealTerminal = (ev: CloseEvent) => {
 };
 
 const initTerm = () => {
-    let ifm = document.getElementById('terminal' + props.id) as HTMLInputElement | null;
+    let ifm = document.getElementById('terminal' + props.terminalID) as HTMLInputElement | null;
     term = new Terminal({
         lineHeight: 1.2,
         fontSize: 12,
@@ -66,15 +70,19 @@ const initTerm = () => {
         cursorStyle: 'underline',
         scrollback: 100,
         tabStopWidth: 4,
-        cols: ifm ? Math.floor(document.documentElement.clientWidth / 7) : 200,
-        rows: ifm ? Math.floor(document.documentElement.clientHeight / 20) : 25,
     });
     if (ifm) {
         term.open(ifm);
         term.write('\n');
-        terminalSocket = new WebSocket(
-            `ws://localhost:9999/api/v1/terminals?id=${props.id}&cols=${term.cols}&rows=${term.rows}`,
-        );
+        if (props.wsID === 0) {
+            terminalSocket = new WebSocket(
+                `ws://localhost:9999/api/v1/terminals/local?cols=${term.cols}&rows=${term.rows}`,
+            );
+        } else {
+            terminalSocket = new WebSocket(
+                `ws://localhost:9999/api/v1/terminals?id=${props.wsID}&cols=${term.cols}&rows=${term.rows}`,
+            );
+        }
         terminalSocket.onopen = runRealTerminal;
         terminalSocket.onmessage = onWSReceive;
         terminalSocket.onclose = closeRealTerminal;
@@ -90,7 +98,24 @@ const initTerm = () => {
             }
         });
         term.loadAddon(new AttachAddon(terminalSocket));
+        term.loadAddon(fitAddon);
+        setTimeout(() => {
+            fitAddon.fit();
+            if (isWsOpen()) {
+                terminalSocket.send(
+                    JSON.stringify({
+                        type: 'resize',
+                        cols: term.cols,
+                        rows: term.rows,
+                    }),
+                );
+            }
+        }, 30);
     }
+};
+
+const fitTerm = () => {
+    fitAddon.fit();
 };
 
 const isWsOpen = () => {
@@ -105,18 +130,16 @@ function onClose() {
 }
 
 function changeTerminalSize() {
-    let ifm = document.getElementById('terminal' + props.id) as HTMLInputElement | null;
-    if (ifm) {
-        ifm.style.height = document.documentElement.clientHeight - 300 + 'px';
-        if (isWsOpen()) {
-            terminalSocket.send(
-                JSON.stringify({
-                    type: 'resize',
-                    cols: Math.floor(document.documentElement.clientWidth / 7),
-                    rows: Math.floor(document.documentElement.clientHeight / 20),
-                }),
-            );
-        }
+    fitTerm();
+    const { cols, rows } = term;
+    if (isWsOpen()) {
+        terminalSocket.send(
+            JSON.stringify({
+                type: 'resize',
+                cols: cols,
+                rows: rows,
+            }),
+        );
     }
 }
 
@@ -128,7 +151,6 @@ defineExpose({
 onMounted(() => {
     nextTick(() => {
         initTerm();
-        changeTerminalSize();
         window.addEventListener('resize', changeTerminalSize);
     });
 });

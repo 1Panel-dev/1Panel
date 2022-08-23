@@ -15,6 +15,7 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/gwatts/gin-adapter v1.0.0
 	github.com/jinzhu/copier v0.3.5
+	github.com/kr/pty v1.1.1
 	github.com/mojocn/base64Captcha v1.3.5
 	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/nicksnyder/go-i18n/v2 v2.1.2

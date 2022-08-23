@@ -3,13 +3,13 @@ package server
 import (
 	"encoding/gob"
 	"fmt"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/init/cache"
 	"github.com/1Panel-dev/1Panel/init/session"
 	"github.com/1Panel-dev/1Panel/init/session/psession"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/global"
-	"github.com/1Panel-dev/1Panel/init/binary"
 	"github.com/1Panel-dev/1Panel/init/db"
 	"github.com/1Panel-dev/1Panel/init/log"
 	"github.com/1Panel-dev/1Panel/init/migration"
@@ -30,7 +30,6 @@ func Start() {
 	gob.Register(psession.SessionUser{})
 	cache.Init()
 	session.Init()
-	binary.StartTTY()
 	gin.SetMode(global.CONF.System.Level)
 
 	routers := router.Routers()
