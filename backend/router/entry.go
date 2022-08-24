@@ -7,6 +7,7 @@ type RouterGroup struct {
 	GroupRouter
 	CommandRouter
 	OperationLogRouter
+	FileRouter
 }
 
 var RouterGroupApp = new(RouterGroup)
