@@ -1,19 +1,28 @@
 <template>
     <LayoutContent :header="$t('menu.files')">
         <el-row :gutter="20">
-            <el-col :span="6">
-                <el-tree :data="dataSource" node-key="id">
-                    <template #default="{ node }">
-                        <el-icon v-if="node.data.isDir && node.expanded"><FolderOpened /></el-icon>
-                        <el-icon v-if="node.data.isDir && !node.expanded"><Folder /></el-icon>
-                        <el-icon v-if="!node.data.isDir"><Document /></el-icon>
-                        <span class="custom-tree-node">
-                            <span>{{ node.data.label }}</span>
-                        </span>
-                    </template>
-                </el-tree>
+            <el-col :span="5">
+                <el-scrollbar height="800px">
+                    <el-tree
+                        :data="fileTree"
+                        :props="defaultProps"
+                        :load="loadNode"
+                        lazy
+                        node-key="id"
+                        v-loading="treeLoading"
+                    >
+                        <template #default="{ node }">
+                            <el-icon v-if="node.expanded"><FolderOpened /></el-icon>
+                            <el-icon v-else><Folder /></el-icon>
+                            <span class="custom-tree-node">
+                                <span>{{ node.data.name }}</span>
+                            </span>
+                        </template>
+                    </el-tree>
+                </el-scrollbar>
             </el-col>
-            <el-col :span="18">
+
+            <el-col :span="19">
                 <div class="path">
                     <BreadCrumbs>
                         <BreadCrumbItem @click="jump(-1)" :right="paths.length == 0">root</BreadCrumbItem>
@@ -30,7 +39,7 @@
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
-                    :loading="loading"
+                    v-loading="loading"
                 >
                     <template #toolbar>
                         <el-dropdown split-button type="primary">
@@ -89,26 +98,29 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from '@vue/runtime-core';
+import { reactive, ref } from '@vue/runtime-core';
 import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import i18n from '@/lang';
-import { GetFilesList } from '@/api/modules/files';
+import { GetFilesList, GetFilesTree } from '@/api/modules/files';
 import { dateFromat } from '@/utils/util';
 import { File } from '@/api/interface/file';
 import BreadCrumbs from '@/components/bread-crumbs/index.vue';
 import BreadCrumbItem from '@/components/bread-crumbs/bread-crumbs-item.vue';
-interface Tree {
-    id: number;
-    label: string;
-    isDir: Boolean;
-    children?: Tree[];
-}
+
 let data = ref();
 let selects = ref<any>([]);
 let req = reactive({ path: '/', expand: true });
 let loading = ref<boolean>(false);
+let treeLoading = ref<boolean>(false);
 let paths = ref<string[]>([]);
+let fileTree = ref<File.FileTree[]>([]);
+
+const defaultProps = {
+    children: 'children',
+    label: 'name',
+};
+
 const paginationConfig = reactive({
     page: 1,
     pageSize: 5,
@@ -135,9 +147,9 @@ const buttons = [
     },
 ];
 
-const search = (req: File.ReqFile) => {
+const search = async (req: File.ReqFile) => {
     loading.value = true;
-    GetFilesList(req)
+    await GetFilesList(req)
         .then((res) => {
             data.value = res.data.items;
             req.path = res.data.path;
@@ -176,53 +188,36 @@ const jump = async (index: number) => {
     search(req);
 };
 
-const dataSource = ref<Tree[]>([
-    {
-        id: 1,
-        label: 'var',
-        isDir: true,
-        children: [
-            {
-                id: 4,
-                label: 'log',
-                isDir: true,
-                children: [
-                    {
-                        id: 9,
-                        isDir: false,
-                        label: 'ko.log',
-                    },
-                    {
-                        id: 10,
-                        isDir: false,
-                        label: 'kubepi.log',
-                    },
-                ],
-            },
-        ],
-    },
-    {
-        id: 2,
-        label: 'opt',
-        isDir: true,
-        children: [
-            {
-                id: 5,
-                isDir: false,
-                label: 'app.conf',
-            },
-            {
-                id: 6,
-                isDir: false,
-                label: 'test.txt',
-            },
-        ],
-    },
-]);
+const getTree = async (req: File.ReqFile, node: File.FileTree | null) => {
+    treeLoading.value = true;
+    await GetFilesTree(req)
+        .then((res) => {
+            if (node) {
+                if (res.data.length > 0) {
+                    node.children = res.data[0].children;
+                }
+            } else {
+                fileTree.value = res.data;
+            }
+            search(req);
+        })
+        .finally(() => {
+            treeLoading.value = false;
+        });
+};
 
-onMounted(() => {
-    search(req);
-});
+const loadNode = (node: any, resolve: (data: File.FileTree[]) => void) => {
+    console.log(node.id);
+    if (!node.hasChildNodes) {
+        if (node.data.path) {
+            req.path = node.data.path;
+            getTree(req, node.data);
+        } else {
+            getTree(req, null);
+        }
+    }
+    resolve([]);
+};
 </script>
 
 <style>

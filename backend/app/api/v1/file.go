@@ -20,3 +20,17 @@ func (b *BaseApi) ListFiles(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, files)
 }
+
+func (b *BaseApi) GetFileTree(c *gin.Context) {
+	var req dto.FileOption
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	tree, err := fileService.GetFileTree(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, tree)
+}
