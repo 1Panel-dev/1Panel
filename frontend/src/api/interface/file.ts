@@ -21,4 +21,11 @@ export namespace File {
         search?: string;
         expand: boolean;
     }
+
+    export interface FileTree {
+        name: string;
+        isDir: Boolean;
+        path: string;
+        children?: FileTree[];
+    }
 }

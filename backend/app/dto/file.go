@@ -9,3 +9,9 @@ type FileOption struct {
 type FileInfo struct {
 	files.FileInfo
 }
+
+type FileTree struct {
+	Name     string     `json:"name"`
+	Path     string     `json:"path"`
+	Children []FileTree `json:"children"`
+}
