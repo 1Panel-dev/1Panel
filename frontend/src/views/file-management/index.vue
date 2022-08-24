@@ -15,14 +15,17 @@
             </el-col>
             <el-col :span="18">
                 <div class="path">
-                    <el-breadcrumb :separator-icon="ArrowRight">
-                        <el-breadcrumb-item @click="jump(-1)">root</el-breadcrumb-item>
-                        <el-breadcrumb-item v-for="(item, key) in paths" :key="key" @click="jump(key)">{{
-                            item
-                        }}</el-breadcrumb-item>
-                    </el-breadcrumb>
+                    <BreadCrumbs>
+                        <BreadCrumbItem @click="jump(-1)" :right="paths.length == 0">root</BreadCrumbItem>
+                        <BreadCrumbItem
+                            v-for="(item, key) in paths"
+                            :key="key"
+                            @click="jump(key)"
+                            :right="key == paths.length - 1"
+                            >{{ item }}</BreadCrumbItem
+                        >
+                    </BreadCrumbs>
                 </div>
-
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
@@ -92,8 +95,9 @@ import ComplexTable from '@/components/complex-table/index.vue';
 import i18n from '@/lang';
 import { GetFilesList } from '@/api/modules/files';
 import { dateFromat } from '@/utils/util';
-import { ArrowRight } from '@element-plus/icons-vue';
 import { File } from '@/api/interface/file';
+import BreadCrumbs from '@/components/bread-crumbs/index.vue';
+import BreadCrumbItem from '@/components/bread-crumbs/bread-crumbs-item.vue';
 interface Tree {
     id: number;
     label: string;
@@ -136,6 +140,14 @@ const search = (req: File.ReqFile) => {
     GetFilesList(req)
         .then((res) => {
             data.value = res.data.items;
+            req.path = res.data.path;
+            const pathArray = req.path.split('/');
+            paths.value = [];
+            for (const p of pathArray) {
+                if (p != '') {
+                    paths.value.push(p);
+                }
+            }
         })
         .finally(() => {
             loading.value = false;
