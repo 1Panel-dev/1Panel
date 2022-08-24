@@ -5,6 +5,7 @@ import "github.com/1Panel-dev/1Panel/app/repo"
 type ServiceGroup struct {
 	UserService
 	OperationService
+	FileService
 }
 
 var ServiceGroupApp = new(ServiceGroup)

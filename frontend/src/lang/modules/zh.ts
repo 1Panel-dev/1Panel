@@ -122,5 +122,7 @@ export default {
         terminal: '终端',
         shareList: '分享列表',
         zip: '压缩',
+        user: '用户',
+        group: '组',
     },
 };
