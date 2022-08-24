@@ -1,7 +1,7 @@
-// import { File } from '@/api/interface/file';
-import files from '@/api/interface/files.json';
+import { File } from '@/api/interface/file';
+import http from '@/api';
+import { ResultData } from '@/api/interface';
 
-export const GetFilesList = () => {
-    // return http.post<Login.ResLogin>(`/auth/login`, params);
-    return files;
+export const GetFilesList = (params: File.ReqFile) => {
+    return http.post<ResultData<File.File>>('files/search', params);
 };
