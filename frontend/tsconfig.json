@@ -16,6 +16,8 @@
         // "alwaysStrict": true,                  /* Parse in strict mode and emit "use strict" for each source file. */
 
         "jsx": "preserve",
+        "jsxFactory": "h",
+        "jsxFragmentFactory": "Fragment",
         "sourceMap": true,
         "resolveJsonModule": true,
         "esModuleInterop": true,

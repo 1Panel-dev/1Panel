@@ -1,9 +1,9 @@
 @font-face {
   font-family: "panel"; /* Project id 3575356 */
-  src: url('iconfont.woff2?t=1660728283223') format('woff2'),
-       url('iconfont.woff?t=1660728283223') format('woff'),
-       url('iconfont.ttf?t=1660728283223') format('truetype'),
-       url('iconfont.svg?t=1660728283223#panel') format('svg');
+  src: url('iconfont.woff2?t=1661325242934') format('woff2'),
+       url('iconfont.woff?t=1661325242934') format('woff'),
+       url('iconfont.ttf?t=1661325242934') format('truetype'),
+       url('iconfont.svg?t=1661325242934#panel') format('svg');
 }
 
 .panel {
@@ -12,6 +12,22 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.p-arrow-right:before {
+  content: "\e665";
+}
+
+.p-home:before {
+  content: "\e615";
+}
+
+.p-terminal:before {
+  content: "\e864";
+}
+
+.p-terminal1:before {
+  content: "\e663";
 }
 
 .p-language:before {
