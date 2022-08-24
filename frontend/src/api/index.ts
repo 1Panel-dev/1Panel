@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { showFullScreenLoading, tryHideFullScreenLoading } from '@/config/service-loading';
+// import { showFullScreenLoading, tryHideFullScreenLoading } from '@/config/service-loading';
 import { AxiosCanceler } from './helper/axios-cancel';
 import { ResultData } from '@/api/interface';
 import { ResultEnum } from '@/enums/http-enum';
@@ -31,7 +31,7 @@ class RequestHttp {
                     };
                 }
                 axiosCanceler.addPending(config);
-                config.headers!.noLoading || showFullScreenLoading();
+                // config.headers!.noLoading || showFullScreenLoading();
                 return {
                     ...config,
                 };
@@ -48,7 +48,7 @@ class RequestHttp {
                     globalStore.setCsrfToken(response.headers['x-csrf-token']);
                 }
                 axiosCanceler.removePending(config);
-                tryHideFullScreenLoading();
+                // tryHideFullScreenLoading();
                 if (data.code == ResultEnum.OVERDUE || data.code == ResultEnum.FORBIDDEN) {
                     ElMessage.error(data.msg);
                     router.replace({
@@ -64,7 +64,7 @@ class RequestHttp {
             },
             async (error: AxiosError) => {
                 const { response } = error;
-                tryHideFullScreenLoading();
+                // tryHideFullScreenLoading();
                 if (error.message.indexOf('timeout') !== -1) ElMessage.error('请求超时！请您稍后重试');
                 if (response) checkStatus(response.status);
                 if (!window.navigator.onLine) router.replace({ path: '/500' });
