@@ -25,3 +25,24 @@ func (f FileService) GetFileList(op dto.FileOption) (dto.FileInfo, error) {
 	fileInfo.FileInfo = *info
 	return fileInfo, nil
 }
+
+func (f FileService) GetFileTree(op dto.FileOption) ([]dto.FileTree, error) {
+	var treeArray []dto.FileTree
+	info, err := files.NewFileInfo(op.FileOption)
+	if err != nil {
+		return nil, err
+	}
+	node := dto.FileTree{
+		Name: info.Name,
+		Path: info.Path,
+	}
+	for _, v := range info.Items {
+		if v.IsDir {
+			node.Children = append(node.Children, dto.FileTree{
+				Name: v.Name,
+				Path: v.Path,
+			})
+		}
+	}
+	return append(treeArray, node), nil
+}
