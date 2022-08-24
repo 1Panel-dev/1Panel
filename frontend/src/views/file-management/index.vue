@@ -8,8 +8,9 @@
                         :props="defaultProps"
                         :load="loadNode"
                         lazy
-                        node-key="id"
                         v-loading="treeLoading"
+                        node-key="id"
+                        :default-expanded-keys="expandKeys"
                     >
                         <template #default="{ node }">
                             <el-icon v-if="node.expanded"><FolderOpened /></el-icon>
@@ -69,7 +70,7 @@
                         <template #default="{ row }">
                             <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
                             <svg-icon v-else className="table-icon" iconName="p-file-normal"></svg-icon>
-                            <el-link :underline="false" @click="open(row.name)">{{ row.name }}</el-link>
+                            <el-link :underline="false" @click="open(row)">{{ row.name }}</el-link>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('file.mode')" prop="mode"> </el-table-column>
@@ -115,10 +116,12 @@ let loading = ref<boolean>(false);
 let treeLoading = ref<boolean>(false);
 let paths = ref<string[]>([]);
 let fileTree = ref<File.FileTree[]>([]);
+let expandKeys = ref<string[]>([]);
 
 const defaultProps = {
     children: 'children',
     label: 'name',
+    id: 'id',
 };
 
 const paginationConfig = reactive({
@@ -126,26 +129,6 @@ const paginationConfig = reactive({
     pageSize: 5,
     total: 0,
 });
-const buttons = [
-    {
-        label: i18n.global.t('file.open'),
-    },
-    {
-        label: i18n.global.t('file.mode'),
-    },
-    {
-        label: i18n.global.t('file.zip'),
-    },
-    {
-        label: i18n.global.t('file.rename'),
-    },
-    {
-        label: i18n.global.t('commons.button.delete'),
-    },
-    {
-        label: i18n.global.t('file.info'),
-    },
-];
 
 const search = async (req: File.ReqFile) => {
     loading.value = true;
@@ -166,14 +149,17 @@ const search = async (req: File.ReqFile) => {
         });
 };
 
-const open = async (name: string) => {
-    paths.value.push(name);
-    if (req.path === '/') {
-        req.path = req.path + name;
-    } else {
-        req.path = req.path + '/' + name;
+const open = async (row: File.File) => {
+    if (row.isDir) {
+        const name = row.name;
+        paths.value.push(name);
+        if (req.path === '/') {
+            req.path = req.path + name;
+        } else {
+            req.path = req.path + '/' + name;
+        }
+        search(req);
     }
-    search(req);
 };
 
 const jump = async (index: number) => {
@@ -198,6 +184,8 @@ const getTree = async (req: File.ReqFile, node: File.FileTree | null) => {
                 }
             } else {
                 fileTree.value = res.data;
+                expandKeys.value = [];
+                expandKeys.value.push(fileTree.value[0].id);
             }
             search(req);
         })
@@ -207,7 +195,6 @@ const getTree = async (req: File.ReqFile, node: File.FileTree | null) => {
 };
 
 const loadNode = (node: any, resolve: (data: File.FileTree[]) => void) => {
-    console.log(node.id);
     if (!node.hasChildNodes) {
         if (node.data.path) {
             req.path = node.data.path;
@@ -218,6 +205,27 @@ const loadNode = (node: any, resolve: (data: File.FileTree[]) => void) => {
     }
     resolve([]);
 };
+const buttons = [
+    {
+        label: i18n.global.t('file.open'),
+        click: open,
+    },
+    {
+        label: i18n.global.t('file.mode'),
+    },
+    {
+        label: i18n.global.t('file.zip'),
+    },
+    {
+        label: i18n.global.t('file.rename'),
+    },
+    {
+        label: i18n.global.t('commons.button.delete'),
+    },
+    {
+        label: i18n.global.t('file.info'),
+    },
+];
 </script>
 
 <style>
