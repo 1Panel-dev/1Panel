@@ -23,6 +23,7 @@ export namespace File {
     }
 
     export interface FileTree {
+        id: string;
         name: string;
         isDir: Boolean;
         path: string;
