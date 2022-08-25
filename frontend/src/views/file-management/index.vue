@@ -11,6 +11,7 @@
                         v-loading="treeLoading"
                         node-key="id"
                         :default-expanded-keys="expandKeys"
+                        @node-click="clickNode"
                     >
                         <template #default="{ node }">
                             <el-icon v-if="node.expanded"><FolderOpened /></el-icon>
@@ -66,7 +67,7 @@
                         <el-button type="primary" plain> {{ $t('file.terminal') }}</el-button>
                         <el-button type="primary" plain> {{ $t('file.shareList') }}</el-button>
                     </template>
-                    <el-table-column :label="$t('commons.table.name')" min-width="120" fix>
+                    <el-table-column :label="$t('commons.table.name')" min-width="150" fix>
                         <template #default="{ row }">
                             <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
                             <svg-icon v-else className="table-icon" iconName="p-file-normal"></svg-icon>
@@ -81,7 +82,7 @@
                         :label="$t('file.updateTime')"
                         prop="modTime"
                         :formatter="dateFromat"
-                        min-width="150"
+                        min-width="100"
                     >
                     </el-table-column>
 
@@ -100,16 +101,17 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from '@vue/runtime-core';
+import { onMounted, reactive, ref } from '@vue/runtime-core';
 import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import i18n from '@/lang';
-import { GetFilesList, GetFilesTree } from '@/api/modules/files';
+import { GetFilesList, GetFilesTree, DeleteFile } from '@/api/modules/files';
 import { dateFromat } from '@/utils/util';
 import { File } from '@/api/interface/file';
 import BreadCrumbs from '@/components/bread-crumbs/index.vue';
 import BreadCrumbItem from '@/components/bread-crumbs/bread-crumbs-item.vue';
 import CreateFile from './create.vue';
+import { useDeleteData } from '@/hooks/use-delete-data';
 
 let data = ref();
 let selects = ref<any>([]);
@@ -191,11 +193,17 @@ const getTree = async (req: File.ReqFile, node: File.FileTree | null) => {
                 expandKeys.value = [];
                 expandKeys.value.push(fileTree.value[0].id);
             }
-            search(req);
         })
         .finally(() => {
             treeLoading.value = false;
         });
+};
+
+const clickNode = async (node: any) => {
+    if (node.path) {
+        req.path = node.path;
+        search(req);
+    }
 };
 
 const loadNode = (node: any, resolve: (data: File.FileTree[]) => void) => {
@@ -215,16 +223,32 @@ const handleCreate = (commnad: string) => {
     fileCreate.value.isDir = false;
     if (commnad === 'dir') {
         fileCreate.value.isDir = true;
-        console.log(fileCreate.value);
     }
-    console.log(commnad);
     openCreate.value = true;
+};
+
+const delFile = async (row: File.File | null) => {
+    // let ids: Array<number> = [];
+
+    // if (row === null) {
+    //     selects.value.forEach((item: File.File) => {
+    //         ids.push(item.id);
+    //     });
+    // } else {
+    //     ids.push(row.id);
+    // }
+    await useDeleteData(DeleteFile, row as File.FileDelete, 'commons.msg.delete');
+    search(req);
 };
 
 const close = () => {
     openCreate.value = false;
     search(req);
 };
+
+onMounted(() => {
+    search(req);
+});
 
 const buttons = [
     {
@@ -242,6 +266,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
+        click: delFile,
     },
     {
         label: i18n.global.t('file.info'),

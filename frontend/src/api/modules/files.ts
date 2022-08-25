@@ -12,3 +12,7 @@ export const GetFilesTree = (params: File.ReqFile) => {
 export const CreateFile = (form: File.FileCreate) => {
     return http.post<File.File>('files', form);
 };
+
+export const DeleteFile = (form: File.FileDelete) => {
+    return http.post<File.File>('files/del', form);
+};

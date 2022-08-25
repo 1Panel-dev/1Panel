@@ -35,4 +35,9 @@ export namespace File {
         isDir: Boolean;
         mode: number;
     }
+
+    export interface FileDelete {
+        path: string;
+        isDir: Boolean;
+    }
 }
