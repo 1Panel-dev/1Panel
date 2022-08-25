@@ -43,17 +43,17 @@
                     v-loading="loading"
                 >
                     <template #toolbar>
-                        <el-dropdown split-button type="primary">
+                        <el-dropdown split-button type="primary" @command="handleCreate">
                             {{ $t('commons.button.create') }}
                             <template #dropdown>
                                 <el-dropdown-menu>
-                                    <el-dropdown-item>
+                                    <el-dropdown-item command="dir">
                                         <svg-icon iconName="p-file-folder"></svg-icon>{{ $t('file.dir') }}
                                     </el-dropdown-item>
-                                    <el-dropdown-item>
+                                    <el-dropdown-item command="file">
                                         <svg-icon iconName="p-file-normal"></svg-icon>{{ $t('file.file') }}
                                     </el-dropdown-item>
-                                    <el-dropdown-item>
+                                    <el-dropdown-item command="link">
                                         <svg-icon iconName="p-file-normal"></svg-icon>{{ $t('file.linkFile') }}
                                     </el-dropdown-item>
                                 </el-dropdown-menu>
@@ -94,6 +94,7 @@
                     />
                 </ComplexTable>
             </el-col>
+            <CreateFile :open="openCreate" :file="fileCreate" @close="close"></CreateFile>
         </el-row>
     </LayoutContent>
 </template>
@@ -108,6 +109,7 @@ import { dateFromat } from '@/utils/util';
 import { File } from '@/api/interface/file';
 import BreadCrumbs from '@/components/bread-crumbs/index.vue';
 import BreadCrumbItem from '@/components/bread-crumbs/bread-crumbs-item.vue';
+import CreateFile from './create.vue';
 
 let data = ref();
 let selects = ref<any>([]);
@@ -117,6 +119,8 @@ let treeLoading = ref<boolean>(false);
 let paths = ref<string[]>([]);
 let fileTree = ref<File.FileTree[]>([]);
 let expandKeys = ref<string[]>([]);
+let openCreate = ref<boolean>(false);
+let fileCreate = ref<File.FileCreate>({ path: '/', isDir: false, mode: 0o755 });
 
 const defaultProps = {
     children: 'children',
@@ -205,6 +209,23 @@ const loadNode = (node: any, resolve: (data: File.FileTree[]) => void) => {
     }
     resolve([]);
 };
+
+const handleCreate = (commnad: string) => {
+    fileCreate.value.path = req.path;
+    fileCreate.value.isDir = false;
+    if (commnad === 'dir') {
+        fileCreate.value.isDir = true;
+        console.log(fileCreate.value);
+    }
+    console.log(commnad);
+    openCreate.value = true;
+};
+
+const close = () => {
+    openCreate.value = false;
+    search(req);
+};
+
 const buttons = [
     {
         label: i18n.global.t('file.open'),
