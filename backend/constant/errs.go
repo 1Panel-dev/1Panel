@@ -32,5 +32,5 @@ var (
 	ErrTypeInvalidParams  = "ErrInvalidParams"
 	ErrTypeToken          = "ErrToken"
 	ErrTypeTokenTimeOut   = "ErrTokenTimeOut"
-	ErrTypeNotLogin       = "ErrNotLogin"
+	ErrTypeNotLogin       = "ErrTypeNotLogin"
 )

@@ -55,6 +55,15 @@ func (f FileService) Create(op dto.FileCreate) error {
 	return nil
 }
 
+func (f FileService) Delete(op dto.FileDelete) error {
+	fo := files.NewFileOp()
+	if op.IsDir {
+		return fo.DeleteDir(op.Path)
+	} else {
+		return fo.DeleteFile(op.Path)
+	}
+}
+
 func getUuid() string {
 	b := make([]byte, 16)
 	io.ReadFull(rand.Reader, b)
