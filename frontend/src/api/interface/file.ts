@@ -29,4 +29,10 @@ export namespace File {
         path: string;
         children?: FileTree[];
     }
+
+    export interface FileCreate {
+        path: string;
+        isDir: Boolean;
+        mode: number;
+    }
 }

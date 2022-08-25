@@ -8,3 +8,7 @@ export const GetFilesList = (params: File.ReqFile) => {
 export const GetFilesTree = (params: File.ReqFile) => {
     return http.post<File.FileTree[]>('files/tree', params);
 };
+
+export const CreateFile = (form: File.FileCreate) => {
+    return http.post<File.File>('files', form);
+};
