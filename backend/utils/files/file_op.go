@@ -22,6 +22,14 @@ func (f FileOp) CreateDir(dst string, mode fs.FileMode) error {
 	return f.Fs.MkdirAll(dst, mode)
 }
 
+func (f FileOp) DeleteDir(dst string) error {
+	return f.Fs.RemoveAll(dst)
+}
+
+func (f FileOp) DeleteFile(dst string) error {
+	return f.Fs.Remove(dst)
+}
+
 func (f FileOp) WriteFile(dst string, in io.Reader, mode fs.FileMode) error {
 	dir, _ := path.Split(dst)
 	if err := f.Fs.MkdirAll(dir, mode); err != nil {
