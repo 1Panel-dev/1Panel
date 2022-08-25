@@ -6,17 +6,10 @@ import (
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/utils/files"
 	"io"
+	"io/fs"
 )
 
 type FileService struct {
-}
-
-type IFileService interface {
-	GetFileList(op dto.FileOption) (dto.FileInfo, error)
-}
-
-func NewFileService() IFileService {
-	return FileService{}
 }
 
 func (f FileService) GetFileList(op dto.FileOption) (dto.FileInfo, error) {
@@ -50,6 +43,16 @@ func (f FileService) GetFileTree(op dto.FileOption) ([]dto.FileTree, error) {
 		}
 	}
 	return append(treeArray, node), nil
+}
+
+func (f FileService) Create(op dto.FileCreate) error {
+
+	fo := files.NewFileOp()
+	if op.IsDir {
+		return fo.CreateDir(op.Path, fs.FileMode(op.Mode))
+	}
+
+	return nil
 }
 
 func getUuid() string {
