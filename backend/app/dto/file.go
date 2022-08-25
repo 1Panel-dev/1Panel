@@ -25,3 +25,8 @@ type FileCreate struct {
 	IsDir   bool
 	Mode    int64
 }
+
+type FileDelete struct {
+	Path  string
+	IsDir bool
+}
