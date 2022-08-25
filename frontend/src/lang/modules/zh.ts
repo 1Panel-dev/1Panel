@@ -124,5 +124,6 @@ export default {
         zip: '压缩',
         user: '用户',
         group: '组',
+        path: '路径',
     },
 };

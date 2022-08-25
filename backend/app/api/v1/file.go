@@ -34,3 +34,17 @@ func (b *BaseApi) GetFileTree(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, tree)
 }
+
+func (b *BaseApi) CreateFile(c *gin.Context) {
+	var req dto.FileCreate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	err := fileService.Create(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}

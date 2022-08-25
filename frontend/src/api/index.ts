@@ -1,6 +1,4 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
-// import { showFullScreenLoading, tryHideFullScreenLoading } from '@/config/service-loading';
-import { AxiosCanceler } from './helper/axios-cancel';
 import { ResultData } from '@/api/interface';
 import { ResultEnum } from '@/enums/http-enum';
 import { checkStatus } from './helper/check-status';
@@ -9,7 +7,6 @@ import router from '@/routers';
 import { GlobalStore } from '@/store';
 
 const globalStore = GlobalStore();
-const axiosCanceler = new AxiosCanceler();
 
 const config = {
     baseURL: import.meta.env.VITE_API_URL as string,
@@ -30,8 +27,7 @@ class RequestHttp {
                         ...config.headers,
                     };
                 }
-                axiosCanceler.addPending(config);
-                // config.headers!.noLoading || showFullScreenLoading();
+
                 return {
                     ...config,
                 };
@@ -43,12 +39,10 @@ class RequestHttp {
 
         this.service.interceptors.response.use(
             (response: AxiosResponse) => {
-                const { data, config } = response;
+                const { data } = response;
                 if (response.headers['x-csrf-token']) {
                     globalStore.setCsrfToken(response.headers['x-csrf-token']);
                 }
-                axiosCanceler.removePending(config);
-                // tryHideFullScreenLoading();
                 if (data.code == ResultEnum.OVERDUE || data.code == ResultEnum.FORBIDDEN) {
                     ElMessage.error(data.msg);
                     router.replace({
@@ -64,7 +58,6 @@ class RequestHttp {
             },
             async (error: AxiosError) => {
                 const { response } = error;
-                // tryHideFullScreenLoading();
                 if (error.message.indexOf('timeout') !== -1) ElMessage.error('请求超时！请您稍后重试');
                 if (response) checkStatus(response.status);
                 if (!window.navigator.onLine) router.replace({ path: '/500' });
