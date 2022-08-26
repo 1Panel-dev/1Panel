@@ -25,19 +25,19 @@ export namespace File {
     export interface FileTree {
         id: string;
         name: string;
-        isDir: Boolean;
+        isDir: boolean;
         path: string;
         children?: FileTree[];
     }
 
     export interface FileCreate {
         path: string;
-        isDir: Boolean;
+        isDir: boolean;
         mode: number;
     }
 
     export interface FileDelete {
         path: string;
-        isDir: Boolean;
+        isDir: boolean;
     }
 }
