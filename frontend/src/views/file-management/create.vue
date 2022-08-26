@@ -7,9 +7,12 @@
         @open="onOpen"
         v-loading="loading"
     >
-        <el-form ref="fileForm" label-position="left" :model="form">
+        <el-form ref="fileForm" label-position="left" :model="form" label-width="100px">
             <el-form-item :label="$t('file.path')"> <el-input v-model="form.path" /></el-form-item>
+            <el-checkbox v-model="isLink" :label="$t('file.link')"></el-checkbox>
         </el-form>
+        <el-checkbox v-model="setRole" :label="$t('file.setRole')"></el-checkbox>
+        <FileRole v-if="setRole" :mode="'0775'" @get-mode="getMode"></FileRole>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
@@ -20,14 +23,17 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, toRefs, ref } from 'vue';
+import { toRefs, ref } from 'vue';
 import { File } from '@/api/interface/file';
 import { ElMessage, FormInstance } from 'element-plus';
 import { CreateFile } from '@/api/modules/files';
 import i18n from '@/lang';
+import FileRole from '@/components/file-role/index.vue';
 
 const fileForm = ref<FormInstance>();
 let loading = ref<Boolean>(false);
+let setRole = ref<Boolean>(false);
+let isLink = ref<Boolean>(false);
 
 const props = defineProps({
     open: Boolean,
@@ -38,6 +44,10 @@ let form = ref<File.FileCreate>({ path: '', isDir: false, mode: 0o755 });
 const em = defineEmits(['close']);
 const handleClose = () => {
     em('close', open);
+};
+
+const getMode = (val: number) => {
+    form.value.mode = val;
 };
 
 const submit = async (formEl: FormInstance | undefined) => {
@@ -63,8 +73,4 @@ const onOpen = () => {
     form.value.isDir = f.isDir;
     form.value.path = f.path;
 };
-
-// function PrefixInteger(num: number, length: number) {
-//     return (Array(length).join('0') + num).slice(-length);
-// }
 </script>
