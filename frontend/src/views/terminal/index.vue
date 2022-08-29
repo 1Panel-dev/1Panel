@@ -37,7 +37,12 @@
         </div>
 
         <el-drawer :size="320" v-model="hostDrawer" :title="$t('terminal.hostHistory')" direction="rtl">
-            <el-button @click="onAddHost">{{ $t('terminal.addHost') }}</el-button>
+            <el-input size="small" clearable style="margin-top: 5px" v-model="searcConfig.info">
+                <template #prepend>
+                    <el-button icon="plus" @click="onAddHost">{{ $t('commons.button.add') }}</el-button>
+                </template>
+                <template #append><el-button icon="search" @click="loadHost" /></template>
+            </el-input>
             <div v-infinite-scroll="nextPage" style="overflow: auto">
                 <el-card
                     @click="onConnLocal()"
@@ -89,16 +94,16 @@
         <el-dialog v-model="connVisiable" :title="$t('terminal.addHost')" width="30%">
             <el-form ref="hostInfoRef" label-width="80px" :model="hostInfo" :rules="rules">
                 <el-form-item :label="$t('commons.table.name')" prop="name">
-                    <el-input v-model="hostInfo.name" style="width: 80%" />
+                    <el-input clearable v-model="hostInfo.name" style="width: 80%" />
                 </el-form-item>
                 <el-form-item label="IP" prop="addr">
-                    <el-input v-model="hostInfo.addr" style="width: 80%" />
+                    <el-input clearable v-model="hostInfo.addr" style="width: 80%" />
                 </el-form-item>
                 <el-form-item :label="$t('terminal.port')" prop="port">
-                    <el-input v-model.number="hostInfo.port" style="width: 80%" />
+                    <el-input clearable v-model.number="hostInfo.port" style="width: 80%" />
                 </el-form-item>
                 <el-form-item :label="$t('terminal.user')" prop="user">
-                    <el-input v-model="hostInfo.user" style="width: 80%" />
+                    <el-input clearable v-model="hostInfo.user" style="width: 80%" />
                 </el-form-item>
                 <el-form-item :label="$t('terminal.authMode')" prop="authMode">
                     <el-radio-group v-model="hostInfo.authMode">
@@ -107,10 +112,10 @@
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item :label="$t('terminal.password')" v-if="hostInfo.authMode === 'password'" prop="password">
-                    <el-input show-password type="password" v-model="hostInfo.password" style="width: 80%" />
+                    <el-input clearable show-password type="password" v-model="hostInfo.password" style="width: 80%" />
                 </el-form-item>
                 <el-form-item :label="$t('terminal.key')" v-if="hostInfo.authMode === 'key'" prop="privateKey">
-                    <el-input type="textarea" v-model="hostInfo.privateKey" style="width: 80%" />
+                    <el-input clearable type="textarea" v-model="hostInfo.privateKey" style="width: 80%" />
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -147,6 +152,12 @@ const terminalTabs = ref([]) as any;
 let tabIndex = 0;
 const data = ref();
 const hostDrawer = ref(false);
+
+let searcConfig = reactive<Host.ReqSearchWithPage>({
+    info: '',
+    page: 1,
+    pageSize: 8,
+});
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -212,7 +223,9 @@ const handleTabsEdit = (targetName: string, action: 'remove' | 'add') => {
 };
 
 const loadHost = async () => {
-    const res = await getHostList({ page: paginationConfig.currentPage, pageSize: paginationConfig.pageSize });
+    searcConfig.page = paginationConfig.currentPage;
+    searcConfig.pageSize = paginationConfig.pageSize;
+    const res = await getHostList(searcConfig);
     data.value = res.data.items;
     paginationConfig.total = res.data.total;
 };
