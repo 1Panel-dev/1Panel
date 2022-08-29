@@ -1,4 +1,4 @@
-import { CommonModel } from '.';
+import { CommonModel, ReqPage } from '.';
 
 export namespace Host {
     export interface Host extends CommonModel {
@@ -20,5 +20,8 @@ export namespace Host {
         password: string;
 
         description: string;
+    }
+    export interface ReqSearchWithPage extends ReqPage {
+        info?: string;
     }
 }

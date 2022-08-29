@@ -2,6 +2,7 @@ export default {
     commons: {
         button: {
             create: 'Create',
+            add: 'Add',
             delete: 'Delete',
             edit: 'Edit',
             confirm: 'Confirm',

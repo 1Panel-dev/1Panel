@@ -1,8 +1,8 @@
 import http from '@/api';
-import { ResPage, ReqPage } from '../interface';
+import { ResPage } from '../interface';
 import { Host } from '../interface/host';
 
-export const getHostList = (params: ReqPage) => {
+export const getHostList = (params: Host.ReqSearchWithPage) => {
     return http.post<ResPage<Host.Host>>(`/hosts/search`, params);
 };
 

@@ -12,7 +12,7 @@ type HostService struct{}
 
 type IHostService interface {
 	GetConnInfo(id uint) (*model.Host, error)
-	Page(search dto.PageInfo) (int64, interface{}, error)
+	Search(search dto.SearchWithPage) (int64, interface{}, error)
 	Create(hostDto dto.HostCreate) (*dto.HostInfo, error)
 	Update(id uint, upMap map[string]interface{}) error
 	BatchDelete(ids []uint) error
@@ -30,8 +30,8 @@ func (u *HostService) GetConnInfo(id uint) (*model.Host, error) {
 	return &host, err
 }
 
-func (u *HostService) Page(search dto.PageInfo) (int64, interface{}, error) {
-	total, hosts, err := hostRepo.Page(search.Page, search.PageSize)
+func (u *HostService) Search(search dto.SearchWithPage) (int64, interface{}, error) {
+	total, hosts, err := hostRepo.Page(search.Page, search.PageSize, hostRepo.WithByInfo(search.Info))
 	var dtoHosts []dto.HostInfo
 	for _, host := range hosts {
 		var item dto.HostInfo

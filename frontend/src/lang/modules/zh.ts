@@ -2,6 +2,7 @@ export default {
     commons: {
         button: {
             create: '创建',
+            add: '添加',
             delete: '删除',
             edit: '编辑',
             confirm: '确认',

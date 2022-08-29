@@ -3,6 +3,7 @@ package repo
 import (
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/global"
+	"gorm.io/gorm"
 )
 
 type HostRepo struct{}
@@ -10,6 +11,7 @@ type HostRepo struct{}
 type IHostRepo interface {
 	Get(opts ...DBOption) (model.Host, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.Host, error)
+	WithByInfo(info string) DBOption
 	Create(host *model.Host) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
@@ -39,6 +41,13 @@ func (u *HostRepo) Page(page, size int, opts ...DBOption) (int64, []model.Host, 
 	db = db.Count(&count)
 	err := db.Limit(size).Offset(size * (page - 1)).Find(&hosts).Error
 	return count, hosts, err
+}
+
+func (c *HostRepo) WithByInfo(info string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		infoStr := "%" + info + "%"
+		return g.Where("name LIKE ? OR addr LIKE ?", infoStr, infoStr)
+	}
 }
 
 func (u *HostRepo) Create(host *model.Host) error {

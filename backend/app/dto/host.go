@@ -14,6 +14,11 @@ type HostCreate struct {
 	Description string `json:"description"`
 }
 
+type SearchWithPage struct {
+	PageInfo
+	Info string `json:"info"`
+}
+
 type HostInfo struct {
 	ID        uint      `json:"id"`
 	CreatedAt time.Time `json:"createdAt"`

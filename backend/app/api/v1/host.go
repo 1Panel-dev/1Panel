@@ -27,13 +27,13 @@ func (b *BaseApi) Create(c *gin.Context) {
 }
 
 func (b *BaseApi) PageHosts(c *gin.Context) {
-	var req dto.PageInfo
+	var req dto.SearchWithPage
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 
-	total, list, err := hostService.Page(req)
+	total, list, err := hostService.Search(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
