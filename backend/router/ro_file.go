@@ -19,6 +19,7 @@ func (f *FileRouter) InitFileRouter(Router *gin.RouterGroup) {
 		fileRouter.POST("/tree", baseApi.GetFileTree)
 		fileRouter.POST("", baseApi.CreateFile)
 		fileRouter.POST("/del", baseApi.DeleteFile)
+		fileRouter.POST("/mode", baseApi.ChangeFileMode)
 	}
 
 }

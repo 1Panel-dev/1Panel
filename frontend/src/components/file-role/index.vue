@@ -44,7 +44,7 @@ interface Props {
 const roles = ref<string[]>(['0', '1', '2', '3', '4', '5', '6', '7']);
 
 const props = withDefaults(defineProps<Props>(), {
-    mode: '0775',
+    mode: '0755',
 });
 
 const { mode } = toRefs(props);
@@ -53,7 +53,7 @@ let form = ref<RoleForm>({
     owner: { r: true, w: true, x: true },
     group: { r: true, w: true, x: true },
     public: { r: true, w: false, x: true },
-    mode: '0775',
+    mode: '0755',
 });
 const em = defineEmits(['getMode']);
 
