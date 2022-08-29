@@ -54,9 +54,6 @@
                                     <el-dropdown-item command="file">
                                         <svg-icon iconName="p-file-normal"></svg-icon>{{ $t('file.file') }}
                                     </el-dropdown-item>
-                                    <el-dropdown-item command="link">
-                                        <svg-icon iconName="p-file-normal"></svg-icon>{{ $t('file.linkFile') }}
-                                    </el-dropdown-item>
                                 </el-dropdown-menu>
                             </template>
                         </el-dropdown>
@@ -74,7 +71,11 @@
                             <el-link :underline="false" @click="open(row)">{{ row.name }}</el-link>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('file.mode')" prop="mode"> </el-table-column>
+                    <el-table-column :label="$t('file.mode')" prop="mode">
+                        <template #default="{ row }">
+                            <el-link :underline="false" @click="openMode(row)">{{ row.mode }}</el-link>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('file.user')" prop="user"> </el-table-column>
                     <el-table-column :label="$t('file.group')" prop="group"> </el-table-column>
                     <el-table-column :label="$t('file.size')" prop="size"> </el-table-column>
@@ -95,7 +96,8 @@
                     />
                 </ComplexTable>
             </el-col>
-            <CreateFile :open="openCreate" :file="fileCreate" @close="close"></CreateFile>
+            <CreateFile :open="openCreate" :file="fileCreate" @close="closeCreate"></CreateFile>
+            <ChangeRole :open="openModePage" :file="modeForm" @close="closeMode"></ChangeRole>
         </el-row>
     </LayoutContent>
 </template>
@@ -111,6 +113,7 @@ import { File } from '@/api/interface/file';
 import BreadCrumbs from '@/components/bread-crumbs/index.vue';
 import BreadCrumbItem from '@/components/bread-crumbs/bread-crumbs-item.vue';
 import CreateFile from './create.vue';
+import ChangeRole from './change-role.vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
 
 let data = ref();
@@ -123,6 +126,8 @@ let fileTree = ref<File.FileTree[]>([]);
 let expandKeys = ref<string[]>([]);
 let openCreate = ref<boolean>(false);
 let fileCreate = ref<File.FileCreate>({ path: '/', isDir: false, mode: 0o755 });
+let openModePage = ref<boolean>(false);
+let modeForm = ref<File.FileCreate>({ path: '/', isDir: false, mode: 0o755 });
 
 const defaultProps = {
     children: 'children',
@@ -228,21 +233,22 @@ const handleCreate = (commnad: string) => {
 };
 
 const delFile = async (row: File.File | null) => {
-    // let ids: Array<number> = [];
-
-    // if (row === null) {
-    //     selects.value.forEach((item: File.File) => {
-    //         ids.push(item.id);
-    //     });
-    // } else {
-    //     ids.push(row.id);
-    // }
-    await useDeleteData(DeleteFile, row as File.FileDelete, 'commons.msg.delete');
+    await useDeleteData(DeleteFile, row as File.FileDelete, 'commons.msg.delete', loading.value);
     search(req);
 };
 
-const close = () => {
+const closeCreate = () => {
     openCreate.value = false;
+    search(req);
+};
+
+const openMode = (item: File.File) => {
+    modeForm.value = item;
+    openModePage.value = true;
+};
+
+const closeMode = () => {
+    openModePage.value = false;
     search(req);
 };
 
@@ -257,6 +263,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('file.mode'),
+        click: openMode,
     },
     {
         label: i18n.global.t('file.zip'),

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/utils/files"
+	"github.com/pkg/errors"
 	"io"
 	"io/fs"
 )
@@ -48,6 +49,11 @@ func (f FileService) GetFileTree(op dto.FileOption) ([]dto.FileTree, error) {
 func (f FileService) Create(op dto.FileCreate) error {
 
 	fo := files.NewFileOp()
+
+	if fo.Stat(op.Path) {
+		return errors.New("file is exist")
+	}
+
 	if op.IsDir {
 		return fo.CreateDir(op.Path, fs.FileMode(op.Mode))
 	}
@@ -62,6 +68,11 @@ func (f FileService) Delete(op dto.FileDelete) error {
 	} else {
 		return fo.DeleteFile(op.Path)
 	}
+}
+
+func (f FileService) ChangeMode(op dto.FileCreate) error {
+	fo := files.NewFileOp()
+	return fo.Chmod(op.Path, fs.FileMode(op.Mode))
 }
 
 func getUuid() string {
