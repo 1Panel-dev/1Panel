@@ -26,6 +26,14 @@ func (f FileOp) DeleteDir(dst string) error {
 	return f.Fs.RemoveAll(dst)
 }
 
+func (f FileOp) Stat(dst string) bool {
+	info, _ := f.Fs.Stat(dst)
+	if info != nil {
+		return true
+	}
+	return false
+}
+
 func (f FileOp) DeleteFile(dst string) error {
 	return f.Fs.Remove(dst)
 }
@@ -49,4 +57,8 @@ func (f FileOp) WriteFile(dst string, in io.Reader, mode fs.FileMode) error {
 		return err
 	}
 	return nil
+}
+
+func (f FileOp) Chmod(dst string, mode fs.FileMode) error {
+	return f.Fs.Chmod(dst, mode)
 }
