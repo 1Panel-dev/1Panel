@@ -16,3 +16,7 @@ export const CreateFile = (form: File.FileCreate) => {
 export const DeleteFile = (form: File.FileDelete) => {
     return http.post<File.File>('files/del', form);
 };
+
+export const ChangeFileMode = (form: File.FileCreate) => {
+    return http.post<File.File>('files/mode', form);
+};
