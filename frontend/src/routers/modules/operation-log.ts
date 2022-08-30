@@ -15,7 +15,6 @@ const operationRouter = {
             name: 'OperationLog',
             component: () => import('@/views/operation-log/index.vue'),
             meta: {
-                keepAlive: true,
                 requiresAuth: true,
                 key: 'OperationLog',
             },

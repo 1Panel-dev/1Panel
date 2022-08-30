@@ -15,9 +15,6 @@ const demoRouter = {
             path: '/demos/table',
             name: 'Table',
             component: () => import('@/views/demos/table/index.vue'),
-            meta: {
-                keepAlive: true,
-            },
         },
         {
             path: '/demos/table/:op/:id?',
@@ -27,7 +24,6 @@ const demoRouter = {
             component: () => import('@/views/demos/table/operate/index.vue'),
             meta: {
                 activeMenu: '/demos/table',
-                keepAlive: true,
             },
         },
     ],

@@ -80,9 +80,7 @@ func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 				return
 			}
 			msgObj := wsMsg{}
-			if err := json.Unmarshal(wsData, &msgObj); err != nil {
-				global.LOG.Errorf("unmarshal websocket message %s failed, err: %v", wsData, err)
-			}
+			_ = json.Unmarshal(wsData, &msgObj)
 			switch msgObj.Type {
 			case wsMsgResize:
 				if msgObj.Cols > 0 && msgObj.Rows > 0 {

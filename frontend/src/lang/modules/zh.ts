@@ -91,8 +91,9 @@ export default {
         logout: '退出登录',
     },
     terminal: {
-        connHistory: '历史连接',
-        hostHistory: '历史主机信息',
+        conn: '连接',
+        hostList: '主机信息',
+        quickCmd: '快捷命令',
         addHost: '添加主机',
         localhost: '本地服务器',
         name: '名称',

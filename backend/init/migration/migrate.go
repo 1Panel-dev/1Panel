@@ -18,5 +18,5 @@ func Init() {
 		global.LOG.Error(err)
 		panic(err)
 	}
-	global.LOG.Infof("Migration did run successfully")
+	global.LOG.Info("Migration did run successfully")
 }
