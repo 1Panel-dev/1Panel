@@ -18,5 +18,9 @@ export const DeleteFile = (form: File.FileDelete) => {
 };
 
 export const ChangeFileMode = (form: File.FileCreate) => {
-    return http.post<File.File>('files/mode', form);
+    return http.post<File.FileCreate>('files/mode', form);
+};
+
+export const CompressFile = (form: File.FileCompress) => {
+    return http.post<File.FileCompress>('files/compress', form);
 };

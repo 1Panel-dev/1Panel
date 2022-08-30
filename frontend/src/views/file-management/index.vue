@@ -1,5 +1,5 @@
 <template>
-    <LayoutContent :header="$t('menu.files')">
+    <LayoutContent>
         <el-row :gutter="20">
             <el-col :span="5">
                 <el-scrollbar height="800px">
@@ -98,6 +98,13 @@
             </el-col>
             <CreateFile :open="openCreate" :file="fileCreate" @close="closeCreate"></CreateFile>
             <ChangeRole :open="openModePage" :file="modeForm" @close="closeMode"></ChangeRole>
+            <Compress
+                :open="compressPage.open"
+                :files="compressPage.files"
+                :dst="compressPage.dst"
+                :name="compressPage.name"
+                @close="closeCompress"
+            ></Compress>
         </el-row>
     </LayoutContent>
 </template>
@@ -114,20 +121,23 @@ import BreadCrumbs from '@/components/bread-crumbs/index.vue';
 import BreadCrumbItem from '@/components/bread-crumbs/bread-crumbs-item.vue';
 import CreateFile from './create.vue';
 import ChangeRole from './change-role.vue';
+import Compress from './compress.vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
 
 let data = ref();
 let selects = ref<any>([]);
 let req = reactive({ path: '/', expand: true });
-let loading = ref<boolean>(false);
-let treeLoading = ref<boolean>(false);
+let loading = ref(false);
+let treeLoading = ref(false);
 let paths = ref<string[]>([]);
 let fileTree = ref<File.FileTree[]>([]);
 let expandKeys = ref<string[]>([]);
-let openCreate = ref<boolean>(false);
+let openCreate = ref(false);
 let fileCreate = ref<File.FileCreate>({ path: '/', isDir: false, mode: 0o755 });
-let openModePage = ref<boolean>(false);
+let openModePage = ref(false);
 let modeForm = ref<File.FileCreate>({ path: '/', isDir: false, mode: 0o755 });
+
+let compressPage = reactive({ open: false, files: [''], name: '', dst: '' });
 
 const defaultProps = {
     children: 'children',
@@ -252,6 +262,17 @@ const closeMode = () => {
     search(req);
 };
 
+const openCompress = (item: File.File) => {
+    compressPage.open = true;
+    compressPage.files = [item.path];
+    compressPage.name = item.name;
+    compressPage.dst = req.path;
+};
+
+const closeCompress = () => {
+    compressPage.open = false;
+    search(req);
+};
 onMounted(() => {
     search(req);
 });
@@ -267,6 +288,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('file.zip'),
+        click: openCompress,
     },
     {
         label: i18n.global.t('file.rename'),
@@ -283,7 +305,6 @@ const buttons = [
 
 <style>
 .path {
-    margin-top: -50px;
     height: 30px;
     margin-bottom: 5px;
 }

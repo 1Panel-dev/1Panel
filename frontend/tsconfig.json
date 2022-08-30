@@ -30,7 +30,8 @@
             "@/*": ["src/*"]
         },
         // 跳过库检查，解决打包失败
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "suppressImplicitAnyIndexErrors": true
     },
     "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "vite.config.ts"],
     "exclude": ["node_modules", "dist", "**/*.js"]
