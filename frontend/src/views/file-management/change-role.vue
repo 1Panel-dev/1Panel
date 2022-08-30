@@ -24,12 +24,20 @@ import { ChangeFileMode } from '@/api/modules/files';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
 import FileRole from '@/components/file-role/index.vue';
-interface Props {
-    open: boolean;
-    file: Object;
-}
 
-const props = withDefaults(defineProps<Props>(), {});
+const props = defineProps({
+    open: {
+        type: Boolean,
+        default: false,
+    },
+    file: {
+        type: Object,
+        default: function () {
+            return {};
+        },
+    },
+});
+
 let form = ref<File.FileCreate>({ path: '', isDir: false, mode: 0o755 });
 let loading = ref<Boolean>(false);
 let mode = ref('0755');

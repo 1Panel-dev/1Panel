@@ -23,6 +23,7 @@ type FileInfo struct {
 	IsSymlink  bool        `json:"isSymlink"`
 	Type       string      `json:"type"`
 	Mode       string      `json:"mode"`
+	MimeType   string      `json:"mimeType"`
 	UpdateTime time.Time   `json:"updateTime"`
 	ModTime    time.Time   `json:"modTime"`
 	FileMode   os.FileMode `json:"-"`
@@ -56,6 +57,7 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 		Mode:      fmt.Sprintf("%04o", info.Mode().Perm()),
 		User:      GetUsername(info.Sys().(*syscall.Stat_t).Uid),
 		Group:     GetGroup(info.Sys().(*syscall.Stat_t).Gid),
+		MimeType:  GetMimeType(op.Path),
 	}
 	if op.Expand {
 		if file.IsDir {
@@ -107,6 +109,7 @@ func (f *FileInfo) listChildren() error {
 			Mode:      fmt.Sprintf("%04o", df.Mode().Perm()),
 			User:      GetUsername(df.Sys().(*syscall.Stat_t).Uid),
 			Group:     GetGroup(df.Sys().(*syscall.Stat_t).Gid),
+			MimeType:  GetMimeType(fPath),
 		}
 
 		if isInvalidLink {

@@ -1,6 +1,7 @@
 package files
 
 import (
+	"github.com/gabriel-vasile/mimetype"
 	"os"
 	"os/user"
 	"strconv"
@@ -24,4 +25,12 @@ func GetGroup(gid uint32) string {
 		return ""
 	}
 	return usr.Name
+}
+
+func GetMimeType(path string) string {
+	mime, err := mimetype.DetectFile(path)
+	if err != nil {
+		return ""
+	}
+	return mime.String()
 }

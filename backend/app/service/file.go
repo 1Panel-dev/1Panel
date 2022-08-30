@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"io"
 	"io/fs"
+	"path/filepath"
 )
 
 type FileService struct {
@@ -73,6 +74,15 @@ func (f FileService) Delete(op dto.FileDelete) error {
 func (f FileService) ChangeMode(op dto.FileCreate) error {
 	fo := files.NewFileOp()
 	return fo.Chmod(op.Path, fs.FileMode(op.Mode))
+}
+
+func (f FileService) Compress(c dto.FileCompress) error {
+	fo := files.NewFileOp()
+	if !c.Replace && fo.Stat(filepath.Join(c.Dst, c.Name)) {
+		return errors.New("file is exist")
+	}
+
+	return fo.Compress(c.Files, c.Dst, c.Name, files.CompressType(c.Type))
 }
 
 func getUuid() string {
