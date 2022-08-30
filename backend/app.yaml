@@ -37,6 +37,7 @@ sqlite:
 
 log:
   level: info
+  time_zone: Asia/Shanghai
   path: /opt/1Panel/log
   log_name: 1Panel
   log_suffix: .log

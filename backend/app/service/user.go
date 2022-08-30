@@ -5,7 +5,6 @@ import (
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
-	"github.com/1Panel-dev/1Panel/init/session/psession"
 	"github.com/1Panel-dev/1Panel/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/utils/jwt"
 	"github.com/gin-gonic/gin"
@@ -18,7 +17,7 @@ type UserService struct{}
 
 type IUserService interface {
 	Get(id uint) (*dto.UserInfo, error)
-	Page(search dto.UserPage) (int64, interface{}, error)
+	Page(search dto.SearchWithPage) (int64, interface{}, error)
 	Register(userDto dto.UserCreate) error
 	Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error)
 	LogOut(c *gin.Context) error
@@ -44,7 +43,7 @@ func (u *UserService) Get(id uint) (*dto.UserInfo, error) {
 	return &dtoUser, err
 }
 
-func (u *UserService) Page(search dto.UserPage) (int64, interface{}, error) {
+func (u *UserService) Page(search dto.SearchWithPage) (int64, interface{}, error) {
 	total, users, err := userRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Name))
 	var dtoUsers []dto.UserInfo
 	for _, user := range users {
@@ -92,13 +91,9 @@ func (u *UserService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo,
 		}
 		return &dto.UserLoginInfo{Name: user.Name, Token: token}, err
 	}
-	sessionUser := psession.SessionUser{
-		ID:   user.ID,
-		Name: user.Name,
-	}
 	lifeTime := global.CONF.Session.ExpiresTime
 	sID, _ := c.Cookie(global.CONF.Session.SessionName)
-	sessionUser, err = global.SESSION.Get(sID)
+	sessionUser, err := global.SESSION.Get(sID)
 	if err != nil {
 		sID = uuid.NewV4().String()
 		c.SetCookie(global.CONF.Session.SessionName, sID, lifeTime, "", "", false, false)

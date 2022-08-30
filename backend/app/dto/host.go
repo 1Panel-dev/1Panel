@@ -1,8 +1,11 @@
 package dto
 
-import "time"
+import (
+	"time"
+)
 
 type HostCreate struct {
+	Group      string `json:"group" validate:"required"`
 	Name       string `json:"name" validate:"required"`
 	Addr       string `json:"addr" validate:"required,ip"`
 	Port       uint   `json:"port" validate:"required,number,max=65535,min=1"`
@@ -14,14 +17,14 @@ type HostCreate struct {
 	Description string `json:"description"`
 }
 
-type SearchWithPage struct {
-	PageInfo
+type SearchForTree struct {
 	Info string `json:"info"`
 }
 
 type HostInfo struct {
 	ID        uint      `json:"id"`
 	CreatedAt time.Time `json:"createdAt"`
+	Group     string    `json:"group"`
 	Name      string    `json:"name"`
 	Addr      string    `json:"addr"`
 	Port      uint      `json:"port"`
@@ -31,7 +34,17 @@ type HostInfo struct {
 	Description string `json:"description"`
 }
 
+type HostTree struct {
+	Label    string      `json:"label"`
+	Children []TreeChild `json:"children"`
+}
+
+type TreeChild struct {
+	Label string `json:"label"`
+}
+
 type HostUpdate struct {
+	Group      string `json:"group" validate:"required"`
 	Name       string `json:"name" validate:"required"`
 	Addr       string `json:"addr" validate:"required,ip"`
 	Port       uint   `json:"port" validate:"required,number,max=65535,min=1"`

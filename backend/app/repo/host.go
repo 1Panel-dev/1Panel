@@ -10,7 +10,7 @@ type HostRepo struct{}
 
 type IHostRepo interface {
 	Get(opts ...DBOption) (model.Host, error)
-	Page(limit, offset int, opts ...DBOption) (int64, []model.Host, error)
+	GetList(opts ...DBOption) ([]model.Host, error)
 	WithByInfo(info string) DBOption
 	Create(host *model.Host) error
 	Update(id uint, vars map[string]interface{}) error
@@ -31,20 +31,21 @@ func (u *HostRepo) Get(opts ...DBOption) (model.Host, error) {
 	return host, err
 }
 
-func (u *HostRepo) Page(page, size int, opts ...DBOption) (int64, []model.Host, error) {
+func (u *HostRepo) GetList(opts ...DBOption) ([]model.Host, error) {
 	var hosts []model.Host
 	db := global.DB.Model(&model.Host{})
 	for _, opt := range opts {
 		db = opt(db)
 	}
-	count := int64(0)
-	db = db.Count(&count)
-	err := db.Limit(size).Offset(size * (page - 1)).Find(&hosts).Error
-	return count, hosts, err
+	err := db.Find(&hosts).Error
+	return hosts, err
 }
 
 func (c *HostRepo) WithByInfo(info string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
+		if len(info) == 0 {
+			return g
+		}
 		infoStr := "%" + info + "%"
 		return g.Where("name LIKE ? OR addr LIKE ?", infoStr, infoStr)
 	}

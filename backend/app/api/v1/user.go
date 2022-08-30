@@ -68,7 +68,7 @@ func (b *BaseApi) Register(c *gin.Context) {
 }
 
 func (b *BaseApi) PageUsers(c *gin.Context) {
-	var req dto.UserPage
+	var req dto.SearchWithPage
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (b *BaseApi) Create(c *gin.Context) {
+func (b *BaseApi) CreateHost(c *gin.Context) {
 	var req dto.HostCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
@@ -26,23 +26,20 @@ func (b *BaseApi) Create(c *gin.Context) {
 	helper.SuccessWithData(c, host)
 }
 
-func (b *BaseApi) PageHosts(c *gin.Context) {
-	var req dto.SearchWithPage
+func (b *BaseApi) HostTree(c *gin.Context) {
+	var req dto.SearchForTree
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 
-	total, list, err := hostService.Search(req)
+	data, err := hostService.SearchForTree(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 
-	helper.SuccessWithData(c, dto.PageResult{
-		Items: list,
-		Total: total,
-	})
+	helper.SuccessWithData(c, data)
 }
 
 func (b *BaseApi) DeleteHost(c *gin.Context) {
@@ -81,6 +78,7 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 
 	upMap := make(map[string]interface{})
 	upMap["name"] = req.Name
+	upMap["group"] = req.Group
 	upMap["addr"] = req.Addr
 	upMap["port"] = req.Port
 	upMap["user"] = req.User

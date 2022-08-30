@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/constant"
@@ -12,7 +14,7 @@ type HostService struct{}
 
 type IHostService interface {
 	GetConnInfo(id uint) (*model.Host, error)
-	Search(search dto.SearchWithPage) (int64, interface{}, error)
+	SearchForTree(search dto.SearchForTree) ([]dto.HostTree, error)
 	Create(hostDto dto.HostCreate) (*dto.HostInfo, error)
 	Update(id uint, upMap map[string]interface{}) error
 	BatchDelete(ids []uint) error
@@ -30,17 +32,25 @@ func (u *HostService) GetConnInfo(id uint) (*model.Host, error) {
 	return &host, err
 }
 
-func (u *HostService) Search(search dto.SearchWithPage) (int64, interface{}, error) {
-	total, hosts, err := hostRepo.Page(search.Page, search.PageSize, hostRepo.WithByInfo(search.Info))
-	var dtoHosts []dto.HostInfo
+func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, error) {
+	hosts, err := hostRepo.GetList(hostRepo.WithByInfo(search.Info))
+	distinctMap := make(map[string][]string)
 	for _, host := range hosts {
-		var item dto.HostInfo
-		if err := copier.Copy(&item, &host); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		if _, ok := distinctMap[host.Group]; !ok {
+			distinctMap[host.Group] = []string{fmt.Sprintf("%s@%s:%d", host.User, host.Addr, host.Port)}
+		} else {
+			distinctMap[host.Group] = append(distinctMap[host.Group], fmt.Sprintf("%s@%s:%d", host.User, host.Addr, host.Port))
 		}
-		dtoHosts = append(dtoHosts, item)
 	}
-	return total, dtoHosts, err
+	var data []dto.HostTree
+	for key, value := range distinctMap {
+		var children []dto.TreeChild
+		for _, label := range value {
+			children = append(children, dto.TreeChild{Label: label})
+		}
+		data = append(data, dto.HostTree{Label: key, Children: children})
+	}
+	return data, err
 }
 
 func (u *HostService) Create(hostDto dto.HostCreate) (*dto.HostInfo, error) {

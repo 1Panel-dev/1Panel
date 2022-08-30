@@ -178,3 +178,15 @@
     }
     border-radius: 5px;
 }
+
+.row-box {
+    display: flex;
+    flex-flow: wrap;
+  }
+.row-box .el-card {
+  min-width: 100%;
+  height: 100%;
+  margin-right: 20px;
+  border: 0;
+  // box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+}

@@ -54,7 +54,7 @@ type LogicSshWsSession struct {
 	session         *ssh.Session
 	wsConn          *websocket.Conn
 	isAdmin         bool
-	IsFlagged       bool `comment:"当前session是否包含禁止命令"`
+	IsFlagged       bool
 }
 
 func NewLogicSshWsSession(cols, rows int, isAdmin bool, sshClient *ssh.Client, wsConn *websocket.Conn) (*LogicSshWsSession, error) {
@@ -127,9 +127,7 @@ func (sws *LogicSshWsSession) receiveWsMsg(exitCh chan bool) {
 				return
 			}
 			msgObj := wsMsg{}
-			if err := json.Unmarshal(wsData, &msgObj); err != nil {
-				global.LOG.Errorf("unmarshal websocket message %s failed, err: %v", wsData, err)
-			}
+			_ = json.Unmarshal(wsData, &msgObj)
 			switch msgObj.Type {
 			case wsMsgResize:
 				if msgObj.Cols > 0 && msgObj.Rows > 0 {

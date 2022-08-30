@@ -15,9 +15,9 @@ func (s *HostRouter) InitHostRouter(Router *gin.RouterGroup) {
 	withRecordRouter := userRouter.Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		withRecordRouter.POST("", baseApi.Create)
+		withRecordRouter.POST("", baseApi.CreateHost)
 		withRecordRouter.POST("/del", baseApi.DeleteHost)
-		userRouter.POST("/search", baseApi.PageHosts)
+		userRouter.POST("/search", baseApi.HostTree)
 		userRouter.PUT(":id", baseApi.UpdateHost)
 	}
 }

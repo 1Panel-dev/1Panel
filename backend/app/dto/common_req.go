@@ -1,5 +1,10 @@
 package dto
 
+type SearchWithPage struct {
+	PageInfo
+	Name string `json:"name"  validate:"required"`
+}
+
 type PageInfo struct {
 	Page     int `json:"page" validate:"required,number"`
 	PageSize int `json:"pageSize" validate:"required,number"`
@@ -11,6 +16,10 @@ type OperationWithName struct {
 
 type BatchDeleteReq struct {
 	Ids []uint `json:"ids" validate:"required"`
+}
+
+type DeleteByName struct {
+	Name string `json:"name" validate:"required"`
 }
 
 type OperationWithNameAndType struct {

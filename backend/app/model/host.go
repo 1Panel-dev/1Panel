@@ -4,6 +4,7 @@ import "gorm.io/gorm"
 
 type Host struct {
 	gorm.Model
+	Group      string `gorm:"type:varchar(64);not null" json:"group"`
 	Name       string `gorm:"type:varchar(64);unique;not null" json:"name"`
 	Addr       string `gorm:"type:varchar(16);unique;not null" json:"addr"`
 	Port       int    `gorm:"type:varchar(5);not null" json:"port"`

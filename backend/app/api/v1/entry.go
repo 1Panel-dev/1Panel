@@ -11,5 +11,7 @@ var ApiGroupApp = new(ApiGroup)
 var (
 	userService      = service.ServiceGroupApp.UserService
 	hostService      = service.ServiceGroupApp.HostService
+	groupService     = service.ServiceGroupApp.GroupService
+	commandService   = service.ServiceGroupApp.CommandService
 	operationService = service.ServiceGroupApp.OperationService
 )

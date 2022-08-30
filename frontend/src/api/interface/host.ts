@@ -1,6 +1,10 @@
-import { CommonModel, ReqPage } from '.';
+import { CommonModel } from '.';
 
 export namespace Host {
+    export interface HostTree {
+        label: string;
+        children: Array<string>;
+    }
     export interface Host extends CommonModel {
         name: string;
         addr: string;
@@ -21,7 +25,7 @@ export namespace Host {
 
         description: string;
     }
-    export interface ReqSearchWithPage extends ReqPage {
+    export interface ReqSearch {
         info?: string;
     }
 }
