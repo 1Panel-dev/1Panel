@@ -24,7 +24,7 @@
 </template>
 <script setup lang="ts">
 import { FormInstance } from 'element-plus';
-import { computed, ref, toRefs, watch, onMounted } from 'vue';
+import { computed, ref, toRefs, watch, onUpdated } from 'vue';
 
 interface Role {
     r: boolean;
@@ -152,7 +152,12 @@ const changeMode = (val: String) => {
     getRoleNum(val[3], form.value.public);
 };
 
-onMounted(() => {
+// onMounted(() => {
+//     form.value.mode = mode.value;
+//     changeMode(form.value.mode);
+// });
+
+onUpdated(() => {
     form.value.mode = mode.value;
     changeMode(form.value.mode);
 });

@@ -40,6 +40,7 @@ export default {
             sureLogOut: '您是否确认退出登录?',
             createSuccess: '新建成功',
             updateSuccess: '更新成功',
+            compressSuccess: '压缩成功',
         },
         login: {
             captchaHelper: '请输入验证码',
@@ -210,5 +211,11 @@ export default {
         rRole: '读取',
         wRole: '写入',
         xRole: '可执行',
+        name: '名称',
+        compress: '压缩',
+        deCompress: '解压',
+        compressType: '压缩格式',
+        compressDst: '压缩路径',
+        replace: '覆盖已存在的文件',
     },
 };

@@ -30,3 +30,11 @@ type FileDelete struct {
 	Path  string
 	IsDir bool
 }
+
+type FileCompress struct {
+	Files   []string
+	Dst     string
+	Type    string
+	Name    string
+	Replace bool
+}
