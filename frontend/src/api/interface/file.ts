@@ -13,6 +13,7 @@ export namespace File {
         updateTime: string;
         modTime: string;
         mode: number;
+        mimeType: string;
         items: File[];
     }
 
@@ -39,5 +40,13 @@ export namespace File {
     export interface FileDelete {
         path: string;
         isDir: boolean;
+    }
+
+    export interface FileCompress {
+        files: string[];
+        type: string;
+        dst: string;
+        name: string;
+        replace: boolean;
     }
 }
