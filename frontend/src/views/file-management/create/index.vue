@@ -20,8 +20,12 @@
                 </el-radio-group>
             </el-form-item>
             <el-form-item v-if="addForm.isLink" :label="$t('file.linkPath')" prop="linkPath">
-                <el-input v-model="addForm.linkPath"
-            /></el-form-item>
+                <el-input v-model="addForm.linkPath">
+                    <template #append>
+                        <FileList @choose="getLinkPath"></FileList>
+                    </template>
+                </el-input>
+            </el-form-item>
             <el-form-item>
                 <el-checkbox v-if="addForm.isDir" v-model="setRole" :label="$t('file.setRole')"></el-checkbox>
             </el-form-item>
@@ -47,6 +51,7 @@ import { CreateFile } from '@/api/modules/files';
 import i18n from '@/lang';
 import FileRole from '@/components/file-role/index.vue';
 import { Rules } from '@/global/form-rues';
+import FileList from '@/components/file-list/index.vue';
 
 const fileForm = ref<FormInstance>();
 let loading = ref(false);
@@ -83,6 +88,10 @@ let getPath = computed(() => {
         return addForm.path + '/' + addForm.name;
     }
 });
+
+const getLinkPath = (path: string) => {
+    addForm.linkPath = path;
+};
 
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
