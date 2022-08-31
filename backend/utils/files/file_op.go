@@ -25,6 +25,22 @@ func (f FileOp) CreateDir(dst string, mode fs.FileMode) error {
 	return f.Fs.MkdirAll(dst, mode)
 }
 
+func (f FileOp) CreateFile(dst string) error {
+	if _, err := f.Fs.Create(dst); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (f FileOp) LinkFile(source string, dst string, isSymlink bool) error {
+	if isSymlink {
+		osFs := afero.OsFs{}
+		return osFs.SymlinkIfPossible(source, dst)
+	} else {
+		return os.Link(source, dst)
+	}
+}
+
 func (f FileOp) DeleteDir(dst string) error {
 	return f.Fs.RemoveAll(dst)
 }

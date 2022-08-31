@@ -219,5 +219,9 @@ export default {
         compressSuccess: '压缩成功',
         deCompressSuccess: '解压成功',
         deCompressDst: '解压路径',
+        linkType: '链接类型',
+        softLink: '软链接',
+        hardLink: '硬链接',
+        linkPath: '链接路径',
     },
 };

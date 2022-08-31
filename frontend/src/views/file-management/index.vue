@@ -64,11 +64,12 @@
                         <el-button type="primary" plain> {{ $t('file.terminal') }}</el-button>
                         <el-button type="primary" plain> {{ $t('file.shareList') }}</el-button>
                     </template>
-                    <el-table-column :label="$t('commons.table.name')" min-width="150" fix>
+                    <el-table-column :label="$t('commons.table.name')" min-width="250" fix show-overflow-tooltip>
                         <template #default="{ row }">
                             <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
                             <svg-icon v-else className="table-icon" iconName="p-file-normal"></svg-icon>
                             <el-link :underline="false" @click="open(row)">{{ row.name }}</el-link>
+                            <span v-if="row.isSymlink"> -> {{ row.linkPath }}</span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('file.mode')" prop="mode">
