@@ -38,3 +38,9 @@ type FileCompress struct {
 	Name    string
 	Replace bool
 }
+
+type FileDeCompress struct {
+	Dst  string
+	Type string
+	Path string
+}
