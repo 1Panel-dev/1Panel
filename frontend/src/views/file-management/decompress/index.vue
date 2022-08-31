@@ -12,7 +12,9 @@
                 <el-input v-model="name" disabled></el-input>
             </el-form-item>
             <el-form-item :label="$t('file.deCompressDst')" prop="dst">
-                <el-input v-model="form.dst"></el-input>
+                <el-input v-model="form.dst">
+                    <template #append> <FileList :path="props.dst" @choose="getLinkPath"></FileList> </template
+                ></el-input>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -32,6 +34,7 @@ import { ElMessage, FormInstance, FormRules } from 'element-plus';
 import { Rules } from '@/global/form-rues';
 import { DeCompressFile } from '@/api/modules/files';
 import { Mimetypes } from '@/global/mimetype';
+import FileList from '@/components/file-list/index.vue';
 
 const props = defineProps({
     open: {
@@ -77,6 +80,10 @@ const getFileType = (mime: string): string => {
     } else {
         return '';
     }
+};
+
+const getLinkPath = (path: string) => {
+    form.value.dst = path;
 };
 
 const onOpen = () => {
