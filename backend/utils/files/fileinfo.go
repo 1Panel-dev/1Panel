@@ -21,6 +21,7 @@ type FileInfo struct {
 	Size       int64       `json:"size"`
 	IsDir      bool        `json:"isDir"`
 	IsSymlink  bool        `json:"isSymlink"`
+	LinkPath   string      `json:"linkPath"`
 	Type       string      `json:"type"`
 	Mode       string      `json:"mode"`
 	MimeType   string      `json:"mimeType"`
@@ -58,6 +59,9 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 		User:      GetUsername(info.Sys().(*syscall.Stat_t).Uid),
 		Group:     GetGroup(info.Sys().(*syscall.Stat_t).Gid),
 		MimeType:  GetMimeType(op.Path),
+	}
+	if file.IsSymlink {
+		file.LinkPath = GetSymlink(op.Path)
 	}
 	if op.Expand {
 		if file.IsDir {
@@ -110,6 +114,9 @@ func (f *FileInfo) listChildren() error {
 			User:      GetUsername(df.Sys().(*syscall.Stat_t).Uid),
 			Group:     GetGroup(df.Sys().(*syscall.Stat_t).Gid),
 			MimeType:  GetMimeType(fPath),
+		}
+		if isSymlink {
+			file.LinkPath = GetSymlink(fPath)
 		}
 
 		if isInvalidLink {
