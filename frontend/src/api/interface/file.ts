@@ -9,6 +9,7 @@ export namespace File {
         size: number;
         isDir: boolean;
         isSymlink: boolean;
+        linkPath: boolean;
         type: string;
         updateTime: string;
         modTime: string;
@@ -35,6 +36,9 @@ export namespace File {
         path: string;
         isDir: boolean;
         mode: number;
+        isLink?: boolean;
+        isSymlink?: boolean;
+        linkPath?: boolean;
     }
 
     export interface FileDelete {

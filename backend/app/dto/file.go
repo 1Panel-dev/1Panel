@@ -20,10 +20,13 @@ type FileTree struct {
 }
 
 type FileCreate struct {
-	Path    string
-	Content string
-	IsDir   bool
-	Mode    int64
+	Path      string
+	Content   string
+	IsDir     bool
+	Mode      int64
+	IsLink    bool
+	IsSymlink bool
+	LinkPath  string
 }
 
 type FileDelete struct {

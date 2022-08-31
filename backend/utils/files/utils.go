@@ -34,3 +34,11 @@ func GetMimeType(path string) string {
 	}
 	return mime.String()
 }
+
+func GetSymlink(path string) string {
+	linkPath, err := os.Readlink(path)
+	if err != nil {
+		return ""
+	}
+	return linkPath
+}
