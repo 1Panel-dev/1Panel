@@ -12,7 +12,9 @@
                 >
             </el-form-item>
             <el-form-item :label="$t('file.compressDst')" prop="dst">
-                <el-input v-model="form.dst"></el-input>
+                <el-input v-model="form.dst">
+                    <template #append> <FileList :path="props.dst" @choose="getLinkPath"></FileList> </template
+                ></el-input>
             </el-form-item>
             <el-form-item>
                 <el-checkbox v-model="form.replace" :label="$t('file.replace')"></el-checkbox>
@@ -35,6 +37,7 @@ import { ElMessage, FormInstance, FormRules } from 'element-plus';
 import { Rules } from '@/global/form-rues';
 import { CompressExtention, CompressType } from '@/enums/files';
 import { CompressFile } from '@/api/modules/files';
+import FileList from '@/components/file-list/index.vue';
 
 const props = defineProps({
     open: {
@@ -85,6 +88,10 @@ const extension = computed(() => {
 
 const handleClose = () => {
     em('close', open);
+};
+
+const getLinkPath = (path: string) => {
+    form.value.dst = path;
 };
 
 const onOpen = () => {
