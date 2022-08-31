@@ -49,4 +49,10 @@ export namespace File {
         name: string;
         replace: boolean;
     }
+
+    export interface FileDeCompress {
+        path: string;
+        dst: string;
+        type: string;
+    }
 }

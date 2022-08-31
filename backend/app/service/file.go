@@ -85,6 +85,11 @@ func (f FileService) Compress(c dto.FileCompress) error {
 	return fo.Compress(c.Files, c.Dst, c.Name, files.CompressType(c.Type))
 }
 
+func (f FileService) DeCompress(c dto.FileDeCompress) error {
+	fo := files.NewFileOp()
+	return fo.Decompress(c.Path, c.Dst, files.CompressType(c.Type))
+}
+
 func getUuid() string {
 	b := make([]byte, 16)
 	io.ReadFull(rand.Reader, b)
