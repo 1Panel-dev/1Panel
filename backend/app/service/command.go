@@ -31,7 +31,7 @@ func (u *CommandService) Search() ([]model.Command, error) {
 }
 
 func (u *CommandService) SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error) {
-	total, commands, err := commandRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Name))
+	total, commands, err := commandRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info))
 	var dtoCommands []dto.CommandInfo
 	for _, command := range commands {
 		var item dto.CommandInfo

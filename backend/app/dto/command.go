@@ -10,6 +10,7 @@ type CommandUpdate struct {
 }
 
 type CommandInfo struct {
+	ID      string `json:"id"`
 	Name    string `json:"name"`
 	Command string `json:"command"`
 }

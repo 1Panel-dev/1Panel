@@ -13,6 +13,7 @@ type IHostRepo interface {
 	GetList(opts ...DBOption) ([]model.Host, error)
 	WithByInfo(info string) DBOption
 	Create(host *model.Host) error
+	ChangeGroup(oldGroup, newGroup string) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
 }
@@ -53,6 +54,10 @@ func (c *HostRepo) WithByInfo(info string) DBOption {
 
 func (u *HostRepo) Create(host *model.Host) error {
 	return global.DB.Create(host).Error
+}
+
+func (u *HostRepo) ChangeGroup(oldGroup, newGroup string) error {
+	return global.DB.Model(&model.Host{}).Where("group_belong = ?", oldGroup).Updates(map[string]interface{}{"group_belong": newGroup}).Error
 }
 
 func (u *HostRepo) Update(id uint, vars map[string]interface{}) error {

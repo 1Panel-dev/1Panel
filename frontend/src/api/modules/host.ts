@@ -5,6 +5,10 @@ export const getHostList = (params: Host.ReqSearch) => {
     return http.post<Array<Host.HostTree>>(`/hosts/search`, params);
 };
 
+export const getHostInfo = (id: number) => {
+    return http.get<Host.Host>(`/hosts/` + id);
+};
+
 export const addHost = (params: Host.HostOperate) => {
     return http.post<Host.HostOperate>(`/hosts`, params);
 };
@@ -14,6 +18,6 @@ export const editHost = (params: Host.HostOperate) => {
     return http.put(`/hosts/` + params.id, params);
 };
 
-export const deleteHost = (params: { ids: number[] }) => {
-    return http.post(`/hosts/del`, params);
+export const deleteHost = (id: number) => {
+    return http.delete(`/hosts/` + id);
 };

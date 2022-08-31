@@ -13,11 +13,13 @@ export default {
         },
         table: {
             name: '名称',
+            group: '组',
             createdAt: '创建时间',
             date: '时间',
             updatedAt: '更新时间',
             operate: '操作',
             message: '信息',
+            description: '描述信息',
         },
         msg: {
             delete: '此操作不可回滚,是否继续',
@@ -94,6 +96,7 @@ export default {
         conn: '连接',
         hostList: '主机信息',
         quickCmd: '快捷命令',
+        command: '命令',
         addHost: '添加主机',
         localhost: '本地服务器',
         name: '名称',
@@ -110,6 +113,8 @@ export default {
         detail: {
             users: '用户',
             hosts: '主机',
+            groups: '组',
+            command: '快捷命令',
             auth: '用户',
             post: '创建',
             put: '更新',

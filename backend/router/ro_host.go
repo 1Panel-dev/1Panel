@@ -10,14 +10,14 @@ import (
 type HostRouter struct{}
 
 func (s *HostRouter) InitHostRouter(Router *gin.RouterGroup) {
-	userRouter := Router.Group("hosts")
-	userRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
-	withRecordRouter := userRouter.Use(middleware.OperationRecord())
+	hostRouter := Router.Group("hosts").Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
+	withRecordRouter := Router.Group("hosts").Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		withRecordRouter.POST("", baseApi.CreateHost)
-		withRecordRouter.POST("/del", baseApi.DeleteHost)
-		userRouter.POST("/search", baseApi.HostTree)
-		userRouter.PUT(":id", baseApi.UpdateHost)
+		withRecordRouter.DELETE(":id", baseApi.DeleteHost)
+		hostRouter.POST("/search", baseApi.HostTree)
+		hostRouter.GET(":id", baseApi.GetHostInfo)
+		hostRouter.PUT(":id", baseApi.UpdateHost)
 	}
 }

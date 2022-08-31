@@ -9,7 +9,7 @@ import (
 )
 
 func (b *BaseApi) CreateGroup(c *gin.Context) {
-	var req dto.GroupCreate
+	var req dto.GroupOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -26,17 +26,13 @@ func (b *BaseApi) CreateGroup(c *gin.Context) {
 }
 
 func (b *BaseApi) DeleteGroup(c *gin.Context) {
-	var req dto.DeleteByName
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
+	id, err := helper.GetParamID(c)
+	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 
-	if err := groupService.Delete(req.Name); err != nil {
+	if err := groupService.Delete(id); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -44,7 +40,7 @@ func (b *BaseApi) DeleteGroup(c *gin.Context) {
 }
 
 func (b *BaseApi) UpdateGroup(c *gin.Context) {
-	var req dto.GroupUpdate
+	var req dto.GroupOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -59,17 +55,39 @@ func (b *BaseApi) UpdateGroup(c *gin.Context) {
 		return
 	}
 
-	upMap := make(map[string]interface{})
-	upMap["name"] = req.Name
-	if err := groupService.Update(id, upMap); err != nil {
+	if err := groupService.Update(id, req.Name); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
 }
 
+func (b *BaseApi) GetGroupInfo(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	group, err := groupService.GetGroupInfo(id)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, group)
+}
+
 func (b *BaseApi) ListGroup(c *gin.Context) {
-	list, err := groupService.Search()
+	var req dto.GroupSearch
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	list, err := groupService.List(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

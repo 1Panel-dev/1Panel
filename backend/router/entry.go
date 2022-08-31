@@ -4,6 +4,8 @@ type RouterGroup struct {
 	BaseRouter
 	UserRouter
 	HostRouter
+	GroupRouter
+	CommandRouter
 	OperationLogRouter
 }
 

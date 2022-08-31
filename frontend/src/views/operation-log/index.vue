@@ -92,7 +92,7 @@ const search = async () => {
 };
 
 const fmtOperation = (row: ResOperationLog) => {
-    if (row.method.toLocaleLowerCase() !== 'put') {
+    if (row.method.toLocaleLowerCase() === 'post') {
         if (row.source == '' && row.action == '') {
             return (
                 i18n.global.t('operations.detail.' + row.group.toLocaleLowerCase()) +
@@ -118,7 +118,6 @@ const fmtOperation = (row: ResOperationLog) => {
             i18n.global.t('operations.detail.' + row.source.toLocaleLowerCase())
         );
     }
-    return '';
 };
 
 const fmtBody = (value: string) => {
