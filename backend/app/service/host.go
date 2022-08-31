@@ -13,9 +13,9 @@ import (
 type HostService struct{}
 
 type IHostService interface {
-	GetConnInfo(id uint) (*model.Host, error)
+	GetHostInfo(id uint) (*model.Host, error)
 	SearchForTree(search dto.SearchForTree) ([]dto.HostTree, error)
-	Create(hostDto dto.HostCreate) (*dto.HostInfo, error)
+	Create(hostDto dto.HostOperate) (*dto.HostInfo, error)
 	Update(id uint, upMap map[string]interface{}) error
 	BatchDelete(ids []uint) error
 }
@@ -24,7 +24,7 @@ func NewIHostService() IHostService {
 	return &HostService{}
 }
 
-func (u *HostService) GetConnInfo(id uint) (*model.Host, error) {
+func (u *HostService) GetHostInfo(id uint) (*model.Host, error) {
 	host, err := hostRepo.Get(commonRepo.WithByID(id))
 	if err != nil {
 		return nil, constant.ErrRecordNotFound
@@ -34,26 +34,30 @@ func (u *HostService) GetConnInfo(id uint) (*model.Host, error) {
 
 func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, error) {
 	hosts, err := hostRepo.GetList(hostRepo.WithByInfo(search.Info))
-	distinctMap := make(map[string][]string)
-	for _, host := range hosts {
-		if _, ok := distinctMap[host.Group]; !ok {
-			distinctMap[host.Group] = []string{fmt.Sprintf("%s@%s:%d", host.User, host.Addr, host.Port)}
-		} else {
-			distinctMap[host.Group] = append(distinctMap[host.Group], fmt.Sprintf("%s@%s:%d", host.User, host.Addr, host.Port))
-		}
+	if err != nil {
+		return nil, err
 	}
-	var data []dto.HostTree
-	for key, value := range distinctMap {
-		var children []dto.TreeChild
-		for _, label := range value {
-			children = append(children, dto.TreeChild{Label: label})
-		}
-		data = append(data, dto.HostTree{Label: key, Children: children})
+	groups, err := groupRepo.GetList()
+	if err != nil {
+		return nil, err
 	}
-	return data, err
+	var datas []dto.HostTree
+	for _, group := range groups {
+		var data dto.HostTree
+		data.ID = group.ID + 10000
+		data.Label = group.Name
+		for _, host := range hosts {
+			label := fmt.Sprintf("%s@%s:%d", host.User, host.Addr, host.Port)
+			if host.GroupBelong == group.Name {
+				data.Children = append(data.Children, dto.TreeChild{ID: host.ID, Label: label})
+			}
+		}
+		datas = append(datas, data)
+	}
+	return datas, err
 }
 
-func (u *HostService) Create(hostDto dto.HostCreate) (*dto.HostInfo, error) {
+func (u *HostService) Create(hostDto dto.HostOperate) (*dto.HostInfo, error) {
 	host, _ := hostRepo.Get(commonRepo.WithByName(hostDto.Name))
 	if host.ID != 0 {
 		return nil, constant.ErrRecordExist

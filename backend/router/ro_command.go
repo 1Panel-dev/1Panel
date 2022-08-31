@@ -17,8 +17,8 @@ func (s *CommandRouter) InitCommandRouter(Router *gin.RouterGroup) {
 	{
 		withRecordRouter.POST("", baseApi.CreateCommand)
 		withRecordRouter.POST("/del", baseApi.DeleteCommand)
+		withRecordRouter.PUT(":id", baseApi.UpdateCommand)
 		userRouter.POST("/search", baseApi.SearchCommand)
 		userRouter.GET("", baseApi.ListCommand)
-		userRouter.PUT(":id", baseApi.UpdateCommand)
 	}
 }

@@ -32,7 +32,7 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	host, err := hostService.GetConnInfo(uint(id))
+	host, err := hostService.GetHostInfo(uint(id))
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

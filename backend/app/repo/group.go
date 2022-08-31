@@ -3,6 +3,7 @@ package repo
 import (
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/global"
+	"gorm.io/gorm"
 )
 
 type GroupRepo struct{}
@@ -10,6 +11,7 @@ type GroupRepo struct{}
 type IGroupRepo interface {
 	Get(opts ...DBOption) (model.Group, error)
 	GetList(opts ...DBOption) ([]model.Group, error)
+	WithByType(groupType string) DBOption
 	Create(group *model.Group) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
@@ -37,6 +39,12 @@ func (u *GroupRepo) GetList(opts ...DBOption) ([]model.Group, error) {
 	}
 	err := db.Find(&groups).Error
 	return groups, err
+}
+
+func (c *GroupRepo) WithByType(groupType string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("type = ?", groupType)
+	}
 }
 
 func (u *GroupRepo) Create(group *model.Group) error {

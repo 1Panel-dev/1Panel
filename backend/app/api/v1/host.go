@@ -5,11 +5,12 @@ import (
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/utils/copier"
 	"github.com/gin-gonic/gin"
 )
 
 func (b *BaseApi) CreateHost(c *gin.Context) {
-	var req dto.HostCreate
+	var req dto.HostOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -42,6 +43,25 @@ func (b *BaseApi) HostTree(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+func (b *BaseApi) GetHostInfo(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	host, err := hostService.GetHostInfo(id)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	var hostDto dto.HostInfo
+	if err := copier.Copy(&hostDto, host); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, hostDto)
+}
+
 func (b *BaseApi) DeleteHost(c *gin.Context) {
 	var req dto.BatchDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -61,7 +81,7 @@ func (b *BaseApi) DeleteHost(c *gin.Context) {
 }
 
 func (b *BaseApi) UpdateHost(c *gin.Context) {
-	var req dto.HostUpdate
+	var req dto.HostOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -78,7 +98,7 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 
 	upMap := make(map[string]interface{})
 	upMap["name"] = req.Name
-	upMap["group"] = req.Group
+	upMap["group_belong"] = req.GroupBelong
 	upMap["addr"] = req.Addr
 	upMap["port"] = req.Port
 	upMap["user"] = req.User

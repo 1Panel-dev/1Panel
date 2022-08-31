@@ -12,7 +12,7 @@ export namespace User {
     }
 
     export interface ReqGetUserParams extends ReqPage {
-        name?: string;
+        info?: string;
         email?: string;
     }
 }

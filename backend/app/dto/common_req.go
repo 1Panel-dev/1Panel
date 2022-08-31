@@ -2,7 +2,7 @@ package dto
 
 type SearchWithPage struct {
 	PageInfo
-	Name string `json:"name"  validate:"required"`
+	Info string `json:"info"  validate:"required"`
 }
 
 type PageInfo struct {

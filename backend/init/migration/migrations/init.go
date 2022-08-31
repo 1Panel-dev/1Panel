@@ -35,6 +35,15 @@ var AddTableOperationLog = &gormigrate.Migration{
 var AddTableHost = &gormigrate.Migration{
 	ID: "20200818-add-table-host",
 	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(&model.Host{})
+		if err := tx.AutoMigrate(&model.Host{}); err != nil {
+			return err
+		}
+		if err := tx.AutoMigrate(&model.Group{}); err != nil {
+			return err
+		}
+		if err := tx.AutoMigrate(&model.Command{}); err != nil {
+			return err
+		}
+		return nil
 	},
 }

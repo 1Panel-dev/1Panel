@@ -44,7 +44,7 @@ func (u *UserService) Get(id uint) (*dto.UserInfo, error) {
 }
 
 func (u *UserService) Page(search dto.SearchWithPage) (int64, interface{}, error) {
-	total, users, err := userRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Name))
+	total, users, err := userRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info))
 	var dtoUsers []dto.UserInfo
 	for _, user := range users {
 		var item dto.UserInfo
