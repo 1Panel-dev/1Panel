@@ -24,3 +24,6 @@ export const ChangeFileMode = (form: File.FileCreate) => {
 export const CompressFile = (form: File.FileCompress) => {
     return http.post<File.FileCompress>('files/compress', form);
 };
+export const DeCompressFile = (form: File.FileDeCompress) => {
+    return http.post<File.FileCompress>('files/decompress', form);
+};
