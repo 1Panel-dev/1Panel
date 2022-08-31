@@ -110,10 +110,10 @@ const submit = async (formEl: FormInstance | undefined) => {
         let addItem = {};
         Object.assign(addItem, form.value);
         addItem['name'] = form.value.name + extension.value;
-
+        loading.value = true;
         CompressFile(addItem as File.FileCompress)
             .then(() => {
-                ElMessage.success(i18n.global.t('commons.msg.compressSuccess'));
+                ElMessage.success(i18n.global.t('file.compressSuccess'));
                 handleClose();
             })
             .finally(() => {

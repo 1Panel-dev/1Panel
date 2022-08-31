@@ -96,8 +96,8 @@
                     />
                 </ComplexTable>
             </el-col>
-            <CreateFile :open="openCreate" :file="fileCreate" @close="closeCreate"></CreateFile>
-            <ChangeRole :open="openModePage" :file="modeForm" @close="closeMode"></ChangeRole>
+            <CreateFile :open="filePage.open" :file="filePage.createForm" @close="closeCreate"></CreateFile>
+            <ChangeRole :open="modePage.open" :file="modePage.modeForm" @close="closeMode"></ChangeRole>
             <Compress
                 :open="compressPage.open"
                 :files="compressPage.files"
@@ -105,6 +105,14 @@
                 :name="compressPage.name"
                 @close="closeCompress"
             ></Compress>
+            <Decompress
+                :open="deCompressPage.open"
+                :dst="deCompressPage.dst"
+                :path="deCompressPage.path"
+                :name="deCompressPage.name"
+                :mimeType="deCompressPage.mimeType"
+                @close="closeDeCompress"
+            ></Decompress>
         </el-row>
     </LayoutContent>
 </template>
@@ -119,9 +127,10 @@ import { dateFromat } from '@/utils/util';
 import { File } from '@/api/interface/file';
 import BreadCrumbs from '@/components/bread-crumbs/index.vue';
 import BreadCrumbItem from '@/components/bread-crumbs/bread-crumbs-item.vue';
-import CreateFile from './create.vue';
-import ChangeRole from './change-role.vue';
-import Compress from './compress.vue';
+import CreateFile from './create/index.vue';
+import ChangeRole from './change-role/index.vue';
+import Compress from './compress/index.vue';
+import Decompress from './decompress/index.vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
 
 let data = ref();
@@ -132,12 +141,11 @@ let treeLoading = ref(false);
 let paths = ref<string[]>([]);
 let fileTree = ref<File.FileTree[]>([]);
 let expandKeys = ref<string[]>([]);
-let openCreate = ref(false);
-let fileCreate = ref<File.FileCreate>({ path: '/', isDir: false, mode: 0o755 });
-let openModePage = ref(false);
-let modeForm = ref<File.FileCreate>({ path: '/', isDir: false, mode: 0o755 });
 
+let filePage = reactive({ open: false, createForm: { path: '/', isDir: false, mode: 0o755 } });
+let modePage = reactive({ open: false, modeForm: { path: '/', isDir: false, mode: 0o755 } });
 let compressPage = reactive({ open: false, files: [''], name: '', dst: '' });
+let deCompressPage = reactive({ open: false, path: '', name: '', dst: '', mimeType: '' });
 
 const defaultProps = {
     children: 'children',
@@ -234,12 +242,12 @@ const loadNode = (node: any, resolve: (data: File.FileTree[]) => void) => {
 };
 
 const handleCreate = (commnad: string) => {
-    fileCreate.value.path = req.path;
-    fileCreate.value.isDir = false;
+    filePage.createForm.path = req.path;
+    filePage.createForm.isDir = false;
     if (commnad === 'dir') {
-        fileCreate.value.isDir = true;
+        filePage.createForm.isDir = true;
     }
-    openCreate.value = true;
+    filePage.open = true;
 };
 
 const delFile = async (row: File.File | null) => {
@@ -248,17 +256,17 @@ const delFile = async (row: File.File | null) => {
 };
 
 const closeCreate = () => {
-    openCreate.value = false;
+    filePage.open = false;
     search(req);
 };
 
 const openMode = (item: File.File) => {
-    modeForm.value = item;
-    openModePage.value = true;
+    modePage.modeForm = item;
+    modePage.open = true;
 };
 
 const closeMode = () => {
-    openModePage.value = false;
+    modePage.open = false;
     search(req);
 };
 
@@ -273,10 +281,26 @@ const closeCompress = () => {
     compressPage.open = false;
     search(req);
 };
+
+const openDeCompress = (item: File.File) => {
+    deCompressPage.open = true;
+    deCompressPage.name = item.name;
+    deCompressPage.path = item.path;
+    deCompressPage.dst = req.path;
+    deCompressPage.mimeType = item.mimeType;
+};
+
+const closeDeCompress = () => {
+    deCompressPage.open = false;
+    search(req);
+};
+
 onMounted(() => {
     search(req);
 });
 
+//TODO button增加v-if判断
+//openDeCompress 增加是否可以解压判断
 const buttons = [
     {
         label: i18n.global.t('file.open'),
@@ -287,8 +311,12 @@ const buttons = [
         click: openMode,
     },
     {
-        label: i18n.global.t('file.zip'),
+        label: i18n.global.t('file.compress'),
         click: openCompress,
+    },
+    {
+        label: i18n.global.t('file.deCompress'),
+        click: openDeCompress,
     },
     {
         label: i18n.global.t('file.rename'),
