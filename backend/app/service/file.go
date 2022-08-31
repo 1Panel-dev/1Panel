@@ -50,16 +50,18 @@ func (f FileService) GetFileTree(op dto.FileOption) ([]dto.FileTree, error) {
 func (f FileService) Create(op dto.FileCreate) error {
 
 	fo := files.NewFileOp()
-
 	if fo.Stat(op.Path) {
 		return errors.New("file is exist")
 	}
-
 	if op.IsDir {
 		return fo.CreateDir(op.Path, fs.FileMode(op.Mode))
+	} else {
+		if op.IsLink {
+			return fo.LinkFile(op.LinkPath, op.Path, op.IsSymlink)
+		} else {
+			return fo.CreateFile(op.Path)
+		}
 	}
-
-	return nil
 }
 
 func (f FileService) Delete(op dto.FileDelete) error {

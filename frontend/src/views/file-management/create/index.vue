@@ -7,13 +7,29 @@
         @open="onOpen"
         v-loading="loading"
     >
-        <el-form ref="fileForm" label-position="left" :model="form" label-width="100px" :rules="rules">
+        <el-form ref="fileForm" label-position="left" :model="addForm" label-width="100px" :rules="rules">
             <el-form-item :label="$t('file.path')" prop="path"> <el-input v-model="getPath" disabled /></el-form-item>
-            <el-form-item :label="$t('file.name')" prop="name"> <el-input v-model="form.name" /></el-form-item>
-            <el-checkbox v-model="isLink" :label="$t('file.link')"></el-checkbox>
+            <el-form-item :label="$t('file.name')" prop="name"> <el-input v-model="addForm.name" /></el-form-item>
+            <el-form-item v-if="!addForm.isDir">
+                <el-checkbox v-model="addForm.isLink" :label="$t('file.link')"></el-checkbox
+            ></el-form-item>
+            <el-form-item :label="$t('file.linkType')" v-if="addForm.isLink" prop="linkType">
+                <el-radio-group v-model="addForm.isSymlink">
+                    <el-radio :label="true">{{ $t('file.softLink') }}</el-radio>
+                    <el-radio :label="false">{{ $t('file.hardLink') }}</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item v-if="addForm.isLink" :label="$t('file.linkPath')" prop="linkPath">
+                <el-input v-model="addForm.linkPath"
+            /></el-form-item>
+            <el-form-item>
+                <el-checkbox v-if="addForm.isDir" v-model="setRole" :label="$t('file.setRole')"></el-checkbox>
+            </el-form-item>
+            <el-form-item>
+                <FileRole v-if="setRole" :mode="'0755'" @get-mode="getMode"></FileRole>
+            </el-form-item>
         </el-form>
-        <el-checkbox v-model="setRole" :label="$t('file.setRole')"></el-checkbox>
-        <FileRole v-if="setRole" :mode="'0755'" @get-mode="getMode"></FileRole>
+
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
@@ -35,15 +51,15 @@ import { Rules } from '@/global/form-rues';
 const fileForm = ref<FormInstance>();
 let loading = ref(false);
 let setRole = ref(false);
-let isLink = ref(false);
 
 const props = defineProps({
     open: Boolean,
     file: Object,
 });
 const { open, file } = toRefs(props);
-let addItem = ref<File.FileCreate>({ path: '', isDir: false, mode: 0o755 });
-let form = ref({ name: '', path: '' });
+
+let addForm = reactive({ path: '', name: '', isDir: false, mode: 0o755, isLink: false, isSymlink: true, linkPath: '' });
+
 const em = defineEmits(['close']);
 const handleClose = () => {
     em('close', open);
@@ -52,17 +68,19 @@ const handleClose = () => {
 const rules = reactive<FormRules>({
     name: [Rules.required],
     path: [Rules.required],
+    isSymlink: [Rules.required],
+    linkPath: [Rules.required],
 });
 
 const getMode = (val: number) => {
-    addItem.value.mode = val;
+    addForm.mode = val;
 };
 
 let getPath = computed(() => {
-    if (form.value.path === '/') {
-        return form.value.path + form.value.name;
+    if (addForm.path === '/') {
+        return addForm.path + addForm.name;
     } else {
-        return form.value.path + '/' + form.value.name;
+        return addForm.path + '/' + addForm.name;
     }
 });
 
@@ -72,9 +90,12 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (!valid) {
             return;
         }
+
+        let addItem = {};
+        Object.assign(addItem, addForm);
+        addItem['path'] = getPath.value;
         loading.value = true;
-        addItem.value.path = getPath.value;
-        CreateFile(addItem.value)
+        CreateFile(addItem as File.FileCreate)
             .then(() => {
                 ElMessage.success(i18n.global.t('commons.msg.createSuccess'));
                 handleClose();
@@ -87,9 +108,14 @@ const submit = async (formEl: FormInstance | undefined) => {
 
 const onOpen = () => {
     const f = file?.value as File.FileCreate;
-    addItem.value.isDir = f.isDir;
-    addItem.value.path = f.path;
-    form.value.name = '';
-    form.value.path = f.path;
+    addForm.isDir = f.isDir;
+    addForm.path = f.path;
+    addForm.name = '';
+    addForm.isLink = false;
+    init();
+};
+
+const init = () => {
+    setRole.value = false;
 };
 </script>
