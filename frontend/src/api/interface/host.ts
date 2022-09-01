@@ -32,6 +32,14 @@ export namespace Host {
 
         description: string;
     }
+    export interface HostConnTest {
+        addr: string;
+        port: number;
+        user: string;
+        authMode: string;
+        privateKey: string;
+        password: string;
+    }
     export interface ReqSearch {
         info?: string;
     }

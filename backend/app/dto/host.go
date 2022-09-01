@@ -17,6 +17,15 @@ type HostOperate struct {
 	Description string `json:"description"`
 }
 
+type HostConnTest struct {
+	Addr       string `json:"addr" validate:"required,ip"`
+	Port       uint   `json:"port" validate:"required,number,max=65535,min=1"`
+	User       string `json:"user" validate:"required"`
+	AuthMode   string `json:"authMode" validate:"oneof=password key"`
+	PrivateKey string `json:"privateKey"`
+	Password   string `json:"password"`
+}
+
 type SearchForTree struct {
 	Info string `json:"info"`
 }

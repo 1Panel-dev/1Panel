@@ -1,22 +1,28 @@
 <template>
-    <!-- <el-button class="drawer-container" icon="arrowLeftBold" @click="hostDrawer = true">
-        {{ $t('terminal.connHistory') }}
-    </el-button> -->
-
     <div>
         <el-tabs
             type="card"
-            editable
             class="terminal-tabs"
             style="background-color: #efefef"
             v-model="terminalValue"
-            @edit="handleTabsEdit"
+            :before-leave="beforeLeave"
+            @edit="handleTabsRemove"
         >
-            <el-tab-pane :key="item.key" v-for="item in terminalTabs" :label="item.title" :name="item.key">
+            <el-tab-pane
+                :key="item.key"
+                v-for="item in terminalTabs"
+                :closable="true"
+                :label="item.title"
+                :name="item.key"
+            >
                 <template #label>
                     <span class="custom-tabs-label">
-                        <el-icon color="#67C23A" v-if="item.status === 'online'"><circleCheck /></el-icon>
-                        <el-icon color="#F56C6C" v-if="item.status === 'closed'"><circleClose /></el-icon>
+                        <el-icon style="margin-top: 1px" color="#67C23A" v-if="item.status === 'online'">
+                            <circleCheck />
+                        </el-icon>
+                        <el-icon style="margin-top: 1px" color="#F56C6C" v-if="item.status === 'closed'">
+                            <circleClose />
+                        </el-icon>
                         <span> &nbsp;{{ item.title }}&nbsp;&nbsp;</span>
                     </span>
                 </template>
@@ -26,16 +32,70 @@
                     :wsID="item.wsID"
                     :terminalID="item.key"
                 ></Terminal>
-                <div style="background-color: #000">
-                    <el-select v-model="quickCmd" style="width: 25%" class="m-2" placeholder="Select" size="small">
-                        <el-option v-for="cmd in quickCmds" :key="cmd.value" :label="cmd.label" :value="cmd.value" />
+                <div>
+                    <el-select
+                        v-model="quickCmd"
+                        clearable
+                        filterable
+                        @change="quickInput"
+                        style="width: 25%"
+                        :placeholder="$t('terminal.quickCommand')"
+                        size="small"
+                    >
+                        <el-option
+                            v-for="cmd in commandList"
+                            :key="cmd.id"
+                            :label="cmd.name + ' [ ' + cmd.command + ' ] '"
+                            :value="cmd.command"
+                        />
                     </el-select>
-                    <el-input v-model="batchInput" class="terminal-input" size="small">
+                    <el-input
+                        :placeholder="$t('terminal.batchInput')"
+                        v-model="batchVal"
+                        @keyup.enter="batchInput"
+                        style="width: 75%"
+                        size="small"
+                    >
                         <template #append>
                             <el-switch size="small" v-model="isBatch" class="ml-2" />
                         </template>
                     </el-input>
                 </div>
+            </el-tab-pane>
+            <el-tab-pane :closable="false" name="newTabs">
+                <template #label>
+                    <el-button
+                        v-popover="popoverRef"
+                        style="background-color: #ededed; border: 0"
+                        icon="Plus"
+                    ></el-button>
+                    <el-popover ref="popoverRef" width="250px" trigger="hover" virtual-triggering persistent>
+                        <el-button-group style="width: 100%">
+                            <el-button @click="onNewSsh">New ssh</el-button>
+                            <el-button @click="onNewTab">New tab</el-button>
+                        </el-button-group>
+                        <el-input size="small" clearable style="margin-top: 5px" v-model="hostfilterInfo">
+                            <template #append><el-button icon="search" /></template>
+                        </el-input>
+                        <el-tree
+                            ref="treeRef"
+                            :expand-on-click-node="false"
+                            node-key="id"
+                            :default-expand-all="true"
+                            :data="hostTree"
+                            :props="defaultProps"
+                            :filter-node-method="filterHost"
+                        >
+                            <template #default="{ node, data }">
+                                <span class="custom-tree-node">
+                                    <span>
+                                        <a @click="onConn(node, data)">{{ node.label }}</a>
+                                    </span>
+                                </span>
+                            </template>
+                        </el-tree>
+                    </el-popover>
+                </template>
             </el-tab-pane>
             <div v-if="terminalTabs.length === 0">
                 <el-empty
@@ -44,148 +104,88 @@
                 ></el-empty>
             </div>
         </el-tabs>
-    </div>
 
-    <!-- <el-drawer :size="320" v-model="hostDrawer" :title="$t('terminal.hostHistory')" direction="rtl">
-        <el-input size="small" clearable style="margin-top: 5px" v-model="searcConfig.info">
-            <template #prepend>
-                <el-button icon="plus" @click="onAddHost">{{ $t('commons.button.add') }}</el-button>
+        <el-dialog v-model="connVisiable" :title="$t('terminal.addHost')" width="30%">
+            <el-form ref="hostInfoRef" label-width="100px" label-position="left" :model="hostInfo" :rules="rules">
+                <el-form-item :label="$t('commons.table.name')" prop="name">
+                    <el-input clearable v-model="hostInfo.name" />
+                </el-form-item>
+                <el-form-item label="IP" prop="addr">
+                    <el-input clearable v-model="hostInfo.addr" />
+                </el-form-item>
+                <el-form-item :label="$t('terminal.port')" prop="port">
+                    <el-input clearable v-model.number="hostInfo.port" />
+                </el-form-item>
+                <el-form-item :label="$t('terminal.user')" prop="user">
+                    <el-input clearable v-model="hostInfo.user" />
+                </el-form-item>
+                <el-form-item :label="$t('terminal.authMode')" prop="authMode">
+                    <el-radio-group v-model="hostInfo.authMode">
+                        <el-radio label="password">{{ $t('terminal.passwordMode') }}</el-radio>
+                        <el-radio label="key">{{ $t('terminal.keyMode') }}</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item :label="$t('terminal.password')" v-if="hostInfo.authMode === 'password'" prop="password">
+                    <el-input clearable show-password type="password" v-model="hostInfo.password" />
+                </el-form-item>
+                <el-form-item :label="$t('terminal.key')" v-if="hostInfo.authMode === 'key'" prop="privateKey">
+                    <el-input clearable type="textarea" v-model="hostInfo.privateKey" />
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="connVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="submitAddHost(hostInfoRef, 'testConn')">
+                        {{ $t('terminal.testConn') }}
+                    </el-button>
+                    <el-button type="primary" @click="submitAddHost(hostInfoRef, 'saveAndConn')">
+                        {{ $t('terminal.saveAndConn') }}
+                    </el-button>
+                </span>
             </template>
-            <template #append><el-button icon="search" @click="loadHost" /></template>
-        </el-input>
-        <div v-infinite-scroll="nextPage" style="overflow: auto">
-            <el-card
-                @click="onConnLocal()"
-                style="margin-top: 5px; cursor: pointer"
-                :title="$t('terminal.localhost')"
-                shadow="hover"
-            >
-                <div :inline="true">
-                    <div>
-                        <span>{{ $t('terminal.localhost') }}</span>
-                    </div>
-                    <span style="font-size: 14px; line-height: 25px"> [ 127.0.0.1 ]</span>
-                </div>
-            </el-card>
-            <div v-for="(item, index) in data" :key="item.id" @mouseover="hover = index" @mouseleave="hover = null">
-                <el-card @click="onConn(item)" style="margin-top: 5px; cursor: pointer" shadow="hover">
-                    <div :inline="true">
-                        <div>
-                            <span>{{ item.name }}</span>
-                        </div>
-                        <span style="font-size: 14px; line-height: 25px">
-                            [ {{ item.addr + ':' + item.port }} ]
-                            <el-button
-                                style="float: right; margin-left: 5px"
-                                size="small"
-                                circle
-                                @click="onDeleteHost(item)"
-                                v-if="hover === index"
-                                icon="delete"
-                            ></el-button>
-                            <el-button
-                                style="float: right; margin-left: 5px"
-                                size="small"
-                                circle
-                                @click="onEditHost(item)"
-                                v-if="hover === index"
-                                icon="edit"
-                            ></el-button>
-                            <div v-if="item.description && hover === index">
-                                <span style="font-size: 12px">{{ item.description }}</span>
-                            </div>
-                        </span>
-                    </div>
-                </el-card>
-            </div>
-        </div>
-    </el-drawer> -->
-
-    <el-dialog v-model="connVisiable" :title="$t('terminal.addHost')" width="30%">
-        <el-form ref="hostInfoRef" label-width="100px" label-position="left" :model="hostInfo" :rules="rules">
-            <el-form-item :label="$t('commons.table.name')" prop="name">
-                <el-input clearable v-model="hostInfo.name" />
-            </el-form-item>
-            <el-form-item label="IP" prop="addr">
-                <el-input clearable v-model="hostInfo.addr" />
-            </el-form-item>
-            <el-form-item :label="$t('terminal.port')" prop="port">
-                <el-input clearable v-model.number="hostInfo.port" />
-            </el-form-item>
-            <el-form-item :label="$t('terminal.user')" prop="user">
-                <el-input clearable v-model="hostInfo.user" />
-            </el-form-item>
-            <el-form-item :label="$t('terminal.authMode')" prop="authMode">
-                <el-radio-group v-model="hostInfo.authMode">
-                    <el-radio label="password">{{ $t('terminal.passwordMode') }}</el-radio>
-                    <el-radio label="key">{{ $t('terminal.keyMode') }}</el-radio>
-                </el-radio-group>
-            </el-form-item>
-            <el-form-item :label="$t('terminal.password')" v-if="hostInfo.authMode === 'password'" prop="password">
-                <el-input clearable show-password type="password" v-model="hostInfo.password" />
-            </el-form-item>
-            <el-form-item :label="$t('terminal.key')" v-if="hostInfo.authMode === 'key'" prop="privateKey">
-                <el-input clearable type="textarea" v-model="hostInfo.privateKey" />
-            </el-form-item>
-        </el-form>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="connVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <!-- <el-button v-if="operation === 'conn'" type="primary" @click="submitAddHost(hostInfoRef)">
-                    {{ $t('commons.button.conn') }}
-                </el-button>
-                <el-button v-else type="primary" @click="submitAddHost(hostInfoRef)">
-                    {{ $t('commons.button.confirm') }}
-                </el-button> -->
-            </span>
-        </template>
-    </el-dialog>
+        </el-dialog>
+    </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeMount, ref, nextTick, reactive, getCurrentInstance } from 'vue';
+import { onMounted, onBeforeMount, ref, watch, nextTick, reactive, getCurrentInstance } from 'vue';
 import { Rules } from '@/global/form-rues';
-// import { getHostList, addHost, editHost, deleteHost } from '@/api/modules/host';
-// import { useDeleteData } from '@/hooks/use-delete-data';
-// import i18n from '@/lang';
+import { testConn, getHostTree, addHost } from '@/api/modules/host';
+import { getCommandList } from '@/api/modules/command';
+import i18n from '@/lang';
 import type { ElForm } from 'element-plus';
 import { Host } from '@/api/interface/host';
-// import { ElMessage } from 'element-plus';
+import { ElMessage } from 'element-plus';
 import Terminal from '@/views/terminal/terminal/index.vue';
-
+import type Node from 'element-plus/es/components/tree/src/model/node';
+import { ElTree } from 'element-plus';
 let timer: NodeJS.Timer | null = null;
 
 const terminalValue = ref();
 const terminalTabs = ref([]) as any;
 let tabIndex = 0;
-// const data = ref();
-// const hostDrawer = ref(false);
-
-// let searcConfig = reactive<Host.ReqSearchWithPage>({
-//     info: '',
-//     page: 1,
-//     pageSize: 8,
-// });
-
-// const paginationConfig = reactive({
-//     currentPage: 1,
-//     pageSize: 8,
-//     total: 0,
-// });
-
+const commandList = ref();
 let quickCmd = ref();
-const quickCmds = [
-    { label: 'ls', value: 'ls -l' },
-    { label: 'pwd', value: 'pwd' },
-];
-let batchInput = ref();
+let batchVal = ref();
 let isBatch = ref<boolean>(false);
+const popoverRef = ref();
 
 const connVisiable = ref<boolean>(false);
-const operation = ref();
-// const hover = ref();
 type FormInstance = InstanceType<typeof ElForm>;
+
 const hostInfoRef = ref<FormInstance>();
+const hostTree = ref<Array<Host.HostTree>>();
+const treeRef = ref<InstanceType<typeof ElTree>>();
+const defaultProps = {
+    label: 'label',
+    children: 'children',
+};
+const hostfilterInfo = ref('');
+interface Tree {
+    id: number;
+    label: string;
+    children?: Tree[];
+}
 const rules = reactive({
     name: [Rules.requiredInput, Rules.name],
     addr: [Rules.requiredInput, Rules.ip],
@@ -199,6 +199,7 @@ const rules = reactive({
 let hostInfo = reactive<Host.HostOperate>({
     id: 0,
     name: '',
+    groupBelong: '',
     addr: '',
     port: 22,
     user: '',
@@ -210,112 +211,128 @@ let hostInfo = reactive<Host.HostOperate>({
 
 const ctx = getCurrentInstance() as any;
 
-const handleTabsEdit = (targetName: string, action: 'remove' | 'add') => {
-    if (action === 'add') {
-        connVisiable.value = true;
-        operation.value = 'conn';
-        if (hostInfoRef.value) {
-            hostInfoRef.value.resetFields();
-        }
-    } else if (action === 'remove') {
-        if (ctx) {
-            ctx.refs[`Ref${targetName}`] && ctx.refs[`Ref${targetName}`][0].onClose();
-        }
-        const tabs = terminalTabs.value;
-        let activeName = terminalValue.value;
-        if (activeName === targetName) {
-            tabs.forEach((tab: any, index: any) => {
-                if (tab.key === targetName) {
-                    const nextTab = tabs[index + 1] || tabs[index - 1];
-                    if (nextTab) {
-                        activeName = nextTab.key;
-                    }
+const handleTabsRemove = (targetName: string, action: 'remove' | 'add') => {
+    if (action !== 'remove') {
+        return;
+    }
+    if (ctx) {
+        ctx.refs[`Ref${targetName}`] && ctx.refs[`Ref${targetName}`][0].onClose();
+    }
+    const tabs = terminalTabs.value;
+    let activeName = terminalValue.value;
+    if (activeName === targetName) {
+        tabs.forEach((tab: any, index: any) => {
+            if (tab.key === targetName) {
+                const nextTab = tabs[index + 1] || tabs[index - 1];
+                if (nextTab) {
+                    activeName = nextTab.key;
                 }
-            });
+            }
+        });
+    }
+    terminalValue.value = activeName;
+    terminalTabs.value = tabs.filter((tab: any) => tab.key !== targetName);
+};
+
+const loadHost = async () => {
+    const res = await getHostTree({});
+    hostTree.value = res.data;
+};
+watch(hostfilterInfo, (val: any) => {
+    treeRef.value!.filter(val);
+});
+const filterHost = (value: string, data: any) => {
+    if (!value) return true;
+    return data.label.includes(value);
+};
+const loadCommand = async () => {
+    const res = await getCommandList();
+    commandList.value = res.data;
+};
+
+function quickInput(val: any) {
+    if (val !== '') {
+        if (ctx) {
+            ctx.refs[`Ref${terminalValue.value}`] && ctx.refs[`Ref${terminalValue.value}`][0].onSendMsg(val + '\n');
         }
-        terminalValue.value = activeName;
-        terminalTabs.value = tabs.filter((tab: any) => tab.key !== targetName);
+    }
+}
+
+function batchInput() {
+    if (batchVal.value === '' || !ctx) {
+        return;
+    }
+    if (isBatch.value) {
+        for (const tab of terminalTabs.value) {
+            ctx.refs[`Ref${tab.key}`] && ctx.refs[`Ref${tab.key}`][0].onSendMsg(batchVal.value + '\n');
+        }
+        batchVal.value = '';
+        return;
+    }
+    ctx.refs[`Ref${terminalValue.value}`] && ctx.refs[`Ref${terminalValue.value}`][0].onSendMsg(batchVal.value + '\n');
+    batchVal.value = '';
+}
+
+function beforeLeave(activeName: string) {
+    if (activeName === 'newTabs') {
+        return false;
+    }
+}
+
+const onNewTab = () => {
+    terminalTabs.value.push({
+        key: `127.0.0.1-${++tabIndex}`,
+        title: '127.0.0.1',
+        wsID: 0,
+        status: 'online',
+    });
+    terminalValue.value = `127.0.0.1-${tabIndex}`;
+};
+
+const onNewSsh = () => {
+    connVisiable.value = true;
+    if (hostInfoRef.value) {
+        hostInfoRef.value.resetFields();
     }
 };
 
-// const loadHost = async () => {
-//     searcConfig.page = paginationConfig.currentPage;
-//     searcConfig.pageSize = paginationConfig.pageSize;
-//     const res = await getHostList(searcConfig);
-//     data.value = res.data.items;
-//     paginationConfig.total = res.data.total;
-// };
+const onConn = (node: Node, data: Tree) => {
+    if (node.level === 1) {
+        return;
+    }
+    let addr = data.label.split('@')[1].split(':')[0];
+    terminalTabs.value.push({
+        key: `${addr}-${++tabIndex}`,
+        title: addr,
+        wsID: data.id,
+        status: 'online',
+    });
+    terminalValue.value = `${addr}-${tabIndex}`;
+};
 
-// const nextPage = () => {
-//     if (paginationConfig.pageSize >= paginationConfig.total) {
-//         return;
-//     }
-//     paginationConfig.pageSize = paginationConfig.pageSize + 3;
-//     loadHost();
-// };
-
-// function onAddHost() {
-//     connVisiable.value = true;
-//     operation.value = 'create';
-//     if (hostInfoRef.value) {
-//         hostInfoRef.value.resetFields();
-//     }
-// }
-
-// function onEditHost(row: Host.Host) {
-//     hostInfo.id = row.id;
-//     hostInfo.name = row.name;
-//     hostInfo.addr = row.addr;
-//     hostInfo.port = row.port;
-//     hostInfo.user = row.user;
-//     hostInfo.authMode = row.authMode;
-//     hostInfo.password = '';
-//     hostInfo.privateKey = '';
-//     operation.value = 'update';
-//     connVisiable.value = true;
-// }
-
-// const submitAddHost = (formEl: FormInstance | undefined) => {
-//     if (!formEl) return;
-//     formEl.validate(async (valid) => {
-//         if (!valid) return;
-//         try {
-//             switch (operation.value) {
-//                 case 'create':
-//                     await addHost(hostInfo);
-//                     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-//                     break;
-//                 case 'update':
-//                     await editHost(hostInfo);
-//                     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-//                     break;
-//                 case 'conn':
-//                     const res = await addHost(hostInfo);
-//                     terminalTabs.value.push({
-//                         key: `${res.data.addr}-${++tabIndex}`,
-//                         title: res.data.addr,
-//                         wsID: res.data.id,
-//                         status: 'online',
-//                     });
-//                     terminalValue.value = `${res.data.addr}-${tabIndex}`;
-//             }
-//             connVisiable.value = false;
-//             // loadHost();
-//         } catch (error) {
-//             ElMessage.success(i18n.global.t('commons.msg.loginSuccess') + ':' + error);
-//         }
-//     });
-// };
-
-// const onConn = (row: Host.Host) => {
-//     terminalTabs.value.push({
-//         key: `${row.addr}-${++tabIndex}`,
-//         title: row.addr,
-//         wsID: row.id,
-//         status: 'online',
-//     });
-//     terminalValue.value = `${row.addr}-${tabIndex}`;
-// };
+const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
+    if (!formEl) return;
+    formEl.validate(async (valid) => {
+        if (!valid) return;
+        switch (ops) {
+            case 'testConn':
+                await testConn(hostInfo);
+                ElMessage.success(i18n.global.t('terminal.connTestOk'));
+                break;
+            case 'saveAndConn':
+                const res = await addHost(hostInfo);
+                terminalTabs.value.push({
+                    key: `${res.data.addr}-${++tabIndex}`,
+                    title: res.data.addr,
+                    wsID: res.data.id,
+                    status: 'online',
+                });
+                terminalValue.value = `${res.data.addr}-${tabIndex}`;
+                connVisiable.value = false;
+                loadHost();
+        }
+    });
+};
 
 const onConnLocal = () => {
     terminalTabs.value.push({
@@ -327,12 +344,6 @@ const onConnLocal = () => {
     terminalValue.value = `127.0.0.1-${tabIndex}`;
 };
 
-// const onDeleteHost = async (row: Host.Host) => {
-//     let ids: Array<number> = [row.id];
-//     await useDeleteData(deleteHost, { ids: ids }, 'commons.msg.delete');
-//     loadHost();
-// };
-
 function changeFrameHeight() {
     let ifm = document.getElementById('iframeTerminal') as HTMLInputElement | null;
     if (ifm) {
@@ -343,6 +354,7 @@ function changeFrameHeight() {
 function syncTerminal() {
     for (const terminal of terminalTabs.value) {
         if (ctx && ctx.refs[`Ref${terminal.key}`]) {
+            console.log(ctx.refs[`Ref${terminal.key}`][0]);
             terminal.status = ctx.refs[`Ref${terminal.key}`][0].isWsOpen() ? 'online' : 'closed';
         }
     }
@@ -354,7 +366,8 @@ onMounted(() => {
         changeFrameHeight();
         window.addEventListener('resize', changeFrameHeight);
     });
-    // loadHost();
+    loadHost();
+    loadCommand();
     timer = setInterval(() => {
         syncTerminal();
     }, 1000 * 8);
@@ -364,29 +377,6 @@ onBeforeMount(() => {
 });
 </script>
 <style lang="scss" scoped>
-.drawer-container {
-    transition: all 0.2s;
-    &:hover {
-        right: 0;
-    }
-    position: fixed;
-    right: -90px;
-    top: 15%;
-    height: 40px;
-    width: 130px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 999;
-    border-radius: 4px 0 0 4px;
-    cursor: pointer;
-}
-.terminal-input {
-    &:hover {
-        width: 75%;
-    }
-    width: 25%;
-}
 .terminal-tabs {
     :deep .el-tabs__header {
         padding: 0;
@@ -408,23 +398,6 @@ onBeforeMount(() => {
         color: #ebeef5;
         background-color: #575758;
     }
-    :deep .el-tabs__new-tab {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        float: right;
-        border: 1pxsolidvar (--el-border-color);
-        height: 20px;
-        width: 20px;
-        line-height: 20px;
-        margin: 10px 30px 10px 10px;
-        border-radius: 3px;
-        text-align: center;
-        font-size: 24px;
-        color: var(--el-text-color-primary);
-        cursor: pointer;
-        transition: all 0.15s;
-    }
 }
 
 .vertical-tabs > .el-tabs__content {
@@ -433,9 +406,14 @@ onBeforeMount(() => {
     font-size: 32px;
     font-weight: 600;
 }
-
-.el-tabs--right .el-tabs__content,
-.el-tabs--left .el-tabs__content {
-    height: 100%;
+.fullScreen {
+    position: absolute;
+    right: 50px;
+    top: 85px;
+    font-weight: 600;
+    font-size: 14px;
+}
+.el-tabs--top.el-tabs--card > .el-tabs__header .el-tabs__item:last-child {
+    padding-right: 0px;
 }
 </style>

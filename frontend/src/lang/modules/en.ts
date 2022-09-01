@@ -92,12 +92,15 @@ export default {
     terminal: {
         conn: 'connection',
         testConn: 'Test connection',
+        saveAndConn: 'Save and Connect',
         connTestOk: 'Connection information available',
         hostList: 'Host information',
         createConn: 'Create a connection',
         createGroup: 'Create a group',
         expand: 'Expand all',
         fold: 'All contract',
+        batchInput: 'Batch input',
+        quickCommand: 'quick command',
         groupDeleteHelper:
             'After the group is removed, all connections in the group will be migrated to the default group. Confirm the information',
         addHost: 'Add Host',

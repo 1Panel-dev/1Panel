@@ -29,7 +29,7 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 }
 
 func (b *BaseApi) TestConn(c *gin.Context) {
-	var req dto.HostOperate
+	var req dto.HostConnTest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

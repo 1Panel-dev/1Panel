@@ -10,15 +10,14 @@ import (
 type CommandRouter struct{}
 
 func (s *CommandRouter) InitCommandRouter(Router *gin.RouterGroup) {
-	userRouter := Router.Group("commands")
-	userRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
-	withRecordRouter := userRouter.Use(middleware.OperationRecord())
+	cmdRouter := Router.Group("commands").Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
+	withRecordRouter := Router.Group("commands").Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		withRecordRouter.POST("", baseApi.CreateCommand)
 		withRecordRouter.POST("/del", baseApi.DeleteCommand)
 		withRecordRouter.PUT(":id", baseApi.UpdateCommand)
-		userRouter.POST("/search", baseApi.SearchCommand)
-		userRouter.GET("", baseApi.ListCommand)
+		cmdRouter.POST("/search", baseApi.SearchCommand)
+		cmdRouter.GET("", baseApi.ListCommand)
 	}
 }

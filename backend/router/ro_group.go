@@ -10,14 +10,14 @@ import (
 type GroupRouter struct{}
 
 func (s *GroupRouter) InitGroupRouter(Router *gin.RouterGroup) {
-	userRouter := Router.Group("groups").Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
+	groupRouter := Router.Group("groups").Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
 	withRecordRouter := Router.Group("groups").Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		withRecordRouter.POST("", baseApi.CreateGroup)
 		withRecordRouter.DELETE(":id", baseApi.DeleteGroup)
-		userRouter.POST("/search", baseApi.ListGroup)
-		userRouter.GET(":id", baseApi.GetGroupInfo)
-		userRouter.PUT(":id", baseApi.UpdateGroup)
+		withRecordRouter.PUT(":id", baseApi.UpdateGroup)
+		groupRouter.POST("/search", baseApi.ListGroup)
+		groupRouter.GET(":id", baseApi.GetGroupInfo)
 	}
 }

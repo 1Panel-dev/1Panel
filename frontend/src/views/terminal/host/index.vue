@@ -44,7 +44,6 @@
                     :default-expand-all="true"
                     :data="hostTree"
                     :props="defaultProps"
-                    draggable
                 >
                     <template #default="{ node, data }">
                         <span class="custom-tree-node" @mouseover="hover = data.id" @mouseleave="hover = null">
@@ -135,7 +134,7 @@ import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rues';
 import { Host } from '@/api/interface/host';
 import { Group } from '@/api/interface/group';
-import { testConn, getHostList, getHostInfo, addHost, editHost, deleteHost } from '@/api/modules/host';
+import { testConn, getHostTree, getHostInfo, addHost, editHost, deleteHost } from '@/api/modules/host';
 import { getGroupList, addGroup, editGroup, deleteGroup } from '@/api/modules/group';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElMessage } from 'element-plus';
@@ -193,7 +192,7 @@ let groupOperation = ref<string>('create');
 let groupInputShow = ref<boolean>(false);
 
 const loadHostTree = async () => {
-    const res = await getHostList(searcConfig);
+    const res = await getHostTree(searcConfig);
     hostTree.value = res.data;
 };
 
@@ -218,7 +217,6 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        console.log(ops);
         switch (ops) {
             case 'create':
                 await addHost(hostInfo);
