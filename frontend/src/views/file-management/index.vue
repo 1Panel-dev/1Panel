@@ -60,9 +60,9 @@
                         <el-button type="primary" plain> {{ $t('file.upload') }}</el-button>
                         <el-button type="primary" plain> {{ $t('file.search') }}</el-button>
                         <el-button type="primary" plain> {{ $t('file.remoteFile') }}</el-button>
-                        <el-button type="primary" plain> {{ $t('file.sync') }}</el-button>
+                        <!-- <el-button type="primary" plain> {{ $t('file.sync') }}</el-button>
                         <el-button type="primary" plain> {{ $t('file.terminal') }}</el-button>
-                        <el-button type="primary" plain> {{ $t('file.shareList') }}</el-button>
+                        <el-button type="primary" plain> {{ $t('file.shareList') }}</el-button> -->
                     </template>
                     <el-table-column :label="$t('commons.table.name')" min-width="250" fix show-overflow-tooltip>
                         <template #default="{ row }">
@@ -114,6 +114,13 @@
                 :mimeType="deCompressPage.mimeType"
                 @close="closeDeCompress"
             ></Decompress>
+            <CodeEditor
+                :open="editorPage.open"
+                :language="'json'"
+                :content="editorPage.content"
+                @close="closeCodeEditor"
+                @save="saveContent"
+            ></CodeEditor>
         </el-row>
     </LayoutContent>
 </template>
@@ -123,7 +130,7 @@ import { onMounted, reactive, ref } from '@vue/runtime-core';
 import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import i18n from '@/lang';
-import { GetFilesList, GetFilesTree, DeleteFile } from '@/api/modules/files';
+import { GetFilesList, GetFilesTree, DeleteFile, GetFileContent, SaveFileContent } from '@/api/modules/files';
 import { dateFromat } from '@/utils/util';
 import { File } from '@/api/interface/file';
 import BreadCrumbs from '@/components/bread-crumbs/index.vue';
@@ -133,6 +140,7 @@ import ChangeRole from './change-role/index.vue';
 import Compress from './compress/index.vue';
 import Decompress from './decompress/index.vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
+import CodeEditor from './code-editor/index.vue';
 
 let data = ref();
 let selects = ref<any>([]);
@@ -147,6 +155,8 @@ let filePage = reactive({ open: false, createForm: { path: '/', isDir: false, mo
 let modePage = reactive({ open: false, modeForm: { path: '/', isDir: false, mode: 0o755 } });
 let compressPage = reactive({ open: false, files: [''], name: '', dst: '' });
 let deCompressPage = reactive({ open: false, path: '', name: '', dst: '', mimeType: '' });
+let editorPage = reactive({ open: false, content: '' });
+let codeReq = reactive({ path: '', expand: false });
 
 const defaultProps = {
     children: 'children',
@@ -183,12 +193,14 @@ const open = async (row: File.File) => {
     if (row.isDir) {
         const name = row.name;
         paths.value.push(name);
-        if (req.path === '/') {
+        if (req.path.endsWith('/')) {
             req.path = req.path + name;
         } else {
             req.path = req.path + '/' + name;
         }
         search(req);
+    } else {
+        openCodeEditor(row);
     }
 };
 
@@ -294,6 +306,25 @@ const openDeCompress = (item: File.File) => {
 const closeDeCompress = () => {
     deCompressPage.open = false;
     search(req);
+};
+
+const openCodeEditor = (row: File.File) => {
+    codeReq.path = row.path;
+    codeReq.expand = true;
+    GetFileContent(codeReq).then((res) => {
+        editorPage.content = res.data.content;
+    });
+    editorPage.open = true;
+};
+
+const closeCodeEditor = () => {
+    editorPage.open = false;
+};
+
+const saveContent = (content: string) => {
+    SaveFileContent({ path: codeReq.path, content: content }).then(() => {
+        editorPage.open = false;
+    });
 };
 
 onMounted(() => {

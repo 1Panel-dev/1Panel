@@ -11,6 +11,7 @@ export default {
             reset: '重置',
             login: '登陆',
             conn: '连接',
+            login: '登录',
         },
         search: {
             timeStart: '开始时间',

@@ -7,7 +7,6 @@ import (
 	"io"
 	"io/fs"
 	"os"
-	"path"
 	"path/filepath"
 )
 
@@ -58,10 +57,6 @@ func (f FileOp) DeleteFile(dst string) error {
 }
 
 func (f FileOp) WriteFile(dst string, in io.Reader, mode fs.FileMode) error {
-	dir, _ := path.Split(dst)
-	if err := f.Fs.MkdirAll(dir, mode); err != nil {
-		return err
-	}
 	file, err := f.Fs.OpenFile(dst, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode)
 	if err != nil {
 		return err
