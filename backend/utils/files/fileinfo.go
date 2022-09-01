@@ -2,6 +2,7 @@ package files
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"os"
 	"path"
@@ -129,5 +130,15 @@ func (f *FileInfo) listChildren() error {
 }
 
 func (f *FileInfo) getContent() error {
-	return nil
+	if f.Size <= 10*1024*1024 {
+		afs := &afero.Afero{Fs: f.Fs}
+		cByte, err := afs.ReadFile(f.Path)
+		if err != nil {
+			return nil
+		}
+		f.Content = string(cByte)
+		return nil
+	} else {
+		return errors.New("file is too large!")
+	}
 }

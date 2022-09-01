@@ -47,3 +47,8 @@ type FileDeCompress struct {
 	Type string
 	Path string
 }
+
+type FileEdit struct {
+	Path    string
+	Content string
+}
