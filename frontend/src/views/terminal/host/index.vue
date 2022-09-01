@@ -2,16 +2,16 @@
     <el-row style="margin: 20px; margin-left: 20px" class="row-box" :gutter="20">
         <el-col :span="8">
             <el-card class="el-card">
-                <el-tooltip class="box-item" effect="dark" content="创建连接" placement="top-start">
+                <el-tooltip class="box-item" effect="dark" :content="$t('terminal.createConn')" placement="top-start">
                     <el-button icon="Plus" @click="restHostForm" size="small" />
                 </el-tooltip>
-                <el-tooltip class="box-item" effect="dark" content="创建分组" placement="top-start">
+                <el-tooltip class="box-item" effect="dark" :content="$t('terminal.createGroup')" placement="top-start">
                     <el-button icon="FolderAdd" @click="onGroupCreate" size="small" />
                 </el-tooltip>
-                <el-tooltip class="box-item" effect="dark" content="展开" placement="top-start">
+                <el-tooltip class="box-item" effect="dark" :content="$t('terminal.expand')" placement="top-start">
                     <el-button icon="Expand" @click="setTreeStatus(true)" size="small" />
                 </el-tooltip>
-                <el-tooltip class="box-item" effect="dark" content="收缩" placement="top-start">
+                <el-tooltip class="box-item" effect="dark" :content="$t('terminal.fold')" placement="top-start">
                     <el-button icon="Fold" @click="setTreeStatus(false)" size="small" />
                 </el-tooltip>
                 <el-input
@@ -69,7 +69,7 @@
                         <el-input clearable v-model="hostInfo.name" />
                     </el-form-item>
                     <el-form-item :label="$t('commons.table.group')" prop="groupBelong">
-                        <el-select v-model="hostInfo.groupBelong" clearable style="width: 100%">
+                        <el-select filterable v-model="hostInfo.groupBelong" clearable style="width: 100%">
                             <el-option v-for="item in groupList" :key="item.id" :label="item.name" :value="item.name" />
                         </el-select>
                     </el-form-item>
@@ -105,10 +105,21 @@
                         <el-button @click="restHostForm">
                             {{ $t('commons.button.reset') }}
                         </el-button>
-                        <el-button v-if="hostOperation === 'create'" type="primary" @click="submitAddHost(hostInfoRef)">
+                        <el-button @click="submitAddHost(hostInfoRef, 'testconn')">
+                            {{ $t('terminal.testConn') }}
+                        </el-button>
+                        <el-button
+                            v-if="hostOperation === 'create'"
+                            type="primary"
+                            @click="submitAddHost(hostInfoRef, 'create')"
+                        >
                             {{ $t('commons.button.create') }}
                         </el-button>
-                        <el-button v-if="hostOperation === 'edit'" type="primary" @click="submitAddHost(hostInfoRef)">
+                        <el-button
+                            v-if="hostOperation === 'edit'"
+                            type="primary"
+                            @click="submitAddHost(hostInfoRef, 'edit')"
+                        >
                             {{ $t('commons.button.confirm') }}
                         </el-button>
                     </el-form-item>
@@ -124,7 +135,7 @@ import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rues';
 import { Host } from '@/api/interface/host';
 import { Group } from '@/api/interface/group';
-import { getHostList, getHostInfo, addHost, editHost, deleteHost } from '@/api/modules/host';
+import { testConn, getHostList, getHostInfo, addHost, editHost, deleteHost } from '@/api/modules/host';
 import { getGroupList, addGroup, editGroup, deleteGroup } from '@/api/modules/group';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElMessage } from 'element-plus';
@@ -203,18 +214,29 @@ function restHostForm() {
     }
 }
 
-const submitAddHost = (formEl: FormInstance | undefined) => {
+const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (hostOperation.value === 'create') {
-            await addHost(hostInfo);
-        } else {
-            await editHost(hostInfo);
+        console.log(ops);
+        switch (ops) {
+            case 'create':
+                await addHost(hostInfo);
+                restHostForm();
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                loadHostTree();
+                break;
+            case 'edit':
+                await editHost(hostInfo);
+                restHostForm();
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                loadHostTree();
+                break;
+            case 'testconn':
+                await testConn(hostInfo);
+                ElMessage.success(i18n.global.t('terminal.connTestOk'));
+                break;
         }
-        restHostForm();
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        loadHostTree();
     });
 };
 
@@ -224,7 +246,6 @@ const onGroupCreate = () => {
     groupOperation.value = 'create';
 };
 const onCreateGroup = async () => {
-    console.log(groupOperation.value);
     if (groupOperation.value === 'create') {
         let group = { id: 0, name: groupInputValue.value, type: 'host' };
         await addGroup(group);
@@ -246,7 +267,7 @@ const onDelete = async (node: Node, data: Tree) => {
         return;
     }
     if (node.level === 1) {
-        await useDeleteData(deleteGroup, data.id - 10000, '移除组后，组内所有连接将迁移到 default 组内，是否确认？');
+        await useDeleteData(deleteGroup, data.id - 10000, i18n.global.t('terminal.groupDeleteHelper'));
         loadGroups();
     } else {
         await useDeleteData(deleteHost, data.id, 'commons.msg.delete');
@@ -259,13 +280,11 @@ const onEdit = async (node: Node, data: Tree) => {
     if (node.level === 1 && data.label === 'default') {
         return;
     }
-    console.log(node.level === 1);
     if (node.level === 1) {
         groupInputShow.value = true;
         groupInputValue.value = data.label;
         currentGroupID.value = data.id - 10000;
         groupOperation.value = 'edit';
-        console.log(groupOperation.value);
         return;
     } else {
         const res = await getHostInfo(data.id);

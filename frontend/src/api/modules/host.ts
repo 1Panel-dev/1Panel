@@ -13,6 +13,10 @@ export const addHost = (params: Host.HostOperate) => {
     return http.post<Host.HostOperate>(`/hosts`, params);
 };
 
+export const testConn = (params: Host.HostOperate) => {
+    return http.post<Host.HostOperate>(`/hosts/testconn`, params);
+};
+
 export const editHost = (params: Host.HostOperate) => {
     console.log(params.id);
     return http.put(`/hosts/` + params.id, params);

@@ -51,7 +51,7 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 	defer wsConn.Close()
 
 	client, err := connInfo.NewClient()
-	if wshandleError(wsConn, errors.WithMessage(err, "  Failed to set up the connection. Please check the host information")) {
+	if wshandleError(wsConn, errors.WithMessage(err, "failed to set up the connection. Please check the host information")) {
 		return
 	}
 	defer client.Close()

@@ -16,8 +16,9 @@ func (s *HostRouter) InitHostRouter(Router *gin.RouterGroup) {
 	{
 		withRecordRouter.POST("", baseApi.CreateHost)
 		withRecordRouter.DELETE(":id", baseApi.DeleteHost)
+		withRecordRouter.PUT(":id", baseApi.UpdateHost)
 		hostRouter.POST("/search", baseApi.HostTree)
+		hostRouter.POST("/testconn", baseApi.TestConn)
 		hostRouter.GET(":id", baseApi.GetHostInfo)
-		hostRouter.PUT(":id", baseApi.UpdateHost)
 	}
 }

@@ -9,7 +9,7 @@ import (
 )
 
 func (b *BaseApi) CreateCommand(c *gin.Context) {
-	var req dto.CommandCreate
+	var req dto.CommandOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -45,7 +45,7 @@ func (b *BaseApi) SearchCommand(c *gin.Context) {
 }
 
 func (b *BaseApi) ListCommand(c *gin.Context) {
-	list, err := commandService.Search()
+	list, err := commandService.List()
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -55,7 +55,7 @@ func (b *BaseApi) ListCommand(c *gin.Context) {
 }
 
 func (b *BaseApi) DeleteCommand(c *gin.Context) {
-	var req dto.DeleteByName
+	var req dto.BatchDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -65,7 +65,7 @@ func (b *BaseApi) DeleteCommand(c *gin.Context) {
 		return
 	}
 
-	if err := commandService.Delete(req.Name); err != nil {
+	if err := commandService.Delete(req.Ids); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -73,7 +73,7 @@ func (b *BaseApi) DeleteCommand(c *gin.Context) {
 }
 
 func (b *BaseApi) UpdateCommand(c *gin.Context) {
-	var req dto.CommandUpdate
+	var req dto.CommandOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -90,6 +90,7 @@ func (b *BaseApi) UpdateCommand(c *gin.Context) {
 
 	upMap := make(map[string]interface{})
 	upMap["name"] = req.Name
+	upMap["command"] = req.Command
 	if err := commandService.Update(id, upMap); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
