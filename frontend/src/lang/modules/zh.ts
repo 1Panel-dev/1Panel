@@ -7,7 +7,7 @@ export default {
             confirm: '确认',
             cancel: '取消',
             reset: '重置',
-            login: '登陆',
+            login: '登录',
         },
         table: {
             name: '名称',

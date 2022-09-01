@@ -8,8 +8,8 @@ import viteCompression from 'vite-plugin-compression';
 import VueSetupExtend from 'vite-plugin-vue-setup-extend';
 import eslintPlugin from 'vite-plugin-eslint';
 import vueJsx from '@vitejs/plugin-vue-jsx';
-
 import DefineOptions from 'unplugin-vue-define-options/vite';
+import MonacoEditorPlugin from 'vite-plugin-monaco-editor';
 
 // @see: https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
@@ -36,6 +36,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         server: {
             port: viteEnv.VITE_PORT,
             open: viteEnv.VITE_OPEN,
+            host: '0.0.0.0',
             // https: false,
             proxy: {
                 '/api/v1': {
@@ -64,6 +65,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             // * name 可以写在 script 标签上
             VueSetupExtend(),
 
+            MonacoEditorPlugin({}),
             viteEnv.VITE_REPORT && visualizer(),
             // * gzip compress
             viteEnv.VITE_BUILD_GZIP &&
