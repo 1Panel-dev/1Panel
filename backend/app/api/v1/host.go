@@ -6,6 +6,7 @@ import (
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
 	"github.com/1Panel-dev/1Panel/utils/copier"
+	"github.com/1Panel-dev/1Panel/utils/ssh"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,6 +26,32 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, host)
+}
+
+func (b *BaseApi) TestConn(c *gin.Context) {
+	var req dto.HostOperate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	var connInfo ssh.ConnInfo
+	if err := copier.Copy(&connInfo, &req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, constant.ErrStructTransform)
+		return
+	}
+	client, err := connInfo.NewClient()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	defer client.Close()
+
+	helper.SuccessWithData(c, nil)
 }
 
 func (b *BaseApi) HostTree(c *gin.Context) {
@@ -63,17 +90,13 @@ func (b *BaseApi) GetHostInfo(c *gin.Context) {
 }
 
 func (b *BaseApi) DeleteHost(c *gin.Context) {
-	var req dto.BatchDeleteReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
+	id, err := helper.GetParamID(c)
+	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 
-	if err := hostService.BatchDelete(req.Ids); err != nil {
+	if err := hostService.Delete(id); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

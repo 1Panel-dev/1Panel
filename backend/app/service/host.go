@@ -17,7 +17,7 @@ type IHostService interface {
 	SearchForTree(search dto.SearchForTree) ([]dto.HostTree, error)
 	Create(hostDto dto.HostOperate) (*dto.HostInfo, error)
 	Update(id uint, upMap map[string]interface{}) error
-	BatchDelete(ids []uint) error
+	Delete(id uint) error
 }
 
 func NewIHostService() IHostService {
@@ -75,14 +75,12 @@ func (u *HostService) Create(hostDto dto.HostOperate) (*dto.HostInfo, error) {
 	return &hostinfo, nil
 }
 
-func (u *HostService) BatchDelete(ids []uint) error {
-	if len(ids) == 1 {
-		host, _ := hostRepo.Get(commonRepo.WithByID(ids[0]))
-		if host.ID == 0 {
-			return constant.ErrRecordNotFound
-		}
+func (u *HostService) Delete(id uint) error {
+	host, _ := hostRepo.Get(commonRepo.WithByID(id))
+	if host.ID == 0 {
+		return constant.ErrRecordNotFound
 	}
-	return hostRepo.Delete(commonRepo.WithIdsIn(ids))
+	return hostRepo.Delete(commonRepo.WithByID(id))
 }
 
 func (u *HostService) Update(id uint, upMap map[string]interface{}) error {

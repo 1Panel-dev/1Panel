@@ -90,8 +90,16 @@ export default {
         logout: 'Logout',
     },
     terminal: {
-        connHistory: 'historys',
-        hostHistory: 'History record',
+        conn: 'connection',
+        testConn: 'Test connection',
+        connTestOk: 'Connection information available',
+        hostList: 'Host information',
+        createConn: 'Create a connection',
+        createGroup: 'Create a group',
+        expand: 'Expand all',
+        fold: 'All contract',
+        groupDeleteHelper:
+            'After the group is removed, all connections in the group will be migrated to the default group. Confirm the information',
         addHost: 'Add Host',
         localhost: 'Localhost',
         name: 'Name',
@@ -108,6 +116,8 @@ export default {
         detail: {
             users: 'User',
             hosts: 'Host',
+            groups: 'Group',
+            commands: 'Command',
             auth: 'User',
             login: ' login',
             logout: ' logout',

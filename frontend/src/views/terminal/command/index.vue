@@ -83,7 +83,6 @@ const submitAddCommand = (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        console.log(commandInfo.id);
         if (operate.value === 'create') {
             await addCommand(commandInfo);
         } else {
@@ -97,12 +96,11 @@ const submitAddCommand = (formEl: FormInstance | undefined) => {
 
 const onEdit = async (row: Command.CommandInfo | null) => {
     if (row !== null) {
-        console.log(row.id);
-        // commandInfo.id = row.id;
-        // commandInfo.name = row.name;
-        // commandInfo.command = row.command;
-        // operate.value = 'edit';
-        // cmdVisiable.value = true;
+        commandInfo.id = row.id;
+        commandInfo.name = row.name;
+        commandInfo.command = row.command;
+        operate.value = 'edit';
+        cmdVisiable.value = true;
     }
 };
 
@@ -142,9 +140,6 @@ const search = async () => {
     commandSearch.pageSize = paginationConfig.pageSize;
     const res = await getCommandPage(commandSearch);
     data.value = res.data.items;
-    for (const d of data.value) {
-        d.id = d.id + '';
-    }
     paginationConfig.total = res.data.total;
 };
 

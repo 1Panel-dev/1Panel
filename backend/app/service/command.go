@@ -11,18 +11,18 @@ import (
 type CommandService struct{}
 
 type ICommandService interface {
-	Search() ([]model.Command, error)
+	List() ([]model.Command, error)
 	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
-	Create(commandDto dto.CommandCreate) error
+	Create(commandDto dto.CommandOperate) error
 	Update(id uint, upMap map[string]interface{}) error
-	Delete(name string) error
+	Delete(ids []uint) error
 }
 
 func NewICommandService() ICommandService {
 	return &CommandService{}
 }
 
-func (u *CommandService) Search() ([]model.Command, error) {
+func (u *CommandService) List() ([]model.Command, error) {
 	commands, err := commandRepo.GetList()
 	if err != nil {
 		return nil, constant.ErrRecordNotFound
@@ -43,7 +43,7 @@ func (u *CommandService) SearchWithPage(search dto.SearchWithPage) (int64, inter
 	return total, dtoCommands, err
 }
 
-func (u *CommandService) Create(commandDto dto.CommandCreate) error {
+func (u *CommandService) Create(commandDto dto.CommandOperate) error {
 	command, _ := commandRepo.Get(commonRepo.WithByName(commandDto.Name))
 	if command.ID != 0 {
 		return constant.ErrRecordExist
@@ -57,12 +57,15 @@ func (u *CommandService) Create(commandDto dto.CommandCreate) error {
 	return nil
 }
 
-func (u *CommandService) Delete(name string) error {
-	command, _ := commandRepo.Get(commonRepo.WithByName(name))
-	if command.ID == 0 {
-		return constant.ErrRecordNotFound
+func (u *CommandService) Delete(ids []uint) error {
+	if len(ids) == 1 {
+		command, _ := commandRepo.Get(commonRepo.WithByID(ids[0]))
+		if command.ID == 0 {
+			return constant.ErrRecordNotFound
+		}
+		return commandRepo.Delete(commonRepo.WithByID(ids[0]))
 	}
-	return commandRepo.Delete(commonRepo.WithByID(command.ID))
+	return commandRepo.Delete(commonRepo.WithIdsIn(ids))
 }
 
 func (u *CommandService) Update(id uint, upMap map[string]interface{}) error {
