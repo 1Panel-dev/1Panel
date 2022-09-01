@@ -18,12 +18,21 @@ export const DeleteFile = (form: File.FileDelete) => {
 };
 
 export const ChangeFileMode = (form: File.FileCreate) => {
-    return http.post<File.FileCreate>('files/mode', form);
+    return http.post<File.File>('files/mode', form);
 };
 
 export const CompressFile = (form: File.FileCompress) => {
-    return http.post<File.FileCompress>('files/compress', form);
+    return http.post<File.File>('files/compress', form);
 };
+
 export const DeCompressFile = (form: File.FileDeCompress) => {
-    return http.post<File.FileCompress>('files/decompress', form);
+    return http.post<File.File>('files/decompress', form);
+};
+
+export const GetFileContent = (params: File.ReqFile) => {
+    return http.post<File.File>('files/content', params);
+};
+
+export const SaveFileContent = (params: File.FileEdit) => {
+    return http.post<File.File>('files/save', params);
 };
