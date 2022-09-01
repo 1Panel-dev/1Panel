@@ -59,4 +59,9 @@ export namespace File {
         dst: string;
         type: string;
     }
+
+    export interface FileEdit {
+        path: string;
+        content: string;
+    }
 }

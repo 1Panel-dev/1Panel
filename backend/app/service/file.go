@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/fs"
 	"path/filepath"
+	"strings"
 )
 
 type FileService struct {
@@ -90,6 +91,28 @@ func (f FileService) Compress(c dto.FileCompress) error {
 func (f FileService) DeCompress(c dto.FileDeCompress) error {
 	fo := files.NewFileOp()
 	return fo.Decompress(c.Path, c.Dst, files.CompressType(c.Type))
+}
+
+func (f FileService) GetContent(c dto.FileOption) (dto.FileInfo, error) {
+	info, err := files.NewFileInfo(c.FileOption)
+	if err != nil {
+		return dto.FileInfo{}, err
+	}
+	return dto.FileInfo{*info}, nil
+}
+
+func (f FileService) SaveContent(c dto.FileEdit) error {
+
+	info, err := files.NewFileInfo(files.FileOption{
+		Path:   c.Path,
+		Expand: false,
+	})
+	if err != nil {
+		return err
+	}
+
+	fo := files.NewFileOp()
+	return fo.WriteFile(c.Path, strings.NewReader(c.Content), info.FileMode)
 }
 
 func getUuid() string {

@@ -82,7 +82,7 @@ const getMode = (val: number) => {
 };
 
 let getPath = computed(() => {
-    if (addForm.path === '/') {
+    if (addForm.path.endsWith('/')) {
         return addForm.path + addForm.name;
     } else {
         return addForm.path + '/' + addForm.name;
