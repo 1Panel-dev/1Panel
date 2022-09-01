@@ -2,12 +2,10 @@ package model
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type OperationLog struct {
-	gorm.Model
+	BaseModel
 	Group  string `gorm:"type:varchar(64)" json:"group"`
 	Source string `gorm:"type:varchar(64)" json:"source"`
 	Action string `gorm:"type:varchar(64)" json:"action"`

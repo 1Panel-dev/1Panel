@@ -1,9 +1,7 @@
 package model
 
-import "gorm.io/gorm"
-
 type Host struct {
-	gorm.Model
+	BaseModel
 	GroupBelong string `gorm:"type:varchar(64);not null" json:"groupBelong"`
 	Name        string `gorm:"type:varchar(64);unique;not null" json:"name"`
 	Addr        string `gorm:"type:varchar(16);unique;not null" json:"addr"`

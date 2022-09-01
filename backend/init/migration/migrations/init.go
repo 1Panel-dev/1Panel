@@ -15,7 +15,7 @@ var InitTable = &gormigrate.Migration{
 }
 
 var user = model.User{
-	Name: "admin", Email: "admin@fit2cloud.com", Password: "Calong@2015",
+	Name: "admin", Email: "admin@fit2cloud.com", Password: "5WYEZ4XcitdomVvAyimt9WwJwBJJSbTTHncZoqyOraQ=",
 }
 
 var AddData = &gormigrate.Migration{
@@ -42,6 +42,12 @@ var AddTableHost = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.AutoMigrate(&model.Command{}); err != nil {
+			return err
+		}
+		group := model.Group{
+			Name: "default", Type: "host",
+		}
+		if err := tx.Create(&group).Error; err != nil {
 			return err
 		}
 		return nil
