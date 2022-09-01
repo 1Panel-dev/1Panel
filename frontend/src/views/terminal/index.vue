@@ -104,6 +104,7 @@
                 ></el-empty>
             </div>
         </el-tabs>
+        <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen"></el-button>
 
         <el-dialog v-model="connVisiable" :title="$t('terminal.addHost')" width="30%">
             <el-form ref="hostInfoRef" label-width="100px" label-position="left" :model="hostInfo" :rules="rules">
@@ -159,6 +160,8 @@ import { ElMessage } from 'element-plus';
 import Terminal from '@/views/terminal/terminal/index.vue';
 import type Node from 'element-plus/es/components/tree/src/model/node';
 import { ElTree } from 'element-plus';
+import screenfull from 'screenfull';
+
 let timer: NodeJS.Timer | null = null;
 
 const terminalValue = ref();
@@ -210,6 +213,12 @@ let hostInfo = reactive<Host.HostOperate>({
 });
 
 const ctx = getCurrentInstance() as any;
+
+function toggleFullscreen() {
+    if (screenfull.isEnabled) {
+        screenfull.toggle();
+    }
+}
 
 const handleTabsRemove = (targetName: string, action: 'remove' | 'add') => {
     if (action !== 'remove') {
@@ -353,8 +362,7 @@ function changeFrameHeight() {
 
 function syncTerminal() {
     for (const terminal of terminalTabs.value) {
-        if (ctx && ctx.refs[`Ref${terminal.key}`]) {
-            console.log(ctx.refs[`Ref${terminal.key}`][0]);
+        if (ctx && ctx.refs[`Ref${terminal.key}`][0]) {
             terminal.status = ctx.refs[`Ref${terminal.key}`][0].isWsOpen() ? 'online' : 'closed';
         }
     }
