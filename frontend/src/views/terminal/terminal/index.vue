@@ -73,7 +73,6 @@ const initTerm = () => {
     });
     if (ifm) {
         term.open(ifm);
-        term.write('\n');
         if (props.wsID === 0) {
             terminalSocket = new WebSocket(
                 `ws://localhost:9999/api/v1/terminals/local?cols=${term.cols}&rows=${term.rows}`,
@@ -129,6 +128,15 @@ function onClose() {
     term && term.dispose();
 }
 
+function onSendMsg(command: string) {
+    terminalSocket.send(
+        JSON.stringify({
+            type: 'cmd',
+            cmd: Base64.encode(command),
+        }),
+    );
+}
+
 function changeTerminalSize() {
     fitTerm();
     const { cols, rows } = term;
@@ -146,6 +154,7 @@ function changeTerminalSize() {
 defineExpose({
     onClose,
     isWsOpen,
+    onSendMsg,
 });
 
 onMounted(() => {
