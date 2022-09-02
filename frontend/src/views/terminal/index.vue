@@ -1,110 +1,135 @@
 <template>
     <div>
-        <el-tabs
-            type="card"
-            class="terminal-tabs"
-            style="background-color: #efefef"
-            v-model="terminalValue"
-            :before-leave="beforeLeave"
-            @edit="handleTabsRemove"
-        >
-            <el-tab-pane
-                :key="item.key"
-                v-for="item in terminalTabs"
-                :closable="true"
-                :label="item.title"
-                :name="item.key"
-            >
+        <el-tabs tab-position="left" @tab-click="handleClick" v-model="routeTab" class="demo-tabs">
+            <el-tab-pane name="terminal">
                 <template #label>
-                    <span class="custom-tabs-label">
-                        <el-icon style="margin-top: 1px" color="#67C23A" v-if="item.status === 'online'">
-                            <circleCheck />
-                        </el-icon>
-                        <el-icon style="margin-top: 1px" color="#F56C6C" v-if="item.status === 'closed'">
-                            <circleClose />
-                        </el-icon>
-                        <span> &nbsp;{{ item.title }}&nbsp;&nbsp;</span>
-                    </span>
+                    <el-tooltip class="box-item" effect="dark" :content="$t('terminal.conn')" placement="right">
+                        <el-icon><Connection /></el-icon>
+                    </el-tooltip>
                 </template>
-                <Terminal
-                    style="height: calc(100vh - 210px); background-color: #000"
-                    :ref="'Ref' + item.key"
-                    :wsID="item.wsID"
-                    :terminalID="item.key"
-                ></Terminal>
-                <div>
-                    <el-select
-                        v-model="quickCmd"
-                        clearable
-                        filterable
-                        @change="quickInput"
-                        style="width: 25%"
-                        :placeholder="$t('terminal.quickCommand')"
-                        size="small"
+                <el-tabs
+                    type="card"
+                    class="terminal-tabs"
+                    style="background-color: #efefef"
+                    v-model="terminalValue"
+                    :before-leave="beforeLeave"
+                    @edit="handleTabsRemove"
+                >
+                    <el-tab-pane
+                        :key="item.key"
+                        v-for="item in terminalTabs"
+                        :closable="true"
+                        :label="item.title"
+                        :name="item.key"
                     >
-                        <el-option
-                            v-for="cmd in commandList"
-                            :key="cmd.id"
-                            :label="cmd.name + ' [ ' + cmd.command + ' ] '"
-                            :value="cmd.command"
-                        />
-                    </el-select>
-                    <el-input
-                        :placeholder="$t('terminal.batchInput')"
-                        v-model="batchVal"
-                        @keyup.enter="batchInput"
-                        style="width: 75%"
-                        size="small"
-                    >
-                        <template #append>
-                            <el-switch size="small" v-model="isBatch" class="ml-2" />
+                        <template #label>
+                            <span class="custom-tabs-label">
+                                <el-icon style="margin-top: 1px" color="#67C23A" v-if="item.status === 'online'">
+                                    <circleCheck />
+                                </el-icon>
+                                <el-icon style="margin-top: 1px" color="#F56C6C" v-if="item.status === 'closed'">
+                                    <circleClose />
+                                </el-icon>
+                                <span> &nbsp;{{ item.title }}&nbsp;&nbsp;</span>
+                            </span>
                         </template>
-                    </el-input>
-                </div>
+                        <Terminal
+                            style="height: calc(100vh - 210px); background-color: #000"
+                            :ref="'Ref' + item.key"
+                            :wsID="item.wsID"
+                            :terminalID="item.key"
+                        ></Terminal>
+                        <div>
+                            <el-select
+                                v-model="quickCmd"
+                                clearable
+                                filterable
+                                @change="quickInput"
+                                style="width: 25%"
+                                :placeholder="$t('terminal.quickCommand')"
+                                size="small"
+                            >
+                                <el-option
+                                    v-for="cmd in commandList"
+                                    :key="cmd.id"
+                                    :label="cmd.name + ' [ ' + cmd.command + ' ] '"
+                                    :value="cmd.command"
+                                />
+                            </el-select>
+                            <el-input
+                                :placeholder="$t('terminal.batchInput')"
+                                v-model="batchVal"
+                                @keyup.enter="batchInput"
+                                style="width: 75%"
+                                size="small"
+                            >
+                                <template #append>
+                                    <el-switch size="small" v-model="isBatch" class="ml-2" />
+                                </template>
+                            </el-input>
+                        </div>
+                    </el-tab-pane>
+                    <el-tab-pane :closable="false" name="newTabs">
+                        <template #label>
+                            <el-button
+                                v-popover="popoverRef"
+                                style="background-color: #ededed; border: 0"
+                                icon="Plus"
+                            ></el-button>
+                            <el-popover ref="popoverRef" width="250px" trigger="hover" virtual-triggering persistent>
+                                <el-button-group style="width: 100%">
+                                    <el-button @click="onNewSsh">New ssh</el-button>
+                                    <el-button @click="onNewTab">New tab</el-button>
+                                </el-button-group>
+                                <el-input size="small" clearable style="margin-top: 5px" v-model="hostfilterInfo">
+                                    <template #append><el-button icon="search" /></template>
+                                </el-input>
+                                <el-tree
+                                    ref="treeRef"
+                                    :expand-on-click-node="false"
+                                    node-key="id"
+                                    :default-expand-all="true"
+                                    :data="hostTree"
+                                    :props="defaultProps"
+                                    :filter-node-method="filterHost"
+                                >
+                                    <template #default="{ node, data }">
+                                        <span class="custom-tree-node">
+                                            <span>
+                                                <a @click="onConn(node, data)">{{ node.label }}</a>
+                                            </span>
+                                        </span>
+                                    </template>
+                                </el-tree>
+                            </el-popover>
+                        </template>
+                    </el-tab-pane>
+                    <div v-if="terminalTabs.length === 0">
+                        <el-empty
+                            style="background-color: #000; height: calc(100vh - 210px)"
+                            :description="$t('terminal.emptyTerminal')"
+                        ></el-empty>
+                    </div>
+                </el-tabs>
+                <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen"></el-button>
             </el-tab-pane>
-            <el-tab-pane :closable="false" name="newTabs">
+            <el-tab-pane name="host">
                 <template #label>
-                    <el-button
-                        v-popover="popoverRef"
-                        style="background-color: #ededed; border: 0"
-                        icon="Plus"
-                    ></el-button>
-                    <el-popover ref="popoverRef" width="250px" trigger="hover" virtual-triggering persistent>
-                        <el-button-group style="width: 100%">
-                            <el-button @click="onNewSsh">New ssh</el-button>
-                            <el-button @click="onNewTab">New tab</el-button>
-                        </el-button-group>
-                        <el-input size="small" clearable style="margin-top: 5px" v-model="hostfilterInfo">
-                            <template #append><el-button icon="search" /></template>
-                        </el-input>
-                        <el-tree
-                            ref="treeRef"
-                            :expand-on-click-node="false"
-                            node-key="id"
-                            :default-expand-all="true"
-                            :data="hostTree"
-                            :props="defaultProps"
-                            :filter-node-method="filterHost"
-                        >
-                            <template #default="{ node, data }">
-                                <span class="custom-tree-node">
-                                    <span>
-                                        <a @click="onConn(node, data)">{{ node.label }}</a>
-                                    </span>
-                                </span>
-                            </template>
-                        </el-tree>
-                    </el-popover>
+                    <el-tooltip class="box-item" effect="dark" :content="$t('terminal.hostList')" placement="right">
+                        <el-icon><Platform /></el-icon>
+                    </el-tooltip>
                 </template>
+                <HostTab ref="hostTabRef" />
             </el-tab-pane>
-            <div v-if="terminalTabs.length === 0">
-                <el-empty
-                    style="background-color: #000; height: calc(100vh - 210px)"
-                    :description="$t('terminal.emptyTerminal')"
-                ></el-empty>
-            </div>
+            <el-tab-pane name="command">
+                <template #label>
+                    <el-tooltip class="box-item" effect="dark" :content="$t('terminal.quickCmd')" placement="right">
+                        <el-icon><Reading /></el-icon>
+                    </el-tooltip>
+                </template>
+                <CommandTab ref="commandTabRef" />
+            </el-tab-pane>
         </el-tabs>
-        <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen"></el-button>
 
         <el-dialog v-model="connVisiable" :title="$t('terminal.addHost')" width="30%">
             <el-form ref="hostInfoRef" label-width="100px" label-position="left" :model="hostInfo" :rules="rules">
@@ -154,15 +179,21 @@ import { Rules } from '@/global/form-rues';
 import { testConn, getHostTree, addHost } from '@/api/modules/host';
 import { getCommandList } from '@/api/modules/command';
 import i18n from '@/lang';
-import type { ElForm } from 'element-plus';
+import { ElForm } from 'element-plus';
 import { Host } from '@/api/interface/host';
 import { ElMessage } from 'element-plus';
 import Terminal from '@/views/terminal/terminal/index.vue';
+import HostTab from '@/views/terminal/host/index.vue';
+import CommandTab from '@/views/terminal/command/index.vue';
 import type Node from 'element-plus/es/components/tree/src/model/node';
 import { ElTree } from 'element-plus';
 import screenfull from 'screenfull';
 
 let timer: NodeJS.Timer | null = null;
+
+const routeTab = ref<string>('terminal');
+const hostTabRef = ref();
+const commandTabRef = ref();
 
 const terminalValue = ref();
 const terminalTabs = ref([]) as any;
@@ -219,6 +250,18 @@ function toggleFullscreen() {
         screenfull.toggle();
     }
 }
+const handleClick = (tab: any) => {
+    if (tab.paneName === 'host') {
+        if (ctx) {
+            ctx.refs[`hostTabRef`] && ctx.refs[`hostTabRef`].onInit();
+        }
+    }
+    if (tab.paneName === 'command') {
+        if (ctx) {
+            ctx.refs[`commandTabRef`] && ctx.refs[`commandTabRef`].onInit();
+        }
+    }
+};
 
 const handleTabsRemove = (targetName: string, action: 'remove' | 'add') => {
     if (action !== 'remove') {
@@ -417,7 +460,7 @@ onBeforeMount(() => {
 .fullScreen {
     position: absolute;
     right: 50px;
-    top: 85px;
+    top: 6px;
     font-weight: 600;
     font-size: 14px;
 }

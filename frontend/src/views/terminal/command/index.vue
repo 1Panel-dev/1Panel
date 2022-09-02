@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="margin: 20px; margin-left: 20px">
         <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
             <template #toolbar>
                 <el-button @click="onCreate()">{{ $t('commons.button.create') }}</el-button>
@@ -38,7 +38,7 @@
 import ComplexTable from '@/components/complex-table/index.vue';
 import { Command } from '@/api/interface/command';
 import { addCommand, editCommand, deleteCommand, getCommandPage } from '@/api/modules/command';
-import { onMounted, reactive, ref } from '@vue/runtime-core';
+import { reactive, ref } from '@vue/runtime-core';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rues';
@@ -143,7 +143,10 @@ const search = async () => {
     paginationConfig.total = res.data.total;
 };
 
-onMounted(() => {
+function onInit() {
     search();
+}
+defineExpose({
+    onInit,
 });
 </script>

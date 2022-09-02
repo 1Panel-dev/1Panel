@@ -67,7 +67,6 @@ export default {
         terminal: '终端管理',
         operations: '操作记录',
     },
-
     home: {
         welcome: '欢迎使用',
     },

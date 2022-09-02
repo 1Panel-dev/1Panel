@@ -1,5 +1,4 @@
 import { Layout } from '@/routers/constant';
-import i18n from '@/lang';
 
 const terminalRouter = {
     sort: 2,
@@ -7,7 +6,7 @@ const terminalRouter = {
     component: Layout,
     redirect: '/terminal',
     meta: {
-        title: i18n.global.t('menu.terminal'),
+        title: 'menu.terminal',
         icon: 'monitor',
     },
     children: [
@@ -18,32 +17,8 @@ const terminalRouter = {
             meta: {
                 requiresAuth: true,
                 key: 'Terminal',
-                title: i18n.global.t('terminal.conn'),
-                icon: 'connection',
-                activeMenu: '/terminals',
-            },
-        },
-        {
-            path: '/terminals/host',
-            name: 'Host',
-            component: () => import('@/views/terminal/host/index.vue'),
-            meta: {
-                requiresAuth: true,
-                key: 'Host',
-                title: i18n.global.t('terminal.hostList'),
-                icon: 'platform',
-                activeMenu: '/terminals',
-            },
-        },
-        {
-            path: '/terminals/command',
-            name: 'Command',
-            component: () => import('@/views/terminal/command/index.vue'),
-            meta: {
-                requiresAuth: true,
-                key: 'Command',
-                title: i18n.global.t('terminal.quickCmd'),
-                icon: 'reading',
+                title: 'terminal.conn',
+                icon: 'Connection',
                 activeMenu: '/terminals',
             },
         },
