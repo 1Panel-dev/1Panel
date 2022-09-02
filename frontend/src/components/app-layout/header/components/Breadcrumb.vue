@@ -3,7 +3,7 @@
         <transition-group name="breadcrumb" mode="out-in">
             <el-breadcrumb-item :to="{ path: HOME_URL }" key="/home">{{ $t('menu.home') }}</el-breadcrumb-item>
             <el-breadcrumb-item v-for="item in matched" :key="item.path" :to="{ path: item.path }">
-                {{ item.meta?.title }}
+                {{ $t(item.meta?.title as string) }}
             </el-breadcrumb-item>
         </transition-group>
     </el-breadcrumb>
