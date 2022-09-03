@@ -68,6 +68,15 @@ func SuccessWithData(ctx *gin.Context, data interface{}) {
 	ctx.Abort()
 }
 
+func SuccessWithMsg(ctx *gin.Context, msg string) {
+	res := dto.Response{
+		Code: constant.CodeSuccess,
+		Msg:  msg,
+	}
+	ctx.JSON(http.StatusOK, res)
+	ctx.Abort()
+}
+
 func GetParamID(c *gin.Context) (uint, error) {
 	idParam, ok := c.Params.Get("id")
 	if !ok {

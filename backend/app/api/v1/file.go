@@ -1,10 +1,13 @@
 package v1
 
 import (
+	"fmt"
 	"github.com/1Panel-dev/1Panel/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/constant"
+	"github.com/1Panel-dev/1Panel/global"
 	"github.com/gin-gonic/gin"
+	"path"
 )
 
 func (b *BaseApi) ListFiles(c *gin.Context) {
@@ -130,4 +133,24 @@ func (b *BaseApi) SaveContent(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) UploadFiles(c *gin.Context) {
+	form, err := c.MultipartForm()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	files := form.File["file"]
+	paths := form.Value["path"]
+	success := 0
+	for _, file := range files {
+		err := c.SaveUploadedFile(file, path.Join(paths[0], file.Filename))
+		if err != nil {
+			global.LOG.Errorf("upload [%s] file failed, err: %v", file.Filename, err)
+			continue
+		}
+		success++
+	}
+	helper.SuccessWithMsg(c, fmt.Sprintf("%d files upload success", success))
 }
