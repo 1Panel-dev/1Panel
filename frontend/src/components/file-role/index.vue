@@ -152,11 +152,6 @@ const changeMode = (val: String) => {
     getRoleNum(val[3], form.value.public);
 };
 
-// onMounted(() => {
-//     form.value.mode = mode.value;
-//     changeMode(form.value.mode);
-// });
-
 onUpdated(() => {
     form.value.mode = mode.value;
     changeMode(form.value.mode);
