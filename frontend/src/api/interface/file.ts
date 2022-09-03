@@ -64,4 +64,9 @@ export namespace File {
         path: string;
         content: string;
     }
+
+    export interface FileRename {
+        oldName: string;
+        newName: string;
+    }
 }

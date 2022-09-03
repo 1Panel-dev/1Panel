@@ -77,6 +77,10 @@ func (f FileOp) Chmod(dst string, mode fs.FileMode) error {
 	return f.Fs.Chmod(dst, mode)
 }
 
+func (f FileOp) Rename(oldName string, newName string) error {
+	return f.Fs.Rename(oldName, newName)
+}
+
 type CompressType string
 
 const (
