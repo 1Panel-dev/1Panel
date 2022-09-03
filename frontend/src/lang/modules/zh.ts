@@ -2,14 +2,12 @@ export default {
     commons: {
         button: {
             create: '新建',
-            create: '创建',
             add: '添加',
             delete: '删除',
             edit: '编辑',
             confirm: '确认',
             cancel: '取消',
             reset: '重置',
-            login: '登陆',
             conn: '连接',
             login: '登录',
         },
@@ -197,5 +195,6 @@ export default {
         softLink: '软链接',
         hardLink: '硬链接',
         linkPath: '链接路径',
+        selectFile: '选择文件',
     },
 };

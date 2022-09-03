@@ -65,9 +65,9 @@ const props = defineProps({
 });
 
 const rules = reactive<FormRules>({
-    type: [Rules.required],
-    dst: [Rules.required],
-    name: [Rules.required],
+    type: [Rules.requiredSelect],
+    dst: [Rules.requiredInput],
+    name: [Rules.requiredInput],
 });
 
 const { open, files, type, dst, name } = toRefs(props);

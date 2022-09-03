@@ -1,12 +1,22 @@
 <template>
-    <el-dialog v-model="open" :title="'code editor'" @opened="onOpen" :before-close="handleClose">
+    <el-dialog
+        v-model="open"
+        :title="$t('commons.button.edit')"
+        @opened="onOpen"
+        :before-close="handleClose"
+        destroy-on-close
+        width="70%"
+        draggable
+    >
         <div>
-            <div id="codeBox" style="height: 600px"></div>
+            <div v-loading="loading">
+                <div id="codeBox" style="height: 60vh"></div>
+            </div>
         </div>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="saveContent">{{ $t('commons.button.confirm') }}</el-button>
+                <el-button type="primary" @click="save()">{{ $t('commons.button.confirm') }}</el-button>
             </span>
         </template>
     </el-dialog>
@@ -31,6 +41,10 @@ const props = defineProps({
         type: String,
         default: '',
     },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 let data = reactive({
@@ -38,13 +52,21 @@ let data = reactive({
     language: '',
 });
 
-const em = defineEmits(['close', 'save']);
+const em = defineEmits(['close', 'qsave', 'save']);
 
 const handleClose = () => {
     if (editor) {
         editor.dispose();
     }
     em('close', false);
+};
+
+const save = () => {
+    em('save', data.content);
+};
+
+const saveNotClose = () => {
+    em('qsave', data.content);
 };
 
 const initEditor = () => {
@@ -67,10 +89,8 @@ const initEditor = () => {
             data.content = editor.getValue();
         }
     });
-};
 
-const saveContent = () => {
-    em('save', data.content);
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, saveNotClose);
 };
 
 const onOpen = () => {
