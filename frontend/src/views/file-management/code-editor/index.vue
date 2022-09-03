@@ -93,6 +93,10 @@ const initEditor = () => {
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, saveNotClose);
 };
 
+const saveContent = () => {
+    em('save', data.content);
+};
+
 const onOpen = () => {
     data.content = props.content;
     data.language = props.language;
