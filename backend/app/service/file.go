@@ -115,6 +115,11 @@ func (f FileService) SaveContent(c dto.FileEdit) error {
 	return fo.WriteFile(c.Path, strings.NewReader(c.Content), info.FileMode)
 }
 
+func (f FileService) ChangeName(c dto.FileRename) error {
+	fo := files.NewFileOp()
+	return fo.Rename(c.OldName, c.NewName)
+}
+
 func getUuid() string {
 	b := make([]byte, 16)
 	io.ReadFull(rand.Reader, b)

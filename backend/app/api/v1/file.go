@@ -154,3 +154,16 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 	}
 	helper.SuccessWithMsg(c, fmt.Sprintf("%d files upload success", success))
 }
+
+func (b *BaseApi) ChangeName(c *gin.Context) {
+	var req dto.FileRename
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := fileService.ChangeName(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}

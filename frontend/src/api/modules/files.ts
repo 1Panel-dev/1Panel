@@ -40,3 +40,7 @@ export const SaveFileContent = (params: File.FileEdit) => {
 export const UploadFileData = (params: FormData) => {
     return http.post<File.File>('files/upload', params);
 };
+
+export const RenameRile = (params: File.FileRename) => {
+    return http.post<File.File>('files/rename', params);
+};
