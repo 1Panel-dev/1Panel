@@ -71,10 +71,10 @@ const handleClose = () => {
 };
 
 const rules = reactive<FormRules>({
-    name: [Rules.required],
-    path: [Rules.required],
-    isSymlink: [Rules.required],
-    linkPath: [Rules.required],
+    name: [Rules.requiredInput],
+    path: [Rules.requiredInput],
+    isSymlink: [Rules.requiredInput],
+    linkPath: [Rules.requiredInput],
 });
 
 const getMode = (val: number) => {

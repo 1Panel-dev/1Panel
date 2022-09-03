@@ -60,7 +60,7 @@ const props = defineProps({
 });
 
 const rules = reactive<FormRules>({
-    dst: [Rules.required],
+    dst: [Rules.requiredInput],
 });
 
 const { open, dst, path, name, mimeType } = toRefs(props);

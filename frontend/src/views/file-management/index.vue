@@ -2,7 +2,7 @@
     <LayoutContent>
         <el-row :gutter="20">
             <el-col :span="5">
-                <el-scrollbar height="800px">
+                <el-scrollbar height="80vh">
                     <el-tree
                         :data="fileTree"
                         :props="defaultProps"
@@ -57,7 +57,7 @@
                                 </el-dropdown-menu>
                             </template>
                         </el-dropdown>
-                        <el-button type="primary" plain> {{ $t('file.upload') }}</el-button>
+                        <el-button type="primary" plain @click="openUpload"> {{ $t('file.upload') }}</el-button>
                         <el-button type="primary" plain> {{ $t('file.search') }}</el-button>
                         <el-button type="primary" plain> {{ $t('file.remoteFile') }}</el-button>
                         <!-- <el-button type="primary" plain> {{ $t('file.sync') }}</el-button>
@@ -85,6 +85,7 @@
                         prop="modTime"
                         :formatter="dateFromat"
                         min-width="100"
+                        show-overflow-tooltip
                     >
                     </el-table-column>
 
@@ -118,9 +119,12 @@
                 :open="editorPage.open"
                 :language="'json'"
                 :content="editorPage.content"
+                :loading="editorPage.loading"
                 @close="closeCodeEditor"
+                @qsave="quickSave"
                 @save="saveContent"
             ></CodeEditor>
+            <Upload :open="uploadPage.open" :path="uploadPage.path" @close="closeUpload"></Upload>
         </el-row>
     </LayoutContent>
 </template>
@@ -139,8 +143,10 @@ import CreateFile from './create/index.vue';
 import ChangeRole from './change-role/index.vue';
 import Compress from './compress/index.vue';
 import Decompress from './decompress/index.vue';
+import Upload from './upload/index.vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import CodeEditor from './code-editor/index.vue';
+import { ElMessage } from 'element-plus';
 
 let data = ref();
 let selects = ref<any>([]);
@@ -155,8 +161,9 @@ let filePage = reactive({ open: false, createForm: { path: '/', isDir: false, mo
 let modePage = reactive({ open: false, modeForm: { path: '/', isDir: false, mode: 0o755 } });
 let compressPage = reactive({ open: false, files: [''], name: '', dst: '' });
 let deCompressPage = reactive({ open: false, path: '', name: '', dst: '', mimeType: '' });
-let editorPage = reactive({ open: false, content: '' });
+let editorPage = reactive({ open: false, content: '', loading: false });
 let codeReq = reactive({ path: '', expand: false });
+const uploadPage = reactive({ open: false, path: '' });
 
 const defaultProps = {
     children: 'children',
@@ -321,9 +328,30 @@ const closeCodeEditor = () => {
     editorPage.open = false;
 };
 
+const openUpload = () => {
+    uploadPage.open = true;
+    uploadPage.path = req.path;
+};
+
+const closeUpload = () => {
+    uploadPage.open = false;
+    search(req);
+};
+
 const saveContent = (content: string) => {
-    SaveFileContent({ path: codeReq.path, content: content }).then(() => {
+    editorPage.loading = true;
+    SaveFileContent({ path: codeReq.path, content: content }).finally(() => {
+        editorPage.loading = false;
         editorPage.open = false;
+        ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+    });
+};
+
+const quickSave = (content: string) => {
+    editorPage.loading = true;
+    SaveFileContent({ path: codeReq.path, content: content }).finally(() => {
+        editorPage.loading = false;
+        ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
     });
 };
 

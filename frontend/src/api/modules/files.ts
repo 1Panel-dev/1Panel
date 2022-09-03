@@ -36,3 +36,7 @@ export const GetFileContent = (params: File.ReqFile) => {
 export const SaveFileContent = (params: File.FileEdit) => {
     return http.post<File.File>('files/save', params);
 };
+
+export const UploadFileData = (params: FormData) => {
+    return http.post<File.File>('files/upload', params);
+};
