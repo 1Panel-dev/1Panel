@@ -52,3 +52,8 @@ type FileEdit struct {
 	Path    string
 	Content string
 }
+
+type FileRename struct {
+	OldName string
+	NewName string
+}

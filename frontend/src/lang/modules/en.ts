@@ -39,6 +39,7 @@ export default {
             sureLogOut: 'Are you sure you want to log out?',
             createSuccess: 'Create Success',
             updateSuccess: 'Update Success',
+            uploadSuccess: 'Update Success',
         },
         login: {
             captchaHelper: 'Please enter the verification code',

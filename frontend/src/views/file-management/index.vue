@@ -124,6 +124,12 @@
                 @qsave="quickSave"
                 @save="saveContent"
             ></CodeEditor>
+            <FileRename
+                :open="renamePage.open"
+                :path="renamePage.path"
+                :oldName="renamePage.oldName"
+                @close="closeRename"
+            ></FileRename>
             <Upload :open="uploadPage.open" :path="uploadPage.path" @close="closeUpload"></Upload>
         </el-row>
     </LayoutContent>
@@ -144,6 +150,7 @@ import ChangeRole from './change-role/index.vue';
 import Compress from './compress/index.vue';
 import Decompress from './decompress/index.vue';
 import Upload from './upload/index.vue';
+import FileRename from './file-rename/index.vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import CodeEditor from './code-editor/index.vue';
 import { ElMessage } from 'element-plus';
@@ -157,13 +164,14 @@ let paths = ref<string[]>([]);
 let fileTree = ref<File.FileTree[]>([]);
 let expandKeys = ref<string[]>([]);
 
-let filePage = reactive({ open: false, createForm: { path: '/', isDir: false, mode: 0o755 } });
-let modePage = reactive({ open: false, modeForm: { path: '/', isDir: false, mode: 0o755 } });
-let compressPage = reactive({ open: false, files: [''], name: '', dst: '' });
-let deCompressPage = reactive({ open: false, path: '', name: '', dst: '', mimeType: '' });
-let editorPage = reactive({ open: false, content: '', loading: false });
-let codeReq = reactive({ path: '', expand: false });
+const filePage = reactive({ open: false, createForm: { path: '/', isDir: false, mode: 0o755 } });
+const modePage = reactive({ open: false, modeForm: { path: '/', isDir: false, mode: 0o755 } });
+const compressPage = reactive({ open: false, files: [''], name: '', dst: '' });
+const deCompressPage = reactive({ open: false, path: '', name: '', dst: '', mimeType: '' });
+const editorPage = reactive({ open: false, content: '', loading: false });
+const codeReq = reactive({ path: '', expand: false });
 const uploadPage = reactive({ open: false, path: '' });
+const renamePage = reactive({ open: false, path: '', oldName: '' });
 
 const defaultProps = {
     children: 'children',
@@ -338,6 +346,17 @@ const closeUpload = () => {
     search(req);
 };
 
+const openRename = (item: File.File) => {
+    renamePage.open = true;
+    renamePage.path = req.path;
+    renamePage.oldName = item.name;
+};
+
+const closeRename = () => {
+    renamePage.open = false;
+    search(req);
+};
+
 const saveContent = (content: string) => {
     editorPage.loading = true;
     SaveFileContent({ path: codeReq.path, content: content }).finally(() => {
@@ -380,6 +399,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('file.rename'),
+        click: openRename,
     },
     {
         label: i18n.global.t('commons.button.delete'),

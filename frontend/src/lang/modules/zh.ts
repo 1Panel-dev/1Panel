@@ -39,6 +39,7 @@ export default {
             sureLogOut: '您是否确认退出登录?',
             createSuccess: '新建成功',
             updateSuccess: '更新成功',
+            uploadSuccess: '上传成功',
         },
         login: {
             captchaHelper: '请输入验证码',
