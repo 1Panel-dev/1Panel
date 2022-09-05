@@ -5,6 +5,7 @@ import (
 	"github.com/1Panel-dev/1Panel/init/cache/badger_db"
 	"github.com/1Panel-dev/1Panel/init/session/psession"
 	"github.com/go-playground/validator/v10"
+	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -16,4 +17,6 @@ var (
 	VALID   *validator.Validate
 	SESSION *psession.PSession
 	CACHE   *badger_db.Cache
+
+	Corn *cron.Cron
 )

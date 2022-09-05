@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/cron"
 	"github.com/1Panel-dev/1Panel/init/cache"
 	"github.com/1Panel-dev/1Panel/init/session"
 	"github.com/1Panel-dev/1Panel/init/session/psession"
@@ -31,6 +32,7 @@ func Start() {
 	cache.Init()
 	session.Init()
 	gin.SetMode(global.CONF.System.Level)
+	cron.Run()
 
 	routers := router.Routers()
 	address := fmt.Sprintf(":%d", global.CONF.System.Port)

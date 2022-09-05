@@ -2,9 +2,10 @@ package badger_db
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/dgraph-io/badger/v3"
 	"github.com/pkg/errors"
-	"time"
 )
 
 type Cache struct {
@@ -53,7 +54,7 @@ func (c *Cache) Get(key string) ([]byte, error) {
 		}
 		err = item.Value(func(val []byte) error {
 			result = append([]byte{}, val...)
-			return nil
+			return err
 		})
 		return nil
 	})

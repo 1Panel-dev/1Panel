@@ -174,7 +174,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeMount, ref, watch, nextTick, reactive, getCurrentInstance } from 'vue';
+import { onMounted, onBeforeMount, ref, watch, reactive, getCurrentInstance } from 'vue';
 import { Rules } from '@/global/form-rues';
 import { testConn, getHostTree, addHost } from '@/api/modules/host';
 import { getCommandList } from '@/api/modules/command';
@@ -396,13 +396,6 @@ const onConnLocal = () => {
     terminalValue.value = `127.0.0.1-${tabIndex}`;
 };
 
-function changeFrameHeight() {
-    let ifm = document.getElementById('iframeTerminal') as HTMLInputElement | null;
-    if (ifm) {
-        ifm.style.height = document.documentElement.clientHeight - 300 + 'px';
-    }
-}
-
 function syncTerminal() {
     for (const terminal of terminalTabs.value) {
         if (ctx && ctx.refs[`Ref${terminal.key}`][0]) {
@@ -413,10 +406,6 @@ function syncTerminal() {
 
 onMounted(() => {
     onConnLocal();
-    nextTick(() => {
-        changeFrameHeight();
-        window.addEventListener('resize', changeFrameHeight);
-    });
     loadHost();
     loadCommand();
     timer = setInterval(() => {

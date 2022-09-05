@@ -65,6 +65,7 @@ export default {
         home: '概览',
         demo: '样例',
         terminal: '终端管理',
+        monitor: '监控',
         operations: '操作记录',
     },
     home: {

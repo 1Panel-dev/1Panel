@@ -64,6 +64,7 @@ export default {
     menu: {
         home: 'Dashboard',
         demo: 'Demo',
+        monitor: 'Monitor',
         terminal: 'Terminal',
         operations: 'Operation logs',
     },

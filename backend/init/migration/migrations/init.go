@@ -53,3 +53,10 @@ var AddTableHost = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddTablemonitor = &gormigrate.Migration{
+	ID: "20200905-add-table-monitor",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.MonitorBase{}, &model.MonitorIO{}, &model.MonitorNetwork{})
+	},
+}
