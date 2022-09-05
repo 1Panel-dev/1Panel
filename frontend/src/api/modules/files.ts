@@ -44,3 +44,7 @@ export const UploadFileData = (params: FormData) => {
 export const RenameRile = (params: File.FileRename) => {
     return http.post<File.File>('files/rename', params);
 };
+
+export const DownloadFile = (params: File.FileDownload) => {
+    return http.post<File.File>('files/download', params);
+};

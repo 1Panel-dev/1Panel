@@ -120,6 +120,11 @@ func (f FileService) ChangeName(c dto.FileRename) error {
 	return fo.Rename(c.OldName, c.NewName)
 }
 
+func (f FileService) Download(c dto.FileDownload) error {
+	fo := files.NewFileOp()
+	return fo.DownloadFile(c.Url, filepath.Join(c.Path, c.Name))
+}
+
 func getUuid() string {
 	b := make([]byte, 16)
 	io.ReadFull(rand.Reader, b)
