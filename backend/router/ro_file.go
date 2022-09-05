@@ -26,6 +26,7 @@ func (f *FileRouter) InitFileRouter(Router *gin.RouterGroup) {
 		fileRouter.POST("/save", baseApi.SaveContent)
 		fileRouter.POST("/upload", baseApi.UploadFiles)
 		fileRouter.POST("/rename", baseApi.ChangeName)
+		fileRouter.POST("/download", baseApi.Download)
 	}
 
 }

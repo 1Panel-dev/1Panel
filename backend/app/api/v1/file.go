@@ -167,3 +167,16 @@ func (b *BaseApi) ChangeName(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, nil)
 }
+
+func (b *BaseApi) Download(c *gin.Context) {
+	var req dto.FileDownload
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := fileService.Download(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}

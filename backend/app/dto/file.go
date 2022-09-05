@@ -57,3 +57,9 @@ type FileRename struct {
 	OldName string
 	NewName string
 }
+
+type FileDownload struct {
+	Url  string `json:"url" validate:"required"`
+	Path string `json:"path" validate:"required"`
+	Name string `json:"name" validate:"required"`
+}

@@ -58,8 +58,8 @@
                             </template>
                         </el-dropdown>
                         <el-button type="primary" plain @click="openUpload"> {{ $t('file.upload') }}</el-button>
-                        <el-button type="primary" plain> {{ $t('file.search') }}</el-button>
-                        <el-button type="primary" plain> {{ $t('file.remoteFile') }}</el-button>
+                        <!-- <el-button type="primary" plain> {{ $t('file.search') }}</el-button> -->
+                        <el-button type="primary" plain @click="openDownload"> {{ $t('file.remoteFile') }}</el-button>
                         <!-- <el-button type="primary" plain> {{ $t('file.sync') }}</el-button>
                         <el-button type="primary" plain> {{ $t('file.terminal') }}</el-button>
                         <el-button type="primary" plain> {{ $t('file.shareList') }}</el-button> -->
@@ -131,6 +131,7 @@
                 @close="closeRename"
             ></FileRename>
             <Upload :open="uploadPage.open" :path="uploadPage.path" @close="closeUpload"></Upload>
+            <FileDown :open="downloadPage.open" :path="downloadPage.path" @close="closeDownload"></FileDown>
         </el-row>
     </LayoutContent>
 </template>
@@ -154,6 +155,7 @@ import FileRename from './file-rename/index.vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import CodeEditor from './code-editor/index.vue';
 import { ElMessage } from 'element-plus';
+import FileDown from './file-down/index.vue';
 
 let data = ref();
 let selects = ref<any>([]);
@@ -172,6 +174,7 @@ const editorPage = reactive({ open: false, content: '', loading: false });
 const codeReq = reactive({ path: '', expand: false });
 const uploadPage = reactive({ open: false, path: '' });
 const renamePage = reactive({ open: false, path: '', oldName: '' });
+const downloadPage = reactive({ open: false, path: '' });
 
 const defaultProps = {
     children: 'children',
@@ -343,6 +346,16 @@ const openUpload = () => {
 
 const closeUpload = () => {
     uploadPage.open = false;
+    search(req);
+};
+
+const openDownload = () => {
+    downloadPage.open = true;
+    downloadPage.path = req.path;
+};
+
+const closeDownload = () => {
+    downloadPage.open = false;
     search(req);
 };
 
