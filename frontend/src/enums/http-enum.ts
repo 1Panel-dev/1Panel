@@ -3,7 +3,7 @@ export enum ResultEnum {
     ERROR = 500,
     OVERDUE = 401,
     FORBIDDEN = 403,
-    TIMEOUT = 10000,
+    TIMEOUT = 100000,
     TYPE = 'success',
 }
 

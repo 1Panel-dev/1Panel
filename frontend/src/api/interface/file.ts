@@ -69,4 +69,10 @@ export namespace File {
         oldName: string;
         newName: string;
     }
+
+    export interface FileDownload {
+        path: string;
+        name: string;
+        url: string;
+    }
 }
