@@ -197,5 +197,8 @@ export default {
         hardLink: '硬链接',
         linkPath: '链接路径',
         selectFile: '选择文件',
+        downloadSuccess: '下载成功',
+        downloadUrl: '下载地址',
+        downloadStart: '下载开始!',
     },
 };

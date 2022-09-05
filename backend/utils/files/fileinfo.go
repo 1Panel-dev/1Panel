@@ -64,6 +64,9 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 	if file.IsSymlink {
 		file.LinkPath = GetSymlink(op.Path)
 	}
+	if op.Search != "" {
+
+	}
 	if op.Expand {
 		if file.IsDir {
 			if err := file.listChildren(); err != nil {
