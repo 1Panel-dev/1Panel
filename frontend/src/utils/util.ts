@@ -48,3 +48,14 @@ export function dateFromat(row: number, col: number, dataStr: any) {
     second = second < 10 ? `0${String(second)}` : second;
     return `${String(y)}-${String(m)}-${String(d)}   ${String(h)}:${String(minute)}:${String(second)}`;
 }
+
+export function getRandomStr(e: number): string {
+    const t = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+    const a = t.length;
+    let n = '';
+
+    for (let i = 0; i < e; i++) {
+        n += t.charAt(Math.floor(Math.random() * a));
+    }
+    return n;
+}
