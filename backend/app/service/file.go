@@ -9,8 +9,10 @@ import (
 	"github.com/pkg/errors"
 	"io"
 	"io/fs"
+	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 type FileService struct {
@@ -94,18 +96,18 @@ func (f FileService) DeCompress(c dto.FileDeCompress) error {
 	return fo.Decompress(c.Path, c.Dst, files.CompressType(c.Type))
 }
 
-func (f FileService) GetContent(c dto.FileOption) (dto.FileInfo, error) {
-	info, err := files.NewFileInfo(c.FileOption)
+func (f FileService) GetContent(op dto.FileOption) (dto.FileInfo, error) {
+	info, err := files.NewFileInfo(op.FileOption)
 	if err != nil {
 		return dto.FileInfo{}, err
 	}
 	return dto.FileInfo{*info}, nil
 }
 
-func (f FileService) SaveContent(c dto.FileEdit) error {
+func (f FileService) SaveContent(edit dto.FileEdit) error {
 
 	info, err := files.NewFileInfo(files.FileOption{
-		Path:   c.Path,
+		Path:   edit.Path,
 		Expand: false,
 	})
 	if err != nil {
@@ -113,30 +115,30 @@ func (f FileService) SaveContent(c dto.FileEdit) error {
 	}
 
 	fo := files.NewFileOp()
-	return fo.WriteFile(c.Path, strings.NewReader(c.Content), info.FileMode)
+	return fo.WriteFile(edit.Path, strings.NewReader(edit.Content), info.FileMode)
 }
 
-func (f FileService) ChangeName(c dto.FileRename) error {
+func (f FileService) ChangeName(re dto.FileRename) error {
 	fo := files.NewFileOp()
-	return fo.Rename(c.OldName, c.NewName)
+	return fo.Rename(re.OldName, re.NewName)
 }
 
-func (f FileService) Download(c dto.FileDownload) error {
+func (f FileService) Wget(w dto.FileWget) error {
 	fo := files.NewFileOp()
-	return fo.DownloadFile(c.Url, filepath.Join(c.Path, c.Name))
+	return fo.DownloadFile(w.Url, filepath.Join(w.Path, w.Name))
 }
 
-func (f FileService) MvFile(c dto.FileMove) error {
+func (f FileService) MvFile(m dto.FileMove) error {
 	fo := files.NewFileOp()
-	if c.Type == "cut" {
-		return fo.Cut(c.OldPaths, c.NewPath)
+	if m.Type == "cut" {
+		return fo.Cut(m.OldPaths, m.NewPath)
 	}
 	var errs []error
-	if c.Type == "copy" {
-		for _, src := range c.OldPaths {
-			if err := fo.Copy(src, c.NewPath); err != nil {
+	if m.Type == "copy" {
+		for _, src := range m.OldPaths {
+			if err := fo.Copy(src, m.NewPath); err != nil {
 				errs = append(errs, err)
-				global.LOG.Errorf("copy file [%s] to [%s] failed, err: %s", src, c.NewPath, err.Error())
+				global.LOG.Errorf("copy file [%s] to [%s] failed, err: %s", src, m.NewPath, err.Error())
 			}
 		}
 	}
@@ -150,6 +152,19 @@ func (f FileService) MvFile(c dto.FileMove) error {
 	}
 
 	return nil
+}
+
+func (f FileService) FileDownload(d dto.FileDownload) (string, error) {
+	tempPath := filepath.Join(os.TempDir(), fmt.Sprintf("%d", time.Now().UnixNano()))
+	if err := os.MkdirAll(tempPath, os.ModePerm); err != nil {
+		return "", err
+	}
+	fo := files.NewFileOp()
+	if err := fo.Compress(d.Paths, tempPath, d.Name, files.CompressType(d.Type)); err != nil {
+		return "", err
+	}
+	filePath := filepath.Join(tempPath, d.Name)
+	return filePath, nil
 }
 
 func getUuid() string {
