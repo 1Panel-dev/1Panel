@@ -87,6 +87,9 @@ const extension = computed(() => {
 });
 
 const handleClose = () => {
+    if (fileForm.value) {
+        fileForm.value.resetFields();
+    }
     em('close', open);
 };
 

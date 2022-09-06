@@ -4,11 +4,13 @@ import (
 	"context"
 	"github.com/1Panel-dev/1Panel/global"
 	"github.com/mholt/archiver/v4"
+	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 	"io"
 	"io/fs"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 )
 
@@ -113,6 +115,112 @@ func (f FileOp) Cut(oldPaths []string, dst string) error {
 			return err
 		}
 	}
+	return nil
+}
+
+func (f FileOp) Copy(src, dst string) error {
+	if src = path.Clean("/" + src); src == "" {
+		return os.ErrNotExist
+	}
+
+	if dst = path.Clean("/" + dst); dst == "" {
+		return os.ErrNotExist
+	}
+
+	if src == "/" || dst == "/" {
+		return os.ErrInvalid
+	}
+
+	if dst == src {
+		return os.ErrInvalid
+	}
+
+	info, err := f.Fs.Stat(src)
+	if err != nil {
+		return err
+	}
+	if info.IsDir() {
+		return f.CopyDir(src, dst)
+	}
+
+	return f.CopyFile(src, dst)
+}
+
+func (f FileOp) CopyDir(src, dst string) error {
+	srcInfo, err := f.Fs.Stat(src)
+	if err != nil {
+		return err
+	}
+	dstDir := filepath.Join(dst, srcInfo.Name())
+	if err := f.Fs.MkdirAll(dstDir, srcInfo.Mode()); err != nil {
+		return err
+	}
+
+	dir, _ := f.Fs.Open(src)
+	obs, err := dir.Readdir(-1)
+	if err != nil {
+		return err
+	}
+	var errs []error
+
+	for _, obj := range obs {
+		fSrc := filepath.Join(src, obj.Name())
+		fDst := filepath.Join(dstDir, obj.Name())
+
+		if obj.IsDir() {
+			err = f.CopyDir(fSrc, fDst)
+			if err != nil {
+				errs = append(errs, err)
+			}
+		} else {
+			err = f.CopyFile(fSrc, fDst)
+			if err != nil {
+				errs = append(errs, err)
+			}
+		}
+	}
+
+	var errString string
+	for _, err := range errs {
+		errString += err.Error() + "\n"
+	}
+
+	if errString != "" {
+		return errors.New(errString)
+	}
+
+	return nil
+}
+
+func (f FileOp) CopyFile(src, dst string) error {
+	srcFile, err := f.Fs.Open(src)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+
+	err = f.Fs.MkdirAll(filepath.Dir(dst), 0666)
+	if err != nil {
+		return err
+	}
+
+	dstFile, err := f.Fs.OpenFile(dst, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775)
+	if err != nil {
+		return err
+	}
+	defer dstFile.Close()
+
+	if _, err = io.Copy(dstFile, srcFile); err != nil {
+		return err
+	}
+	info, err := f.Fs.Stat(src)
+	if err != nil {
+		return err
+	}
+	if err = f.Fs.Chmod(dst, info.Mode()); err != nil {
+		return err
+	}
+
 	return nil
 }
 

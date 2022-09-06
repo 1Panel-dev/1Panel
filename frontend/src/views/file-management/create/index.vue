@@ -67,6 +67,9 @@ let addForm = reactive({ path: '', name: '', isDir: false, mode: 0o755, isLink: 
 
 const em = defineEmits(['close']);
 const handleClose = () => {
+    if (fileForm.value) {
+        fileForm.value.resetFields();
+    }
     em('close', open);
 };
 
