@@ -63,3 +63,9 @@ type FileDownload struct {
 	Path string `json:"path" validate:"required"`
 	Name string `json:"name" validate:"required"`
 }
+
+type FileMove struct {
+	Type     string   `json:"type" validate:"required"`
+	OldPaths []string `json:"oldPaths" validate:"required"`
+	NewPath  string   `json:"newPath" validate:"required"`
+}

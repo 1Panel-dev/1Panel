@@ -125,6 +125,14 @@ func (f FileService) Download(c dto.FileDownload) error {
 	return fo.DownloadFile(c.Url, filepath.Join(c.Path, c.Name))
 }
 
+func (f FileService) MvFile(c dto.FileMove) error {
+	fo := files.NewFileOp()
+	if c.Type == "cut" {
+		return fo.Cut(c.OldPaths, c.NewPath)
+	}
+	return nil
+}
+
 func getUuid() string {
 	b := make([]byte, 16)
 	io.ReadFull(rand.Reader, b)

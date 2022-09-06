@@ -60,10 +60,17 @@
                         <el-button type="primary" plain @click="openUpload"> {{ $t('file.upload') }}</el-button>
                         <!-- <el-button type="primary" plain> {{ $t('file.search') }}</el-button> -->
                         <el-button type="primary" plain @click="openDownload"> {{ $t('file.remoteFile') }}</el-button>
+                        <el-button type="primary" plain @click="openMove('copy')" :disabled="selects.length === 0">
+                            {{ $t('file.copy') }}</el-button
+                        >
+                        <el-button type="primary" plain @click="openMove('cut')" :disabled="selects.length === 0">
+                            {{ $t('file.move') }}</el-button
+                        >
                         <!-- <el-button type="primary" plain> {{ $t('file.sync') }}</el-button>
                         <el-button type="primary" plain> {{ $t('file.terminal') }}</el-button>
                         <el-button type="primary" plain> {{ $t('file.shareList') }}</el-button> -->
                     </template>
+                    <el-table-column type="selection" width="55" />
                     <el-table-column :label="$t('commons.table.name')" min-width="250" fix show-overflow-tooltip>
                         <template #default="{ row }">
                             <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
@@ -132,6 +139,7 @@
             ></FileRename>
             <Upload :open="uploadPage.open" :path="uploadPage.path" @close="closeUpload"></Upload>
             <FileDown :open="downloadPage.open" :path="downloadPage.path" @close="closeDownload"></FileDown>
+            <Move :open="movePage.open" :oldPaths="movePage.oldPaths" :type="movePage.type" @close="clodeMove"></Move>
         </el-row>
     </LayoutContent>
 </template>
@@ -151,11 +159,12 @@ import ChangeRole from './change-role/index.vue';
 import Compress from './compress/index.vue';
 import Decompress from './decompress/index.vue';
 import Upload from './upload/index.vue';
-import FileRename from './file-rename/index.vue';
+import FileRename from './rename/index.vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import CodeEditor from './code-editor/index.vue';
 import { ElMessage } from 'element-plus';
-import FileDown from './file-down/index.vue';
+import FileDown from './download/index.vue';
+import Move from './move/index.vue';
 
 let data = ref();
 let selects = ref<any>([]);
@@ -175,6 +184,7 @@ const codeReq = reactive({ path: '', expand: false });
 const uploadPage = reactive({ open: false, path: '' });
 const renamePage = reactive({ open: false, path: '', oldName: '' });
 const downloadPage = reactive({ open: false, path: '' });
+const movePage = reactive({ open: false, oldPaths: [''], type: '' });
 
 const defaultProps = {
     children: 'children',
@@ -367,6 +377,21 @@ const openRename = (item: File.File) => {
 
 const closeRename = () => {
     renamePage.open = false;
+    search(req);
+};
+
+const openMove = (type: string) => {
+    movePage.type = type;
+    movePage.open = true;
+    const oldpaths = [];
+    for (const s of selects.value) {
+        oldpaths.push(s['path']);
+    }
+    movePage.oldPaths = oldpaths;
+};
+
+const clodeMove = () => {
+    movePage.open = false;
     search(req);
 };
 
