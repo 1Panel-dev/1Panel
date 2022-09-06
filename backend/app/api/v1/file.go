@@ -155,7 +155,7 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 	helper.SuccessWithMsg(c, fmt.Sprintf("%d files upload success", success))
 }
 
-func (b *BaseApi) ChangeName(c *gin.Context) {
+func (b *BaseApi) ChangeFileName(c *gin.Context) {
 	var req dto.FileRename
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
@@ -168,20 +168,20 @@ func (b *BaseApi) ChangeName(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-func (b *BaseApi) Download(c *gin.Context) {
-	var req dto.FileDownload
+func (b *BaseApi) WgetFile(c *gin.Context) {
+	var req dto.FileWget
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if err := fileService.Download(req); err != nil {
+	if err := fileService.Wget(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
 }
 
-func (b *BaseApi) Move(c *gin.Context) {
+func (b *BaseApi) MoveFile(c *gin.Context) {
 	var req dto.FileMove
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
@@ -192,4 +192,18 @@ func (b *BaseApi) Move(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) Download(c *gin.Context) {
+	var req dto.FileDownload
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	filePath, err := fileService.FileDownload(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	c.File(filePath)
 }

@@ -45,10 +45,14 @@ export const RenameRile = (params: File.FileRename) => {
     return http.post<File.File>('files/rename', params);
 };
 
-export const DownloadFile = (params: File.FileDownload) => {
-    return http.post<File.File>('files/download', params);
+export const WgetFile = (params: File.FileWget) => {
+    return http.post<File.File>('files/wget', params);
 };
 
 export const MoveFile = (params: File.FileMove) => {
     return http.post<File.File>('files/move', params);
+};
+
+export const DownloadFile = (params: File.FileDownload) => {
+    return http.download<BlobPart>('files/download', params, { responseType: 'blob' });
 };

@@ -61,3 +61,14 @@ export function dateFromatWithoutYear(dataStr: any) {
     minute = minute < 10 ? `0${String(minute)}` : minute;
     return `${String(m)}-${String(d)}\n${String(h)}:${String(minute)}`;
 }
+
+export function getRandomStr(e: number): string {
+    const t = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+    const a = t.length;
+    let n = '';
+
+    for (let i = 0; i < e; i++) {
+        n += t.charAt(Math.floor(Math.random() * a));
+    }
+    return n;
+}

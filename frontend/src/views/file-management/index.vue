@@ -59,12 +59,18 @@
                         </el-dropdown>
                         <el-button type="primary" plain @click="openUpload"> {{ $t('file.upload') }}</el-button>
                         <!-- <el-button type="primary" plain> {{ $t('file.search') }}</el-button> -->
-                        <el-button type="primary" plain @click="openDownload"> {{ $t('file.remoteFile') }}</el-button>
+                        <el-button type="primary" plain @click="openWget"> {{ $t('file.remoteFile') }}</el-button>
                         <el-button type="primary" plain @click="openMove('copy')" :disabled="selects.length === 0">
                             {{ $t('file.copy') }}</el-button
                         >
                         <el-button type="primary" plain @click="openMove('cut')" :disabled="selects.length === 0">
                             {{ $t('file.move') }}</el-button
+                        >
+                        <el-button type="primary" plain @click="openCompress(selects)" :disabled="selects.length === 0">
+                            {{ $t('file.compress') }}</el-button
+                        >
+                        <el-button type="primary" plain @click="openDownload" :disabled="selects.length === 0">
+                            {{ $t('file.download') }}</el-button
                         >
                         <!-- <el-button type="primary" plain> {{ $t('file.sync') }}</el-button>
                         <el-button type="primary" plain> {{ $t('file.terminal') }}</el-button>
@@ -138,20 +144,28 @@
                 @close="closeRename"
             ></FileRename>
             <Upload :open="uploadPage.open" :path="uploadPage.path" @close="closeUpload"></Upload>
-            <FileDown :open="downloadPage.open" :path="downloadPage.path" @close="closeDownload"></FileDown>
+            <Wget :open="wgetPage.open" :path="wgetPage.path" @close="closeWget"></Wget>
             <Move :open="movePage.open" :oldPaths="movePage.oldPaths" :type="movePage.type" @close="clodeMove"></Move>
+            <Download
+                :open="downloadPage.open"
+                :paths="downloadPage.paths"
+                :name="downloadPage.name"
+                @close="closeDownload"
+            ></Download>
         </el-row>
     </LayoutContent>
 </template>
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from '@vue/runtime-core';
+import { GetFilesList, GetFilesTree, DeleteFile, GetFileContent, SaveFileContent } from '@/api/modules/files';
+import { dateFromat, getRandomStr } from '@/utils/util';
+import { File } from '@/api/interface/file';
+import { useDeleteData } from '@/hooks/use-delete-data';
+import { ElMessage } from 'element-plus';
 import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import i18n from '@/lang';
-import { GetFilesList, GetFilesTree, DeleteFile, GetFileContent, SaveFileContent } from '@/api/modules/files';
-import { dateFromat } from '@/utils/util';
-import { File } from '@/api/interface/file';
 import BreadCrumbs from '@/components/bread-crumbs/index.vue';
 import BreadCrumbItem from '@/components/bread-crumbs/bread-crumbs-item.vue';
 import CreateFile from './create/index.vue';
@@ -160,20 +174,19 @@ import Compress from './compress/index.vue';
 import Decompress from './decompress/index.vue';
 import Upload from './upload/index.vue';
 import FileRename from './rename/index.vue';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import CodeEditor from './code-editor/index.vue';
-import { ElMessage } from 'element-plus';
-import FileDown from './download/index.vue';
+import Wget from './wget/index.vue';
 import Move from './move/index.vue';
+import Download from './download/index.vue';
 
-let data = ref();
-let selects = ref<any>([]);
-let req = reactive({ path: '/', expand: true });
-let loading = ref(false);
-let treeLoading = ref(false);
-let paths = ref<string[]>([]);
-let fileTree = ref<File.FileTree[]>([]);
-let expandKeys = ref<string[]>([]);
+const data = ref();
+const selects = ref<any>([]);
+const req = reactive({ path: '/', expand: true });
+const loading = ref(false);
+const treeLoading = ref(false);
+const paths = ref<string[]>([]);
+const fileTree = ref<File.FileTree[]>([]);
+const expandKeys = ref<string[]>([]);
 
 const filePage = reactive({ open: false, createForm: { path: '/', isDir: false, mode: 0o755 } });
 const modePage = reactive({ open: false, modeForm: { path: '/', isDir: false, mode: 0o755 } });
@@ -183,8 +196,9 @@ const editorPage = reactive({ open: false, content: '', loading: false });
 const codeReq = reactive({ path: '', expand: false });
 const uploadPage = reactive({ open: false, path: '' });
 const renamePage = reactive({ open: false, path: '', oldName: '' });
-const downloadPage = reactive({ open: false, path: '' });
+const wgetPage = reactive({ open: false, path: '' });
 const movePage = reactive({ open: false, oldPaths: [''], type: '' });
+const downloadPage = reactive({ open: false, paths: [''], name: '' });
 
 const defaultProps = {
     children: 'children',
@@ -237,7 +251,11 @@ const jump = async (index: number) => {
     if (index != -1) {
         const jPaths = paths.value.slice(0, index + 1);
         for (let i in jPaths) {
-            path = path + '/' + jPaths[i];
+            if (path.endsWith('/')) {
+                path = path + jPaths[i];
+            } else {
+                path = path + '/' + jPaths[i];
+            }
         }
     }
     req.path = path;
@@ -311,10 +329,18 @@ const closeMode = () => {
     search(req);
 };
 
-const openCompress = (item: File.File) => {
+const openCompress = (items: File.File[]) => {
     compressPage.open = true;
-    compressPage.files = [item.path];
-    compressPage.name = item.name;
+    const paths = [];
+    for (const item of items) {
+        paths.push(item.path);
+    }
+    compressPage.files = paths;
+    if (paths.length === 1) {
+        compressPage.name = items[0].name;
+    } else {
+        compressPage.name = getRandomStr(6);
+    }
     compressPage.dst = req.path;
 };
 
@@ -359,13 +385,13 @@ const closeUpload = () => {
     search(req);
 };
 
-const openDownload = () => {
-    downloadPage.open = true;
-    downloadPage.path = req.path;
+const openWget = () => {
+    wgetPage.open = true;
+    wgetPage.path = req.path;
 };
 
-const closeDownload = () => {
-    downloadPage.open = false;
+const closeWget = () => {
+    wgetPage.open = false;
     search(req);
 };
 
@@ -382,16 +408,31 @@ const closeRename = () => {
 
 const openMove = (type: string) => {
     movePage.type = type;
-    movePage.open = true;
     const oldpaths = [];
     for (const s of selects.value) {
         oldpaths.push(s['path']);
     }
     movePage.oldPaths = oldpaths;
+    movePage.open = true;
 };
 
 const clodeMove = () => {
     movePage.open = false;
+    search(req);
+};
+
+const openDownload = () => {
+    const paths = [];
+    for (const s of selects.value) {
+        paths.push(s['path']);
+    }
+    downloadPage.paths = paths;
+    downloadPage.name = getRandomStr(6);
+    downloadPage.open = true;
+};
+
+const closeDownload = () => {
+    downloadPage.open = false;
     search(req);
 };
 
@@ -429,7 +470,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('file.compress'),
-        click: openCompress,
+        click: (row: File.File) => {
+            openCompress([row]);
+        },
     },
     {
         label: i18n.global.t('file.deCompress'),
