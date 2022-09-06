@@ -71,6 +71,9 @@ let form = ref<File.FileDeCompress>({ type: 'zip', dst: '', path: '' });
 const em = defineEmits(['close']);
 
 const handleClose = () => {
+    if (fileForm.value) {
+        fileForm.value.resetFields();
+    }
     em('close', open);
 };
 
