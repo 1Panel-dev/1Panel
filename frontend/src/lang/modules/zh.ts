@@ -200,5 +200,8 @@ export default {
         downloadSuccess: '下载成功',
         downloadUrl: '下载地址',
         downloadStart: '下载开始!',
+        moveStart: '移动成功',
+        move: '移动',
+        copy: '复制',
     },
 };

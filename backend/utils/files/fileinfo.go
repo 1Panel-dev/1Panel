@@ -36,6 +36,7 @@ type FileOption struct {
 	Path   string `json:"path"`
 	Search string `json:"search"`
 	Expand bool   `json:"expand"`
+	Dir    bool   `json:"dir"`
 }
 
 func NewFileInfo(op FileOption) (*FileInfo, error) {
@@ -69,7 +70,7 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 	}
 	if op.Expand {
 		if file.IsDir {
-			if err := file.listChildren(); err != nil {
+			if err := file.listChildren(op.Dir); err != nil {
 				return nil, err
 			}
 			return file, nil
@@ -82,14 +83,18 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 	return file, nil
 }
 
-func (f *FileInfo) listChildren() error {
+func (f *FileInfo) listChildren(dir bool) error {
 	afs := &afero.Afero{Fs: f.Fs}
-	dir, err := afs.ReadDir(f.Path)
+	files, err := afs.ReadDir(f.Path)
 	if err != nil {
 		return err
 	}
 	var items []*FileInfo
-	for _, df := range dir {
+	for _, df := range files {
+		if dir && !df.IsDir() {
+			continue
+		}
+
 		name := df.Name()
 		fPath := path.Join(f.Path, df.Name())
 

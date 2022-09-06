@@ -48,3 +48,7 @@ export const RenameRile = (params: File.FileRename) => {
 export const DownloadFile = (params: File.FileDownload) => {
     return http.post<File.File>('files/download', params);
 };
+
+export const MoveFile = (params: File.FileMove) => {
+    return http.post<File.File>('files/move', params);
+};

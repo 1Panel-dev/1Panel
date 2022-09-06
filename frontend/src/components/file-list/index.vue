@@ -54,6 +54,10 @@ const props = defineProps({
         type: String,
         default: '/',
     },
+    dir: {
+        type: Boolean,
+        default: false,
+    },
 });
 
 const em = defineEmits(['choose']);
@@ -89,6 +93,7 @@ const jump = async (index: number) => {
 };
 
 const search = async (req: File.ReqFile) => {
+    req.dir = props.dir;
     loading.value = true;
     await GetFilesList(req)
         .then((res) => {

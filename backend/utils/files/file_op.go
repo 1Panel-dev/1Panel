@@ -105,6 +105,17 @@ func (f FileOp) DownloadFile(url, dst string) error {
 	return nil
 }
 
+func (f FileOp) Cut(oldPaths []string, dst string) error {
+	for _, p := range oldPaths {
+		base := filepath.Base(p)
+		dstPath := filepath.Join(dst, base)
+		if err := f.Fs.Rename(p, dstPath); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 type CompressType string
 
 const (
