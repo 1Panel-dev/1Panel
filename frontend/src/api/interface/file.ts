@@ -22,6 +22,7 @@ export namespace File {
         path: string;
         search?: string;
         expand: boolean;
+        dir?: boolean;
     }
 
     export interface FileTree {
@@ -74,5 +75,11 @@ export namespace File {
         path: string;
         name: string;
         url: string;
+    }
+
+    export interface FileMove {
+        oldPaths: string[];
+        newPath: string;
+        type: string;
     }
 }
