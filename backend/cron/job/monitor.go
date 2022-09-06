@@ -47,15 +47,43 @@ func (m *monitor) Run() {
 		itemIO.WriteByte = v.WriteBytes
 		itemIO.ReadTime = v.ReadTime
 		itemIO.WriteTime = v.WriteTime
+		var aheadData model.MonitorIO
+		if err := global.DB.Where("name = ?", v.Name).Order("created_at").Find(&aheadData).Error; err != nil {
+			_ = global.DB.Create(&itemIO)
+			continue
+		}
+		stime := time.Since(aheadData.CreatedAt).Seconds()
+		itemIO.Read = uint64(float64(v.ReadBytes-aheadData.ReadByte) / stime)
+		itemIO.Write = uint64(float64(v.WriteBytes-aheadData.WriteByte) / stime)
+
+		itemIO.Count = uint64(float64(v.ReadCount-aheadData.ReadCount) / stime)
+		writeCount := uint64(float64(v.WriteCount-aheadData.WriteCount) / stime)
+		if writeCount > itemIO.Count {
+			itemIO.Count = writeCount
+		}
+
+		itemIO.Time = uint64(float64(v.ReadTime-aheadData.ReadTime) / stime)
+		writeTime := uint64(float64(v.WriteTime-aheadData.WriteTime) / stime)
+		if writeTime > itemIO.Time {
+			itemIO.Time = writeTime
+		}
 		_ = global.DB.Create(&itemIO)
 	}
 
 	netStat, _ := net.IOCounters(true)
 	for _, v := range netStat {
 		var itemNet model.MonitorNetwork
+		var aheadData model.MonitorNetwork
 		itemNet.Name = v.Name
 		itemNet.BytesSent = v.BytesSent
 		itemNet.BytesRecv = v.BytesRecv
+		if err := global.DB.Where("name = ?", v.Name).Order("created_at").Find(&aheadData).Error; err != nil {
+			_ = global.DB.Create(&itemNet)
+			continue
+		}
+		stime := time.Since(aheadData.CreatedAt).Seconds()
+		itemNet.Up = float64(v.BytesSent-aheadData.BytesSent) / 1024 / stime
+		itemNet.Down = float64(v.BytesRecv-aheadData.BytesRecv) / 1024 / stime
 		_ = global.DB.Create(&itemNet)
 	}
 }

@@ -1,11 +1,15 @@
 package v1
 
 import (
+	"time"
+
 	"github.com/1Panel-dev/1Panel/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/app/dto"
+	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
 	"github.com/gin-gonic/gin"
+	"github.com/shirou/gopsutil/net"
 )
 
 func (b *BaseApi) LoadMonitor(c *gin.Context) {
@@ -18,7 +22,71 @@ func (b *BaseApi) LoadMonitor(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
+	if global.CONF.System.DbType == "sqlite" {
+		req.StartTime = req.StartTime.Add(8 * time.Hour)
+		req.EndTime = req.EndTime.Add(8 * time.Hour)
+	}
 
-	// stampStart := req.StartTime.Unix()
-	// stampEnd := req.EndTime.Unix()
+	var backdatas []dto.MonitorData
+	if req.Param == "all" || req.Param == "cpu" || req.Param == "memory" || req.Param == "load" {
+		var bases []model.MonitorBase
+		if err := global.DB.
+			Where("created_at > ? AND created_at < ?", req.StartTime, req.EndTime).
+			Find(&bases).Error; err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+
+		var itemData dto.MonitorData
+		itemData.Param = "base"
+		for _, base := range bases {
+			itemData.Date = append(itemData.Date, base.CreatedAt)
+			itemData.Value = append(itemData.Value, base)
+		}
+		backdatas = append(backdatas, itemData)
+	}
+	if req.Param == "all" || req.Param == "io" {
+		var bases []model.MonitorIO
+		if err := global.DB.
+			Where("created_at > ? AND created_at < ?", req.StartTime, req.EndTime).
+			Find(&bases).Error; err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+
+		var itemData dto.MonitorData
+		itemData.Param = "io"
+		for _, base := range bases {
+			itemData.Date = append(itemData.Date, base.CreatedAt)
+			itemData.Value = append(itemData.Value, base)
+		}
+		backdatas = append(backdatas, itemData)
+	}
+	if req.Param == "all" || req.Param == "network" {
+		var bases []model.MonitorNetwork
+		if err := global.DB.
+			Where("name = ? AND created_at > ? AND created_at < ?", req.Info, req.StartTime, req.EndTime).
+			Find(&bases).Error; err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+
+		var itemData dto.MonitorData
+		itemData.Param = "network"
+		for _, base := range bases {
+			itemData.Date = append(itemData.Date, base.CreatedAt)
+			itemData.Value = append(itemData.Value, base)
+		}
+		backdatas = append(backdatas, itemData)
+	}
+	helper.SuccessWithData(c, backdatas)
+}
+
+func (b *BaseApi) GetNetworkOptions(c *gin.Context) {
+	netStat, _ := net.IOCounters(true)
+	var options []string
+	for _, net := range netStat {
+		options = append(options, net.Name)
+	}
+	helper.SuccessWithData(c, options)
 }
