@@ -58,7 +58,7 @@ type FileRename struct {
 	NewName string
 }
 
-type FileDownload struct {
+type FileWget struct {
 	Url  string `json:"url" validate:"required"`
 	Path string `json:"path" validate:"required"`
 	Name string `json:"name" validate:"required"`
@@ -68,4 +68,10 @@ type FileMove struct {
 	Type     string   `json:"type" validate:"required"`
 	OldPaths []string `json:"oldPaths" validate:"required"`
 	NewPath  string   `json:"newPath" validate:"required"`
+}
+
+type FileDownload struct {
+	Paths []string `json:"paths" validate:"required"`
+	Type  string   `json:"type" validate:"required"`
+	Name  string   `json:"name" validate:"required"`
 }

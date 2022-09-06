@@ -71,7 +71,7 @@ export namespace File {
         newName: string;
     }
 
-    export interface FileDownload {
+    export interface FileWget {
         path: string;
         name: string;
         url: string;
@@ -81,5 +81,11 @@ export namespace File {
         oldPaths: string[];
         newPath: string;
         type: string;
+    }
+
+    export interface FileDownload {
+        paths: string[];
+        name: string;
+        url: string;
     }
 }
