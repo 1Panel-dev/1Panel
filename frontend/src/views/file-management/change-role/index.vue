@@ -6,6 +6,7 @@
         width="30%"
         @open="onOpen"
         v-loading="loading"
+        destory-on-close
     >
         <FileRole :mode="mode" @get-mode="getMode"></FileRole>
         <template #footer>

@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/app/dto"
+	"github.com/1Panel-dev/1Panel/global"
 	"github.com/1Panel-dev/1Panel/utils/files"
 	"github.com/pkg/errors"
 	"io"
@@ -130,6 +131,24 @@ func (f FileService) MvFile(c dto.FileMove) error {
 	if c.Type == "cut" {
 		return fo.Cut(c.OldPaths, c.NewPath)
 	}
+	var errs []error
+	if c.Type == "copy" {
+		for _, src := range c.OldPaths {
+			if err := fo.Copy(src, c.NewPath); err != nil {
+				errs = append(errs, err)
+				global.LOG.Errorf("copy file [%s] to [%s] failed, err: %s", src, c.NewPath, err.Error())
+			}
+		}
+	}
+
+	var errString string
+	for _, err := range errs {
+		errString += err.Error() + "\n"
+	}
+	if errString != "" {
+		return errors.New(errString)
+	}
+
 	return nil
 }
 

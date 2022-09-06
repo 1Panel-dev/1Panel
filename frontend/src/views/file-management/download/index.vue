@@ -67,6 +67,9 @@ const addForm = reactive({
 const em = defineEmits(['close']);
 
 const handleClose = () => {
+    if (fileForm.value) {
+        fileForm.value.resetFields();
+    }
     em('close', open);
 };
 
