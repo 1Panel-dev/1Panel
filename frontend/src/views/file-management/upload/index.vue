@@ -32,7 +32,6 @@ const props = defineProps({
 });
 
 const uploadRef = ref<UploadInstance>();
-// let loading = ref<Boolean>(false);
 
 const em = defineEmits(['close']);
 const handleClose = () => {
