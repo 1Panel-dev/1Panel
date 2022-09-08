@@ -72,7 +72,7 @@ const batchDelete = async (row: User.User | null) => {
     } else {
         ids.push(row.id);
     }
-    await useDeleteData(deleteUser, { ids: ids }, 'commons.msg.delete');
+    await useDeleteData(deleteUser, { ids: ids }, 'commons.msg.delete', true);
     search();
 };
 const buttons = [
