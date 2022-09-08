@@ -1,6 +1,6 @@
 system:
   port: 9999
-  db_type: mysql
+  db_type: sqlite
   level: debug
 
 jwt:

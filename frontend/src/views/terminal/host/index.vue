@@ -265,10 +265,10 @@ const onDelete = async (node: Node, data: Tree) => {
         return;
     }
     if (node.level === 1) {
-        await useDeleteData(deleteGroup, data.id - 10000, i18n.global.t('terminal.groupDeleteHelper'));
+        await useDeleteData(deleteGroup, data.id - 10000, i18n.global.t('terminal.groupDeleteHelper'), true);
         loadGroups();
     } else {
-        await useDeleteData(deleteHost, data.id, 'commons.msg.delete');
+        await useDeleteData(deleteHost, data.id, 'commons.msg.delete', true);
     }
     loadHostTree();
     loadGroups();
