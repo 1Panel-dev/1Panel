@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/constant"
-	"github.com/1Panel-dev/1Panel/global"
 
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -32,17 +31,17 @@ type BaseClaims struct {
 
 func NewJWT() *JWT {
 	return &JWT{
-		[]byte(global.CONF.JWT.SigningKey),
+		[]byte(constant.JWTSigningKey),
 	}
 }
 
-func (j *JWT) CreateClaims(baseClaims BaseClaims) CustomClaims {
+func (j *JWT) CreateClaims(baseClaims BaseClaims, ttl int) CustomClaims {
 	claims := CustomClaims{
 		BaseClaims: baseClaims,
-		BufferTime: global.CONF.JWT.BufferTime,
+		BufferTime: constant.JWTBufferTime,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(global.CONF.JWT.ExpiresTime))),
-			Issuer:    global.CONF.JWT.Issuer,
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(ttl))),
+			Issuer:    constant.JWTIssuer,
 		},
 	}
 	return claims

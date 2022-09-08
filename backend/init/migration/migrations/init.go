@@ -9,24 +9,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var InitTable = &gormigrate.Migration{
-	ID: "20220803-init-table",
-	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(&model.User{})
-	},
-}
-
-var user = model.User{
-	Name: "admin", Email: "admin@fit2cloud.com", Password: "5WYEZ4XcitdomVvAyimt9WwJwBJJSbTTHncZoqyOraQ=",
-}
-
-var AddData = &gormigrate.Migration{
-	ID: "20200803-add-data",
-	Migrate: func(tx *gorm.DB) error {
-		return tx.Create(&user).Error
-	},
-}
-
 var AddTableOperationLog = &gormigrate.Migration{
 	ID: "20200809-add-table-operation-log",
 	Migrate: func(tx *gorm.DB) error {

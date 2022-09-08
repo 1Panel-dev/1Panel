@@ -38,7 +38,6 @@ func Routers() *gin.Engine {
 	PrivateGroup := Router.Group("/api/v1")
 	{
 		systemRouter.InitBaseRouter(PrivateGroup)
-		systemRouter.InitUserRouter(PrivateGroup)
 		systemRouter.InitHostRouter(PrivateGroup)
 		systemRouter.InitGroupRouter(PrivateGroup)
 		systemRouter.InitCommandRouter(PrivateGroup)

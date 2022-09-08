@@ -144,12 +144,13 @@
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
 import { ElMessage, ElForm } from 'element-plus';
-import { updateSetting } from '@/api/modules/setting';
+import { updateSetting, updatePassword } from '@/api/modules/setting';
 import { Setting } from '@/api/interface/setting';
 import { useI18n } from 'vue-i18n';
 import { GlobalStore } from '@/store';
 import { useTheme } from '@/hooks/use-theme';
 import { Rules } from '@/global/form-rues';
+import router from '@/routers/router';
 
 const i18n = useI18n();
 const globalStore = GlobalStore();
@@ -210,5 +211,11 @@ function checkPassword(rule: any, value: any, callback: any) {
     }
     callback();
 }
-function submitChangePassword() {}
+const submitChangePassword = async () => {
+    await updatePassword(passForm);
+    passwordVisiable.value = false;
+    ElMessage.success(i18n.t('commons.msg.operationSuccess'));
+    router.push({ name: 'login' });
+    globalStore.setLogStatus(false);
+};
 </script>

@@ -3,25 +3,6 @@ system:
   db_type: sqlite
   level: debug
 
-jwt:
-  header_name: Authorization
-  signing_key: 1panelKey
-  expires_time: 604800 #过期时间
-  buffer_time: 86400 #缓冲时间 缓冲时间内会获取新的token刷新令牌
-  issuer: 1Panel
-
-session:
-  session_name: psession
-  expires_time: 604800
-
-captcha:
-  enable: true
-  source: "1234567890QWERTYUIOPLKJHGFDSAZXCVBNMqwertyuioplkjhgfdsazxcvbnm"
-  length: 4
-  noise-count: 0
-  img-width: 120
-  img-height: 50
-
 mysql:
   path: localhost
   port: 3306

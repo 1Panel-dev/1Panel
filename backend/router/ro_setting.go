@@ -14,5 +14,6 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 	{
 		settingRouter.POST("/search", baseApi.GetSettingInfo)
 		settingRouter.PUT("", baseApi.UpdateSetting)
+		settingRouter.PUT("/password", baseApi.UpdatePassword)
 	}
 }
