@@ -1,9 +1,11 @@
 package middleware
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/app/api/v1/helper"
+	"github.com/1Panel-dev/1Panel/app/repo"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
 	jwtUtils "github.com/1Panel-dev/1Panel/utils/jwt"
@@ -15,7 +17,7 @@ import (
 func JwtAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("authMethod", "")
-		token := c.Request.Header.Get(global.CONF.JWT.HeaderName)
+		token := c.Request.Header.Get(constant.JWTHeaderName)
 		if token == "" {
 			c.Next()
 			return
@@ -27,7 +29,13 @@ func JwtAuth() gin.HandlerFunc {
 			return
 		}
 		if claims.ExpiresAt.Unix()-time.Now().Unix() < claims.BufferTime {
-			claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(global.CONF.JWT.ExpiresTime)))
+			settingRepo := repo.NewISettingRepo()
+			setting, err := settingRepo.Get(settingRepo.WithByKey("SessionTimeout"))
+			if err != nil {
+				global.LOG.Errorf("create operation record failed, err: %v", err)
+			}
+			lifeTime, _ := strconv.Atoi(setting.Value)
+			claims.ExpiresAt = jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(lifeTime)))
 		}
 		c.Set("claims", claims)
 		c.Set("authMethod", constant.AuthMethodJWT)

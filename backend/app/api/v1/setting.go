@@ -28,7 +28,25 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 		return
 	}
 
-	if err := settingService.Update(req.Key, req.Value); err != nil {
+	if err := settingService.Update(c, req.Key, req.Value); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) UpdatePassword(c *gin.Context) {
+	var req dto.PasswordUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := settingService.UpdatePassword(c, req.OldPassword, req.NewPassword); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

@@ -2,13 +2,13 @@ package router
 
 type RouterGroup struct {
 	BaseRouter
-	UserRouter
 	HostRouter
 	GroupRouter
 	CommandRouter
 	MonitorRouter
 	OperationLogRouter
 	FileRouter
+	TerminalRouter
 	SettingRouter
 }
 

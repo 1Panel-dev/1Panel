@@ -20,6 +20,7 @@ var (
 	ErrRecordExist     = errors.New("ErrRecordExist")
 	ErrRecordNotFound  = errors.New("ErrRecordNotFound")
 	ErrStructTransform = errors.New("ErrStructTransform")
+	ErrInitialPassword = errors.New("ErrInitialPassword")
 
 	ErrTokenParse = errors.New("ErrTokenParse")
 
