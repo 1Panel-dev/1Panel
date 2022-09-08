@@ -190,7 +190,6 @@ let groupInputValue = ref();
 let currentGroupID = ref();
 let groupOperation = ref<string>('create');
 let groupInputShow = ref<boolean>(false);
-let loading = ref(false);
 
 const loadHostTree = async () => {
     const res = await getHostTree(searcConfig);
@@ -266,10 +265,10 @@ const onDelete = async (node: Node, data: Tree) => {
         return;
     }
     if (node.level === 1) {
-        await useDeleteData(deleteGroup, data.id - 10000, i18n.global.t('terminal.groupDeleteHelper'), loading.value);
+        await useDeleteData(deleteGroup, data.id - 10000, i18n.global.t('terminal.groupDeleteHelper'));
         loadGroups();
     } else {
-        await useDeleteData(deleteHost, data.id, 'commons.msg.delete', loading.value);
+        await useDeleteData(deleteHost, data.id, 'commons.msg.delete');
     }
     loadHostTree();
     loadGroups();

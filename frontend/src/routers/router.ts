@@ -10,7 +10,7 @@ const homeRouter: RouteRecordRaw = {
     meta: {
         keepAlive: true,
         title: 'menu.home',
-        icon: 'p-home',
+        icon: 'home-filled',
     },
     children: [
         {

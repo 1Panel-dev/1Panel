@@ -1,13 +1,13 @@
 import { Layout } from '@/routers/constant';
 
 const operationRouter = {
-    sort: 8,
+    sort: 3,
     path: '/operations',
     component: Layout,
     redirect: '/operation',
     meta: {
         title: 'menu.operations',
-        icon: 'p-log',
+        icon: 'notebook',
     },
     children: [
         {

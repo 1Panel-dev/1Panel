@@ -3,23 +3,29 @@
         <el-sub-menu v-if="subItem.children && subItem.children.length > 1" :index="subItem.path">
             <template #title>
                 <el-icon>
-                    <SvgIcon :iconName="(subItem.meta?.icon as string)" :className="'svg-icon'"></SvgIcon>
+                    <component :is="subItem.meta?.icon"></component>
                 </el-icon>
-                <span>{{ $t(subItem.meta?.title as string) }}</span>
+                <span>{{ subItem.meta?.title }}</span>
             </template>
             <SubItem :menuList="subItem.children" />
         </el-sub-menu>
         <el-menu-item v-else-if="subItem.children && subItem.children.length === 1" :index="subItem.children[0].path">
             <el-icon>
-                <SvgIcon :iconName="(subItem.meta?.icon as string)" :className="'svg-icon'"></SvgIcon>
+                <component :is="subItem.meta?.icon"></component>
             </el-icon>
-            <template #title>
+            <template v-if="!subItem.meta?.isLink" #title>
                 <span>{{ $t(subItem.meta?.title as string) }}</span>
             </template>
         </el-menu-item>
         <el-menu-item v-else :index="subItem.path">
-            <template #title>
-                <span style="margin-left: 10px">{{ $t(subItem.meta?.title as string) }}</span>
+            <el-icon>
+                <component :is="subItem.meta?.icon"></component>
+            </el-icon>
+            <template v-if="!subItem.meta?.isLink" #title>
+                <span>{{ subItem.meta?.title }}</span>
+            </template>
+            <template v-else #title>
+                <a class="menu-href" :href="subItem.isLink" target="_blank">{{ subItem.meta?.title }}</a>
             </template>
         </el-menu-item>
     </template>
@@ -27,7 +33,6 @@
 
 <script setup lang="ts">
 import { RouteRecordRaw } from 'vue-router';
-import SvgIcon from '@/components/svg-icon/svg-icon.vue';
 
 defineProps<{ menuList: RouteRecordRaw[] }>();
 </script>

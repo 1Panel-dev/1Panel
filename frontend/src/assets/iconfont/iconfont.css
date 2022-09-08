@@ -1,9 +1,9 @@
 @font-face {
   font-family: "panel"; /* Project id 3575356 */
-  src: url('iconfont.woff2?t=1662608296116') format('woff2'),
-       url('iconfont.woff?t=1662608296116') format('woff'),
-       url('iconfont.ttf?t=1662608296116') format('truetype'),
-       url('iconfont.svg?t=1662608296116#panel') format('svg');
+  src: url('iconfont.woff2?t=1661325242934') format('woff2'),
+       url('iconfont.woff?t=1661325242934') format('woff'),
+       url('iconfont.ttf?t=1661325242934') format('truetype'),
+       url('iconfont.svg?t=1661325242934#panel') format('svg');
 }
 
 .panel {
@@ -14,56 +14,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.p-plan:before {
-  content: "\e746";
-}
-
-.p-database:before {
-  content: "\e754";
-}
-
-.p-rejected-order:before {
-  content: "\e75e";
-}
-
-.p-toolbox:before {
-  content: "\e769";
-}
-
-.p-website:before {
-  content: "\e781";
-}
-
-.p-config:before {
-  content: "\e78e";
-}
-
-.p-appstore1:before {
-  content: "\e792";
-}
-
-.p-log:before {
-  content: "\e793";
-}
-
-.p-host:before {
-  content: "\e7b1";
+.p-arrow-right:before {
+  content: "\e665";
 }
 
 .p-home:before {
-  content: "\e7c6";
-}
-
-.p-appstore:before {
-  content: "\eb65";
-}
-
-.p-docker:before {
-  content: "\e659";
-}
-
-.p-arrow-right:before {
-  content: "\e665";
+  content: "\e615";
 }
 
 .p-terminal:before {
