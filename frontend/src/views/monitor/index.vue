@@ -158,27 +158,24 @@ const shortcuts = [
     {
         text: i18n.global.t('monitor.lastNDay', [3]),
         value: () => {
-            const yestoday = new Date(new Date().getTime() - 3600 * 1000 * 24 * 3);
-            const end = new Date(yestoday.setHours(23, 59, 59, 999));
-            const start = new Date(yestoday.setHours(0, 0, 0, 0));
+            const start = new Date(new Date().getTime() - 3600 * 1000 * 24 * 3);
+            const end = new Date();
             return [start, end];
         },
     },
     {
         text: i18n.global.t('monitor.lastNDay', [7]),
         value: () => {
-            const lastweek = new Date(new Date().getTime() - 3600 * 1000 * 24 * 7);
-            const end = new Date(lastweek.setHours(23, 59, 59, 999));
-            const start = new Date(lastweek.setHours(0, 0, 0, 0));
+            const start = new Date(new Date().getTime() - 3600 * 1000 * 24 * 7);
+            const end = new Date();
             return [start, end];
         },
     },
     {
         text: i18n.global.t('monitor.lastNDay', [30]),
         value: () => {
-            const lastmonth = new Date(new Date().getTime() - 3600 * 1000 * 24 * 7);
-            const end = new Date(lastmonth.setHours(23, 59, 59, 999));
-            const start = new Date(lastmonth.setHours(0, 0, 0, 0));
+            const start = new Date(new Date().getTime() - 3600 * 1000 * 24 * 30);
+            const end = new Date();
             return [start, end];
         },
     },

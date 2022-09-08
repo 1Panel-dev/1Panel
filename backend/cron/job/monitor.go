@@ -86,4 +86,20 @@ func (m *monitor) Run() {
 		itemNet.Down = float64(v.BytesRecv-aheadData.BytesRecv) / 1024 / stime
 		_ = global.DB.Create(&itemNet)
 	}
+	netStatAll, _ := net.IOCounters(false)
+	if len(netStatAll) != 0 {
+		var itemNet model.MonitorNetwork
+		var aheadData model.MonitorNetwork
+		itemNet.Name = netStatAll[0].Name
+		itemNet.BytesSent = netStatAll[0].BytesSent
+		itemNet.BytesRecv = netStatAll[0].BytesRecv
+		if err := global.DB.Where("name = ?", netStatAll[0].Name).Order("created_at").Find(&aheadData).Error; err != nil {
+			_ = global.DB.Create(&itemNet)
+			return
+		}
+		stime := time.Since(aheadData.CreatedAt).Seconds()
+		itemNet.Up = float64(netStatAll[0].BytesSent-aheadData.BytesSent) / 1024 / stime
+		itemNet.Down = float64(netStatAll[0].BytesRecv-aheadData.BytesRecv) / 1024 / stime
+		_ = global.DB.Create(&itemNet)
+	}
 }

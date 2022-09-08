@@ -85,6 +85,7 @@ func (b *BaseApi) LoadMonitor(c *gin.Context) {
 func (b *BaseApi) GetNetworkOptions(c *gin.Context) {
 	netStat, _ := net.IOCounters(true)
 	var options []string
+	options = append(options, "all")
 	for _, net := range netStat {
 		options = append(options, net.Name)
 	}
