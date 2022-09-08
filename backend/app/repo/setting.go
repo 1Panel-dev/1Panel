@@ -3,20 +3,23 @@ package repo
 import (
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/global"
+	"gorm.io/gorm"
 )
 
 type SettingRepo struct{}
 
 type ISettingRepo interface {
-	Get(opts ...DBOption) ([]model.Setting, error)
+	GetList(opts ...DBOption) ([]model.Setting, error)
+	Get(opts ...DBOption) (model.Setting, error)
 	Update(key, value string) error
+	WithByKey(key string) DBOption
 }
 
-func NewISettingService() ISettingRepo {
+func NewISettingRepo() ISettingRepo {
 	return &SettingRepo{}
 }
 
-func (u *SettingRepo) Get(opts ...DBOption) ([]model.Setting, error) {
+func (u *SettingRepo) GetList(opts ...DBOption) ([]model.Setting, error) {
 	var settings []model.Setting
 	db := global.DB.Model(&model.Setting{})
 	for _, opt := range opts {
@@ -24,6 +27,22 @@ func (u *SettingRepo) Get(opts ...DBOption) ([]model.Setting, error) {
 	}
 	err := db.Find(&settings).Error
 	return settings, err
+}
+
+func (u *SettingRepo) Get(opts ...DBOption) (model.Setting, error) {
+	var settings model.Setting
+	db := global.DB.Model(&model.Setting{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.First(&settings).Error
+	return settings, err
+}
+
+func (c *SettingRepo) WithByKey(key string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("key = ?", key)
+	}
 }
 
 func (u *SettingRepo) Update(key, value string) error {

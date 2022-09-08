@@ -30,3 +30,8 @@ type SettingUpdate struct {
 	Key   string `json:"key" validate:"required"`
 	Value string `json:"value"`
 }
+
+type PasswordUpdate struct {
+	OldPassword string `json:"oldPassword" validate:"required"`
+	NewPassword string `json:"newPassword" validate:"required"`
+}

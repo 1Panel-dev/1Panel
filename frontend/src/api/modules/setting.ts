@@ -8,3 +8,7 @@ export const getSettingInfo = () => {
 export const updateSetting = (param: Setting.SettingUpdate) => {
     return http.put(`/settings`, param);
 };
+
+export const updatePassword = (param: Setting.PasswordUpdate) => {
+    return http.put(`/settings/password`, param);
+};
