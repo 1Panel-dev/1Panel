@@ -207,3 +207,17 @@ func (b *BaseApi) Download(c *gin.Context) {
 	}
 	c.File(filePath)
 }
+
+func (b *BaseApi) Size(c *gin.Context) {
+	var req dto.DirSizeReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	res, err := fileService.DirSize(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}

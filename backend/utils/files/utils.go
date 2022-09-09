@@ -2,9 +2,12 @@ package files
 
 import (
 	"github.com/gabriel-vasile/mimetype"
+	"github.com/spf13/afero"
 	"os"
 	"os/user"
+	"path/filepath"
 	"strconv"
+	"sync"
 )
 
 func IsSymlink(mode os.FileMode) bool {
@@ -41,6 +44,22 @@ func GetSymlink(path string) string {
 		return ""
 	}
 	return linkPath
+}
+
+func ScanDir(fs afero.Fs, path string, dirMap *sync.Map, wg *sync.WaitGroup) {
+	afs := &afero.Afero{Fs: fs}
+	files, _ := afs.ReadDir(path)
+	for _, f := range files {
+		if f.IsDir() {
+			wg.Add(1)
+			go ScanDir(fs, filepath.Join(path, f.Name()), dirMap, wg)
+		} else {
+			if f.Size() > 0 {
+				dirMap.Store(filepath.Join(path, f.Name()), float64(f.Size()))
+			}
+		}
+	}
+	defer wg.Done()
 }
 
 const dotCharacter = 46

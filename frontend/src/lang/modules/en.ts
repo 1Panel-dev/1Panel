@@ -242,5 +242,6 @@ export default {
         moveStart: 'Move start',
         move: 'Move',
         copy: 'Cpoy',
+        calculate: 'Calculate',
     },
 };
