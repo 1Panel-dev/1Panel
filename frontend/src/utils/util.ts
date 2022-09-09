@@ -82,3 +82,21 @@ export function computeSize(size: number): string {
     if (size < Math.pow(num, 4)) return (size / Math.pow(num, 3)).toFixed(2) + ' GB';
     return (size / Math.pow(num, 4)).toFixed(2) + ' TB';
 }
+
+let icons = new Map([
+    ['.zip', 'p-file-zip'],
+    ['.gz', 'p-file-zip'],
+    ['.tar.bz2', 'p-file-zip'],
+    ['.tar', 'p-file-zip'],
+    ['.tar.gz', 'p-file-zip'],
+    ['.tar.xz', 'p-file-zip'],
+]);
+
+export function getIcon(extention: string): string {
+    if (icons.get(extention) != undefined) {
+        const icon = icons.get(extention);
+        return String(icon);
+    } else {
+        return 'p-file-normal';
+    }
+}
