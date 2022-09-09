@@ -10,16 +10,16 @@
         >
             <el-form-item :label="$t('file.path')" prop="newPath">
                 <el-input v-model="addForm.newPath">
-                    <template #append> <FileList @choose="getPath" :dir="true"></FileList> </template>
+                    <template #append><FileList @choose="getPath" :dir="true"></FileList></template>
                 </el-input>
             </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(fileForm)" :disabled="loading">{{
-                    $t('commons.button.confirm')
-                }}</el-button>
+                <el-button type="primary" @click="submit(fileForm)" :disabled="loading">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
             </span>
         </template>
     </el-dialog>

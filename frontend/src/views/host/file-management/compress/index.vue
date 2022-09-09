@@ -1,6 +1,13 @@
 <template>
-    <el-dialog v-model="open" :title="title" :before-close="handleClose" width="30%" @open="onOpen" v-loading="loading">
-        <el-form ref="fileForm" label-position="left" :model="form" label-width="100px" :rules="rules">
+    <el-dialog v-model="open" :title="title" :before-close="handleClose" width="30%" @open="onOpen">
+        <el-form
+            ref="fileForm"
+            label-position="left"
+            :model="form"
+            label-width="100px"
+            :rules="rules"
+            v-loading="loading"
+        >
             <el-form-item :label="$t('file.compressType')" prop="type">
                 <el-select v-model="form.type">
                     <el-option v-for="item in options" :key="item" :label="item" :value="item" />
@@ -8,13 +15,13 @@
             </el-form-item>
             <el-form-item :label="$t('file.name')" prop="name">
                 <el-input v-model="form.name">
-                    <template #append>{{ extension }}</template></el-input
-                >
+                    <template #append>{{ extension }}</template>
+                </el-input>
             </el-form-item>
             <el-form-item :label="$t('file.compressDst')" prop="dst">
                 <el-input v-model="form.dst">
-                    <template #append> <FileList :path="props.dst" @choose="getLinkPath"></FileList> </template
-                ></el-input>
+                    <template #append><FileList :path="props.dst" @choose="getLinkPath"></FileList></template>
+                </el-input>
             </el-form-item>
             <el-form-item>
                 <el-checkbox v-model="form.replace" :label="$t('file.replace')"></el-checkbox>

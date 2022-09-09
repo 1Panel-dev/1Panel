@@ -3,9 +3,9 @@
         <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
             <template #toolbar>
                 <el-button @click="onCreate()">{{ $t('commons.button.create') }}</el-button>
-                <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete(null)">{{
-                    $t('commons.button.delete')
-                }}</el-button>
+                <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete(null)">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
             </template>
             <el-table-column type="selection" fix />
             <el-table-column :label="$t('commons.table.name')" min-width="100" prop="name" fix />

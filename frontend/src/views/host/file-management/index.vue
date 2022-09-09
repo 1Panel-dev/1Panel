@@ -33,8 +33,9 @@
                             :key="key"
                             @click="jump(key)"
                             :right="key == paths.length - 1"
-                            >{{ item }}</BreadCrumbItem
                         >
+                            {{ item }}
+                        </BreadCrumbItem>
                     </BreadCrumbs>
                 </div>
                 <ComplexTable
@@ -44,34 +45,46 @@
                     v-loading="loading"
                 >
                     <template #toolbar>
-                        <el-dropdown split-button type="primary" @command="handleCreate">
-                            {{ $t('commons.button.create') }}
-                            <template #dropdown>
-                                <el-dropdown-menu>
-                                    <el-dropdown-item command="dir">
-                                        <svg-icon iconName="p-file-folder"></svg-icon>{{ $t('file.dir') }}
-                                    </el-dropdown-item>
-                                    <el-dropdown-item command="file">
-                                        <svg-icon iconName="p-file-normal"></svg-icon>{{ $t('file.file') }}
-                                    </el-dropdown-item>
-                                </el-dropdown-menu>
-                            </template>
-                        </el-dropdown>
-                        <el-button type="primary" plain @click="openUpload"> {{ $t('file.upload') }}</el-button>
-                        <!-- <el-button type="primary" plain> {{ $t('file.search') }}</el-button> -->
-                        <el-button type="primary" plain @click="openWget"> {{ $t('file.remoteFile') }}</el-button>
-                        <el-button type="primary" plain @click="openMove('copy')" :disabled="selects.length === 0">
-                            {{ $t('file.copy') }}</el-button
-                        >
-                        <el-button type="primary" plain @click="openMove('cut')" :disabled="selects.length === 0">
-                            {{ $t('file.move') }}</el-button
-                        >
-                        <el-button type="primary" plain @click="openCompress(selects)" :disabled="selects.length === 0">
-                            {{ $t('file.compress') }}</el-button
-                        >
-                        <el-button type="primary" plain @click="openDownload" :disabled="selects.length === 0">
-                            {{ $t('file.download') }}</el-button
-                        >
+                        <el-button-group>
+                            <el-dropdown split-button type="primary" @command="handleCreate">
+                                {{ $t('commons.button.create') }}
+                                <template #dropdown>
+                                    <el-dropdown-menu>
+                                        <el-dropdown-item command="dir">
+                                            <svg-icon iconName="p-file-folder"></svg-icon>
+                                            {{ $t('file.dir') }}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item command="file">
+                                            <svg-icon iconName="p-file-normal"></svg-icon>
+                                            {{ $t('file.file') }}
+                                        </el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </template>
+                            </el-dropdown>
+                        </el-button-group>
+                        <el-button-group style="margin-left: 5px">
+                            <el-button type="primary" plain @click="openUpload">{{ $t('file.upload') }}</el-button>
+                            <!-- <el-button type="primary" plain> {{ $t('file.search') }}</el-button> -->
+                            <el-button type="primary" plain @click="openWget">{{ $t('file.remoteFile') }}</el-button>
+                            <el-button type="primary" plain @click="openMove('copy')" :disabled="selects.length === 0">
+                                {{ $t('file.copy') }}
+                            </el-button>
+                            <el-button type="primary" plain @click="openMove('cut')" :disabled="selects.length === 0">
+                                {{ $t('file.move') }}
+                            </el-button>
+                            <el-button
+                                type="primary"
+                                plain
+                                @click="openCompress(selects)"
+                                :disabled="selects.length === 0"
+                            >
+                                {{ $t('file.compress') }}
+                            </el-button>
+                            <el-button type="primary" plain @click="openDownload" :disabled="selects.length === 0">
+                                {{ $t('file.download') }}
+                            </el-button>
+                        </el-button-group>
+
                         <!-- <el-button type="primary" plain> {{ $t('file.sync') }}</el-button>
                         <el-button type="primary" plain> {{ $t('file.terminal') }}</el-button>
                         <el-button type="primary" plain> {{ $t('file.shareList') }}</el-button> -->
@@ -82,7 +95,7 @@
                             <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
                             <svg-icon v-else className="table-icon" iconName="p-file-normal"></svg-icon>
                             <el-link :underline="false" @click="open(row)">{{ row.name }}</el-link>
-                            <span v-if="row.isSymlink"> -> {{ row.linkPath }}</span>
+                            <span v-if="row.isSymlink">-> {{ row.linkPath }}</span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('file.mode')" prop="mode">
@@ -90,17 +103,16 @@
                             <el-link :underline="false" @click="openMode(row)">{{ row.mode }}</el-link>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('file.user')" prop="user"> </el-table-column>
-                    <el-table-column :label="$t('file.group')" prop="group"> </el-table-column>
-                    <el-table-column :label="$t('file.size')" prop="size"> </el-table-column>
+                    <el-table-column :label="$t('file.user')" prop="user"></el-table-column>
+                    <el-table-column :label="$t('file.group')" prop="group"></el-table-column>
+                    <el-table-column :label="$t('file.size')" prop="size"></el-table-column>
                     <el-table-column
                         :label="$t('file.updateTime')"
                         prop="modTime"
                         :formatter="dateFromat"
                         min-width="100"
                         show-overflow-tooltip
-                    >
-                    </el-table-column>
+                    ></el-table-column>
 
                     <fu-table-operations
                         :ellipsis="1"
@@ -181,7 +193,7 @@ import Download from './download/index.vue';
 
 const data = ref();
 const selects = ref<any>([]);
-const req = reactive({ path: '/', expand: true });
+const req = reactive({ path: '/', expand: true, showHidden: false });
 const loading = ref(false);
 const treeLoading = ref(false);
 const paths = ref<string[]>([]);

@@ -1,18 +1,18 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :before-close="handleClose"
-        :title="$t('file.setRole')"
-        width="30%"
-        @open="onOpen"
-        v-loading="loading"
-    >
-        <el-form ref="fileForm" label-position="left" :model="addForm" label-width="100px" :rules="rules">
+    <el-dialog v-model="open" :before-close="handleClose" :title="$t('file.setRole')" width="30%" @open="onOpen">
+        <el-form
+            ref="fileForm"
+            label-position="left"
+            :model="addForm"
+            label-width="100px"
+            :rules="rules"
+            v-loading="loading"
+        >
             <el-form-item :label="$t('file.path')" prop="path">
-                <el-input v-model="props.path" disabled
-            /></el-form-item>
-            <el-form-item :label="$t('file.name')" prop="newName"> <el-input v-model="addForm.newName" /></el-form-item
-        ></el-form>
+                <el-input v-model="props.path" disabled />
+            </el-form-item>
+            <el-form-item :label="$t('file.name')" prop="newName"><el-input v-model="addForm.newName" /></el-form-item>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>

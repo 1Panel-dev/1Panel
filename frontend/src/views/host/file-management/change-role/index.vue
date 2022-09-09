@@ -1,14 +1,6 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :before-close="handleClose"
-        :title="$t('file.setRole')"
-        width="30%"
-        @open="onOpen"
-        v-loading="loading"
-        destory-on-close
-    >
-        <FileRole :mode="mode" @get-mode="getMode"></FileRole>
+    <el-dialog v-model="open" :before-close="handleClose" :title="$t('file.setRole')" width="30%" @open="onOpen">
+        <FileRole v-loading="loading" :mode="mode" @get-mode="getMode"></FileRole>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>

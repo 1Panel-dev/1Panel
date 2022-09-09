@@ -14,9 +14,7 @@ const databaseRouter = {
             path: '/database',
             name: 'Database',
             component: () => import('@/views/database/index.vue'),
-            meta: {
-                keepAlive: true,
-            },
+            meta: {},
         },
     ],
 };

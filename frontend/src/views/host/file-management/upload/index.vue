@@ -5,7 +5,6 @@
                 <el-button type="primary">{{ $t('file.selectFile') }}</el-button>
             </template>
         </el-upload>
-
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>

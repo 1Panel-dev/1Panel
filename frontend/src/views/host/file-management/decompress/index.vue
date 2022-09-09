@@ -1,29 +1,31 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('file.deCompress')"
-        :before-close="handleClose"
-        width="30%"
-        @open="onOpen"
-        v-loading="loading"
-    >
-        <el-form ref="fileForm" label-position="left" :model="form" label-width="100px" :rules="rules">
-            <el-form-item :label="$t('file.name')">
-                <el-input v-model="name" disabled></el-input>
-            </el-form-item>
-            <el-form-item :label="$t('file.deCompressDst')" prop="dst">
-                <el-input v-model="form.dst">
-                    <template #append> <FileList :path="props.dst" @choose="getLinkPath"></FileList> </template
-                ></el-input>
-            </el-form-item>
-        </el-form>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(fileForm)">{{ $t('commons.button.confirm') }}</el-button>
-            </span>
-        </template>
-    </el-dialog>
+    <div>
+        <el-dialog v-model="open" :title="$t('file.deCompress')" :before-close="handleClose" width="30%" @open="onOpen">
+            <el-form
+                ref="fileForm"
+                label-position="left"
+                :model="form"
+                label-width="100px"
+                :rules="rules"
+                v-loading="loading"
+            >
+                <el-form-item :label="$t('file.name')">
+                    <el-input v-model="name" disabled></el-input>
+                </el-form-item>
+                <el-form-item :label="$t('file.deCompressDst')" prop="dst">
+                    <el-input v-model="form.dst">
+                        <template #append><FileList :path="props.dst" @choose="getLinkPath"></FileList></template>
+                    </el-input>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button type="primary" @click="submit(fileForm)">{{ $t('commons.button.confirm') }}</el-button>
+                </span>
+            </template>
+        </el-dialog>
+    </div>
 </template>
 
 <script setup lang="ts">
