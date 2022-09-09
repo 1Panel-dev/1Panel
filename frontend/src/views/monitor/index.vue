@@ -15,7 +15,8 @@
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
                             style="float: right; right: 20px"
-                        ></el-date-picker>
+                        >
+                        </el-date-picker>
                     </template>
                     <div id="loadLoadChart" style="width: 100%; height: 400px"></div>
                 </el-card>
@@ -36,7 +37,8 @@
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
                             style="float: right; right: 20px"
-                        ></el-date-picker>
+                        >
+                        </el-date-picker>
                     </template>
                     <div id="loadCPUChart" style="width: 100%; height: 400px"></div>
                 </el-card>
@@ -55,7 +57,8 @@
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
                             style="float: right; right: 20px"
-                        ></el-date-picker>
+                        >
+                        </el-date-picker>
                     </template>
                     <div id="loadMemoryChart" style="width: 100%; height: 400px"></div>
                 </el-card>
@@ -76,7 +79,8 @@
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
                             style="float: right; right: 20px"
-                        ></el-date-picker>
+                        >
+                        </el-date-picker>
                     </template>
                     <div id="loadIOChart" style="width: 100%; height: 400px"></div>
                 </el-card>
@@ -106,7 +110,8 @@
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
                             style="float: right; right: 20px"
-                        ></el-date-picker>
+                        >
+                        </el-date-picker>
                     </template>
                     <div id="loadNetworkChart" style="width: 100%; height: 400px"></div>
                 </el-card>

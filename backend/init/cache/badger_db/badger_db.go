@@ -55,7 +55,7 @@ func (c *Cache) Get(key string) ([]byte, error) {
 			result = append([]byte{}, val...)
 			return nil
 		})
-		return err
+		return nil
 	})
 	return result, err
 }

@@ -50,7 +50,10 @@ func (f FileOp) DeleteDir(dst string) error {
 
 func (f FileOp) Stat(dst string) bool {
 	info, _ := f.Fs.Stat(dst)
-	return info != nil
+	if info != nil {
+		return true
+	}
+	return false
 }
 
 func (f FileOp) DeleteFile(dst string) error {

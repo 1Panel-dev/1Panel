@@ -14,9 +14,9 @@
             </el-form>
             <div class="form-button">
                 <el-button @click="router.back()">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submitForm(ruleFormRef)">
-                    {{ $t('commons.button.confirm') }}
-                </el-button>
+                <el-button type="primary" @click="submitForm(ruleFormRef)">{{
+                    $t('commons.button.confirm')
+                }}</el-button>
             </div>
         </template>
     </LayoutContent>

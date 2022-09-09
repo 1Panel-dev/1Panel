@@ -1,5 +1,5 @@
 <template>
-    <el-icon :size="25" class="collapse-icon" @click="menuStore.setCollapse()">
+    <el-icon class="collapse-icon" @click="menuStore.setCollapse()">
         <component :is="isCollapse ? 'expand' : 'fold'"></component>
     </el-icon>
 </template>
@@ -12,9 +12,5 @@ const isCollapse = computed((): boolean => menuStore.isCollapse);
 </script>
 
 <style scoped lang="scss">
-// @import '../index.scss';
-
-.collapse-icon {
-    cursor: pointer;
-}
+@import '../index.scss';
 </style>

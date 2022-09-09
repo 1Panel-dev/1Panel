@@ -23,7 +23,6 @@ export namespace File {
         search?: string;
         expand: boolean;
         dir?: boolean;
-        showHidden?: boolean;
     }
 
     export interface FileTree {

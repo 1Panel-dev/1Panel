@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"fmt"
 	"github.com/1Panel-dev/1Panel/global"
 	"github.com/1Panel-dev/1Panel/init/cache/badger_db"
 	"github.com/dgraph-io/badger/v3"
@@ -50,4 +51,25 @@ func Init() {
 	}
 
 	global.CACHE = badger_db.NewCacheDB(cache)
+
+	err = cache.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = false
+		it := txn.NewIterator(opts)
+		defer it.Close()
+		for it.Rewind(); it.Valid(); it.Next() {
+			item := it.Item()
+			k := item.Key()
+			fmt.Printf("key=%s\n", k)
+		}
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("run gc")
+	err = cache.RunValueLogGC(0.01)
+	if err != nil {
+		fmt.Printf(err.Error())
+	}
 }
