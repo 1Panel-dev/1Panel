@@ -205,6 +205,7 @@ import CodeEditor from './code-editor/index.vue';
 import Wget from './wget/index.vue';
 import Move from './move/index.vue';
 import Download from './download/index.vue';
+import { Mimetypes } from '@/global/mimetype';
 
 const data = ref();
 let selects = ref<any>([]);
@@ -399,6 +400,11 @@ const closeCompress = () => {
 };
 
 const openDeCompress = (item: File.File) => {
+    if (Mimetypes.get(item.mimeType) == undefined) {
+        ElMessage.warning(i18n.global.t('file.canNotDeCompress'));
+        return;
+    }
+
     deCompressPage.open = true;
     deCompressPage.name = item.name;
     deCompressPage.path = item.path;
@@ -526,6 +532,9 @@ const buttons = [
     {
         label: i18n.global.t('file.deCompress'),
         click: openDeCompress,
+        disabled: (row: File.File) => {
+            return row.isDir;
+        },
     },
     {
         label: i18n.global.t('file.rename'),

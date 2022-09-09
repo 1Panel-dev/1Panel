@@ -243,5 +243,6 @@ export default {
         move: 'Move',
         copy: 'Cpoy',
         calculate: 'Calculate',
+        canNotDeCompress: 'Can not DeCompress this File',
     },
 };

@@ -243,5 +243,6 @@ export default {
         move: '移动',
         copy: '复制',
         calculate: '计算',
+        canNotDeCompress: '无法解压此文件',
     },
 };
