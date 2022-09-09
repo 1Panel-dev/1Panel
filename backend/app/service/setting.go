@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/constant"
@@ -35,6 +36,7 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	if err := json.Unmarshal(arr, &info); err != nil {
 		return nil, err
 	}
+	info.LocalTime = time.Now().Format("2006.01.02 15:04:05")
 	return &info, err
 }
 

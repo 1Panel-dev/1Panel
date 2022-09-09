@@ -17,7 +17,7 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 	helper.SuccessWithData(c, setting)
 }
 
-func (b *BaseApi) UpdateInfo(c *gin.Context) {
+func (b *BaseApi) UpdateSetting(c *gin.Context) {
 	var req dto.SettingUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)

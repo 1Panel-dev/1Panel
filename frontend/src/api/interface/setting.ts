@@ -5,6 +5,7 @@ export namespace Setting {
         email: string;
 
         sessionTimeout: string;
+        localTime: string;
 
         panelName: string;
         theme: string;
@@ -12,6 +13,7 @@ export namespace Setting {
 
         serverPort: string;
         securityEntrance: string;
+        passwordTimeOut: string;
         complexityVerification: string;
         mfaStatus: string;
 
@@ -22,5 +24,14 @@ export namespace Setting {
         emailVars: string;
         weChatVars: string;
         dingVars: string;
+    }
+    export interface SettingUpdate {
+        key: string;
+        value: string;
+    }
+    export interface PasswordUpdate {
+        oldPassword: string;
+        newPassword: string;
+        retryPassword: string;
     }
 }
