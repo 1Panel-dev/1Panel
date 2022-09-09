@@ -56,3 +56,7 @@ export const MoveFile = (params: File.FileMove) => {
 export const DownloadFile = (params: File.FileDownload) => {
     return http.download<BlobPart>('files/download', params, { responseType: 'blob' });
 };
+
+export const ComputeDirSize = (params: File.DirSizeReq) => {
+    return http.post<File.DirSizeRes>('files/size', params);
+};

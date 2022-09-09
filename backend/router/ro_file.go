@@ -29,6 +29,7 @@ func (f *FileRouter) InitFileRouter(Router *gin.RouterGroup) {
 		fileRouter.POST("/wget", baseApi.WgetFile)
 		fileRouter.POST("/move", baseApi.MoveFile)
 		fileRouter.POST("/download", baseApi.Download)
+		fileRouter.POST("/size", baseApi.Size)
 	}
 
 }

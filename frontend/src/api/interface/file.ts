@@ -15,6 +15,7 @@ export namespace File {
         modTime: string;
         mode: number;
         mimeType: string;
+        dirSize: number;
         items: File[];
     }
 
@@ -88,5 +89,13 @@ export namespace File {
         paths: string[];
         name: string;
         url: string;
+    }
+
+    export interface DirSizeReq {
+        path: string;
+    }
+
+    export interface DirSizeRes {
+        size: number;
     }
 }

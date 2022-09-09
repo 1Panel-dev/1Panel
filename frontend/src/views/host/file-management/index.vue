@@ -105,7 +105,19 @@
                     </el-table-column>
                     <el-table-column :label="$t('file.user')" prop="user"></el-table-column>
                     <el-table-column :label="$t('file.group')" prop="group"></el-table-column>
-                    <el-table-column :label="$t('file.size')" prop="size"></el-table-column>
+                    <el-table-column :label="$t('file.size')" prop="size">
+                        <template #default="{ row }">
+                            <span v-if="row.isDir">
+                                <el-button type="primary" link small @click="getDirSize(row)">
+                                    <span v-if="row.dirSize == undefined">
+                                        {{ $t('file.calculate') }}
+                                    </span>
+                                    <span v-else>{{ getFileSize(row.dirSize) }}</span>
+                                </el-button>
+                            </span>
+                            <span v-else>{{ getFileSize(row.size) }}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         :label="$t('file.updateTime')"
                         prop="modTime"
@@ -170,8 +182,15 @@
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from '@vue/runtime-core';
-import { GetFilesList, GetFilesTree, DeleteFile, GetFileContent, SaveFileContent } from '@/api/modules/files';
-import { dateFromat, getRandomStr } from '@/utils/util';
+import {
+    GetFilesList,
+    GetFilesTree,
+    DeleteFile,
+    GetFileContent,
+    SaveFileContent,
+    ComputeDirSize,
+} from '@/api/modules/files';
+import { computeSize, dateFromat, getRandomStr } from '@/utils/util';
 import { File } from '@/api/interface/file';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElMessage } from 'element-plus';
@@ -192,10 +211,10 @@ import Move from './move/index.vue';
 import Download from './download/index.vue';
 
 const data = ref();
-const selects = ref<any>([]);
-const req = reactive({ path: '/', expand: true, showHidden: false });
-const loading = ref(false);
-const treeLoading = ref(false);
+let selects = ref<any>([]);
+let req = reactive({ path: '/', expand: true, showHidden: false });
+let loading = ref(false);
+let treeLoading = ref(false);
 const paths = ref<string[]>([]);
 const fileTree = ref<File.FileTree[]>([]);
 const expandKeys = ref<string[]>([]);
@@ -324,6 +343,24 @@ const handleCreate = (commnad: string) => {
 const delFile = async (row: File.File | null) => {
     await useDeleteData(DeleteFile, row as File.FileDelete, 'commons.msg.delete', loading.value);
     search(req);
+};
+
+const getFileSize = (size: number) => {
+    return computeSize(size);
+};
+
+const getDirSize = async (row: any) => {
+    const req = {
+        path: row.path,
+    };
+    loading.value = true;
+    await ComputeDirSize(req)
+        .then(async (res) => {
+            row.dirSize = res.data.size;
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 const closeCreate = () => {

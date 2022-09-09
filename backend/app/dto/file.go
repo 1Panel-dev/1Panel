@@ -75,3 +75,11 @@ type FileDownload struct {
 	Type  string   `json:"type" validate:"required"`
 	Name  string   `json:"name" validate:"required"`
 }
+
+type DirSizeReq struct {
+	Path string `json:"path" validate:"required"`
+}
+
+type DirSizeRes struct {
+	Size float64 `json:"size" validate:"required"`
+}

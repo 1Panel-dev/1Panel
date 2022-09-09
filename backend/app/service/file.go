@@ -167,6 +167,15 @@ func (f FileService) FileDownload(d dto.FileDownload) (string, error) {
 	return filePath, nil
 }
 
+func (f FileService) DirSize(req dto.DirSizeReq) (dto.DirSizeRes, error) {
+	fo := files.NewFileOp()
+	size, err := fo.GetDirSize(req.Path)
+	if err != nil {
+		return dto.DirSizeRes{}, err
+	}
+	return dto.DirSizeRes{Size: size}, nil
+}
+
 func getUuid() string {
 	b := make([]byte, 16)
 	_, _ = io.ReadFull(rand.Reader, b)

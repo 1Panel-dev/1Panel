@@ -242,5 +242,6 @@ export default {
         moveStart: '移动成功',
         move: '移动',
         copy: '复制',
+        calculate: '计算',
     },
 };
