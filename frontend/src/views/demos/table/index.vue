@@ -4,9 +4,9 @@
             <template #toolbar>
                 <el-button type="primary" @click="openOperate(null)">{{ $t('commons.button.create') }}</el-button>
                 <el-button type="primary" plain>{{ '其他操作' }}</el-button>
-                <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete(null)">{{
-                    $t('commons.button.delete')
-                }}</el-button>
+                <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete(null)">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
             </template>
             <el-table-column type="selection" fix />
             <el-table-column label="ID" min-width="100" prop="id" fix />

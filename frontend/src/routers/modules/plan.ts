@@ -1,7 +1,7 @@
 import { Layout } from '@/routers/constant';
 
 const planRouter = {
-    sort: 5,
+    sort: 6,
     path: '/plans',
     component: Layout,
     redirect: '/plans',
@@ -14,9 +14,7 @@ const planRouter = {
             path: '/plans',
             name: 'Plan',
             component: () => import('@/views/plan/index.vue'),
-            meta: {
-                keepAlive: true,
-            },
+            meta: {},
         },
     ],
 };

@@ -16,7 +16,6 @@ const webSiteRouter = {
             component: () => import('@/views/website/project/index.vue'),
             meta: {
                 title: 'menu.project',
-                keepAlive: true,
             },
         },
         {
@@ -25,7 +24,6 @@ const webSiteRouter = {
             component: () => import('@/views/website/config/index.vue'),
             meta: {
                 title: 'menu.config',
-                keepAlive: true,
             },
         },
         {
@@ -34,7 +32,6 @@ const webSiteRouter = {
             component: () => import('@/views/website/project/index.vue'),
             meta: {
                 title: 'menu.firewall',
-                keepAlive: true,
             },
         },
     ],

@@ -13,8 +13,8 @@
             </el-form-item>
             <el-form-item :label="$t('file.path')" prop="path">
                 <el-input v-model="addForm.path">
-                    <template #append> <FileList :path="path" @choose="getPath"></FileList> </template
-                ></el-input>
+                    <template #append><FileList :path="path" @choose="getPath"></FileList></template>
+                </el-input>
             </el-form-item>
             <el-form-item :label="$t('file.name')" prop="name">
                 <el-input v-model="addForm.name"></el-input>
@@ -23,9 +23,9 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(fileForm)" :disabled="loading">{{
-                    $t('commons.button.confirm')
-                }}</el-button>
+                <el-button type="primary" @click="submit(fileForm)" :disabled="loading">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
             </span>
         </template>
     </el-dialog>
@@ -37,6 +37,7 @@ import { Rules } from '@/global/form-rues';
 import i18n from '@/lang';
 import { ElMessage, FormInstance, FormRules } from 'element-plus';
 import { reactive, ref, toRefs } from 'vue';
+import FileList from '@/components/file-list/index.vue';
 
 const props = defineProps({
     open: {

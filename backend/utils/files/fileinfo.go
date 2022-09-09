@@ -22,6 +22,7 @@ type FileInfo struct {
 	Size       int64       `json:"size"`
 	IsDir      bool        `json:"isDir"`
 	IsSymlink  bool        `json:"isSymlink"`
+	IsHidden   bool        `json:"isHidden"`
 	LinkPath   string      `json:"linkPath"`
 	Type       string      `json:"type"`
 	Mode       string      `json:"mode"`
@@ -33,10 +34,11 @@ type FileInfo struct {
 }
 
 type FileOption struct {
-	Path   string `json:"path"`
-	Search string `json:"search"`
-	Expand bool   `json:"expand"`
-	Dir    bool   `json:"dir"`
+	Path       string `json:"path"`
+	Search     string `json:"search"`
+	Expand     bool   `json:"expand"`
+	Dir        bool   `json:"dir"`
+	ShowHidden bool   `json:"showHidden"`
 }
 
 func NewFileInfo(op FileOption) (*FileInfo, error) {
@@ -57,6 +59,7 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 		Size:      info.Size(),
 		IsSymlink: IsSymlink(info.Mode()),
 		Extension: filepath.Ext(info.Name()),
+		IsHidden:  IsHidden(op.Path),
 		Mode:      fmt.Sprintf("%04o", info.Mode().Perm()),
 		User:      GetUsername(info.Sys().(*syscall.Stat_t).Uid),
 		Group:     GetGroup(info.Sys().(*syscall.Stat_t).Gid),
@@ -65,12 +68,9 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 	if file.IsSymlink {
 		file.LinkPath = GetSymlink(op.Path)
 	}
-	if op.Search != "" {
-
-	}
 	if op.Expand {
 		if file.IsDir {
-			if err := file.listChildren(op.Dir); err != nil {
+			if err := file.listChildren(op.Dir, op.ShowHidden); err != nil {
 				return nil, err
 			}
 			return file, nil
@@ -83,7 +83,7 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 	return file, nil
 }
 
-func (f *FileInfo) listChildren(dir bool) error {
+func (f *FileInfo) listChildren(dir, showHidden bool) error {
 	afs := &afero.Afero{Fs: f.Fs}
 	files, err := afs.ReadDir(f.Path)
 	if err != nil {
@@ -97,6 +97,10 @@ func (f *FileInfo) listChildren(dir bool) error {
 
 		name := df.Name()
 		fPath := path.Join(f.Path, df.Name())
+
+		if !showHidden && IsHidden(name) {
+			continue
+		}
 
 		isSymlink, isInvalidLink := false, false
 		if IsSymlink(df.Mode()) {
@@ -117,6 +121,7 @@ func (f *FileInfo) listChildren(dir bool) error {
 			FileMode:  df.Mode(),
 			IsDir:     df.IsDir(),
 			IsSymlink: isSymlink,
+			IsHidden:  IsHidden(fPath),
 			Extension: filepath.Ext(name),
 			Path:      fPath,
 			Mode:      fmt.Sprintf("%04o", df.Mode().Perm()),

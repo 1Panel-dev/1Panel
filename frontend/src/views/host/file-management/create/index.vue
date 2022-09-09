@@ -5,14 +5,20 @@
         :title="$t('commons.button.create')"
         width="30%"
         @open="onOpen"
-        v-loading="loading"
     >
-        <el-form ref="fileForm" label-position="left" :model="addForm" label-width="100px" :rules="rules">
-            <el-form-item :label="$t('file.path')" prop="path"> <el-input v-model="getPath" disabled /></el-form-item>
-            <el-form-item :label="$t('file.name')" prop="name"> <el-input v-model="addForm.name" /></el-form-item>
+        <el-form
+            ref="fileForm"
+            label-position="left"
+            :model="addForm"
+            label-width="100px"
+            :rules="rules"
+            v-loading="loading"
+        >
+            <el-form-item :label="$t('file.path')" prop="path"><el-input v-model="getPath" disabled /></el-form-item>
+            <el-form-item :label="$t('file.name')" prop="name"><el-input v-model="addForm.name" /></el-form-item>
             <el-form-item v-if="!addForm.isDir">
-                <el-checkbox v-model="addForm.isLink" :label="$t('file.link')"></el-checkbox
-            ></el-form-item>
+                <el-checkbox v-model="addForm.isLink" :label="$t('file.link')"></el-checkbox>
+            </el-form-item>
             <el-form-item :label="$t('file.linkType')" v-if="addForm.isLink" prop="linkType">
                 <el-radio-group v-model="addForm.isSymlink">
                     <el-radio :label="true">{{ $t('file.softLink') }}</el-radio>

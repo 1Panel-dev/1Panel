@@ -11,12 +11,13 @@
                     :key="key"
                     @click="jump(key)"
                     :right="key == paths.length - 1"
-                    >{{ item }}</BreadCrumbItem
                 >
+                    {{ item }}
+                </BreadCrumbItem>
             </BreadCrumbs>
         </div>
         <div>
-            <el-input :prefix-icon="Search"> </el-input>
+            <el-input :prefix-icon="Search"></el-input>
             <el-table :data="data" highlight-current-row height="40vh">
                 <el-table-column width="40" fix>
                     <template #default="{ row }">

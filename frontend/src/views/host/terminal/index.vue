@@ -30,7 +30,7 @@
                                 <el-icon style="margin-top: 1px" color="#F56C6C" v-if="item.status === 'closed'">
                                     <circleClose />
                                 </el-icon>
-                                <span> &nbsp;{{ item.title }}&nbsp;&nbsp;</span>
+                                <span>&nbsp;{{ item.title }}&nbsp;&nbsp;</span>
                             </span>
                         </template>
                         <Terminal

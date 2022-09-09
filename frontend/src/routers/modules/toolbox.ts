@@ -1,7 +1,7 @@
 import { Layout } from '@/routers/constant';
 
 const toolBoxRouter = {
-    sort: 7,
+    sort: 9,
     path: '/toolbox',
     component: Layout,
     redirect: '/toolbox',
@@ -14,9 +14,7 @@ const toolBoxRouter = {
             path: '/toolbox',
             name: 'ToolBox',
             component: () => import('@/views/toolbox/index.vue'),
-            meta: {
-                keepAlive: true,
-            },
+            meta: {},
         },
     ],
 };

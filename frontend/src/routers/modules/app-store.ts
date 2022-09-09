@@ -1,6 +1,5 @@
 import { Layout } from '@/routers/constant';
 
-// demo
 const appStoreRouter = {
     sort: 2,
     path: '/apps',
@@ -15,9 +14,7 @@ const appStoreRouter = {
             path: '/apps',
             name: 'App',
             component: () => import('@/views/app-store/index.vue'),
-            meta: {
-                keepAlive: true,
-            },
+            meta: {},
         },
     ],
 };
