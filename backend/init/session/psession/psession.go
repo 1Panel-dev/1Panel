@@ -28,7 +28,7 @@ func (p *PSession) Get(sessionID string) (SessionUser, error) {
 	if err != nil {
 		return result, err
 	}
-	json.Unmarshal(item, &result)
+	_ = json.Unmarshal(item, &result)
 	return result, nil
 }
 

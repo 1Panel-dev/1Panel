@@ -1,7 +1,7 @@
 <template>
     <div
         class="menu"
-        :style="{ width: isCollapse ? '65px' : '220px' }"
+        :style="{ width: isCollapse ? '65px' : '180px' }"
         element-loading-text="Loading..."
         :element-loading-spinner="loadingSvg"
         element-loading-svg-view-box="-10, -10, 50, 50"
@@ -20,6 +20,14 @@
                 active-text-color="#fff"
             >
                 <SubItem :menuList="routerMenus"></SubItem>
+                <el-menu-item>
+                    <el-icon>
+                        <SvgIcon :iconName="'p-logout'" :className="'svg-icon'"></SvgIcon>
+                    </el-icon>
+                    <template #title>
+                        <span @click="logout">{{ $t('commons.header.logout') }}</span>
+                    </template>
+                </el-menu-item>
             </el-menu>
         </el-scrollbar>
     </div>
@@ -32,9 +40,14 @@ import { MenuStore } from '@/store/modules/menu';
 import { loadingSvg } from '@/utils/svg';
 import Logo from './components/logo.vue';
 import SubItem from './components/sub-item.vue';
-import { menuList } from '@/routers/router';
+import router, { menuList } from '@/routers/router';
+import { logOutApi } from '@/api/modules/login';
+import i18n from '@/lang';
+import { ElMessageBox, ElMessage } from 'element-plus';
+import { GlobalStore } from '@/store';
 const route = useRoute();
 const menuStore = MenuStore();
+const globalStore = GlobalStore();
 
 onMounted(async () => {
     menuStore.setMenuList(menuList);
@@ -62,6 +75,26 @@ const listeningWindow = () => {
     };
 };
 listeningWindow();
+
+const logout = () => {
+    ElMessageBox.confirm(i18n.global.t('commons.msg.sureLogOut'), i18n.global.t('commons.msg.infoTitle'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'warning',
+    }).then(() => {
+        systemLogOut();
+        router.push({ name: 'login' });
+        globalStore.setLogStatus(false);
+        ElMessage({
+            type: 'success',
+            message: i18n.global.t('commons.msg.operationSuccess'),
+        });
+    });
+};
+
+const systemLogOut = async () => {
+    await logOutApi();
+};
 </script>
 
 <style scoped lang="scss">
