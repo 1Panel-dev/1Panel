@@ -84,16 +84,12 @@
                                 {{ $t('file.download') }}
                             </el-button>
                         </el-button-group>
-
-                        <!-- <el-button type="primary" plain> {{ $t('file.sync') }}</el-button>
-                        <el-button type="primary" plain> {{ $t('file.terminal') }}</el-button>
-                        <el-button type="primary" plain> {{ $t('file.shareList') }}</el-button> -->
                     </template>
                     <el-table-column type="selection" width="55" />
                     <el-table-column :label="$t('commons.table.name')" min-width="250" fix show-overflow-tooltip>
                         <template #default="{ row }">
                             <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
-                            <svg-icon v-else className="table-icon" iconName="p-file-normal"></svg-icon>
+                            <svg-icon v-else className="table-icon" :iconName="getIconName(row.extension)"></svg-icon>
                             <el-link :underline="false" @click="open(row)">{{ row.name }}</el-link>
                             <span v-if="row.isSymlink">-> {{ row.linkPath }}</span>
                         </template>
@@ -190,7 +186,7 @@ import {
     SaveFileContent,
     ComputeDirSize,
 } from '@/api/modules/files';
-import { computeSize, dateFromat, getRandomStr } from '@/utils/util';
+import { computeSize, dateFromat, getIcon, getRandomStr } from '@/utils/util';
 import { File } from '@/api/interface/file';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElMessage } from 'element-plus';
@@ -361,6 +357,10 @@ const getDirSize = async (row: any) => {
         .finally(() => {
             loading.value = false;
         });
+};
+
+const getIconName = (extension: string) => {
+    return getIcon(extension);
 };
 
 const closeCreate = () => {

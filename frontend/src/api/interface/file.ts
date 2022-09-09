@@ -17,6 +17,7 @@ export namespace File {
         mimeType: string;
         dirSize: number;
         items: File[];
+        extension: string;
     }
 
     export interface ReqFile {
