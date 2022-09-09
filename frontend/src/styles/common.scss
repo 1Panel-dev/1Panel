@@ -114,3 +114,13 @@
 .form-button {
     float: right;
 }
+
+.input-help {
+  font-size: 12px;
+  word-break: break-all;
+  color: #4A4B4D;
+  transform: scale(0.9);
+  transform-origin: left;
+  width: 110%;
+  display: inline-block;
+}

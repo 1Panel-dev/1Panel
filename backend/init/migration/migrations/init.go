@@ -1,6 +1,8 @@
 package migrations
 
 import (
+	"time"
+
 	"github.com/1Panel-dev/1Panel/app/model"
 
 	"github.com/go-gormigrate/gormigrate/v2"
@@ -90,11 +92,17 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "SessionTimeout", Value: "86400"}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: "LocalTime", Value: ""}).Error; err != nil {
+			return err
+		}
 
 		if err := tx.Create(&model.Setting{Key: "ServerPort", Value: "4004"}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "SecurityEntrance", Value: "/89dc6ae8"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "PasswordTimeOut", Value: time.Now().AddDate(0, 0, 10).Format("2016.01.02 15:04:05")}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "ComplexityVerification", Value: "enable"}).Error; err != nil {

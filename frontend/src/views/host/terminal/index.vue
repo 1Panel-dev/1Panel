@@ -34,7 +34,7 @@
                             </span>
                         </template>
                         <Terminal
-                            style="height: calc(100vh - 210px); background-color: #000"
+                            style="height: calc(100vh - 150px); background-color: #000"
                             :ref="'Ref' + item.key"
                             :wsID="item.wsID"
                             :terminalID="item.key"
@@ -106,7 +106,7 @@
                     </el-tab-pane>
                     <div v-if="terminalTabs.length === 0">
                         <el-empty
-                            style="background-color: #000; height: calc(100vh - 210px)"
+                            style="background-color: #000; height: calc(100vh - 150px)"
                             :description="$t('terminal.emptyTerminal')"
                         ></el-empty>
                     </div>
@@ -182,9 +182,9 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { Host } from '@/api/interface/host';
 import { ElMessage } from 'element-plus';
-import Terminal from '@/views/terminal/terminal/index.vue';
-import HostTab from '@/views/terminal/host/index.vue';
-import CommandTab from '@/views/terminal/command/index.vue';
+import Terminal from '@/views/host/terminal/terminal/index.vue';
+import HostTab from '@/views/host/terminal/host/index.vue';
+import CommandTab from '@/views/host/terminal/command/index.vue';
 import type Node from 'element-plus/es/components/tree/src/model/node';
 import { ElTree } from 'element-plus';
 import screenfull from 'screenfull';

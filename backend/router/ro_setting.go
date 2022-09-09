@@ -9,9 +9,10 @@ import (
 type SettingRouter struct{}
 
 func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
-	monitorRouter := Router.Group("settings").Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
+	settingRouter := Router.Group("settings").Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		monitorRouter.POST("/search", baseApi.GetSettingInfo)
+		settingRouter.POST("/search", baseApi.GetSettingInfo)
+		settingRouter.PUT("", baseApi.UpdateSetting)
 	}
 }
