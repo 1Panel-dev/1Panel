@@ -3,100 +3,45 @@
         <el-card class="topCard">
             <el-radio-group v-model="activeNames">
                 <el-radio-button class="topButton" size="large" label="all">全部</el-radio-button>
-                <el-radio-button class="topButton" size="large" label="user">用户设置</el-radio-button>
-                <el-radio-button class="topButton" size="large" label="panel">面板设置</el-radio-button>
-                <el-radio-button class="topButton" size="large" label="safe">安全设置</el-radio-button>
-                <el-radio-button class="topButton" size="large" label="backup">备份设置</el-radio-button>
-                <el-radio-button class="topButton" size="large" label="monitor">监控设置</el-radio-button>
-                <el-radio-button class="topButton" size="large" label="message">通知设置</el-radio-button>
+                <el-radio-button class="topButton" size="large" label="panel">面板</el-radio-button>
+                <el-radio-button class="topButton" size="large" label="safe">安全</el-radio-button>
+                <el-radio-button class="topButton" size="large" label="backup">备份</el-radio-button>
+                <el-radio-button class="topButton" size="large" label="monitor">监控</el-radio-button>
+                <el-radio-button class="topButton" size="large" label="message">通知</el-radio-button>
                 <el-radio-button class="topButton" size="large" label="about">关于</el-radio-button>
             </el-radio-group>
         </el-card>
-        <el-form :model="form" label-position="left" label-width="120px">
-            <el-card v-if="activeNames === 'all' || activeNames === 'user'" style="margin-top: 20px">
-                <template #header>
-                    <div class="card-header">
-                        <span>用户设置</span>
-                    </div>
-                </template>
-                <el-row>
-                    <el-col :span="1"><br /></el-col>
-                    <el-col :span="8">
-                        <el-form-item label="用户名">
-                            <el-input size="small" clearable v-model="form.userName" />
-                        </el-form-item>
-                        <el-form-item label="密码">
-                            <el-input type="password" clearable show-password size="small" v-model="form.password" />
-                        </el-form-item>
-                        <el-form-item label="主题色">
-                            <el-radio-group size="small" v-model="form.theme">
-                                <el-radio-button label="black">
-                                    <el-icon><Moon /></el-icon>黑金
-                                </el-radio-button>
-                                <el-tooltip
-                                    effect="dark"
-                                    placement="top"
-                                    content="选择自动设置，将会在晚 6 点到次日早 6 点间自动切换到黑金主题。"
-                                >
-                                    <el-radio-button label="auto" icon="Sunny">
-                                        <el-icon><MagicStick /></el-icon>自动
-                                    </el-radio-button>
-                                </el-tooltip>
-                                <el-radio-button label="write">
-                                    <el-icon><Sunny /></el-icon>白金
-                                </el-radio-button>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item label="系统语言">
-                            <el-radio-group size="small" v-model="form.language">
-                                <el-radio-button label="ch">中文 </el-radio-button>
-                                <el-radio-button label="en">English </el-radio-button>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button size="small" icon="Pointer">更新用户设置</el-button>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-card>
-            <el-card v-if="activeNames === 'all' || activeNames === 'panel'" style="margin-top: 10px">
-                <template #header>
-                    <div class="card-header">
-                        <span>面板设置</span>
-                    </div>
-                </template>
-                <el-row>
-                    <el-col :span="1"><br /></el-col>
-                    <el-col :span="8">
-                        <el-form-item label="超时时间">
-                            <el-input size="small" v-model="form.sessionTimeout" />
-                        </el-form-item>
-                        <el-form-item label="同步时间">
-                            <el-input size="small" v-model="form.password" />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-card>
-        </el-form>
+        <Panel v-if="activeNames === 'all' || activeNames === 'panel'" :settingInfo="form" />
+        <Safe v-if="activeNames === 'all' || activeNames === 'safe'" :settingInfo="form" />
+        <Backup v-if="activeNames === 'all' || activeNames === 'backup'" :settingInfo="form" />
+        <Monitor v-if="activeNames === 'all' || activeNames === 'monitor'" :settingInfo="form" />
+        <Message v-if="activeNames === 'all' || activeNames === 'message'" :settingInfo="form" />
     </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted } from 'vue';
 import { getSettingInfo } from '@/api/modules/setting';
 import { Setting } from '@/api/interface/setting';
+import Panel from '@/views/setting/tabs/panel.vue';
+import Safe from '@/views/setting/tabs/safe.vue';
+import Backup from '@/views/setting/tabs/backup.vue';
+import Monitor from '@/views/setting/tabs/monitor.vue';
+import Message from '@/views/setting/tabs/message.vue';
 
 const activeNames = ref('all');
-let form = reactive<Setting.SettingInfo>({
+let form = ref<Setting.SettingInfo>({
     userName: '',
     password: '',
     email: '',
     sessionTimeout: '',
+    localTime: '',
     panelName: '',
     theme: '',
     language: '',
     serverPort: '',
     securityEntrance: '',
+    passwordTimeOut: '',
     complexityVerification: '',
     mfaStatus: '',
     monitorStatus: '',
@@ -109,9 +54,10 @@ let form = reactive<Setting.SettingInfo>({
 
 const search = async () => {
     const res = await getSettingInfo();
-    console.log(res);
-    form = res.data;
+    form.value = res.data;
+    form.value.password = '******';
 };
+
 onMounted(() => {
     search();
 });

@@ -1,13 +1,13 @@
 import { Layout } from '@/routers/constant';
 
 const settingRouter = {
-    sort: 3,
+    sort: 7,
     path: '/settings',
     component: Layout,
     redirect: '/setting',
     meta: {
         title: 'menu.settings',
-        icon: 'Setting',
+        icon: 'p-config',
     },
     children: [
         {

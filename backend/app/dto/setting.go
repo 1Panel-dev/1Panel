@@ -2,10 +2,10 @@ package dto
 
 type SettingInfo struct {
 	UserName string `json:"userName"`
-	Password string `json:"password"`
 	Email    string `json:"email"`
 
 	SessionTimeout string `json:"sessionTimeout"`
+	LocalTime      string `json:"localTime"`
 
 	PanelName string `json:"panelName"`
 	Theme     string `json:"theme"`
@@ -13,6 +13,7 @@ type SettingInfo struct {
 
 	ServerPort             string `json:"serverPort"`
 	SecurityEntrance       string `json:"securityEntrance"`
+	PasswordTimeOut        string `json:"passwordTimeOut"`
 	ComplexityVerification string `json:"complexityVerification"`
 	MFAStatus              string `json:"mfaStatus"`
 
