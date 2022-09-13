@@ -11,7 +11,6 @@ const globalStore = GlobalStore();
 const config = {
     baseURL: import.meta.env.VITE_API_URL as string,
     timeout: ResultEnum.TIMEOUT as number,
-    // 跨域时候允许携带凭证
     withCredentials: true,
 };
 
@@ -80,6 +79,9 @@ class RequestHttp {
     }
     download<BlobPart>(url: string, params?: object, _object = {}): Promise<BlobPart> {
         return this.service.post(url, params, _object);
+    }
+    upload<T>(url: string, params: object = {}, config: AxiosRequestConfig): Promise<T> {
+        return this.service.post(url, params, config);
     }
 }
 

@@ -1,5 +1,6 @@
 import { File } from '@/api/interface/file';
 import http from '@/api';
+import { AxiosRequestConfig } from 'axios';
 
 export const GetFilesList = (params: File.ReqFile) => {
     return http.post<File.File>('files/search', params);
@@ -37,8 +38,8 @@ export const SaveFileContent = (params: File.FileEdit) => {
     return http.post<File.File>('files/save', params);
 };
 
-export const UploadFileData = (params: FormData) => {
-    return http.post<File.File>('files/upload', params);
+export const UploadFileData = (params: FormData, config: AxiosRequestConfig) => {
+    return http.upload<File.File>('files/upload', params, config);
 };
 
 export const RenameRile = (params: File.FileRename) => {
