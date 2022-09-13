@@ -65,7 +65,7 @@ const loginRules = reactive({
 // 登录表单数据
 const loginForm = reactive<Login.ReqLoginForm>({
     name: 'admin',
-    password: 'Songliu123++',
+    password: 'Calong@2015',
     captcha: '',
     captchaID: '',
     authMethod: '',
@@ -93,8 +93,7 @@ const login = (formEl: FormInstance | undefined) => {
                 captchaID: captcha.captchaID,
                 authMethod: '',
             };
-            const res = await loginApi(requestLoginForm);
-            globalStore.setUserInfo(res.data.name);
+            await loginApi(requestLoginForm);
             globalStore.setLogStatus(true);
             menuStore.setMenuList([]);
             ElMessage.success(i18n.global.t('commons.msg.loginSuccess'));

@@ -3,6 +3,9 @@ export default {
         button: {
             create: 'Create',
             add: 'Add',
+            save: 'Save',
+            set: 'Reset',
+            sync: 'Sync',
             delete: 'Delete',
             edit: 'Edit',
             confirm: 'Confirm',
@@ -74,12 +77,10 @@ export default {
             logout: 'Logout',
         },
     },
-    business: {
-        user: {
-            username: 'Username',
-            email: 'Email',
-            password: 'Password',
-        },
+    auth: {
+        username: 'Username',
+        email: 'Email',
+        password: 'Password',
     },
     menu: {
         home: 'Overview',
@@ -248,5 +249,24 @@ export default {
         uploadSuccess: 'Upload Success!',
         downloadProcess: 'Download Process',
         downloading: 'Downloading...',
+    },
+    setting: {
+        panel: 'Panel',
+        emailHelper: 'For password retrieval',
+        title: 'Panel alias',
+        theme: 'Theme',
+        dark: 'Dark',
+        light: 'Light',
+        language: 'Language',
+        languageHelper:
+            'By default, it follows the browser language. This parameter takes effect only on the current browser',
+        sessionTimeout: 'Timeout',
+        sessionTimeoutHelper:
+            'If you do not operate the panel for more than {0} seconds, the panel automatically logs out',
+        syncTime: 'Synchronization time',
+        changePassword: 'Password change',
+        oldPassword: 'Original password',
+        newPassword: 'New password',
+        retryPassword: 'Confirm password',
     },
 };

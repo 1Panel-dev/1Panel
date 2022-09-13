@@ -2,22 +2,18 @@ import { RouteRecordRaw } from 'vue-router';
 
 /* themeConfigProp */
 export interface ThemeConfigProp {
+    panelName: string;
     primary: string;
-    isDark: boolean;
-    isGrey: boolean;
-    isWeak: boolean;
-    breadcrumb: boolean;
-    tabs: boolean;
+    theme: string; // dark | bright ｜ auto
     footer: boolean;
 }
 
 /* GlobalState */
 export interface GlobalState {
     isLogin: boolean;
-    userInfo: any;
     csrfToken: string;
-    assemblySize: string;
-    language: string;
+    language: string; // zh | en
+    assemblySize: string; // small | default | large
     themeConfig: ThemeConfigProp;
 }
 

@@ -8,17 +8,13 @@ export const GlobalStore = defineStore({
     id: 'GlobalState',
     state: (): GlobalState => ({
         isLogin: false,
-        userInfo: '',
         csrfToken: '',
-        assemblySize: 'default',
+        assemblySize: 'small',
         language: '',
         themeConfig: {
+            panelName: '',
             primary: '#409EFF',
-            isDark: false,
-            isGrey: false,
-            isWeak: false,
-            breadcrumb: true,
-            tabs: false,
+            theme: 'bright',
             footer: true,
         },
     }),
@@ -27,13 +23,10 @@ export const GlobalStore = defineStore({
         setLogStatus(login: boolean) {
             this.isLogin = login;
         },
-        setUserInfo(userInfo: any) {
-            this.userInfo = userInfo;
-        },
         setCsrfToken(token: string) {
             this.csrfToken = token;
         },
-        setAssemblySizeSize(assemblySize: string) {
+        setAssemblySize(assemblySize: string) {
             this.assemblySize = assemblySize;
         },
         updateLanguage(language: string) {
@@ -46,7 +39,6 @@ export const GlobalStore = defineStore({
     persist: piniaPersistConfig('GlobalState'),
 });
 
-// piniaPersist(持久化)
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 
