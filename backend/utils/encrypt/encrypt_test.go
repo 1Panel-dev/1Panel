@@ -18,7 +18,7 @@ func TestStringEncrypt(t *testing.T) {
 
 func TestStringDecrypt(t *testing.T) {
 	viper.Init()
-	p, err := StringDecrypt("5WYEZ4XcitdomVvAyimt9WwJwBJJSbTTHncZoqyOraQ=")
+	p, err := StringDecrypt("Jmg4EUACGznt3dEQTJ+0ZRxwLaVNsNg7R5RcZ0V7ElQ=")
 	if err != nil {
 		t.Fatal(err)
 	}

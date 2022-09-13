@@ -1,12 +1,11 @@
 <template>
     <div class="logo flx-center">
-        <img src="@/assets/images/logo.svg" alt="logo" />
-        <span v-show="!isCollapse">1Panel</span>
+        <span v-show="!isCollapse">{{ panelName }}</span>
     </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{ isCollapse: boolean }>();
+defineProps<{ isCollapse: boolean; panelName: string }>();
 </script>
 
 <style scoped lang="scss">

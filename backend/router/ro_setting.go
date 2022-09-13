@@ -10,10 +10,12 @@ type SettingRouter struct{}
 
 func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 	settingRouter := Router.Group("settings").Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
+	withRecordRouter := Router.Group("settings").Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		settingRouter.POST("/search", baseApi.GetSettingInfo)
-		settingRouter.PUT("", baseApi.UpdateSetting)
+		withRecordRouter.PUT("", baseApi.UpdateSetting)
 		settingRouter.PUT("/password", baseApi.UpdatePassword)
+		settingRouter.POST("/time/sync", baseApi.SyncTime)
 	}
 }

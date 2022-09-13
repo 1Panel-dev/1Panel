@@ -7,7 +7,7 @@
         element-loading-svg-view-box="-10, -10, 50, 50"
         element-loading-background="rgba(122, 122, 122, 0.01)"
     >
-        <Logo :isCollapse="isCollapse"></Logo>
+        <Logo :panelName="panelName" :isCollapse="isCollapse"></Logo>
         <el-scrollbar>
             <el-menu
                 :default-active="activeMenu"
@@ -48,11 +48,6 @@ import { GlobalStore } from '@/store';
 const route = useRoute();
 const menuStore = MenuStore();
 const globalStore = GlobalStore();
-
-onMounted(async () => {
-    menuStore.setMenuList(menuList);
-});
-
 // const activeMenu = computed((): string => route.path);
 const activeMenu = computed(() => {
     const { meta, path } = route;
@@ -62,6 +57,9 @@ const activeMenu = computed(() => {
     return path;
 });
 const isCollapse = computed((): boolean => menuStore.isCollapse);
+const panelName = computed(() => {
+    return globalStore.themeConfig.panelName;
+});
 const routerMenus = computed((): RouteRecordRaw[] => menuStore.menuList);
 
 const screenWidth = ref<number>(0);
@@ -95,6 +93,9 @@ const logout = () => {
 const systemLogOut = async () => {
     await logOutApi();
 };
+onMounted(async () => {
+    menuStore.setMenuList(menuList);
+});
 </script>
 
 <style scoped lang="scss">

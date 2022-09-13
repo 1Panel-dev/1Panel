@@ -63,7 +63,7 @@
                             </template>
                         </el-input>
                         <div>
-                            <span class="input-help"> 为面板密码设置过期时间，过期后需要重新设置密码 </span>
+                            <span class="input-help">为面板密码设置过期时间，过期后需要重新设置密码</span>
                         </div>
                     </el-form-item>
                     <el-form-item label="密码复杂度验证">
