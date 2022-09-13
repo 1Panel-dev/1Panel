@@ -30,7 +30,7 @@
                         </el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-button icon="Delete"> 清空监控记录 </el-button>
+                        <el-button icon="Delete">清空监控记录</el-button>
                     </el-form-item>
                 </el-col>
             </el-row>

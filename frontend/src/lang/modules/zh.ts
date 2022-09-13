@@ -3,6 +3,9 @@ export default {
         button: {
             create: '新建',
             add: '添加',
+            save: '保存',
+            set: '设置',
+            sync: '同步',
             delete: '删除',
             edit: '编辑',
             confirm: '确认',
@@ -85,12 +88,10 @@ export default {
             logout: '退出登录',
         },
     },
-    business: {
-        user: {
-            username: '用户名',
-            email: '邮箱',
-            password: '密码',
-        },
+    auth: {
+        username: '用户名',
+        email: '邮箱',
+        password: '密码',
     },
     menu: {
         home: '概览',
@@ -258,5 +259,23 @@ export default {
         uploadSuccess: '上传成功!',
         downloadProcess: '下载进度',
         downloading: '正在下载...',
+    },
+    setting: {
+        panel: '面板',
+        emailHelper: '用于密码找回',
+        title: '面板别名',
+        theme: '主题色',
+        componentSize: '组件大小',
+        dark: '黑金',
+        light: '白金',
+        language: '系统语言',
+        languageHelper: '默认跟随浏览器语言，设置后只对当前浏览器生效，更换浏览器后需要重新设置',
+        sessionTimeout: '超时时间',
+        sessionTimeoutHelper: '如果用户超过 {0} 秒未操作面板，面板将自动退出登录',
+        syncTime: '同步时间',
+        changePassword: '密码修改',
+        oldPassword: '原密码',
+        newPassword: '新密码',
+        retryPassword: '确认密码',
     },
 };

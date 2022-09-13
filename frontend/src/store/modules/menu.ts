@@ -7,9 +7,7 @@ const whiteList = ['/login', '/error'];
 export const MenuStore = defineStore({
     id: 'MenuState',
     state: (): MenuState => ({
-        // menu collapse
         isCollapse: false,
-        // menu List
         menuList: [],
     }),
     getters: {},

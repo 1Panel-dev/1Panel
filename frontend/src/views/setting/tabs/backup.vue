@@ -7,7 +7,7 @@
         </template>
         <el-row>
             <el-col :span="1"><br /></el-col>
-            <el-col :span="8"> </el-col>
+            <el-col :span="8"></el-col>
         </el-row>
     </el-card>
 </template>

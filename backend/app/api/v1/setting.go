@@ -5,6 +5,7 @@ import (
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/utils/ntp"
 	"github.com/gin-gonic/gin"
 )
 
@@ -51,4 +52,21 @@ func (b *BaseApi) UpdatePassword(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) SyncTime(c *gin.Context) {
+	var timeLayoutStr = "2006-01-02 15:04:05"
+
+	ntime, err := ntp.Getremotetime()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	ts := ntime.Format(timeLayoutStr)
+	if err := ntp.UpdateSystemDate(ts); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, ts)
 }

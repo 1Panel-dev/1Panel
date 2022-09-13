@@ -2,13 +2,13 @@
     <LayoutContent :header="$t('commons.button.' + op)" :back-name="'Table'">
         <template #form>
             <el-form ref="ruleFormRef" label-position="left" :model="demoForm" :rules="rules" label-width="140px">
-                <el-form-item :label="$t('business.user.username')" prop="name">
+                <el-form-item :label="$t('auth.username')" prop="name">
                     <el-input v-model="demoForm.name" />
                 </el-form-item>
-                <el-form-item :label="$t('business.user.email')" prop="email">
+                <el-form-item :label="$t('auth.email')" prop="email">
                     <el-input v-model="demoForm.email" />
                 </el-form-item>
-                <el-form-item :label="$t('business.user.password')" prop="password">
+                <el-form-item :label="$t('auth.password')" prop="password">
                     <el-input type="password" v-model="demoForm.password" />
                 </el-form-item>
             </el-form>
