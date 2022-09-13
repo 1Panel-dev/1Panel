@@ -244,5 +244,6 @@ export default {
         copy: 'Cpoy',
         calculate: 'Calculate',
         canNotDeCompress: 'Can not DeCompress this File',
+        uploadSuccess: 'Upload Success!',
     },
 };
