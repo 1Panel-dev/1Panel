@@ -16,6 +16,7 @@ type SettingInfo struct {
 	PasswordTimeOut        string `json:"passwordTimeOut"`
 	ComplexityVerification string `json:"complexityVerification"`
 	MFAStatus              string `json:"mfaStatus"`
+	MFASecret              string `json:"mfaSecret"`
 
 	MonitorStatus    string `json:"monitorStatus"`
 	MonitorStoreDays string `json:"monitorStoreDays"`

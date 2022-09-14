@@ -1,9 +1,11 @@
 package job
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/app/model"
+	"github.com/1Panel-dev/1Panel/app/repo"
 	"github.com/1Panel-dev/1Panel/global"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
@@ -19,6 +21,11 @@ func NewMonitorJob() *monitor {
 }
 
 func (m *monitor) Run() {
+	settingRepo := repo.NewISettingRepo()
+	monitorStatus, _ := settingRepo.Get(settingRepo.WithByKey("MonitorStatus"))
+	if monitorStatus.Value == "disable" {
+		return
+	}
 	var itemModel model.MonitorBase
 	totalPercent, _ := cpu.Percent(3*time.Second, false)
 	if len(totalPercent) == 1 {
@@ -35,7 +42,9 @@ func (m *monitor) Run() {
 	memoryInfo, _ := mem.VirtualMemory()
 	itemModel.Memory = memoryInfo.UsedPercent
 
-	_ = global.DB.Create(&itemModel)
+	if err := global.DB.Create(&itemModel).Error; err != nil {
+		global.LOG.Debug("create monitor base failed, err: %v", err)
+	}
 
 	ioStat, _ := disk.IOCounters()
 	for _, v := range ioStat {
@@ -67,7 +76,9 @@ func (m *monitor) Run() {
 		if writeTime > itemIO.Time {
 			itemIO.Time = writeTime
 		}
-		_ = global.DB.Create(&itemIO)
+		if err := global.DB.Create(&itemIO).Error; err != nil {
+			global.LOG.Debug("create monitor io failed, err: %v", err)
+		}
 	}
 
 	netStat, _ := net.IOCounters(true)
@@ -84,7 +95,9 @@ func (m *monitor) Run() {
 		stime := time.Since(aheadData.CreatedAt).Seconds()
 		itemNet.Up = float64(v.BytesSent-aheadData.BytesSent) / 1024 / stime
 		itemNet.Down = float64(v.BytesRecv-aheadData.BytesRecv) / 1024 / stime
-		_ = global.DB.Create(&itemNet)
+		if err := global.DB.Create(&itemNet).Error; err != nil {
+			global.LOG.Debug("create monitor network failed, err: %v", err)
+		}
 	}
 	netStatAll, _ := net.IOCounters(false)
 	if len(netStatAll) != 0 {
@@ -100,6 +113,18 @@ func (m *monitor) Run() {
 		stime := time.Since(aheadData.CreatedAt).Seconds()
 		itemNet.Up = float64(netStatAll[0].BytesSent-aheadData.BytesSent) / 1024 / stime
 		itemNet.Down = float64(netStatAll[0].BytesRecv-aheadData.BytesRecv) / 1024 / stime
-		_ = global.DB.Create(&itemNet)
+		if err := global.DB.Create(&itemNet).Error; err != nil {
+			global.LOG.Debug("create monitor network all failed, err: %v", err)
+		}
 	}
+
+	MonitorStoreDays, err := settingRepo.Get(settingRepo.WithByKey("MonitorStoreDays"))
+	if err != nil {
+		return
+	}
+	storeDays, _ := strconv.Atoi(MonitorStoreDays.Value)
+	timeForDelete := time.Now().AddDate(0, 0, -storeDays)
+	_ = global.DB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorBase{}).Error
+	_ = global.DB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorIO{}).Error
+	_ = global.DB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorNetwork{}).Error
 }
