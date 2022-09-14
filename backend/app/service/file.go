@@ -7,6 +7,7 @@ import (
 	"github.com/1Panel-dev/1Panel/global"
 	"github.com/1Panel-dev/1Panel/utils/files"
 	"github.com/pkg/errors"
+	uuid "github.com/satori/go.uuid"
 	"io"
 	"io/fs"
 	"os"
@@ -123,9 +124,10 @@ func (f FileService) ChangeName(re dto.FileRename) error {
 	return fo.Rename(re.OldName, re.NewName)
 }
 
-func (f FileService) Wget(w dto.FileWget) error {
+func (f FileService) Wget(w dto.FileWget) (string, error) {
 	fo := files.NewFileOp()
-	return fo.DownloadFile(w.Url, filepath.Join(w.Path, w.Name))
+	key := "file-wget-" + uuid.NewV4().String()
+	return key, fo.DownloadFile(w.Url, filepath.Join(w.Path, w.Name), key)
 }
 
 func (f FileService) MvFile(m dto.FileMove) error {

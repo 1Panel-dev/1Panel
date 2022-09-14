@@ -22,7 +22,7 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button @click="handleClose(false)" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button type="primary" @click="submit(fileForm)" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
@@ -67,19 +67,19 @@ const addForm = reactive({
 
 const em = defineEmits(['close']);
 
-const handleClose = () => {
+const handleClose = (submit: boolean) => {
     if (fileForm.value) {
         fileForm.value.resetFields();
     }
-    em('close', open);
+    if (submit != true) {
+        em('close', false);
+    } else {
+        em('close', true);
+    }
 };
 
 const getPath = (path: string) => {
     addForm.path = path;
-};
-
-const onOpen = () => {
-    addForm.path = props.path;
 };
 
 const submit = async (formEl: FormInstance | undefined) => {
@@ -92,11 +92,15 @@ const submit = async (formEl: FormInstance | undefined) => {
         WgetFile(addForm)
             .then(() => {
                 ElMessage.success(i18n.global.t('file.downloadStart'));
-                handleClose();
+                handleClose(true);
             })
             .finally(() => {
                 loading.value = false;
             });
     });
+};
+
+const onOpen = () => {
+    addForm.path = props.path;
 };
 </script>

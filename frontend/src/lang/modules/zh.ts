@@ -245,5 +245,6 @@ export default {
         calculate: '计算',
         canNotDeCompress: '无法解压此文件',
         uploadSuccess: '上传成功!',
+        downloadProcess: '下载进度',
     },
 };

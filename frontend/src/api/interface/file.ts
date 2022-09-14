@@ -80,6 +80,14 @@ export namespace File {
         url: string;
     }
 
+    export interface FileWgetRes {
+        key: string;
+    }
+
+    export interface FileKeys {
+        keys: string[];
+    }
+
     export interface FileMove {
         oldPaths: string[];
         newPath: string;

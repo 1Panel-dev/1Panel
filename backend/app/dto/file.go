@@ -83,3 +83,22 @@ type DirSizeReq struct {
 type DirSizeRes struct {
 	Size float64 `json:"size" validate:"required"`
 }
+
+type FileProcess struct {
+	Total   uint64  `json:"total"`
+	Written uint64  `json:"written"`
+	Percent float64 `json:"percent"`
+	Name    string  `json:"name"`
+}
+
+type FileProcessReq struct {
+	Key string
+}
+
+type FileProcessKeys struct {
+	Keys []string `json:"keys"`
+}
+
+type FileWgetRes struct {
+	Key string
+}
