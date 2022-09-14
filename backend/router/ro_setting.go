@@ -17,5 +17,8 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 		withRecordRouter.PUT("", baseApi.UpdateSetting)
 		settingRouter.PUT("/password", baseApi.UpdatePassword)
 		settingRouter.POST("/time/sync", baseApi.SyncTime)
+		settingRouter.POST("/monitor/clean", baseApi.CleanMonitor)
+		settingRouter.GET("/mfa", baseApi.GetMFA)
+		settingRouter.POST("/mfa/bind", baseApi.MFABind)
 	}
 }

@@ -3,33 +3,21 @@
         <el-col :span="8">
             <el-card class="el-card">
                 <el-tooltip class="box-item" effect="dark" :content="$t('terminal.createConn')" placement="top-start">
-                    <el-button icon="Plus" @click="restHostForm" size="small" />
+                    <el-button icon="Plus" @click="restHostForm" />
                 </el-tooltip>
                 <el-tooltip class="box-item" effect="dark" :content="$t('terminal.createGroup')" placement="top-start">
-                    <el-button icon="FolderAdd" @click="onGroupCreate" size="small" />
+                    <el-button icon="FolderAdd" @click="onGroupCreate" />
                 </el-tooltip>
                 <el-tooltip class="box-item" effect="dark" :content="$t('terminal.expand')" placement="top-start">
-                    <el-button icon="Expand" @click="setTreeStatus(true)" size="small" />
+                    <el-button icon="Expand" @click="setTreeStatus(true)" />
                 </el-tooltip>
                 <el-tooltip class="box-item" effect="dark" :content="$t('terminal.fold')" placement="top-start">
-                    <el-button icon="Fold" @click="setTreeStatus(false)" size="small" />
+                    <el-button icon="Fold" @click="setTreeStatus(false)" />
                 </el-tooltip>
-                <el-input
-                    size="small"
-                    @input="loadHostTree"
-                    clearable
-                    style="margin-top: 5px"
-                    v-model="searcConfig.info"
-                >
+                <el-input @input="loadHostTree" clearable style="margin-top: 5px" v-model="searcConfig.info">
                     <template #append><el-button icon="search" @click="loadHostTree" /></template>
                 </el-input>
-                <el-input
-                    size="small"
-                    v-if="groupInputShow"
-                    clearable
-                    style="margin-top: 5px"
-                    v-model="groupInputValue"
-                >
+                <el-input v-if="groupInputShow" clearable style="margin-top: 5px" v-model="groupInputValue">
                     <template #append>
                         <el-button-group>
                             <el-button icon="Check" @click="onCreateGroup" />
@@ -53,8 +41,8 @@
                             <el-button-group
                                 v-if="!(node.level === 1 && data.label === 'default') && data.id === hover"
                             >
-                                <el-button icon="Edit" size="small" @click="onEdit(node, data)" />
-                                <el-button icon="Delete" size="small" @click="onDelete(node, data)" />
+                                <el-button icon="Edit" @click="onEdit(node, data)" />
+                                <el-button icon="Delete" @click="onDelete(node, data)" />
                             </el-button-group>
                         </span>
                     </template>

@@ -1,5 +1,5 @@
 <template>
-    <el-form size="small" :model="form" label-position="left" label-width="160px">
+    <el-form :model="form" label-position="left" label-width="160px">
         <el-card style="margin-top: 20px">
             <template #header>
                 <div class="card-header">
@@ -9,7 +9,7 @@
             <el-row>
                 <el-col :span="1"><br /></el-col>
                 <el-col :span="10">
-                    <el-form-item :label="$t('auth.username')">
+                    <el-form-item :label="$t('auth.username')" prop="settingInfo.userName">
                         <el-input clearable v-model="form.settingInfo.userName">
                             <template #append>
                                 <el-button
@@ -21,7 +21,7 @@
                             </template>
                         </el-input>
                     </el-form-item>
-                    <el-form-item :label="$t('auth.password')">
+                    <el-form-item :label="$t('auth.password')" prop="settingInfo.password">
                         <el-input type="password" clearable disabled v-model="form.settingInfo.password">
                             <template #append>
                                 <el-button icon="Setting" @click="passwordVisiable = true">
@@ -30,7 +30,7 @@
                             </template>
                         </el-input>
                     </el-form-item>
-                    <el-form-item :label="$t('auth.email')">
+                    <el-form-item :label="$t('auth.email')" prop="settingInfo.email">
                         <el-input clearable v-model="form.settingInfo.email">
                             <template #append>
                                 <el-button @click="SaveSetting('Email', form.settingInfo.email)" icon="Collection">
@@ -42,7 +42,7 @@
                             <span class="input-help">{{ $t('setting.emailHelper') }}</span>
                         </div>
                     </el-form-item>
-                    <el-form-item :label="$t('setting.title')">
+                    <el-form-item :label="$t('setting.title')" prop="settingInfo.panelName">
                         <el-input clearable v-model="form.settingInfo.panelName">
                             <template #append>
                                 <el-button
@@ -54,7 +54,7 @@
                             </template>
                         </el-input>
                     </el-form-item>
-                    <el-form-item :label="$t('setting.theme')">
+                    <el-form-item :label="$t('setting.theme')" prop="settingInfo.theme">
                         <el-radio-group
                             @change="SaveSetting('Theme', form.settingInfo.theme)"
                             v-model="form.settingInfo.theme"
@@ -69,7 +69,7 @@
                             </el-radio-button>
                         </el-radio-group>
                     </el-form-item>
-                    <el-form-item :label="$t('setting.language')">
+                    <el-form-item :label="$t('setting.language')" prop="settingInfo.language">
                         <el-radio-group
                             @change="SaveSetting('Language', form.settingInfo.language)"
                             v-model="form.settingInfo.language"
@@ -83,8 +83,8 @@
                             </span>
                         </div>
                     </el-form-item>
-                    <el-form-item :label="$t('setting.sessionTimeout')">
-                        <el-input v-model="form.settingInfo.sessionTimeout">
+                    <el-form-item :label="$t('setting.sessionTimeout')" prop="settingInfo.sessionTimeout">
+                        <el-input v-model.number="form.settingInfo.sessionTimeout">
                             <template #append>
                                 <el-button
                                     @click="SaveSetting('SessionTimeout', form.settingInfo.sessionTimeout)"
@@ -114,14 +114,7 @@
         </el-card>
     </el-form>
     <el-dialog v-model="passwordVisiable" :title="$t('setting.changePassword')" width="30%">
-        <el-form
-            size="small"
-            ref="passFormRef"
-            label-width="80px"
-            label-position="left"
-            :model="passForm"
-            :rules="passRules"
-        >
+        <el-form ref="passFormRef" label-width="80px" label-position="left" :model="passForm" :rules="passRules">
             <el-form-item :label="$t('setting.oldPassword')" prop="oldPassword">
                 <el-input type="password" show-password clearable v-model="passForm.oldPassword" />
             </el-form-item>
@@ -135,7 +128,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="passwordVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button @click="submitChangePassword()">
+                <el-button @click="submitChangePassword(passFormRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -151,8 +144,8 @@ import { Setting } from '@/api/interface/setting';
 import { useI18n } from 'vue-i18n';
 import { GlobalStore } from '@/store';
 import { useTheme } from '@/hooks/use-theme';
-import { Rules } from '@/global/form-rues';
 import router from '@/routers/router';
+import { Rules } from '@/global/form-rues';
 
 const i18n = useI18n();
 const globalStore = GlobalStore();
@@ -191,6 +184,9 @@ const form = withDefaults(defineProps<Props>(), {
 const { switchDark } = useTheme();
 
 const SaveSetting = async (key: string, val: string) => {
+    if (val === '') {
+        return;
+    }
     switch (key) {
         case 'Language':
             i18n.locale.value = val;
@@ -218,12 +214,16 @@ function checkPassword(rule: any, value: any, callback: any) {
     }
     callback();
 }
-const submitChangePassword = async () => {
-    await updatePassword(passForm);
-    passwordVisiable.value = false;
-    ElMessage.success(i18n.t('commons.msg.operationSuccess'));
-    router.push({ name: 'login' });
-    globalStore.setLogStatus(false);
+const submitChangePassword = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    formEl.validate(async (valid) => {
+        if (!valid) return;
+        await updatePassword(passForm);
+        passwordVisiable.value = false;
+        ElMessage.success(i18n.t('commons.msg.operationSuccess'));
+        router.push({ name: 'login' });
+        globalStore.setLogStatus(false);
+    });
 };
 const onSyncTime = async () => {
     const res = await syncTime();

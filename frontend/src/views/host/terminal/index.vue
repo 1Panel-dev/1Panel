@@ -47,7 +47,7 @@
                                 @change="quickInput"
                                 style="width: 25%"
                                 :placeholder="$t('terminal.quickCommand')"
-                                size="small"
+                               
                             >
                                 <el-option
                                     v-for="cmd in commandList"
@@ -61,10 +61,10 @@
                                 v-model="batchVal"
                                 @keyup.enter="batchInput"
                                 style="width: 75%"
-                                size="small"
+                               
                             >
                                 <template #append>
-                                    <el-switch size="small" v-model="isBatch" class="ml-2" />
+                                    <el-switch v-model="isBatch" class="ml-2" />
                                 </template>
                             </el-input>
                         </div>
@@ -81,7 +81,7 @@
                                     <el-button @click="onNewSsh">New ssh</el-button>
                                     <el-button @click="onNewTab">New tab</el-button>
                                 </el-button-group>
-                                <el-input size="small" clearable style="margin-top: 5px" v-model="hostfilterInfo">
+                                <el-input clearable style="margin-top: 5px" v-model="hostfilterInfo">
                                     <template #append><el-button icon="search" /></template>
                                 </el-input>
                                 <el-tree

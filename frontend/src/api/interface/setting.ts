@@ -16,6 +16,7 @@ export namespace Setting {
         passwordTimeOut: string;
         complexityVerification: string;
         mfaStatus: string;
+        mfaSecret: string;
 
         monitorStatus: string;
         monitorStoreDays: string;
@@ -33,5 +34,13 @@ export namespace Setting {
         oldPassword: string;
         newPassword: string;
         retryPassword: string;
+    }
+    export interface MFAInfo {
+        secret: string;
+        qrImage: string;
+    }
+    export interface MFABind {
+        secret: string;
+        code: string;
     }
 }
