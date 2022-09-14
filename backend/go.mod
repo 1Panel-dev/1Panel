@@ -27,11 +27,13 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/shirou/gopsutil v3.21.11+incompatible
 	github.com/sirupsen/logrus v1.9.0
+	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/spf13/afero v1.8.2
 	github.com/spf13/viper v1.12.0
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a
 	github.com/swaggo/gin-swagger v1.5.1
 	github.com/swaggo/swag v1.8.4
+	github.com/xlzd/gotp v0.0.0-20220817083547-a63b9d03d72f
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
 	golang.org/x/text v0.3.7
 	gopkg.in/yaml.v2 v2.4.0

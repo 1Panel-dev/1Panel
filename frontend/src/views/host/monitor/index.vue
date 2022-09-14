@@ -9,7 +9,6 @@
                             @change="search('load')"
                             v-model="timeRangeLoad"
                             type="datetimerange"
-                            size="small"
                             :range-separator="$t('commons.search.timeRange')"
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
@@ -30,7 +29,6 @@
                             @change="search('cpu')"
                             v-model="timeRangeCpu"
                             type="datetimerange"
-                            size="small"
                             :range-separator="$t('commons.search.timeRange')"
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
@@ -49,7 +47,6 @@
                             @change="search('memory')"
                             v-model="timeRangeMemory"
                             type="datetimerange"
-                            size="small"
                             :range-separator="$t('commons.search.timeRange')"
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
@@ -70,7 +67,6 @@
                             @change="search('io')"
                             v-model="timeRangeIO"
                             type="datetimerange"
-                            size="small"
                             :range-separator="$t('commons.search.timeRange')"
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
@@ -92,7 +88,6 @@
                             @change="search('network')"
                             style="margin-left: 20px"
                             placeholder="Select"
-                            size="small"
                         >
                             <el-option v-for="item in netOptions" :key="item" :label="item" :value="item" />
                         </el-select>
@@ -100,7 +95,6 @@
                             @change="search('network')"
                             v-model="timeRangeNetwork"
                             type="datetimerange"
-                            size="small"
                             :range-separator="$t('commons.search.timeRange')"
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"

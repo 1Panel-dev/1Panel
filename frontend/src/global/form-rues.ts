@@ -20,6 +20,7 @@ interface CommonRule {
     requiredSelect: FormItemRule;
     name: FormItemRule;
     email: FormItemRule;
+    number: FormItemRule;
     ip: FormItemRule;
     port: FormItemRule;
 }
@@ -47,6 +48,13 @@ export const Rules: CommonRule = {
         type: 'email',
         message: i18n.global.t('commons.rule.email'),
         trigger: 'blur',
+    },
+    number: {
+        required: true,
+        trigger: 'blur',
+        min: 0,
+        type: 'number',
+        message: i18n.global.t('commons.rule.number'),
     },
     ip: {
         validator: checkIp,

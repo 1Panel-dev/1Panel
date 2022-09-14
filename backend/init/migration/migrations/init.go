@@ -93,6 +93,9 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "MFAStatus", Value: "disable"}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: "MFASecret", Value: ""}).Error; err != nil {
+			return err
+		}
 
 		if err := tx.Create(&model.Setting{Key: "MonitorStatus", Value: "enable"}).Error; err != nil {
 			return err

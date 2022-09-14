@@ -16,3 +16,15 @@ export const updatePassword = (param: Setting.PasswordUpdate) => {
 export const syncTime = () => {
     return http.post(`/settings/time/sync`, {});
 };
+
+export const cleanMonitors = () => {
+    return http.post(`/settings/monitor/clean`, {});
+};
+
+export const getMFA = () => {
+    return http.get<Setting.MFAInfo>(`/settings/mfa`, {});
+};
+
+export const bindMFA = (param: Setting.MFABind) => {
+    return http.post(`/settings/mfa/bind`, param);
+};
