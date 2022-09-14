@@ -2,6 +2,8 @@ package files
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"github.com/1Panel-dev/1Panel/global"
 	"github.com/mholt/archiver/v4"
 	"github.com/pkg/errors"
@@ -12,7 +14,9 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"sync"
+	"time"
 )
 
 type FileOp struct {
@@ -83,23 +87,77 @@ func (f FileOp) Rename(oldName string, newName string) error {
 	return f.Fs.Rename(oldName, newName)
 }
 
-func (f FileOp) DownloadFile(url, dst string) error {
+type WriteCounter struct {
+	Total   uint64
+	Written uint64
+	Key     string
+	Name    string
+}
+
+type Process struct {
+	Total   uint64  `json:"total"`
+	Written uint64  `json:"written"`
+	Percent float64 `json:"percent"`
+	Name    string  `json:"name"`
+}
+
+func (w *WriteCounter) Write(p []byte) (n int, err error) {
+	n = len(p)
+	w.Written += uint64(n)
+	w.SaveProcess()
+	return n, nil
+}
+
+func (w *WriteCounter) SaveProcess() {
+	percent := float64(w.Written) / float64(w.Total) * 100
+	percentValue, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", percent), 64)
+
+	process := Process{
+		Total:   w.Total,
+		Written: w.Written,
+		Percent: percentValue,
+		Name:    w.Name,
+	}
+
+	by, _ := json.Marshal(process)
+
+	if percentValue < 100 {
+		if err := global.CACHE.Set(w.Key, string(by)); err != nil {
+			global.LOG.Errorf("save cache error, err %s", err.Error())
+		}
+	} else {
+		if err := global.CACHE.SetWithTTL(w.Key, string(by), time.Second*time.Duration(10)); err != nil {
+			global.LOG.Errorf("save cache error, err %s", err.Error())
+		}
+	}
+
+}
+
+func (f FileOp) DownloadFile(url, dst, key string) error {
 	resp, err := http.Get(url)
 	if err != nil {
-		panic(err)
+		global.LOG.Errorf("get download file [%s] error, err %s", dst, err.Error())
 	}
-	defer resp.Body.Close()
+	header, err := http.Head(url)
+	if err != nil {
+		global.LOG.Errorf("get download file [%s] error, err %s", dst, err.Error())
+	}
 
 	out, err := os.Create(dst)
 	if err != nil {
-		panic(err)
+		global.LOG.Errorf("create download file [%s] error, err %s", dst, err.Error())
 	}
-	defer out.Close()
 
 	go func() {
-		if _, err = io.Copy(out, resp.Body); err != nil {
+		counter := &WriteCounter{}
+		counter.Key = key
+		counter.Total = uint64(header.ContentLength)
+		counter.Name = filepath.Base(dst)
+		if _, err = io.Copy(out, io.TeeReader(resp.Body, counter)); err != nil {
 			global.LOG.Errorf("save download file [%s] error, err %s", dst, err.Error())
 		}
+		out.Close()
+		resp.Body.Close()
 	}()
 
 	return nil

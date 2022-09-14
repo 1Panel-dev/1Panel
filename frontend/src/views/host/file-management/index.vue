@@ -172,6 +172,7 @@
                 :name="downloadPage.name"
                 @close="closeDownload"
             ></Download>
+            <Process :open="processPage.open" @close="closeProcess"></Process>
         </el-row>
     </LayoutContent>
 </template>
@@ -206,6 +207,7 @@ import Wget from './wget/index.vue';
 import Move from './move/index.vue';
 import Download from './download/index.vue';
 import { Mimetypes } from '@/global/mimetype';
+import Process from './process/index.vue';
 
 const data = ref();
 let selects = ref<any>([]);
@@ -227,6 +229,7 @@ const renamePage = reactive({ open: false, path: '', oldName: '' });
 const wgetPage = reactive({ open: false, path: '' });
 const movePage = reactive({ open: false, oldPaths: [''], type: '' });
 const downloadPage = reactive({ open: false, paths: [''], name: '' });
+const processPage = reactive({ open: false });
 
 const defaultProps = {
     children: 'children',
@@ -445,9 +448,21 @@ const openWget = () => {
     wgetPage.path = req.path;
 };
 
-const closeWget = () => {
+const closeWget = (submit: any) => {
+    console.log(submit);
     wgetPage.open = false;
     search(req);
+    if (submit) {
+        openProcess();
+    }
+};
+
+const openProcess = () => {
+    processPage.open = true;
+};
+
+const closeProcess = () => {
+    processPage.open = false;
 };
 
 const openRename = (item: File.File) => {
@@ -490,7 +505,6 @@ const closeDownload = () => {
     downloadPage.open = false;
     search(req);
 };
-
 const saveContent = (content: string) => {
     editorPage.loading = true;
     SaveFileContent({ path: codeReq.path, content: content }).finally(() => {

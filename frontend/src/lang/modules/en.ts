@@ -245,5 +245,6 @@ export default {
         calculate: 'Calculate',
         canNotDeCompress: 'Can not DeCompress this File',
         uploadSuccess: 'Upload Success!',
+        downloadProcess: 'Download Process',
     },
 };

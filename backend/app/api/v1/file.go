@@ -6,7 +6,10 @@ import (
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
+	websocket2 "github.com/1Panel-dev/1Panel/utils/websocket"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
+	"net/http"
 	"path"
 )
 
@@ -174,11 +177,14 @@ func (b *BaseApi) WgetFile(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if err := fileService.Wget(req); err != nil {
+	key, err := fileService.Wget(req)
+	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithData(c, dto.FileWgetRes{
+		Key: key,
+	})
 }
 
 func (b *BaseApi) MoveFile(c *gin.Context) {
@@ -219,5 +225,39 @@ func (b *BaseApi) Size(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
+	helper.SuccessWithData(c, res)
+}
+
+var wsUpgrade = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
+
+var WsManager = websocket2.Manager{
+	Group:       make(map[string]*websocket2.Client),
+	Register:    make(chan *websocket2.Client, 128),
+	UnRegister:  make(chan *websocket2.Client, 128),
+	ClientCount: 0,
+}
+
+func (b *BaseApi) Ws(c *gin.Context) {
+	ws, err := wsUpgrade.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		return
+	}
+	wsClient := websocket2.NewWsClient("13232", ws)
+	go wsClient.Read()
+	go wsClient.Write()
+}
+
+func (b *BaseApi) Keys(c *gin.Context) {
+	res := &dto.FileProcessKeys{}
+	keys, err := global.CACHE.PrefixScanKey("file-wget-")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	res.Keys = keys
 	helper.SuccessWithData(c, res)
 }

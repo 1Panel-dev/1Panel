@@ -36,11 +36,11 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         server: {
             port: viteEnv.VITE_PORT,
             open: viteEnv.VITE_OPEN,
-            host: '0.0.0.0',
+            // host: '0.0.0.0',
             // https: false,
             proxy: {
                 '/api/v1': {
-                    target: 'http://localhost:9999',
+                    target: 'http://127.0.0.1:9999',
                     changeOrigin: true,
                     // rewrite: (path) => path.replace(/^\/api/, ''),
                 },

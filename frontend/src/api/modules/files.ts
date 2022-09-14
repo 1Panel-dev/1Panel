@@ -47,7 +47,7 @@ export const RenameRile = (params: File.FileRename) => {
 };
 
 export const WgetFile = (params: File.FileWget) => {
-    return http.post<File.File>('files/wget', params);
+    return http.post<File.FileWgetRes>('files/wget', params);
 };
 
 export const MoveFile = (params: File.FileMove) => {
@@ -60,4 +60,8 @@ export const DownloadFile = (params: File.FileDownload) => {
 
 export const ComputeDirSize = (params: File.DirSizeReq) => {
     return http.post<File.DirSizeRes>('files/size', params);
+};
+
+export const FileKeys = () => {
+    return http.get<File.FileKeys>('files/keys');
 };
