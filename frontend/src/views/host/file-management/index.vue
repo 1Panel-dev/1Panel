@@ -43,6 +43,7 @@
                     v-model:selects="selects"
                     :data="data"
                     v-loading="loading"
+                    @search="search(req)"
                 >
                     <template #toolbar>
                         <el-button-group>
@@ -211,7 +212,7 @@ import Process from './process/index.vue';
 
 const data = ref();
 let selects = ref<any>([]);
-let req = reactive({ path: '/', expand: true, showHidden: false });
+let req = reactive({ path: '/', expand: true, showHidden: false, page: 1, pageSize: 100 });
 let loading = ref(false);
 let treeLoading = ref(false);
 const paths = ref<string[]>([]);
@@ -223,7 +224,7 @@ const modePage = reactive({ open: false, modeForm: { path: '/', isDir: false, mo
 const compressPage = reactive({ open: false, files: [''], name: '', dst: '' });
 const deCompressPage = reactive({ open: false, path: '', name: '', dst: '', mimeType: '' });
 const editorPage = reactive({ open: false, content: '', loading: false });
-const codeReq = reactive({ path: '', expand: false });
+const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100 });
 const uploadPage = reactive({ open: false, path: '' });
 const renamePage = reactive({ open: false, path: '', oldName: '' });
 const wgetPage = reactive({ open: false, path: '' });
@@ -239,14 +240,17 @@ const defaultProps = {
 
 const paginationConfig = reactive({
     page: 1,
-    pageSize: 5,
+    pageSize: 100,
     total: 0,
 });
 
 const search = async (req: File.ReqFile) => {
     loading.value = true;
+    req.page = paginationConfig.page;
+    req.pageSize = paginationConfig.pageSize;
     await GetFilesList(req)
         .then((res) => {
+            paginationConfig.total = res.data.itemTotal;
             data.value = res.data.items;
             req.path = res.data.path;
             const pathArray = req.path.split('/');
