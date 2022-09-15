@@ -5,13 +5,7 @@
                 <div class="login-left">
                     <img src="@/assets/images/login_left0.png" alt="login" />
                 </div>
-                <div class="login-form">
-                    <div class="login-logo">
-                        <img class="login-icon" src="@/assets/images/logo.svg" alt="" />
-                        <h2 class="logo-text">1Panel</h2>
-                    </div>
-                    <LoginForm ref="loginRef"></LoginForm>
-                </div>
+                <LoginForm ref="loginRef"></LoginForm>
             </div>
         </div>
         <div style="margin-left: 50px" v-if="statusCode == -1">
@@ -37,12 +31,8 @@
 
 <script setup lang="ts" name="login">
 import LoginForm from './components/login-form.vue';
-import { ref, onMounted, onBeforeMount } from 'vue';
+import { ref, onMounted } from 'vue';
 import { loginStatus, entrance } from '@/api/modules/auth';
-import { useRouter } from 'vue-router';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
-const router = useRouter();
 
 interface Props {
     code: string;
@@ -69,11 +59,6 @@ const getStatus = async () => {
     }
 };
 
-onBeforeMount(() => {
-    if (globalStore.isLogin) {
-        router.push({ name: 'home' });
-    }
-});
 onMounted(() => {
     getStatus();
 });

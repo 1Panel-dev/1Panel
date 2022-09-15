@@ -34,3 +34,11 @@ type Login struct {
 	CaptchaID  string `json:"captchaID"`
 	AuthMethod string `json:"authMethod"`
 }
+
+type MFALogin struct {
+	Name       string `json:"name" validate:"name,required"`
+	Password   string `json:"password" validate:"required"`
+	Secret     string `json:"secret" validate:"required"`
+	Code       string `json:"code"`
+	AuthMethod string `json:"authMethod"`
+}
