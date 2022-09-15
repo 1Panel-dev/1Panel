@@ -61,6 +61,13 @@ export default {
         },
         login: {
             captchaHelper: '请输入验证码',
+            safeEntrance: '请使用正确的入口登录面板',
+            reason: '错误原因：',
+            reasonHelper:
+                '当前新安装的已经开启了安全入口登录，新装机器都会随机一个8位字符的安全入口名称，亦可以在面板设置处修改，如您没记录或不记得了，可以使用以下方式解决',
+            solution: '解决方法：',
+            solutionHelper: '在SSH终端输入以下一种命令来解决 1.查看面板入口：/etc/init.d/bt default',
+            warnning: '注意：【关闭安全入口】将使您的面板登录地址被直接暴露在互联网上，非常危险，请谨慎操作',
         },
         rule: {
             username: '请输入用户名',
@@ -101,7 +108,6 @@ export default {
     },
     menu: {
         home: '概览',
-        demo: '样例',
         monitor: '监控',
         terminal: '终端',
         operations: '操作日志',
@@ -287,7 +293,7 @@ export default {
         panelPort: '面板端口',
         portHelper: '建议端口范围8888 - 65535，注意：有安全组的服务器请提前在安全组放行新端口',
         safeEntrance: '安全入口',
-        safeEntranceHelper: '面板管理入口，设置后只能通过指定安全入口登录面板,如: /89dc6ae8',
+        safeEntranceHelper: '面板管理入口，设置后只能通过指定安全入口登录面板,如: 89dc6ae8',
         passwordTimeout: '密码过期时间',
         timeoutHelper: '【 {0} 天后 】面板密码即将过期，过期后需要重新设置密码',
         complexity: '密码复杂度验证',

@@ -8,6 +8,8 @@ export default {
             sync: 'Sync',
             delete: 'Delete',
             edit: 'Edit',
+            enable: 'Enable',
+            disable: 'Disable',
             confirm: 'Confirm',
             cancel: 'Cancel',
             reset: 'Reset',
@@ -49,6 +51,15 @@ export default {
         },
         login: {
             captchaHelper: 'Please enter the verification code',
+            safeEntrance: 'Please use the correct entry to log in to the panel',
+            reason: 'Cause of error:',
+            reasonHelper:
+                'At present, the newly installed machine has enabled the security entrance login. The newly installed machine will have a random 8-character security entrance name, which can also be modified in the panel Settings. If you do not record or do not remember, you can use the following methods to solve the problem',
+            solution: 'The solution:',
+            solutionHelper:
+                'Run the following command on the SSH terminal to solve the problem: 1. View the /etc/init.d/bt default command on the panel',
+            warnning:
+                'Note: [Closing the security entrance] will make your panel login address directly exposed to the Internet, very dangerous, please exercise caution',
         },
         rule: {
             username: 'Please enter a username',
@@ -87,7 +98,6 @@ export default {
     },
     menu: {
         home: 'Overview',
-        demo: 'Example',
         terminal: 'Terminal',
         apps: 'App Store',
         website: 'Website',

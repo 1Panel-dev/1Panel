@@ -46,7 +46,7 @@ import { useRouter } from 'vue-router';
 import { Login } from '@/api/interface';
 import type { ElForm } from 'element-plus';
 import { ElMessage } from 'element-plus';
-import { loginApi, getCaptcha } from '@/api/modules/login';
+import { loginApi, getCaptcha } from '@/api/modules/auth';
 import { GlobalStore } from '@/store';
 import { MenuStore } from '@/store/modules/menu';
 import i18n from '@/lang';
@@ -111,17 +111,15 @@ const resetForm = (formEl: FormInstance | undefined) => {
     formEl.resetFields();
 };
 
-const loginVerify = () => {
-    getCaptcha().then(async (ele) => {
-        captcha.imagePath = ele.data?.imagePath ? ele.data.imagePath : '';
-        captcha.captchaID = ele.data?.captchaID ? ele.data.captchaID : '';
-        captcha.captchaLength = ele.data?.captchaLength ? ele.data.captchaLength : 0;
-    });
+const loginVerify = async () => {
+    const res = await getCaptcha();
+    captcha.imagePath = res.data.imagePath ? res.data.imagePath : '';
+    captcha.captchaID = res.data.captchaID ? res.data.captchaID : '';
+    captcha.captchaLength = res.data.captchaLength ? res.data.captchaLength : 0;
 };
 loginVerify();
 
 onMounted(() => {
-    // 监听enter事件（调用登录）
     document.onkeydown = (e: any) => {
         e = window.event || e;
         if (e.code === 'Enter' || e.code === 'enter' || e.code === 'NumpadEnter') {

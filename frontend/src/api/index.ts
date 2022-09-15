@@ -49,6 +49,12 @@ class RequestHttp {
                     });
                     return Promise.reject(data);
                 }
+                if (data.code == ResultEnum.UNSAFETY) {
+                    router.replace({
+                        path: '/login',
+                    });
+                    return data;
+                }
                 if (data.code && data.code !== ResultEnum.SUCCESS) {
                     ElMessage.error(data.msg);
                     return Promise.reject(data);

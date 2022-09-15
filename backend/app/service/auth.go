@@ -16,6 +16,8 @@ import (
 type AuthService struct{}
 
 type IAuthService interface {
+	SafetyStatus(c *gin.Context) error
+	VerifyCode(code string) (bool, error)
 	Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error)
 	LogOut(c *gin.Context) error
 }
@@ -86,6 +88,33 @@ func (u *AuthService) LogOut(c *gin.Context) error {
 		if err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func (u *AuthService) VerifyCode(code string) (bool, error) {
+	setting, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntrance"))
+	if err != nil {
+		return false, err
+	}
+	return setting.Value == code, nil
+}
+
+func (u *AuthService) SafetyStatus(c *gin.Context) error {
+	setting, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntrance"))
+	if err != nil {
+		return err
+	}
+	codeWithEcrypt, err := c.Cookie(encrypt.Md5(setting.Value))
+	if err != nil {
+		return err
+	}
+	code, err := encrypt.StringDecrypt(codeWithEcrypt)
+	if err != nil {
+		return err
+	}
+	if code != encrypt.Md5(setting.Value) {
+		return errors.New("code not match")
 	}
 	return nil
 }

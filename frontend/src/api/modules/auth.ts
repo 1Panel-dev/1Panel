@@ -12,3 +12,11 @@ export const getCaptcha = () => {
 export const logOutApi = () => {
     return http.post<any>(`/auth/logout`);
 };
+
+export const entrance = (code: string) => {
+    return http.get<any>(`/${code}`);
+};
+
+export const loginStatus = () => {
+    return http.get<any>('/info');
+};
