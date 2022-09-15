@@ -47,7 +47,6 @@
                                 @change="quickInput"
                                 style="width: 25%"
                                 :placeholder="$t('terminal.quickCommand')"
-                               
                             >
                                 <el-option
                                     v-for="cmd in commandList"
@@ -61,7 +60,6 @@
                                 v-model="batchVal"
                                 @keyup.enter="batchInput"
                                 style="width: 75%"
-                               
                             >
                                 <template #append>
                                     <el-switch v-model="isBatch" class="ml-2" />

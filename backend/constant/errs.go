@@ -8,6 +8,7 @@ const (
 	CodeSuccess           = 200
 	CodeErrBadRequest     = 400
 	CodeErrUnauthorized   = 401
+	CodeErrUnSafety       = 402
 	CodeErrForbidden      = 403
 	CodeErrNotFound       = 404
 	CodeErrInternalServer = 500
@@ -33,5 +34,6 @@ var (
 	ErrTypeInvalidParams  = "ErrInvalidParams"
 	ErrTypeToken          = "ErrToken"
 	ErrTypeTokenTimeOut   = "ErrTokenTimeOut"
-	ErrTypeNotLogin       = "ErrTypeNotLogin"
+	ErrTypeNotLogin       = "ErrNotLogin"
+	ErrTypeNotSafety      = "ErrNotSafety"
 )

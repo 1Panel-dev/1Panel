@@ -35,7 +35,7 @@
                                 </span>
                             </div>
                         </el-form-item>
-                        <el-form-item label="$t('setting.safeEntrance')">
+                        <el-form-item :label="$t('setting.safeEntrance')">
                             <el-input clearable v-model="form.settingInfo.securityEntrance">
                                 <template #append>
                                     <el-button
