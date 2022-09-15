@@ -1,11 +1,14 @@
 package v1
 
 import (
+	"errors"
+
 	"github.com/1Panel-dev/1Panel/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
 	"github.com/1Panel-dev/1Panel/utils/captcha"
+	"github.com/1Panel-dev/1Panel/utils/encrypt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -46,6 +49,37 @@ func (b *BaseApi) Captcha(c *gin.Context) {
 	captcha, err := captcha.CreateCaptcha()
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
 	}
 	helper.SuccessWithData(c, captcha)
+}
+
+func (b *BaseApi) GetSafetyStatus(c *gin.Context) {
+	if err := authService.SafetyStatus(c); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrUnSafety, constant.ErrTypeNotSafety, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) SafeEntrance(c *gin.Context) {
+	code, exist := c.Params.Get("code")
+	if !exist {
+		helper.ErrorWithDetail(c, constant.CodeErrUnSafety, constant.ErrTypeNotSafety, errors.New("missing code"))
+		return
+	}
+	ok, err := authService.VerifyCode(code)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrUnSafety, constant.ErrTypeNotSafety, errors.New("missing code"))
+		return
+	}
+	if !ok {
+		helper.ErrorWithDetail(c, constant.CodeErrUnSafety, constant.ErrTypeNotSafety, errors.New("missing code"))
+		return
+	}
+	codeWithMD5 := encrypt.Md5(code)
+	cookieValue, _ := encrypt.StringEncrypt(codeWithMD5)
+	c.SetCookie(codeWithMD5, cookieValue, 86400, "", "", false, false)
+
+	helper.SuccessWithData(c, nil)
 }

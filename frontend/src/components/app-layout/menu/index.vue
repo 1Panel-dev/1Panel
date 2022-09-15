@@ -41,7 +41,7 @@ import { loadingSvg } from '@/utils/svg';
 import Logo from './components/logo.vue';
 import SubItem from './components/sub-item.vue';
 import router, { menuList } from '@/routers/router';
-import { logOutApi } from '@/api/modules/login';
+import { logOutApi } from '@/api/modules/auth';
 import i18n from '@/lang';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { GlobalStore } from '@/store';

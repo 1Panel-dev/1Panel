@@ -3,6 +3,7 @@ package router
 import (
 	"html/template"
 
+	v1 "github.com/1Panel-dev/1Panel/app/api/v1"
 	"github.com/1Panel-dev/1Panel/docs"
 	"github.com/1Panel-dev/1Panel/i18n"
 	"github.com/1Panel-dev/1Panel/middleware"
@@ -19,8 +20,11 @@ func Routers() *gin.Engine {
 	Router.Use(middleware.LoadCsrfToken())
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
-	Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
 	Router.Use(i18n.GinI18nLocalize())
+	Router.GET("/api/v1/info", v1.ApiGroupApp.BaseApi.GetSafetyStatus)
+	Router.GET("/api/v1/:code", v1.ApiGroupApp.BaseApi.SafeEntrance)
+	Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	Router.SetFuncMap(template.FuncMap{
 		"Localize": ginI18n.GetMessage,
@@ -35,7 +39,9 @@ func Routers() *gin.Engine {
 			c.JSON(200, "ok")
 		})
 	}
+
 	PrivateGroup := Router.Group("/api/v1")
+	PrivateGroup.Use(middleware.SafetyAuth())
 	{
 		systemRouter.InitBaseRouter(PrivateGroup)
 		systemRouter.InitHostRouter(PrivateGroup)

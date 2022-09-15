@@ -1,10 +1,10 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import { Layout } from '@/routers/constant';
 
 const modules = import.meta.globEager('./modules/*.ts');
 
 const homeRouter: RouteRecordRaw = {
-    path: '/',
+    path: '/home',
     component: Layout,
     redirect: '/home/index',
     meta: {
@@ -55,8 +55,9 @@ menuList.unshift(homeRouter);
 export const routes: RouteRecordRaw[] = [
     homeRouter,
     {
-        path: '/login',
+        path: '/login/:code?',
         name: 'login',
+        props: true,
         component: () => import('@/views/login/index.vue'),
         meta: {
             requiresAuth: false,
@@ -70,7 +71,7 @@ export const routes: RouteRecordRaw[] = [
     },
 ];
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes: routes as RouteRecordRaw[],
     strict: false,
     scrollBehavior: () => ({ left: 0, top: 0 }),

@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/md5"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"io"
 
@@ -36,6 +38,12 @@ func StringDecrypt(text string) (string, error) {
 		return result, err
 	}
 	return "", err
+}
+
+func Md5(str string) string {
+	h := md5.New()
+	h.Write([]byte(str))
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 func padding(plaintext []byte, blockSize int) []byte {

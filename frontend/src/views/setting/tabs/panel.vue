@@ -221,7 +221,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
         await updatePassword(passForm);
         passwordVisiable.value = false;
         ElMessage.success(i18n.t('commons.msg.operationSuccess'));
-        router.push({ name: 'login' });
+        router.push({ name: 'login', params: { code: '' } });
         globalStore.setLogStatus(false);
     });
 };
