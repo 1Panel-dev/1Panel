@@ -60,6 +60,7 @@ export default {
                 'Run the following command on the SSH terminal to solve the problem: 1. View the /etc/init.d/bt default command on the panel',
             warnning:
                 'Note: [Closing the security entrance] will make your panel login address directly exposed to the Internet, very dangerous, please exercise caution',
+            codeInput: 'Please enter the 6-digit verification code of the MFA validator',
         },
         rule: {
             username: 'Please enter a username',

@@ -1,42 +1,75 @@
 <template>
-    <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" size="large">
-        <el-form-item prop="username">
-            <el-input v-model="loginForm.name">
-                <template #prefix>
-                    <el-icon class="el-input__icon">
-                        <user />
-                    </el-icon>
-                </template>
-            </el-input>
-        </el-form-item>
-        <el-form-item prop="password">
-            <el-input type="password" v-model="loginForm.password" show-password autocomplete="new-password">
-                <template #prefix>
-                    <el-icon class="el-input__icon">
-                        <lock />
-                    </el-icon>
-                </template>
-            </el-input>
-        </el-form-item>
-    </el-form>
-    <el-form-item prop="captcha">
-        <div class="vPicBox">
-            <el-input v-model="loginForm.captcha" :placeholder="$t('commons.login.captchaHelper')" style="width: 60%" />
-            <div class="vPic">
-                <img
-                    v-if="captcha.imagePath"
-                    :src="captcha.imagePath"
-                    :alt="$t('commons.login.captchaHelper')"
-                    @click="loginVerify()"
-                />
+    <div>
+        <div v-if="mfaShow" class="login-mfa-form">
+            <div class="info-text">
+                <span style="font-size: 14px">{{ $t('commons.login.codeInput') }}</span>
+            </div>
+            <div>
+                <span>Secret:{{ mfaLoginForm.secret }}</span>
+            </div>
+            <el-input v-model="mfaLoginForm.code"></el-input>
+            <el-button class="login-btn" type="primary" @click="mfaLogin()">
+                {{ $t('commons.button.login') }}
+            </el-button>
+        </div>
+        <div v-if="!mfaShow">
+            <div class="login-form">
+                <div class="login-logo">
+                    <img class="login-icon" src="@/assets/images/logo.svg" alt="" />
+                    <h2 class="logo-text">1Panel</h2>
+                </div>
+                <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" size="large">
+                    <el-form-item prop="username">
+                        <el-input v-model="loginForm.name">
+                            <template #prefix>
+                                <el-icon class="el-input__icon">
+                                    <user />
+                                </el-icon>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item prop="password">
+                        <el-input
+                            type="password"
+                            v-model="loginForm.password"
+                            show-password
+                            autocomplete="new-password"
+                        >
+                            <template #prefix>
+                                <el-icon class="el-input__icon">
+                                    <lock />
+                                </el-icon>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+                </el-form>
+                <el-form-item prop="captcha">
+                    <div class="vPicBox">
+                        <el-input
+                            v-model="loginForm.captcha"
+                            :placeholder="$t('commons.login.captchaHelper')"
+                            style="width: 60%"
+                        />
+                        <div class="vPic">
+                            <img
+                                v-if="captcha.imagePath"
+                                :src="captcha.imagePath"
+                                :alt="$t('commons.login.captchaHelper')"
+                                @click="loginVerify()"
+                            />
+                        </div>
+                    </div>
+                </el-form-item>
+                <div class="login-btn">
+                    <el-button round @click="resetForm(loginFormRef)" size="large">
+                        {{ $t('commons.button.reset') }}
+                    </el-button>
+                    <el-button round @click="login(loginFormRef)" size="large" type="primary" :loading="loading">
+                        {{ $t('commons.button.login') }}
+                    </el-button>
+                </div>
             </div>
         </div>
-    </el-form-item>
-    <div class="login-btn">
-        <el-button round @click="resetForm(loginFormRef)" size="large">{{ $t('commons.button.reset') }}</el-button>
-        <el-button round @click="login(loginFormRef)" size="large" type="primary" :loading="loading">
-            {{ $t('commons.button.login') }}
-        </el-button>
     </div>
 </template>
 
@@ -46,7 +79,7 @@ import { useRouter } from 'vue-router';
 import { Login } from '@/api/interface';
 import type { ElForm } from 'element-plus';
 import { ElMessage } from 'element-plus';
-import { loginApi, getCaptcha } from '@/api/modules/auth';
+import { loginApi, getCaptcha, mfaLoginApi } from '@/api/modules/auth';
 import { GlobalStore } from '@/store';
 import { MenuStore } from '@/store/modules/menu';
 import i18n from '@/lang';
@@ -54,7 +87,6 @@ import i18n from '@/lang';
 const globalStore = GlobalStore();
 const menuStore = MenuStore();
 
-// 定义 formRef（校验规则）
 type FormInstance = InstanceType<typeof ElForm>;
 const loginFormRef = ref<FormInstance>();
 const loginRules = reactive({
@@ -62,12 +94,18 @@ const loginRules = reactive({
     password: [{ required: true, message: i18n.global.t('commons.rule.password'), trigger: 'blur' }],
 });
 
-// 登录表单数据
 const loginForm = reactive<Login.ReqLoginForm>({
     name: 'admin',
     password: 'Calong@2015',
     captcha: '',
     captchaID: '',
+    authMethod: '',
+});
+const mfaLoginForm = reactive<Login.MFALoginForm>({
+    name: 'admin',
+    password: 'Calong@2015',
+    secret: '',
+    code: '',
     authMethod: '',
 });
 
@@ -78,6 +116,8 @@ const captcha = reactive<Login.ResCaptcha>({
 });
 
 const loading = ref<boolean>(false);
+const mfaShow = ref<boolean>(false);
+
 const router = useRouter();
 
 const login = (formEl: FormInstance | undefined) => {
@@ -93,7 +133,12 @@ const login = (formEl: FormInstance | undefined) => {
                 captchaID: captcha.captchaID,
                 authMethod: '',
             };
-            await loginApi(requestLoginForm);
+            const res = await loginApi(requestLoginForm);
+            if (res.data.mfaStatus === 'enable') {
+                mfaShow.value = true;
+                mfaLoginForm.secret = res.data.mfaSecret;
+                return;
+            }
             globalStore.setLogStatus(true);
             menuStore.setMenuList([]);
             ElMessage.success(i18n.global.t('commons.msg.loginSuccess'));
@@ -104,6 +149,18 @@ const login = (formEl: FormInstance | undefined) => {
             loading.value = false;
         }
     });
+};
+
+const mfaLogin = async () => {
+    if (mfaLoginForm.code) {
+        mfaLoginForm.name = loginForm.name;
+        mfaLoginForm.password = loginForm.password;
+        await mfaLoginApi(mfaLoginForm);
+        globalStore.setLogStatus(true);
+        menuStore.setMenuList([]);
+        ElMessage.success(i18n.global.t('commons.msg.loginSuccess'));
+        router.push({ name: 'home' });
+    }
 };
 
 const resetForm = (formEl: FormInstance | undefined) => {

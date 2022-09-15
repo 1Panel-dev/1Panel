@@ -33,9 +33,18 @@ export namespace Login {
         captchaID: string;
         authMethod: string;
     }
+    export interface MFALoginForm {
+        name: string;
+        password: string;
+        secret: string;
+        code: string;
+        authMethod: string;
+    }
     export interface ResLogin {
         name: string;
         token: string;
+        mfaStatus: string;
+        mfaSecret: string;
     }
     export interface ResCaptcha {
         imagePath: string;

@@ -5,6 +5,10 @@ export const loginApi = (params: Login.ReqLoginForm) => {
     return http.post<Login.ResLogin>(`/auth/login`, params);
 };
 
+export const mfaLoginApi = (params: Login.MFALoginForm) => {
+    return http.post<Login.ResLogin>(`/auth/mfalogin`, params);
+};
+
 export const getCaptcha = () => {
     return http.get<Login.ResCaptcha>(`/auth/captcha`);
 };
