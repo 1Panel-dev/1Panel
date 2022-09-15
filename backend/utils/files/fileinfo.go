@@ -31,6 +31,7 @@ type FileInfo struct {
 	ModTime    time.Time   `json:"modTime"`
 	FileMode   os.FileMode `json:"-"`
 	Items      []*FileInfo `json:"items"`
+	ItemTotal  int         `json:"itemTotal"`
 }
 
 type FileOption struct {
@@ -39,6 +40,8 @@ type FileOption struct {
 	Expand     bool   `json:"expand"`
 	Dir        bool   `json:"dir"`
 	ShowHidden bool   `json:"showHidden"`
+	Page       int    `json:"page"`
+	PageSize   int    `json:"pageSize"`
 }
 
 func NewFileInfo(op FileOption) (*FileInfo, error) {
@@ -70,7 +73,7 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 	}
 	if op.Expand {
 		if file.IsDir {
-			if err := file.listChildren(op.Dir, op.ShowHidden); err != nil {
+			if err := file.listChildren(op.Dir, op.ShowHidden, op.Page, op.PageSize); err != nil {
 				return nil, err
 			}
 			return file, nil
@@ -83,12 +86,14 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 	return file, nil
 }
 
-func (f *FileInfo) listChildren(dir, showHidden bool) error {
+func (f *FileInfo) listChildren(dir, showHidden bool, page, pageSize int) error {
 	afs := &afero.Afero{Fs: f.Fs}
 	files, err := afs.ReadDir(f.Path)
 	if err != nil {
 		return err
 	}
+	f.ItemTotal = len(files)
+
 	var items []*FileInfo
 	for _, df := range files {
 		if dir && !df.IsDir() {
@@ -138,7 +143,17 @@ func (f *FileInfo) listChildren(dir, showHidden bool) error {
 		}
 		items = append(items, file)
 	}
-	f.Items = items
+
+	start := (page - 1) * pageSize
+	end := pageSize + start
+	var result []*FileInfo
+	if start < 0 || start > f.ItemTotal || end < 0 || start > end || end > f.ItemTotal {
+		result = items
+	} else {
+		result = items[start:end]
+	}
+
+	f.Items = result
 	return nil
 }
 

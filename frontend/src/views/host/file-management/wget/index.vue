@@ -9,7 +9,7 @@
             v-loading="loading"
         >
             <el-form-item :label="$t('file.downloadUrl')" prop="url">
-                <el-input v-model="addForm.url" />
+                <el-input v-model="addForm.url" @input="getFileName" />
             </el-form-item>
             <el-form-item :label="$t('file.path')" prop="path">
                 <el-input v-model="addForm.path">
@@ -98,6 +98,11 @@ const submit = async (formEl: FormInstance | undefined) => {
                 loading.value = false;
             });
     });
+};
+
+const getFileName = (url: string) => {
+    const paths = url.split('/');
+    addForm.name = paths[paths.length - 1];
 };
 
 const onOpen = () => {
