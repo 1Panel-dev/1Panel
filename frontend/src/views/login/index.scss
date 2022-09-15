@@ -67,5 +67,27 @@
                 }
             }
         }
+        .login-mfa-form {
+            width: 420px;
+            padding: 50px 40px 45px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 2px 3px 7px rgb(0 0 0 / 20%);
+                .info-text {
+                    margin: 0;
+                    font-size: 24px;
+                    font-weight: 500;
+                    color: #34495e;
+                    white-space: nowrap;
+                }
+            .login-btn {
+                width: 100%;
+                margin-top: 10px;
+                white-space: nowrap;
+                .el-button {
+                    width: 185px;
+                }
+            }
+        }
     }
 }

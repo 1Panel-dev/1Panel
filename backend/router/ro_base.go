@@ -14,6 +14,7 @@ func (s *BaseRouter) InitBaseRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		baseRouter.GET("captcha", baseApi.Captcha)
+		baseRouter.POST("mfalogin", baseApi.MFALogin)
 		withRecordRouter.POST("login", baseApi.Login)
 		withRecordRouter.POST("logout", baseApi.LogOut)
 	}

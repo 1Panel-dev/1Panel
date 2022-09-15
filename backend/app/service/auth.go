@@ -39,9 +39,45 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo,
 	if err != nil {
 		return nil, err
 	}
-	if info.Password != pass {
+	if info.Password != pass && nameSetting.Value == info.Name {
 		return nil, errors.New("login failed")
 	}
+	mfa, err := settingRepo.Get(settingRepo.WithByKey("MFAStatus"))
+	if err != nil {
+		return nil, err
+	}
+	if mfa.Value == "enable" {
+		mfaSecret, err := settingRepo.Get(settingRepo.WithByKey("MFASecret"))
+		if err != nil {
+			return nil, err
+		}
+		return &dto.UserLoginInfo{Name: nameSetting.Value, MfaStatus: mfa.Value, MfaSecret: mfaSecret.Value}, nil
+	}
+
+	return u.generateSession(c, info.Name, info.AuthMethod)
+}
+
+func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin) (*dto.UserLoginInfo, error) {
+	nameSetting, err := settingRepo.Get(settingRepo.WithByKey("UserName"))
+	if err != nil {
+		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
+	}
+	passwrodSetting, err := settingRepo.Get(settingRepo.WithByKey("Password"))
+	if err != nil {
+		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
+	}
+	pass, err := encrypt.StringDecrypt(passwrodSetting.Value)
+	if err != nil {
+		return nil, err
+	}
+	if info.Password != pass && nameSetting.Value == info.Name {
+		return nil, errors.New("login failed")
+	}
+
+	return u.generateSession(c, info.Name, info.AuthMethod)
+}
+
+func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (*dto.UserLoginInfo, error) {
 	setting, err := settingRepo.Get(settingRepo.WithByKey("SessionTimeout"))
 	if err != nil {
 		return nil, err
@@ -51,16 +87,16 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo,
 		return nil, err
 	}
 
-	if info.AuthMethod == constant.AuthMethodJWT {
+	if authMethod == constant.AuthMethodJWT {
 		j := jwt.NewJWT()
 		claims := j.CreateClaims(jwt.BaseClaims{
-			Name: nameSetting.Value,
+			Name: name,
 		}, lifeTime)
 		token, err := j.CreateToken(claims)
 		if err != nil {
 			return nil, err
 		}
-		return &dto.UserLoginInfo{Name: nameSetting.Value, Token: token}, err
+		return &dto.UserLoginInfo{Name: name, Token: token}, nil
 	}
 	sID, _ := c.Cookie(constant.SessionName)
 	sessionUser, err := global.SESSION.Get(sID)
@@ -71,13 +107,13 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo,
 		if err != nil {
 			return nil, err
 		}
-		return &dto.UserLoginInfo{Name: nameSetting.Value}, nil
+		return &dto.UserLoginInfo{Name: name}, nil
 	}
 	if err := global.SESSION.Set(sID, sessionUser, lifeTime); err != nil {
 		return nil, err
 	}
 
-	return &dto.UserLoginInfo{Name: nameSetting.Value}, nil
+	return &dto.UserLoginInfo{Name: name}, nil
 }
 
 func (u *AuthService) LogOut(c *gin.Context) error {
