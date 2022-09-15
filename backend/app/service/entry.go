@@ -9,6 +9,7 @@ type ServiceGroup struct {
 	CommandService
 	OperationService
 	FileService
+	SettingService
 }
 
 var ServiceGroupApp = new(ServiceGroup)
@@ -20,4 +21,5 @@ var (
 	commandRepo   = repo.RepoGroupApp.CommandRepo
 	operationRepo = repo.RepoGroupApp.OperationRepo
 	commonRepo    = repo.RepoGroupApp.CommonRepo
+	settingRepo   = repo.RepoGroupApp.SettingRepo
 )

@@ -1,4 +1,4 @@
-import { CommonModel } from '.';
+import { CommonModel, ReqPage } from '.';
 export namespace File {
     export interface File extends CommonModel {
         path: string;
@@ -18,9 +18,10 @@ export namespace File {
         dirSize: number;
         items: File[];
         extension: string;
+        itemTotal: number;
     }
 
-    export interface ReqFile {
+    export interface ReqFile extends ReqPage {
         path: string;
         search?: string;
         expand: boolean;

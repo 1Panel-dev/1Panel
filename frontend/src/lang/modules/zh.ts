@@ -100,6 +100,7 @@ export default {
         monitor: '监控',
         operations: '操作记录',
         files: '文件管理',
+        settings: '系统设置',
     },
     home: {
         welcome: '欢迎使用',
@@ -246,5 +247,6 @@ export default {
         canNotDeCompress: '无法解压此文件',
         uploadSuccess: '上传成功!',
         downloadProcess: '下载进度',
+        downloading: '正在下载...',
     },
 };

@@ -7,15 +7,16 @@
         :before-close="handleClose"
     >
         <div v-for="(value, index) in res" :key="index">
-            <span>{{ value['name'] }}</span>
+            <span>{{ $t('file.downloading') }} {{ value['name'] }}</span>
             <el-progress :text-inside="true" :stroke-width="15" :percentage="value['percent']"></el-progress>
-            <span>{{ value['written'] }}/{{ value['total'] }}</span>
+            <span>{{ getFileSize(value['written']) }}/{{ getFileSize(value['total']) }}</span>
         </div>
     </el-dialog>
 </template>
 
 <script lang="ts" setup>
 import { FileKeys } from '@/api/modules/files';
+import { computeSize } from '@/utils/util';
 import { onBeforeUnmount, ref, toRefs } from 'vue';
 
 const props = defineProps({
@@ -82,6 +83,10 @@ const sendMsg = () => {
             );
         }
     }, 1000);
+};
+
+const getFileSize = (size: number) => {
+    return computeSize(size);
 };
 
 onBeforeUnmount(() => {

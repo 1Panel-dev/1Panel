@@ -100,6 +100,7 @@ export default {
         monitor: 'Monitor',
         operations: 'Operation Records',
         files: 'File Management',
+        settings: 'Setting',
     },
     home: {
         welcome: 'Welcome',
@@ -246,5 +247,6 @@ export default {
         canNotDeCompress: 'Can not DeCompress this File',
         uploadSuccess: 'Upload Success!',
         downloadProcess: 'Download Process',
+        downloading: 'Downloading...',
     },
 };
