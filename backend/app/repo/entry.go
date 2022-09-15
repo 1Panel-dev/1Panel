@@ -7,6 +7,7 @@ type RepoGroup struct {
 	CommandRepo
 	OperationRepo
 	CommonRepo
+	SettingRepo
 }
 
 var RepoGroupApp = new(RepoGroup)

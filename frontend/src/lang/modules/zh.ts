@@ -100,6 +100,7 @@ export default {
         monitor: '监控',
         operations: '操作记录',
         files: '文件管理',
+        settings: '系统设置',
     },
     home: {
         welcome: '欢迎使用',

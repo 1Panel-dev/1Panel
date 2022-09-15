@@ -100,6 +100,7 @@ export default {
         monitor: 'Monitor',
         operations: 'Operation Records',
         files: 'File Management',
+        settings: 'Setting',
     },
     home: {
         welcome: 'Welcome',

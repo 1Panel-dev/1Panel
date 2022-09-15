@@ -54,9 +54,75 @@ var AddTableHost = &gormigrate.Migration{
 	},
 }
 
-var AddTablemonitor = &gormigrate.Migration{
+var AddTableMonitor = &gormigrate.Migration{
 	ID: "20200905-add-table-monitor",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.MonitorBase{}, &model.MonitorIO{}, &model.MonitorNetwork{})
+	},
+}
+
+var AddTableSetting = &gormigrate.Migration{
+	ID: "20200908-add-table-setting",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Setting{}); err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "UserName", Value: "admin"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "Password", Value: "5WYEZ4XcitdomVvAyimt9WwJwBJJSbTTHncZoqyOraQ="}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "Email", Value: ""}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Create(&model.Setting{Key: "PanelName", Value: "1Panel"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "Language", Value: "ch"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "Theme", Value: "auto"}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Create(&model.Setting{Key: "SessionTimeout", Value: "86400"}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Create(&model.Setting{Key: "ServerPort", Value: "4004"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "SecurityEntrance", Value: "/89dc6ae8"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "ComplexityVerification", Value: "enable"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "MFAStatus", Value: "disable"}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Create(&model.Setting{Key: "MonitorStatus", Value: "enable"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "MonitorStoreDays", Value: "30"}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Create(&model.Setting{Key: "MessageType", Value: "none"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "EmailVars", Value: ""}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "WeChatVars", Value: ""}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "DingVars", Value: ""}).Error; err != nil {
+			return err
+		}
+		return nil
 	},
 }
