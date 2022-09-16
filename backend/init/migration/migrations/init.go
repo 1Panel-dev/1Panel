@@ -119,3 +119,22 @@ var AddTableSetting = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddTableBackupAccount = &gormigrate.Migration{
+	ID: "20200916-add-table-backup",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.BackupAccount{}); err != nil {
+			return err
+		}
+		item := &model.BackupAccount{
+			Name:   "Default Local",
+			Type:   "LOCAL",
+			Status: "VALID",
+			Vars:   "{\"dir\":\"/opt/1Panel/backup\"}",
+		}
+		if err := tx.Create(item).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

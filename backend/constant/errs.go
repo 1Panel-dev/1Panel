@@ -22,6 +22,8 @@ var (
 	ErrRecordNotFound  = errors.New("ErrRecordNotFound")
 	ErrStructTransform = errors.New("ErrStructTransform")
 	ErrInitialPassword = errors.New("ErrInitialPassword")
+	ErrNotSupportType  = errors.New("ErrNotSupportType")
+	ErrInvalidParams   = errors.New("ErrInvalidParams")
 
 	ErrTokenParse = errors.New("ErrTokenParse")
 
