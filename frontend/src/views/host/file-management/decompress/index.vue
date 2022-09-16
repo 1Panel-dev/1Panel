@@ -33,7 +33,7 @@ import i18n from '@/lang';
 import { reactive, ref, toRefs } from 'vue';
 import { File } from '@/api/interface/file';
 import { ElMessage, FormInstance, FormRules } from 'element-plus';
-import { Rules } from '@/global/form-rues';
+import { Rules } from '@/global/form-rules';
 import { DeCompressFile } from '@/api/modules/files';
 import { Mimetypes } from '@/global/mimetype';
 import FileList from '@/components/file-list/index.vue';

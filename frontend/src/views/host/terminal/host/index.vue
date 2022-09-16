@@ -119,7 +119,7 @@
 <script lang="ts" setup>
 import { ref, reactive } from 'vue';
 import type { ElForm } from 'element-plus';
-import { Rules } from '@/global/form-rues';
+import { Rules } from '@/global/form-rules';
 import { Host } from '@/api/interface/host';
 import { Group } from '@/api/interface/group';
 import { testConn, getHostTree, getHostInfo, addHost, editHost, deleteHost } from '@/api/modules/host';

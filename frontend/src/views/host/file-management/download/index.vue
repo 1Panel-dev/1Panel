@@ -36,7 +36,7 @@ import { CompressExtention, CompressType } from '@/enums/files';
 import { computed, PropType, reactive, ref, toRefs } from 'vue';
 import { DownloadFile } from '@/api/modules/files';
 import { File } from '@/api/interface/file';
-import { Rules } from '@/global/form-rues';
+import { Rules } from '@/global/form-rules';
 
 const props = defineProps({
     open: {

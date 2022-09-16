@@ -173,7 +173,7 @@
 
 <script setup lang="ts">
 import { onMounted, onBeforeMount, ref, watch, reactive, getCurrentInstance } from 'vue';
-import { Rules } from '@/global/form-rues';
+import { Rules } from '@/global/form-rules';
 import { testConn, getHostTree, addHost } from '@/api/modules/host';
 import { getCommandList } from '@/api/modules/command';
 import i18n from '@/lang';

@@ -41,7 +41,7 @@ import i18n from '@/lang';
 import { computed, reactive, ref, toRefs } from 'vue';
 import { File } from '@/api/interface/file';
 import { ElMessage, FormInstance, FormRules } from 'element-plus';
-import { Rules } from '@/global/form-rues';
+import { Rules } from '@/global/form-rules';
 import { CompressExtention, CompressType } from '@/enums/files';
 import { CompressFile } from '@/api/modules/files';
 import FileList from '@/components/file-list/index.vue';
