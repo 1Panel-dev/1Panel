@@ -45,6 +45,7 @@ func Routers() *gin.Engine {
 	{
 		systemRouter.InitBaseRouter(PrivateGroup)
 		systemRouter.InitHostRouter(PrivateGroup)
+		systemRouter.InitBackupRouter(PrivateGroup)
 		systemRouter.InitGroupRouter(PrivateGroup)
 		systemRouter.InitCommandRouter(PrivateGroup)
 		systemRouter.InitTerminalRouter(PrivateGroup)

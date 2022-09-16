@@ -56,7 +56,7 @@ func (u *OperationService) BatchDelete(ids []uint) error {
 }
 
 func filterSensitive(vars string) string {
-	var Sensitives = []string{"password", "Password", "privateKey"}
+	var Sensitives = []string{"password", "Password", "credential", "privateKey"}
 	ops := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(vars), &ops); err != nil {
 		return vars

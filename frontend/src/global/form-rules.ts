@@ -64,6 +64,7 @@ export const Rules: CommonRule = {
         trigger: 'change',
     },
     name: {
+        required: true,
         validator: checkName,
         trigger: 'blur',
     },

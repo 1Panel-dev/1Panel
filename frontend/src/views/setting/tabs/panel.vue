@@ -178,7 +178,10 @@ type FormInstance = InstanceType<typeof ElForm>;
 const passFormRef = ref<FormInstance>();
 const passRules = reactive({
     oldPassword: [Rules.requiredInput],
-    newPassword: [Rules.requiredInput, { min: 6, message: i18n.global.t('commons.rule.passwordLen'), trigger: 'blur' }],
+    newPassword: [
+        Rules.requiredInput,
+        { min: 6, message: i18n.global.t('commons.rule.commonPassword'), trigger: 'blur' },
+    ],
     newPasswordComplexity: [Rules.password],
     retryPassword: [Rules.requiredInput, { validator: checkPassword, trigger: 'blur' }],
 });
