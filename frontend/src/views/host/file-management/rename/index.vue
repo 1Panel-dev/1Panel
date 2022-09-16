@@ -24,7 +24,7 @@
 
 <script lang="ts" setup>
 import { RenameRile } from '@/api/modules/files';
-import { Rules } from '@/global/form-rues';
+import { Rules } from '@/global/form-rules';
 import { ElMessage, FormInstance, FormRules } from 'element-plus';
 import { reactive, ref, toRefs } from 'vue';
 import { File } from '@/api/interface/file';

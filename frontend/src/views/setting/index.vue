@@ -7,45 +7,51 @@
                 <el-radio-button class="topButton" size="large" label="safe">安全</el-radio-button>
                 <el-radio-button class="topButton" size="large" label="backup">备份</el-radio-button>
                 <el-radio-button class="topButton" size="large" label="monitor">监控</el-radio-button>
-                <el-radio-button class="topButton" size="large" label="message">通知</el-radio-button>
                 <el-radio-button class="topButton" size="large" label="about">关于</el-radio-button>
             </el-radio-group>
         </el-card>
-        <Panel v-if="activeNames === 'all' || activeNames === 'panel'" :settingInfo="form" />
-        <Safe v-if="activeNames === 'all' || activeNames === 'safe'" :settingInfo="form" />
-        <Backup v-if="activeNames === 'all' || activeNames === 'backup'" :settingInfo="form" />
-        <Monitor v-if="activeNames === 'all' || activeNames === 'monitor'" :settingInfo="form" />
-        <Message v-if="activeNames === 'all' || activeNames === 'message'" :settingInfo="form" />
+        <Panel v-if="activeNames === 'all' || activeNames === 'panel'" :settingInfo="form" @on-save="SaveSetting" />
+        <Safe v-if="activeNames === 'all' || activeNames === 'safe'" :settingInfo="form" @on-save="SaveSetting" />
+        <Backup v-if="activeNames === 'all' || activeNames === 'backup'" :settingInfo="form" @on-save="SaveSetting" />
+        <Monitor v-if="activeNames === 'all' || activeNames === 'monitor'" :settingInfo="form" @on-save="SaveSetting" />
     </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
-import { getSettingInfo } from '@/api/modules/setting';
+import { ref, onMounted, computed } from 'vue';
+import { getSettingInfo, updateSetting } from '@/api/modules/setting';
 import { Setting } from '@/api/interface/setting';
 import Panel from '@/views/setting/tabs/panel.vue';
 import Safe from '@/views/setting/tabs/safe.vue';
 import Backup from '@/views/setting/tabs/backup.vue';
 import Monitor from '@/views/setting/tabs/monitor.vue';
-import Message from '@/views/setting/tabs/message.vue';
+import { GlobalStore } from '@/store';
+import { useTheme } from '@/hooks/use-theme';
+import { useI18n } from 'vue-i18n';
+import { ElMessage, FormInstance } from 'element-plus';
+
+const i18n = useI18n();
+const globalStore = GlobalStore();
+const themeConfig = computed(() => globalStore.themeConfig);
 
 const activeNames = ref('all');
 let form = ref<Setting.SettingInfo>({
     userName: '',
     password: '',
     email: '',
-    sessionTimeout: '',
+    sessionTimeout: 86400,
     localTime: '',
     panelName: '',
     theme: '',
     language: '',
-    serverPort: '',
+    serverPort: 8888,
     securityEntrance: '',
     passwordTimeOut: '',
     complexityVerification: '',
     mfaStatus: '',
+    mfaSecret: '',
     monitorStatus: '',
-    monitorStoreDays: '',
+    monitorStoreDays: 30,
     messageType: '',
     emailVars: '',
     weChatVars: '',
@@ -57,6 +63,52 @@ const search = async () => {
     form.value = res.data;
     form.value.password = '******';
 };
+
+const { switchDark } = useTheme();
+
+const SaveSetting = async (formEl: FormInstance | undefined, key: string, val: any) => {
+    if (!formEl) return;
+    const result = await formEl.validateField('settingInfo.' + key.replace(key[0], key[0].toLowerCase()), callback);
+    if (!result) {
+        return;
+    }
+    if (val === '') {
+        return;
+    }
+    switch (key) {
+        case 'Language':
+            i18n.locale.value = val;
+            globalStore.updateLanguage(val);
+            break;
+        case 'Theme':
+            globalStore.setThemeConfig({ ...themeConfig.value, theme: val });
+            switchDark();
+            break;
+        case 'PanelName':
+            globalStore.setThemeConfig({ ...themeConfig.value, panelName: val });
+            break;
+        case 'SessionTimeout':
+        case 'MonitorStoreDays':
+        case 'ServerPort':
+            val = val + '';
+            break;
+    }
+    let param = {
+        key: key,
+        value: val,
+    };
+    await updateSetting(param);
+    ElMessage.success(i18n.t('commons.msg.operationSuccess'));
+    search();
+};
+
+function callback(error: any) {
+    if (error) {
+        return error.message;
+    } else {
+        return;
+    }
+}
 
 onMounted(() => {
     search();

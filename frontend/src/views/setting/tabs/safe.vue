@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-form :model="form" label-position="left" label-width="160px">
+        <el-form :model="form" ref="panelFormRef" label-position="left" label-width="160px">
             <el-card style="margin-top: 10px">
                 <template #header>
                     <div class="card-header">
@@ -10,11 +10,15 @@
                 <el-row>
                     <el-col :span="1"><br /></el-col>
                     <el-col :span="10">
-                        <el-form-item :label="$t('setting.panelPort')">
+                        <el-form-item
+                            :label="$t('setting.panelPort')"
+                            prop="settingInfo.serverPort"
+                            :rules="Rules.number"
+                        >
                             <el-input clearable v-model="form.settingInfo.serverPort">
                                 <template #append>
                                     <el-button
-                                        @click="SaveSetting('ServerPort', form.settingInfo.serverPort)"
+                                        @click="onSave(panelFormRef, 'ServerPort', form.settingInfo.serverPort)"
                                         icon="Collection"
                                     >
                                         {{ $t('commons.button.save') }}
@@ -35,11 +39,17 @@
                                 </span>
                             </div>
                         </el-form-item>
-                        <el-form-item :label="$t('setting.safeEntrance')">
+                        <el-form-item
+                            :label="$t('setting.safeEntrance')"
+                            prop="settingInfo.securityEntrance"
+                            :rules="Rules.requiredInput"
+                        >
                             <el-input clearable v-model="form.settingInfo.securityEntrance">
                                 <template #append>
                                     <el-button
-                                        @click="SaveSetting('SecurityEntrance', form.settingInfo.securityEntrance)"
+                                        @click="
+                                            onSave(panelFormRef, 'SecurityEntrance', form.settingInfo.securityEntrance)
+                                        "
                                         icon="Collection"
                                     >
                                         {{ $t('commons.button.save') }}
@@ -52,8 +62,12 @@
                                 </span>
                             </div>
                         </el-form-item>
-                        <el-form-item :label="$t('setting.passwordTimeout')">
-                            <el-input clearable v-model="form.settingInfo.passwordTimeOut">
+                        <el-form-item
+                            :label="$t('setting.passwordTimeout')"
+                            prop="settingInfo.passwordTimeOut"
+                            :rules="Rules.requiredInput"
+                        >
+                            <el-input disabled v-model="form.settingInfo.passwordTimeOut">
                                 <template #append>
                                     <el-button @click="timeoutVisiable = true" icon="Collection">
                                         {{ $t('commons.button.set') }}
@@ -66,9 +80,19 @@
                                 </span>
                             </div>
                         </el-form-item>
-                        <el-form-item :label="$t('setting.complexity')">
+                        <el-form-item
+                            :label="$t('setting.complexity')"
+                            prop="settingInfo.complexityVerification"
+                            :rules="Rules.requiredSelect"
+                        >
                             <el-radio-group
-                                @change="SaveSetting('ComplexityVerification', form.settingInfo.complexityVerification)"
+                                @change="
+                                    onSave(
+                                        panelFormRef,
+                                        'ComplexityVerification',
+                                        form.settingInfo.complexityVerification,
+                                    )
+                                "
                                 v-model="form.settingInfo.complexityVerification"
                             >
                                 <el-radio-button label="enable">{{ $t('commons.button.enable') }}</el-radio-button>
@@ -80,7 +104,11 @@
                                 </span>
                             </div>
                         </el-form-item>
-                        <el-form-item :label="$t('setting.mfa')">
+                        <el-form-item
+                            :label="$t('setting.mfa')"
+                            prop="settingInfo.securityEntrance"
+                            :rules="Rules.requiredSelect"
+                        >
                             <el-radio-group @change="handleMFA()" v-model="form.settingInfo.mfaStatus">
                                 <el-radio-button label="enable">{{ $t('commons.button.enable') }}</el-radio-button>
                                 <el-radio-button label="disable">{{ $t('commons.button.disable') }}</el-radio-button>
@@ -143,8 +171,11 @@ import { ElMessage, ElForm } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
 import { updateSetting, getMFA, bindMFA } from '@/api/modules/setting';
 import i18n from '@/lang';
-import { Rules } from '@/global/form-rues';
+import { Rules } from '@/global/form-rules';
 import { dateFromat } from '@/utils/util';
+
+// const emit = defineEmits(['on-save']);
+const emit = defineEmits<{ (e: 'on-save', formEl: FormInstance | undefined, key: string, val: any): void }>();
 
 interface Props {
     settingInfo: any;
@@ -172,15 +203,11 @@ const otp = reactive<Setting.MFAInfo>({
     qrImage: '',
 });
 const mfaCode = ref();
+const panelFormRef = ref<FormInstance>();
 
-const SaveSetting = async (key: string, val: string) => {
-    let param = {
-        key: key,
-        value: val,
-    };
-    await updateSetting(param);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-};
+function onSave(formEl: FormInstance | undefined, key: string, val: any) {
+    emit('on-save', formEl, key, val);
+}
 
 const handleMFA = async () => {
     if (form.settingInfo.mfaStatus === 'enable') {
@@ -205,7 +232,7 @@ const submitTimeout = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         let time = new Date(new Date().getTime() + 3600 * 1000 * 24 * timeoutForm.days);
-        SaveSetting('PasswordTimeOut', dateFromat(0, 0, time));
+        await updateSetting({ key: 'PasswordTimeOut', value: dateFromat(0, 0, time) });
         form.settingInfo.passwordTimeOut = dateFromat(0, 0, time);
         timeoutVisiable.value = false;
     });

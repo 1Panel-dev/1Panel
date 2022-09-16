@@ -68,6 +68,9 @@ export default {
             requiredInput: 'Please enter the required fields',
             requiredSelect: 'Please select the required fields',
             commonName: 'Support English, Chinese, numbers, .-_, length 1-30',
+            complexityPassword:
+                'Please enter a password with more than 8 characters and must contain letters, digits, and special symbols',
+            commonPassword: 'Please enter a password with more than 6 characters',
             email: 'Email format error',
             ip: 'Please enter the correct IP address',
             port: 'Please enter the correct port',

@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"strconv"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/app/dto"
@@ -37,9 +38,10 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := json.Unmarshal(arr, &info); err != nil {
-		return nil, err
-	}
+	_ = json.Unmarshal(arr, &info)
+	info.MonitorStoreDays, _ = strconv.Atoi(settingMap["MonitorStoreDays"])
+	info.ServerPort, _ = strconv.Atoi(settingMap["ServerPort"])
+	info.SessionTimeout, _ = strconv.Atoi(settingMap["SessionTimeout"])
 	info.LocalTime = time.Now().Format("2006-01-02 15:04:05")
 	return &info, err
 }

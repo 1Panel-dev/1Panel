@@ -41,7 +41,7 @@ import { addCommand, editCommand, deleteCommand, getCommandPage } from '@/api/mo
 import { reactive, ref } from '@vue/runtime-core';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import type { ElForm } from 'element-plus';
-import { Rules } from '@/global/form-rues';
+import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
 

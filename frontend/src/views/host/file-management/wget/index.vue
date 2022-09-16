@@ -33,7 +33,7 @@
 
 <script lang="ts" setup>
 import { WgetFile } from '@/api/modules/files';
-import { Rules } from '@/global/form-rues';
+import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElMessage, FormInstance, FormRules } from 'element-plus';
 import { reactive, ref, toRefs } from 'vue';

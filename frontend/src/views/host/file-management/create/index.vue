@@ -56,7 +56,7 @@ import { ElMessage, FormInstance, FormRules } from 'element-plus';
 import { CreateFile } from '@/api/modules/files';
 import i18n from '@/lang';
 import FileRole from '@/components/file-role/index.vue';
-import { Rules } from '@/global/form-rues';
+import { Rules } from '@/global/form-rules';
 import FileList from '@/components/file-list/index.vue';
 
 const fileForm = ref<FormInstance>();
