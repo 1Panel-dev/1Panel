@@ -1,5 +1,5 @@
 <template>
-    <el-row style="margin-top: 10px; margin-left: 10px" class="row-box" :gutter="20">
+    <el-row style="margin-top: 20px" class="row-box" :gutter="20">
         <el-col :span="8">
             <el-card class="el-card">
                 <el-tooltip class="box-item" effect="dark" :content="$t('terminal.createConn')" placement="top-start">

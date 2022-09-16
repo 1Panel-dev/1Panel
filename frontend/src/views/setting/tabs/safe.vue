@@ -135,7 +135,7 @@
                                     <li>{{ $t('setting.mfaHelper3') }}</li>
                                     <el-input v-model="mfaCode"></el-input>
                                     <div style="margin-top: 10px; margin-bottom: 10px; float: right">
-                                        <el-button @click="form.settingInfo.mfaStatus = 'disable'">
+                                        <el-button @click="onCancelMfaBind">
                                             {{ $t('commons.button.cancel') }}
                                         </el-button>
                                         <el-button @click="onBind">{{ $t('commons.button.saveAndEnable') }}</el-button>
@@ -174,7 +174,6 @@ import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { dateFromat } from '@/utils/util';
 
-// const emit = defineEmits(['on-save']);
 const emit = defineEmits<{ (e: 'on-save', formEl: FormInstance | undefined, key: string, val: any): void }>();
 
 interface Props {
@@ -224,6 +223,11 @@ const handleMFA = async () => {
 const onBind = async () => {
     await bindMFA({ code: mfaCode.value, secret: otp.secret });
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    isMFAShow.value = false;
+};
+
+const onCancelMfaBind = async () => {
+    form.settingInfo.mfaStatus = 'disable';
     isMFAShow.value = false;
 };
 

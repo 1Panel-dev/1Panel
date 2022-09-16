@@ -1,5 +1,5 @@
 <template>
-    <div style="margin: 20px; margin-left: 20px">
+    <div style="margin: 20px">
         <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
             <template #toolbar>
                 <el-button @click="onCreate()">{{ $t('commons.button.create') }}</el-button>

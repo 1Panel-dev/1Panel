@@ -1,6 +1,6 @@
 <template>
     <el-form :model="form" ref="panelFormRef" label-position="left" label-width="160px">
-        <el-card style="margin-top: 10px">
+        <el-card style="margin-top: 20px">
             <template #header>
                 <div class="card-header">
                     <span>{{ $t('menu.monitor') }}</span>

@@ -1,6 +1,6 @@
 <template>
     <el-form :model="mesForm" label-position="left" label-width="160px">
-        <el-card style="margin-top: 10px">
+        <el-card style="margin-top: 20px">
             <template #header>
                 <div class="card-header">
                     <span>{{ $t('setting.message') }}</span>

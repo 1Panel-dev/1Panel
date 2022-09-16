@@ -82,6 +82,7 @@ const handleClose = () => {
 };
 
 const getPath = (path: string) => {
+    console.log(path);
     addForm.newPath = path;
 };
 

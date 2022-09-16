@@ -1,5 +1,5 @@
 <template>
-    <div class="demo-collapse">
+    <div>
         <el-card class="topCard">
             <el-radio-group v-model="activeNames">
                 <el-radio-button class="topButton" size="large" label="all">全部</el-radio-button>
