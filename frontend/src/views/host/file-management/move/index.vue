@@ -27,7 +27,7 @@
 
 <script lang="ts" setup>
 import { MoveFile } from '@/api/modules/files';
-import { Rules } from '@/global/form-rues';
+import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElMessage, FormInstance, FormRules } from 'element-plus';
 import { toRefs, ref, reactive, PropType, computed } from 'vue';

@@ -4,14 +4,14 @@ export namespace Setting {
         password: string;
         email: string;
 
-        sessionTimeout: string;
+        sessionTimeout: number;
         localTime: string;
 
         panelName: string;
         theme: string;
         language: string;
 
-        serverPort: string;
+        serverPort: number;
         securityEntrance: string;
         passwordTimeOut: string;
         complexityVerification: string;
@@ -19,7 +19,7 @@ export namespace Setting {
         mfaSecret: string;
 
         monitorStatus: string;
-        monitorStoreDays: string;
+        monitorStoreDays: number;
 
         messageType: string;
         emailVars: string;
@@ -33,7 +33,6 @@ export namespace Setting {
     export interface PasswordUpdate {
         oldPassword: string;
         newPassword: string;
-        retryPassword: string;
     }
     export interface MFAInfo {
         secret: string;

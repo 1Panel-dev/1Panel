@@ -1,5 +1,5 @@
 <template>
-    <el-form :model="form" label-position="left" label-width="160px">
+    <el-form :model="form" ref="panelFormRef" label-position="left" label-width="160px">
         <el-card style="margin-top: 10px">
             <template #header>
                 <div class="card-header">
@@ -9,20 +9,28 @@
             <el-row>
                 <el-col :span="1"><br /></el-col>
                 <el-col :span="10">
-                    <el-form-item :label="$t('setting.enableMonitor')">
+                    <el-form-item
+                        :label="$t('setting.enableMonitor')"
+                        :rules="Rules.requiredInput"
+                        prop="settingInfo.monitorStatus"
+                    >
                         <el-radio-group
-                            @change="SaveSetting('MonitorStatus', form.settingInfo.monitorStatus)"
+                            @change="onSave(panelFormRef, 'MonitorStatus', form.settingInfo.monitorStatus)"
                             v-model="form.settingInfo.monitorStatus"
                         >
                             <el-radio-button label="enable">{{ $t('commons.button.enable') }}</el-radio-button>
                             <el-radio-button label="disable">{{ $t('commons.button.disable') }}</el-radio-button>
                         </el-radio-group>
                     </el-form-item>
-                    <el-form-item :label="$t('setting.storeDays')">
-                        <el-input clearable v-model="form.settingInfo.monitorStoreDays">
+                    <el-form-item
+                        :label="$t('setting.storeDays')"
+                        :rules="Rules.number"
+                        prop="settingInfo.monitorStoreDays"
+                    >
+                        <el-input clearable v-model.number="form.settingInfo.monitorStoreDays">
                             <template #append>
                                 <el-button
-                                    @click="SaveSetting('MonitorStoreDays', form.settingInfo.monitorStoreDays)"
+                                    @click="onSave(panelFormRef, 'MonitorStoreDays', form.settingInfo.monitorStoreDays)"
                                     icon="Collection"
                                 >
                                     {{ $t('commons.button.save') }}
@@ -40,10 +48,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ElMessage } from 'element-plus';
-import { updateSetting, cleanMonitors } from '@/api/modules/setting';
-import i18n from '@/lang';
+import { ref } from 'vue';
+import { FormInstance } from 'element-plus';
+import { cleanMonitors } from '@/api/modules/setting';
 import { useDeleteData } from '@/hooks/use-delete-data';
+import { Rules } from '@/global/form-rules';
+
+const emit = defineEmits<{ (e: 'on-save', formEl: FormInstance | undefined, key: string, val: any): void }>();
 
 interface Props {
     settingInfo: any;
@@ -51,18 +62,14 @@ interface Props {
 const form = withDefaults(defineProps<Props>(), {
     settingInfo: {
         monitorStatus: '',
-        monitorStoreDays: '',
+        monitorStoreDays: 30,
     },
 });
+const panelFormRef = ref<FormInstance>();
 
-const SaveSetting = async (key: string, val: string) => {
-    let param = {
-        key: key,
-        value: val,
-    };
-    await updateSetting(param);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-};
+function onSave(formEl: FormInstance | undefined, key: string, val: any) {
+    emit('on-save', formEl, key, val);
+}
 
 const onClean = async () => {
     await useDeleteData(cleanMonitors, {}, 'commons.msg.delete', true);
