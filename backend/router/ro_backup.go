@@ -14,7 +14,7 @@ func (s *BackupRouter) InitBackupRouter(Router *gin.RouterGroup) {
 	withRecordRouter := Router.Group("backups").Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		baRouter.POST("/search", baseApi.PageBackup)
+		baRouter.GET("/search", baseApi.ListBackup)
 		baRouter.POST("/buckets", baseApi.ListBuckets)
 		withRecordRouter.POST("", baseApi.CreateBackup)
 		withRecordRouter.POST("/del", baseApi.DeleteBackup)

@@ -259,6 +259,7 @@ export default {
         downloading: '正在下载...',
     },
     setting: {
+        all: '全部',
         panel: '面板',
         emailHelper: '用于密码找回',
         title: '面板别名',
@@ -278,6 +279,8 @@ export default {
 
         backup: '备份',
         serverDisk: '服务器磁盘',
+        OSS: '阿里云 OSS',
+        S3: '亚马逊 S3 云存储',
         backupAccount: '备份账号',
         loadBucket: '获取桶',
         accountName: '账户名称',
@@ -292,7 +295,7 @@ export default {
         panelPort: '面板端口',
         portHelper: '建议端口范围8888 - 65535，注意：有安全组的服务器请提前在安全组放行新端口',
         safeEntrance: '安全入口',
-        safeEntranceHelper: '面板管理入口，设置后只能通过指定安全入口登录面板,如: 89dc6ae8',
+        safeEntranceHelper: '面板管理入口，设置后只能通过指定安全入口登录面板，如: onepanel',
         passwordTimeout: '密码过期时间',
         timeoutHelper: '【 {0} 天后 】面板密码即将过期，过期后需要重新设置密码',
         complexity: '密码复杂度验证',
@@ -318,5 +321,10 @@ export default {
         secret: '密钥',
 
         about: '关于',
+        project: '项目地址',
+        issue: '问题反馈',
+        chat: '参与讨论',
+        star: '点亮 Star',
+        description: '一个现代化的 Linux 面板工具',
     },
 };

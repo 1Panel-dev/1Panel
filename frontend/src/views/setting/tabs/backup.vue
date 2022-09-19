@@ -13,8 +13,9 @@
                 <el-card class="el-card">
                     <template #header>
                         <div class="card-header">
+                            <svg-icon style="font-size: 7px" :iconName="loadIconName(item.type)"></svg-icon>
                             <span style="font-size: 16px; font-weight: 500">
-                                [{{ item.type === 'LOCAL' ? $t('setting.serverDisk') : item.type }}] {{ item.name }}
+                                {{ loadBackupName(item.type) }}
                             </span>
                             <div style="float: right">
                                 <el-button @click="onEdit(item)">{{ $t('commons.button.edit') }}</el-button>
@@ -25,7 +26,7 @@
                         </div>
                     </template>
                     <el-form label-position="left" label-width="130px">
-                        <el-form-item v-if="item.type === 'LOCAL'" label="Dir">
+                        <el-form-item v-if="item.type === 'LOCAL'" label="Directory">
                             {{ item.varsJson['dir'] }}
                         </el-form-item>
                         <el-form-item v-if="hasBucket(item.type)" label="Access Key ID">
@@ -59,9 +60,6 @@
 
         <el-dialog @close="search" v-model="backupVisiable" :title="$t('setting.backupAccount')" width="30%">
             <el-form ref="formRef" label-position="left" :model="form" label-width="160px">
-                <el-form-item :label="$t('commons.table.name')" prop="name" :rules="Rules.name">
-                    <el-input v-model="form.name" :disabled="operation === 'edit'" />
-                </el-form-item>
                 <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
                     <el-select style="width: 100%" v-model="form.type" :disabled="operation === 'edit'">
                         <el-option
@@ -74,7 +72,7 @@
                 </el-form-item>
                 <el-form-item
                     v-if="form.type === 'LOCAL'"
-                    label="Dir"
+                    label="Directory"
                     prop="varsJson['dir']"
                     :rules="Rules.requiredInput"
                 >
@@ -94,7 +92,7 @@
                 </el-form-item>
                 <el-form-item
                     v-if="hasBucket(form.type)"
-                    label="Secret Access Key"
+                    label="Access Key Secret"
                     prop="credential"
                     :rules="Rules.requiredInput"
                 >
@@ -182,19 +180,8 @@ const selects = ref<any>([]);
 const backupVisiable = ref<boolean>(false);
 const operation = ref<string>('create');
 
-const paginationConfig = reactive({
-    currentPage: 1,
-    pageSize: 5,
-    total: 0,
-});
-const backSearch = reactive({
-    page: 1,
-    pageSize: 5,
-});
-
 const form = reactive({
     id: 0,
-    name: '',
     type: 'LOCAL',
     bucket: '',
     credential: '',
@@ -203,31 +190,22 @@ const form = reactive({
 });
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
-const typeOptions = ref([
-    { label: i18n.global.t('setting.serverDisk'), value: 'LOCAL' },
-    { label: 'OSS', value: 'OSS' },
-    { label: 'S3', value: 'S3' },
-    { label: 'SFTP', value: 'SFTP' },
-    { label: 'MINIO', value: 'MINIO' },
-]);
+const typeOptions = ref();
 const buckets = ref();
 
 const search = async () => {
-    backSearch.page = paginationConfig.currentPage;
-    backSearch.pageSize = paginationConfig.pageSize;
-    const res = await getBackupList(backSearch);
-    data.value = res.data.items;
+    const res = await getBackupList();
+    data.value = res.data;
     for (const bac of data.value) {
         bac.varsJson = JSON.parse(bac.vars);
     }
-    paginationConfig.total = res.data.total;
 };
 
 const onCreate = () => {
+    loadOption();
     operation.value = 'create';
     form.id = 0;
-    form.name = '';
-    form.type = 'LOCAL';
+    form.type = typeOptions.value[0].value;
     form.bucket = '';
     form.credential = '';
     form.vars = '';
@@ -250,9 +228,15 @@ const onBatchDelete = async (row: Backup.BackupInfo | null) => {
 };
 
 const onEdit = (row: Backup.BackupInfo) => {
+    typeOptions.value = [
+        { label: i18n.global.t('setting.serverDisk'), value: 'LOCAL' },
+        { label: i18n.global.t('setting.OSS'), value: 'OSS' },
+        { label: i18n.global.t('setting.S3'), value: 'S3' },
+        { label: 'SFTP', value: 'SFTP' },
+        { label: 'MinIO', value: 'MINIO' },
+    ];
     restForm();
     form.id = row.id;
-    form.name = row.name;
     form.type = row.type;
     form.bucket = row.bucket;
     form.varsJson = JSON.parse(row.vars);
@@ -295,6 +279,57 @@ const getBuckets = async () => {
 const loadDir = async (path: string) => {
     console.log(path);
     form.varsJson['dir'] = path;
+};
+const loadOption = () => {
+    let options = [
+        { label: i18n.global.t('setting.serverDisk'), value: 'LOCAL' },
+        { label: i18n.global.t('setting.OSS'), value: 'OSS' },
+        { label: i18n.global.t('setting.S3'), value: 'S3' },
+        { label: 'SFTP', value: 'SFTP' },
+        { label: 'MinIO', value: 'MINIO' },
+    ];
+    for (const item of data.value) {
+        for (let i = 0; i < options.length; i++) {
+            if (item.type === options[i].value) {
+                options.splice(i, 1);
+            }
+        }
+    }
+    typeOptions.value = options;
+};
+const loadIconName = (type: string) => {
+    switch (type) {
+        case 'OSS':
+            return 'p-oss';
+            break;
+        case 'S3':
+            return 'p-s3';
+            break;
+        case 'SFTP':
+            return 'p-SFTP';
+            break;
+        case 'MINIO':
+            return 'p-minio';
+            break;
+        case 'LOCAL':
+            return 'p-file-folder';
+            break;
+    }
+};
+const loadBackupName = (type: string) => {
+    switch (type) {
+        case 'OSS':
+            return i18n.global.t('setting.OSS');
+            break;
+        case 'S3':
+            return i18n.global.t('setting.S3');
+            break;
+        case 'LOCAL':
+            return i18n.global.t('setting.serverDisk');
+            break;
+        default:
+            return type;
+    }
 };
 
 onMounted(() => {

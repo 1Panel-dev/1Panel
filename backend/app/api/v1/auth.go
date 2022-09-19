@@ -98,7 +98,7 @@ func (b *BaseApi) SafeEntrance(c *gin.Context) {
 	}
 	codeWithMD5 := encrypt.Md5(code)
 	cookieValue, _ := encrypt.StringEncrypt(codeWithMD5)
-	c.SetCookie(codeWithMD5, cookieValue, 86400, "", "", false, false)
+	c.SetCookie(codeWithMD5, cookieValue, 604800, "", "", false, false)
 
 	helper.SuccessWithData(c, nil)
 }

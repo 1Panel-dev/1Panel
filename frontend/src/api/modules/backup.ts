@@ -1,9 +1,8 @@
 import http from '@/api';
 import { Backup } from '../interface/backup';
-import { ResPage, ReqPage } from '../interface';
 
-export const getBackupList = (params: ReqPage) => {
-    return http.post<ResPage<Backup.BackupInfo>>(`/backups/search`, params);
+export const getBackupList = () => {
+    return http.get<Array<Backup.BackupInfo>>(`/backups/search`);
 };
 
 export const addBackup = (params: Backup.BackupOperate) => {
