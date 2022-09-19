@@ -13,7 +13,7 @@ import (
 type BackupService struct{}
 
 type IBackupService interface {
-	Page(search dto.PageInfo) (int64, interface{}, error)
+	List() ([]dto.BackupInfo, error)
 	Create(backupDto dto.BackupOperate) error
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
 	Update(id uint, upMap map[string]interface{}) error
@@ -24,21 +24,21 @@ func NewIBackupService() IBackupService {
 	return &BackupService{}
 }
 
-func (u *BackupService) Page(search dto.PageInfo) (int64, interface{}, error) {
-	total, ops, err := backupRepo.Page(search.Page, search.PageSize, commonRepo.WithOrderBy("created_at desc"))
+func (u *BackupService) List() ([]dto.BackupInfo, error) {
+	ops, err := backupRepo.List(commonRepo.WithOrderBy("created_at desc"))
 	var dtobas []dto.BackupInfo
 	for _, group := range ops {
 		var item dto.BackupInfo
 		if err := copier.Copy(&item, &group); err != nil {
-			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
 		dtobas = append(dtobas, item)
 	}
-	return total, dtobas, err
+	return dtobas, err
 }
 
 func (u *BackupService) Create(backupDto dto.BackupOperate) error {
-	backup, _ := backupRepo.Get(commonRepo.WithByName(backupDto.Name))
+	backup, _ := backupRepo.Get(commonRepo.WithByType(backupDto.Type))
 	if backup.ID != 0 {
 		return constant.ErrRecordExist
 	}

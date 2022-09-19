@@ -2,18 +2,27 @@
     <div>
         <el-card class="topCard">
             <el-radio-group v-model="activeNames">
-                <el-radio-button class="topButton" size="large" label="all">全部</el-radio-button>
-                <el-radio-button class="topButton" size="large" label="panel">面板</el-radio-button>
-                <el-radio-button class="topButton" size="large" label="safe">安全</el-radio-button>
-                <el-radio-button class="topButton" size="large" label="backup">备份</el-radio-button>
-                <el-radio-button class="topButton" size="large" label="monitor">监控</el-radio-button>
-                <el-radio-button class="topButton" size="large" label="about">关于</el-radio-button>
+                <el-radio-button class="topButton" size="large" label="all">{{ $t('setting.all') }}</el-radio-button>
+                <el-radio-button class="topButton" size="large" label="panel">
+                    {{ $t('setting.panel') }}
+                </el-radio-button>
+                <el-radio-button class="topButton" size="large" label="safe">{{ $t('setting.safe') }}</el-radio-button>
+                <el-radio-button class="topButton" size="large" label="backup">
+                    {{ $t('setting.backup') }}
+                </el-radio-button>
+                <el-radio-button class="topButton" size="large" label="monitor">
+                    {{ $t('menu.monitor') }}
+                </el-radio-button>
+                <el-radio-button class="topButton" size="large" label="about">
+                    {{ $t('setting.about') }}
+                </el-radio-button>
             </el-radio-group>
         </el-card>
         <Panel v-if="activeNames === 'all' || activeNames === 'panel'" :settingInfo="form" @on-save="SaveSetting" />
         <Safe v-if="activeNames === 'all' || activeNames === 'safe'" :settingInfo="form" @on-save="SaveSetting" />
         <Backup v-if="activeNames === 'all' || activeNames === 'backup'" :settingInfo="form" @on-save="SaveSetting" />
         <Monitor v-if="activeNames === 'all' || activeNames === 'monitor'" :settingInfo="form" @on-save="SaveSetting" />
+        <About v-if="activeNames === 'all' || activeNames === 'about'" />
     </div>
 </template>
 
@@ -25,6 +34,7 @@ import Panel from '@/views/setting/tabs/panel.vue';
 import Safe from '@/views/setting/tabs/safe.vue';
 import Backup from '@/views/setting/tabs/backup.vue';
 import Monitor from '@/views/setting/tabs/monitor.vue';
+import About from '@/views/setting/tabs/about.vue';
 import { GlobalStore } from '@/store';
 import { useTheme } from '@/hooks/use-theme';
 import { useI18n } from 'vue-i18n';

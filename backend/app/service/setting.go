@@ -50,17 +50,6 @@ func (u *SettingService) Update(c *gin.Context, key, value string) error {
 	if err := settingRepo.Update(key, value); err != nil {
 		return err
 	}
-	switch key {
-	case "UserName":
-		sID, _ := c.Cookie(constant.SessionName)
-		if sID != "" {
-			c.SetCookie(constant.SessionName, sID, -1, "", "", false, false)
-			err := global.SESSION.Delete(sID)
-			if err != nil {
-				return err
-			}
-		}
-	}
 	return settingRepo.Update(key, value)
 }
 

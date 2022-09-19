@@ -1,0 +1,247 @@
+{
+  "id": "3575356",
+  "name": "panel",
+  "font_family": "panel",
+  "css_prefix_text": "p-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "1760690",
+      "name": "讨论",
+      "font_class": "taolun",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "5192988",
+      "name": "Star Star",
+      "font_class": "StarStar",
+      "unicode": "e635",
+      "unicode_decimal": 58933
+    },
+    {
+      "icon_id": "6642940",
+      "name": "bug",
+      "font_class": "bug",
+      "unicode": "e616",
+      "unicode_decimal": 58902
+    },
+    {
+      "icon_id": "13532955",
+      "name": "SFTP",
+      "font_class": "SFTP",
+      "unicode": "e647",
+      "unicode_decimal": 58951
+    },
+    {
+      "icon_id": "15337722",
+      "name": "Logo GitHub",
+      "font_class": "huaban88",
+      "unicode": "e67c",
+      "unicode_decimal": 59004
+    },
+    {
+      "icon_id": "16268521",
+      "name": "oss",
+      "font_class": "oss",
+      "unicode": "e607",
+      "unicode_decimal": 58887
+    },
+    {
+      "icon_id": "17895439",
+      "name": "Amazon S3上传",
+      "font_class": "s3",
+      "unicode": "e8e4",
+      "unicode_decimal": 59620
+    },
+    {
+      "icon_id": "20290513",
+      "name": "minio",
+      "font_class": "minio",
+      "unicode": "e63c",
+      "unicode_decimal": 58940
+    },
+    {
+      "icon_id": "924436",
+      "name": "logout",
+      "font_class": "logout",
+      "unicode": "e8fe",
+      "unicode_decimal": 59646
+    },
+    {
+      "icon_id": "837256",
+      "name": "terminal",
+      "font_class": "terminal2",
+      "unicode": "e82a",
+      "unicode_decimal": 59434
+    },
+    {
+      "icon_id": "8358944",
+      "name": "英文5",
+      "font_class": "yingwen",
+      "unicode": "e6c3",
+      "unicode_decimal": 59075
+    },
+    {
+      "icon_id": "8358949",
+      "name": "中文5",
+      "font_class": "zhongwen",
+      "unicode": "e6c8",
+      "unicode_decimal": 59080
+    },
+    {
+      "icon_id": "11487994",
+      "name": "calendar",
+      "font_class": "plan",
+      "unicode": "e746",
+      "unicode_decimal": 59206
+    },
+    {
+      "icon_id": "11488064",
+      "name": "integral",
+      "font_class": "database",
+      "unicode": "e754",
+      "unicode_decimal": 59220
+    },
+    {
+      "icon_id": "11488108",
+      "name": "rejected-order",
+      "font_class": "rejected-order",
+      "unicode": "e75e",
+      "unicode_decimal": 59230
+    },
+    {
+      "icon_id": "11488148",
+      "name": "tool",
+      "font_class": "toolbox",
+      "unicode": "e769",
+      "unicode_decimal": 59241
+    },
+    {
+      "icon_id": "4765743",
+      "name": "earth",
+      "font_class": "website",
+      "unicode": "e781",
+      "unicode_decimal": 59265
+    },
+    {
+      "icon_id": "4765891",
+      "name": "setting",
+      "font_class": "config",
+      "unicode": "e78e",
+      "unicode_decimal": 59278
+    },
+    {
+      "icon_id": "4765962",
+      "name": "app store",
+      "font_class": "appstore1",
+      "unicode": "e792",
+      "unicode_decimal": 59282
+    },
+    {
+      "icon_id": "4765971",
+      "name": "detail",
+      "font_class": "log",
+      "unicode": "e793",
+      "unicode_decimal": 59283
+    },
+    {
+      "icon_id": "4766440",
+      "name": "sever",
+      "font_class": "host",
+      "unicode": "e7b1",
+      "unicode_decimal": 59313
+    },
+    {
+      "icon_id": "4766685",
+      "name": "home",
+      "font_class": "home",
+      "unicode": "e7c6",
+      "unicode_decimal": 59334
+    },
+    {
+      "icon_id": "19688849",
+      "name": "应用商店",
+      "font_class": "appstore",
+      "unicode": "eb65",
+      "unicode_decimal": 60261
+    },
+    {
+      "icon_id": "3876424",
+      "name": "docker",
+      "font_class": "docker",
+      "unicode": "e659",
+      "unicode_decimal": 58969
+    },
+    {
+      "icon_id": "15838431",
+      "name": "arrow-right",
+      "font_class": "arrow-right",
+      "unicode": "e665",
+      "unicode_decimal": 58981
+    },
+    {
+      "icon_id": "6172786",
+      "name": "terminal",
+      "font_class": "terminal",
+      "unicode": "e864",
+      "unicode_decimal": 59492
+    },
+    {
+      "icon_id": "14772948",
+      "name": "terminal",
+      "font_class": "terminal1",
+      "unicode": "e663",
+      "unicode_decimal": 58979
+    },
+    {
+      "icon_id": "7533292",
+      "name": "中英文",
+      "font_class": "language",
+      "unicode": "e605",
+      "unicode_decimal": 58885
+    },
+    {
+      "icon_id": "22551111",
+      "name": "主题",
+      "font_class": "theme",
+      "unicode": "e638",
+      "unicode_decimal": 58936
+    },
+    {
+      "icon_id": "22735864",
+      "name": "文件类型-文件夹",
+      "font_class": "file-folder",
+      "unicode": "66",
+      "unicode_decimal": 102
+    },
+    {
+      "icon_id": "22761833",
+      "name": "文件类型-未知文件",
+      "font_class": "file-unknown",
+      "unicode": "233",
+      "unicode_decimal": 563
+    },
+    {
+      "icon_id": "22761837",
+      "name": "文件类型-Txt",
+      "font_class": "file-txt",
+      "unicode": "74",
+      "unicode_decimal": 116
+    },
+    {
+      "icon_id": "19671156",
+      "name": "txt-1",
+      "font_class": "file-normal",
+      "unicode": "e7ac",
+      "unicode_decimal": 59308
+    },
+    {
+      "icon_id": "22761832",
+      "name": "文件类型-压缩包",
+      "font_class": "file-zip",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    }
+  ]
+}

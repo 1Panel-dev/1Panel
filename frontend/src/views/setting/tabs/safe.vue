@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-form :model="form" ref="panelFormRef" label-position="left" label-width="160px">
-            <el-card style="margin-top: 10px">
+            <el-card style="margin-top: 20px">
                 <template #header>
                     <div class="card-header">
                         <span>{{ $t('setting.safe') }}</span>
@@ -86,6 +86,7 @@
                             :rules="Rules.requiredSelect"
                         >
                             <el-radio-group
+                                style="width: 100%"
                                 @change="
                                     onSave(
                                         panelFormRef,

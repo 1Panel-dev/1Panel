@@ -410,23 +410,23 @@ onBeforeMount(() => {
 </script>
 <style lang="scss" scoped>
 .terminal-tabs {
-    :deep(.el-tabs__header) {
+    :deep .el-tabs__header {
         padding: 0;
         position: relative;
         margin: 0 0 3px 0;
     }
-    :deep(.el-tabs__nav) {
+    ::deep .el-tabs__nav {
         white-space: nowrap;
         position: relative;
         transition: transform var(--el-transition-duration);
         float: left;
         z-index: calc(var(--el-index-normal) + 1);
     }
-    :deep(.el-tabs__item) {
+    :deep .el-tabs__item {
         color: #575758;
         padding: 0 0px;
     }
-    :deep(.el-tabs__item.is-active) {
+    :deep .el-tabs__item.is-active {
         color: #ebeef5;
         background-color: #575758;
     }
@@ -441,7 +441,7 @@ onBeforeMount(() => {
 .fullScreen {
     position: absolute;
     right: 50px;
-    top: 6px;
+    top: 86px;
     font-weight: 600;
     font-size: 14px;
 }

@@ -21,6 +21,7 @@
                             </template>
                         </el-input>
                     </el-form-item>
+
                     <el-form-item :label="$t('auth.password')" :rules="Rules.requiredInput" prop="settingInfo.password">
                         <el-input type="password" clearable disabled v-model="form.settingInfo.password">
                             <template #append>
@@ -30,6 +31,7 @@
                             </template>
                         </el-input>
                     </el-form-item>
+
                     <el-form-item :label="$t('auth.email')" :rules="Rules.email" prop="settingInfo.email">
                         <el-input clearable v-model="form.settingInfo.email">
                             <template #append>
@@ -45,6 +47,7 @@
                             <span class="input-help">{{ $t('setting.emailHelper') }}</span>
                         </div>
                     </el-form-item>
+
                     <el-form-item
                         :label="$t('setting.title')"
                         :rules="Rules.requiredInput"
@@ -61,6 +64,7 @@
                             </template>
                         </el-input>
                     </el-form-item>
+
                     <el-form-item :label="$t('setting.theme')" :rules="Rules.requiredSelect" prop="settingInfo.theme">
                         <el-radio-group
                             @change="onSave(panelFormRef, 'Theme', form.settingInfo.theme)"
@@ -76,12 +80,14 @@
                             </el-radio-button>
                         </el-radio-group>
                     </el-form-item>
+
                     <el-form-item
                         :label="$t('setting.language')"
                         :rules="Rules.requiredSelect"
                         prop="settingInfo.language"
                     >
                         <el-radio-group
+                            style="width: 100%"
                             @change="onSave(panelFormRef, 'Language', form.settingInfo.language)"
                             v-model="form.settingInfo.language"
                         >
@@ -94,6 +100,7 @@
                             </span>
                         </div>
                     </el-form-item>
+
                     <el-form-item
                         :label="$t('setting.sessionTimeout')"
                         :rules="Rules.number"
@@ -115,6 +122,7 @@
                             </span>
                         </div>
                     </el-form-item>
+
                     <el-form-item :label="$t('setting.syncTime')">
                         <el-input disabled v-model="form.settingInfo.localTime">
                             <template #append>
