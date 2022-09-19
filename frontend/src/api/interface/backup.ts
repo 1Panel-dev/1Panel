@@ -1,7 +1,6 @@
 export namespace Backup {
     export interface BackupInfo {
         id: number;
-        name: string;
         type: string;
         bucket: string;
         vars: string;
@@ -9,7 +8,6 @@ export namespace Backup {
     }
     export interface BackupOperate {
         id: number;
-        name: string;
         type: string;
         bucket: string;
         credential: string;

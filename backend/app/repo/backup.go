@@ -8,7 +8,8 @@ import (
 type BackupRepo struct{}
 
 type IBackupRepo interface {
-	Page(page, size int, opts ...DBOption) (int64, []model.BackupAccount, error)
+	Get(opts ...DBOption) (model.BackupAccount, error)
+	List(opts ...DBOption) ([]model.BackupAccount, error)
 	Create(backup *model.BackupAccount) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
@@ -28,7 +29,7 @@ func (u *BackupRepo) Get(opts ...DBOption) (model.BackupAccount, error) {
 	return backup, err
 }
 
-func (u *BackupRepo) Page(page, size int, opts ...DBOption) (int64, []model.BackupAccount, error) {
+func (u *BackupRepo) List(opts ...DBOption) ([]model.BackupAccount, error) {
 	var ops []model.BackupAccount
 	db := global.DB.Model(&model.BackupAccount{})
 	for _, opt := range opts {
@@ -36,8 +37,8 @@ func (u *BackupRepo) Page(page, size int, opts ...DBOption) (int64, []model.Back
 	}
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Limit(size).Offset(size * (page - 1)).Find(&ops).Error
-	return count, ops, err
+	err := db.Find(&ops).Error
+	return ops, err
 }
 
 func (u *BackupRepo) Create(backup *model.BackupAccount) error {

@@ -88,25 +88,12 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-func (b *BaseApi) PageBackup(c *gin.Context) {
-	var req dto.PageInfo
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-
-	total, list, err := backupService.Page(req)
+func (b *BaseApi) ListBackup(c *gin.Context) {
+	data, err := backupService.List()
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 
-	helper.SuccessWithData(c, dto.PageResult{
-		Items: list,
-		Total: total,
-	})
+	helper.SuccessWithData(c, data)
 }

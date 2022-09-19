@@ -262,6 +262,7 @@ export default {
         downloading: 'Downloading...',
     },
     setting: {
+        all: 'All',
         panel: 'Panel',
         emailHelper: 'For password retrieval',
         title: 'Panel alias',
@@ -282,6 +283,8 @@ export default {
 
         backup: 'Backup',
         serverDisk: 'Server disks',
+        OSS: 'Ali OSS',
+        S3: 'Amazon S3',
         backupAccount: 'Backup account',
         loadBucket: 'Get bucket',
         accountName: 'Account name',
@@ -298,11 +301,11 @@ export default {
             'The recommended port range is 8888 to 65535. Note: If the server has a security group, permit the new port from the security group in advance',
         safeEntrance: 'Security entrance',
         safeEntranceHelper:
-            'Panel management portal. You can log in to the panel only through a specified security portal, for example, / 89DC6AE8',
-        passwordTimeout: 'Password expiration Time',
+            'Panel management portal. You can log in to the panel only through a specified security portal, for example: onepanel',
+        passwordTimeout: 'Expiration Time',
         timeoutHelper:
             '[ {0} days ] The panel password is about to expire. After the expiration, you need to reset the password',
-        complexity: 'Password complexity verification',
+        complexity: 'Complexity verification',
         complexityHelper:
             'The password must contain at least eight characters and contain at least three uppercase letters, lowercase letters, digits, and special characters',
         mfa: 'MFA',
@@ -324,5 +327,12 @@ export default {
         emailAddr: 'Service address',
         emailSMTP: 'SMTP code',
         secret: 'Secret',
+
+        about: 'About',
+        project: 'Project Address',
+        issue: 'Feedback',
+        chat: 'Community Discussion',
+        star: 'Star',
+        description: 'A modern Linux panel tool',
     },
 };
