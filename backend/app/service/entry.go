@@ -10,6 +10,7 @@ type ServiceGroup struct {
 	CommandService
 	OperationService
 	FileService
+	CronjobService
 	SettingService
 }
 
@@ -22,5 +23,6 @@ var (
 	commandRepo   = repo.RepoGroupApp.CommandRepo
 	operationRepo = repo.RepoGroupApp.OperationRepo
 	commonRepo    = repo.RepoGroupApp.CommonRepo
+	cronjobRepo   = repo.RepoGroupApp.CronjobRepo
 	settingRepo   = repo.RepoGroupApp.SettingRepo
 )

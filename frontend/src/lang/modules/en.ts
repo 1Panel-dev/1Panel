@@ -114,7 +114,7 @@ export default {
         firewall: 'Firewall',
         database: 'Database',
         container: 'Container',
-        plan: 'Planned Task',
+        cronjob: 'Cronjob',
         host: 'Host',
         security: 'Security',
         files: 'File Management',
