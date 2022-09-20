@@ -17,5 +17,5 @@ func Run() {
 	}
 	Cron.Start()
 
-	global.Corn = Cron
+	global.Cron = Cron
 }

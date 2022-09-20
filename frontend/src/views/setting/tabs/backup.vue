@@ -277,7 +277,6 @@ const getBuckets = async () => {
     buckets.value = res.data;
 };
 const loadDir = async (path: string) => {
-    console.log(path);
     form.varsJson['dir'] = path;
 };
 const loadOption = () => {

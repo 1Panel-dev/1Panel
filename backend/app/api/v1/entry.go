@@ -16,5 +16,6 @@ var (
 	commandService   = service.ServiceGroupApp.CommandService
 	operationService = service.ServiceGroupApp.OperationService
 	fileService      = service.ServiceGroupApp.FileService
+	cronjobService   = service.ServiceGroupApp.CronjobService
 	settingService   = service.ServiceGroupApp.SettingService
 )

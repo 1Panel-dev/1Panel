@@ -18,5 +18,5 @@ var (
 	SESSION *psession.PSession
 	CACHE   *badger_db.Cache
 
-	Corn *cron.Cron
+	Cron *cron.Cron
 )
