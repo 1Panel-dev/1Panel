@@ -10,6 +10,7 @@ type RouterGroup struct {
 	OperationLogRouter
 	FileRouter
 	TerminalRouter
+	CronjobRouter
 	SettingRouter
 }
 
