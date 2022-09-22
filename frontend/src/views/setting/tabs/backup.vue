@@ -167,6 +167,7 @@
 <script setup lang="ts">
 import { dateFromat } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
+import { loadBackupName } from '@/views/setting/helper';
 import { getBackupList, addBackup, editBackup, listBucket, deleteBackup } from '@/api/modules/backup';
 import { Backup } from '@/api/interface/backup';
 import i18n from '@/lang';
@@ -315,22 +316,6 @@ const loadIconName = (type: string) => {
             break;
     }
 };
-const loadBackupName = (type: string) => {
-    switch (type) {
-        case 'OSS':
-            return i18n.global.t('setting.OSS');
-            break;
-        case 'S3':
-            return i18n.global.t('setting.S3');
-            break;
-        case 'LOCAL':
-            return i18n.global.t('setting.serverDisk');
-            break;
-        default:
-            return type;
-    }
-};
-
 onMounted(() => {
     search();
 });

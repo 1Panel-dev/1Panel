@@ -79,6 +79,21 @@ func (b *BaseApi) UpdateCronjob(c *gin.Context) {
 	}
 
 	upMap := make(map[string]interface{})
+	upMap["name"] = req.Name
+	upMap["spec_type"] = req.SpecType
+	upMap["week"] = req.Week
+	upMap["day"] = req.Day
+	upMap["hour"] = req.Hour
+	upMap["minute"] = req.Minute
+
+	upMap["script"] = req.Script
+	upMap["website"] = req.Website
+	upMap["database"] = req.Database
+	upMap["source_dir"] = req.SourceDir
+	upMap["target_dir_id"] = req.TargetDirID
+	upMap["exclusion_rules"] = req.ExclusionRules
+	upMap["retain_copies"] = req.RetainCopies
+	upMap["status"] = req.Status
 	if err := cronjobService.Update(id, upMap); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
