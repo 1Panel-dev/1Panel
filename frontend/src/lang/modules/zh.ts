@@ -17,6 +17,7 @@ export default {
             clean: '清空',
             login: '登录',
             close: '关闭',
+            view: '详情',
             saveAndEnable: '保存并启用',
         },
         search: {
@@ -134,7 +135,7 @@ export default {
         logout: '退出登录',
     },
     cronjob: {
-        createCronTask: '创建计划任务',
+        cronTask: '计划任务',
         taskType: '任务类型',
         shell: 'Shell 脚本',
         website: '备份网站',

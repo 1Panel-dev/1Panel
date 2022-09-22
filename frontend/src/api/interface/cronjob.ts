@@ -14,6 +14,7 @@ export namespace Cronjob {
         exclusionRules: string;
         database: string;
         url: string;
+        sourceDir: string;
         targetDirID: number;
         targetDir: string;
         retainCopies: number;
@@ -33,6 +34,7 @@ export namespace Cronjob {
         exclusionRules: string;
         database: string;
         url: string;
+        sourceDir: string;
         targetDirID: number;
         retainCopies: number;
     }
@@ -49,6 +51,7 @@ export namespace Cronjob {
         exclusionRules: string;
         database: string;
         url: string;
+        sourceDir: string;
         targetDirID: number;
         retainCopies: number;
         status: string;
