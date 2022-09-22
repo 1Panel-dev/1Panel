@@ -12,6 +12,7 @@ type ServiceGroup struct {
 	FileService
 	CronjobService
 	SettingService
+	AppService
 }
 
 var ServiceGroupApp = new(ServiceGroup)
@@ -25,4 +26,8 @@ var (
 	commonRepo    = repo.RepoGroupApp.CommonRepo
 	cronjobRepo   = repo.RepoGroupApp.CronjobRepo
 	settingRepo   = repo.RepoGroupApp.SettingRepo
+	appRepo       = repo.RepoGroupApp.AppRepo
+	appTagRepo    = repo.RepoGroupApp.AppTagRepo
+	appDetailRepo = repo.RepoGroupApp.AppDetailRepo
+	tagRepo       = repo.RepoGroupApp.TagRepo
 )

@@ -396,4 +396,9 @@ export default {
         star: 'Star',
         description: 'A modern Linux panel tool',
     },
+    app: {
+        installed: 'Installed',
+        all: 'All',
+        version: 'Version',
+    },
 };

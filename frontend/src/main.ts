@@ -17,6 +17,16 @@ import router from '@/routers/index';
 import I18n from '@/lang/index';
 import pinia from '@/store/index';
 import SvgIcon from './components/svg-icon/svg-icon.vue';
+import VMdPreview from '@kangc/v-md-editor/lib/preview';
+import '@kangc/v-md-editor/lib/style/preview.css';
+import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
+import '@kangc/v-md-editor/lib/theme/style/github.css';
+import hljs from 'highlight.js';
+
+VMdPreview.use(githubTheme, {
+    hljs,
+});
+
 const app = createApp(App);
 app.component('SvgIcon', SvgIcon);
 app.use(ElementPlus);
@@ -29,4 +39,5 @@ app.use(router);
 app.use(I18n);
 app.use(pinia);
 app.use(directives);
+app.use(VMdPreview);
 app.mount('#app');

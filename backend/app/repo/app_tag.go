@@ -1,0 +1,29 @@
+package repo
+
+import (
+	"context"
+	"github.com/1Panel-dev/1Panel/app/model"
+	"github.com/1Panel-dev/1Panel/global"
+	"gorm.io/gorm"
+)
+
+type AppTagRepo struct {
+}
+
+func (a AppTagRepo) BatchCreate(ctx context.Context, tags []*model.AppTag) error {
+	db := ctx.Value("db").(*gorm.DB)
+	return db.Create(&tags).Error
+}
+
+func (a AppTagRepo) DeleteByAppIds(ctx context.Context, appIds []uint) error {
+	db := ctx.Value("db").(*gorm.DB)
+	return db.Where("app_id in (?)", appIds).Delete(&model.AppTag{}).Error
+}
+
+func (a AppTagRepo) GetByAppId(appId uint) ([]model.AppTag, error) {
+	var appTags []model.AppTag
+	if err := global.DB.Where("app_id = ?", appId).Find(&appTags).Error; err != nil {
+		return nil, err
+	}
+	return appTags, nil
+}

@@ -388,4 +388,9 @@ export default {
         star: '点亮 Star',
         description: '一个现代化的 Linux 面板工具',
     },
+    app: {
+        installed: '已安装',
+        all: '全部',
+        version: '版本',
+    },
 };

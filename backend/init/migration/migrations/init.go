@@ -146,3 +146,10 @@ var AddTableCronjob = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.Cronjob{}, &model.JobRecords{})
 	},
 }
+
+var AddTableApp = &gormigrate.Migration{
+	ID: "20200921-add-table-app",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.App{}, &model.AppDetail{}, &model.Tag{}, &model.AppTag{}, &model.AppConfig{})
+	},
+}

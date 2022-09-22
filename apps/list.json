@@ -1,0 +1,26 @@
+{
+  "version": "0.1",
+  "tags": [
+    {
+      "key": "WebSite",
+      "name": "网站"
+    },
+    {
+      "key": "Datastore",
+      "name": "数据库"
+    }
+  ],
+  "items": [
+    {
+      "key": "mysql",
+      "name": "Mysql",
+      "tags": ["Datastore"],
+      "versions": ["5.7.39","8.0.30"],
+      "short_desc": "常用关系型数据库",
+      "icon": "mysql.png",
+      "author": "Oracle",
+      "type": "internal",
+      "source": "https://www.mysql.com"
+    }
+  ]
+}

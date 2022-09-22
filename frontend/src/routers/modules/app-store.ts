@@ -16,6 +16,25 @@ const appStoreRouter = {
             component: () => import('@/views/app-store/index.vue'),
             meta: {},
         },
+        // {
+        //     path: '/apps/detail/:name',
+        //     name: 'AppDetail',
+        //     component: () => import('@/views/app-store/detail/index.vue'),
+        //     meta: {
+        //         hidden: true,
+        //         title: 'menu.apps',
+        //     },
+        // },
+        {
+            path: '/apps/detail/:name',
+            name: 'AppDetail',
+            props: true,
+            hidden: true,
+            component: () => import('@/views/app-store/detail/index.vue'),
+            meta: {
+                activeMenu: '/apps',
+            },
+        },
     ],
 };
 

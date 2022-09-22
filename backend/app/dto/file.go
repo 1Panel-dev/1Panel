@@ -92,7 +92,7 @@ type FileProcess struct {
 }
 
 type FileProcessReq struct {
-	Key string
+	Key string `json:"key"`
 }
 
 type FileProcessKeys struct {
