@@ -12,6 +12,7 @@ type RouterGroup struct {
 	TerminalRouter
 	CronjobRouter
 	SettingRouter
+	AppRouter
 }
 
 var RouterGroupApp = new(RouterGroup)

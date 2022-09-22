@@ -1,0 +1,52 @@
+{
+  "form_fields": [
+    {
+      "type": "text",
+      "label_zh": "时区",
+      "label_en": "TimeZone",
+      "required": true,
+      "default": "Asia/Shanghai",
+      "env_variable": "TZ"
+    },
+    {
+      "type": "text",
+      "label_zh": "数据库",
+      "label_en": "Database",
+      "required": true,
+      "default": "db",
+      "env_variable": "DATABASE"
+    },
+    {
+      "type": "text",
+      "label_zh": "普通用户",
+      "label_en": "User",
+      "required": true,
+      "default": "mysql",
+      "env_variable": "USER"
+    },
+    {
+      "type": "password",
+      "label_zh": "普通用户密码",
+      "label_en": "Password",
+      "required": true,
+      "default": "1qaz@WSX",
+      "env_variable": "PASSWORD"
+    },
+    {
+      "type": "password",
+      "label_zh": "Root用户密码",
+      "label_en": "RootPassword",
+      "required": true,
+      "default": "1panel@mysql",
+      "env_variable": "ROOT_PASSWORD"
+    },
+    {
+      "type": "number",
+      "label_zh": "端口",
+      "label_en": "Port",
+      "required": true,
+      "default": 3306,
+      "env_variable": "PORT"
+    }
+  ]
+}

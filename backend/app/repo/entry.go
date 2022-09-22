@@ -9,6 +9,10 @@ type RepoGroup struct {
 	CommonRepo
 	CronjobRepo
 	SettingRepo
+	AppRepo
+	AppTagRepo
+	TagRepo
+	AppDetailRepo
 }
 
 var RepoGroupApp = new(RepoGroup)

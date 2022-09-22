@@ -18,4 +18,5 @@ var (
 	fileService      = service.ServiceGroupApp.FileService
 	cronjobService   = service.ServiceGroupApp.CronjobService
 	settingService   = service.ServiceGroupApp.SettingService
+	appService       = service.ServiceGroupApp.AppService
 )
