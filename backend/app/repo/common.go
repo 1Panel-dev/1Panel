@@ -32,6 +32,15 @@ func (c *CommonRepo) WithByType(name string) DBOption {
 	}
 }
 
+func (c *CommonRepo) WithByStatus(status string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if len(status) == 0 {
+			return g
+		}
+		return g.Where("status = ?", status)
+	}
+}
+
 func (c *CommonRepo) WithLikeName(name string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("name like ?", "%"+name+"%")
