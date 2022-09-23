@@ -1,138 +1,96 @@
 <template>
-    <LayoutContent>
+    <LayoutContent :header="$t('app.detail')" :back-name="'App'">
         <div class="brief">
             <el-row :gutter="20">
                 <el-col :span="4">
                     <div class="icon">
-                        <el-image class="image" :src="getImageUrl(appDetail.icon)"></el-image>
+                        <el-image class="image" :src="'data:image/png;base64,' + app.icon"></el-image>
                     </div>
                 </el-col>
                 <el-col :span="20">
                     <div class="a-detail">
                         <div class="a-name">
-                            <font size="5" style="font-weight: 800">{{ appDetail.name }}</font>
+                            <font size="5" style="font-weight: 800">{{ app.name }}</font>
                         </div>
                         <div class="a-description">
                             <span>
                                 <font>
-                                    {{ appDetail.description }}
+                                    {{ app.shortDesc }}
                                 </font>
                             </span>
                         </div>
+                        <br />
                         <el-descriptions :column="1">
                             <el-descriptions-item :label="$t('app.version')">
-                                <el-select v-model="appSelect.version">
-                                    <el-option
-                                        v-for="(v, index) in appDetail.versions"
-                                        :key="index"
-                                        :value="v"
-                                        :label="v"
-                                    >
+                                <el-select v-model="version" @change="getDetail(version)">
+                                    <el-option v-for="(v, index) in app.versions" :key="index" :value="v" :label="v">
                                         {{ v }}
                                     </el-option>
                                 </el-select>
                             </el-descriptions-item>
-                            <el-descriptions-item :label="'链接'">
-                                <el-link>source</el-link>
+                            <el-descriptions-item :label="'来源'">
+                                <el-link @click="toLink(app.source)">
+                                    <el-icon><Link /></el-icon>
+                                </el-link>
                             </el-descriptions-item>
-                            <el-descriptions-item :label="'来源'">FIT2CLOUD</el-descriptions-item>
+                            <el-descriptions-item :label="'作者'">{{ app.author }}</el-descriptions-item>
                         </el-descriptions>
                         <div>
-                            <el-button type="primary">安装</el-button>
+                            <el-button type="primary">{{ $t('app.install') }}</el-button>
                         </div>
                     </div>
                 </el-col>
             </el-row>
         </div>
         <el-divider border-style="double" />
-        <div class="detail">
-            <v-md-preview :text="readme"></v-md-preview>
+        <div class="detail" v-loading="loadingDetail">
+            <v-md-preview :text="appDetail.readme"></v-md-preview>
         </div>
     </LayoutContent>
 </template>
 
 <script lang="ts" setup>
+import { GetApp, GetAppDetail } from '@/api/modules/app';
 import LayoutContent from '@/layout/layout-content.vue';
-import { getAssetsFile } from '@/utils/image';
-import { reactive, ref } from 'vue';
-import detail from './detail.json';
+import { onMounted, ref } from 'vue';
 
-let appDetail = ref<any>();
-appDetail.value = detail;
-
-let appSelect = reactive({
-    version: '',
+interface OperateProps {
+    id: number;
+}
+const props = withDefaults(defineProps<OperateProps>(), {
+    id: 0,
 });
-appSelect.version = appDetail.value.versions[0];
+let app = ref<any>({});
+let appDetail = ref<any>({});
+let version = ref('');
+let loadingDetail = ref(false);
 
-let readme = ref<string>(`<p align="center">
-    <a href="https://halo.run" target="_blank" rel="noopener noreferrer">
-        <img width="100" src="https://halo.run/logo" alt="Halo logo" />
-    </a>
-</p>
-<p align="center"><b>Halo</b> [ˈheɪloʊ]，一款现代化的开源博客/CMS系统，值得一试。</p>
-
-<p align="center">
-<a href="https://github.com/halo-dev/halo/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/halo-dev/halo.svg?style=flat-square" /></a>
-<a href="https://github.com/halo-dev/halo/releases"><img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/halo-dev/halo/total.svg?style=flat-square" /></a>
-<a href="https://hub.docker.com/r/halohub/halo"><img alt="Docker pulls" src="https://img.shields.io/docker/pulls/halohub/halo?style=flat-square" /></a>
-<a href="https://github.com/halo-dev/halo/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/halo-dev/halo.svg?style=flat-square" /></a>
-<a href="https://github.com/halo-dev/halo/actions"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/halo-dev/halo/Halo%20CI?style=flat-square" /></a>
-<br />
-<a href="https://halo.run">官网</a>
-<a href="https://docs.halo.run">文档</a>
-<a href="https://bbs.halo.run">社区</a>
-<a href="https://gitee.com/halo-dev">Gitee</a>
-<a href="https://t.me/halo_dev">Telegram 频道</a>
-</p>
-
----
-
-## 快速开始
-
-详细部署文档请查阅：<https://docs.halo.run>
-
-## 在线体验
-
--   环境地址：<https://demo.halo.run>
--   后台地址：<https://demo.halo.run/admin>
--   用户名：demo
--   密码：P@ssw0rd123..
--   使用前请阅读：<https://demo.halo.run/archives/tips>
-
-## 生态
-
-| 项目 | 状态 | 描述 |
-| --- | --- | --- |
-| [halo-admin](https://github.com/halo-dev/halo-admin) | <a href="https://github.com/halo-dev/halo-admin/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/halo-dev/halo-admin.svg?style=flat-square" /></a> | Web 管理端 UI，已内置在主应用 |
-| [js-sdk](https://github.com/halo-dev/js-sdk) | <a href="https://github.com/halo-dev/js-sdk"><img alt="npm release" src="https://img.shields.io/npm/v/@halo-dev/content-api?style=flat-square"/></a> | JavaScript SDK |
-| [halo-comment](https://github.com/halo-dev/halo-comment) | <a href="https://www.npmjs.com/package/halo-comment"><img alt="npm release" src="https://img.shields.io/npm/v/halo-comment?style=flat-square"/></a> | 独立评论组件，可以非常方便的集成到主题中 |
-| [halo-comment-normal](https://github.com/halo-dev/halo-comment-normal) | <a href="https://www.npmjs.com/package/halo-comment-normal"><img alt="npm release" src="https://img.shields.io/npm/v/halo-comment-normal?style=flat-square"/></a> | 另外一款评论组件 |
-| [halo-mobile-app](https://github.com/halo-dev/halo-mobile-app) | 已停止维护 | 移动端管理 APP |
-| [tencent-cloudbase-halo](https://github.com/halo-dev/tencent-cloudbase-halo) | 无 | 腾讯云 CloudBase 一键部署配置 |
-| [halo-theme-\*](https://github.com/topics/halo-theme) | 无 | GitHub 上开源的 Halo 主题集合 |
-
-## 许可证
-
-[![license](https://img.shields.io/github/license/halo-dev/halo.svg?style=flat-square)](https://github.com/halo-dev/halo/blob/master/LICENSE)
-
-Halo 使用 GPL-v3.0 协议开源，请遵守开源协议。
-
-## 贡献
-
-参考 [CONTRIBUTING](https://github.com/halo-dev/halo/blob/master/CONTRIBUTING.md)。
-
-<a href="https://github.com/halo-dev/halo/graphs/contributors"><img src="https://opencollective.com/halo/contributors.svg?width=890&button=false" /></a>
-
-## 状态
-
-![Repobeats analytics](https://repobeats.axiom.co/api/embed/ad008b2151c22e7cf734d2688befaa795d593b95.svg 'Repobeats analytics image')
-
-`);
-
-const getImageUrl = (name: string) => {
-    return getAssetsFile(name);
+const getApp = () => {
+    GetApp(props.id).then((res) => {
+        app.value = res.data;
+        version.value = app.value.versions[0];
+        getDetail(version.value);
+    });
 };
+
+const getDetail = (version: string) => {
+    loadingDetail.value = true;
+    GetAppDetail(props.id, version)
+        .then((res) => {
+            appDetail.value = res.data;
+        })
+        .finally(() => {
+            loadingDetail.value = false;
+        });
+};
+
+const toLink = (link: string) => {
+    window.open(link, '_blank');
+};
+
+onMounted(() => {
+    getApp();
+});
 </script>
 
 <style lang="scss">

@@ -1,7 +1,7 @@
-import { ReqPage } from '.';
+import { ReqPage, CommonModel } from '.';
 
 export namespace App {
-    export interface App {
+    export interface App extends CommonModel {
         name: string;
         icon: string;
         key: string;
@@ -10,6 +10,10 @@ export namespace App {
         author: string;
         source: string;
         type: string;
+    }
+
+    export interface AppDTO extends App {
+        versions: string[];
     }
 
     export interface Tag {
@@ -25,18 +29,17 @@ export namespace App {
         tags: App.Tag[];
     }
 
-    export interface AppDetail {
-        name: string;
+    export interface AppDetail extends CommonModel {
+        appId: string;
         icon: string;
-        description: string;
-        sourceLink: string;
-        versions: string[];
+        version: string;
         readme: string;
-        athor: string;
+        formFields: string;
+        dockerCompose: string;
     }
 
     export interface AppReq extends ReqPage {
         name: string;
-        types: string[];
+        tags: string[];
     }
 }

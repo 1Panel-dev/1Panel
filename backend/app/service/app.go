@@ -7,10 +7,12 @@ import (
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/app/repo"
 	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/utils/common"
 	"golang.org/x/net/context"
 	"os"
 	"path"
 	"reflect"
+	"sort"
 )
 
 type AppService struct {
@@ -23,8 +25,25 @@ func (a AppService) Page(req dto.AppRequest) (interface{}, error) {
 	if req.Name != "" {
 		opts = append(opts, commonRepo.WithLikeName(req.Name))
 	}
-	if len(req.Types) != 0 {
-		opts = append(opts, appRepo.WithInTypes(req.Types))
+	if len(req.Tags) != 0 {
+		tags, err := tagRepo.GetByKeys(req.Tags)
+		if err != nil {
+			return nil, err
+		}
+		var tagIds []uint
+		for _, t := range tags {
+			tagIds = append(tagIds, t.ID)
+		}
+		appTags, err := appTagRepo.GetByTagIds(tagIds)
+		if err != nil {
+			return nil, err
+		}
+		var appIds []uint
+		for _, t := range appTags {
+			appIds = append(appIds, t.AppId)
+		}
+
+		opts = append(opts, commonRepo.WithIdsIn(appIds))
 	}
 	var res dto.AppRes
 	total, apps, err := appRepo.Page(req.Page, req.PageSize, opts...)
@@ -60,6 +79,47 @@ func (a AppService) Page(req dto.AppRequest) (interface{}, error) {
 	res.Tags = tags
 
 	return res, nil
+}
+
+func (a AppService) GetApp(id uint) (dto.AppDTO, error) {
+	var appDTO dto.AppDTO
+	app, err := appRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return appDTO, err
+	}
+	appDTO.App = app
+	details, err := appDetailRepo.GetByAppId(context.WithValue(context.Background(), "db", global.DB), id)
+	if err != nil {
+		return appDTO, err
+	}
+	var versionsRaw []string
+	for _, detail := range details {
+		versionsRaw = append(versionsRaw, detail.Version)
+	}
+
+	sort.Slice(versionsRaw, func(i, j int) bool {
+		return common.CompareVersion(versionsRaw[i], versionsRaw[j])
+	})
+	appDTO.Versions = versionsRaw
+
+	return appDTO, nil
+}
+
+func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, error) {
+
+	var (
+		appDetailDTO dto.AppDetailDTO
+	)
+
+	var opts []repo.DBOption
+	opts = append(opts, appDetailRepo.WithAppId(appId), appDetailRepo.WithVersion(version))
+	detail, err := appDetailRepo.GetAppDetail(opts...)
+	if err != nil {
+		return appDetailDTO, err
+	}
+
+	appDetailDTO.AppDetail = detail
+	return appDetailDTO, nil
 }
 
 func (a AppService) Sync() error {

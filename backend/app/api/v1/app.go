@@ -5,6 +5,7 @@ import (
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/gin-gonic/gin"
+	"strconv"
 )
 
 func (b *BaseApi) AppSearch(c *gin.Context) {
@@ -29,4 +30,34 @@ func (b *BaseApi) AppSync(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, "")
+}
+
+func (b *BaseApi) GetApp(c *gin.Context) {
+	idStr := c.Param("id")
+	u64, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	appDTO, err := appService.GetApp(uint(u64))
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, appDTO)
+}
+func (b *BaseApi) GetAppDetail(c *gin.Context) {
+	idStr := c.Param("appid")
+	u64, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	version := c.Param("version")
+	appDetailDTO, err := appService.GetAppDetail(uint(u64), version)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, appDetailDTO)
 }

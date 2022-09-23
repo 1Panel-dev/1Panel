@@ -392,5 +392,7 @@ export default {
         installed: '已安装',
         all: '全部',
         version: '版本',
+        detail: '详情',
+        install: '安装',
     },
 };

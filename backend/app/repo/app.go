@@ -11,12 +11,6 @@ import (
 type AppRepo struct {
 }
 
-func (a AppRepo) WithInTypes(types []string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("type in (?)", types)
-	}
-}
-
 func (a AppRepo) Page(page, size int, opts ...DBOption) (int64, []model.App, error) {
 	var apps []model.App
 	db := global.DB.Model(&model.App{})
@@ -27,6 +21,18 @@ func (a AppRepo) Page(page, size int, opts ...DBOption) (int64, []model.App, err
 	db = db.Count(&count)
 	err := db.Debug().Limit(size).Offset(size * (page - 1)).Preload("AppTags").Find(&apps).Error
 	return count, apps, err
+}
+
+func (a AppRepo) GetFirst(opts ...DBOption) (model.App, error) {
+	var app model.App
+	db := global.DB.Model(&model.App{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	if err := db.First(&app).Error; err != nil {
+		return app, err
+	}
+	return app, nil
 }
 
 func (a AppRepo) BatchCreate(ctx context.Context, apps []*model.App) error {
