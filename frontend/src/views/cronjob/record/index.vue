@@ -95,11 +95,11 @@
                                         trigger="click"
                                         style="white-space: pre-wrap"
                                     >
-                                        <div style="margin-left: 20px">
+                                        <div style="margin-left: 20px; height: 400px; overflow: auto">
                                             <span style="white-space: pre-wrap">{{ dialogData.rowData!.script }}</span>
                                         </div>
                                         <template #reference>
-                                            <el-button link>{{ $t('commons.button.expand') }}</el-button>
+                                            <el-button type="primary" link>{{ $t('commons.button.expand') }}</el-button>
                                         </template>
                                     </el-popover>
                                 </el-form-item>
@@ -130,7 +130,7 @@
                                 </el-form-item>
                             </el-col>
                             <el-col :span="8" v-if="dialogData.rowData!.type === 'curl'">
-                                <el-form-item :label="$t('cronjob.url') + 'URL'">
+                                <el-form-item :label="$t('cronjob.url')">
                                     {{ dialogData.rowData!.url }}
                                 </el-form-item>
                             </el-col>
@@ -182,13 +182,13 @@
                                         trigger="click"
                                         style="white-space: pre-wrap"
                                     >
-                                        <div style="margin-left: 20px">
+                                        <div style="margin-left: 20px; height: 400px; overflow: auto">
                                             <span style="white-space: pre-wrap">
                                                 {{ currentRecordDetail }}
                                             </span>
                                         </div>
                                         <template #reference>
-                                            <el-button link @click="loadRecord(currentRecord?.records!)">
+                                            <el-button type="primary" link @click="loadRecord(currentRecord?.records!)">
                                                 {{ $t('commons.button.expand') }}
                                             </el-button>
                                         </template>

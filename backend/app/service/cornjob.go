@@ -2,7 +2,10 @@ package service
 
 import (
 	"bufio"
+	"crypto/tls"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
 	"time"
@@ -82,14 +85,21 @@ func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
 	if err := cronjobRepo.Create(&cronjob); err != nil {
 		return err
 	}
+	var (
+		entryID int
+		err     error
+	)
 	switch cronjobDto.Type {
 	case "shell":
-		entryID, err := u.AddShellJob(&cronjob)
-		if err != nil {
-			return err
-		}
-		_ = cronjobRepo.Update(cronjob.ID, map[string]interface{}{"entry_id": entryID})
+		entryID, err = u.AddShellJob(&cronjob)
+	case "curl":
+		entryID, err = u.AddCurlJob(&cronjob)
 	}
+
+	if err != nil {
+		return err
+	}
+	_ = cronjobRepo.Update(cronjob.ID, map[string]interface{}{"entry_id": entryID})
 	return nil
 }
 
@@ -136,15 +146,47 @@ func (u *CronjobService) AddShellJob(cronjob *model.Cronjob) (int, error) {
 	return int(entryID), nil
 }
 
+func (u *CronjobService) AddCurlJob(cronjob *model.Cronjob) (int, error) {
+	addFunc := func() {
+		record := cronjobRepo.StartRecords(cronjob.ID, "")
+		if len(cronjob.URL) == 0 {
+			return
+		}
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client := &http.Client{Timeout: 1 * time.Second, Transport: tr}
+		request, _ := http.NewRequest("GET", cronjob.URL, nil)
+		response, err := client.Do(request)
+		if err != nil {
+			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), "")
+		}
+		defer response.Body.Close()
+		stdout, _ := ioutil.ReadAll(response.Body)
+
+		record.Records, err = mkdirAndWriteFile(cronjob.ID, cronjob.Name, record.StartTime, stdout)
+		if err != nil {
+			record.Records = "ERR_CREATE_FILE"
+			global.LOG.Errorf("save file %s failed, err: %v", record.Records, err)
+		}
+		cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
+	}
+	entryID, err := global.Cron.AddFunc(cronjob.Spec, addFunc)
+	if err != nil {
+		return 0, err
+	}
+	return int(entryID), nil
+}
+
 func mkdirAndWriteFile(id uint, name string, startTime time.Time, msg []byte) (string, error) {
-	dir := fmt.Sprintf("/opt/1Panel/data/cron/%s%v", name, id)
+	dir := fmt.Sprintf("/opt/1Panel/task/%s%v/log", name, id)
 	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
 			return "", err
 		}
 	}
 
-	path := fmt.Sprintf("%s/%s", dir, startTime.Format("20060102150405"))
+	path := fmt.Sprintf("%s/%s.log", dir, startTime.Format("20060102150405"))
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		return "", err
