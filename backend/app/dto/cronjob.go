@@ -1,5 +1,7 @@
 package dto
 
+import "time"
+
 type CronjobCreate struct {
 	Name     string `json:"name" validate:"required"`
 	Type     string `json:"type" validate:"required"`
@@ -39,6 +41,10 @@ type CronjobUpdate struct {
 	Status string `json:"status"`
 }
 
+type DetailFile struct {
+	Path string `json:"path" validate:"required"`
+}
+
 type CronjobInfo struct {
 	ID       uint   `json:"id"`
 	Name     string `json:"name"`
@@ -60,4 +66,22 @@ type CronjobInfo struct {
 	RetainCopies   int    `json:"retainCopies"`
 
 	Status string `json:"status"`
+}
+
+type SearchRecord struct {
+	PageInfo
+	CronjobID int       `json:"cronjobID"`
+	StartTime time.Time `json:"startTime"`
+	EndTime   time.Time `json:"endTime"`
+	Status    string    `json:"status"`
+}
+
+type Record struct {
+	ID         uint      `json:"id"`
+	StartTime  time.Time `json:"startTime"`
+	Records    string    `json:"records"`
+	Status     string    `json:"status"`
+	Message    string    `json:"message"`
+	TargetPath string    `json:"targetPath"`
+	Interval   int       `json:"interval"`
 }

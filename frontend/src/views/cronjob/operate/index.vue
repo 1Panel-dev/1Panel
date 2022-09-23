@@ -5,15 +5,7 @@
                 <span>{{ title }}{{ $t('cronjob.cronTask') }}</span>
             </div>
         </template>
-        <el-form
-            :disabled="dialogData.isView"
-            ref="formRef"
-            :model="dialogData.rowData"
-            label-position="left"
-            :rules="rules"
-            label-width="120px"
-            :hide-required-asterisk="dialogData.isView"
-        >
+        <el-form ref="formRef" :model="dialogData.rowData" label-position="left" :rules="rules" label-width="120px">
             <el-form-item :label="$t('cronjob.taskType')" prop="type">
                 <el-select
                     @change="changeName(true, dialogData.rowData!.type, dialogData.rowData!.website)"
@@ -134,7 +126,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="cronjobVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button v-show="!dialogData.isView" type="primary" @click="onSubmit(formRef)">
+                <el-button type="primary" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -146,7 +138,7 @@
 import { onMounted, reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import { loadBackupName } from '@/views/setting/helper';
-import { typeOptions, specOptions, weekOptions } from '../options';
+import { typeOptions, specOptions, weekOptions } from '@/views/cronjob/options';
 import FileList from '@/components/file-list/index.vue';
 import { getBackupList } from '@/api/modules/backup';
 import i18n from '@/lang';
@@ -156,14 +148,12 @@ import { addCronjob, editCronjob } from '@/api/modules/cronjob';
 
 interface DialogProps {
     title: string;
-    isView: boolean;
     rowData?: Cronjob.CronjobInfo;
     getTableList?: () => Promise<any>;
 }
 const title = ref<string>('');
 const cronjobVisiable = ref(false);
 const dialogData = ref<DialogProps>({
-    isView: false,
     title: '',
 });
 const acceptParams = (params: DialogProps): void => {

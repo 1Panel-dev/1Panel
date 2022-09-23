@@ -13,17 +13,6 @@
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
-            <el-table-column type="expand">
-                <template #default="{ row }">
-                    <ul>
-                        <li>{{ row.name }} {{ $t('cronjob.handle') }}记录 1</li>
-                        <li>{{ row.name }} {{ $t('cronjob.handle') }}记录 2</li>
-                        <li>{{ row.name }} {{ $t('cronjob.handle') }}记录 3</li>
-                        <li>{{ row.name }} {{ $t('cronjob.handle') }}记录 4</li>
-                    </ul>
-                </template>
-            </el-table-column>
-
             <el-table-column type="selection" fix />
             <el-table-column :label="$t('cronjob.taskName')" prop="name" />
             <el-table-column :label="$t('commons.table.status')" prop="status">
@@ -33,11 +22,12 @@
                         :before-change="beforeChangeStatus"
                         v-model="row.status"
                         inline-prompt
+                        size="default"
                         style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
                         active-text="Y"
                         inactive-text="N"
-                        active-value="running"
-                        inactive-value="stoped"
+                        active-value="Enable"
+                        inactive-value="Disable"
                     />
                 </template>
             </el-table-column>
@@ -71,12 +61,15 @@
         </ComplexTable>
 
         <OperatrDialog @search="search" ref="dialogRef" />
+        <RecordDialog ref="dialogRecordRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import OperatrDialog from '@/views/cronjob/operate/index.vue';
+import RecordDialog from '@/views/cronjob/record/index.vue';
+import { loadZero } from '@/views/cronjob/options';
 import { onMounted, reactive, ref } from 'vue';
 import { loadBackupName } from '@/views/setting/helper';
 import { deleteCronjob, editCronjob, getCronjobPage } from '@/api/modules/cronjob';
@@ -85,6 +78,7 @@ import i18n from '@/lang';
 import { Cronjob } from '@/api/interface/cronjob';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElMessage } from 'element-plus';
+
 const selects = ref<any>([]);
 const switchState = ref<boolean>(false);
 
@@ -104,7 +98,7 @@ const search = async () => {
     logSearch.page = paginationConfig.currentPage;
     logSearch.pageSize = paginationConfig.pageSize;
     const res = await getCronjobPage(logSearch);
-    data.value = res.data.items;
+    data.value = res.data.items || [];
     for (const item of data.value) {
         if (item.targetDir !== '-') {
             item.targetDir = loadBackupName(item.targetDir);
@@ -112,6 +106,8 @@ const search = async () => {
     }
     paginationConfig.total = res.data.total;
 };
+
+const dialogRecordRef = ref<DialogExpose>();
 
 interface DialogExpose {
     acceptParams: (params: any) => void;
@@ -131,7 +127,6 @@ const onOpenDialog = async (
     let params = {
         title,
         rowData: { ...rowData },
-        isView: title === 'view',
     };
     dialogRef.value!.acceptParams(params);
 };
@@ -154,7 +149,6 @@ const beforeChangeStatus = () => {
 };
 const onChangeStatus = async (row: Cronjob.CronjobInfo) => {
     if (switchState.value) {
-        console.log(row.status);
         await editCronjob(row);
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         search();
@@ -170,24 +164,26 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('commons.button.view'),
-        icon: 'View',
-        click: (row: Cronjob.CronjobInfo) => {
-            onOpenDialog('view', row);
-        },
-    },
-    {
         label: i18n.global.t('commons.button.delete'),
         icon: 'Delete',
         click: (row: Cronjob.CronjobInfo) => {
             onBatchDelete(row);
         },
     },
+    {
+        label: i18n.global.t('commons.button.log'),
+        icon: 'Clock',
+        click: (row: Cronjob.CronjobInfo) => {
+            onOpenRecordDialog(row);
+        },
+    },
 ];
-
-function loadZero(i: number) {
-    return i < 10 ? '0' + i : '' + i;
-}
+const onOpenRecordDialog = async (rowData: Partial<Cronjob.CronjobInfo> = {}) => {
+    let params = {
+        rowData: { ...rowData },
+    };
+    dialogRecordRef.value!.acceptParams(params);
+};
 
 onMounted(() => {
     search();

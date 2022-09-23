@@ -140,7 +140,6 @@ var AddTableBackupAccount = &gormigrate.Migration{
 var AddTableCronjob = &gormigrate.Migration{
 	ID: "20200921-add-table-cronjob",
 	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(&model.Cronjob{})
-
+		return tx.AutoMigrate(&model.Cronjob{}, &model.JobRecords{})
 	},
 }

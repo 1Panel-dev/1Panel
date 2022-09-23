@@ -80,7 +80,7 @@ func SuccessWithMsg(ctx *gin.Context, msg string) {
 func GetParamID(c *gin.Context) (uint, error) {
 	idParam, ok := c.Params.Get("id")
 	if !ok {
-		return 0, errors.New("error name")
+		return 0, errors.New("error id in path")
 	}
 	intNum, _ := strconv.Atoi(idParam)
 	return uint(intNum), nil

@@ -36,3 +36,6 @@ export const loadWeek = (i: number) => {
     }
     return '';
 };
+export const loadZero = (i: number) => {
+    return i < 10 ? '0' + i : '' + i;
+};

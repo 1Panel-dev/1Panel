@@ -18,5 +18,7 @@ func (s *CronjobRouter) InitCronjobRouter(Router *gin.RouterGroup) {
 		withRecordRouter.POST("/del", baseApi.DeleteCronjob)
 		withRecordRouter.PUT(":id", baseApi.UpdateCronjob)
 		cmdRouter.POST("/search", baseApi.SearchCronjob)
+		cmdRouter.POST("/search/records", baseApi.SearchJobRecords)
+		cmdRouter.POST("/search/detail", baseApi.LoadRecordDetail)
 	}
 }
