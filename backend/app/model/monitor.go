@@ -15,17 +15,17 @@ type MonitorBase struct {
 type MonitorIO struct {
 	BaseModel
 	Name       string `json:"name"`
-	ReadCount  uint64 `gorm:"type:decimal" json:"readCount"`
-	WriteCount uint64 `gorm:"type:decimal" json:"writeCount"`
-	ReadTime   uint64 `gorm:"type:decimal" json:"readTime"`
-	WriteTime  uint64 `gorm:"type:decimal" json:"writeTime"`
+	ReadCount  uint64 `json:"readCount"`
+	WriteCount uint64 `json:"writeCount"`
+	ReadTime   uint64 `json:"readTime"`
+	WriteTime  uint64 `json:"writeTime"`
 	ReadByte   uint64 `gorm:"type:decimal(32)" json:"readByte"`
 	WriteByte  uint64 `gorm:"type:decimal(32)" json:"writeByte"`
 
-	Read  uint64 `gorm:"type:decimal" json:"read"`
-	Write uint64 `gorm:"type:decimal" json:"write"`
-	Count uint64 `gorm:"type:decimal" json:"count"`
-	Time  uint64 `gorm:"type:decimal" json:"time"`
+	Read  uint64 `json:"read"`
+	Write uint64 `json:"write"`
+	Count uint64 `json:"count"`
+	Time  uint64 `json:"time"`
 }
 
 type MonitorNetwork struct {

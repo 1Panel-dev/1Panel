@@ -1,3 +1,5 @@
+import { ReqPage } from '.';
+
 export namespace Cronjob {
     export interface CronjobInfo {
         id: number;
@@ -55,5 +57,21 @@ export namespace Cronjob {
         targetDirID: number;
         retainCopies: number;
         status: string;
+    }
+    export interface SearchRecord extends ReqPage {
+        cronjobID: number;
+        startTime: Date;
+        endTime: Date;
+        status: string;
+    }
+    export interface Record {
+        id: number;
+        startTime: Date;
+        endTime: Date;
+        records: string;
+        status: string;
+        message: string;
+        targetPath: string;
+        interval: number;
     }
 }
