@@ -12,7 +12,12 @@ type AppRes struct {
 
 type AppDTO struct {
 	model.App
-	Tags []model.Tag `json:"tags"`
+	Versions []string    `json:"versions"`
+	Tags     []model.Tag `json:"tags"`
+}
+
+type AppDetailDTO struct {
+	model.AppDetail
 }
 
 type AppList struct {
@@ -53,6 +58,6 @@ type AppFormFields struct {
 
 type AppRequest struct {
 	PageInfo
-	Name  string   `json:"name"`
-	Types []string `json:"types"`
+	Name string   `json:"name"`
+	Tags []string `json:"tags"`
 }

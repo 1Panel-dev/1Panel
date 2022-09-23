@@ -27,3 +27,11 @@ func (a AppTagRepo) GetByAppId(appId uint) ([]model.AppTag, error) {
 	}
 	return appTags, nil
 }
+
+func (a AppTagRepo) GetByTagIds(tagIds []uint) ([]model.AppTag, error) {
+	var appTags []model.AppTag
+	if err := global.DB.Where("tag_id in (?)", tagIds).Find(&appTags).Error; err != nil {
+		return nil, err
+	}
+	return appTags, nil
+}

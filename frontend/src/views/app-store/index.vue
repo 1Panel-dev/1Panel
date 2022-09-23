@@ -1,31 +1,19 @@
 <template>
     <LayoutContent>
         <el-row :gutter="20">
-            <!-- <el-col :span="24">
-                <div class="header">
-                    <el-radio-group v-model="activeName">
-                        <el-radio-button label="all">
-                            {{ $t('app.all') }}
-                        </el-radio-button>
-                        <el-radio-button label="installed">
-                            {{ $t('app.installed') }}
-                        </el-radio-button>
-                    </el-radio-group>
-                </div>
-            </el-col> -->
             <el-col :span="12">
-                <el-input></el-input>
+                <el-input v-model="req.name" @blur="searchByName"></el-input>
             </el-col>
             <el-col :span="12">
-                <el-select v-model="selectTags" multiple style="width: 100%">
+                <el-select v-model="req.tags" multiple style="width: 100%" @change="changeTag">
                     <el-option v-for="item in tags" :key="item.key" :label="item.name" :value="item.key"></el-option>
                 </el-select>
             </el-col>
-            <el-button @click="sync">同步</el-button>
+            <!-- <el-button @click="sync">同步</el-button> -->
         </el-row>
         <el-row :gutter="20">
             <el-col v-for="(app, index) in apps" :key="index" :xs="8" :sm="8" :lg="4">
-                <div @click="getAppDetail(app.name)">
+                <div @click="getAppDetail(app.id)">
                     <el-card :body-style="{ padding: '0px' }" class="a-card">
                         <el-row :gutter="24">
                             <el-col :span="8">
@@ -63,32 +51,31 @@
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import LayoutContent from '@/layout/layout-content.vue';
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import router from '@/routers';
-import { SyncApp } from '@/api/modules/app';
+// import { SyncApp } from '@/api/modules/app';
 import { SearchApp } from '@/api/modules/app';
 
-let req = ref<App.AppReq>({
+let req = reactive({
     name: '',
-    types: [],
+    tags: [],
     page: 1,
     pageSize: 50,
 });
 
 let apps = ref<App.App[]>([]);
 let tags = ref<App.Tag[]>([]);
-let selectTags = ref<string[]>([]);
 const colorArr = ['#6495ED', '#54FF9F', '#BEBEBE', '#FFF68F', '#FFFF00', '#8B0000'];
 
 const getColor = (index: number) => {
     return colorArr[index];
 };
 
-const sync = () => {
-    SyncApp().then((res) => {
-        console.log(res);
-    });
-};
+// const sync = () => {
+//     SyncApp().then((res) => {
+//         console.log(res);
+//     });
+// };
 
 const search = async (req: App.AppReq) => {
     await SearchApp(req).then((res) => {
@@ -97,15 +84,24 @@ const search = async (req: App.AppReq) => {
     });
 };
 
-const getAppDetail = (name: string) => {
+const getAppDetail = (id: number) => {
+    console.log(id);
     let params: { [key: string]: any } = {
-        name: name,
+        id: id,
     };
     router.push({ name: 'AppDetail', params });
 };
 
+const changeTag = () => {
+    search(req);
+};
+
+const searchByName = () => {
+    search(req);
+};
+
 onMounted(() => {
-    search(req.value);
+    search(req);
 });
 </script>
 
