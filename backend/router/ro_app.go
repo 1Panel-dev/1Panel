@@ -19,5 +19,7 @@ func (a *AppRouter) InitAppRouter(Router *gin.RouterGroup) {
 		appRouter.POST("/search", baseApi.AppSearch)
 		appRouter.GET("/:id", baseApi.GetApp)
 		appRouter.GET("/detail/:appid/:version", baseApi.GetAppDetail)
+		appRouter.POST("/install", baseApi.InstallApp)
+		appRouter.POST("/installed", baseApi.PageInstalled)
 	}
 }

@@ -18,6 +18,7 @@ type AppDTO struct {
 
 type AppDetailDTO struct {
 	model.AppDetail
+	Params interface{} `json:"params"`
 }
 
 type AppList struct {
@@ -60,4 +61,21 @@ type AppRequest struct {
 	PageInfo
 	Name string   `json:"name"`
 	Tags []string `json:"tags"`
+}
+
+type AppInstallRequest struct {
+	AppDetailId uint                   `json:"appDetailId" validate:"required"`
+	Params      map[string]interface{} `json:"params"`
+}
+
+type AppInstalled struct {
+	model.AppInstall
+	Total   int    `json:"total"`
+	Ready   int    `json:"ready"`
+	AppName string `json:"appName"`
+	Icon    string `json:"icon"`
+}
+
+type AppInstalledRequest struct {
+	PageInfo
 }

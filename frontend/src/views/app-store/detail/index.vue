@@ -28,15 +28,15 @@
                                     </el-option>
                                 </el-select>
                             </el-descriptions-item>
-                            <el-descriptions-item :label="'来源'">
+                            <el-descriptions-item :label="$t('app.source')">
                                 <el-link @click="toLink(app.source)">
                                     <el-icon><Link /></el-icon>
                                 </el-link>
                             </el-descriptions-item>
-                            <el-descriptions-item :label="'作者'">{{ app.author }}</el-descriptions-item>
+                            <el-descriptions-item :label="$t('app.author')">{{ app.author }}</el-descriptions-item>
                         </el-descriptions>
                         <div>
-                            <el-button type="primary">{{ $t('app.install') }}</el-button>
+                            <el-button @click="openInstall" type="primary">{{ $t('app.install') }}</el-button>
                         </div>
                     </div>
                 </el-col>
@@ -46,6 +46,7 @@
         <div class="detail" v-loading="loadingDetail">
             <v-md-preview :text="appDetail.readme"></v-md-preview>
         </div>
+        <Install ref="installRef"></Install>
     </LayoutContent>
 </template>
 
@@ -53,6 +54,7 @@
 import { GetApp, GetAppDetail } from '@/api/modules/app';
 import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, ref } from 'vue';
+import Install from './install.vue';
 
 interface OperateProps {
     id: number;
@@ -64,6 +66,7 @@ let app = ref<any>({});
 let appDetail = ref<any>({});
 let version = ref('');
 let loadingDetail = ref(false);
+const installRef = ref();
 
 const getApp = () => {
     GetApp(props.id).then((res) => {
@@ -86,6 +89,14 @@ const getDetail = (version: string) => {
 
 const toLink = (link: string) => {
     window.open(link, '_blank');
+};
+
+const openInstall = () => {
+    let params = {
+        params: appDetail.value.params,
+        appDetailId: appDetail.value.id,
+    };
+    installRef.value.acceptParams(params);
 };
 
 onMounted(() => {

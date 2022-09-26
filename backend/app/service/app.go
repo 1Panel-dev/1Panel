@@ -6,13 +6,18 @@ import (
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/app/repo"
+	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
 	"github.com/1Panel-dev/1Panel/utils/common"
+	"github.com/1Panel-dev/1Panel/utils/compose"
+	"github.com/1Panel-dev/1Panel/utils/files"
+	"github.com/joho/godotenv"
 	"golang.org/x/net/context"
 	"os"
 	"path"
 	"reflect"
 	"sort"
+	"strconv"
 )
 
 type AppService struct {
@@ -105,6 +110,24 @@ func (a AppService) GetApp(id uint) (dto.AppDTO, error) {
 	return appDTO, nil
 }
 
+func (a AppService) PageInstalled(req dto.AppInstalledRequest) (int64, []dto.AppInstalled, error) {
+	total, installed, err := appInstallRepo.Page(req.Page, req.PageSize)
+	if err != nil {
+		return 0, nil, err
+	}
+	installDTOs := []dto.AppInstalled{}
+	for _, in := range installed {
+		installDto := dto.AppInstalled{
+			AppInstall: in,
+			AppName:    in.App.Name,
+			Icon:       in.App.Icon,
+		}
+		installDTOs = append(installDTOs, installDto)
+	}
+
+	return total, installDTOs, nil
+}
+
 func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, error) {
 
 	var (
@@ -117,9 +140,83 @@ func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, 
 	if err != nil {
 		return appDetailDTO, err
 	}
-
+	paramMap := make(map[string]interface{})
+	json.Unmarshal([]byte(detail.Params), &paramMap)
 	appDetailDTO.AppDetail = detail
+	appDetailDTO.Params = paramMap
 	return appDetailDTO, nil
+}
+
+func (a AppService) Install(appDetailId uint, params map[string]interface{}) error {
+	appDetail, err := appDetailRepo.GetAppDetail(commonRepo.WithByID(appDetailId))
+	if err != nil {
+		return err
+	}
+	app, err := appRepo.GetFirst(commonRepo.WithByID(appDetail.AppId))
+	paramByte, err := json.Marshal(params)
+	if err != nil {
+		return err
+	}
+	containerName := constant.ContainerPrefix + app.Key + "-" + common.RandStr(6)
+	appInstall := model.AppInstall{
+		AppId:         appDetail.AppId,
+		AppDetailId:   appDetail.ID,
+		Version:       appDetail.Version,
+		Status:        constant.Installing,
+		Params:        string(paramByte),
+		ContainerName: containerName,
+		Message:       "",
+	}
+	resourceDir := path.Join(global.CONF.System.ResourceDir, "apps", app.Key, appDetail.Version)
+	installDir := path.Join(global.CONF.System.AppDir, app.Key)
+	op := files.NewFileOp()
+	if err := op.CopyDir(resourceDir, installDir); err != nil {
+		return err
+	}
+	installAppDir := path.Join(installDir, appDetail.Version)
+	containerNameDir := path.Join(installDir, containerName)
+	if err := op.Rename(installAppDir, containerNameDir); err != nil {
+		return err
+	}
+	composeFilePath := path.Join(containerNameDir, "docker-compose.yml")
+	envPath := path.Join(containerNameDir, ".env")
+
+	envParams := make(map[string]string, len(params))
+	for k, v := range params {
+		switch t := v.(type) {
+		case string:
+			envParams[k] = t
+		case float64:
+			envParams[k] = strconv.FormatFloat(t, 'f', -1, 32)
+		default:
+			envParams[k] = t.(string)
+		}
+	}
+	envParams["CONTAINER_NAME"] = containerName
+	if err := godotenv.Write(envParams, envPath); err != nil {
+		return err
+	}
+	if err := appInstallRepo.Create(appInstall); err != nil {
+		return err
+	}
+	go upApp(composeFilePath, appInstall)
+	return nil
+}
+
+func upApp(composeFilePath string, appInstall model.AppInstall) {
+	out, err := compose.Up(composeFilePath)
+	if err != nil {
+		if out != "" {
+			appInstall.Message = out
+		} else {
+			appInstall.Message = err.Error()
+		}
+		appInstall.Status = constant.Error
+		_ = appInstallRepo.Save(appInstall)
+	} else {
+		appInstall.Status = constant.Running
+		_ = appInstallRepo.Save(appInstall)
+	}
 }
 
 func (a AppService) Sync() error {
@@ -204,11 +301,11 @@ func (a AppService) Sync() error {
 				continue
 			}
 			detail.DockerCompose = string(dockerComposeStr)
-			formStr, err := os.ReadFile(path.Join(detailPath, "form.json"))
+			paramStr, err := os.ReadFile(path.Join(detailPath, "params.json"))
 			if err != nil {
 				global.LOG.Errorf("get [%s] form.json error: %s", detailPath, err.Error())
 			}
-			detail.FormFields = string(formStr)
+			detail.Params = string(paramStr)
 			app.Details = append(app.Details, detail)
 		}
 	}

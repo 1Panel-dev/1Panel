@@ -1,14 +1,13 @@
 package service
 
 import (
-	"crypto/rand"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/utils/common"
 	"github.com/1Panel-dev/1Panel/utils/files"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
-	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -36,14 +35,14 @@ func (f FileService) GetFileTree(op dto.FileOption) ([]dto.FileTree, error) {
 		return nil, err
 	}
 	node := dto.FileTree{
-		ID:   getUuid(),
+		ID:   common.GetUuid(),
 		Name: info.Name,
 		Path: info.Path,
 	}
 	for _, v := range info.Items {
 		if v.IsDir {
 			node.Children = append(node.Children, dto.FileTree{
-				ID:   getUuid(),
+				ID:   common.GetUuid(),
 				Name: v.Name,
 				Path: v.Path,
 			})
@@ -176,12 +175,4 @@ func (f FileService) DirSize(req dto.DirSizeReq) (dto.DirSizeRes, error) {
 		return dto.DirSizeRes{}, err
 	}
 	return dto.DirSizeRes{Size: size}, nil
-}
-
-func getUuid() string {
-	b := make([]byte, 16)
-	_, _ = io.ReadFull(rand.Reader, b)
-	b[6] = (b[6] & 0x0f) | 0x40
-	b[8] = (b[8] & 0x3f) | 0x80
-	return fmt.Sprintf("%x-%x-%x-%x-%x", b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 }

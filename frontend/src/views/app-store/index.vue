@@ -1,108 +1,40 @@
 <template>
     <LayoutContent>
         <el-row :gutter="20">
-            <el-col :span="12">
-                <el-input v-model="req.name" @blur="searchByName"></el-input>
-            </el-col>
-            <el-col :span="12">
-                <el-select v-model="req.tags" multiple style="width: 100%" @change="changeTag">
-                    <el-option v-for="item in tags" :key="item.key" :label="item.name" :value="item.key"></el-option>
-                </el-select>
-            </el-col>
-            <!-- <el-button @click="sync">同步</el-button> -->
-        </el-row>
-        <el-row :gutter="20">
-            <el-col v-for="(app, index) in apps" :key="index" :xs="8" :sm="8" :lg="4">
-                <div @click="getAppDetail(app.id)">
-                    <el-card :body-style="{ padding: '0px' }" class="a-card">
-                        <el-row :gutter="24">
-                            <el-col :span="8">
-                                <div class="icon">
-                                    <el-image class="image" :src="'data:image/png;base64,' + app.icon"></el-image>
-                                </div>
-                            </el-col>
-                            <el-col :span="16">
-                                <div class="a-detail">
-                                    <div class="d-name">
-                                        <font size="3" style="font-weight: 700">{{ app.name }}</font>
-                                    </div>
-                                    <div class="d-description">
-                                        <font size="1">
-                                            <span>
-                                                {{ app.shortDesc }}
-                                            </span>
-                                        </font>
-                                    </div>
-                                    <div class="d-tag">
-                                        <el-tag v-for="(tag, ind) in app.tags" :key="ind" round :colr="getColor(ind)">
-                                            {{ tag.name }}
-                                        </el-tag>
-                                    </div>
-                                </div>
-                            </el-col>
-                        </el-row>
-                    </el-card>
+            <el-col :span="24">
+                <div style="margin-bottom: 10px">
+                    <el-radio-group v-model="activeName">
+                        <el-radio-button label="all">
+                            {{ $t('app.all') }}
+                        </el-radio-button>
+                        <el-radio-button label="installed">
+                            {{ $t('app.installed') }}
+                        </el-radio-button>
+                    </el-radio-group>
+                    <div style="float: right">
+                        <el-button @click="sync">{{ $t('app.sync') }}</el-button>
+                    </div>
                 </div>
             </el-col>
         </el-row>
+        <Apps v-if="activeName === 'all'"></Apps>
+        <Installed v-if="activeName === 'installed'"></Installed>
     </LayoutContent>
 </template>
 
 <script lang="ts" setup>
-import { App } from '@/api/interface/app';
 import LayoutContent from '@/layout/layout-content.vue';
-import { onMounted, reactive, ref } from 'vue';
-import router from '@/routers';
-// import { SyncApp } from '@/api/modules/app';
-import { SearchApp } from '@/api/modules/app';
+import { ref } from 'vue';
+import { SyncApp } from '@/api/modules/app';
+import Apps from './apps/index.vue';
+import Installed from './installed/index.vue';
+const activeName = ref('all');
 
-let req = reactive({
-    name: '',
-    tags: [],
-    page: 1,
-    pageSize: 50,
-});
-
-let apps = ref<App.App[]>([]);
-let tags = ref<App.Tag[]>([]);
-const colorArr = ['#6495ED', '#54FF9F', '#BEBEBE', '#FFF68F', '#FFFF00', '#8B0000'];
-
-const getColor = (index: number) => {
-    return colorArr[index];
-};
-
-// const sync = () => {
-//     SyncApp().then((res) => {
-//         console.log(res);
-//     });
-// };
-
-const search = async (req: App.AppReq) => {
-    await SearchApp(req).then((res) => {
-        apps.value = res.data.items;
-        tags.value = res.data.tags;
+const sync = () => {
+    SyncApp().then((res) => {
+        console.log(res);
     });
 };
-
-const getAppDetail = (id: number) => {
-    console.log(id);
-    let params: { [key: string]: any } = {
-        id: id,
-    };
-    router.push({ name: 'AppDetail', params });
-};
-
-const changeTag = () => {
-    search(req);
-};
-
-const searchByName = () => {
-    search(req);
-};
-
-onMounted(() => {
-    search(req);
-});
 </script>
 
 <style lang="scss">
