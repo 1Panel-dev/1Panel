@@ -18,7 +18,7 @@ type IHostRepo interface {
 	Delete(opts ...DBOption) error
 }
 
-func NewIHostService() IHostRepo {
+func NewIHostRepo() IHostRepo {
 	return &HostRepo{}
 }
 

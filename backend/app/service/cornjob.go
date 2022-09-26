@@ -3,19 +3,27 @@ package service
 import (
 	"bufio"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/utils/cloud_storage"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
+)
+
+const (
+	errRecord = "errRecord"
+	errHandle = "errHandle"
 )
 
 type CronjobService struct{}
@@ -94,6 +102,8 @@ func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
 		entryID, err = u.AddShellJob(&cronjob)
 	case "curl":
 		entryID, err = u.AddCurlJob(&cronjob)
+	case "directory":
+		entryID, err = u.AddDirectoryJob(&cronjob)
 	}
 
 	if err != nil {
@@ -129,12 +139,13 @@ func (u *CronjobService) AddShellJob(cronjob *model.Cronjob) (int, error) {
 		cmd := exec.Command(cronjob.Script)
 		stdout, err := cmd.Output()
 		if err != nil {
-			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), "ERR_GENERAGE_STDOUT")
+			record.Records = errHandle
+			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), errHandle)
 			return
 		}
-		record.Records, err = mkdirAndWriteFile(cronjob.ID, cronjob.Name, record.StartTime, stdout)
+		record.Records, err = mkdirAndWriteFile(cronjob, record.StartTime, stdout)
 		if err != nil {
-			record.Records = "ERR_CREATE_FILE"
+			record.Records = errRecord
 			global.LOG.Errorf("save file %s failed, err: %v", record.Records, err)
 		}
 		cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
@@ -159,14 +170,15 @@ func (u *CronjobService) AddCurlJob(cronjob *model.Cronjob) (int, error) {
 		request, _ := http.NewRequest("GET", cronjob.URL, nil)
 		response, err := client.Do(request)
 		if err != nil {
-			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), "")
+			record.Records = errHandle
+			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), errHandle)
 		}
 		defer response.Body.Close()
 		stdout, _ := ioutil.ReadAll(response.Body)
 
-		record.Records, err = mkdirAndWriteFile(cronjob.ID, cronjob.Name, record.StartTime, stdout)
+		record.Records, err = mkdirAndWriteFile(cronjob, record.StartTime, stdout)
 		if err != nil {
-			record.Records = "ERR_CREATE_FILE"
+			record.Records = errRecord
 			global.LOG.Errorf("save file %s failed, err: %v", record.Records, err)
 		}
 		cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
@@ -178,8 +190,60 @@ func (u *CronjobService) AddCurlJob(cronjob *model.Cronjob) (int, error) {
 	return int(entryID), nil
 }
 
-func mkdirAndWriteFile(id uint, name string, startTime time.Time, msg []byte) (string, error) {
-	dir := fmt.Sprintf("/opt/1Panel/task/%s%v/log", name, id)
+func (u *CronjobService) AddDirectoryJob(cronjob *model.Cronjob) (int, error) {
+	addFunc := func() {
+		record := cronjobRepo.StartRecords(cronjob.ID, "")
+		if len(cronjob.SourceDir) == 0 {
+			return
+		}
+		message, err := tarWithExclude(cronjob, record.StartTime)
+		if err != nil {
+			record.Records = errHandle
+			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), errHandle)
+			return
+		}
+		record.Records, err = mkdirAndWriteFile(cronjob, record.StartTime, message)
+		if err != nil {
+			record.Records = errRecord
+			global.LOG.Errorf("save file %s failed, err: %v", record.Records, err)
+		}
+		cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
+	}
+	entryID, err := global.Cron.AddFunc(cronjob.Spec, addFunc)
+	if err != nil {
+		return 0, err
+	}
+	return int(entryID), nil
+}
+
+func (u *CronjobService) AddWebSiteJob(cronjob *model.Cronjob) (int, error) {
+	addFunc := func() {
+		record := cronjobRepo.StartRecords(cronjob.ID, "")
+		if len(cronjob.URL) == 0 {
+			return
+		}
+		message, err := tarWithExclude(cronjob, record.StartTime)
+		if err != nil {
+			record.Records = errHandle
+			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), errHandle)
+			return
+		}
+		record.Records, err = mkdirAndWriteFile(cronjob, record.StartTime, message)
+		if err != nil {
+			record.Records = errRecord
+			global.LOG.Errorf("save file %s failed, err: %v", record.Records, err)
+		}
+		cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
+	}
+	entryID, err := global.Cron.AddFunc(cronjob.Spec, addFunc)
+	if err != nil {
+		return 0, err
+	}
+	return int(entryID), nil
+}
+
+func mkdirAndWriteFile(cronjob *model.Cronjob, startTime time.Time, msg []byte) (string, error) {
+	dir := fmt.Sprintf("%s%s/%s-%v", constant.TaskDir, cronjob.Type, cronjob.Name, cronjob.ID)
 	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
 			return "", err
@@ -196,6 +260,76 @@ func mkdirAndWriteFile(id uint, name string, startTime time.Time, msg []byte) (s
 	_, _ = write.WriteString(string(msg))
 	write.Flush()
 	return path, nil
+}
+
+func tarWithExclude(cronjob *model.Cronjob, startTime time.Time) ([]byte, error) {
+	varMaps, targetdir, err := loadTargetInfo(cronjob)
+	if err != nil {
+		return nil, fmt.Errorf("load target dir failed, err: %v", err)
+	}
+
+	excludes := strings.Split(cronjob.ExclusionRules, ";")
+	name := fmt.Sprintf("%s/%s.tar.gz", targetdir, startTime.Format("20060102150405"))
+	exStr := []string{"-zcvPf", name}
+	for _, exclude := range excludes {
+		exStr = append(exStr, "--exclude")
+		exStr = append(exStr, exclude)
+	}
+	exStr = append(exStr, cronjob.SourceDir)
+	cmd := exec.Command("tar", exStr...)
+	stdout, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("tar zcvPf failed, err: %v", err)
+	}
+
+	if varMaps["type"] != "LOCAL" {
+		backClient, err := cloud_storage.NewCloudStorageClient(varMaps)
+		if err != nil {
+			return stdout, fmt.Errorf("new cloud storage client failed, err: %v", err)
+		}
+		isOK, err := backClient.Upload(name, strings.Replace(name, constant.TmpDir, "", -1))
+		if !isOK {
+			return nil, fmt.Errorf("cloud storage upload failed, err: %v", err)
+		}
+	}
+	return stdout, nil
+}
+
+func loadTargetInfo(cronjob *model.Cronjob) (map[string]interface{}, string, error) {
+	backup, err := backupRepo.Get(commonRepo.WithByID(uint(cronjob.TargetDirID)))
+	if err != nil {
+		return nil, "", err
+	}
+	varMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
+		return nil, "", err
+	}
+	dir := ""
+	if backup.Type != "LOCAL" {
+		varMap["type"] = backup.Type
+		varMap["bucket"] = backup.Bucket
+		switch backup.Type {
+		case constant.Sftp:
+			varMap["password"] = backup.Credential
+		case constant.OSS, constant.S3, constant.MinIo:
+			varMap["secretKey"] = backup.Credential
+		}
+		dir = fmt.Sprintf("%s%s/%s", constant.TmpDir, cronjob.Type, cronjob.Name)
+	} else {
+		if _, ok := varMap["dir"]; !ok {
+			return nil, "", errors.New("load local backup dir failed")
+		}
+		dir = fmt.Sprintf("%v/%s/%s", varMap["dir"], cronjob.Type, cronjob.Name)
+	}
+
+	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
+			if err != nil {
+				return nil, "", fmt.Errorf("mkdir %s failed, err: %v", dir, err)
+			}
+		}
+	}
+	return varMap, dir, nil
 }
 
 func loadSpec(cronjob model.Cronjob) string {
