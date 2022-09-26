@@ -13,7 +13,7 @@ type IOperationRepo interface {
 	Delete(opts ...DBOption) error
 }
 
-func NewIOperationService() IOperationRepo {
+func NewIOperationRepo() IOperationRepo {
 	return &OperationRepo{}
 }
 

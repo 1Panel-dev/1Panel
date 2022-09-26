@@ -17,7 +17,7 @@ type IGroupRepo interface {
 	Delete(opts ...DBOption) error
 }
 
-func NewIGroupService() IGroupRepo {
+func NewIGroupRepo() IGroupRepo {
 	return &GroupRepo{}
 }
 

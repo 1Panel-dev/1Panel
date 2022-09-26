@@ -24,7 +24,7 @@ type ICronjobRepo interface {
 	EndRecords(record model.JobRecords, status, message, records string)
 }
 
-func NewICronjobService() ICronjobRepo {
+func NewICronjobRepo() ICronjobRepo {
 	return &CronjobRepo{}
 }
 

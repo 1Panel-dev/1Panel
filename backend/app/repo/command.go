@@ -17,7 +17,7 @@ type ICommandRepo interface {
 	Delete(opts ...DBOption) error
 }
 
-func NewICommandService() ICommandRepo {
+func NewICommandRepo() ICommandRepo {
 	return &CommandRepo{}
 }
 

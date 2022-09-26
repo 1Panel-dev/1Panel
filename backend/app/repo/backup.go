@@ -15,7 +15,7 @@ type IBackupRepo interface {
 	Delete(opts ...DBOption) error
 }
 
-func NewIBackupService() IBackupRepo {
+func NewIBackupRepo() IBackupRepo {
 	return &BackupRepo{}
 }
 
