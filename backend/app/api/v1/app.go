@@ -68,7 +68,7 @@ func (b *BaseApi) InstallApp(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if err := appService.Install(req.AppDetailId, req.Params); err != nil {
+	if err := appService.Install(req.Name, req.AppDetailId, req.Params); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -91,4 +91,18 @@ func (b *BaseApi) PageInstalled(c *gin.Context) {
 		Items: list,
 		Total: total,
 	})
+}
+
+func (b *BaseApi) InstallOperate(c *gin.Context) {
+	var req dto.AppInstallOperate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := appService.Operate(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
 }

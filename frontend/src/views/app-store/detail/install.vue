@@ -1,6 +1,9 @@
 <template>
     <el-dialog v-model="open" :title="$t('app.install')" width="30%">
         <el-form ref="paramForm" label-position="left" :model="form" label-width="150px" :rules="rules">
+            <el-form-item :label="$t('app.name')" prop="name">
+                <el-input v-model="req.name"></el-input>
+            </el-form-item>
             <div v-for="(f, index) in installData.params?.formFields" :key="index">
                 <el-form-item :label="f.labelZh" :prop="f.envKey">
                     <el-input
@@ -44,12 +47,15 @@ const installData = ref<InstallRrops>({
 });
 let open = ref(false);
 let form = reactive<{ [key: string]: any }>({});
-let rules = reactive<FormRules>({});
+let rules = reactive<FormRules>({
+    name: [Rules.requiredInput],
+});
 let loading = false;
 const paramForm = ref<FormInstance>();
 const req = reactive({
     appDetailId: 0,
     params: {},
+    name: '',
 });
 const em = defineEmits(['close']);
 const handleClose = () => {

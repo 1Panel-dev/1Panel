@@ -66,6 +66,7 @@ type AppRequest struct {
 type AppInstallRequest struct {
 	AppDetailId uint                   `json:"appDetailId" validate:"required"`
 	Params      map[string]interface{} `json:"params"`
+	Name        string                 `json:"name" validate:"required"`
 }
 
 type AppInstalled struct {
@@ -78,4 +79,17 @@ type AppInstalled struct {
 
 type AppInstalledRequest struct {
 	PageInfo
+}
+
+type AppOperate string
+
+var (
+	Up      AppOperate = "up"
+	Down    AppOperate = "down"
+	Restart AppOperate = "restart"
+)
+
+type AppInstallOperate struct {
+	InstallId uint       `json:"installId" validate:"required"`
+	Operate   AppOperate `json:"operate" validate:"required"`
 }

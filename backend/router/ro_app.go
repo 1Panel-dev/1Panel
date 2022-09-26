@@ -21,5 +21,6 @@ func (a *AppRouter) InitAppRouter(Router *gin.RouterGroup) {
 		appRouter.GET("/detail/:appid/:version", baseApi.GetAppDetail)
 		appRouter.POST("/install", baseApi.InstallApp)
 		appRouter.POST("/installed", baseApi.PageInstalled)
+		appRouter.POST("/installed/op", baseApi.InstallOperate)
 	}
 }
