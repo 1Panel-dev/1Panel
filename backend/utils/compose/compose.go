@@ -28,3 +28,12 @@ func Restart(filePath string) (string, error) {
 	}
 	return string(stdout), nil
 }
+
+func Rmf(filePath string) (string, error) {
+	cmd := exec.Command("docker-compose", "-f", filePath, "rm", "-f")
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", err
+	}
+	return string(stdout), nil
+}

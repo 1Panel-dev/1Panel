@@ -406,5 +406,6 @@ export default {
         down: '停止',
         name: '名称',
         description: '描述',
+        delete: '删除',
     },
 };

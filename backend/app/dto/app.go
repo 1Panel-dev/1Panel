@@ -87,6 +87,7 @@ var (
 	Up      AppOperate = "up"
 	Down    AppOperate = "down"
 	Restart AppOperate = "restart"
+	Delete  AppOperate = "delete"
 )
 
 type AppInstallOperate struct {
