@@ -154,7 +154,7 @@ func (a AppService) Operate(req dto.AppInstallOperate) error {
 		return err
 	}
 	if len(appInstall) == 0 {
-		return errors.New("not found")
+		return errors.New("req not found")
 	}
 
 	install := appInstall[0]
@@ -175,6 +175,20 @@ func (a AppService) Operate(req dto.AppInstallOperate) error {
 		if err != nil {
 			return handleErr(install, err, out)
 		}
+	case dto.Delete:
+		op := files.NewFileOp()
+		appDir := path.Join(global.CONF.System.AppDir, install.App.Key, install.ContainerName)
+		dir, _ := os.Stat(appDir)
+		if dir == nil {
+			_ = appInstallRepo.Delete(commonRepo.WithByID(install.ID))
+			break
+		}
+		_ = op.DeleteDir(appDir)
+		out, err := compose.Rmf(dockerComposePath)
+		if err != nil {
+			return handleErr(install, err, out)
+		}
+		_ = appInstallRepo.Delete(commonRepo.WithByID(install.ID))
 	default:
 		return errors.New("operate not support")
 	}

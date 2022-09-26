@@ -21,9 +21,18 @@ func (a AppInstallRepo) Create(install *model.AppInstall) error {
 	db := global.DB.Model(&model.AppInstall{})
 	return db.Create(&install).Error
 }
+
 func (a AppInstallRepo) Save(install model.AppInstall) error {
 	db := global.DB.Model(&model.AppInstall{})
 	return db.Save(&install).Error
+}
+
+func (a AppInstallRepo) Delete(opts ...DBOption) error {
+	db := global.DB.Model(&model.AppInstall{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	return db.Delete(&model.AppInstall{}).Error
 }
 
 func (a AppInstallRepo) Page(page, size int, opts ...DBOption) (int64, []model.AppInstall, error) {

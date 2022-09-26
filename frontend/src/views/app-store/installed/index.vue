@@ -1,7 +1,7 @@
 <template>
     <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" v-loading="loading">
         <el-table-column :label="$t('app.name')" prop="name"></el-table-column>
-        <el-table-column :label="$t('app.description')" prop="description"></el-table-column>
+        <!-- <el-table-column :label="$t('app.description')" prop="description"></el-table-column> -->
         <el-table-column :label="$t('app.appName')" prop="appName"></el-table-column>
         <el-table-column :label="$t('app.version')" prop="version"></el-table-column>
         <el-table-column :label="$t('app.container')">
@@ -41,7 +41,7 @@ import { onMounted, reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { dateFromat } from '@/utils/util';
 import i18n from '@/lang';
-import { ElMessageBox } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 
 let data = ref<any>();
 let loading = ref(false);
@@ -77,7 +77,10 @@ const operate = async (row: any, op: string) => {
     }).then(async () => {
         loading.value = true;
         InstalledOp(req)
-            .then(() => {})
+            .then(() => {
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
             .finally(() => {
                 loading.value = false;
             });
@@ -101,6 +104,12 @@ const buttons = [
         label: i18n.global.t('app.down'),
         click: (row: any) => {
             operate(row, 'down');
+        },
+    },
+    {
+        label: i18n.global.t('app.delete'),
+        click: (row: any) => {
+            operate(row, 'delete');
         },
     },
 ];
