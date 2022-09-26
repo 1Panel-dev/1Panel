@@ -25,3 +25,7 @@ export const InstallApp = (install: App.AppInstall) => {
 export const GetAppInstalled = (info: ReqPage) => {
     return http.post<ResPage<App.AppInstalled>>('apps/installed', info);
 };
+
+export const InstalledOp = (op: App.AppInstalledOp) => {
+    return http.post<any>('apps/installed/op', op);
+};

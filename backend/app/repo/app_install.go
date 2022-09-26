@@ -13,7 +13,7 @@ func (a AppInstallRepo) GetBy(opts ...DBOption) ([]model.AppInstall, error) {
 		db = opt(db)
 	}
 	var install []model.AppInstall
-	err := db.Find(&install).Error
+	err := db.Preload("App").Find(&install).Error
 	return install, err
 }
 

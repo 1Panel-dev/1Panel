@@ -2,6 +2,7 @@ package model
 
 type AppInstall struct {
 	BaseModel
+	Name          string `json:"name" gorm:"type:varchar(64);not null"`
 	ContainerName string `json:"containerName" gorm:"type:varchar(256);not null"`
 	Version       string `json:"version" gorm:"type:varchar(256);not null"`
 	AppId         uint   `json:"appId" gorm:"type:integer;not null"`

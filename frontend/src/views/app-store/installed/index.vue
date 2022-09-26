@@ -1,5 +1,7 @@
 <template>
-    <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
+    <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" v-loading="loading">
+        <el-table-column :label="$t('app.name')" prop="name"></el-table-column>
+        <el-table-column :label="$t('app.description')" prop="description"></el-table-column>
         <el-table-column :label="$t('app.appName')" prop="appName"></el-table-column>
         <el-table-column :label="$t('app.version')" prop="version"></el-table-column>
         <el-table-column :label="$t('app.container')">
@@ -9,7 +11,18 @@
         </el-table-column>
         <el-table-column :label="$t('app.status')">
             <template #default="{ row }">
-                <el-tag>{{ row.status }}</el-tag>
+                <el-popover
+                    v-if="row.status === 'Error'"
+                    placement="top-start"
+                    :width="400"
+                    trigger="hover"
+                    :content="row.message"
+                >
+                    <template #reference>
+                        <el-tag type="error">{{ row.status }}</el-tag>
+                    </template>
+                </el-popover>
+                <el-tag v-else>{{ row.status }}</el-tag>
             </template>
         </el-table-column>
         <el-table-column
@@ -23,14 +36,15 @@
 </template>
 
 <script lang="ts" setup>
-import { GetAppInstalled } from '@/api/modules/app';
+import { GetAppInstalled, InstalledOp } from '@/api/modules/app';
 import { onMounted, reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { dateFromat } from '@/utils/util';
 import i18n from '@/lang';
+import { ElMessageBox } from 'element-plus';
 
 let data = ref<any>();
-
+let loading = ref(false);
 const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 20,
@@ -49,15 +63,45 @@ const search = () => {
     });
 };
 
+const operate = async (row: any, op: string) => {
+    const req = {
+        installId: row.id,
+        operate: op,
+    };
+
+    ElMessageBox.confirm(i18n.global.t(`${'app.' + op}`) + '?', i18n.global.t('commons.msg.operate'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'warning',
+        draggable: true,
+    }).then(async () => {
+        loading.value = true;
+        InstalledOp(req)
+            .then(() => {})
+            .finally(() => {
+                loading.value = false;
+            });
+    });
+};
+
 const buttons = [
     {
         label: i18n.global.t('app.restart'),
+        click: (row: any) => {
+            operate(row, 'restart');
+        },
     },
     {
         label: i18n.global.t('app.up'),
+        click: (row: any) => {
+            operate(row, 'up');
+        },
     },
     {
         label: i18n.global.t('app.down'),
+        click: (row: any) => {
+            operate(row, 'down');
+        },
     },
 ];
 

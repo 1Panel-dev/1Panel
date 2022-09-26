@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/app/repo"
@@ -147,7 +148,51 @@ func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, 
 	return appDetailDTO, nil
 }
 
-func (a AppService) Install(appDetailId uint, params map[string]interface{}) error {
+func (a AppService) Operate(req dto.AppInstallOperate) error {
+	appInstall, err := appInstallRepo.GetBy(commonRepo.WithByID(req.InstallId))
+	if err != nil {
+		return err
+	}
+	if len(appInstall) == 0 {
+		return errors.New("not found")
+	}
+
+	install := appInstall[0]
+	dockerComposePath := path.Join(global.CONF.System.AppDir, install.App.Key, install.ContainerName, "docker-compose.yml")
+	switch req.Operate {
+	case dto.Up:
+		out, err := compose.Up(dockerComposePath)
+		if err != nil {
+			return handleErr(install, err, out)
+		}
+	case dto.Down:
+		out, err := compose.Down(dockerComposePath)
+		if err != nil {
+			return handleErr(install, err, out)
+		}
+	case dto.Restart:
+		out, err := compose.Restart(dockerComposePath)
+		if err != nil {
+			return handleErr(install, err, out)
+		}
+	default:
+		return errors.New("operate not support")
+	}
+	return nil
+}
+
+func handleErr(install model.AppInstall, err error, out string) error {
+	reErr := err
+	install.Message = err.Error()
+	if out != "" {
+		install.Message = out
+		reErr = errors.New(out)
+	}
+	_ = appInstallRepo.Save(install)
+	return reErr
+}
+
+func (a AppService) Install(name string, appDetailId uint, params map[string]interface{}) error {
 	appDetail, err := appDetailRepo.GetAppDetail(commonRepo.WithByID(appDetailId))
 	if err != nil {
 		return err
@@ -159,6 +204,7 @@ func (a AppService) Install(appDetailId uint, params map[string]interface{}) err
 	}
 	containerName := constant.ContainerPrefix + app.Key + "-" + common.RandStr(6)
 	appInstall := model.AppInstall{
+		Name:          name,
 		AppId:         appDetail.AppId,
 		AppDetailId:   appDetail.ID,
 		Version:       appDetail.Version,

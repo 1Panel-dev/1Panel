@@ -61,6 +61,7 @@ export default {
             createSuccess: '新建成功',
             updateSuccess: '更新成功',
             uploadSuccess: '上传成功',
+            operate: '操作',
         },
         login: {
             captchaHelper: '请输入验证码',
@@ -403,5 +404,7 @@ export default {
         restart: '重启',
         up: '启动',
         down: '停止',
+        name: '名称',
+        description: '描述',
     },
 };
