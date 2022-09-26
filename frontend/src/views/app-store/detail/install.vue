@@ -1,8 +1,8 @@
 <template>
     <el-dialog v-model="open" :title="$t('app.install')" width="30%">
         <el-form ref="paramForm" label-position="left" :model="form" label-width="150px" :rules="rules">
-            <el-form-item :label="$t('app.name')" prop="name">
-                <el-input v-model="req.name"></el-input>
+            <el-form-item :label="$t('app.name')" prop="NAME">
+                <el-input v-model="form['NAME']"></el-input>
             </el-form-item>
             <div v-for="(f, index) in installData.params?.formFields" :key="index">
                 <el-form-item :label="f.labelZh" :prop="f.envKey">
@@ -19,6 +19,9 @@
                     ></el-input>
                 </el-form-item>
             </div>
+            <!-- <el-form-item :label="$t('app.description')">
+                <el-input v-model="req.name"></el-input>
+            </el-form-item> -->
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -47,8 +50,9 @@ const installData = ref<InstallRrops>({
 });
 let open = ref(false);
 let form = reactive<{ [key: string]: any }>({});
+
 let rules = reactive<FormRules>({
-    name: [Rules.requiredInput],
+    NAME: [Rules.requiredInput],
 });
 let loading = false;
 const paramForm = ref<FormInstance>();
@@ -88,8 +92,9 @@ const submit = async (formEl: FormInstance | undefined) => {
         }
         req.appDetailId = installData.value.appDetailId;
         req.params = form;
-        InstallApp(req).then((res) => {
-            console.log(res);
+        req.name = form['NAME'];
+        InstallApp(req).then(() => {
+            handleClose();
         });
     });
 };

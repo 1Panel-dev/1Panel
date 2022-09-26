@@ -17,7 +17,7 @@ func (a AppInstallRepo) GetBy(opts ...DBOption) ([]model.AppInstall, error) {
 	return install, err
 }
 
-func (a AppInstallRepo) Create(install model.AppInstall) error {
+func (a AppInstallRepo) Create(install *model.AppInstall) error {
 	db := global.DB.Model(&model.AppInstall{})
 	return db.Create(&install).Error
 }
