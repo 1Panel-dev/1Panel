@@ -242,7 +242,7 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 	if err := godotenv.Write(envParams, envPath); err != nil {
 		return err
 	}
-	if err := appInstallRepo.Create(appInstall); err != nil {
+	if err := appInstallRepo.Create(&appInstall); err != nil {
 		return err
 	}
 	go upApp(composeFilePath, appInstall)
