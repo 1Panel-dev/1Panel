@@ -3,7 +3,7 @@ version: '3'
 services:
   mysql5.7:
     image: mysql:5.7.39
-    container_name: 1panel-mysql
+    container_name: ${CONTAINER_NAME}
     restart: always
     environment:
       TZ: ${TZ}

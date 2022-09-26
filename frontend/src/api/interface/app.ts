@@ -34,12 +34,45 @@ export namespace App {
         icon: string;
         version: string;
         readme: string;
-        formFields: string;
+        params: AppParams;
         dockerCompose: string;
     }
 
     export interface AppReq extends ReqPage {
         name: string;
         tags: string[];
+    }
+
+    export interface AppParams {
+        formFields: FromField[];
+    }
+
+    export interface FromField {
+        type: string;
+        labelZh: string;
+        labelEn: string;
+        required: boolean;
+        default: any;
+        envKey: string;
+    }
+
+    export interface AppInstall {
+        appDetailId: number;
+        params: any;
+    }
+
+    export interface AppInstalled extends CommonModel {
+        containerName: string;
+        version: string;
+        appId: string;
+        appDetailId: string;
+        params: string;
+        status: string;
+        description: string;
+        message: string;
+        appName: string;
+        total: number;
+        ready: number;
+        icon: string;
     }
 }

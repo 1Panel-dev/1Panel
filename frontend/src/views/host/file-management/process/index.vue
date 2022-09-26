@@ -64,7 +64,6 @@ const initProcess = () => {
 
 const getKeys = () => {
     FileKeys().then((res) => {
-        console.log(res);
         if (res.data.keys.length > 0) {
             keys.value = res.data.keys;
             initProcess();

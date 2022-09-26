@@ -6,7 +6,7 @@ func Up(filePath string) (string, error) {
 	cmd := exec.Command("docker-compose", "-f", filePath, "up", "-d")
 	stdout, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", err
+		return string(stdout), err
 	}
 	return string(stdout), nil
 }

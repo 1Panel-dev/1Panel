@@ -22,7 +22,7 @@
         </template>
 
         <div class="complex-table__body">
-            <fu-table v-bind="$attrs" @selection-change="handleSelectionChange" height="67vh">
+            <fu-table v-bind="$attrs" @selection-change="handleSelectionChange" max-height="67vh">
                 <slot></slot>
             </fu-table>
         </div>
