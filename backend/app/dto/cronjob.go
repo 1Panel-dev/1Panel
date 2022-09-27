@@ -37,8 +37,11 @@ type CronjobUpdate struct {
 	SourceDir      string `json:"sourceDir"`
 	TargetDirID    int    `json:"targetDirID"`
 	RetainCopies   int    `json:"retainCopies" validate:"number,min=1"`
+}
 
-	Status string `json:"status"`
+type CronjobUpdateStatus struct {
+	ID     uint   `json:"id" validate:"required"`
+	Status string `json:"status" validate:"required"`
 }
 
 type DetailFile struct {

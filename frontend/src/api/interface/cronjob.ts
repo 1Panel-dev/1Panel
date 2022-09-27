@@ -56,6 +56,9 @@ export namespace Cronjob {
         sourceDir: string;
         targetDirID: number;
         retainCopies: number;
+    }
+    export interface UpdateStatus {
+        id: number;
         status: string;
     }
     export interface SearchRecord extends ReqPage {

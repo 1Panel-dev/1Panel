@@ -8,7 +8,7 @@
         <el-form ref="formRef" :model="dialogData.rowData" label-position="left" :rules="rules" label-width="120px">
             <el-form-item :label="$t('cronjob.taskType')" prop="type">
                 <el-select
-                    @change="changeName(true, dialogData.rowData!.type, dialogData.rowData!.website)"
+                    @change="changeName(true, dialogData.rowData!.type)"
                     style="width: 100%"
                     v-model="dialogData.rowData!.type"
                 >
@@ -17,12 +17,7 @@
             </el-form-item>
 
             <el-form-item :label="$t('cronjob.taskName')" prop="name">
-                <el-input
-                    :disabled="dialogData.rowData!.type === 'website' || dialogData.rowData!.type === 'database'"
-                    style="width: 100%"
-                    clearable
-                    v-model="dialogData.rowData!.name"
-                />
+                <el-input style="width: 100%" clearable v-model="dialogData.rowData!.name" />
             </el-form-item>
 
             <el-form-item :label="$t('cronjob.cronSpec')" prop="spec">
@@ -56,12 +51,18 @@
             </el-form-item>
 
             <el-form-item v-if="hasScript()" :label="$t('cronjob.shellContent')" prop="script">
-                <el-input style="width: 100%" clearable type="textarea" v-model="dialogData.rowData!.script" />
+                <el-input
+                    style="width: 100%"
+                    clearable
+                    type="textarea"
+                    :autosize="{ minRows: 3, maxRows: 6 }"
+                    v-model="dialogData.rowData!.script"
+                />
             </el-form-item>
 
             <el-form-item v-if="dialogData.rowData!.type === 'website'" :label="$t('cronjob.website')" prop="website">
                 <el-select
-                    @change="changeName(false, dialogData.rowData!.type, dialogData.rowData!.website)"
+                    @change="changeName(false, dialogData.rowData!.type)"
                     style="width: 100%"
                     v-model="dialogData.rowData!.website"
                 >
@@ -86,7 +87,7 @@
                 prop="sourceDir"
             >
                 <el-input
-                    @input="changeName(false, dialogData.rowData!.type, dialogData.rowData!.website)"
+                    @input="changeName(false, dialogData.rowData!.type)"
                     style="width: 100%"
                     clearable
                     v-model="dialogData.rowData!.sourceDir"
@@ -120,7 +121,13 @@
                 :label="$t('cronjob.exclusionRules')"
                 prop="exclusionRules"
             >
-                <el-input style="width: 100%" type="textarea" clearable v-model="dialogData.rowData!.exclusionRules" />
+                <el-input
+                    style="width: 100%"
+                    type="textarea"
+                    :autosize="{ minRows: 3, maxRows: 6 }"
+                    clearable
+                    v-model="dialogData.rowData!.exclusionRules"
+                />
             </el-form-item>
         </el-form>
         <template #footer>
@@ -216,7 +223,7 @@ const varifySpec = (rule: any, value: any, callback: any) => {
     callback();
 };
 const rules = reactive({
-    name: [Rules.requiredInput],
+    name: [Rules.requiredInput, Rules.name],
     type: [Rules.requiredSelect],
     specType: [Rules.requiredSelect],
     spec: [
@@ -232,7 +239,7 @@ const rules = reactive({
     website: [Rules.requiredSelect],
     database: [Rules.requiredSelect],
     url: [Rules.requiredInput],
-    sourceDir: [Rules.requiredInput],
+    sourceDir: [Rules.requiredSelect],
     targetDirID: [Rules.requiredSelect, Rules.number],
     retainCopies: [Rules.number],
 });
@@ -261,42 +268,15 @@ function isBackup() {
 function hasScript() {
     return dialogData.value.rowData!.type === 'shell' || dialogData.value.rowData!.type === 'sync';
 }
-function changeName(isChangeType: boolean, type: string, targetName: string) {
+function changeName(isChangeType: boolean, type: string) {
     if (isChangeType) {
-        targetName = '';
         if (isBackup()) {
             if (backupOptions.value.length === 0) {
                 ElMessage.error(i18n.global.t('cronjob.missBackupAccount'));
             }
         }
     }
-    switch (type) {
-        case 'website':
-            targetName = targetName ? targetName : i18n.global.t('cronjob.all');
-            dialogData.value.rowData!.name = `${i18n.global.t('cronjob.website')} [ ${targetName} ]`;
-            break;
-        case 'database':
-            targetName = targetName ? targetName : i18n.global.t('cronjob.all');
-            dialogData.value.rowData!.name = `${i18n.global.t('cronjob.database')} [ ${targetName} ]`;
-            break;
-        case 'directory':
-            targetName = targetName ? targetName : '/etc/1panel';
-            dialogData.value.rowData!.name = `${i18n.global.t('cronjob.directory')} [ ${targetName} ]`;
-            break;
-        case 'sync':
-            dialogData.value.rowData!.name = i18n.global.t('cronjob.syncDateName');
-            break;
-        case 'release':
-            dialogData.value.rowData!.name = i18n.global.t('cronjob.releaseMemory');
-            break;
-        case 'curl':
-            dialogData.value.rowData!.name = i18n.global.t('cronjob.curl');
-            dialogData.value.rowData!.url = 'http://';
-            break;
-        default:
-            dialogData.value.rowData!.name = '';
-            break;
-    }
+    dialogData.value.rowData!.name = `${type}-test`;
 }
 function restForm() {
     if (formRef.value) {

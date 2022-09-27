@@ -72,7 +72,7 @@ import RecordDialog from '@/views/cronjob/record/index.vue';
 import { loadZero } from '@/views/cronjob/options';
 import { onMounted, reactive, ref } from 'vue';
 import { loadBackupName } from '@/views/setting/helper';
-import { deleteCronjob, editCronjob, getCronjobPage } from '@/api/modules/cronjob';
+import { deleteCronjob, getCronjobPage, updateStatus } from '@/api/modules/cronjob';
 import { loadWeek } from './options';
 import i18n from '@/lang';
 import { Cronjob } from '@/api/interface/cronjob';
@@ -149,7 +149,7 @@ const beforeChangeStatus = () => {
 };
 const onChangeStatus = async (row: Cronjob.CronjobInfo) => {
     if (switchState.value) {
-        await editCronjob(row);
+        await updateStatus({ id: row.id, status: row.status });
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         search();
     }
