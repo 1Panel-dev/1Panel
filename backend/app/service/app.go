@@ -14,7 +14,6 @@ import (
 	"github.com/1Panel-dev/1Panel/utils/files"
 	"github.com/joho/godotenv"
 	"golang.org/x/net/context"
-	"math"
 	"os"
 	"path"
 	"reflect"
@@ -219,8 +218,8 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 
 	port, ok := params["PORT"]
 	if ok {
-		port := int(math.Floor(port.(float64)))
-		if common.ScanPort(string(port)) {
+		portStr := strconv.FormatFloat(port.(float64), 'f', -1, 32)
+		if common.ScanPort(portStr) {
 			return errors.New("port is  in used")
 		}
 	}

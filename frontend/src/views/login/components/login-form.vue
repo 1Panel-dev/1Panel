@@ -96,14 +96,14 @@ const loginRules = reactive({
 
 const loginForm = reactive<Login.ReqLoginForm>({
     name: 'admin',
-    password: 'Calong@2015',
+    password: 'Songliu123++',
     captcha: '',
     captchaID: '',
     authMethod: '',
 });
 const mfaLoginForm = reactive<Login.MFALoginForm>({
     name: 'admin',
-    password: 'Calong@2015',
+    password: 'Songliu123++',
     secret: '',
     code: '',
     authMethod: '',
