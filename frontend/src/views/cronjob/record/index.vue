@@ -95,7 +95,7 @@
                                         trigger="click"
                                         style="white-space: pre-wrap"
                                     >
-                                        <div style="margin-left: 20px; height: 400px; overflow: auto">
+                                        <div style="margin-left: 20px; max-height: 400px; overflow: auto">
                                             <span style="white-space: pre-wrap">{{ dialogData.rowData!.script }}</span>
                                         </div>
                                         <template #reference>
@@ -121,7 +121,7 @@
                             </el-col>
                             <el-col :span="8" v-if="isBackup()">
                                 <el-form-item :label="$t('cronjob.target')">
-                                    {{ dialogData.rowData!.targetDirID }}
+                                    {{ loadBackupName(dialogData.rowData!.targetDir) }}
                                 </el-form-item>
                             </el-col>
                             <el-col :span="8" v-if="isBackup()">
@@ -139,7 +139,9 @@
                                 v-if="dialogData.rowData!.type === 'website' || dialogData.rowData!.type === 'directory'"
                             >
                                 <el-form-item :label="$t('cronjob.exclusionRules')">
-                                    {{ dialogData.rowData!.exclusionRules }}
+                                    <div v-for="item in dialogData.rowData!.exclusionRules.split(';')" :key="item">
+                                        <el-tag>{{ item }}</el-tag>
+                                    </div>
                                 </el-form-item>
                             </el-col>
                         </el-row>
@@ -176,13 +178,18 @@
                         <el-row>
                             <el-col :span="24">
                                 <el-form-item :label="$t('commons.table.records')">
+                                    <span
+                                        v-if="currentRecord?.records! === 'errRecord' || currentRecord?.records! === 'errHandle'|| currentRecord?.records! === 'noRecord'"
+                                    >
+                                        {{ $t('cronjob.' + currentRecord?.records!) }}
+                                    </span>
                                     <el-popover
                                         placement="right"
                                         :width="600"
                                         trigger="click"
                                         style="white-space: pre-wrap"
                                     >
-                                        <div style="margin-left: 20px; height: 400px; overflow: auto">
+                                        <div style="margin-left: 20px; max-height: 400px; overflow: auto">
                                             <span style="white-space: pre-wrap">
                                                 {{ currentRecordDetail }}
                                             </span>
@@ -212,6 +219,7 @@
 import { reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import { loadZero, loadWeek } from '@/views/cronjob/options';
+import { loadBackupName } from '@/views/setting/helper';
 import { searchRecords, getRecordDetail } from '@/api/modules/cronjob';
 import { dateFromat } from '@/utils/util';
 import i18n from '@/lang';

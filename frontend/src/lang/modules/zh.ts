@@ -183,6 +183,9 @@ export default {
         saturday: '周六',
         sunday: '周日',
         shellContent: '脚本内容',
+        errRecord: '错误的日志记录',
+        errHandle: '任务执行失败',
+        noRecord: '执行未产生任何日志',
     },
     monitor: {
         avgLoad: '平均负载',

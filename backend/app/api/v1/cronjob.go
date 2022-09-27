@@ -111,6 +111,24 @@ func (b *BaseApi) UpdateCronjob(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+func (b *BaseApi) UpdateCronjobStatus(c *gin.Context) {
+	var req dto.CronjobUpdateStatus
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := cronjobService.UpdateStatus(req.ID, req.Status); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
 func (b *BaseApi) LoadRecordDetail(c *gin.Context) {
 	var req dto.DetailFile
 	if err := c.ShouldBindJSON(&req); err != nil {

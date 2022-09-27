@@ -13,6 +13,7 @@ type CronjobRepo struct{}
 
 type ICronjobRepo interface {
 	Get(opts ...DBOption) (model.Cronjob, error)
+	List(opts ...DBOption) ([]model.Cronjob, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.Cronjob, error)
 	Create(cronjob *model.Cronjob) error
 	WithByDate(startTime, endTime time.Time) DBOption
@@ -20,6 +21,7 @@ type ICronjobRepo interface {
 	Save(id uint, cronjob model.Cronjob) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
+	DeleteRecord(jobID uint) error
 	StartRecords(cronjobID uint, targetPath string) model.JobRecords
 	EndRecords(record model.JobRecords, status, message, records string)
 }
@@ -38,28 +40,40 @@ func (u *CronjobRepo) Get(opts ...DBOption) (model.Cronjob, error) {
 	return cronjob, err
 }
 
-func (u *CronjobRepo) Page(page, size int, opts ...DBOption) (int64, []model.Cronjob, error) {
-	var users []model.Cronjob
+func (u *CronjobRepo) List(opts ...DBOption) ([]model.Cronjob, error) {
+	var cronjobs []model.Cronjob
 	db := global.DB.Model(&model.Cronjob{})
 	for _, opt := range opts {
 		db = opt(db)
 	}
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Limit(size).Offset(size * (page - 1)).Find(&users).Error
-	return count, users, err
+	err := db.Find(&cronjobs).Error
+	return cronjobs, err
+}
+
+func (u *CronjobRepo) Page(page, size int, opts ...DBOption) (int64, []model.Cronjob, error) {
+	var cronjobs []model.Cronjob
+	db := global.DB.Model(&model.Cronjob{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	count := int64(0)
+	db = db.Count(&count)
+	err := db.Order("created_at").Limit(size).Offset(size * (page - 1)).Find(&cronjobs).Error
+	return count, cronjobs, err
 }
 
 func (u *CronjobRepo) PageRecords(page, size int, opts ...DBOption) (int64, []model.JobRecords, error) {
-	var users []model.JobRecords
+	var cronjobs []model.JobRecords
 	db := global.DB.Model(&model.JobRecords{})
 	for _, opt := range opts {
 		db = opt(db)
 	}
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Limit(size).Offset(size * (page - 1)).Find(&users).Error
-	return count, users, err
+	err := db.Order("created_at").Limit(size).Offset(size * (page - 1)).Find(&cronjobs).Error
+	return count, cronjobs, err
 }
 
 func (u *CronjobRepo) Create(cronjob *model.Cronjob) error {
@@ -111,4 +125,7 @@ func (u *CronjobRepo) Delete(opts ...DBOption) error {
 		db = opt(db)
 	}
 	return db.Delete(&model.Cronjob{}).Error
+}
+func (u *CronjobRepo) DeleteRecord(jobID uint) error {
+	return global.DB.Where("cronjob_id = ?", jobID).Delete(&model.JobRecords{}).Error
 }
