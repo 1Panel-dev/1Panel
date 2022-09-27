@@ -25,3 +25,7 @@ export const searchRecords = (params: Cronjob.SearchRecord) => {
 export const getRecordDetail = (params: string) => {
     return http.post<string>(`cronjobs/search/detail`, { path: params });
 };
+
+export const updateStatus = (params: Cronjob.UpdateStatus) => {
+    return http.post(`cronjobs/status`, params);
+};
