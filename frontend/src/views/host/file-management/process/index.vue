@@ -37,13 +37,14 @@ const handleClose = () => {
     em('close', open);
 };
 
-const closeSocket = () => {
-    processSocket && processSocket.close();
-};
-
 const isWsOpen = () => {
     const readyState = processSocket && processSocket.readyState;
     return readyState === 1;
+};
+const closeSocket = () => {
+    if (isWsOpen()) {
+        processSocket && processSocket.close();
+    }
 };
 
 const onOpenProcess = () => {};

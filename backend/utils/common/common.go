@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	mathRand "math/rand"
+	"net"
 	"regexp"
 	"strconv"
 	"strings"
@@ -59,4 +60,14 @@ func RandStr(n int) string {
 		b[i] = letters[mathRand.Intn(len(letters))]
 	}
 	return string(b)
+}
+
+func ScanPort(port string) bool {
+
+	ln, err := net.Listen("tcp", ":"+port)
+	if err != nil {
+		return true
+	}
+	defer ln.Close()
+	return false
 }

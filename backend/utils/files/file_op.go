@@ -207,8 +207,8 @@ func (f FileOp) CopyDir(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	dstDir := filepath.Join(dst, srcInfo.Name())
-	if err := f.Fs.MkdirAll(dstDir, srcInfo.Mode()); err != nil {
+	//dstDir := filepath.Join(dst, srcInfo.Name())
+	if err := f.Fs.MkdirAll(dst, srcInfo.Mode()); err != nil {
 		return err
 	}
 
@@ -221,7 +221,7 @@ func (f FileOp) CopyDir(src, dst string) error {
 
 	for _, obj := range obs {
 		fSrc := filepath.Join(src, obj.Name())
-		fDst := filepath.Join(dstDir, obj.Name())
+		fDst := filepath.Join(dst, obj.Name())
 
 		if obj.IsDir() {
 			err = f.CopyDir(fSrc, fDst)
