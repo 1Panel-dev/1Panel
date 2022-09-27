@@ -415,5 +415,7 @@ export default {
         name: 'Name',
         description: 'Description',
         delete: 'Delete',
+        deleteWarn:
+            'Delete the operation data and delete the operation data. This operation cannot be rolled back. Do you want to continue?',
     },
 };

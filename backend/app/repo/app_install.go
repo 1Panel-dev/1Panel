@@ -23,7 +23,7 @@ func (a AppInstallRepo) Create(install *model.AppInstall) error {
 }
 
 func (a AppInstallRepo) Save(install model.AppInstall) error {
-	db := global.DB.Model(&model.AppInstall{})
+	db := global.DB
 	return db.Save(&install).Error
 }
 

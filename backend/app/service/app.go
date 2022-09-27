@@ -14,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/utils/files"
 	"github.com/joho/godotenv"
 	"golang.org/x/net/context"
+	"math"
 	"os"
 	"path"
 	"reflect"
@@ -165,34 +166,42 @@ func (a AppService) Operate(req dto.AppInstallOperate) error {
 		if err != nil {
 			return handleErr(install, err, out)
 		}
+		install.Status = constant.Running
 	case dto.Down:
 		out, err := compose.Down(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
 		}
+		install.Status = constant.Stopped
 	case dto.Restart:
 		out, err := compose.Restart(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
 		}
+		install.Status = constant.Running
 	case dto.Delete:
 		op := files.NewFileOp()
 		appDir := path.Join(global.CONF.System.AppDir, install.App.Key, install.ContainerName)
 		dir, _ := os.Stat(appDir)
 		if dir == nil {
-			_ = appInstallRepo.Delete(commonRepo.WithByID(install.ID))
-			break
+			return appInstallRepo.Delete(commonRepo.WithByID(install.ID))
 		}
-		_ = op.DeleteDir(appDir)
-		out, err := compose.Rmf(dockerComposePath)
+		out, err := compose.Down(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
 		}
+		out, err = compose.Rmf(dockerComposePath)
+		if err != nil {
+			return handleErr(install, err, out)
+		}
+		_ = op.DeleteDir(appDir)
 		_ = appInstallRepo.Delete(commonRepo.WithByID(install.ID))
+		return nil
 	default:
 		return errors.New("operate not support")
 	}
-	return nil
+
+	return appInstallRepo.Save(install)
 }
 
 func handleErr(install model.AppInstall, err error, out string) error {
@@ -207,6 +216,15 @@ func handleErr(install model.AppInstall, err error, out string) error {
 }
 
 func (a AppService) Install(name string, appDetailId uint, params map[string]interface{}) error {
+
+	port, ok := params["PORT"]
+	if ok {
+		port := int(math.Floor(port.(float64)))
+		if common.ScanPort(string(port)) {
+			return errors.New("port is  in used")
+		}
+	}
+
 	appDetail, err := appDetailRepo.GetAppDetail(commonRepo.WithByID(appDetailId))
 	if err != nil {
 		return err
@@ -229,11 +247,11 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 	}
 	resourceDir := path.Join(global.CONF.System.ResourceDir, "apps", app.Key, appDetail.Version)
 	installDir := path.Join(global.CONF.System.AppDir, app.Key)
+	installAppDir := path.Join(installDir, appDetail.Version)
 	op := files.NewFileOp()
-	if err := op.CopyDir(resourceDir, installDir); err != nil {
+	if err := op.Copy(resourceDir, installAppDir); err != nil {
 		return err
 	}
-	installAppDir := path.Join(installDir, appDetail.Version)
 	containerNameDir := path.Join(installDir, containerName)
 	if err := op.Rename(installAppDir, containerNameDir); err != nil {
 		return err
@@ -277,6 +295,11 @@ func upApp(composeFilePath string, appInstall model.AppInstall) {
 		appInstall.Status = constant.Running
 		_ = appInstallRepo.Save(appInstall)
 	}
+}
+
+func (a AppService) SyncInstalled() error {
+
+	return nil
 }
 
 func (a AppService) Sync() error {

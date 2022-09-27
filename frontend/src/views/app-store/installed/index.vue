@@ -13,7 +13,7 @@
             <template #default="{ row }">
                 <el-popover
                     v-if="row.status === 'Error'"
-                    placement="top-start"
+                    placement="bottom"
                     :width="400"
                     trigger="hover"
                     :content="row.message"
@@ -31,8 +31,24 @@
             :formatter="dateFromat"
             show-overflow-tooltip
         />
-        <fu-table-operations :ellipsis="10" :buttons="buttons" :label="$t('commons.table.operate')" fixed="right" fix />
+        <fu-table-operations
+            width="200px"
+            :ellipsis="10"
+            :buttons="buttons"
+            :label="$t('commons.table.operate')"
+            fixed="right"
+            fix
+        />
     </ComplexTable>
+    <el-dialog v-model="open" :title="$t('commons.msg.operate')" :before-close="handleClose" width="30%">
+        <el-alert :title="getMsg(operateReq.operate)" type="warning" :closable="false" show-icon />
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button type="primary" @click="operate">{{ $t('commons.button.confirm') }}</el-button>
+            </span>
+        </template>
+    </el-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -41,7 +57,7 @@ import { onMounted, reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { dateFromat } from '@/utils/util';
 import i18n from '@/lang';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessage } from 'element-plus';
 
 let data = ref<any>();
 let loading = ref(false);
@@ -49,6 +65,11 @@ const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 20,
     total: 0,
+});
+let open = ref(false);
+let operateReq = reactive({
+    installId: 0,
+    operate: '',
 });
 
 const search = () => {
@@ -63,53 +84,72 @@ const search = () => {
     });
 };
 
-const operate = async (row: any, op: string) => {
-    const req = {
-        installId: row.id,
-        operate: op,
-    };
+const openOperate = (row: any, op: string) => {
+    operateReq.installId = row.id;
+    operateReq.operate = op;
+    open.value = true;
+};
 
-    ElMessageBox.confirm(i18n.global.t(`${'app.' + op}`) + '?', i18n.global.t('commons.msg.operate'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'warning',
-        draggable: true,
-    }).then(async () => {
-        loading.value = true;
-        InstalledOp(req)
-            .then(() => {
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-            })
-            .finally(() => {
-                loading.value = false;
-            });
-    });
+const operate = async () => {
+    open.value = false;
+    loading.value = true;
+    await InstalledOp(operateReq)
+        .then(() => {
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            search();
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+};
+
+const handleClose = () => {
+    open.value = false;
+};
+
+const getMsg = (op: string) => {
+    let tip = '';
+    switch (op) {
+        case 'up':
+            tip = i18n.global.t('app.up');
+            break;
+        case 'down':
+            tip = i18n.global.t('app.down');
+            break;
+        case 'restart':
+            tip = i18n.global.t('app.restart');
+            break;
+        case 'delete':
+            tip = i18n.global.t('app.deleteWarn');
+            break;
+        default:
+    }
+    return tip;
 };
 
 const buttons = [
     {
         label: i18n.global.t('app.restart'),
         click: (row: any) => {
-            operate(row, 'restart');
+            openOperate(row, 'restart');
         },
     },
     {
         label: i18n.global.t('app.up'),
         click: (row: any) => {
-            operate(row, 'up');
+            openOperate(row, 'up');
         },
     },
     {
         label: i18n.global.t('app.down'),
         click: (row: any) => {
-            operate(row, 'down');
+            openOperate(row, 'down');
         },
     },
     {
         label: i18n.global.t('app.delete'),
         click: (row: any) => {
-            operate(row, 'delete');
+            openOperate(row, 'delete');
         },
     },
 ];

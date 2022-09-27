@@ -48,7 +48,7 @@ let rowName = ref('');
 let data = ref();
 let loading = ref(false);
 let paths = ref<string[]>([]);
-let req = reactive({ path: '/', expand: true, page: 1, pageSize: 20 });
+let req = reactive({ path: '/', expand: true, page: 1, pageSize: 300 });
 
 const props = defineProps({
     path: {

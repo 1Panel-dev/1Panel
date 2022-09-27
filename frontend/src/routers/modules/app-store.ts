@@ -15,6 +15,28 @@ const appStoreRouter = {
             name: 'App',
             component: () => import('@/views/app-store/index.vue'),
             meta: {},
+            children: [
+                {
+                    path: 'all',
+                    name: 'AppAll',
+                    component: () => import('@/views/app-store/apps/index.vue'),
+                    props: true,
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/apps',
+                    },
+                },
+                {
+                    path: 'installed',
+                    name: 'AppInstalled',
+                    component: () => import('@/views/app-store/installed/index.vue'),
+                    props: true,
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/apps',
+                    },
+                },
+            ],
         },
         {
             path: '/apps/detail/:id',
