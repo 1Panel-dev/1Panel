@@ -2,12 +2,12 @@ package client
 
 import (
 	"github.com/1Panel-dev/1Panel/constant"
-	"github.com/aliyun/aliyun-oss-go-sdk/oss"
+	osssdk "github.com/aliyun/aliyun-oss-go-sdk/oss"
 )
 
 type ossClient struct {
 	Vars   map[string]interface{}
-	client oss.Client
+	client osssdk.Client
 }
 
 func NewOssClient(vars map[string]interface{}) (*ossClient, error) {
@@ -29,7 +29,7 @@ func NewOssClient(vars map[string]interface{}) (*ossClient, error) {
 	} else {
 		return nil, constant.ErrInvalidParams
 	}
-	client, err := oss.New(endpoint, accessKey, secretKey)
+	client, err := osssdk.New(endpoint, accessKey, secretKey)
 	if err != nil {
 		return nil, err
 	}
@@ -96,13 +96,33 @@ func (oss ossClient) Download(src, target string) (bool, error) {
 	return true, nil
 }
 
-func (oss *ossClient) GetBucket() (*oss.Bucket, error) {
+func (oss *ossClient) GetBucket() (*osssdk.Bucket, error) {
 	if _, ok := oss.Vars["bucket"]; ok {
 		bucket, err := oss.client.Bucket(oss.Vars["bucket"].(string))
 		if err != nil {
 			return nil, err
 		}
 		return bucket, nil
+	} else {
+		return nil, constant.ErrInvalidParams
+	}
+}
+
+func (oss *ossClient) ListObjects(prefix string) ([]interface{}, error) {
+	if _, ok := oss.Vars["bucket"]; ok {
+		bucket, err := oss.client.Bucket(oss.Vars["bucket"].(string))
+		if err != nil {
+			return nil, err
+		}
+		lor, err := bucket.ListObjects(osssdk.Prefix(prefix))
+		if err != nil {
+			return nil, err
+		}
+		var result []interface{}
+		for _, obj := range lor.Objects {
+			result = append(result, obj.Key)
+		}
+		return result, nil
 	} else {
 		return nil, constant.ErrInvalidParams
 	}

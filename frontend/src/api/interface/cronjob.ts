@@ -61,6 +61,10 @@ export namespace Cronjob {
         id: number;
         status: string;
     }
+    export interface UpdateStatus {
+        recordID: number;
+        backupAccountID: number;
+    }
     export interface SearchRecord extends ReqPage {
         cronjobID: number;
         startTime: Date;

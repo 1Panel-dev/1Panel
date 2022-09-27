@@ -152,3 +152,22 @@ func (b *BaseApi) LoadRecordDetail(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, string(buf))
 }
+
+func (b *BaseApi) TargetDownload(c *gin.Context) {
+	var req dto.CronjobDownload
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	dir, err := cronjobService.Download(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, dir)
+}

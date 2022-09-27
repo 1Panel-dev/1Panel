@@ -175,3 +175,7 @@ func (s3C *s3Client) getBucket() (string, error) {
 		return "", constant.ErrInvalidParams
 	}
 }
+
+func (s3C *s3Client) ListObjects(prefix string) ([]interface{}, error) {
+	return nil, nil
+}

@@ -210,3 +210,7 @@ func (s sftpClient) getBucket() (string, error) {
 		return "", constant.ErrInvalidParams
 	}
 }
+
+func (s sftpClient) ListObjects(prefix string) ([]interface{}, error) {
+	return nil, nil
+}

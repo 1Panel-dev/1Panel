@@ -82,6 +82,53 @@ func (u *CronjobService) SearchRecords(search dto.SearchRecord) (int64, interfac
 	return total, dtoCronjobs, err
 }
 
+func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
+	record, _ := cronjobRepo.GetRecord(commonRepo.WithByID(down.RecordID))
+	if record.ID != 0 {
+		return "", constant.ErrRecordExist
+	}
+	cronjob, _ := cronjobRepo.Get(commonRepo.WithByID(record.CronjobID))
+	if cronjob.ID != 0 {
+		return "", constant.ErrRecordExist
+	}
+	backup, _ := backupRepo.Get(commonRepo.WithByID(down.BackupAccountID))
+	if cronjob.ID != 0 {
+		return "", constant.ErrRecordExist
+	}
+	varMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
+		return "", err
+	}
+	varMap["type"] = backup.Type
+	if backup.Type != "LOCAL" {
+		varMap["bucket"] = backup.Bucket
+		switch backup.Type {
+		case constant.Sftp:
+			varMap["password"] = backup.Credential
+		case constant.OSS, constant.S3, constant.MinIo:
+			varMap["secretKey"] = backup.Credential
+		}
+		backClient, err := cloud_storage.NewCloudStorageClient(varMap)
+		if err != nil {
+			return "", fmt.Errorf("new cloud storage client failed, err: %v", err)
+		}
+		name := fmt.Sprintf("%s/%s/%s.tar.gz", cronjob.Type, cronjob.Name, record.StartTime.Format("20060102150405"))
+		if cronjob.Type == "database" {
+			name = fmt.Sprintf("%s/%s/%s.gz", cronjob.Type, cronjob.Name, record.StartTime.Format("20060102150405"))
+		}
+		isOK, err := backClient.Download(name, constant.DownloadDir)
+		if !isOK {
+			return "", fmt.Errorf("cloud storage download failed, err: %v", err)
+		}
+		return constant.DownloadDir, nil
+	}
+	if _, ok := varMap["dir"]; !ok {
+		return "", errors.New("load local backup dir failed")
+	}
+	return fmt.Sprintf("%v/%s/%s", varMap["dir"], cronjob.Type, cronjob.Name), nil
+
+}
+
 func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
 	cronjob, _ := cronjobRepo.Get(commonRepo.WithByName(cronjobDto.Name))
 	if cronjob.ID != 0 {
@@ -386,6 +433,14 @@ func tarWithExclude(cronjob *model.Cronjob, startTime time.Time) ([]byte, error)
 		isOK, err := backClient.Upload(name, strings.Replace(name, constant.TmpDir, "", -1))
 		if !isOK {
 			return nil, fmt.Errorf("cloud storage upload failed, err: %v", err)
+		}
+		currentObjs, _ := backClient.ListObjects(fmt.Sprintf("%s/%s/", cronjob.Type, cronjob.Name))
+		if len(currentObjs) > int(cronjob.RetainCopies) {
+			for i := 0; i < len(currentObjs)-int(cronjob.RetainCopies); i++ {
+				if path, ok := currentObjs[i].(string); ok {
+					_, _ = backClient.Delete(path)
+				}
+			}
 		}
 		if err := os.RemoveAll(fmt.Sprintf("%s/%s/%s-%v", constant.TmpDir, cronjob.Type, cronjob.Name, cronjob.ID)); err != nil {
 			global.LOG.Errorf("rm file %s/%s/%s-%v failed, err: %v", constant.TaskDir, cronjob.Type, cronjob.Name, cronjob.ID, err)

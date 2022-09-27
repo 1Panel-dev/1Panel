@@ -156,3 +156,7 @@ func (minIo minIoClient) Download(src, target string) (bool, error) {
 		return false, constant.ErrInvalidParams
 	}
 }
+
+func (minIo minIoClient) ListObjects(prefix string) ([]interface{}, error) {
+	return nil, nil
+}
