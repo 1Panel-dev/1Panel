@@ -6,6 +6,10 @@
       "name": "网站"
     },
     {
+      "key": "Server",
+      "name": "服务器"
+    },
+    {
       "key": "Datastore",
       "name": "数据库"
     }
@@ -21,6 +25,17 @@
       "author": "Oracle",
       "type": "internal",
       "source": "https://www.mysql.com"
+    },
+    {
+      "key": "nginx",
+      "name": "Nginx",
+      "tags": ["Server"],
+      "versions": ["1.23.1"],
+      "short_desc": "高性能的HTTP和反向代理web服务器",
+      "icon": "nginx.png",
+      "author": "Nginx",
+      "type": "internal",
+      "source": "http://nginx.org/"
     }
   ]
 }

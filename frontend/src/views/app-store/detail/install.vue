@@ -31,7 +31,7 @@
 <script lang="ts" setup name="appInstall">
 import { App } from '@/api/interface/app';
 import { InstallApp } from '@/api/modules/app';
-import { Rules } from '@/global/form-rues';
+import { Rules } from '@/global/form-rules';
 import { FormInstance, FormRules } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
