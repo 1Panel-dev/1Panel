@@ -44,6 +44,11 @@ type CronjobUpdateStatus struct {
 	Status string `json:"status" validate:"required"`
 }
 
+type CronjobDownload struct {
+	RecordID        uint `json:"recordID" validate:"required"`
+	BackupAccountID uint `json:"backupAccountID" validate:"required"`
+}
+
 type DetailFile struct {
 	Path string `json:"path" validate:"required"`
 }

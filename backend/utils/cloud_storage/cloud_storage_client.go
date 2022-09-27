@@ -7,6 +7,7 @@ import (
 
 type CloudStorageClient interface {
 	ListBuckets() ([]interface{}, error)
+	ListObjects(prefix string) ([]interface{}, error)
 	Exist(path string) (bool, error)
 	Delete(path string) (bool, error)
 	Upload(src, target string) (bool, error)
