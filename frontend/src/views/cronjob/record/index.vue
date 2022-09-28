@@ -32,10 +32,13 @@
                             {{ dateFromat(0, 0, item.startTime) }}
                         </li>
                     </ul>
+                    <div style="margin-top: 10px; margin-bottom: 5px; font-size: 12px; float: right">
+                        <span>{{ $t('commons.table.total', [searchInfo.recordTotal]) }}</span>
+                    </div>
                 </el-card>
             </el-col>
             <el-col :span="18">
-                <el-card style="height: 340px">
+                <el-card style="height: 352px">
                     <el-form>
                         <el-row>
                             <el-col :span="8">
@@ -122,11 +125,21 @@
                             <el-col :span="8" v-if="isBackup()">
                                 <el-form-item :label="$t('cronjob.target')">
                                     {{ loadBackupName(dialogData.rowData!.targetDir) }}
+                                    <el-button
+                                        v-if="currentRecord?.records! !== 'errHandle'"
+                                        type="primary"
+                                        style="margin-left: 10px"
+                                        link
+                                        icon="Download"
+                                        @click="onDownload(currentRecord!.id, dialogData.rowData!.targetDirID)"
+                                    >
+                                        {{ $t('file.download') }}
+                                    </el-button>
                                 </el-form-item>
                             </el-col>
                             <el-col :span="8" v-if="isBackup()">
-                                <el-form-item :label="$t('cronjob.retainCopies')">
-                                    {{ dialogData.rowData!.retainCopies }}
+                                <el-form-item :label="$t('cronjob.retainDays')">
+                                    {{ dialogData.rowData!.retainDays }}
                                 </el-form-item>
                             </el-col>
                             <el-col :span="8" v-if="dialogData.rowData!.type === 'curl'">
@@ -179,11 +192,13 @@
                             <el-col :span="24">
                                 <el-form-item :label="$t('commons.table.records')">
                                     <span
+                                        style="color: red"
                                         v-if="currentRecord?.records! === 'errRecord' || currentRecord?.records! === 'errHandle'|| currentRecord?.records! === 'noRecord'"
                                     >
-                                        {{ $t('cronjob.' + currentRecord?.records!) }}
+                                        {{ currentRecord?.message }}
                                     </span>
                                     <el-popover
+                                        v-else
                                         placement="right"
                                         :width="600"
                                         trigger="click"
@@ -220,8 +235,8 @@ import { reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import { loadZero, loadWeek } from '@/views/cronjob/options';
 import { loadBackupName } from '@/views/setting/helper';
-import { searchRecords, getRecordDetail } from '@/api/modules/cronjob';
-import { dateFromat } from '@/utils/util';
+import { searchRecords, getRecordDetail, download } from '@/api/modules/cronjob';
+import { dateFromat, dateFromatForName } from '@/utils/util';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
 
@@ -305,12 +320,19 @@ const searchInfo = reactive({
     pageSize: 5,
     recordTotal: 0,
     cronjobID: 0,
-    startTime: new Date(new Date().getTime() - 3600 * 1000 * 24 * 30),
+    startTime: new Date(new Date().setHours(0, 0, 0, 0)),
     endTime: new Date(),
     status: false,
 });
 
 const search = async () => {
+    if (timeRangeLoad.value && timeRangeLoad.value.length === 2) {
+        searchInfo.startTime = timeRangeLoad.value[0];
+        searchInfo.endTime = timeRangeLoad.value[1];
+    } else {
+        searchInfo.startTime = new Date(new Date().setHours(0, 0, 0, 0));
+        searchInfo.endTime = new Date();
+    }
     let params = {
         page: searchInfo.page,
         pageSize: searchInfo.pageSize,
@@ -322,6 +344,24 @@ const search = async () => {
     const res = await searchRecords(params);
     records.value = res.data.items || [];
     searchInfo.recordTotal = res.data.total;
+};
+const onDownload = async (recordID: number, backupID: number) => {
+    let params = {
+        recordID: recordID,
+        backupAccountID: backupID,
+    };
+    const res = await download(params);
+    const downloadUrl = window.URL.createObjectURL(new Blob([res]));
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = downloadUrl;
+    if (dialogData.value.rowData!.type === 'database') {
+        a.download = dateFromatForName(currentRecord.value?.startTime) + '.sql.gz';
+    } else {
+        a.download = dateFromatForName(currentRecord.value?.startTime) + '.tar.gz';
+    }
+    const event = new MouseEvent('click');
+    a.dispatchEvent(event);
 };
 
 const nextPage = async () => {

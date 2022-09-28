@@ -6,7 +6,7 @@ export const typeOptions = [
     { label: i18n.global.t('cronjob.database'), value: 'database' },
     { label: i18n.global.t('cronjob.directory'), value: 'directory' },
     { label: i18n.global.t('cronjob.syncDate'), value: 'sync' },
-    { label: i18n.global.t('cronjob.releaseMemory'), value: 'release' },
+    // { label: i18n.global.t('cronjob.releaseMemory'), value: 'release' },
     { label: i18n.global.t('cronjob.curl') + ' URL', value: 'curl' },
 ];
 

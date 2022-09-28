@@ -14,6 +14,7 @@ type CronjobRepo struct{}
 type ICronjobRepo interface {
 	Get(opts ...DBOption) (model.Cronjob, error)
 	GetRecord(opts ...DBOption) (model.JobRecords, error)
+	ListRecord(opts ...DBOption) ([]model.JobRecords, error)
 	List(opts ...DBOption) ([]model.Cronjob, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.Cronjob, error)
 	Create(cronjob *model.Cronjob) error
@@ -22,7 +23,7 @@ type ICronjobRepo interface {
 	Save(id uint, cronjob model.Cronjob) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
-	DeleteRecord(jobID uint) error
+	DeleteRecord(opts ...DBOption) error
 	StartRecords(cronjobID uint, targetPath string) model.JobRecords
 	EndRecords(record model.JobRecords, status, message, records string)
 }
@@ -57,8 +58,16 @@ func (u *CronjobRepo) List(opts ...DBOption) ([]model.Cronjob, error) {
 	for _, opt := range opts {
 		db = opt(db)
 	}
-	count := int64(0)
-	db = db.Count(&count)
+	err := db.Find(&cronjobs).Error
+	return cronjobs, err
+}
+
+func (u *CronjobRepo) ListRecord(opts ...DBOption) ([]model.JobRecords, error) {
+	var cronjobs []model.JobRecords
+	db := global.DB.Model(&model.JobRecords{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
 	err := db.Find(&cronjobs).Error
 	return cronjobs, err
 }
@@ -71,7 +80,7 @@ func (u *CronjobRepo) Page(page, size int, opts ...DBOption) (int64, []model.Cro
 	}
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Order("created_at").Limit(size).Offset(size * (page - 1)).Find(&cronjobs).Error
+	err := db.Order("created_at desc").Limit(size).Offset(size * (page - 1)).Find(&cronjobs).Error
 	return count, cronjobs, err
 }
 
@@ -83,7 +92,7 @@ func (u *CronjobRepo) PageRecords(page, size int, opts ...DBOption) (int64, []mo
 	}
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Order("created_at").Limit(size).Offset(size * (page - 1)).Find(&cronjobs).Error
+	err := db.Order("created_at desc").Limit(size).Offset(size * (page - 1)).Find(&cronjobs).Error
 	return count, cronjobs, err
 }
 
@@ -94,6 +103,11 @@ func (u *CronjobRepo) Create(cronjob *model.Cronjob) error {
 func (c *CronjobRepo) WithByDate(startTime, endTime time.Time) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("start_time > ? AND start_time < ?", startTime, endTime)
+	}
+}
+func (c *CronjobRepo) WithByStartDate(startTime time.Time) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("start_time < ?", startTime)
 	}
 }
 func (c *CronjobRepo) WithByJobID(id int) DBOption {
@@ -137,6 +151,10 @@ func (u *CronjobRepo) Delete(opts ...DBOption) error {
 	}
 	return db.Delete(&model.Cronjob{}).Error
 }
-func (u *CronjobRepo) DeleteRecord(jobID uint) error {
-	return global.DB.Where("cronjob_id = ?", jobID).Delete(&model.JobRecords{}).Error
+func (u *CronjobRepo) DeleteRecord(opts ...DBOption) error {
+	db := global.DB
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	return db.Delete(&model.JobRecords{}).Error
 }
