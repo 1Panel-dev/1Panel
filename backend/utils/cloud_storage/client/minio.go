@@ -51,7 +51,7 @@ func NewMinIoClient(vars map[string]interface{}) (*minIoClient, error) {
 	var transport http.RoundTripper = &http.Transport{
 		TLSClientConfig: tlsConfig,
 	}
-	client, err := minio.New(endpoint, &minio.Options{
+	client, err := minio.New(strings.ReplaceAll(endpoint, ssl+"://", ""), &minio.Options{
 		Creds:     credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
 		Secure:    secure,
 		Transport: transport,
@@ -113,7 +113,6 @@ func (minIo minIoClient) Delete(path string) (bool, error) {
 }
 
 func (minIo minIoClient) Upload(src, target string) (bool, error) {
-
 	var bucket string
 	if _, ok := minIo.Vars["bucket"]; ok {
 		bucket = minIo.Vars["bucket"].(string)
@@ -157,6 +156,30 @@ func (minIo minIoClient) Download(src, target string) (bool, error) {
 	}
 }
 
+func (minIo *minIoClient) GetBucket() (string, error) {
+	if _, ok := minIo.Vars["bucket"]; ok {
+		return minIo.Vars["bucket"].(string), nil
+	} else {
+		return "", constant.ErrInvalidParams
+	}
+}
+
 func (minIo minIoClient) ListObjects(prefix string) ([]interface{}, error) {
-	return nil, nil
+	bucket, err := minIo.GetBucket()
+	if err != nil {
+		return nil, constant.ErrInvalidParams
+	}
+	opts := minio.ListObjectsOptions{
+		Recursive: true,
+		Prefix:    prefix,
+	}
+
+	var result []interface{}
+	for object := range minIo.client.ListObjects(context.Background(), bucket, opts) {
+		if object.Err != nil {
+			continue
+		}
+		result = append(result, object.Key)
+	}
+	return result, nil
 }

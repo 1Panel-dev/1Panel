@@ -7,7 +7,7 @@ const cronRouter = {
     redirect: '/cronjobs',
     meta: {
         icon: 'p-plan',
-        title: 'menu.cron',
+        title: 'menu.cronjob',
     },
     children: [
         {

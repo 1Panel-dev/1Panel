@@ -212,5 +212,26 @@ func (s sftpClient) getBucket() (string, error) {
 }
 
 func (s sftpClient) ListObjects(prefix string) ([]interface{}, error) {
-	return nil, nil
+	bucket, err := s.getBucket()
+	if err != nil {
+		return nil, err
+	}
+	port, err := strconv.Atoi(strconv.FormatFloat(s.Vars["port"].(float64), 'G', -1, 64))
+	if err != nil {
+		return nil, err
+	}
+	sftpC, err := connect(s.Vars["username"].(string), s.Vars["password"].(string), s.Vars["address"].(string), port)
+	if err != nil {
+		return nil, err
+	}
+	defer sftpC.Close()
+	files, err := sftpC.ReadDir(bucket + "/" + prefix)
+	if err != nil {
+		return nil, err
+	}
+	var result []interface{}
+	for _, file := range files {
+		result = append(result, file.Name())
+	}
+	return result, nil
 }

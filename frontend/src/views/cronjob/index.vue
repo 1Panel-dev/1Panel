@@ -55,8 +55,12 @@
                     {{ $t('cronjob.handle') }}
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('cronjob.retainCopies')" prop="retainCopies" />
-            <el-table-column :label="$t('cronjob.target')" prop="targetDir" />
+            <el-table-column :label="$t('cronjob.retainDays')" prop="retainDays" />
+            <el-table-column :label="$t('cronjob.target')" prop="targetDir">
+                <template #default="{ row }">
+                    {{ loadBackupName(row.targetDir) }}
+                </template>
+            </el-table-column>
             <fu-table-operations type="icon" :buttons="buttons" :label="$t('commons.table.operate')" fix />
         </ComplexTable>
 
@@ -71,8 +75,8 @@ import OperatrDialog from '@/views/cronjob/operate/index.vue';
 import RecordDialog from '@/views/cronjob/record/index.vue';
 import { loadZero } from '@/views/cronjob/options';
 import { onMounted, reactive, ref } from 'vue';
-import { loadBackupName } from '@/views/setting/helper';
 import { deleteCronjob, getCronjobPage, updateStatus } from '@/api/modules/cronjob';
+import { loadBackupName } from '@/views/setting/helper';
 import { loadWeek } from './options';
 import i18n from '@/lang';
 import { Cronjob } from '@/api/interface/cronjob';
@@ -121,7 +125,7 @@ const onOpenDialog = async (
         day: 1,
         hour: 2,
         minute: 3,
-        retainCopies: 3,
+        retainDays: 7,
     },
 ) => {
     let params = {

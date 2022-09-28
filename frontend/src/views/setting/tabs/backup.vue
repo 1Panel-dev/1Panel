@@ -8,8 +8,8 @@
         <el-button type="primary" @click="onCreate">
             {{ $t('commons.button.create') }}
         </el-button>
-        <el-row :gutter="20" class="row-box" style="margin-top: 10px; margin-bottom: 20px">
-            <el-col v-for="item in data" :key="item.id" :span="8">
+        <el-row :gutter="20" class="row-box">
+            <el-col v-for="item in data" :key="item.id" :span="8" style="margin-top: 20px">
                 <el-card class="el-card">
                     <template #header>
                         <div class="card-header">
@@ -131,12 +131,8 @@
                     <el-form-item :label="$t('setting.address')" prop="varsJson.address" :rules="Rules.requiredInput">
                         <el-input v-model="form.varsJson['address']" />
                     </el-form-item>
-                    <el-form-item
-                        :label="$t('setting.port')"
-                        prop="varsJson.port"
-                        :rules="[Rules.number, { max: 65535 }]"
-                    >
-                        <el-input v-model.number="form.varsJson['port']" />
+                    <el-form-item :label="$t('setting.port')" prop="varsJson.port" :rules="[Rules.number]">
+                        <el-input-number :min="0" :max="65535" v-model.number="form.varsJson['port']" />
                     </el-form-item>
                     <el-form-item
                         :label="$t('setting.username')"

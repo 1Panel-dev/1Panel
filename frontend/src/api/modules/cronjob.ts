@@ -29,3 +29,7 @@ export const getRecordDetail = (params: string) => {
 export const updateStatus = (params: Cronjob.UpdateStatus) => {
     return http.post(`cronjobs/status`, params);
 };
+
+export const download = (params: Cronjob.Download) => {
+    return http.download<BlobPart>(`cronjobs/download`, params, { responseType: 'blob' });
+};

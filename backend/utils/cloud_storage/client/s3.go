@@ -18,7 +18,6 @@ type s3Client struct {
 }
 
 func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
-
 	var accessKey string
 	var secretKey string
 	var endpoint string
@@ -177,5 +176,22 @@ func (s3C *s3Client) getBucket() (string, error) {
 }
 
 func (s3C *s3Client) ListObjects(prefix string) ([]interface{}, error) {
-	return nil, nil
+	bucket, err := s3C.getBucket()
+	if err != nil {
+		return nil, constant.ErrInvalidParams
+	}
+	svc := s3.New(&s3C.Sess)
+	var result []interface{}
+	if err := svc.ListObjectsPages(&s3.ListObjectsInput{
+		Bucket: &bucket,
+		Prefix: &prefix,
+	}, func(p *s3.ListObjectsOutput, last bool) (shouldContinue bool) {
+		for _, obj := range p.Contents {
+			result = append(result, obj)
+		}
+		return true
+	}); err != nil {
+		return nil, err
+	}
+	return result, nil
 }
