@@ -8,8 +8,8 @@
         <el-button type="primary" @click="onCreate">
             {{ $t('commons.button.create') }}
         </el-button>
-        <el-row :gutter="20" class="row-box" style="margin-top: 10px; margin-bottom: 20px">
-            <el-col v-for="item in data" :key="item.id" :span="8">
+        <el-row :gutter="20" class="row-box">
+            <el-col v-for="item in data" :key="item.id" :span="8" style="margin-top: 20px">
                 <el-card class="el-card">
                     <template #header>
                         <div class="card-header">

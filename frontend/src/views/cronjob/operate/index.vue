@@ -21,7 +21,7 @@
             </el-form-item>
 
             <el-form-item :label="$t('cronjob.cronSpec')" prop="spec">
-                <el-select style="width: 15%" v-model="dialogData.rowData!.specType">
+                <el-select style="width: 20%" v-model="dialogData.rowData!.specType">
                     <el-option v-for="item in specOptions" :key="item.label" :value="item.value" :label="item.label" />
                 </el-select>
                 <el-select
