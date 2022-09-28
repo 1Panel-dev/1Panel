@@ -109,21 +109,17 @@ func (oss *ossClient) GetBucket() (*osssdk.Bucket, error) {
 }
 
 func (oss *ossClient) ListObjects(prefix string) ([]interface{}, error) {
-	if _, ok := oss.Vars["bucket"]; ok {
-		bucket, err := oss.client.Bucket(oss.Vars["bucket"].(string))
-		if err != nil {
-			return nil, err
-		}
-		lor, err := bucket.ListObjects(osssdk.Prefix(prefix))
-		if err != nil {
-			return nil, err
-		}
-		var result []interface{}
-		for _, obj := range lor.Objects {
-			result = append(result, obj.Key)
-		}
-		return result, nil
-	} else {
+	bucket, err := oss.GetBucket()
+	if err != nil {
 		return nil, constant.ErrInvalidParams
 	}
+	lor, err := bucket.ListObjects(osssdk.Prefix(prefix))
+	if err != nil {
+		return nil, err
+	}
+	var result []interface{}
+	for _, obj := range lor.Objects {
+		result = append(result, obj.Key)
+	}
+	return result, nil
 }

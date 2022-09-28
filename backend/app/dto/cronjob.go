@@ -18,7 +18,7 @@ type CronjobCreate struct {
 	URL            string `json:"url"`
 	SourceDir      string `json:"sourceDir"`
 	TargetDirID    int    `json:"targetDirID"`
-	RetainCopies   int    `json:"retainCopies" validate:"number,min=1"`
+	RetainDays     int    `json:"retainDays" validate:"number,min=1"`
 }
 
 type CronjobUpdate struct {
@@ -36,7 +36,7 @@ type CronjobUpdate struct {
 	URL            string `json:"url"`
 	SourceDir      string `json:"sourceDir"`
 	TargetDirID    int    `json:"targetDirID"`
-	RetainCopies   int    `json:"retainCopies" validate:"number,min=1"`
+	RetainDays     int    `json:"retainDays" validate:"number,min=1"`
 }
 
 type CronjobUpdateStatus struct {
@@ -71,7 +71,7 @@ type CronjobInfo struct {
 	SourceDir      string `json:"sourceDir"`
 	TargetDir      string `json:"targetDir"`
 	TargetDirID    int    `json:"targetDirID"`
-	RetainCopies   int    `json:"retainCopies"`
+	RetainDays     int    `json:"retainDays"`
 
 	Status string `json:"status"`
 }

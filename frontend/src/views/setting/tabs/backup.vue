@@ -131,12 +131,8 @@
                     <el-form-item :label="$t('setting.address')" prop="varsJson.address" :rules="Rules.requiredInput">
                         <el-input v-model="form.varsJson['address']" />
                     </el-form-item>
-                    <el-form-item
-                        :label="$t('setting.port')"
-                        prop="varsJson.port"
-                        :rules="[Rules.number, { max: 65535 }]"
-                    >
-                        <el-input v-model.number="form.varsJson['port']" />
+                    <el-form-item :label="$t('setting.port')" prop="varsJson.port" :rules="[Rules.number]">
+                        <el-input-number :min="0" :max="65535" v-model.number="form.varsJson['port']" />
                     </el-form-item>
                     <el-form-item
                         :label="$t('setting.username')"

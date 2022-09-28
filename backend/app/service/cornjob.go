@@ -84,16 +84,16 @@ func (u *CronjobService) SearchRecords(search dto.SearchRecord) (int64, interfac
 
 func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 	record, _ := cronjobRepo.GetRecord(commonRepo.WithByID(down.RecordID))
-	if record.ID != 0 {
-		return "", constant.ErrRecordExist
+	if record.ID == 0 {
+		return "", constant.ErrRecordNotFound
 	}
 	cronjob, _ := cronjobRepo.Get(commonRepo.WithByID(record.CronjobID))
-	if cronjob.ID != 0 {
-		return "", constant.ErrRecordExist
+	if cronjob.ID == 0 {
+		return "", constant.ErrRecordNotFound
 	}
 	backup, _ := backupRepo.Get(commonRepo.WithByID(down.BackupAccountID))
-	if cronjob.ID != 0 {
-		return "", constant.ErrRecordExist
+	if cronjob.ID == 0 {
+		return "", constant.ErrRecordNotFound
 	}
 	varMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
@@ -112,21 +112,35 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("new cloud storage client failed, err: %v", err)
 		}
-		name := fmt.Sprintf("%s/%s/%s.tar.gz", cronjob.Type, cronjob.Name, record.StartTime.Format("20060102150405"))
+		commonDir := fmt.Sprintf("%s/%s/", cronjob.Type, cronjob.Name)
+		name := fmt.Sprintf("%s%s.tar.gz", commonDir, record.StartTime.Format("20060102150405"))
 		if cronjob.Type == "database" {
-			name = fmt.Sprintf("%s/%s/%s.gz", cronjob.Type, cronjob.Name, record.StartTime.Format("20060102150405"))
+			name = fmt.Sprintf("%s%s.gz", commonDir, record.StartTime.Format("20060102150405"))
 		}
-		isOK, err := backClient.Download(name, constant.DownloadDir)
-		if !isOK {
-			return "", fmt.Errorf("cloud storage download failed, err: %v", err)
+		tempPath := fmt.Sprintf("%s%s", constant.DownloadDir, commonDir)
+		if _, err := os.Stat(tempPath); err != nil && os.IsNotExist(err) {
+			if err = os.MkdirAll(tempPath, os.ModePerm); err != nil {
+				fmt.Println(err)
+			}
 		}
-		return constant.DownloadDir, nil
+		targetPath := tempPath + strings.ReplaceAll(name, commonDir, "")
+		if _, err = os.Stat(targetPath); err != nil && os.IsNotExist(err) {
+			isOK, err := backClient.Download(name, targetPath)
+			if !isOK {
+				return "", fmt.Errorf("cloud storage download failed, err: %v", err)
+			}
+		}
+		return targetPath, nil
 	}
 	if _, ok := varMap["dir"]; !ok {
 		return "", errors.New("load local backup dir failed")
 	}
-	return fmt.Sprintf("%v/%s/%s", varMap["dir"], cronjob.Type, cronjob.Name), nil
-
+	dir := fmt.Sprintf("%v/%s/%s/", varMap["dir"], cronjob.Type, cronjob.Name)
+	name := fmt.Sprintf("%s%s.tar.gz", dir, record.StartTime.Format("20060102150405"))
+	if cronjob.Type == "database" {
+		name = fmt.Sprintf("%s%s.gz", dir, record.StartTime.Format("20060102150405"))
+	}
+	return name, nil
 }
 
 func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
@@ -183,7 +197,7 @@ func (u *CronjobService) Delete(ids []uint) error {
 			return constant.ErrRecordNotFound
 		}
 		global.Cron.Remove(cron.EntryID(cronjob.EntryID))
-		_ = cronjobRepo.DeleteRecord(ids[0])
+		_ = cronjobRepo.DeleteRecord(cronjobRepo.WithByJobID(int(ids[0])))
 
 		if err := os.RemoveAll(fmt.Sprintf("%s/%s/%s-%v", constant.TaskDir, cronjob.Type, cronjob.Name, cronjob.ID)); err != nil {
 			global.LOG.Errorf("rm file %s/%s/%s-%v failed, err: %v", constant.TaskDir, cronjob.Type, cronjob.Name, cronjob.ID, err)
@@ -196,7 +210,7 @@ func (u *CronjobService) Delete(ids []uint) error {
 	}
 	for i := range cronjobs {
 		global.Cron.Remove(cron.EntryID(cronjobs[i].EntryID))
-		_ = cronjobRepo.DeleteRecord(cronjobs[i].ID)
+		_ = cronjobRepo.DeleteRecord(cronjobRepo.WithByJobID(int(cronjobs[i].ID)))
 		if err := os.RemoveAll(fmt.Sprintf("%s/%s/%s-%v", constant.TaskDir, cronjobs[i].Type, cronjobs[i].Name, cronjobs[i].ID)); err != nil {
 			global.LOG.Errorf("rm file %s/%s/%s-%v failed, err: %v", constant.TaskDir, cronjobs[i].Type, cronjobs[i].Name, cronjobs[i].ID, err)
 		}
@@ -425,8 +439,9 @@ func tarWithExclude(cronjob *model.Cronjob, startTime time.Time) ([]byte, error)
 		return nil, fmt.Errorf("tar zcPf failed, err: %v", err)
 	}
 
+	var backClient cloud_storage.CloudStorageClient
 	if varMaps["type"] != "LOCAL" {
-		backClient, err := cloud_storage.NewCloudStorageClient(varMaps)
+		backClient, err = cloud_storage.NewCloudStorageClient(varMaps)
 		if err != nil {
 			return stdout, fmt.Errorf("new cloud storage client failed, err: %v", err)
 		}
@@ -434,17 +449,9 @@ func tarWithExclude(cronjob *model.Cronjob, startTime time.Time) ([]byte, error)
 		if !isOK {
 			return nil, fmt.Errorf("cloud storage upload failed, err: %v", err)
 		}
-		currentObjs, _ := backClient.ListObjects(fmt.Sprintf("%s/%s/", cronjob.Type, cronjob.Name))
-		if len(currentObjs) > int(cronjob.RetainCopies) {
-			for i := 0; i < len(currentObjs)-int(cronjob.RetainCopies); i++ {
-				if path, ok := currentObjs[i].(string); ok {
-					_, _ = backClient.Delete(path)
-				}
-			}
-		}
-		if err := os.RemoveAll(fmt.Sprintf("%s/%s/%s-%v", constant.TmpDir, cronjob.Type, cronjob.Name, cronjob.ID)); err != nil {
-			global.LOG.Errorf("rm file %s/%s/%s-%v failed, err: %v", constant.TaskDir, cronjob.Type, cronjob.Name, cronjob.ID, err)
-		}
+	}
+	if backType, ok := varMaps["type"].(string); ok {
+		rmOverdueCloud(backType, targetdir, cronjob, backClient)
 	}
 	return stdout, nil
 }
@@ -484,6 +491,60 @@ func loadTargetInfo(cronjob *model.Cronjob) (map[string]interface{}, string, err
 		}
 	}
 	return varMap, dir, nil
+}
+
+func rmOverdueCloud(backType, path string, cronjob *model.Cronjob, backClient cloud_storage.CloudStorageClient) {
+	timeNow := time.Now()
+	timeZero := time.Date(timeNow.Year(), timeNow.Month(), timeNow.Day(), 0, 0, 0, 0, timeNow.Location())
+	timeStart := timeZero.AddDate(0, 0, -int(cronjob.RetainDays)+1)
+	var timePrefixs []string
+	for i := 0; i < int(cronjob.RetainDays); i++ {
+		timePrefixs = append(timePrefixs, timeZero.AddDate(0, 0, i).Format("20060102"))
+	}
+	if backType != "LOCAL" {
+		dir := fmt.Sprintf("%s/%s/", cronjob.Type, cronjob.Name)
+		currentObjs, err := backClient.ListObjects(dir)
+		if err != nil {
+			global.LOG.Errorf("list bucket object %s failed, err: %v", dir, err)
+			return
+		}
+		for _, obj := range currentObjs {
+			objKey, ok := obj.(string)
+			if !ok {
+				continue
+			}
+			objKey = strings.ReplaceAll(objKey, dir, "")
+			isOk := false
+			for _, pre := range timePrefixs {
+				if strings.HasPrefix(objKey, pre) {
+					isOk = true
+					break
+				}
+			}
+			if !isOk {
+				_, _ = backClient.Delete(objKey)
+			}
+		}
+		return
+	}
+	files, err := ioutil.ReadDir(path)
+	if err != nil {
+		global.LOG.Errorf("read dir %s failed, err: %v", path, err)
+		return
+	}
+	for _, file := range files {
+		isOk := false
+		for _, pre := range timePrefixs {
+			if strings.HasPrefix(file.Name(), pre) {
+				isOk = true
+				break
+			}
+		}
+		if !isOk {
+			_ = os.Remove(path + "/" + file.Name())
+		}
+	}
+	_ = cronjobRepo.DeleteRecord(cronjobRepo.WithByStartDate(timeStart))
 }
 
 func loadSpec(cronjob model.Cronjob) string {

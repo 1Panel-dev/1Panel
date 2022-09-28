@@ -19,7 +19,7 @@ export namespace Cronjob {
         sourceDir: string;
         targetDirID: number;
         targetDir: string;
-        retainCopies: number;
+        retainDays: number;
         status: string;
     }
     export interface CronjobCreate {
@@ -38,7 +38,7 @@ export namespace Cronjob {
         url: string;
         sourceDir: string;
         targetDirID: number;
-        retainCopies: number;
+        retainDays: number;
     }
     export interface CronjobUpdate {
         id: number;
@@ -55,13 +55,13 @@ export namespace Cronjob {
         url: string;
         sourceDir: string;
         targetDirID: number;
-        retainCopies: number;
+        retainDays: number;
     }
     export interface UpdateStatus {
         id: number;
         status: string;
     }
-    export interface UpdateStatus {
+    export interface Download {
         recordID: number;
         backupAccountID: number;
     }

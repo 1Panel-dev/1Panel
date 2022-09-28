@@ -30,6 +30,7 @@ export default {
             dateEnd: '结束日期',
         },
         table: {
+            total: '共 {0} 条',
             name: '名称',
             type: '类型',
             status: '状态',
@@ -161,7 +162,7 @@ export default {
         exclusionRules: '排除规则',
         url: 'URL 地址',
         target: '备份到',
-        retainCopies: '保留份数',
+        retainDays: '保留天数',
         cronSpecRule: '请输入正确的执行周期',
         perMonth: '每月',
         perWeek: '每周',

@@ -55,7 +55,7 @@
                     {{ $t('cronjob.handle') }}
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('cronjob.retainCopies')" prop="retainCopies" />
+            <el-table-column :label="$t('cronjob.retainDays')" prop="retainDays" />
             <el-table-column :label="$t('cronjob.target')" prop="targetDir" />
             <fu-table-operations type="icon" :buttons="buttons" :label="$t('commons.table.operate')" fix />
         </ComplexTable>
@@ -121,7 +121,7 @@ const onOpenDialog = async (
         day: 1,
         hour: 2,
         minute: 3,
-        retainCopies: 3,
+        retainDays: 7,
     },
 ) => {
     let params = {

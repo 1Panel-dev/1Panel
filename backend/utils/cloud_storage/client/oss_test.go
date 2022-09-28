@@ -1,8 +1,10 @@
-package service
+package client
 
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/1Panel-dev/1Panel/app/model"
@@ -52,6 +54,28 @@ func TestCron(t *testing.T) {
 		fmt.Println(err)
 	}
 	fmt.Println("my objects:", getObjectsFormResponse(lor))
+
+	name := "directory/directory-test1/20220928104331.tar.gz"
+	targetPath := constant.DownloadDir + "directory/directory-test1/"
+	if _, err := os.Stat(targetPath); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(targetPath, os.ModePerm); err != nil {
+			fmt.Println(err)
+		}
+	}
+	if err := bucket.GetObjectToFile(name, targetPath+"20220928104231.tar.gz"); err != nil {
+		fmt.Println(err)
+	}
+}
+
+func TestDir(t *testing.T) {
+	files, err := ioutil.ReadDir("/opt/1Panel/task/directory/directory-test1-3")
+	if len(files) <= 10 {
+		return
+	}
+	for i := 0; i < len(files)-10; i++ {
+		os.Remove("/opt/1Panel/task/directory/directory-test1-3/" + files[i].Name())
+	}
+	fmt.Println(files, err)
 }
 
 func getObjectsFormResponse(lor oss.ListObjectsResult) string {

@@ -164,10 +164,10 @@ func (b *BaseApi) TargetDownload(c *gin.Context) {
 		return
 	}
 
-	dir, err := cronjobService.Download(req)
+	filePath, err := cronjobService.Download(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, dir)
+	c.File(filePath)
 }

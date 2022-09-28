@@ -21,7 +21,7 @@ type Cronjob struct {
 	SourceDir      string `gorm:"type:varchar(256)" json:"sourceDir"`
 	TargetDirID    uint64 `gorm:"type:decimal" json:"targetDirID"`
 	ExclusionRules string `gorm:"longtext" json:"exclusionRules"`
-	RetainCopies   uint64 `gorm:"type:decimal" json:"retainCopies"`
+	RetainDays     uint64 `gorm:"type:decimal" json:"retainDays"`
 
 	Status  string       `gorm:"type:varchar(64)" json:"status"`
 	EntryID uint64       `gorm:"type:decimal" json:"entryID"`
@@ -31,11 +31,10 @@ type Cronjob struct {
 type JobRecords struct {
 	BaseModel
 
-	CronjobID  uint      `gorm:"type:varchar(64);not null" json:"cronjobID"`
-	StartTime  time.Time `gorm:"type:datetime" json:"startTime"`
-	Interval   float64   `gorm:"type:float" json:"interval"`
-	Records    string    `gorm:"longtext" json:"records"`
-	Status     string    `gorm:"type:varchar(64)" json:"status"`
-	Message    string    `gorm:"longtext" json:"message"`
-	TargetPath string    `gorm:"type:varchar(256)" json:"targetPath"`
+	CronjobID uint      `gorm:"type:varchar(64);not null" json:"cronjobID"`
+	StartTime time.Time `gorm:"type:datetime" json:"startTime"`
+	Interval  float64   `gorm:"type:float" json:"interval"`
+	Records   string    `gorm:"longtext" json:"records"`
+	Status    string    `gorm:"type:varchar(64)" json:"status"`
+	Message   string    `gorm:"longtext" json:"message"`
 }
