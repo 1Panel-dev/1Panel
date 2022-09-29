@@ -18,6 +18,7 @@ export default {
             login: '登录',
             close: '关闭',
             view: '详情',
+            handle: '执行',
             expand: '展开',
             log: '日志',
             saveAndEnable: '保存并启用',

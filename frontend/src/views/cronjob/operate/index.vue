@@ -145,7 +145,6 @@
 import { onMounted, reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import { loadBackupName } from '@/views/setting/helper';
-import { typeOptions, specOptions, weekOptions } from '@/views/cronjob/options';
 import FileList from '@/components/file-list/index.vue';
 import { getBackupList } from '@/api/modules/backup';
 import i18n from '@/lang';
@@ -222,6 +221,31 @@ const varifySpec = (rule: any, value: any, callback: any) => {
     }
     callback();
 };
+const typeOptions = [
+    { label: i18n.global.t('cronjob.shell'), value: 'shell' },
+    { label: i18n.global.t('cronjob.website'), value: 'website' },
+    { label: i18n.global.t('cronjob.database'), value: 'database' },
+    { label: i18n.global.t('cronjob.directory'), value: 'directory' },
+    { label: i18n.global.t('cronjob.curl') + ' URL', value: 'curl' },
+];
+
+const specOptions = [
+    { label: i18n.global.t('cronjob.perMonth'), value: 'perMonth' },
+    { label: i18n.global.t('cronjob.perWeek'), value: 'perWeek' },
+    { label: i18n.global.t('cronjob.perNDay'), value: 'perNDay' },
+    { label: i18n.global.t('cronjob.perNHour'), value: 'perNHour' },
+    { label: i18n.global.t('cronjob.perHour'), value: 'perHour' },
+    { label: i18n.global.t('cronjob.perNMinute'), value: 'perNMinute' },
+];
+const weekOptions = [
+    { label: i18n.global.t('cronjob.monday'), value: 1 },
+    { label: i18n.global.t('cronjob.tuesday'), value: 2 },
+    { label: i18n.global.t('cronjob.wednesday'), value: 3 },
+    { label: i18n.global.t('cronjob.thursday'), value: 4 },
+    { label: i18n.global.t('cronjob.friday'), value: 5 },
+    { label: i18n.global.t('cronjob.saturday'), value: 6 },
+    { label: i18n.global.t('cronjob.sunday'), value: 7 },
+];
 const rules = reactive({
     name: [Rules.requiredInput, Rules.name],
     type: [Rules.requiredSelect],
@@ -265,8 +289,9 @@ function isBackup() {
         dialogData.value.rowData!.type === 'directory'
     );
 }
+
 function hasScript() {
-    return dialogData.value.rowData!.type === 'shell' || dialogData.value.rowData!.type === 'sync';
+    return dialogData.value.rowData!.type === 'shell';
 }
 function changeName(isChangeType: boolean, type: string) {
     if (isChangeType) {

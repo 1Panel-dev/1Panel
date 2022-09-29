@@ -18,6 +18,7 @@ export default {
             login: 'Login',
             close: 'Close',
             view: 'View',
+            handle: 'Handle',
             expand: 'Expand',
             log: 'Log',
             saveAndEnable: 'Save and enable',

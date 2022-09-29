@@ -25,7 +25,6 @@ import (
 const (
 	errRecord = "errRecord"
 	errHandle = "errHandle"
-	noRecord  = "noRecord"
 )
 
 type CronjobService struct{}
@@ -34,6 +33,7 @@ type ICronjobService interface {
 	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
 	SearchRecords(search dto.SearchRecord) (int64, interface{}, error)
 	Create(cronjobDto dto.CronjobCreate) error
+	HandleOnce(id uint) error
 	Save(id uint, req dto.CronjobUpdate) error
 	UpdateStatus(id uint, status string) error
 	Delete(ids []uint) error
@@ -143,6 +143,15 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 	return name, nil
 }
 
+func (u *CronjobService) HandleOnce(id uint) error {
+	cronjob, _ := cronjobRepo.Get(commonRepo.WithByID(id))
+	if cronjob.ID == 0 {
+		return constant.ErrRecordNotFound
+	}
+	u.HandleJob(&cronjob)
+	return nil
+}
+
 func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
 	cronjob, _ := cronjobRepo.Get(commonRepo.WithByName(cronjobDto.Name))
 	if cronjob.ID != 0 {
@@ -165,24 +174,7 @@ func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
 
 func (u *CronjobService) StartJob(cronjob *model.Cronjob) error {
 	global.Cron.Remove(cron.EntryID(cronjob.EntryID))
-	var (
-		entryID int
-		err     error
-	)
-	switch cronjob.Type {
-	case "shell":
-		entryID, err = u.AddShellJob(cronjob)
-	case "curl":
-		entryID, err = u.AddCurlJob(cronjob)
-	case "directory":
-		entryID, err = u.AddDirectoryJob(cronjob)
-	case "website":
-		entryID, err = u.AddWebSiteJob(cronjob)
-	case "database":
-		entryID, err = u.AddDatabaseJob(cronjob)
-	default:
-		entryID, err = u.AddShellJob(cronjob)
-	}
+	entryID, err := u.AddCronJob(cronjob)
 	if err != nil {
 		return err
 	}
@@ -244,23 +236,9 @@ func (u *CronjobService) UpdateStatus(id uint, status string) error {
 	return cronjobRepo.Update(cronjob.ID, map[string]interface{}{"status": status})
 }
 
-func (u *CronjobService) AddShellJob(cronjob *model.Cronjob) (int, error) {
+func (u *CronjobService) AddCronJob(cronjob *model.Cronjob) (int, error) {
 	addFunc := func() {
-		record := cronjobRepo.StartRecords(cronjob.ID, "")
-
-		cmd := exec.Command(cronjob.Script)
-		stdout, err := cmd.CombinedOutput()
-		if err != nil {
-			record.Records = errHandle
-			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), errHandle)
-			return
-		}
-		record.Records, err = mkdirAndWriteFile(cronjob, record.StartTime, stdout)
-		if err != nil {
-			record.Records = errRecord
-			global.LOG.Errorf("save file %s failed, err: %v", record.Records, err)
-		}
-		cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
+		u.HandleJob(cronjob)
 	}
 	global.LOG.Infof("add %s job %s successful", cronjob.Type, cronjob.Name)
 	entryID, err := global.Cron.AddFunc(cronjob.Spec, addFunc)
@@ -270,9 +248,26 @@ func (u *CronjobService) AddShellJob(cronjob *model.Cronjob) (int, error) {
 	return int(entryID), nil
 }
 
-func (u *CronjobService) AddCurlJob(cronjob *model.Cronjob) (int, error) {
-	addFunc := func() {
-		record := cronjobRepo.StartRecords(cronjob.ID, "")
+func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
+	var (
+		message []byte
+		err     error
+	)
+	record := cronjobRepo.StartRecords(cronjob.ID, "")
+	switch cronjob.Type {
+	case "shell":
+		cmd := exec.Command(cronjob.Script)
+		message, err = cmd.CombinedOutput()
+	case "website":
+		message, err = tarWithExclude(cronjob, record.StartTime)
+	case "database":
+		message, err = tarWithExclude(cronjob, record.StartTime)
+	case "directory":
+		if len(cronjob.SourceDir) == 0 {
+			return
+		}
+		message, err = tarWithExclude(cronjob, record.StartTime)
+	case "curl":
 		if len(cronjob.URL) == 0 {
 			return
 		}
@@ -287,107 +282,19 @@ func (u *CronjobService) AddCurlJob(cronjob *model.Cronjob) (int, error) {
 			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), errHandle)
 		}
 		defer response.Body.Close()
-		stdout, _ := ioutil.ReadAll(response.Body)
-
-		record.Records, err = mkdirAndWriteFile(cronjob, record.StartTime, stdout)
-		if err != nil {
-			record.Records = errRecord
-			global.LOG.Errorf("save file %s failed, err: %v", record.Records, err)
-		}
-		cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
+		message, _ = ioutil.ReadAll(response.Body)
 	}
-	global.LOG.Infof("add %s job %s successful", cronjob.Type, cronjob.Name)
-	entryID, err := global.Cron.AddFunc(cronjob.Spec, addFunc)
 	if err != nil {
-		return 0, err
+		record.Records = errHandle
+		cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), errHandle)
+		return
 	}
-	return int(entryID), nil
-}
-
-func (u *CronjobService) AddDirectoryJob(cronjob *model.Cronjob) (int, error) {
-	addFunc := func() {
-		record := cronjobRepo.StartRecords(cronjob.ID, "")
-		if len(cronjob.SourceDir) == 0 {
-			return
-		}
-		message, err := tarWithExclude(cronjob, record.StartTime)
-		if err != nil {
-			record.Records = errHandle
-			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), errHandle)
-			return
-		}
-		record.Records, err = mkdirAndWriteFile(cronjob, record.StartTime, message)
-		if err != nil {
-			record.Records = errRecord
-			global.LOG.Errorf("save file %s failed, err: %v", record.Records, err)
-		}
-		cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
-	}
-	global.LOG.Infof("add %s job %s successful", cronjob.Type, cronjob.Name)
-	entryID, err := global.Cron.AddFunc(cronjob.Spec, addFunc)
+	record.Records, err = mkdirAndWriteFile(cronjob, record.StartTime, message)
 	if err != nil {
-		return 0, err
+		record.Records = errRecord
+		global.LOG.Errorf("save file %s failed, err: %v", record.Records, err)
 	}
-	return int(entryID), nil
-}
-
-func (u *CronjobService) AddWebSiteJob(cronjob *model.Cronjob) (int, error) {
-	addFunc := func() {
-		record := cronjobRepo.StartRecords(cronjob.ID, "")
-		if len(cronjob.URL) == 0 {
-			return
-		}
-		message, err := tarWithExclude(cronjob, record.StartTime)
-		if err != nil {
-			record.Records = errHandle
-			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), errHandle)
-			return
-		}
-		if len(message) == 0 {
-			record.Records = noRecord
-			cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
-			return
-		}
-		record.Records, err = mkdirAndWriteFile(cronjob, record.StartTime, message)
-		if err != nil {
-			record.Records = errRecord
-			global.LOG.Errorf("save file %s failed, err: %v", record.Records, err)
-		}
-		cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
-	}
-	global.LOG.Infof("add %s job %s successful", cronjob.Type, cronjob.Name)
-	entryID, err := global.Cron.AddFunc(cronjob.Spec, addFunc)
-	if err != nil {
-		return 0, err
-	}
-	return int(entryID), nil
-}
-
-func (u *CronjobService) AddDatabaseJob(cronjob *model.Cronjob) (int, error) {
-	addFunc := func() {
-		record := cronjobRepo.StartRecords(cronjob.ID, "")
-		if len(cronjob.URL) == 0 {
-			return
-		}
-		message, err := tarWithExclude(cronjob, record.StartTime)
-		if err != nil {
-			record.Records = errHandle
-			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), errHandle)
-			return
-		}
-		record.Records, err = mkdirAndWriteFile(cronjob, record.StartTime, message)
-		if err != nil {
-			record.Records = errRecord
-			global.LOG.Errorf("save file %s failed, err: %v", record.Records, err)
-		}
-		cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
-	}
-	global.LOG.Infof("add %s job %s successful", cronjob.Type, cronjob.Name)
-	entryID, err := global.Cron.AddFunc(cronjob.Spec, addFunc)
-	if err != nil {
-		return 0, err
-	}
-	return int(entryID), nil
+	cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
 }
 
 func mkdirAndWriteFile(cronjob *model.Cronjob, startTime time.Time, msg []byte) (string, error) {
@@ -451,7 +358,7 @@ func tarWithExclude(cronjob *model.Cronjob, startTime time.Time) ([]byte, error)
 		}
 	}
 	if backType, ok := varMaps["type"].(string); ok {
-		rmOverdueCloud(backType, targetdir, cronjob, backClient)
+		rmExpiredRecords(backType, targetdir, cronjob, backClient)
 	}
 	return stdout, nil
 }
@@ -493,7 +400,7 @@ func loadTargetInfo(cronjob *model.Cronjob) (map[string]interface{}, string, err
 	return varMap, dir, nil
 }
 
-func rmOverdueCloud(backType, path string, cronjob *model.Cronjob, backClient cloud_storage.CloudStorageClient) {
+func rmExpiredRecords(backType, path string, cronjob *model.Cronjob, backClient cloud_storage.CloudStorageClient) {
 	timeNow := time.Now()
 	timeZero := time.Date(timeNow.Year(), timeNow.Month(), timeNow.Day(), 0, 0, 0, 0, timeNow.Location())
 	timeStart := timeZero.AddDate(0, 0, -int(cronjob.RetainDays)+1)
@@ -544,7 +451,7 @@ func rmOverdueCloud(backType, path string, cronjob *model.Cronjob, backClient cl
 			_ = os.Remove(path + "/" + file.Name())
 		}
 	}
-	_ = cronjobRepo.DeleteRecord(cronjobRepo.WithByStartDate(timeStart))
+	_ = cronjobRepo.DeleteRecord(cronjobRepo.WithByJobID(int(cronjob.ID)), cronjobRepo.WithByStartDate(timeStart))
 }
 
 func loadSpec(cronjob model.Cronjob) string {
