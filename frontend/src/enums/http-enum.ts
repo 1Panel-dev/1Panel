@@ -4,6 +4,7 @@ export enum ResultEnum {
     OVERDUE = 401,
     UNSAFETY = 402,
     FORBIDDEN = 403,
+    EXPIRED = 405,
     TIMEOUT = 100000,
     TYPE = 'success',
 }

@@ -2,13 +2,14 @@ package files
 
 import (
 	"fmt"
-	"github.com/pkg/errors"
-	"github.com/spf13/afero"
 	"os"
 	"path"
 	"path/filepath"
 	"syscall"
 	"time"
+
+	"github.com/pkg/errors"
+	"github.com/spf13/afero"
 )
 
 type FileInfo struct {
@@ -92,7 +93,7 @@ func (f *FileInfo) listChildren(dir, showHidden bool, page, pageSize int) error 
 	if err != nil {
 		return err
 	}
-	f.ItemTotal = len(files)
+	f.ItemTotal = 0
 
 	var items []*FileInfo
 	for _, df := range files {
@@ -106,6 +107,7 @@ func (f *FileInfo) listChildren(dir, showHidden bool, page, pageSize int) error 
 		if !showHidden && IsHidden(name) {
 			continue
 		}
+		f.ItemTotal++
 
 		isSymlink, isInvalidLink := false, false
 		if IsSymlink(df.Mode()) {

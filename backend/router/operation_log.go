@@ -11,7 +11,7 @@ type OperationLogRouter struct{}
 
 func (s *OperationLogRouter) InitOperationLogRouter(Router *gin.RouterGroup) {
 	operationRouter := Router.Group("operations")
-	operationRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
+	operationRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		operationRouter.POST("", baseApi.GetOperationList)

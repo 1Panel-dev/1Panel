@@ -10,8 +10,15 @@ import (
 type CronjobRouter struct{}
 
 func (s *CronjobRouter) InitCronjobRouter(Router *gin.RouterGroup) {
-	cmdRouter := Router.Group("cronjobs").Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
-	withRecordRouter := Router.Group("cronjobs").Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.OperationRecord())
+	cmdRouter := Router.Group("cronjobs").
+		Use(middleware.JwtAuth()).
+		Use(middleware.SessionAuth()).
+		Use(middleware.PasswordExpired())
+	withRecordRouter := Router.Group("cronjobs").
+		Use(middleware.JwtAuth()).
+		Use(middleware.SessionAuth()).
+		Use(middleware.PasswordExpired()).
+		Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		withRecordRouter.POST("", baseApi.CreateCronjob)

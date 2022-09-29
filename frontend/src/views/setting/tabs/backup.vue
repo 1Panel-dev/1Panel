@@ -198,6 +198,10 @@ const search = async () => {
 
 const onCreate = () => {
     loadOption();
+    if (!typeOptions.value || typeOptions.value.length === 0) {
+        ElMessage.info(i18n.global.t('setting.noTypeForCreate'));
+        return;
+    }
     operation.value = 'create';
     form.id = 0;
     form.type = typeOptions.value[0].value;

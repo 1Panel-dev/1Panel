@@ -10,8 +10,15 @@ import (
 type BackupRouter struct{}
 
 func (s *BackupRouter) InitBackupRouter(Router *gin.RouterGroup) {
-	baRouter := Router.Group("backups").Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
-	withRecordRouter := Router.Group("backups").Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.OperationRecord())
+	baRouter := Router.Group("backups").
+		Use(middleware.JwtAuth()).
+		Use(middleware.SessionAuth()).
+		Use(middleware.PasswordExpired())
+	withRecordRouter := Router.Group("backups").
+		Use(middleware.JwtAuth()).
+		Use(middleware.SessionAuth()).
+		Use(middleware.PasswordExpired()).
+		Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		baRouter.GET("/search", baseApi.ListBackup)

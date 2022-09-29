@@ -54,7 +54,7 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "UserName", Value: "admin"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "Password", Value: "5WYEZ4XcitdomVvAyimt9WwJwBJJSbTTHncZoqyOraQ="}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "Password", Value: "Sr2qOhssQNg8rGRvqyWhsBDJx+tV5VfLEZXdbax//dA="}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "Email", Value: ""}).Error; err != nil {
@@ -84,7 +84,10 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "SecurityEntrance", Value: "onepanel"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "PasswordTimeOut", Value: time.Now().AddDate(0, 0, 10).Format("2016.01.02 15:04:05")}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "ExpirationTime", Value: time.Now().AddDate(0, 0, 10).Format("2006.01.02 15:04:05")}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "ExpirationDays", Value: "10"}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "ComplexityVerification", Value: "enable"}).Error; err != nil {

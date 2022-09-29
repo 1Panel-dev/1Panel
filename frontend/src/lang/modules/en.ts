@@ -151,6 +151,8 @@ export default {
         taskType: 'Task type',
         shell: 'shell',
         website: 'website',
+        rulesHelper: 'Compression exclusion rules (with; Is a delimiter), for example: \n*.log; *.sql',
+        lastRecrodTime: 'Last execution time',
         failedFilter: 'Failed Task Filtering',
         all: 'all',
         database: 'database',
@@ -165,7 +167,7 @@ export default {
         exclusionRules: 'Exclusive rule',
         url: 'URL Address',
         target: 'Target',
-        retainDays: 'Retain days',
+        retainCopies: 'Retain copies',
         cronSpecRule: 'Please enter a correct lifecycle',
         perMonth: 'Per monthly',
         perWeek: 'Per week',
@@ -339,6 +341,7 @@ export default {
         retryPassword: 'Confirm password',
 
         backup: 'Backup',
+        noTypeForCreate: 'No backup type is currently created',
         serverDisk: 'Server disks',
         OSS: 'Ali OSS',
         S3: 'Amazon S3',
@@ -359,7 +362,8 @@ export default {
         safeEntrance: 'Security entrance',
         safeEntranceHelper:
             'Panel management portal. You can log in to the panel only through a specified security portal, for example: onepanel',
-        passwordTimeout: 'Expiration Time',
+        expirationTime: 'Expiration Time',
+        expiredHelper: 'The current password has expired. Please change the password again.',
         timeoutHelper:
             '[ {0} days ] The panel password is about to expire. After the expiration, you need to reset the password',
         complexity: 'Complexity verification',
