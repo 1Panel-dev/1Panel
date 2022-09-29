@@ -171,3 +171,16 @@ func (b *BaseApi) TargetDownload(c *gin.Context) {
 	}
 	c.File(filePath)
 }
+
+func (b *BaseApi) HandleOnce(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := cronjobService.HandleOnce(id); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}

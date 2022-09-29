@@ -33,3 +33,7 @@ export const updateStatus = (params: Cronjob.UpdateStatus) => {
 export const download = (params: Cronjob.Download) => {
     return http.download<BlobPart>(`cronjobs/download`, params, { responseType: 'blob' });
 };
+
+export const handleOnce = (params: number) => {
+    return http.post(`cronjobs/handle/${params}`);
+};

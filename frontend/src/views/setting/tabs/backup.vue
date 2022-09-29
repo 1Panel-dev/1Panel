@@ -14,9 +14,7 @@
                     <template #header>
                         <div class="card-header">
                             <svg-icon style="font-size: 7px" :iconName="loadIconName(item.type)"></svg-icon>
-                            <span style="font-size: 16px; font-weight: 500">
-                                {{ loadBackupName(item.type) }}
-                            </span>
+                            <span style="font-size: 16px; font-weight: 500">&nbsp;{{ loadBackupName(item.type) }}</span>
                             <div style="float: right">
                                 <el-button @click="onEdit(item)">{{ $t('commons.button.edit') }}</el-button>
                                 <el-button @click="onBatchDelete(item)">
@@ -299,7 +297,7 @@ const loadIconName = (type: string) => {
             return 'p-oss';
             break;
         case 'S3':
-            return 'p-s3';
+            return 'p-aws';
             break;
         case 'SFTP':
             return 'p-SFTP';

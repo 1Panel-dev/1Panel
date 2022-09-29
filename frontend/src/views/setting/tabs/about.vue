@@ -25,7 +25,7 @@
                 <el-link @click="toTalk">
                     <span>{{ $t('setting.chat') }}</span>
                 </el-link>
-                <svg-icon style="font-size: 9px; margin-left: 15px" iconName="p-StarStar"></svg-icon>
+                <svg-icon style="font-size: 9px; margin-left: 15px" iconName="p-star"></svg-icon>
                 <el-link @click="toGithubStar">
                     <span>{{ $t('setting.star') }}</span>
                 </el-link>

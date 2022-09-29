@@ -59,35 +59,35 @@
                                             dialogData.rowData?.specType === 'perWeek'
                                         "
                                     >
-                                        {{ $t('cronjob.' + dialogData.rowData?.specType) }}
+                                        {{ $t('cronjob.' + dialogData.rowData?.specType) }}&nbsp;
                                     </span>
                                     <span v-else>{{ $t('cronjob.per') }}</span>
                                     <span v-if="dialogData.rowData?.specType === 'perMonth'">
-                                        {{ dialogData.rowData?.day }}{{ $t('cronjob.day') }}
+                                        {{ dialogData.rowData?.day }}{{ $t('cronjob.day') }}&nbsp;
                                         {{ loadZero(dialogData.rowData?.hour) }} :
                                         {{ loadZero(dialogData.rowData?.minute) }}
                                     </span>
                                     <span v-if="dialogData.rowData?.specType === 'perWeek'">
-                                        {{ loadWeek(dialogData.rowData?.week) }}
+                                        {{ loadWeek(dialogData.rowData?.week) }}&nbsp;
                                         {{ loadZero(dialogData.rowData?.hour) }} :
                                         {{ loadZero(dialogData.rowData?.minute) }}
                                     </span>
                                     <span v-if="dialogData.rowData?.specType === 'perNDay'">
-                                        {{ dialogData.rowData?.day }}{{ $t('cronjob.day1') }},
+                                        {{ dialogData.rowData?.day }}{{ $t('cronjob.day1') }},&nbsp;
                                         {{ loadZero(dialogData.rowData?.hour) }} :
                                         {{ loadZero(dialogData.rowData?.minute) }}
                                     </span>
                                     <span v-if="dialogData.rowData?.specType === 'perNHour'">
-                                        {{ dialogData.rowData?.hour }}{{ $t('cronjob.hour') }},
+                                        {{ dialogData.rowData?.hour }}{{ $t('cronjob.hour') }},&nbsp;
                                         {{ loadZero(dialogData.rowData?.minute) }}
                                     </span>
                                     <span v-if="dialogData.rowData?.specType === 'perHour'">
-                                        {{ loadZero(dialogData.rowData?.minute) }}
+                                        &nbsp;{{ loadZero(dialogData.rowData?.minute) }}
                                     </span>
                                     <span v-if="dialogData.rowData?.specType === 'perNMinute'">
-                                        {{ dialogData.rowData?.minute }}{{ $t('cronjob.minute') }}
+                                        &nbsp;{{ dialogData.rowData?.minute }}{{ $t('cronjob.minute') }}
                                     </span>
-                                    {{ $t('cronjob.handle') }}
+                                    &nbsp;{{ $t('cronjob.handle') }}
                                 </el-form-item>
                             </el-col>
                             <el-col :span="8" v-if="hasScript()">
@@ -233,7 +233,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
-import { loadZero, loadWeek } from '@/views/cronjob/options';
+import { loadZero } from '@/utils/util';
 import { loadBackupName } from '@/views/setting/helper';
 import { searchRecords, getRecordDetail, download } from '@/api/modules/cronjob';
 import { dateFromat, dateFromatForName } from '@/utils/util';
@@ -314,6 +314,15 @@ const shortcuts = [
         },
     },
 ];
+const weekOptions = [
+    { label: i18n.global.t('cronjob.monday'), value: 1 },
+    { label: i18n.global.t('cronjob.tuesday'), value: 2 },
+    { label: i18n.global.t('cronjob.wednesday'), value: 3 },
+    { label: i18n.global.t('cronjob.thursday'), value: 4 },
+    { label: i18n.global.t('cronjob.friday'), value: 5 },
+    { label: i18n.global.t('cronjob.saturday'), value: 6 },
+    { label: i18n.global.t('cronjob.sunday'), value: 7 },
+];
 const timeRangeLoad = ref<Array<any>>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
 const searchInfo = reactive({
     page: 1,
@@ -387,6 +396,14 @@ function isBackup() {
 }
 function hasScript() {
     return dialogData.value.rowData!.type === 'shell' || dialogData.value.rowData!.type === 'sync';
+}
+function loadWeek(i: number) {
+    for (const week of weekOptions) {
+        if (week.value === i) {
+            return week.label;
+        }
+    }
+    return '';
 }
 
 defineExpose({

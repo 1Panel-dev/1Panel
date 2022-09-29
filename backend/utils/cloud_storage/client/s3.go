@@ -187,7 +187,7 @@ func (s3C *s3Client) ListObjects(prefix string) ([]interface{}, error) {
 		Prefix: &prefix,
 	}, func(p *s3.ListObjectsOutput, last bool) (shouldContinue bool) {
 		for _, obj := range p.Contents {
-			result = append(result, obj)
+			result = append(result, *obj.Key)
 		}
 		return true
 	}); err != nil {

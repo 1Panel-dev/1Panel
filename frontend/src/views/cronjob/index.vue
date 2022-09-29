@@ -73,11 +73,10 @@
 import ComplexTable from '@/components/complex-table/index.vue';
 import OperatrDialog from '@/views/cronjob/operate/index.vue';
 import RecordDialog from '@/views/cronjob/record/index.vue';
-import { loadZero } from '@/views/cronjob/options';
+import { loadZero } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
-import { deleteCronjob, getCronjobPage, updateStatus } from '@/api/modules/cronjob';
+import { deleteCronjob, getCronjobPage, handleOnce, updateStatus } from '@/api/modules/cronjob';
 import { loadBackupName } from '@/views/setting/helper';
-import { loadWeek } from './options';
 import i18n from '@/lang';
 import { Cronjob } from '@/api/interface/cronjob';
 import { useDeleteData } from '@/hooks/use-delete-data';
@@ -97,6 +96,15 @@ const logSearch = reactive({
     page: 1,
     pageSize: 5,
 });
+const weekOptions = [
+    { label: i18n.global.t('cronjob.monday'), value: 1 },
+    { label: i18n.global.t('cronjob.tuesday'), value: 2 },
+    { label: i18n.global.t('cronjob.wednesday'), value: 3 },
+    { label: i18n.global.t('cronjob.thursday'), value: 4 },
+    { label: i18n.global.t('cronjob.friday'), value: 5 },
+    { label: i18n.global.t('cronjob.saturday'), value: 6 },
+    { label: i18n.global.t('cronjob.sunday'), value: 7 },
+];
 
 const search = async () => {
     logSearch.page = paginationConfig.currentPage;
@@ -158,8 +166,20 @@ const onChangeStatus = async (row: Cronjob.CronjobInfo) => {
         search();
     }
 };
+const onHandle = async (row: Cronjob.CronjobInfo) => {
+    await handleOnce(row.id);
+    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    search();
+};
 
 const buttons = [
+    {
+        label: i18n.global.t('commons.button.handle'),
+        icon: 'Pointer',
+        click: (row: Cronjob.CronjobInfo) => {
+            onHandle(row);
+        },
+    },
     {
         label: i18n.global.t('commons.button.edit'),
         icon: 'Edit',
@@ -189,6 +209,14 @@ const onOpenRecordDialog = async (rowData: Partial<Cronjob.CronjobInfo> = {}) =>
     dialogRecordRef.value!.acceptParams(params);
 };
 
+function loadWeek(i: number) {
+    for (const week of weekOptions) {
+        if (week.value === i) {
+            return week.label;
+        }
+    }
+    return '';
+}
 onMounted(() => {
     search();
 });
