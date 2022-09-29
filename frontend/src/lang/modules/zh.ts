@@ -242,6 +242,8 @@ export default {
             commands: '快捷命令',
             backups: '备份账号',
             settings: '面板设置',
+            cronjobs: '计划任务',
+            status: '状态修改',
             auth: '用户',
             post: '创建',
             put: '更新',

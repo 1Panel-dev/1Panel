@@ -6,18 +6,25 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "974125",
+      "name": "star",
+      "font_class": "star",
+      "unicode": "e60f",
+      "unicode_decimal": 58895
+    },
+    {
+      "icon_id": "32101973",
+      "name": "Amazon_Web_Services_Logo",
+      "font_class": "aws",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
       "icon_id": "1760690",
       "name": "讨论",
       "font_class": "taolun",
       "unicode": "e602",
       "unicode_decimal": 58882
-    },
-    {
-      "icon_id": "5192988",
-      "name": "Star Star",
-      "font_class": "StarStar",
-      "unicode": "e635",
-      "unicode_decimal": 58933
     },
     {
       "icon_id": "6642940",
@@ -46,13 +53,6 @@
       "font_class": "oss",
       "unicode": "e607",
       "unicode_decimal": 58887
-    },
-    {
-      "icon_id": "17895439",
-      "name": "Amazon S3上传",
-      "font_class": "s3",
-      "unicode": "e8e4",
-      "unicode_decimal": 59620
     },
     {
       "icon_id": "20290513",

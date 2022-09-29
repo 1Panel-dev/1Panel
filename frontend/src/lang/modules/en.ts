@@ -245,6 +245,8 @@ export default {
             commands: 'Command',
             backups: 'Backup Account',
             settings: 'Panel Setting',
+            cronjobs: 'Cronjob',
+            status: ' Update status',
             auth: 'User',
             login: ' login',
             logout: ' logout',
