@@ -150,6 +150,6 @@ var AddTableCronjob = &gormigrate.Migration{
 var AddTableApp = &gormigrate.Migration{
 	ID: "20200921-add-table-app",
 	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(&model.App{}, &model.AppDetail{}, &model.Tag{}, &model.AppTag{}, &model.AppConfig{}, &model.AppInstall{})
+		return tx.AutoMigrate(&model.App{}, &model.AppDetail{}, &model.Tag{}, &model.AppTag{}, &model.AppConfig{}, &model.AppInstall{}, &model.AppContainer{}, &model.AppContainer{})
 	},
 }

@@ -25,7 +25,7 @@ func (b *BaseApi) AppSearch(c *gin.Context) {
 }
 
 func (b *BaseApi) AppSync(c *gin.Context) {
-	if err := appService.Sync(); err != nil {
+	if err := appService.SyncAppList(); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -105,4 +105,12 @@ func (b *BaseApi) InstallOperate(c *gin.Context) {
 	}
 
 	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) InstalledSync(c *gin.Context) {
+	if err := appService.SyncAllInstalled(); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, "")
 }

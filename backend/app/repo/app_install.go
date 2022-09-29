@@ -13,7 +13,17 @@ func (a AppInstallRepo) GetBy(opts ...DBOption) ([]model.AppInstall, error) {
 		db = opt(db)
 	}
 	var install []model.AppInstall
-	err := db.Preload("App").Find(&install).Error
+	err := db.Preload("App").Preload("Containers").Find(&install).Error
+	return install, err
+}
+
+func (a AppInstallRepo) GetFirst(opts ...DBOption) (model.AppInstall, error) {
+	db := global.DB.Model(&model.AppInstall{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	var install model.AppInstall
+	err := db.Preload("App").Preload("Containers").First(&install).Error
 	return install, err
 }
 
@@ -43,6 +53,6 @@ func (a AppInstallRepo) Page(page, size int, opts ...DBOption) (int64, []model.A
 	}
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Debug().Limit(size).Offset(size * (page - 1)).Preload("App").Find(&apps).Error
+	err := db.Debug().Limit(size).Offset(size * (page - 1)).Preload("App").Preload("Containers").Find(&apps).Error
 	return count, apps, err
 }

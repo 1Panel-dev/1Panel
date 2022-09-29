@@ -11,14 +11,17 @@ import (
 	"github.com/1Panel-dev/1Panel/global"
 	"github.com/1Panel-dev/1Panel/utils/common"
 	"github.com/1Panel-dev/1Panel/utils/compose"
+	"github.com/1Panel-dev/1Panel/utils/docker"
 	"github.com/1Panel-dev/1Panel/utils/files"
 	"github.com/joho/godotenv"
 	"golang.org/x/net/context"
+	"gopkg.in/yaml.v3"
 	"os"
 	"path"
 	"reflect"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 type AppService struct {
@@ -158,7 +161,8 @@ func (a AppService) Operate(req dto.AppInstallOperate) error {
 	}
 
 	install := appInstall[0]
-	dockerComposePath := path.Join(global.CONF.System.AppDir, install.App.Key, install.ContainerName, "docker-compose.yml")
+	dockerComposePath := install.GetComposePath()
+
 	switch req.Operate {
 	case dto.Up:
 		out, err := compose.Up(dockerComposePath)
@@ -180,7 +184,7 @@ func (a AppService) Operate(req dto.AppInstallOperate) error {
 		install.Status = constant.Running
 	case dto.Delete:
 		op := files.NewFileOp()
-		appDir := path.Join(global.CONF.System.AppDir, install.App.Key, install.ContainerName)
+		appDir := install.GetPath()
 		dir, _ := os.Stat(appDir)
 		if dir == nil {
 			return appInstallRepo.Delete(commonRepo.WithByID(install.ID))
@@ -195,6 +199,11 @@ func (a AppService) Operate(req dto.AppInstallOperate) error {
 		}
 		_ = op.DeleteDir(appDir)
 		_ = appInstallRepo.Delete(commonRepo.WithByID(install.ID))
+		return nil
+	case dto.Sync:
+		if err := a.SyncInstalled(install.ID); err != nil {
+			return err
+		}
 		return nil
 	default:
 		return errors.New("operate not support")
@@ -233,30 +242,28 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 	if err != nil {
 		return err
 	}
-	containerName := constant.ContainerPrefix + app.Key + "-" + common.RandStr(6)
 	appInstall := model.AppInstall{
-		Name:          name,
-		AppId:         appDetail.AppId,
-		AppDetailId:   appDetail.ID,
-		Version:       appDetail.Version,
-		Status:        constant.Installing,
-		Params:        string(paramByte),
-		ContainerName: containerName,
-		Message:       "",
+		Name:        name,
+		AppId:       appDetail.AppId,
+		AppDetailId: appDetail.ID,
+		Version:     appDetail.Version,
+		Status:      constant.Installing,
+		Params:      string(paramByte),
 	}
+
 	resourceDir := path.Join(global.CONF.System.ResourceDir, "apps", app.Key, appDetail.Version)
 	installDir := path.Join(global.CONF.System.AppDir, app.Key)
-	installAppDir := path.Join(installDir, appDetail.Version)
-	op := files.NewFileOp()
-	if err := op.Copy(resourceDir, installAppDir); err != nil {
+	installVersionDir := path.Join(installDir, appDetail.Version)
+	fileOp := files.NewFileOp()
+	if err := fileOp.Copy(resourceDir, installVersionDir); err != nil {
 		return err
 	}
-	containerNameDir := path.Join(installDir, containerName)
-	if err := op.Rename(installAppDir, containerNameDir); err != nil {
+	appDir := path.Join(installDir, name)
+	if err := fileOp.Rename(installVersionDir, appDir); err != nil {
 		return err
 	}
-	composeFilePath := path.Join(containerNameDir, "docker-compose.yml")
-	envPath := path.Join(containerNameDir, ".env")
+	composeFilePath := path.Join(appDir, "docker-compose.yml")
+	envPath := path.Join(appDir, ".env")
 
 	envParams := make(map[string]string, len(params))
 	for k, v := range params {
@@ -269,11 +276,56 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 			envParams[k] = t.(string)
 		}
 	}
-	envParams["CONTAINER_NAME"] = containerName
 	if err := godotenv.Write(envParams, envPath); err != nil {
 		return err
 	}
+
+	fileContent, err := os.ReadFile(composeFilePath)
+	if err != nil {
+		return err
+	}
+	composeMap := make(map[string]interface{})
+	if err := yaml.Unmarshal(fileContent, &composeMap); err != nil {
+		return err
+	}
+	servicesMap := composeMap["services"].(map[string]interface{})
+	changeKeys := make(map[string]string, len(servicesMap))
+	var appContainers []*model.AppContainer
+	for k, v := range servicesMap {
+		serviceName := k + "-" + common.RandStr(4)
+		changeKeys[k] = serviceName
+		value := v.(map[string]interface{})
+		containerName := constant.ContainerPrefix + k + "-" + common.RandStr(4)
+		value["container_name"] = containerName
+		var image string
+		if i, ok := value["image"]; ok {
+			image = i.(string)
+		}
+		appContainers = append(appContainers, &model.AppContainer{
+			ServiceName:   serviceName,
+			ContainerName: containerName,
+			Image:         image,
+		})
+	}
+	for k, v := range changeKeys {
+		servicesMap[v] = servicesMap[k]
+		delete(servicesMap, k)
+	}
+	serviceByte, err := yaml.Marshal(servicesMap)
+	if err != nil {
+		return err
+	}
+	if err := fileOp.WriteFile(composeFilePath, strings.NewReader(string(serviceByte)), 0775); err != nil {
+		return err
+	}
+
 	if err := appInstallRepo.Create(&appInstall); err != nil {
+		return err
+	}
+	for _, c := range appContainers {
+		c.AppInstallId = appInstall.ID
+	}
+	if err := appContainerRepo.BatchCreate(context.WithValue(context.Background(), "db", global.DB), appContainers); err != nil {
 		return err
 	}
 	go upApp(composeFilePath, appInstall)
@@ -296,12 +348,96 @@ func upApp(composeFilePath string, appInstall model.AppInstall) {
 	}
 }
 
-func (a AppService) SyncInstalled() error {
-
+func (a AppService) SyncAllInstalled() error {
+	allList, err := appInstallRepo.GetBy()
+	if err != nil {
+		return err
+	}
+	go func() {
+		for _, i := range allList {
+			if err := a.SyncInstalled(i.ID); err != nil {
+				global.LOG.Errorf("sync install app[%s] error,mgs: %s", i.Name, err.Error())
+			}
+		}
+	}()
 	return nil
 }
 
-func (a AppService) Sync() error {
+func (a AppService) SyncInstalled(installId uint) error {
+	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
+	if err != nil {
+		return err
+	}
+	var containerNames []string
+	for _, a := range appInstall.Containers {
+		containerNames = append(containerNames, a.ContainerName)
+	}
+	cli, err := docker.NewClient()
+	if err != nil {
+		return err
+	}
+	containers, err := cli.ListContainersByName(containerNames)
+	if err != nil {
+		return err
+	}
+	var errorContainers []string
+	var notFoundContainers []string
+
+	for _, n := range containers {
+		if n.State != "running" {
+			errorContainers = append(errorContainers, n.Names...)
+		}
+	}
+	for _, old := range containerNames {
+		exist := false
+		for _, new := range containers {
+			if common.ExistWithStrArray(old, new.Names) {
+				exist = true
+				break
+			}
+		}
+		if !exist {
+			notFoundContainers = append(notFoundContainers, old)
+		}
+	}
+
+	if len(containers) == 0 {
+		appInstall.Status = constant.Error
+		appInstall.Message = "container is not found"
+		return appInstallRepo.Save(appInstall)
+	}
+
+	if len(errorContainers) == 0 && len(notFoundContainers) == 0 {
+		appInstall.Status = constant.Running
+		return appInstallRepo.Save(appInstall)
+	}
+	if len(errorContainers) == len(containerNames) {
+		appInstall.Status = constant.Error
+	}
+	if len(notFoundContainers) == len(containerNames) {
+		appInstall.Status = constant.Stopped
+	}
+
+	var errMsg strings.Builder
+	if len(errorContainers) > 0 {
+		errMsg.Write([]byte(string(rune(len(errorContainers))) + " error containers:"))
+		for _, e := range errorContainers {
+			errMsg.Write([]byte(e))
+		}
+		errMsg.Write([]byte("\n"))
+	}
+	if len(notFoundContainers) > 0 {
+		errMsg.Write([]byte(string(rune(len(notFoundContainers))) + " not found containers:"))
+		for _, e := range notFoundContainers {
+			errMsg.Write([]byte(e))
+		}
+		errMsg.Write([]byte("\n"))
+	}
+	appInstall.Message = errMsg.String()
+	return appInstallRepo.Save(appInstall)
+}
+
+func (a AppService) SyncAppList() error {
 	//TODO 从 oss 拉取最新列表
 	var appConfig model.AppConfig
 	appConfig.OssPath = global.CONF.System.AppOss

@@ -1,53 +1,60 @@
 <template>
-    <el-row :gutter="20">
-        <el-col :span="12">
-            <el-input v-model="req.name" @blur="searchByName"></el-input>
-        </el-col>
-        <el-col :span="12">
-            <el-select v-model="req.tags" multiple style="width: 100%" @change="changeTag">
-                <el-option v-for="item in tags" :key="item.key" :label="item.name" :value="item.key"></el-option>
-            </el-select>
-        </el-col>
-        <el-col v-for="(app, index) in apps" :key="index" :xs="8" :sm="8" :lg="4">
-            <div @click="getAppDetail(app.id)">
-                <el-card :body-style="{ padding: '0px' }" class="a-card">
-                    <el-row :gutter="24">
-                        <el-col :span="8">
-                            <div class="icon">
-                                <el-image class="image" :src="'data:image/png;base64,' + app.icon"></el-image>
-                            </div>
-                        </el-col>
-                        <el-col :span="16">
-                            <div class="a-detail">
-                                <div class="d-name">
-                                    <font size="3" style="font-weight: 700">{{ app.name }}</font>
+    <div v-loading="loading">
+        <el-row :gutter="20">
+            <el-col :span="12">
+                <el-input v-model="req.name" @blur="searchByName"></el-input>
+            </el-col>
+            <el-col :span="11">
+                <el-select v-model="req.tags" multiple style="width: 100%" @change="changeTag">
+                    <el-option v-for="item in tags" :key="item.key" :label="item.name" :value="item.key"></el-option>
+                </el-select>
+            </el-col>
+            <el-col :span="1">
+                <el-button @click="sync">{{ $t('app.sync') }}</el-button>
+            </el-col>
+            <el-col v-for="(app, index) in apps" :key="index" :xs="8" :sm="8" :lg="4">
+                <div @click="getAppDetail(app.id)">
+                    <el-card :body-style="{ padding: '0px' }" class="a-card">
+                        <el-row :gutter="24">
+                            <el-col :span="8">
+                                <div class="icon">
+                                    <el-image class="image" :src="'data:image/png;base64,' + app.icon"></el-image>
                                 </div>
-                                <div class="d-description">
-                                    <font size="1">
-                                        <span>
-                                            {{ app.shortDesc }}
-                                        </span>
-                                    </font>
+                            </el-col>
+                            <el-col :span="16">
+                                <div class="a-detail">
+                                    <div class="d-name">
+                                        <font size="3" style="font-weight: 700">{{ app.name }}</font>
+                                    </div>
+                                    <div class="d-description">
+                                        <font size="1">
+                                            <span>
+                                                {{ app.shortDesc }}
+                                            </span>
+                                        </font>
+                                    </div>
+                                    <div class="d-tag">
+                                        <el-tag v-for="(tag, ind) in app.tags" :key="ind" round :colr="getColor(ind)">
+                                            {{ tag.name }}
+                                        </el-tag>
+                                    </div>
                                 </div>
-                                <div class="d-tag">
-                                    <el-tag v-for="(tag, ind) in app.tags" :key="ind" round :colr="getColor(ind)">
-                                        {{ tag.name }}
-                                    </el-tag>
-                                </div>
-                            </div>
-                        </el-col>
-                    </el-row>
-                </el-card>
-            </div>
-        </el-col>
-    </el-row>
+                            </el-col>
+                        </el-row>
+                    </el-card>
+                </div>
+            </el-col>
+        </el-row>
+    </div>
 </template>
 
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { onMounted, reactive, ref } from 'vue';
 import router from '@/routers';
-import { SearchApp } from '@/api/modules/app';
+import { SearchApp, SyncApp } from '@/api/modules/app';
+import { ElMessage } from 'element-plus';
+import i18n from '@/lang';
 
 let req = reactive({
     name: '',
@@ -59,6 +66,7 @@ let req = reactive({
 let apps = ref<App.App[]>([]);
 let tags = ref<App.Tag[]>([]);
 const colorArr = ['#6495ED', '#54FF9F', '#BEBEBE', '#FFF68F', '#FFFF00', '#8B0000'];
+let loading = ref(false);
 
 const getColor = (index: number) => {
     return colorArr[index];
@@ -76,6 +84,17 @@ const getAppDetail = (id: number) => {
         id: id,
     };
     router.push({ name: 'AppDetail', params });
+};
+
+const sync = () => {
+    loading.value = true;
+    SyncApp()
+        .then(() => {
+            ElMessage.success(i18n.global.t('app.syncSuccess'));
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 const changeTag = () => {

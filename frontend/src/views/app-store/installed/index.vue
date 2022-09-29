@@ -1,14 +1,12 @@
 <template>
+    <div style="float: right; margin-bottom: 5px">
+        <el-button @click="sync">{{ $t('app.sync') }}</el-button>
+    </div>
     <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" v-loading="loading">
         <el-table-column :label="$t('app.name')" prop="name"></el-table-column>
         <!-- <el-table-column :label="$t('app.description')" prop="description"></el-table-column> -->
         <el-table-column :label="$t('app.appName')" prop="appName"></el-table-column>
         <el-table-column :label="$t('app.version')" prop="version"></el-table-column>
-        <el-table-column :label="$t('app.container')">
-            <template #default="{ row }">
-                {{ row.ready / row.total }}
-            </template>
-        </el-table-column>
         <el-table-column :label="$t('app.status')">
             <template #default="{ row }">
                 <el-popover
@@ -32,7 +30,7 @@
             show-overflow-tooltip
         />
         <fu-table-operations
-            width="200px"
+            width="250px"
             :ellipsis="10"
             :buttons="buttons"
             :label="$t('commons.table.operate')"
@@ -52,7 +50,7 @@
 </template>
 
 <script lang="ts" setup>
-import { GetAppInstalled, InstalledOp } from '@/api/modules/app';
+import { GetAppInstalled, InstalledOp, SyncInstalledApp } from '@/api/modules/app';
 import { onMounted, reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { dateFromat } from '@/utils/util';
@@ -71,6 +69,18 @@ let operateReq = reactive({
     installId: 0,
     operate: '',
 });
+
+const sync = () => {
+    loading.value = true;
+    SyncInstalledApp()
+        .then(() => {
+            ElMessage.success(i18n.global.t('app.syncSuccess'));
+            search();
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+};
 
 const search = () => {
     const req = {
@@ -122,12 +132,21 @@ const getMsg = (op: string) => {
         case 'delete':
             tip = i18n.global.t('app.deleteWarn');
             break;
+        case 'sync':
+            tip = i18n.global.t('app.sync');
+            break;
         default:
     }
     return tip;
 };
 
 const buttons = [
+    {
+        label: i18n.global.t('app.sync'),
+        click: (row: any) => {
+            openOperate(row, 'sync');
+        },
+    },
     {
         label: i18n.global.t('app.restart'),
         click: (row: any) => {

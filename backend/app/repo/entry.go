@@ -14,6 +14,7 @@ type RepoGroup struct {
 	TagRepo
 	AppDetailRepo
 	AppInstallRepo
+	AppContainerRepo
 }
 
 var RepoGroupApp = new(RepoGroup)

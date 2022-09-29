@@ -2,7 +2,7 @@ package constant
 
 const (
 	Running    = "Running"
-	Warning    = "Warning"
+	UnHealthy  = "UnHealthy"
 	Error      = "Error"
 	Stopped    = "Stopped"
 	Installing = "Installing"

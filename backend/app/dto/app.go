@@ -88,9 +88,18 @@ var (
 	Down    AppOperate = "down"
 	Restart AppOperate = "restart"
 	Delete  AppOperate = "delete"
+	Sync    AppOperate = "sync"
 )
 
 type AppInstallOperate struct {
 	InstallId uint       `json:"installId" validate:"required"`
 	Operate   AppOperate `json:"operate" validate:"required"`
 }
+
+//type AppContainer struct {
+//	Names  []string `json:"names"`
+//	Image  string   `json:"image"`
+//	Ports  string   `json:"ports"`
+//	Status string   `json:"status"`
+//	State  string   `json:"state"`
+//}

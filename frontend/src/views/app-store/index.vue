@@ -21,25 +21,17 @@
 </template>
 
 <script lang="ts" setup>
-import { SyncApp } from '@/api/modules/app';
 import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 const activeName = ref('all');
 
-const sync = () => {
-    SyncApp().then((res) => {
-        console.log(res);
-    });
-};
-
 const routerTo = (path: string) => {
     router.push({ path: path });
 };
 
 onMounted(() => {
-    sync();
     const path = router.currentRoute.value.path;
     if (path === '/apps/all') {
         activeName.value = 'all';
