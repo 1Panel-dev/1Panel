@@ -335,6 +335,7 @@ export default {
         retryPassword: '确认密码',
 
         backup: '备份',
+        noTypeForCreate: '当前无可创建备份类型',
         serverDisk: '服务器磁盘',
         OSS: '阿里云 OSS',
         S3: '亚马逊 S3 云存储',
@@ -353,7 +354,8 @@ export default {
         portHelper: '建议端口范围8888 - 65535，注意：有安全组的服务器请提前在安全组放行新端口',
         safeEntrance: '安全入口',
         safeEntranceHelper: '面板管理入口，设置后只能通过指定安全入口登录面板，如: onepanel',
-        passwordTimeout: '密码过期时间',
+        expirationTime: '密码过期时间',
+        expiredHelper: '当前密码已过期，请重新修改密码：',
         timeoutHelper: '【 {0} 天后 】面板密码即将过期，过期后需要重新设置密码',
         complexity: '密码复杂度验证',
         complexityHelper: '密码必须满足密码长度大于 8 位且包含字母、数字及特殊字符',

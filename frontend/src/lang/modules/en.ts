@@ -339,6 +339,7 @@ export default {
         retryPassword: 'Confirm password',
 
         backup: 'Backup',
+        noTypeForCreate: 'No backup type is currently created',
         serverDisk: 'Server disks',
         OSS: 'Ali OSS',
         S3: 'Amazon S3',
@@ -359,7 +360,8 @@ export default {
         safeEntrance: 'Security entrance',
         safeEntranceHelper:
             'Panel management portal. You can log in to the panel only through a specified security portal, for example: onepanel',
-        passwordTimeout: 'Expiration Time',
+        expirationTime: 'Expiration Time',
+        expiredHelper: 'The current password has expired. Please change the password again.',
         timeoutHelper:
             '[ {0} days ] The panel password is about to expire. After the expiration, you need to reset the password',
         complexity: 'Complexity verification',

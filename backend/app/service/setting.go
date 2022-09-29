@@ -18,6 +18,7 @@ type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
 	Update(c *gin.Context, key, value string) error
 	UpdatePassword(c *gin.Context, old, new string) error
+	HandlePasswordExpired(c *gin.Context, old, new string) error
 }
 
 func NewISettingService() ISettingService {
@@ -47,13 +48,20 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 }
 
 func (u *SettingService) Update(c *gin.Context, key, value string) error {
+	if key == "ExpirationDays" {
+		timeout, _ := strconv.Atoi(value)
+		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006.01.02 15:04:05")); err != nil {
+			return err
+		}
+		c.SetCookie(constant.PasswordExpiredName, encrypt.Md5(time.Now().Format("20060102150405")), 86400*timeout, "", "", false, false)
+	}
 	if err := settingRepo.Update(key, value); err != nil {
 		return err
 	}
-	return settingRepo.Update(key, value)
+	return nil
 }
 
-func (u *SettingService) UpdatePassword(c *gin.Context, old, new string) error {
+func (u *SettingService) HandlePasswordExpired(c *gin.Context, old, new string) error {
 	setting, err := settingRepo.Get(settingRepo.WithByKey("Password"))
 	if err != nil {
 		return err
@@ -70,15 +78,32 @@ func (u *SettingService) UpdatePassword(c *gin.Context, old, new string) error {
 		if err := settingRepo.Update("Password", newPassword); err != nil {
 			return err
 		}
-		sID, _ := c.Cookie(constant.SessionName)
-		if sID != "" {
-			c.SetCookie(constant.SessionName, sID, -1, "", "", false, false)
-			err := global.SESSION.Delete(sID)
-			if err != nil {
-				return err
-			}
+
+		expiredSetting, err := settingRepo.Get(settingRepo.WithByKey("ExpirationDays"))
+		if err != nil {
+			return err
+		}
+		timeout, _ := strconv.Atoi(expiredSetting.Value)
+		c.SetCookie(constant.PasswordExpiredName, encrypt.Md5(time.Now().Format("20060102150405")), 86400*timeout, "", "", false, false)
+		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006.01.02 15:04:05")); err != nil {
+			return err
 		}
 		return nil
 	}
 	return constant.ErrInitialPassword
+}
+
+func (u *SettingService) UpdatePassword(c *gin.Context, old, new string) error {
+	if err := u.HandlePasswordExpired(c, old, new); err != nil {
+		return err
+	}
+	sID, _ := c.Cookie(constant.SessionName)
+	if sID != "" {
+		c.SetCookie(constant.SessionName, sID, -1, "", "", false, false)
+		err := global.SESSION.Delete(sID)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

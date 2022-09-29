@@ -10,7 +10,10 @@ import (
 type MonitorRouter struct{}
 
 func (s *MonitorRouter) InitMonitorRouter(Router *gin.RouterGroup) {
-	monitorRouter := Router.Group("monitors").Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
+	monitorRouter := Router.Group("monitors").
+		Use(middleware.JwtAuth()).
+		Use(middleware.SessionAuth()).
+		Use(middleware.PasswordExpired())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		monitorRouter.POST("/search", baseApi.LoadMonitor)

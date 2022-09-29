@@ -56,7 +56,7 @@ let form = ref<Setting.SettingInfo>({
     language: '',
     serverPort: 8888,
     securityEntrance: '',
-    passwordTimeOut: '',
+    expirationTime: '',
     complexityVerification: '',
     mfaStatus: '',
     mfaSecret: '',

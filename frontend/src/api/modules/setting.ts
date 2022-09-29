@@ -13,6 +13,10 @@ export const updatePassword = (param: Setting.PasswordUpdate) => {
     return http.put(`/settings/password`, param);
 };
 
+export const handleExpired = (param: Setting.PasswordUpdate) => {
+    return http.put(`/settings/expired/handle`, param);
+};
+
 export const syncTime = () => {
     return http.post(`/settings/time/sync`, {});
 };
