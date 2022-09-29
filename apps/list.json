@@ -1,5 +1,5 @@
 {
-  "version": "0.1",
+  "version": "ddd",
   "tags": [
     {
       "key": "WebSite",
@@ -24,6 +24,8 @@
       "icon": "mysql.png",
       "author": "Oracle",
       "type": "internal",
+      "required": [""],
+      "crossVersionUpdate": false,
       "source": "https://www.mysql.com"
     },
     {
@@ -35,6 +37,8 @@
       "icon": "nginx.png",
       "author": "Nginx",
       "type": "internal",
+      "required": [""],
+      "crossVersionUpdate": true,
       "source": "http://nginx.org/"
     }
   ]

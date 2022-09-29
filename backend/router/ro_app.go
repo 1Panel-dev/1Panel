@@ -22,5 +22,6 @@ func (a *AppRouter) InitAppRouter(Router *gin.RouterGroup) {
 		appRouter.POST("/install", baseApi.InstallApp)
 		appRouter.POST("/installed", baseApi.PageInstalled)
 		appRouter.POST("/installed/op", baseApi.InstallOperate)
+		appRouter.POST("/installed/sync", baseApi.InstalledSync)
 	}
 }

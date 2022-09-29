@@ -63,7 +63,6 @@ export namespace App {
 
     export interface AppInstalled extends CommonModel {
         name: string;
-        containerName: string;
         version: string;
         appId: string;
         appDetailId: string;
@@ -72,9 +71,8 @@ export namespace App {
         description: string;
         message: string;
         appName: string;
-        total: number;
-        ready: number;
         icon: string;
+        constainers: any[];
     }
 
     export interface AppInstalledOp {

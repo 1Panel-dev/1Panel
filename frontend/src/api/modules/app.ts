@@ -29,3 +29,7 @@ export const GetAppInstalled = (info: ReqPage) => {
 export const InstalledOp = (op: App.AppInstalledOp) => {
     return http.post<any>('apps/installed/op', op);
 };
+
+export const SyncInstalledApp = () => {
+    return http.post<any>('apps/installed/sync', {});
+};

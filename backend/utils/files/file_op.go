@@ -29,6 +29,10 @@ func NewFileOp() FileOp {
 	}
 }
 
+func (f FileOp) OpenFile(dst string) (fs.File, error) {
+	return f.Fs.Open(dst)
+}
+
 func (f FileOp) CreateDir(dst string, mode fs.FileMode) error {
 	return f.Fs.MkdirAll(dst, mode)
 }

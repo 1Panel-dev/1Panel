@@ -408,5 +408,6 @@ export default {
         description: '描述',
         delete: '删除',
         deleteWarn: '删除操作会把数据一并删除,此操作不可回滚,是否继续?',
+        syncSuccess: '同步成功',
     },
 };

@@ -71,3 +71,12 @@ func ScanPort(port string) bool {
 	defer ln.Close()
 	return false
 }
+
+func ExistWithStrArray(str string, arr []string) bool {
+	for _, a := range arr {
+		if strings.Contains(a, str) {
+			return true
+		}
+	}
+	return false
+}
