@@ -14,6 +14,7 @@ type CronjobRepo struct{}
 type ICronjobRepo interface {
 	Get(opts ...DBOption) (model.Cronjob, error)
 	GetRecord(opts ...DBOption) (model.JobRecords, error)
+	RecordFirst(id uint) (model.JobRecords, error)
 	ListRecord(opts ...DBOption) ([]model.JobRecords, error)
 	List(opts ...DBOption) ([]model.Cronjob, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.Cronjob, error)
@@ -82,6 +83,12 @@ func (u *CronjobRepo) Page(page, size int, opts ...DBOption) (int64, []model.Cro
 	db = db.Count(&count)
 	err := db.Order("created_at desc").Limit(size).Offset(size * (page - 1)).Find(&cronjobs).Error
 	return count, cronjobs, err
+}
+
+func (u *CronjobRepo) RecordFirst(id uint) (model.JobRecords, error) {
+	var record model.JobRecords
+	err := global.DB.Order("created_at desc").First(&record).Error
+	return record, err
 }
 
 func (u *CronjobRepo) PageRecords(page, size int, opts ...DBOption) (int64, []model.JobRecords, error) {

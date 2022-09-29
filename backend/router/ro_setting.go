@@ -9,11 +9,20 @@ import (
 type SettingRouter struct{}
 
 func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
-	settingRouter := Router.Group("settings").Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
-	withRecordRouter := Router.Group("settings").Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.OperationRecord())
+	baseRouter := Router.Group("settings")
+	settingRouter := Router.Group("settings").
+		Use(middleware.JwtAuth()).
+		Use(middleware.SessionAuth()).
+		Use(middleware.PasswordExpired())
+	withRecordRouter := Router.Group("settings").
+		Use(middleware.JwtAuth()).
+		Use(middleware.SessionAuth()).
+		Use(middleware.PasswordExpired()).
+		Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		settingRouter.POST("/search", baseApi.GetSettingInfo)
+		baseRouter.POST("/search", baseApi.GetSettingInfo)
+		baseRouter.PUT("/expired/handle", baseApi.HandlePasswordExpired)
 		withRecordRouter.PUT("", baseApi.UpdateSetting)
 		settingRouter.PUT("/password", baseApi.UpdatePassword)
 		settingRouter.POST("/time/sync", baseApi.SyncTime)

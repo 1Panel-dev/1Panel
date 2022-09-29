@@ -19,6 +19,16 @@ const settingRouter = {
                 key: 'Setting',
             },
         },
+        {
+            path: '/expired',
+            name: 'Expired',
+            hidden: true,
+            component: () => import('@/views/setting/expired.vue'),
+            meta: {
+                requiresAuth: true,
+                key: 'Expired',
+            },
+        },
     ],
 };
 

@@ -9,7 +9,7 @@ import (
 
 func TestStringEncrypt(t *testing.T) {
 	viper.Init()
-	p, err := StringEncrypt("Songliu123++")
+	p, err := StringEncrypt("1Panel@2022")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -18,7 +18,7 @@ func TestStringEncrypt(t *testing.T) {
 
 func TestStringDecrypt(t *testing.T) {
 	viper.Init()
-	p, err := StringDecrypt("Jmg4EUACGznt3dEQTJ+0ZRxwLaVNsNg7R5RcZ0V7ElQ=")
+	p, err := StringDecrypt("dXn5bVtea+KVLDrLJlpnPIJNfW8TAMmqX1QNMdSGp88=")
 	if err != nil {
 		t.Fatal(err)
 	}

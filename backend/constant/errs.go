@@ -11,6 +11,7 @@ const (
 	CodeErrUnSafety       = 402
 	CodeErrForbidden      = 403
 	CodeErrNotFound       = 404
+	CodePasswordExpired   = 405
 	CodeErrInternalServer = 500
 	CodeErrHeader         = 406
 )
@@ -32,10 +33,11 @@ var (
 
 // api
 var (
-	ErrTypeInternalServer = "ErrInternalServer"
-	ErrTypeInvalidParams  = "ErrInvalidParams"
-	ErrTypeToken          = "ErrToken"
-	ErrTypeTokenTimeOut   = "ErrTokenTimeOut"
-	ErrTypeNotLogin       = "ErrNotLogin"
-	ErrTypeNotSafety      = "ErrNotSafety"
+	ErrTypeInternalServer  = "ErrInternalServer"
+	ErrTypeInvalidParams   = "ErrInvalidParams"
+	ErrTypeToken           = "ErrToken"
+	ErrTypeTokenTimeOut    = "ErrTokenTimeOut"
+	ErrTypeNotLogin        = "ErrNotLogin"
+	ErrTypePasswordExpired = "ErrPasswordExpired"
+	ErrTypeNotSafety       = "ErrNotSafety"
 )
