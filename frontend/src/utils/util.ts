@@ -89,6 +89,10 @@ export function getRandomStr(e: number): string {
     return n;
 }
 
+export function loadZero(i: number) {
+    return i < 10 ? '0' + i : '' + i;
+}
+
 export function computeSize(size: number): string {
     const num = 1024.0;
 

@@ -5,7 +5,7 @@ import "time"
 type Cronjob struct {
 	BaseModel
 
-	Name     string `gorm:"type:varchar(64);not null" json:"name"`
+	Name     string `gorm:"type:varchar(64);not null;unique" json:"name"`
 	Type     string `gorm:"type:varchar(64);not null" json:"type"`
 	SpecType string `gorm:"type:varchar(64);not null" json:"specType"`
 	Spec     string `gorm:"type:varchar(64);not null" json:"spec"`
