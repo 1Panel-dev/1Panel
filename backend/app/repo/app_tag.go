@@ -20,6 +20,11 @@ func (a AppTagRepo) DeleteByAppIds(ctx context.Context, appIds []uint) error {
 	return db.Where("app_id in (?)", appIds).Delete(&model.AppTag{}).Error
 }
 
+func (a AppTagRepo) DeleteAll(ctx context.Context) error {
+	db := ctx.Value("db").(*gorm.DB)
+	return db.Where("1 = 1").Delete(&model.AppTag{}).Error
+}
+
 func (a AppTagRepo) GetByAppId(appId uint) ([]model.AppTag, error) {
 	var appTags []model.AppTag
 	if err := global.DB.Where("app_id = ?", appId).Find(&appTags).Error; err != nil {

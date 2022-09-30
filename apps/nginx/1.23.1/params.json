@@ -5,7 +5,7 @@
       "labelZh": "端口",
       "labelEn": "Port",
       "required": true,
-      "default": 3306,
+      "default": 80,
       "envKey": "PORT"
     }
   ]

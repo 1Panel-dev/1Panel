@@ -11,3 +11,8 @@ const (
 const (
 	ContainerPrefix = "1Panel-"
 )
+
+const (
+	AppNormal   = "Normal"
+	AppTakeDown = "TakeDown"
+)

@@ -35,9 +35,21 @@ func (a AppRepo) GetFirst(opts ...DBOption) (model.App, error) {
 	return app, nil
 }
 
-func (a AppRepo) BatchCreate(ctx context.Context, apps []*model.App) error {
+func (a AppRepo) GetBy(opts ...DBOption) ([]model.App, error) {
+	var apps []model.App
+	db := global.DB.Model(&model.App{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	if err := db.Preload("Details").Preload("AppTags").Find(&apps).Error; err != nil {
+		return apps, err
+	}
+	return apps, nil
+}
+
+func (a AppRepo) BatchCreate(ctx context.Context, apps []model.App) error {
 	db := ctx.Value("db").(*gorm.DB)
-	return db.Omit(clause.Associations).Create(apps).Error
+	return db.Omit(clause.Associations).Create(&apps).Error
 }
 
 func (a AppRepo) GetByKey(ctx context.Context, key string) (model.App, error) {

@@ -7,4 +7,5 @@ type AppDetail struct {
 	Params        string `json:"-" gorm:"type:longtext;"`
 	DockerCompose string `json:"-"  gorm:"type:longtext;not null"`
 	Readme        string `json:"readme"  gorm:"type:longtext;not null"`
+	Status        string `json:"status" gorm:"type:varchar(64);not null"`
 }

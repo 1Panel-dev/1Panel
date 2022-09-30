@@ -119,7 +119,7 @@ onMounted(() => {
     height: 100px;
     margin-top: 10px;
     cursor: pointer;
-    padding: 1px;
+    padding: 5px;
 
     .icon {
         width: 100%;

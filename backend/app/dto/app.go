@@ -1,6 +1,9 @@
 package dto
 
-import "github.com/1Panel-dev/1Panel/app/model"
+import (
+	"encoding/json"
+	"github.com/1Panel-dev/1Panel/app/model"
+)
 
 type AppRes struct {
 	Version   string      `json:"version"`
@@ -28,15 +31,22 @@ type AppList struct {
 }
 
 type AppDefine struct {
-	Key       string   `json:"key"`
-	Name      string   `json:"name"`
-	Tags      []string `json:"tags"`
-	Versions  []string `json:"versions"`
-	Icon      string   `json:"icon"`
-	Author    string   `json:"author"`
-	Source    string   `json:"source"`
-	ShortDesc string   `json:"short_desc"`
-	Type      string   `json:"type"`
+	Key                string   `json:"key"`
+	Name               string   `json:"name"`
+	Tags               []string `json:"tags"`
+	Versions           []string `json:"versions"`
+	Icon               string   `json:"icon"`
+	Author             string   `json:"author"`
+	Source             string   `json:"source"`
+	ShortDesc          string   `json:"short_desc"`
+	Type               string   `json:"type"`
+	Required           []string `json:"Required"`
+	CrossVersionUpdate bool     `json:"crossVersionUpdate"`
+}
+
+func (define AppDefine) GetRequired() string {
+	by, _ := json.Marshal(define.Required)
+	return string(by)
 }
 
 type Tag struct {

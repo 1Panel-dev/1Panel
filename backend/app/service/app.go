@@ -18,7 +18,6 @@ import (
 	"gopkg.in/yaml.v3"
 	"os"
 	"path"
-	"reflect"
 	"sort"
 	"strconv"
 	"strings"
@@ -136,9 +135,9 @@ func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, 
 
 	var (
 		appDetailDTO dto.AppDetailDTO
+		opts         []repo.DBOption
 	)
 
-	var opts []repo.DBOption
 	opts = append(opts, appDetailRepo.WithAppId(appId), appDetailRepo.WithVersion(version))
 	detail, err := appDetailRepo.GetAppDetail(opts...)
 	if err != nil {
@@ -152,15 +151,11 @@ func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, 
 }
 
 func (a AppService) Operate(req dto.AppInstallOperate) error {
-	appInstall, err := appInstallRepo.GetBy(commonRepo.WithByID(req.InstallId))
+	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallId))
 	if err != nil {
 		return err
 	}
-	if len(appInstall) == 0 {
-		return errors.New("req not found")
-	}
 
-	install := appInstall[0]
 	dockerComposePath := install.GetComposePath()
 
 	switch req.Operate {
@@ -193,13 +188,10 @@ func (a AppService) Operate(req dto.AppInstallOperate) error {
 		if err != nil {
 			return handleErr(install, err, out)
 		}
-		out, err = compose.Rmf(dockerComposePath)
-		if err != nil {
-			return handleErr(install, err, out)
+		if err := op.DeleteDir(appDir); err != nil {
+			return err
 		}
-		_ = op.DeleteDir(appDir)
-		_ = appInstallRepo.Delete(commonRepo.WithByID(install.ID))
-		return nil
+		return appInstallRepo.Delete(commonRepo.WithByID(install.ID))
 	case dto.Sync:
 		if err := a.SyncInstalled(install.ID); err != nil {
 			return err
@@ -380,12 +372,17 @@ func (a AppService) SyncInstalled(installId uint) error {
 	if err != nil {
 		return err
 	}
-	var errorContainers []string
-	var notFoundContainers []string
+	var (
+		errorContainers    []string
+		notFoundContainers []string
+		runningContainers  []string
+	)
 
 	for _, n := range containers {
 		if n.State != "running" {
-			errorContainers = append(errorContainers, n.Names...)
+			errorContainers = append(errorContainers, n.Names[0])
+		} else {
+			runningContainers = append(runningContainers, n.Names[0])
 		}
 	}
 	for _, old := range containerNames {
@@ -401,33 +398,41 @@ func (a AppService) SyncInstalled(installId uint) error {
 		}
 	}
 
-	if len(containers) == 0 {
+	containerCount := len(containers)
+	errCount := len(errorContainers)
+	notFoundCount := len(notFoundContainers)
+	normalCount := len(containerNames)
+	runningCount := len(runningContainers)
+
+	if containerCount == 0 {
 		appInstall.Status = constant.Error
 		appInstall.Message = "container is not found"
 		return appInstallRepo.Save(appInstall)
 	}
-
-	if len(errorContainers) == 0 && len(notFoundContainers) == 0 {
+	if errCount == 0 && notFoundCount == 0 {
 		appInstall.Status = constant.Running
 		return appInstallRepo.Save(appInstall)
 	}
-	if len(errorContainers) == len(containerNames) {
+	if errCount == normalCount {
 		appInstall.Status = constant.Error
 	}
-	if len(notFoundContainers) == len(containerNames) {
+	if notFoundCount == normalCount {
 		appInstall.Status = constant.Stopped
+	}
+	if runningCount < normalCount {
+		appInstall.Status = constant.UnHealthy
 	}
 
 	var errMsg strings.Builder
-	if len(errorContainers) > 0 {
-		errMsg.Write([]byte(string(rune(len(errorContainers))) + " error containers:"))
+	if errCount > 0 {
+		errMsg.Write([]byte(string(rune(errCount)) + " error containers:"))
 		for _, e := range errorContainers {
 			errMsg.Write([]byte(e))
 		}
 		errMsg.Write([]byte("\n"))
 	}
-	if len(notFoundContainers) > 0 {
-		errMsg.Write([]byte(string(rune(len(notFoundContainers))) + " not found containers:"))
+	if notFoundCount > 0 {
+		errMsg.Write([]byte(string(rune(notFoundCount)) + " not found containers:"))
 		for _, e := range notFoundContainers {
 			errMsg.Write([]byte(e))
 		}
@@ -437,10 +442,55 @@ func (a AppService) SyncInstalled(installId uint) error {
 	return appInstallRepo.Save(appInstall)
 }
 
+func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
+	apps := make(map[string]model.App, len(oldApps))
+	for _, old := range oldApps {
+		old.Status = constant.AppTakeDown
+		apps[old.Key] = old
+	}
+	for _, item := range items {
+		app, ok := apps[item.Key]
+		if !ok {
+			app = model.App{}
+		}
+		app.Name = item.Name
+		app.Key = item.Key
+		app.ShortDesc = item.ShortDesc
+		app.Author = item.Author
+		app.Source = item.Source
+		app.Type = item.Type
+		app.CrossVersionUpdate = item.CrossVersionUpdate
+		app.Required = item.GetRequired()
+		app.Status = constant.AppNormal
+		apps[item.Key] = app
+	}
+	return apps
+}
+
+func getAppDetails(details []model.AppDetail, versions []string) map[string]model.AppDetail {
+	appDetails := make(map[string]model.AppDetail, len(details))
+	for _, old := range details {
+		old.Status = constant.AppTakeDown
+		appDetails[old.Version] = old
+	}
+
+	for _, v := range versions {
+		detail, ok := appDetails[v]
+		if ok {
+			detail.Status = constant.AppNormal
+			appDetails[v] = detail
+		} else {
+			appDetails[v] = model.AppDetail{
+				Version: v,
+				Status:  constant.AppNormal,
+			}
+		}
+	}
+	return appDetails
+}
+
 func (a AppService) SyncAppList() error {
 	//TODO 从 oss 拉取最新列表
-	var appConfig model.AppConfig
-	appConfig.OssPath = global.CONF.System.AppOss
 
 	appDir := path.Join(global.CONF.System.ResourceDir, "apps")
 	iconDir := path.Join(appDir, "icons")
@@ -454,14 +504,10 @@ func (a AppService) SyncAppList() error {
 	if err := json.Unmarshal(content, list); err != nil {
 		return err
 	}
-	appConfig.Version = list.Version
-	appConfig.CanUpdate = false
 
 	var (
-		tags       []*model.Tag
-		addApps    []*model.App
-		updateApps []*model.App
-		appTags    []*model.AppTag
+		tags    []*model.Tag
+		appTags []*model.AppTag
 	)
 
 	for _, t := range list.Tags {
@@ -471,38 +517,29 @@ func (a AppService) SyncAppList() error {
 		})
 	}
 
-	db := global.DB
-	dbCtx := context.WithValue(context.Background(), "db", db)
+	oldApps, err := appRepo.GetBy()
+	if err != nil {
+		return err
+	}
+	appsMap := getApps(oldApps, list.Items)
+
 	for _, l := range list.Items {
+
+		app := appsMap[l.Key]
 		icon, err := os.ReadFile(path.Join(iconDir, l.Icon))
 		if err != nil {
 			global.LOG.Errorf("get [%s] icon error: %s", l.Name, err.Error())
 			continue
 		}
 		iconStr := base64.StdEncoding.EncodeToString(icon)
-		app := &model.App{
-			Name:      l.Name,
-			Key:       l.Key,
-			ShortDesc: l.ShortDesc,
-			Author:    l.Author,
-			Source:    l.Source,
-			Icon:      iconStr,
-			Type:      l.Type,
-		}
+		app.Icon = iconStr
 		app.TagsKey = l.Tags
-		old, _ := appRepo.GetByKey(dbCtx, l.Key)
-		if reflect.DeepEqual(old, &model.App{}) {
-			addApps = append(addApps, app)
-		} else {
-			app.ID = old.ID
-			updateApps = append(updateApps, app)
-		}
 
 		versions := l.Versions
+		detailsMap := getAppDetails(app.Details, versions)
+
 		for _, v := range versions {
-			detail := &model.AppDetail{
-				Version: v,
-			}
+			detail := detailsMap[v]
 			detailPath := path.Join(appDir, l.Key, v)
 			if _, err := os.Stat(detailPath); err != nil {
 				global.LOG.Errorf("get [%s] folder error: %s", detailPath, err.Error())
@@ -524,13 +561,34 @@ func (a AppService) SyncAppList() error {
 				global.LOG.Errorf("get [%s] form.json error: %s", detailPath, err.Error())
 			}
 			detail.Params = string(paramStr)
-			app.Details = append(app.Details, detail)
+			detailsMap[v] = detail
+		}
+		var newDetails []model.AppDetail
+		for _, v := range detailsMap {
+			newDetails = append(newDetails, v)
+		}
+		app.Details = newDetails
+		appsMap[l.Key] = app
+	}
+
+	var (
+		addAppArray []model.App
+		updateArray []model.App
+	)
+	tagMap := make(map[string]uint, len(tags))
+	for _, v := range appsMap {
+		if v.ID == 0 {
+			addAppArray = append(addAppArray, v)
+		} else {
+			updateArray = append(updateArray, v)
 		}
 	}
+
 	tx := global.DB.Begin()
 	ctx := context.WithValue(context.Background(), "db", tx)
-	if len(addApps) > 0 {
-		if err := appRepo.BatchCreate(ctx, addApps); err != nil {
+
+	if len(addAppArray) > 0 {
+		if err := appRepo.BatchCreate(ctx, addAppArray); err != nil {
 			tx.Rollback()
 			return err
 		}
@@ -539,34 +597,29 @@ func (a AppService) SyncAppList() error {
 		tx.Rollback()
 		return err
 	}
-
 	if len(tags) > 0 {
 		if err := tagRepo.BatchCreate(ctx, tags); err != nil {
 			tx.Rollback()
 			return err
 		}
+		for _, t := range tags {
+			tagMap[t.Key] = t.ID
+		}
 	}
-
-	tagMap := make(map[string]uint, len(tags))
-
-	for _, t := range tags {
-		tagMap[t.Key] = t.ID
-	}
-
-	for _, a := range updateApps {
-		if err := appRepo.Save(ctx, a); err != nil {
+	for _, update := range updateArray {
+		if err := appRepo.Save(ctx, &update); err != nil {
 			tx.Rollback()
 			return err
 		}
 	}
-	apps := append(addApps, updateApps...)
+
+	apps := append(addAppArray, updateArray...)
 
 	var (
-		appDetails []*model.AppDetail
-		appIds     []uint
+		addDetails    []model.AppDetail
+		updateDetails []model.AppDetail
 	)
 	for _, a := range apps {
-
 		for _, t := range a.TagsKey {
 			tagId, ok := tagMap[t]
 			if ok {
@@ -579,24 +632,28 @@ func (a AppService) SyncAppList() error {
 
 		for _, d := range a.Details {
 			d.AppId = a.ID
-			appDetails = append(appDetails, d)
+			if d.ID == 0 {
+				addDetails = append(addDetails, d)
+			} else {
+				updateDetails = append(updateDetails, d)
+			}
 		}
-		appIds = append(appIds, a.ID)
 	}
 
-	if err := appDetailRepo.DeleteByAppIds(ctx, appIds); err != nil {
-		tx.Rollback()
-		return err
+	if len(addDetails) > 0 {
+		if err := appDetailRepo.BatchCreate(ctx, addDetails); err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
-
-	if len(appDetails) > 0 {
-		if err := appDetailRepo.BatchCreate(ctx, appDetails); err != nil {
+	for _, u := range updateDetails {
+		if err := appDetailRepo.Update(ctx, u); err != nil {
 			tx.Rollback()
 			return err
 		}
 	}
 
-	if err := appTagRepo.DeleteByAppIds(ctx, appIds); err != nil {
+	if err := appTagRepo.DeleteAll(ctx); err != nil {
 		tx.Rollback()
 		return err
 	}
