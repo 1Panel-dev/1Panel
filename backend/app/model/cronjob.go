@@ -21,7 +21,7 @@ type Cronjob struct {
 	SourceDir      string `gorm:"type:varchar(256)" json:"sourceDir"`
 	TargetDirID    uint64 `gorm:"type:decimal" json:"targetDirID"`
 	ExclusionRules string `gorm:"longtext" json:"exclusionRules"`
-	RetainDays     uint64 `gorm:"type:decimal" json:"retainDays"`
+	RetainCopies   uint64 `gorm:"type:decimal" json:"retainCopies"`
 
 	Status  string       `gorm:"type:varchar(64)" json:"status"`
 	EntryID uint64       `gorm:"type:decimal" json:"entryID"`

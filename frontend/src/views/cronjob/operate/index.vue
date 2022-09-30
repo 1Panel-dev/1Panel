@@ -108,8 +108,8 @@
                     />
                 </el-select>
             </el-form-item>
-            <el-form-item v-if="isBackup()" :label="$t('cronjob.retainDays')" prop="retainDays">
-                <el-input-number :min="1" :max="30" v-model.number="dialogData.rowData!.retainDays"></el-input-number>
+            <el-form-item v-if="isBackup()" :label="$t('cronjob.retainCopies')" prop="retainCopies">
+                <el-input-number :min="1" :max="30" v-model.number="dialogData.rowData!.retainCopies"></el-input-number>
             </el-form-item>
 
             <el-form-item v-if="dialogData.rowData!.type === 'curl'" :label="$t('cronjob.url') + 'URL'" prop="url">
@@ -124,6 +124,7 @@
                 <el-input
                     style="width: 100%"
                     type="textarea"
+                    :placeholder="$t('cronjob.rulesHelper')"
                     :autosize="{ minRows: 3, maxRows: 6 }"
                     clearable
                     v-model="dialogData.rowData!.exclusionRules"
@@ -265,7 +266,7 @@ const rules = reactive({
     url: [Rules.requiredInput],
     sourceDir: [Rules.requiredSelect],
     targetDirID: [Rules.requiredSelect, Rules.number],
-    retainDays: [Rules.number],
+    retainCopies: [Rules.number],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;

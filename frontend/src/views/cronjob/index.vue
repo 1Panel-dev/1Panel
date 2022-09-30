@@ -55,7 +55,12 @@
                     {{ $t('cronjob.handle') }}
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('cronjob.retainDays')" prop="retainDays" />
+            <el-table-column :label="$t('cronjob.retainCopies')" prop="retainCopies" />
+            <el-table-column :label="$t('cronjob.lastRecrodTime')" prop="lastRecrodTime">
+                <template #default="{ row }">
+                    {{ row.lastRecrodTime }}
+                </template>
+            </el-table-column>
             <el-table-column :label="$t('cronjob.target')" prop="targetDir">
                 <template #default="{ row }">
                     {{ loadBackupName(row.targetDir) }}
@@ -88,13 +93,13 @@ const switchState = ref<boolean>(false);
 const data = ref();
 const paginationConfig = reactive({
     currentPage: 1,
-    pageSize: 5,
+    pageSize: 10,
     total: 0,
 });
 
 const logSearch = reactive({
     page: 1,
-    pageSize: 5,
+    pageSize: 10,
 });
 const weekOptions = [
     { label: i18n.global.t('cronjob.monday'), value: 1 },
@@ -133,7 +138,7 @@ const onOpenDialog = async (
         day: 1,
         hour: 2,
         minute: 3,
-        retainDays: 7,
+        retainCopies: 7,
     },
 ) => {
     let params = {
@@ -195,7 +200,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('commons.button.log'),
+        label: i18n.global.t('commons.button.view'),
         icon: 'Clock',
         click: (row: Cronjob.CronjobInfo) => {
             onOpenRecordDialog(row);

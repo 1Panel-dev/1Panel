@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/1Panel-dev/1Panel/app/dto"
+	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/utils/cloud_storage"
 	"github.com/jinzhu/copier"
@@ -18,6 +19,7 @@ type IBackupService interface {
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
 	Update(id uint, upMap map[string]interface{}) error
 	BatchDelete(ids []uint) error
+	NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error)
 }
 
 func NewIBackupService() IBackupService {
@@ -80,4 +82,29 @@ func (u *BackupService) BatchDelete(ids []uint) error {
 
 func (u *BackupService) Update(id uint, upMap map[string]interface{}) error {
 	return backupRepo.Update(id, upMap)
+}
+
+func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error) {
+	varMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
+		return nil, err
+	}
+	varMap["type"] = backup.Type
+	if backup.Type == "LOCAL" {
+		return nil, errors.New("not support")
+	}
+	varMap["bucket"] = backup.Bucket
+	switch backup.Type {
+	case constant.Sftp:
+		varMap["password"] = backup.Credential
+	case constant.OSS, constant.S3, constant.MinIo:
+		varMap["secretKey"] = backup.Credential
+	}
+
+	backClient, err := cloud_storage.NewCloudStorageClient(varMap)
+	if err != nil {
+		return nil, err
+	}
+
+	return backClient, nil
 }
