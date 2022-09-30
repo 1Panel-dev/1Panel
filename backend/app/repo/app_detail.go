@@ -31,7 +31,12 @@ func (a AppDetailRepo) GetAppDetail(opts ...DBOption) (model.AppDetail, error) {
 	return detail, err
 }
 
-func (a AppDetailRepo) BatchCreate(ctx context.Context, details []*model.AppDetail) error {
+func (a AppDetailRepo) Update(ctx context.Context, detail model.AppDetail) error {
+	db := ctx.Value("db").(*gorm.DB)
+	return db.Save(&detail).Error
+}
+
+func (a AppDetailRepo) BatchCreate(ctx context.Context, details []model.AppDetail) error {
 	db := ctx.Value("db").(*gorm.DB)
 	return db.Model(&model.AppDetail{}).Create(&details).Error
 }
