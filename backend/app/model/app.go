@@ -11,7 +11,7 @@ type App struct {
 	Type               string      `json:"type" gorm:"type:varchar(64);not null"`
 	Status             string      `json:"status" gorm:"type:varchar(64);not null"`
 	Required           string      `json:"required" gorm:"type:varchar(64);not null"`
-	CrossVersionUpdate bool        `json:"crossVersionUpdate" gorm:"type:varchar(64);not null"`
+	CrossVersionUpdate bool        `json:"crossVersionUpdate"`
 	Details            []AppDetail `json:"-"`
 	TagsKey            []string    `json:"-" gorm:"-"`
 	AppTags            []AppTag    `json:"-" `

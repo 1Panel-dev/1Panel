@@ -3,9 +3,16 @@ package repo
 import (
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/global"
+	"gorm.io/gorm"
 )
 
 type AppInstallRepo struct{}
+
+func (a AppInstallRepo) WithDetailIdsIn(detailIds []uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("app_detail_id in (?)", detailIds)
+	}
+}
 
 func (a AppInstallRepo) GetBy(opts ...DBOption) ([]model.AppInstall, error) {
 	db := global.DB.Model(&model.AppInstall{})
@@ -55,4 +62,12 @@ func (a AppInstallRepo) Page(page, size int, opts ...DBOption) (int64, []model.A
 	db = db.Count(&count)
 	err := db.Debug().Limit(size).Offset(size * (page - 1)).Preload("App").Preload("Containers").Find(&apps).Error
 	return count, apps, err
+}
+
+func (a AppInstallRepo) BatchUpdateBy(update model.AppInstall, opts ...DBOption) error {
+	db := global.DB.Model(model.AppInstall{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	return db.Updates(update).Error
 }
