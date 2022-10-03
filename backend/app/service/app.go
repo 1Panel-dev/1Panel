@@ -18,7 +18,6 @@ import (
 	"gopkg.in/yaml.v3"
 	"os"
 	"path"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -96,7 +95,7 @@ func (a AppService) GetApp(id uint) (dto.AppDTO, error) {
 		return appDTO, err
 	}
 	appDTO.App = app
-	details, err := appDetailRepo.GetByAppId(context.WithValue(context.Background(), "db", global.DB), id)
+	details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))
 	if err != nil {
 		return appDTO, err
 	}
@@ -105,10 +104,7 @@ func (a AppService) GetApp(id uint) (dto.AppDTO, error) {
 		versionsRaw = append(versionsRaw, detail.Version)
 	}
 
-	sort.Slice(versionsRaw, func(i, j int) bool {
-		return common.CompareVersion(versionsRaw[i], versionsRaw[j])
-	})
-	appDTO.Versions = versionsRaw
+	appDTO.Versions = common.GetSortedVersions(versionsRaw)
 
 	return appDTO, nil
 }
@@ -139,7 +135,7 @@ func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, 
 	)
 
 	opts = append(opts, appDetailRepo.WithAppId(appId), appDetailRepo.WithVersion(version))
-	detail, err := appDetailRepo.GetAppDetail(opts...)
+	detail, err := appDetailRepo.GetFirst(opts...)
 	if err != nil {
 		return appDetailDTO, err
 	}
@@ -225,7 +221,7 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 		}
 	}
 
-	appDetail, err := appDetailRepo.GetAppDetail(commonRepo.WithByID(appDetailId))
+	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(appDetailId))
 	if err != nil {
 		return err
 	}
@@ -289,14 +285,9 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 		value := v.(map[string]interface{})
 		containerName := constant.ContainerPrefix + k + "-" + common.RandStr(4)
 		value["container_name"] = containerName
-		var image string
-		if i, ok := value["image"]; ok {
-			image = i.(string)
-		}
 		appContainers = append(appContainers, &model.AppContainer{
 			ServiceName:   serviceName,
 			ContainerName: containerName,
-			Image:         image,
 		})
 	}
 	for k, v := range changeKeys {
@@ -666,5 +657,44 @@ func (a AppService) SyncAppList() error {
 	}
 
 	tx.Commit()
+
+	go syncCanUpdate()
 	return nil
+}
+
+func syncCanUpdate() {
+
+	apps, err := appRepo.GetBy()
+	if err != nil {
+		global.LOG.Errorf("sync update app error: %s", err.Error())
+	}
+	for _, app := range apps {
+		details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))
+		if err != nil {
+			global.LOG.Errorf("sync update app error: %s", err.Error())
+		}
+		var versions []string
+		for _, detail := range details {
+			versions = append(versions, detail.Version)
+		}
+		versions = common.GetSortedVersions(versions)
+		lastVersion := versions[0]
+
+		var updateDetailIds []uint
+		for _, detail := range details {
+			if common.CompareVersion(lastVersion, detail.Version) {
+				if app.CrossVersionUpdate || !common.IsCrossVersion(detail.Version, lastVersion) {
+					updateDetailIds = append(updateDetailIds, detail.ID)
+				}
+			}
+		}
+		if len(updateDetailIds) > 0 {
+			if err := appDetailRepo.BatchUpdateBy(model.AppDetail{LastVersion: lastVersion}, commonRepo.WithIdsIn(updateDetailIds)); err != nil {
+				global.LOG.Errorf("sync update app error: %s", err.Error())
+			}
+			if err := appInstallRepo.BatchUpdateBy(model.AppInstall{CanUpdate: true}, appInstallRepo.WithDetailIdsIn(updateDetailIds)); err != nil {
+				global.LOG.Errorf("sync update app error: %s", err.Error())
+			}
+		}
+	}
 }

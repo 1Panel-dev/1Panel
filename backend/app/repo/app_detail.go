@@ -21,7 +21,7 @@ func (a AppDetailRepo) WithAppId(id uint) DBOption {
 	}
 }
 
-func (a AppDetailRepo) GetAppDetail(opts ...DBOption) (model.AppDetail, error) {
+func (a AppDetailRepo) GetFirst(opts ...DBOption) (model.AppDetail, error) {
 	var detail model.AppDetail
 	db := global.DB
 	for _, opt := range opts {
@@ -46,11 +46,20 @@ func (a AppDetailRepo) DeleteByAppIds(ctx context.Context, appIds []uint) error 
 	return db.Where("app_id in (?)", appIds).Delete(&model.AppDetail{}).Error
 }
 
-func (a AppDetailRepo) GetByAppId(ctx context.Context, appId uint) ([]model.AppDetail, error) {
-	db := ctx.Value("db").(*gorm.DB)
+func (a AppDetailRepo) GetBy(opts ...DBOption) ([]model.AppDetail, error) {
 	var details []model.AppDetail
-	if err := db.Where("app_id = ?", appId).Find(&details).Error; err != nil {
-		return nil, err
+	db := global.DB
+	for _, opt := range opts {
+		db = opt(db)
 	}
-	return details, nil
+	err := db.Find(&details).Error
+	return details, err
+}
+
+func (a AppDetailRepo) BatchUpdateBy(update model.AppDetail, opts ...DBOption) error {
+	db := global.DB.Model(model.AppDetail{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	return db.Updates(update).Error
 }

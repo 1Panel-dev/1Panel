@@ -70,10 +70,3 @@ func (a AppRepo) Save(ctx context.Context, app *model.App) error {
 	db := ctx.Value("db").(*gorm.DB)
 	return db.Omit(clause.Associations).Save(app).Error
 }
-
-func (a AppRepo) UpdateAppConfig(ctx context.Context, app *model.AppConfig) error {
-	db := ctx.Value("db").(*gorm.DB)
-	return db.Clauses(clause.OnConflict{
-		Columns: []clause.Column{{Name: "id"}},
-	}).Create(app).Error
-}

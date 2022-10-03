@@ -7,6 +7,7 @@ import (
 	mathRand "math/rand"
 	"net"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -35,6 +36,21 @@ func CompareVersion(version1 string, version2 string) bool {
 		}
 	}
 	return true
+}
+
+func GetSortedVersions(versions []string) []string {
+	sort.Slice(versions, func(i, j int) bool {
+		return CompareVersion(versions[i], versions[j])
+	})
+	return versions
+}
+
+func IsCrossVersion(version1, version2 string) bool {
+	version1s := strings.Split(version1, ".")
+	version2s := strings.Split(version2, ".")
+	v1num, _ := strconv.Atoi(version1s[0])
+	v2num, _ := strconv.Atoi(version2s[0])
+	return v2num > v1num
 }
 
 func min(a, b int) int {
