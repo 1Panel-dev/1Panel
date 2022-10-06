@@ -18,11 +18,6 @@ import (
 	"github.com/robfig/cron/v3"
 )
 
-const (
-	errRecord = "errRecord"
-	errHandle = "errHandle"
-)
-
 type CronjobService struct{}
 
 type ICronjobService interface {

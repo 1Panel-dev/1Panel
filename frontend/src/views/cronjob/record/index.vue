@@ -152,9 +152,12 @@
                                 v-if="dialogData.rowData!.type === 'website' || dialogData.rowData!.type === 'directory'"
                             >
                                 <el-form-item :label="$t('cronjob.exclusionRules')">
-                                    <div v-for="item in dialogData.rowData!.exclusionRules.split(';')" :key="item">
-                                        <el-tag>{{ item }}</el-tag>
+                                    <div v-if="dialogData.rowData!.exclusionRules">
+                                        <div v-for="item in dialogData.rowData!.exclusionRules.split(';')" :key="item">
+                                            <el-tag>{{ item }}</el-tag>
+                                        </div>
                                     </div>
+                                    <span v-else>-</span>
                                 </el-form-item>
                             </el-col>
                         </el-row>
@@ -191,30 +194,32 @@
                         <el-row>
                             <el-col :span="24">
                                 <el-form-item :label="$t('commons.table.records')">
-                                    <span
-                                        style="color: red"
-                                        v-if="currentRecord?.records! === 'errRecord' || currentRecord?.records! === 'errHandle'|| currentRecord?.records! === 'noRecord'"
-                                    >
+                                    <span style="color: red" v-if="currentRecord?.status! === 'Failed'">
                                         {{ currentRecord?.message }}
                                     </span>
-                                    <el-popover
-                                        v-else
-                                        placement="right"
-                                        :width="600"
-                                        trigger="click"
-                                        style="white-space: pre-wrap"
-                                    >
-                                        <div style="margin-left: 20px; max-height: 400px; overflow: auto">
-                                            <span style="white-space: pre-wrap">
-                                                {{ currentRecordDetail }}
-                                            </span>
-                                        </div>
-                                        <template #reference>
-                                            <el-button type="primary" link @click="loadRecord(currentRecord?.records!)">
-                                                {{ $t('commons.button.expand') }}
-                                            </el-button>
-                                        </template>
-                                    </el-popover>
+                                    <div v-else>
+                                        <el-popover
+                                            placement="right"
+                                            :width="600"
+                                            trigger="click"
+                                            style="white-space: pre-wrap"
+                                        >
+                                            <div style="margin-left: 20px; max-height: 400px; overflow: auto">
+                                                <span style="white-space: pre-wrap">
+                                                    {{ currentRecordDetail }}
+                                                </span>
+                                            </div>
+                                            <template #reference>
+                                                <el-button
+                                                    type="primary"
+                                                    link
+                                                    @click="loadRecord(currentRecord?.records!)"
+                                                >
+                                                    {{ $t('commons.button.expand') }}
+                                                </el-button>
+                                            </template>
+                                        </el-popover>
+                                    </div>
                                 </el-form-item>
                             </el-col>
                         </el-row>

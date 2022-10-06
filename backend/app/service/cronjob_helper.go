@@ -49,20 +49,17 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 		request, _ := http.NewRequest("GET", cronjob.URL, nil)
 		response, err := client.Do(request)
 		if err != nil {
-			record.Records = errHandle
-			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), errHandle)
+			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), string(message))
 		}
 		defer response.Body.Close()
 		message, _ = ioutil.ReadAll(response.Body)
 	}
 	if err != nil {
-		record.Records = errHandle
-		cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), errHandle)
+		cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), string(message))
 		return
 	}
 	record.Records, err = mkdirAndWriteFile(cronjob, record.StartTime, message)
 	if err != nil {
-		record.Records = errRecord
 		global.LOG.Errorf("save file %s failed, err: %v", record.Records, err)
 	}
 	cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
