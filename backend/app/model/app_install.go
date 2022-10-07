@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/1Panel-dev/1Panel/global"
+	"gorm.io/gorm"
 	"path"
 )
 
@@ -20,10 +21,19 @@ type AppInstall struct {
 	Containers  []AppContainer `json:"containers"`
 }
 
-func (i AppInstall) GetPath() string {
+func (i *AppInstall) GetPath() string {
 	return path.Join(global.CONF.System.AppDir, i.App.Key, i.Name)
 }
 
-func (i AppInstall) GetComposePath() string {
+func (i *AppInstall) GetComposePath() string {
 	return path.Join(global.CONF.System.AppDir, i.App.Key, i.Name, "docker-compose.yml")
+}
+
+func (i *AppInstall) BeforeDelete(tx *gorm.DB) (err error) {
+
+	if err = tx.Where("app_install_id = ?", i.ID).Delete(&AppContainer{}).Error; err != nil {
+		return err
+	}
+
+	return
 }

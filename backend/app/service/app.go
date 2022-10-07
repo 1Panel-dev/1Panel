@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/app/repo"
@@ -217,7 +218,7 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 	if ok {
 		portStr := strconv.FormatFloat(port.(float64), 'f', -1, 32)
 		if common.ScanPort(portStr) {
-			return errors.New("port is  in used")
+			return errors.New("port is in used")
 		}
 	}
 
@@ -226,6 +227,38 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 		return err
 	}
 	app, err := appRepo.GetFirst(commonRepo.WithByID(appDetail.AppId))
+	if err != nil {
+		return err
+	}
+	if app.Required != "" {
+		var requiredArray []string
+		if err := json.Unmarshal([]byte(app.Required), &requiredArray); err != nil {
+			return err
+		}
+		for _, key := range requiredArray {
+			if key == "" {
+				continue
+			}
+			requireApp, err := appRepo.GetFirst(appRepo.WithKey(key))
+			if err != nil {
+				return err
+			}
+			details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(requireApp.ID))
+			if err != nil {
+				return err
+			}
+			var detailIds []uint
+			for _, d := range details {
+				detailIds = append(detailIds, d.ID)
+			}
+
+			_, err = appInstallRepo.GetFirst(appInstallRepo.WithDetailIdsIn(detailIds))
+			if err != nil {
+				return errors.New(fmt.Sprintf("%s is required", requireApp.Key))
+			}
+		}
+	}
+
 	paramByte, err := json.Marshal(params)
 	if err != nil {
 		return err
@@ -268,12 +301,8 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 		return err
 	}
 
-	fileContent, err := os.ReadFile(composeFilePath)
-	if err != nil {
-		return err
-	}
 	composeMap := make(map[string]interface{})
-	if err := yaml.Unmarshal(fileContent, &composeMap); err != nil {
+	if err := yaml.Unmarshal([]byte(appDetail.DockerCompose), &composeMap); err != nil {
 		return err
 	}
 	servicesMap := composeMap["services"].(map[string]interface{})
@@ -285,20 +314,38 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 		value := v.(map[string]interface{})
 		containerName := constant.ContainerPrefix + k + "-" + common.RandStr(4)
 		value["container_name"] = containerName
+		servicePort := 0
+		if portArray, ok := value["ports"].([]interface{}); ok {
+			for _, p := range portArray {
+				if pStr, ok := p.(string); ok {
+					start := strings.Index(pStr, "{")
+					end := strings.Index(pStr, "}")
+					if start > -1 && end > -1 {
+						portS := pStr[start+1 : end]
+						if v, ok := envParams[portS]; ok {
+							portN, _ := strconv.Atoi(v)
+							servicePort = portN
+						}
+					}
+				}
+			}
+		}
+
 		appContainers = append(appContainers, &model.AppContainer{
 			ServiceName:   serviceName,
 			ContainerName: containerName,
+			Port:          servicePort,
 		})
 	}
 	for k, v := range changeKeys {
 		servicesMap[v] = servicesMap[k]
 		delete(servicesMap, k)
 	}
-	serviceByte, err := yaml.Marshal(servicesMap)
+	composeByte, err := yaml.Marshal(composeMap)
 	if err != nil {
 		return err
 	}
-	if err := fileOp.WriteFile(composeFilePath, strings.NewReader(string(serviceByte)), 0775); err != nil {
+	if err := fileOp.WriteFile(composeFilePath, strings.NewReader(string(composeByte)), 0775); err != nil {
 		return err
 	}
 
@@ -344,6 +391,31 @@ func (a AppService) SyncAllInstalled() error {
 		}
 	}()
 	return nil
+}
+
+func (a AppService) GetServices(key string) ([]dto.AppService, error) {
+	app, err := appRepo.GetFirst(appRepo.WithKey(key))
+	if err != nil {
+		return nil, err
+	}
+	installs, err := appInstallRepo.GetBy(appInstallRepo.WithAppId(app.ID), appInstallRepo.WithStatus(constant.Running))
+	if err != nil {
+		return nil, err
+	}
+	var res []dto.AppService
+	for _, install := range installs {
+		for _, container := range install.Containers {
+			value := container.ServiceName
+			if container.Port > 0 {
+				value = value + ":" + string(rune(container.Port))
+			}
+			res = append(res, dto.AppService{
+				Label: install.Name,
+				Value: value,
+			})
+		}
+	}
+	return res, nil
 }
 
 func (a AppService) SyncInstalled(installId uint) error {

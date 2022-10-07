@@ -77,6 +77,7 @@ type AppInstallRequest struct {
 	AppDetailId uint                   `json:"appDetailId" validate:"required"`
 	Params      map[string]interface{} `json:"params"`
 	Name        string                 `json:"name" validate:"required"`
+	Services    map[string]string      `json:"services"`
 }
 
 type AppInstalled struct {
@@ -106,10 +107,7 @@ type AppInstallOperate struct {
 	Operate   AppOperate `json:"operate" validate:"required"`
 }
 
-//type AppContainer struct {
-//	Names  []string `json:"names"`
-//	Image  string   `json:"image"`
-//	Ports  string   `json:"ports"`
-//	Status string   `json:"status"`
-//	State  string   `json:"state"`
-//}
+type AppService struct {
+	Label string `json:"label"`
+	Value string `json:"value"`
+}

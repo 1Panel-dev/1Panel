@@ -15,7 +15,7 @@ export const GetApp = (id: number) => {
 };
 
 export const GetAppDetail = (id: number, version: string) => {
-    return http.get<App.AppDetail>('apps/detail/' + id + '/' + version);
+    return http.get<App.AppDetail>(`apps/detail/${id}/${version}`);
 };
 
 export const InstallApp = (install: App.AppInstall) => {
@@ -32,4 +32,8 @@ export const InstalledOp = (op: App.AppInstalledOp) => {
 
 export const SyncInstalledApp = () => {
     return http.post<any>('apps/installed/sync', {});
+};
+
+export const GetAppService = (key: string | undefined) => {
+    return http.get<any>(`apps/services/${key}`);
 };

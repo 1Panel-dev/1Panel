@@ -11,6 +11,12 @@ import (
 type AppRepo struct {
 }
 
+func (a AppRepo) WithKey(key string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("key = ?", key)
+	}
+}
+
 func (a AppRepo) Page(page, size int, opts ...DBOption) (int64, []model.App, error) {
 	var apps []model.App
 	db := global.DB.Model(&model.App{})

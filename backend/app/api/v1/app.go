@@ -114,3 +114,15 @@ func (b *BaseApi) InstalledSync(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, "")
 }
+
+func (b *BaseApi) GetServices(c *gin.Context) {
+
+	key := c.Param("key")
+	services, err := appService.GetServices(key)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, services)
+}

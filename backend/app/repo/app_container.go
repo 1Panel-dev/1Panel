@@ -10,6 +10,22 @@ import (
 type AppContainerRepo struct {
 }
 
+func (a AppContainerRepo) WithAppId(appId uint) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("app_id = ?", appId)
+	}
+}
+
+func (a AppContainerRepo) GetBy(opts ...DBOption) ([]model.AppContainer, error) {
+	db := global.DB.Model(&model.AppContainer{})
+	var appContainers []model.AppContainer
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.Find(&appContainers).Error
+	return appContainers, err
+}
+
 func (a AppContainerRepo) Create(container *model.AppContainer) error {
 	db := global.DB.Model(&model.AppContainer{})
 	return db.Create(&container).Error
