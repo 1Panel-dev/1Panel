@@ -54,6 +54,7 @@ export namespace App {
         required: boolean;
         default: any;
         envKey: string;
+        key?: string;
     }
 
     export interface AppInstall {
@@ -78,5 +79,10 @@ export namespace App {
     export interface AppInstalledOp {
         installId: number;
         operate: string;
+    }
+
+    export interface AppService {
+        label: string;
+        value: string;
     }
 }

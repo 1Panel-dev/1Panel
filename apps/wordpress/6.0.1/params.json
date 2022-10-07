@@ -1,0 +1,45 @@
+{
+  "formFields": [
+    {
+      "type": "service",
+      "key": "mysql",
+      "labelZh": "数据库服务",
+      "labelEn": "Database Service",
+      "required": true,
+      "default": "1Panel-mysql",
+      "envKey": "WORDPRESS_DB_HOST"
+    },
+    {
+      "type": "text",
+      "labelZh": "数据库名",
+      "labelEn": "Database",
+      "required": true,
+      "default": "db",
+      "envKey": "WORDPRESS_DB_NAME"
+    },
+    {
+      "type": "text",
+      "labelZh": "数据库用户",
+      "labelEn": "User",
+      "required": true,
+      "default": "wordpress_user",
+      "envKey": "WORDPRESS_DB_USER"
+    },
+    {
+      "type": "text",
+      "labelZh": "数据库用户密码",
+      "labelEn": "Password",
+      "required": true,
+      "default": "1qaz@WSX",
+      "envKey": "WORDPRESS_DB_PASSWORD"
+    },
+    {
+      "type": "number",
+      "labelZh": "端口",
+      "labelEn": "Port",
+      "required": true,
+      "default": 8080,
+      "envKey": "PORT"
+    }
+  ]
+}

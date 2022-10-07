@@ -11,6 +11,8 @@ services:
       MYSQL_USER: ${USER}
       MYSQL_PASSWORD: ${PASSWORD}
       MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
+    networks:
+      - 1panel
     ports:
       - ${PORT}:3306
     volumes:

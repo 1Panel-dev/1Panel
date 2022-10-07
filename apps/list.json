@@ -26,6 +26,7 @@
       "type": "internal",
       "required": [""],
       "crossVersionUpdate": false,
+      "limit": 0,
       "source": "https://www.mysql.com"
     },
     {
@@ -38,8 +39,23 @@
       "author": "Nginx",
       "type": "internal",
       "required": [""],
+      "limit": 0,
       "crossVersionUpdate": true,
       "source": "http://nginx.org/"
+    },
+    {
+      "key": "wordpress",
+      "name": "Wordpress",
+      "tags": ["WebSite"],
+      "versions": ["6.0.1"],
+      "short_desc": "老牌博客网站模版",
+      "icon": "wordpress.png",
+      "author": "Wordpress",
+      "type": "internal",
+      "required": ["mysql"],
+      "limit": 0,
+      "crossVersionUpdate": true,
+      "source": "http://wordpress.org/"
     }
   ]
 }

@@ -1,0 +1,4 @@
+version: '3'
+networks:
+  1panel:
+    driver: bridge

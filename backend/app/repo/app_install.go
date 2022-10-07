@@ -13,6 +13,16 @@ func (a AppInstallRepo) WithDetailIdsIn(detailIds []uint) DBOption {
 		return g.Where("app_detail_id in (?)", detailIds)
 	}
 }
+func (a AppInstallRepo) WithAppId(appId uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("app_id = ?", appId)
+	}
+}
+func (a AppInstallRepo) WithStatus(status string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("status = ?", status)
+	}
+}
 
 func (a AppInstallRepo) GetBy(opts ...DBOption) ([]model.AppInstall, error) {
 	db := global.DB.Model(&model.AppInstall{})

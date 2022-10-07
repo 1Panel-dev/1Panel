@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="open" :title="$t('app.install')" width="30%">
+    <el-dialog v-model="open" :title="$t('app.install')" width="40%">
         <el-form ref="paramForm" label-position="left" :model="form" label-width="150px" :rules="rules">
             <el-form-item :label="$t('app.name')" prop="NAME">
                 <el-input v-model="form['NAME']"></el-input>
@@ -14,6 +14,14 @@
                         :type="f.type"
                         show-password
                     ></el-input>
+                    <el-select v-model="form[f.envKey]" v-if="f.type == 'service'">
+                        <el-option
+                            v-for="service in services"
+                            :key="service.label"
+                            :value="service.value"
+                            :label="service.label"
+                        ></el-option>
+                    </el-select>
                 </el-form-item>
             </div>
         </el-form>
@@ -30,7 +38,7 @@
 
 <script lang="ts" setup name="appInstall">
 import { App } from '@/api/interface/app';
-import { InstallApp } from '@/api/modules/app';
+import { InstallApp, GetAppService } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import { FormInstance, FormRules } from 'element-plus';
 import { reactive, ref } from 'vue';
@@ -47,7 +55,6 @@ const installData = ref<InstallRrops>({
 });
 let open = ref(false);
 let form = reactive<{ [key: string]: any }>({});
-
 let rules = reactive<FormRules>({
     NAME: [Rules.requiredInput],
 });
@@ -58,6 +65,8 @@ const req = reactive({
     params: {},
     name: '',
 });
+let services = ref();
+
 const handleClose = () => {
     if (paramForm.value) {
         paramForm.value.resetFields();
@@ -74,9 +83,22 @@ const acceptParams = (props: InstallRrops): void => {
             if (p.required) {
                 rules[p.envKey] = [Rules.requiredInput];
             }
+            if (p.key) {
+                form[p.envKey] = '';
+                getServices(form[p.envKey], p.key);
+            }
         }
     }
     open.value = true;
+};
+
+const getServices = (value: any, key: string | undefined) => {
+    GetAppService(key).then((res) => {
+        services.value = res.data;
+        if (services.value != null) {
+            value = services.value[0].value;
+        }
+    });
 };
 
 const submit = async (formEl: FormInstance | undefined) => {

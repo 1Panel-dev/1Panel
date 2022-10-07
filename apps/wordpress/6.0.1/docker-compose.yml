@@ -4,17 +4,17 @@ services:
     image: wordpress:6.0.1
     container_name: 1panel_wordpress
     ports:
-      - "8080:80"
+      -  ${PORT}:80
     restart: always
     networks:
       - 1panel
     volumes:
       - ./data:/var/www/html
     environment:
-      WORDPRESS_DB_HOST: 1panel_mysql
-      WORDPRESS_DB_NAME: wpdb
-      WORDPRESS_DB_USER: root
-      WORDPRESS_DB_PASSWORD: Password@123
+      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
+      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
+      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
       WORDPRESS_DEBUG: 1
 
 networks:
