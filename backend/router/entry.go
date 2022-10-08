@@ -5,6 +5,7 @@ type RouterGroup struct {
 	HostRouter
 	BackupRouter
 	GroupRouter
+	ContainerRouter
 	CommandRouter
 	MonitorRouter
 	OperationLogRouter

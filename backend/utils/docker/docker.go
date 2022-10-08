@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
@@ -20,6 +21,14 @@ func NewClient() (Client, error) {
 	return Client{
 		cli: cli,
 	}, nil
+}
+
+func NewDockerClient() (*client.Client, error) {
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return nil, err
+	}
+	return cli, nil
 }
 
 func (c Client) ListAllContainers() ([]types.Container, error) {
