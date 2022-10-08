@@ -24,7 +24,7 @@
             </template>
         </el-table-column>
         <el-table-column label="IP" prop="ip" />
-        <el-table-column align="left" :label="$t('operations.request')" prop="path">
+        <el-table-column :label="$t('operations.request')" prop="path">
             <template #default="{ row }">
                 <div>
                     <el-popover :width="500" v-if="row.body" placement="left-start" trigger="click">
@@ -39,7 +39,7 @@
                 </div>
             </template>
         </el-table-column>
-        <el-table-column align="left" :label="$t('operations.response')" prop="path">
+        <el-table-column :label="$t('operations.response')" prop="path">
             <template #default="{ row }">
                 <div>
                     <el-popover :width="500" v-if="row.resp" placement="left-start" trigger="click">

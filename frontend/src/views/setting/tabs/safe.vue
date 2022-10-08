@@ -184,7 +184,7 @@ const form = withDefaults(defineProps<Props>(), {
     settingInfo: {
         serverPort: '',
         securityEntrance: '',
-        ExpirationTime: '',
+        expirationTime: '',
         complexityVerification: '',
         mfaStatus: '',
         mfaSecret: '',
@@ -237,14 +237,14 @@ const submitTimeout = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         let time = new Date(new Date().getTime() + 3600 * 1000 * 24 * timeoutForm.days);
-        await updateSetting({ key: 'ExpirationTime', value: dateFromat(0, 0, time) });
-        form.settingInfo.ExpirationTime = dateFromat(0, 0, time);
+        await updateSetting({ key: 'expirationTime', value: dateFromat(0, 0, time) });
+        form.settingInfo.expirationTime = dateFromat(0, 0, time);
         timeoutVisiable.value = false;
     });
 };
 
 function loadTimeOut() {
-    let staytimeGap = new Date(form.settingInfo.ExpirationTime).getTime() - new Date().getTime();
+    let staytimeGap = new Date(form.settingInfo.expirationTime).getTime() - new Date().getTime();
     return Math.floor(staytimeGap / (3600 * 1000 * 24));
 }
 </script>

@@ -7,6 +7,7 @@ type ServiceGroup struct {
 	HostService
 	BackupService
 	GroupService
+	ContainerService
 	CommandService
 	OperationService
 	FileService

@@ -13,6 +13,7 @@ var (
 	hostService      = service.ServiceGroupApp.HostService
 	backupService    = service.ServiceGroupApp.BackupService
 	groupService     = service.ServiceGroupApp.GroupService
+	containerService = service.ServiceGroupApp.ContainerService
 	commandService   = service.ServiceGroupApp.CommandService
 	operationService = service.ServiceGroupApp.OperationService
 	fileService      = service.ServiceGroupApp.FileService
