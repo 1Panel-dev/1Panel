@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="open" :title="$t('app.install')" width="40%">
+    <el-dialog v-model="open" :title="$t('app.install')" width="40%" :before-close="handleClose" @opened="opened">
         <el-form ref="paramForm" label-position="left" :model="form" label-width="150px" :rules="rules">
             <el-form-item :label="$t('app.name')" prop="NAME">
                 <el-input v-model="form['NAME']"></el-input>
@@ -40,8 +40,9 @@
 import { App } from '@/api/interface/app';
 import { InstallApp, GetAppService } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
+import { getRandomStr } from '@/utils/util';
 import { FormInstance, FormRules } from 'element-plus';
-import { reactive, ref } from 'vue';
+import { nextTick, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 
@@ -68,10 +69,22 @@ const req = reactive({
 let services = ref();
 
 const handleClose = () => {
+    open.value = false;
+    resetForm();
+};
+
+const opened = () => {
+    nextTick(() => {
+        if (paramForm.value) {
+            paramForm.value.clearValidate();
+        }
+    });
+};
+
+const resetForm = () => {
     if (paramForm.value) {
         paramForm.value.resetFields();
     }
-    open.value = false;
 };
 
 const acceptParams = (props: InstallRrops): void => {
@@ -79,24 +92,28 @@ const acceptParams = (props: InstallRrops): void => {
     const params = installData.value.params;
     if (params?.formFields != undefined) {
         for (const p of params?.formFields) {
-            form[p.envKey] = p.default;
+            if (p.default == 'random') {
+                form[p.envKey] = getRandomStr(6);
+            } else {
+                form[p.envKey] = p.default;
+            }
             if (p.required) {
                 rules[p.envKey] = [Rules.requiredInput];
             }
             if (p.key) {
                 form[p.envKey] = '';
-                getServices(form[p.envKey], p.key);
+                getServices(p.envKey, p.key);
             }
         }
     }
     open.value = true;
 };
 
-const getServices = (value: any, key: string | undefined) => {
-    GetAppService(key).then((res) => {
+const getServices = async (envKey: string, key: string | undefined) => {
+    await GetAppService(key).then((res) => {
         services.value = res.data;
         if (services.value != null) {
-            value = services.value[0].value;
+            form[envKey] = services.value[0].value;
         }
     });
 };

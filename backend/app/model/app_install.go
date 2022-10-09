@@ -31,7 +31,7 @@ func (i *AppInstall) GetComposePath() string {
 
 func (i *AppInstall) BeforeDelete(tx *gorm.DB) (err error) {
 
-	if err = tx.Where("app_install_id = ?", i.ID).Delete(&AppContainer{}).Error; err != nil {
+	if err = tx.Model(AppContainer{}).Debug().Where("app_install_id = ?", i.ID).Delete(AppContainer{}).Error; err != nil {
 		return err
 	}
 

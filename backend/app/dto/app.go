@@ -111,3 +111,20 @@ type AppService struct {
 	Label string `json:"label"`
 	Value string `json:"value"`
 }
+
+type AppDatabase struct {
+	ServiceName string `json:"PANEL_DB_HOST"`
+	DbName      string `json:"PANEL_DB_NAME"`
+	DbUser      string `json:"PANEL_DB_USER"`
+	Password    string `json:"PANEL_DB_USER_PASSWORD"`
+}
+
+type AuthParam struct {
+	RootPassword string `json:"PANEL_DB_ROOT_PASSWORD"`
+}
+
+type ContainerExec struct {
+	ContainerName string      `json:"containerName"`
+	DbParam       AppDatabase `json:"dbParam"`
+	Auth          AuthParam   `json:"auth"`
+}

@@ -43,3 +43,11 @@ func (t TagRepo) GetByKeys(keys []string) ([]model.Tag, error) {
 	}
 	return tags, nil
 }
+
+func (t TagRepo) GetByAppId(appId uint) ([]model.Tag, error) {
+	var tags []model.Tag
+	if err := global.DB.Where("id in (select tag_id from app_tags where app_id = ?)", appId).Find(&tags).Error; err != nil {
+		return nil, err
+	}
+	return tags, nil
+}
