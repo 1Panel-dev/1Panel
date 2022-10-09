@@ -35,7 +35,7 @@ func (a AppRepo) GetFirst(opts ...DBOption) (model.App, error) {
 	for _, opt := range opts {
 		db = opt(db)
 	}
-	if err := db.First(&app).Error; err != nil {
+	if err := db.Preload("AppTags").First(&app).Error; err != nil {
 		return app, err
 	}
 	return app, nil

@@ -16,6 +16,12 @@ func (a AppContainerRepo) WithAppId(appId uint) DBOption {
 	}
 }
 
+func (a AppContainerRepo) WithServiceName(serviceName string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("service_name = ?", serviceName)
+	}
+}
+
 func (a AppContainerRepo) GetBy(opts ...DBOption) ([]model.AppContainer, error) {
 	db := global.DB.Model(&model.AppContainer{})
 	var appContainers []model.AppContainer
@@ -24,6 +30,16 @@ func (a AppContainerRepo) GetBy(opts ...DBOption) ([]model.AppContainer, error) 
 	}
 	err := db.Find(&appContainers).Error
 	return appContainers, err
+}
+
+func (a AppContainerRepo) GetFirst(opts ...DBOption) (model.AppContainer, error) {
+	db := global.DB.Model(&model.AppContainer{})
+	var appContainer model.AppContainer
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.Find(&appContainer).Error
+	return appContainer, err
 }
 
 func (a AppContainerRepo) Create(container *model.AppContainer) error {

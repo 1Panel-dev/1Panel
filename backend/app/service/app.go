@@ -10,6 +10,7 @@ import (
 	"github.com/1Panel-dev/1Panel/app/repo"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/utils/cmd"
 	"github.com/1Panel-dev/1Panel/utils/common"
 	"github.com/1Panel-dev/1Panel/utils/compose"
 	"github.com/1Panel-dev/1Panel/utils/docker"
@@ -19,6 +20,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"os"
 	"path"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -179,7 +181,7 @@ func (a AppService) Operate(req dto.AppInstallOperate) error {
 		appDir := install.GetPath()
 		dir, _ := os.Stat(appDir)
 		if dir == nil {
-			return appInstallRepo.Delete(commonRepo.WithByID(install.ID))
+			return appInstallRepo.Delete(install)
 		}
 		out, err := compose.Down(dockerComposePath)
 		if err != nil {
@@ -188,7 +190,7 @@ func (a AppService) Operate(req dto.AppInstallOperate) error {
 		if err := op.DeleteDir(appDir); err != nil {
 			return err
 		}
-		return appInstallRepo.Delete(commonRepo.WithByID(install.ID))
+		return appInstallRepo.Delete(install)
 	case dto.Sync:
 		if err := a.SyncInstalled(install.ID); err != nil {
 			return err
@@ -214,7 +216,7 @@ func handleErr(install model.AppInstall, err error, out string) error {
 
 func (a AppService) Install(name string, appDetailId uint, params map[string]interface{}) error {
 
-	port, ok := params["PORT"]
+	port, ok := params["PANEL_APP_PORT"]
 	if ok {
 		portStr := strconv.FormatFloat(port.(float64), 'f', -1, 32)
 		if common.ScanPort(portStr) {
@@ -230,6 +232,7 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 	if err != nil {
 		return err
 	}
+
 	if app.Required != "" {
 		var requiredArray []string
 		if err := json.Unmarshal([]byte(app.Required), &requiredArray); err != nil {
@@ -301,6 +304,41 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 		return err
 	}
 
+	var (
+		auth     string
+		dbConfig dto.AppDatabase
+	)
+	tags, err := tagRepo.GetByAppId(app.ID)
+	if err != nil {
+		return err
+	}
+	for _, tag := range tags {
+		if tag.Key == "Database" {
+			var authParam dto.AuthParam
+			paramByte, err := json.Marshal(params)
+			if err != nil {
+				return err
+			}
+			if err := json.Unmarshal(paramByte, &authParam); err != nil {
+				return err
+			}
+			authByte, err := json.Marshal(authParam)
+			if err != nil {
+				return err
+			}
+			auth = string(authByte)
+		}
+		if tag.Key == "WebSite" {
+			paramByte, err := json.Marshal(params)
+			if err != nil {
+				return err
+			}
+			if err := json.Unmarshal(paramByte, &dbConfig); err != nil {
+				return err
+			}
+		}
+	}
+
 	composeMap := make(map[string]interface{})
 	if err := yaml.Unmarshal([]byte(appDetail.DockerCompose), &composeMap); err != nil {
 		return err
@@ -335,6 +373,7 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 			ServiceName:   serviceName,
 			ContainerName: containerName,
 			Port:          servicePort,
+			Auth:          auth,
 		})
 	}
 	for k, v := range changeKeys {
@@ -349,33 +388,62 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 		return err
 	}
 
-	if err := appInstallRepo.Create(&appInstall); err != nil {
+	tx := global.DB.Begin()
+	ctx := context.WithValue(context.Background(), "db", tx)
+
+	if err := appInstallRepo.Create(ctx, &appInstall); err != nil {
+		tx.Rollback()
 		return err
 	}
 	for _, c := range appContainers {
-		c.AppInstallId = appInstall.ID
+		c.AppInstallID = appInstall.ID
 	}
-	if err := appContainerRepo.BatchCreate(context.WithValue(context.Background(), "db", global.DB), appContainers); err != nil {
+	if err := appContainerRepo.BatchCreate(ctx, appContainers); err != nil {
+		tx.Rollback()
 		return err
 	}
+	if !reflect.DeepEqual(dbConfig, dto.AppDatabase{}) {
+		container, err := appContainerRepo.GetFirst(appContainerRepo.WithServiceName(dbConfig.ServiceName))
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+		install, err := appInstallRepo.GetFirst(commonRepo.WithByID(container.AppInstallID))
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+		app, err := appRepo.GetFirst(commonRepo.WithByID(install.ID))
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+		var database model.Database
+		database.AppContainerId = container.ID
+		database.Dbname = dbConfig.DbName
+		database.Username = dbConfig.DbUser
+		database.Password = dbConfig.Password
+		if err := dataBaseRepo.Create(ctx, &database); err != nil {
+			tx.Rollback()
+			return err
+		}
+		var auth dto.AuthParam
+		json.Unmarshal([]byte(container.Auth), &auth)
+		execConfig := dto.ContainerExec{
+			ContainerName: container.ContainerName,
+			Auth:          auth,
+			DbParam:       dbConfig,
+		}
+		_, err = cmd.Exec(getSqlStr(app.Key, execConfig))
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	tx.Commit()
 	go upApp(composeFilePath, appInstall)
 	return nil
-}
-
-func upApp(composeFilePath string, appInstall model.AppInstall) {
-	out, err := compose.Up(composeFilePath)
-	if err != nil {
-		if out != "" {
-			appInstall.Message = out
-		} else {
-			appInstall.Message = err.Error()
-		}
-		appInstall.Status = constant.Error
-		_ = appInstallRepo.Save(appInstall)
-	} else {
-		appInstall.Status = constant.Running
-		_ = appInstallRepo.Save(appInstall)
-	}
 }
 
 func (a AppService) SyncAllInstalled() error {
@@ -405,13 +473,9 @@ func (a AppService) GetServices(key string) ([]dto.AppService, error) {
 	var res []dto.AppService
 	for _, install := range installs {
 		for _, container := range install.Containers {
-			value := container.ServiceName
-			if container.Port > 0 {
-				value = value + ":" + string(rune(container.Port))
-			}
 			res = append(res, dto.AppService{
 				Label: install.Name,
-				Value: value,
+				Value: container.ServiceName,
 			})
 		}
 	}
@@ -503,53 +567,6 @@ func (a AppService) SyncInstalled(installId uint) error {
 	}
 	appInstall.Message = errMsg.String()
 	return appInstallRepo.Save(appInstall)
-}
-
-func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
-	apps := make(map[string]model.App, len(oldApps))
-	for _, old := range oldApps {
-		old.Status = constant.AppTakeDown
-		apps[old.Key] = old
-	}
-	for _, item := range items {
-		app, ok := apps[item.Key]
-		if !ok {
-			app = model.App{}
-		}
-		app.Name = item.Name
-		app.Key = item.Key
-		app.ShortDesc = item.ShortDesc
-		app.Author = item.Author
-		app.Source = item.Source
-		app.Type = item.Type
-		app.CrossVersionUpdate = item.CrossVersionUpdate
-		app.Required = item.GetRequired()
-		app.Status = constant.AppNormal
-		apps[item.Key] = app
-	}
-	return apps
-}
-
-func getAppDetails(details []model.AppDetail, versions []string) map[string]model.AppDetail {
-	appDetails := make(map[string]model.AppDetail, len(details))
-	for _, old := range details {
-		old.Status = constant.AppTakeDown
-		appDetails[old.Version] = old
-	}
-
-	for _, v := range versions {
-		detail, ok := appDetails[v]
-		if ok {
-			detail.Status = constant.AppNormal
-			appDetails[v] = detail
-		} else {
-			appDetails[v] = model.AppDetail{
-				Version: v,
-				Status:  constant.AppNormal,
-			}
-		}
-	}
-	return appDetails
 }
 
 func (a AppService) SyncAppList() error {
@@ -769,4 +786,79 @@ func syncCanUpdate() {
 			}
 		}
 	}
+}
+
+func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
+	apps := make(map[string]model.App, len(oldApps))
+	for _, old := range oldApps {
+		old.Status = constant.AppTakeDown
+		apps[old.Key] = old
+	}
+	for _, item := range items {
+		app, ok := apps[item.Key]
+		if !ok {
+			app = model.App{}
+		}
+		app.Name = item.Name
+		app.Key = item.Key
+		app.ShortDesc = item.ShortDesc
+		app.Author = item.Author
+		app.Source = item.Source
+		app.Type = item.Type
+		app.CrossVersionUpdate = item.CrossVersionUpdate
+		app.Required = item.GetRequired()
+		app.Status = constant.AppNormal
+		apps[item.Key] = app
+	}
+	return apps
+}
+
+func getAppDetails(details []model.AppDetail, versions []string) map[string]model.AppDetail {
+	appDetails := make(map[string]model.AppDetail, len(details))
+	for _, old := range details {
+		old.Status = constant.AppTakeDown
+		appDetails[old.Version] = old
+	}
+
+	for _, v := range versions {
+		detail, ok := appDetails[v]
+		if ok {
+			detail.Status = constant.AppNormal
+			appDetails[v] = detail
+		} else {
+			appDetails[v] = model.AppDetail{
+				Version: v,
+				Status:  constant.AppNormal,
+			}
+		}
+	}
+	return appDetails
+}
+
+func upApp(composeFilePath string, appInstall model.AppInstall) {
+	out, err := compose.Up(composeFilePath)
+	if err != nil {
+		if out != "" {
+			appInstall.Message = out
+		} else {
+			appInstall.Message = err.Error()
+		}
+		appInstall.Status = constant.Error
+		_ = appInstallRepo.Save(appInstall)
+	} else {
+		appInstall.Status = constant.Running
+		_ = appInstallRepo.Save(appInstall)
+	}
+}
+
+func getSqlStr(key string, exec dto.ContainerExec) string {
+	var str string
+	param := exec.DbParam
+	switch key {
+	case "mysql":
+		str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s  -e \"CREATE USER '%s'@'%%' IDENTIFIED BY '%s';\" -e \"create database %s;\" -e \"GRANT ALL ON %s.* TO '%s'@'%%';\"",
+			exec.ContainerName, exec.Auth.RootPassword, param.DbUser, param.Password, param.DbName, param.DbName, param.DbUser)
+	}
+	fmt.Println(str)
+	return str
 }

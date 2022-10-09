@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"context"
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/global"
 	"gorm.io/gorm"
@@ -44,8 +45,8 @@ func (a AppInstallRepo) GetFirst(opts ...DBOption) (model.AppInstall, error) {
 	return install, err
 }
 
-func (a AppInstallRepo) Create(install *model.AppInstall) error {
-	db := global.DB.Model(&model.AppInstall{})
+func (a AppInstallRepo) Create(ctx context.Context, install *model.AppInstall) error {
+	db := ctx.Value("db").(*gorm.DB).Model(&model.AppInstall{})
 	return db.Create(&install).Error
 }
 
@@ -54,12 +55,17 @@ func (a AppInstallRepo) Save(install model.AppInstall) error {
 	return db.Save(&install).Error
 }
 
-func (a AppInstallRepo) Delete(opts ...DBOption) error {
+func (a AppInstallRepo) DeleteBy(opts ...DBOption) error {
 	db := global.DB.Model(&model.AppInstall{})
 	for _, opt := range opts {
 		db = opt(db)
 	}
 	return db.Delete(&model.AppInstall{}).Error
+}
+
+func (a AppInstallRepo) Delete(install model.AppInstall) error {
+	db := global.DB
+	return db.Delete(&install).Error
 }
 
 func (a AppInstallRepo) Page(page, size int, opts ...DBOption) (int64, []model.AppInstall, error) {

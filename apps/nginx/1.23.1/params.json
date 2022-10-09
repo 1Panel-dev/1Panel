@@ -6,7 +6,7 @@
       "labelEn": "Port",
       "required": true,
       "default": 80,
-      "envKey": "PORT"
+      "envKey": "PANEL_APP_PORT"
     }
   ]
 }

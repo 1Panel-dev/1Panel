@@ -2,43 +2,11 @@
   "formFields": [
     {
       "type": "text",
-      "labelZh": "时区",
-      "labelEn": "TimeZone",
-      "required": true,
-      "default": "Asia/Shanghai",
-      "envKey": "TZ"
-    },
-    {
-      "type": "text",
-      "labelZh": "数据库",
-      "labelEn": "Database",
-      "required": true,
-      "default": "db",
-      "envKey": "DATABASE"
-    },
-    {
-      "type": "text",
-      "labelZh": "普通用户",
-      "labelEn": "User",
-      "required": true,
-      "default": "mysql",
-      "envKey": "USER"
-    },
-    {
-      "type": "text",
-      "labelZh": "普通用户密码",
-      "labelEn": "Password",
-      "required": true,
-      "default": "1qaz@WSX",
-      "envKey": "PASSWORD"
-    },
-    {
-      "type": "text",
       "labelZh": "Root用户密码",
       "labelEn": "RootPassword",
       "required": true,
       "default": "1panel@mysql",
-      "envKey": "ROOT_PASSWORD"
+      "envKey": "PANEL_DB_ROOT_PASSWORD"
     },
     {
       "type": "number",
@@ -46,7 +14,7 @@
       "labelEn": "Port",
       "required": true,
       "default": 3306,
-      "envKey": "PORT"
+      "envKey": "PANEL_APP_PORT"
     }
   ]
 }

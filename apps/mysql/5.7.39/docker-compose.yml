@@ -7,14 +7,11 @@ services:
     restart: always
     environment:
       TZ: ${TZ}
-      MYSQL_DATABASE: ${DATABASE}
-      MYSQL_USER: ${USER}
-      MYSQL_PASSWORD: ${PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${PANEL_DB_ROOT_PASSWORD}
     networks:
       - 1panel
     ports:
-      - ${PORT}:3306
+      - ${PANEL_APP_PORT}:3306
     volumes:
       - ./data/:/var/lib/mysql
       - ./conf/my.cnf:/etc/mysql/my.cnf

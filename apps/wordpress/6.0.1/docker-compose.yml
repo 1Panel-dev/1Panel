@@ -2,19 +2,19 @@ version: '3'
 services:
   1panel_wordpress:
     image: wordpress:6.0.1
-    container_name: 1panel_wordpress
+    container_name: ${CONTAINER_NAME}
     ports:
-      -  ${PORT}:80
+      -  ${PANEL_APP_PORT}:80
     restart: always
     networks:
       - 1panel
     volumes:
       - ./data:/var/www/html
     environment:
-      WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
-      WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME}
-      WORDPRESS_DB_USER: ${WORDPRESS_DB_USER}
-      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      WORDPRESS_DB_HOST: ${PANEL_DB_HOST}
+      WORDPRESS_DB_NAME: ${PANEL_DB_NAME}
+      WORDPRESS_DB_USER: ${PANEL_DB_USER}
+      WORDPRESS_DB_PASSWORD: ${PANEL_DB_USER_PASSWORD}
       WORDPRESS_DEBUG: 1
 
 networks:
