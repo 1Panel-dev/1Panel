@@ -1,5 +1,7 @@
 export default {
     commons: {
+        true: 'true',
+        false: 'false',
         button: {
             create: 'Create',
             add: 'Add',
@@ -169,6 +171,13 @@ export default {
         last4Hour: 'Last 4 Hours',
         lastHour: 'Last Hour',
         last10Min: 'Last 10 Minutes',
+
+        repo: 'Repo',
+        name: 'Name',
+        downloadUrl: 'Download URL',
+        imageRepo: 'ImageRepo',
+        repoHelper: 'Does it include a mirror repository/organization/project?',
+        auth: 'Auth',
     },
     cronjob: {
         cronTask: 'Task',

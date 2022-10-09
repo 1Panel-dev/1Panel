@@ -153,3 +153,20 @@ var AddTableApp = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.App{}, &model.AppDetail{}, &model.Tag{}, &model.AppTag{}, &model.AppInstall{}, &model.AppInstallResource{}, &model.Database{}, &model.AppInstallBackup{})
 	},
 }
+
+var AddTableImageRepo = &gormigrate.Migration{
+	ID: "20201009-add-table-imagerepo",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.ImageRepo{}); err != nil {
+			return err
+		}
+		item := &model.ImageRepo{
+			Name:        "Docker Hub",
+			DownloadUrl: "docker.io",
+		}
+		if err := tx.Create(item).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

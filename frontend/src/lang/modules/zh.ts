@@ -1,5 +1,7 @@
 export default {
     commons: {
+        true: '是',
+        false: '否',
         button: {
             create: '新建',
             add: '添加',
@@ -166,6 +168,13 @@ export default {
         last4Hour: '最近 4 小时',
         lastHour: '最近 1 小时',
         last10Min: '最近 10 分钟',
+
+        repo: '仓库',
+        name: '名称',
+        downloadUrl: '下载地址',
+        imageRepo: '镜像库',
+        repoHelper: '是否包含镜像仓库/组织/项目?',
+        auth: '认证',
     },
     cronjob: {
         cronTask: '计划任务',

@@ -16,6 +16,7 @@ func Init() {
 		migrations.AddTableBackupAccount,
 		migrations.AddTableCronjob,
 		migrations.AddTableApp,
+		migrations.AddTableImageRepo,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)
