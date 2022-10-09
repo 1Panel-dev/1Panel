@@ -14,13 +14,16 @@
                 <el-radio-button class="topButton" size="large" label="storage">
                     {{ $t('container.storage') }}
                 </el-radio-button>
+                <el-radio-button class="topButton" size="large" label="repo">
+                    {{ $t('container.repo') }}
+                </el-radio-button>
                 <el-radio-button class="topButton" size="large" label="schedule">
                     {{ $t('container.schedule') }}
                 </el-radio-button>
             </el-radio-group>
         </el-card>
         <Container v-if="activeNames === 'container'" />
-        <Safe v-if="activeNames === 'image'" />
+        <Repo v-if="activeNames === 'repo'" />
         <Backup v-if="activeNames === 'network'" />
         <Monitor v-if="activeNames === 'storage'" />
         <About v-if="activeNames === 'schedule'" />
@@ -30,7 +33,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import Container from '@/views/container/container/index.vue';
-import Safe from '@/views/setting/tabs/safe.vue';
+import Repo from '@/views/container/repo/index.vue';
 import Backup from '@/views/setting/tabs/backup.vue';
 import Monitor from '@/views/setting/tabs/monitor.vue';
 import About from '@/views/setting/tabs/about.vue';

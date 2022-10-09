@@ -7,6 +7,7 @@ type ServiceGroup struct {
 	HostService
 	BackupService
 	GroupService
+	ImageRepoService
 	ContainerService
 	CommandService
 	OperationService
@@ -25,6 +26,7 @@ var (
 	commandRepo            = repo.RepoGroupApp.CommandRepo
 	operationRepo          = repo.RepoGroupApp.OperationRepo
 	commonRepo             = repo.RepoGroupApp.CommonRepo
+	imageRepoRepo          = repo.RepoGroupApp.ImageRepoRepo
 	cronjobRepo            = repo.RepoGroupApp.CronjobRepo
 	settingRepo            = repo.RepoGroupApp.SettingRepo
 	appRepo                = repo.RepoGroupApp.AppRepo

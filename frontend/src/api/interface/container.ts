@@ -21,4 +21,30 @@ export namespace Container {
         containerID: string;
         mode: string;
     }
+
+    export interface RepoCreate {
+        name: string;
+        downloadUrl: string;
+        repoName: string;
+        username: string;
+        password: string;
+        auth: boolean;
+    }
+    export interface RepoUpdate {
+        id: number;
+        downloadUrl: string;
+        username: string;
+        password: string;
+        auth: boolean;
+    }
+    export interface RepoInfo {
+        id: number;
+        createdAt: Date;
+        name: string;
+        downloadUrl: string;
+        repoName: string;
+        username: string;
+        password: string;
+        auth: boolean;
+    }
 }
