@@ -2,11 +2,14 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"testing"
 
+	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/utils/docker"
 )
 
@@ -25,6 +28,37 @@ func TestImage(t *testing.T) {
 	fmt.Println(err)
 	defer out.Close()
 	if _, err = io.Copy(file, out); err != nil {
+		fmt.Println(err)
+	}
+}
+
+func TestDeam(t *testing.T) {
+	file, err := ioutil.ReadFile(constant.DaemonJsonDir)
+	if err != nil {
+		fmt.Println(err)
+	}
+	deamonMap := make(map[string]interface{})
+	err = json.Unmarshal(file, &deamonMap)
+	fmt.Println(err)
+	for k, v := range deamonMap {
+		fmt.Println(k, v)
+	}
+	if _, ok := deamonMap["insecure-registries"]; ok {
+		if k, v := deamonMap["insecure-registries"].(string); v {
+			fmt.Println("string ", k)
+		}
+		if k, v := deamonMap["insecure-registries"].([]interface{}); v {
+			fmt.Println("[]string ", k)
+			k = append(k, "172.16.10.111:8085")
+			deamonMap["insecure-registries"] = k
+		}
+	}
+	newss, err := json.Marshal(deamonMap)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(string(newss))
+	if err := ioutil.WriteFile(constant.DaemonJsonDir, newss, 0777); err != nil {
 		fmt.Println(err)
 	}
 }

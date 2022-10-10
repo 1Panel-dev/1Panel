@@ -53,7 +53,7 @@ export namespace Container {
     export interface RepoCreate {
         name: string;
         downloadUrl: string;
-        repoName: string;
+        protocol: string;
         username: string;
         password: string;
         auth: boolean;
@@ -61,6 +61,7 @@ export namespace Container {
     export interface RepoUpdate {
         id: number;
         downloadUrl: string;
+        protocol: string;
         username: string;
         password: string;
         auth: boolean;
@@ -70,7 +71,7 @@ export namespace Container {
         createdAt: Date;
         name: string;
         downloadUrl: string;
-        repoName: string;
+        protocol: string;
         username: string;
         password: string;
         auth: boolean;

@@ -169,7 +169,6 @@ export default {
         last10Min: '最近 10 分钟',
 
         image: '镜像',
-        pullFromRepo: '从仓库中拉取',
         imagePull: '镜像拉取',
         imagePush: '镜像推送',
         repoName: '仓库名',
@@ -186,11 +185,13 @@ export default {
         exportImage: '导出镜像',
         version: '版本',
         size: '大小',
+        from: '来源',
 
         repo: '仓库',
         name: '名称',
+        protocol: '协议',
         downloadUrl: '下载地址',
-        imageRepo: '镜像库',
+        imageRepo: '镜像仓库',
         repoHelper: '是否包含镜像仓库/组织/项目?',
         auth: '认证',
     },

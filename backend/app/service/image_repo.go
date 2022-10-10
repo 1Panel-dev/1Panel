@@ -1,6 +1,9 @@
 package service
 
 import (
+	"encoding/json"
+	"io/ioutil"
+
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/jinzhu/copier"
@@ -48,9 +51,33 @@ func (u *ImageRepoService) List() ([]dto.ImageRepoOption, error) {
 }
 
 func (u *ImageRepoService) Create(imageRepoDto dto.ImageRepoCreate) error {
-	imageRepo, _ := imageRepoRepo.Get(commonRepo.WithByName(imageRepoDto.RepoName))
+	imageRepo, _ := imageRepoRepo.Get(commonRepo.WithByName(imageRepoDto.Name))
 	if imageRepo.ID != 0 {
 		return constant.ErrRecordExist
+	}
+	if imageRepo.Protocol == "http" {
+		file, err := ioutil.ReadFile(constant.DaemonJsonDir)
+		if err != nil {
+			return err
+		}
+
+		deamonMap := make(map[string]interface{})
+		if err := json.Unmarshal(file, &deamonMap); err != nil {
+			return err
+		}
+		if _, ok := deamonMap["insecure-registries"]; ok {
+			if k, v := deamonMap["insecure-registries"].([]interface{}); v {
+				k = append(k, imageRepoDto.DownloadUrl)
+				deamonMap["insecure-registries"] = k
+			}
+		}
+		newJson, err := json.Marshal(deamonMap)
+		if err != nil {
+			return err
+		}
+		if err := ioutil.WriteFile(constant.DaemonJsonDir, newJson, 0777); err != nil {
+			return err
+		}
 	}
 	if err := copier.Copy(&imageRepo, &imageRepoDto); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
@@ -59,6 +86,10 @@ func (u *ImageRepoService) Create(imageRepoDto dto.ImageRepoCreate) error {
 		return err
 	}
 	return nil
+}
+
+type DeamonJson struct {
+	InsecureRegistries []string `json:"insecure-registries"`
 }
 
 func (u *ImageRepoService) BatchDelete(ids []uint) error {
