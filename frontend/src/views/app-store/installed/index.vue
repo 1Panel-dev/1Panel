@@ -32,10 +32,13 @@
                         <el-tag type="error">{{ row.status }}</el-tag>
                     </template>
                 </el-popover>
-                <el-icon v-if="row.status === 'Installing'" class="is-loading">
-                    <Loading />
-                </el-icon>
-                <el-tag v-else>{{ row.status }}</el-tag>
+
+                <el-tag v-else>
+                    <el-icon v-if="row.status === 'Installing'" class="is-loading">
+                        <Loading />
+                    </el-icon>
+                    {{ row.status }}
+                </el-tag>
             </template>
         </el-table-column>
         <el-table-column
@@ -90,7 +93,7 @@
 
 <script lang="ts" setup>
 import { GetAppInstalled, InstalledOp, SyncInstalledApp, GetAppUpdateVersions } from '@/api/modules/app';
-import { onBeforeMount, onMounted, reactive, ref } from 'vue';
+import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { dateFromat } from '@/utils/util';
 import i18n from '@/lang';
@@ -254,7 +257,7 @@ onMounted(() => {
     }, 1000 * 8);
 });
 
-onBeforeMount(() => {
+onUnmounted(() => {
     clearInterval(Number(timer));
 });
 </script>

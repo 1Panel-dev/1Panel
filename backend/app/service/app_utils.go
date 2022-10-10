@@ -46,21 +46,26 @@ func execDockerCommand(database model.Database, dbInstall model.AppInstall, op D
 		Auth:          auth,
 		DbParam:       dbConfig,
 	}
-	_, err := cmd.Exec(getSqlStr(database.Key, op, execConfig))
+	_, err := cmd.Exec(getSqlStr(database.Key, dbInstall.Version, op, execConfig))
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func getSqlStr(key string, operate DatabaseOp, exec dto.ContainerExec) string {
+func getSqlStr(key, version string, operate DatabaseOp, exec dto.ContainerExec) string {
 	var str string
 	param := exec.DbParam
 	switch key {
 	case "mysql":
 		if operate == Add {
-			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s  -e \"CREATE USER '%s'@'%%' IDENTIFIED BY '%s';\" -e \"create database %s;\" -e \"GRANT ALL ON %s.* TO '%s'@'%%' IDENTIFIED BY '%s';\"",
-				exec.ContainerName, exec.Auth.RootPassword, param.DbUser, param.Password, param.DbName, param.DbName, param.DbUser, param.Password)
+			if common.CompareVersion(version, "8.0") {
+				str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s  -e \"CREATE USER '%s'@'%%' IDENTIFIED BY '%s';\" -e \"create database %s;\" -e \"GRANT ALL ON %s.* TO '%s'@'%%';\" -e \"FLUSH PRIVILEGES;\"",
+					exec.ContainerName, exec.Auth.RootPassword, param.DbUser, param.Password, param.DbName, param.DbName, param.DbUser)
+			} else {
+				str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s  -e \"CREATE USER '%s'@'%%' IDENTIFIED BY '%s';\" -e \"create database %s;\" -e \"GRANT ALL ON %s.* TO '%s'@'%%' IDENTIFIED BY '%s';\" -e \"FLUSH PRIVILEGES;\"",
+					exec.ContainerName, exec.Auth.RootPassword, param.DbUser, param.Password, param.DbName, param.DbName, param.DbUser, param.Password)
+			}
 		}
 		if operate == Delete {
 			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s   -e \"drop database %s;\"  -e \"drop user %s;\" ",
