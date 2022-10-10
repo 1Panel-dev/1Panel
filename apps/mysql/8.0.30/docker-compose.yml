@@ -11,7 +11,7 @@ services:
     networks:
       - 1panel
     ports:
-      - ${PANEL_APP_PORT}:3306
+      - ${PANEL_APP_PORT_HTTP}:3306
     volumes:
       - ./data/:/var/lib/mysql
       - ./conf/my.cnf:/etc/my.cnf

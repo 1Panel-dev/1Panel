@@ -2,11 +2,19 @@
   "formFields": [
     {
       "type": "number",
-      "labelZh": "端口",
-      "labelEn": "Port",
+      "labelZh": "Http 端口",
+      "labelEn": "Http Port",
       "required": true,
       "default": 80,
-      "envKey": "PANEL_APP_PORT"
+      "envKey": "PANEL_APP_PORT_HTTP"
+    },
+    {
+      "type": "number",
+      "labelZh": "Https 端口",
+      "labelEn": "Https Port",
+      "required": true,
+      "default": 443,
+      "envKey": "PANEL_APP_PORT_HTTPS"
     }
   ]
 }

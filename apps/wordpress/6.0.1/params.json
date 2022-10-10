@@ -39,7 +39,7 @@
       "labelEn": "Port",
       "required": true,
       "default": 8080,
-      "envKey": "PANEL_APP_PORT"
+      "envKey": "PANEL_APP_PORT_HTTP"
     }
   ]
 }

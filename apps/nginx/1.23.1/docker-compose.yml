@@ -4,7 +4,8 @@ services:
     image: nginx:1.23.1
     restart: always
     ports:
-      - ${PANEL_APP_PORT}:80
+      - ${PANEL_APP_PORT_HTTP}:80
+      - ${PANEL_APP_PORT_HTTPS}:443
     volumes:
       - ./conf/nginx.conf:/etc/nginx/nginx.conf
       - ./www:/home/www

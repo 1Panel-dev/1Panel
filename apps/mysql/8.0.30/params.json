@@ -14,7 +14,7 @@
       "labelEn": "Port",
       "required": true,
       "default": 3306,
-      "envKey": "PANEL_APP_PORT"
+      "envKey": "PANEL_APP_PORT_HTTP"
     }
   ]
 }
