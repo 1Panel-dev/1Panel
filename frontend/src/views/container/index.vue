@@ -24,7 +24,7 @@
         </el-card>
         <Container v-if="activeNames === 'container'" />
         <Repo v-if="activeNames === 'repo'" />
-        <Backup v-if="activeNames === 'network'" />
+        <Image v-if="activeNames === 'image'" />
         <Monitor v-if="activeNames === 'storage'" />
         <About v-if="activeNames === 'schedule'" />
     </div>
@@ -34,7 +34,7 @@
 import { ref } from 'vue';
 import Container from '@/views/container/container/index.vue';
 import Repo from '@/views/container/repo/index.vue';
-import Backup from '@/views/setting/tabs/backup.vue';
+import Image from '@/views/container/image/index.vue';
 import Monitor from '@/views/setting/tabs/monitor.vue';
 import About from '@/views/setting/tabs/about.vue';
 

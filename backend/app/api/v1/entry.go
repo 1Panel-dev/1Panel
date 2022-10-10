@@ -15,6 +15,7 @@ var (
 	groupService     = service.ServiceGroupApp.GroupService
 	containerService = service.ServiceGroupApp.ContainerService
 	imageRepoService = service.ServiceGroupApp.ImageRepoService
+	imageService     = service.ServiceGroupApp.ImageService
 	commandService   = service.ServiceGroupApp.CommandService
 	operationService = service.ServiceGroupApp.OperationService
 	fileService      = service.ServiceGroupApp.FileService

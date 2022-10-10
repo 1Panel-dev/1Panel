@@ -22,6 +22,34 @@ export namespace Container {
         mode: string;
     }
 
+    export interface ImageInfo {
+        id: string;
+        createdAt: Date;
+        name: string;
+        version: string;
+        size: string;
+    }
+    export interface ImagePull {
+        repoID: number;
+        imageName: string;
+    }
+    export interface ImagePush {
+        repoID: number;
+        imageName: string;
+        tagName: string;
+    }
+    export interface ImageRemove {
+        imageName: string;
+    }
+    export interface ImageLoad {
+        path: string;
+    }
+    export interface ImageSave {
+        imageName: string;
+        path: string;
+        name: string;
+    }
+
     export interface RepoCreate {
         name: string;
         downloadUrl: string;
@@ -46,5 +74,10 @@ export namespace Container {
         username: string;
         password: string;
         auth: boolean;
+    }
+    export interface RepoOptions {
+        id: number;
+        name: string;
+        downloadUrl: string;
     }
 }

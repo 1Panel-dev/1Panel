@@ -11,6 +11,7 @@ type ImageRepoService struct{}
 
 type IImageRepoService interface {
 	Page(search dto.PageInfo) (int64, interface{}, error)
+	List() ([]dto.ImageRepoOption, error)
 	Create(imageRepoDto dto.ImageRepoCreate) error
 	Update(id uint, upMap map[string]interface{}) error
 	BatchDelete(ids []uint) error
@@ -33,6 +34,19 @@ func (u *ImageRepoService) Page(search dto.PageInfo) (int64, interface{}, error)
 	return total, dtoOps, err
 }
 
+func (u *ImageRepoService) List() ([]dto.ImageRepoOption, error) {
+	ops, err := imageRepoRepo.List(commonRepo.WithOrderBy("created_at desc"))
+	var dtoOps []dto.ImageRepoOption
+	for _, op := range ops {
+		var item dto.ImageRepoOption
+		if err := copier.Copy(&item, &op); err != nil {
+			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		}
+		dtoOps = append(dtoOps, item)
+	}
+	return dtoOps, err
+}
+
 func (u *ImageRepoService) Create(imageRepoDto dto.ImageRepoCreate) error {
 	imageRepo, _ := imageRepoRepo.Get(commonRepo.WithByName(imageRepoDto.RepoName))
 	if imageRepo.ID != 0 {
@@ -48,9 +62,17 @@ func (u *ImageRepoService) Create(imageRepoDto dto.ImageRepoCreate) error {
 }
 
 func (u *ImageRepoService) BatchDelete(ids []uint) error {
+	for _, id := range ids {
+		if id == 1 {
+			return errors.New("The default value cannot be edit !")
+		}
+	}
 	return imageRepoRepo.Delete(commonRepo.WithIdsIn(ids))
 }
 
 func (u *ImageRepoService) Update(id uint, upMap map[string]interface{}) error {
+	if id == 1 {
+		return errors.New("The default value cannot be deleted !")
+	}
 	return imageRepoRepo.Update(id, upMap)
 }
