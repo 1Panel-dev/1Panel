@@ -63,8 +63,8 @@ func (a AppInstallRepo) DeleteBy(opts ...DBOption) error {
 	return db.Delete(&model.AppInstall{}).Error
 }
 
-func (a AppInstallRepo) Delete(install model.AppInstall) error {
-	db := global.DB
+func (a AppInstallRepo) Delete(ctx context.Context, install model.AppInstall) error {
+	db := ctx.Value("db").(*gorm.DB).Model(&model.AppInstall{})
 	return db.Delete(&install).Error
 }
 
