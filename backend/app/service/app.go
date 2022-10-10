@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/app/repo"
@@ -249,7 +248,7 @@ func handleErr(install model.AppInstall, err error, out string) error {
 
 func (a AppService) Install(name string, appDetailId uint, params map[string]interface{}) error {
 
-	port, ok := params["PANEL_APP_PORT"]
+	port, ok := params["PANEL_APP_PORT_HTTP"]
 	if ok {
 		portStr := strconv.FormatFloat(port.(float64), 'f', -1, 32)
 		if common.ScanPort(portStr) {
@@ -266,33 +265,12 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 		return err
 	}
 
-	if app.Required != "" {
-		var requiredArray []string
-		if err := json.Unmarshal([]byte(app.Required), &requiredArray); err != nil {
-			return err
-		}
-		for _, key := range requiredArray {
-			if key == "" {
-				continue
-			}
-			requireApp, err := appRepo.GetFirst(appRepo.WithKey(key))
-			if err != nil {
-				return err
-			}
-			details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(requireApp.ID))
-			if err != nil {
-				return err
-			}
-			var detailIds []uint
-			for _, d := range details {
-				detailIds = append(detailIds, d.ID)
-			}
-
-			_, err = appInstallRepo.GetFirst(appInstallRepo.WithDetailIdsIn(detailIds))
-			if err != nil {
-				return errors.New(fmt.Sprintf("%s is required", requireApp.Key))
-			}
-		}
+	if err := checkRequiredAndLimit(app); err != nil {
+		return err
+	}
+	composeFilePath, err := copyAppData(app.Key, appDetail.Version, name, params)
+	if err != nil {
+		return err
 	}
 
 	paramByte, err := json.Marshal(params)
@@ -306,11 +284,6 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 		Version:     appDetail.Version,
 		Status:      constant.Installing,
 		Params:      string(paramByte),
-	}
-
-	composeFilePath, err := copyAppData(app.Key, appDetail.Version, name, params)
-	if err != nil {
-		return err
 	}
 
 	var (
@@ -363,7 +336,7 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 		value["container_name"] = containerName
 		servicePort := 0
 
-		port, ok := params["PANEL_APP_PORT"]
+		port, ok := params["PANEL_APP_PORT_HTTP"]
 		if ok {
 			portN := int(math.Ceil(port.(float64)))
 			servicePort = portN

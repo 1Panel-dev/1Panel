@@ -4,7 +4,7 @@ services:
     image: wordpress:6.0.1
     container_name: ${CONTAINER_NAME}
     ports:
-      -  ${PANEL_APP_PORT}:80
+      -  ${PANEL_APP_PORT_HTTP}:80
     restart: always
     networks:
       - 1panel

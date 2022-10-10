@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/utils/compose"
 	"github.com/1Panel-dev/1Panel/utils/files"
 	"github.com/joho/godotenv"
+	"github.com/pkg/errors"
 	"path"
 	"strconv"
 )
@@ -56,6 +57,50 @@ func getSqlStr(key string, operate DatabaseOp, exec dto.ContainerExec) string {
 		}
 	}
 	return str
+}
+
+func checkRequiredAndLimit(app model.App) error {
+
+	if app.Limit > 0 {
+		installs, err := appInstallRepo.GetBy(appInstallRepo.WithAppId(app.ID))
+		if err != nil {
+			return err
+		}
+		if len(installs) >= app.Limit {
+			return errors.New(fmt.Sprintf("app install limit %d", app.Limit))
+		}
+	}
+
+	if app.Required != "" {
+		var requiredArray []string
+		if err := json.Unmarshal([]byte(app.Required), &requiredArray); err != nil {
+			return err
+		}
+		for _, key := range requiredArray {
+			if key == "" {
+				continue
+			}
+			requireApp, err := appRepo.GetFirst(appRepo.WithKey(key))
+			if err != nil {
+				return err
+			}
+			details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(requireApp.ID))
+			if err != nil {
+				return err
+			}
+			var detailIds []uint
+			for _, d := range details {
+				detailIds = append(detailIds, d.ID)
+			}
+
+			_, err = appInstallRepo.GetFirst(appInstallRepo.WithDetailIdsIn(detailIds))
+			if err != nil {
+				return errors.New(fmt.Sprintf("%s is required", requireApp.Key))
+			}
+		}
+	}
+
+	return nil
 }
 
 func copyAppData(key, version, installName string, params map[string]interface{}) (composeFilePath string, err error) {

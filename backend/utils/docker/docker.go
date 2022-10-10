@@ -1,9 +1,7 @@
 package docker
 
 import (
-	"bufio"
 	"context"
-	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
@@ -50,29 +48,21 @@ func (c Client) ListContainersByName(names []string) ([]types.Container, error) 
 	return containers, nil
 }
 
-func (c Client) ExecCommand(context context.Context, name string, command []string) {
-	execConfig := types.ExecConfig{Tty: true, AttachStdout: true, AttachStderr: false, Cmd: command}
-	respIdExecCreate, err := c.cli.ContainerExecCreate(context, name, execConfig)
+func (c Client) CreateNetwork(name string) error {
+	_, err := c.cli.NetworkCreate(context.Background(), name, types.NetworkCreate{
+		Driver: "bridge",
+	})
+	return err
+}
+
+func (c Client) NetworkExist(name string) bool {
+	var options types.NetworkListOptions
+	var array []filters.KeyValuePair
+	array = append(array, filters.Arg("name", name))
+	networks, err := c.cli.NetworkList(context.Background(), options)
 	if err != nil {
-		fmt.Println(err)
-	}
-	respId, err := c.cli.ContainerExecAttach(context, respIdExecCreate.ID, types.ExecStartCheck{})
-	if err != nil {
-		fmt.Println(err)
+		return false
 	}
 
-	//text, _ := respId.Reader.ReadString('\n')
-	//fmt.Printf("%s\n", text)
-	scanner := bufio.NewScanner(respId.Reader)
-	//text, _ := resp.Reader.ReadString('\n')
-	//log.Print(text)
-	for scanner.Scan() {
-		fmt.Println(scanner.Text())
-	}
-	//
-	//respId, err := c.cli.ContainerExecAttach(context, respIdExecCreate.ID, types.ExecStartCheck{})
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-
+	return len(networks) > 0
 }
