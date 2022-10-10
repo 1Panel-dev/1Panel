@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (b *BaseApi) SearchRepo(c *gin.Context) {
+func (b *BaseApi) SearchImage(c *gin.Context) {
 	var req dto.PageInfo
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
@@ -19,7 +19,7 @@ func (b *BaseApi) SearchRepo(c *gin.Context) {
 		return
 	}
 
-	total, list, err := imageRepoService.Page(req)
+	total, list, err := imageService.Page(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -31,18 +31,8 @@ func (b *BaseApi) SearchRepo(c *gin.Context) {
 	})
 }
 
-func (b *BaseApi) ListRepo(c *gin.Context) {
-	list, err := imageRepoService.List()
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-
-	helper.SuccessWithData(c, list)
-}
-
-func (b *BaseApi) CreateRepo(c *gin.Context) {
-	var req dto.ImageRepoCreate
+func (b *BaseApi) ImagePull(c *gin.Context) {
+	var req dto.ImagePull
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -51,15 +41,17 @@ func (b *BaseApi) CreateRepo(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if err := imageRepoService.Create(req); err != nil {
+
+	if err := imageService.ImagePull(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
+
 	helper.SuccessWithData(c, nil)
 }
 
-func (b *BaseApi) DeleteRepo(c *gin.Context) {
-	var req dto.BatchDeleteReq
+func (b *BaseApi) ImagePush(c *gin.Context) {
+	var req dto.ImagePush
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -69,15 +61,16 @@ func (b *BaseApi) DeleteRepo(c *gin.Context) {
 		return
 	}
 
-	if err := imageRepoService.BatchDelete(req.Ids); err != nil {
+	if err := imageService.ImagePush(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
+
 	helper.SuccessWithData(c, nil)
 }
 
-func (b *BaseApi) UpdateRepo(c *gin.Context) {
-	var req dto.ImageRepoUpdate
+func (b *BaseApi) ImageRemove(c *gin.Context) {
+	var req dto.ImageRemove
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -86,21 +79,49 @@ func (b *BaseApi) UpdateRepo(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	id, err := helper.GetParamID(c)
-	if err != nil {
+
+	if err := imageService.ImageRemove(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) ImageSave(c *gin.Context) {
+	var req dto.ImageSave
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 
-	upMap := make(map[string]interface{})
-	upMap["download_url"] = req.DownloadUrl
-	upMap["repo_name"] = req.RepoName
-	upMap["username"] = req.Username
-	upMap["password"] = req.Password
-	upMap["auth"] = req.Auth
-	if err := imageRepoService.Update(id, upMap); err != nil {
+	if err := imageService.ImageSave(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
+
+	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) ImageLoad(c *gin.Context) {
+	var req dto.ImageLoad
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := imageService.ImageLoad(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
 	helper.SuccessWithData(c, nil)
 }

@@ -10,6 +10,7 @@ type ImageRepoRepo struct{}
 type IImageRepoRepo interface {
 	Get(opts ...DBOption) (model.ImageRepo, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.ImageRepo, error)
+	List(opts ...DBOption) ([]model.ImageRepo, error)
 	Create(imageRepo *model.ImageRepo) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
@@ -39,6 +40,18 @@ func (u *ImageRepoRepo) Page(page, size int, opts ...DBOption) (int64, []model.I
 	db = db.Count(&count)
 	err := db.Limit(size).Offset(size * (page - 1)).Find(&ops).Error
 	return count, ops, err
+}
+
+func (u *ImageRepoRepo) List(opts ...DBOption) ([]model.ImageRepo, error) {
+	var ops []model.ImageRepo
+	db := global.DB.Model(&model.ImageRepo{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	count := int64(0)
+	db = db.Count(&count)
+	err := db.Find(&ops).Error
+	return ops, err
 }
 
 func (u *ImageRepoRepo) Create(imageRepo *model.ImageRepo) error {

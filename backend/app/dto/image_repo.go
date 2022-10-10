@@ -29,3 +29,9 @@ type ImageRepoInfo struct {
 	Username    string    `json:"username"`
 	Auth        bool      `json:"auth"`
 }
+
+type ImageRepoOption struct {
+	ID          uint   `json:"id"`
+	Name        string `json:"name"`
+	DownloadUrl string `json:"downloadUrl"`
+}

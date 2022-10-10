@@ -25,9 +25,17 @@ func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
 		withRecordRouter.POST("operate", baseApi.ContainerOperation)
 		withRecordRouter.POST("/log", baseApi.ContainerLogs)
 
-		baRouter.POST("/repo/search", baseApi.GetRepoList)
+		baRouter.POST("/repo/search", baseApi.SearchRepo)
 		baRouter.PUT("/repo/:id", baseApi.UpdateRepo)
+		baRouter.GET("/repo", baseApi.ListRepo)
 		withRecordRouter.POST("/repo", baseApi.CreateRepo)
 		withRecordRouter.POST("/repo/del", baseApi.DeleteRepo)
+
+		baRouter.POST("/image/search", baseApi.SearchImage)
+		baRouter.POST("/image/pull", baseApi.ImagePull)
+		baRouter.POST("/image/push", baseApi.ImagePush)
+		baRouter.POST("/image/save", baseApi.ImageSave)
+		baRouter.POST("/image/load", baseApi.ImageLoad)
+		baRouter.POST("/image/remove", baseApi.ImageRemove)
 	}
 }
