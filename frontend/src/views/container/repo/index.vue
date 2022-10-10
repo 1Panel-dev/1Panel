@@ -19,13 +19,7 @@
                     min-width="100"
                     fix
                 />
-                <el-table-column
-                    :label="$t('container.imageRepo')"
-                    show-overflow-tooltip
-                    prop="repoName"
-                    min-width="70"
-                    fix
-                />
+                <el-table-column :label="$t('container.protocol')" prop="protocol" min-width="60" fix />
                 <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
                     <template #default="{ row }">
                         {{ dateFromat(0, 0, row.createdAt) }}
@@ -78,6 +72,7 @@ const onOpenDialog = async (
     title: string,
     rowData: Partial<Container.RepoInfo> = {
         auth: true,
+        protocol: 'http',
     },
 ) => {
     let params = {

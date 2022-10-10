@@ -24,9 +24,11 @@
             <el-form-item :label="$t('container.downloadUrl')" prop="downloadUrl">
                 <el-input v-model="dialogData.rowData!.downloadUrl" :placeholder="'172.16.10.10:8081'"></el-input>
             </el-form-item>
-            <el-form-item :label="$t('container.imageRepo')" prop="repoName">
-                <el-checkbox v-model="hasRepo">{{ $t('container.repoHelper') }}</el-checkbox>
-                <el-input v-if="hasRepo" v-model="dialogData.rowData!.repoName"></el-input>
+            <el-form-item :label="$t('container.protocol')" prop="protocol">
+                <el-radio-group v-model="dialogData.rowData!.protocol">
+                    <el-radio label="http">http</el-radio>
+                    <el-radio label="https">https</el-radio>
+                </el-radio-group>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -61,16 +63,14 @@ const dialogData = ref<DialogProps>({
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
-    hasRepo.value = params.rowData?.repoName ? params.rowData?.repoName.length !== 0 : false;
     repoVisiable.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
-const hasRepo = ref(false);
 const rules = reactive({
     name: [Rules.requiredInput, Rules.name],
     downloadUrl: [Rules.requiredInput],
-    repoName: [Rules.requiredInput],
+    protocol: [Rules.requiredSelect],
     username: [Rules.requiredInput],
     password: [Rules.requiredInput],
     auth: [Rules.requiredSelect],

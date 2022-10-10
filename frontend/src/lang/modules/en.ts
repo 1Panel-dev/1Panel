@@ -172,7 +172,6 @@ export default {
         last10Min: 'Last 10 Minutes',
 
         image: 'Image',
-        pullFromRepo: 'Pull from repo',
         imagePull: 'Image pull',
         imagePush: 'Image push',
         repoName: 'Repo Name',
@@ -189,11 +188,13 @@ export default {
         exportImage: 'ExportImage',
         version: 'Version',
         size: 'Size',
+        from: 'From',
 
         repo: 'Repo',
         name: 'Name',
+        protocol: 'protocol',
         downloadUrl: 'Download URL',
-        imageRepo: 'ImageRepo',
+        imageRepo: 'Image repo',
         repoHelper: 'Does it include a mirror repository/organization/project?',
         auth: 'Auth',
     },

@@ -19,7 +19,7 @@ type ImageRemove struct {
 }
 
 type ImagePull struct {
-	RepoID    uint   `josn:"repoID" validate:"required"`
+	RepoID    uint   `josn:"repoID"`
 	ImageName string `josn:"imageName" validate:"required"`
 }
 

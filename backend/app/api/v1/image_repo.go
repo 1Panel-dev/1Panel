@@ -94,7 +94,7 @@ func (b *BaseApi) UpdateRepo(c *gin.Context) {
 
 	upMap := make(map[string]interface{})
 	upMap["download_url"] = req.DownloadUrl
-	upMap["repo_name"] = req.RepoName
+	upMap["protocol"] = req.Protocol
 	upMap["username"] = req.Username
 	upMap["password"] = req.Password
 	upMap["auth"] = req.Auth

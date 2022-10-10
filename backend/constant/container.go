@@ -9,4 +9,6 @@ const (
 	ContainerOpUnpause = "unPause"
 	ContainerOpRename  = "reName"
 	ContainerOpRemove  = "remove"
+
+	DaemonJsonDir = "/System/Volumes/Data/Users/slooop/.docker/daemon.json"
 )

@@ -5,7 +5,7 @@ import "time"
 type ImageRepoCreate struct {
 	Name        string `json:"name" validate:"required"`
 	DownloadUrl string `json:"downloadUrl"`
-	RepoName    string `json:"repoName"`
+	Protocol    string `json:"protocol"`
 	Username    string `json:"username"`
 	Password    string `json:"password"`
 	Auth        bool   `json:"auth"`
@@ -14,7 +14,7 @@ type ImageRepoCreate struct {
 type ImageRepoUpdate struct {
 	ID          uint   `json:"id"`
 	DownloadUrl string `json:"downloadUrl"`
-	RepoName    string `json:"repoName"`
+	Protocol    string `json:"protocol"`
 	Username    string `json:"username"`
 	Password    string `json:"password"`
 	Auth        bool   `json:"auth"`
@@ -25,7 +25,7 @@ type ImageRepoInfo struct {
 	CreatedAt   time.Time `json:"createdAt"`
 	Name        string    `json:"name"`
 	DownloadUrl string    `json:"downloadUrl"`
-	RepoName    string    `json:"repoName"`
+	Protocol    string    `json:"protocol"`
 	Username    string    `json:"username"`
 	Auth        bool      `json:"auth"`
 }

@@ -3,10 +3,10 @@
         <el-card style="margin-top: 20px">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
                 <template #toolbar>
-                    <el-button type="primary" @click="pullVisiable = true">
-                        {{ $t('container.pullFromRepo') }}
+                    <el-button @click="onOpenPull">
+                        {{ $t('container.imagePull') }}
                     </el-button>
-                    <el-button @click="loadVisiable = true">
+                    <el-button @click="onOpenload">
                         {{ $t('container.importImage') }}
                     </el-button>
                     <el-button @click="onBatchDelete(null)">
@@ -30,28 +30,30 @@
             </ComplexTable>
         </el-card>
 
-        <el-dialog v-model="pullVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="50%">
+        <el-dialog v-model="pullVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
             <template #header>
                 <div class="card-header">
                     <span>{{ $t('container.imagePull') }}</span>
                 </div>
             </template>
             <el-form ref="pullFormRef" :model="pullForm" label-width="80px">
-                <el-form-item :label="$t('container.repoName')" :rules="Rules.requiredSelect" prop="repoID">
+                <el-form-item :label="$t('container.from')">
+                    <el-checkbox v-model="pullForm.fromRepo">{{ $t('container.imageRepo') }}</el-checkbox>
+                </el-form-item>
+                <el-form-item
+                    v-if="pullForm.fromRepo"
+                    :label="$t('container.repoName')"
+                    :rules="Rules.requiredSelect"
+                    prop="repoID"
+                >
                     <el-select style="width: 100%" filterable v-model="pullForm.repoID">
-                        <el-option
-                            v-for="item in repos"
-                            :key="item.id"
-                            :value="item.id"
-                            :label="item.name + ' [ ' + item.downloadUrl + ' ] '"
-                        />
+                        <el-option v-for="item in repos" :key="item.id" :value="item.id" :label="item.name" />
                     </el-select>
                 </el-form-item>
                 <el-form-item :label="$t('container.imageName')" :rules="Rules.requiredInput" prop="imageName">
-                    <el-input v-model="pullForm.imageName"></el-input>
-                </el-form-item>
-                <el-form-item v-if="pullForm.imageName !== ''">
-                    <el-tag>docker pull {{ loadDetailInfo(pullForm.repoID) }}/{{ pullForm.imageName }}</el-tag>
+                    <el-input v-model="pullForm.imageName">
+                        <template v-if="pullForm.fromRepo" #prepend>{{ loadDetailInfo(pullForm.repoID) }}/</template>
+                    </el-input>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -73,24 +75,13 @@
             <el-form ref="pushFormRef" :model="pushForm" label-width="80px">
                 <el-form-item :label="$t('container.repoName')" :rules="Rules.requiredSelect" prop="repoID">
                     <el-select style="width: 100%" filterable v-model="pushForm.repoID">
-                        <el-option
-                            v-for="item in repos"
-                            :key="item.id"
-                            :value="item.id"
-                            :label="item.name + ' [ ' + item.downloadUrl + ' ] '"
-                        />
+                        <el-option v-for="item in repos" :key="item.id" :value="item.id" :label="item.name" />
                     </el-select>
                 </el-form-item>
                 <el-form-item :label="$t('container.label')" :rules="Rules.requiredInput" prop="tagName">
-                    <el-input v-model="pushForm.tagName"></el-input>
-                </el-form-item>
-                <el-form-item v-if="pushForm.tagName !== ''">
-                    <el-tag>
-                        docker tag {{ pushForm.imageName }} {{ loadDetailInfo(pushForm.repoID) }}/{{ pushForm.tagName }}
-                    </el-tag>
-                </el-form-item>
-                <el-form-item v-if="pushForm.tagName !== ''">
-                    <el-tag>docker push {{ loadDetailInfo(pushForm.repoID) }}/{{ pushForm.tagName }}</el-tag>
+                    <el-input v-model="pushForm.tagName">
+                        <template #prepend>{{ loadDetailInfo(pushForm.repoID) }}/</template>
+                    </el-input>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -198,6 +189,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const pullVisiable = ref(false);
 const pullFormRef = ref<FormInstance>();
 const pullForm = reactive({
+    fromRepo: true,
     repoID: 1,
     imageName: '',
 });
@@ -248,12 +240,20 @@ const loadLoadDir = async (path: string) => {
     loadForm.path = path;
 };
 
+const onOpenPull = () => {
+    pullVisiable.value = true;
+    pullForm.imageName = '';
+    pullForm.repoID = 1;
+};
 const submitPull = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
         try {
             loading.value = true;
+            if (!pullForm.fromRepo) {
+                pullForm.repoID = 0;
+            }
             pullVisiable.value = false;
             await imagePull(pullForm);
             loading.value = false;
@@ -284,6 +284,10 @@ const submitPush = async (formEl: FormInstance | undefined) => {
     });
 };
 
+const onOpenload = () => {
+    loadVisiable.value = true;
+    loadForm.path = '';
+};
 const submitLoad = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {

@@ -78,7 +78,20 @@ func (u *ImageService) ImagePull(req dto.ImagePull) error {
 	if err != nil {
 		return err
 	}
-	ctx := context.Background()
+	if req.RepoID == 0 {
+		go func() {
+			out, err := client.ImagePull(context.TODO(), req.ImageName, types.ImagePullOptions{})
+			if err != nil {
+				global.LOG.Errorf("image %s pull failed, err: %v", req.ImageName, err)
+				return
+			}
+			defer out.Close()
+			buf := new(bytes.Buffer)
+			_, _ = buf.ReadFrom(out)
+			global.LOG.Debugf("image %s pull stdout: %v", req.ImageName, buf.String())
+		}()
+		return nil
+	}
 	repo, err := imageRepoRepo.Get(commonRepo.WithByID(req.RepoID))
 	if err != nil {
 		return err
@@ -97,11 +110,8 @@ func (u *ImageService) ImagePull(req dto.ImagePull) error {
 		options.RegistryAuth = authStr
 	}
 	image := repo.DownloadUrl + "/" + req.ImageName
-	if len(repo.RepoName) != 0 {
-		image = fmt.Sprintf("%s/%s/%s", repo.DownloadUrl, repo.RepoName, req.ImageName)
-	}
 	go func() {
-		out, err := client.ImagePull(ctx, image, options)
+		out, err := client.ImagePull(context.TODO(), image, options)
 		if err != nil {
 			global.LOG.Errorf("image %s pull failed, err: %v", image, err)
 			return
