@@ -158,7 +158,6 @@ export default {
         reName: '重命名',
         remove: '移除',
         container: '容器',
-        storage: '数据卷',
         schedule: '编排',
         upTime: '运行时长',
         all: '全部',
@@ -168,8 +167,9 @@ export default {
         last10Min: '最近 10 分钟',
 
         image: '镜像',
-        imagePull: '镜像拉取',
-        imagePush: '镜像推送',
+        imagePull: '拉取镜像',
+        imagePush: '推送镜像',
+        imageDelete: '删除镜像',
         repoName: '仓库名',
         imageName: '镜像名',
         pull: '拉取',
@@ -198,6 +198,11 @@ export default {
         subnet: '子网',
         scope: 'IP 范围',
         gateway: '网关',
+
+        volume: '存储卷',
+        volumeName: '名称',
+        mountpoint: '挂载点',
+        createVolume: '创建存储卷',
 
         repo: '仓库',
         name: '名称',

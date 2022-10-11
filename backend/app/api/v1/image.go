@@ -89,7 +89,7 @@ func (b *BaseApi) ImagePush(c *gin.Context) {
 }
 
 func (b *BaseApi) ImageRemove(c *gin.Context) {
-	var req dto.ImageRemove
+	var req dto.BatchDelete
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -119,6 +119,25 @@ func (b *BaseApi) ImageSave(c *gin.Context) {
 	}
 
 	if err := imageService.ImageSave(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) ImageTag(c *gin.Context) {
+	var req dto.ImageTag
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := imageService.ImageTag(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

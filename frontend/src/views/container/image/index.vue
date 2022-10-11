@@ -12,14 +12,19 @@
                     <el-button @click="onOpenBuild">
                         {{ $t('container.build') }}
                     </el-button>
-                    <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                    <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete('byid')">
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </template>
                 <el-table-column type="selection" fix></el-table-column>
                 <el-table-column label="ID" show-overflow-tooltip prop="id" min-width="60" />
-                <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name" min-width="100" />
-                <el-table-column :label="$t('container.version')" prop="version" min-width="60" fix />
+                <el-table-column :label="$t('container.tag')" prop="tags" min-width="160" fix>
+                    <template #default="{ row }">
+                        <el-tag style="margin-left: 5px" v-for="(item, index) of row.tags" :key="index">
+                            {{ item }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
                 <el-table-column :label="$t('container.size')" prop="size" min-width="70" fix />
                 <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
                     <template #default="{ row }">
@@ -30,160 +35,32 @@
             </ComplexTable>
         </el-card>
 
-        <el-dialog v-model="buildVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="50%">
-            <template #header>
-                <div class="card-header">
-                    <span>{{ $t('container.importImage') }}</span>
-                </div>
-            </template>
-            <el-form ref="buildFormRef" :model="buildForm" label-position="left" label-width="80px">
-                <el-form-item label="Dockerfile" :rules="Rules.requiredSelect" prop="from">
-                    <el-radio-group v-model="buildForm.from">
-                        <el-radio label="edit">{{ $t('container.edit') }}</el-radio>
-                        <el-radio label="path">{{ $t('container.pathSelect') }}</el-radio>
-                    </el-radio-group>
-                </el-form-item>
-                <el-form-item v-if="buildForm.from !== 'edit'" :rules="Rules.requiredInput">
-                    <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 10 }" v-model="buildForm.dockerfile" />
-                </el-form-item>
-                <el-form-item v-else :rules="Rules.requiredInput">
-                    <el-input clearable v-model="buildForm.dockerfile">
-                        <template #append>
-                            <FileList @choose="loadBuildDir" :dir="true"></FileList>
-                        </template>
-                    </el-input>
-                </el-form-item>
-                <el-form-item :label="$t('container.tag')">
-                    <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" v-model="buildForm.tag" />
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="submitBuild(buildFormRef)">{{ $t('container.import') }}</el-button>
-                    <el-button @click="buildVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                </span>
-            </template>
-        </el-dialog>
+        <Pull ref="dialogPullRef" @search="search" />
+        <Tag ref="dialogTagRef" @search="search" />
+        <Push ref="dialogPushRef" @search="search" />
+        <Save ref="dialogSaveRef" @search="search" />
+        <Load ref="dialogLoadRef" @search="search" />
+        <Build ref="dialogBuildRef" @search="search" />
 
-        <el-dialog v-model="pullVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
+        <el-dialog v-model="deleteVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
             <template #header>
                 <div class="card-header">
-                    <span>{{ $t('container.imagePull') }}</span>
+                    <span>{{ $t('container.imageDelete') }}</span>
                 </div>
             </template>
-            <el-form ref="pullFormRef" :model="pullForm" label-width="80px">
-                <el-form-item :label="$t('container.from')">
-                    <el-checkbox v-model="pullForm.fromRepo">{{ $t('container.imageRepo') }}</el-checkbox>
-                </el-form-item>
-                <el-form-item
-                    v-if="pullForm.fromRepo"
-                    :label="$t('container.repoName')"
-                    :rules="Rules.requiredSelect"
-                    prop="repoID"
-                >
-                    <el-select style="width: 100%" filterable v-model="pullForm.repoID">
-                        <el-option v-for="item in repos" :key="item.id" :value="item.id" :label="item.name" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item :label="$t('container.imageName')" :rules="Rules.requiredInput" prop="imageName">
-                    <el-input v-model="pullForm.imageName">
-                        <template v-if="pullForm.fromRepo" #prepend>{{ loadDetailInfo(pullForm.repoID) }}/</template>
-                    </el-input>
+            <el-form :model="deleteForm" label-width="80px">
+                <el-form-item label="Tag" prop="tagName">
+                    <el-checkbox-group v-model="deleteForm.deleteTags">
+                        <el-checkbox v-for="item in deleteForm.tags" :key="item" :value="item" :label="item" />
+                    </el-checkbox-group>
                 </el-form-item>
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="submitPull(pullFormRef)">
-                        {{ $t('container.pull') }}
+                    <el-button :disabled="deleteForm.deleteTags.length === 0" @click="batchDelete('byname')">
+                        {{ $t('commons.button.delete') }}
                     </el-button>
-                    <el-button @click="pullVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                </span>
-            </template>
-        </el-dialog>
-
-        <el-dialog v-model="pushVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="50%">
-            <template #header>
-                <div class="card-header">
-                    <span>{{ $t('container.imagePush') }} ({{ pushForm.imageName }})</span>
-                </div>
-            </template>
-            <el-form ref="pushFormRef" :model="pushForm" label-width="80px">
-                <el-form-item :label="$t('container.repoName')" :rules="Rules.requiredSelect" prop="repoID">
-                    <el-select style="width: 100%" filterable v-model="pushForm.repoID">
-                        <el-option v-for="item in repos" :key="item.id" :value="item.id" :label="item.name" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item :label="$t('container.label')" :rules="Rules.requiredInput" prop="tagName">
-                    <el-input v-model="pushForm.tagName">
-                        <template #prepend>{{ loadDetailInfo(pushForm.repoID) }}/</template>
-                    </el-input>
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="submitPush(pushFormRef)">
-                        {{ $t('container.push') }}
-                    </el-button>
-                    <el-button @click="pushVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                </span>
-            </template>
-        </el-dialog>
-
-        <el-dialog v-model="saveVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="50%">
-            <template #header>
-                <div class="card-header">
-                    <span>{{ $t('container.exportImage') }} ({{ saveForm.imageName }})</span>
-                </div>
-            </template>
-            <el-form ref="saveFormRef" :model="saveForm" label-width="80px">
-                <el-form-item :label="$t('container.path')" :rules="Rules.requiredSelect" prop="path">
-                    <el-input clearable v-model="saveForm.path">
-                        <template #append>
-                            <FileList @choose="loadSaveDir" :dir="true"></FileList>
-                        </template>
-                    </el-input>
-                </el-form-item>
-                <el-form-item :label="$t('container.fileName')" :rules="Rules.requiredInput" prop="name">
-                    <el-input v-model="saveForm.name">
-                        <template #append>.tar</template>
-                    </el-input>
-                </el-form-item>
-                <el-form-item v-if="saveForm.path !== '' && saveForm.name !== ''">
-                    <el-tag>docker save {{ saveForm.imageName }} > {{ saveForm.path }}/{{ saveForm.name }}.tar</el-tag>
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="submitSave(saveFormRef)">
-                        {{ $t('container.export') }}
-                    </el-button>
-                    <el-button @click="saveVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                </span>
-            </template>
-        </el-dialog>
-
-        <el-dialog v-model="loadVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
-            <template #header>
-                <div class="card-header">
-                    <span>{{ $t('container.importImage') }}</span>
-                </div>
-            </template>
-            <el-form ref="loadFormRef" :model="loadForm" label-width="80px">
-                <el-form-item :label="$t('container.path')" :rules="Rules.requiredSelect" prop="path">
-                    <el-input clearable v-model="loadForm.path">
-                        <template #append>
-                            <FileList @choose="loadLoadDir" :dir="false"></FileList>
-                        </template>
-                    </el-input>
-                </el-form-item>
-                <el-form-item v-if="loadForm.path !== ''">
-                    <el-tag>docker load &lt; {{ loadForm.path }}</el-tag>
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="submitLoad(loadFormRef)">{{ $t('container.import') }}</el-button>
-                    <el-button @click="loadVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="deleteVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
                 </span>
             </template>
         </el-dialog>
@@ -193,22 +70,18 @@
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import { reactive, onMounted, ref } from 'vue';
-import FileList from '@/components/file-list/index.vue';
 import { dateFromat } from '@/utils/util';
 import { Container } from '@/api/interface/container';
-import {
-    getImagePage,
-    getRepoOption,
-    imageBuild,
-    imageLoad,
-    imagePull,
-    imagePush,
-    imageRemove,
-    imageSave,
-} from '@/api/modules/container';
-import { Rules } from '@/global/form-rules';
+import Pull from '@/views/container/image/pull/index.vue';
+import Tag from '@/views/container/image/tag/index.vue';
+import Push from '@/views/container/image/push/index.vue';
+import Save from '@/views/container/image/save/index.vue';
+import Load from '@/views/container/image/load/index.vue';
+import Build from '@/views/container/image/build/index.vue';
+import { getImagePage, getRepoOption, imageRemove } from '@/api/modules/container';
 import i18n from '@/lang';
-import { ElForm, ElMessage, ElMessageBox } from 'element-plus';
+import { ElForm } from 'element-plus';
+import { useDeleteData } from '@/hooks/use-delete-data';
 
 const loading = ref(false);
 
@@ -221,44 +94,17 @@ const paginationConfig = reactive({
     total: 0,
 });
 
-type FormInstance = InstanceType<typeof ElForm>;
+const dialogPullRef = ref();
+const dialogTagRef = ref();
+const dialogPushRef = ref();
+const dialogLoadRef = ref();
+const dialogSaveRef = ref();
+const dialogBuildRef = ref();
 
-const buildVisiable = ref(false);
-const buildFormRef = ref<FormInstance>();
-const buildForm = reactive({
-    from: 'path',
-    dockerfile: '',
-    tag: '',
-});
-
-const pullVisiable = ref(false);
-const pullFormRef = ref<FormInstance>();
-const pullForm = reactive({
-    fromRepo: true,
-    repoID: 1,
-    imageName: '',
-});
-
-const pushVisiable = ref(false);
-const pushFormRef = ref<FormInstance>();
-const pushForm = reactive({
-    repoID: 1,
-    imageName: '',
-    tagName: '',
-});
-
-const saveVisiable = ref(false);
-const saveFormRef = ref<FormInstance>();
-const saveForm = reactive({
-    imageName: '',
-    path: '',
-    name: '',
-});
-
-const loadVisiable = ref(false);
-const loadFormRef = ref<FormInstance>();
-const loadForm = reactive({
-    path: '',
+const deleteVisiable = ref(false);
+const deleteForm = reactive({
+    deleteTags: [] as Array<string>,
+    tags: [] as Array<string>,
 });
 
 const search = async () => {
@@ -278,183 +124,73 @@ const loadRepos = async () => {
     repos.value = res.data;
 };
 
-const loadBuildDir = async (path: string) => {
-    buildForm.dockerfile = path;
-};
-const loadSaveDir = async (path: string) => {
-    saveForm.path = path;
-};
-const loadLoadDir = async (path: string) => {
-    loadForm.path = path;
-};
-
 const onOpenPull = () => {
-    pullVisiable.value = true;
-    pullForm.imageName = '';
-    pullForm.repoID = 1;
-};
-const submitPull = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        try {
-            loading.value = true;
-            if (!pullForm.fromRepo) {
-                pullForm.repoID = 0;
-            }
-            pullVisiable.value = false;
-            await imagePull(pullForm);
-            loading.value = false;
-            search();
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        } catch {
-            loading.value = false;
-            search();
-        }
-    });
-};
-
-const submitPush = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        try {
-            loading.value = true;
-            pushVisiable.value = false;
-            await imagePush(pushForm);
-            loading.value = false;
-            search();
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        } catch {
-            loading.value = false;
-            search();
-        }
-    });
+    let params = {
+        repos: repos,
+    };
+    dialogPullRef.value!.acceptParams(params);
 };
 
 const onOpenBuild = () => {
-    buildVisiable.value = true;
-    buildForm.from = 'path';
-    buildForm.dockerfile = '';
-};
-const submitBuild = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        try {
-            loading.value = true;
-            loadVisiable.value = false;
-            await imageBuild(buildForm);
-            loading.value = false;
-            search();
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        } catch {
-            loading.value = false;
-            search();
-        }
-    });
+    dialogBuildRef.value!.acceptParams();
 };
 
 const onOpenload = () => {
-    loadVisiable.value = true;
-    loadForm.path = '';
-};
-const submitLoad = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        try {
-            loading.value = true;
-            loadVisiable.value = false;
-            await imageLoad(loadForm);
-            loading.value = false;
-            search();
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        } catch {
-            loading.value = false;
-            search();
-        }
-    });
+    dialogLoadRef.value!.acceptParams();
 };
 
-const submitSave = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        try {
-            loading.value = true;
-            saveVisiable.value = false;
-            await imageSave(saveForm);
-            loading.value = false;
-            search();
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        } catch {
-            loading.value = false;
-            search();
-        }
-    });
-};
-
-const onBatchDelete = async (row: Container.ImageInfo | null) => {
-    ElMessageBox.confirm(i18n.global.t('commons.msg.delete'), i18n.global.t('commons.msg.deleteTitle'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(async () => {
-        if (row) {
-            loading.value = true;
-            await imageRemove({ imageName: row.name + ':' + row.version });
-            loading.value = false;
-            search();
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-            return;
-        }
-        let ps = [];
-        for (const item of selects.value) {
-            ps.push(imageRemove({ imageName: item.name + ':' + item.version }));
-        }
-        loading.value = true;
-        Promise.all(ps)
-            .then(() => {
-                loading.value = false;
-                search();
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-            })
-            .catch(() => {
-                loading.value = false;
-                search();
-            });
-    });
-};
-
-function loadDetailInfo(id: number) {
-    for (const item of repos.value) {
-        if (item.id === id) {
-            return item.downloadUrl;
+const batchDelete = async (option: string) => {
+    let ids: Array<string> = [];
+    if (option === 'byid') {
+        selects.value.forEach((item: Container.NetworkInfo) => {
+            ids.push(item.id);
+        });
+    } else {
+        for (const item of deleteForm.deleteTags) {
+            ids.push(item);
         }
     }
-    return '';
-}
+    await useDeleteData(imageRemove, { ids: ids }, 'commons.msg.delete', true);
+    deleteVisiable.value = false;
+    search();
+};
 
 const buttons = [
     {
+        label: 'Tag',
+        click: (row: Container.ImageInfo) => {
+            let params = {
+                repos: repos.value,
+                sourceID: row.id,
+            };
+            dialogTagRef.value!.acceptParams(params);
+        },
+    },
+    {
         label: i18n.global.t('container.push'),
         click: (row: Container.ImageInfo) => {
-            pushForm.imageName = row.name + ':' + row.version;
-            pushVisiable.value = true;
+            let params = {
+                repos: repos.value,
+                tags: row.tags,
+            };
+            dialogPushRef.value!.acceptParams(params);
         },
     },
     {
         label: i18n.global.t('container.export'),
         click: (row: Container.ImageInfo) => {
-            saveForm.imageName = row.name + ':' + row.version;
-            saveVisiable.value = true;
+            let params = {
+                repos: repos.value,
+                tags: row.tags,
+            };
+            dialogSaveRef.value!.acceptParams(params);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
         click: (row: Container.ImageInfo) => {
-            onBatchDelete(row);
+            deleteForm.tags = row.tags;
+            deleteVisiable.value = true;
         },
     },
 ];

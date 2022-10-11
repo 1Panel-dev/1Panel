@@ -37,6 +37,7 @@ func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
 		baRouter.POST("/image/save", baseApi.ImageSave)
 		baRouter.POST("/image/load", baseApi.ImageLoad)
 		baRouter.POST("/image/remove", baseApi.ImageRemove)
+		baRouter.POST("/image/tag", baseApi.ImageTag)
 
 		baRouter.POST("/network/del", baseApi.DeleteNetwork)
 		baRouter.POST("/network/search", baseApi.SearchNetwork)

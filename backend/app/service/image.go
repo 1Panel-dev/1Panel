@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/app/dto"
@@ -25,7 +24,7 @@ type IImageService interface {
 	ImageLoad(req dto.ImageLoad) error
 	ImageSave(req dto.ImageSave) error
 	ImagePush(req dto.ImagePush) error
-	ImageRemove(req dto.ImageRemove) error
+	ImageRemove(req dto.BatchDelete) error
 }
 
 func NewIImageService() IImageService {
@@ -48,17 +47,12 @@ func (u *ImageService) Page(req dto.PageInfo) (int64, interface{}, error) {
 
 	for _, image := range list {
 		size := formatFileSize(image.Size)
-		for _, item := range image.RepoTags {
-			name := item[0:strings.LastIndex(item, ":")]
-			tag := strings.ReplaceAll(item[strings.LastIndex(item, ":"):], ":", "")
-			records = append(records, dto.ImageInfo{
-				ID:        image.ID,
-				Name:      name,
-				Version:   tag,
-				CreatedAt: time.Unix(image.Created, 0),
-				Size:      size,
-			})
-		}
+		records = append(records, dto.ImageInfo{
+			ID:        image.ID,
+			Tags:      image.RepoTags,
+			CreatedAt: time.Unix(image.Created, 0),
+			Size:      size,
+		})
 	}
 	total, start, end := len(records), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
@@ -164,22 +158,34 @@ func (u *ImageService) ImageLoad(req dto.ImageLoad) error {
 }
 
 func (u *ImageService) ImageSave(req dto.ImageSave) error {
-	file, err := os.OpenFile(fmt.Sprintf("%s/%s.tar", req.Path, req.Name), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0666)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return err
 	}
 
-	out, err := client.ImageSave(context.TODO(), []string{req.ImageName})
+	out, err := client.ImageSave(context.TODO(), []string{req.TagName})
 	if err != nil {
 		return err
 	}
 	defer out.Close()
+	file, err := os.OpenFile(fmt.Sprintf("%s/%s.tar", req.Path, req.Name), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0666)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
 	if _, err = io.Copy(file, out); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (u *ImageService) ImageTag(req dto.ImageTag) error {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+
+	if err := client.ImageTag(context.TODO(), req.SourceID, req.TargetName); err != nil {
 		return err
 	}
 	return nil
@@ -207,34 +213,36 @@ func (u *ImageService) ImagePush(req dto.ImagePush) error {
 		authStr := base64.URLEncoding.EncodeToString(encodedJSON)
 		options.RegistryAuth = authStr
 	}
-	newName := fmt.Sprintf("%s/%s", repo.DownloadUrl, req.TagName)
-	if newName != req.ImageName {
-		if err := client.ImageTag(context.TODO(), req.ImageName, newName); err != nil {
+	newName := fmt.Sprintf("%s/%s", repo.DownloadUrl, req.Name)
+	if newName != req.TagName {
+		if err := client.ImageTag(context.TODO(), req.TagName, newName); err != nil {
 			return err
 		}
 	}
 	go func() {
 		out, err := client.ImagePush(context.TODO(), newName, options)
 		if err != nil {
-			global.LOG.Errorf("image %s push failed, err: %v", req.ImageName, err)
+			global.LOG.Errorf("image %s push failed, err: %v", req.TagName, err)
 			return
 		}
 		defer out.Close()
 		buf := new(bytes.Buffer)
 		_, _ = buf.ReadFrom(out)
-		global.LOG.Debugf("image %s push stdout: %v", req.ImageName, buf.String())
+		global.LOG.Debugf("image %s push stdout: %v", req.TagName, buf.String())
 	}()
 
 	return nil
 }
 
-func (u *ImageService) ImageRemove(req dto.ImageRemove) error {
+func (u *ImageService) ImageRemove(req dto.BatchDelete) error {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return err
 	}
-	if _, err := client.ImageRemove(context.TODO(), req.ImageName, types.ImageRemoveOptions{Force: true}); err != nil {
-		return err
+	for _, ids := range req.Ids {
+		if _, err := client.ImageRemove(context.TODO(), ids, types.ImageRemoveOptions{Force: true}); err != nil {
+			return err
+		}
 	}
 	return nil
 }

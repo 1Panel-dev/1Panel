@@ -29,26 +29,24 @@ type ContainerOperation struct {
 }
 
 type Network struct {
-	ID          string    `json:"id"`
-	Name        string    `json:"name"`
-	Labels      []string  `json:"labels"`
-	Driver      string    `json:"driver"`
-	IPAMDriver  string    `json:"ipamDriver"`
-	IPV4Subnet  string    `json:"ipv4Subnet"`
-	IPV4Gateway string    `json:"ipv4Gateway"`
-	IPV6Subnet  string    `json:"ipv6Subnet"`
-	IPV6Gateway string    `json:"ipv6Gateway"`
-	CreatedAt   time.Time `json:"createdAt"`
-	Attachable  bool      `json:"attachable"`
+	ID         string    `json:"id"`
+	Name       string    `json:"name"`
+	Labels     []string  `json:"labels"`
+	Driver     string    `json:"driver"`
+	IPAMDriver string    `json:"ipamDriver"`
+	Subnet     string    `json:"subnet"`
+	Gateway    string    `json:"gateway"`
+	CreatedAt  time.Time `json:"createdAt"`
+	Attachable bool      `json:"attachable"`
 }
 type NetworkCreat struct {
-	Name        string   `json:"name"`
-	Driver      string   `json:"driver"`
-	Options     []string `json:"options"`
-	IPV4Subnet  string   `json:"ipv4Subnet"`
-	IPV4Gateway string   `json:"ipv4Gateway"`
-	Scope       string   `json:"scope"`
-	Labels      []string `json:"labels"`
+	Name    string   `json:"name"`
+	Driver  string   `json:"driver"`
+	Options []string `json:"options"`
+	Subnet  string   `json:"subnet"`
+	Gateway string   `json:"gateway"`
+	IPRange string   `json:"ipRange"`
+	Labels  []string `json:"labels"`
 }
 
 type Volume struct {

@@ -21,7 +21,7 @@ export namespace Container {
         id: string;
         createdAt: Date;
         name: string;
-        version: string;
+        tags: Array<string>;
         size: string;
     }
     export interface ImageBuild {
@@ -32,19 +32,20 @@ export namespace Container {
         repoID: number;
         imageName: string;
     }
+    export interface ImageTag {
+        repoID: number;
+        sourceID: string;
+        targetName: string;
+    }
     export interface ImagePush {
         repoID: number;
-        imageName: string;
         tagName: string;
-    }
-    export interface ImageRemove {
-        imageName: string;
     }
     export interface ImageLoad {
         path: string;
     }
     export interface ImageSave {
-        imageName: string;
+        tagName: string;
         path: string;
         name: string;
     }
@@ -55,10 +56,8 @@ export namespace Container {
         labels: Array<string>;
         driver: string;
         ipamDriver: string;
-        ipv4Subnet: string;
-        ipv4Gateway: string;
-        ipv6Subnet: string;
-        ipv6Gateway: string;
+        subnet: string;
+        gateway: string;
         createdAt: string;
         attachable: string;
     }
@@ -67,8 +66,8 @@ export namespace Container {
         labels: Array<string>;
         options: Array<string>;
         driver: string;
-        ipv4Subnet: string;
-        ipv4Gateway: string;
+        subnet: string;
+        gateway: string;
         scope: string;
     }
 
@@ -83,7 +82,7 @@ export namespace Container {
         name: string;
         driver: string;
         options: Array<string>;
-        label: Array<string>;
+        labels: Array<string>;
     }
 
     export interface RepoCreate {
