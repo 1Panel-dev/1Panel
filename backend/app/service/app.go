@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/app/repo"
@@ -15,18 +16,15 @@ import (
 	"github.com/1Panel-dev/1Panel/utils/files"
 	"golang.org/x/net/context"
 	"gopkg.in/yaml.v3"
-	"math"
 	"os"
 	"path"
-	"reflect"
-	"strconv"
 	"strings"
 )
 
 type AppService struct {
 }
 
-func (a AppService) Page(req dto.AppRequest) (interface{}, error) {
+func (a AppService) PageApp(req dto.AppRequest) (interface{}, error) {
 
 	var opts []repo.DBOption
 	opts = append(opts, commonRepo.WithOrderBy("name"))
@@ -147,7 +145,7 @@ func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, 
 	return appDetailDTO, nil
 }
 
-func (a AppService) Operate(req dto.AppInstallOperate) error {
+func (a AppService) OperateInstall(req dto.AppInstallOperate) error {
 	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallId))
 	if err != nil {
 		return err
@@ -178,46 +176,24 @@ func (a AppService) Operate(req dto.AppInstallOperate) error {
 		op := files.NewFileOp()
 		appDir := install.GetPath()
 		dir, _ := os.Stat(appDir)
+		if dir != nil {
+			out, err := compose.Down(dockerComposePath)
+			if err != nil {
+				return handleErr(install, err, out)
+			}
+			if err := op.DeleteDir(appDir); err != nil {
+				return err
+			}
+		}
 
 		tx := global.DB.Begin()
 		ctx := context.WithValue(context.Background(), "db", tx)
-		if dir == nil {
-			if err := appInstallRepo.Delete(ctx, install); err != nil {
-				return err
-			}
-			tx.Commit()
-			return nil
-		}
-		out, err := compose.Down(dockerComposePath)
-		if err != nil {
-			tx.Rollback()
-			return handleErr(install, err, out)
-		}
-		if err := op.DeleteDir(appDir); err != nil {
-			tx.Rollback()
-			return err
-		}
+
 		if err := appInstallRepo.Delete(ctx, install); err != nil {
 			tx.Rollback()
 			return err
 		}
-
-		database, _ := dataBaseRepo.GetFirst(dataBaseRepo.ByAppInstallId(install.ID))
-		if reflect.DeepEqual(database, model.Database{}) {
-			tx.Commit()
-			return nil
-		}
-		if err := dataBaseRepo.DeleteBy(ctx, dataBaseRepo.ByAppInstallId(install.ID)); err != nil {
-			tx.Rollback()
-			return err
-		}
-		container, err := appContainerRepo.GetFirst(commonRepo.WithByID(database.AppContainerId))
-		if err != nil {
-			tx.Commit()
-			return nil
-		}
-
-		if err := execDockerCommand(database, container, Delete); err != nil {
+		if err := deleteLink(ctx, &install); err != nil {
 			tx.Rollback()
 			return err
 		}
@@ -235,25 +211,15 @@ func (a AppService) Operate(req dto.AppInstallOperate) error {
 	return appInstallRepo.Save(install)
 }
 
-func handleErr(install model.AppInstall, err error, out string) error {
-	reErr := err
-	install.Message = err.Error()
-	if out != "" {
-		install.Message = out
-		reErr = errors.New(out)
-	}
-	_ = appInstallRepo.Save(install)
-	return reErr
-}
-
 func (a AppService) Install(name string, appDetailId uint, params map[string]interface{}) error {
 
-	port, ok := params["PANEL_APP_PORT_HTTP"]
-	if ok {
-		portStr := strconv.FormatFloat(port.(float64), 'f', -1, 32)
-		if common.ScanPort(portStr) {
-			return errors.New("port is in used")
-		}
+	httpPort, err := checkPort("PANEL_APP_PORT_HTTP", params)
+	if err != nil {
+		return errors.New(fmt.Sprintf("%d port is in used", httpPort))
+	}
+	httpsPort, err := checkPort("PANEL_APP_PORT_HTTPS", params)
+	if err != nil {
+		return errors.New(fmt.Sprintf("%d port is in used", httpsPort))
 	}
 
 	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(appDetailId))
@@ -268,8 +234,7 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 	if err := checkRequiredAndLimit(app); err != nil {
 		return err
 	}
-	composeFilePath, err := copyAppData(app.Key, appDetail.Version, name, params)
-	if err != nil {
+	if err := copyAppData(app.Key, appDetail.Version, name, params); err != nil {
 		return err
 	}
 
@@ -283,42 +248,10 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 		AppDetailId: appDetail.ID,
 		Version:     appDetail.Version,
 		Status:      constant.Installing,
-		Params:      string(paramByte),
-	}
-
-	var (
-		auth     string
-		dbConfig dto.AppDatabase
-	)
-	tags, err := tagRepo.GetByAppId(app.ID)
-	if err != nil {
-		return err
-	}
-	for _, tag := range tags {
-		if tag.Key == "Database" {
-			var authParam dto.AuthParam
-			paramByte, err := json.Marshal(params)
-			if err != nil {
-				return err
-			}
-			if err := json.Unmarshal(paramByte, &authParam); err != nil {
-				return err
-			}
-			authByte, err := json.Marshal(authParam)
-			if err != nil {
-				return err
-			}
-			auth = string(authByte)
-		}
-		if tag.Key == "WebSite" {
-			paramByte, err := json.Marshal(params)
-			if err != nil {
-				return err
-			}
-			if err := json.Unmarshal(paramByte, &dbConfig); err != nil {
-				return err
-			}
-		}
+		Env:         string(paramByte),
+		HttpPort:    httpPort,
+		HttpsPort:   httpsPort,
+		App:         app,
 	}
 
 	composeMap := make(map[string]interface{})
@@ -327,27 +260,14 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 	}
 	servicesMap := composeMap["services"].(map[string]interface{})
 	changeKeys := make(map[string]string, len(servicesMap))
-	var appContainers []*model.AppContainer
 	for k, v := range servicesMap {
 		serviceName := k + "-" + common.RandStr(4)
 		changeKeys[k] = serviceName
 		value := v.(map[string]interface{})
 		containerName := constant.ContainerPrefix + k + "-" + common.RandStr(4)
 		value["container_name"] = containerName
-		servicePort := 0
-
-		port, ok := params["PANEL_APP_PORT_HTTP"]
-		if ok {
-			portN := int(math.Ceil(port.(float64)))
-			servicePort = portN
-		}
-
-		appContainers = append(appContainers, &model.AppContainer{
-			ServiceName:   serviceName,
-			ContainerName: containerName,
-			Port:          servicePort,
-			Auth:          auth,
-		})
+		appInstall.ServiceName = serviceName
+		appInstall.ContainerName = containerName
 	}
 	for k, v := range changeKeys {
 		servicesMap[v] = servicesMap[k]
@@ -357,61 +277,25 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 	if err != nil {
 		return err
 	}
+	appInstall.DockerCompose = string(composeByte)
+
 	fileOp := files.NewFileOp()
-	if err := fileOp.WriteFile(composeFilePath, strings.NewReader(string(composeByte)), 0775); err != nil {
+	if err := fileOp.WriteFile(appInstall.GetComposePath(), strings.NewReader(string(composeByte)), 0775); err != nil {
 		return err
 	}
 
 	tx := global.DB.Begin()
 	ctx := context.WithValue(context.Background(), "db", tx)
-
 	if err := appInstallRepo.Create(ctx, &appInstall); err != nil {
 		tx.Rollback()
 		return err
 	}
-	for _, c := range appContainers {
-		c.AppInstallID = appInstall.ID
-	}
-	if err := appContainerRepo.BatchCreate(ctx, appContainers); err != nil {
+	if err := createLink(ctx, app, &appInstall, params); err != nil {
 		tx.Rollback()
 		return err
 	}
-	if !reflect.DeepEqual(dbConfig, dto.AppDatabase{}) {
-		container, err := appContainerRepo.GetFirst(appContainerRepo.WithServiceName(dbConfig.ServiceName))
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-		install, err := appInstallRepo.GetFirst(commonRepo.WithByID(container.AppInstallID))
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-		app, err := appRepo.GetFirst(commonRepo.WithByID(install.ID))
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-		var database model.Database
-		database.AppContainerId = container.ID
-		database.Dbname = dbConfig.DbName
-		database.Username = dbConfig.DbUser
-		database.Password = dbConfig.Password
-		database.AppInstallId = appInstall.ID
-		database.Key = app.Key
-		if err := dataBaseRepo.Create(ctx, &database); err != nil {
-			tx.Rollback()
-			return err
-		}
-
-		if err := execDockerCommand(database, container, Add); err != nil {
-			tx.Rollback()
-			return err
-		}
-	}
-
 	tx.Commit()
-	go upApp(composeFilePath, appInstall)
+	go upApp(appInstall.GetComposePath(), appInstall)
 	return nil
 }
 
@@ -441,12 +325,10 @@ func (a AppService) GetServices(key string) ([]dto.AppService, error) {
 	}
 	var res []dto.AppService
 	for _, install := range installs {
-		for _, container := range install.Containers {
-			res = append(res, dto.AppService{
-				Label: install.Name,
-				Value: container.ServiceName,
-			})
-		}
+		res = append(res, dto.AppService{
+			Label: install.Name,
+			Value: install.ServiceName,
+		})
 	}
 	return res, nil
 }
@@ -456,10 +338,12 @@ func (a AppService) SyncInstalled(installId uint) error {
 	if err != nil {
 		return err
 	}
-	var containerNames []string
-	for _, a := range appInstall.Containers {
-		containerNames = append(containerNames, a.ContainerName)
+
+	containerNames, err := getContainerNames(appInstall)
+	if err != nil {
+		return err
 	}
+
 	cli, err := docker.NewClient()
 	if err != nil {
 		return err

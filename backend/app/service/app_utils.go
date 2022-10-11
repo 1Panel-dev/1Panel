@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/app/dto"
@@ -8,11 +9,14 @@ import (
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
 	"github.com/1Panel-dev/1Panel/utils/cmd"
+	"github.com/1Panel-dev/1Panel/utils/common"
 	"github.com/1Panel-dev/1Panel/utils/compose"
 	"github.com/1Panel-dev/1Panel/utils/files"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
+	"math"
 	"path"
+	"reflect"
 	"strconv"
 )
 
@@ -23,15 +27,15 @@ var (
 	Delete DatabaseOp = "delete"
 )
 
-func execDockerCommand(database model.Database, container model.AppContainer, op DatabaseOp) error {
+func execDockerCommand(database model.Database, dbInstall model.AppInstall, op DatabaseOp) error {
 	var auth dto.AuthParam
 	var dbConfig dto.AppDatabase
 	dbConfig.Password = database.Password
 	dbConfig.DbUser = database.Username
 	dbConfig.DbName = database.Dbname
-	json.Unmarshal([]byte(container.Auth), &auth)
+	json.Unmarshal([]byte(dbInstall.Param), &auth)
 	execConfig := dto.ContainerExec{
-		ContainerName: container.ContainerName,
+		ContainerName: dbInstall.ContainerName,
 		Auth:          auth,
 		DbParam:       dbConfig,
 	}
@@ -57,6 +61,118 @@ func getSqlStr(key string, operate DatabaseOp, exec dto.ContainerExec) string {
 		}
 	}
 	return str
+}
+
+func checkPort(key string, params map[string]interface{}) (int, error) {
+
+	port, ok := params[key]
+	if ok {
+		portN := int(math.Ceil(port.(float64)))
+		if common.ScanPort(portN) {
+			return portN, errors.New("port is in used")
+		} else {
+			return portN, nil
+		}
+	}
+	return 0, nil
+}
+
+func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall, params map[string]interface{}) error {
+	var dbConfig dto.AppDatabase
+	if app.Type == "runtime" {
+		var authParam dto.AuthParam
+		paramByte, err := json.Marshal(params)
+		if err != nil {
+			return err
+		}
+		if err := json.Unmarshal(paramByte, &authParam); err != nil {
+			return err
+		}
+		authByte, err := json.Marshal(authParam)
+		if err != nil {
+			return err
+		}
+		appInstall.Param = string(authByte)
+	}
+	if app.Type == "website" {
+		paramByte, err := json.Marshal(params)
+		if err != nil {
+			return err
+		}
+		if err := json.Unmarshal(paramByte, &dbConfig); err != nil {
+			return err
+		}
+	}
+
+	if !reflect.DeepEqual(dbConfig, dto.AppDatabase{}) {
+		dbInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithServiceName(dbConfig.ServiceName))
+		if err != nil {
+			return err
+		}
+		var database model.Database
+		database.Dbname = dbConfig.DbName
+		database.Username = dbConfig.DbUser
+		database.Password = dbConfig.Password
+		database.AppInstallId = dbInstall.ID
+		database.Key = dbInstall.App.Key
+		if err := dataBaseRepo.Create(ctx, &database); err != nil {
+			return err
+		}
+		var installResource model.AppInstallResource
+		installResource.ResourceId = database.ID
+		installResource.AppInstallId = appInstall.ID
+		installResource.LinkId = dbInstall.ID
+		installResource.Key = dbInstall.App.Key
+		if err := appInstallResourceRepo.Create(ctx, &installResource); err != nil {
+			return err
+		}
+		if err := execDockerCommand(database, dbInstall, Add); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func deleteLink(ctx context.Context, install *model.AppInstall) error {
+	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
+	if len(resources) == 0 {
+		return nil
+	}
+	for _, re := range resources {
+		if re.Key == "mysql" {
+			database, _ := dataBaseRepo.GetFirst(commonRepo.WithByID(re.ResourceId))
+			if reflect.DeepEqual(database, model.Database{}) {
+				continue
+			}
+			appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(database.AppInstallId))
+			if err != nil {
+				return nil
+			}
+			if err := execDockerCommand(database, appInstall, Delete); err != nil {
+				return err
+			}
+			if err := dataBaseRepo.DeleteBy(ctx, commonRepo.WithByID(database.ID)); err != nil {
+				return err
+			}
+		}
+	}
+	return appInstallResourceRepo.DeleteBy(ctx, appInstallResourceRepo.WithAppInstallId(install.ID))
+}
+
+func getContainerNames(install model.AppInstall) ([]string, error) {
+	composeMap := install.DockerCompose
+	envMap := make(map[string]string)
+	_ = json.Unmarshal([]byte(install.Env), &envMap)
+	project, err := compose.GetComposeProject([]byte(composeMap), envMap)
+	if err != nil {
+		return nil, err
+	}
+	var containerNames []string
+	for _, service := range project.AllServices() {
+		containerNames = append(containerNames, service.ContainerName)
+	}
+	return containerNames, nil
 }
 
 func checkRequiredAndLimit(app model.App) error {
@@ -103,7 +219,7 @@ func checkRequiredAndLimit(app model.App) error {
 	return nil
 }
 
-func copyAppData(key, version, installName string, params map[string]interface{}) (composeFilePath string, err error) {
+func copyAppData(key, version, installName string, params map[string]interface{}) (err error) {
 	resourceDir := path.Join(global.CONF.System.ResourceDir, "apps", key, version)
 	installDir := path.Join(global.CONF.System.AppDir, key)
 	installVersionDir := path.Join(installDir, version)
@@ -115,7 +231,6 @@ func copyAppData(key, version, installName string, params map[string]interface{}
 	if err = fileOp.Rename(installVersionDir, appDir); err != nil {
 		return
 	}
-	composeFilePath = path.Join(appDir, "docker-compose.yml")
 	envPath := path.Join(appDir, ".env")
 
 	envParams := make(map[string]string, len(params))
@@ -196,4 +311,15 @@ func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
 		apps[item.Key] = app
 	}
 	return apps
+}
+
+func handleErr(install model.AppInstall, err error, out string) error {
+	reErr := err
+	install.Message = err.Error()
+	if out != "" {
+		install.Message = out
+		reErr = errors.New(out)
+	}
+	_ = appInstallRepo.Save(install)
+	return reErr
 }
