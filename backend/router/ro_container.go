@@ -21,7 +21,7 @@ func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		baRouter.POST("/search", baseApi.SearchContainer)
-		baRouter.GET("/detail/:id", baseApi.ContainerDetail)
+		baRouter.POST("/inspect", baseApi.Inspect)
 		withRecordRouter.POST("operate", baseApi.ContainerOperation)
 		withRecordRouter.POST("/log", baseApi.ContainerLogs)
 

@@ -14,8 +14,8 @@ export const ContainerOperator = (params: Container.ContainerOperate) => {
     return http.post(`/containers/operate`, params);
 };
 
-export const getContainerInspect = (containerID: string) => {
-    return http.get<string>(`/containers/detail/${containerID}`);
+export const inspect = (params: Container.ContainerInspect) => {
+    return http.post<string>(`/containers/inspect`, params);
 };
 
 // image

@@ -7,6 +7,11 @@ type PageContainer struct {
 	Status string `json:"status" validate:"required,oneof=all running"`
 }
 
+type InspectReq struct {
+	ID   string `json:"id"`
+	Type string `json:"type"`
+}
+
 type ContainerInfo struct {
 	ContainerID string `json:"containerID"`
 	Name        string `json:"name"`
