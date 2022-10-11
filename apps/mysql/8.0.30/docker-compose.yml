@@ -6,7 +6,6 @@ services:
     container_name: ${CONTAINER_NAME}
     restart: always
     environment:
-      TZ: ${TZ}
       MYSQL_ROOT_PASSWORD: ${PANEL_DB_ROOT_PASSWORD}
     networks:
       - 1panel

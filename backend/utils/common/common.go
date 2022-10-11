@@ -78,9 +78,9 @@ func RandStr(n int) string {
 	return string(b)
 }
 
-func ScanPort(port string) bool {
+func ScanPort(port int) bool {
 
-	ln, err := net.Listen("tcp", ":"+port)
+	ln, err := net.Listen("tcp", ":"+strconv.Itoa(port))
 	if err != nil {
 		return true
 	}

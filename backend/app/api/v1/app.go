@@ -8,14 +8,14 @@ import (
 	"strconv"
 )
 
-func (b *BaseApi) AppSearch(c *gin.Context) {
+func (b *BaseApi) SearchApp(c *gin.Context) {
 	var req dto.AppRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 
-	list, err := appService.Page(req)
+	list, err := appService.PageApp(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -24,7 +24,7 @@ func (b *BaseApi) AppSearch(c *gin.Context) {
 	helper.SuccessWithData(c, list)
 }
 
-func (b *BaseApi) AppSync(c *gin.Context) {
+func (b *BaseApi) SyncApp(c *gin.Context) {
 	if err := appService.SyncAppList(); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -75,7 +75,7 @@ func (b *BaseApi) InstallApp(c *gin.Context) {
 
 	helper.SuccessWithData(c, nil)
 }
-func (b *BaseApi) PageInstalled(c *gin.Context) {
+func (b *BaseApi) SearchInstalled(c *gin.Context) {
 	var req dto.AppInstalledRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
@@ -93,13 +93,13 @@ func (b *BaseApi) PageInstalled(c *gin.Context) {
 	})
 }
 
-func (b *BaseApi) InstallOperate(c *gin.Context) {
+func (b *BaseApi) OperateInstalled(c *gin.Context) {
 	var req dto.AppInstallOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if err := appService.Operate(req); err != nil {
+	if err := appService.OperateInstall(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -107,7 +107,7 @@ func (b *BaseApi) InstallOperate(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-func (b *BaseApi) InstalledSync(c *gin.Context) {
+func (b *BaseApi) SyncInstalled(c *gin.Context) {
 	if err := appService.SyncAllInstalled(); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

@@ -1,6 +1,10 @@
 package repo
 
-import "gorm.io/gorm"
+import (
+	"context"
+	"github.com/1Panel-dev/1Panel/global"
+	"gorm.io/gorm"
+)
 
 type DBOption func(*gorm.DB) *gorm.DB
 
@@ -57,4 +61,20 @@ func (c *CommonRepo) WithIdsIn(ids []uint) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("id in (?)", ids)
 	}
+}
+
+func getTx(ctx context.Context, opts ...DBOption) *gorm.DB {
+	tx := ctx.Value("db").(*gorm.DB)
+	for _, opt := range opts {
+		tx = opt(tx)
+	}
+	return tx
+}
+
+func getDb(opts ...DBOption) *gorm.DB {
+	db := global.DB
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	return db
 }

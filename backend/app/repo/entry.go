@@ -14,7 +14,7 @@ type RepoGroup struct {
 	TagRepo
 	AppDetailRepo
 	AppInstallRepo
-	AppContainerRepo
+	AppInstallResourceRpo
 	DatabaseRepo
 }
 
