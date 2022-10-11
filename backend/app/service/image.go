@@ -73,6 +73,29 @@ func (u *ImageService) Page(req dto.PageInfo) (int64, interface{}, error) {
 	return int64(total), backDatas, nil
 }
 
+func (u *ImageService) ImageBuild(req dto.ImageBuild) error {
+	// client, err := docker.NewDockerClient()
+	// if err != nil {
+	// 	return err
+	// }
+	// if req.From == "path" {
+	// 	tar, err := archive.TarWithOptions("node-hello/", &archive.TarOptions{})
+	// 	if err != nil {
+	// 		return err
+	// 	}
+
+	// 	opts := types.ImageBuildOptions{
+	// 		Dockerfile: "Dockerfile",
+	// 		Tags:       []string{dockerRegistryUserID + "/node-hello"},
+	// 		Remove:     true,
+	// 	}
+	// 	if _, err := client.ImageBuild(context.TODO(), tar, opts); err != nil {
+	// 		return err
+	// 	}
+	// }
+	return nil
+}
+
 func (u *ImageService) ImagePull(req dto.ImagePull) error {
 	client, err := docker.NewDockerClient()
 	if err != nil {
@@ -185,8 +208,10 @@ func (u *ImageService) ImagePush(req dto.ImagePush) error {
 		options.RegistryAuth = authStr
 	}
 	newName := fmt.Sprintf("%s/%s", repo.DownloadUrl, req.TagName)
-	if err := client.ImageTag(context.TODO(), req.ImageName, newName); err != nil {
-		return err
+	if newName != req.ImageName {
+		if err := client.ImageTag(context.TODO(), req.ImageName, newName); err != nil {
+			return err
+		}
 	}
 	go func() {
 		out, err := client.ImagePush(context.TODO(), newName, options)

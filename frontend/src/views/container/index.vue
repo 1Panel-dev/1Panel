@@ -25,6 +25,7 @@
         <Container v-if="activeNames === 'container'" />
         <Repo v-if="activeNames === 'repo'" />
         <Image v-if="activeNames === 'image'" />
+        <Network v-if="activeNames === 'network'" />
         <Monitor v-if="activeNames === 'storage'" />
         <About v-if="activeNames === 'schedule'" />
     </div>
@@ -35,6 +36,7 @@ import { ref } from 'vue';
 import Container from '@/views/container/container/index.vue';
 import Repo from '@/views/container/repo/index.vue';
 import Image from '@/views/container/image/index.vue';
+import Network from '@/views/container/network/index.vue';
 import Monitor from '@/views/setting/tabs/monitor.vue';
 import About from '@/views/setting/tabs/about.vue';
 
