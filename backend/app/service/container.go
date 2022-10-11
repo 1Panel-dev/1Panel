@@ -27,7 +27,7 @@ type IContainerService interface {
 	PageVolume(req dto.PageInfo) (int64, interface{}, error)
 	ContainerOperation(req dto.ContainerOperation) error
 	ContainerLogs(param dto.ContainerLog) (string, error)
-	ContainerInspect(id string) (string, error)
+	Inspect(req dto.InspectReq) (string, error)
 	DeleteNetwork(req dto.BatchDelete) error
 	CreateNetwork(req dto.NetworkCreat) error
 	DeleteVolume(req dto.BatchDelete) error
@@ -77,6 +77,30 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 	return int64(total), backDatas, nil
 }
 
+func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return "", err
+	}
+	var inspectInfo interface{}
+	switch req.Type {
+	case "container":
+		inspectInfo, err = client.ContainerInspect(context.Background(), req.ID)
+	case "network":
+		inspectInfo, err = client.NetworkInspect(context.TODO(), req.ID, types.NetworkInspectOptions{})
+	case "volume":
+		inspectInfo, err = client.VolumeInspect(context.TODO(), req.ID)
+	}
+	if err != nil {
+		return "", err
+	}
+	bytes, err := json.Marshal(inspectInfo)
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
+}
+
 func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error {
 	var err error
 	ctx := context.Background()
@@ -103,22 +127,6 @@ func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error 
 		err = dc.ContainerRemove(ctx, req.ContainerID, types.ContainerRemoveOptions{RemoveVolumes: true, RemoveLinks: true, Force: true})
 	}
 	return err
-}
-
-func (u *ContainerService) ContainerInspect(id string) (string, error) {
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return "", err
-	}
-	inspect, err := client.ContainerInspect(context.Background(), id)
-	if err != nil {
-		return "", err
-	}
-	bytes, err := json.Marshal(inspect)
-	if err != nil {
-		return "", err
-	}
-	return string(bytes), err
 }
 
 func (u *ContainerService) ContainerLogs(req dto.ContainerLog) (string, error) {

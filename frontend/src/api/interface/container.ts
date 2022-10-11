@@ -16,6 +16,10 @@ export namespace Container {
         containerID: string;
         mode: string;
     }
+    export interface ContainerInspect {
+        id: string;
+        type: string;
+    }
 
     export interface ImageInfo {
         id: string;

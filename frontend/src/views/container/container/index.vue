@@ -37,7 +37,11 @@
                     min-width="100"
                     prop="name"
                     fix
-                />
+                >
+                    <template #default="{ row }">
+                        <el-link @click="onInspect(row.containerID)" type="primary">{{ row.name }}</el-link>
+                    </template>
+                </el-table-column>
                 <el-table-column
                     :label="$t('container.image')"
                     show-overflow-tooltip
@@ -165,7 +169,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFromat, dateFromatForName } from '@/utils/util';
 import { Rules } from '@/global/form-rules';
-import { ContainerOperator, getContainerInspect, getContainerLog, getContainerPage } from '@/api/modules/container';
+import { ContainerOperator, inspect, getContainerLog, getContainerPage } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { ElForm, ElMessage, ElMessageBox, FormInstance } from 'element-plus';
 import i18n from '@/lang';
@@ -244,11 +248,12 @@ const onCreate = async () => {
     dialogCreateRef.value!.acceptParams();
 };
 
-const onDetail = async (row: Container.ContainerInfo) => {
-    const res = await getContainerInspect(row.containerID);
+const onInspect = async (id: string) => {
+    const res = await inspect({ id: id, type: 'container' });
     detailInfo.value = JSON.stringify(JSON.parse(res.data), null, 2);
     detailVisiable.value = true;
 };
+
 const onLog = async (row: Container.ContainerInfo) => {
     logSearch.container = row.name;
     logSearch.containerID = row.containerID;
@@ -369,12 +374,6 @@ const buttons = [
         label: i18n.global.t('commons.button.log'),
         click: (row: Container.ContainerInfo) => {
             onLog(row);
-        },
-    },
-    {
-        label: i18n.global.t('commons.button.view'),
-        click: (row: Container.ContainerInfo) => {
-            onDetail(row);
         },
     },
 ];
