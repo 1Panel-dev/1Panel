@@ -5,17 +5,12 @@ import "time"
 type ImageInfo struct {
 	ID        string    `json:"id"`
 	CreatedAt time.Time `json:"createdAt"`
-	Name      string    `json:"name"`
-	Version   string    `json:"version"`
+	Tags      []string  `json:"tags"`
 	Size      string    `json:"size"`
 }
 
 type ImageLoad struct {
 	Path string `josn:"path" validate:"required"`
-}
-
-type ImageRemove struct {
-	ImageName string `josn:"imageName" validate:"required"`
 }
 
 type ImageBuild struct {
@@ -29,14 +24,20 @@ type ImagePull struct {
 	ImageName string `josn:"imageName" validate:"required"`
 }
 
+type ImageTag struct {
+	RepoID     uint   `josn:"repoID"`
+	SourceID   string `json:"sourceID" validate:"required"`
+	TargetName string `josn:"targetName" validate:"required"`
+}
+
 type ImagePush struct {
-	RepoID    uint   `josn:"repoID" validate:"required"`
-	ImageName string `josn:"imageName" validate:"required"`
-	TagName   string `json:"tagName" validate:"required"`
+	RepoID  uint   `josn:"repoID" validate:"required"`
+	TagName string `json:"tagName" validate:"required"`
+	Name    string `json:"name" validate:"required"`
 }
 
 type ImageSave struct {
-	ImageName string `josn:"imageName" validate:"required"`
-	Path      string `josn:"path" validate:"required"`
-	Name      string `json:"name" validate:"required"`
+	TagName string `json:"tagName" validate:"required"`
+	Path    string `josn:"path" validate:"required"`
+	Name    string `json:"name" validate:"required"`
 }

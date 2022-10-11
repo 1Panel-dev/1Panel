@@ -178,28 +178,20 @@ func (u *ContainerService) PageNetwork(req dto.PageInfo) (int64, interface{}, er
 		for key, val := range item.Labels {
 			tag = append(tag, fmt.Sprintf("%s=%s", key, val))
 		}
-		var (
-			ipv4 network.IPAMConfig
-			ipv6 network.IPAMConfig
-		)
-		if len(item.IPAM.Config) > 1 {
-			ipv4 = item.IPAM.Config[0]
-			ipv6 = item.IPAM.Config[1]
-		} else if len(item.IPAM.Config) > 0 {
-			ipv4 = item.IPAM.Config[0]
+		var ipam network.IPAMConfig
+		if len(item.IPAM.Config) > 0 {
+			ipam = item.IPAM.Config[0]
 		}
 		data = append(data, dto.Network{
-			ID:          item.ID,
-			CreatedAt:   item.Created,
-			Name:        item.Name,
-			Driver:      item.Driver,
-			IPAMDriver:  item.IPAM.Driver,
-			IPV4Subnet:  ipv4.Subnet,
-			IPV4Gateway: ipv4.Gateway,
-			IPV6Subnet:  ipv6.Subnet,
-			IPV6Gateway: ipv6.Gateway,
-			Attachable:  item.Attachable,
-			Labels:      tag,
+			ID:         item.ID,
+			CreatedAt:  item.Created,
+			Name:       item.Name,
+			Driver:     item.Driver,
+			IPAMDriver: item.IPAM.Driver,
+			Subnet:     ipam.Subnet,
+			Gateway:    ipam.Gateway,
+			Attachable: item.Attachable,
+			Labels:     tag,
 		})
 	}
 
@@ -222,18 +214,30 @@ func (u *ContainerService) CreateNetwork(req dto.NetworkCreat) error {
 	if err != nil {
 		return err
 	}
-	ipv4 := network.IPAMConfig{
-		Subnet:  req.IPV4Subnet,
-		Gateway: req.IPV4Gateway,
+	var (
+		ipam    network.IPAMConfig
+		hasConf bool
+	)
+	if len(req.Subnet) != 0 {
+		ipam.Subnet = req.Subnet
+		hasConf = true
 	}
+	if len(req.Gateway) != 0 {
+		ipam.Gateway = req.Gateway
+		hasConf = true
+	}
+	if len(req.IPRange) != 0 {
+		ipam.IPRange = req.IPRange
+		hasConf = true
+	}
+
 	options := types.NetworkCreate{
-		Driver: req.Driver,
-		Scope:  req.Scope,
-		IPAM: &network.IPAM{
-			Config: []network.IPAMConfig{ipv4},
-		},
+		Driver:  req.Driver,
 		Options: stringsToMap(req.Options),
 		Labels:  stringsToMap(req.Labels),
+	}
+	if hasConf {
+		options.IPAM = &network.IPAM{Config: []network.IPAMConfig{ipam}}
 	}
 	if _, err := client.NetworkCreate(context.TODO(), req.Name, options); err != nil {
 		return err

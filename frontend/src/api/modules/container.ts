@@ -23,21 +23,24 @@ export const getImagePage = (params: ReqPage) => {
     return http.post<ResPage<Container.ImageInfo>>(`/containers/image/search`, params);
 };
 export const imageBuild = (params: Container.ImageBuild) => {
-    return http.post<string>(`/containers/image/build`, params);
+    return http.post(`/containers/image/build`, params);
 };
 export const imagePull = (params: Container.ImagePull) => {
-    return http.post<string>(`/containers/image/pull`, params);
+    return http.post(`/containers/image/pull`, params);
 };
 export const imagePush = (params: Container.ImagePush) => {
-    return http.post<string>(`/containers/image/push`, params);
+    return http.post(`/containers/image/push`, params);
 };
 export const imageLoad = (params: Container.ImageLoad) => {
-    return http.post<string>(`/containers/image/load`, params);
+    return http.post(`/containers/image/load`, params);
 };
 export const imageSave = (params: Container.ImageSave) => {
-    return http.post<string>(`/containers/image/save`, params);
+    return http.post(`/containers/image/save`, params);
 };
-export const imageRemove = (params: Container.ImageRemove) => {
+export const imageTag = (params: Container.ImageTag) => {
+    return http.post(`/containers/image/tag`, params);
+};
+export const imageRemove = (params: Container.BatchDelete) => {
     return http.post(`/containers/image/remove`, params);
 };
 

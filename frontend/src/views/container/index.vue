@@ -11,8 +11,8 @@
                 <el-radio-button class="topButton" size="large" label="network">
                     {{ $t('container.network') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" label="storage">
-                    {{ $t('container.storage') }}
+                <el-radio-button class="topButton" size="large" label="volume">
+                    {{ $t('container.volume') }}
                 </el-radio-button>
                 <el-radio-button class="topButton" size="large" label="repo">
                     {{ $t('container.repo') }}
@@ -26,7 +26,7 @@
         <Repo v-if="activeNames === 'repo'" />
         <Image v-if="activeNames === 'image'" />
         <Network v-if="activeNames === 'network'" />
-        <Monitor v-if="activeNames === 'storage'" />
+        <Volume v-if="activeNames === 'volume'" />
         <About v-if="activeNames === 'schedule'" />
     </div>
 </template>
@@ -37,7 +37,7 @@ import Container from '@/views/container/container/index.vue';
 import Repo from '@/views/container/repo/index.vue';
 import Image from '@/views/container/image/index.vue';
 import Network from '@/views/container/network/index.vue';
-import Monitor from '@/views/setting/tabs/monitor.vue';
+import Volume from '@/views/container/volume/index.vue';
 import About from '@/views/setting/tabs/about.vue';
 
 const activeNames = ref('container');

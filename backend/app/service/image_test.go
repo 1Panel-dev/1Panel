@@ -8,13 +8,10 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
-	"time"
 
-	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/utils/docker"
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/pkg/archive"
 )
 
@@ -95,24 +92,8 @@ func TestNetwork(t *testing.T) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	var data []dto.Volume
-	list, err := client.VolumeList(context.TODO(), filters.NewArgs())
+	_, err = client.NetworkCreate(context.TODO(), "test", types.NetworkCreate{})
 	if err != nil {
 		fmt.Println(err)
 	}
-	for _, item := range list.Volumes {
-		tag := make([]string, 0)
-		for _, val := range item.Labels {
-			tag = append(tag, val)
-		}
-		createTime, _ := time.Parse("2006-01-02T15:04:05Z", item.CreatedAt)
-		data = append(data, dto.Volume{
-			CreatedAt:  createTime,
-			Name:       item.Name,
-			Driver:     item.Driver,
-			Mountpoint: item.Mountpoint,
-			Labels:     tag,
-		})
-	}
-	fmt.Println(data)
 }
