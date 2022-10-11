@@ -18,6 +18,12 @@ type ImageRemove struct {
 	ImageName string `josn:"imageName" validate:"required"`
 }
 
+type ImageBuild struct {
+	From       string `josn:"from" validate:"required"`
+	Dockerfile string `josn:"dockerfile" validate:"required"`
+	Tags       string `josn:"tags" validate:"required"`
+}
+
 type ImagePull struct {
 	RepoID    uint   `josn:"repoID"`
 	ImageName string `josn:"imageName" validate:"required"`

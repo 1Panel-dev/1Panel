@@ -31,6 +31,25 @@ func (b *BaseApi) SearchImage(c *gin.Context) {
 	})
 }
 
+func (b *BaseApi) ImageBuild(c *gin.Context) {
+	var req dto.ImageBuild
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := imageService.ImageBuild(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
+}
+
 func (b *BaseApi) ImagePull(c *gin.Context) {
 	var req dto.ImagePull
 	if err := c.ShouldBindJSON(&req); err != nil {

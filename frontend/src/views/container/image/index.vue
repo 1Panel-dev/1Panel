@@ -9,7 +9,7 @@
                     <el-button @click="onOpenload">
                         {{ $t('container.importImage') }}
                     </el-button>
-                    <el-button @click="onBatchDelete(null)">
+                    <el-button @click="onOpenBuild">
                         {{ $t('container.build') }}
                     </el-button>
                     <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
@@ -29,6 +29,41 @@
                 <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" />
             </ComplexTable>
         </el-card>
+
+        <el-dialog v-model="buildVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="50%">
+            <template #header>
+                <div class="card-header">
+                    <span>{{ $t('container.importImage') }}</span>
+                </div>
+            </template>
+            <el-form ref="buildFormRef" :model="buildForm" label-position="left" label-width="80px">
+                <el-form-item label="Dockerfile" :rules="Rules.requiredSelect" prop="from">
+                    <el-radio-group v-model="buildForm.from">
+                        <el-radio label="edit">{{ $t('container.edit') }}</el-radio>
+                        <el-radio label="path">{{ $t('container.pathSelect') }}</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item v-if="buildForm.from !== 'edit'" :rules="Rules.requiredInput">
+                    <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 10 }" v-model="buildForm.dockerfile" />
+                </el-form-item>
+                <el-form-item v-else :rules="Rules.requiredInput">
+                    <el-input clearable v-model="buildForm.dockerfile">
+                        <template #append>
+                            <FileList @choose="loadBuildDir" :dir="true"></FileList>
+                        </template>
+                    </el-input>
+                </el-form-item>
+                <el-form-item :label="$t('container.tag')">
+                    <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" v-model="buildForm.tag" />
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="submitBuild(buildFormRef)">{{ $t('container.import') }}</el-button>
+                    <el-button @click="buildVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                </span>
+            </template>
+        </el-dialog>
 
         <el-dialog v-model="pullVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
             <template #header>
@@ -164,6 +199,7 @@ import { Container } from '@/api/interface/container';
 import {
     getImagePage,
     getRepoOption,
+    imageBuild,
     imageLoad,
     imagePull,
     imagePush,
@@ -186,6 +222,15 @@ const paginationConfig = reactive({
 });
 
 type FormInstance = InstanceType<typeof ElForm>;
+
+const buildVisiable = ref(false);
+const buildFormRef = ref<FormInstance>();
+const buildForm = reactive({
+    from: 'path',
+    dockerfile: '',
+    tag: '',
+});
+
 const pullVisiable = ref(false);
 const pullFormRef = ref<FormInstance>();
 const pullForm = reactive({
@@ -233,6 +278,9 @@ const loadRepos = async () => {
     repos.value = res.data;
 };
 
+const loadBuildDir = async (path: string) => {
+    buildForm.dockerfile = path;
+};
 const loadSaveDir = async (path: string) => {
     saveForm.path = path;
 };
@@ -274,6 +322,29 @@ const submitPush = async (formEl: FormInstance | undefined) => {
             loading.value = true;
             pushVisiable.value = false;
             await imagePush(pushForm);
+            loading.value = false;
+            search();
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        } catch {
+            loading.value = false;
+            search();
+        }
+    });
+};
+
+const onOpenBuild = () => {
+    buildVisiable.value = true;
+    buildForm.from = 'path';
+    buildForm.dockerfile = '';
+};
+const submitBuild = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    formEl.validate(async (valid) => {
+        if (!valid) return;
+        try {
+            loading.value = true;
+            loadVisiable.value = false;
+            await imageBuild(buildForm);
             loading.value = false;
             search();
             ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));

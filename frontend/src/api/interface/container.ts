@@ -1,13 +1,8 @@
-import { ReqPage } from '.';
-
 export namespace Container {
     export interface ContainerOperate {
         containerID: string;
         operation: string;
         newName: string;
-    }
-    export interface ContainerSearch extends ReqPage {
-        status: string;
     }
     export interface ContainerInfo {
         containerID: string;
@@ -29,6 +24,10 @@ export namespace Container {
         version: string;
         size: string;
     }
+    export interface ImageBuild {
+        from: string;
+        dockerfile: string;
+    }
     export interface ImagePull {
         repoID: number;
         imageName: string;
@@ -48,6 +47,43 @@ export namespace Container {
         imageName: string;
         path: string;
         name: string;
+    }
+
+    export interface NetworkInfo {
+        id: string;
+        name: string;
+        labels: Array<string>;
+        driver: string;
+        ipamDriver: string;
+        ipv4Subnet: string;
+        ipv4Gateway: string;
+        ipv6Subnet: string;
+        ipv6Gateway: string;
+        createdAt: string;
+        attachable: string;
+    }
+    export interface NetworkCreate {
+        name: string;
+        labels: Array<string>;
+        options: Array<string>;
+        driver: string;
+        ipv4Subnet: string;
+        ipv4Gateway: string;
+        scope: string;
+    }
+
+    export interface VolumeInfo {
+        name: string;
+        labels: Array<string>;
+        driver: string;
+        mountpoint: string;
+        createdAt: string;
+    }
+    export interface VolumeCreate {
+        name: string;
+        driver: string;
+        options: Array<string>;
+        label: Array<string>;
     }
 
     export interface RepoCreate {
@@ -80,5 +116,9 @@ export namespace Container {
         id: number;
         name: string;
         downloadUrl: string;
+    }
+
+    export interface BatchDelete {
+        ids: Array<string>;
     }
 }
