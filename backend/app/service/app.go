@@ -117,8 +117,6 @@ func (a AppService) PageInstalled(req dto.AppInstalledRequest) (int64, []dto.App
 	for _, in := range installed {
 		installDto := dto.AppInstalled{
 			AppInstall: in,
-			AppName:    in.App.Name,
-			Icon:       in.App.Icon,
 		}
 		installDTOs = append(installDTOs, installDto)
 	}
@@ -143,6 +141,10 @@ func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, 
 	appDetailDTO.AppDetail = detail
 	appDetailDTO.Params = paramMap
 	return appDetailDTO, nil
+}
+
+func (a AppService) PageInstallBackups(req dto.AppBackupRequest) (int64, []model.AppInstallBackup, error) {
+	return appInstallBackupRepo.Page(req.Page, req.PageSize, appInstallBackupRepo.WithAppInstallID(req.AppInstallID))
 }
 
 func (a AppService) OperateInstall(req dto.AppInstallOperate) error {
@@ -186,9 +188,7 @@ func (a AppService) OperateInstall(req dto.AppInstallOperate) error {
 			}
 		}
 
-		tx := global.DB.Begin()
-		ctx := context.WithValue(context.Background(), "db", tx)
-
+		tx, ctx := getTxAndContext()
 		if err := appInstallRepo.Delete(ctx, install); err != nil {
 			tx.Rollback()
 			return err
@@ -203,6 +203,13 @@ func (a AppService) OperateInstall(req dto.AppInstallOperate) error {
 		if err := a.SyncInstalled(install.ID); err != nil {
 			return err
 		}
+		return nil
+	case dto.Backup:
+		tx, ctx := getTxAndContext()
+		if err := backupInstall(ctx, install); err != nil {
+			tx.Rollback()
+		}
+		tx.Commit()
 		return nil
 	default:
 		return errors.New("operate not support")
@@ -284,8 +291,7 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 		return err
 	}
 
-	tx := global.DB.Begin()
-	ctx := context.WithValue(context.Background(), "db", tx)
+	tx, ctx := getTxAndContext()
 	if err := appInstallRepo.Create(ctx, &appInstall); err != nil {
 		tx.Rollback()
 		return err
@@ -311,6 +317,24 @@ func (a AppService) SyncAllInstalled() error {
 			}
 		}
 	}()
+	return nil
+}
+
+func (a AppService) DeleteBackup(req dto.AppBackupDeleteRequest) error {
+
+	backups, err := appInstallBackupRepo.GetBy(commonRepo.WithIdsIn(req.Ids))
+	if err != nil {
+		return err
+	}
+	fileOp := files.NewFileOp()
+
+	for _, backup := range backups {
+		dst := path.Join(backup.Path, backup.Name)
+		if err := fileOp.DeleteFile(dst); err != nil {
+			continue
+		}
+		appInstallBackupRepo.Delete(commonRepo.WithIdsIn(req.Ids))
+	}
 	return nil
 }
 
@@ -425,7 +449,7 @@ func (a AppService) SyncInstalled(installId uint) error {
 func (a AppService) SyncAppList() error {
 	//TODO 从 oss 拉取最新列表
 
-	appDir := path.Join(global.CONF.System.ResourceDir, "apps")
+	appDir := constant.AppResourceDir
 	iconDir := path.Join(appDir, "icons")
 	listFile := path.Join(appDir, "list.json")
 

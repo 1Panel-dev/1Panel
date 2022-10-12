@@ -40,14 +40,14 @@ func (a AppInstallRepo) WithServiceName(serviceName string) DBOption {
 func (a AppInstallRepo) GetBy(opts ...DBOption) ([]model.AppInstall, error) {
 	var install []model.AppInstall
 	db := getDb(opts...).Model(&model.AppInstall{})
-	err := db.Preload("App").Find(&install).Error
+	err := db.Preload("App").Preload("Backups").Find(&install).Error
 	return install, err
 }
 
 func (a AppInstallRepo) GetFirst(opts ...DBOption) (model.AppInstall, error) {
 	var install model.AppInstall
 	db := getDb(opts...).Model(&model.AppInstall{})
-	err := db.Preload("App").First(&install).Error
+	err := db.Preload("App").Preload("Backups").First(&install).Error
 	return install, err
 }
 
@@ -74,7 +74,7 @@ func (a AppInstallRepo) Page(page, size int, opts ...DBOption) (int64, []model.A
 	db := getDb(opts...).Model(&model.AppInstall{})
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Debug().Limit(size).Offset(size * (page - 1)).Preload("App").Find(&apps).Error
+	err := db.Debug().Limit(size).Offset(size * (page - 1)).Preload("App").Preload("Backups").Find(&apps).Error
 	return count, apps, err
 }
 

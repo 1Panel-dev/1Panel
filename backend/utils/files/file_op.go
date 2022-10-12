@@ -341,6 +341,10 @@ func (f FileOp) Compress(srcRiles []string, dst string, name string, cType Compr
 		fileMaps[s] = base
 	}
 
+	if !f.Stat(dst) {
+		_ = f.CreateDir(dst, 0755)
+	}
+
 	files, err := archiver.FilesFromDisk(nil, fileMaps)
 	if err != nil {
 		return err

@@ -7,7 +7,6 @@ import (
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/constant"
-	"github.com/1Panel-dev/1Panel/global"
 	"github.com/1Panel-dev/1Panel/utils/cmd"
 	"github.com/1Panel-dev/1Panel/utils/common"
 	"github.com/1Panel-dev/1Panel/utils/compose"
@@ -18,6 +17,7 @@ import (
 	"path"
 	"reflect"
 	"strconv"
+	"time"
 )
 
 type DatabaseOp string
@@ -52,8 +52,8 @@ func getSqlStr(key string, operate DatabaseOp, exec dto.ContainerExec) string {
 	switch key {
 	case "mysql":
 		if operate == Add {
-			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s  -e \"CREATE USER '%s'@'%%' IDENTIFIED BY '%s';\" -e \"create database %s;\" -e \"GRANT ALL ON %s.* TO '%s'@'%%';\"",
-				exec.ContainerName, exec.Auth.RootPassword, param.DbUser, param.Password, param.DbName, param.DbName, param.DbUser)
+			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s  -e \"CREATE USER '%s'@'%%' IDENTIFIED BY '%s';\" -e \"create database %s;\" -e \"GRANT ALL ON %s.* TO '%s'@'%%' IDENTIFIED BY '%s';\"",
+				exec.ContainerName, exec.Auth.RootPassword, param.DbUser, param.Password, param.DbName, param.DbName, param.DbUser, param.Password)
 		}
 		if operate == Delete {
 			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s   -e \"drop database %s;\"  -e \"drop user %s;\" ",
@@ -160,6 +160,28 @@ func deleteLink(ctx context.Context, install *model.AppInstall) error {
 	return appInstallResourceRepo.DeleteBy(ctx, appInstallResourceRepo.WithAppInstallId(install.ID))
 }
 
+func backupInstall(ctx context.Context, install model.AppInstall) error {
+	var backup model.AppInstallBackup
+	appPath := install.GetPath()
+	backupDir := path.Join(constant.BackupDir, install.App.Key, install.Name)
+	fileOp := files.NewFileOp()
+	now := time.Now()
+	day := now.Format("2006-01-02-15-04")
+	fileName := fmt.Sprintf("%s-%s-%s%s", install.Name, install.Version, day, ".tar.gz")
+	if err := fileOp.Compress([]string{appPath}, backupDir, fileName, files.TarGz); err != nil {
+		return err
+	}
+	backup.Name = fileName
+	backup.Path = backupDir
+	backup.AppInstallId = install.ID
+	backup.AppDetailId = install.AppDetailId
+
+	if err := appInstallBackupRepo.Create(ctx, backup); err != nil {
+		return err
+	}
+	return nil
+}
+
 func getContainerNames(install model.AppInstall) ([]string, error) {
 	composeMap := install.DockerCompose
 	envMap := make(map[string]string)
@@ -220,8 +242,8 @@ func checkRequiredAndLimit(app model.App) error {
 }
 
 func copyAppData(key, version, installName string, params map[string]interface{}) (err error) {
-	resourceDir := path.Join(global.CONF.System.ResourceDir, "apps", key, version)
-	installDir := path.Join(global.CONF.System.AppDir, key)
+	resourceDir := path.Join(constant.AppResourceDir, key, version)
+	installDir := path.Join(constant.AppInstallDir, key)
 	installVersionDir := path.Join(installDir, version)
 	fileOp := files.NewFileOp()
 	if err = fileOp.Copy(resourceDir, installVersionDir); err != nil {

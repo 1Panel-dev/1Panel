@@ -1,0 +1,109 @@
+<template>
+    <el-dialog v-model="open" :title="$t('app.backup')" width="70%" :before-close="handleClose">
+        <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" v-loading="loading">
+            <template #toolbar>
+                <el-button type="primary" plain @click="backup">{{ $t('app.backup') }}</el-button>
+            </template>
+            <el-table-column :label="$t('app.backupName')" prop="name"></el-table-column>
+            <el-table-column :label="$t('app.backupPath')" prop="path"></el-table-column>
+            <el-table-column
+                prop="createdAt"
+                :label="$t('app.backupdate')"
+                :formatter="dateFromat"
+                show-overflow-tooltip
+            />
+            <fu-table-operations
+                width="300px"
+                :ellipsis="10"
+                :buttons="buttons"
+                :label="$t('commons.table.operate')"
+                fixed="right"
+                fix
+            />
+        </ComplexTable>
+    </el-dialog>
+</template>
+
+<script lang="ts" setup name="installBackup">
+import { DelAppBackups, GetAppBackups, InstalledOp } from '@/api/modules/app';
+import { reactive, ref } from 'vue';
+import ComplexTable from '@/components/complex-table/index.vue';
+import { dateFromat } from '@/utils/util';
+import { ElMessage } from 'element-plus';
+import i18n from '@/lang';
+import { useDeleteData } from '@/hooks/use-delete-data';
+
+interface InstallRrops {
+    appInstallId: number;
+}
+const installData = ref<InstallRrops>({
+    appInstallId: 0,
+});
+let open = ref(false);
+let loading = ref(false);
+let data = ref<any>();
+const paginationConfig = reactive({
+    currentPage: 1,
+    pageSize: 20,
+    total: 0,
+});
+
+const handleClose = () => {
+    open.value = false;
+};
+
+const acceptParams = (props: InstallRrops) => {
+    installData.value.appInstallId = props.appInstallId;
+    search();
+    open.value = true;
+};
+
+const search = async () => {
+    const req = {
+        page: paginationConfig.currentPage,
+        pageSize: paginationConfig.pageSize,
+        appInstallId: installData.value.appInstallId,
+    };
+    await GetAppBackups(req).then((res) => {
+        data.value = res.data.items;
+        paginationConfig.total = res.data.total;
+    });
+};
+
+const backup = async () => {
+    const req = {
+        installId: installData.value.appInstallId,
+        operate: 'backup',
+    };
+    loading.value = true;
+    await InstalledOp(req)
+        .then(() => {
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            search();
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+};
+
+const deleteBackup = async (ids: number[]) => {
+    const req = {
+        ids: ids,
+    };
+    await useDeleteData(DelAppBackups, req, 'commons.msg.delete', loading.value);
+    search();
+};
+
+const buttons = [
+    {
+        label: i18n.global.t('app.delete'),
+        click: (row: any) => {
+            deleteBackup([row.id]);
+        },
+    },
+];
+
+defineExpose({
+    acceptParams,
+});
+</script>

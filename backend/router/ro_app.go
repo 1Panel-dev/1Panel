@@ -23,6 +23,8 @@ func (a *AppRouter) InitAppRouter(Router *gin.RouterGroup) {
 		appRouter.POST("/installed", baseApi.SearchInstalled)
 		appRouter.POST("/installed/op", baseApi.OperateInstalled)
 		appRouter.POST("/installed/sync", baseApi.SyncInstalled)
+		appRouter.POST("/installed/backups", baseApi.SearchInstalledBackup)
+		appRouter.POST("/installed/backups/del", baseApi.DeleteAppBackup)
 		appRouter.GET("/services/:key", baseApi.GetServices)
 	}
 }
