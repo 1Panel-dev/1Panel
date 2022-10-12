@@ -4,6 +4,31 @@ export namespace Container {
         operation: string;
         newName: string;
     }
+    export interface ContainerCreate {
+        name: string;
+        image: string;
+        cmd: Array<string>;
+        publishAllPorts: boolean;
+        exposedPorts: Array<Port>;
+        nanoCPUs: number;
+        memory: number;
+        volumes: Array<Volume>;
+        autoRemove: boolean;
+        labels: Array<string>;
+        labelsStr: string;
+        env: Array<string>;
+        envStr: string;
+        restartPolicy: string;
+    }
+    export interface Port {
+        containerPort: number;
+        hostPort: number;
+    }
+    export interface Volume {
+        sourceDir: string;
+        containerDir: string;
+        mode: string;
+    }
     export interface ContainerInfo {
         containerID: string;
         name: string;
@@ -19,6 +44,9 @@ export namespace Container {
     export interface ContainerInspect {
         id: string;
         type: string;
+    }
+    export interface Options {
+        option: string;
     }
 
     export interface ImageInfo {

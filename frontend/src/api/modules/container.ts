@@ -5,6 +5,9 @@ import { Container } from '../interface/container';
 export const getContainerPage = (params: ReqPage) => {
     return http.post<ResPage<Container.ContainerInfo>>(`/containers/search`, params);
 };
+export const createContainer = (params: Container.ContainerCreate) => {
+    return http.post(`/containers`, params);
+};
 
 export const getContainerLog = (params: Container.ContainerLogSearch) => {
     return http.post<string>(`/containers/log`, params);
@@ -21,6 +24,9 @@ export const inspect = (params: Container.ContainerInspect) => {
 // image
 export const getImagePage = (params: ReqPage) => {
     return http.post<ResPage<Container.ImageInfo>>(`/containers/image/search`, params);
+};
+export const imageOptions = () => {
+    return http.get<Array<Container.Options>>(`/containers/image`);
 };
 export const imageBuild = (params: Container.ImageBuild) => {
     return http.post<string>(`/containers/image/build`, params);
@@ -58,6 +64,9 @@ export const createNetwork = (params: Container.NetworkCreate) => {
 // volume
 export const getVolumePage = (params: ReqPage) => {
     return http.post<ResPage<Container.VolumeInfo>>(`/containers/volume/search`, params);
+};
+export const volumeOptions = () => {
+    return http.get<Array<Container.Options>>(`/containers/volume`);
 };
 export const deleteVolume = (params: Container.BatchDelete) => {
     return http.post(`/containers/volume/del`, params);

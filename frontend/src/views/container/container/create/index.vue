@@ -2,93 +2,174 @@
     <el-dialog v-model="createVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="50%">
         <template #header>
             <div class="card-header">
-                <span>容器创建</span>
+                <span>{{ $t('container.containerCreate') }}</span>
             </div>
         </template>
-        <el-form ref="formRef" :model="form" label-position="left" :rules="rules" label-width="120px">
-            <el-form-item label="容器名称" prop="name">
+        <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
+            <el-form-item :label="$t('container.name')" prop="name">
                 <el-input clearable v-model="form.name" />
             </el-form-item>
-            <el-form-item label="镜像" prop="image">
-                <el-input clearable v-model="form.image" />
+            <el-form-item :label="$t('container.image')" prop="image">
+                <el-select style="width: 100%" filterable v-model="form.image">
+                    <el-option v-for="(item, index) of images" :key="index" :value="item.option" :label="item.option" />
+                </el-select>
             </el-form-item>
-            <el-form-item label="端口" prop="image">
+            <el-form-item :label="$t('container.port')">
                 <el-radio-group v-model="form.publishAllPorts" class="ml-4">
-                    <el-radio :label="false">暴露端口</el-radio>
-                    <el-radio :label="true">暴露所有</el-radio>
+                    <el-radio :label="false">{{ $t('container.exposePort') }}</el-radio>
+                    <el-radio :label="true">{{ $t('container.exposeAll') }}</el-radio>
                 </el-radio-group>
-
-                <div style="margin-top: 20px"></div>
-                <table style="width: 100%; margin-top: 5px" class="tab-table">
-                    <tr v-for="(row, index) in ports" :key="index">
-                        <td width="48%">
-                            <el-input v-model="row['key']" />
-                        </td>
-                        <td width="48%">
-                            <el-input v-model="row['value']" />
-                        </td>
-                        <td>
-                            <el-button type="text" style="font-size: 10px" @click="handlePortsDelete(index)">
-                                {{ $t('commons.button.delete') }}
-                            </el-button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="left">
-                            <el-button @click="handlePortsAdd()">{{ $t('commons.button.add') }}</el-button>
-                        </td>
-                    </tr>
-                </table>
             </el-form-item>
-            <el-form-item label="启动命令" prop="command">
-                <el-input clearable v-model="form.command" />
+            <el-form-item v-if="!form.publishAllPorts">
+                <el-card style="width: 100%">
+                    <table style="width: 100%" class="tab-table">
+                        <tr v-if="form.exposedPorts.length !== 0">
+                            <th scope="col" width="48%" align="left">
+                                <label>{{ $t('container.containerPort') }}</label>
+                            </th>
+                            <th scope="col" width="48%" align="left">
+                                <label>{{ $t('container.serverPort') }}</label>
+                            </th>
+                            <th align="left"></th>
+                        </tr>
+                        <tr v-for="(row, index) in form.exposedPorts" :key="index">
+                            <td width="48%">
+                                <el-input-number
+                                    :min="0"
+                                    :max="65535"
+                                    style="width: 100%"
+                                    controls-position="right"
+                                    v-model.number="row.containerPort"
+                                />
+                            </td>
+                            <td width="48%">
+                                <el-input-number
+                                    :min="0"
+                                    :max="65535"
+                                    style="width: 100%"
+                                    controls-position="right"
+                                    v-model.number="row.hostPort"
+                                />
+                            </td>
+                            <td>
+                                <el-button link style="font-size: 10px" @click="handlePortsDelete(index)">
+                                    {{ $t('commons.button.delete') }}
+                                </el-button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left">
+                                <el-button @click="handlePortsAdd()">{{ $t('commons.button.add') }}</el-button>
+                            </td>
+                        </tr>
+                    </table>
+                </el-card>
+            </el-form-item>
+            <el-form-item :label="$t('container.cmd')" prop="cmdStr">
+                <el-input
+                    type="textarea"
+                    :placeholder="$t('container.cmdHelper')"
+                    :autosize="{ minRows: 2, maxRows: 4 }"
+                    v-model="form.cmdStr"
+                />
             </el-form-item>
             <el-form-item prop="autoRemove">
-                <el-checkbox v-model="form.autoRemove">容器停止后自动删除容器</el-checkbox>
+                <el-checkbox v-model="form.autoRemove">{{ $t('container.autoRemove') }}</el-checkbox>
             </el-form-item>
-            <el-form-item label="限制CPU" prop="cpusetCpus">
-                <el-input v-model="form.cpusetCpus" />
+            <el-form-item :label="$t('container.cpuQuota')" prop="nanoCPUs">
+                <el-input type="number" style="width: 40%" v-model.number="form.nanoCPUs">
+                    <template #append><div style="width: 60px">Core</div></template>
+                </el-input>
+                <span class="input-help">{{ $t('container.limitHelper') }}</span>
             </el-form-item>
-            <el-form-item label="内存" prop="memeryLimit">
-                <el-input v-model="form.memeryLimit" />
+            <el-form-item :label="$t('container.memoryLimit')" prop="memoryItem">
+                <el-input style="width: 40%" v-model.number="form.memoryItem">
+                    <template #append>
+                        <el-select v-model="form.memoryUnit" placeholder="Select" style="width: 100px">
+                            <el-option label="KB" value="KB" />
+                            <el-option label="MB" value="MB" />
+                            <el-option label="GB" value="GB" />
+                        </el-select>
+                    </template>
+                </el-input>
+                <span class="input-help">{{ $t('container.limitHelper') }}</span>
             </el-form-item>
-            <el-form-item label="挂载卷">
-                <div style="margin-top: 20px"></div>
-                <table style="width: 100%; margin-top: 5px" class="tab-table">
-                    <tr v-for="(row, index) in volumes" :key="index">
-                        <td width="30%">
-                            <el-input v-model="row['name']" />
-                        </td>
-                        <td width="30%">
-                            <el-input v-model="row['bind']" />
-                        </td>
-                        <td width="30%">
-                            <el-input v-model="row['mode']" />
-                        </td>
-                        <td>
-                            <el-button type="text" style="font-size: 10px" @click="handleVolumesDelete(index)">
-                                {{ $t('commons.button.delete') }}
-                            </el-button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="left">
-                            <el-button @click="handleVolumesAdd()">{{ $t('commons.button.add') }}</el-button>
-                        </td>
-                    </tr>
-                </table>
+            <el-form-item :label="$t('container.mount')">
+                <el-card style="width: 100%">
+                    <table style="width: 100%" class="tab-table">
+                        <tr v-if="form.volumes.length !== 0">
+                            <th scope="col" width="32%" align="left">
+                                <label>{{ $t('container.serverPath') }}</label>
+                            </th>
+                            <th scope="col" width="32%" align="left">
+                                <label>{{ $t('container.mode') }}</label>
+                            </th>
+                            <th scope="col" width="32%" align="left">
+                                <label>{{ $t('container.containerDir') }}</label>
+                            </th>
+                            <th align="left"></th>
+                        </tr>
+                        <tr v-for="(row, index) in form.volumes" :key="index">
+                            <td width="32%">
+                                <el-select
+                                    style="width: 100%"
+                                    allow-create
+                                    clearable
+                                    filterable
+                                    v-model="row.sourceDir"
+                                >
+                                    <el-option
+                                        v-for="(item, indexV) of volumes"
+                                        :key="indexV"
+                                        :value="item.option"
+                                        :label="item.option"
+                                    />
+                                </el-select>
+                            </td>
+                            <td width="32%">
+                                <el-select style="width: 100%" filterable v-model="row.mode">
+                                    <el-option value="rw" :label="$t('container.modeRW')" />
+                                    <el-option value="ro" :label="$t('container.modeR')" />
+                                </el-select>
+                            </td>
+                            <td width="32%">
+                                <el-input v-model="row.containerDir" />
+                            </td>
+                            <td>
+                                <el-button link style="font-size: 10px" @click="handleVolumesDelete(index)">
+                                    {{ $t('commons.button.delete') }}
+                                </el-button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left">
+                                <el-button @click="handleVolumesAdd()">{{ $t('commons.button.add') }}</el-button>
+                            </td>
+                        </tr>
+                    </table>
+                </el-card>
             </el-form-item>
-            <el-form-item label="标签" prop="labels">
-                <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" v-model="form.labels" />
+            <el-form-item :label="$t('container.tag')" prop="labelsStr">
+                <el-input
+                    type="textarea"
+                    :placeholder="$t('container.tagHelper')"
+                    :autosize="{ minRows: 2, maxRows: 4 }"
+                    v-model="form.labelsStr"
+                />
             </el-form-item>
-            <el-form-item label="环境变量(每行一个)" prop="environment">
-                <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" v-model="form.environment" />
+            <el-form-item :label="$t('container.env')" prop="envStr">
+                <el-input
+                    type="textarea"
+                    :placeholder="$t('container.tagHelper')"
+                    :autosize="{ minRows: 2, maxRows: 4 }"
+                    v-model="form.envStr"
+                />
             </el-form-item>
-            <el-form-item label="重启规则" prop="restartPolicy.value">
-                <el-radio-group v-model="form.restartPolicy.value">
-                    <el-radio :label="false">关闭后马上重启</el-radio>
-                    <el-radio :label="false">错误时重启（默认重启 5 次）</el-radio>
-                    <el-radio :label="true">不重启</el-radio>
+            <el-form-item :label="$t('container.restartPolicy')" prop="restartPolicy">
+                <el-radio-group v-model="form.restartPolicy">
+                    <el-radio label="unless-stopped">{{ $t('container.unlessStopped') }}</el-radio>
+                    <el-radio label="on-failure">{{ $t('container.onFailure') }}</el-radio>
+                    <el-radio label="no">{{ $t('container.no') }}</el-radio>
                 </el-radio-group>
             </el-form-item>
         </el-form>
@@ -108,51 +189,47 @@ import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
+import { imageOptions, volumeOptions, createContainer } from '@/api/modules/container';
+import { Container } from '@/api/interface/container';
 
 const createVisiable = ref(false);
 const form = reactive({
     name: '',
     image: '',
-    command: '',
+    cmdStr: '',
+    cmd: [] as Array<string>,
     publishAllPorts: false,
-    ports: [],
-    cpusetCpus: 1,
-    memeryLimit: 100,
-    volumes: [],
+    exposedPorts: [] as Array<Container.Port>,
+    nanoCPUs: 1,
+    memory: 100,
+    memoryItem: 100,
+    memoryUnit: 'MB',
+    volumes: [] as Array<Container.Volume>,
     autoRemove: false,
-    labels: '',
-    environment: '',
-    restartPolicy: {
-        value: '',
-        name: '',
-        maximumRetryCount: '',
-    },
+    labels: [] as Array<string>,
+    labelsStr: '',
+    env: [] as Array<string>,
+    envStr: '',
+    restartPolicy: '',
 });
-const ports = ref();
+const images = ref();
 const volumes = ref();
 
 const acceptParams = (): void => {
     createVisiable.value = true;
+    form.restartPolicy = 'no';
+    form.memoryUnit = 'MB';
+    loadImageOptions();
+    loadVolumeOptions();
 };
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const rules = reactive({
     name: [Rules.requiredInput, Rules.name],
-    type: [Rules.requiredSelect],
-    specType: [Rules.requiredSelect],
-    week: [Rules.requiredSelect, Rules.number],
-    day: [Rules.number, { max: 31, min: 1 }],
-    hour: [Rules.number, { max: 23, min: 0 }],
-    minute: [Rules.number, { max: 60, min: 1 }],
-
-    script: [Rules.requiredInput],
-    website: [Rules.requiredSelect],
-    database: [Rules.requiredSelect],
-    url: [Rules.requiredInput],
-    sourceDir: [Rules.requiredSelect],
-    targetDirID: [Rules.requiredSelect, Rules.number],
-    retainCopies: [Rules.number],
+    image: [Rules.requiredSelect],
+    nanoCPUs: [Rules.number],
+    memoryItem: [Rules.number],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -160,39 +237,61 @@ const formRef = ref<FormInstance>();
 
 const handlePortsAdd = () => {
     let item = {
-        key: '',
-        value: '',
+        containerPort: 80,
+        hostPort: 8080,
     };
-    ports.value.push(item);
+    form.exposedPorts.push(item);
 };
 const handlePortsDelete = (index: number) => {
-    ports.value.splice(index, 1);
+    form.exposedPorts.splice(index, 1);
 };
 
 const handleVolumesAdd = () => {
     let item = {
-        from: '',
-        bind: '',
-        mode: '',
+        sourceDir: '',
+        containerDir: '',
+        mode: 'rw',
     };
-    volumes.value.push(item);
+    form.volumes.push(item);
 };
 const handleVolumesDelete = (index: number) => {
-    volumes.value.splice(index, 1);
+    form.volumes.splice(index, 1);
 };
 
-function restForm() {
-    if (formRef.value) {
-        formRef.value.resetFields();
-    }
-}
+const loadImageOptions = async () => {
+    const res = await imageOptions();
+    images.value = res.data;
+};
+const loadVolumeOptions = async () => {
+    const res = await volumeOptions();
+    volumes.value = res.data;
+};
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-
+        if (form.envStr.length !== 0) {
+            form.env = form.envStr.split('\n');
+        }
+        if (form.labelsStr.length !== 0) {
+            form.labels = form.labelsStr.split('\n');
+        }
+        if (form.cmdStr.length !== 0) {
+            form.cmd = form.cmdStr.split('\n');
+        }
+        switch (form.memoryUnit) {
+            case 'KB':
+                form.memory = form.memoryItem * 1024;
+                break;
+            case 'MB':
+                form.memory = form.memoryItem * 1024 * 1024;
+                break;
+            case 'GB':
+                form.memory = form.memoryItem * 1024 * 1024 * 1024;
+                break;
+        }
+        await createContainer(form);
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        restForm();
         emit('search');
         createVisiable.value = false;
     });

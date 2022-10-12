@@ -156,7 +156,7 @@
                 </span>
             </template>
         </el-dialog>
-        <CreateDialog ref="dialogCreateRef" />
+        <CreateDialog @search="search" ref="dialogCreateRef" />
     </div>
 </template>
 

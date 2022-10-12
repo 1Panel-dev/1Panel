@@ -22,6 +22,31 @@ type ContainerInfo struct {
 	RunTime     string `json:"runTime"`
 }
 
+type ContainerCreate struct {
+	Name            string         `json:"name"`
+	Image           string         `json:"image"`
+	PublishAllPorts bool           `json:"publishAllPorts"`
+	ExposedPorts    []PortHelper   `json:"exposedPorts"`
+	Cmd             []string       `json:"cmd"`
+	NanoCPUs        int64          `json:"nanoCPUs"`
+	Memory          int64          `json:"memory"`
+	AutoRemove      bool           `json:"autoRemove"`
+	Volumes         []VolumeHelper `json:"volumes"`
+	Labels          []string       `json:"labels"`
+	Env             []string       `json:"env"`
+	RestartPolicy   string         `json:"restartPolicy"`
+}
+
+type VolumeHelper struct {
+	SourceDir    string `json:"sourceDir"`
+	ContainerDir string `json:"containerDir"`
+	Mode         string `json:"mode"`
+}
+type PortHelper struct {
+	ContainerPort int `json:"containerPort"`
+	HostPort      int `json:"hostPort"`
+}
+
 type ContainerLog struct {
 	ContainerID string `json:"containerID" validate:"required"`
 	Mode        string `json:"mode" validate:"required"`
