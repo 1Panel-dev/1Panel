@@ -47,7 +47,7 @@
       "key": "wordpress",
       "name": "Wordpress",
       "tags": ["WebSite"],
-      "versions": ["6.0.1"],
+      "versions": ["6.0.1","6.0.2"],
       "short_desc": "老牌博客网站模版",
       "icon": "wordpress.png",
       "author": "Wordpress",

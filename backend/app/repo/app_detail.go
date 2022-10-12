@@ -3,7 +3,6 @@ package repo
 import (
 	"context"
 	"github.com/1Panel-dev/1Panel/app/model"
-	"github.com/1Panel-dev/1Panel/global"
 	"gorm.io/gorm"
 )
 
@@ -23,43 +22,32 @@ func (a AppDetailRepo) WithAppId(id uint) DBOption {
 
 func (a AppDetailRepo) GetFirst(opts ...DBOption) (model.AppDetail, error) {
 	var detail model.AppDetail
-	db := global.DB
-	for _, opt := range opts {
-		db = opt(db)
-	}
-	err := db.Find(&detail).Error
+	err := getDb(opts...).Model(&model.AppDetail{}).Find(&detail).Error
 	return detail, err
 }
 
 func (a AppDetailRepo) Update(ctx context.Context, detail model.AppDetail) error {
-	db := ctx.Value("db").(*gorm.DB)
-	return db.Save(&detail).Error
+	return getTx(ctx).Save(&detail).Error
 }
 
 func (a AppDetailRepo) BatchCreate(ctx context.Context, details []model.AppDetail) error {
-	db := ctx.Value("db").(*gorm.DB)
-	return db.Model(&model.AppDetail{}).Create(&details).Error
+	return getTx(ctx).Model(&model.AppDetail{}).Create(&details).Error
 }
 
 func (a AppDetailRepo) DeleteByAppIds(ctx context.Context, appIds []uint) error {
-	db := ctx.Value("db").(*gorm.DB)
-	return db.Where("app_id in (?)", appIds).Delete(&model.AppDetail{}).Error
+	return getTx(ctx).Where("app_id in (?)", appIds).Delete(&model.AppDetail{}).Error
 }
 
 func (a AppDetailRepo) GetBy(opts ...DBOption) ([]model.AppDetail, error) {
 	var details []model.AppDetail
-	db := global.DB
-	for _, opt := range opts {
-		db = opt(db)
-	}
-	err := db.Find(&details).Error
+	err := getDb(opts...).Find(&details).Error
 	return details, err
 }
 
-func (a AppDetailRepo) BatchUpdateBy(update model.AppDetail, opts ...DBOption) error {
-	db := global.DB.Model(model.AppDetail{})
-	for _, opt := range opts {
-		db = opt(db)
+func (a AppDetailRepo) BatchUpdateBy(maps map[string]interface{}, opts ...DBOption) error {
+	db := getDb(opts...).Model(&model.AppDetail{})
+	if len(opts) == 0 {
+		db = db.Where("1=1")
 	}
-	return db.Updates(update).Error
+	return db.Updates(&maps).Error
 }
