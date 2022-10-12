@@ -63,6 +63,12 @@ func (c *CommonRepo) WithIdsIn(ids []uint) DBOption {
 	}
 }
 
+func (c *CommonRepo) WithIdsNotIn(ids []uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("id not in (?)", ids)
+	}
+}
+
 func getTx(ctx context.Context, opts ...DBOption) *gorm.DB {
 	tx := ctx.Value("db").(*gorm.DB)
 	for _, opt := range opts {

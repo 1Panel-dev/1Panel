@@ -623,19 +623,28 @@ func syncCanUpdate() {
 
 		var updateDetailIds []uint
 		for _, detail := range details {
-			if common.CompareVersion(lastVersion, detail.Version) {
-				if app.CrossVersionUpdate || !common.IsCrossVersion(detail.Version, lastVersion) {
-					updateDetailIds = append(updateDetailIds, detail.ID)
-				}
+			if lastVersion == detail.Version {
+				continue
 			}
+			if common.CompareVersion(lastVersion, detail.Version) && (app.CrossVersionUpdate || !common.IsCrossVersion(detail.Version, lastVersion)) {
+				updateDetailIds = append(updateDetailIds, detail.ID)
+			}
+		}
+		if err := appDetailRepo.BatchUpdateBy(map[string]interface{}{"last_version": ""}); err != nil {
+			global.LOG.Errorf("sync update app error: %s", err.Error())
+		}
+
+		if err := appInstallRepo.BatchUpdateBy(map[string]interface{}{"can_update": 0}); err != nil {
+			global.LOG.Errorf("sync update app error: %s", err.Error())
 		}
 		if len(updateDetailIds) > 0 {
-			if err := appDetailRepo.BatchUpdateBy(model.AppDetail{LastVersion: lastVersion}, commonRepo.WithIdsIn(updateDetailIds)); err != nil {
+			if err := appDetailRepo.BatchUpdateBy(map[string]interface{}{"last_version": lastVersion}, commonRepo.WithIdsIn(updateDetailIds)); err != nil {
 				global.LOG.Errorf("sync update app error: %s", err.Error())
 			}
-			if err := appInstallRepo.BatchUpdateBy(model.AppInstall{CanUpdate: true}, appInstallRepo.WithDetailIdsIn(updateDetailIds)); err != nil {
+			if err := appInstallRepo.BatchUpdateBy(map[string]interface{}{"can_update": 1}, appInstallRepo.WithDetailIdsIn(updateDetailIds)); err != nil {
 				global.LOG.Errorf("sync update app error: %s", err.Error())
 			}
 		}
+
 	}
 }

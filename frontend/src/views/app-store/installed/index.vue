@@ -3,7 +3,12 @@
         <el-button @click="sync">{{ $t('app.sync') }}</el-button>
     </div>
     <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" v-loading="loading">
-        <el-table-column :label="$t('app.name')" prop="name"></el-table-column>
+        <el-table-column :label="$t('app.name')" prop="name">
+            <template #default="{ row }">
+                {{ row.name }}
+                <el-tag round effect="dark" v-if="row.canUpdate">{{ $t('app.canUpdate') }}</el-tag>
+            </template>
+        </el-table-column>
         <!-- <el-table-column :label="$t('app.description')" prop="description"></el-table-column> -->
         <el-table-column :label="$t('app.appName')" prop="appName"></el-table-column>
         <el-table-column :label="$t('app.version')" prop="version"></el-table-column>
