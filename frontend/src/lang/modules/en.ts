@@ -418,5 +418,9 @@ export default {
         deleteWarn:
             'Delete the operation data and delete the operation data. This operation cannot be rolled back. Do you want to continue?',
         canUpdate: 'CanUpdate',
+        backup: 'Backup',
+        backupName: 'Filename',
+        backupPath: 'Filepath',
+        backupdate: 'Backup Date',
     },
 };

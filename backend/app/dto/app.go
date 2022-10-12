@@ -92,6 +92,15 @@ type AppInstalledRequest struct {
 	PageInfo
 }
 
+type AppBackupRequest struct {
+	PageInfo
+	AppInstallID uint `json:"appInstallID"`
+}
+
+type AppBackupDeleteRequest struct {
+	Ids []uint `json:"ids"`
+}
+
 type AppOperate string
 
 var (
@@ -100,6 +109,7 @@ var (
 	Restart AppOperate = "restart"
 	Delete  AppOperate = "delete"
 	Sync    AppOperate = "sync"
+	Backup  AppOperate = "backup"
 )
 
 type AppInstallOperate struct {

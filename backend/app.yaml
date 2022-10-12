@@ -5,7 +5,6 @@ system:
   data_dir:  /opt/1Panel/data
   resource_dir:  /opt/1Panel/data/resource
   app_dir: /opt/1Panel/data/apps
-  app_oss: 
 
 mysql:
   path: localhost

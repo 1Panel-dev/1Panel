@@ -37,3 +37,11 @@ export const SyncInstalledApp = () => {
 export const GetAppService = (key: string | undefined) => {
     return http.get<any>(`apps/services/${key}`);
 };
+
+export const GetAppBackups = (info: App.AppBackupReq) => {
+    return http.post<ResPage<App.AppBackup>>('apps/installed/backups', info);
+};
+
+export const DelAppBackups = (req: App.AppBackupDelReq) => {
+    return http.post<any>('apps/installed/backups/del', req);
+};

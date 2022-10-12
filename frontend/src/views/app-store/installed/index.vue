@@ -10,8 +10,15 @@
             </template>
         </el-table-column>
         <!-- <el-table-column :label="$t('app.description')" prop="description"></el-table-column> -->
-        <el-table-column :label="$t('app.appName')" prop="appName"></el-table-column>
+        <el-table-column :label="$t('app.appName')" prop="app.name"></el-table-column>
         <el-table-column :label="$t('app.version')" prop="version"></el-table-column>
+        <el-table-column :label="$t('app.backup')">
+            <template #default="{ row }">
+                <el-link :underline="false" @click="openBackups(row.id)" type="primary">
+                    {{ $t('app.backup') }} ({{ row.backups.length }})
+                </el-link>
+            </template>
+        </el-table-column>
         <el-table-column :label="$t('app.status')">
             <template #default="{ row }">
                 <el-popover
@@ -35,7 +42,7 @@
             show-overflow-tooltip
         />
         <fu-table-operations
-            width="250px"
+            width="300px"
             :ellipsis="10"
             :buttons="buttons"
             :label="$t('commons.table.operate')"
@@ -52,6 +59,7 @@
             </span>
         </template>
     </el-dialog>
+    <Backups ref="backupRef"></Backups>
 </template>
 
 <script lang="ts" setup>
@@ -61,6 +69,7 @@ import ComplexTable from '@/components/complex-table/index.vue';
 import { dateFromat } from '@/utils/util';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
+import Backups from './backups.vue';
 
 let data = ref<any>();
 let loading = ref(false);
@@ -74,6 +83,7 @@ let operateReq = reactive({
     installId: 0,
     operate: '',
 });
+const backupRef = ref();
 
 const sync = () => {
     loading.value = true;
@@ -177,6 +187,13 @@ const buttons = [
         },
     },
 ];
+
+const openBackups = (installId: number) => {
+    let params = {
+        appInstallId: installId,
+    };
+    backupRef.value.acceptParams(params);
+};
 
 onMounted(() => {
     search();

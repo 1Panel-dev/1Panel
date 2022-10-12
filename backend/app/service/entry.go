@@ -33,4 +33,5 @@ var (
 	appInstallRepo         = repo.RepoGroupApp.AppInstallRepo
 	appInstallResourceRepo = repo.RepoGroupApp.AppInstallResourceRpo
 	dataBaseRepo           = repo.RepoGroupApp.DatabaseRepo
+	appInstallBackupRepo   = repo.RepoGroupApp.AppInstallBackupRepo
 )

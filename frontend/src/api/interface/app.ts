@@ -66,12 +66,12 @@ export namespace App {
         name: string;
         appId: string;
         appDetailId: string;
-        params: string;
+        env: string;
         status: string;
         description: string;
         message: string;
-        appName: string;
         icon: string;
+        canUpdate: boolean;
         app: App;
     }
 
@@ -83,5 +83,20 @@ export namespace App {
     export interface AppService {
         label: string;
         value: string;
+    }
+
+    export interface AppBackupReq extends ReqPage {
+        appInstallId: number;
+    }
+
+    export interface AppBackupDelReq {
+        ids: number[];
+    }
+
+    export interface AppBackup extends CommonModel {
+        name: string;
+        path: string;
+        appInstallId: string;
+        appDetail: AppDetail;
     }
 }

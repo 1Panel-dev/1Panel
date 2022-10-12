@@ -75,6 +75,21 @@ func (b *BaseApi) InstallApp(c *gin.Context) {
 
 	helper.SuccessWithData(c, nil)
 }
+
+func (b *BaseApi) DeleteAppBackup(c *gin.Context) {
+	var req dto.AppBackupDeleteRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := appService.DeleteBackup(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
+}
+
 func (b *BaseApi) SearchInstalled(c *gin.Context) {
 	var req dto.AppInstalledRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -82,6 +97,24 @@ func (b *BaseApi) SearchInstalled(c *gin.Context) {
 		return
 	}
 	total, list, err := appService.PageInstalled(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, dto.PageResult{
+		Items: list,
+		Total: total,
+	})
+}
+
+func (b *BaseApi) SearchInstalledBackup(c *gin.Context) {
+	var req dto.AppBackupRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	total, list, err := appService.PageInstallBackups(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

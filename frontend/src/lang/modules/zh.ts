@@ -410,5 +410,9 @@ export default {
         deleteWarn: '删除操作会把数据一并删除,此操作不可回滚,是否继续?',
         syncSuccess: '同步成功',
         canUpdate: '可更新',
+        backup: '备份',
+        backupName: '文件名称',
+        backupPath: '文件路径',
+        backupdate: '备份时间',
     },
 };
