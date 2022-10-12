@@ -240,10 +240,11 @@ import { reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import { loadZero } from '@/utils/util';
 import { loadBackupName } from '@/views/setting/helper';
-import { searchRecords, getRecordDetail, download } from '@/api/modules/cronjob';
+import { searchRecords, download } from '@/api/modules/cronjob';
 import { dateFromat, dateFromatForName } from '@/utils/util';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
+import { LoadFile } from '@/api/modules/files';
 
 interface DialogProps {
     rowData?: Cronjob.CronjobInfo;
@@ -389,7 +390,7 @@ const forDetail = async (row: Cronjob.Record) => {
     currentRecord.value = row;
 };
 const loadRecord = async (path: string) => {
-    const res = await getRecordDetail(path);
+    const res = await LoadFile({ path: path });
     currentRecordDetail.value = res.data;
 };
 function isBackup() {

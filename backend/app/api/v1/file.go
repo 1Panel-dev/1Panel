@@ -2,6 +2,10 @@ package v1
 
 import (
 	"fmt"
+	"net/http"
+	"os"
+	"path"
+
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -9,8 +13,6 @@ import (
 	websocket2 "github.com/1Panel-dev/1Panel/backend/utils/websocket"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"net/http"
-	"path"
 )
 
 func (b *BaseApi) ListFiles(c *gin.Context) {
@@ -226,6 +228,30 @@ func (b *BaseApi) Size(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, res)
+}
+
+func (b *BaseApi) LoadFromFile(c *gin.Context) {
+	var req dto.FilePath
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	file, err := os.Open(req.Path)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	defer file.Close()
+	buf := make([]byte, 1024*500)
+	if _, err := file.Read(buf); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, string(buf))
 }
 
 var wsUpgrade = websocket.Upgrader{

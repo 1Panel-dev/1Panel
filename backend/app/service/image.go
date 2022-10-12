@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/base64"
@@ -11,9 +12,11 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/app/dto"
+	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/global"
 	"github.com/1Panel-dev/1Panel/utils/docker"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/pkg/archive"
 )
 
 type ImageService struct{}
@@ -40,7 +43,7 @@ func (u *ImageService) Page(req dto.PageInfo) (int64, interface{}, error) {
 	if err != nil {
 		return 0, nil, err
 	}
-	list, err = client.ImageList(context.Background(), types.ImageListOptions{})
+	list, err = client.ImageList(context.Background(), types.ImageListOptions{All: true})
 	if err != nil {
 		return 0, nil, err
 	}
@@ -67,27 +70,60 @@ func (u *ImageService) Page(req dto.PageInfo) (int64, interface{}, error) {
 	return int64(total), backDatas, nil
 }
 
-func (u *ImageService) ImageBuild(req dto.ImageBuild) error {
-	// client, err := docker.NewDockerClient()
-	// if err != nil {
-	// 	return err
-	// }
-	// if req.From == "path" {
-	// 	tar, err := archive.TarWithOptions("node-hello/", &archive.TarOptions{})
-	// 	if err != nil {
-	// 		return err
-	// 	}
+func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return "", err
+	}
+	if req.From == "edit" {
+		dir := fmt.Sprintf("%s/%s", constant.TmpDockerBuildDir, req.Name)
+		if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
+			if err = os.MkdirAll(dir, os.ModePerm); err != nil {
+				return "", err
+			}
+		}
 
-	// 	opts := types.ImageBuildOptions{
-	// 		Dockerfile: "Dockerfile",
-	// 		Tags:       []string{dockerRegistryUserID + "/node-hello"},
-	// 		Remove:     true,
-	// 	}
-	// 	if _, err := client.ImageBuild(context.TODO(), tar, opts); err != nil {
-	// 		return err
-	// 	}
-	// }
-	return nil
+		path := fmt.Sprintf("%s/Dockerfile", dir)
+		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+		if err != nil {
+			return "", err
+		}
+		defer file.Close()
+		write := bufio.NewWriter(file)
+		_, _ = write.WriteString(string(req.Dockerfile))
+		write.Flush()
+		req.Dockerfile = dir
+	}
+	tar, err := archive.TarWithOptions(req.Dockerfile+"/", &archive.TarOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	opts := types.ImageBuildOptions{
+		Dockerfile: "Dockerfile",
+		Tags:       []string{req.Name},
+		Remove:     true,
+		Labels:     stringsToMap(req.Tags),
+	}
+	logName := fmt.Sprintf("%s/build.log", req.Dockerfile)
+
+	path := logName
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		return "", err
+	}
+	go func() {
+		defer file.Close()
+		res, err := client.ImageBuild(context.TODO(), tar, opts)
+		if err != nil {
+			global.LOG.Errorf("build image %s failed, err: %v", req.Name, err)
+			return
+		}
+		global.LOG.Debugf("build image %s successful!", req.Name)
+		_, _ = io.Copy(file, res.Body)
+	}()
+
+	return logName, nil
 }
 
 func (u *ImageService) ImagePull(req dto.ImagePull) error {
@@ -240,7 +276,7 @@ func (u *ImageService) ImageRemove(req dto.BatchDelete) error {
 		return err
 	}
 	for _, ids := range req.Ids {
-		if _, err := client.ImageRemove(context.TODO(), ids, types.ImageRemoveOptions{Force: true}); err != nil {
+		if _, err := client.ImageRemove(context.TODO(), ids, types.ImageRemoveOptions{Force: true, PruneChildren: true}); err != nil {
 			return err
 		}
 	}

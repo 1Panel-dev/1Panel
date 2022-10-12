@@ -18,6 +18,10 @@ type BatchDeleteReq struct {
 	Ids []uint `json:"ids" validate:"required"`
 }
 
+type FilePath struct {
+	Path string `json:"path" validate:"required"`
+}
+
 type DeleteByName struct {
 	Name string `json:"name" validate:"required"`
 }

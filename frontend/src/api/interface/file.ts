@@ -108,4 +108,8 @@ export namespace File {
     export interface DirSizeRes {
         size: number;
     }
+
+    export interface FilePath {
+        path: string;
+    }
 }
