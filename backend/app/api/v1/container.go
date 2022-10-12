@@ -30,6 +30,23 @@ func (b *BaseApi) SearchContainer(c *gin.Context) {
 	})
 }
 
+func (b *BaseApi) ContainerCreate(c *gin.Context) {
+	var req dto.ContainerCreate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := containerService.ContainerCreate(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
 func (b *BaseApi) ContainerOperation(c *gin.Context) {
 	var req dto.ContainerOperation
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -160,6 +177,14 @@ func (b *BaseApi) SearchVolume(c *gin.Context) {
 		Items: list,
 		Total: total,
 	})
+}
+func (b *BaseApi) ListVolume(c *gin.Context) {
+	list, err := containerService.ListVolume()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
 }
 func (b *BaseApi) DeleteVolume(c *gin.Context) {
 	var req dto.BatchDelete

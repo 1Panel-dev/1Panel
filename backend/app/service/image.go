@@ -23,6 +23,7 @@ type ImageService struct{}
 
 type IImageService interface {
 	Page(req dto.PageInfo) (int64, interface{}, error)
+	List() ([]dto.Options, error)
 	ImagePull(req dto.ImagePull) error
 	ImageLoad(req dto.ImageLoad) error
 	ImageSave(req dto.ImageSave) error
@@ -43,7 +44,7 @@ func (u *ImageService) Page(req dto.PageInfo) (int64, interface{}, error) {
 	if err != nil {
 		return 0, nil, err
 	}
-	list, err = client.ImageList(context.Background(), types.ImageListOptions{All: true})
+	list, err = client.ImageList(context.Background(), types.ImageListOptions{})
 	if err != nil {
 		return 0, nil, err
 	}
@@ -68,6 +69,29 @@ func (u *ImageService) Page(req dto.PageInfo) (int64, interface{}, error) {
 	}
 
 	return int64(total), backDatas, nil
+}
+
+func (u *ImageService) List() ([]dto.Options, error) {
+	var (
+		list      []types.ImageSummary
+		backDatas []dto.Options
+	)
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return nil, err
+	}
+	list, err = client.ImageList(context.Background(), types.ImageListOptions{})
+	if err != nil {
+		return nil, err
+	}
+	for _, image := range list {
+		for _, tag := range image.RepoTags {
+			backDatas = append(backDatas, dto.Options{
+				Option: tag,
+			})
+		}
+	}
+	return backDatas, nil
 }
 
 func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {

@@ -8,12 +8,12 @@
     >
         <template #header>
             <div class="card-header">
-                <span>{{ $t('container.importImage') }}</span>
+                <span>{{ $t('container.buildImage') }}</span>
             </div>
         </template>
         <el-form ref="formRef" :model="form" label-width="80px">
             <el-form-item :label="$t('container.name')" :rules="Rules.requiredInput" prop="name">
-                <el-input v-model="form.name" clearable />
+                <el-input :placeholder="$t('container.imageNameHelper')" v-model="form.name" clearable />
             </el-form-item>
             <el-form-item label="Dockerfile" :rules="Rules.requiredSelect" prop="from">
                 <el-radio-group v-model="form.from">
@@ -32,7 +32,12 @@
                 </el-input>
             </el-form-item>
             <el-form-item :label="$t('container.tag')">
-                <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" v-model="form.tagStr" />
+                <el-input
+                    :placeholder="$t('container.tagHelper')"
+                    type="textarea"
+                    :autosize="{ minRows: 2, maxRows: 4 }"
+                    v-model="form.tagStr"
+                />
             </el-form-item>
         </el-form>
 
@@ -55,7 +60,7 @@
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="onSubmit(formRef)">{{ $t('container.import') }}</el-button>
+                <el-button @click="onSubmit(formRef)">{{ $t('container.build') }}</el-button>
                 <el-button @click="buildVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
             </span>
         </template>

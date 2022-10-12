@@ -18,7 +18,12 @@
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('container.option')" prop="optionStr">
-                <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" v-model="form.optionStr" />
+                <el-input
+                    type="textarea"
+                    :placeholder="$t('container.tagHelper')"
+                    :autosize="{ minRows: 2, maxRows: 4 }"
+                    v-model="form.optionStr"
+                />
             </el-form-item>
             <el-form-item :label="$t('container.subnet')" prop="subnet">
                 <el-input clearable v-model="form.subnet" />
@@ -30,7 +35,12 @@
                 <el-input clearable v-model="form.scope" />
             </el-form-item>
             <el-form-item :label="$t('container.tag')" prop="labelStr">
-                <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 4 }" v-model="form.labelStr" />
+                <el-input
+                    type="textarea"
+                    :placeholder="$t('container.tagHelper')"
+                    :autosize="{ minRows: 2, maxRows: 4 }"
+                    v-model="form.labelStr"
+                />
             </el-form-item>
         </el-form>
         <template #footer>

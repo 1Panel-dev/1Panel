@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 	"time"
 
@@ -13,10 +14,13 @@ import (
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/utils/docker"
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/pkg/stdcopy"
+	"github.com/docker/go-connections/nat"
+	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
 type ContainerService struct{}
@@ -25,6 +29,8 @@ type IContainerService interface {
 	Page(req dto.PageContainer) (int64, interface{}, error)
 	PageNetwork(req dto.PageInfo) (int64, interface{}, error)
 	PageVolume(req dto.PageInfo) (int64, interface{}, error)
+	ListVolume() ([]dto.Options, error)
+	ContainerCreate(req dto.ContainerCreate) error
 	ContainerOperation(req dto.ContainerOperation) error
 	ContainerLogs(param dto.ContainerLog) (string, error)
 	Inspect(req dto.InspectReq) (string, error)
@@ -99,6 +105,55 @@ func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
 		return "", err
 	}
 	return string(bytes), nil
+}
+
+func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+	config := &container.Config{
+		Image:  req.Image,
+		Cmd:    req.Cmd,
+		Env:    req.Env,
+		Labels: stringsToMap(req.Labels),
+	}
+	hostConf := &container.HostConfig{
+		AutoRemove:      req.AutoRemove,
+		PublishAllPorts: req.PublishAllPorts,
+		RestartPolicy:   container.RestartPolicy{Name: req.RestartPolicy},
+	}
+	if req.RestartPolicy == "on-failure" {
+		hostConf.RestartPolicy.MaximumRetryCount = 5
+	}
+	if req.NanoCPUs != 0 {
+		hostConf.NanoCPUs = req.NanoCPUs * 1000000000
+	}
+	if req.Memory != 0 {
+		hostConf.Memory = req.Memory
+	}
+	if len(req.ExposedPorts) != 0 {
+		hostConf.PortBindings = make(nat.PortMap)
+		for _, port := range req.ExposedPorts {
+			bindItem := nat.PortBinding{HostPort: strconv.Itoa(port.HostPort)}
+			hostConf.PortBindings[nat.Port(fmt.Sprintf("%d/tcp", port.ContainerPort))] = []nat.PortBinding{bindItem}
+		}
+	}
+	if len(req.Volumes) != 0 {
+		config.Volumes = make(map[string]struct{})
+		for _, volume := range req.Volumes {
+			config.Volumes[volume.ContainerDir] = struct{}{}
+			hostConf.Binds = append(hostConf.Binds, fmt.Sprintf("%s:%s:%s", volume.SourceDir, volume.ContainerDir, volume.Mode))
+		}
+	}
+	container, err := client.ContainerCreate(context.TODO(), config, hostConf, &network.NetworkingConfig{}, &v1.Platform{}, req.Name)
+	if err != nil {
+		return err
+	}
+	if err := client.ContainerStart(context.TODO(), container.ID, types.ContainerStartOptions{}); err != nil {
+		return fmt.Errorf("create successful but start failed, err: %v", err)
+	}
+	return nil
 }
 
 func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error {
@@ -292,6 +347,23 @@ func (u *ContainerService) PageVolume(req dto.PageInfo) (int64, interface{}, err
 	}
 
 	return int64(total), data, nil
+}
+func (u *ContainerService) ListVolume() ([]dto.Options, error) {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return nil, err
+	}
+	list, err := client.VolumeList(context.TODO(), filters.NewArgs())
+	if err != nil {
+		return nil, err
+	}
+	var data []dto.Options
+	for _, item := range list.Volumes {
+		data = append(data, dto.Options{
+			Option: item.Name,
+		})
+	}
+	return data, nil
 }
 func (u *ContainerService) DeleteVolume(req dto.BatchDelete) error {
 	client, err := docker.NewDockerClient()

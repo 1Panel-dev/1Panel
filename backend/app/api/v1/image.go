@@ -31,6 +31,15 @@ func (b *BaseApi) SearchImage(c *gin.Context) {
 	})
 }
 
+func (b *BaseApi) ListImage(c *gin.Context) {
+	list, err := imageService.List()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, list)
+}
+
 func (b *BaseApi) ImageBuild(c *gin.Context) {
 	var req dto.ImageBuild
 	if err := c.ShouldBindJSON(&req); err != nil {
