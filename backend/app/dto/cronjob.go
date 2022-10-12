@@ -49,10 +49,6 @@ type CronjobDownload struct {
 	BackupAccountID uint `json:"backupAccountID" validate:"required"`
 }
 
-type DetailFile struct {
-	Path string `json:"path" validate:"required"`
-}
-
 type CronjobInfo struct {
 	ID       uint   `json:"id"`
 	Name     string `json:"name"`

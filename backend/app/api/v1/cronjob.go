@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"os"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
@@ -142,30 +141,6 @@ func (b *BaseApi) UpdateCronjobStatus(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, nil)
-}
-
-func (b *BaseApi) LoadRecordDetail(c *gin.Context) {
-	var req dto.DetailFile
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	file, err := os.Open(req.Path)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	defer file.Close()
-	buf := make([]byte, 1024*2)
-	if _, err := file.Read(buf); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, string(buf))
 }
 
 func (b *BaseApi) TargetDownload(c *gin.Context) {

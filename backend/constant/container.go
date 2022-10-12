@@ -10,5 +10,6 @@ const (
 	ContainerOpRename  = "reName"
 	ContainerOpRemove  = "remove"
 
-	DaemonJsonDir = "/System/Volumes/Data/Users/slooop/.docker/daemon.json"
+	DaemonJsonDir     = "/System/Volumes/Data/Users/slooop/.docker/daemon.json"
+	TmpDockerBuildDir = "/opt/1Panel/build"
 )

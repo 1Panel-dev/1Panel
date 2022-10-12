@@ -14,9 +14,10 @@ type ImageLoad struct {
 }
 
 type ImageBuild struct {
-	From       string `josn:"from" validate:"required"`
-	Dockerfile string `josn:"dockerfile" validate:"required"`
-	Tags       string `josn:"tags" validate:"required"`
+	From       string   `josn:"from" validate:"required"`
+	Name       string   `json:"name" validate:"required"`
+	Dockerfile string   `josn:"dockerfile" validate:"required"`
+	Tags       []string `josn:"tags"`
 }
 
 type ImagePull struct {

@@ -23,7 +23,7 @@ export const getImagePage = (params: ReqPage) => {
     return http.post<ResPage<Container.ImageInfo>>(`/containers/image/search`, params);
 };
 export const imageBuild = (params: Container.ImageBuild) => {
-    return http.post(`/containers/image/build`, params);
+    return http.post<string>(`/containers/image/build`, params);
 };
 export const imagePull = (params: Container.ImagePull) => {
     return http.post(`/containers/image/pull`, params);

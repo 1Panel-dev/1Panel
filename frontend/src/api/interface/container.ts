@@ -30,7 +30,9 @@ export namespace Container {
     }
     export interface ImageBuild {
         from: string;
+        name: string;
         dockerfile: string;
+        tags: Array<string>;
     }
     export interface ImagePull {
         repoID: number;

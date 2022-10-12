@@ -42,12 +42,13 @@ func (b *BaseApi) ImageBuild(c *gin.Context) {
 		return
 	}
 
-	if err := imageService.ImageBuild(req); err != nil {
+	log, err := imageService.ImageBuild(req)
+	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithData(c, log)
 }
 
 func (b *BaseApi) ImagePull(c *gin.Context) {
