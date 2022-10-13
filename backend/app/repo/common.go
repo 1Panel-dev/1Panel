@@ -70,6 +70,9 @@ func (c *CommonRepo) WithIdsNotIn(ids []uint) DBOption {
 }
 
 func getTx(ctx context.Context, opts ...DBOption) *gorm.DB {
+	if ctx == nil {
+		return getDb()
+	}
 	tx := ctx.Value("db").(*gorm.DB)
 	for _, opt := range opts {
 		tx = opt(tx)

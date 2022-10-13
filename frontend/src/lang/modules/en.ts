@@ -422,5 +422,8 @@ export default {
         backupName: 'Filename',
         backupPath: 'Filepath',
         backupdate: 'Backup Date',
+        restore: 'Restore',
+        restoreWarn:
+            'The rollback operation will restart the application and replace the data. This operation cannot be rolled back. Do you want to continue?',
     },
 };

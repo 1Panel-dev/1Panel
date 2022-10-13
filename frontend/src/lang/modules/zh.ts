@@ -414,5 +414,7 @@ export default {
         backupName: '文件名称',
         backupPath: '文件路径',
         backupdate: '备份时间',
+        restore: '回滚',
+        restoreWarn: '回滚操作会重启应用,并替换数据,此操作不可回滚,是否继续?',
     },
 };
