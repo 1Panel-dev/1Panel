@@ -79,6 +79,7 @@ export namespace App {
         installId: number;
         operate: string;
         backupId?: number;
+        detailId?: number;
     }
 
     export interface AppService {
@@ -99,5 +100,10 @@ export namespace App {
         path: string;
         appInstallId: string;
         appDetail: AppDetail;
+    }
+
+    export interface VersionDetail {
+        version: string;
+        detailId: number;
     }
 }

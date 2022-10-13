@@ -45,3 +45,7 @@ export const GetAppBackups = (info: App.AppBackupReq) => {
 export const DelAppBackups = (req: App.AppBackupDelReq) => {
     return http.post<any>('apps/installed/backups/del', req);
 };
+
+export const GetAppUpdateVersions = (id: number) => {
+    return http.get<any>(`apps/installed/${id}/versions`);
+};

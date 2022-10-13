@@ -218,6 +218,8 @@ func (a AppService) OperateInstall(req dto.AppInstallOperate) error {
 			return err
 		}
 		return restoreInstall(install, installBackup)
+	case dto.Update:
+		return updateInstall(install.ID, req.DetailId)
 	default:
 		return errors.New("operate not support")
 	}
@@ -350,25 +352,6 @@ func (a AppService) DeleteBackup(req dto.AppBackupDeleteRequest) error {
 		return errors.New(errStr.String())
 	}
 	return nil
-}
-
-func (a AppService) GetServices(key string) ([]dto.AppService, error) {
-	app, err := appRepo.GetFirst(appRepo.WithKey(key))
-	if err != nil {
-		return nil, err
-	}
-	installs, err := appInstallRepo.GetBy(appInstallRepo.WithAppId(app.ID), appInstallRepo.WithStatus(constant.Running))
-	if err != nil {
-		return nil, err
-	}
-	var res []dto.AppService
-	for _, install := range installs {
-		res = append(res, dto.AppService{
-			Label: install.Name,
-			Value: install.ServiceName,
-		})
-	}
-	return res, nil
 }
 
 func (a AppService) SyncInstalled(installId uint) error {
@@ -685,4 +668,45 @@ func syncCanUpdate() {
 		}
 
 	}
+}
+
+func (a AppService) GetServices(key string) ([]dto.AppService, error) {
+	app, err := appRepo.GetFirst(appRepo.WithKey(key))
+	if err != nil {
+		return nil, err
+	}
+	installs, err := appInstallRepo.GetBy(appInstallRepo.WithAppId(app.ID), appInstallRepo.WithStatus(constant.Running))
+	if err != nil {
+		return nil, err
+	}
+	var res []dto.AppService
+	for _, install := range installs {
+		res = append(res, dto.AppService{
+			Label: install.Name,
+			Value: install.ServiceName,
+		})
+	}
+	return res, nil
+}
+
+func (a AppService) GetUpdateVersions(installId uint) ([]dto.AppVersion, error) {
+	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
+	var versions []dto.AppVersion
+	if err != nil {
+		return versions, err
+	}
+	app, err := appRepo.GetFirst(commonRepo.WithByID(install.AppId))
+	if err != nil {
+		return versions, err
+	}
+	details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))
+	for _, detail := range details {
+		if common.CompareVersion(detail.Version, install.Version) {
+			versions = append(versions, dto.AppVersion{
+				Version:  detail.Version,
+				DetailId: detail.ID,
+			})
+		}
+	}
+	return versions, nil
 }

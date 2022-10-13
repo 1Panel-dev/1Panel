@@ -416,5 +416,7 @@ export default {
         backupdate: '备份时间',
         restore: '回滚',
         restoreWarn: '回滚操作会重启应用,并替换数据,此操作不可回滚,是否继续?',
+        update: '更新',
+        versioneSelect: '请选择版本',
     },
 };
