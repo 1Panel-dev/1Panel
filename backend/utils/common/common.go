@@ -13,6 +13,9 @@ import (
 )
 
 func CompareVersion(version1 string, version2 string) bool {
+	if version1 == version2 {
+		return false
+	}
 	version1s := strings.Split(version1, ".")
 	version2s := strings.Split(version2, ".")
 

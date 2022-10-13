@@ -159,3 +159,24 @@ func (b *BaseApi) GetServices(c *gin.Context) {
 
 	helper.SuccessWithData(c, services)
 }
+
+func (b *BaseApi) GetUpdateVersions(c *gin.Context) {
+
+	appInstallId := c.Param("appInstallId")
+	if appInstallId == "" {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	id, err := strconv.Atoi(appInstallId)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	versions, err := appService.GetUpdateVersions(uint(id))
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, versions)
+}

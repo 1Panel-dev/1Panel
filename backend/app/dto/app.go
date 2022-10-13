@@ -111,11 +111,13 @@ var (
 	Sync    AppOperate = "sync"
 	Backup  AppOperate = "backup"
 	Restore AppOperate = "restore"
+	Update  AppOperate = "update"
 )
 
 type AppInstallOperate struct {
 	InstallId uint       `json:"installId" validate:"required"`
 	BackupId  uint       `json:"backupId"`
+	DetailId  uint       `json:"detailId"`
 	Operate   AppOperate `json:"operate" validate:"required"`
 }
 
@@ -139,4 +141,9 @@ type ContainerExec struct {
 	ContainerName string      `json:"containerName"`
 	DbParam       AppDatabase `json:"dbParam"`
 	Auth          AuthParam   `json:"auth"`
+}
+
+type AppVersion struct {
+	Version  string `json:"version"`
+	DetailId uint   `json:"detailId"`
 }

@@ -425,5 +425,7 @@ export default {
         restore: 'Restore',
         restoreWarn:
             'The rollback operation will restart the application and replace the data. This operation cannot be rolled back. Do you want to continue?',
+        update: 'Update',
+        versioneSelect: 'Please Select version',
     },
 };

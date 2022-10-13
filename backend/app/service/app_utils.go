@@ -19,6 +19,7 @@ import (
 	"path"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -162,6 +163,38 @@ func deleteLink(ctx context.Context, install *model.AppInstall) error {
 	return appInstallResourceRepo.DeleteBy(ctx, appInstallResourceRepo.WithAppInstallId(install.ID))
 }
 
+func updateInstall(installId uint, detailId uint) error {
+	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
+	if err != nil {
+		return err
+	}
+	detail, err := appDetailRepo.GetFirst(commonRepo.WithByID(detailId))
+	if err != nil {
+		return err
+	}
+	if install.Version == detail.Version {
+		return errors.New("two version is save")
+	}
+	tx, ctx := getTxAndContext()
+	if err := backupInstall(ctx, install); err != nil {
+		return err
+	}
+	tx.Commit()
+	if _, err = compose.Down(install.GetComposePath()); err != nil {
+		return err
+	}
+	install.DockerCompose = detail.DockerCompose
+	install.Version = detail.Version
+	fileOp := files.NewFileOp()
+	if err := fileOp.WriteFile(install.GetComposePath(), strings.NewReader(install.DockerCompose), 0775); err != nil {
+		return err
+	}
+	if _, err = compose.Up(install.GetComposePath()); err != nil {
+		return err
+	}
+	return appInstallRepo.Save(&install)
+}
+
 func backupInstall(ctx context.Context, install model.AppInstall) error {
 	var backup model.AppInstallBackup
 	appPath := install.GetPath()
@@ -251,6 +284,7 @@ func restoreInstall(install model.AppInstall, backup model.AppInstallBackup) err
 	if out, err := compose.Up(install.GetComposePath()); err != nil {
 		return handleErr(install, err, out)
 	}
+	install.AppDetailId = backup.AppDetailId
 	install.Status = constant.Running
 	return appInstallRepo.Save(&install)
 }
