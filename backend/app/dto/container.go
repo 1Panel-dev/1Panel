@@ -37,6 +37,18 @@ type ContainerCreate struct {
 	RestartPolicy   string         `json:"restartPolicy"`
 }
 
+type ContainterStats struct {
+	CPUPercent float64 `json:"cpuPercent"`
+	Memory     float64 `json:"memory"`
+	Cache      float64 `json:"cache"`
+	IORead     float64 `json:"ioRead"`
+	IOWrite    float64 `json:"ioWrite"`
+	NetworkRX  float64 `json:"networkRX"`
+	NetworkTX  float64 `json:"networkTX"`
+
+	ShotTime time.Time `json:"shotTime"`
+}
+
 type VolumeHelper struct {
 	SourceDir    string `json:"sourceDir"`
 	ContainerDir string `json:"containerDir"`

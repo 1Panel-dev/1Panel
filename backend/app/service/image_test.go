@@ -9,6 +9,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/utils/docker"
 	"github.com/docker/docker/api/types"
@@ -95,10 +96,31 @@ func TestNetwork(t *testing.T) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	_, err = client.NetworkCreate(context.TODO(), "test", types.NetworkCreate{})
+	res, err := client.ContainerStatsOneShot(context.TODO(), "30e4d3395b87")
 	if err != nil {
 		fmt.Println(err)
 	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
+	var state *types.StatsJSON
+	if err := json.Unmarshal(body, &state); err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(string(body))
+
+	var data dto.ContainterStats
+	previousCPU := state.PreCPUStats.CPUUsage.TotalUsage
+	previousSystem := state.PreCPUStats.SystemUsage
+	data.CPUPercent = calculateCPUPercentUnix(previousCPU, previousSystem, state)
+	data.IORead, data.IOWrite = calculateBlockIO(state.BlkioStats)
+	data.Memory = float64(state.MemoryStats.Usage)
+	data.NetworkRX, data.NetworkTX = calculateNetwork(state.Networks)
+	fmt.Println(data)
 }
 
 func TestContainer(t *testing.T) {

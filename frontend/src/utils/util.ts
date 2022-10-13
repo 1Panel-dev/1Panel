@@ -49,6 +49,7 @@ export function dateFromat(row: number, col: number, dataStr: any) {
     return `${String(y)}-${String(m)}-${String(d)}   ${String(h)}:${String(minute)}:${String(second)}`;
 }
 
+// 20221013151302
 export function dateFromatForName(dataStr: any) {
     const date = new Date(dataStr);
     const y = date.getFullYear();
@@ -65,6 +66,7 @@ export function dateFromatForName(dataStr: any) {
     return `${String(y)}${String(m)}${String(d)}${String(h)}${String(minute)}${String(second)}`;
 }
 
+// 10-13 \n 15:13
 export function dateFromatWithoutYear(dataStr: any) {
     const date = new Date(dataStr);
     let m: string | number = date.getMonth() + 1;
@@ -76,6 +78,18 @@ export function dateFromatWithoutYear(dataStr: any) {
     let minute: string | number = date.getMinutes();
     minute = minute < 10 ? `0${String(minute)}` : minute;
     return `${String(m)}-${String(d)}\n${String(h)}:${String(minute)}`;
+}
+
+// 20221013151302
+export function dateFromatForSecond(dataStr: any) {
+    const date = new Date(dataStr);
+    let h: string | number = date.getHours();
+    h = h < 10 ? `0${String(h)}` : h;
+    let minute: string | number = date.getMinutes();
+    minute = minute < 10 ? `0${String(minute)}` : minute;
+    let second: string | number = date.getSeconds();
+    second = second < 10 ? `0${String(second)}` : second;
+    return `${String(h)}:${String(minute)}:${String(second)}`;
 }
 
 export function getRandomStr(e: number): string {

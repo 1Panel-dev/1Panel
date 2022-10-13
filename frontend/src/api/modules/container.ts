@@ -12,6 +12,9 @@ export const createContainer = (params: Container.ContainerCreate) => {
 export const getContainerLog = (params: Container.ContainerLogSearch) => {
     return http.post<string>(`/containers/log`, params);
 };
+export const ContainerStats = (id: string) => {
+    return http.get<Container.ContainerStats>(`/containers/stats/${id}`);
+};
 
 export const ContainerOperator = (params: Container.ContainerOperate) => {
     return http.post(`/containers/operate`, params);

@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"errors"
+
 	"github.com/1Panel-dev/1Panel/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/constant"
@@ -62,6 +64,21 @@ func (b *BaseApi) ContainerOperation(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) ContainerStats(c *gin.Context) {
+	containerID, ok := c.Params.Get("id")
+	if !ok {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error container id in path"))
+		return
+	}
+
+	result, err := containerService.ContainerStats(containerID)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
 }
 
 func (b *BaseApi) Inspect(c *gin.Context) {
