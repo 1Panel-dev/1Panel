@@ -21,6 +21,19 @@
                 fix
             />
         </ComplexTable>
+        <el-dialog v-model="openRestorePage" :title="$t('commons.msg.operate')" width="30%" :show-close="false">
+            <el-alert :title="$t('app.restoreWarn')" type="warning" :closable="false" show-icon />
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="openRestorePage = false" :loading="loading">
+                        {{ $t('commons.button.cancel') }}
+                    </el-button>
+                    <el-button type="primary" @click="restore" :loading="loading">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
     </el-dialog>
 </template>
 
@@ -42,14 +55,22 @@ const installData = ref<InstallRrops>({
 let open = ref(false);
 let loading = ref(false);
 let data = ref<any>();
+let openRestorePage = ref(false);
 const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 20,
     total: 0,
 });
+let req = reactive({
+    installId: installData.value.appInstallId,
+    operate: 'restore',
+    backupId: -1,
+});
 
+const em = defineEmits(['close']);
 const handleClose = () => {
     open.value = false;
+    em('close', open);
 };
 
 const acceptParams = (props: InstallRrops) => {
@@ -86,6 +107,26 @@ const backup = async () => {
         });
 };
 
+const openRestore = (backupId: number) => {
+    openRestorePage.value = true;
+    req.backupId = backupId;
+    req.operate = 'restore';
+    req.installId = installData.value.appInstallId;
+};
+
+const restore = async () => {
+    loading.value = true;
+    await InstalledOp(req)
+        .then(() => {
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            openRestorePage.value = false;
+            search();
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+};
+
 const deleteBackup = async (ids: number[]) => {
     const req = {
         ids: ids,
@@ -99,6 +140,12 @@ const buttons = [
         label: i18n.global.t('app.delete'),
         click: (row: any) => {
             deleteBackup([row.id]);
+        },
+    },
+    {
+        label: i18n.global.t('app.restore'),
+        click: (row: any) => {
+            openRestore(row.id);
         },
     },
 ];

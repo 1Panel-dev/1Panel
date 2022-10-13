@@ -56,7 +56,7 @@ func (a AppInstallRepo) Create(ctx context.Context, install *model.AppInstall) e
 	return db.Create(&install).Error
 }
 
-func (a AppInstallRepo) Save(install model.AppInstall) error {
+func (a AppInstallRepo) Save(install *model.AppInstall) error {
 	return getDb().Save(&install).Error
 }
 

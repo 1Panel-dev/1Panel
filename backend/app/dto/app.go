@@ -110,10 +110,12 @@ var (
 	Delete  AppOperate = "delete"
 	Sync    AppOperate = "sync"
 	Backup  AppOperate = "backup"
+	Restore AppOperate = "restore"
 )
 
 type AppInstallOperate struct {
 	InstallId uint       `json:"installId" validate:"required"`
+	BackupId  uint       `json:"backupId"`
 	Operate   AppOperate `json:"operate" validate:"required"`
 }
 

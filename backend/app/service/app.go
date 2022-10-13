@@ -208,14 +208,21 @@ func (a AppService) OperateInstall(req dto.AppInstallOperate) error {
 		tx, ctx := getTxAndContext()
 		if err := backupInstall(ctx, install); err != nil {
 			tx.Rollback()
+			return err
 		}
 		tx.Commit()
 		return nil
+	case dto.Restore:
+		installBackup, err := appInstallBackupRepo.GetFirst(commonRepo.WithByID(req.BackupId))
+		if err != nil {
+			return err
+		}
+		return restoreInstall(install, installBackup)
 	default:
 		return errors.New("operate not support")
 	}
 
-	return appInstallRepo.Save(install)
+	return appInstallRepo.Save(&install)
 }
 
 func (a AppService) Install(name string, appDetailId uint, params map[string]interface{}) error {
@@ -328,12 +335,19 @@ func (a AppService) DeleteBackup(req dto.AppBackupDeleteRequest) error {
 	}
 	fileOp := files.NewFileOp()
 
+	var errStr strings.Builder
 	for _, backup := range backups {
 		dst := path.Join(backup.Path, backup.Name)
 		if err := fileOp.DeleteFile(dst); err != nil {
+			errStr.WriteString(err.Error())
 			continue
 		}
-		appInstallBackupRepo.Delete(commonRepo.WithIdsIn(req.Ids))
+		if err := appInstallBackupRepo.Delete(commonRepo.WithIdsIn(req.Ids)); err != nil {
+			errStr.WriteString(err.Error())
+		}
+	}
+	if errStr.String() != "" {
+		return errors.New(errStr.String())
 	}
 	return nil
 }
@@ -411,11 +425,11 @@ func (a AppService) SyncInstalled(installId uint) error {
 	if containerCount == 0 {
 		appInstall.Status = constant.Error
 		appInstall.Message = "container is not found"
-		return appInstallRepo.Save(appInstall)
+		return appInstallRepo.Save(&appInstall)
 	}
 	if errCount == 0 && notFoundCount == 0 {
 		appInstall.Status = constant.Running
-		return appInstallRepo.Save(appInstall)
+		return appInstallRepo.Save(&appInstall)
 	}
 	if errCount == normalCount {
 		appInstall.Status = constant.Error
@@ -443,7 +457,7 @@ func (a AppService) SyncInstalled(installId uint) error {
 		errMsg.Write([]byte("\n"))
 	}
 	appInstall.Message = errMsg.String()
-	return appInstallRepo.Save(appInstall)
+	return appInstallRepo.Save(&appInstall)
 }
 
 func (a AppService) SyncAppList() error {
@@ -513,7 +527,7 @@ func (a AppService) SyncAppList() error {
 				continue
 			}
 			detail.DockerCompose = string(dockerComposeStr)
-			paramStr, err := os.ReadFile(path.Join(detailPath, "params.json"))
+			paramStr, err := os.ReadFile(path.Join(detailPath, "config.json"))
 			if err != nil {
 				global.LOG.Errorf("get [%s] form.json error: %s", detailPath, err.Error())
 			}

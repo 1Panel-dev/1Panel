@@ -31,6 +31,13 @@ func (a AppInstallBackupRepo) GetBy(opts ...DBOption) ([]model.AppInstallBackup,
 	return backups, nil
 }
 
+func (a AppInstallBackupRepo) GetFirst(opts ...DBOption) (model.AppInstallBackup, error) {
+	var backup model.AppInstallBackup
+	db := getDb(opts...).Model(&model.AppInstallBackup{})
+	err := db.First(&backup).Error
+	return backup, err
+}
+
 func (a AppInstallBackupRepo) Page(page, size int, opts ...DBOption) (int64, []model.AppInstallBackup, error) {
 	var backups []model.AppInstallBackup
 	db := getDb(opts...).Model(&model.AppInstallBackup{})

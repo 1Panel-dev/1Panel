@@ -59,7 +59,7 @@
             </span>
         </template>
     </el-dialog>
-    <Backups ref="backupRef"></Backups>
+    <Backups ref="backupRef" @close="search"></Backups>
 </template>
 
 <script lang="ts" setup>

@@ -78,6 +78,7 @@ export namespace App {
     export interface AppInstalledOp {
         installId: number;
         operate: string;
+        backupId?: number;
     }
 
     export interface AppService {
