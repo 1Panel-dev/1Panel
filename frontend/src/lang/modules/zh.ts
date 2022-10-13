@@ -190,6 +190,10 @@ export default {
         onFailure: '失败后重启（默认重启 5 次）',
         no: '不重启',
 
+        monitor: '监控',
+        refreshTime: '刷新间隔',
+        cache: '缓存',
+
         image: '镜像',
         imagePull: '拉取镜像',
         imagePush: '推送镜像',

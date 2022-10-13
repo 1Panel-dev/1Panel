@@ -226,6 +226,10 @@ export default {
         scope: 'IP Scope',
         gateway: 'Gateway',
 
+        monitor: 'Monitor',
+        refreshTime: 'Refresh time',
+        cache: 'Cache',
+
         volume: 'Volume',
         volumeName: 'Name',
         mountpoint: 'Mountpoint',

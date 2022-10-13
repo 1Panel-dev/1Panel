@@ -131,6 +131,7 @@ const loadLogs = async (path: string) => {
 const onCloseLog = async () => {
     emit('search');
     clearInterval(Number(timer));
+    timer = null;
 };
 
 const loadBuildDir = async (path: string) => {

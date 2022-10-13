@@ -157,12 +157,14 @@
             </template>
         </el-dialog>
         <CreateDialog @search="search" ref="dialogCreateRef" />
+        <MonitorDialog ref="dialogMonitorRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import CreateDialog from '@/views/container/container/create/index.vue';
+import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -239,13 +241,14 @@ const search = async () => {
     });
 };
 
-const dialogCreateRef = ref<DialogExpose>();
-
-interface DialogExpose {
-    acceptParams: () => void;
-}
-const onCreate = async () => {
+const dialogCreateRef = ref();
+const onCreate = () => {
     dialogCreateRef.value!.acceptParams();
+};
+
+const dialogMonitorRef = ref();
+const onMonitor = (containerID: string) => {
+    dialogMonitorRef.value!.acceptParams({ containerID: containerID });
 };
 
 const onInspect = async (id: string) => {
@@ -364,6 +367,12 @@ const onOperate = async (operation: string) => {
 };
 
 const buttons = [
+    {
+        label: i18n.global.t('container.monitor'),
+        click: (row: Container.ContainerInfo) => {
+            onMonitor(row.containerID);
+        },
+    },
     {
         label: i18n.global.t('container.reName'),
         click: (row: Container.ContainerInfo) => {

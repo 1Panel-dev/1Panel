@@ -37,6 +37,16 @@ export namespace Container {
         state: string;
         runTime: string;
     }
+    export interface ContainerStats {
+        cpuPercent: number;
+        memory: number;
+        cache: number;
+        ioRead: number;
+        ioWrite: number;
+        networkRX: number;
+        networkTX: number;
+        shotTime: Date;
+    }
     export interface ContainerLogSearch {
         containerID: string;
         mode: string;

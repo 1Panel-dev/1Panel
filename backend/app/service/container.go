@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"strconv"
 	"strings"
 	"time"
@@ -33,6 +34,7 @@ type IContainerService interface {
 	ContainerCreate(req dto.ContainerCreate) error
 	ContainerOperation(req dto.ContainerOperation) error
 	ContainerLogs(param dto.ContainerLog) (string, error)
+	ContainerStats(id string) (*dto.ContainterStats, error)
 	Inspect(req dto.InspectReq) (string, error)
 	DeleteNetwork(req dto.BatchDelete) error
 	CreateNetwork(req dto.NetworkCreat) error
@@ -159,27 +161,27 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
 func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error {
 	var err error
 	ctx := context.Background()
-	dc, err := docker.NewDockerClient()
+	client, err := docker.NewDockerClient()
 	if err != nil {
 		return err
 	}
 	switch req.Operation {
 	case constant.ContainerOpStart:
-		err = dc.ContainerStart(ctx, req.ContainerID, types.ContainerStartOptions{})
+		err = client.ContainerStart(ctx, req.ContainerID, types.ContainerStartOptions{})
 	case constant.ContainerOpStop:
-		err = dc.ContainerStop(ctx, req.ContainerID, nil)
+		err = client.ContainerStop(ctx, req.ContainerID, nil)
 	case constant.ContainerOpRestart:
-		err = dc.ContainerRestart(ctx, req.ContainerID, nil)
+		err = client.ContainerRestart(ctx, req.ContainerID, nil)
 	case constant.ContainerOpKill:
-		err = dc.ContainerKill(ctx, req.ContainerID, "SIGKILL")
+		err = client.ContainerKill(ctx, req.ContainerID, "SIGKILL")
 	case constant.ContainerOpPause:
-		err = dc.ContainerPause(ctx, req.ContainerID)
+		err = client.ContainerPause(ctx, req.ContainerID)
 	case constant.ContainerOpUnpause:
-		err = dc.ContainerUnpause(ctx, req.ContainerID)
+		err = client.ContainerUnpause(ctx, req.ContainerID)
 	case constant.ContainerOpRename:
-		err = dc.ContainerRename(ctx, req.ContainerID, req.NewName)
+		err = client.ContainerRename(ctx, req.ContainerID, req.NewName)
 	case constant.ContainerOpRemove:
-		err = dc.ContainerRemove(ctx, req.ContainerID, types.ContainerRemoveOptions{RemoveVolumes: true, RemoveLinks: true, Force: true})
+		err = client.ContainerRemove(ctx, req.ContainerID, types.ContainerRemoveOptions{RemoveVolumes: true, RemoveLinks: true, Force: true})
 	}
 	return err
 }
@@ -211,6 +213,40 @@ func (u *ContainerService) ContainerLogs(req dto.ContainerLog) (string, error) {
 		return "", err
 	}
 	return buf.String(), nil
+}
+
+func (u *ContainerService) ContainerStats(id string) (*dto.ContainterStats, error) {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return nil, err
+	}
+	res, err := client.ContainerStats(context.TODO(), id, false)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	var stats *types.StatsJSON
+	if err := json.Unmarshal(body, &stats); err != nil {
+		return nil, err
+	}
+	var data dto.ContainterStats
+	previousCPU := stats.PreCPUStats.CPUUsage.TotalUsage
+	previousSystem := stats.PreCPUStats.SystemUsage
+	data.CPUPercent = calculateCPUPercentUnix(previousCPU, previousSystem, stats)
+	data.IORead, data.IOWrite = calculateBlockIO(stats.BlkioStats)
+	data.Memory = float64(stats.MemoryStats.Usage) / 1024 / 1024
+	if cache, ok := stats.MemoryStats.Stats["cache"]; ok {
+		data.Cache = float64(cache) / 1024 / 1024
+	}
+	data.Memory = data.Memory - data.Cache
+	data.NetworkRX, data.NetworkTX = calculateNetwork(stats.Networks)
+	data.ShotTime = stats.Read
+	return &data, nil
 }
 
 func (u *ContainerService) PageNetwork(req dto.PageInfo) (int64, interface{}, error) {
@@ -403,4 +439,36 @@ func stringsToMap(list []string) map[string]string {
 		}
 	}
 	return lableMap
+}
+func calculateCPUPercentUnix(previousCPU, previousSystem uint64, v *types.StatsJSON) float64 {
+	var (
+		cpuPercent  = 0.0
+		cpuDelta    = float64(v.CPUStats.CPUUsage.TotalUsage) - float64(previousCPU)
+		systemDelta = float64(v.CPUStats.SystemUsage) - float64(previousSystem)
+	)
+
+	if systemDelta > 0.0 && cpuDelta > 0.0 {
+		cpuPercent = (cpuDelta / systemDelta) * float64(len(v.CPUStats.CPUUsage.PercpuUsage)) * 100.0
+	}
+	return cpuPercent
+}
+func calculateBlockIO(blkio types.BlkioStats) (blkRead float64, blkWrite float64) {
+	for _, bioEntry := range blkio.IoServiceBytesRecursive {
+		switch strings.ToLower(bioEntry.Op) {
+		case "read":
+			blkRead = (blkRead + float64(bioEntry.Value)) / 1024 / 1024
+		case "write":
+			blkWrite = (blkWrite + float64(bioEntry.Value)) / 1024 / 1024
+		}
+	}
+	return
+}
+func calculateNetwork(network map[string]types.NetworkStats) (float64, float64) {
+	var rx, tx float64
+
+	for _, v := range network {
+		rx += float64(v.RxBytes) / 1024
+		tx += float64(v.TxBytes) / 1024
+	}
+	return rx, tx
 }
