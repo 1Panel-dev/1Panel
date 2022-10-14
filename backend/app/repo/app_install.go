@@ -84,5 +84,5 @@ func (a AppInstallRepo) BatchUpdateBy(maps map[string]interface{}, opts ...DBOpt
 	if len(opts) == 0 {
 		db = db.Where("1=1")
 	}
-	return db.Updates(&maps).Error
+	return db.Debug().Updates(&maps).Error
 }

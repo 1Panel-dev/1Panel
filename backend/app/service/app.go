@@ -444,7 +444,10 @@ func (a AppService) SyncInstalled(installId uint) error {
 }
 
 func (a AppService) SyncAppList() error {
-	//TODO 从 oss 拉取最新列表
+	if err := getAppFromOss(); err != nil {
+		global.LOG.Errorf("get app from oss  error: %s", err.Error())
+		return err
+	}
 
 	appDir := constant.AppResourceDir
 	iconDir := path.Join(appDir, "icons")
