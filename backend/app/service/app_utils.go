@@ -7,6 +7,7 @@ import (
 	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/app/model"
 	"github.com/1Panel-dev/1Panel/constant"
+	"github.com/1Panel-dev/1Panel/global"
 	"github.com/1Panel-dev/1Panel/utils/cmd"
 	"github.com/1Panel-dev/1Panel/utils/common"
 	"github.com/1Panel-dev/1Panel/utils/compose"
@@ -14,7 +15,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
+	"io/ioutil"
 	"math"
+	"net/http"
 	"os"
 	"path"
 	"reflect"
@@ -229,13 +232,9 @@ func restoreInstall(install model.AppInstall, backup model.AppInstallBackup) err
 	if !fileOp.Stat(backupFile) {
 		return errors.New(fmt.Sprintf("%s file is not exist", backup.Name))
 	}
-	backDir := installDir + "_back"
-	if fileOp.Stat(backDir) {
-		if err := fileOp.DeleteDir(backDir); err != nil {
-			return err
-		}
-	}
-	if err := fileOp.Rename(installDir, backDir); err != nil {
+
+	backupDir, err := fileOp.Backup(installDir)
+	if err != nil {
 		return err
 	}
 	if err := fileOp.Decompress(backupFile, installKeyDir, files.TarGz); err != nil {
@@ -280,7 +279,7 @@ func restoreInstall(install model.AppInstall, backup model.AppInstallBackup) err
 	}
 
 	install.Param = backup.Param
-	_ = fileOp.DeleteDir(backDir)
+	_ = fileOp.DeleteDir(backupDir)
 	if out, err := compose.Up(install.GetComposePath()); err != nil {
 		return handleErr(install, err, out)
 	}
@@ -455,4 +454,51 @@ func handleErr(install model.AppInstall, err error, out string) error {
 	}
 	_ = appInstallRepo.Save(&install)
 	return reErr
+}
+
+func getAppFromOss() error {
+	res, err := http.Get(global.CONF.System.AppOss)
+	if err != nil {
+		return err
+	}
+	appByte, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+	var ossConfig dto.AppOssConfig
+	if err := json.Unmarshal(appByte, &ossConfig); err != nil {
+		return err
+	}
+	appDir := constant.AppResourceDir
+	oldListFile := path.Join(appDir, "list.json")
+	content, err := os.ReadFile(oldListFile)
+	if err != nil {
+		return err
+	}
+	list := &dto.AppList{}
+	if err := json.Unmarshal(content, list); err != nil {
+		return err
+	}
+	if list.Version == ossConfig.Version {
+		return nil
+	}
+
+	fileOp := files.NewFileOp()
+	if _, err := fileOp.Backup(appDir); err != nil {
+		return err
+	}
+
+	packageName := path.Base(ossConfig.Package)
+	packagePath := path.Join(constant.ResourceDir, packageName)
+	if err := fileOp.DownloadFile(ossConfig.Package, packagePath); err != nil {
+		return err
+	}
+	if err := fileOp.Decompress(packagePath, constant.ResourceDir, files.Zip); err != nil {
+		return err
+	}
+
+	defer func() {
+		_ = fileOp.DeleteFile(packagePath)
+	}()
+	return nil
 }

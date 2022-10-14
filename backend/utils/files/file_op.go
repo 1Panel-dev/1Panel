@@ -137,7 +137,7 @@ func (w *WriteCounter) SaveProcess() {
 
 }
 
-func (f FileOp) DownloadFile(url, dst, key string) error {
+func (f FileOp) DownloadFileWithProcess(url, dst, key string) error {
 	resp, err := http.Get(url)
 	if err != nil {
 		global.LOG.Errorf("get download file [%s] error, err %s", dst, err.Error())
@@ -163,6 +163,26 @@ func (f FileOp) DownloadFile(url, dst, key string) error {
 		out.Close()
 		resp.Body.Close()
 	}()
+
+	return nil
+}
+
+func (f FileOp) DownloadFile(url, dst string) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		global.LOG.Errorf("get download file [%s] error, err %s", dst, err.Error())
+	}
+
+	out, err := os.Create(dst)
+	if err != nil {
+		global.LOG.Errorf("create download file [%s] error, err %s", dst, err.Error())
+	}
+
+	if _, err = io.Copy(out, resp.Body); err != nil {
+		global.LOG.Errorf("save download file [%s] error, err %s", dst, err.Error())
+	}
+	out.Close()
+	resp.Body.Close()
 
 	return nil
 }
@@ -395,4 +415,20 @@ func (f FileOp) Decompress(srcFile string, dst string, cType CompressType) error
 		return err
 	}
 	return format.Extract(context.Background(), input, nil, handler)
+}
+
+func (f FileOp) Backup(srcFile string) (string, error) {
+	backupPath := srcFile + "_bak"
+	info, _ := f.Fs.Stat(backupPath)
+	if info != nil {
+		if info.IsDir() {
+			f.DeleteDir(backupPath)
+		} else {
+			f.DeleteFile(backupPath)
+		}
+	}
+	if err := f.Rename(srcFile, backupPath); err != nil {
+		return backupPath, err
+	}
+	return backupPath, nil
 }

@@ -126,7 +126,7 @@ func (f FileService) ChangeName(re dto.FileRename) error {
 func (f FileService) Wget(w dto.FileWget) (string, error) {
 	fo := files.NewFileOp()
 	key := "file-wget-" + uuid.NewV4().String()
-	return key, fo.DownloadFile(w.Url, filepath.Join(w.Path, w.Name), key)
+	return key, fo.DownloadFileWithProcess(w.Url, filepath.Join(w.Path, w.Name), key)
 }
 
 func (f FileService) MvFile(m dto.FileMove) error {

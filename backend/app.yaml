@@ -3,8 +3,7 @@ system:
   db_type: sqlite
   level: debug
   data_dir:  /opt/1Panel/data
-  resource_dir:  /opt/1Panel/data/resource
-  app_dir: /opt/1Panel/data/apps
+  app_oss: "https://1panel.oss-cn-hangzhou.aliyuncs.com/apps.json"
 
 mysql:
   path: localhost
