@@ -32,6 +32,64 @@ func (b *BaseApi) SearchContainer(c *gin.Context) {
 	})
 }
 
+func (b *BaseApi) SearchCompose(c *gin.Context) {
+	var req dto.PageInfo
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	total, list, err := containerService.PageCompose(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, dto.PageResult{
+		Items: list,
+		Total: total,
+	})
+}
+
+func (b *BaseApi) CreateCompose(c *gin.Context) {
+	var req dto.ComposeCreate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := containerService.CreateCompose(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) OperatorCompose(c *gin.Context) {
+	var req dto.ComposeOperation
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := containerService.ComposeOperation(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
 func (b *BaseApi) ContainerCreate(c *gin.Context) {
 	var req dto.ContainerCreate
 	if err := c.ShouldBindJSON(&req); err != nil {

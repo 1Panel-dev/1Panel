@@ -18,11 +18,11 @@
                     <el-radio label="path">{{ $t('container.pathSelect') }}</el-radio>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item v-if="dialogData.rowData!.from === 'path'" :rules="Rules.requiredSelect" prop="content">
+            <el-form-item v-if="dialogData.rowData!.from === 'path'" prop="path">
                 <el-input
                     clearable
                     :placeholder="$t('commons.example') + '/tmp/docker-compose.yml'"
-                    v-model="dialogData.rowData!.content"
+                    v-model="dialogData.rowData!.path"
                 >
                     <template #append>
                         <FileList @choose="loadDir" :dir="false"></FileList>
@@ -88,14 +88,16 @@ const acceptParams = (params: DialogProps): void => {
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const varifyPath = (rule: any, value: any, callback: any) => {
+    console.log(value, value.indexOf('docker-compose.yml'));
     if (value.indexOf('docker-compose.yml') === -1) {
-        callback(new Error(i18n.global.t('commons.rule.selectHelper', ['.docker-compose.yml'])));
+        callback(new Error(i18n.global.t('commons.rule.selectHelper', ['docker-compose.yml'])));
     }
     callback();
 };
 const rules = reactive({
     name: [Rules.requiredInput, Rules.name],
-    content: [Rules.requiredInput, { validator: varifyPath, trigger: 'change', required: true }],
+    path: [Rules.requiredInput, { validator: varifyPath, trigger: 'change', required: true }],
+    content: [Rules.requiredInput],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -124,7 +126,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
 };
 
 const loadDir = async (path: string) => {
-    dialogData.value.rowData!.content = path;
+    dialogData.value.rowData!.path = path;
 };
 
 defineExpose({

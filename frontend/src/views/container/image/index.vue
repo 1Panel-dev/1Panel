@@ -1,5 +1,6 @@
 <template>
     <div v-loading="loading">
+        <Submenu activeName="image" />
         <el-card style="margin-top: 20px">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
                 <template #toolbar>
@@ -71,6 +72,7 @@
 import ComplexTable from '@/components/complex-table/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFromat } from '@/utils/util';
+import Submenu from '@/views/container/index.vue';
 import { Container } from '@/api/interface/container';
 import Pull from '@/views/container/image/pull/index.vue';
 import Tag from '@/views/container/image/tag/index.vue';

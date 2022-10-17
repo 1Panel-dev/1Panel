@@ -1,5 +1,6 @@
 <template>
     <div>
+        <Submenu activeName="repo" />
         <el-card style="margin-top: 20px">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
                 <template #toolbar>
@@ -35,6 +36,7 @@
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import OperatorDialog from '@/views/container/repo/operator/index.vue';
+import Submenu from '@/views/container/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFromat } from '@/utils/util';
 import { Container } from '@/api/interface/container';

@@ -8,20 +8,20 @@
     >
         <template #header>
             <div class="card-header">
-                <span>{{ $t('container.buildImage') }}</span>
+                <span>{{ $t('container.imageBuild') }}</span>
             </div>
         </template>
-        <el-form ref="formRef" :model="form" label-width="80px">
-            <el-form-item :label="$t('container.name')" :rules="Rules.requiredInput" prop="name">
+        <el-form ref="formRef" :model="form" label-width="80px" :rules="rules">
+            <el-form-item :label="$t('container.name')" prop="name">
                 <el-input :placeholder="$t('container.imageNameHelper')" v-model="form.name" clearable />
             </el-form-item>
-            <el-form-item label="Dockerfile" :rules="Rules.requiredSelect" prop="from">
+            <el-form-item label="Dockerfile" prop="from">
                 <el-radio-group v-model="form.from">
                     <el-radio label="edit">{{ $t('container.edit') }}</el-radio>
                     <el-radio label="path">{{ $t('container.pathSelect') }}</el-radio>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item v-if="form.from === 'edit'" :rules="Rules.requiredInput" prop="dockerfile">
+            <el-form-item v-if="form.from === 'edit'" :rules="Rules.requiredInput">
                 <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 10 }" v-model="form.dockerfile" />
             </el-form-item>
             <el-form-item v-else :rules="Rules.requiredSelect" prop="dockerfile">
@@ -101,7 +101,8 @@ const varifyPath = (rule: any, value: any, callback: any) => {
 };
 const rules = reactive({
     name: [Rules.requiredInput, Rules.name],
-    content: [Rules.requiredInput, { validator: varifyPath, trigger: 'change', required: true }],
+    from: [Rules.requiredSelect],
+    dockerfile: [Rules.requiredInput, { validator: varifyPath, trigger: 'change', required: true }],
 });
 const acceptParams = async () => {
     buildVisiable.value = true;

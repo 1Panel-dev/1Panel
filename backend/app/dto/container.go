@@ -4,7 +4,7 @@ import "time"
 
 type PageContainer struct {
 	PageInfo
-	Status string `json:"status" validate:"required,oneof=all running"`
+	Filters string `json:"filters"`
 }
 
 type InspectReq struct {
@@ -66,7 +66,7 @@ type ContainerLog struct {
 
 type ContainerOperation struct {
 	ContainerID string `json:"containerID" validate:"required"`
-	Operation   string `json:"operation" validate:"required,oneof=start stop reStart kill pause unPause reName remove"`
+	Operation   string `json:"operation" validate:"required,oneof=start stop restart kill pause unpause rename remove"`
 	NewName     string `json:"newName"`
 }
 
@@ -107,4 +107,31 @@ type VolumeCreat struct {
 
 type BatchDelete struct {
 	Ids []string `json:"ids" validate:"required"`
+}
+
+type ComposeInfo struct {
+	Name            string             `json:"name"`
+	CreatedAt       string             `json:"createdAt"`
+	ContainerNumber int                `json:"containerNumber"`
+	ConfigFile      string             `json:"configFile"`
+	Workdir         string             `json:"workdir"`
+	Path            string             `json:"path"`
+	Containers      []ComposeContainer `json:"containers"`
+}
+type ComposeContainer struct {
+	ContainerID string `json:"containerID"`
+	Name        string `json:"name"`
+	CreateTime  string `json:"createTime"`
+	State       string `json:"state"`
+}
+type ComposeCreate struct {
+	Name     string `json:"name" validate:"required"`
+	From     string `json:"from" validate:"required,oneof=edit path template"`
+	File     string `json:"file"`
+	Path     string `json:"path"`
+	Template uint   `json:"template"`
+}
+type ComposeOperation struct {
+	Path      string `json:"path" validate:"required"`
+	Operation string `json:"operation" validate:"required,oneof=up stop pause unpause restart down"`
 }

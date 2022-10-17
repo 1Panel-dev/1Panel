@@ -1,5 +1,6 @@
 <template>
     <div>
+        <Submenu activeName="container" />
         <el-card style="margin-top: 20px">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
                 <template #toolbar>
@@ -10,8 +11,8 @@
                         <el-button :disabled="checkStatus('stop')" @click="onOperate('stop')">
                             {{ $t('container.stop') }}
                         </el-button>
-                        <el-button :disabled="checkStatus('reStart')" @click="onOperate('reStart')">
-                            {{ $t('container.reStart') }}
+                        <el-button :disabled="checkStatus('restart')" @click="onOperate('restart')">
+                            {{ $t('container.restart') }}
                         </el-button>
                         <el-button :disabled="checkStatus('kill')" @click="onOperate('kill')">
                             {{ $t('container.kill') }}
@@ -19,8 +20,8 @@
                         <el-button :disabled="checkStatus('pause')" @click="onOperate('pause')">
                             {{ $t('container.pause') }}
                         </el-button>
-                        <el-button :disabled="checkStatus('unPause')" @click="onOperate('unPause')">
-                            {{ $t('container.unPause') }}
+                        <el-button :disabled="checkStatus('unpause')" @click="onOperate('unpause')">
+                            {{ $t('container.unpause') }}
                         </el-button>
                         <el-button :disabled="checkStatus('remove')" @click="onOperate('remove')">
                             {{ $t('container.remove') }}
@@ -141,12 +142,12 @@
         >
             <template #header>
                 <div class="card-header">
-                    <span>{{ $t('container.reName') }}</span>
+                    <span>{{ $t('container.rename') }}</span>
                 </div>
             </template>
-            <el-form ref="newNameRef" :model="reNameForm">
+            <el-form ref="newNameRef" :model="renameForm">
                 <el-form-item label="新名称" :rules="Rules.requiredInput" prop="newName">
-                    <el-input v-model="reNameForm.newName"></el-input>
+                    <el-input v-model="renameForm.newName"></el-input>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -165,6 +166,7 @@
 import ComplexTable from '@/components/complex-table/index.vue';
 import CreateDialog from '@/views/container/container/create/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
+import Submenu from '@/views/container/index.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -183,10 +185,12 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
-const containerSearch = reactive({
-    page: 1,
-    pageSize: 5,
-    status: 'all',
+
+interface Filters {
+    filters?: string;
+}
+const props = withDefaults(defineProps<Filters>(), {
+    filters: '',
 });
 
 const detailVisiable = ref<boolean>(false);
@@ -205,9 +209,9 @@ let timer: NodeJS.Timer | null = null;
 const newNameVisiable = ref<boolean>(false);
 type FormInstance = InstanceType<typeof ElForm>;
 const newNameRef = ref<FormInstance>();
-const reNameForm = reactive({
+const renameForm = reactive({
     containerID: '',
-    operation: 'reName',
+    operation: 'rename',
     newName: '',
 });
 
@@ -232,9 +236,13 @@ const timeOptions = ref([
 ]);
 
 const search = async () => {
-    containerSearch.page = paginationConfig.page;
-    containerSearch.pageSize = paginationConfig.pageSize;
-    await searchContainer(containerSearch).then((res) => {
+    let filterItem = props.filters ? props.filters : '';
+    let params = {
+        page: paginationConfig.page,
+        pageSize: paginationConfig.pageSize,
+        filters: filterItem,
+    };
+    await searchContainer(params).then((res) => {
         if (res.data) {
             data.value = res.data.items;
         }
@@ -286,15 +294,15 @@ const onDownload = async () => {
 };
 
 const onRename = async (row: Container.ContainerInfo) => {
-    reNameForm.containerID = row.containerID;
-    reNameForm.newName = '';
+    renameForm.containerID = row.containerID;
+    renameForm.newName = '';
     newNameVisiable.value = true;
 };
 const onSubmitName = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        ContainerOperator(reNameForm);
+        ContainerOperator(renameForm);
         search();
         newNameVisiable.value = false;
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
@@ -327,7 +335,7 @@ const checkStatus = (operation: string) => {
                 }
             }
             return false;
-        case 'unPause':
+        case 'unpause':
             for (const item of selects.value) {
                 if (item.state !== 'paused') {
                     return true;
@@ -338,7 +346,7 @@ const checkStatus = (operation: string) => {
 };
 const onOperate = async (operation: string) => {
     ElMessageBox.confirm(
-        i18n.global.t('container.operatorHelper', [operation]),
+        i18n.global.t('container.operatorHelper', [i18n.global.t('container.' + operation)]),
         i18n.global.t('container.' + operation),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -374,7 +382,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('container.reName'),
+        label: i18n.global.t('container.rename'),
         click: (row: Container.ContainerInfo) => {
             onRename(row);
         },
