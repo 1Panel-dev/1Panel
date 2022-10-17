@@ -83,7 +83,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFromat } from '@/utils/util';
-import { deleteNetwork, getNetworkPage, inspect } from '@/api/modules/container';
+import { deleteNetwork, searchNetwork, inspect } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';
@@ -114,7 +114,7 @@ const search = async () => {
         page: paginationConfig.page,
         pageSize: paginationConfig.pageSize,
     };
-    await getNetworkPage(params).then((res) => {
+    await searchNetwork(params).then((res) => {
         if (res.data) {
             data.value = res.data.items;
         }

@@ -78,7 +78,7 @@ import Push from '@/views/container/image/push/index.vue';
 import Save from '@/views/container/image/save/index.vue';
 import Load from '@/views/container/image/load/index.vue';
 import Build from '@/views/container/image/build/index.vue';
-import { getImagePage, getRepoOption, imageRemove } from '@/api/modules/container';
+import { searchImage, listImageRepo, imageRemove } from '@/api/modules/container';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { useDeleteData } from '@/hooks/use-delete-data';
@@ -112,7 +112,7 @@ const search = async () => {
         page: paginationConfig.page,
         pageSize: paginationConfig.pageSize,
     };
-    await getImagePage(repoSearch).then((res) => {
+    await searchImage(repoSearch).then((res) => {
         if (res.data) {
             data.value = res.data.items;
         }
@@ -120,7 +120,7 @@ const search = async () => {
     });
 };
 const loadRepos = async () => {
-    const res = await getRepoOption();
+    const res = await listImageRepo();
     repos.value = res.data;
 };
 

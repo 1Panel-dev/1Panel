@@ -189,7 +189,7 @@ import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
-import { imageOptions, volumeOptions, createContainer } from '@/api/modules/container';
+import { listImage, listVolume, createContainer } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 
 const createVisiable = ref(false);
@@ -259,11 +259,11 @@ const handleVolumesDelete = (index: number) => {
 };
 
 const loadImageOptions = async () => {
-    const res = await imageOptions();
+    const res = await listImage();
     images.value = res.data;
 };
 const loadVolumeOptions = async () => {
-    const res = await volumeOptions();
+    const res = await listVolume();
     volumes.value = res.data;
 };
 const onSubmit = async (formEl: FormInstance | undefined) => {

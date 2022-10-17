@@ -2,6 +2,7 @@ export default {
     commons: {
         true: '是',
         false: '否',
+        example: '例如：',
         button: {
             create: '新建',
             add: '添加',
@@ -90,6 +91,7 @@ export default {
             number: '请输入正确的数字',
             ip: '请输入正确的 IP 地址',
             port: '请输入正确的端口',
+            selectHelper: '请选择正确的 {0} 文件',
         },
         res: {
             paramError: '请求失败,请稍后重试!',
@@ -158,7 +160,6 @@ export default {
         reName: '重命名',
         remove: '移除',
         container: '容器',
-        schedule: '编排',
         upTime: '运行时长',
         all: '全部',
         lastDay: '最近一天',
@@ -242,6 +243,11 @@ export default {
         imageRepo: '镜像仓库',
         repoHelper: '是否包含镜像仓库/组织/项目?',
         auth: '认证',
+
+        compose: '编排',
+        composeTemplate: '编排模版',
+        description: '描述',
+        content: '内容',
     },
     cronjob: {
         cronTask: '计划任务',

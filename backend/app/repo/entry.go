@@ -5,6 +5,7 @@ type RepoGroup struct {
 	BackupRepo
 	GroupRepo
 	ImageRepoRepo
+	ComposeTemplateRepo
 	CommandRepo
 	OperationRepo
 	CommonRepo

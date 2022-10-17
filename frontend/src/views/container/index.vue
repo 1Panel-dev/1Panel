@@ -17,8 +17,11 @@
                 <el-radio-button class="topButton" size="large" label="repo">
                     {{ $t('container.repo') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" label="schedule">
-                    {{ $t('container.schedule') }}
+                <el-radio-button class="topButton" size="large" label="compose">
+                    {{ $t('container.compose') }}
+                </el-radio-button>
+                <el-radio-button class="topButton" size="large" label="composeTemplate">
+                    {{ $t('container.composeTemplate') }}
                 </el-radio-button>
             </el-radio-group>
         </el-card>
@@ -27,7 +30,7 @@
         <Image v-if="activeNames === 'image'" />
         <Network v-if="activeNames === 'network'" />
         <Volume v-if="activeNames === 'volume'" />
-        <About v-if="activeNames === 'schedule'" />
+        <ComposeTemplate v-if="activeNames === 'composeTemplate'" />
     </div>
 </template>
 
@@ -38,7 +41,7 @@ import Repo from '@/views/container/repo/index.vue';
 import Image from '@/views/container/image/index.vue';
 import Network from '@/views/container/network/index.vue';
 import Volume from '@/views/container/volume/index.vue';
-import About from '@/views/setting/tabs/about.vue';
+import ComposeTemplate from '@/views/container/compose/template/index.vue';
 
 const activeNames = ref('container');
 </script>

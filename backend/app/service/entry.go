@@ -8,6 +8,7 @@ type ServiceGroup struct {
 	BackupService
 	GroupService
 	ImageService
+	ComposeTemplateService
 	ImageRepoService
 	ContainerService
 	CommandService
@@ -28,6 +29,7 @@ var (
 	operationRepo          = repo.RepoGroupApp.OperationRepo
 	commonRepo             = repo.RepoGroupApp.CommonRepo
 	imageRepoRepo          = repo.RepoGroupApp.ImageRepoRepo
+	composeRepo            = repo.RepoGroupApp.ComposeTemplateRepo
 	cronjobRepo            = repo.RepoGroupApp.CronjobRepo
 	settingRepo            = repo.RepoGroupApp.SettingRepo
 	appRepo                = repo.RepoGroupApp.AppRepo
@@ -36,6 +38,7 @@ var (
 	tagRepo                = repo.RepoGroupApp.TagRepo
 	appInstallRepo         = repo.RepoGroupApp.AppInstallRepo
 	appInstallResourceRepo = repo.RepoGroupApp.AppInstallResourceRpo
+	appContainerRepo       = repo.RepoGroupApp.AppContainerRepo
 	dataBaseRepo           = repo.RepoGroupApp.DatabaseRepo
 	appInstallBackupRepo   = repo.RepoGroupApp.AppInstallBackupRepo
 )

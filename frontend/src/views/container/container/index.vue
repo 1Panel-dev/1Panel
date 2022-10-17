@@ -171,7 +171,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFromat, dateFromatForName } from '@/utils/util';
 import { Rules } from '@/global/form-rules';
-import { ContainerOperator, inspect, getContainerLog, getContainerPage } from '@/api/modules/container';
+import { ContainerOperator, inspect, logContainer, searchContainer } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { ElForm, ElMessage, ElMessageBox, FormInstance } from 'element-plus';
 import i18n from '@/lang';
@@ -234,7 +234,7 @@ const timeOptions = ref([
 const search = async () => {
     containerSearch.page = paginationConfig.page;
     containerSearch.pageSize = paginationConfig.pageSize;
-    await getContainerPage(containerSearch).then((res) => {
+    await searchContainer(containerSearch).then((res) => {
         if (res.data) {
             data.value = res.data.items;
         }
@@ -272,7 +272,7 @@ const onCloseLog = async () => {
     clearInterval(Number(timer));
 };
 const searchLogs = async () => {
-    const res = await getContainerLog(logSearch);
+    const res = await logContainer(logSearch);
     logInfo.value = res.data;
 };
 const onDownload = async () => {

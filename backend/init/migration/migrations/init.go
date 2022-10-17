@@ -157,7 +157,7 @@ var AddTableApp = &gormigrate.Migration{
 var AddTableImageRepo = &gormigrate.Migration{
 	ID: "20201009-add-table-imagerepo",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.ImageRepo{}); err != nil {
+		if err := tx.AutoMigrate(&model.ImageRepo{}, &model.ComposeTemplate{}); err != nil {
 			return err
 		}
 		item := &model.ImageRepo{
