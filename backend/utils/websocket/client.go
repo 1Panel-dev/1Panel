@@ -2,8 +2,8 @@ package websocket
 
 import (
 	"encoding/json"
-	"github.com/1Panel-dev/1Panel/global"
-	"github.com/1Panel-dev/1Panel/utils/files"
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/gorilla/websocket"
 )
 

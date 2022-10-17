@@ -1,0 +1,15 @@
+version: '3'
+services:
+  redis-6.0.16:
+    image: redis:6.0.16
+    restart: always
+    networks:
+      - 1panel
+    ports:
+      - ${PANEL_APP_PORT_HTTP}:6379
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes:
+      - ./data:/data
+networks:
+  1panel:
+    external: true

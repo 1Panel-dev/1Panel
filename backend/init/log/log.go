@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/configs"
-	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/backend/configs"
+	"github.com/1Panel-dev/1Panel/backend/global"
 
 	"github.com/natefinch/lumberjack"
 	"github.com/sirupsen/logrus"
@@ -45,7 +45,7 @@ func (s *MineFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	var cstSh, _ = time.LoadLocation(global.CONF.LogConfig.TimeZone)
 	detailInfo := ""
 	if entry.Caller != nil {
-		funcion := strings.ReplaceAll(entry.Caller.Function, "github.com/1Panel-dev/1Panel/", "")
+		funcion := strings.ReplaceAll(entry.Caller.Function, "github.com/1Panel-dev/1Panel/backend/", "")
 		detailInfo = fmt.Sprintf("(%s: %d)", funcion, entry.Caller.Line)
 	}
 	if len(entry.Data) == 0 {

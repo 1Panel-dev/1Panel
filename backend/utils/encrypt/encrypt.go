@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/backend/global"
 )
 
 func StringEncrypt(text string) (string, error) {

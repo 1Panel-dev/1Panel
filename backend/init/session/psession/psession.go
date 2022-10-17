@@ -2,7 +2,7 @@ package psession
 
 import (
 	"encoding/json"
-	"github.com/1Panel-dev/1Panel/init/cache/badger_db"
+	"github.com/1Panel-dev/1Panel/backend/init/cache/badger_db"
 	"time"
 )
 

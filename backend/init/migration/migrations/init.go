@@ -3,7 +3,7 @@ package migrations
 import (
 	"time"
 
-	"github.com/1Panel-dev/1Panel/app/model"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"

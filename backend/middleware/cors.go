@@ -3,8 +3,8 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/1Panel-dev/1Panel/configs"
-	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/backend/configs"
+	"github.com/1Panel-dev/1Panel/backend/global"
 
 	"github.com/gin-gonic/gin"
 )

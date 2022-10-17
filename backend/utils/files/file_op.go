@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/mholt/archiver/v4"
 	"github.com/pkg/errors"
 	"github.com/spf13/afero"

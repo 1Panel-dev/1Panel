@@ -4,11 +4,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/app/api/v1/helper"
-	"github.com/1Panel-dev/1Panel/app/repo"
-	"github.com/1Panel-dev/1Panel/constant"
-	"github.com/1Panel-dev/1Panel/global"
-	jwtUtils "github.com/1Panel-dev/1Panel/utils/jwt"
+	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
+	jwtUtils "github.com/1Panel-dev/1Panel/backend/utils/jwt"
 	"github.com/golang-jwt/jwt/v4"
 
 	"github.com/gin-gonic/gin"

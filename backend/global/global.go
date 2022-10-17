@@ -1,9 +1,9 @@
 package global
 
 import (
-	"github.com/1Panel-dev/1Panel/configs"
-	"github.com/1Panel-dev/1Panel/init/cache/badger_db"
-	"github.com/1Panel-dev/1Panel/init/session/psession"
+	"github.com/1Panel-dev/1Panel/backend/configs"
+	"github.com/1Panel-dev/1Panel/backend/init/cache/badger_db"
+	"github.com/1Panel-dev/1Panel/backend/init/session/psession"
 	"github.com/go-playground/validator/v10"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"

@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/backend/global"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

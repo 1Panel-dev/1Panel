@@ -1,0 +1,20 @@
+{
+  "formFields": [
+    {
+      "type": "text",
+      "labelZh": "密码",
+      "labelEn": "Password",
+      "required": true,
+      "default": "eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81",
+      "envKey": "PANEL_DB_ROOT_PASSWORD"
+    },
+    {
+      "type": "number",
+      "labelZh": "端口",
+      "labelEn": "Port",
+      "required": true,
+      "default": 6379,
+      "envKey": "PANEL_APP_PORT_HTTP"
+    }
+  ]
+}

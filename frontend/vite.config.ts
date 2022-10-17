@@ -17,7 +17,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     const viteEnv = wrapperEnv(env);
 
     return {
-        // base: "/",
+        // base: '/kubepi',
         // alias config
         resolve: {
             alias: {
@@ -39,6 +39,9 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             // host: '0.0.0.0',
             // https: false,
             proxy: {
+                '/1panel': {
+                    target: 'http://0.0.0.0:4004',
+                },
                 '/api/v1': {
                     target: 'http://127.0.0.1:9999',
                     changeOrigin: true,
@@ -81,7 +84,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             pure: viteEnv.VITE_DROP_CONSOLE ? ['console.log', 'debugger'] : [],
         },
         build: {
-            outDir: 'dist',
+            outDir: '../cmd/server/web',
             minify: 'esbuild',
             rollupOptions: {
                 output: {

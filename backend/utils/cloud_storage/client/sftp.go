@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/constant"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
 )

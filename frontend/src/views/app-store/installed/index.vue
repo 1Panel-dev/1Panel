@@ -72,7 +72,11 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="operate" :disabled="versions == null">
+                <el-button
+                    type="primary"
+                    @click="operate"
+                    :disabled="operateReq.operate == 'update' && versions == null"
+                >
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -199,6 +203,9 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'update');
         },
+        disabled: (row: any) => {
+            return !row.canUpdate;
+        },
     },
     {
         label: i18n.global.t('app.restart'),
@@ -210,6 +217,9 @@ const buttons = [
         label: i18n.global.t('app.up'),
         click: (row: any) => {
             openOperate(row, 'up');
+        },
+        disabled: (row: any) => {
+            return row.status === 'Running';
         },
     },
     {

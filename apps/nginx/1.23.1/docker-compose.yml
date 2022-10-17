@@ -3,6 +3,8 @@ services:
     container_name: ${CONTAINER_NAME}
     image: nginx:1.23.1
     restart: always
+    networks:
+      - 1panel
     ports:
       - ${PANEL_APP_PORT_HTTP}:80
       - ${PANEL_APP_PORT_HTTPS}:443
@@ -12,3 +14,7 @@ services:
       - ./log:/var/log/nginx
       - ./conf/conf.d:/etc/nginx/conf.d/
       - ./html:/usr/share/nginx/html
+
+networks:
+  1panel:
+    external: true

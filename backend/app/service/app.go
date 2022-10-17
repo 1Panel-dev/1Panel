@@ -5,15 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/app/dto"
-	"github.com/1Panel-dev/1Panel/app/model"
-	"github.com/1Panel-dev/1Panel/app/repo"
-	"github.com/1Panel-dev/1Panel/constant"
-	"github.com/1Panel-dev/1Panel/global"
-	"github.com/1Panel-dev/1Panel/utils/common"
-	"github.com/1Panel-dev/1Panel/utils/compose"
-	"github.com/1Panel-dev/1Panel/utils/docker"
-	"github.com/1Panel-dev/1Panel/utils/files"
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/1Panel-dev/1Panel/backend/utils/compose"
+	"github.com/1Panel-dev/1Panel/backend/utils/docker"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"golang.org/x/net/context"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -175,35 +175,9 @@ func (a AppService) OperateInstall(req dto.AppInstallOperate) error {
 		}
 		install.Status = constant.Running
 	case dto.Delete:
-		op := files.NewFileOp()
-		appDir := install.GetPath()
-		dir, _ := os.Stat(appDir)
-		if dir != nil {
-			out, err := compose.Down(dockerComposePath)
-			if err != nil {
-				return handleErr(install, err, out)
-			}
-			if err := op.DeleteDir(appDir); err != nil {
-				return err
-			}
-		}
-
-		tx, ctx := getTxAndContext()
-		if err := appInstallRepo.Delete(ctx, install); err != nil {
-			tx.Rollback()
-			return err
-		}
-		if err := deleteLink(ctx, &install); err != nil {
-			tx.Rollback()
-			return err
-		}
-		tx.Commit()
-		return nil
+		return deleteAppInstall(install)
 	case dto.Sync:
-		if err := a.SyncInstalled(install.ID); err != nil {
-			return err
-		}
-		return nil
+		return a.SyncInstalled(install.ID)
 	case dto.Backup:
 		tx, ctx := getTxAndContext()
 		if err := backupInstall(ctx, install); err != nil {
@@ -213,11 +187,7 @@ func (a AppService) OperateInstall(req dto.AppInstallOperate) error {
 		tx.Commit()
 		return nil
 	case dto.Restore:
-		installBackup, err := appInstallBackupRepo.GetFirst(commonRepo.WithByID(req.BackupId))
-		if err != nil {
-			return err
-		}
-		return restoreInstall(install, installBackup)
+		return restoreInstall(install, req.BackupId)
 	case dto.Update:
 		return updateInstall(install.ID, req.DetailId)
 	default:
@@ -344,7 +314,7 @@ func (a AppService) DeleteBackup(req dto.AppBackupDeleteRequest) error {
 			errStr.WriteString(err.Error())
 			continue
 		}
-		if err := appInstallBackupRepo.Delete(commonRepo.WithIdsIn(req.Ids)); err != nil {
+		if err := appInstallBackupRepo.Delete(nil, commonRepo.WithIdsIn(req.Ids)); err != nil {
 			errStr.WriteString(err.Error())
 		}
 	}

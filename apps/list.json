@@ -1,5 +1,5 @@
 {
-  "version": "0.1",
+  "version": "0.0.2",
   "tags": [
     {
       "key": "WebSite",
@@ -56,6 +56,20 @@
       "limit": 0,
       "crossVersionUpdate": true,
       "source": "http://wordpress.org/"
+    },
+    {
+      "key": "redis",
+      "name": "redis",
+      "tags": ["Datastore"],
+      "versions": ["7.0.5","6.0.16"],
+      "short_desc": "缓存数据库",
+      "icon": "redis.png",
+      "author": "Salvatore Sanfilippo",
+      "type": "runtime",
+      "required": [""],
+      "limit": 0,
+      "crossVersionUpdate": true,
+      "source": "https://redis.io/"
     }
   ]
 }
