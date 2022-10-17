@@ -1,6 +1,6 @@
 package db
 
-import "github.com/1Panel-dev/1Panel/global"
+import "github.com/1Panel-dev/1Panel/backend/global"
 
 func Init() {
 	switch global.CONF.System.DbType {

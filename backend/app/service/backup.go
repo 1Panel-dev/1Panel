@@ -3,10 +3,10 @@ package service
 import (
 	"encoding/json"
 
-	"github.com/1Panel-dev/1Panel/app/dto"
-	"github.com/1Panel-dev/1Panel/app/model"
-	"github.com/1Panel-dev/1Panel/constant"
-	"github.com/1Panel-dev/1Panel/utils/cloud_storage"
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/cloud_storage"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 )

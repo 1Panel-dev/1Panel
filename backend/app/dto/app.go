@@ -2,7 +2,7 @@ package dto
 
 import (
 	"encoding/json"
-	"github.com/1Panel-dev/1Panel/app/model"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 )
 
 type AppRes struct {

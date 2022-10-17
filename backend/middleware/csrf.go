@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/csrf"
 	adapter "github.com/gwatts/gin-adapter"

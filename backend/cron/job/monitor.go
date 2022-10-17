@@ -4,9 +4,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/app/model"
-	"github.com/1Panel-dev/1Panel/app/repo"
-	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/load"

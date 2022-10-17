@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/1Panel-dev/1Panel/constant"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	osssdk "github.com/aliyun/aliyun-oss-go-sdk/oss"
 )
 

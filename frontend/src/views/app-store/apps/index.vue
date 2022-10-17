@@ -91,6 +91,7 @@ const sync = () => {
     SyncApp()
         .then(() => {
             ElMessage.success(i18n.global.t('app.syncSuccess'));
+            search(req);
         })
         .finally(() => {
             loading.value = false;

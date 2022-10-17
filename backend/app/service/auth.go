@@ -3,11 +3,11 @@ package service
 import (
 	"strconv"
 
-	"github.com/1Panel-dev/1Panel/app/dto"
-	"github.com/1Panel-dev/1Panel/constant"
-	"github.com/1Panel-dev/1Panel/global"
-	"github.com/1Panel-dev/1Panel/utils/encrypt"
-	"github.com/1Panel-dev/1Panel/utils/jwt"
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/backend/utils/jwt"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"

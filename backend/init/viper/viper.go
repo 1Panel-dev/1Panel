@@ -2,9 +2,9 @@ package viper
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/configs"
-	"github.com/1Panel-dev/1Panel/constant"
-	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/backend/configs"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"path"
 
 	"github.com/fsnotify/fsnotify"

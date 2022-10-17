@@ -1,8 +1,8 @@
 package session
 
 import (
-	"github.com/1Panel-dev/1Panel/global"
-	"github.com/1Panel-dev/1Panel/init/session/psession"
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/init/session/psession"
 )
 
 func Init() {

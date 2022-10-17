@@ -6,9 +6,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/1Panel-dev/1Panel/app/dto"
-	"github.com/1Panel-dev/1Panel/constant"
-	"github.com/1Panel-dev/1Panel/i18n"
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/gin-gonic/gin"
 )
 

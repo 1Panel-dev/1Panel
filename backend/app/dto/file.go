@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"github.com/1Panel-dev/1Panel/utils/files"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 )
 
 type FileOption struct {

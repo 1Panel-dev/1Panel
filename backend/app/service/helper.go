@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"gorm.io/gorm"
 )
 

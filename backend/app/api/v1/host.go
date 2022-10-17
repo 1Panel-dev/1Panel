@@ -1,12 +1,12 @@
 package v1
 
 import (
-	"github.com/1Panel-dev/1Panel/app/api/v1/helper"
-	"github.com/1Panel-dev/1Panel/app/dto"
-	"github.com/1Panel-dev/1Panel/constant"
-	"github.com/1Panel-dev/1Panel/global"
-	"github.com/1Panel-dev/1Panel/utils/copier"
-	"github.com/1Panel-dev/1Panel/utils/ssh"
+	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/copier"
+	"github.com/1Panel-dev/1Panel/backend/utils/ssh"
 	"github.com/gin-gonic/gin"
 )
 

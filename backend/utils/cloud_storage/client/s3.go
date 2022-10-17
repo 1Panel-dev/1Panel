@@ -3,7 +3,7 @@ package client
 import (
 	"os"
 
-	"github.com/1Panel-dev/1Panel/constant"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/credentials"

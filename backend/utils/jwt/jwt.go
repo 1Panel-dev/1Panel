@@ -3,7 +3,7 @@ package jwt
 import (
 	"time"
 
-	"github.com/1Panel-dev/1Panel/constant"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 
 	"github.com/golang-jwt/jwt/v4"
 )

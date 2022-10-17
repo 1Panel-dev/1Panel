@@ -5,6 +5,12 @@
 *.so
 *.dylib
 .idea
+cmd/server/web/assets/
+cmd/server/web/monacoeditorwork
+cmd/server/web/favicon.ico
+cmd/server/web/index.html
+
+build
 
 # Test binary, built with `go test -c`
 *.test

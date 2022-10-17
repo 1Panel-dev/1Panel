@@ -4,14 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/app/dto"
-	"github.com/1Panel-dev/1Panel/app/model"
-	"github.com/1Panel-dev/1Panel/constant"
-	"github.com/1Panel-dev/1Panel/global"
-	"github.com/1Panel-dev/1Panel/utils/cmd"
-	"github.com/1Panel-dev/1Panel/utils/common"
-	"github.com/1Panel-dev/1Panel/utils/compose"
-	"github.com/1Panel-dev/1Panel/utils/files"
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/1Panel-dev/1Panel/backend/utils/compose"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"gopkg.in/yaml.v3"
@@ -140,6 +140,37 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 	return nil
 }
 
+func deleteAppInstall(install model.AppInstall) error {
+	op := files.NewFileOp()
+	appDir := install.GetPath()
+	dir, _ := os.Stat(appDir)
+	if dir != nil {
+		out, err := compose.Down(install.GetComposePath())
+		if err != nil {
+			return handleErr(install, err, out)
+		}
+		if err := op.DeleteDir(appDir); err != nil {
+			return err
+		}
+	}
+
+	tx, ctx := getTxAndContext()
+	if err := appInstallRepo.Delete(ctx, install); err != nil {
+		tx.Rollback()
+		return err
+	}
+	if err := deleteLink(ctx, &install); err != nil {
+		tx.Rollback()
+		return err
+	}
+	if err := appInstallBackupRepo.Delete(ctx, appInstallBackupRepo.WithAppInstallID(install.ID)); err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
+}
+
 func deleteLink(ctx context.Context, install *model.AppInstall) error {
 	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
 	if len(resources) == 0 {
@@ -171,12 +202,20 @@ func updateInstall(installId uint, detailId uint) error {
 	if err != nil {
 		return err
 	}
+	oldDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(install.AppDetailId))
+	if err != nil {
+		return err
+	}
+
 	detail, err := appDetailRepo.GetFirst(commonRepo.WithByID(detailId))
 	if err != nil {
 		return err
 	}
+	if oldDetail.LastVersion == detail.Version {
+		install.CanUpdate = false
+	}
 	if install.Version == detail.Version {
-		return errors.New("two version is save")
+		return errors.New("two version is same")
 	}
 	tx, ctx := getTxAndContext()
 	if err := backupInstall(ctx, install); err != nil {
@@ -188,6 +227,7 @@ func updateInstall(installId uint, detailId uint) error {
 	}
 	install.DockerCompose = detail.DockerCompose
 	install.Version = detail.Version
+
 	fileOp := files.NewFileOp()
 	if err := fileOp.WriteFile(install.GetComposePath(), strings.NewReader(install.DockerCompose), 0775); err != nil {
 		return err
@@ -221,7 +261,11 @@ func backupInstall(ctx context.Context, install model.AppInstall) error {
 	return nil
 }
 
-func restoreInstall(install model.AppInstall, backup model.AppInstallBackup) error {
+func restoreInstall(install model.AppInstall, backupId uint) error {
+	backup, err := appInstallBackupRepo.GetFirst(commonRepo.WithByID(backupId))
+	if err != nil {
+		return err
+	}
 	if _, err := compose.Down(install.GetComposePath()); err != nil {
 		return err
 	}
@@ -284,6 +328,7 @@ func restoreInstall(install model.AppInstall, backup model.AppInstallBackup) err
 		return handleErr(install, err, out)
 	}
 	install.AppDetailId = backup.AppDetailId
+	install.Version = backup.AppDetail.Version
 	install.Status = constant.Running
 	return appInstallRepo.Save(&install)
 }

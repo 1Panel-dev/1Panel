@@ -3,20 +3,22 @@ package server
 import (
 	"encoding/gob"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/cmd/server/web"
+	"net/http"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/cron"
-	"github.com/1Panel-dev/1Panel/init/cache"
-	"github.com/1Panel-dev/1Panel/init/session"
-	"github.com/1Panel-dev/1Panel/init/session/psession"
+	"github.com/1Panel-dev/1Panel/backend/cron"
+	"github.com/1Panel-dev/1Panel/backend/init/cache"
+	"github.com/1Panel-dev/1Panel/backend/init/session"
+	"github.com/1Panel-dev/1Panel/backend/init/session/psession"
 
-	"github.com/1Panel-dev/1Panel/global"
-	"github.com/1Panel-dev/1Panel/init/db"
-	"github.com/1Panel-dev/1Panel/init/log"
-	"github.com/1Panel-dev/1Panel/init/migration"
-	"github.com/1Panel-dev/1Panel/init/router"
-	"github.com/1Panel-dev/1Panel/init/validator"
-	"github.com/1Panel-dev/1Panel/init/viper"
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/init/db"
+	"github.com/1Panel-dev/1Panel/backend/init/log"
+	"github.com/1Panel-dev/1Panel/backend/init/migration"
+	"github.com/1Panel-dev/1Panel/backend/init/router"
+	"github.com/1Panel-dev/1Panel/backend/init/validator"
+	"github.com/1Panel-dev/1Panel/backend/init/viper"
 
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
@@ -34,9 +36,17 @@ func Start() {
 	gin.SetMode(global.CONF.System.Level)
 	cron.Run()
 
-	routers := router.Routers()
+	rootRouter := router.Routers()
 	address := fmt.Sprintf(":%d", global.CONF.System.Port)
-	s := initServer(address, routers)
+	rootRouter.StaticFS("/login/onepanel", http.FS(web.IndexHtml))
+	rootRouter.StaticFS("/1panel", http.FS(web.IndexHtml))
+
+	rootRouter.GET("/assets/*filepath", func(c *gin.Context) {
+		staticServer := http.FileServer(http.FS(web.Assets))
+		staticServer.ServeHTTP(c.Writer, c.Request)
+	})
+
+	s := initServer(address, rootRouter)
 	global.LOG.Infof("server run success on %d", global.CONF.System.Port)
 	if err := s.ListenAndServe(); err != nil {
 		global.LOG.Error(err)

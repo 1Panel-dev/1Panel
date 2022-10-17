@@ -2,11 +2,11 @@ package v1
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/app/api/v1/helper"
-	"github.com/1Panel-dev/1Panel/app/dto"
-	"github.com/1Panel-dev/1Panel/constant"
-	"github.com/1Panel-dev/1Panel/global"
-	websocket2 "github.com/1Panel-dev/1Panel/utils/websocket"
+	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
+	websocket2 "github.com/1Panel-dev/1Panel/backend/utils/websocket"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"net/http"

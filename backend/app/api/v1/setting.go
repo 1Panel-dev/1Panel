@@ -3,12 +3,12 @@ package v1
 import (
 	"errors"
 
-	"github.com/1Panel-dev/1Panel/app/api/v1/helper"
-	"github.com/1Panel-dev/1Panel/app/dto"
-	"github.com/1Panel-dev/1Panel/constant"
-	"github.com/1Panel-dev/1Panel/global"
-	"github.com/1Panel-dev/1Panel/utils/mfa"
-	"github.com/1Panel-dev/1Panel/utils/ntp"
+	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/mfa"
+	"github.com/1Panel-dev/1Panel/backend/utils/ntp"
 	"github.com/gin-gonic/gin"
 )
 

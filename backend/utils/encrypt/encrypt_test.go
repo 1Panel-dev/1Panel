@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/1Panel-dev/1Panel/init/viper"
+	"github.com/1Panel-dev/1Panel/backend/init/viper"
 )
 
 func TestStringEncrypt(t *testing.T) {

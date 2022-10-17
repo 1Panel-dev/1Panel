@@ -2,10 +2,10 @@ package service
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/app/dto"
-	"github.com/1Panel-dev/1Panel/global"
-	"github.com/1Panel-dev/1Panel/utils/common"
-	"github.com/1Panel-dev/1Panel/utils/files"
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 	"io/fs"
