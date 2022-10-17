@@ -32,6 +32,9 @@
                         <el-tag type="error">{{ row.status }}</el-tag>
                     </template>
                 </el-popover>
+                <el-icon v-if="row.status === 'Installing'" class="is-loading">
+                    <Loading />
+                </el-icon>
                 <el-tag v-else>{{ row.status }}</el-tag>
             </template>
         </el-table-column>
@@ -87,7 +90,7 @@
 
 <script lang="ts" setup>
 import { GetAppInstalled, InstalledOp, SyncInstalledApp, GetAppUpdateVersions } from '@/api/modules/app';
-import { onMounted, reactive, ref } from 'vue';
+import { onBeforeMount, onMounted, reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { dateFromat } from '@/utils/util';
 import i18n from '@/lang';
@@ -97,6 +100,7 @@ import { App } from '@/api/interface/app';
 
 let data = ref<any>();
 let loading = ref(false);
+let timer: NodeJS.Timer | null = null;
 const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 20,
@@ -245,6 +249,13 @@ const openBackups = (installId: number) => {
 
 onMounted(() => {
     search();
+    timer = setInterval(() => {
+        search();
+    }, 1000 * 8);
+});
+
+onBeforeMount(() => {
+    clearInterval(Number(timer));
 });
 </script>
 
