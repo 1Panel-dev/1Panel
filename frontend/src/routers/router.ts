@@ -71,7 +71,7 @@ export const routes: RouteRecordRaw[] = [
     },
 ];
 const router = createRouter({
-    history: createWebHistory('/kubepi/'),
+    history: createWebHistory('/1panel/'),
     routes: routes as RouteRecordRaw[],
     strict: false,
     scrollBehavior: () => ({ left: 0, top: 0 }),
