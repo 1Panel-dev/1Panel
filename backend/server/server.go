@@ -3,8 +3,6 @@ package server
 import (
 	"encoding/gob"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/cmd/server/web"
-	"net/http"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/cron"
@@ -38,14 +36,6 @@ func Start() {
 
 	rootRouter := router.Routers()
 	address := fmt.Sprintf(":%d", global.CONF.System.Port)
-	rootRouter.StaticFS("/login/onepanel", http.FS(web.IndexHtml))
-	rootRouter.StaticFS("/1panel", http.FS(web.IndexHtml))
-
-	rootRouter.GET("/assets/*filepath", func(c *gin.Context) {
-		staticServer := http.FileServer(http.FS(web.Assets))
-		staticServer.ServeHTTP(c.Writer, c.Request)
-	})
-
 	s := initServer(address, rootRouter)
 	global.LOG.Infof("server run success on %d", global.CONF.System.Port)
 	if err := s.ListenAndServe(); err != nil {
