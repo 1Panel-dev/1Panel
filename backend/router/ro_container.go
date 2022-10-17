@@ -33,6 +33,12 @@ func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
 		withRecordRouter.POST("/repo", baseApi.CreateRepo)
 		withRecordRouter.POST("/repo/del", baseApi.DeleteRepo)
 
+		baRouter.POST("/compose/search", baseApi.SearchComposeTemplate)
+		baRouter.PUT("/compose/:id", baseApi.UpdateComposeTemplate)
+		baRouter.GET("/compose", baseApi.ListComposeTemplate)
+		withRecordRouter.POST("/compose", baseApi.CreateComposeTemplate)
+		withRecordRouter.POST("/compose/del", baseApi.DeleteComposeTemplate)
+
 		baRouter.POST("/image/search", baseApi.SearchImage)
 		baRouter.GET("/image", baseApi.ListImage)
 		baRouter.POST("/image/pull", baseApi.ImagePull)

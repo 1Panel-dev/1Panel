@@ -72,7 +72,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFromat } from '@/utils/util';
-import { deleteVolume, getVolumePage, inspect } from '@/api/modules/container';
+import { deleteVolume, searchVolume, inspect } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';
@@ -103,7 +103,7 @@ const search = async () => {
         page: paginationConfig.page,
         pageSize: paginationConfig.pageSize,
     };
-    await getVolumePage(params).then((res) => {
+    await searchVolume(params).then((res) => {
         if (res.data) {
             data.value = res.data.items;
         }

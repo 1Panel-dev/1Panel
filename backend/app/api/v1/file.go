@@ -246,7 +246,7 @@ func (b *BaseApi) LoadFromFile(c *gin.Context) {
 		return
 	}
 	defer file.Close()
-	buf := make([]byte, 1024*500)
+	buf := make([]byte, 1024*2)
 	if _, err := file.Read(buf); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

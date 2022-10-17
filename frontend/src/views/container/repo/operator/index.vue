@@ -48,7 +48,7 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { Container } from '@/api/interface/container';
-import { repoCreate, repoUpdate } from '@/api/modules/container';
+import { createImageRepo, updateImageRepo } from '@/api/modules/container';
 
 interface DialogProps {
     title: string;
@@ -89,10 +89,10 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         if (dialogData.value.title === 'create') {
-            await repoCreate(dialogData.value.rowData!);
+            await createImageRepo(dialogData.value.rowData!);
         }
         if (dialogData.value.title === 'edit') {
-            await repoUpdate(dialogData.value.rowData!);
+            await updateImageRepo(dialogData.value.rowData!);
         }
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         restForm();

@@ -93,6 +93,16 @@ const form = reactive({
     tagStr: '',
     tags: [] as Array<string>,
 });
+const varifyPath = (rule: any, value: any, callback: any) => {
+    if (value.indexOf('docker-compose.yml') === -1) {
+        callback(new Error(i18n.global.t('commons.rule.selectHelper', ['Dockerfile'])));
+    }
+    callback();
+};
+const rules = reactive({
+    name: [Rules.requiredInput, Rules.name],
+    content: [Rules.requiredInput, { validator: varifyPath, trigger: 'change', required: true }],
+});
 const acceptParams = async () => {
     buildVisiable.value = true;
     form.from = 'path';

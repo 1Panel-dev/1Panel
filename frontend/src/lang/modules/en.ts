@@ -93,6 +93,7 @@ export default {
             number: 'Please enter the correct number',
             ip: 'Please enter the correct IP address',
             port: 'Please enter the correct port',
+            selectHelper: 'Please select the correct {0} file',
         },
         res: {
             paramError: 'The request failed, please try again later!',
@@ -161,7 +162,6 @@ export default {
         reName: 'ReName',
         remove: 'Remove',
         container: 'Container',
-        schedule: 'Schedule',
         upTime: 'UpTime',
         all: 'All',
         lastDay: 'Last Day',
@@ -242,6 +242,11 @@ export default {
         imageRepo: 'Image repo',
         repoHelper: 'Does it include a mirror repository/organization/project?',
         auth: 'Auth',
+
+        compose: 'Compose',
+        composeTemplate: 'Compose template',
+        description: 'Description',
+        content: 'Content',
     },
     cronjob: {
         cronTask: 'Task',

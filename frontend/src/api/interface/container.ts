@@ -161,6 +161,27 @@ export namespace Container {
         downloadUrl: string;
     }
 
+    export interface TemplateCreate {
+        name: string;
+        from: string;
+        description: string;
+        content: string;
+    }
+    export interface TemplateUpdate {
+        id: number;
+        from: string;
+        description: string;
+        content: string;
+    }
+    export interface TemplateInfo {
+        id: number;
+        createdAt: Date;
+        name: string;
+        from: string;
+        description: string;
+        content: string;
+    }
+
     export interface BatchDelete {
         ids: Array<string>;
     }
