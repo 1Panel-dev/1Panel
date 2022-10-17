@@ -2,7 +2,7 @@ import http from '@/api';
 import { ResPage, ReqPage } from '../interface';
 import { Container } from '../interface/container';
 
-export const searchContainer = (params: ReqPage) => {
+export const searchContainer = (params: Container.ContainerSearch) => {
     return http.post<ResPage<Container.ContainerInfo>>(`/containers/search`, params);
 };
 export const createContainer = (params: Container.ContainerCreate) => {
@@ -94,17 +94,28 @@ export const deleteImageRepo = (params: { ids: number[] }) => {
 
 // composeTemplate
 export const searchComposeTemplate = (params: ReqPage) => {
-    return http.post<ResPage<Container.TemplateInfo>>(`/containers/compose/search`, params);
+    return http.post<ResPage<Container.TemplateInfo>>(`/containers/template/search`, params);
 };
-export const listComposeTemplate = (params: ReqPage) => {
-    return http.post<ResPage<Container.TemplateInfo>>(`/containers/compose/search`, params);
+export const listComposeTemplate = () => {
+    return http.get<Container.TemplateInfo>(`/containers/template`);
 };
 export const deleteComposeTemplate = (params: { ids: number[] }) => {
-    return http.post(`/containers/compose/del`, params);
+    return http.post(`/containers/template/del`, params);
 };
 export const createComposeTemplate = (params: Container.TemplateCreate) => {
-    return http.post(`/containers/compose`, params);
+    return http.post(`/containers/template`, params);
 };
 export const updateComposeTemplate = (params: Container.TemplateUpdate) => {
-    return http.put(`/containers/compose/${params.id}`, params);
+    return http.put(`/containers/template/${params.id}`, params);
+};
+
+// compose
+export const searchCompose = (params: ReqPage) => {
+    return http.post<ResPage<Container.ComposeInfo>>(`/containers/compose/search`, params);
+};
+export const upCompose = (params: Container.ComposeCreate) => {
+    return http.post(`/containers/compose/up`, params);
+};
+export const ComposeOperator = (params: Container.ComposeOpration) => {
+    return http.post(`/containers/compose/operate`, params);
 };

@@ -1,8 +1,13 @@
+import { ReqPage } from '.';
+
 export namespace Container {
     export interface ContainerOperate {
         containerID: string;
         operation: string;
         newName: string;
+    }
+    export interface ContainerSearch extends ReqPage {
+        filters: string;
     }
     export interface ContainerCreate {
         name: string;
@@ -161,16 +166,46 @@ export namespace Container {
         downloadUrl: string;
     }
 
+    export interface ComposeInfo {
+        name: string;
+        createdAt: string;
+        containerNumber: number;
+        configFile: string;
+        workdir: string;
+        path: string;
+        containers: Array<ComposeContainer>;
+        expand: boolean;
+    }
+    export interface ComposeContainer {
+        name: string;
+        createTime: string;
+        containerID: string;
+        state: string;
+    }
+    export interface ComposeCreate {
+        name: string;
+        from: string;
+        file: string;
+        path: string;
+        template: number;
+    }
+    export interface ComposeOpration {
+        operation: string;
+        path: string;
+    }
+
     export interface TemplateCreate {
         name: string;
         from: string;
         description: string;
+        path: string;
         content: string;
     }
     export interface TemplateUpdate {
         id: number;
         from: string;
         description: string;
+        path: string;
         content: string;
     }
     export interface TemplateInfo {
@@ -179,6 +214,7 @@ export namespace Container {
         name: string;
         from: string;
         description: string;
+        path: string;
         content: string;
     }
 

@@ -3,13 +3,18 @@ package constant
 const (
 	ContainerOpStart   = "start"
 	ContainerOpStop    = "stop"
-	ContainerOpRestart = "reStart"
+	ContainerOpRestart = "restart"
 	ContainerOpKill    = "kill"
 	ContainerOpPause   = "pause"
-	ContainerOpUnpause = "unPause"
-	ContainerOpRename  = "reName"
+	ContainerOpUnpause = "unpause"
+	ContainerOpRename  = "rename"
 	ContainerOpRemove  = "remove"
 
-	DaemonJsonDir     = "/System/Volumes/Data/Users/slooop/.docker/daemon.json"
-	TmpDockerBuildDir = "/opt/1Panel/build"
+	ComposeOpStop    = "stop"
+	ComposeOpRestart = "restart"
+	ComposeOpRemove  = "remove"
+
+	DaemonJsonDir      = "/System/Volumes/Data/Users/slooop/.docker/daemon.json"
+	TmpDockerBuildDir  = "/opt/1Panel/data/docker/build"
+	TmpComposeBuildDir = "/opt/1Panel/data/docker/compose"
 )

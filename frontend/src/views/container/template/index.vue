@@ -1,5 +1,6 @@
 <template>
     <div>
+        <Submenu activeName="template" />
         <el-card style="margin-top: 20px">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
                 <template #toolbar>
@@ -65,13 +66,14 @@
 
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
+import Submenu from '@/views/container/index.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFromat } from '@/utils/util';
 import { Container } from '@/api/interface/container';
-import OperatorDialog from '@/views/container/compose/template/operator/index.vue';
+import OperatorDialog from '@/views/container/template/operator/index.vue';
 import { deleteComposeTemplate, searchComposeTemplate } from '@/api/modules/container';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import i18n from '@/lang';
@@ -106,7 +108,7 @@ const onOpenDetail = async (row: Container.TemplateInfo) => {
         detailInfo.value = row.content;
         detailVisiable.value = true;
     } else {
-        const res = await LoadFile({ path: row.content });
+        const res = await LoadFile({ path: row.path });
         detailInfo.value = res.data;
         detailVisiable.value = true;
     }
@@ -119,6 +121,7 @@ const onOpenDialog = async (
         name: '',
         from: 'edit',
         description: '',
+        path: '',
         content: '',
     },
 ) => {

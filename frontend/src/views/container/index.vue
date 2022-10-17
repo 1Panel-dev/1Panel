@@ -1,49 +1,70 @@
 <template>
     <div>
         <el-card class="topCard">
-            <el-radio-group v-model="activeNames">
-                <el-radio-button class="topButton" size="large" label="container">
+            <el-radio-group v-model="active">
+                <el-radio-button class="topButton" size="large" @click="routerTo('/containers')" label="container">
                     {{ $t('container.container') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" label="image">
+                <el-radio-button class="topButton" size="large" @click="routerTo('/containers/image')" label="image">
                     {{ $t('container.image') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" label="network">
+                <el-radio-button
+                    class="topButton"
+                    size="large"
+                    @click="routerTo('/containers/network')"
+                    label="network"
+                >
                     {{ $t('container.network') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" label="volume">
+                <el-radio-button class="topButton" size="large" @click="routerTo('/containers/volume')" label="volume">
                     {{ $t('container.volume') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" label="repo">
+                <el-radio-button class="topButton" size="large" @click="routerTo('/containers/repo')" label="repo">
                     {{ $t('container.repo') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" label="compose">
+                <el-radio-button
+                    class="topButton"
+                    size="large"
+                    @click="routerTo('/containers/compose')"
+                    label="compose"
+                >
                     {{ $t('container.compose') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" label="composeTemplate">
+                <el-radio-button
+                    class="topButton"
+                    size="large"
+                    @click="routerTo('/containers/template')"
+                    label="template"
+                >
                     {{ $t('container.composeTemplate') }}
                 </el-radio-button>
             </el-radio-group>
         </el-card>
-        <Container v-if="activeNames === 'container'" />
-        <Repo v-if="activeNames === 'repo'" />
-        <Image v-if="activeNames === 'image'" />
-        <Network v-if="activeNames === 'network'" />
-        <Volume v-if="activeNames === 'volume'" />
-        <ComposeTemplate v-if="activeNames === 'composeTemplate'" />
     </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
-import Container from '@/views/container/container/index.vue';
-import Repo from '@/views/container/repo/index.vue';
-import Image from '@/views/container/image/index.vue';
-import Network from '@/views/container/network/index.vue';
-import Volume from '@/views/container/volume/index.vue';
-import ComposeTemplate from '@/views/container/compose/template/index.vue';
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
+interface MenuProps {
+    activeName: string;
+}
+const props = withDefaults(defineProps<MenuProps>(), {
+    activeName: 'container',
+});
 
-const activeNames = ref('container');
+const active = ref();
+
+onMounted(() => {
+    if (props.activeName) {
+        active.value = props.activeName;
+    }
+});
+
+const routerTo = (path: string) => {
+    router.push({ path: path });
+};
 </script>
 
 <style>

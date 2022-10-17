@@ -9,11 +9,11 @@ import (
 	"os"
 	"testing"
 
-	"github.com/1Panel-dev/1Panel/app/dto"
 	"github.com/1Panel-dev/1Panel/constant"
 	"github.com/1Panel-dev/1Panel/utils/docker"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/pkg/archive"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
@@ -96,31 +96,11 @@ func TestNetwork(t *testing.T) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	res, err := client.ContainerStatsOneShot(context.TODO(), "30e4d3395b87")
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		fmt.Println(err)
-	}
-	var state *types.StatsJSON
-	if err := json.Unmarshal(body, &state); err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Println(string(body))
-
-	var data dto.ContainterStats
-	previousCPU := state.PreCPUStats.CPUUsage.TotalUsage
-	previousSystem := state.PreCPUStats.SystemUsage
-	data.CPUPercent = calculateCPUPercentUnix(previousCPU, previousSystem, state)
-	data.IORead, data.IOWrite = calculateBlockIO(state.BlkioStats)
-	data.Memory = float64(state.MemoryStats.Usage)
-	data.NetworkRX, data.NetworkTX = calculateNetwork(state.Networks)
-	fmt.Println(data)
+	options := types.ContainerListOptions{All: true}
+	options.Filters = filters.NewArgs()
+	options.Filters.Add("label", "maintainer")
+	ss, _ := client.ContainerList(context.TODO(), options)
+	fmt.Println(ss)
 }
 
 func TestContainer(t *testing.T) {
