@@ -159,6 +159,7 @@
         </el-dialog>
         <CreateDialog @search="search" ref="dialogCreateRef" />
         <MonitorDialog ref="dialogMonitorRef" />
+        <TerminalDialog ref="dialogTerminalRef" />
     </div>
 </template>
 
@@ -166,6 +167,7 @@
 import ComplexTable from '@/components/complex-table/index.vue';
 import CreateDialog from '@/views/container/container/create/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
+import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import Submenu from '@/views/container/index.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
@@ -257,6 +259,11 @@ const onCreate = () => {
 const dialogMonitorRef = ref();
 const onMonitor = (containerID: string) => {
     dialogMonitorRef.value!.acceptParams({ containerID: containerID });
+};
+
+const dialogTerminalRef = ref();
+const onTerminal = (containerID: string) => {
+    dialogTerminalRef.value!.acceptParams({ containerID: containerID });
 };
 
 const onInspect = async (id: string) => {
@@ -376,7 +383,19 @@ const onOperate = async (operation: string) => {
 
 const buttons = [
     {
+        label: i18n.global.t('file.terminal'),
+        disabled: (row: Container.ContainerInfo) => {
+            return row.state !== 'running';
+        },
+        click: (row: Container.ContainerInfo) => {
+            onTerminal(row.containerID);
+        },
+    },
+    {
         label: i18n.global.t('container.monitor'),
+        disabled: (row: Container.ContainerInfo) => {
+            return row.state !== 'running';
+        },
         click: (row: Container.ContainerInfo) => {
             onMonitor(row.containerID);
         },

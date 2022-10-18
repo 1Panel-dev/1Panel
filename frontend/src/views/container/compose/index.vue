@@ -40,15 +40,16 @@
                         <el-link @click="goContainer(row.name)" type="primary">{{ row.name }}</el-link>
                     </template>
                 </el-table-column>
+                <el-table-column :label="$t('container.from')" prop="createdBy" min-width="80" fix />
                 <el-table-column :label="$t('container.containerNumber')" prop="containerNumber" min-width="80" fix />
-                <el-table-column :label="$t('container.containerNumber')" prop="contaienrs" min-width="80" fix>
+                <el-table-column :label="$t('container.container')" prop="contaienrs" min-width="80" fix>
                     <template #default="{ row }">
                         <div v-for="(item, index) in row.containers" :key="index">
-                            <div v-if="row.expand || (!row.expand && index < 1)">
+                            <div v-if="row.expand || (!row.expand && index < 3)">
                                 <el-tag>{{ item.name }} [{{ item.state }}]</el-tag>
                             </div>
                         </div>
-                        <div v-if="!row.expand">
+                        <div v-if="!row.expand && row.containers.length > 3">
                             <el-button type="primary" link @click="row.expand = true">
                                 {{ $t('commons.button.expand') }}...
                             </el-button>
@@ -91,6 +92,7 @@ const search = async () => {
     await searchCompose(params).then((res) => {
         if (res.data) {
             data.value = res.data.items;
+            paginationConfig.total = res.data.total;
         }
     });
 };
@@ -132,7 +134,6 @@ const onOperate = async (operation: string) => {
             });
     });
 };
-// const buttons = [];
 
 onMounted(() => {
     search();

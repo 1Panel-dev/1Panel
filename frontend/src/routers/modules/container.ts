@@ -24,7 +24,6 @@ const containerRouter = {
             path: 'image',
             name: 'Image',
             component: () => import('@/views/container/image/index.vue'),
-            props: true,
             hidden: true,
             meta: {
                 activeMenu: '/containers',
@@ -34,7 +33,6 @@ const containerRouter = {
             path: 'network',
             name: 'Network',
             component: () => import('@/views/container/network/index.vue'),
-            props: true,
             hidden: true,
             meta: {
                 activeMenu: '/containers',
@@ -44,7 +42,6 @@ const containerRouter = {
             path: 'volume',
             name: 'Volume',
             component: () => import('@/views/container/volume/index.vue'),
-            props: true,
             hidden: true,
             meta: {
                 activeMenu: '/containers',
@@ -54,7 +51,6 @@ const containerRouter = {
             path: 'repo',
             name: 'Repo',
             component: () => import('@/views/container/repo/index.vue'),
-            props: true,
             hidden: true,
             meta: {
                 activeMenu: '/containers',
@@ -64,7 +60,6 @@ const containerRouter = {
             path: 'compose',
             name: 'Compose',
             component: () => import('@/views/container/compose/index.vue'),
-            props: true,
             hidden: true,
             meta: {
                 activeMenu: '/containers',
@@ -74,7 +69,6 @@ const containerRouter = {
             path: 'template',
             name: 'composeTemplate',
             component: () => import('@/views/container/template/index.vue'),
-            props: true,
             hidden: true,
             meta: {
                 activeMenu: '/containers',

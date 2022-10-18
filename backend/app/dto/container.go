@@ -112,6 +112,7 @@ type BatchDelete struct {
 type ComposeInfo struct {
 	Name            string             `json:"name"`
 	CreatedAt       string             `json:"createdAt"`
+	CreatedBy       string             `json:"createdBy"`
 	ContainerNumber int                `json:"containerNumber"`
 	ConfigFile      string             `json:"configFile"`
 	Workdir         string             `json:"workdir"`

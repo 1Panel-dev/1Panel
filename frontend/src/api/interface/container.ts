@@ -109,6 +109,7 @@ export namespace Container {
         gateway: string;
         createdAt: string;
         attachable: string;
+        expand: boolean;
     }
     export interface NetworkCreate {
         name: string;
@@ -169,6 +170,7 @@ export namespace Container {
     export interface ComposeInfo {
         name: string;
         createdAt: string;
+        createdBy: string;
         containerNumber: number;
         configFile: string;
         workdir: string;

@@ -16,6 +16,7 @@ export default {
             cancel: 'Cancel',
             reset: 'Reset',
             conn: 'Connect',
+            disconn: 'Disconnect',
             clean: 'Clean',
             login: 'Login',
             close: 'Close',
@@ -168,6 +169,9 @@ export default {
         last4Hour: 'Last 4 Hours',
         lastHour: 'Last Hour',
         last10Min: 'Last 10 Minutes',
+
+        custom: 'Custom',
+        containerTerminal: 'Container terminal',
 
         containerCreate: 'Container create',
         port: 'Port',

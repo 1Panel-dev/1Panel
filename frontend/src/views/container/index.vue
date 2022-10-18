@@ -54,7 +54,7 @@ const props = withDefaults(defineProps<MenuProps>(), {
     activeName: 'container',
 });
 
-const active = ref();
+const active = ref('container');
 
 onMounted(() => {
     if (props.activeName) {
