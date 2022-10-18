@@ -148,5 +148,4 @@ require (
 	golang.org/x/tools v0.1.12 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/ini.v1 v1.66.6 // indirect
-	gotest.tools/v3 v3.3.0 // indirect
 )

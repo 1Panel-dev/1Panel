@@ -1,8 +1,8 @@
 package repo
 
 import (
-	"github.com/1Panel-dev/1Panel/app/model"
-	"github.com/1Panel-dev/1Panel/global"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/global"
 )
 
 type ComposeTemplateRepo struct{}

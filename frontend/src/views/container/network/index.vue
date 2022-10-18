@@ -28,10 +28,15 @@
                 <el-table-column :label="$t('container.gateway')" min-width="80" prop="gateway" fix />
                 <el-table-column :label="$t('container.tag')" min-width="140" fix>
                     <template #default="{ row }">
-                        <div v-for="(item, index) of row.labels" :key="index">
-                            <el-tooltip class="item" :content="item" placement="top">
+                        <div v-for="(item, index) in row.labels" :key="index">
+                            <div v-if="row.expand || (!row.expand && index < 3)">
                                 <el-tag>{{ item }}</el-tag>
-                            </el-tooltip>
+                            </div>
+                        </div>
+                        <div v-if="!row.expand && row.labels.length > 3">
+                            <el-button type="primary" link @click="row.expand = true">
+                                {{ $t('commons.button.expand') }}...
+                            </el-button>
                         </div>
                     </template>
                 </el-table-column>

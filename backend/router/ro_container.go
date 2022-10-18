@@ -1,8 +1,8 @@
 package router
 
 import (
-	v1 "github.com/1Panel-dev/1Panel/app/api/v1"
-	"github.com/1Panel-dev/1Panel/middleware"
+	v1 "github.com/1Panel-dev/1Panel/backend/app/api/v1"
+	"github.com/1Panel-dev/1Panel/backend/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,6 +20,8 @@ func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
 		Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
+		baRouter.GET("/exec", baseApi.ContainerExec)
+
 		baRouter.POST("/search", baseApi.SearchContainer)
 		baRouter.POST("/inspect", baseApi.Inspect)
 		baRouter.POST("", baseApi.ContainerCreate)

@@ -1,38 +1,29 @@
 package service
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"os"
-	"os/exec"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/app/dto"
-	"github.com/1Panel-dev/1Panel/constant"
-	"github.com/1Panel-dev/1Panel/global"
-	"github.com/1Panel-dev/1Panel/utils/docker"
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
 type ContainerService struct{}
-
-const composeProjectLabel = "com.docker.compose.project"
-const composeConfigLabel = "com.docker.compose.project.config_files"
-const composeWorkdirLabel = "com.docker.compose.project.working_dir"
 
 type IContainerService interface {
 	Page(req dto.PageContainer) (int64, interface{}, error)
@@ -99,128 +90,6 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 	}
 
 	return int64(total), backDatas, nil
-}
-
-func (u *ContainerService) PageCompose(req dto.PageInfo) (int64, interface{}, error) {
-	var (
-		records   []dto.ComposeInfo
-		BackDatas []dto.ComposeInfo
-	)
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return 0, nil, err
-	}
-
-	options := types.ContainerListOptions{All: true}
-	options.Filters = filters.NewArgs()
-	options.Filters.Add("label", composeProjectLabel)
-
-	list, err := client.ContainerList(context.Background(), options)
-	if err != nil {
-		return 0, nil, err
-	}
-	composeMap := make(map[string]dto.ComposeInfo)
-	for _, container := range list {
-		if name, ok := container.Labels[composeProjectLabel]; ok {
-			containerItem := dto.ComposeContainer{
-				ContainerID: container.ID,
-				Name:        container.Names[0][1:],
-				State:       container.State,
-				CreateTime:  time.Unix(container.Created, 0).Format("2006-01-02 15:04:05"),
-			}
-			if compose, has := composeMap[name]; has {
-				compose.ContainerNumber++
-				compose.Containers = append(compose.Containers, containerItem)
-				composeMap[name] = compose
-			} else {
-				config := container.Labels[composeConfigLabel]
-				workdir := container.Labels[composeWorkdirLabel]
-				composeItem := dto.ComposeInfo{
-					ContainerNumber: 1,
-					CreatedAt:       time.Unix(container.Created, 0).Format("2006-01-02 15:04:05"),
-					ConfigFile:      config,
-					Workdir:         workdir,
-					Containers:      []dto.ComposeContainer{containerItem},
-				}
-				if len(config) != 0 && len(workdir) != 0 && strings.Contains(config, workdir) {
-					composeItem.Path = config
-				} else {
-					composeItem.Path = workdir
-				}
-				composeMap[name] = composeItem
-			}
-		}
-	}
-	for key, value := range composeMap {
-		value.Name = key
-		records = append(records, value)
-	}
-	total, start, end := len(records), (req.Page-1)*req.PageSize, req.Page*req.PageSize
-	if start > total {
-		BackDatas = make([]dto.ComposeInfo, 0)
-	} else {
-		if end >= total {
-			end = total
-		}
-		BackDatas = records[start:end]
-	}
-	return int64(total), BackDatas, nil
-}
-
-func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
-	if req.From == "template" {
-		template, err := composeRepo.Get(commonRepo.WithByID(req.Template))
-		if err != nil {
-			return err
-		}
-		req.From = template.From
-		if req.From == "edit" {
-			req.File = template.Content
-		} else {
-			req.Path = template.Path
-		}
-	}
-	if req.From == "edit" {
-		dir := fmt.Sprintf("%s/%s", constant.TmpComposeBuildDir, req.Name)
-		if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
-			if err = os.MkdirAll(dir, os.ModePerm); err != nil {
-				return err
-			}
-		}
-
-		path := fmt.Sprintf("%s/docker-compose.yml", dir)
-		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-		write := bufio.NewWriter(file)
-		_, _ = write.WriteString(string(req.File))
-		write.Flush()
-		req.Path = path
-	}
-	go func() {
-		cmd := exec.Command("docker-compose", "-f", req.Path, "up", "-d")
-		stdout, err := cmd.CombinedOutput()
-		if err != nil {
-			global.LOG.Debugf("docker-compose up %s failed, err: %v", req.Name, err)
-			return
-		}
-		global.LOG.Debugf("docker-compose up %s successful, logs: %v", req.Name, string(stdout))
-	}()
-
-	return nil
-}
-
-func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
-	cmd := exec.Command("docker-compose", "-f", req.Path, req.Operation)
-	stdout, err := cmd.CombinedOutput()
-	if err != nil {
-		return err
-	}
-	global.LOG.Debugf("docker-compose %s %s successful: logs: %v", req.Operation, req.Path, string(stdout))
-
-	return err
 }
 
 func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
@@ -385,187 +254,6 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainterStats, erro
 	data.NetworkRX, data.NetworkTX = calculateNetwork(stats.Networks)
 	data.ShotTime = stats.Read
 	return &data, nil
-}
-
-func (u *ContainerService) PageNetwork(req dto.PageInfo) (int64, interface{}, error) {
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return 0, nil, err
-	}
-	list, err := client.NetworkList(context.TODO(), types.NetworkListOptions{})
-	if err != nil {
-		return 0, nil, err
-	}
-	var (
-		data    []dto.Network
-		records []types.NetworkResource
-	)
-	total, start, end := len(list), (req.Page-1)*req.PageSize, req.Page*req.PageSize
-	if start > total {
-		records = make([]types.NetworkResource, 0)
-	} else {
-		if end >= total {
-			end = total
-		}
-		records = list[start:end]
-	}
-
-	for _, item := range records {
-		tag := make([]string, 0)
-		for key, val := range item.Labels {
-			tag = append(tag, fmt.Sprintf("%s=%s", key, val))
-		}
-		var ipam network.IPAMConfig
-		if len(item.IPAM.Config) > 0 {
-			ipam = item.IPAM.Config[0]
-		}
-		data = append(data, dto.Network{
-			ID:         item.ID,
-			CreatedAt:  item.Created,
-			Name:       item.Name,
-			Driver:     item.Driver,
-			IPAMDriver: item.IPAM.Driver,
-			Subnet:     ipam.Subnet,
-			Gateway:    ipam.Gateway,
-			Attachable: item.Attachable,
-			Labels:     tag,
-		})
-	}
-
-	return int64(total), data, nil
-}
-func (u *ContainerService) DeleteNetwork(req dto.BatchDelete) error {
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return err
-	}
-	for _, id := range req.Ids {
-		if err := client.NetworkRemove(context.TODO(), id); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-func (u *ContainerService) CreateNetwork(req dto.NetworkCreat) error {
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return err
-	}
-	var (
-		ipam    network.IPAMConfig
-		hasConf bool
-	)
-	if len(req.Subnet) != 0 {
-		ipam.Subnet = req.Subnet
-		hasConf = true
-	}
-	if len(req.Gateway) != 0 {
-		ipam.Gateway = req.Gateway
-		hasConf = true
-	}
-	if len(req.IPRange) != 0 {
-		ipam.IPRange = req.IPRange
-		hasConf = true
-	}
-
-	options := types.NetworkCreate{
-		Driver:  req.Driver,
-		Options: stringsToMap(req.Options),
-		Labels:  stringsToMap(req.Labels),
-	}
-	if hasConf {
-		options.IPAM = &network.IPAM{Config: []network.IPAMConfig{ipam}}
-	}
-	if _, err := client.NetworkCreate(context.TODO(), req.Name, options); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (u *ContainerService) PageVolume(req dto.PageInfo) (int64, interface{}, error) {
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return 0, nil, err
-	}
-	list, err := client.VolumeList(context.TODO(), filters.NewArgs())
-	if err != nil {
-		return 0, nil, err
-	}
-	var (
-		data    []dto.Volume
-		records []*types.Volume
-	)
-	total, start, end := len(list.Volumes), (req.Page-1)*req.PageSize, req.Page*req.PageSize
-	if start > total {
-		records = make([]*types.Volume, 0)
-	} else {
-		if end >= total {
-			end = total
-		}
-		records = list.Volumes[start:end]
-	}
-
-	for _, item := range records {
-		tag := make([]string, 0)
-		for _, val := range item.Labels {
-			tag = append(tag, val)
-		}
-		createTime, _ := time.Parse("2006-01-02T15:04:05Z", item.CreatedAt)
-		data = append(data, dto.Volume{
-			CreatedAt:  createTime,
-			Name:       item.Name,
-			Driver:     item.Driver,
-			Mountpoint: item.Mountpoint,
-			Labels:     tag,
-		})
-	}
-
-	return int64(total), data, nil
-}
-func (u *ContainerService) ListVolume() ([]dto.Options, error) {
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return nil, err
-	}
-	list, err := client.VolumeList(context.TODO(), filters.NewArgs())
-	if err != nil {
-		return nil, err
-	}
-	var data []dto.Options
-	for _, item := range list.Volumes {
-		data = append(data, dto.Options{
-			Option: item.Name,
-		})
-	}
-	return data, nil
-}
-func (u *ContainerService) DeleteVolume(req dto.BatchDelete) error {
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return err
-	}
-	for _, id := range req.Ids {
-		if err := client.VolumeRemove(context.TODO(), id, true); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-func (u *ContainerService) CreateVolume(req dto.VolumeCreat) error {
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return err
-	}
-	options := volume.VolumeCreateBody{
-		Name:       req.Name,
-		Driver:     req.Driver,
-		DriverOpts: stringsToMap(req.Options),
-		Labels:     stringsToMap(req.Labels),
-	}
-	if _, err := client.VolumeCreate(context.TODO(), options); err != nil {
-		return err
-	}
-	return nil
 }
 
 func stringsToMap(list []string) map[string]string {

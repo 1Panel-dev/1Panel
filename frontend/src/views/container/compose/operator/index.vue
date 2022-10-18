@@ -96,6 +96,9 @@ const rules = reactive({
 const loadTemplates = async () => {
     const res = await listComposeTemplate();
     templateOptions.value = res.data;
+    if (templateOptions.value && templateOptions.value.length !== 0) {
+        form.template = templateOptions.value[0].id;
+    }
 };
 
 const acceptParams = (): void => {
@@ -104,7 +107,6 @@ const acceptParams = (): void => {
     form.from = 'edit';
     form.path = '';
     form.file = '';
-    form.template = 0;
     loadTemplates();
 };
 const emit = defineEmits<{ (e: 'search'): void }>();

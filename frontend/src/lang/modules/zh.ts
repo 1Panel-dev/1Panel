@@ -17,6 +17,7 @@ export default {
             cancel: '取消',
             reset: '重置',
             conn: '连接',
+            disconn: '断开',
             clean: '清空',
             login: '登录',
             close: '关闭',
@@ -166,6 +167,9 @@ export default {
         last4Hour: '最近 4 小时',
         lastHour: '最近 1 小时',
         last10Min: '最近 10 分钟',
+
+        custom: '自定义',
+        containerTerminal: '容器终端',
 
         containerCreate: '容器创建',
         port: '端口',
