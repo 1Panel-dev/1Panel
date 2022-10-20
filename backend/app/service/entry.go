@@ -4,34 +4,35 @@ import "github.com/1Panel-dev/1Panel/backend/app/repo"
 
 type ServiceGroup struct {
 	AuthService
-	HostService
-	BackupService
-	GroupService
-	ImageService
-	ComposeTemplateService
-	ImageRepoService
-	ContainerService
-	CommandService
-	OperationService
-	FileService
-	CronjobService
-	SettingService
+
 	AppService
+
+	ContainerService
+	ImageService
+	ImageRepoService
+	ComposeTemplateService
+
+	MysqlService
+
+	CronjobService
+
+	HostService
+	GroupService
+	CommandService
+	FileService
+
+	SettingService
+	BackupService
+
+	OperationService
 }
 
 var ServiceGroupApp = new(ServiceGroup)
 
 var (
-	hostRepo               = repo.RepoGroupApp.HostRepo
-	backupRepo             = repo.RepoGroupApp.BackupRepo
-	groupRepo              = repo.RepoGroupApp.GroupRepo
-	commandRepo            = repo.RepoGroupApp.CommandRepo
-	operationRepo          = repo.RepoGroupApp.OperationRepo
-	commonRepo             = repo.RepoGroupApp.CommonRepo
-	imageRepoRepo          = repo.RepoGroupApp.ImageRepoRepo
-	composeRepo            = repo.RepoGroupApp.ComposeTemplateRepo
-	cronjobRepo            = repo.RepoGroupApp.CronjobRepo
-	settingRepo            = repo.RepoGroupApp.SettingRepo
+	commonRepo = repo.RepoGroupApp.CommonRepo
+
+	appInstallBackupRepo   = repo.RepoGroupApp.AppInstallBackupRepo
 	appRepo                = repo.RepoGroupApp.AppRepo
 	appTagRepo             = repo.RepoGroupApp.AppTagRepo
 	appDetailRepo          = repo.RepoGroupApp.AppDetailRepo
@@ -39,5 +40,20 @@ var (
 	appInstallRepo         = repo.RepoGroupApp.AppInstallRepo
 	appInstallResourceRepo = repo.RepoGroupApp.AppInstallResourceRpo
 	dataBaseRepo           = repo.RepoGroupApp.DatabaseRepo
-	appInstallBackupRepo   = repo.RepoGroupApp.AppInstallBackupRepo
+
+	mysqlRepo = repo.RepoGroupApp.MysqlRepo
+
+	imageRepoRepo = repo.RepoGroupApp.ImageRepoRepo
+	composeRepo   = repo.RepoGroupApp.ComposeTemplateRepo
+
+	cronjobRepo = repo.RepoGroupApp.CronjobRepo
+
+	hostRepo    = repo.RepoGroupApp.HostRepo
+	groupRepo   = repo.RepoGroupApp.GroupRepo
+	commandRepo = repo.RepoGroupApp.CommandRepo
+
+	settingRepo = repo.RepoGroupApp.SettingRepo
+	backupRepo  = repo.RepoGroupApp.BackupRepo
+
+	operationRepo = repo.RepoGroupApp.OperationRepo
 )

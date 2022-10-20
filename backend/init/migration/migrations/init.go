@@ -170,3 +170,10 @@ var AddTableImageRepo = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddTableDatabaseMysql = &gormigrate.Migration{
+	ID: "20201020-add-table-database_mysql",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.DatabaseMysql{})
+	},
+}

@@ -1,16 +1,8 @@
 package repo
 
 type RepoGroup struct {
-	HostRepo
-	BackupRepo
-	GroupRepo
-	ImageRepoRepo
-	ComposeTemplateRepo
-	CommandRepo
-	OperationRepo
 	CommonRepo
-	CronjobRepo
-	SettingRepo
+
 	AppRepo
 	AppTagRepo
 	TagRepo
@@ -19,6 +11,22 @@ type RepoGroup struct {
 	AppInstallResourceRpo
 	DatabaseRepo
 	AppInstallBackupRepo
+
+	ImageRepoRepo
+	ComposeTemplateRepo
+
+	MysqlRepo
+
+	CronjobRepo
+
+	HostRepo
+	CommandRepo
+	GroupRepo
+
+	SettingRepo
+	BackupRepo
+
+	OperationRepo
 }
 
 var RepoGroupApp = new(RepoGroup)

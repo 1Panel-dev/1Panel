@@ -14,6 +14,7 @@ type RouterGroup struct {
 	CronjobRouter
 	SettingRouter
 	AppRouter
+	DatabaseRouter
 }
 
 var RouterGroupApp = new(RouterGroup)

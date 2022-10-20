@@ -9,18 +9,26 @@ type ApiGroup struct {
 var ApiGroupApp = new(ApiGroup)
 
 var (
-	authService            = service.ServiceGroupApp.AuthService
-	hostService            = service.ServiceGroupApp.HostService
-	backupService          = service.ServiceGroupApp.BackupService
-	groupService           = service.ServiceGroupApp.GroupService
+	authService = service.ServiceGroupApp.AuthService
+
+	appService = service.ServiceGroupApp.AppService
+
 	containerService       = service.ServiceGroupApp.ContainerService
 	composeTemplateService = service.ServiceGroupApp.ComposeTemplateService
 	imageRepoService       = service.ServiceGroupApp.ImageRepoService
 	imageService           = service.ServiceGroupApp.ImageService
-	commandService         = service.ServiceGroupApp.CommandService
-	operationService       = service.ServiceGroupApp.OperationService
-	fileService            = service.ServiceGroupApp.FileService
-	cronjobService         = service.ServiceGroupApp.CronjobService
-	settingService         = service.ServiceGroupApp.SettingService
-	appService             = service.ServiceGroupApp.AppService
+
+	mysqlService = service.ServiceGroupApp.MysqlService
+
+	cronjobService = service.ServiceGroupApp.CronjobService
+
+	hostService    = service.ServiceGroupApp.HostService
+	groupService   = service.ServiceGroupApp.GroupService
+	commandService = service.ServiceGroupApp.CommandService
+	fileService    = service.ServiceGroupApp.FileService
+
+	settingService = service.ServiceGroupApp.SettingService
+	backupService  = service.ServiceGroupApp.BackupService
+
+	operationService = service.ServiceGroupApp.OperationService
 )

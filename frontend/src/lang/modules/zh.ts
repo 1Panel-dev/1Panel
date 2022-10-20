@@ -150,6 +150,16 @@ export default {
     header: {
         logout: '退出登录',
     },
+    database: {
+        permission: '权限',
+        permissionLocal: '本地服务器',
+        permissionForIP: '指定 IP',
+        permissionAll: '所有人（不安全）',
+        rootPassword: 'root 密码',
+        backupList: '备份列表',
+        loadBackup: '导入备份',
+        setting: '数据库设置',
+    },
     container: {
         operatorHelper: '将对选中容器进行 {0} 操作，是否继续？',
         start: '启动',
