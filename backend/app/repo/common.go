@@ -70,7 +70,7 @@ func (c *CommonRepo) WithIdsNotIn(ids []uint) DBOption {
 }
 
 func getTx(ctx context.Context, opts ...DBOption) *gorm.DB {
-	if ctx == nil {
+	if ctx == nil || ctx.Value("db") == nil {
 		return getDb()
 	}
 	tx := ctx.Value("db").(*gorm.DB)

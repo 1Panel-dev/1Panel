@@ -16,22 +16,22 @@ func (d DatabaseRepo) ByAppInstallId(installId uint) DBOption {
 	}
 }
 
-func (d DatabaseRepo) Create(ctx context.Context, database *model.Database) error {
-	db := ctx.Value("db").(*gorm.DB).Model(&model.Database{})
+func (d DatabaseRepo) Create(ctx context.Context, database *model.AppDatabase) error {
+	db := ctx.Value("db").(*gorm.DB).Model(&model.AppDatabase{})
 	return db.Create(&database).Error
 }
 
 func (d DatabaseRepo) DeleteBy(ctx context.Context, opts ...DBOption) error {
-	db := ctx.Value("db").(*gorm.DB).Model(&model.Database{})
+	db := ctx.Value("db").(*gorm.DB).Model(&model.AppDatabase{})
 	for _, opt := range opts {
 		db = opt(db)
 	}
-	return db.Delete(&model.Database{}).Error
+	return db.Delete(&model.AppDatabase{}).Error
 }
 
-func (d DatabaseRepo) GetBy(opts ...DBOption) ([]model.Database, error) {
-	db := global.DB.Model(model.Database{})
-	var databases []model.Database
+func (d DatabaseRepo) GetBy(opts ...DBOption) ([]model.AppDatabase, error) {
+	db := global.DB.Model(model.AppDatabase{})
+	var databases []model.AppDatabase
 	for _, opt := range opts {
 		db = opt(db)
 	}
@@ -42,9 +42,9 @@ func (d DatabaseRepo) GetBy(opts ...DBOption) ([]model.Database, error) {
 	return databases, nil
 }
 
-func (d DatabaseRepo) GetFirst(opts ...DBOption) (model.Database, error) {
-	db := global.DB.Model(model.Database{})
-	var database model.Database
+func (d DatabaseRepo) GetFirst(opts ...DBOption) (model.AppDatabase, error) {
+	db := global.DB.Model(model.AppDatabase{})
+	var database model.AppDatabase
 	for _, opt := range opts {
 		db = opt(db)
 	}

@@ -113,7 +113,7 @@ func (a AppService) PageInstalled(req dto.AppInstalledRequest) (int64, []dto.App
 	if err != nil {
 		return 0, nil, err
 	}
-	installDTOs := []dto.AppInstalled{}
+	var installDTOs []dto.AppInstalled
 	for _, in := range installed {
 		installDto := dto.AppInstalled{
 			AppInstall: in,
@@ -137,7 +137,7 @@ func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, 
 		return appDetailDTO, err
 	}
 	paramMap := make(map[string]interface{})
-	json.Unmarshal([]byte(detail.Params), &paramMap)
+	_ = json.Unmarshal([]byte(detail.Params), &paramMap)
 	appDetailDTO.AppDetail = detail
 	appDetailDTO.Params = paramMap
 	return appDetailDTO, nil
@@ -201,11 +201,11 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 
 	httpPort, err := checkPort("PANEL_APP_PORT_HTTP", params)
 	if err != nil {
-		return errors.New(fmt.Sprintf("%d port is in used", httpPort))
+		return fmt.Errorf("%d port is in used", httpPort)
 	}
 	httpsPort, err := checkPort("PANEL_APP_PORT_HTTPS", params)
 	if err != nil {
-		return errors.New(fmt.Sprintf("%d port is in used", httpsPort))
+		return fmt.Errorf("%d port is in used", httpPort)
 	}
 
 	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(appDetailId))
@@ -314,7 +314,7 @@ func (a AppService) DeleteBackup(req dto.AppBackupDeleteRequest) error {
 			errStr.WriteString(err.Error())
 			continue
 		}
-		if err := appInstallBackupRepo.Delete(nil, commonRepo.WithIdsIn(req.Ids)); err != nil {
+		if err := appInstallBackupRepo.Delete(context.TODO(), commonRepo.WithIdsIn(req.Ids)); err != nil {
 			errStr.WriteString(err.Error())
 		}
 	}
@@ -673,6 +673,9 @@ func (a AppService) GetUpdateVersions(installId uint) ([]dto.AppVersion, error) 
 		return versions, err
 	}
 	details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))
+	if err != nil {
+		return versions, err
+	}
 	for _, detail := range details {
 		if common.CompareVersion(detail.Version, install.Version) {
 			versions = append(versions, dto.AppVersion{

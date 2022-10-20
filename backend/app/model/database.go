@@ -1,6 +1,6 @@
 package model
 
-type Database struct {
+type AppDatabase struct {
 	BaseModel
 	AppInstallId uint   `json:"appInstallId" gorm:"type:integer;not null"`
 	Key          string `json:"key" gorm:"type:varchar(64);not null"`

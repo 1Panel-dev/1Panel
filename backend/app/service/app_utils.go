@@ -34,13 +34,13 @@ var (
 	Delete DatabaseOp = "delete"
 )
 
-func execDockerCommand(database model.Database, dbInstall model.AppInstall, op DatabaseOp) error {
+func execDockerCommand(database model.AppDatabase, dbInstall model.AppInstall, op DatabaseOp) error {
 	var auth dto.AuthParam
 	var dbConfig dto.AppDatabase
 	dbConfig.Password = database.Password
 	dbConfig.DbUser = database.Username
 	dbConfig.DbName = database.Dbname
-	json.Unmarshal([]byte(dbInstall.Param), &auth)
+	_ = json.Unmarshal([]byte(dbInstall.Param), &auth)
 	execConfig := dto.ContainerExec{
 		ContainerName: dbInstall.ContainerName,
 		Auth:          auth,
@@ -121,7 +121,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 		if err != nil {
 			return err
 		}
-		var database model.Database
+		var database model.AppDatabase
 		database.Dbname = dbConfig.DbName
 		database.Username = dbConfig.DbUser
 		database.Password = dbConfig.Password
@@ -185,7 +185,7 @@ func deleteLink(ctx context.Context, install *model.AppInstall) error {
 	for _, re := range resources {
 		if re.Key == "mysql" {
 			database, _ := dataBaseRepo.GetFirst(commonRepo.WithByID(re.ResourceId))
-			if reflect.DeepEqual(database, model.Database{}) {
+			if reflect.DeepEqual(database, model.AppDatabase{}) {
 				continue
 			}
 			appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(database.AppInstallId))
