@@ -78,15 +78,12 @@ const paginationConfig = reactive({
     total: 0,
 });
 
-const logSearch = reactive({
-    page: 1,
-    pageSize: 5,
-});
-
 const search = async () => {
-    logSearch.page = paginationConfig.currentPage;
-    logSearch.pageSize = paginationConfig.pageSize;
-    const res = await getOperationList(logSearch);
+    let params = {
+        page: paginationConfig.currentPage,
+        pageSize: paginationConfig.pageSize,
+    };
+    const res = await getOperationList(params);
     data.value = res.data.items;
     paginationConfig.total = res.data.total;
 };

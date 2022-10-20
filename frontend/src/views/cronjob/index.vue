@@ -97,10 +97,6 @@ const paginationConfig = reactive({
     total: 0,
 });
 
-const logSearch = reactive({
-    page: 1,
-    pageSize: 10,
-});
 const weekOptions = [
     { label: i18n.global.t('cronjob.monday'), value: 1 },
     { label: i18n.global.t('cronjob.tuesday'), value: 2 },
@@ -112,9 +108,11 @@ const weekOptions = [
 ];
 
 const search = async () => {
-    logSearch.page = paginationConfig.currentPage;
-    logSearch.pageSize = paginationConfig.pageSize;
-    const res = await getCronjobPage(logSearch);
+    let params = {
+        page: paginationConfig.currentPage,
+        pageSize: paginationConfig.pageSize,
+    };
+    const res = await getCronjobPage(params);
     data.value = res.data.items || [];
     for (const item of data.value) {
         if (item.targetDir !== '-') {

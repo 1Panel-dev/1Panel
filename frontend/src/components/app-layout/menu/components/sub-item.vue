@@ -24,7 +24,8 @@
                 <SvgIcon :iconName="(subItem.meta?.icon as string)" :className="'svg-icon'"></SvgIcon>
             </el-icon>
             <template #title>
-                <span style="margin-left: 10px">{{ $t(subItem.meta?.title as string) }}</span>
+                <span v-if="subItem.meta?.icon">{{ $t(subItem.meta?.title as string) }}</span>
+                <span v-else style="margin-left: 10px">{{ $t(subItem.meta?.title as string) }}</span>
             </template>
         </el-menu-item>
     </template>
