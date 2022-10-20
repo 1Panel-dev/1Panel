@@ -1,6 +1,9 @@
 package router
 
 import (
+	"html/template"
+	"net/http"
+
 	v1 "github.com/1Panel-dev/1Panel/backend/app/api/v1"
 	"github.com/1Panel-dev/1Panel/backend/docs"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
@@ -11,8 +14,6 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"html/template"
-	"net/http"
 )
 
 func setWebStatic(rootRouter *gin.Engine) {
@@ -78,6 +79,7 @@ func Routers() *gin.Engine {
 		systemRouter.InitCronjobRouter(PrivateGroup)
 		systemRouter.InitSettingRouter(PrivateGroup)
 		systemRouter.InitAppRouter(PrivateGroup)
+		systemRouter.InitDatabaseRouter(PrivateGroup)
 	}
 
 	return Router

@@ -2,19 +2,31 @@ import { Layout } from '@/routers/constant';
 
 const databaseRouter = {
     sort: 4,
-    path: '/database',
+    path: '/databases',
     component: Layout,
-    redirect: '/database',
+    redirect: '/databases',
     meta: {
         icon: 'p-database',
         title: 'menu.database',
     },
     children: [
         {
-            path: '/database',
-            name: 'Database',
-            component: () => import('@/views/database/index.vue'),
-            meta: {},
+            path: '',
+            name: 'Mysql',
+            component: () => import('@/views/database/mysql/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/databases',
+            },
+        },
+        {
+            path: '/redis',
+            name: 'Redis',
+            component: () => import('@/views/database/redis/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/databases',
+            },
         },
     ],
 };
