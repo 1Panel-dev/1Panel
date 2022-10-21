@@ -61,3 +61,23 @@ func (b *BaseApi) DeleteMysql(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, nil)
 }
+
+func (b *BaseApi) LoadStatus(c *gin.Context) {
+	data, err := mysqlService.LoadStatus("")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, data)
+}
+
+func (b *BaseApi) LoadConf(c *gin.Context) {
+	data, err := mysqlService.LoadConf("")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, data)
+}

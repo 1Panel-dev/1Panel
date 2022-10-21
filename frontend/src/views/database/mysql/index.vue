@@ -1,7 +1,7 @@
 <template>
     <div>
         <Submenu activeName="mysql" />
-        <el-dropdown size="large" split-button style="margin-top: 20px; margin-bottom: 5px">
+        <el-dropdown size="default" split-button style="margin-top: 20px; margin-bottom: 5px">
             Mysql 版本 {{ version }}
             <template #dropdown>
                 <el-dropdown-menu v-model="version">
@@ -10,14 +10,31 @@
                 </el-dropdown-menu>
             </template>
         </el-dropdown>
-        <el-button style="margin-top: 20px; margin-left: 10px" size="large" icon="Setting" @click="onOpenDialog()">
+        <el-button
+            v-if="!isOnSetting"
+            style="margin-top: 20px; margin-left: 10px"
+            size="default"
+            icon="Setting"
+            @click="onSetting"
+        >
             {{ $t('database.setting') }}
         </el-button>
-        <el-card>
+        <el-button
+            v-if="isOnSetting"
+            style="margin-top: 20px; margin-left: 10px"
+            size="default"
+            icon="Back"
+            @click="isOnSetting = false"
+        >
+            {{ $t('commons.button.back') }}列表
+        </el-button>
+
+        <Setting ref="settingRef" v-if="isOnSetting"></Setting>
+
+        <el-card v-if="!isOnSetting">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" @search="search" :data="data">
                 <template #toolbar>
                     <el-button type="primary" @click="onOpenDialog()">{{ $t('commons.button.create') }}</el-button>
-                    <el-button @click="onOpenDialog()">{{ $t('database.rootPassword') }}</el-button>
                     <el-button @click="onOpenDialog()">phpMyAdmin</el-button>
                     <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                         {{ $t('commons.button.delete') }}
@@ -51,6 +68,7 @@
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import OperatrDialog from '@/views/database/mysql/create/index.vue';
+import Setting from '@/views/database/mysql/setting/index.vue';
 import Submenu from '@/views/database/index.vue';
 import { dateFromat } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
@@ -61,6 +79,7 @@ import { useDeleteData } from '@/hooks/use-delete-data';
 
 const selects = ref<any>([]);
 const version = ref<string>('5.7.39');
+const isOnSetting = ref<boolean>();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -72,6 +91,12 @@ const paginationConfig = reactive({
 const dialogRef = ref();
 const onOpenDialog = async () => {
     dialogRef.value!.acceptParams();
+};
+
+const settingRef = ref();
+const onSetting = async () => {
+    isOnSetting.value = true;
+    console.log(settingRef.value);
 };
 
 const search = async () => {

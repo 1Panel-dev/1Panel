@@ -124,3 +124,38 @@
   width: 110%;
   display: inline-block;
 }
+
+.myTable {
+    border-collapse: collapse;
+    font-size: 12px;
+    table-layout: fixed;
+}
+
+.myTable td {
+    width: 35%;
+    padding: 8px;
+    height: 23px;
+    border: 1px solid #383c42;
+    word-wrap: break-word;
+}
+
+.myTable td div {
+    margin-top: 2px
+}
+
+.myTable th {
+    border: 0;
+    height: 30px;
+}
+
+.myTable tr:hover {
+    background-color: #d9dde2;
+}
+
+.myTable tr:first-child:hover {
+    background-color: transparent !important;
+}
+
+.myTable tr td:nth-child(even) {
+    color: #85888e;
+}
