@@ -26,6 +26,7 @@ export default {
             handle: '执行',
             expand: '展开',
             log: '日志',
+            back: '返回',
             saveAndEnable: '保存并启用',
         },
         search: {
@@ -159,6 +160,12 @@ export default {
         backupList: '备份列表',
         loadBackup: '导入备份',
         setting: '数据库设置',
+        remoteAccess: '远程访问',
+
+        baseSetting: '基础设置',
+        confChange: '配置修改',
+        currentStatus: '当前状态',
+        runTime: '启动时间',
     },
     container: {
         operatorHelper: '将对选中容器进行 {0} 操作，是否继续？',
