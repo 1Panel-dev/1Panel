@@ -99,3 +99,8 @@ func ExistWithStrArray(str string, arr []string) bool {
 	}
 	return false
 }
+
+func IsNum(s string) bool {
+	_, err := strconv.ParseFloat(s, 64)
+	return err == nil
+}
