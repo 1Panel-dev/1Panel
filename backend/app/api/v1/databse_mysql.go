@@ -25,6 +25,23 @@ func (b *BaseApi) CreateMysql(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+func (b *BaseApi) UpdateMysql(c *gin.Context) {
+	var req dto.ChangeDBInfo
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := mysqlService.ChangeInfo(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
 func (b *BaseApi) SearchMysql(c *gin.Context) {
 	var req dto.SearchWithPage
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -73,7 +90,7 @@ func (b *BaseApi) LoadStatus(c *gin.Context) {
 }
 
 func (b *BaseApi) LoadConf(c *gin.Context) {
-	data, err := mysqlService.LoadConf("")
+	data, err := mysqlService.LoadVariables("")
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

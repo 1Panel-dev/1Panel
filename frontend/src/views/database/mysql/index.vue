@@ -24,12 +24,12 @@
             style="margin-top: 20px; margin-left: 10px"
             size="default"
             icon="Back"
-            @click="isOnSetting = false"
+            @click="onBacklist"
         >
             {{ $t('commons.button.back') }}列表
         </el-button>
 
-        <Setting ref="settingRef" v-if="isOnSetting"></Setting>
+        <Setting ref="settingRef"></Setting>
 
         <el-card v-if="!isOnSetting">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" @search="search" :data="data">
@@ -61,6 +61,50 @@
             </ComplexTable>
         </el-card>
 
+        <el-dialog v-model="changeVisiable" :destroy-on-close="true" width="30%">
+            <template #header>
+                <div class="card-header">
+                    <span>{{ $t('database.changePassword') }}</span>
+                </div>
+            </template>
+            <el-form>
+                <el-form ref="changeFormRef" :model="changeForm" label-width="80px">
+                    <div v-if="changeForm.operation === 'password'">
+                        <el-form-item :label="$t('auth.username')" prop="userName">
+                            <el-input disabled v-model="changeForm.userName"></el-input>
+                        </el-form-item>
+                        <el-form-item :label="$t('auth.password')" prop="password" :rules="Rules.requiredInput">
+                            <el-input type="password" clearable show-password v-model="changeForm.password"></el-input>
+                        </el-form-item>
+                    </div>
+                    <div v-if="changeForm.operation === 'privilege'">
+                        <el-form-item :label="$t('database.permission')" prop="privilege">
+                            <el-select style="width: 100%" v-model="changeForm.privilege">
+                                <el-option value="localhost" :label="$t('database.permissionLocal')" />
+                                <el-option value="%" :label="$t('database.permissionAll')" />
+                                <el-option value="ip" :label="$t('database.permissionForIP')" />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item
+                            v-if="changeForm.privilege === 'ip'"
+                            prop="privilegeIPs"
+                            :rules="Rules.requiredInput"
+                        >
+                            <el-input clearable v-model="changeForm.privilegeIPs" />
+                        </el-form-item>
+                    </div>
+                </el-form>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="changeVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="submitChangeInfo(changeFormRef)">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
+
         <OperatrDialog @search="search" ref="dialogRef" />
     </div>
 </template>
@@ -72,10 +116,13 @@ import Setting from '@/views/database/mysql/setting/index.vue';
 import Submenu from '@/views/database/index.vue';
 import { dateFromat } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
-import { deleteMysqlDB, searchMysqlDBs } from '@/api/modules/database';
+import { deleteMysqlDB, searchMysqlDBs, updateMysqlDBInfo } from '@/api/modules/database';
 import i18n from '@/lang';
 import { Cronjob } from '@/api/interface/cronjob';
 import { useDeleteData } from '@/hooks/use-delete-data';
+import { ElForm, ElMessage } from 'element-plus';
+import { Database } from '@/api/interface/database';
+import { Rules } from '@/global/form-rules';
 
 const selects = ref<any>([]);
 const version = ref<string>('5.7.39');
@@ -90,13 +137,49 @@ const paginationConfig = reactive({
 
 const dialogRef = ref();
 const onOpenDialog = async () => {
-    dialogRef.value!.acceptParams();
+    let params = {
+        version: version.value,
+    };
+    dialogRef.value!.acceptParams(params);
 };
 
 const settingRef = ref();
 const onSetting = async () => {
     isOnSetting.value = true;
-    console.log(settingRef.value);
+    let params = {
+        version: version.value,
+    };
+    settingRef.value!.acceptParams(params);
+};
+const onBacklist = async () => {
+    isOnSetting.value = false;
+    search();
+    settingRef.value!.onClose();
+};
+
+const changeVisiable = ref(false);
+type FormInstance = InstanceType<typeof ElForm>;
+const changeFormRef = ref<FormInstance>();
+const changeForm = reactive({
+    id: 0,
+    userName: '',
+    password: '',
+    operation: '',
+    privilege: '',
+    privilegeIPs: '',
+    value: '',
+});
+const submitChangeInfo = async (formEl: FormInstance | undefined) => {
+    console.log(formEl);
+    if (!formEl) return;
+    formEl.validate(async (valid) => {
+        if (!valid) return;
+        changeForm.value = changeForm.operation === 'password' ? changeForm.password : changeForm.privilege;
+        await updateMysqlDBInfo(changeForm);
+        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        search();
+        changeVisiable.value = false;
+    });
 };
 
 const search = async () => {
@@ -123,29 +206,42 @@ const onBatchDelete = async (row: Cronjob.CronjobInfo | null) => {
 };
 const buttons = [
     {
-        label: i18n.global.t('commons.button.edit'),
-        icon: 'Delete',
-        click: (row: Cronjob.CronjobInfo) => {
-            onBatchDelete(row);
+        label: i18n.global.t('database.changePassword'),
+        click: (row: Database.MysqlDBInfo) => {
+            changeForm.id = row.id;
+            changeForm.operation = 'password';
+            changeForm.userName = row.username;
+            changeForm.password = row.password;
+            changeVisiable.value = true;
+        },
+    },
+    {
+        label: i18n.global.t('database.permission'),
+        click: (row: Database.MysqlDBInfo) => {
+            changeForm.id = row.id;
+            changeForm.operation = 'privilege';
+            if (row.permission === '%' || row.permission === 'localhost') {
+                changeForm.privilege = row.permission;
+            } else {
+                changeForm.privilege = 'ip';
+            }
+            changeVisiable.value = true;
         },
     },
     {
         label: i18n.global.t('database.backupList') + '(1)',
-        icon: 'Delete',
         click: (row: Cronjob.CronjobInfo) => {
             onBatchDelete(row);
         },
     },
     {
         label: i18n.global.t('database.loadBackup'),
-        icon: 'Delete',
         click: (row: Cronjob.CronjobInfo) => {
             onBatchDelete(row);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        icon: 'Delete',
         click: (row: Cronjob.CronjobInfo) => {
             onBatchDelete(row);
         },
