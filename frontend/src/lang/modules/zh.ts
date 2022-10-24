@@ -161,6 +161,7 @@ export default {
         loadBackup: '导入备份',
         setting: '数据库设置',
         remoteAccess: '远程访问',
+        changePassword: '改密',
 
         baseSetting: '基础设置',
         confChange: '配置修改',
