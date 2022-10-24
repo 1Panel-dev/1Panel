@@ -27,13 +27,13 @@
 
             <el-form-item :label="$t('database.permission')" prop="permission">
                 <el-select style="width: 100%" v-model="form.permission">
-                    <el-option value="local" :label="$t('database.permissionLocal')" />
-                    <el-option value="all" :label="$t('database.permissionAll')" />
+                    <el-option value="localhost" :label="$t('database.permissionLocal')" />
+                    <el-option value="%" :label="$t('database.permissionAll')" />
                     <el-option value="ip" :label="$t('database.permissionForIP')" />
                 </el-select>
             </el-form-item>
             <el-form-item v-if="form.permission === 'ip'" prop="permissionIPs">
-                <el-input type="password" clearable v-model="form.permissionIPs" />
+                <el-input clearable v-model="form.permissionIPs" />
             </el-form-item>
             <el-form-item :label="$t('commons.table.description')" prop="description">
                 <el-input type="textarea" clearable v-model="form.description" />
@@ -60,6 +60,7 @@ import { addMysqlDB } from '@/api/modules/database';
 const createVisiable = ref(false);
 const form = reactive({
     name: '',
+    version: '',
     format: '',
     username: '',
     password: '',
@@ -77,12 +78,16 @@ const rules = reactive({
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
-const acceptParams = (): void => {
+interface DialogProps {
+    version: string;
+}
+const acceptParams = (params: DialogProps): void => {
     form.name = '';
+    form.version = params.version;
     form.format = 'utf8mb4';
     form.username = '';
     form.password = '';
-    form.permission = 'local';
+    form.permission = 'localhost';
     form.permissionIPs = '';
     form.description = '';
     createVisiable.value = true;
@@ -93,8 +98,10 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
+        if (form.permission === 'ip') {
+            form.permission = form.permissionIPs;
+        }
         await addMysqlDB(form);
-
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         emit('search');
         createVisiable.value = false;

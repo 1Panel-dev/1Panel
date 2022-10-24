@@ -2,43 +2,32 @@ package service
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"testing"
 
-	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func TestMysql(t *testing.T) {
-	connArgs := fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8", "root", "Calong@2015", "localhost", 2306)
+	connArgs := fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8", "root", "Calong@2015", "172.16.10.143", 3306)
 	db, err := sql.Open("mysql", connArgs)
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer db.Close()
 
-	rows, err := db.Query("show VARIABLES")
+	rows, err := db.Query("show master status")
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	variableMap := make(map[string]string)
+	masterRows := make([]string, 5)
 	for rows.Next() {
-		var variableName, variableValue string
-		if err := rows.Scan(&variableName, &variableValue); err != nil {
+		if err := rows.Scan(&masterRows[0], &masterRows[1], &masterRows[2], &masterRows[3], &masterRows[4]); err != nil {
 			fmt.Println(err)
 		}
-		variableMap[variableName] = variableValue
 	}
-	var info dto.MysqlConf
-	arr, err := json.Marshal(variableMap)
-	if err != nil {
-		fmt.Println(err)
+	for k, v := range masterRows {
+		fmt.Println(k, v)
 	}
-	err = json.Unmarshal(arr, &info)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(info)
 }
