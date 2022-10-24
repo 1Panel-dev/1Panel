@@ -14,13 +14,13 @@ type MysqlDBInfo struct {
 }
 
 type MysqlDBCreate struct {
-	Name          string `json:"name" validate:"required"`
-	Format        string `json:"format" validate:"required,oneof=utf8mb4 utf-8 gbk big5"`
-	Username      string `json:"username" validate:"required"`
-	Password      string `json:"password" validate:"required"`
-	Permission    string `json:"permission" validate:"required,oneof=local all ip"`
-	PermissionIPs string `json:"permissionIPs"`
-	Description   string `json:"description"`
+	Name        string `json:"name" validate:"required"`
+	Version     string `json:"version" validate:"required,oneof=5.7.39 8.0.30"`
+	Format      string `json:"format" validate:"required,oneof=utf8mb4 utf-8 gbk big5"`
+	Username    string `json:"username" validate:"required"`
+	Password    string `json:"password" validate:"required"`
+	Permission  string `json:"permission" validate:"required"`
+	Description string `json:"description"`
 }
 
 type MysqlStatus struct {
@@ -61,7 +61,7 @@ type MysqlStatus struct {
 	Position                     string `json:"Position"`
 }
 
-type MysqlConf struct {
+type MysqlVariables struct {
 	BinlogCachSize       string `json:"binlog_cache_size"`
 	InnodbBufferPoolSize string `json:"innodb_buffer_pool_size"`
 	InnodbLogBufferSize  string `json:"innodb_log_buffer_size"`
@@ -78,4 +78,14 @@ type MysqlConf struct {
 	ThreadCacheSize      string `json:"thread_cache_size"`
 	ThreadStack          string `json:"thread_stack"`
 	Tmp_tableSize        string `json:"tmp_table_size"`
+}
+
+type ChangeDBInfo struct {
+	ID        uint   `json:"id" validate:"required"`
+	Operation string `json:"operation" validate:"required,oneof=password privilege"`
+	Value     string `json:"value" validate:"required"`
+}
+
+type BatchDeleteByName struct {
+	Names []string `json:"names" validate:"required"`
 }

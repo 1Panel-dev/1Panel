@@ -7,16 +7,15 @@ export namespace Database {
         username: string;
         password: string;
         permission: string;
-        permissionIPs: string;
         description: string;
     }
     export interface MysqlDBCreate {
         name: string;
+        version: string;
         format: string;
         username: string;
         password: string;
         permission: string;
-        permissionIPs: string;
         description: string;
     }
     export interface MysqlVariables {
@@ -26,9 +25,7 @@ export namespace Database {
         join_buffer_size: number;
         key_buffer_size: number;
         max_connections: number;
-        max_heap_table_size: number;
         query_cache_size: number;
-        query_cache_type: string;
         read_buffer_size: number;
         read_rnd_buffer_size: number;
         sort_buffer_size: number;
@@ -73,5 +70,10 @@ export namespace Database {
         Run: number;
         File: string;
         Position: number;
+    }
+    export interface ChangeInfo {
+        id: number;
+        operation: string;
+        value: string;
     }
 }

@@ -9,7 +9,9 @@ export const searchMysqlDBs = (params: ReqPage) => {
 export const addMysqlDB = (params: Database.MysqlDBCreate) => {
     return http.post(`/databases`, params);
 };
-
+export const updateMysqlDBInfo = (params: Database.ChangeInfo) => {
+    return http.put(`/databases/${params.id}`, params);
+};
 export const deleteMysqlDB = (params: { ids: number[] }) => {
     return http.post(`/databases/del`, params);
 };

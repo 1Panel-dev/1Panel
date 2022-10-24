@@ -22,6 +22,7 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		withRecordRouter.POST("", baseApi.CreateMysql)
+		withRecordRouter.PUT("/:id", baseApi.UpdateMysql)
 		withRecordRouter.POST("/del", baseApi.DeleteMysql)
 		cmdRouter.POST("/search", baseApi.SearchMysql)
 		cmdRouter.GET("/conf", baseApi.LoadConf)
