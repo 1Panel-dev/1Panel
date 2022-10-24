@@ -46,26 +46,30 @@ func execDockerCommand(database model.AppDatabase, dbInstall model.AppInstall, o
 		Auth:          auth,
 		DbParam:       dbConfig,
 	}
-	_, err := cmd.Exec(getSqlStr(database.Key, dbInstall.Version, op, execConfig))
+	_, err := cmd.Exec(getSqlStr(database.Key, op, execConfig))
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func getSqlStr(key, version string, operate DatabaseOp, exec dto.ContainerExec) string {
+func getSqlStr(key string, operate DatabaseOp, exec dto.ContainerExec) string {
 	var str string
 	param := exec.DbParam
 	switch key {
-	case "mysql":
+	case "mysql5.7":
 		if operate == Add {
-			if common.CompareVersion(version, "8.0") {
-				str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s  -e \"CREATE USER '%s'@'%%' IDENTIFIED BY '%s';\" -e \"create database %s;\" -e \"GRANT ALL ON %s.* TO '%s'@'%%';\" -e \"FLUSH PRIVILEGES;\"",
-					exec.ContainerName, exec.Auth.RootPassword, param.DbUser, param.Password, param.DbName, param.DbName, param.DbUser)
-			} else {
-				str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s  -e \"CREATE USER '%s'@'%%' IDENTIFIED BY '%s';\" -e \"create database %s;\" -e \"GRANT ALL ON %s.* TO '%s'@'%%' IDENTIFIED BY '%s';\" -e \"FLUSH PRIVILEGES;\"",
-					exec.ContainerName, exec.Auth.RootPassword, param.DbUser, param.Password, param.DbName, param.DbName, param.DbUser, param.Password)
-			}
+			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s  -e \"CREATE USER '%s'@'%%' IDENTIFIED BY '%s';\" -e \"create database %s;\" -e \"GRANT ALL ON %s.* TO '%s'@'%%' IDENTIFIED BY '%s';\" -e \"FLUSH PRIVILEGES;\"",
+				exec.ContainerName, exec.Auth.RootPassword, param.DbUser, param.Password, param.DbName, param.DbName, param.DbUser, param.Password)
+		}
+		if operate == Delete {
+			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s   -e \"drop database %s;\"  -e \"drop user %s;\" ",
+				exec.ContainerName, exec.Auth.RootPassword, param.DbName, param.DbUser)
+		}
+	case "mysql8.0":
+		if operate == Add {
+			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s  -e \"CREATE USER '%s'@'%%' IDENTIFIED BY '%s';\" -e \"create database %s;\" -e \"GRANT ALL ON %s.* TO '%s'@'%%';\" -e \"FLUSH PRIVILEGES;\"",
+				exec.ContainerName, exec.Auth.RootPassword, param.DbUser, param.Password, param.DbName, param.DbName, param.DbUser)
 		}
 		if operate == Delete {
 			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s   -e \"drop database %s;\"  -e \"drop user %s;\" ",
