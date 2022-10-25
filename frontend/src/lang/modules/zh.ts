@@ -164,6 +164,7 @@ export default {
         changePassword: '改密',
 
         baseSetting: '基础设置',
+        remoteConnHelper: 'root 帐号远程连接 mysql 有安全风险，开启需谨慎！',
         confChange: '配置修改',
 
         currentStatus: '当前状态',

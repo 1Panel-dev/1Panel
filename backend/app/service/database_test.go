@@ -1,9 +1,10 @@
 package service
 
 import (
-	"database/sql"
+	"encoding/json"
 	"fmt"
-	"reflect"
+	"os/exec"
+	"strings"
 	"testing"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -11,61 +12,60 @@ import (
 )
 
 func TestMysql(t *testing.T) {
-	connArgs := fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8", "root", "Calong@2015", "172.16.10.143", 3306)
-	db, err := sql.Open("mysql", connArgs)
+	cmd := exec.Command("docker", "exec", "-i", "1Panel-mysql5.7-RnzE", "mysql", "-uroot", "-pCalong@2016", "-e", "show global variables;")
+	stdout, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println(err)
 	}
-	defer db.Close()
-
-	rows, err := db.Query("show variables")
-	if err != nil {
-		fmt.Println(err)
-	}
-	variableMap := make(map[string]int)
-
-	for rows.Next() {
-		var variableName string
-		var variableValue int
-		if err := rows.Scan(&variableName, &variableValue); err != nil {
-			fmt.Println(err)
+	kk := strings.Split(string(stdout), "\n")
+	testMap := make(map[string]interface{})
+	for _, v := range kk {
+		itemRow := strings.Split(v, "\t")
+		if len(itemRow) == 2 {
+			testMap[itemRow[0]] = itemRow[1]
 		}
-		variableMap[variableName] = variableValue
 	}
-	for k, v := range variableMap {
-		fmt.Println(k, v)
-	}
-}
-
-func TestMs(t *testing.T) {
-	db, err := newDatabaseClient()
+	var info dto.MysqlVariables
+	arr, err := json.Marshal(testMap)
 	if err != nil {
 		fmt.Println(err)
 	}
-	defer db.Close()
+	_ = json.Unmarshal(arr, &info)
+	fmt.Print(info)
+	// fmt.Println(string(stdout))
+	// for {
+	// 	str, err := hr.Reader.ReadString('\n')
+	// 	if err == nil {
+	// 		testMap := make(map[string]interface{})
+	// 		err = json.Unmarshal([]byte(str), &testMap)
+	// 		fmt.Println(err)
+	// 		for k, v := range testMap {
+	// 			fmt.Println(k, v)
+	// 		}
+	// 		// fmt.Print(str)
+	// 	} else if err == io.EOF {
+	// 		// ReadString最后会同EOF和最后的数据一起返回
+	// 		fmt.Println(str)
+	// 		break
+	// 	} else {
+	// 		fmt.Println("出错！！")
+	// 		return
+	// 	}
+	// }
+	// input, err := hr.Reader.ReadString('\n')
+	// if err == nil {
+	// 	fmt.Printf("The input was: %s\n", input)
+	// }
 
-	variables := dto.MysqlVariablesUpdate{
-		Version:              "5.7.39",
-		KeyBufferSize:        8388608,
-		QueryCacheSize:       1048576,
-		TmpTableSize:         16777216,
-		InnodbBufferPoolSize: 134217728,
-		InnodbLogBufferSize:  16777216,
-		SortBufferSize:       262144,
-		ReadBufferSize:       131072,
-
-		ReadRndBufferSize: 262144,
-		JoinBufferSize:    262144,
-		ThreadStack:       262144,
-		BinlogCachSize:    32768,
-		ThreadCacheSize:   9,
-		TableOpenCache:    2000,
-		MaxConnections:    150,
-	}
-
-	v := reflect.ValueOf(variables)
-	typeOfS := v.Type()
-	for i := 0; i < v.NumField(); i++ {
-		fmt.Printf("SET GLOBAL %s=%d \n", typeOfS.Field(i).Name, v.Field(i).Interface())
-	}
+	// _, err = hr.Conn.Write([]byte("show global variables; \n"))
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// time.Sleep(3 * time.Second)
+	// buf1 := make([]byte, 1024)
+	// _, err = hr.Reader.Read(buf1)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// fmt.Println(string(buf1))
 }

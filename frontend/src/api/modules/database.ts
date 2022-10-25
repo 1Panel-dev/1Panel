@@ -1,8 +1,8 @@
 import http from '@/api';
-import { ResPage, ReqPage } from '../interface';
+import { ResPage } from '../interface';
 import { Database } from '../interface/database';
 
-export const searchMysqlDBs = (params: ReqPage) => {
+export const searchMysqlDBs = (params: Database.Search) => {
     return http.post<ResPage<Database.MysqlDBInfo>>(`databases/search`, params);
 };
 
@@ -19,9 +19,15 @@ export const deleteMysqlDB = (params: { ids: number[] }) => {
     return http.post(`/databases/del`, params);
 };
 
-export const loadMysqlVariables = () => {
-    return http.get<Database.MysqlVariables>(`/databases/conf`);
+export const loadMysqlBaseInfo = (param: string) => {
+    return http.get<Database.BaseInfo>(`/databases/baseinfo/${param}`);
 };
-export const loadMysqlStatus = () => {
-    return http.get<Database.MysqlStatus>(`/databases/status`);
+export const loadMysqlVariables = (param: string) => {
+    return http.get<Database.MysqlVariables>(`/databases/variables/${param}`);
+};
+export const loadMysqlStatus = (param: string) => {
+    return http.get<Database.MysqlStatus>(`/databases/status/${param}`);
+};
+export const loadVersions = () => {
+    return http.get(`/databases/versions`);
 };

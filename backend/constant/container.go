@@ -17,4 +17,7 @@ const (
 	DaemonJsonDir      = "/System/Volumes/Data/Users/slooop/.docker/daemon.json"
 	TmpDockerBuildDir  = "/opt/1Panel/data/docker/build"
 	TmpComposeBuildDir = "/opt/1Panel/data/docker/compose"
+
+	ExecCmd   = "docker exec"
+	ExecCmdIT = "docker exec -it"
 )

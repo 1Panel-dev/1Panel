@@ -3,15 +3,15 @@
         <el-card>
             <el-collapse v-model="activeName" accordion>
                 <el-collapse-item :title="$t('database.baseSetting')" name="1">
-                    <el-form :model="form" ref="panelFormRef" label-width="120px">
+                    <el-form :model="baseInfo" ref="panelFormRef" label-width="120px">
                         <el-row>
                             <el-col :span="1"><br /></el-col>
                             <el-col :span="10">
-                                <el-form-item :label="$t('setting.port')" prop="port">
-                                    <el-input clearable v-model="form.port">
+                                <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
+                                    <el-input clearable type="number" v-model.number="baseInfo.port">
                                         <template #append>
                                             <el-button
-                                                @click="onSave(panelFormRef, 'port', form.port)"
+                                                @click="onSave(panelFormRef, 'port', baseInfo.port)"
                                                 icon="Collection"
                                             >
                                                 {{ $t('commons.button.save') }}
@@ -19,11 +19,15 @@
                                         </template>
                                     </el-input>
                                 </el-form-item>
-                                <el-form-item :label="$t('setting.password')" prop="password">
-                                    <el-input clearable v-model="form.port">
+                                <el-form-item
+                                    :label="$t('setting.password')"
+                                    prop="password"
+                                    :rules="Rules.requiredInput"
+                                >
+                                    <el-input type="password" show-password clearable v-model="baseInfo.password">
                                         <template #append>
                                             <el-button
-                                                @click="onSave(panelFormRef, 'password', form.password)"
+                                                @click="onSave(panelFormRef, 'password', baseInfo.password)"
                                                 icon="Collection"
                                             >
                                                 {{ $t('commons.button.save') }}
@@ -31,17 +35,16 @@
                                         </template>
                                     </el-input>
                                 </el-form-item>
-                                <el-form-item :label="$t('database.remoteAccess')" prop="remoteAccess">
-                                    <el-input clearable v-model="form.port">
-                                        <template #append>
-                                            <el-button
-                                                @click="onSave(panelFormRef, 'remoteAccess', form.remoteAccess)"
-                                                icon="Collection"
-                                            >
-                                                {{ $t('commons.button.save') }}
-                                            </el-button>
-                                        </template>
-                                    </el-input>
+                                <el-form-item
+                                    :label="$t('database.remoteAccess')"
+                                    prop="remoteConn"
+                                    :rules="Rules.requiredSelect"
+                                >
+                                    <el-switch
+                                        v-model="baseInfo.remoteConn"
+                                        @change="onSave(panelFormRef, 'remoteConn', baseInfo.remoteConn)"
+                                    />
+                                    <span class="input-help">{{ $t('database.remoteConnHelper') }}</span>
                                 </el-form-item>
                             </el-col>
                         </el-row>
@@ -65,7 +68,7 @@
                     <el-button
                         type="primary"
                         style="width: 120px; margin-top: 10px"
-                        @click="onSave(panelFormRef, 'remoteAccess', form.remoteAccess)"
+                        @click="onSave(panelFormRef, 'remoteAccess', baseInfo.port)"
                     >
                         {{ $t('commons.button.save') }}
                     </el-button>
@@ -317,7 +320,13 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { LoadFile } from '@/api/modules/files';
 import { planOptions } from './helper';
-import { loadMysqlStatus, loadMysqlVariables, updateMysqlVariables } from '@/api/modules/database';
+import {
+    loadMysqlBaseInfo,
+    loadMysqlStatus,
+    loadMysqlVariables,
+    updateMysqlDBInfo,
+    updateMysqlVariables,
+} from '@/api/modules/database';
 import { computeSize } from '@/utils/util';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -325,16 +334,11 @@ import i18n from '@/lang';
 const extensions = [javascript(), oneDark];
 const activeName = ref('1');
 
-const form = reactive({
-    port: '',
+const baseInfo = reactive({
+    name: '',
+    port: 3306,
     password: '',
-    remoteAccess: '',
-    sessionTimeout: 0,
-    localTime: '',
-    panelName: '',
-    theme: '',
-    language: '',
-    complexityVerification: '',
+    remoteConn: false,
 });
 const panelFormRef = ref<FormInstance>();
 const mysqlConf = ref();
@@ -407,17 +411,48 @@ interface DialogProps {
 }
 const acceptParams = (params: DialogProps): void => {
     onSetting.value = true;
-    loadMysqlConf('/opt/1Panel/conf/mysql.conf');
+    paramVersion.value = params.version;
+    loadBaseInfo();
     loadStatus();
     loadVariables();
-    paramVersion.value = params.version;
 };
 const onClose = (): void => {
     onSetting.value = false;
 };
 
 const onSave = async (formEl: FormInstance | undefined, key: string, val: any) => {
-    console.log(formEl, key, val);
+    if (!formEl) return;
+    const result = await formEl.validateField(key, callback);
+    if (!result) {
+        return;
+    }
+    let changeForm = {
+        id: 0,
+        version: paramVersion.value,
+        value: val,
+        operation: key === 'remoteConn' ? 'privilege' : key,
+    };
+    if (changeForm.operation === 'privilege') {
+        changeForm.value = val ? '%' : 'localhost';
+    }
+    await updateMysqlDBInfo(changeForm);
+    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+};
+function callback(error: any) {
+    if (error) {
+        return error.message;
+    } else {
+        return;
+    }
+}
+
+const loadBaseInfo = async () => {
+    const res = await loadMysqlBaseInfo(paramVersion.value);
+    baseInfo.name = res.data?.name;
+    baseInfo.port = res.data?.port;
+    baseInfo.password = res.data?.password;
+    baseInfo.remoteConn = res.data?.remoteConn;
+    loadMysqlConf(`/opt/1Panel/data/apps/${paramVersion.value}/${baseInfo.name}/conf/my.cnf`);
 };
 
 const loadMysqlConf = async (path: string) => {
@@ -426,7 +461,7 @@ const loadMysqlConf = async (path: string) => {
 };
 
 const loadVariables = async () => {
-    const res = await loadMysqlVariables();
+    const res = await loadMysqlVariables(paramVersion.value);
     mysqlVariables.key_buffer_size = Number(res.data.key_buffer_size) / 1024 / 1024;
     mysqlVariables.query_cache_size = Number(res.data.query_cache_size) / 1024 / 1024;
     mysqlVariables.tmp_table_size = Number(res.data.tmp_table_size) / 1024 / 1024;
@@ -494,7 +529,7 @@ const onSaveVariables = async (formEl: FormInstance | undefined) => {
 };
 
 const loadStatus = async () => {
-    const res = await loadMysqlStatus();
+    const res = await loadMysqlStatus(paramVersion.value);
     let queryPerSecond = res.data.Questions / res.data.Uptime;
     let txPerSecond = (res.data!.Com_commit + res.data.Com_rollback) / res.data.Uptime;
 
