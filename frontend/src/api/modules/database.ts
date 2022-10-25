@@ -12,6 +12,9 @@ export const addMysqlDB = (params: Database.MysqlDBCreate) => {
 export const updateMysqlDBInfo = (params: Database.ChangeInfo) => {
     return http.put(`/databases/${params.id}`, params);
 };
+export const updateMysqlVariables = (params: Database.MysqlVariables) => {
+    return http.post(`/databases/variables/update`, params);
+};
 export const deleteMysqlDB = (params: { ids: number[] }) => {
     return http.post(`/databases/del`, params);
 };

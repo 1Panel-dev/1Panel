@@ -19,6 +19,7 @@ export namespace Database {
         description: string;
     }
     export interface MysqlVariables {
+        version: string;
         binlog_cache_size: number;
         innodb_buffer_pool_size: number;
         innodb_log_buffer_size: number;

@@ -3,8 +3,10 @@ package service
 import (
 	"database/sql"
 	"fmt"
+	"reflect"
 	"testing"
 
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -16,18 +18,54 @@ func TestMysql(t *testing.T) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("show master status")
+	rows, err := db.Query("show variables")
 	if err != nil {
 		fmt.Println(err)
 	}
+	variableMap := make(map[string]int)
 
-	masterRows := make([]string, 5)
 	for rows.Next() {
-		if err := rows.Scan(&masterRows[0], &masterRows[1], &masterRows[2], &masterRows[3], &masterRows[4]); err != nil {
+		var variableName string
+		var variableValue int
+		if err := rows.Scan(&variableName, &variableValue); err != nil {
 			fmt.Println(err)
 		}
+		variableMap[variableName] = variableValue
 	}
-	for k, v := range masterRows {
+	for k, v := range variableMap {
 		fmt.Println(k, v)
+	}
+}
+
+func TestMs(t *testing.T) {
+	db, err := newDatabaseClient()
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	variables := dto.MysqlVariablesUpdate{
+		Version:              "5.7.39",
+		KeyBufferSize:        8388608,
+		QueryCacheSize:       1048576,
+		TmpTableSize:         16777216,
+		InnodbBufferPoolSize: 134217728,
+		InnodbLogBufferSize:  16777216,
+		SortBufferSize:       262144,
+		ReadBufferSize:       131072,
+
+		ReadRndBufferSize: 262144,
+		JoinBufferSize:    262144,
+		ThreadStack:       262144,
+		BinlogCachSize:    32768,
+		ThreadCacheSize:   9,
+		TableOpenCache:    2000,
+		MaxConnections:    150,
+	}
+
+	v := reflect.ValueOf(variables)
+	typeOfS := v.Type()
+	for i := 0; i < v.NumField(); i++ {
+		fmt.Printf("SET GLOBAL %s=%d \n", typeOfS.Field(i).Name, v.Field(i).Interface())
 	}
 }
