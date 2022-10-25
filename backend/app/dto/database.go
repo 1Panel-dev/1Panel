@@ -15,7 +15,7 @@ type MysqlDBInfo struct {
 
 type MysqlDBCreate struct {
 	Name        string `json:"name" validate:"required"`
-	Version     string `json:"version" validate:"required,oneof=5.7.39 8.0.30"`
+	Version     string `json:"version" validate:"required,oneof=mysql5.7 mysql8.0"`
 	Format      string `json:"format" validate:"required,oneof=utf8mb4 utf-8 gbk big5"`
 	Username    string `json:"username" validate:"required"`
 	Password    string `json:"password" validate:"required"`
@@ -81,7 +81,7 @@ type MysqlVariables struct {
 }
 
 type MysqlVariablesUpdate struct {
-	Version              string `json:"version" validate:"required"`
+	Version              string `json:"version" validate:"required,oneof=mysql5.7 mysql8.0"`
 	KeyBufferSize        int64  `json:"key_buffer_size" validate:"required"`
 	QueryCacheSize       int64  `json:"query_cache_size" validate:"required"`
 	TmpTableSize         int64  `json:"tmp_table_size" validate:"required"`
@@ -100,11 +100,20 @@ type MysqlVariablesUpdate struct {
 }
 
 type ChangeDBInfo struct {
-	ID        uint   `json:"id" validate:"required"`
+	ID        uint   `json:"id"`
+	Version   string `json:"version" validate:"required,oneof=mysql5.7 mysql8.0"`
 	Operation string `json:"operation" validate:"required,oneof=password privilege"`
 	Value     string `json:"value" validate:"required"`
 }
 
-type BatchDeleteByName struct {
-	Names []string `json:"names" validate:"required"`
+type DBBaseInfo struct {
+	Name       string `json:"name"`
+	Port       int64  `json:"port"`
+	Password   string `json:"password"`
+	RemoteConn bool   `json:"remoteConn"`
+}
+
+type SearchDBWithPage struct {
+	PageInfo
+	Version string `json:"version"  validate:"required"`
 }

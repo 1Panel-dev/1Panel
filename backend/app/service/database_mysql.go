@@ -1,13 +1,15 @@
 package service
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
+	"os/exec"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/copier"
@@ -17,46 +19,23 @@ import (
 type MysqlService struct{}
 
 type IMysqlService interface {
-	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
+	SearchWithPage(search dto.SearchDBWithPage) (int64, interface{}, error)
 	Create(mysqlDto dto.MysqlDBCreate) error
 	ChangeInfo(info dto.ChangeDBInfo) error
 	UpdateVariables(variables dto.MysqlVariablesUpdate) error
-	Delete(ids []uint) error
+	Delete(version string, ids []uint) error
 	LoadStatus(version string) (*dto.MysqlStatus, error)
 	LoadVariables(version string) (*dto.MysqlVariables, error)
+	LoadRunningVersion() ([]string, error)
+	LoadBaseInfo(version string) (*dto.DBBaseInfo, error)
 }
 
 func NewIMysqlService() IMysqlService {
 	return &MysqlService{}
 }
 
-func newDatabaseClient() (*sql.DB, error) {
-	connArgs := fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8", "root", "Calong@2015", "localhost", 2306)
-	db, err := sql.Open("mysql", connArgs)
-	if err != nil {
-		return nil, err
-	}
-	return db, nil
-}
-func handleSql(db *sql.DB, query string) (map[string]string, error) {
-	variableMap := make(map[string]string)
-	rows, err := db.Query(query)
-	if err != nil {
-		return variableMap, err
-	}
-
-	for rows.Next() {
-		var variableName, variableValue string
-		if err := rows.Scan(&variableName, &variableValue); err != nil {
-			return variableMap, err
-		}
-		variableMap[variableName] = variableValue
-	}
-	return variableMap, err
-}
-
-func (u *MysqlService) SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error) {
-	total, mysqls, err := mysqlRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info))
+func (u *MysqlService) SearchWithPage(search dto.SearchDBWithPage) (int64, interface{}, error) {
+	total, mysqls, err := mysqlRepo.Page(search.Page, search.PageSize, mysqlRepo.WithByVersion(search.Version))
 	var dtoMysqls []dto.MysqlDBInfo
 	for _, mysql := range mysqls {
 		var item dto.MysqlDBInfo
@@ -66,6 +45,10 @@ func (u *MysqlService) SearchWithPage(search dto.SearchWithPage) (int64, interfa
 		dtoMysqls = append(dtoMysqls, item)
 	}
 	return total, dtoMysqls, err
+}
+
+func (u *MysqlService) LoadRunningVersion() ([]string, error) {
+	return mysqlRepo.LoadRunningVersion()
 }
 
 func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
@@ -79,23 +62,23 @@ func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
 	if err := copier.Copy(&mysql, &mysqlDto); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
-	sql, err := newDatabaseClient()
+
+	app, err := mysqlRepo.LoadBaseInfoByVersion(mysqlDto.Version)
 	if err != nil {
 		return err
 	}
-	defer sql.Close()
-	if _, err := sql.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s CHARACTER SET=%s", mysqlDto.Name, mysqlDto.Format)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create database if not exists %s character set=%s", mysqlDto.Name, mysqlDto.Format)); err != nil {
 		return err
 	}
 	tmpPermission := mysqlDto.Permission
-	if _, err := sql.Exec(fmt.Sprintf("CREATE USER '%s'@'%s' IDENTIFIED BY '%s';", mysqlDto.Name, tmpPermission, mysqlDto.Password)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create user if not exists '%s'@'%s' identified by '%s';", mysqlDto.Name, tmpPermission, mysqlDto.Password)); err != nil {
 		return err
 	}
-	grantStr := fmt.Sprintf("GRANT ALL PRIVILEGES ON %s.* TO '%s'@'%s'", mysqlDto.Name, mysqlDto.Username, tmpPermission)
+	grantStr := fmt.Sprintf("grant all privileges on %s.* to '%s'@'%s'", mysqlDto.Name, mysqlDto.Username, tmpPermission)
 	if mysqlDto.Version == "5.7.39" {
-		grantStr = fmt.Sprintf("%s IDENTIFIED BY '%s' WITH GRANT OPTION;", grantStr, mysqlDto.Password)
+		grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, mysqlDto.Password)
 	}
-	if _, err := sql.Exec(grantStr); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, grantStr); err != nil {
 		return err
 	}
 	if err := mysqlRepo.Create(&mysql); err != nil {
@@ -104,12 +87,12 @@ func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
 	return nil
 }
 
-func (u *MysqlService) Delete(ids []uint) error {
-	dbClient, err := newDatabaseClient()
+func (u *MysqlService) Delete(version string, ids []uint) error {
+	app, err := mysqlRepo.LoadBaseInfoByVersion(version)
 	if err != nil {
 		return err
 	}
-	defer dbClient.Close()
+
 	dbs, err := mysqlRepo.List(commonRepo.WithIdsIn(ids))
 	if err != nil {
 		return err
@@ -117,10 +100,10 @@ func (u *MysqlService) Delete(ids []uint) error {
 
 	for _, db := range dbs {
 		if len(db.Name) != 0 {
-			if _, err := dbClient.Exec(fmt.Sprintf("DROP USER IF EXISTS '%s'@'%s'", db.Name, db.Permission)); err != nil {
+			if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", db.Name, db.Permission)); err != nil {
 				return err
 			}
-			if _, err := dbClient.Exec(fmt.Sprintf("DROP DATABASE IF EXISTS %s", db.Name)); err != nil {
+			if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop database if exists %s", db.Name)); err != nil {
 				return err
 			}
 		}
@@ -130,103 +113,165 @@ func (u *MysqlService) Delete(ids []uint) error {
 }
 
 func (u *MysqlService) ChangeInfo(info dto.ChangeDBInfo) error {
-	mysql, err := mysqlRepo.Get(commonRepo.WithByID(info.ID))
-	if err != nil {
-		return err
-	}
-	db, err := newDatabaseClient()
-	if err != nil {
-		return err
-	}
-	defer db.Close()
-	if info.Operation == "password" {
-		if _, err := db.Exec(fmt.Sprintf("SET PASSWORD FOR %s@%s = password('%s')", mysql.Username, mysql.Permission, info.Value)); err != nil {
+	var (
+		mysql model.DatabaseMysql
+		err   error
+	)
+	if info.ID != 0 {
+		mysql, err = mysqlRepo.Get(commonRepo.WithByID(info.ID))
+		if err != nil {
 			return err
 		}
-		_ = mysqlRepo.Update(mysql.ID, map[string]interface{}{"password": info.Value})
+	}
+	app, err := mysqlRepo.LoadBaseInfoByVersion(info.Version)
+	if err != nil {
+		return err
+	}
+	if info.Operation == "password" {
+		if info.ID != 0 {
+			if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set password for %s@%s = password('%s')", mysql.Username, mysql.Permission, info.Value)); err != nil {
+				return err
+			}
+			_ = mysqlRepo.Update(mysql.ID, map[string]interface{}{"password": info.Value})
+			return nil
+		}
+		hosts, err := excuteSqlForRows(app.ContainerName, app.Password, "select host from mysql.user where user='root';")
+		if err != nil {
+			return err
+		}
+		for _, host := range hosts {
+			if host == "%" || host == "localhost" {
+				if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set password for root@'%s' = password('%s')", host, info.Value)); err != nil {
+					return err
+				}
+			}
+		}
+		_ = mysqlRepo.UpdateMysqlConf(app.ID, map[string]interface{}{
+			"param": strings.ReplaceAll(app.Param, app.Password, info.Value),
+			"env":   strings.ReplaceAll(app.Env, app.Password, info.Value),
+		})
 		return nil
 	}
 
-	if _, err := db.Exec(fmt.Sprintf("DROP USER IF EXISTS '%s'@'%s'", mysql.Name, mysql.Permission)); err != nil {
+	if info.ID == 0 {
+		mysql.Name = "*"
+		mysql.Username = "root"
+		mysql.Permission = "%"
+		mysql.Password = app.Password
+	}
+
+	if info.Value != mysql.Permission {
+		if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", mysql.Username, mysql.Permission)); err != nil {
+			return err
+		}
+		if info.ID == 0 {
+			return nil
+		}
+	}
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create user if not exists '%s'@'%s' identified by '%s';", mysql.Username, info.Value, mysql.Password)); err != nil {
 		return err
 	}
-	grantStr := fmt.Sprintf("GRANT ALL PRIVILEGES ON %s.* TO '%s'@'%s'", mysql.Name, mysql.Username, info.Value)
+	grantStr := fmt.Sprintf("grant all privileges on %s.* to '%s'@'%s'", mysql.Name, mysql.Username, info.Value)
 	if mysql.Version == "5.7.39" {
-		grantStr = fmt.Sprintf("%s IDENTIFIED BY '%s' WITH GRANT OPTION;", grantStr, mysql.Password)
+		grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, mysql.Password)
 	}
-	if _, err := db.Exec(grantStr); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, grantStr); err != nil {
 		return err
 	}
-	if _, err := db.Exec("FLUSH PRIVILEGES"); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, "flush privileges"); err != nil {
 		return err
 	}
+	if info.ID == 0 {
+		return nil
+	}
+
 	_ = mysqlRepo.Update(mysql.ID, map[string]interface{}{"permission": info.Value})
 
 	return nil
 }
 
 func (u *MysqlService) UpdateVariables(variables dto.MysqlVariablesUpdate) error {
-	db, err := newDatabaseClient()
+	app, err := mysqlRepo.LoadBaseInfoByVersion(variables.Version)
 	if err != nil {
 		return err
 	}
-	defer db.Close()
 
-	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL key_buffer_size=%d", variables.KeyBufferSize)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL key_buffer_size=%d", variables.KeyBufferSize)); err != nil {
 		return err
 	}
-	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL query_cache_size=%d", variables.QueryCacheSize)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL query_cache_size=%d", variables.QueryCacheSize)); err != nil {
 		return err
 	}
-	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL tmp_table_size=%d", variables.TmpTableSize)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL tmp_table_size=%d", variables.TmpTableSize)); err != nil {
 		return err
 	}
-	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL innodb_buffer_pool_size=%d", variables.InnodbBufferPoolSize)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL innodb_buffer_pool_size=%d", variables.InnodbBufferPoolSize)); err != nil {
 		return err
 	}
-	// if _, err := db.Exec(fmt.Sprintf("SET GLOBAL innodb_log_buffer_size=%d", variables.InnodbLogBufferSize)); err != nil {
+	// if  err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL innodb_log_buffer_size=%d", variables.InnodbLogBufferSize)); err != nil {
 	// 	return err
 	// }
-	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL sort_buffer_size=%d", variables.SortBufferSize)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL sort_buffer_size=%d", variables.SortBufferSize)); err != nil {
 		return err
 	}
-	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL read_buffer_size=%d", variables.ReadBufferSize)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL read_buffer_size=%d", variables.ReadBufferSize)); err != nil {
 		return err
 	}
 
-	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL read_rnd_buffer_size=%d", variables.ReadRndBufferSize)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL read_rnd_buffer_size=%d", variables.ReadRndBufferSize)); err != nil {
 		return err
 	}
-	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL join_buffer_size=%d", variables.JoinBufferSize)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL join_buffer_size=%d", variables.JoinBufferSize)); err != nil {
 		return err
 	}
-	// if _, err := db.Exec(fmt.Sprintf("SET GLOBAL thread_stack=%d", variables.ThreadStack)); err != nil {
+	// if  err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL thread_stack=%d", variables.ThreadStack)); err != nil {
 	// 	return err
 	// }
-	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL binlog_cache_size=%d", variables.BinlogCachSize)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL binlog_cache_size=%d", variables.BinlogCachSize)); err != nil {
 		return err
 	}
-	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL thread_cache_size=%d", variables.ThreadCacheSize)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL thread_cache_size=%d", variables.ThreadCacheSize)); err != nil {
 		return err
 	}
-	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL table_open_cache=%d", variables.TableOpenCache)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL table_open_cache=%d", variables.TableOpenCache)); err != nil {
 		return err
 	}
-	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL max_connections=%d", variables.MaxConnections)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL max_connections=%d", variables.MaxConnections)); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (u *MysqlService) LoadVariables(version string) (*dto.MysqlVariables, error) {
-	db, err := newDatabaseClient()
+func (u *MysqlService) LoadBaseInfo(version string) (*dto.DBBaseInfo, error) {
+	var data dto.DBBaseInfo
+	app, err := mysqlRepo.LoadBaseInfoByVersion(version)
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
+	data.Name = app.Name
+	data.Port = int64(app.Port)
+	data.Password = app.Password
 
-	variableMap, err := handleSql(db, "SHOW	VARIABLES")
+	hosts, err := excuteSqlForRows(app.ContainerName, app.Password, "select host from mysql.user where user='root';")
+	if err != nil {
+		return nil, err
+	}
+	for _, host := range hosts {
+		if host == "%" {
+			data.RemoteConn = true
+			break
+		}
+	}
+	return &data, nil
+}
+
+func (u *MysqlService) LoadVariables(version string) (*dto.MysqlVariables, error) {
+	app, err := mysqlRepo.LoadBaseInfoByVersion(version)
+	if err != nil {
+		return nil, err
+	}
+	variableMap, err := excuteSqlForMaps(app.ContainerName, app.Password, "show global variables;")
 	if err != nil {
 		return nil, err
 	}
@@ -240,51 +285,89 @@ func (u *MysqlService) LoadVariables(version string) (*dto.MysqlVariables, error
 }
 
 func (u *MysqlService) LoadStatus(version string) (*dto.MysqlStatus, error) {
-	db, err := newDatabaseClient()
+	app, err := mysqlRepo.LoadBaseInfoByVersion(version)
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
 
-	globalMap, err := handleSql(db, "SHOW GLOBAL STATUS")
+	statusMap, err := excuteSqlForMaps(app.ContainerName, app.Password, "show global status;")
 	if err != nil {
 		return nil, err
 	}
+
 	var info dto.MysqlStatus
-	arr, err := json.Marshal(globalMap)
+	arr, err := json.Marshal(statusMap)
 	if err != nil {
 		return nil, err
 	}
 	_ = json.Unmarshal(arr, &info)
 
-	if value, ok := globalMap["Run"]; ok {
+	if value, ok := statusMap["Run"]; ok {
 		uptime, _ := strconv.Atoi(value)
 		info.Run = time.Unix(time.Now().Unix()-int64(uptime), 0).Format("2006-01-02 15:04:05")
 	} else {
-		if value, ok := globalMap["Uptime"]; ok {
+		if value, ok := statusMap["Uptime"]; ok {
 			uptime, _ := strconv.Atoi(value)
 			info.Run = time.Unix(time.Now().Unix()-int64(uptime), 0).Format("2006-01-02 15:04:05")
 		}
 	}
 
-	rows, err := db.Query("SHOW MASTER STATUS")
+	info.File = "OFF"
+	info.Position = "OFF"
+	rows, err := excuteSqlForRows(app.ContainerName, app.Password, "show master status;")
 	if err != nil {
-		return &info, err
+		return nil, err
 	}
-	masterRows := make([]string, 5)
-	for rows.Next() {
-		if err := rows.Scan(&masterRows[0], &masterRows[1], &masterRows[2], &masterRows[3], &masterRows[4]); err != nil {
-			return &info, err
+	if len(rows) > 2 {
+		itemValue := strings.Split(rows[1], "\t")
+		if len(itemValue) > 2 {
+			info.File = itemValue[0]
+			info.Position = itemValue[1]
 		}
-	}
-	info.File = masterRows[0]
-	if len(masterRows[0]) == 0 {
-		info.File = "OFF"
-	}
-	info.Position = masterRows[1]
-	if len(masterRows[1]) == 0 {
-		info.Position = "OFF"
 	}
 
 	return &info, nil
+}
+
+func excuteSqlForMaps(containerName, password, command string) (map[string]string, error) {
+	cmd := exec.Command("docker", "exec", "-i", containerName, "mysql", "-uroot", fmt.Sprintf("-p%s", password), "-e", command)
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return nil, err
+	}
+
+	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
+	rows := strings.Split(stdStr, "\n")
+	rowMap := make(map[string]string)
+	for _, v := range rows {
+		itemRow := strings.Split(v, "\t")
+		if len(itemRow) == 2 {
+			rowMap[itemRow[0]] = itemRow[1]
+		}
+	}
+	return rowMap, nil
+}
+
+func excuteSqlForRows(containerName, password, command string) ([]string, error) {
+	cmd := exec.Command("docker", "exec", "-i", containerName, "mysql", "-uroot", fmt.Sprintf("-p%s", password), "-e", command)
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return nil, err
+	}
+	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
+	return strings.Split(stdStr, "\n"), nil
+}
+
+func excuteSql(containerName, password, command string) error {
+	cmd := exec.Command("docker", "exec", "-i", containerName, "mysql", "-uroot", fmt.Sprintf("-p%s", password), "-e", command)
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return err
+	}
+	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
+
+	if strings.HasPrefix(string(stdStr), "ERROR ") {
+		return errors.New(string(stdStr))
+	}
+	return nil
 }

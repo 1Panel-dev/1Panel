@@ -1,4 +1,9 @@
+import { ReqPage } from '.';
+
 export namespace Database {
+    export interface Search extends ReqPage {
+        version: string;
+    }
     export interface MysqlDBInfo {
         id: number;
         createdAt: Date;
@@ -8,6 +13,12 @@ export namespace Database {
         password: string;
         permission: string;
         description: string;
+    }
+    export interface BaseInfo {
+        name: string;
+        port: number;
+        password: string;
+        remoteConn: boolean;
     }
     export interface MysqlDBCreate {
         name: string;
@@ -74,6 +85,7 @@ export namespace Database {
     }
     export interface ChangeInfo {
         id: number;
+        version: string;
         operation: string;
         value: string;
     }

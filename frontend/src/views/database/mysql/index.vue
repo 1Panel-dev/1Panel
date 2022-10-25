@@ -2,11 +2,12 @@
     <div>
         <Submenu activeName="mysql" />
         <el-dropdown size="default" split-button style="margin-top: 20px; margin-bottom: 5px">
-            Mysql 版本 {{ version }}
+            {{ version }}
             <template #dropdown>
                 <el-dropdown-menu v-model="version">
-                    <el-dropdown-item @click="version = '5.7.39'">5.7.39</el-dropdown-item>
-                    <el-dropdown-item @click="version = '8.0.30'">8.0.30</el-dropdown-item>
+                    <el-dropdown-item v-for="item in mysqlVersions" :key="item" @click="onChangeVersion(item)">
+                        {{ item }}
+                    </el-dropdown-item>
                 </el-dropdown-menu>
             </template>
         </el-dropdown>
@@ -116,16 +117,16 @@ import Setting from '@/views/database/mysql/setting/index.vue';
 import Submenu from '@/views/database/index.vue';
 import { dateFromat } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
-import { deleteMysqlDB, searchMysqlDBs, updateMysqlDBInfo } from '@/api/modules/database';
+import { deleteMysqlDB, loadVersions, searchMysqlDBs, updateMysqlDBInfo } from '@/api/modules/database';
 import i18n from '@/lang';
-import { Cronjob } from '@/api/interface/cronjob';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElForm, ElMessage } from 'element-plus';
 import { Database } from '@/api/interface/database';
 import { Rules } from '@/global/form-rules';
 
 const selects = ref<any>([]);
-const version = ref<string>('5.7.39');
+const mysqlVersions = ref();
+const version = ref<string>('5.7');
 const isOnSetting = ref<boolean>();
 
 const data = ref();
@@ -162,6 +163,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const changeFormRef = ref<FormInstance>();
 const changeForm = reactive({
     id: 0,
+    version: '',
     userName: '',
     password: '',
     operation: '',
@@ -170,11 +172,11 @@ const changeForm = reactive({
     value: '',
 });
 const submitChangeInfo = async (formEl: FormInstance | undefined) => {
-    console.log(formEl);
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
         changeForm.value = changeForm.operation === 'password' ? changeForm.password : changeForm.privilege;
+        changeForm.version = version.value;
         await updateMysqlDBInfo(changeForm);
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         search();
@@ -182,22 +184,43 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
     });
 };
 
+const loadRunningOptions = async () => {
+    const res = await loadVersions();
+    mysqlVersions.value = res.data;
+    if (mysqlVersions.value.length != 0) {
+        version.value = mysqlVersions.value[0];
+        search();
+    }
+};
+
+const onChangeVersion = async (val: string) => {
+    version.value = val;
+    search();
+    if (isOnSetting.value) {
+        let params = {
+            version: version.value,
+        };
+        settingRef.value!.acceptParams(params);
+    }
+};
+
 const search = async () => {
     let params = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
+        version: version.value,
     };
     const res = await searchMysqlDBs(params);
     data.value = res.data.items || [];
     paginationConfig.total = res.data.total;
 };
 
-const onBatchDelete = async (row: Cronjob.CronjobInfo | null) => {
+const onBatchDelete = async (row: Database.MysqlDBInfo | null) => {
     let ids: Array<number> = [];
     if (row) {
         ids.push(row.id);
     } else {
-        selects.value.forEach((item: Cronjob.CronjobInfo) => {
+        selects.value.forEach((item: Database.MysqlDBInfo) => {
             ids.push(item.id);
         });
     }
@@ -230,25 +253,25 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.backupList') + '(1)',
-        click: (row: Cronjob.CronjobInfo) => {
+        click: (row: Database.MysqlDBInfo) => {
             onBatchDelete(row);
         },
     },
     {
         label: i18n.global.t('database.loadBackup'),
-        click: (row: Cronjob.CronjobInfo) => {
+        click: (row: Database.MysqlDBInfo) => {
             onBatchDelete(row);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        click: (row: Cronjob.CronjobInfo) => {
+        click: (row: Database.MysqlDBInfo) => {
             onBatchDelete(row);
         },
     },
 ];
 
 onMounted(() => {
-    search();
+    loadRunningOptions();
 });
 </script>

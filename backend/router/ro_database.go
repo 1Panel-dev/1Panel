@@ -26,7 +26,9 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		withRecordRouter.POST("/del", baseApi.DeleteMysql)
 		withRecordRouter.POST("/variables/update", baseApi.UpdateMysqlVariables)
 		cmdRouter.POST("/search", baseApi.SearchMysql)
-		cmdRouter.GET("/conf", baseApi.LoadConf)
-		cmdRouter.GET("/status", baseApi.LoadStatus)
+		cmdRouter.GET("/variables/:version", baseApi.LoadVariables)
+		cmdRouter.GET("/status/:version", baseApi.LoadStatus)
+		cmdRouter.GET("/baseinfo/:version", baseApi.LoadBaseinfo)
+		cmdRouter.GET("/versions", baseApi.LoadVersions)
 	}
 }
