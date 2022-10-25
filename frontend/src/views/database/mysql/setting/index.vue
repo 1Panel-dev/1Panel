@@ -2,7 +2,7 @@
     <div class="demo-collapse" v-if="onSetting">
         <el-card>
             <el-collapse v-model="activeName" accordion>
-                <el-collapse-item title="基础设置" name="1">
+                <el-collapse-item :title="$t('database.baseSetting')" name="1">
                     <el-form :model="form" ref="panelFormRef" label-width="120px">
                         <el-row>
                             <el-col :span="1"><br /></el-col>
@@ -47,7 +47,7 @@
                         </el-row>
                     </el-form>
                 </el-collapse-item>
-                <el-collapse-item title="配置修改" name="2">
+                <el-collapse-item :title="$t('database.confChange')" name="2">
                     <codemirror
                         :autofocus="true"
                         placeholder="None data"
@@ -70,25 +70,25 @@
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </el-collapse-item>
-                <el-collapse-item title="当前状态" name="3">
+                <el-collapse-item :title="$t('database.currentStatus')" name="3">
                     <el-row :gutter="20">
                         <el-col :span="1"><br /></el-col>
                         <el-col :span="6">
                             <table style="width: 100%" class="myTable">
                                 <tr>
-                                    <td>启动时间</td>
+                                    <td>{{ $t('database.runTime') }}</td>
                                     <td>{{ mysqlStatus.run }}</td>
                                 </tr>
                                 <tr>
-                                    <td>总连接次数</td>
+                                    <td>{{ $t('database.connections') }}</td>
                                     <td>{{ mysqlStatus.connections }}</td>
                                 </tr>
                                 <tr>
-                                    <td>发送</td>
+                                    <td>{{ $t('database.bytesSent') }}</td>
                                     <td>{{ mysqlStatus!.bytesSent }}</td>
                                 </tr>
                                 <tr>
-                                    <td>接收</td>
+                                    <td>{{ $t('database.bytesReceived') }}</td>
                                     <td>{{ mysqlStatus!.bytesReceived }}</td>
                                 </tr>
                             </table>
@@ -96,11 +96,11 @@
                         <el-col :span="6">
                             <table style="width: 100%" class="myTable">
                                 <tr>
-                                    <td>每秒查询</td>
+                                    <td>{{ $t('database.queryPerSecond') }}</td>
                                     <td>{{ mysqlStatus!.queryPerSecond }}</td>
                                 </tr>
                                 <tr>
-                                    <td>每秒事务</td>
+                                    <td>{{ $t('database.queryPerSecond') }}</td>
                                     <td>{{ mysqlStatus!.txPerSecond }}</td>
                                 </tr>
                                 <tr>
@@ -119,157 +119,184 @@
                         <el-col :span="12">
                             <table style="margin-top: 20px; width: 100%" class="myTable">
                                 <tr>
-                                    <td>活动/峰值连接数</td>
+                                    <td>{{ $t('database.queryPerSecond') }}</td>
                                     <td>{{ mysqlStatus!.connInfo }}</td>
-                                    <td>若值过大,增加max_connections</td>
+                                    <td>{{ $t('database.connInfoHelper') }}</td>
                                 </tr>
                                 <tr>
-                                    <td>线程缓存命中率</td>
+                                    <td>{{ $t('database.threadCacheHit') }}</td>
                                     <td>{{ mysqlStatus!.threadCacheHit }}</td>
-                                    <td>若过低,增加thread_cache_size</td>
+                                    <td>{{ $t('database.threadCacheHitHelper') }}</td>
                                 </tr>
                                 <tr>
-                                    <td>索引命中率</td>
+                                    <td>{{ $t('database.indexHit') }}</td>
                                     <td>{{ mysqlStatus!.indexHit }}</td>
-                                    <td>若过低,增加key_buffer_size</td>
+                                    <td>{{ $t('database.indexHitHelper') }}</td>
                                 </tr>
                                 <tr>
-                                    <td>Innodb 索引命中率</td>
+                                    <td>{{ $t('database.innodbIndexHit') }}</td>
                                     <td>{{ mysqlStatus!.innodbIndexHit }}</td>
-                                    <td>若过低,增加innodb_buffer_pool_size</td>
+                                    <td>{{ $t('database.innodbIndexHitHelper') }}</td>
                                 </tr>
                                 <tr>
-                                    <td>查询缓存命中率</td>
+                                    <td>{{ $t('database.cacheHit') }}</td>
                                     <td>{{ mysqlStatus!.cacheHit }}</td>
-                                    <td>若过低,增加query_cache_size</td>
+                                    <td>{{ $t('database.cacheHitHelper') }}</td>
                                 </tr>
                                 <tr>
-                                    <td>创建临时表到磁盘</td>
+                                    <td>{{ $t('database.tmpTableToDB') }}</td>
                                     <td>{{ mysqlStatus!.tmpTableToDB }}</td>
-                                    <td>若过大,尝试增加tmp_table_size</td>
+                                    <td>{{ $t('database.tmpTableToDBHelper') }}</td>
                                 </tr>
                                 <tr>
-                                    <td>已打开的表</td>
+                                    <td>{{ $t('database.openTables') }}</td>
                                     <td>{{ mysqlStatus!.openTables }}</td>
-                                    <td>table_open_cache配置值应大于等于此值</td>
+                                    <td>{{ $t('database.openTablesHelper') }}</td>
                                 </tr>
                                 <tr>
-                                    <td>没有使用索引的量</td>
+                                    <td>{{ $t('database.selectFullJoin') }}</td>
                                     <td>{{ mysqlStatus!.selectFullJoin }}</td>
-                                    <td>若不为0,请检查数据表的索引是否合理</td>
+                                    <td>{{ $t('database.selectFullJoinHelper') }}</td>
                                 </tr>
                                 <tr>
-                                    <td>没有索引的JOIN量</td>
+                                    <td>{{ $t('database.selectRangeCheck') }}</td>
                                     <td>{{ mysqlStatus!.selectRangeCheck }}</td>
-                                    <td>若不为0,请检查数据表的索引是否合理</td>
+                                    <td>{{ $t('database.selectRangeCheckHelper') }}</td>
                                 </tr>
                                 <tr>
-                                    <td>排序后的合并次数</td>
+                                    <td>{{ $t('database.sortMergePasses') }}</td>
                                     <td>{{ mysqlStatus!.sortMergePasses }}</td>
-                                    <td>若值过大,增加sort_buffer_size</td>
+                                    <td>{{ $t('database.sortMergePassesHelper') }}</td>
                                 </tr>
                                 <tr>
-                                    <td>锁表次数</td>
+                                    <td>{{ $t('database.tableLocksWaited') }}</td>
                                     <td>{{ mysqlStatus!.tableLocksWaited }}</td>
-                                    <td>若值过大,请考虑增加您的数据库性能</td>
+                                    <td>{{ $t('database.tableLocksWaitedHelper') }}</td>
                                 </tr>
                             </table>
                         </el-col>
                     </el-row>
                 </el-collapse-item>
-                <el-collapse-item title="性能调整" name="4">
+                <el-collapse-item :title="$t('database.performanceTuning')" name="4">
                     <el-card>
-                        <el-form :model="form" ref="panelFormRef" label-width="160px">
+                        <el-form
+                            :model="mysqlVariables"
+                            :rules="variablesRules"
+                            ref="variableFormRef"
+                            label-width="160px"
+                        >
                             <el-row>
                                 <el-col :span="1"><br /></el-col>
-                                <el-col :span="6">
-                                    <el-form-item label="key_buffer_size">
-                                        <el-input clearable v-model="mysqlVariables.key_buffer_size">
+                                <el-col :span="9">
+                                    <el-form-item :label="$t('database.optimizationScheme')">
+                                        <el-select @change="changePlan" clearable v-model="plan">
+                                            <el-option
+                                                v-for="item in planOptions"
+                                                :key="item.id"
+                                                :label="item.title"
+                                                :value="item.id"
+                                            />
+                                        </el-select>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="1"><br /></el-col>
+                                <el-col :span="9">
+                                    <el-form-item label="key_buffer_size" prop="key_buffer_size">
+                                        <el-input clearable v-model.number="mysqlVariables.key_buffer_size">
                                             <template #append>MB</template>
                                         </el-input>
-                                        <span class="input-help">用于索引的缓冲区大小</span>
+                                        <span class="input-help">{{ $t('database.keyBufferSizeHelper') }}</span>
                                     </el-form-item>
-                                    <el-form-item label="query_cache_size">
-                                        <el-input clearable v-model="mysqlVariables.query_cache_size">
+                                    <el-form-item label="query_cache_size" prop="query_cache_size">
+                                        <el-input clearable v-model.number="mysqlVariables.query_cache_size">
                                             <template #append>MB</template>
                                         </el-input>
-                                        <span class="input-help">查询缓存,不开启请设为0</span>
+                                        <span class="input-help">{{ $t('database.queryCacheSizeHelper') }}</span>
                                     </el-form-item>
-                                    <el-form-item label="tmp_table_size">
-                                        <el-input clearable v-model="mysqlVariables.tmp_table_size">
+                                    <el-form-item label="tmp_table_size" prop="tmp_table_size">
+                                        <el-input clearable v-model.number="mysqlVariables.tmp_table_size">
                                             <template #append>MB</template>
                                         </el-input>
-                                        <span class="input-help">临时表缓存大小</span>
+                                        <span class="input-help">{{ $t('database.tmpTableSizeHelper') }}</span>
                                     </el-form-item>
-                                    <el-form-item label="innodb_buffer_pool_size">
-                                        <el-input clearable v-model="mysqlVariables.innodb_buffer_pool_size">
+                                    <el-form-item label="innodb_buffer_pool_size" prop="innodb_buffer_pool_size">
+                                        <el-input clearable v-model.number="mysqlVariables.innodb_buffer_pool_size">
                                             <template #append>MB</template>
                                         </el-input>
-                                        <span class="input-help">Innodb缓冲区大小</span>
+                                        <span class="input-help">{{ $t('database.innodbBufferPoolSizeHelper') }}</span>
                                     </el-form-item>
-                                    <el-form-item label="innodb_log_buffer_size">
-                                        <el-input clearable v-model="mysqlVariables.innodb_log_buffer_size">
+                                    <el-form-item label="innodb_log_buffer_size" prop="innodb_log_buffer_size">
+                                        <el-input clearable v-model.number="mysqlVariables.innodb_log_buffer_size">
                                             <template #append>MB</template>
                                         </el-input>
-                                        <span class="input-help">Innodb日志缓冲区大小</span>
+                                        <span class="input-help">{{ $t('database.innodbLogBufferSizeHelper') }}</span>
                                     </el-form-item>
-                                    <el-form-item label="sort_buffer_size">
-                                        <el-input clearable v-model="mysqlVariables.sort_buffer_size">
+                                    <el-form-item label="sort_buffer_size" prop="sort_buffer_size">
+                                        <el-input clearable v-model.number="mysqlVariables.sort_buffer_size">
                                             <template #append>KB</template>
                                         </el-input>
-                                        <span class="input-help">* 连接数, 每个线程排序的缓冲大小</span>
+                                        <span class="input-help">{{ $t('database.sortBufferSizeHelper') }}</span>
                                     </el-form-item>
-                                    <el-form-item label="read_buffer_size">
-                                        <el-input clearable v-model="mysqlVariables.read_buffer_size">
+                                    <el-form-item label="read_buffer_size" prop="read_buffer_size">
+                                        <el-input clearable v-model.number="mysqlVariables.read_buffer_size">
                                             <template #append>KB</template>
                                         </el-input>
-                                        <span class="input-help">* 连接数, 读入缓冲区大小</span>
+                                        <span class="input-help">{{ $t('database.readBufferSizeHelper') }}</span>
                                     </el-form-item>
 
                                     <el-form-item>
-                                        <el-button icon="Collection" type="primary" size="default">
+                                        <el-button
+                                            icon="Collection"
+                                            @click="onSaveVariables(variableFormRef)"
+                                            type="primary"
+                                            size="default"
+                                        >
                                             {{ $t('commons.button.save') }}
                                         </el-button>
-                                        <el-button icon="RefreshLeft" size="default">重启数据库</el-button>
+                                        <el-button icon="RefreshLeft" size="default">
+                                            {{ $t('database.restart') }}
+                                        </el-button>
                                     </el-form-item>
                                 </el-col>
                                 <el-col :span="2"><br /></el-col>
-                                <el-col :span="6">
-                                    <el-form-item label="read_rnd_buffer_size">
-                                        <el-input clearable v-model="mysqlVariables.read_rnd_buffer_size">
+                                <el-col :span="9">
+                                    <el-form-item label="read_rnd_buffer_size" prop="read_rnd_buffer_size">
+                                        <el-input clearable v-model.number="mysqlVariables.read_rnd_buffer_size">
                                             <template #append>KB</template>
                                         </el-input>
-                                        <span class="input-help">* 连接数, 随机读取缓冲区大小</span>
+                                        <span class="input-help">{{ $t('database.readRndBufferSizeHelper') }}</span>
                                     </el-form-item>
-                                    <el-form-item label="join_buffer_size">
-                                        <el-input clearable v-model="mysqlVariables.join_buffer_size">
+                                    <el-form-item label="join_buffer_size" prop="join_buffer_size">
+                                        <el-input clearable v-model.number="mysqlVariables.join_buffer_size">
                                             <template #append>KB</template>
                                         </el-input>
-                                        <span class="input-help">* 连接数, 关联表缓存大小</span>
+                                        <span class="input-help">{{ $t('database.joinBufferSizeHelper') }}</span>
                                     </el-form-item>
-                                    <el-form-item label="thread_stack">
-                                        <el-input clearable v-model="mysqlVariables.thread_stack">
+                                    <el-form-item label="thread_stack" prop="thread_stack">
+                                        <el-input clearable v-model.number="mysqlVariables.thread_stack">
                                             <template #append>KB</template>
                                         </el-input>
-                                        <span class="input-help">* 连接数, 每个线程的堆栈大小</span>
+                                        <span class="input-help">{{ $t('database.threadStackelper') }}</span>
                                     </el-form-item>
-                                    <el-form-item label="binlog_cache_size">
-                                        <el-input clearable v-model="mysqlVariables.binlog_cache_size">
+                                    <el-form-item label="binlog_cache_size" prop="binlog_cache_size">
+                                        <el-input clearable v-model.number="mysqlVariables.binlog_cache_size">
                                             <template #append>KB</template>
                                         </el-input>
-                                        <span class="input-help">* 连接数, 二进制日志缓存大小(4096的倍数)</span>
+                                        <span class="input-help">{{ $t('database.binlogCacheSizeHelper') }}</span>
                                     </el-form-item>
-                                    <el-form-item label="thread_cache_size">
-                                        <el-input clearable v-model="mysqlVariables.thread_cache_size" />
-                                        <span class="input-help">线程池大小</span>
+                                    <el-form-item label="thread_cache_size" prop="thread_cache_size">
+                                        <el-input clearable v-model.number="mysqlVariables.thread_cache_size" />
+                                        <span class="input-help">{{ $t('database.threadCacheSizeHelper') }}</span>
                                     </el-form-item>
-                                    <el-form-item label="table_open_cache">
-                                        <el-input clearable v-model="mysqlVariables.table_open_cache" />
-                                        <span class="input-help">表缓存</span>
+                                    <el-form-item label="table_open_cache" prop="table_open_cache">
+                                        <el-input clearable v-model.number="mysqlVariables.table_open_cache" />
+                                        <span class="input-help">{{ $t('database.tableOpenCacheHelper') }}</span>
                                     </el-form-item>
-                                    <el-form-item label="max_connections">
-                                        <el-input clearable v-model="mysqlVariables.max_connections" />
-                                        <span class="input-help">最大连接数</span>
+                                    <el-form-item label="max_connections" prop="max_connections">
+                                        <el-input clearable v-model.number="mysqlVariables.max_connections" />
+                                        <span class="input-help">{{ $t('database.maxConnectionsHelper') }}</span>
                                     </el-form-item>
                                 </el-col>
                             </el-row>
@@ -283,15 +310,17 @@
 </template>
 
 <script lang="ts" setup>
-import { FormInstance } from 'element-plus';
+import { ElMessage, FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { LoadFile } from '@/api/modules/files';
-import { loadMysqlStatus, loadMysqlVariables } from '@/api/modules/database';
-import { Database } from '@/api/interface/database';
+import { planOptions } from './helper';
+import { loadMysqlStatus, loadMysqlVariables, updateMysqlVariables } from '@/api/modules/database';
 import { computeSize } from '@/utils/util';
+import { Rules } from '@/global/form-rules';
+import i18n from '@/lang';
 
 const extensions = [javascript(), oneDark];
 const activeName = ref('1');
@@ -309,7 +338,12 @@ const form = reactive({
 });
 const panelFormRef = ref<FormInstance>();
 const mysqlConf = ref();
-const mysqlVariables = reactive<Database.MysqlVariables>({
+
+const plan = ref();
+
+const variableFormRef = ref<FormInstance>();
+let mysqlVariables = reactive({
+    version: '',
     key_buffer_size: 0,
     query_cache_size: 0,
     tmp_table_size: 0,
@@ -324,6 +358,22 @@ const mysqlVariables = reactive<Database.MysqlVariables>({
     thread_cache_size: 0,
     table_open_cache: 0,
     max_connections: 0,
+});
+const variablesRules = reactive({
+    key_buffer_size: [Rules.number],
+    query_cache_size: [Rules.number],
+    tmp_table_size: [Rules.number],
+    innodb_buffer_pool_size: [Rules.number],
+    innodb_log_buffer_size: [Rules.number],
+    sort_buffer_size: [Rules.number],
+    read_buffer_size: [Rules.number],
+    read_rnd_buffer_size: [Rules.number],
+    join_buffer_size: [Rules.number],
+    thread_stack: [Rules.number],
+    binlog_cache_size: [Rules.number],
+    thread_cache_size: [Rules.number],
+    table_open_cache: [Rules.number],
+    max_connections: [Rules.number],
 });
 let mysqlStatus = reactive({
     run: 0,
@@ -350,12 +400,17 @@ let mysqlStatus = reactive({
 });
 
 const onSetting = ref<boolean>(false);
+const paramVersion = ref();
 
-const acceptParams = (): void => {
+interface DialogProps {
+    version: string;
+}
+const acceptParams = (params: DialogProps): void => {
     onSetting.value = true;
     loadMysqlConf('/opt/1Panel/conf/mysql.conf');
     loadStatus();
     loadVariables();
+    paramVersion.value = params.version;
 };
 const onClose = (): void => {
     onSetting.value = false;
@@ -372,21 +427,70 @@ const loadMysqlConf = async (path: string) => {
 
 const loadVariables = async () => {
     const res = await loadMysqlVariables();
-    mysqlVariables.key_buffer_size = res.data.key_buffer_size / 1024 / 1024;
-    mysqlVariables.query_cache_size = res.data.query_cache_size / 1024 / 1024;
-    mysqlVariables.tmp_table_size = res.data.tmp_table_size / 1024 / 1024;
-    mysqlVariables.innodb_buffer_pool_size = res.data.innodb_buffer_pool_size / 1024 / 1024;
-    mysqlVariables.innodb_log_buffer_size = res.data.innodb_log_buffer_size / 1024 / 1024;
+    mysqlVariables.key_buffer_size = Number(res.data.key_buffer_size) / 1024 / 1024;
+    mysqlVariables.query_cache_size = Number(res.data.query_cache_size) / 1024 / 1024;
+    mysqlVariables.tmp_table_size = Number(res.data.tmp_table_size) / 1024 / 1024;
+    mysqlVariables.innodb_buffer_pool_size = Number(res.data.innodb_buffer_pool_size) / 1024 / 1024;
+    mysqlVariables.innodb_log_buffer_size = Number(res.data.innodb_log_buffer_size) / 1024 / 1024;
 
-    mysqlVariables.sort_buffer_size = res.data.sort_buffer_size / 1024;
-    mysqlVariables.read_buffer_size = res.data.read_buffer_size / 1024;
-    mysqlVariables.read_rnd_buffer_size = res.data.read_rnd_buffer_size / 1024;
-    mysqlVariables.join_buffer_size = res.data.join_buffer_size / 1024;
-    mysqlVariables.thread_stack = res.data.thread_stack / 1024;
-    mysqlVariables.binlog_cache_size = res.data.binlog_cache_size / 1024;
-    mysqlVariables.thread_cache_size = res.data.thread_cache_size;
-    mysqlVariables.table_open_cache = res.data.table_open_cache;
-    mysqlVariables.max_connections = res.data.max_connections;
+    mysqlVariables.sort_buffer_size = Number(res.data.sort_buffer_size) / 1024;
+    mysqlVariables.read_buffer_size = Number(res.data.read_buffer_size) / 1024;
+    mysqlVariables.read_rnd_buffer_size = Number(res.data.read_rnd_buffer_size) / 1024;
+    mysqlVariables.join_buffer_size = Number(res.data.join_buffer_size) / 1024;
+    mysqlVariables.thread_stack = Number(res.data.thread_stack) / 1024;
+    mysqlVariables.binlog_cache_size = Number(res.data.binlog_cache_size) / 1024;
+    mysqlVariables.thread_cache_size = Number(res.data.thread_cache_size);
+    mysqlVariables.table_open_cache = Number(res.data.table_open_cache);
+    mysqlVariables.max_connections = Number(res.data.max_connections);
+};
+
+const changePlan = async () => {
+    for (const item of planOptions) {
+        if (item.id === plan.value) {
+            mysqlVariables.key_buffer_size = item.data.key_buffer_size;
+            mysqlVariables.query_cache_size = item.data.query_cache_size;
+            mysqlVariables.tmp_table_size = item.data.tmp_table_size;
+            mysqlVariables.innodb_buffer_pool_size = item.data.innodb_buffer_pool_size;
+
+            mysqlVariables.sort_buffer_size = item.data.sort_buffer_size;
+            mysqlVariables.read_buffer_size = item.data.read_buffer_size;
+            mysqlVariables.read_rnd_buffer_size = item.data.read_rnd_buffer_size;
+            mysqlVariables.join_buffer_size = item.data.join_buffer_size;
+            mysqlVariables.thread_stack = item.data.thread_stack;
+            mysqlVariables.binlog_cache_size = item.data.binlog_cache_size;
+            mysqlVariables.thread_cache_size = item.data.thread_cache_size;
+            mysqlVariables.table_open_cache = item.data.table_open_cache;
+            mysqlVariables.max_connections = item.data.max_connections;
+            break;
+        }
+    }
+};
+
+const onSaveVariables = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    formEl.validate(async (valid) => {
+        if (!valid) return;
+        let itemForm = {
+            version: paramVersion.value,
+            key_buffer_size: mysqlVariables.key_buffer_size * 1024 * 1024,
+            query_cache_size: mysqlVariables.query_cache_size * 1024 * 1024,
+            tmp_table_size: mysqlVariables.tmp_table_size * 1024 * 1024,
+            innodb_buffer_pool_size: mysqlVariables.innodb_buffer_pool_size * 1024 * 1024,
+            innodb_log_buffer_size: mysqlVariables.innodb_log_buffer_size * 1024 * 1024,
+
+            sort_buffer_size: mysqlVariables.sort_buffer_size * 1024,
+            read_buffer_size: mysqlVariables.read_buffer_size * 1024,
+            read_rnd_buffer_size: mysqlVariables.read_rnd_buffer_size * 1024,
+            join_buffer_size: mysqlVariables.join_buffer_size * 1024,
+            thread_stack: mysqlVariables.thread_stack * 1024,
+            binlog_cache_size: mysqlVariables.binlog_cache_size * 1024,
+            thread_cache_size: mysqlVariables.thread_cache_size,
+            table_open_cache: mysqlVariables.table_open_cache,
+            max_connections: mysqlVariables.max_connections,
+        };
+        await updateMysqlVariables(itemForm);
+        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    });
 };
 
 const loadStatus = async () => {

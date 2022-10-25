@@ -80,6 +80,25 @@ type MysqlVariables struct {
 	Tmp_tableSize        string `json:"tmp_table_size"`
 }
 
+type MysqlVariablesUpdate struct {
+	Version              string `json:"version" validate:"required"`
+	KeyBufferSize        int64  `json:"key_buffer_size" validate:"required"`
+	QueryCacheSize       int64  `json:"query_cache_size" validate:"required"`
+	TmpTableSize         int64  `json:"tmp_table_size" validate:"required"`
+	InnodbBufferPoolSize int64  `json:"innodb_buffer_pool_size" validate:"required"`
+	InnodbLogBufferSize  int64  `json:"innodb_log_buffer_size" validate:"required"`
+	SortBufferSize       int64  `json:"sort_buffer_size" validate:"required"`
+	ReadBufferSize       int64  `json:"read_buffer_size" validate:"required"`
+
+	ReadRndBufferSize int64 `json:"read_rnd_buffer_size" validate:"required"`
+	JoinBufferSize    int64 `json:"join_buffer_size" validate:"required"`
+	ThreadStack       int64 `json:"thread_stack" validate:"required"`
+	BinlogCachSize    int64 `json:"binlog_cache_size" validate:"required"`
+	ThreadCacheSize   int64 `json:"thread_cache_size" validate:"required"`
+	TableOpenCache    int64 `json:"table_open_cache" validate:"required"`
+	MaxConnections    int64 `json:"max_connections" validate:"required"`
+}
+
 type ChangeDBInfo struct {
 	ID        uint   `json:"id" validate:"required"`
 	Operation string `json:"operation" validate:"required,oneof=password privilege"`

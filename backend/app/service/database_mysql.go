@@ -20,6 +20,7 @@ type IMysqlService interface {
 	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
 	Create(mysqlDto dto.MysqlDBCreate) error
 	ChangeInfo(info dto.ChangeDBInfo) error
+	UpdateVariables(variables dto.MysqlVariablesUpdate) error
 	Delete(ids []uint) error
 	LoadStatus(version string) (*dto.MysqlStatus, error)
 	LoadVariables(version string) (*dto.MysqlVariables, error)
@@ -160,6 +161,60 @@ func (u *MysqlService) ChangeInfo(info dto.ChangeDBInfo) error {
 		return err
 	}
 	_ = mysqlRepo.Update(mysql.ID, map[string]interface{}{"permission": info.Value})
+
+	return nil
+}
+
+func (u *MysqlService) UpdateVariables(variables dto.MysqlVariablesUpdate) error {
+	db, err := newDatabaseClient()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL key_buffer_size=%d", variables.KeyBufferSize)); err != nil {
+		return err
+	}
+	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL query_cache_size=%d", variables.QueryCacheSize)); err != nil {
+		return err
+	}
+	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL tmp_table_size=%d", variables.TmpTableSize)); err != nil {
+		return err
+	}
+	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL innodb_buffer_pool_size=%d", variables.InnodbBufferPoolSize)); err != nil {
+		return err
+	}
+	// if _, err := db.Exec(fmt.Sprintf("SET GLOBAL innodb_log_buffer_size=%d", variables.InnodbLogBufferSize)); err != nil {
+	// 	return err
+	// }
+	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL sort_buffer_size=%d", variables.SortBufferSize)); err != nil {
+		return err
+	}
+	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL read_buffer_size=%d", variables.ReadBufferSize)); err != nil {
+		return err
+	}
+
+	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL read_rnd_buffer_size=%d", variables.ReadRndBufferSize)); err != nil {
+		return err
+	}
+	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL join_buffer_size=%d", variables.JoinBufferSize)); err != nil {
+		return err
+	}
+	// if _, err := db.Exec(fmt.Sprintf("SET GLOBAL thread_stack=%d", variables.ThreadStack)); err != nil {
+	// 	return err
+	// }
+	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL binlog_cache_size=%d", variables.BinlogCachSize)); err != nil {
+		return err
+	}
+	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL thread_cache_size=%d", variables.ThreadCacheSize)); err != nil {
+		return err
+	}
+	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL table_open_cache=%d", variables.TableOpenCache)); err != nil {
+		return err
+	}
+	if _, err := db.Exec(fmt.Sprintf("SET GLOBAL max_connections=%d", variables.MaxConnections)); err != nil {
+		return err
+	}
 
 	return nil
 }
