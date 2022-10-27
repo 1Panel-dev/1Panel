@@ -4,6 +4,19 @@ export namespace Database {
     export interface Search extends ReqPage {
         version: string;
     }
+    export interface SearchBackupRecord extends ReqPage {
+        version: string;
+        dbName: string;
+    }
+    export interface Backup {
+        version: string;
+        dbName: string;
+    }
+    export interface Recover {
+        version: string;
+        dbName: string;
+        backupName: string;
+    }
     export interface MysqlDBInfo {
         id: number;
         createdAt: Date;

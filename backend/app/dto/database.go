@@ -10,6 +10,7 @@ type MysqlDBInfo struct {
 	Username    string    `json:"username"`
 	Password    string    `json:"password"`
 	Permission  string    `json:"permission"`
+	BackupCount int       `json:"backupCount"`
 	Description string    `json:"description"`
 }
 
@@ -115,5 +116,22 @@ type DBBaseInfo struct {
 
 type SearchDBWithPage struct {
 	PageInfo
-	Version string `json:"version"  validate:"required"`
+	Version string `json:"version" validate:"required,oneof=mysql5.7 mysql8.0"`
+}
+
+type SearchBackupsWithPage struct {
+	PageInfo
+	Version string `json:"version" validate:"required,oneof=mysql5.7 mysql8.0"`
+	DBName  string `json:"dbName" validate:"required"`
+}
+
+type BackupDB struct {
+	Version string `json:"version" validate:"required,oneof=mysql5.7 mysql8.0"`
+	DBName  string `json:"dbName" validate:"required"`
+}
+
+type RecoverDB struct {
+	Version    string `json:"version" validate:"required,oneof=mysql5.7 mysql8.0"`
+	DBName     string `json:"dbName" validate:"required"`
+	BackupName string `json:"backupName" validate:"required"`
 }

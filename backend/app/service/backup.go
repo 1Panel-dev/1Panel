@@ -2,10 +2,12 @@ package service
 
 import (
 	"encoding/json"
+	"os"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cloud_storage"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -15,10 +17,12 @@ type BackupService struct{}
 
 type IBackupService interface {
 	List() ([]dto.BackupInfo, error)
+	SearchRecordWithPage(search dto.BackupSearch) (int64, []dto.BackupRecords, error)
 	Create(backupDto dto.BackupOperate) error
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
 	Update(id uint, upMap map[string]interface{}) error
 	BatchDelete(ids []uint) error
+	BatchDeleteRecord(ids []uint) error
 	NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error)
 }
 
@@ -37,6 +41,25 @@ func (u *BackupService) List() ([]dto.BackupInfo, error) {
 		dtobas = append(dtobas, item)
 	}
 	return dtobas, err
+}
+
+func (u *BackupService) SearchRecordWithPage(search dto.BackupSearch) (int64, []dto.BackupRecords, error) {
+	total, records, err := backupRepo.PageRecord(
+		search.Page, search.PageSize,
+		commonRepo.WithOrderBy("created_at desc"),
+		commonRepo.WithByName(search.Name),
+		commonRepo.WithByType(search.Type),
+		backupRepo.WithByDetailName(search.DetailName),
+	)
+	var dtobas []dto.BackupRecords
+	for _, group := range records {
+		var item dto.BackupRecords
+		if err := copier.Copy(&item, &group); err != nil {
+			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		}
+		dtobas = append(dtobas, item)
+	}
+	return total, dtobas, err
 }
 
 func (u *BackupService) Create(backupDto dto.BackupOperate) error {
@@ -78,6 +101,33 @@ func (u *BackupService) GetBuckets(backupDto dto.ForBuckets) ([]interface{}, err
 
 func (u *BackupService) BatchDelete(ids []uint) error {
 	return backupRepo.Delete(commonRepo.WithIdsIn(ids))
+}
+
+func (u *BackupService) BatchDeleteRecord(ids []uint) error {
+	records, err := backupRepo.ListRecord(commonRepo.WithIdsIn(ids))
+	if err != nil {
+		return err
+	}
+	for _, record := range records {
+		if record.Source == "LOCAL" {
+			if err := os.Remove(record.FileDir + record.FileName); err != nil {
+				global.LOG.Errorf("remove file %s failed, err: %v", record.FileDir+record.FileName, err)
+			}
+		} else {
+			backupAccount, err := backupRepo.Get(commonRepo.WithByName(record.Source))
+			if err != nil {
+				return err
+			}
+			client, err := u.NewClient(&backupAccount)
+			if err != nil {
+				return err
+			}
+			if _, err = client.Delete(record.FileDir + record.FileName); err != nil {
+				global.LOG.Errorf("remove file %s from %s failed, err: %v", record.FileDir+record.FileName, record.Source, err)
+			}
+		}
+	}
+	return backupRepo.DeleteRecord(commonRepo.WithIdsIn(ids))
 }
 
 func (u *BackupService) Update(id uint, upMap map[string]interface{}) error {

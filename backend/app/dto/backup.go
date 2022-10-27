@@ -17,6 +17,21 @@ type BackupInfo struct {
 	Vars      string    `json:"vars"`
 }
 
+type BackupSearch struct {
+	PageInfo
+	Type       string `json:"type" validate:"required,oneof=website mysql"`
+	Name       string `json:"name" validate:"required"`
+	DetailName string `json:"detailName"`
+}
+
+type BackupRecords struct {
+	ID        uint      `json:"id"`
+	CreatedAt time.Time `json:"createdAt"`
+	Source    string    `json:"source"`
+	FileDir   string    `json:"fileDir"`
+	FileName  string    `json:"fileName"`
+}
+
 type ForBuckets struct {
 	Type       string `json:"type" validate:"required"`
 	Credential string `json:"credential" validate:"required"`

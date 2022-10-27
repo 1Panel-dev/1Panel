@@ -152,6 +152,8 @@ export default {
         logout: '退出登录',
     },
     database: {
+        source: '来源',
+        backup: '备份数据库',
         permission: '权限',
         permissionLocal: '本地服务器',
         permissionForIP: '指定 IP',

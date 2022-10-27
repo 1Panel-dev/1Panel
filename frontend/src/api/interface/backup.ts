@@ -13,6 +13,13 @@ export namespace Backup {
         credential: string;
         vars: string;
     }
+    export interface RecordInfo {
+        id: number;
+        createdAt: Date;
+        source: string;
+        fileDir: string;
+        fileName: string;
+    }
     export interface ForBucket {
         type: string;
         credential: string;

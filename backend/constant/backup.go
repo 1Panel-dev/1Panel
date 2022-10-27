@@ -8,4 +8,7 @@ const (
 	OSS          = "OSS"
 	Sftp         = "SFTP"
 	MinIo        = "MINIO"
+
+	DatabaseDir = "/opt/1Panel/data/backup/database"
+	WebsiteDir  = "/opt/1Panel/data/backup/website"
 )
