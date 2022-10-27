@@ -126,7 +126,7 @@ var AddTableSetting = &gormigrate.Migration{
 var AddTableBackupAccount = &gormigrate.Migration{
 	ID: "20200916-add-table-backup",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.BackupAccount{}); err != nil {
+		if err := tx.AutoMigrate(&model.BackupAccount{}, &model.BackupRecord{}); err != nil {
 			return err
 		}
 		item := &model.BackupAccount{

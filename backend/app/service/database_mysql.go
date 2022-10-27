@@ -1,8 +1,10 @@
 package service
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -11,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -20,9 +23,14 @@ type MysqlService struct{}
 
 type IMysqlService interface {
 	SearchWithPage(search dto.SearchDBWithPage) (int64, interface{}, error)
+	SearchBacpupsWithPage(search dto.SearchBackupsWithPage) (int64, interface{}, error)
 	Create(mysqlDto dto.MysqlDBCreate) error
 	ChangeInfo(info dto.ChangeDBInfo) error
 	UpdateVariables(variables dto.MysqlVariablesUpdate) error
+
+	Backup(db dto.BackupDB) error
+	Recover(db dto.RecoverDB) error
+
 	Delete(version string, ids []uint) error
 	LoadStatus(version string) (*dto.MysqlStatus, error)
 	LoadVariables(version string) (*dto.MysqlVariables, error)
@@ -45,6 +53,21 @@ func (u *MysqlService) SearchWithPage(search dto.SearchDBWithPage) (int64, inter
 		dtoMysqls = append(dtoMysqls, item)
 	}
 	return total, dtoMysqls, err
+}
+
+func (u *MysqlService) SearchBacpupsWithPage(search dto.SearchBackupsWithPage) (int64, interface{}, error) {
+	app, err := mysqlRepo.LoadBaseInfoByVersion(search.Version)
+	if err != nil {
+		return 0, nil, err
+	}
+	searchDto := dto.BackupSearch{
+		Type:       "database-mysql",
+		PageInfo:   search.PageInfo,
+		Name:       app.Name,
+		DetailName: search.DBName,
+	}
+
+	return NewIBackupService().SearchRecordWithPage(searchDto)
 }
 
 func (u *MysqlService) LoadRunningVersion() ([]string, error) {
@@ -83,6 +106,66 @@ func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
 	}
 	if err := mysqlRepo.Create(&mysql); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (u *MysqlService) Backup(db dto.BackupDB) error {
+	app, err := mysqlRepo.LoadBaseInfoByVersion(db.Version)
+	if err != nil {
+		return err
+	}
+
+	backupDir := fmt.Sprintf("%s/%s/%s/", constant.DatabaseDir, app.Name, db.DBName)
+	if _, err := os.Stat(backupDir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(backupDir, os.ModePerm); err != nil {
+			return err
+		}
+	}
+	backupName := fmt.Sprintf("%s%s_%s.sql.gz", backupDir, db.DBName, time.Now().Format("20060102150405"))
+	outfile, _ := os.OpenFile(backupName, os.O_RDWR|os.O_CREATE, 0755)
+	cmd := exec.Command("docker", "exec", app.ContainerName, "mysqldump", "-uroot", "-p"+app.Password, db.DBName)
+	gzipCmd := exec.Command("gzip", "-cf")
+	gzipCmd.Stdin, _ = cmd.StdoutPipe()
+	gzipCmd.Stdout = outfile
+	_ = gzipCmd.Start()
+	_ = cmd.Run()
+	_ = gzipCmd.Wait()
+
+	if err := backupRepo.CreateRecord(&model.BackupRecord{
+		Type:       "database-mysql",
+		Name:       app.Name,
+		DetailName: db.DBName,
+		Source:     "LOCAL",
+		FileDir:    backupDir,
+		FileName:   strings.ReplaceAll(backupName, backupDir, ""),
+	}); err != nil {
+		global.LOG.Errorf("save backup record failed, err: %v", err)
+	}
+	return nil
+}
+
+func (u *MysqlService) Recover(db dto.RecoverDB) error {
+	app, err := mysqlRepo.LoadBaseInfoByVersion(db.Version)
+	if err != nil {
+		return err
+	}
+	gzipFile, err := os.Open(db.BackupName)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer gzipFile.Close()
+	gzipReader, err := gzip.NewReader(gzipFile)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer gzipReader.Close()
+	cmd := exec.Command("docker", "exec", "-i", app.ContainerName, "mysql", "-uroot", "-p"+app.Password, db.DBName)
+	cmd.Stdin = gzipReader
+	stdout, err := cmd.CombinedOutput()
+	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
+	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
+		return errors.New(stdStr)
 	}
 	return nil
 }
@@ -330,13 +413,13 @@ func (u *MysqlService) LoadStatus(version string) (*dto.MysqlStatus, error) {
 }
 
 func excuteSqlForMaps(containerName, password, command string) (map[string]string, error) {
-	cmd := exec.Command("docker", "exec", "-i", containerName, "mysql", "-uroot", fmt.Sprintf("-p%s", password), "-e", command)
+	cmd := exec.Command("docker", "exec", containerName, "mysql", "-uroot", "-p"+password, "-e", command)
 	stdout, err := cmd.CombinedOutput()
-	if err != nil {
-		return nil, err
+	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
+	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
+		return nil, errors.New(stdStr)
 	}
 
-	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
 	rows := strings.Split(stdStr, "\n")
 	rowMap := make(map[string]string)
 	for _, v := range rows {
@@ -349,25 +432,21 @@ func excuteSqlForMaps(containerName, password, command string) (map[string]strin
 }
 
 func excuteSqlForRows(containerName, password, command string) ([]string, error) {
-	cmd := exec.Command("docker", "exec", "-i", containerName, "mysql", "-uroot", fmt.Sprintf("-p%s", password), "-e", command)
+	cmd := exec.Command("docker", "exec", containerName, "mysql", "-uroot", "-p"+password, "-e", command)
 	stdout, err := cmd.CombinedOutput()
-	if err != nil {
-		return nil, err
-	}
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
+	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
+		return nil, errors.New(stdStr)
+	}
 	return strings.Split(stdStr, "\n"), nil
 }
 
 func excuteSql(containerName, password, command string) error {
-	cmd := exec.Command("docker", "exec", "-i", containerName, "mysql", "-uroot", fmt.Sprintf("-p%s", password), "-e", command)
+	cmd := exec.Command("docker", "exec", containerName, "mysql", "-uroot", "-p"+password, "-e", command)
 	stdout, err := cmd.CombinedOutput()
-	if err != nil {
-		return err
-	}
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
-
-	if strings.HasPrefix(string(stdStr), "ERROR ") {
-		return errors.New(string(stdStr))
+	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
+		return errors.New(stdStr)
 	}
 	return nil
 }

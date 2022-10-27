@@ -16,6 +16,9 @@ export const editBackup = (params: Backup.BackupOperate) => {
 export const deleteBackup = (params: { ids: number[] }) => {
     return http.post(`/backups/del`, params);
 };
+export const deleteBackupRecord = (params: { ids: number[] }) => {
+    return http.post(`/backups/record/del`, params);
+};
 
 export const listBucket = (params: Backup.ForBucket) => {
     return http.post(`/backups/buckets`, params);

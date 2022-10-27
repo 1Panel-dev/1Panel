@@ -1,9 +1,20 @@
 import http from '@/api';
 import { ResPage } from '../interface';
+import { Backup } from '../interface/backup';
 import { Database } from '../interface/database';
 
 export const searchMysqlDBs = (params: Database.Search) => {
     return http.post<ResPage<Database.MysqlDBInfo>>(`databases/search`, params);
+};
+
+export const backup = (params: Database.Backup) => {
+    return http.post(`/databases/backup`, params);
+};
+export const recover = (params: Database.Recover) => {
+    return http.post(`/databases/recover`, params);
+};
+export const searchBackupRecords = (params: Database.SearchBackupRecord) => {
+    return http.post<ResPage<Backup.RecordInfo>>(`/databases/backups/search`, params);
 };
 
 export const addMysqlDB = (params: Database.MysqlDBCreate) => {

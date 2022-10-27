@@ -107,12 +107,14 @@
         </el-dialog>
 
         <OperatrDialog @search="search" ref="dialogRef" />
+        <BackupRecords ref="dialogBackupRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import OperatrDialog from '@/views/database/mysql/create/index.vue';
+import BackupRecords from '@/views/database/mysql/backup/index.vue';
 import Setting from '@/views/database/mysql/setting/index.vue';
 import Submenu from '@/views/database/index.vue';
 import { dateFromat } from '@/utils/util';
@@ -142,6 +144,15 @@ const onOpenDialog = async () => {
         version: version.value,
     };
     dialogRef.value!.acceptParams(params);
+};
+
+const dialogBackupRef = ref();
+const onOpenBackupDialog = async (dbName: string) => {
+    let params = {
+        version: version.value,
+        dbName: dbName,
+    };
+    dialogBackupRef.value!.acceptParams(params);
 };
 
 const settingRef = ref();
@@ -252,9 +263,9 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('database.backupList') + '(1)',
+        label: i18n.global.t('database.backupList'),
         click: (row: Database.MysqlDBInfo) => {
-            onBatchDelete(row);
+            onOpenBackupDialog(row.name);
         },
     },
     {
