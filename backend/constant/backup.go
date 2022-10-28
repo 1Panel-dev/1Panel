@@ -9,6 +9,6 @@ const (
 	Sftp         = "SFTP"
 	MinIo        = "MINIO"
 
-	DatabaseDir = "/opt/1Panel/data/backup/database"
-	WebsiteDir  = "/opt/1Panel/data/backup/website"
+	DatabaseBackupDir = "/opt/1Panel/data/backup/database"
+	WebsiteBackupDir  = "/opt/1Panel/data/backup/website"
 )

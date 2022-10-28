@@ -217,10 +217,12 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	upMap["website"] = req.Website
 	upMap["exclusion_rules"] = req.ExclusionRules
 	upMap["database"] = req.Database
+	upMap["db_name"] = req.DBName
 	upMap["url"] = req.URL
 	upMap["source_dir"] = req.SourceDir
+	upMap["keep_local"] = req.KeepLocal
 	upMap["target_dir_id"] = req.TargetDirID
-	upMap["retain_days"] = req.RetainCopies
+	upMap["retain_copies"] = req.RetainCopies
 	return cronjobRepo.Update(id, upMap)
 }
 
@@ -252,7 +254,7 @@ func (u *CronjobService) AddCronJob(cronjob *model.Cronjob) (int, error) {
 }
 
 func mkdirAndWriteFile(cronjob *model.Cronjob, startTime time.Time, msg []byte) (string, error) {
-	dir := fmt.Sprintf("%s%s/%s-%v", constant.TaskDir, cronjob.Type, cronjob.Name, cronjob.ID)
+	dir := fmt.Sprintf("%s/%s/%s-%v", constant.TaskDir, cronjob.Type, cronjob.Name, cronjob.ID)
 	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
 			return "", err

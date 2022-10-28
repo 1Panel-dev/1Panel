@@ -66,7 +66,7 @@ func (u *BackupService) SearchRecordWithPage(search dto.BackupSearch) (int64, []
 
 func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) {
 	if info.Source == "LOCAL" {
-		return info.FileDir + info.FileName, nil
+		return info.FileDir + "/" + info.FileName, nil
 	}
 	backup, _ := backupRepo.Get(commonRepo.WithByType(info.Source))
 	if backup.ID == 0 {
@@ -199,4 +199,26 @@ func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.Cl
 	}
 
 	return backClient, nil
+}
+
+func loadLocalDir(backup model.BackupAccount) (string, error) {
+	varMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
+		return "", err
+	}
+	if _, ok := varMap["dir"]; !ok {
+		return "", errors.New("load local backup dir failed")
+	}
+	baseDir, ok := varMap["dir"].(string)
+	if ok {
+		if _, err := os.Stat(baseDir); err != nil && os.IsNotExist(err) {
+			if err = os.MkdirAll(baseDir, os.ModePerm); err != nil {
+				if err != nil {
+					return "", fmt.Errorf("mkdir %s failed, err: %v", baseDir, err)
+				}
+			}
+		}
+		return baseDir, nil
+	}
+	return "", fmt.Errorf("error type dir: %T", varMap["dir"])
 }

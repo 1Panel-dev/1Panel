@@ -136,6 +136,7 @@ const onOpenDialog = async (
         day: 1,
         hour: 2,
         minute: 3,
+        keepLocal: true,
         retainCopies: 7,
     },
 ) => {
