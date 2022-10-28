@@ -32,6 +32,12 @@ type BackupRecords struct {
 	FileName  string    `json:"fileName"`
 }
 
+type DownloadRecord struct {
+	Source   string `json:"source" validate:"required,oneof=OSS S3 SFTP MINIO LOCAL"`
+	FileDir  string `json:"fileDir" validate:"required"`
+	FileName string `json:"fileName" validate:"required"`
+}
+
 type ForBuckets struct {
 	Type       string `json:"type" validate:"required"`
 	Credential string `json:"credential" validate:"required"`

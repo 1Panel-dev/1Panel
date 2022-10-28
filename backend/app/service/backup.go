@@ -2,6 +2,7 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -18,6 +19,7 @@ type BackupService struct{}
 type IBackupService interface {
 	List() ([]dto.BackupInfo, error)
 	SearchRecordWithPage(search dto.BackupSearch) (int64, []dto.BackupRecords, error)
+	DownloadRecord(info dto.DownloadRecord) (string, error)
 	Create(backupDto dto.BackupOperate) error
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
 	Update(id uint, upMap map[string]interface{}) error
@@ -60,6 +62,46 @@ func (u *BackupService) SearchRecordWithPage(search dto.BackupSearch) (int64, []
 		dtobas = append(dtobas, item)
 	}
 	return total, dtobas, err
+}
+
+func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) {
+	if info.Source == "LOCAL" {
+		return info.FileDir + info.FileName, nil
+	}
+	backup, _ := backupRepo.Get(commonRepo.WithByType(info.Source))
+	if backup.ID == 0 {
+		return "", constant.ErrRecordNotFound
+	}
+	varMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
+		return "", err
+	}
+	varMap["type"] = backup.Type
+	varMap["bucket"] = backup.Bucket
+	switch backup.Type {
+	case constant.Sftp:
+		varMap["password"] = backup.Credential
+	case constant.OSS, constant.S3, constant.MinIo:
+		varMap["secretKey"] = backup.Credential
+	}
+	backClient, err := cloud_storage.NewCloudStorageClient(varMap)
+	if err != nil {
+		return "", fmt.Errorf("new cloud storage client failed, err: %v", err)
+	}
+	tempPath := fmt.Sprintf("%s%s", constant.DownloadDir, info.FileDir)
+	if _, err := os.Stat(tempPath); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(tempPath, os.ModePerm); err != nil {
+			fmt.Println(err)
+		}
+	}
+	targetPath := tempPath + info.FileName
+	if _, err = os.Stat(targetPath); err != nil && os.IsNotExist(err) {
+		isOK, err := backClient.Download(info.FileName, targetPath)
+		if !isOK {
+			return "", fmt.Errorf("cloud storage download failed, err: %v", err)
+		}
+	}
+	return targetPath, nil
 }
 
 func (u *BackupService) Create(backupDto dto.BackupOperate) error {

@@ -27,6 +27,8 @@ export default {
             expand: '展开',
             log: '日志',
             back: '返回',
+            recover: '恢复',
+            download: '下载',
             saveAndEnable: '保存并启用',
         },
         search: {

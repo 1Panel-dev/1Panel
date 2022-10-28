@@ -25,7 +25,7 @@
                     show-overflow-tooltip
                 />
 
-                <fu-table-operations type="icon" :buttons="buttons" :label="$t('commons.table.operate')" fix />
+                <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
             </ComplexTable>
         </el-dialog>
     </div>
@@ -36,10 +36,10 @@ import ComplexTable from '@/components/complex-table/index.vue';
 import { reactive, ref } from 'vue';
 import { dateFromat } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
-import { backup, searchBackupRecords } from '@/api/modules/database';
+import { backup, recover, searchBackupRecords } from '@/api/modules/database';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
-import { deleteBackupRecord } from '@/api/modules/backup';
+import { deleteBackupRecord, downloadBackupRecord } from '@/api/modules/backup';
 import { Backup } from '@/api/interface/backup';
 
 const selects = ref<any>([]);
@@ -87,6 +87,32 @@ const onBackup = async () => {
     search();
 };
 
+const onRecover = async (row: Backup.RecordInfo) => {
+    let params = {
+        version: version.value,
+        dbName: dbName.value,
+        backupName: row.fileDir + row.fileName,
+    };
+    await recover(params);
+    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+};
+
+const onDownload = async (row: Backup.RecordInfo) => {
+    let params = {
+        source: row.source,
+        fileDir: row.fileDir,
+        fileName: row.fileName,
+    };
+    const res = await downloadBackupRecord(params);
+    const downloadUrl = window.URL.createObjectURL(new Blob([res]));
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = downloadUrl;
+    a.download = row.fileName;
+    const event = new MouseEvent('click');
+    a.dispatchEvent(event);
+};
+
 const onBatchDelete = async (row: Backup.RecordInfo | null) => {
     let ids: Array<number> = [];
     if (row) {
@@ -103,9 +129,20 @@ const onBatchDelete = async (row: Backup.RecordInfo | null) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
-        icon: 'Delete',
         click: (row: Backup.RecordInfo) => {
             onBatchDelete(row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.recover'),
+        click: (row: Backup.RecordInfo) => {
+            onRecover(row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.download'),
+        click: (row: Backup.RecordInfo) => {
+            onDownload(row);
         },
     },
 ];
