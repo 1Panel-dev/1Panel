@@ -17,11 +17,14 @@ type Cronjob struct {
 	Script         string `gorm:"longtext" json:"script"`
 	Website        string `gorm:"type:varchar(64)" json:"website"`
 	Database       string `gorm:"type:varchar(64)" json:"database"`
+	DBName         string `gorm:"type:varchar(64)" json:"dbName"`
 	URL            string `gorm:"type:varchar(256)" json:"url"`
 	SourceDir      string `gorm:"type:varchar(256)" json:"sourceDir"`
-	TargetDirID    uint64 `gorm:"type:decimal" json:"targetDirID"`
 	ExclusionRules string `gorm:"longtext" json:"exclusionRules"`
-	RetainCopies   uint64 `gorm:"type:decimal" json:"retainCopies"`
+
+	KeepLocal    bool   `gorm:"type:varchar(64)" json:"keepLocal"`
+	TargetDirID  uint64 `gorm:"type:decimal" json:"targetDirID"`
+	RetainCopies uint64 `gorm:"type:decimal" json:"retainCopies"`
 
 	Status  string       `gorm:"type:varchar(64)" json:"status"`
 	EntryID uint64       `gorm:"type:decimal" json:"entryID"`
@@ -35,6 +38,8 @@ type JobRecords struct {
 	StartTime time.Time `gorm:"type:datetime" json:"startTime"`
 	Interval  float64   `gorm:"type:float" json:"interval"`
 	Records   string    `gorm:"longtext" json:"records"`
+	FromLocal bool      `gorm:"type:varchar(64)" json:"source"`
+	File      string    `gorm:"type:varchar(256)" json:"file"`
 	Status    string    `gorm:"type:varchar(64)" json:"status"`
 	Message   string    `gorm:"longtext" json:"message"`
 }

@@ -6,6 +6,9 @@ import { Database } from '../interface/database';
 export const searchMysqlDBs = (params: Database.Search) => {
     return http.post<ResPage<Database.MysqlDBInfo>>(`databases/search`, params);
 };
+export const listDBByVersion = (params: string) => {
+    return http.get(`databases/dbs/${params}`);
+};
 
 export const backup = (params: Database.Backup) => {
     return http.post(`/databases/backup`, params);

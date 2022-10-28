@@ -126,7 +126,7 @@
                                 <el-form-item :label="$t('cronjob.target')">
                                     {{ loadBackupName(dialogData.rowData!.targetDir) }}
                                     <el-button
-                                        v-if="currentRecord?.records! !== 'errHandle'"
+                                        v-if="currentRecord?.status! !== 'Failed'"
                                         type="primary"
                                         style="margin-left: 10px"
                                         link

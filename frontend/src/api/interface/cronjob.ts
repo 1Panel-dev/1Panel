@@ -15,8 +15,10 @@ export namespace Cronjob {
         website: string;
         exclusionRules: string;
         database: string;
+        dbName: string;
         url: string;
         sourceDir: string;
+        keepLocal: boolean;
         targetDirID: number;
         targetDir: string;
         retainCopies: number;
@@ -35,8 +37,10 @@ export namespace Cronjob {
         website: string;
         exclusionRules: string;
         database: string;
+        dbName: string;
         url: string;
         sourceDir: string;
+        keepLocal: boolean;
         targetDirID: number;
         retainCopies: number;
     }
@@ -52,8 +56,10 @@ export namespace Cronjob {
         website: string;
         exclusionRules: string;
         database: string;
+        dbName: string;
         url: string;
         sourceDir: string;
+        keepLocal: boolean;
         targetDirID: number;
         retainCopies: number;
     }

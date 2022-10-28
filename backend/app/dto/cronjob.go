@@ -15,8 +15,10 @@ type CronjobCreate struct {
 	Website        string `json:"website"`
 	ExclusionRules string `json:"exclusionRules"`
 	Database       string `json:"database"`
+	DBName         string `json:"dbName"`
 	URL            string `json:"url"`
 	SourceDir      string `json:"sourceDir"`
+	KeepLocal      bool   `json:"keepLocal"`
 	TargetDirID    int    `json:"targetDirID"`
 	RetainCopies   int    `json:"retainCopies" validate:"number,min=1"`
 }
@@ -33,8 +35,10 @@ type CronjobUpdate struct {
 	Website        string `json:"website"`
 	ExclusionRules string `json:"exclusionRules"`
 	Database       string `json:"database"`
+	DBName         string `json:"dbName"`
 	URL            string `json:"url"`
 	SourceDir      string `json:"sourceDir"`
+	KeepLocal      bool   `json:"keepLocal"`
 	TargetDirID    int    `json:"targetDirID"`
 	RetainCopies   int    `json:"retainCopies" validate:"number,min=1"`
 }
@@ -63,8 +67,10 @@ type CronjobInfo struct {
 	Website        string `json:"website"`
 	ExclusionRules string `json:"exclusionRules"`
 	Database       string `json:"database"`
+	DBName         string `json:"dbName"`
 	URL            string `json:"url"`
 	SourceDir      string `json:"sourceDir"`
+	KeepLocal      bool   `json:"keepLocal"`
 	TargetDir      string `json:"targetDir"`
 	TargetDirID    int    `json:"targetDirID"`
 	RetainCopies   int    `json:"retainCopies"`

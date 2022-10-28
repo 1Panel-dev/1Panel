@@ -1,7 +1,7 @@
 package constant
 
 const (
-	TmpDir      = "/opt/1Panel/task/tmp/"
-	TaskDir     = "/opt/1Panel/task/"
-	DownloadDir = "/opt/1Panel/download/"
+	TmpDir      = "/opt/1Panel/data/tmp"
+	TaskDir     = "/opt/1Panel/data/task"
+	DownloadDir = "/opt/1Panel/download"
 )

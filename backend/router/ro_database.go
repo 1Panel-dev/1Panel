@@ -33,5 +33,6 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		cmdRouter.GET("/status/:version", baseApi.LoadStatus)
 		cmdRouter.GET("/baseinfo/:version", baseApi.LoadBaseinfo)
 		cmdRouter.GET("/versions", baseApi.LoadVersions)
+		cmdRouter.GET("/dbs/:version", baseApi.ListDBNameByVersion)
 	}
 }

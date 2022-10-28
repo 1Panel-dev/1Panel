@@ -2,7 +2,6 @@ package service
 
 import (
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -25,19 +24,23 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 		err     error
 	)
 	record := cronjobRepo.StartRecords(cronjob.ID, "")
+	record.FromLocal = cronjob.KeepLocal
 	switch cronjob.Type {
 	case "shell":
 		cmd := exec.Command(cronjob.Script)
-		message, err = cmd.CombinedOutput()
+		stdout, errExec := cmd.CombinedOutput()
+		if errExec != nil {
+			err = errors.New(string(stdout))
+		}
 	case "website":
-		message, err = u.HandleBackup(cronjob, record.StartTime)
+		record.File, err = u.HandleBackup(cronjob, record.StartTime)
 	case "database":
-		message, err = u.HandleBackup(cronjob, record.StartTime)
+		record.File, err = u.HandleBackup(cronjob, record.StartTime)
 	case "directory":
 		if len(cronjob.SourceDir) == 0 {
 			return
 		}
-		message, err = u.HandleBackup(cronjob, record.StartTime)
+		record.File, err = u.HandleBackup(cronjob, record.StartTime)
 	case "curl":
 		if len(cronjob.URL) == 0 {
 			return
@@ -65,56 +68,63 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 	cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
 }
 
-func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Time) ([]byte, error) {
-	var stdout []byte
+func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Time) (string, error) {
+	var (
+		baseDir   string
+		backupDir string
+		fileName  string
+	)
 	backup, err := backupRepo.Get(commonRepo.WithByID(uint(cronjob.TargetDirID)))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	commonDir := fmt.Sprintf("%s/%s/", cronjob.Type, cronjob.Name)
-	name := fmt.Sprintf("%s.gz", startTime.Format("20060102150405"))
-	if cronjob.Type != "database" {
-		name = fmt.Sprintf("%s.tar.gz", startTime.Format("20060102150405"))
-	}
-	if backup.Type == "LOCAL" {
-		varMap := make(map[string]interface{})
-		if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
-			return nil, err
-		}
-		if _, ok := varMap["dir"]; !ok {
-			return nil, errors.New("load local backup dir failed")
-		}
-		baseDir := varMap["dir"].(string)
-		if _, err := os.Stat(baseDir); err != nil && os.IsNotExist(err) {
-			if err = os.MkdirAll(baseDir, os.ModePerm); err != nil {
-				if err != nil {
-					return nil, fmt.Errorf("mkdir %s failed, err: %v", baseDir, err)
-				}
-			}
-		}
-		stdout, err = handleTar(cronjob.SourceDir, fmt.Sprintf("%s/%s", baseDir, commonDir), name, cronjob.ExclusionRules)
+	if cronjob.KeepLocal || cronjob.Type != "LOCAL" {
+		backupLocal, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
 		if err != nil {
-			return stdout, err
+			return "", err
 		}
-		u.HandleRmExpired(backup.Type, fmt.Sprintf("%s/%s", baseDir, commonDir), cronjob, nil)
-		return stdout, nil
+		localDir, err := loadLocalDir(backupLocal)
+		if err != nil {
+			return "", err
+		}
+		baseDir = localDir
+	} else {
+		baseDir = constant.TmpDir
 	}
-	targetDir := constant.TmpDir + commonDir
+
+	if cronjob.Type == "database" {
+		fileName = fmt.Sprintf("db_%s_%s.sql.gz", cronjob.DBName, time.Now().Format("20060102150405"))
+		backupDir = fmt.Sprintf("database/%s/%s", cronjob.Database, cronjob.DBName)
+		err = backupMysql(backup.Type, baseDir, backupDir, cronjob.Database, cronjob.DBName, fileName)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		fileName = fmt.Sprintf("%s.tar.gz", startTime.Format("20060102150405"))
+		backupDir = fmt.Sprintf("%s/%s", cronjob.Type, cronjob.Name)
+		if err := handleTar(cronjob.SourceDir, baseDir+"/"+backupDir, fileName, cronjob.ExclusionRules); err != nil {
+			return "", err
+		}
+	}
+
+	if backup.Type == "LOCAL" {
+		u.HandleRmExpired(backup.Type, baseDir, backupDir, cronjob, nil)
+		return baseDir + "/" + backupDir + "/" + fileName, nil
+	}
+
+	cloudFile := baseDir + "/" + backupDir + "/" + fileName
+	if !cronjob.KeepLocal {
+		cloudFile = backupDir + "/" + fileName
+	}
 	client, err := NewIBackupService().NewClient(&backup)
 	if err != nil {
-		return nil, err
+		return cloudFile, err
 	}
-	if cronjob.Type != "database" {
-		stdout, err = handleTar(cronjob.SourceDir, targetDir, name, cronjob.ExclusionRules)
-		if err != nil {
-			return stdout, err
-		}
+	if _, err = client.Upload(baseDir+"/"+backupDir+"/"+fileName, backupDir+"/"+fileName); err != nil {
+		return cloudFile, err
 	}
-	if _, err = client.Upload(targetDir+name, commonDir+name); err != nil {
-		return nil, err
-	}
-	u.HandleRmExpired(backup.Type, commonDir+name, cronjob, client)
-	return stdout, nil
+	u.HandleRmExpired(backup.Type, baseDir, backupDir, cronjob, client)
+	return cloudFile, nil
 }
 
 func (u *CronjobService) HandleDelete(id uint) error {
@@ -132,26 +142,27 @@ func (u *CronjobService) HandleDelete(id uint) error {
 	return nil
 }
 
-func (u *CronjobService) HandleRmExpired(backType, path string, cronjob *model.Cronjob, backClient cloud_storage.CloudStorageClient) {
+func (u *CronjobService) HandleRmExpired(backType, baseDir, backupDir string, cronjob *model.Cronjob, backClient cloud_storage.CloudStorageClient) {
 	if backType != "LOCAL" {
-		commonDir := fmt.Sprintf("%s/%s/", cronjob.Type, cronjob.Name)
-		currentObjs, err := backClient.ListObjects(commonDir)
+		currentObjs, err := backClient.ListObjects(backupDir + "/")
 		if err != nil {
-			global.LOG.Errorf("list bucket object %s failed, err: %v", commonDir, err)
+			global.LOG.Errorf("list bucket object %s failed, err: %v", backupDir, err)
 			return
 		}
 		for i := 0; i < len(currentObjs)-int(cronjob.RetainCopies); i++ {
 			_, _ = backClient.Delete(currentObjs[i].(string))
 		}
-		return
+		if !cronjob.KeepLocal {
+			return
+		}
 	}
-	files, err := ioutil.ReadDir(path)
+	files, err := ioutil.ReadDir(baseDir + "/" + backupDir)
 	if err != nil {
-		global.LOG.Errorf("read dir %s failed, err: %v", path, err)
+		global.LOG.Errorf("read dir %s failed, err: %v", baseDir+"/"+backupDir, err)
 		return
 	}
 	for i := 0; i < len(files)-int(cronjob.RetainCopies); i++ {
-		_ = os.Remove(path + "/" + files[i].Name())
+		_ = os.Remove(baseDir + "/" + backupDir + "/" + files[i].Name())
 	}
 	records, _ := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(cronjob.ID)))
 	if len(records) > int(cronjob.RetainCopies) {
@@ -161,15 +172,15 @@ func (u *CronjobService) HandleRmExpired(backType, path string, cronjob *model.C
 	}
 }
 
-func handleTar(sourceDir, targetDir, name, exclusionRules string) ([]byte, error) {
+func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 	if _, err := os.Stat(targetDir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(targetDir, os.ModePerm); err != nil {
-			return nil, err
+			return err
 		}
 	}
 	exStr := []string{}
 	exStr = append(exStr, "zcvf")
-	exStr = append(exStr, targetDir+name)
+	exStr = append(exStr, targetDir+"/"+name)
 	excludes := strings.Split(exclusionRules, ";")
 	for _, exclude := range excludes {
 		if len(exclude) == 0 {
@@ -188,5 +199,9 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) ([]byte, error
 		exStr = append(exStr, sourceDir)
 	}
 	cmd := exec.Command("tar", exStr...)
-	return (cmd.CombinedOutput())
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return errors.New(string(stdout))
+	}
+	return nil
 }

@@ -23,7 +23,8 @@ type MysqlService struct{}
 
 type IMysqlService interface {
 	SearchWithPage(search dto.SearchDBWithPage) (int64, interface{}, error)
-	SearchBacpupsWithPage(search dto.SearchBackupsWithPage) (int64, interface{}, error)
+	ListDBByVersion(version string) ([]string, error)
+	SearchBackupsWithPage(search dto.SearchBackupsWithPage) (int64, interface{}, error)
 	Create(mysqlDto dto.MysqlDBCreate) error
 	ChangeInfo(info dto.ChangeDBInfo) error
 	UpdateVariables(variables dto.MysqlVariablesUpdate) error
@@ -55,7 +56,16 @@ func (u *MysqlService) SearchWithPage(search dto.SearchDBWithPage) (int64, inter
 	return total, dtoMysqls, err
 }
 
-func (u *MysqlService) SearchBacpupsWithPage(search dto.SearchBackupsWithPage) (int64, interface{}, error) {
+func (u *MysqlService) ListDBByVersion(version string) ([]string, error) {
+	mysqls, err := mysqlRepo.List(mysqlRepo.WithByVersion(version))
+	var dbNames []string
+	for _, mysql := range mysqls {
+		dbNames = append(dbNames, mysql.Name)
+	}
+	return dbNames, err
+}
+
+func (u *MysqlService) SearchBackupsWithPage(search dto.SearchBackupsWithPage) (int64, interface{}, error) {
 	app, err := mysqlRepo.LoadBaseInfoByVersion(search.Version)
 	if err != nil {
 		return 0, nil, err
@@ -111,36 +121,18 @@ func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
 }
 
 func (u *MysqlService) Backup(db dto.BackupDB) error {
-	app, err := mysqlRepo.LoadBaseInfoByVersion(db.Version)
+	backupLocal, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
 	if err != nil {
 		return err
 	}
-
-	backupDir := fmt.Sprintf("%s/%s/%s/", constant.DatabaseDir, app.Name, db.DBName)
-	if _, err := os.Stat(backupDir); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(backupDir, os.ModePerm); err != nil {
-			return err
-		}
+	localDir, err := loadLocalDir(backupLocal)
+	if err != nil {
+		return err
 	}
-	backupName := fmt.Sprintf("%s%s_%s.sql.gz", backupDir, db.DBName, time.Now().Format("20060102150405"))
-	outfile, _ := os.OpenFile(backupName, os.O_RDWR|os.O_CREATE, 0755)
-	cmd := exec.Command("docker", "exec", app.ContainerName, "mysqldump", "-uroot", "-p"+app.Password, db.DBName)
-	gzipCmd := exec.Command("gzip", "-cf")
-	gzipCmd.Stdin, _ = cmd.StdoutPipe()
-	gzipCmd.Stdout = outfile
-	_ = gzipCmd.Start()
-	_ = cmd.Run()
-	_ = gzipCmd.Wait()
-
-	if err := backupRepo.CreateRecord(&model.BackupRecord{
-		Type:       "database-mysql",
-		Name:       app.Name,
-		DetailName: db.DBName,
-		Source:     "LOCAL",
-		FileDir:    backupDir,
-		FileName:   strings.ReplaceAll(backupName, backupDir, ""),
-	}); err != nil {
-		global.LOG.Errorf("save backup record failed, err: %v", err)
+	backupDir := fmt.Sprintf("database/%s/%s", db.Version, db.DBName)
+	fileName := fmt.Sprintf("%s_%s.sql.gz", db.DBName, time.Now().Format("20060102150405"))
+	if err := backupMysql("LOCAL", localDir, backupDir, db.Version, db.DBName, fileName); err != nil {
+		return err
 	}
 	return nil
 }
@@ -447,6 +439,47 @@ func excuteSql(containerName, password, command string) error {
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
 	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
 		return errors.New(stdStr)
+	}
+	return nil
+}
+
+func backupMysql(backupType, baseDir, backupDir, version, dbName, fileName string) error {
+	app, err := mysqlRepo.LoadBaseInfoByVersion(version)
+	if err != nil {
+		return err
+	}
+
+	fullDir := baseDir + "/" + backupDir
+	if _, err := os.Stat(fullDir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(fullDir, os.ModePerm); err != nil {
+			if err != nil {
+				return fmt.Errorf("mkdir %s failed, err: %v", fullDir, err)
+			}
+		}
+	}
+	outfile, _ := os.OpenFile(fullDir+"/"+fileName, os.O_RDWR|os.O_CREATE, 0755)
+	cmd := exec.Command("docker", "exec", app.ContainerName, "mysqldump", "-uroot", "-p"+app.Password, dbName)
+	gzipCmd := exec.Command("gzip", "-cf")
+	gzipCmd.Stdin, _ = cmd.StdoutPipe()
+	gzipCmd.Stdout = outfile
+	_ = gzipCmd.Start()
+	_ = cmd.Run()
+	_ = gzipCmd.Wait()
+
+	record := &model.BackupRecord{
+		Type:       "database-mysql",
+		Name:       app.Name,
+		DetailName: dbName,
+		Source:     backupType,
+		FileDir:    backupDir,
+		FileName:   fileName,
+	}
+	if baseDir != constant.TmpDir || backupType == "LOCAL" {
+		record.Source = "LOCAL"
+		record.FileDir = fullDir
+	}
+	if err := backupRepo.CreateRecord(record); err != nil {
+		global.LOG.Errorf("save backup record failed, err: %v", err)
 	}
 	return nil
 }

@@ -74,13 +74,20 @@
                     />
                 </el-select>
             </el-form-item>
-            <el-form-item
-                v-if="dialogData.rowData!.type === 'database'"
-                :label="$t('cronjob.database')"
-                prop="database"
-            >
-                <el-input style="width: 100%" clearable v-model="dialogData.rowData!.database" />
-            </el-form-item>
+
+            <div v-if="dialogData.rowData!.type === 'database'">
+                <el-form-item :label="$t('cronjob.database')" prop="database">
+                    <el-radio-group v-model="dialogData.rowData!.database" @change="changeDBVersion" class="ml-4">
+                        <el-radio v-for="item in mysqlVersionOptions" :key="item" :label="item" :value="item" />
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item :label="$t('cronjob.database')" prop="dbName">
+                    <el-select style="width: 100%" clearable v-model="dialogData.rowData!.dbName">
+                        <el-option v-for="item in dbOptions" :key="item" :label="item" :value="item" />
+                    </el-select>
+                </el-form-item>
+            </div>
+
             <el-form-item
                 v-if="dialogData.rowData!.type === 'directory'"
                 :label="$t('cronjob.sourceDir')"
@@ -98,19 +105,30 @@
                 </el-input>
             </el-form-item>
 
-            <el-form-item v-if="isBackup()" :label="$t('cronjob.target')" prop="targetDirID">
-                <el-select style="width: 100%" v-model="dialogData.rowData!.targetDirID">
-                    <el-option
-                        v-for="item in backupOptions"
-                        :key="item.label"
-                        :value="item.value"
-                        :label="item.label"
-                    />
-                </el-select>
-            </el-form-item>
-            <el-form-item v-if="isBackup()" :label="$t('cronjob.retainCopies')" prop="retainCopies">
-                <el-input-number :min="1" :max="30" v-model.number="dialogData.rowData!.retainCopies"></el-input-number>
-            </el-form-item>
+            <div v-if="isBackup()">
+                <el-form-item :label="$t('cronjob.target')" prop="targetDirID">
+                    <el-select style="width: 100%" v-model="dialogData.rowData!.targetDirID">
+                        <el-option
+                            v-for="item in backupOptions"
+                            :key="item.label"
+                            :value="item.value"
+                            :label="item.label"
+                        />
+                    </el-select>
+                </el-form-item>
+                <el-form-item v-if="dialogData.rowData!.targetDirID !== localDirID">
+                    <el-checkbox v-model="dialogData.rowData!.keepLocal">
+                        同时保留本地备份（和云存储保留份数一致）
+                    </el-checkbox>
+                </el-form-item>
+                <el-form-item :label="$t('cronjob.retainCopies')" prop="retainCopies">
+                    <el-input-number
+                        :min="1"
+                        :max="30"
+                        v-model.number="dialogData.rowData!.retainCopies"
+                    ></el-input-number>
+                </el-form-item>
+            </div>
 
             <el-form-item v-if="dialogData.rowData!.type === 'curl'" :label="$t('cronjob.url') + 'URL'" prop="url">
                 <el-input style="width: 100%" clearable v-model="dialogData.rowData!.url" />
@@ -143,7 +161,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import { loadBackupName } from '@/views/setting/helper';
 import FileList from '@/components/file-list/index.vue';
@@ -152,6 +170,7 @@ import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { Cronjob } from '@/api/interface/cronjob';
 import { addCronjob, editCronjob } from '@/api/modules/cronjob';
+import { listDBByVersion, loadVersions } from '@/api/modules/database';
 
 interface DialogProps {
     title: string;
@@ -167,7 +186,13 @@ const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     cronjobVisiable.value = true;
+    loadRunningOptions();
+    loadBackups();
 };
+
+const mysqlVersionOptions = ref();
+const dbOptions = ref();
+const localDirID = ref();
 
 const websiteOptions = ref([
     { label: '所有', value: 'all' },
@@ -263,6 +288,7 @@ const rules = reactive({
     script: [Rules.requiredInput],
     website: [Rules.requiredSelect],
     database: [Rules.requiredSelect],
+    dbName: [Rules.requiredSelect],
     url: [Rules.requiredInput],
     sourceDir: [Rules.requiredSelect],
     targetDirID: [Rules.requiredSelect, Rules.number],
@@ -280,9 +306,30 @@ const loadBackups = async () => {
     const res = await getBackupList();
     backupOptions.value = [];
     for (const item of res.data) {
+        if (item.type === 'LOCAL') {
+            localDirID.value = item.id;
+        }
         backupOptions.value.push({ label: loadBackupName(item.type), value: item.id });
     }
 };
+
+const loadRunningOptions = async () => {
+    const res = await loadVersions();
+    mysqlVersionOptions.value = res.data;
+    if (mysqlVersionOptions.value.length != 0) {
+        dialogData.value.rowData!.database = mysqlVersionOptions.value[0];
+        changeDBVersion();
+    }
+};
+const changeDBVersion = async () => {
+    dialogData.value.rowData!.dbName = '';
+    const res = await listDBByVersion(dialogData.value.rowData!.database);
+    dbOptions.value = res.data;
+    if (dbOptions.value.length != 0) {
+        dialogData.value.rowData!.dbName = dbOptions.value[0];
+    }
+};
+
 function isBackup() {
     return (
         dialogData.value.rowData!.type === 'website' ||
@@ -328,9 +375,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     });
 };
 
-onMounted(() => {
-    loadBackups();
-});
 defineExpose({
     acceptParams,
 });

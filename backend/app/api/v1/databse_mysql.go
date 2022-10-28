@@ -80,6 +80,22 @@ func (b *BaseApi) SearchMysql(c *gin.Context) {
 	})
 }
 
+func (b *BaseApi) ListDBNameByVersion(c *gin.Context) {
+	version, ok := c.Params.Get("version")
+	if !ok {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error version in path"))
+		return
+	}
+
+	list, err := mysqlService.ListDBByVersion(version)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, list)
+}
+
 func (b *BaseApi) SearchDBBackups(c *gin.Context) {
 	var req dto.SearchBackupsWithPage
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -87,7 +103,7 @@ func (b *BaseApi) SearchDBBackups(c *gin.Context) {
 		return
 	}
 
-	total, list, err := mysqlService.SearchBacpupsWithPage(req)
+	total, list, err := mysqlService.SearchBackupsWithPage(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
