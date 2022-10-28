@@ -5,8 +5,6 @@ import (
 	"fmt"
 	components "github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
 	"io/ioutil"
-	"os"
-	"path/filepath"
 	"sort"
 	"strings"
 )
@@ -123,10 +121,5 @@ func DumpConfig(c *components.Config, style *Style) string {
 }
 
 func WriteConfig(c *components.Config, style *Style) error {
-	dir, _ := filepath.Split(c.FilePath)
-	err := os.MkdirAll(dir, 0755)
-	if err != nil {
-		return err
-	}
 	return ioutil.WriteFile(c.FilePath, []byte(DumpConfig(c, style)), 0644)
 }

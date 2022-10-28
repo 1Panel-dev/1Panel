@@ -1,13 +1,13 @@
 package v1
 
 import (
-	"strconv"
-
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/gin-gonic/gin"
+	"reflect"
+	"strconv"
 )
 
 func (b *BaseApi) SearchApp(c *gin.Context) {
@@ -98,16 +98,26 @@ func (b *BaseApi) SearchInstalled(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	total, list, err := appService.PageInstalled(req)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
+	if !reflect.DeepEqual(req.PageInfo, dto.PageInfo{}) {
+		total, list, err := appService.PageInstalled(req)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
 
-	helper.SuccessWithData(c, dto.PageResult{
-		Items: list,
-		Total: total,
-	})
+		helper.SuccessWithData(c, dto.PageResult{
+			Items: list,
+			Total: total,
+		})
+	} else {
+		list, err := appService.SearchInstalled(req)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+
+		helper.SuccessWithData(c, list)
+	}
 }
 
 func (b *BaseApi) SearchInstalledBackup(c *gin.Context) {

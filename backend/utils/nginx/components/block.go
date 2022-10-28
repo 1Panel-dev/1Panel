@@ -48,3 +48,19 @@ func (b *Block) AddDirectives(directive Directive) {
 	directives := append(b.GetDirectives(), &directive)
 	b.Directives = directives
 }
+
+func (b *Block) RemoveDirectives(names []string) {
+	nameMaps := make(map[string]struct{}, len(names))
+	for _, name := range names {
+		nameMaps[name] = struct{}{}
+	}
+	directives := b.GetDirectives()
+	var newDirectives []IDirective
+	for _, dir := range directives {
+		if _, ok := nameMaps[dir.GetName()]; ok {
+			continue
+		}
+		newDirectives = append(newDirectives, dir)
+	}
+	b.Directives = newDirectives
+}

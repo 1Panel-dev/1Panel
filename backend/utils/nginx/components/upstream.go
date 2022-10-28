@@ -92,3 +92,19 @@ func (us *Upstream) AddDirectives(directive Directive) {
 	directives := append(us.GetDirectives(), &directive)
 	us.Directives = directives
 }
+
+func (us *Upstream) RemoveDirectives(names []string) {
+	nameMaps := make(map[string]struct{}, len(names))
+	for _, name := range names {
+		nameMaps[name] = struct{}{}
+	}
+	directives := us.GetDirectives()
+	var newDirectives []IDirective
+	for _, dir := range directives {
+		if _, ok := nameMaps[dir.GetName()]; ok {
+			continue
+		}
+		newDirectives = append(newDirectives, dir)
+	}
+	us.Directives = newDirectives
+}

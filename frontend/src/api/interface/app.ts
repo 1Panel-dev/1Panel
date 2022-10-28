@@ -88,6 +88,10 @@ export namespace App {
         detailId?: number;
     }
 
+    export interface AppInstalledSearch {
+        type: string;
+    }
+
     export interface AppService {
         label: string;
         value: string;
