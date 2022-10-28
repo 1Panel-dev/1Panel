@@ -10,7 +10,7 @@
       "name": "服务器"
     },
     {
-      "key": "Datastore",
+      "key": "Database",
       "name": "数据库"
     }
   ],
@@ -18,7 +18,7 @@
     {
       "key": "mysql5.7",
       "name": "Mysql5.7",
-      "tags": ["Datastore"],
+      "tags": ["Database"],
       "versions": ["5.7.39"],
       "short_desc": "常用关系型数据库",
       "icon": "mysql.png",
@@ -32,7 +32,7 @@
     {
       "key": "mysql8.0",
       "name": "Mysql8.0",
-      "tags": ["Datastore"],
+      "tags": ["Database"],
       "versions": ["8.0.30"],
       "short_desc": "常用关系型数据库",
       "icon": "mysql.png",
@@ -66,7 +66,7 @@
       "icon": "wordpress.png",
       "author": "Wordpress",
       "type": "website",
-      "required": ["mysql"],
+      "required": ["mysql8.0"],
       "limit": 0,
       "crossVersionUpdate": true,
       "source": "http://wordpress.org/"
@@ -74,7 +74,7 @@
     {
       "key": "redis",
       "name": "redis",
-      "tags": ["Datastore"],
+      "tags": ["Database"],
       "versions": ["7.0.5","6.0.16"],
       "short_desc": "缓存数据库",
       "icon": "redis.png",

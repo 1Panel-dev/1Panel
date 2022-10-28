@@ -14,6 +14,8 @@ type RouterGroup struct {
 	CronjobRouter
 	SettingRouter
 	AppRouter
+	WebsiteRouter
+	WebsiteGroupRouter
 	DatabaseRouter
 }
 

@@ -19,6 +19,15 @@ const webSiteRouter = {
             },
         },
         {
+            path: '/websites/projects/config',
+            name: 'WebsiteConfig',
+            component: () => import('@/views/website/project/config/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/websites',
+            },
+        },
+        {
             path: '/websites/config',
             name: 'Config',
             component: () => import('@/views/website/config/index.vue'),

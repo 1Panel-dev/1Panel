@@ -79,6 +79,8 @@ func Routers() *gin.Engine {
 		systemRouter.InitCronjobRouter(PrivateGroup)
 		systemRouter.InitSettingRouter(PrivateGroup)
 		systemRouter.InitAppRouter(PrivateGroup)
+		systemRouter.InitWebsiteRouter(PrivateGroup)
+		systemRouter.InitWebsiteGroupRouter(PrivateGroup)
 		systemRouter.InitDatabaseRouter(PrivateGroup)
 	}
 

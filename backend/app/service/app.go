@@ -127,6 +127,40 @@ func (a AppService) PageInstalled(req dto.AppInstalledRequest) (int64, []dto.App
 	return total, installDTOs, nil
 }
 
+func (a AppService) SearchInstalled(req dto.AppInstalledRequest) ([]dto.AppInstalled, error) {
+	var installs []model.AppInstall
+	var err error
+	if req.Type != "" {
+		apps, err := appRepo.GetBy(appRepo.WithType(req.Type))
+		if err != nil {
+			return nil, err
+		}
+		var ids []uint
+		for _, app := range apps {
+			ids = append(ids, app.ID)
+		}
+		installs, err = appInstallRepo.GetBy(appInstallRepo.WithAppIdsIn(ids))
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		installs, err = appInstallRepo.GetBy()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var installDTOs []dto.AppInstalled
+	for _, in := range installs {
+		installDto := dto.AppInstalled{
+			AppInstall: in,
+		}
+		installDTOs = append(installDTOs, installDto)
+	}
+
+	return installDTOs, nil
+}
+
 func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, error) {
 
 	var (

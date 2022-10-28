@@ -25,6 +25,13 @@ func (a AppInstallRepo) WithAppId(appId uint) DBOption {
 		return g.Where("app_id = ?", appId)
 	}
 }
+
+func (a AppInstallRepo) WithAppIdsIn(appIds []uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("app_id in (?)", appIds)
+	}
+}
+
 func (a AppInstallRepo) WithStatus(status string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("status = ?", status)

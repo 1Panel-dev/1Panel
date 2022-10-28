@@ -5,6 +5,7 @@ type IBlock interface {
 	FindDirectives(directiveName string) []IDirective
 	UpdateDirectives(directiveName string, directive Directive)
 	AddDirectives(directive Directive)
+	RemoveDirectives(names []string)
 	GetComment() string
 }
 

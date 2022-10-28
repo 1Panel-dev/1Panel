@@ -16,6 +16,12 @@ func (a AppRepo) WithKey(key string) DBOption {
 	}
 }
 
+func (a AppRepo) WithType(typeStr string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("type = ?", typeStr)
+	}
+}
+
 func (a AppRepo) Page(page, size int, opts ...DBOption) (int64, []model.App, error) {
 	var apps []model.App
 	db := getDb(opts...).Model(&model.App{})

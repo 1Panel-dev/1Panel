@@ -25,11 +25,13 @@ var (
 
 	hostService    = service.ServiceGroupApp.HostService
 	groupService   = service.ServiceGroupApp.GroupService
-	commandService = service.ServiceGroupApp.CommandService
 	fileService    = service.ServiceGroupApp.FileService
 
 	settingService = service.ServiceGroupApp.SettingService
 	backupService  = service.ServiceGroupApp.BackupService
 
 	operationService = service.ServiceGroupApp.OperationService
+	commandService         = service.ServiceGroupApp.CommandService
+	websiteGroupService    = service.ServiceGroupApp.WebsiteGroupService
+	websiteService         = service.ServiceGroupApp.WebsiteService
 )

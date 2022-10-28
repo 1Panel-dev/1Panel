@@ -88,6 +88,22 @@ func (h *Http) AddDirectives(directive Directive) {
 	h.Directives = directives
 }
 
+func (h *Http) RemoveDirectives(names []string) {
+	nameMaps := make(map[string]struct{}, len(names))
+	for _, name := range names {
+		nameMaps[name] = struct{}{}
+	}
+	directives := h.GetDirectives()
+	var newDirectives []IDirective
+	for _, dir := range directives {
+		if _, ok := nameMaps[dir.GetName()]; ok {
+			continue
+		}
+		newDirectives = append(newDirectives, dir)
+	}
+	h.Directives = newDirectives
+}
+
 func (h *Http) GetBlock() IBlock {
 	return h
 }

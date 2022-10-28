@@ -30,6 +30,10 @@ export const GetAppInstalled = (info: ReqPage) => {
     return http.post<ResPage<App.AppInstalled>>('apps/installed', info);
 };
 
+export const SearchAppInstalled = (search: App.AppInstalledSearch) => {
+    return http.post<App.AppInstalled[]>('apps/installed', search);
+};
+
 export const InstalledOp = (op: App.AppInstalledOp) => {
     return http.post<any>('apps/installed/op', op);
 };

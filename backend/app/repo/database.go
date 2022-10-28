@@ -3,7 +3,6 @@ package repo
 import (
 	"context"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
-	"github.com/1Panel-dev/1Panel/backend/global"
 	"gorm.io/gorm"
 )
 
@@ -17,24 +16,16 @@ func (d DatabaseRepo) ByAppInstallId(installId uint) DBOption {
 }
 
 func (d DatabaseRepo) Create(ctx context.Context, database *model.AppDatabase) error {
-	db := ctx.Value("db").(*gorm.DB).Model(&model.AppDatabase{})
-	return db.Create(&database).Error
+	return getTx(ctx).Model(&model.AppDatabase{}).Create(&database).Error
 }
 
 func (d DatabaseRepo) DeleteBy(ctx context.Context, opts ...DBOption) error {
-	db := ctx.Value("db").(*gorm.DB).Model(&model.AppDatabase{})
-	for _, opt := range opts {
-		db = opt(db)
-	}
-	return db.Delete(&model.AppDatabase{}).Error
+	return getTx(ctx, opts...).Model(&model.AppDatabase{}).Delete(&model.AppDatabase{}).Error
 }
 
 func (d DatabaseRepo) GetBy(opts ...DBOption) ([]model.AppDatabase, error) {
-	db := global.DB.Model(model.AppDatabase{})
+	db := getDb(opts...)
 	var databases []model.AppDatabase
-	for _, opt := range opts {
-		db = opt(db)
-	}
 	err := db.Find(&databases).Error
 	if err != nil {
 		return nil, err
@@ -43,11 +34,8 @@ func (d DatabaseRepo) GetBy(opts ...DBOption) ([]model.AppDatabase, error) {
 }
 
 func (d DatabaseRepo) GetFirst(opts ...DBOption) (model.AppDatabase, error) {
-	db := global.DB.Model(model.AppDatabase{})
+	db := getDb(opts...)
 	var database model.AppDatabase
-	for _, opt := range opts {
-		db = opt(db)
-	}
 	err := db.Find(&database).Error
 	if err != nil {
 		return database, err
