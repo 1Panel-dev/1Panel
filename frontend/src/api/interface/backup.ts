@@ -13,6 +13,11 @@ export namespace Backup {
         credential: string;
         vars: string;
     }
+    export interface RecordDownload {
+        source: string;
+        fileDir: string;
+        fileName: string;
+    }
     export interface RecordInfo {
         id: number;
         createdAt: Date;

@@ -16,6 +16,10 @@ export const editBackup = (params: Backup.BackupOperate) => {
 export const deleteBackup = (params: { ids: number[] }) => {
     return http.post(`/backups/del`, params);
 };
+
+export const downloadBackupRecord = (params: Backup.RecordDownload) => {
+    return http.download<BlobPart>(`/backups/record/download`, params, { responseType: 'blob' });
+};
 export const deleteBackupRecord = (params: { ids: number[] }) => {
     return http.post(`/backups/record/del`, params);
 };
