@@ -56,6 +56,18 @@ export const setRedis = (params: Database.RedisDataSet) => {
 export const deleteRedisKey = (params: Database.RedisDelBatch) => {
     return http.post(`/databases/redis/del`, params);
 };
-export const cleanRedisKey = (db: number) => {
-    return http.post(`/databases/redis/clean/${db}`);
+export const cleanRedisKey = (params: Database.RedisBaseReq) => {
+    return http.post(`/databases/redis/clean`, params);
+};
+export const loadRedisStatus = (params: Database.RedisBaseReq) => {
+    return http.post<Database.RedisStatus>(`/databases/redis/status`, params);
+};
+export const loadRedisConf = (params: Database.RedisBaseReq) => {
+    return http.post<Database.RedisConf>(`/databases/redis/conf`, params);
+};
+export const updateRedisConf = (params: Database.RedisConfUpdate) => {
+    return http.post(`/databases/redis/conf/update`, params);
+};
+export const loadRedisVersions = () => {
+    return http.get(`/databases/redis/versions`);
 };

@@ -2,18 +2,18 @@ import { ReqPage } from '.';
 
 export namespace Database {
     export interface Search extends ReqPage {
-        version: string;
+        mysqlName: string;
     }
     export interface SearchBackupRecord extends ReqPage {
-        version: string;
+        mysqlName: string;
         dbName: string;
     }
     export interface Backup {
-        version: string;
+        mysqlName: string;
         dbName: string;
     }
     export interface Recover {
-        version: string;
+        mysqlName: string;
         dbName: string;
         backupName: string;
     }
@@ -32,10 +32,11 @@ export namespace Database {
         port: number;
         password: string;
         remoteConn: boolean;
+        mysqlKey: string;
     }
     export interface MysqlDBCreate {
         name: string;
-        version: string;
+        mysqlName: string;
         format: string;
         username: string;
         password: string;
@@ -43,7 +44,7 @@ export namespace Database {
         description: string;
     }
     export interface MysqlVariables {
-        version: string;
+        mysqlName: string;
         binlog_cache_size: number;
         innodb_buffer_pool_size: number;
         innodb_log_buffer_size: number;
@@ -98,16 +99,29 @@ export namespace Database {
     }
     export interface ChangeInfo {
         id: number;
-        version: string;
+        mysqlName: string;
         operation: string;
         value: string;
     }
 
     // redis
     export interface SearchRedisWithPage extends ReqPage {
+        redisName: string;
         db: number;
     }
+    export interface RedisBaseReq {
+        redisName: string;
+        db: number;
+    }
+    export interface RedisConfUpdate {
+        redisName: string;
+        db: number;
+        paramName: string;
+        value: string;
+    }
     export interface RedisData {
+        redisName: string;
+        db: number;
         key: string;
         value: string;
         type: string;
@@ -115,14 +129,42 @@ export namespace Database {
         expiration: number;
     }
     export interface RedisDataSet {
+        redisName: string;
         db: number;
         key: string;
         value: string;
         expiration: number;
     }
-
     export interface RedisDelBatch {
+        redisName: string;
         db: number;
         names: Array<string>;
+    }
+    export interface RedisStatus {
+        tcp_port: string;
+        uptime_in_days: string;
+        connected_clients: string;
+        used_memory: string;
+        used_memory_rss: string;
+        used_memory_peak: string;
+        mem_fragmentation_ratio: string;
+        total_connections_received: string;
+        total_commands_processed: string;
+        instantaneous_ops_per_sec: string;
+        keyspace_hits: string;
+        keyspace_misses: string;
+        latest_fork_usec: string;
+    }
+    export interface RedisConf {
+        timeout: number;
+        maxclients: number;
+        databases: number;
+        requirepass: string;
+        maxmemory: number;
+
+        dir: string;
+        appendonly: string;
+        appendfsync: string;
+        save: string;
     }
 }

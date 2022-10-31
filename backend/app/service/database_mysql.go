@@ -23,7 +23,7 @@ type MysqlService struct{}
 
 type IMysqlService interface {
 	SearchWithPage(search dto.SearchDBWithPage) (int64, interface{}, error)
-	ListDBByVersion(version string) ([]string, error)
+	ListDBByVersion(name string) ([]string, error)
 	SearchBackupsWithPage(search dto.SearchBackupsWithPage) (int64, interface{}, error)
 	Create(mysqlDto dto.MysqlDBCreate) error
 	ChangeInfo(info dto.ChangeDBInfo) error
@@ -32,11 +32,11 @@ type IMysqlService interface {
 	Backup(db dto.BackupDB) error
 	Recover(db dto.RecoverDB) error
 
-	Delete(version string, ids []uint) error
-	LoadStatus(version string) (*dto.MysqlStatus, error)
-	LoadVariables(version string) (*dto.MysqlVariables, error)
+	Delete(name string, ids []uint) error
+	LoadStatus(name string) (*dto.MysqlStatus, error)
+	LoadVariables(vernamesion string) (*dto.MysqlVariables, error)
 	LoadRunningVersion() ([]string, error)
-	LoadBaseInfo(version string) (*dto.DBBaseInfo, error)
+	LoadBaseInfo(name string) (*dto.DBBaseInfo, error)
 }
 
 func NewIMysqlService() IMysqlService {
@@ -44,7 +44,7 @@ func NewIMysqlService() IMysqlService {
 }
 
 func (u *MysqlService) SearchWithPage(search dto.SearchDBWithPage) (int64, interface{}, error) {
-	total, mysqls, err := mysqlRepo.Page(search.Page, search.PageSize, mysqlRepo.WithByVersion(search.Version))
+	total, mysqls, err := mysqlRepo.Page(search.Page, search.PageSize, mysqlRepo.WithByMysqlName(search.MysqlName))
 	var dtoMysqls []dto.MysqlDBInfo
 	for _, mysql := range mysqls {
 		var item dto.MysqlDBInfo
@@ -56,8 +56,8 @@ func (u *MysqlService) SearchWithPage(search dto.SearchDBWithPage) (int64, inter
 	return total, dtoMysqls, err
 }
 
-func (u *MysqlService) ListDBByVersion(version string) ([]string, error) {
-	mysqls, err := mysqlRepo.List(mysqlRepo.WithByVersion(version))
+func (u *MysqlService) ListDBByVersion(name string) ([]string, error) {
+	mysqls, err := mysqlRepo.List(commonRepo.WithByName(name))
 	var dbNames []string
 	for _, mysql := range mysqls {
 		dbNames = append(dbNames, mysql.Name)
@@ -66,7 +66,7 @@ func (u *MysqlService) ListDBByVersion(version string) ([]string, error) {
 }
 
 func (u *MysqlService) SearchBackupsWithPage(search dto.SearchBackupsWithPage) (int64, interface{}, error) {
-	app, err := mysqlRepo.LoadBaseInfoByKey(search.Version)
+	app, err := mysqlRepo.LoadBaseInfoByName(search.MysqlName)
 	if err != nil {
 		return 0, nil, err
 	}
@@ -81,7 +81,7 @@ func (u *MysqlService) SearchBackupsWithPage(search dto.SearchBackupsWithPage) (
 }
 
 func (u *MysqlService) LoadRunningVersion() ([]string, error) {
-	return mysqlRepo.LoadRunningVersion()
+	return mysqlRepo.LoadRunningVersion([]string{"Mysql5.7", "Mysql8.0"})
 }
 
 func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
@@ -96,7 +96,7 @@ func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 
-	app, err := mysqlRepo.LoadBaseInfoByKey(mysqlDto.Version)
+	app, err := mysqlRepo.LoadBaseInfoByName(mysqlDto.MysqlName)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
 		return err
 	}
 	grantStr := fmt.Sprintf("grant all privileges on %s.* to '%s'@'%s'", mysqlDto.Name, mysqlDto.Username, tmpPermission)
-	if mysqlDto.Version == "5.7.39" {
+	if app.Key == "mysql5.7" {
 		grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, mysqlDto.Password)
 	}
 	if err := excuteSql(app.ContainerName, app.Password, grantStr); err != nil {
@@ -129,16 +129,16 @@ func (u *MysqlService) Backup(db dto.BackupDB) error {
 	if err != nil {
 		return err
 	}
-	backupDir := fmt.Sprintf("database/%s/%s", db.Version, db.DBName)
+	backupDir := fmt.Sprintf("database/%s/%s", db.MysqlName, db.DBName)
 	fileName := fmt.Sprintf("%s_%s.sql.gz", db.DBName, time.Now().Format("20060102150405"))
-	if err := backupMysql("LOCAL", localDir, backupDir, db.Version, db.DBName, fileName); err != nil {
+	if err := backupMysql("LOCAL", localDir, backupDir, db.MysqlName, db.DBName, fileName); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (u *MysqlService) Recover(db dto.RecoverDB) error {
-	app, err := mysqlRepo.LoadBaseInfoByKey(db.Version)
+	app, err := mysqlRepo.LoadBaseInfoByName(db.MysqlName)
 	if err != nil {
 		return err
 	}
@@ -162,8 +162,8 @@ func (u *MysqlService) Recover(db dto.RecoverDB) error {
 	return nil
 }
 
-func (u *MysqlService) Delete(version string, ids []uint) error {
-	app, err := mysqlRepo.LoadBaseInfoByKey(version)
+func (u *MysqlService) Delete(name string, ids []uint) error {
+	app, err := mysqlRepo.LoadBaseInfoByName(name)
 	if err != nil {
 		return err
 	}
@@ -198,7 +198,7 @@ func (u *MysqlService) ChangeInfo(info dto.ChangeDBInfo) error {
 			return err
 		}
 	}
-	app, err := mysqlRepo.LoadBaseInfoByKey(info.Version)
+	app, err := mysqlRepo.LoadBaseInfoByName(info.MysqlName)
 	if err != nil {
 		return err
 	}
@@ -247,7 +247,7 @@ func (u *MysqlService) ChangeInfo(info dto.ChangeDBInfo) error {
 		return err
 	}
 	grantStr := fmt.Sprintf("grant all privileges on %s.* to '%s'@'%s'", mysql.Name, mysql.Username, info.Value)
-	if mysql.Version == "5.7.39" {
+	if app.Key == "mysql5.7" {
 		grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, mysql.Password)
 	}
 	if err := excuteSql(app.ContainerName, app.Password, grantStr); err != nil {
@@ -266,7 +266,7 @@ func (u *MysqlService) ChangeInfo(info dto.ChangeDBInfo) error {
 }
 
 func (u *MysqlService) UpdateVariables(variables dto.MysqlVariablesUpdate) error {
-	app, err := mysqlRepo.LoadBaseInfoByKey(variables.Version)
+	app, err := mysqlRepo.LoadBaseInfoByName(variables.MysqlName)
 	if err != nil {
 		return err
 	}
@@ -318,15 +318,16 @@ func (u *MysqlService) UpdateVariables(variables dto.MysqlVariablesUpdate) error
 	return nil
 }
 
-func (u *MysqlService) LoadBaseInfo(version string) (*dto.DBBaseInfo, error) {
+func (u *MysqlService) LoadBaseInfo(name string) (*dto.DBBaseInfo, error) {
 	var data dto.DBBaseInfo
-	app, err := mysqlRepo.LoadBaseInfoByKey(version)
+	app, err := mysqlRepo.LoadBaseInfoByName(name)
 	if err != nil {
 		return nil, err
 	}
 	data.Name = app.Name
 	data.Port = int64(app.Port)
 	data.Password = app.Password
+	data.MysqlKey = app.Key
 
 	hosts, err := excuteSqlForRows(app.ContainerName, app.Password, "select host from mysql.user where user='root';")
 	if err != nil {
@@ -341,8 +342,8 @@ func (u *MysqlService) LoadBaseInfo(version string) (*dto.DBBaseInfo, error) {
 	return &data, nil
 }
 
-func (u *MysqlService) LoadVariables(version string) (*dto.MysqlVariables, error) {
-	app, err := mysqlRepo.LoadBaseInfoByKey(version)
+func (u *MysqlService) LoadVariables(name string) (*dto.MysqlVariables, error) {
+	app, err := mysqlRepo.LoadBaseInfoByName(name)
 	if err != nil {
 		return nil, err
 	}
@@ -359,8 +360,8 @@ func (u *MysqlService) LoadVariables(version string) (*dto.MysqlVariables, error
 	return &info, nil
 }
 
-func (u *MysqlService) LoadStatus(version string) (*dto.MysqlStatus, error) {
-	app, err := mysqlRepo.LoadBaseInfoByKey(version)
+func (u *MysqlService) LoadStatus(name string) (*dto.MysqlStatus, error) {
+	app, err := mysqlRepo.LoadBaseInfoByName(name)
 	if err != nil {
 		return nil, err
 	}
@@ -443,8 +444,8 @@ func excuteSql(containerName, password, command string) error {
 	return nil
 }
 
-func backupMysql(backupType, baseDir, backupDir, version, dbName, fileName string) error {
-	app, err := mysqlRepo.LoadBaseInfoByKey(version)
+func backupMysql(backupType, baseDir, backupDir, mysqkName, dbName, fileName string) error {
+	app, err := mysqlRepo.LoadBaseInfoByName(mysqkName)
 	if err != nil {
 		return err
 	}

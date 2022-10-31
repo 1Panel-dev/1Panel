@@ -1,7 +1,37 @@
 <template>
     <div>
         <Submenu activeName="redis" />
-        <el-card style="margin-top: 20px">
+        <el-dropdown size="default" split-button style="margin-top: 20px; margin-bottom: 5px">
+            {{ redisName }}
+            <template #dropdown>
+                <el-dropdown-menu v-model="redisName">
+                    <el-dropdown-item v-for="item in redisNames" :key="item" @click="onChangeName(item)">
+                        {{ item }}
+                    </el-dropdown-item>
+                </el-dropdown-menu>
+            </template>
+        </el-dropdown>
+        <el-button
+            v-if="!isOnSetting"
+            style="margin-top: 20px; margin-left: 10px"
+            size="default"
+            icon="Setting"
+            @click="onSetting"
+        >
+            {{ $t('database.setting') }}
+        </el-button>
+        <el-button
+            v-if="isOnSetting"
+            style="margin-top: 20px; margin-left: 10px"
+            size="default"
+            icon="Back"
+            @click="onBacklist"
+        >
+            {{ $t('commons.button.back') }}列表
+        </el-button>
+
+        <Setting ref="settingRef"></Setting>
+        <el-card v-if="!isOnSetting">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" @search="search" :data="data">
                 <template #toolbar>
                     <el-button type="primary" @click="onOperate">{{ $t('commons.button.create') }}</el-button>
@@ -80,8 +110,9 @@
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import Submenu from '@/views/database/index.vue';
+import Setting from '@/views/database/redis/setting/index.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { cleanRedisKey, deleteRedisKey, searchRedisDBs, setRedis } from '@/api/modules/database';
+import { cleanRedisKey, deleteRedisKey, loadRedisVersions, searchRedisDBs, setRedis } from '@/api/modules/database';
 import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { Database } from '@/api/interface/database';
@@ -113,6 +144,7 @@ const paginationConfig = reactive({
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 const form = reactive({
+    redisName: '',
     key: '',
     value: '',
     db: 0,
@@ -126,10 +158,48 @@ const rules = reactive({
 });
 const redisVisiable = ref(false);
 
+const redisNames = ref();
+const redisName = ref();
+const isOnSetting = ref(false);
+const settingRef = ref();
+const onSetting = async () => {
+    isOnSetting.value = true;
+    let params = {
+        redisName: redisName.value,
+        db: currentDB.value,
+    };
+    settingRef.value!.acceptParams(params);
+};
+const onBacklist = async () => {
+    isOnSetting.value = false;
+    search();
+    settingRef.value!.onClose();
+};
+
+const loadRunningNames = async () => {
+    const res = await loadRedisVersions();
+    redisNames.value = res.data;
+    if (redisNames.value.length != 0) {
+        redisName.value = redisNames.value[0];
+        search();
+    }
+};
+const onChangeName = async (val: string) => {
+    redisName.value = val;
+    search();
+    if (isOnSetting.value) {
+        let params = {
+            redisName: redisName.value,
+        };
+        settingRef.value!.acceptParams(params);
+    }
+};
+
 const search = async () => {
     let params = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
+        redisName: redisName.value,
         db: currentDB.value,
     };
     const res = await searchRedisDBs(params);
@@ -147,6 +217,7 @@ const onBatchDelete = async (row: Database.RedisData | null) => {
         });
     }
     let params = {
+        redisName: redisName.value,
         db: form.db,
         names: names,
     };
@@ -161,7 +232,11 @@ const onCleanAll = async () => {
         type: 'warning',
         draggable: true,
     }).then(async () => {
-        await cleanRedisKey(currentDB.value);
+        let params = {
+            redisName: redisName.value,
+            db: currentDB.value,
+        };
+        await cleanRedisKey(params);
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         search();
     });
@@ -186,6 +261,7 @@ const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
+        form.redisName = redisName.value;
         await setRedis(form);
         redisVisiable.value = false;
         currentDB.value = form.db;
@@ -208,8 +284,7 @@ const buttons = [
         },
     },
 ];
-
 onMounted(() => {
-    search();
+    loadRunningNames();
 });
 </script>

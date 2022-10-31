@@ -16,7 +16,7 @@ type MysqlDBInfo struct {
 
 type MysqlDBCreate struct {
 	Name        string `json:"name" validate:"required"`
-	Version     string `json:"version" validate:"required,oneof=mysql5.7 mysql8.0"`
+	MysqlName   string `json:"mysqlName" validate:"required"`
 	Format      string `json:"format" validate:"required,oneof=utf8mb4 utf-8 gbk big5"`
 	Username    string `json:"username" validate:"required"`
 	Password    string `json:"password" validate:"required"`
@@ -82,7 +82,7 @@ type MysqlVariables struct {
 }
 
 type MysqlVariablesUpdate struct {
-	Version              string `json:"version" validate:"required,oneof=mysql5.7 mysql8.0"`
+	MysqlName            string `json:"mysqlName" validate:"required"`
 	KeyBufferSize        int64  `json:"key_buffer_size" validate:"required"`
 	QueryCacheSize       int64  `json:"query_cache_size" validate:"required"`
 	TmpTableSize         int64  `json:"tmp_table_size" validate:"required"`
@@ -102,7 +102,7 @@ type MysqlVariablesUpdate struct {
 
 type ChangeDBInfo struct {
 	ID        uint   `json:"id"`
-	Version   string `json:"version" validate:"required,oneof=mysql5.7 mysql8.0"`
+	MysqlName string `json:"mysqlName" validate:"required"`
 	Operation string `json:"operation" validate:"required,oneof=password privilege"`
 	Value     string `json:"value" validate:"required"`
 }
@@ -112,26 +112,27 @@ type DBBaseInfo struct {
 	Port       int64  `json:"port"`
 	Password   string `json:"password"`
 	RemoteConn bool   `json:"remoteConn"`
+	MysqlKey   string `json:"mysqlKey"`
 }
 
 type SearchDBWithPage struct {
 	PageInfo
-	Version string `json:"version" validate:"required,oneof=mysql5.7 mysql8.0"`
+	MysqlName string `json:"mysqlName" validate:"required"`
 }
 
 type SearchBackupsWithPage struct {
 	PageInfo
-	Version string `json:"version" validate:"required,oneof=mysql5.7 mysql8.0"`
-	DBName  string `json:"dbName" validate:"required"`
+	MysqlName string `json:"mysqlName" validate:"required"`
+	DBName    string `json:"dbName" validate:"required"`
 }
 
 type BackupDB struct {
-	Version string `json:"version" validate:"required,oneof=mysql5.7 mysql8.0"`
-	DBName  string `json:"dbName" validate:"required"`
+	MysqlName string `json:"mysqlName" validate:"required"`
+	DBName    string `json:"dbName" validate:"required"`
 }
 
 type RecoverDB struct {
-	Version    string `json:"version" validate:"required,oneof=mysql5.7 mysql8.0"`
+	MysqlName  string `json:"mysqlName" validate:"required"`
 	DBName     string `json:"dbName" validate:"required"`
 	BackupName string `json:"backupName" validate:"required"`
 }
@@ -139,7 +140,8 @@ type RecoverDB struct {
 // redis
 type SearchRedisWithPage struct {
 	PageInfo
-	DB int `json:"db" validate:"required"`
+	RedisName string `json:"redisName" validate:"required"`
+	DB        int    `json:"db" validate:"required"`
 }
 
 type RedisData struct {
@@ -151,6 +153,7 @@ type RedisData struct {
 }
 
 type RedisDataSet struct {
+	RedisName  string `json:"redisName" validate:"required"`
 	DB         int    `json:"db"`
 	Key        string `json:"key" validate:"required"`
 	Value      string `json:"value" validate:"required"`
@@ -158,6 +161,48 @@ type RedisDataSet struct {
 }
 
 type RedisDelBatch struct {
-	DB    int      `json:"db" validate:"required"`
-	Names []string `json:"names" validate:"required"`
+	RedisName string   `json:"redisName" validate:"required"`
+	DB        int      `json:"db" validate:"required"`
+	Names     []string `json:"names" validate:"required"`
+}
+
+type RedisBaseReq struct {
+	RedisName string `json:"redisName" validate:"required"`
+	DB        int    `json:"db"`
+}
+
+type RedisConfUpdate struct {
+	RedisName string `json:"redisName" validate:"required"`
+	DB        int    `json:"db"`
+	ParamName string `json:"paramName" validate:"required"`
+	Value     string `json:"value"`
+}
+
+type RedisConf struct {
+	Timeout     string `json:"timeout"`
+	Maxclients  string `json:"maxclients"`
+	Databases   string `json:"databases"`
+	Requirepass string `json:"requirepass"`
+	Maxmemory   string `json:"maxmemory"`
+
+	Dir         string `json:"dir"`
+	Appendonly  string `json:"appendonly"`
+	Appendfsync string `json:"appendfsync"`
+	Save        string `json:"save"`
+}
+
+type RedisStatus struct {
+	TcpPort                  string `json:"tcp_port"`
+	UptimeInDays             string `json:"uptime_in_days"`
+	ConnectedClients         string `json:"connected_clients"`
+	UsedMemory               string `json:"used_memory"`
+	UsedMemory_rss           string `json:"used_memory_rss"`
+	UsedMemory_peak          string `json:"used_memory_peak"`
+	MemFragmentationRatio    string `json:"mem_fragmentation_ratio"`
+	TotalConnectionsReceived string `json:"total_connections_received"`
+	TotalCommandsProcessed   string `json:"total_commands_processed"`
+	InstantaneousOpsPerSec   string `json:"instantaneous_ops_per_sec"`
+	KeyspaceHits             string `json:"keyspace_hits"`
+	KeyspaceMisses           string `json:"keyspace_misses"`
+	LatestForkUsec           string `json:"latest_fork_usec"`
 }

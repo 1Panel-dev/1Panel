@@ -60,7 +60,7 @@ import { addMysqlDB } from '@/api/modules/database';
 const createVisiable = ref(false);
 const form = reactive({
     name: '',
-    version: '',
+    mysqlName: '',
     format: '',
     username: '',
     password: '',
@@ -79,11 +79,11 @@ type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
 interface DialogProps {
-    version: string;
+    mysqlName: string;
 }
 const acceptParams = (params: DialogProps): void => {
     form.name = '';
-    form.version = params.version;
+    form.mysqlName = params.mysqlName;
     form.format = 'utf8mb4';
     form.username = '';
     form.password = '';

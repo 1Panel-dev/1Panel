@@ -339,6 +339,7 @@ const baseInfo = reactive({
     port: 3306,
     password: '',
     remoteConn: false,
+    mysqlKey: '',
 });
 const panelFormRef = ref<FormInstance>();
 const mysqlConf = ref();
@@ -347,7 +348,7 @@ const plan = ref();
 
 const variableFormRef = ref<FormInstance>();
 let mysqlVariables = reactive({
-    version: '',
+    mysqlName: '',
     key_buffer_size: 0,
     query_cache_size: 0,
     tmp_table_size: 0,
@@ -404,14 +405,14 @@ let mysqlStatus = reactive({
 });
 
 const onSetting = ref<boolean>(false);
-const paramVersion = ref();
+const mysqlName = ref();
 
 interface DialogProps {
-    version: string;
+    mysqlName: string;
 }
 const acceptParams = (params: DialogProps): void => {
     onSetting.value = true;
-    paramVersion.value = params.version;
+    mysqlName.value = params.mysqlName;
     loadBaseInfo();
     loadStatus();
     loadVariables();
@@ -428,7 +429,7 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
     }
     let changeForm = {
         id: 0,
-        version: paramVersion.value,
+        mysqlName: mysqlName.value,
         value: val,
         operation: key === 'remoteConn' ? 'privilege' : key,
     };
@@ -447,12 +448,13 @@ function callback(error: any) {
 }
 
 const loadBaseInfo = async () => {
-    const res = await loadMysqlBaseInfo(paramVersion.value);
+    const res = await loadMysqlBaseInfo(mysqlName.value);
     baseInfo.name = res.data?.name;
     baseInfo.port = res.data?.port;
     baseInfo.password = res.data?.password;
     baseInfo.remoteConn = res.data?.remoteConn;
-    loadMysqlConf(`/opt/1Panel/data/apps/${paramVersion.value}/${baseInfo.name}/conf/my.cnf`);
+    baseInfo.mysqlKey = res.data?.mysqlKey;
+    loadMysqlConf(`/opt/1Panel/data/apps/${baseInfo.mysqlKey}/${baseInfo.name}/conf/my.cnf`);
 };
 
 const loadMysqlConf = async (path: string) => {
@@ -461,7 +463,7 @@ const loadMysqlConf = async (path: string) => {
 };
 
 const loadVariables = async () => {
-    const res = await loadMysqlVariables(paramVersion.value);
+    const res = await loadMysqlVariables(mysqlName.value);
     mysqlVariables.key_buffer_size = Number(res.data.key_buffer_size) / 1024 / 1024;
     mysqlVariables.query_cache_size = Number(res.data.query_cache_size) / 1024 / 1024;
     mysqlVariables.tmp_table_size = Number(res.data.tmp_table_size) / 1024 / 1024;
@@ -506,7 +508,7 @@ const onSaveVariables = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         let itemForm = {
-            version: paramVersion.value,
+            mysqlName: mysqlName.value,
             key_buffer_size: mysqlVariables.key_buffer_size * 1024 * 1024,
             query_cache_size: mysqlVariables.query_cache_size * 1024 * 1024,
             tmp_table_size: mysqlVariables.tmp_table_size * 1024 * 1024,
@@ -529,7 +531,7 @@ const onSaveVariables = async (formEl: FormInstance | undefined) => {
 };
 
 const loadStatus = async () => {
-    const res = await loadMysqlStatus(paramVersion.value);
+    const res = await loadMysqlStatus(mysqlName.value);
     let queryPerSecond = res.data.Questions / res.data.Uptime;
     let txPerSecond = (res.data!.Com_commit + res.data.Com_rollback) / res.data.Uptime;
 
