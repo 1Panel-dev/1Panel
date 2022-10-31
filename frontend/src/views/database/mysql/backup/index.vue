@@ -52,14 +52,14 @@ const paginationConfig = reactive({
 });
 
 const backupVisiable = ref(false);
-const version = ref();
+const mysqlName = ref();
 const dbName = ref();
 interface DialogProps {
-    version: string;
+    mysqlName: string;
     dbName: string;
 }
 const acceptParams = (params: DialogProps): void => {
-    version.value = params.version;
+    mysqlName.value = params.mysqlName;
     dbName.value = params.dbName;
     backupVisiable.value = true;
     search();
@@ -69,7 +69,7 @@ const search = async () => {
     let params = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
-        version: version.value,
+        mysqlName: mysqlName.value,
         dbName: dbName.value,
     };
     const res = await searchBackupRecords(params);
@@ -79,7 +79,7 @@ const search = async () => {
 
 const onBackup = async () => {
     let params = {
-        version: version.value,
+        mysqlName: mysqlName.value,
         dbName: dbName.value,
     };
     await backup(params);
@@ -89,7 +89,7 @@ const onBackup = async () => {
 
 const onRecover = async (row: Backup.RecordInfo) => {
     let params = {
-        version: version.value,
+        mysqlName: mysqlName.value,
         dbName: dbName.value,
         backupName: row.fileDir + row.fileName,
     };

@@ -2,9 +2,9 @@
     <div>
         <Submenu activeName="mysql" />
         <el-dropdown size="default" split-button style="margin-top: 20px; margin-bottom: 5px">
-            {{ version }}
+            {{ mysqlName }}
             <template #dropdown>
-                <el-dropdown-menu v-model="version">
+                <el-dropdown-menu v-model="mysqlName">
                     <el-dropdown-item v-for="item in mysqlVersions" :key="item" @click="onChangeVersion(item)">
                         {{ item }}
                     </el-dropdown-item>
@@ -128,7 +128,7 @@ import { Rules } from '@/global/form-rules';
 
 const selects = ref<any>([]);
 const mysqlVersions = ref();
-const version = ref<string>('5.7');
+const mysqlName = ref<string>('5.7');
 const isOnSetting = ref<boolean>();
 
 const data = ref();
@@ -141,7 +141,7 @@ const paginationConfig = reactive({
 const dialogRef = ref();
 const onOpenDialog = async () => {
     let params = {
-        version: version.value,
+        mysqlName: mysqlName.value,
     };
     dialogRef.value!.acceptParams(params);
 };
@@ -149,7 +149,7 @@ const onOpenDialog = async () => {
 const dialogBackupRef = ref();
 const onOpenBackupDialog = async (dbName: string) => {
     let params = {
-        version: version.value,
+        mysqlName: mysqlName.value,
         dbName: dbName,
     };
     dialogBackupRef.value!.acceptParams(params);
@@ -159,7 +159,7 @@ const settingRef = ref();
 const onSetting = async () => {
     isOnSetting.value = true;
     let params = {
-        version: version.value,
+        mysqlName: mysqlName.value,
     };
     settingRef.value!.acceptParams(params);
 };
@@ -174,7 +174,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const changeFormRef = ref<FormInstance>();
 const changeForm = reactive({
     id: 0,
-    version: '',
+    mysqlName: '',
     userName: '',
     password: '',
     operation: '',
@@ -187,7 +187,7 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         changeForm.value = changeForm.operation === 'password' ? changeForm.password : changeForm.privilege;
-        changeForm.version = version.value;
+        changeForm.mysqlName = mysqlName.value;
         await updateMysqlDBInfo(changeForm);
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         search();
@@ -199,17 +199,17 @@ const loadRunningOptions = async () => {
     const res = await loadVersions();
     mysqlVersions.value = res.data;
     if (mysqlVersions.value.length != 0) {
-        version.value = mysqlVersions.value[0];
+        mysqlName.value = mysqlVersions.value[0];
         search();
     }
 };
 
 const onChangeVersion = async (val: string) => {
-    version.value = val;
+    mysqlName.value = val;
     search();
     if (isOnSetting.value) {
         let params = {
-            version: version.value,
+            mysqlName: mysqlName.value,
         };
         settingRef.value!.acceptParams(params);
     }
@@ -219,7 +219,7 @@ const search = async () => {
     let params = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
-        version: version.value,
+        mysqlName: mysqlName.value,
     };
     const res = await searchMysqlDBs(params);
     data.value = res.data.items || [];

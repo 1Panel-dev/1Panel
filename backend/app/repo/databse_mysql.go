@@ -13,14 +13,15 @@ type MysqlRepo struct{}
 
 type IMysqlRepo interface {
 	Get(opts ...DBOption) (model.DatabaseMysql, error)
-	WithByVersion(version string) DBOption
+	WithByMysqlName(mysqlName string) DBOption
 	List(opts ...DBOption) ([]model.DatabaseMysql, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.DatabaseMysql, error)
 	Create(mysql *model.DatabaseMysql) error
 	Delete(opts ...DBOption) error
 	Update(id uint, vars map[string]interface{}) error
-	LoadRunningVersion() ([]string, error)
-	LoadBaseInfoByKey(key string) (*RootInfo, error)
+	LoadRunningVersion(keys []string) ([]string, error)
+	LoadBaseInfoByName(name string) (*RootInfo, error)
+	LoadRedisBaseInfoByName(name string) (*RootInfo, error)
 	UpdateMysqlConf(id uint, vars map[string]interface{}) error
 }
 
@@ -60,21 +61,21 @@ func (u *MysqlRepo) Page(page, size int, opts ...DBOption) (int64, []model.Datab
 	return count, users, err
 }
 
-func (u *MysqlRepo) LoadRunningVersion() ([]string, error) {
+func (u *MysqlRepo) LoadRunningVersion(keys []string) ([]string, error) {
 	var (
 		apps       []model.App
-		appInstall model.AppInstall
+		appInstall []model.AppInstall
 		results    []string
 	)
-	if err := global.DB.Where("name = ? OR name = ?", "Mysql5.7", "Mysql8.0").Find(&apps).Error; err != nil {
+	if err := global.DB.Where("name in (?)", keys).Find(&apps).Error; err != nil {
 		return nil, err
 	}
 	for _, app := range apps {
-		if err := global.DB.Where("app_id = ?", app.ID).First(&appInstall).Error; err != nil && err != gorm.ErrRecordNotFound {
+		if err := global.DB.Where("app_id = ?", app.ID).Find(&appInstall).Error; err != nil {
 			return nil, err
 		}
-		if appInstall.ID != 0 {
-			results = append(results, app.Key)
+		for _, item := range appInstall {
+			results = append(results, item.Name)
 		}
 	}
 	return results, nil
@@ -88,18 +89,56 @@ type RootInfo struct {
 	ContainerName string `json:"containerName"`
 	Param         string `json:"param"`
 	Env           string `json:"env"`
+	Key           string `json:"key"`
 }
 
-func (u *MysqlRepo) LoadBaseInfoByKey(key string) (*RootInfo, error) {
+func (u *MysqlRepo) LoadBaseInfoByName(name string) (*RootInfo, error) {
 	var (
 		app        model.App
 		appInstall model.AppInstall
 		info       RootInfo
 	)
-	if err := global.DB.Where("key = ?", key).First(&app).Error; err != nil {
+	if err := global.DB.Where("name = ?", name).First(&appInstall).Error; err != nil {
 		return nil, err
 	}
-	if err := global.DB.Where("app_id = ?", app.ID).First(&appInstall).Error; err != nil {
+	if err := global.DB.Where("id = ?", appInstall.AppId).First(&app).Error; err != nil {
+		return nil, err
+	}
+	envMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(appInstall.Env), &envMap); err != nil {
+		return nil, err
+	}
+	password, ok := envMap["PANEL_DB_ROOT_PASSWORD"].(string)
+	if ok {
+		info.Password = password
+	} else {
+		return nil, errors.New("error password in db")
+	}
+	port, ok := envMap["PANEL_APP_PORT_HTTP"].(float64)
+	if ok {
+		info.Port = int64(port)
+	} else {
+		return nil, errors.New("error port in db")
+	}
+	info.ID = appInstall.ID
+	info.Key = app.Key
+	info.ContainerName = appInstall.ContainerName
+	info.Name = appInstall.Name
+	info.Env = appInstall.Env
+	info.Param = appInstall.Param
+	return &info, nil
+}
+
+func (u *MysqlRepo) LoadRedisBaseInfoByName(name string) (*RootInfo, error) {
+	var (
+		app        model.App
+		appInstall model.AppInstall
+		info       RootInfo
+	)
+	if err := global.DB.Where("key = ?", "redis").First(&app).Error; err != nil {
+		return nil, err
+	}
+	if err := global.DB.Where("app_id = ? AND name = ?", app.ID, name).First(&appInstall).Error; err != nil {
 		return nil, err
 	}
 	envMap := make(map[string]interface{})
@@ -149,8 +188,8 @@ func (u *MysqlRepo) UpdateMysqlConf(id uint, vars map[string]interface{}) error 
 	return nil
 }
 
-func (c *MysqlRepo) WithByVersion(version string) DBOption {
+func (c *MysqlRepo) WithByMysqlName(mysqlName string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("version = ?", version)
+		return g.Where("mysql_name = ?", mysqlName)
 	}
 }

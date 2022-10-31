@@ -81,13 +81,13 @@ func (b *BaseApi) SearchMysql(c *gin.Context) {
 }
 
 func (b *BaseApi) ListDBNameByVersion(c *gin.Context) {
-	version, ok := c.Params.Get("version")
+	name, ok := c.Params.Get("name")
 	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error version in path"))
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error name in path"))
 		return
 	}
 
-	list, err := mysqlService.ListDBByVersion(version)
+	list, err := mysqlService.ListDBByVersion(name)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -155,13 +155,13 @@ func (b *BaseApi) DeleteMysql(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	version, ok := c.Params.Get("version")
+	name, ok := c.Params.Get("name")
 	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error version in path"))
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error name in path"))
 		return
 	}
 
-	if err := mysqlService.Delete(version, req.Ids); err != nil {
+	if err := mysqlService.Delete(name, req.Ids); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -179,13 +179,13 @@ func (b *BaseApi) LoadVersions(c *gin.Context) {
 }
 
 func (b *BaseApi) LoadBaseinfo(c *gin.Context) {
-	version, ok := c.Params.Get("version")
+	name, ok := c.Params.Get("name")
 	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error version in path"))
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error name in path"))
 		return
 	}
 
-	data, err := mysqlService.LoadBaseInfo(version)
+	data, err := mysqlService.LoadBaseInfo(name)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -195,13 +195,13 @@ func (b *BaseApi) LoadBaseinfo(c *gin.Context) {
 }
 
 func (b *BaseApi) LoadStatus(c *gin.Context) {
-	version, ok := c.Params.Get("version")
+	name, ok := c.Params.Get("name")
 	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error version in path"))
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error name in path"))
 		return
 	}
 
-	data, err := mysqlService.LoadStatus(version)
+	data, err := mysqlService.LoadStatus(name)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -211,12 +211,12 @@ func (b *BaseApi) LoadStatus(c *gin.Context) {
 }
 
 func (b *BaseApi) LoadVariables(c *gin.Context) {
-	version, ok := c.Params.Get("version")
+	name, ok := c.Params.Get("name")
 	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error version in path"))
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error name in path"))
 		return
 	}
-	data, err := mysqlService.LoadVariables(version)
+	data, err := mysqlService.LoadVariables(name)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
