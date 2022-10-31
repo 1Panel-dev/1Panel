@@ -34,5 +34,10 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		cmdRouter.GET("/baseinfo/:version", baseApi.LoadBaseinfo)
 		cmdRouter.GET("/versions", baseApi.LoadVersions)
 		cmdRouter.GET("/dbs/:version", baseApi.ListDBNameByVersion)
+
+		cmdRouter.POST("/redis/search", baseApi.SearchRedis)
+		withRecordRouter.POST("/redis", baseApi.SetRedis)
+		withRecordRouter.POST("/redis/del", baseApi.DeleteRedis)
+		withRecordRouter.POST("/redis/clean/:db", baseApi.CleanRedis)
 	}
 }

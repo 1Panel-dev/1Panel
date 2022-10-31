@@ -14,6 +14,7 @@ type BackupRecord struct {
 	Name       string `gorm:"type:varchar(64);not null" json:"name"`
 	DetailName string `gorm:"type:varchar(256)" json:"detailName"`
 	Source     string `gorm:"type:varchar(256)" json:"source"`
+	BackupType string `gorm:"type:varchar(256)" json:"backupType"`
 	FileDir    string `gorm:"type:varchar(256)" json:"fileDir"`
 	FileName   string `gorm:"type:varchar(256)" json:"fileName"`
 }

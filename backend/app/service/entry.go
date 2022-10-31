@@ -13,6 +13,7 @@ type ServiceGroup struct {
 	ComposeTemplateService
 
 	MysqlService
+	RedisService
 
 	CronjobService
 

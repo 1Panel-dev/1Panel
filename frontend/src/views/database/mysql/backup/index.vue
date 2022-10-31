@@ -11,13 +11,13 @@
                     <el-button type="primary" @click="onBackup()">
                         {{ $t('database.backup') }}
                     </el-button>
-                    <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete">
+                    <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </template>
                 <el-table-column type="selection" fix />
                 <el-table-column :label="$t('commons.table.name')" prop="fileName" show-overflow-tooltip />
-                <el-table-column :label="$t('database.source')" prop="source" />
+                <el-table-column :label="$t('database.source')" prop="backupType" />
                 <el-table-column
                     prop="createdAt"
                     :label="$t('commons.table.date')"

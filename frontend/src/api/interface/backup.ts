@@ -22,6 +22,7 @@ export namespace Backup {
         id: number;
         createdAt: Date;
         source: string;
+        backupType: string;
         fileDir: string;
         fileName: string;
     }

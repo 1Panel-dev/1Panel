@@ -25,11 +25,12 @@ type BackupSearch struct {
 }
 
 type BackupRecords struct {
-	ID        uint      `json:"id"`
-	CreatedAt time.Time `json:"createdAt"`
-	Source    string    `json:"source"`
-	FileDir   string    `json:"fileDir"`
-	FileName  string    `json:"fileName"`
+	ID         uint      `json:"id"`
+	CreatedAt  time.Time `json:"createdAt"`
+	Source     string    `json:"source"`
+	BackupType string    `json:"backupType"`
+	FileDir    string    `json:"fileDir"`
+	FileName   string    `json:"fileName"`
 }
 
 type DownloadRecord struct {

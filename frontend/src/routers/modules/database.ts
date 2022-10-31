@@ -20,7 +20,7 @@ const databaseRouter = {
             },
         },
         {
-            path: '/redis',
+            path: 'redis',
             name: 'Redis',
             component: () => import('@/views/database/redis/index.vue'),
             hidden: true,

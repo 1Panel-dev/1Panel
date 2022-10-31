@@ -66,7 +66,7 @@ func (u *MysqlService) ListDBByVersion(version string) ([]string, error) {
 }
 
 func (u *MysqlService) SearchBackupsWithPage(search dto.SearchBackupsWithPage) (int64, interface{}, error) {
-	app, err := mysqlRepo.LoadBaseInfoByVersion(search.Version)
+	app, err := mysqlRepo.LoadBaseInfoByKey(search.Version)
 	if err != nil {
 		return 0, nil, err
 	}
@@ -96,7 +96,7 @@ func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 
-	app, err := mysqlRepo.LoadBaseInfoByVersion(mysqlDto.Version)
+	app, err := mysqlRepo.LoadBaseInfoByKey(mysqlDto.Version)
 	if err != nil {
 		return err
 	}
@@ -138,7 +138,7 @@ func (u *MysqlService) Backup(db dto.BackupDB) error {
 }
 
 func (u *MysqlService) Recover(db dto.RecoverDB) error {
-	app, err := mysqlRepo.LoadBaseInfoByVersion(db.Version)
+	app, err := mysqlRepo.LoadBaseInfoByKey(db.Version)
 	if err != nil {
 		return err
 	}
@@ -163,7 +163,7 @@ func (u *MysqlService) Recover(db dto.RecoverDB) error {
 }
 
 func (u *MysqlService) Delete(version string, ids []uint) error {
-	app, err := mysqlRepo.LoadBaseInfoByVersion(version)
+	app, err := mysqlRepo.LoadBaseInfoByKey(version)
 	if err != nil {
 		return err
 	}
@@ -198,7 +198,7 @@ func (u *MysqlService) ChangeInfo(info dto.ChangeDBInfo) error {
 			return err
 		}
 	}
-	app, err := mysqlRepo.LoadBaseInfoByVersion(info.Version)
+	app, err := mysqlRepo.LoadBaseInfoByKey(info.Version)
 	if err != nil {
 		return err
 	}
@@ -266,7 +266,7 @@ func (u *MysqlService) ChangeInfo(info dto.ChangeDBInfo) error {
 }
 
 func (u *MysqlService) UpdateVariables(variables dto.MysqlVariablesUpdate) error {
-	app, err := mysqlRepo.LoadBaseInfoByVersion(variables.Version)
+	app, err := mysqlRepo.LoadBaseInfoByKey(variables.Version)
 	if err != nil {
 		return err
 	}
@@ -320,7 +320,7 @@ func (u *MysqlService) UpdateVariables(variables dto.MysqlVariablesUpdate) error
 
 func (u *MysqlService) LoadBaseInfo(version string) (*dto.DBBaseInfo, error) {
 	var data dto.DBBaseInfo
-	app, err := mysqlRepo.LoadBaseInfoByVersion(version)
+	app, err := mysqlRepo.LoadBaseInfoByKey(version)
 	if err != nil {
 		return nil, err
 	}
@@ -342,7 +342,7 @@ func (u *MysqlService) LoadBaseInfo(version string) (*dto.DBBaseInfo, error) {
 }
 
 func (u *MysqlService) LoadVariables(version string) (*dto.MysqlVariables, error) {
-	app, err := mysqlRepo.LoadBaseInfoByVersion(version)
+	app, err := mysqlRepo.LoadBaseInfoByKey(version)
 	if err != nil {
 		return nil, err
 	}
@@ -360,7 +360,7 @@ func (u *MysqlService) LoadVariables(version string) (*dto.MysqlVariables, error
 }
 
 func (u *MysqlService) LoadStatus(version string) (*dto.MysqlStatus, error) {
-	app, err := mysqlRepo.LoadBaseInfoByVersion(version)
+	app, err := mysqlRepo.LoadBaseInfoByKey(version)
 	if err != nil {
 		return nil, err
 	}
@@ -444,7 +444,7 @@ func excuteSql(containerName, password, command string) error {
 }
 
 func backupMysql(backupType, baseDir, backupDir, version, dbName, fileName string) error {
-	app, err := mysqlRepo.LoadBaseInfoByVersion(version)
+	app, err := mysqlRepo.LoadBaseInfoByKey(version)
 	if err != nil {
 		return err
 	}
@@ -471,6 +471,7 @@ func backupMysql(backupType, baseDir, backupDir, version, dbName, fileName strin
 		Name:       app.Name,
 		DetailName: dbName,
 		Source:     backupType,
+		BackupType: backupType,
 		FileDir:    backupDir,
 		FileName:   fileName,
 	}
