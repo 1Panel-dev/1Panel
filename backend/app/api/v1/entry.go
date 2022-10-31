@@ -19,6 +19,7 @@ var (
 	imageService           = service.ServiceGroupApp.ImageService
 
 	mysqlService = service.ServiceGroupApp.MysqlService
+	redisService = service.ServiceGroupApp.RedisService
 
 	cronjobService = service.ServiceGroupApp.CronjobService
 

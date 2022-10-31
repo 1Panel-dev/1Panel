@@ -102,4 +102,27 @@ export namespace Database {
         operation: string;
         value: string;
     }
+
+    // redis
+    export interface SearchRedisWithPage extends ReqPage {
+        db: number;
+    }
+    export interface RedisData {
+        key: string;
+        value: string;
+        type: string;
+        length: number;
+        expiration: number;
+    }
+    export interface RedisDataSet {
+        db: number;
+        key: string;
+        value: string;
+        expiration: number;
+    }
+
+    export interface RedisDelBatch {
+        db: number;
+        names: Array<string>;
+    }
 }

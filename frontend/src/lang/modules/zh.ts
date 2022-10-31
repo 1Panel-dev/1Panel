@@ -218,6 +218,16 @@ export default {
         tableOpenCacheHelper: '表缓存',
         maxConnectionsHelper: '最大连接数',
         restart: '重启数据库',
+
+        key: '键',
+        value: '值',
+        type: '数据类型',
+        length: '数据长度',
+        expiration: '有效期',
+        cleanAll: '清除所有',
+        expirationHelper: '有效期为 0 表示永久',
+        forever: '永久',
+        second: '秒',
     },
     container: {
         operatorHelper: '将对选中容器进行 {0} 操作，是否继续？',

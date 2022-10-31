@@ -20,7 +20,7 @@ type IMysqlRepo interface {
 	Delete(opts ...DBOption) error
 	Update(id uint, vars map[string]interface{}) error
 	LoadRunningVersion() ([]string, error)
-	LoadBaseInfoByVersion(key string) (*RootInfo, error)
+	LoadBaseInfoByKey(key string) (*RootInfo, error)
 	UpdateMysqlConf(id uint, vars map[string]interface{}) error
 }
 
@@ -90,7 +90,7 @@ type RootInfo struct {
 	Env           string `json:"env"`
 }
 
-func (u *MysqlRepo) LoadBaseInfoByVersion(key string) (*RootInfo, error) {
+func (u *MysqlRepo) LoadBaseInfoByKey(key string) (*RootInfo, error) {
 	var (
 		app        model.App
 		appInstall model.AppInstall

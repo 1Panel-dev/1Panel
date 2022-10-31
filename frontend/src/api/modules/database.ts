@@ -6,6 +6,9 @@ import { Database } from '../interface/database';
 export const searchMysqlDBs = (params: Database.Search) => {
     return http.post<ResPage<Database.MysqlDBInfo>>(`databases/search`, params);
 };
+export const searchRedisDBs = (params: Database.SearchRedisWithPage) => {
+    return http.post<ResPage<Database.RedisData>>(`databases/redis/search`, params);
+};
 export const listDBByVersion = (params: string) => {
     return http.get(`databases/dbs/${params}`);
 };
@@ -44,4 +47,15 @@ export const loadMysqlStatus = (param: string) => {
 };
 export const loadVersions = () => {
     return http.get(`/databases/versions`);
+};
+
+// redis
+export const setRedis = (params: Database.RedisDataSet) => {
+    return http.post(`/databases/redis`, params);
+};
+export const deleteRedisKey = (params: Database.RedisDelBatch) => {
+    return http.post(`/databases/redis/del`, params);
+};
+export const cleanRedisKey = (db: number) => {
+    return http.post(`/databases/redis/clean/${db}`);
 };

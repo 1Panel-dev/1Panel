@@ -135,3 +135,29 @@ type RecoverDB struct {
 	DBName     string `json:"dbName" validate:"required"`
 	BackupName string `json:"backupName" validate:"required"`
 }
+
+// redis
+type SearchRedisWithPage struct {
+	PageInfo
+	DB int `json:"db" validate:"required"`
+}
+
+type RedisData struct {
+	Key        string `json:"key"`
+	Value      string `json:"value"`
+	Type       string `json:"type"`
+	Length     int64  `json:"length"`
+	Expiration int64  `json:"expiration"`
+}
+
+type RedisDataSet struct {
+	DB         int    `json:"db"`
+	Key        string `json:"key" validate:"required"`
+	Value      string `json:"value" validate:"required"`
+	Expiration int64  `json:"expiration"`
+}
+
+type RedisDelBatch struct {
+	DB    int      `json:"db" validate:"required"`
+	Names []string `json:"names" validate:"required"`
+}
