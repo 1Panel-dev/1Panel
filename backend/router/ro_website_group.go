@@ -15,6 +15,7 @@ func (a *WebsiteGroupRouter) InitWebsiteGroupRouter(Router *gin.RouterGroup) {
 
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		groupRouter.GET("", baseApi.GetGroups)
+		groupRouter.GET("", baseApi.GetWebGroups)
+		//groupRouter.GET("", baseApi.GetGroups)
 	}
 }

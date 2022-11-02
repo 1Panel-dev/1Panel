@@ -5,10 +5,12 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/parser"
 	"github.com/1Panel-dev/1Panel/cmd/server/nginx_conf"
 	"github.com/pkg/errors"
+	"gorm.io/gorm"
 	"path"
 	"strconv"
 	"strings"
@@ -21,6 +23,7 @@ func getDomain(domainStr string, websiteID uint) (model.WebSiteDomain, error) {
 	domainArray := strings.Split(domainStr, ":")
 	if len(domainArray) == 1 {
 		domain.Domain = domainArray[0]
+		domain.Port = 80
 		return domain, nil
 	}
 	if len(domainArray) > 1 {
@@ -36,7 +39,7 @@ func getDomain(domainStr string, websiteID uint) (model.WebSiteDomain, error) {
 	return model.WebSiteDomain{}, nil
 }
 
-func configDefaultNginx(website model.WebSite, domains []model.WebSiteDomain) error {
+func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) error {
 
 	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
 	if err != nil {
@@ -67,7 +70,7 @@ func configDefaultNginx(website model.WebSite, domains []model.WebSiteDomain) er
 		server.UpdateListen(string(rune(domain.Port)), false)
 	}
 	server.UpdateServerName(serverNames)
-	proxy := fmt.Sprintf("%s:%d", appInstall.ServiceName, appInstall.HttpPort)
+	proxy := fmt.Sprintf("http://%s:%d", appInstall.ServiceName, appInstall.HttpPort)
 	server.UpdateRootProxy([]string{proxy})
 
 	config.FilePath = configPath
@@ -88,5 +91,36 @@ func opNginx(containerName, operate string) error {
 	if _, err := cmd.Exec(nginxCmd); err != nil {
 		return err
 	}
+	return nil
+}
+
+func delNginxConfig(website model.WebSite) error {
+
+	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
+	if err != nil {
+		return err
+	}
+	nginxInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithAppId(nginxApp.ID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
+		return err
+	}
+
+	nginxFileName := website.PrimaryDomain + ".conf"
+	configPath := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "conf", "conf.d", nginxFileName)
+	fileOp := files.NewFileOp()
+
+	if !fileOp.Stat(configPath) {
+		return nil
+	}
+	if err := fileOp.DeleteFile(configPath); err != nil {
+		return err
+	}
+	return opNginx(nginxInstall.ContainerName, "reload")
+}
+
+func delApp() error {
 	return nil
 }

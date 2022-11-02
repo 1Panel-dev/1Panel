@@ -633,6 +633,7 @@ export default {
         description: '一个现代化的 Linux 面板工具',
     },
     app: {
+        app: '应用',
         installed: '已安装',
         all: '全部',
         version: '版本',
@@ -676,5 +677,8 @@ export default {
         app_new: '新装应用',
         app_installed: '已装应用',
         create: '创建网站',
+        delete: '删除网站',
+        deleteApp: '删除应用',
+        deleteBackup: '删除备份',
     },
 };

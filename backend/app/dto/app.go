@@ -29,6 +29,7 @@ type AppRequest struct {
 	PageInfo
 	Name string   `json:"name"`
 	Tags []string `json:"tags"`
+	Type string   `json:"type"`
 }
 
 type AppInstallRequest struct {

@@ -1,0 +1,133 @@
+<template>
+    <div v-for="(p, index) in paramObjs" :key="index">
+        <el-form-item :label="p.labelZh" :prop="p.prop">
+            <el-input v-model="form[p.envKey]" v-if="p.type == 'text'" :type="p.type" @change="updateParam"></el-input>
+            <el-input
+                v-model.number="form[p.envKey]"
+                v-if="p.type == 'number'"
+                :type="p.type"
+                @change="updateParam"
+            ></el-input>
+            <el-input
+                v-model="form[p.envKey]"
+                v-if="p.type == 'password'"
+                :type="p.type"
+                show-password
+                @change="updateParam"
+            ></el-input>
+            <el-select v-model="form[p.envKey]" v-if="p.type == 'service'" @change="updateParam">
+                <el-option
+                    v-for="service in p.services"
+                    :key="service.label"
+                    :value="service.value"
+                    :label="service.label"
+                ></el-option>
+            </el-select>
+        </el-form-item>
+    </div>
+</template>
+<script lang="ts" setup>
+import { computed, onMounted, reactive, ref } from 'vue';
+import { getRandomStr } from '@/utils/util';
+import { GetAppService } from '@/api/modules/app';
+import { Rules } from '@/global/form-rules';
+import { App } from '@/api/interface/app';
+
+interface ParamObj extends App.FromField {
+    services: App.AppService[];
+    prop: string;
+}
+
+const emit = defineEmits(['update:form', 'update:rules']);
+
+const props = defineProps({
+    form: {
+        type: Object,
+        default: function () {
+            return {};
+        },
+    },
+    params: {
+        type: Object,
+        default: function () {
+            return {};
+        },
+    },
+    rules: {
+        type: Object,
+        default: function () {
+            return {};
+        },
+    },
+    propStart: {
+        type: String,
+        default: '',
+    },
+});
+
+const form = reactive({});
+let rules = reactive({});
+const params = computed({
+    get() {
+        return props.params;
+    },
+    set() {},
+});
+const propStart = computed({
+    get() {
+        return props.propStart;
+    },
+    set() {},
+});
+const paramObjs = ref<ParamObj[]>([]);
+
+const updateParam = () => {
+    emit('update:form', form);
+};
+
+const handleParams = () => {
+    rules = props.rules;
+
+    if (params.value != undefined && params.value.formFields != undefined) {
+        for (const p of params.value.formFields) {
+            const pObj = p;
+            pObj.prop = propStart.value + p.envKey;
+            paramObjs.value.push(pObj);
+            if (p.default == 'random') {
+                form[p.envKey] = getRandomStr(6);
+            } else {
+                form[p.envKey] = p.default;
+            }
+            if (p.required) {
+                if (p.type === 'service') {
+                    rules[p.envKey] = [Rules.requiredSelect];
+                } else {
+                    rules[p.envKey] = [Rules.requiredInput];
+                }
+            }
+            if (p.key) {
+                form[p.envKey] = '';
+                getServices(p.envKey, p.key, pObj);
+            }
+            emit('update:rules', rules);
+            updateParam();
+        }
+        console.log(rules);
+        console.log(paramObjs);
+    }
+};
+
+const getServices = async (envKey: string, key: string | undefined, pObj: ParamObj) => {
+    await GetAppService(key).then((res) => {
+        pObj.services = res.data;
+        if (res.data.length > 0) {
+            form[envKey] = res.data[0].value;
+            updateParam();
+        }
+    });
+};
+
+onMounted(() => {
+    handleParams();
+});
+</script>

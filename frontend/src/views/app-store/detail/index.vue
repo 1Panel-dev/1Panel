@@ -54,7 +54,7 @@
 import { GetApp, GetAppDetail } from '@/api/modules/app';
 import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, ref } from 'vue';
-import Install from './install.vue';
+import Install from './install/index.vue';
 
 interface OperateProps {
     id: number;
