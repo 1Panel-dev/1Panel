@@ -2,7 +2,8 @@
     <LayoutContent :header="'网站'">
         <ComplexTable :data="data" @search="search()">
             <template #toolbar>
-                <el-button type="primary" plain @click="openCreate">{{ '新建网站' }}</el-button>
+                <el-button type="primary" plain @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                <el-button type="primary" plain @click="openGroup">{{ $t('website.group') }}</el-button>
                 <el-button type="primary" plain>{{ '修改默认页' }}</el-button>
                 <el-button type="primary" plain>{{ '默认站点' }}</el-button>
             </template>
@@ -25,6 +26,7 @@
         </ComplexTable>
         <CreateWebSite ref="createRef" @close="search"></CreateWebSite>
         <DeleteWebsite ref="deleteRef" @close="search"></DeleteWebsite>
+        <WebSiteGroup ref="groupRef"></WebSiteGroup>
     </LayoutContent>
 </template>
 
@@ -32,15 +34,18 @@
 import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
-import router from '@/routers';
 import CreateWebSite from './create/index.vue';
 import DeleteWebsite from './delete/index.vue';
+import WebSiteGroup from './group/index.vue';
 import { SearchWebSites } from '@/api/modules/website';
-import i18n from '@/lang';
 import { WebSite } from '@/api/interface/website';
+
+import i18n from '@/lang';
+import router from '@/routers';
 
 const createRef = ref();
 const deleteRef = ref();
+const groupRef = ref();
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -84,6 +89,10 @@ const openDelete = (id: number) => {
 
 const openCreate = () => {
     createRef.value.acceptParams();
+};
+
+const openGroup = () => {
+    groupRef.value.acceptParams();
 };
 
 onMounted(() => {

@@ -21,16 +21,16 @@
                 <el-form-item prop="appType">
                     <el-radio-group v-model="website.appType" @change="changeAppType(website.appType)">
                         <el-radio :label="'installed'" :value="'installed'">
-                            {{ $t('website.app_installed') }}
+                            {{ $t('website.appInstalled') }}
                         </el-radio>
                         <el-radio :label="'new'">
-                            {{ $t('website.app_new') }}
+                            {{ $t('website.appNew') }}
                         </el-radio>
                     </el-radio-group>
                 </el-form-item>
                 <el-form-item
                     v-if="website.appType == 'installed'"
-                    :label="$t('website.app_installed')"
+                    :label="$t('website.appInstalled')"
                     prop="appInstallID"
                 >
                     <el-select v-model="website.appInstallID">
@@ -125,13 +125,13 @@ const website = ref({
     remark: '',
     domains: [],
     appType: 'installed',
-    appInstallID: null,
+    appInstallID: 0,
     webSiteGroupID: 1,
     otherDomains: '',
     appinstall: {
-        appID: null,
+        appID: 0,
         name: '',
-        appDetailID: null,
+        appDetailID: 0,
         params: {},
         version: '',
     },
@@ -140,12 +140,12 @@ let rules = ref({
     primaryDomain: [Rules.requiredInput],
     alias: [Rules.requiredInput],
     type: [Rules.requiredInput],
-    webSiteGroupID: [Rules.requiredInput],
-    appInstallID: [Rules.requiredInput],
+    webSiteGroupID: [Rules.requiredSelectBusiness],
+    appInstallID: [Rules.requiredSelectBusiness],
     appType: [Rules.requiredInput],
     appinstall: {
         name: [Rules.requiredInput],
-        appID: [Rules.requiredInput],
+        appID: [Rules.requiredSelectBusiness],
         params: {},
     },
 });

@@ -46,4 +46,9 @@ export namespace WebSite {
         name: string;
         default: boolean;
     }
+
+    export interface GroupOp {
+        name: string;
+        id?: number;
+    }
 }
