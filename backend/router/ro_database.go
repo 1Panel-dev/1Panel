@@ -28,6 +28,7 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		withRecordRouter.POST("/backups/search", baseApi.SearchDBBackups)
 		withRecordRouter.POST("/del", baseApi.DeleteMysql)
 		withRecordRouter.POST("/variables/update", baseApi.UpdateMysqlVariables)
+		withRecordRouter.POST("/conf/update/byfile", baseApi.UpdateMysqlConfByFile)
 		cmdRouter.POST("/search", baseApi.SearchMysql)
 		cmdRouter.GET("/variables/:name", baseApi.LoadVariables)
 		cmdRouter.GET("/status/:name", baseApi.LoadStatus)
@@ -39,5 +40,7 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		cmdRouter.GET("/redis/status", baseApi.LoadRedisStatus)
 		cmdRouter.GET("/redis/conf", baseApi.LoadRedisConf)
 		cmdRouter.GET("/redis/exec", baseApi.RedisExec)
+		cmdRouter.POST("/redis/conf/update", baseApi.UpdateRedisConf)
+		cmdRouter.POST("/redis/conf/update/byfile", baseApi.UpdateRedisConfByFile)
 	}
 }

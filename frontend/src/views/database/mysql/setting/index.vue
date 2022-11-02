@@ -65,11 +65,7 @@
                         v-model="mysqlConf"
                         :readOnly="true"
                     />
-                    <el-button
-                        type="primary"
-                        style="width: 120px; margin-top: 10px"
-                        @click="onSave(panelFormRef, 'remoteAccess', baseInfo.port)"
-                    >
+                    <el-button type="primary" style="width: 120px; margin-top: 10px" @click="onSaveFile()">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </el-collapse-item>
@@ -324,6 +320,7 @@ import {
     loadMysqlBaseInfo,
     loadMysqlStatus,
     loadMysqlVariables,
+    updateMysqlConfByFile,
     updateMysqlDBInfo,
     updateMysqlVariables,
 } from '@/api/modules/database';
@@ -446,6 +443,15 @@ function callback(error: any) {
         return;
     }
 }
+
+const onSaveFile = async () => {
+    let param = {
+        mysqlName: mysqlName.value,
+        file: mysqlConf.value,
+    };
+    await updateMysqlConfByFile(param);
+    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+};
 
 const loadBaseInfo = async () => {
     const res = await loadMysqlBaseInfo(mysqlName.value);
