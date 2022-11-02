@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/go-redis/redis"
@@ -14,16 +13,11 @@ import (
 type RedisService struct{}
 
 type IRedisService interface {
-	SearchWithPage(search dto.SearchRedisWithPage) (int64, interface{}, error)
-	Set(setData dto.RedisDataSet) error
-	Delete(info dto.RedisDelBatch) error
-
 	UpdateConf(req dto.RedisConfUpdate) error
 
-	CleanAll(req dto.RedisBaseReq) error
-	LoadState(req dto.RedisBaseReq) (*dto.RedisStatus, error)
-	LoadConf(req dto.RedisBaseReq) (*dto.RedisConf, error)
-	LoadRedisRunningVersion() ([]string, error)
+	LoadStatus() (*dto.RedisStatus, error)
+	LoadConf() (*dto.RedisConf, error)
+	LoadPersistenceConf() (*dto.RedisPersistence, error)
 
 	// Backup(db dto.BackupDB) error
 	// Recover(db dto.RecoverDB) error
@@ -33,67 +27,21 @@ func NewIRedisService() IRedisService {
 	return &RedisService{}
 }
 
-func newRedisClient(name string, db int) (*redis.Client, error) {
-	redisInfo, err := mysqlRepo.LoadRedisBaseInfoByName(name)
+func newRedisClient() (*redis.Client, error) {
+	redisInfo, err := mysqlRepo.LoadRedisBaseInfo()
 	if err != nil {
 		return nil, err
 	}
 	client := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("localhost:%v", redisInfo.Port),
-		Password: "eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81",
-		DB:       db,
+		Password: redisInfo.Password,
+		DB:       0,
 	})
 	return client, nil
 }
 
-func (u *RedisService) SearchWithPage(search dto.SearchRedisWithPage) (int64, interface{}, error) {
-	client, err := newRedisClient(search.RedisName, search.DB)
-	if err != nil {
-		return 0, nil, err
-	}
-	total, err := client.DbSize().Result()
-	if err != nil {
-		return 0, nil, err
-	}
-	keys, _, err := client.Scan(uint64((search.Page-1)*search.PageSize), "*", int64(search.PageSize)).Result()
-	if err != nil {
-		return 0, nil, err
-	}
-	var data []dto.RedisData
-	for _, key := range keys {
-		var dataItem dto.RedisData
-		dataItem.Key = key
-		value, err := client.Get(key).Result()
-		if err != nil {
-			return 0, nil, err
-		}
-		dataItem.Value = value
-		typeVal, err := client.Type(key).Result()
-		if err != nil {
-			return 0, nil, err
-		}
-		dataItem.Type = typeVal
-		length, err := client.StrLen(key).Result()
-		if err != nil {
-			return 0, nil, err
-		}
-		dataItem.Length = length
-		ttl, err := client.TTL(key).Result()
-		if err != nil {
-			return 0, nil, err
-		}
-		dataItem.Expiration = int64(ttl / 1000000000)
-		data = append(data, dataItem)
-	}
-	return total, data, nil
-}
-
-func (u *RedisService) LoadRedisRunningVersion() ([]string, error) {
-	return mysqlRepo.LoadRunningVersion([]string{"redis"})
-}
-
 func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
-	client, err := newRedisClient(req.RedisName, 0)
+	client, err := newRedisClient()
 	if err != nil {
 		return err
 	}
@@ -107,50 +55,8 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 	return nil
 }
 
-func (u *RedisService) Set(setData dto.RedisDataSet) error {
-	client, err := newRedisClient(setData.RedisName, setData.DB)
-	if err != nil {
-		return err
-	}
-	value, _ := client.Get(setData.Key).Result()
-	if err != nil {
-		return err
-	}
-	if len(value) != 0 {
-		if _, err := client.Del(setData.Key).Result(); err != nil {
-			return err
-		}
-	}
-	if _, err := client.Set(setData.Key, setData.Value, time.Duration(setData.Expiration*int64(time.Second))).Result(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (u *RedisService) Delete(req dto.RedisDelBatch) error {
-	client, err := newRedisClient(req.RedisName, req.DB)
-	if err != nil {
-		return err
-	}
-	if _, err := client.Del(req.Names...).Result(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (u *RedisService) CleanAll(req dto.RedisBaseReq) error {
-	client, err := newRedisClient(req.RedisName, req.DB)
-	if err != nil {
-		return err
-	}
-	if _, err := client.FlushAll().Result(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (u *RedisService) LoadState(req dto.RedisBaseReq) (*dto.RedisStatus, error) {
-	client, err := newRedisClient(req.RedisName, req.DB)
+func (u *RedisService) LoadStatus() (*dto.RedisStatus, error) {
+	client, err := newRedisClient()
 	if err != nil {
 		return nil, err
 	}
@@ -175,18 +81,38 @@ func (u *RedisService) LoadState(req dto.RedisBaseReq) (*dto.RedisStatus, error)
 	return &info, nil
 }
 
-func (u *RedisService) LoadConf(req dto.RedisBaseReq) (*dto.RedisConf, error) {
-	client, err := newRedisClient(req.RedisName, req.DB)
+func (u *RedisService) LoadConf() (*dto.RedisConf, error) {
+	redisInfo, err := mysqlRepo.LoadRedisBaseInfo()
 	if err != nil {
 		return nil, err
 	}
+	client := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("localhost:%v", redisInfo.Port),
+		Password: redisInfo.Password,
+		DB:       0,
+	})
 	var item dto.RedisConf
+	item.ContainerName = redisInfo.ContainerName
+	item.Name = redisInfo.Name
 	item.Timeout = configGetStr(client, "timeout")
 	item.Maxclients = configGetStr(client, "maxclients")
 	item.Databases = configGetStr(client, "databases")
 	item.Requirepass = configGetStr(client, "requirepass")
 	item.Maxmemory = configGetStr(client, "maxmemory")
+	return &item, nil
+}
 
+func (u *RedisService) LoadPersistenceConf() (*dto.RedisPersistence, error) {
+	redisInfo, err := mysqlRepo.LoadRedisBaseInfo()
+	if err != nil {
+		return nil, err
+	}
+	client := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("localhost:%v", redisInfo.Port),
+		Password: redisInfo.Password,
+		DB:       0,
+	})
+	var item dto.RedisPersistence
 	item.Dir = configGetStr(client, "dir")
 	item.Appendonly = configGetStr(client, "appendonly")
 	item.Appendfsync = configGetStr(client, "appendfsync")

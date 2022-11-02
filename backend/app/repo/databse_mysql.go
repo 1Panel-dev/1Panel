@@ -21,7 +21,7 @@ type IMysqlRepo interface {
 	Update(id uint, vars map[string]interface{}) error
 	LoadRunningVersion(keys []string) ([]string, error)
 	LoadBaseInfoByName(name string) (*RootInfo, error)
-	LoadRedisBaseInfoByName(name string) (*RootInfo, error)
+	LoadRedisBaseInfo() (*RootInfo, error)
 	UpdateMysqlConf(id uint, vars map[string]interface{}) error
 }
 
@@ -129,7 +129,7 @@ func (u *MysqlRepo) LoadBaseInfoByName(name string) (*RootInfo, error) {
 	return &info, nil
 }
 
-func (u *MysqlRepo) LoadRedisBaseInfoByName(name string) (*RootInfo, error) {
+func (u *MysqlRepo) LoadRedisBaseInfo() (*RootInfo, error) {
 	var (
 		app        model.App
 		appInstall model.AppInstall
@@ -138,7 +138,7 @@ func (u *MysqlRepo) LoadRedisBaseInfoByName(name string) (*RootInfo, error) {
 	if err := global.DB.Where("key = ?", "redis").First(&app).Error; err != nil {
 		return nil, err
 	}
-	if err := global.DB.Where("app_id = ? AND name = ?", app.ID, name).First(&appInstall).Error; err != nil {
+	if err := global.DB.Where("app_id = ?", app.ID).First(&appInstall).Error; err != nil {
 		return nil, err
 	}
 	envMap := make(map[string]interface{})

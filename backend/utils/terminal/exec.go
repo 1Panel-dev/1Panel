@@ -20,8 +20,11 @@ type ExecWsSession struct {
 	writeMutex sync.Mutex
 }
 
-func NewExecConn(cols, rows int, wsConn *websocket.Conn, hijacked net.Conn) (*ExecWsSession, error) {
+func NewExecConn(cols, rows int, wsConn *websocket.Conn, hijacked net.Conn, commands ...string) (*ExecWsSession, error) {
 	_, _ = hijacked.Write([]byte(fmt.Sprintf("stty cols %d rows %d && clear \r", cols, rows)))
+	for _, command := range commands {
+		_, _ = hijacked.Write([]byte(fmt.Sprintf("%s \r", command)))
+	}
 
 	return &ExecWsSession{
 		conn:   hijacked,

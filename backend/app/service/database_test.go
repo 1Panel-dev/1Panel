@@ -10,12 +10,13 @@ import (
 
 func TestMysql(t *testing.T) {
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81",
+		Addr:     "172.16.10.143:6379",
+		Password: "",
 		DB:       0,
 	})
+	fmt.Println(client.Ping().Result())
 
-	var item dto.RedisConf
+	var item dto.RedisPersistence
 	dir, _ := client.ConfigGet("dir").Result()
 	if len(dir) == 2 {
 		if value, ok := dir[1].(string); ok {

@@ -219,6 +219,8 @@ export default {
         maxConnectionsHelper: '最大连接数',
         restart: '重启数据库',
 
+        status: '当前状态',
+        terminal: '终端模式',
         key: '键',
         value: '值',
         type: '数据类型',

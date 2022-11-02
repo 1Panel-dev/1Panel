@@ -138,39 +138,6 @@ type RecoverDB struct {
 }
 
 // redis
-type SearchRedisWithPage struct {
-	PageInfo
-	RedisName string `json:"redisName" validate:"required"`
-	DB        int    `json:"db" validate:"required"`
-}
-
-type RedisData struct {
-	Key        string `json:"key"`
-	Value      string `json:"value"`
-	Type       string `json:"type"`
-	Length     int64  `json:"length"`
-	Expiration int64  `json:"expiration"`
-}
-
-type RedisDataSet struct {
-	RedisName  string `json:"redisName" validate:"required"`
-	DB         int    `json:"db"`
-	Key        string `json:"key" validate:"required"`
-	Value      string `json:"value" validate:"required"`
-	Expiration int64  `json:"expiration"`
-}
-
-type RedisDelBatch struct {
-	RedisName string   `json:"redisName" validate:"required"`
-	DB        int      `json:"db" validate:"required"`
-	Names     []string `json:"names" validate:"required"`
-}
-
-type RedisBaseReq struct {
-	RedisName string `json:"redisName" validate:"required"`
-	DB        int    `json:"db"`
-}
-
 type RedisConfUpdate struct {
 	RedisName string `json:"redisName" validate:"required"`
 	DB        int    `json:"db"`
@@ -179,12 +146,16 @@ type RedisConfUpdate struct {
 }
 
 type RedisConf struct {
-	Timeout     string `json:"timeout"`
-	Maxclients  string `json:"maxclients"`
-	Databases   string `json:"databases"`
-	Requirepass string `json:"requirepass"`
-	Maxmemory   string `json:"maxmemory"`
+	Name          string `json:"name"`
+	ContainerName string `json:"containerName"`
+	Timeout       string `json:"timeout"`
+	Maxclients    string `json:"maxclients"`
+	Databases     string `json:"databases"`
+	Requirepass   string `json:"requirepass"`
+	Maxmemory     string `json:"maxmemory"`
+}
 
+type RedisPersistence struct {
 	Dir         string `json:"dir"`
 	Appendonly  string `json:"appendonly"`
 	Appendfsync string `json:"appendfsync"`
