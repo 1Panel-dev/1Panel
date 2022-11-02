@@ -44,6 +44,7 @@ const checkName = (rule: any, value: any, callback: any) => {
 interface CommonRule {
     requiredInput: FormItemRule;
     requiredSelect: FormItemRule;
+    requiredSelectBusiness: FormItemRule;
     name: FormItemRule;
     password: FormItemRule;
     email: FormItemRule;
@@ -60,6 +61,14 @@ export const Rules: CommonRule = {
     },
     requiredSelect: {
         required: true,
+        message: i18n.global.t('commons.rule.requiredSelect'),
+        trigger: 'change',
+    },
+    requiredSelectBusiness: {
+        required: true,
+        min: 1,
+        max: 65535,
+        type: 'number',
         message: i18n.global.t('commons.rule.requiredSelect'),
         trigger: 'change',
     },
