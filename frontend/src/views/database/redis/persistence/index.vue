@@ -1,24 +1,26 @@
 <template>
     <div v-if="persistenceShow">
-        <el-form :model="form" ref="formRef" :rules="rules" label-width="120px">
-            <el-row>
-                <el-col :span="1"><br /></el-col>
-                <el-col :span="10">
-                    <el-form>
-                        <el-form-item label="appendonly" prop="appendonly">
-                            <el-switch v-model="form.appendonly"></el-switch>
-                        </el-form-item>
-                        <el-form-item label="appendfsync" prop="appendfsync">
-                            <el-radio-group v-model="form.appendfsync">
-                                <el-radio label="always">always</el-radio>
-                                <el-radio label="everysec">everysec</el-radio>
-                                <el-radio label="no">no</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                    </el-form>
-                </el-col>
-            </el-row>
-        </el-form>
+        <el-card style="margin-top: 5px">
+            <el-form :model="form" ref="formRef" :rules="rules" label-width="120px">
+                <el-row>
+                    <el-col :span="1"><br /></el-col>
+                    <el-col :span="10">
+                        <el-form>
+                            <el-form-item label="appendonly" prop="appendonly">
+                                <el-switch v-model="form.appendonly"></el-switch>
+                            </el-form-item>
+                            <el-form-item label="appendfsync" prop="appendfsync">
+                                <el-radio-group v-model="form.appendfsync">
+                                    <el-radio label="always">always</el-radio>
+                                    <el-radio label="everysec">everysec</el-radio>
+                                    <el-radio label="no">no</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        </el-form>
+                    </el-col>
+                </el-row>
+            </el-form>
+        </el-card>
     </div>
 </template>
 

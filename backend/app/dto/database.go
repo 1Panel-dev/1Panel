@@ -99,6 +99,10 @@ type MysqlVariablesUpdate struct {
 	TableOpenCache    int64 `json:"table_open_cache" validate:"required"`
 	MaxConnections    int64 `json:"max_connections" validate:"required"`
 }
+type MysqlConfUpdateByFile struct {
+	MysqlName string `json:"mysqlName" validate:"required"`
+	File      string `json:"file"`
+}
 
 type ChangeDBInfo struct {
 	ID        uint   `json:"id"`
@@ -139,10 +143,14 @@ type RecoverDB struct {
 
 // redis
 type RedisConfUpdate struct {
-	RedisName string `json:"redisName" validate:"required"`
-	DB        int    `json:"db"`
-	ParamName string `json:"paramName" validate:"required"`
-	Value     string `json:"value"`
+	Timeout     string `json:"timeout"`
+	Maxclients  string `json:"maxclients"`
+	Databases   string `json:"databases"`
+	Requirepass string `json:"requirepass"`
+	Maxmemory   string `json:"maxmemory"`
+}
+type RedisConfUpdateByFile struct {
+	File string `json:"file"`
 }
 
 type RedisConf struct {

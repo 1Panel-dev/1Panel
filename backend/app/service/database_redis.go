@@ -1,8 +1,11 @@
 package service
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -41,17 +44,44 @@ func newRedisClient() (*redis.Client, error) {
 }
 
 func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
-	client, err := newRedisClient()
+	redisInfo, err := mysqlRepo.LoadRedisBaseInfo()
 	if err != nil {
 		return err
 	}
-	if _, err := client.ConfigSet(req.ParamName, req.Value).Result(); err != nil {
+	file, err := os.OpenFile(fmt.Sprintf("/opt/1Panel/data/apps/redis/%s/conf/redis.conf", redisInfo.Name), os.O_RDWR, 0666)
+	if err != nil {
 		return err
 	}
-	if _, err := client.ConfigRewrite().Result(); err != nil {
-		return err
-	}
+	defer file.Close()
 
+	reader := bufio.NewReader(file)
+	pos := int64(0)
+	for {
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			if err == io.EOF {
+				break
+			} else {
+				return err
+			}
+		}
+		if bytes := updateConfFile(line, "timeout", req.Timeout); len(bytes) != 0 {
+			_, _ = file.WriteAt(bytes, pos)
+		}
+		if bytes := updateConfFile(line, "maxclients", req.Maxclients); len(bytes) != 0 {
+			_, _ = file.WriteAt(bytes, pos)
+		}
+		if bytes := updateConfFile(line, "databases", req.Databases); len(bytes) != 0 {
+			_, _ = file.WriteAt(bytes, pos)
+		}
+		if bytes := updateConfFile(line, "requirepass", req.Requirepass); len(bytes) != 0 {
+			_, _ = file.WriteAt(bytes, pos)
+		}
+		if bytes := updateConfFile(line, "maxmemory", req.Maxmemory); len(bytes) != 0 {
+			_, _ = file.WriteAt(bytes, pos)
+		}
+		pos += int64(len(line))
+	}
 	return nil
 }
 
@@ -128,4 +158,17 @@ func configGetStr(client *redis.Client, param string) string {
 		}
 	}
 	return ""
+}
+
+func updateConfFile(line, param string, value string) []byte {
+	var bytes []byte
+	if strings.HasPrefix(line, param) || strings.HasPrefix(line, "# "+param) {
+		if len(value) == 0 || value == "0" {
+			bytes = []byte(fmt.Sprintf("# %s", param))
+		} else {
+			bytes = []byte(fmt.Sprintf("%s %v", param, value))
+		}
+		return bytes
+	}
+	return bytes
 }

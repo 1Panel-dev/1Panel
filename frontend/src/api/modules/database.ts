@@ -29,6 +29,9 @@ export const updateMysqlDBInfo = (params: Database.ChangeInfo) => {
 export const updateMysqlVariables = (params: Database.MysqlVariables) => {
     return http.post(`/databases/variables/update`, params);
 };
+export const updateMysqlConfByFile = (params: Database.MysqlConfUpdateByFile) => {
+    return http.post(`/databases/conf/update/byfile`, params);
+};
 export const deleteMysqlDB = (params: { ids: number[] }) => {
     return http.post(`/databases/del`, params);
 };
@@ -57,5 +60,8 @@ export const RedisPersistenceConf = () => {
     return http.get<Database.RedisPersistenceConf>(`/databases/redis/persistence/conf`);
 };
 export const updateRedisConf = (params: Database.RedisConfUpdate) => {
-    return http.get(`/databases/redis/conf/update`, params);
+    return http.post(`/databases/redis/conf/update`, params);
+};
+export const updateRedisConfByFile = (params: Database.RedisConfUpdateByFile) => {
+    return http.post(`/databases/redis/conf/update/byfile`, params);
 };

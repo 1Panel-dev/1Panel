@@ -34,6 +34,10 @@ export namespace Database {
         remoteConn: boolean;
         mysqlKey: string;
     }
+    export interface MysqlConfUpdateByFile {
+        mysqlName: string;
+        file: string;
+    }
     export interface MysqlDBCreate {
         name: string;
         mysqlName: string;
@@ -106,10 +110,14 @@ export namespace Database {
 
     // redis
     export interface RedisConfUpdate {
-        redisName: string;
-        db: number;
-        paramName: string;
-        value: string;
+        timeout: string;
+        maxclients: string;
+        databases: string;
+        requirepass: string;
+        maxmemory: string;
+    }
+    export interface RedisConfUpdateByFile {
+        file: string;
     }
     export interface RedisStatus {
         tcp_port: string;
