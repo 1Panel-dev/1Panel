@@ -1,10 +1,10 @@
 package dto
 
-type WebSiteGroupCreateReq struct {
+type WebSiteGroupCreate struct {
 	Name string
 }
 
-type WebSiteGroupUpdateReq struct {
+type WebSiteGroupUpdate struct {
 	ID   uint
 	Name string
 }

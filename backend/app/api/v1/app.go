@@ -70,12 +70,13 @@ func (b *BaseApi) InstallApp(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if err := appService.Install(req.Name, req.AppDetailId, req.Params); err != nil {
+	install, err := appService.Install(req.Name, req.AppDetailId, req.Params)
+	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithData(c, install)
 }
 
 func (b *BaseApi) DeleteAppBackup(c *gin.Context) {

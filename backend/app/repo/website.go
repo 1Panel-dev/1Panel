@@ -43,3 +43,7 @@ func (w WebSiteRepo) Create(ctx context.Context, app *model.WebSite) error {
 func (w WebSiteRepo) Save(ctx context.Context, app *model.WebSite) error {
 	return getTx(ctx).Omit(clause.Associations).Save(app).Error
 }
+
+func (w WebSiteRepo) DeleteBy(ctx context.Context, opts ...DBOption) error {
+	return getTx(ctx, opts...).Delete(&model.WebSite{}).Error
+}

@@ -8,7 +8,7 @@ import (
 type WebsiteGroupService struct {
 }
 
-func (w WebsiteGroupService) CreateGroup(create dto.WebSiteGroupCreateReq) error {
+func (w WebsiteGroupService) CreateGroup(create dto.WebSiteGroupCreate) error {
 	return websiteGroupRepo.Create(&model.WebSiteGroup{
 		Name: create.Name,
 	})
@@ -18,7 +18,7 @@ func (w WebsiteGroupService) GetGroups() ([]model.WebSiteGroup, error) {
 	return websiteGroupRepo.GetBy()
 }
 
-func (w WebsiteGroupService) UpdateGroup(update dto.WebSiteGroupUpdateReq) error {
+func (w WebsiteGroupService) UpdateGroup(update dto.WebSiteGroupUpdate) error {
 	return websiteGroupRepo.Save(&model.WebSiteGroup{
 		BaseModel: model.BaseModel{
 			ID: update.ID,

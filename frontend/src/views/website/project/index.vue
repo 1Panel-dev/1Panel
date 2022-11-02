@@ -23,29 +23,42 @@
                 fix
             />
         </ComplexTable>
-        <CreateWebSite ref="createRef"></CreateWebSite>
+        <CreateWebSite ref="createRef" @close="search"></CreateWebSite>
+        <DeleteWebsite ref="deleteRef" @close="search"></DeleteWebsite>
     </LayoutContent>
 </template>
 
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
-import { onMounted, ref } from '@vue/runtime-core';
+import { onMounted, reactive, ref } from '@vue/runtime-core';
 import router from '@/routers';
 import CreateWebSite from './create/index.vue';
+import DeleteWebsite from './delete/index.vue';
+import { SearchWebSites } from '@/api/modules/website';
+import i18n from '@/lang';
+import { WebSite } from '@/api/interface/website';
 
 const createRef = ref();
+const deleteRef = ref();
+
+const paginationConfig = reactive({
+    currentPage: 1,
+    pageSize: 20,
+    total: 0,
+});
 
 const data = ref();
 const search = async () => {
-    data.value = [
-        {
-            primaryDomain: 'www.baicu.com',
-            status: 'Running',
-            backup: '1',
-            remark: '主网站',
-        },
-    ];
+    const req = {
+        name: '',
+        page: paginationConfig.currentPage,
+        pageSize: paginationConfig.pageSize,
+    };
+
+    SearchWebSites(req).then((res) => {
+        data.value = res.data.items;
+    });
 };
 
 const openConfig = () => {
@@ -57,7 +70,17 @@ const buttons = [
         label: '设置',
         click: open,
     },
+    {
+        label: i18n.global.t('app.delete'),
+        click: function (row: WebSite.WebSite) {
+            openDelete(row.id);
+        },
+    },
 ];
+
+const openDelete = (id: number) => {
+    deleteRef.value.acceptParams(id);
+};
 
 const openCreate = () => {
     createRef.value.acceptParams();

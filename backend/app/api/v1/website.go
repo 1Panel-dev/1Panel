@@ -7,15 +7,44 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (b *BaseApi) CreateWebsite(c *gin.Context) {
+func (b *BaseApi) PageWebsite(c *gin.Context) {
+	var req dto.WebSiteReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	total, websites, err := websiteService.PageWebSite(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, dto.PageResult{
+		Total: total,
+		Items: websites,
+	})
+}
 
+func (b *BaseApi) CreateWebsite(c *gin.Context) {
 	var req dto.WebSiteCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-
 	err := websiteService.CreateWebsite(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) DeleteWebSite(c *gin.Context) {
+	var req dto.WebSiteDel
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	err := websiteService.DeleteWebSite(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

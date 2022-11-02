@@ -3,12 +3,18 @@ package repo
 import (
 	"context"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
 type WebSiteDomainRepo struct {
 }
 
+func (w WebSiteDomainRepo) WithWebSiteId(websiteId uint) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("web_site_id = ?", websiteId)
+	}
+}
 func (w WebSiteDomainRepo) Page(page, size int, opts ...DBOption) (int64, []model.WebSiteDomain, error) {
 	var domains []model.WebSiteDomain
 	db := getDb(opts...).Model(&model.WebSiteDomain{})
@@ -46,4 +52,8 @@ func (w WebSiteDomainRepo) Create(ctx context.Context, app *model.WebSiteDomain)
 
 func (w WebSiteDomainRepo) Save(ctx context.Context, app *model.WebSiteDomain) error {
 	return getTx(ctx).Omit(clause.Associations).Save(app).Error
+}
+
+func (w WebSiteDomainRepo) DeleteBy(ctx context.Context, opts ...DBOption) error {
+	return getTx(ctx, opts...).Delete(&model.WebSiteDomain{}).Error
 }

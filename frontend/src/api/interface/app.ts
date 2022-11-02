@@ -39,8 +39,9 @@ export namespace App {
     }
 
     export interface AppReq extends ReqPage {
-        name: string;
-        tags: string[];
+        name?: string;
+        tags?: string[];
+        type?: string;
     }
 
     export interface AppParams {

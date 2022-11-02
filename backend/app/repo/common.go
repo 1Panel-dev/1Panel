@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"gorm.io/gorm"
 )
@@ -70,10 +71,10 @@ func (c *CommonRepo) WithIdsNotIn(ids []uint) DBOption {
 }
 
 func getTx(ctx context.Context, opts ...DBOption) *gorm.DB {
-	if ctx == nil || ctx.Value("db") == nil {
+	if ctx == nil || ctx.Value(constant.DB) == nil {
 		return getDb()
 	}
-	tx := ctx.Value("db").(*gorm.DB)
+	tx := ctx.Value(constant.DB).(*gorm.DB)
 	for _, opt := range opts {
 		tx = opt(tx)
 	}
