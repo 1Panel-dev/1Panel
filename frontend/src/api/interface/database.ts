@@ -105,40 +105,11 @@ export namespace Database {
     }
 
     // redis
-    export interface SearchRedisWithPage extends ReqPage {
-        redisName: string;
-        db: number;
-    }
-    export interface RedisBaseReq {
-        redisName: string;
-        db: number;
-    }
     export interface RedisConfUpdate {
         redisName: string;
         db: number;
         paramName: string;
         value: string;
-    }
-    export interface RedisData {
-        redisName: string;
-        db: number;
-        key: string;
-        value: string;
-        type: string;
-        length: number;
-        expiration: number;
-    }
-    export interface RedisDataSet {
-        redisName: string;
-        db: number;
-        key: string;
-        value: string;
-        expiration: number;
-    }
-    export interface RedisDelBatch {
-        redisName: string;
-        db: number;
-        names: Array<string>;
     }
     export interface RedisStatus {
         tcp_port: string;
@@ -156,12 +127,14 @@ export namespace Database {
         latest_fork_usec: string;
     }
     export interface RedisConf {
+        name: string;
         timeout: number;
         maxclients: number;
         databases: number;
         requirepass: string;
         maxmemory: number;
-
+    }
+    export interface RedisPersistenceConf {
         dir: string;
         appendonly: string;
         appendfsync: string;

@@ -2,8 +2,8 @@ package v1
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
-	"os"
 	"path"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
@@ -240,18 +240,13 @@ func (b *BaseApi) LoadFromFile(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	file, err := os.Open(req.Path)
+
+	content, err := ioutil.ReadFile(req.Path)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	defer file.Close()
-	buf := make([]byte, 1024*2)
-	if _, err := file.Read(buf); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, string(buf))
+	helper.SuccessWithData(c, string(content))
 }
 
 var wsUpgrade = websocket.Upgrader{

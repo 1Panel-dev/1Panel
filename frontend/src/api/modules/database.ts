@@ -6,9 +6,6 @@ import { Database } from '../interface/database';
 export const searchMysqlDBs = (params: Database.Search) => {
     return http.post<ResPage<Database.MysqlDBInfo>>(`databases/search`, params);
 };
-export const searchRedisDBs = (params: Database.SearchRedisWithPage) => {
-    return http.post<ResPage<Database.RedisData>>(`databases/redis/search`, params);
-};
 export const listDBByVersion = (params: string) => {
     return http.get(`databases/dbs/${params}`);
 };
@@ -50,24 +47,15 @@ export const loadVersions = () => {
 };
 
 // redis
-export const setRedis = (params: Database.RedisDataSet) => {
-    return http.post(`/databases/redis`, params);
+export const loadRedisStatus = () => {
+    return http.get<Database.RedisStatus>(`/databases/redis/status`);
 };
-export const deleteRedisKey = (params: Database.RedisDelBatch) => {
-    return http.post(`/databases/redis/del`, params);
+export const loadRedisConf = () => {
+    return http.get<Database.RedisConf>(`/databases/redis/conf`);
 };
-export const cleanRedisKey = (params: Database.RedisBaseReq) => {
-    return http.post(`/databases/redis/clean`, params);
-};
-export const loadRedisStatus = (params: Database.RedisBaseReq) => {
-    return http.post<Database.RedisStatus>(`/databases/redis/status`, params);
-};
-export const loadRedisConf = (params: Database.RedisBaseReq) => {
-    return http.post<Database.RedisConf>(`/databases/redis/conf`, params);
+export const RedisPersistenceConf = () => {
+    return http.get<Database.RedisPersistenceConf>(`/databases/redis/persistence/conf`);
 };
 export const updateRedisConf = (params: Database.RedisConfUpdate) => {
-    return http.post(`/databases/redis/conf/update`, params);
-};
-export const loadRedisVersions = () => {
-    return http.get(`/databases/redis/versions`);
+    return http.get(`/databases/redis/conf/update`, params);
 };
