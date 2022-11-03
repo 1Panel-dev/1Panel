@@ -682,5 +682,8 @@ export default {
         deleteApp: '删除应用',
         deleteBackup: '删除备份',
         domain: '域名',
+        domainHelper: '一行一个域名,支持*和IP地址,支持域名:端口',
+        port: '端口',
+        addDomain: '新增域名',
     },
 };

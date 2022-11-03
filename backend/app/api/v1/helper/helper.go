@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -81,6 +82,15 @@ func GetParamID(c *gin.Context) (uint, error) {
 	idParam, ok := c.Params.Get("id")
 	if !ok {
 		return 0, errors.New("error id in path")
+	}
+	intNum, _ := strconv.Atoi(idParam)
+	return uint(intNum), nil
+}
+
+func GetIntParamByKey(c *gin.Context, key string) (uint, error) {
+	idParam, ok := c.Params.Get(key)
+	if !ok {
+		return 0, fmt.Errorf("error %s in path", key)
 	}
 	intNum, _ := strconv.Atoi(idParam)
 	return uint(intNum), nil

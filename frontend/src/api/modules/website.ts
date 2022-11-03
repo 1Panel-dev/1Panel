@@ -29,3 +29,11 @@ export const UpdateGroup = (req: WebSite.GroupOp) => {
 export const DeleteGroup = (id: number) => {
     return http.delete<any>(`/websites/groups/${id}`);
 };
+
+export const ListDomains = (id: number) => {
+    return http.get<WebSite.Domain[]>(`/websites/domains/${id}`);
+};
+
+export const DeleteDomain = (id: number) => {
+    return http.delete<any>(`/websites/domains/${id}`);
+};

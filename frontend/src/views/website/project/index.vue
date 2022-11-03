@@ -9,7 +9,7 @@
             </template>
             <el-table-column :label="$t('commons.table.name')" fix show-overflow-tooltip prop="primaryDomain">
                 <template #default="{ row }">
-                    <el-link @click="openConfig">{{ row.primaryDomain }}</el-link>
+                    <el-link @click="openConfig(row.id)">{{ row.primaryDomain }}</el-link>
                 </template>
             </el-table-column>
             <el-table-column :label="$t('commons.table.status')" prop="status"></el-table-column>
@@ -66,8 +66,8 @@ const search = async () => {
     });
 };
 
-const openConfig = () => {
-    router.push({ name: 'WebsiteConfig' });
+const openConfig = (id: number) => {
+    router.push({ name: 'WebsiteConfig', params: { id: id } });
 };
 
 const buttons = [

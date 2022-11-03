@@ -15,6 +15,17 @@ func (w WebSiteDomainRepo) WithWebSiteId(websiteId uint) DBOption {
 		return db.Where("web_site_id = ?", websiteId)
 	}
 }
+
+func (w WebSiteDomainRepo) WithPort(port int) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("port = ?", port)
+	}
+}
+func (w WebSiteDomainRepo) WithDomain(domain string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("domain = ?", domain)
+	}
+}
 func (w WebSiteDomainRepo) Page(page, size int, opts ...DBOption) (int64, []model.WebSiteDomain, error) {
 	var domains []model.WebSiteDomain
 	db := getDb(opts...).Model(&model.WebSiteDomain{})

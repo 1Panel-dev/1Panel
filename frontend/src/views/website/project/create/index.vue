@@ -86,7 +86,12 @@
                 <el-input v-model="website.primaryDomain"></el-input>
             </el-form-item>
             <el-form-item :label="$t('website.otherDomains')" prop="otherDomains">
-                <el-input v-model="website.otherDomains"></el-input>
+                <el-input
+                    type="textarea"
+                    :autosize="{ minRows: 2, maxRows: 6 }"
+                    v-model="website.otherDomains"
+                    :placeholder="$t('website.domainHelper')"
+                ></el-input>
             </el-form-item>
             <el-form-item :label="$t('website.alias')" prop="alias">
                 <el-input v-model="website.alias"></el-input>
@@ -123,7 +128,6 @@ const website = ref({
     type: 'deployment',
     alias: '',
     remark: '',
-    domains: [],
     appType: 'installed',
     appInstallID: 0,
     webSiteGroupID: 1,
