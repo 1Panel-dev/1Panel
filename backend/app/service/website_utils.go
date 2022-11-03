@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
@@ -137,23 +138,59 @@ func nginxCheckAndReload(oldContent string, filePath string, containerName strin
 	return nil
 }
 
-func deleteListenAndServerName(website model.WebSite, ports []int, domains []string) error {
-
+func getNginxConfig(primaryDomain string) (dto.NginxConfig, error) {
+	var nginxConfig dto.NginxConfig
 	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
 	if err != nil {
-		return err
+		return nginxConfig, err
 	}
 	nginxInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithAppId(nginxApp.ID))
 	if err != nil {
-		return err
+		return nginxConfig, err
 	}
 
-	configPath := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "conf", "conf.d", website.PrimaryDomain+".conf")
+	configPath := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "conf", "conf.d", primaryDomain+".conf")
 	content, err := os.ReadFile(configPath)
 	if err != nil {
-		return err
+		return nginxConfig, err
 	}
 	config := parser.NewStringParser(string(content)).Parse()
+	config.FilePath = configPath
+	nginxConfig.Config = config
+	nginxConfig.OldContent = string(content)
+	nginxConfig.ContainerName = nginxInstall.ContainerName
+	nginxConfig.FilePath = configPath
+
+	return nginxConfig, nil
+}
+
+func addListenAndServerName(website model.WebSite, ports []int, domains []string) error {
+
+	nginxConfig, err := getNginxConfig(website.PrimaryDomain)
+	if err != nil {
+		return nil
+	}
+	config := nginxConfig.Config
+	server := config.FindServers()[0]
+	for _, port := range ports {
+		server.AddListen(strconv.Itoa(port), false)
+	}
+	for _, domain := range domains {
+		server.AddServerName(domain)
+	}
+	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return err
+	}
+	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxConfig.ContainerName)
+}
+
+func deleteListenAndServerName(website model.WebSite, ports []int, domains []string) error {
+
+	nginxConfig, err := getNginxConfig(website.PrimaryDomain)
+	if err != nil {
+		return nil
+	}
+	config := nginxConfig.Config
 	server := config.FindServers()[0]
 	for _, port := range ports {
 		server.DeleteListen(strconv.Itoa(port))
@@ -162,10 +199,8 @@ func deleteListenAndServerName(website model.WebSite, ports []int, domains []str
 		server.DeleteServerName(domain)
 	}
 
-	config.FilePath = configPath
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
-	return nginxCheckAndReload(string(content), configPath, nginxInstall.ContainerName)
-
+	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxConfig.ContainerName)
 }

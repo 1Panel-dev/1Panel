@@ -126,8 +126,28 @@ func (w WebsiteService) DeleteWebSite(req dto.WebSiteDel) error {
 	return nil
 }
 
-func (w WebsiteService) CreateWebsiteDomain() {
+func (w WebsiteService) CreateWebsiteDomain(create dto.WebSiteDomainCreate) (model.WebSiteDomain, error) {
+	var domainModel model.WebSiteDomain
+	var ports []int
+	var domains []string
 
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(create.WebSiteID))
+	if err != nil {
+		return domainModel, err
+	}
+	if oldDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebSiteId(create.WebSiteID), websiteDomainRepo.WithPort(create.Port)); len(oldDomains) == 0 {
+		ports = append(ports, create.Port)
+	}
+	domains = append(domains, create.Domain)
+	if err := addListenAndServerName(website, ports, domains); err != nil {
+		return domainModel, err
+	}
+	domainModel = model.WebSiteDomain{
+		Domain:    create.Domain,
+		Port:      create.Port,
+		WebSiteID: create.WebSiteID,
+	}
+	return domainModel, websiteDomainRepo.Create(context.TODO(), &domainModel)
 }
 
 func (w WebsiteService) GetWebsiteDomain(websiteId uint) ([]model.WebSiteDomain, error) {

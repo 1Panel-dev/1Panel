@@ -52,8 +52,15 @@ export namespace WebSite {
     }
 
     export interface Domain {
-        name: string;
+        websiteId: number;
         port: number;
         id: number;
+        domain: string;
+    }
+
+    export interface DomainCreate {
+        websiteId: number;
+        port: number;
+        domain: string;
     }
 }

@@ -1,6 +1,9 @@
 package dto
 
-import "github.com/1Panel-dev/1Panel/backend/app/model"
+import (
+	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
+)
 
 type WebSiteReq struct {
 	PageInfo
@@ -43,16 +46,23 @@ type WebSiteDTO struct {
 }
 
 type WebSiteGroupCreate struct {
-	Name string
+	Name string `json:"name"`
 }
 
 type WebSiteGroupUpdate struct {
-	ID   uint
-	Name string
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
 }
 
 type WebSiteDomainCreate struct {
+	WebSiteID uint   `json:"webSiteId"`
+	Port      int    `json:"port"`
+	Domain    string `json:"domain"`
 }
 
-type WebSiteDomainDel struct {
+type NginxConfig struct {
+	FilePath      string             `json:"filePath"`
+	ContainerName string             `json:"containerName"`
+	Config        *components.Config `json:"config"`
+	OldContent    string             `json:"oldContent"`
 }
