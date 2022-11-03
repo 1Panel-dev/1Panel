@@ -71,12 +71,13 @@ func (c *CommonRepo) WithIdsNotIn(ids []uint) DBOption {
 }
 
 func getTx(ctx context.Context, opts ...DBOption) *gorm.DB {
-	if ctx == nil || ctx.Value(constant.DB) == nil {
-		return getDb()
-	}
-	tx := ctx.Value(constant.DB).(*gorm.DB)
-	for _, opt := range opts {
-		tx = opt(tx)
+	tx, ok := ctx.Value(constant.DB).(*gorm.DB)
+	if ok {
+		for _, opt := range opts {
+			tx = opt(tx)
+		}
+	} else {
+		return getDb(opts...)
 	}
 	return tx
 }

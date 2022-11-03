@@ -74,15 +74,42 @@ func (s *Server) UpdateListen(bind string, defaultServer bool, params ...string)
 		listen.DefaultServer = DefaultServer
 	}
 	var newListens []*ServerListen
+	exist := false
 	for _, li := range s.Listens {
 		if li.Bind == bind {
+			exist = true
 			newListens = append(newListens, listen)
 		} else {
 			newListens = append(newListens, li)
 		}
 	}
+	if !exist {
+		newListens = append(newListens, listen)
+	}
 
 	s.Listens = newListens
+}
+
+func (s *Server) DeleteListen(bind string) {
+	var newListens []*ServerListen
+	for _, li := range s.Listens {
+		if li.Bind != bind {
+			newListens = append(newListens, li)
+		}
+	}
+	s.Listens = newListens
+}
+
+func (s *Server) DeleteServerName(name string) {
+	var names []string
+	dirs := s.FindDirectives("server_name")
+	params := dirs[0].GetParameters()
+	for _, param := range params {
+		if param != name {
+			names = append(names, param)
+		}
+	}
+	s.UpdateServerName(names)
 }
 
 func (s *Server) UpdateServerName(names []string) {

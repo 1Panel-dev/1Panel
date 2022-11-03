@@ -35,7 +35,6 @@ export namespace WebSite {
         type: string;
         alias: string;
         remark: string;
-        domains: string[];
         appType: string;
         appInstallID: number;
         webSiteGroupID: number;
@@ -50,5 +49,11 @@ export namespace WebSite {
     export interface GroupOp {
         name: string;
         id?: number;
+    }
+
+    export interface Domain {
+        name: string;
+        port: number;
+        id: number;
     }
 }

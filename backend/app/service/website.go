@@ -1,12 +1,15 @@
 package service
 
 import (
+	"context"
+	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -28,6 +31,7 @@ func (w WebsiteService) PageWebSite(req dto.WebSiteReq) (int64, []dto.WebSiteDTO
 }
 
 func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
+
 	defaultDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
 	website := &model.WebSite{
 		PrimaryDomain:  create.PrimaryDomain,
@@ -54,7 +58,9 @@ func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
 	}
 	var domains []model.WebSiteDomain
 	domains = append(domains, model.WebSiteDomain{Domain: website.PrimaryDomain, WebSiteID: website.ID, Port: 80})
-	for _, domain := range create.Domains {
+
+	otherDomainArray := strings.Split(create.OtherDomains, "\n")
+	for _, domain := range otherDomainArray {
 		domainModel, err := getDomain(domain, website.ID)
 		if err != nil {
 			tx.Rollback()
@@ -93,6 +99,10 @@ func (w WebsiteService) DeleteWebSite(req dto.WebSiteDel) error {
 	tx, ctx := getTxAndContext()
 
 	if req.DeleteApp {
+		websites, _ := websiteRepo.GetBy(websiteRepo.WithAppInstallId(website.AppInstallID))
+		if len(websites) > 1 {
+			return errors.New("other website use this app")
+		}
 		appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
@@ -114,4 +124,44 @@ func (w WebsiteService) DeleteWebSite(req dto.WebSiteDel) error {
 	}
 	tx.Commit()
 	return nil
+}
+
+func (w WebsiteService) CreateWebsiteDomain() {
+
+}
+
+func (w WebsiteService) GetWebsiteDomain(websiteId uint) ([]model.WebSiteDomain, error) {
+	return websiteDomainRepo.GetBy(websiteDomainRepo.WithWebSiteId(websiteId))
+}
+
+func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
+
+	webSiteDomain, err := websiteDomainRepo.GetFirst(commonRepo.WithByID(domainId))
+	if err != nil {
+		return err
+	}
+
+	if websiteDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebSiteId(webSiteDomain.WebSiteID)); len(websiteDomains) == 1 {
+		return fmt.Errorf("can not delete last domain")
+	}
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(webSiteDomain.WebSiteID))
+	if err != nil {
+		return err
+	}
+	var ports []int
+	if oldDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebSiteId(webSiteDomain.WebSiteID), websiteDomainRepo.WithPort(webSiteDomain.Port)); len(oldDomains) == 1 {
+		ports = append(ports, webSiteDomain.Port)
+	}
+
+	var domains []string
+	if oldDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebSiteId(webSiteDomain.WebSiteID), websiteDomainRepo.WithDomain(webSiteDomain.Domain)); len(oldDomains) == 1 {
+		domains = append(domains, webSiteDomain.Domain)
+	}
+	if len(ports) > 0 || len(domains) > 0 {
+		if err := deleteListenAndServerName(website, ports, domains); err != nil {
+			return err
+		}
+	}
+
+	return websiteDomainRepo.DeleteBy(context.TODO(), commonRepo.WithByID(domainId))
 }

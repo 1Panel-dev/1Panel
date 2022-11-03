@@ -7,7 +7,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/gin-gonic/gin"
 	"reflect"
-	"strconv"
 )
 
 func (b *BaseApi) SearchApp(c *gin.Context) {
@@ -35,13 +34,13 @@ func (b *BaseApi) SyncApp(c *gin.Context) {
 }
 
 func (b *BaseApi) GetApp(c *gin.Context) {
-	idStr := c.Param("id")
-	u64, err := strconv.ParseUint(idStr, 10, 32)
+
+	id, err := helper.GetParamID(c)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	appDTO, err := appService.GetApp(uint(u64))
+	appDTO, err := appService.GetApp(id)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -49,14 +48,15 @@ func (b *BaseApi) GetApp(c *gin.Context) {
 	helper.SuccessWithData(c, appDTO)
 }
 func (b *BaseApi) GetAppDetail(c *gin.Context) {
-	idStr := c.Param("appid")
-	u64, err := strconv.ParseUint(idStr, 10, 32)
+
+	appId, err := helper.GetIntParamByKey(c, "appId")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
 		return
 	}
+
 	version := c.Param("version")
-	appDetailDTO, err := appService.GetAppDetail(uint(u64), version)
+	appDetailDTO, err := appService.GetAppDetail(appId, version)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -175,17 +175,13 @@ func (b *BaseApi) GetServices(c *gin.Context) {
 
 func (b *BaseApi) GetUpdateVersions(c *gin.Context) {
 
-	appInstallId := c.Param("appInstallId")
-	if appInstallId == "" {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, nil)
-		return
-	}
-	id, err := strconv.Atoi(appInstallId)
+	appInstallId, err := helper.GetIntParamByKey(c, "appInstallId")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
 		return
 	}
-	versions, err := appService.GetUpdateVersions(uint(id))
+
+	versions, err := appService.GetUpdateVersions(appInstallId)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

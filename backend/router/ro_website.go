@@ -18,5 +18,7 @@ func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("", baseApi.CreateWebsite)
 		groupRouter.POST("/search", baseApi.PageWebsite)
 		groupRouter.POST("/del", baseApi.DeleteWebSite)
+		groupRouter.GET("/domains/:websiteId", baseApi.GetWebDomains)
+		groupRouter.DELETE("/domains/:id", baseApi.DeleteWebDomain)
 	}
 }

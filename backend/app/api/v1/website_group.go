@@ -5,7 +5,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/gin-gonic/gin"
-	"strconv"
 )
 
 func (b *BaseApi) GetWebGroups(c *gin.Context) {
@@ -45,17 +44,13 @@ func (b *BaseApi) UpdateWebGroup(c *gin.Context) {
 
 func (b *BaseApi) DeleteWebGroup(c *gin.Context) {
 
-	groupId := c.Param("groupId")
-	if groupId == "" {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, nil)
-		return
-	}
-	id, err := strconv.Atoi(groupId)
+	groupId, err := helper.GetIntParamByKey(c, "groupId")
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
 		return
 	}
-	if err := websiteGroupService.DeleteGroup(uint(id)); err != nil {
+
+	if err := websiteGroupService.DeleteGroup(groupId); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

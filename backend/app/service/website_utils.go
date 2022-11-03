@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/cmd/server/nginx_conf"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
+	"os"
 	"path"
 	"strconv"
 	"strings"
@@ -67,7 +68,7 @@ func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) e
 	var serverNames []string
 	for _, domain := range domains {
 		serverNames = append(serverNames, domain.Domain)
-		server.UpdateListen(string(rune(domain.Port)), false)
+		server.UpdateListen(strconv.Itoa(domain.Port), false)
 	}
 	server.UpdateServerName(serverNames)
 	proxy := fmt.Sprintf("http://%s:%d", appInstall.ServiceName, appInstall.HttpPort)
@@ -121,6 +122,50 @@ func delNginxConfig(website model.WebSite) error {
 	return opNginx(nginxInstall.ContainerName, "reload")
 }
 
-func delApp() error {
+func nginxCheckAndReload(oldContent string, filePath string, containerName string) error {
+
+	if err := opNginx(containerName, "check"); err != nil {
+		_ = files.NewFileOp().WriteFile(filePath, strings.NewReader(oldContent), 0644)
+		return err
+	}
+
+	if err := opNginx(containerName, "reload"); err != nil {
+		_ = files.NewFileOp().WriteFile(filePath, strings.NewReader(oldContent), 0644)
+		return err
+	}
+
 	return nil
+}
+
+func deleteListenAndServerName(website model.WebSite, ports []int, domains []string) error {
+
+	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
+	if err != nil {
+		return err
+	}
+	nginxInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithAppId(nginxApp.ID))
+	if err != nil {
+		return err
+	}
+
+	configPath := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "conf", "conf.d", website.PrimaryDomain+".conf")
+	content, err := os.ReadFile(configPath)
+	if err != nil {
+		return err
+	}
+	config := parser.NewStringParser(string(content)).Parse()
+	server := config.FindServers()[0]
+	for _, port := range ports {
+		server.DeleteListen(strconv.Itoa(port))
+	}
+	for _, domain := range domains {
+		server.DeleteServerName(domain)
+	}
+
+	config.FilePath = configPath
+	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return err
+	}
+	return nginxCheckAndReload(string(content), configPath, nginxInstall.ContainerName)
+
 }
