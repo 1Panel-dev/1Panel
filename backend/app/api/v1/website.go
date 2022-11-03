@@ -82,3 +82,17 @@ func (b *BaseApi) DeleteWebDomain(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, nil)
 }
+
+func (b *BaseApi) CreateWebDomain(c *gin.Context) {
+	var req dto.WebSiteDomainCreate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	domain, err := websiteService.CreateWebsiteDomain(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, domain)
+}

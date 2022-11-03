@@ -1,16 +1,18 @@
 <template>
     <ComplexTable :data="data" @search="search" v-loading="loading">
         <template #toolbar>
-            <el-button type="primary" plain>{{ $t('website.addDomain') }}</el-button>
+            <el-button type="primary" plain @click="openCreate">{{ $t('website.addDomain') }}</el-button>
         </template>
         <el-table-column :label="$t('website.domain')" prop="domain"></el-table-column>
         <el-table-column :label="$t('website.port')" prop="port"></el-table-column>
         <fu-table-operations :ellipsis="1" :buttons="buttons" :label="$t('commons.table.operate')" fixed="right" fix />
     </ComplexTable>
+    <Domain ref="domainRef" @close="search(id)"></Domain>
 </template>
 
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
+import Domain from './create/index.vue';
 import { WebSite } from '@/api/interface/website';
 import { DeleteDomain, ListDomains } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
@@ -23,13 +25,12 @@ const props = defineProps({
         default: 0,
     },
 });
-
 const id = computed(() => {
     return props.id;
 });
-
 let loading = ref(false);
 const data = ref<WebSite.Domain[]>([]);
+const domainRef = ref();
 
 const buttons = [
     {
@@ -39,6 +40,10 @@ const buttons = [
         },
     },
 ];
+
+const openCreate = () => {
+    domainRef.value.acceptParams(id.value);
+};
 
 const deleteDoamin = async (domainId: number) => {
     await useDeleteData(DeleteDomain, domainId, 'commons.msg.delete', loading.value);

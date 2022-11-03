@@ -37,3 +37,7 @@ export const ListDomains = (id: number) => {
 export const DeleteDomain = (id: number) => {
     return http.delete<any>(`/websites/domains/${id}`);
 };
+
+export const CreateDomain = (req: WebSite.DomainCreate) => {
+    return http.post<any>(`/websites/domains`, req);
+};

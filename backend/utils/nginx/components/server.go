@@ -112,6 +112,13 @@ func (s *Server) DeleteServerName(name string) {
 	s.UpdateServerName(names)
 }
 
+func (s *Server) AddServerName(name string) {
+	dirs := s.FindDirectives("server_name")
+	params := dirs[0].GetParameters()
+	params = append(params, name)
+	s.UpdateServerName(params)
+}
+
 func (s *Server) UpdateServerName(names []string) {
 	serverNameDirective := Directive{
 		Name:       "server_name",
