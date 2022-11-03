@@ -221,7 +221,7 @@ func (u *MysqlService) ChangeInfo(info dto.ChangeDBInfo) error {
 				}
 			}
 		}
-		_ = mysqlRepo.UpdateMysqlConf(app.ID, map[string]interface{}{
+		_ = mysqlRepo.UpdateDatabasePassword(app.ID, map[string]interface{}{
 			"param": strings.ReplaceAll(app.Param, app.Password, info.Value),
 			"env":   strings.ReplaceAll(app.Env, app.Password, info.Value),
 		})
@@ -444,8 +444,8 @@ func excuteSql(containerName, password, command string) error {
 	return nil
 }
 
-func backupMysql(backupType, baseDir, backupDir, mysqkName, dbName, fileName string) error {
-	app, err := mysqlRepo.LoadBaseInfoByName(mysqkName)
+func backupMysql(backupType, baseDir, backupDir, mysqlName, dbName, fileName string) error {
+	app, err := mysqlRepo.LoadBaseInfoByName(mysqlName)
 	if err != nil {
 		return err
 	}

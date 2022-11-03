@@ -1,45 +1,35 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
+	"os/exec"
+	"strings"
 	"testing"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
-	"github.com/go-redis/redis"
 )
 
 func TestMysql(t *testing.T) {
-	client := redis.NewClient(&redis.Options{
-		Addr:     "172.16.10.143:6379",
-		Password: "",
-		DB:       0,
-	})
-	fmt.Println(client.Ping().Result())
+	cmd := exec.Command("docker", "exec", "1Panel-redis-7.0.5-zgVH-K859", "redis-cli", "config", "get", "save")
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		fmt.Println(string(stdout))
+	}
 
-	var item dto.RedisPersistence
-	dir, _ := client.ConfigGet("dir").Result()
-	if len(dir) == 2 {
-		if value, ok := dir[1].(string); ok {
-			item.Dir = value
+	rows := strings.Split(string(stdout), "\r\n")
+	rowMap := make(map[string]string)
+	for _, v := range rows {
+		itemRow := strings.Split(v, "\n")
+		if len(itemRow) == 3 {
+			rowMap[itemRow[0]] = itemRow[1]
 		}
 	}
-	appendonly, _ := client.ConfigGet("appendonly").Result()
-	if len(appendonly) == 2 {
-		if value, ok := appendonly[1].(string); ok {
-			item.Appendonly = value
-		}
+	var info dto.RedisStatus
+	arr, err := json.Marshal(rowMap)
+	if err != nil {
+		fmt.Println(err)
 	}
-	appendfsync, _ := client.ConfigGet("appendfsync").Result()
-	if len(appendfsync) == 2 {
-		if value, ok := appendfsync[1].(string); ok {
-			item.Appendfsync = value
-		}
-	}
-	save, _ := client.ConfigGet("save").Result()
-	if len(save) == 2 {
-		if value, ok := save[1].(string); ok {
-			item.Save = value
-		}
-	}
-	fmt.Println(item)
+	_ = json.Unmarshal(arr, &info)
+	fmt.Println(info)
 }

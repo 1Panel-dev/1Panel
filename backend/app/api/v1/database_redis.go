@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/terminal"
 	"github.com/docker/docker/api/types"
@@ -65,6 +66,86 @@ func (b *BaseApi) UpdateRedisConf(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+func (b *BaseApi) UpdateRedisPersistenceConf(c *gin.Context) {
+	var req dto.RedisConfPersistenceUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := redisService.UpdatePersistenceConf(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) RedisBackup(c *gin.Context) {
+	if err := redisService.Backup(); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) RedisRecover(c *gin.Context) {
+	var req dto.RedisBackupRecover
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := redisService.Recover(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) RedisBackupList(c *gin.Context) {
+	var req dto.PageInfo
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	total, list, err := redisService.SearchBackupListWithPage(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, dto.PageResult{
+		Items: list,
+		Total: total,
+	})
+}
+
+func (b *BaseApi) RedisBackupDelete(c *gin.Context) {
+	var req dto.RedisBackupDelete
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	for _, name := range req.Names {
+		fullPath := fmt.Sprintf("%s/%s", req.FileDir, name)
+		if err := os.Remove(fullPath); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+	}
+
+	helper.SuccessWithData(c, nil)
+}
+
 func (b *BaseApi) UpdateRedisConfByFile(c *gin.Context) {
 	var req dto.RedisConfUpdateByFile
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -76,7 +157,7 @@ func (b *BaseApi) UpdateRedisConfByFile(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	path := fmt.Sprintf("/opt/1Panel/data/apps/redis/%s/conf/redis.conf", redisInfo.Name)
+	path := fmt.Sprintf("%s/redis/%s/conf/redis.conf", constant.AppInstallDir, redisInfo.Name)
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0640)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -86,6 +167,14 @@ func (b *BaseApi) UpdateRedisConfByFile(c *gin.Context) {
 	write := bufio.NewWriter(file)
 	_, _ = write.WriteString(req.File)
 	write.Flush()
+
+	if req.RestartNow {
+		composeDir := fmt.Sprintf("%s/redis/%s/docker-compose.yml", constant.AppInstallDir, redisInfo.Name)
+		if _, err := compose.Restart(composeDir); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+	}
 
 	helper.SuccessWithData(c, nil)
 }

@@ -112,12 +112,18 @@ export namespace Database {
     export interface RedisConfUpdate {
         timeout: string;
         maxclients: string;
-        databases: string;
         requirepass: string;
         maxmemory: string;
     }
+    export interface RedisConfPersistenceUpdate {
+        type: string;
+        appendonly: string;
+        appendfsync: string;
+        save: string;
+    }
     export interface RedisConfUpdateByFile {
         file: string;
+        restartNow: boolean;
     }
     export interface RedisStatus {
         tcp_port: string;
@@ -138,14 +144,26 @@ export namespace Database {
         name: string;
         timeout: number;
         maxclients: number;
-        databases: number;
         requirepass: string;
         maxmemory: number;
     }
     export interface RedisPersistenceConf {
-        dir: string;
         appendonly: string;
         appendfsync: string;
         save: string;
+    }
+    export interface RedisBackupRecord {
+        fileName: string;
+        fileDir: string;
+        createdAt: string;
+        size: string;
+    }
+    export interface RedisBackupDelete {
+        fileDir: string;
+        names: Array<string>;
+    }
+    export interface RedisRecover {
+        fileName: string;
+        fileDir: string;
     }
 }

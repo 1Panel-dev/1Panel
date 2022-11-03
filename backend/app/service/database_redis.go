@@ -1,15 +1,19 @@
 package service
 
 import (
-	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
-	"github.com/go-redis/redis"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -17,30 +21,19 @@ type RedisService struct{}
 
 type IRedisService interface {
 	UpdateConf(req dto.RedisConfUpdate) error
+	UpdatePersistenceConf(req dto.RedisConfPersistenceUpdate) error
 
 	LoadStatus() (*dto.RedisStatus, error)
 	LoadConf() (*dto.RedisConf, error)
 	LoadPersistenceConf() (*dto.RedisPersistence, error)
 
-	// Backup(db dto.BackupDB) error
-	// Recover(db dto.RecoverDB) error
+	Backup() error
+	SearchBackupListWithPage(req dto.PageInfo) (int64, interface{}, error)
+	Recover(req dto.RedisBackupRecover) error
 }
 
 func NewIRedisService() IRedisService {
 	return &RedisService{}
-}
-
-func newRedisClient() (*redis.Client, error) {
-	redisInfo, err := mysqlRepo.LoadRedisBaseInfo()
-	if err != nil {
-		return nil, err
-	}
-	client := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("localhost:%v", redisInfo.Port),
-		Password: redisInfo.Password,
-		DB:       0,
-	})
-	return client, nil
 }
 
 func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
@@ -48,53 +41,73 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 	if err != nil {
 		return err
 	}
-	file, err := os.OpenFile(fmt.Sprintf("/opt/1Panel/data/apps/redis/%s/conf/redis.conf", redisInfo.Name), os.O_RDWR, 0666)
+	if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "timeout", req.Timeout); err != nil {
+		return err
+	}
+	if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "maxclients", req.Maxclients); err != nil {
+		return err
+	}
+	if err := mysqlRepo.UpdateDatabasePassword(redisInfo.ID, map[string]interface{}{
+		"param": strings.ReplaceAll(redisInfo.Param, redisInfo.Password, req.Requirepass),
+		"env":   strings.ReplaceAll(redisInfo.Env, redisInfo.Password, req.Requirepass),
+	}); err != nil {
+		return err
+	}
+	if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "requirepass", req.Requirepass); err != nil {
+		return err
+	}
+	if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "maxmemory", req.Maxmemory); err != nil {
+		return err
+	}
+
+	commands := append(redisExec(redisInfo.ContainerName, redisInfo.Password), []string{"config", "rewrite"}...)
+	cmd := exec.Command("docker", commands...)
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return errors.New(string(stdout))
+	}
+	return nil
+}
+
+func (u *RedisService) UpdatePersistenceConf(req dto.RedisConfPersistenceUpdate) error {
+	redisInfo, err := mysqlRepo.LoadRedisBaseInfo()
 	if err != nil {
 		return err
 	}
-	defer file.Close()
 
-	reader := bufio.NewReader(file)
-	pos := int64(0)
-	for {
-		line, err := reader.ReadString('\n')
-		if err != nil {
-			if err == io.EOF {
-				break
-			} else {
-				return err
-			}
+	if req.Type == "rbd" {
+		if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "save", req.Save); err != nil {
+			return err
 		}
-		if bytes := updateConfFile(line, "timeout", req.Timeout); len(bytes) != 0 {
-			_, _ = file.WriteAt(bytes, pos)
+	} else {
+		if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "appendonly", req.Appendonly); err != nil {
+			return err
 		}
-		if bytes := updateConfFile(line, "maxclients", req.Maxclients); len(bytes) != 0 {
-			_, _ = file.WriteAt(bytes, pos)
+		if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "appendfsync", req.Appendfsync); err != nil {
+			return err
 		}
-		if bytes := updateConfFile(line, "databases", req.Databases); len(bytes) != 0 {
-			_, _ = file.WriteAt(bytes, pos)
-		}
-		if bytes := updateConfFile(line, "requirepass", req.Requirepass); len(bytes) != 0 {
-			_, _ = file.WriteAt(bytes, pos)
-		}
-		if bytes := updateConfFile(line, "maxmemory", req.Maxmemory); len(bytes) != 0 {
-			_, _ = file.WriteAt(bytes, pos)
-		}
-		pos += int64(len(line))
+	}
+	commands := append(redisExec(redisInfo.ContainerName, redisInfo.Password), []string{"config", "rewrite"}...)
+	cmd := exec.Command("docker", commands...)
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return errors.New(string(stdout))
 	}
 	return nil
 }
 
 func (u *RedisService) LoadStatus() (*dto.RedisStatus, error) {
-	client, err := newRedisClient()
+	redisInfo, err := mysqlRepo.LoadRedisBaseInfo()
 	if err != nil {
 		return nil, err
 	}
-	stdStr, err := client.Info().Result()
+	commands := append(redisExec(redisInfo.ContainerName, redisInfo.Password), "info")
+	cmd := exec.Command("docker", commands...)
+	stdout, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, err
+		return nil, errors.New(string(stdout))
 	}
-	rows := strings.Split(stdStr, "\r\n")
+	rows := strings.Split(string(stdout), "\r\n")
 	rowMap := make(map[string]string)
 	for _, v := range rows {
 		itemRow := strings.Split(v, ":")
@@ -116,19 +129,22 @@ func (u *RedisService) LoadConf() (*dto.RedisConf, error) {
 	if err != nil {
 		return nil, err
 	}
-	client := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("localhost:%v", redisInfo.Port),
-		Password: redisInfo.Password,
-		DB:       0,
-	})
+
 	var item dto.RedisConf
 	item.ContainerName = redisInfo.ContainerName
 	item.Name = redisInfo.Name
-	item.Timeout = configGetStr(client, "timeout")
-	item.Maxclients = configGetStr(client, "maxclients")
-	item.Databases = configGetStr(client, "databases")
-	item.Requirepass = configGetStr(client, "requirepass")
-	item.Maxmemory = configGetStr(client, "maxmemory")
+	if item.Timeout, err = configGetStr(redisInfo.ContainerName, redisInfo.Password, "timeout"); err != nil {
+		return nil, err
+	}
+	if item.Maxclients, err = configGetStr(redisInfo.ContainerName, redisInfo.Password, "maxclients"); err != nil {
+		return nil, err
+	}
+	if item.Requirepass, err = configGetStr(redisInfo.ContainerName, redisInfo.Password, "requirepass"); err != nil {
+		return nil, err
+	}
+	if item.Maxmemory, err = configGetStr(redisInfo.ContainerName, redisInfo.Password, "maxmemory"); err != nil {
+		return nil, err
+	}
 	return &item, nil
 }
 
@@ -137,38 +153,153 @@ func (u *RedisService) LoadPersistenceConf() (*dto.RedisPersistence, error) {
 	if err != nil {
 		return nil, err
 	}
-	client := redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("localhost:%v", redisInfo.Port),
-		Password: redisInfo.Password,
-		DB:       0,
-	})
+
 	var item dto.RedisPersistence
-	item.Dir = configGetStr(client, "dir")
-	item.Appendonly = configGetStr(client, "appendonly")
-	item.Appendfsync = configGetStr(client, "appendfsync")
-	item.Save = configGetStr(client, "save")
+	if item.Appendonly, err = configGetStr(redisInfo.ContainerName, redisInfo.Password, "appendonly"); err != nil {
+		return nil, err
+	}
+	if item.Appendfsync, err = configGetStr(redisInfo.ContainerName, redisInfo.Password, "appendfsync"); err != nil {
+		return nil, err
+	}
+	if item.Save, err = configGetStr(redisInfo.ContainerName, redisInfo.Password, "save"); err != nil {
+		return nil, err
+	}
 	return &item, nil
 }
 
-func configGetStr(client *redis.Client, param string) string {
-	item, _ := client.ConfigGet(param).Result()
-	if len(item) == 2 {
-		if value, ok := item[1].(string); ok {
-			return value
+func (u *RedisService) Backup() error {
+	redisInfo, err := mysqlRepo.LoadRedisBaseInfo()
+	if err != nil {
+		return err
+	}
+	commands := append(redisExec(redisInfo.ContainerName, redisInfo.Password), "save")
+	cmd := exec.Command("docker", commands...)
+	if stdout, err := cmd.CombinedOutput(); err != nil {
+		return errors.New(string(stdout))
+	}
+	name := fmt.Sprintf("%s.rdb", time.Now().Format("20060102150405"))
+
+	backupLocal, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
+	if err != nil {
+		return err
+	}
+	localDir, err := loadLocalDir(backupLocal)
+	if err != nil {
+		return err
+	}
+
+	backupDir := fmt.Sprintf("database/redis/%s/", redisInfo.Name)
+	fullDir := fmt.Sprintf("%s/%s", localDir, backupDir)
+	if _, err := os.Stat(fullDir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(fullDir, os.ModePerm); err != nil {
+			if err != nil {
+				return fmt.Errorf("mkdir %s failed, err: %v", fullDir, err)
+			}
 		}
 	}
-	return ""
+	cmd2 := exec.Command("docker", "cp", fmt.Sprintf("%s:/data/dump.rdb", redisInfo.ContainerName), fmt.Sprintf("%s/%s", fullDir, name))
+	if stdout, err := cmd2.CombinedOutput(); err != nil {
+		return errors.New(string(stdout))
+	}
+	return nil
 }
 
-func updateConfFile(line, param string, value string) []byte {
-	var bytes []byte
-	if strings.HasPrefix(line, param) || strings.HasPrefix(line, "# "+param) {
-		if len(value) == 0 || value == "0" {
-			bytes = []byte(fmt.Sprintf("# %s", param))
-		} else {
-			bytes = []byte(fmt.Sprintf("%s %v", param, value))
-		}
-		return bytes
+func (u *RedisService) Recover(req dto.RedisBackupRecover) error {
+	redisInfo, err := mysqlRepo.LoadRedisBaseInfo()
+	if err != nil {
+		return err
 	}
-	return bytes
+	composeDir := fmt.Sprintf("%s/redis/%s", constant.AppInstallDir, redisInfo.Name)
+	if _, err := compose.Down(composeDir + "/docker-compose.yml"); err != nil {
+		return err
+	}
+
+	fullName := fmt.Sprintf("%s/%s", req.FileDir, req.FileName)
+	input, err := ioutil.ReadFile(fullName)
+	if err != nil {
+		return err
+	}
+	if err = ioutil.WriteFile(composeDir+"/data/dump.rdb", input, 0640); err != nil {
+		return err
+	}
+	if _, err := compose.Up(composeDir + "/docker-compose.yml"); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *RedisService) SearchBackupListWithPage(req dto.PageInfo) (int64, interface{}, error) {
+	var (
+		list      []dto.RedisBackupRecords
+		backDatas []dto.RedisBackupRecords
+	)
+	redisInfo, err := mysqlRepo.LoadRedisBaseInfo()
+	if err != nil {
+		return 0, nil, err
+	}
+	backupLocal, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
+	if err != nil {
+		return 0, nil, err
+	}
+	localDir, err := loadLocalDir(backupLocal)
+	if err != nil {
+		return 0, nil, err
+	}
+	backupDir := fmt.Sprintf("%s/database/redis/%s", localDir, redisInfo.Name)
+	_ = filepath.Walk(backupDir, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			list = append(list, dto.RedisBackupRecords{
+				CreatedAt: info.ModTime().Format("2006-01-02 15:04:05"),
+				Size:      int(info.Size()),
+				FileDir:   backupDir,
+				FileName:  info.Name(),
+			})
+		}
+		return nil
+	})
+	total, start, end := len(list), (req.Page-1)*req.PageSize, req.Page*req.PageSize
+	if start > total {
+		backDatas = make([]dto.RedisBackupRecords, 0)
+	} else {
+		if end >= total {
+			end = total
+		}
+		backDatas = list[start:end]
+	}
+	return int64(total), backDatas, nil
+}
+
+func configGetStr(containerName, password, param string) (string, error) {
+	commands := append(redisExec(containerName, password), []string{"config", "get", param}...)
+	cmd := exec.Command("docker", commands...)
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", errors.New(string(stdout))
+	}
+	rows := strings.Split(string(stdout), "\r\n")
+	for _, v := range rows {
+		itemRow := strings.Split(v, "\n")
+		if len(itemRow) == 3 {
+			return itemRow[1], nil
+		}
+	}
+	return "", nil
+}
+func configSetStr(containerName, password, param, value string) error {
+	commands := append(redisExec(containerName, password), []string{"config", "set", param, value}...)
+	cmd := exec.Command("docker", commands...)
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return errors.New(string(stdout))
+	}
+	return nil
+}
+
+func redisExec(containerName, password string) []string {
+	cmds := []string{"exec", containerName, "redis-cli", "-a", password, "--no-auth-warning"}
+	if len(password) == 0 {
+		cmds = []string{"exec", containerName, "redis-cli"}
+	}
+	return cmds
 }

@@ -1,5 +1,5 @@
 import http from '@/api';
-import { ResPage } from '../interface';
+import { ReqPage, ResPage } from '../interface';
 import { Backup } from '../interface/backup';
 import { Database } from '../interface/database';
 
@@ -59,9 +59,24 @@ export const loadRedisConf = () => {
 export const RedisPersistenceConf = () => {
     return http.get<Database.RedisPersistenceConf>(`/databases/redis/persistence/conf`);
 };
+export const updateRedisPersistenceConf = (params: Database.RedisConfPersistenceUpdate) => {
+    return http.post(`/databases/redis/conf/update/persistence`, params);
+};
 export const updateRedisConf = (params: Database.RedisConfUpdate) => {
     return http.post(`/databases/redis/conf/update`, params);
 };
 export const updateRedisConfByFile = (params: Database.RedisConfUpdateByFile) => {
     return http.post(`/databases/redis/conf/update/byfile`, params);
+};
+export const backupRedis = () => {
+    return http.post(`/databases/redis/backup`);
+};
+export const recoverRedis = (param: Database.RedisRecover) => {
+    return http.post(`/databases/redis/recover`, param);
+};
+export const redisBackupRedisRecords = (param: ReqPage) => {
+    return http.post<ResPage<Database.RedisBackupRecord>>(`/databases/redis/backup/records`, param);
+};
+export const deleteBackupRedis = (param: Database.RedisBackupDelete) => {
+    return http.post(`/databases/redis/backup/del`, param);
 };
