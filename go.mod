@@ -16,7 +16,6 @@ require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-gormigrate/gormigrate/v2 v2.0.2
 	github.com/go-playground/validator/v10 v10.11.0
-	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gogf/gf v1.16.9
 	github.com/golang-jwt/jwt/v4 v4.4.2
@@ -119,8 +118,6 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nwaples/rardecode/v2 v2.0.0-beta.2 // indirect
-	github.com/onsi/ginkgo v1.16.5 // indirect
-	github.com/onsi/gomega v1.21.1 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/runc v1.1.4 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect

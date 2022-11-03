@@ -145,12 +145,18 @@ type RecoverDB struct {
 type RedisConfUpdate struct {
 	Timeout     string `json:"timeout"`
 	Maxclients  string `json:"maxclients"`
-	Databases   string `json:"databases"`
 	Requirepass string `json:"requirepass"`
 	Maxmemory   string `json:"maxmemory"`
 }
+type RedisConfPersistenceUpdate struct {
+	Type        string `json:"type" validate:"required,oneof=aof rbd"`
+	Appendonly  string `json:"appendonly"`
+	Appendfsync string `json:"appendfsync"`
+	Save        string `json:"save"`
+}
 type RedisConfUpdateByFile struct {
-	File string `json:"file"`
+	File       string `json:"file"`
+	RestartNow bool   `json:"restartNow"`
 }
 
 type RedisConf struct {
@@ -158,13 +164,11 @@ type RedisConf struct {
 	ContainerName string `json:"containerName"`
 	Timeout       string `json:"timeout"`
 	Maxclients    string `json:"maxclients"`
-	Databases     string `json:"databases"`
 	Requirepass   string `json:"requirepass"`
 	Maxmemory     string `json:"maxmemory"`
 }
 
 type RedisPersistence struct {
-	Dir         string `json:"dir"`
 	Appendonly  string `json:"appendonly"`
 	Appendfsync string `json:"appendfsync"`
 	Save        string `json:"save"`
@@ -184,4 +188,19 @@ type RedisStatus struct {
 	KeyspaceHits             string `json:"keyspace_hits"`
 	KeyspaceMisses           string `json:"keyspace_misses"`
 	LatestForkUsec           string `json:"latest_fork_usec"`
+}
+
+type RedisBackupRecords struct {
+	FileName  string `json:"fileName"`
+	FileDir   string `json:"fileDir"`
+	CreatedAt string `json:"createdAt"`
+	Size      int    `json:"size"`
+}
+type RedisBackupRecover struct {
+	FileName string `json:"fileName"`
+	FileDir  string `json:"fileDir"`
+}
+type RedisBackupDelete struct {
+	FileDir string   `json:"fileDir"`
+	Names   []string `json:"names"`
 }

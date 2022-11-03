@@ -2,8 +2,8 @@
     <div v-if="settingShow">
         <el-card style="margin-top: 5px">
             <el-radio-group v-model="confShowType">
-                <el-radio-button label="base">基础配置</el-radio-button>
-                <el-radio-button label="all">全部配置</el-radio-button>
+                <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
+                <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
             </el-radio-group>
             <el-form v-if="confShowType === 'base'" :model="form" ref="formRef" :rules="rules" label-width="120px">
                 <el-row style="margin-top: 20px">
@@ -22,9 +22,6 @@
                         </el-form-item>
                         <el-form-item :label="$t('database.maxclients')" prop="maxclients">
                             <el-input clearable type="number" v-model.number="form.maxclients" />
-                        </el-form-item>
-                        <el-form-item :label="$t('database.databases')" prop="databases">
-                            <el-input clearable type="number" v-model.number="form.databases" />
                         </el-form-item>
                         <el-form-item :label="$t('database.maxmemory')" prop="maxmemory">
                             <el-input clearable type="number" v-model.number="form.maxmemory" />
@@ -53,11 +50,40 @@
                     v-model="mysqlConf"
                     :readOnly="true"
                 />
-                <el-button type="primary" size="default" @click="onSaveFile" style="width: 90px; margin-top: 5px">
+                <el-button
+                    type="primary"
+                    size="default"
+                    @click="saveVisiable = true"
+                    style="width: 90px; margin-top: 5px"
+                >
                     {{ $t('commons.button.save') }}
                 </el-button>
             </div>
         </el-card>
+
+        <el-dialog v-model="saveVisiable" :destroy-on-close="true" width="30%">
+            <template #header>
+                <div class="card-header">
+                    <span>{{ $t('database.confChange') }}</span>
+                </div>
+            </template>
+            <el-checkbox v-model="restartNow" :label="$t('database.restartNow')" />
+            <div>
+                <span style="font-size: 12px">{{ $t('database.restartNowHelper1') }}</span>
+                <span style="font-size: 12px; color: red; font-weight: 500">
+                    {{ $t('database.restartNowHelper2') }}
+                </span>
+                <span style="font-size: 12px">{{ $t('database.restartNowHelper3') }}</span>
+            </div>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="saveVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="onSaveFile()">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
@@ -75,20 +101,20 @@ import { Rules } from '@/global/form-rules';
 const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
 
+const restartNow = ref(false);
+const saveVisiable = ref(false);
 const form = reactive({
     name: '',
     port: 3306,
     requirepass: '',
     timeout: 0,
     maxclients: 0,
-    databases: 0,
     maxmemory: 0,
 });
 const rules = reactive({
     port: [Rules.port],
     timeout: [Rules.number],
     maxclients: [Rules.number],
-    databases: [Rules.number],
     maxmemory: [Rules.number],
 });
 
@@ -106,17 +132,20 @@ const onClose = (): void => {
 };
 
 const onSave = async (formEl: FormInstance | undefined) => {
+    if (confShowType.value === 'all') {
+        onSaveFile();
+    }
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
         let param = {
             timeout: form.timeout + '',
             maxclients: form.maxclients + '',
-            databases: form.databases + '',
             requirepass: form.requirepass,
             maxmemory: form.maxmemory + '',
         };
         await updateRedisConf(param);
+        saveVisiable.value = false;
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
     });
 };
@@ -124,8 +153,11 @@ const onSave = async (formEl: FormInstance | undefined) => {
 const onSaveFile = async () => {
     let param = {
         file: mysqlConf.value,
+        restartNow: restartNow.value,
     };
     await updateRedisConfByFile(param);
+    saveVisiable.value = false;
+    restartNow.value = false;
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };
 
@@ -134,7 +166,6 @@ const loadform = async () => {
     form.name = res.data?.name;
     form.timeout = Number(res.data?.timeout);
     form.maxclients = Number(res.data?.maxclients);
-    form.databases = Number(res.data?.databases);
     form.requirepass = res.data?.requirepass;
     form.maxmemory = Number(res.data?.maxmemory);
     loadMysqlConf(`/opt/1Panel/data/apps/redis/${form.name}/conf/redis.conf`);
