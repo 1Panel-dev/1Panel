@@ -27,7 +27,7 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		withRecordRouter.POST("/recover", baseApi.RecoverMysql)
 		withRecordRouter.POST("/backups/search", baseApi.SearchDBBackups)
 		withRecordRouter.POST("/del", baseApi.DeleteMysql)
-		withRecordRouter.POST("/variables/update", baseApi.UpdateMysqlVariables)
+		withRecordRouter.POST("/variables/update/:mysqlName", baseApi.UpdateMysqlVariables)
 		withRecordRouter.POST("/conf/update/byfile", baseApi.UpdateMysqlConfByFile)
 		cmdRouter.POST("/search", baseApi.SearchMysql)
 		cmdRouter.GET("/variables/:name", baseApi.LoadVariables)

@@ -205,3 +205,18 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 	}
 	return nil
 }
+
+func handleUnTar(sourceFile, targetDir string) error {
+	if _, err := os.Stat(targetDir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(targetDir, os.ModePerm); err != nil {
+			return err
+		}
+	}
+
+	cmd := exec.Command("tar", "zxvfC", sourceFile, targetDir)
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return errors.New(string(stdout))
+	}
+	return nil
+}

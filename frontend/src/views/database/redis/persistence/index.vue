@@ -113,11 +113,14 @@
                 />
             </ComplexTable>
         </el-card>
+
+        <ConfirmDialog ref="confirmDialogRef" @confirm="onRecover"></ConfirmDialog>
     </div>
 </template>
 
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
+import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { Database } from '@/api/interface/database';
 import {
     backupRedis,
@@ -161,6 +164,9 @@ const onClose = (): void => {
 
 const data = ref();
 const selects = ref<any>([]);
+const currentRow = ref();
+const confirmDialogRef = ref();
+const submitInput = ref();
 const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 10,
@@ -192,13 +198,15 @@ const onBackup = async () => {
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
     loadBackupRecords();
 };
-const onRecover = async (row: Database.RedisBackupRecord) => {
-    let param = {
-        fileName: row.fileName,
-        fileDir: row.fileDir,
-    };
-    await recoverRedis(param);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+const onRecover = async () => {
+    if (submitInput.value === i18n.global.t('database.submitIt')) {
+        let param = {
+            fileName: currentRow.value.fileName,
+            fileDir: currentRow.value.fileDir,
+        };
+        await recoverRedis(param);
+        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    }
 };
 
 const onBatchDelete = async (row: Database.RedisBackupRecord | null) => {
@@ -220,7 +228,13 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.recover'),
         click: (row: Database.RedisBackupRecord) => {
-            onRecover(row);
+            currentRow.value = row;
+            let params = {
+                header: i18n.global.t('commons.button.recover'),
+                operationInfo: i18n.global.t('database.recoverHelper', [row.fileName]),
+                submitInputInfo: i18n.global.t('database.submitIt'),
+            };
+            confirmDialogRef.value!.acceptParams(params);
         },
     },
     {

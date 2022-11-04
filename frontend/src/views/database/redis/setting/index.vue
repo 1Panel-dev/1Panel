@@ -50,40 +50,13 @@
                     v-model="mysqlConf"
                     :readOnly="true"
                 />
-                <el-button
-                    type="primary"
-                    size="default"
-                    @click="saveVisiable = true"
-                    style="width: 90px; margin-top: 5px"
-                >
+                <el-button type="primary" size="default" @click="onSaveFile" style="width: 90px; margin-top: 5px">
                     {{ $t('commons.button.save') }}
                 </el-button>
             </div>
         </el-card>
 
-        <el-dialog v-model="saveVisiable" :destroy-on-close="true" width="30%">
-            <template #header>
-                <div class="card-header">
-                    <span>{{ $t('database.confChange') }}</span>
-                </div>
-            </template>
-            <el-checkbox v-model="restartNow" :label="$t('database.restartNow')" />
-            <div>
-                <span style="font-size: 12px">{{ $t('database.restartNowHelper1') }}</span>
-                <span style="font-size: 12px; color: red; font-weight: 500">
-                    {{ $t('database.restartNowHelper2') }}
-                </span>
-                <span style="font-size: 12px">{{ $t('database.restartNowHelper3') }}</span>
-            </div>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="saveVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button @click="onSaveFile()">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-dialog>
+        <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmitSave"></ConfirmDialog>
     </div>
 </template>
 
@@ -94,6 +67,7 @@ import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { LoadFile } from '@/api/modules/files';
+import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { loadRedisConf, updateRedisConf, updateRedisConfByFile } from '@/api/modules/database';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
@@ -102,7 +76,6 @@ const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
 
 const restartNow = ref(false);
-const saveVisiable = ref(false);
 const form = reactive({
     name: '',
     port: 3306,
@@ -120,6 +93,7 @@ const rules = reactive({
 
 const formRef = ref<FormInstance>();
 const mysqlConf = ref();
+const confirmDialogRef = ref();
 
 const settingShow = ref<boolean>(false);
 
@@ -145,18 +119,25 @@ const onSave = async (formEl: FormInstance | undefined) => {
             maxmemory: form.maxmemory + '',
         };
         await updateRedisConf(param);
-        saveVisiable.value = false;
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
     });
 };
 
 const onSaveFile = async () => {
+    let params = {
+        header: i18n.global.t('database.confChange'),
+        operationInfo: i18n.global.t('database.restartNowHelper1'),
+        submitInputInfo: i18n.global.t('database.restartNow'),
+    };
+    confirmDialogRef.value!.acceptParams(params);
+};
+
+const onSubmitSave = async () => {
     let param = {
         file: mysqlConf.value,
         restartNow: restartNow.value,
     };
     await updateRedisConfByFile(param);
-    saveVisiable.value = false;
     restartNow.value = false;
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };
