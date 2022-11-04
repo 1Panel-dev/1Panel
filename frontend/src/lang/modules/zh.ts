@@ -70,6 +70,7 @@ export default {
             updateSuccess: '更新成功',
             uploadSuccess: '上传成功',
             operate: '操作',
+            operateConfirm: '如果确认操作，请手动输入',
         },
         login: {
             captchaHelper: '请输入验证码',
@@ -252,12 +253,13 @@ export default {
         hit: '查找数据库键命中率',
         latestForkUsec: '最近一次 fork() 操作耗费的微秒数',
 
+        recoverHelper: '即将使用 [{0}] 对数据进行覆盖，是否继续?',
+        submitIt: '覆盖数据',
+
         baseConf: '基础配置',
         allConf: '全部配置',
         restartNow: '立即重启',
-        restartNowHelper1: '修改配置后需要',
-        restartNowHelper2: '重启 redis 生效',
-        restartNowHelper3: '，若您的数据需要持久化请先执行 save 操作。',
+        restartNowHelper1: '修改配置后需要重启生效，若您的数据需要持久化请先执行 save 操作。',
 
         persistence: '持久化',
         rdbHelper1: '秒內,插入',

@@ -78,26 +78,15 @@ type MysqlVariables struct {
 	TableOpenCache       string `json:"table_open_cache"`
 	ThreadCacheSize      string `json:"thread_cache_size"`
 	ThreadStack          string `json:"thread_stack"`
-	Tmp_tableSize        string `json:"tmp_table_size"`
+	TmpTableSize         string `json:"tmp_table_size"`
+
+	SlowQueryLog  string `json:"slow_query_log"`
+	LongQueryTime string `json:"long_query_time"`
 }
 
 type MysqlVariablesUpdate struct {
-	MysqlName            string `json:"mysqlName" validate:"required"`
-	KeyBufferSize        int64  `json:"key_buffer_size" validate:"required"`
-	QueryCacheSize       int64  `json:"query_cache_size" validate:"required"`
-	TmpTableSize         int64  `json:"tmp_table_size" validate:"required"`
-	InnodbBufferPoolSize int64  `json:"innodb_buffer_pool_size" validate:"required"`
-	InnodbLogBufferSize  int64  `json:"innodb_log_buffer_size" validate:"required"`
-	SortBufferSize       int64  `json:"sort_buffer_size" validate:"required"`
-	ReadBufferSize       int64  `json:"read_buffer_size" validate:"required"`
-
-	ReadRndBufferSize int64 `json:"read_rnd_buffer_size" validate:"required"`
-	JoinBufferSize    int64 `json:"join_buffer_size" validate:"required"`
-	ThreadStack       int64 `json:"thread_stack" validate:"required"`
-	BinlogCachSize    int64 `json:"binlog_cache_size" validate:"required"`
-	ThreadCacheSize   int64 `json:"thread_cache_size" validate:"required"`
-	TableOpenCache    int64 `json:"table_open_cache" validate:"required"`
-	MaxConnections    int64 `json:"max_connections" validate:"required"`
+	Param string      `json:"param"`
+	Value interface{} `json:"value"`
 }
 type MysqlConfUpdateByFile struct {
 	MysqlName string `json:"mysqlName" validate:"required"`
@@ -112,11 +101,12 @@ type ChangeDBInfo struct {
 }
 
 type DBBaseInfo struct {
-	Name       string `json:"name"`
-	Port       int64  `json:"port"`
-	Password   string `json:"password"`
-	RemoteConn bool   `json:"remoteConn"`
-	MysqlKey   string `json:"mysqlKey"`
+	Name          string `json:"name"`
+	ContainerName string `json:"containerName"`
+	Port          int64  `json:"port"`
+	Password      string `json:"password"`
+	RemoteConn    bool   `json:"remoteConn"`
+	MysqlKey      string `json:"mysqlKey"`
 }
 
 type SearchDBWithPage struct {

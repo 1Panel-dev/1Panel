@@ -1,35 +1,65 @@
 package service
 
 import (
-	"encoding/json"
 	"fmt"
-	"os/exec"
+	"io/ioutil"
+	"os"
+	"regexp"
 	"strings"
 	"testing"
-
-	"github.com/1Panel-dev/1Panel/backend/app/dto"
 )
 
 func TestMysql(t *testing.T) {
-	cmd := exec.Command("docker", "exec", "1Panel-redis-7.0.5-zgVH-K859", "redis-cli", "config", "get", "save")
-	stdout, err := cmd.CombinedOutput()
-	if err != nil {
-		fmt.Println(string(stdout))
-	}
+	path := "/Users/slooop/go/src/github.com/1Panel/apps/mysql/5.7.39/conf/my.cnf"
 
-	rows := strings.Split(string(stdout), "\r\n")
-	rowMap := make(map[string]string)
-	for _, v := range rows {
-		itemRow := strings.Split(v, "\n")
-		if len(itemRow) == 3 {
-			rowMap[itemRow[0]] = itemRow[1]
+	var lines []string
+	lineBytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		lines = strings.Split(string(lineBytes), "\n")
+	}
+	var newLines []string
+
+	start := "[mysqld]"
+	isOn := false
+	hasKey := false
+	regItem, _ := regexp.Compile(`^\[*\]`)
+	i := 0
+	for _, line := range lines {
+		i++
+		if strings.HasPrefix(line, start) {
+			isOn = true
+			newLines = append(newLines, line)
+			continue
+		}
+		if !isOn {
+			newLines = append(newLines, line)
+			continue
+		}
+		if strings.HasPrefix(line, "user") || strings.HasPrefix(line, "# user") {
+			newLines = append(newLines, "user="+"ON")
+			hasKey = true
+			continue
+		}
+		isDeadLine := regItem.Match([]byte(line))
+		if !isDeadLine {
+			newLines = append(newLines, line)
+			continue
+		}
+		if !hasKey {
+			newLines = append(newLines, "user="+"ON \n")
+			newLines = append(newLines, line)
 		}
 	}
-	var info dto.RedisStatus
-	arr, err := json.Marshal(rowMap)
+
+	file, err := os.OpenFile(path, os.O_WRONLY, 0666)
 	if err != nil {
 		fmt.Println(err)
 	}
-	_ = json.Unmarshal(arr, &info)
-	fmt.Println(info)
+	defer file.Close()
+	_, err = file.WriteString(strings.Join(newLines, "\n"))
+	if err != nil {
+		fmt.Println(err)
+	}
 }

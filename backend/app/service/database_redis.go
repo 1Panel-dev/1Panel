@@ -177,8 +177,6 @@ func (u *RedisService) Backup() error {
 	if stdout, err := cmd.CombinedOutput(); err != nil {
 		return errors.New(string(stdout))
 	}
-	name := fmt.Sprintf("%s.rdb", time.Now().Format("20060102150405"))
-
 	backupLocal, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
 	if err != nil {
 		return err
@@ -187,7 +185,6 @@ func (u *RedisService) Backup() error {
 	if err != nil {
 		return err
 	}
-
 	backupDir := fmt.Sprintf("database/redis/%s/", redisInfo.Name)
 	fullDir := fmt.Sprintf("%s/%s", localDir, backupDir)
 	if _, err := os.Stat(fullDir); err != nil && os.IsNotExist(err) {
@@ -197,6 +194,21 @@ func (u *RedisService) Backup() error {
 			}
 		}
 	}
+
+	appendonly, err := configGetStr(redisInfo.ContainerName, redisInfo.Password, "appendonly")
+	if err != nil {
+		return err
+	}
+	if appendonly == "yes" {
+		redisDataDir := fmt.Sprintf("%s/%s/%s/data", constant.AppInstallDir, "redis", redisInfo.Name)
+		name := fmt.Sprintf("%s.tar.gz", time.Now().Format("20060102150405"))
+		if err := handleTar(redisDataDir+"/appendonlydir", fullDir, name, ""); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	name := fmt.Sprintf("%s.rdb", time.Now().Format("20060102150405"))
 	cmd2 := exec.Command("docker", "cp", fmt.Sprintf("%s:/data/dump.rdb", redisInfo.ContainerName), fmt.Sprintf("%s/%s", fullDir, name))
 	if stdout, err := cmd2.CombinedOutput(); err != nil {
 		return errors.New(string(stdout))
@@ -209,18 +221,29 @@ func (u *RedisService) Recover(req dto.RedisBackupRecover) error {
 	if err != nil {
 		return err
 	}
+	appendonly, err := configGetStr(redisInfo.ContainerName, redisInfo.Password, "appendonly")
+	if err != nil {
+		return err
+	}
+
 	composeDir := fmt.Sprintf("%s/redis/%s", constant.AppInstallDir, redisInfo.Name)
 	if _, err := compose.Down(composeDir + "/docker-compose.yml"); err != nil {
 		return err
 	}
-
 	fullName := fmt.Sprintf("%s/%s", req.FileDir, req.FileName)
-	input, err := ioutil.ReadFile(fullName)
-	if err != nil {
-		return err
-	}
-	if err = ioutil.WriteFile(composeDir+"/data/dump.rdb", input, 0640); err != nil {
-		return err
+	if appendonly == "yes" {
+		redisDataDir := fmt.Sprintf("%s/%s/%s/data/", constant.AppInstallDir, "redis", redisInfo.Name)
+		if err := handleUnTar(fullName, redisDataDir); err != nil {
+			return err
+		}
+	} else {
+		input, err := ioutil.ReadFile(fullName)
+		if err != nil {
+			return err
+		}
+		if err = ioutil.WriteFile(composeDir+"/data/dump.rdb", input, 0640); err != nil {
+			return err
+		}
 	}
 	if _, err := compose.Up(composeDir + "/docker-compose.yml"); err != nil {
 		return err

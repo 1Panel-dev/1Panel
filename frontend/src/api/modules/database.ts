@@ -26,8 +26,8 @@ export const addMysqlDB = (params: Database.MysqlDBCreate) => {
 export const updateMysqlDBInfo = (params: Database.ChangeInfo) => {
     return http.put(`/databases/${params.id}`, params);
 };
-export const updateMysqlVariables = (params: Database.MysqlVariables) => {
-    return http.post(`/databases/variables/update`, params);
+export const updateMysqlVariables = (mysqlName: string, params: Array<Database.VariablesUpdate>) => {
+    return http.post(`/databases/variables/update/${mysqlName}`, params);
 };
 export const updateMysqlConfByFile = (params: Database.MysqlConfUpdateByFile) => {
     return http.post(`/databases/conf/update/byfile`, params);

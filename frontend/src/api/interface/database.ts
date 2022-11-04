@@ -33,6 +33,7 @@ export namespace Database {
         password: string;
         remoteConn: boolean;
         mysqlKey: string;
+        containerName: string;
     }
     export interface MysqlConfUpdateByFile {
         mysqlName: string;
@@ -63,6 +64,13 @@ export namespace Database {
         thread_cache_size: number;
         thread_stack: number;
         tmp_table_size: number;
+
+        slow_query_log: string;
+        long_query_time: number;
+    }
+    export interface VariablesUpdate {
+        param: string;
+        value: any;
     }
     export interface MysqlStatus {
         Aborted_clients: number;

@@ -4,8 +4,10 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -14,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -27,7 +30,7 @@ type IMysqlService interface {
 	SearchBackupsWithPage(search dto.SearchBackupsWithPage) (int64, interface{}, error)
 	Create(mysqlDto dto.MysqlDBCreate) error
 	ChangeInfo(info dto.ChangeDBInfo) error
-	UpdateVariables(variables dto.MysqlVariablesUpdate) error
+	UpdateVariables(mysqlName string, updatas []dto.MysqlVariablesUpdate) error
 
 	Backup(db dto.BackupDB) error
 	Recover(db dto.RecoverDB) error
@@ -265,53 +268,41 @@ func (u *MysqlService) ChangeInfo(info dto.ChangeDBInfo) error {
 	return nil
 }
 
-func (u *MysqlService) UpdateVariables(variables dto.MysqlVariablesUpdate) error {
-	app, err := mysqlRepo.LoadBaseInfoByName(variables.MysqlName)
+func (u *MysqlService) UpdateVariables(mysqlName string, updatas []dto.MysqlVariablesUpdate) error {
+	app, err := mysqlRepo.LoadBaseInfoByName(mysqlName)
+	if err != nil {
+		return err
+	}
+	var files []string
+
+	path := fmt.Sprintf("%s/%s/%s/conf/my.cnf", constant.AppInstallDir, app.Key, app.Name)
+	lineBytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		return err
+	} else {
+		files = strings.Split(string(lineBytes), "\n")
+	}
+	group := ""
+	for _, info := range updatas {
+		switch info.Param {
+		case "key_buffer_size", "sort_buffer_size":
+			group = "[myisamchk]"
+		default:
+			group = "[mysqld]"
+		}
+		files = updateMyCnf(files, group, info.Param, info.Value)
+	}
+	file, err := os.OpenFile(path, os.O_WRONLY, 0666)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	_, err = file.WriteString(strings.Join(files, "\n"))
 	if err != nil {
 		return err
 	}
 
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL key_buffer_size=%d", variables.KeyBufferSize)); err != nil {
-		return err
-	}
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL query_cache_size=%d", variables.QueryCacheSize)); err != nil {
-		return err
-	}
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL tmp_table_size=%d", variables.TmpTableSize)); err != nil {
-		return err
-	}
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL innodb_buffer_pool_size=%d", variables.InnodbBufferPoolSize)); err != nil {
-		return err
-	}
-	// if  err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL innodb_log_buffer_size=%d", variables.InnodbLogBufferSize)); err != nil {
-	// 	return err
-	// }
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL sort_buffer_size=%d", variables.SortBufferSize)); err != nil {
-		return err
-	}
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL read_buffer_size=%d", variables.ReadBufferSize)); err != nil {
-		return err
-	}
-
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL read_rnd_buffer_size=%d", variables.ReadRndBufferSize)); err != nil {
-		return err
-	}
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL join_buffer_size=%d", variables.JoinBufferSize)); err != nil {
-		return err
-	}
-	// if  err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL thread_stack=%d", variables.ThreadStack)); err != nil {
-	// 	return err
-	// }
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL binlog_cache_size=%d", variables.BinlogCachSize)); err != nil {
-		return err
-	}
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL thread_cache_size=%d", variables.ThreadCacheSize)); err != nil {
-		return err
-	}
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL table_open_cache=%d", variables.TableOpenCache)); err != nil {
-		return err
-	}
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set GLOBAL max_connections=%d", variables.MaxConnections)); err != nil {
+	if _, err := compose.Restart(fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, app.Key, app.Name)); err != nil {
 		return err
 	}
 
@@ -324,6 +315,7 @@ func (u *MysqlService) LoadBaseInfo(name string) (*dto.DBBaseInfo, error) {
 	if err != nil {
 		return nil, err
 	}
+	data.ContainerName = app.ContainerName
 	data.Name = app.Name
 	data.Port = int64(app.Port)
 	data.Password = app.Password
@@ -484,4 +476,41 @@ func backupMysql(backupType, baseDir, backupDir, mysqlName, dbName, fileName str
 		global.LOG.Errorf("save backup record failed, err: %v", err)
 	}
 	return nil
+}
+
+func updateMyCnf(oldFiles []string, group string, param string, value interface{}) []string {
+	isOn := false
+	hasKey := false
+	regItem, _ := regexp.Compile(`\[*\]`)
+	var newFiles []string
+	for _, line := range oldFiles {
+		if strings.HasPrefix(line, group) {
+			isOn = true
+			newFiles = append(newFiles, line)
+			continue
+		}
+		if !isOn {
+			newFiles = append(newFiles, line)
+			continue
+		}
+		if strings.HasPrefix(line, param) || strings.HasPrefix(line, "# "+param) {
+			newFiles = append(newFiles, fmt.Sprintf("%s=%v", param, value))
+			hasKey = true
+			continue
+		}
+		isDeadLine := regItem.Match([]byte(line))
+		if !isDeadLine {
+			newFiles = append(newFiles, line)
+			continue
+		}
+		if !hasKey {
+			newFiles = append(newFiles, fmt.Sprintf("%s=%v\n", param, value))
+			newFiles = append(newFiles, line)
+		}
+	}
+	if !isOn {
+		newFiles = append(newFiles, group+"\n")
+		newFiles = append(newFiles, fmt.Sprintf("%s=%v\n", param, value))
+	}
+	return newFiles
 }

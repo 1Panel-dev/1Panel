@@ -48,16 +48,19 @@ func (b *BaseApi) UpdateMysql(c *gin.Context) {
 }
 
 func (b *BaseApi) UpdateMysqlVariables(c *gin.Context) {
-	var req dto.MysqlVariablesUpdate
+	var req []dto.MysqlVariablesUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+
+	mysqlName, ok := c.Params.Get("mysqlName")
+	if !ok {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error mysqlName in path"))
 		return
 	}
-	if err := mysqlService.UpdateVariables(req); err != nil {
+
+	if err := mysqlService.UpdateVariables(mysqlName, req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
