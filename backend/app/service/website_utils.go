@@ -8,6 +8,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
+	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/parser"
 	"github.com/1Panel-dev/1Panel/cmd/server/nginx_conf"
 	"github.com/pkg/errors"
@@ -203,4 +204,52 @@ func deleteListenAndServerName(website model.WebSite, ports []int, domains []str
 		return err
 	}
 	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxConfig.ContainerName)
+}
+
+func getNginxConfigByKeys(website model.WebSite, keys []string) (map[string]interface{}, error) {
+	nginxConfig, err := getNginxConfig(website.PrimaryDomain)
+	if err != nil {
+		return nil, err
+	}
+	config := nginxConfig.Config
+	server := config.FindServers()[0]
+	res := make(map[string]interface{})
+	for _, key := range keys {
+		dirs := server.FindDirectives(key)
+		for _, dir := range dirs {
+			res[dir.GetName()] = dir.GetParameters()
+		}
+	}
+	return res, nil
+}
+
+func updateNginxConfig(website model.WebSite, keyValues map[string][]string) error {
+	nginxConfig, err := getNginxConfig(website.PrimaryDomain)
+	if err != nil {
+		return err
+	}
+	config := nginxConfig.Config
+	server := config.FindServers()[0]
+	for k, v := range keyValues {
+		newDir := components.Directive{
+			Name:       k,
+			Parameters: v,
+		}
+		server.UpdateDirectives(k, newDir)
+	}
+	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return err
+	}
+	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxConfig.ContainerName)
+}
+
+func getNginxParams(key string, param interface{}) []string {
+	var res []string
+	switch param.(type) {
+	case string:
+		if key == "index" {
+			res = strings.Split(param.(string), "\n")
+		}
+	}
+	return res
 }

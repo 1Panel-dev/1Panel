@@ -96,3 +96,30 @@ func (b *BaseApi) CreateWebDomain(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, domain)
 }
+
+func (b *BaseApi) GetNginxConfig(c *gin.Context) {
+	var req dto.NginxConfigReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	config, err := websiteService.GetNginxConfigByScope(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, config)
+}
+
+func (b *BaseApi) UpdateNginxConfig(c *gin.Context) {
+	var req dto.NginxConfigReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.UpdateNginxConfigByScope(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}

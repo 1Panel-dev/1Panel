@@ -63,4 +63,10 @@ export namespace WebSite {
         port: number;
         domain: string;
     }
+
+    export interface NginxConfigReq {
+        websiteId: number;
+        scope: string;
+        params?: any;
+    }
 }

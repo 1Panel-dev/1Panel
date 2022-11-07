@@ -685,5 +685,7 @@ export default {
         domainHelper: '一行一个域名,支持*和IP地址,支持域名:端口',
         port: '端口',
         addDomain: '新增域名',
+        domainConfig: '域名设置',
+        defaultDoc: '默认文档',
     },
 };
