@@ -38,6 +38,9 @@ const buttons = [
         click: function (row: WebSite.Domain) {
             deleteDoamin(row.id);
         },
+        disabled: () => {
+            return data.value.length == 1;
+        },
     },
 ];
 

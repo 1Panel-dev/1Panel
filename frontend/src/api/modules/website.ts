@@ -41,3 +41,11 @@ export const DeleteDomain = (id: number) => {
 export const CreateDomain = (req: WebSite.DomainCreate) => {
     return http.post<any>(`/websites/domains`, req);
 };
+
+export const GetNginxConfig = (req: WebSite.NginxConfigReq) => {
+    return http.post<any>(`/websites/config`, req);
+};
+
+export const UpdateNginxConfig = (req: WebSite.NginxConfigReq) => {
+    return http.post<any>(`/websites/config/update`, req);
+};

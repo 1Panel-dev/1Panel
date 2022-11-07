@@ -2,7 +2,6 @@ package dto
 
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
-	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
 )
 
 type WebSiteReq struct {
@@ -58,11 +57,4 @@ type WebSiteDomainCreate struct {
 	WebSiteID uint   `json:"webSiteId"`
 	Port      int    `json:"port"`
 	Domain    string `json:"domain"`
-}
-
-type NginxConfig struct {
-	FilePath      string             `json:"filePath"`
-	ContainerName string             `json:"containerName"`
-	Config        *components.Config `json:"config"`
-	OldContent    string             `json:"oldContent"`
 }

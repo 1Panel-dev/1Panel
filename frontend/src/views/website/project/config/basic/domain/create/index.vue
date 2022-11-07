@@ -59,7 +59,6 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        console.log(domain.value);
         CreateDomain(domain.value)
             .then(() => {
                 ElMessage.success(i18n.global.t('commons.msg.createSuccess'));

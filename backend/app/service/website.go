@@ -185,3 +185,41 @@ func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
 
 	return websiteDomainRepo.DeleteBy(context.TODO(), commonRepo.WithByID(domainId))
 }
+
+func (w WebsiteService) GetNginxConfigByScope(req dto.NginxConfigReq) (map[string]interface{}, error) {
+
+	keys, ok := dto.ScopeKeyMap[req.Scope]
+	if !ok || len(keys) == 0 {
+		return nil, nil
+	}
+
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebSiteID))
+	if err != nil {
+		return nil, err
+	}
+
+	return getNginxConfigByKeys(website, keys)
+}
+
+func (w WebsiteService) UpdateNginxConfigByScope(req dto.NginxConfigReq) error {
+
+	keys, ok := dto.ScopeKeyMap[req.Scope]
+	if !ok || len(keys) == 0 {
+		return nil
+	}
+	keyValues := make(map[string][]string, len(keys))
+	for k, v := range req.Params {
+		for _, name := range keys {
+			if name == k {
+				keyValues[k] = getNginxParams(k, v)
+			}
+		}
+	}
+
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebSiteID))
+	if err != nil {
+		return err
+	}
+
+	return updateNginxConfig(website, keyValues)
+}

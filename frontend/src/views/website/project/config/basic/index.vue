@@ -1,9 +1,11 @@
 <template>
-    <el-tabs tab-position="left" type="border-card">
-        <el-tab-pane label="域名设置">
-            <Doamin :id="id"></Doamin>
+    <el-tabs tab-position="left" type="border-card" v-model="index">
+        <el-tab-pane :label="$t('website.domainConfig')">
+            <Doamin :id="id" v-if="index == '0'"></Doamin>
         </el-tab-pane>
-        <el-tab-pane label="目录设置">Config</el-tab-pane>
+        <el-tab-pane :label="$t('website.defaultDoc')">
+            <Default :id="id" v-if="index == '1'"></Default>
+        </el-tab-pane>
         <el-tab-pane label="HTTPS">Role</el-tab-pane>
         <el-tab-pane label="域名跳转">Task</el-tab-pane>
         <el-tab-pane label="错误页面">Task</el-tab-pane>
@@ -14,9 +16,10 @@
 </template>
 
 <script lang="ts" setup name="Basic">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 import Doamin from './domain/index.vue';
+import Default from './default-doc/index.vue';
 
 const props = defineProps({
     id: {
@@ -28,4 +31,6 @@ const props = defineProps({
 const id = computed(() => {
     return props.id;
 });
+
+let index = ref('0');
 </script>
