@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"mime/multipart"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -32,6 +34,8 @@ type IMysqlService interface {
 	ChangeInfo(info dto.ChangeDBInfo) error
 	UpdateVariables(mysqlName string, updatas []dto.MysqlVariablesUpdate) error
 
+	UpFile(mysqlName string, files []*multipart.FileHeader) error
+	SearchUpListWithPage(req dto.SearchDBWithPage) (int64, interface{}, error)
 	Backup(db dto.BackupDB) error
 	Recover(db dto.RecoverDB) error
 
@@ -59,8 +63,88 @@ func (u *MysqlService) SearchWithPage(search dto.SearchDBWithPage) (int64, inter
 	return total, dtoMysqls, err
 }
 
+func (u *MysqlService) SearchUpListWithPage(req dto.SearchDBWithPage) (int64, interface{}, error) {
+	var (
+		list      []dto.RedisBackupRecords
+		backDatas []dto.RedisBackupRecords
+	)
+	redisInfo, err := mysqlRepo.LoadBaseInfoByName(req.MysqlName)
+	if err != nil {
+		return 0, nil, err
+	}
+	backupLocal, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
+	if err != nil {
+		return 0, nil, err
+	}
+	localDir, err := loadLocalDir(backupLocal)
+	if err != nil {
+		return 0, nil, err
+	}
+	uploadDir := fmt.Sprintf("%s/database/%s/%s/upload", localDir, redisInfo.Key, redisInfo.Name)
+	if _, err := os.Stat(uploadDir); err != nil {
+		return 0, list, nil
+	}
+	_ = filepath.Walk(uploadDir, func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			list = append(list, dto.RedisBackupRecords{
+				CreatedAt: info.ModTime().Format("2006-01-02 15:04:05"),
+				Size:      int(info.Size()),
+				FileDir:   uploadDir,
+				FileName:  info.Name(),
+			})
+		}
+		return nil
+	})
+	total, start, end := len(list), (req.Page-1)*req.PageSize, req.Page*req.PageSize
+	if start > total {
+		backDatas = make([]dto.RedisBackupRecords, 0)
+	} else {
+		if end >= total {
+			end = total
+		}
+		backDatas = list[start:end]
+	}
+	return int64(total), backDatas, nil
+}
+
+func (u *MysqlService) UpFile(mysqlName string, files []*multipart.FileHeader) error {
+	backupLocal, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
+	if err != nil {
+		return err
+	}
+	app, err := mysqlRepo.LoadBaseInfoByName(mysqlName)
+	if err != nil {
+		return err
+	}
+	localDir, err := loadLocalDir(backupLocal)
+	if err != nil {
+		return err
+	}
+	dstDir := fmt.Sprintf("%s/database/%s/%s/upload", localDir, app.Key, mysqlName)
+	if _, err := os.Stat(dstDir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(dstDir, os.ModePerm); err != nil {
+			if err != nil {
+				return fmt.Errorf("mkdir %s failed, err: %v", dstDir, err)
+			}
+		}
+	}
+	for _, file := range files {
+		src, err := file.Open()
+		if err != nil {
+			return err
+		}
+		defer src.Close()
+		out, err := os.Create(dstDir + "/" + file.Filename)
+		if err != nil {
+			return err
+		}
+		defer out.Close()
+	}
+	return nil
+}
+
 func (u *MysqlService) ListDBByVersion(name string) ([]string, error) {
-	mysqls, err := mysqlRepo.List(commonRepo.WithByName(name))
+	mysqls, err := mysqlRepo.List(mysqlRepo.WithByMysqlName(name))
 	var dbNames []string
 	for _, mysql := range mysqls {
 		dbNames = append(dbNames, mysql.Name)
@@ -128,11 +212,15 @@ func (u *MysqlService) Backup(db dto.BackupDB) error {
 	if err != nil {
 		return err
 	}
+	app, err := mysqlRepo.LoadBaseInfoByName(db.MysqlName)
+	if err != nil {
+		return err
+	}
 	localDir, err := loadLocalDir(backupLocal)
 	if err != nil {
 		return err
 	}
-	backupDir := fmt.Sprintf("database/%s/%s", db.MysqlName, db.DBName)
+	backupDir := fmt.Sprintf("database/%s/%s/%s", app.Key, db.MysqlName, db.DBName)
 	fileName := fmt.Sprintf("%s_%s.sql.gz", db.DBName, time.Now().Format("20060102150405"))
 	if err := backupMysql("LOCAL", localDir, backupDir, db.MysqlName, db.DBName, fileName); err != nil {
 		return err

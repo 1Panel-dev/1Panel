@@ -163,6 +163,7 @@ export default {
         permissionAll: '所有人（不安全）',
         rootPassword: 'root 密码',
         backupList: '备份列表',
+        backList: '返回列表',
         loadBackup: '导入备份',
         setting: '数据库设置',
         remoteAccess: '远程访问',
@@ -172,6 +173,8 @@ export default {
         remoteConnHelper: 'root 帐号远程连接 mysql 有安全风险，开启需谨慎！',
         confChange: '配置修改',
         portHelper: '该端口为容器对外暴露端口，修改需要单独保存并且重启容器！',
+
+        unSupportType: '不支持当前文件类型',
 
         currentStatus: '当前状态',
         runTime: '启动时间',

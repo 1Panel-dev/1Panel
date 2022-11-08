@@ -78,6 +78,10 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 	if err != nil {
 		return "", err
 	}
+	app, err := mysqlRepo.LoadBaseInfoByName(cronjob.Database)
+	if err != nil {
+		return "", err
+	}
 	if cronjob.KeepLocal || cronjob.Type != "LOCAL" {
 		backupLocal, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
 		if err != nil {
@@ -94,7 +98,7 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 
 	if cronjob.Type == "database" {
 		fileName = fmt.Sprintf("db_%s_%s.sql.gz", cronjob.DBName, time.Now().Format("20060102150405"))
-		backupDir = fmt.Sprintf("database/%s/%s", cronjob.Database, cronjob.DBName)
+		backupDir = fmt.Sprintf("database/%s/%s/%s", app.Key, cronjob.Database, cronjob.DBName)
 		err = backupMysql(backup.Type, baseDir, backupDir, cronjob.Database, cronjob.DBName, fileName)
 		if err != nil {
 			return "", err
@@ -161,8 +165,24 @@ func (u *CronjobService) HandleRmExpired(backType, baseDir, backupDir string, cr
 		global.LOG.Errorf("read dir %s failed, err: %v", baseDir+"/"+backupDir, err)
 		return
 	}
-	for i := 0; i < len(files)-int(cronjob.RetainCopies); i++ {
-		_ = os.Remove(baseDir + "/" + backupDir + "/" + files[i].Name())
+	if len(files) == 0 {
+		return
+	}
+	if cronjob.Type == "database" {
+		dbCopies := uint64(0)
+		for i := len(files) - 1; i >= 0; i-- {
+			if strings.HasPrefix(files[i].Name(), "db_") {
+				dbCopies++
+				if dbCopies > cronjob.RetainCopies {
+					_ = os.Remove(baseDir + "/" + backupDir + "/" + files[i].Name())
+					_ = backupRepo.DeleteRecord(backupRepo.WithByFileName(files[i].Name()))
+				}
+			}
+		}
+	} else {
+		for i := 0; i < len(files)-int(cronjob.RetainCopies); i++ {
+			_ = os.Remove(baseDir + "/" + backupDir + "/" + files[i].Name())
+		}
 	}
 	records, _ := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(cronjob.ID)))
 	if len(records) > int(cronjob.RetainCopies) {

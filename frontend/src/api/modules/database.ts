@@ -2,14 +2,21 @@ import http from '@/api';
 import { ReqPage, ResPage } from '../interface';
 import { Backup } from '../interface/backup';
 import { Database } from '../interface/database';
+import { File } from '@/api/interface/file';
 
 export const searchMysqlDBs = (params: Database.Search) => {
-    return http.post<ResPage<Database.MysqlDBInfo>>(`databases/search`, params);
+    return http.post<ResPage<Database.MysqlDBInfo>>(`/databases/search`, params);
 };
 export const listDBByVersion = (params: string) => {
-    return http.get(`databases/dbs/${params}`);
+    return http.get(`/databases/dbs/${params}`);
 };
 
+export const searchUpList = (params: Database.Search) => {
+    return http.post<ResPage<Database.FileRecord>>(`/databases/uplist`, params);
+};
+export const uploadFile = (mysqlName: string, params: FormData) => {
+    return http.upload<File.File>(`/databases/uplist/upload/${mysqlName}`, params);
+};
 export const backup = (params: Database.Backup) => {
     return http.post(`/databases/backup`, params);
 };
@@ -75,7 +82,7 @@ export const recoverRedis = (param: Database.RedisRecover) => {
     return http.post(`/databases/redis/recover`, param);
 };
 export const redisBackupRedisRecords = (param: ReqPage) => {
-    return http.post<ResPage<Database.RedisBackupRecord>>(`/databases/redis/backup/records`, param);
+    return http.post<ResPage<Database.FileRecord>>(`/databases/redis/backup/records`, param);
 };
 export const deleteBackupRedis = (param: Database.RedisBackupDelete) => {
     return http.post(`/databases/redis/backup/del`, param);

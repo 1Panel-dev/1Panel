@@ -27,7 +27,7 @@
             icon="Back"
             @click="onBacklist"
         >
-            {{ $t('commons.button.back') }}列表
+            {{ $t('database.backList') }}
         </el-button>
 
         <Setting ref="settingRef"></Setting>
@@ -106,6 +106,7 @@
             </template>
         </el-dialog>
 
+        <UploadDialog ref="uploadRef" />
         <OperatrDialog @search="search" ref="dialogRef" />
         <BackupRecords ref="dialogBackupRef" />
     </div>
@@ -115,6 +116,7 @@
 import ComplexTable from '@/components/complex-table/index.vue';
 import OperatrDialog from '@/views/database/mysql/create/index.vue';
 import BackupRecords from '@/views/database/mysql/backup/index.vue';
+import UploadDialog from '@/views/database/mysql/upload/index.vue';
 import Setting from '@/views/database/mysql/setting/index.vue';
 import Submenu from '@/views/database/index.vue';
 import { dateFromat } from '@/utils/util';
@@ -154,6 +156,8 @@ const onOpenBackupDialog = async (dbName: string) => {
     };
     dialogBackupRef.value!.acceptParams(params);
 };
+
+const uploadRef = ref();
 
 const settingRef = ref();
 const onSetting = async () => {
@@ -270,8 +274,11 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.loadBackup'),
-        click: (row: Database.MysqlDBInfo) => {
-            onBatchDelete(row);
+        click: () => {
+            let params = {
+                mysqlName: mysqlName.value,
+            };
+            uploadRef.value!.acceptParams(params);
         },
     },
     {

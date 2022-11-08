@@ -66,6 +66,15 @@ func (c *BackupRepo) WithByDetailName(detailName string) DBOption {
 	}
 }
 
+func (c *BackupRepo) WithByFileName(fileName string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if len(fileName) == 0 {
+			return g
+		}
+		return g.Where("file_name = ?", fileName)
+	}
+}
+
 func (u *BackupRepo) List(opts ...DBOption) ([]model.BackupAccount, error) {
 	var ops []model.BackupAccount
 	db := global.DB.Model(&model.BackupAccount{})
