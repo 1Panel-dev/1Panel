@@ -98,7 +98,12 @@ import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { LoadFile } from '@/api/modules/files';
-import { loadMysqlBaseInfo, updateMysqlConfByFile, updateMysqlDBInfo } from '@/api/modules/database';
+import {
+    loadMysqlBaseInfo,
+    loadMysqlVariables,
+    updateMysqlConfByFile,
+    updateMysqlDBInfo,
+} from '@/api/modules/database';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 
@@ -122,6 +127,7 @@ const slowLogRef = ref();
 
 const onSetting = ref<boolean>(false);
 const mysqlName = ref();
+const variables = ref();
 
 interface DialogProps {
     mysqlName: string;
@@ -131,9 +137,10 @@ const dialogContainerLogRef = ref();
 const acceptParams = (params: DialogProps): void => {
     onSetting.value = true;
     mysqlName.value = params.mysqlName;
-    variablesRef.value!.acceptParams({ mysqlName: params.mysqlName });
-    statusRef.value!.acceptParams({ mysqlName: params.mysqlName });
     loadBaseInfo();
+    loadVariables();
+    loadSlowLogs();
+    statusRef.value!.acceptParams({ mysqlName: params.mysqlName });
 };
 const onClose = (): void => {
     onSetting.value = false;
@@ -188,6 +195,22 @@ const loadBaseInfo = async () => {
     baseInfo.containerID = res.data?.containerName;
     loadMysqlConf(`/opt/1Panel/data/apps/${baseInfo.mysqlKey}/${baseInfo.name}/conf/my.cnf`);
     loadContainerLog(baseInfo.containerID);
+};
+
+const loadVariables = async () => {
+    const res = await loadMysqlVariables(mysqlName.value);
+    variables.value = res.data;
+    variablesRef.value!.acceptParams({ mysqlName: mysqlName.value, variables: res.data });
+};
+
+const loadSlowLogs = async () => {
+    await Promise.all([loadBaseInfo(), loadVariables()]);
+    let param = {
+        mysqlName: mysqlName.value,
+        mysqlKey: baseInfo.mysqlKey,
+        variables: variables.value,
+    };
+    slowLogRef.value!.acceptParams(param);
 };
 
 const loadMysqlConf = async (path: string) => {
