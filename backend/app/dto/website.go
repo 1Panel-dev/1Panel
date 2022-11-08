@@ -28,6 +28,13 @@ type WebSiteCreate struct {
 	WebSiteGroupID uint          `json:"webSiteGroupID" validate:"required"`
 }
 
+type WebSiteUpdate struct {
+	ID             uint   `json:"id" validate:"required"`
+	PrimaryDomain  string `json:"primaryDomain" validate:"required"`
+	Remark         string `json:"remark"`
+	WebSiteGroupID uint   `json:"webSiteGroupID" validate:"required"`
+}
+
 type NewAppInstall struct {
 	Name        string                 `json:"name"`
 	AppDetailId uint                   `json:"appDetailID"`

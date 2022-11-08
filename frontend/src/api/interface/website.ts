@@ -41,6 +41,13 @@ export namespace WebSite {
         otherDomains: string;
     }
 
+    export interface WebSiteUpdateReq {
+        id: number;
+        primaryDomain: string;
+        remark: string;
+        webSiteGroupID: number;
+    }
+
     export interface Group extends CommonModel {
         name: string;
         default: boolean;
