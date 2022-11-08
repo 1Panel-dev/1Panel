@@ -65,8 +65,16 @@ export namespace WebSite {
     }
 
     export interface NginxConfigReq {
+        operate: string;
         websiteId: number;
         scope: string;
         params?: any;
+    }
+
+    export interface NginxParam {
+        name: string;
+        secondKey: string;
+        isRepeatKey: string;
+        params: string[];
     }
 }

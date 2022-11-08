@@ -186,7 +186,7 @@ func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
 	return websiteDomainRepo.DeleteBy(context.TODO(), commonRepo.WithByID(domainId))
 }
 
-func (w WebsiteService) GetNginxConfigByScope(req dto.NginxConfigReq) (map[string]interface{}, error) {
+func (w WebsiteService) GetNginxConfigByScope(req dto.NginxConfigReq) ([]dto.NginxParam, error) {
 
 	keys, ok := dto.ScopeKeyMap[req.Scope]
 	if !ok || len(keys) == 0 {
@@ -207,19 +207,13 @@ func (w WebsiteService) UpdateNginxConfigByScope(req dto.NginxConfigReq) error {
 	if !ok || len(keys) == 0 {
 		return nil
 	}
-	keyValues := make(map[string][]string, len(keys))
-	for k, v := range req.Params {
-		for _, name := range keys {
-			if name == k {
-				keyValues[k] = getNginxParams(k, v)
-			}
-		}
-	}
-
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebSiteID))
 	if err != nil {
 		return err
 	}
+	if req.Operate == dto.ConfigDel {
+		return deleteNginxConfig(website, keys, req.Scope)
+	}
 
-	return updateNginxConfig(website, keyValues)
+	return updateNginxConfig(website, getNginxParams(req.Params, keys), req.Scope)
 }

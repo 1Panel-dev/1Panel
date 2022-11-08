@@ -43,7 +43,7 @@ export const CreateDomain = (req: WebSite.DomainCreate) => {
 };
 
 export const GetNginxConfig = (req: WebSite.NginxConfigReq) => {
-    return http.post<any>(`/websites/config`, req);
+    return http.post<WebSite.NginxParam[]>(`/websites/config`, req);
 };
 
 export const UpdateNginxConfig = (req: WebSite.NginxConfigReq) => {
