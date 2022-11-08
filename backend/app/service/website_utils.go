@@ -91,8 +91,8 @@ func opNginx(containerName, operate string) error {
 	if operate == "check" {
 		nginxCmd = fmt.Sprintf("docker exec -i %s %s", containerName, "nginx -t")
 	}
-	if _, err := cmd.Exec(nginxCmd); err != nil {
-		return err
+	if out, err := cmd.Exec(nginxCmd); err != nil {
+		return errors.New(out)
 	}
 	return nil
 }
@@ -206,36 +206,50 @@ func deleteListenAndServerName(website model.WebSite, ports []int, domains []str
 	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxConfig.ContainerName)
 }
 
-func getNginxConfigByKeys(website model.WebSite, keys []string) (map[string]interface{}, error) {
+func getNginxConfigByKeys(website model.WebSite, keys []string) ([]dto.NginxParam, error) {
 	nginxConfig, err := getNginxConfig(website.PrimaryDomain)
 	if err != nil {
 		return nil, err
 	}
 	config := nginxConfig.Config
 	server := config.FindServers()[0]
-	res := make(map[string]interface{})
+
+	var res []dto.NginxParam
 	for _, key := range keys {
 		dirs := server.FindDirectives(key)
 		for _, dir := range dirs {
-			res[dir.GetName()] = dir.GetParameters()
+			nginxParam := dto.NginxParam{
+				Name:   dir.GetName(),
+				Params: dir.GetParameters(),
+			}
+			if isRepeatKey(key) {
+				nginxParam.IsRepeatKey = true
+				nginxParam.SecondKey = dir.GetParameters()[0]
+			}
+			res = append(res, nginxParam)
 		}
 	}
 	return res, nil
 }
 
-func updateNginxConfig(website model.WebSite, keyValues map[string][]string) error {
+func updateNginxConfig(website model.WebSite, params []dto.NginxParam, scope dto.NginxScope) error {
 	nginxConfig, err := getNginxConfig(website.PrimaryDomain)
 	if err != nil {
 		return err
 	}
 	config := nginxConfig.Config
+	updateConfig(config, scope)
 	server := config.FindServers()[0]
-	for k, v := range keyValues {
+	for _, p := range params {
 		newDir := components.Directive{
-			Name:       k,
-			Parameters: v,
+			Name:       p.Name,
+			Parameters: p.Params,
 		}
-		server.UpdateDirectives(k, newDir)
+		if p.IsRepeatKey {
+			server.UpdateDirectiveBySecondKey(p.Name, p.SecondKey, newDir)
+		} else {
+			server.UpdateDirectives(p.Name, newDir)
+		}
 	}
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
@@ -243,13 +257,101 @@ func updateNginxConfig(website model.WebSite, keyValues map[string][]string) err
 	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxConfig.ContainerName)
 }
 
-func getNginxParams(key string, param interface{}) []string {
+func updateConfig(config *components.Config, scope dto.NginxScope) {
+	if scope == dto.LimitConn {
+		limit := parser.NewStringParser(string(nginx_conf.Limit)).Parse()
+		for _, dir := range limit.GetDirectives() {
+			newDir := components.Directive{
+				Name:       dir.GetName(),
+				Parameters: dir.GetParameters(),
+			}
+			config.UpdateDirectiveBySecondKey(dir.GetName(), dir.GetParameters()[0], newDir)
+		}
+	}
+}
+
+func deleteNginxConfig(website model.WebSite, keys []string, scope dto.NginxScope) error {
+	nginxConfig, err := getNginxConfig(website.PrimaryDomain)
+	if err != nil {
+		return err
+	}
+	config := nginxConfig.Config
+	config.RemoveDirectives(keys)
+	server := config.FindServers()[0]
+	server.RemoveDirectives(keys)
+	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return err
+	}
+	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxConfig.ContainerName)
+}
+
+func getParamArray(key string, param interface{}) []string {
 	var res []string
 	switch param.(type) {
 	case string:
 		if key == "index" {
 			res = strings.Split(param.(string), "\n")
+			return res
 		}
+
+		res = strings.Split(param.(string), " ")
+		return res
 	}
 	return res
+}
+
+func handleParamMap(paramMap map[string]string, keys []string) []dto.NginxParam {
+	var nginxParams []dto.NginxParam
+	for k, v := range paramMap {
+		for _, name := range keys {
+			if name == k {
+				param := dto.NginxParam{
+					Name:   k,
+					Params: getParamArray(k, v),
+				}
+				if isRepeatKey(k) {
+					param.IsRepeatKey = true
+					param.SecondKey = param.Params[0]
+				}
+				nginxParams = append(nginxParams, param)
+			}
+		}
+	}
+	return nginxParams
+}
+
+func getNginxParams(params interface{}, keys []string) []dto.NginxParam {
+	var nginxParams []dto.NginxParam
+
+	switch params.(type) {
+	case map[string]string:
+		return handleParamMap(params.(map[string]string), keys)
+	case []interface{}:
+
+		if mArray, ok := params.([]interface{}); ok {
+			for _, mA := range mArray {
+				if m, ok := mA.(map[string]interface{}); ok {
+					nginxParams = append(nginxParams, handleParamMap(toMapStr(m), keys)...)
+				}
+			}
+		}
+
+	}
+	return nginxParams
+}
+
+func isRepeatKey(key string) bool {
+
+	if _, ok := dto.RepeatKeys[key]; ok {
+		return true
+	}
+	return false
+}
+
+func toMapStr(m map[string]interface{}) map[string]string {
+	ret := make(map[string]string, len(m))
+	for k, v := range m {
+		ret[k] = fmt.Sprint(v)
+	}
+	return ret
 }

@@ -1,23 +1,20 @@
 <template>
-    <div>
-        <el-form ref="defaultForm" label-position="top" :model="defaultModel" :rules="rules" :loading="loading">
-            <el-form-item :label="$t('website.domain')" prop="index">
-                <el-col :span="8">
+    <el-row :gutter="20">
+        <el-col :span="8" :offset="2">
+            <el-form ref="defaultForm" label-position="top" :model="defaultModel" :rules="rules" :loading="loading">
+                <el-form-item :label="$t('website.defaultDoc')" prop="index">
                     <el-input
-                        width="40%"
                         v-model="defaultModel.index"
                         type="textarea"
                         :autosize="{ minRows: 8, maxRows: 20 }"
                     ></el-input>
-                </el-col>
-            </el-form-item>
-        </el-form>
-        <span class="dialog-footer">
+                </el-form-item>
+            </el-form>
             <el-button type="primary" @click="submit(defaultForm)" :loading="loading">
                 {{ $t('commons.button.save') }}
             </el-button>
-        </span>
-    </div>
+        </el-col>
+    </el-row>
 </template>
 
 <script lang="ts" setup>
@@ -45,6 +42,7 @@ let defaultModel = ref({
     index: '',
 });
 let req = ref({
+    operate: 'update',
     scope: 'index',
     websiteId: websiteId.value,
     params: {},
@@ -75,13 +73,14 @@ const search = (req: WebSite.NginxConfigReq) => {
     loading.value = true;
     GetNginxConfig(req)
         .then((res) => {
-            const params = res.data['index'];
-            let values = '';
-            for (const param of params) {
-                values = values + param + '\n';
+            if (res.data.length > 0) {
+                const indexParam = res.data[0];
+                let values = '';
+                for (const param of indexParam.params) {
+                    values = values + param + '\n';
+                }
+                defaultModel.value.index = values;
             }
-
-            defaultModel.value.index = values;
         })
         .finally(() => {
             loading.value = false;

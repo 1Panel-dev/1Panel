@@ -687,5 +687,12 @@ export default {
         addDomain: '新增域名',
         domainConfig: '域名设置',
         defaultDoc: '默认文档',
+        perserver: '并发限制',
+        perserverHelper: '限制当前站点最大并发数',
+        perip: '单IP限制',
+        peripHelper: '限制单个IP访问最大并发数',
+        rate: '流量限制',
+        rateHelper: '限制每个请求的流量上限（单位：KB）',
+        limtHelper: '启用流量控制',
     },
 };

@@ -28,10 +28,29 @@ func (b *Block) FindDirectives(directiveName string) []IDirective {
 }
 
 func (b *Block) UpdateDirectives(directiveName string, directive Directive) {
-	directives := make([]IDirective, len(b.GetDirectives()))
+	directives := b.GetDirectives()
 	index := -1
-	for i, dir := range b.GetDirectives() {
+	for i, dir := range directives {
 		if dir.GetName() == directiveName {
+			index = i
+			break
+		}
+	}
+	if index > -1 {
+		directives[index] = &directive
+	} else {
+		directives = append(directives, &directive)
+	}
+	b.Directives = directives
+}
+
+func (b *Block) UpdateDirectiveBySecondKey(name string, key string, directive Directive) {
+
+	directives := b.GetDirectives()
+
+	index := -1
+	for i, dir := range directives {
+		if dir.GetName() == name && dir.GetParameters()[0] == key {
 			index = i
 			break
 		}

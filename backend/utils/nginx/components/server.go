@@ -144,9 +144,26 @@ func (s *Server) UpdateRootProxy(proxy []string) {
 				Parameters: proxy,
 			})
 			newDir.Block = block
-			s.UpdateDirectives("location", newDir)
+			s.UpdateDirectiveBySecondKey("location", "/", newDir)
 		}
 	}
+}
+
+func (s *Server) UpdateDirectiveBySecondKey(name string, key string, directive Directive) {
+	directives := s.Directives
+	index := -1
+	for i, dir := range directives {
+		if dir.GetName() == name && dir.GetParameters()[0] == key {
+			index = i
+			break
+		}
+	}
+	if index > -1 {
+		directives[index] = &directive
+	} else {
+		directives = append(directives, &directive)
+	}
+	s.Directives = directives
 }
 
 func (s *Server) RemoveListenByBind(bind string) {
@@ -176,13 +193,18 @@ func (s *Server) FindDirectives(directiveName string) []IDirective {
 }
 
 func (s *Server) UpdateDirectives(directiveName string, directive Directive) {
-	directives := make([]IDirective, 0)
-	for _, dir := range s.Directives {
+	directives := s.Directives
+	index := -1
+	for i, dir := range directives {
 		if dir.GetName() == directiveName {
-			directives = append(directives, &directive)
-		} else {
-			directives = append(directives, dir)
+			index = i
+			break
 		}
+	}
+	if index > -1 {
+		directives[index] = &directive
+	} else {
+		directives = append(directives, &directive)
 	}
 	s.Directives = directives
 }
@@ -197,7 +219,7 @@ func (s *Server) RemoveDirectives(names []string) {
 	for _, name := range names {
 		nameMaps[name] = struct{}{}
 	}
-	directives := s.GetDirectives()
+	directives := s.Directives
 	var newDirectives []IDirective
 	for _, dir := range directives {
 		if _, ok := nameMaps[dir.GetName()]; ok {
