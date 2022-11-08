@@ -151,6 +151,7 @@ type RedisConfUpdateByFile struct {
 
 type RedisConf struct {
 	Name          string `json:"name"`
+	Port          int64  `json:"port"`
 	ContainerName string `json:"containerName"`
 	Timeout       string `json:"timeout"`
 	Maxclients    string `json:"maxclients"`

@@ -104,6 +104,7 @@ import {
     updateMysqlConfByFile,
     updateMysqlDBInfo,
 } from '@/api/modules/database';
+import { ChangePort } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 
@@ -150,6 +151,16 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
     if (!formEl) return;
     const result = await formEl.validateField(key, callback);
     if (!result) {
+        return;
+    }
+    if (key === 'port') {
+        let params = {
+            key: baseInfo.mysqlKey,
+            name: mysqlName.value,
+            port: val,
+        };
+        await ChangePort(params);
+        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         return;
     }
     let changeForm = {

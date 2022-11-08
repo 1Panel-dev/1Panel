@@ -47,7 +47,7 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 	if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "maxclients", req.Maxclients); err != nil {
 		return err
 	}
-	if err := mysqlRepo.UpdateDatabasePassword(redisInfo.ID, map[string]interface{}{
+	if err := mysqlRepo.UpdateDatabaseInfo(redisInfo.ID, map[string]interface{}{
 		"param": strings.ReplaceAll(redisInfo.Param, redisInfo.Password, req.Requirepass),
 		"env":   strings.ReplaceAll(redisInfo.Env, redisInfo.Password, req.Requirepass),
 	}); err != nil {
@@ -133,6 +133,7 @@ func (u *RedisService) LoadConf() (*dto.RedisConf, error) {
 	var item dto.RedisConf
 	item.ContainerName = redisInfo.ContainerName
 	item.Name = redisInfo.Name
+	item.Port = redisInfo.Port
 	if item.Timeout, err = configGetStr(redisInfo.ContainerName, redisInfo.Password, "timeout"); err != nil {
 		return nil, err
 	}

@@ -150,6 +150,7 @@ export namespace Database {
     }
     export interface RedisConf {
         name: string;
+        port: number;
         timeout: number;
         maxclients: number;
         requirepass: string;
