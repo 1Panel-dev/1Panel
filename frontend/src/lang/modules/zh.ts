@@ -220,6 +220,9 @@ export default {
         maxConnectionsHelper: '最大连接数',
         restart: '重启数据库',
 
+        isOn: '是否开启',
+        longQueryTime: '慢查询阈值',
+
         status: '当前状态',
         terminal: '终端模式',
         key: '键',
@@ -260,6 +263,7 @@ export default {
         allConf: '全部配置',
         restartNow: '立即重启',
         restartNowHelper1: '修改配置后需要重启生效，若您的数据需要持久化请先执行 save 操作。',
+        restartNowHelper: '修改配置后需要重启生效。',
 
         persistence: '持久化',
         rdbHelper1: '秒內,插入',
