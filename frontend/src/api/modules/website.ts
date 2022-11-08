@@ -10,6 +10,14 @@ export const CreateWebsite = (req: WebSite.WebSiteCreateReq) => {
     return http.post<any>(`/websites`, req);
 };
 
+export const UpdateWebsite = (req: WebSite.WebSiteUpdateReq) => {
+    return http.post<any>(`/websites/update`, req);
+};
+
+export const GetWebsite = (id: number) => {
+    return http.get<WebSite.WebSite>(`/websites/${id}`);
+};
+
 export const DeleteWebsite = (req: WebSite.WebSiteDel) => {
     return http.post<any>(`/websites/del`, req);
 };

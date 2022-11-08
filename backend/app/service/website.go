@@ -87,6 +87,26 @@ func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
 	return nil
 }
 
+func (w WebsiteService) UpdateWebsite(req dto.WebSiteUpdate) error {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	website.PrimaryDomain = req.PrimaryDomain
+	website.WebSiteGroupID = req.WebSiteGroupID
+	website.Remark = req.Remark
+
+	return websiteRepo.Save(context.TODO(), &website)
+}
+
+func (w WebsiteService) GetWebsite(id uint) (model.WebSite, error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return website, err
+	}
+	return website, nil
+}
+
 func (w WebsiteService) DeleteWebSite(req dto.WebSiteDel) error {
 
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))

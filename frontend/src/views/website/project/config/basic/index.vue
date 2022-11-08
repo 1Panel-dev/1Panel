@@ -9,12 +9,10 @@
         <el-tab-pane :label="$t('website.rate')">
             <LimitConn :id="id" v-if="index == '2'"></LimitConn>
         </el-tab-pane>
-
         <el-tab-pane label="HTTPS">Role</el-tab-pane>
-        <el-tab-pane label="域名跳转">Task</el-tab-pane>
-        <el-tab-pane label="错误页面">Task</el-tab-pane>
-        <el-tab-pane label="过期时间">Task</el-tab-pane>
-        <el-tab-pane label="默认文档">Task</el-tab-pane>
+        <el-tab-pane label="其他">
+            <Other :id="id" v-if="index == '4'"></Other>
+        </el-tab-pane>
     </el-tabs>
 </template>
 
@@ -24,6 +22,7 @@ import { computed, ref } from 'vue';
 import Doamin from './domain/index.vue';
 import Default from './default-doc/index.vue';
 import LimitConn from './limit-conn/index.vue';
+import Other from './other/index.vue';
 
 const props = defineProps({
     id: {

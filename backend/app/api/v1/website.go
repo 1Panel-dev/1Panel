@@ -52,6 +52,34 @@ func (b *BaseApi) DeleteWebSite(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+func (b *BaseApi) UpdateWebSite(c *gin.Context) {
+	var req dto.WebSiteUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.UpdateWebsite(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) GetWebSite(c *gin.Context) {
+
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	website, err := websiteService.GetWebsite(id)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, website)
+}
+
 func (b *BaseApi) GetWebDomains(c *gin.Context) {
 
 	websiteId, err := helper.GetIntParamByKey(c, "websiteId")
