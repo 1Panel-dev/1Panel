@@ -5,6 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path"
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
@@ -16,9 +22,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"golang.org/x/net/context"
 	"gopkg.in/yaml.v3"
-	"os"
-	"path"
-	"strings"
 )
 
 type AppService struct {
@@ -195,6 +198,58 @@ func (a AppService) OperateInstall(req dto.AppInstallOperate) error {
 	}
 
 	return appInstallRepo.Save(&install)
+}
+
+func (a AppService) ChangeAppPort(req dto.PortUpdate) error {
+	var (
+		files    []string
+		newFiles []string
+	)
+	app, err := mysqlRepo.LoadBaseInfoByName(req.Name)
+	if err != nil {
+		return err
+	}
+
+	ComposeDir := fmt.Sprintf("%s/%s/%s", constant.AppInstallDir, req.Key, req.Name)
+	ComposeFile := fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, req.Key, req.Name)
+	path := fmt.Sprintf("%s/.env", ComposeDir)
+	lineBytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		return err
+	} else {
+		files = strings.Split(string(lineBytes), "\n")
+	}
+	for _, line := range files {
+		if strings.HasPrefix(line, "PANEL_APP_PORT_HTTP=") {
+			newFiles = append(newFiles, fmt.Sprintf("PANEL_APP_PORT_HTTP=%v", req.Port))
+		} else {
+			newFiles = append(newFiles, line)
+		}
+	}
+	file, err := os.OpenFile(path, os.O_WRONLY, 0666)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	_, err = file.WriteString(strings.Join(newFiles, "\n"))
+	if err != nil {
+		return err
+	}
+
+	if err := mysqlRepo.UpdateDatabaseInfo(app.ID, map[string]interface{}{
+		"env": strings.ReplaceAll(app.Env, strconv.FormatInt(app.Port, 10), strconv.FormatInt(req.Port, 10)),
+	}); err != nil {
+		return err
+	}
+	stdout, err := compose.Down(ComposeFile)
+	if err != nil {
+		return errors.New(stdout)
+	}
+	stdout, err = compose.Up(ComposeFile)
+	if err != nil {
+		return errors.New(stdout)
+	}
+	return nil
 }
 
 func (a AppService) Install(name string, appDetailId uint, params map[string]interface{}) error {

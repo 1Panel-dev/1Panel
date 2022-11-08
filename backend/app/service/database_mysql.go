@@ -224,7 +224,7 @@ func (u *MysqlService) ChangeInfo(info dto.ChangeDBInfo) error {
 				}
 			}
 		}
-		_ = mysqlRepo.UpdateDatabasePassword(app.ID, map[string]interface{}{
+		_ = mysqlRepo.UpdateDatabaseInfo(app.ID, map[string]interface{}{
 			"param": strings.ReplaceAll(app.Param, app.Password, info.Value),
 			"env":   strings.ReplaceAll(app.Env, app.Password, info.Value),
 		})

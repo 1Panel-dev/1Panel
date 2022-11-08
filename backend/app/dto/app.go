@@ -2,6 +2,7 @@ package dto
 
 import (
 	"encoding/json"
+
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 )
 
@@ -76,6 +77,12 @@ type AppInstallOperate struct {
 	BackupId  uint       `json:"backupId"`
 	DetailId  uint       `json:"detailId"`
 	Operate   AppOperate `json:"operate" validate:"required"`
+}
+
+type PortUpdate struct {
+	Key  string `json:"key"`
+	Name string `json:"name"`
+	Port int64  `json:"port"`
 }
 
 type AppService struct {

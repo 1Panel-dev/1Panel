@@ -22,7 +22,7 @@ type IMysqlRepo interface {
 	LoadRunningVersion(keys []string) ([]string, error)
 	LoadBaseInfoByName(name string) (*RootInfo, error)
 	LoadRedisBaseInfo() (*RootInfo, error)
-	UpdateDatabasePassword(id uint, vars map[string]interface{}) error
+	UpdateDatabaseInfo(id uint, vars map[string]interface{}) error
 }
 
 func NewIMysqlRepo() IMysqlRepo {
@@ -181,7 +181,7 @@ func (u *MysqlRepo) Update(id uint, vars map[string]interface{}) error {
 	return global.DB.Model(&model.DatabaseMysql{}).Where("id = ?", id).Updates(vars).Error
 }
 
-func (u *MysqlRepo) UpdateDatabasePassword(id uint, vars map[string]interface{}) error {
+func (u *MysqlRepo) UpdateDatabaseInfo(id uint, vars map[string]interface{}) error {
 	if err := global.DB.Model(&model.AppInstall{}).Where("id = ?", id).Updates(vars).Error; err != nil {
 		return err
 	}

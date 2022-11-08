@@ -171,6 +171,7 @@ export default {
         baseSetting: '基础设置',
         remoteConnHelper: 'root 帐号远程连接 mysql 有安全风险，开启需谨慎！',
         confChange: '配置修改',
+        portHelper: '该端口为容器对外暴露端口，修改需要单独保存并且重启容器！',
 
         currentStatus: '当前状态',
         runTime: '启动时间',

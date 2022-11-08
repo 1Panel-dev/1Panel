@@ -62,6 +62,12 @@ export namespace App {
         params: any;
     }
 
+    export interface ChangePort {
+        key: string;
+        name: string;
+        port: number;
+    }
+
     export interface AppInstalled extends CommonModel {
         name: string;
         appId: string;

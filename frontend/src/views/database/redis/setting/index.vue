@@ -9,8 +9,15 @@
                 <el-row style="margin-top: 20px">
                     <el-col :span="1"><br /></el-col>
                     <el-col :span="10">
-                        <el-form-item :label="$t('setting.port')" prop="port">
-                            <el-input clearable type="number" v-model.number="form.port" />
+                        <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
+                            <el-input clearable type="number" v-model.number="form.port">
+                                <template #append>
+                                    <el-button @click="onChangePort(formRef)" icon="Collection">
+                                        {{ $t('commons.button.save') }}
+                                    </el-button>
+                                </template>
+                            </el-input>
+                            <span class="input-help">{{ $t('database.portHelper') }}</span>
                         </el-form-item>
                         <el-form-item :label="$t('setting.password')" prop="requirepass">
                             <el-input type="password" show-password clearable v-model="form.requirepass" />
@@ -71,6 +78,7 @@ import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { loadRedisConf, updateRedisConf, updateRedisConfByFile } from '@/api/modules/database';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
+import { ChangePort } from '@/api/modules/app';
 
 const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
@@ -78,7 +86,7 @@ const confShowType = ref('base');
 const restartNow = ref(false);
 const form = reactive({
     name: '',
-    port: 3306,
+    port: 6379,
     requirepass: '',
     timeout: 0,
     maxclients: 0,
@@ -104,6 +112,29 @@ const acceptParams = (): void => {
 const onClose = (): void => {
     settingShow.value = false;
 };
+
+const onChangePort = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    const result = await formEl.validateField('port', callback);
+    if (!result) {
+        return;
+    }
+    let params = {
+        key: 'redis',
+        name: form.name,
+        port: form.port,
+    };
+    await ChangePort(params);
+    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    return;
+};
+function callback(error: any) {
+    if (error) {
+        return error.message;
+    } else {
+        return;
+    }
+}
 
 const onSave = async (formEl: FormInstance | undefined) => {
     if (confShowType.value === 'all') {
@@ -149,6 +180,7 @@ const loadform = async () => {
     form.maxclients = Number(res.data?.maxclients);
     form.requirepass = res.data?.requirepass;
     form.maxmemory = Number(res.data?.maxmemory);
+    form.port = Number(res.data?.port);
     loadMysqlConf(`/opt/1Panel/data/apps/redis/${form.name}/conf/redis.conf`);
 };
 

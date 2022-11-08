@@ -22,6 +22,10 @@ export const InstallApp = (install: App.AppInstall) => {
     return http.post<any>('apps/install', install);
 };
 
+export const ChangePort = (params: App.ChangePort) => {
+    return http.post<any>('apps/installed/port/change', params);
+};
+
 export const GetAppInstalled = (info: ReqPage) => {
     return http.post<ResPage<App.AppInstalled>>('apps/installed', info);
 };
