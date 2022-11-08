@@ -90,7 +90,7 @@ class RequestHttp {
     download<BlobPart>(url: string, params?: object, _object = {}): Promise<BlobPart> {
         return this.service.post(url, params, _object);
     }
-    upload<T>(url: string, params: object = {}, config: AxiosRequestConfig): Promise<T> {
+    upload<T>(url: string, params: object = {}, config?: AxiosRequestConfig): Promise<T> {
         return this.service.post(url, params, config);
     }
 }

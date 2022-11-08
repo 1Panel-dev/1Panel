@@ -161,7 +161,7 @@ export namespace Database {
         appendfsync: string;
         save: string;
     }
-    export interface RedisBackupRecord {
+    export interface FileRecord {
         fileName: string;
         fileDir: string;
         createdAt: string;
