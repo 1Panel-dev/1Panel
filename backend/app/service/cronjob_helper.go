@@ -83,11 +83,7 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 		return "", err
 	}
 	if cronjob.KeepLocal || cronjob.Type != "LOCAL" {
-		backupLocal, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
-		if err != nil {
-			return "", err
-		}
-		localDir, err := loadLocalDir(backupLocal)
+		localDir, err := loadLocalDir()
 		if err != nil {
 			return "", err
 		}

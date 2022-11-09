@@ -28,6 +28,7 @@ export default {
             log: '日志',
             back: '返回',
             recover: '恢复',
+            upload: '上传',
             download: '下载',
             saveAndEnable: '保存并启用',
         },
@@ -174,7 +175,11 @@ export default {
         confChange: '配置修改',
         portHelper: '该端口为容器对外暴露端口，修改需要单独保存并且重启容器！',
 
-        unSupportType: '不支持当前文件类型',
+        unSupportType: '不支持当前文件类型！',
+        unSupportSize: '上传文件超过 10M，请确认！',
+        selectFile: '选择文件',
+        supportUpType: '仅支持 10M 以内 sql、zip、sql.gz、(tar.gz gz tgz) 文件',
+        zipFormat: 'zip、tar.gz 压缩包结构：test.zip 或 test.tar.gz 压缩包内，必需包含 test.sql',
 
         currentStatus: '当前状态',
         runTime: '启动时间',

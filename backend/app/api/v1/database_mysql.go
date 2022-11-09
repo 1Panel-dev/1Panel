@@ -1,10 +1,7 @@
 package v1
 
 import (
-	"bufio"
 	"errors"
-	"fmt"
-	"os"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -118,21 +115,10 @@ func (b *BaseApi) UpdateMysqlConfByFile(c *gin.Context) {
 		return
 	}
 
-	mysqlInfo, err := mysqlService.LoadBaseInfo(req.MysqlName)
-	if err != nil {
+	if err := mysqlService.UpdateConfByFile(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	path := fmt.Sprintf("/opt/1Panel/data/apps/%s/%s/conf/my.cnf", mysqlInfo.MysqlKey, mysqlInfo.Name)
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0640)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	defer file.Close()
-	write := bufio.NewWriter(file)
-	_, _ = write.WriteString(req.File)
-	write.Flush()
 
 	helper.SuccessWithData(c, nil)
 }
@@ -199,6 +185,21 @@ func (b *BaseApi) BackupMysql(c *gin.Context) {
 	}
 
 	if err := mysqlService.Backup(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) RecoverMysqlByUpload(c *gin.Context) {
+	var req dto.UploadRecover
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := mysqlService.RecoverByUpload(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

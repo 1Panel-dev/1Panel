@@ -23,6 +23,9 @@ export const backup = (params: Database.Backup) => {
 export const recover = (params: Database.Recover) => {
     return http.post(`/databases/recover`, params);
 };
+export const recoverByUpload = (params: Database.RecoverByUpload) => {
+    return http.post(`/databases/recover/byupload`, params);
+};
 export const searchBackupRecords = (params: Database.SearchBackupRecord) => {
     return http.post<ResPage<Backup.RecordInfo>>(`/databases/backups/search`, params);
 };
@@ -84,6 +87,6 @@ export const recoverRedis = (param: Database.RedisRecover) => {
 export const redisBackupRedisRecords = (param: ReqPage) => {
     return http.post<ResPage<Database.FileRecord>>(`/databases/redis/backup/records`, param);
 };
-export const deleteBackupRedis = (param: Database.RedisBackupDelete) => {
+export const deleteDatabaseFile = (param: Database.FileRecordDelete) => {
     return http.post(`/databases/redis/backup/del`, param);
 };

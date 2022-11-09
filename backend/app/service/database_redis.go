@@ -178,11 +178,7 @@ func (u *RedisService) Backup() error {
 	if stdout, err := cmd.CombinedOutput(); err != nil {
 		return errors.New(string(stdout))
 	}
-	backupLocal, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
-	if err != nil {
-		return err
-	}
-	localDir, err := loadLocalDir(backupLocal)
+	localDir, err := loadLocalDir()
 	if err != nil {
 		return err
 	}
@@ -255,25 +251,24 @@ func (u *RedisService) Recover(req dto.RedisBackupRecover) error {
 
 func (u *RedisService) SearchBackupListWithPage(req dto.PageInfo) (int64, interface{}, error) {
 	var (
-		list      []dto.RedisBackupRecords
-		backDatas []dto.RedisBackupRecords
+		list      []dto.DatabaseFileRecords
+		backDatas []dto.DatabaseFileRecords
 	)
 	redisInfo, err := mysqlRepo.LoadRedisBaseInfo()
 	if err != nil {
 		return 0, nil, err
 	}
-	backupLocal, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
-	if err != nil {
-		return 0, nil, err
-	}
-	localDir, err := loadLocalDir(backupLocal)
+	localDir, err := loadLocalDir()
 	if err != nil {
 		return 0, nil, err
 	}
 	backupDir := fmt.Sprintf("%s/database/redis/%s", localDir, redisInfo.Name)
 	_ = filepath.Walk(backupDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
 		if !info.IsDir() {
-			list = append(list, dto.RedisBackupRecords{
+			list = append(list, dto.DatabaseFileRecords{
 				CreatedAt: info.ModTime().Format("2006-01-02 15:04:05"),
 				Size:      int(info.Size()),
 				FileDir:   backupDir,
@@ -284,7 +279,7 @@ func (u *RedisService) SearchBackupListWithPage(req dto.PageInfo) (int64, interf
 	})
 	total, start, end := len(list), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
-		backDatas = make([]dto.RedisBackupRecords, 0)
+		backDatas = make([]dto.DatabaseFileRecords, 0)
 	} else {
 		if end >= total {
 			end = total

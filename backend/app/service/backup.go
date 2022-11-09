@@ -201,7 +201,11 @@ func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.Cl
 	return backClient, nil
 }
 
-func loadLocalDir(backup model.BackupAccount) (string, error) {
+func loadLocalDir() (string, error) {
+	backup, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
+	if err != nil {
+		return "", err
+	}
 	varMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
 		return "", err

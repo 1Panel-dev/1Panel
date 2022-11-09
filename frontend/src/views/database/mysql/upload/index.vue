@@ -14,13 +14,17 @@
                 :auto-upload="false"
             >
                 <template #trigger>
-                    <el-button>选择文件</el-button>
+                    <el-button type="primary" plain>{{ $t('database.selectFile') }}</el-button>
                 </template>
-                <el-button style="margin-left: 10px" @click="onSubmit">上传</el-button>
+                <el-button style="margin-left: 10px" icon="Upload" @click="onSubmit">
+                    {{ $t('commons.button.upload') }}
+                </el-button>
             </el-upload>
             <div style="margin-left: 10px">
-                <span class="input-help">仅支持sql、zip、sql.gz、(tar.gz|gz|tgz)</span>
-                <span class="input-help">zip、tar.gz压缩包结构：test.zip或test.tar.gz压缩包内，必需包含test.sql</span>
+                <span class="input-help">{{ $t('database.supportUpType') }}</span>
+                <span class="input-help">
+                    {{ $t('database.zipFormat') }}
+                </span>
             </div>
             <el-divider />
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data">
@@ -61,11 +65,10 @@ import ComplexTable from '@/components/complex-table/index.vue';
 import { reactive, ref } from 'vue';
 import { computeSize } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
-import { recover, searchUpList, uploadFile } from '@/api/modules/database';
+import { deleteDatabaseFile, recoverByUpload, searchUpList, uploadFile } from '@/api/modules/database';
 import i18n from '@/lang';
 import { ElMessage, UploadFile, UploadFiles, UploadInstance, UploadProps } from 'element-plus';
-import { deleteBackupRecord } from '@/api/modules/backup';
-import { Backup } from '@/api/interface/backup';
+import { Database } from '@/api/interface/database';
 
 const selects = ref<any>([]);
 
@@ -101,13 +104,14 @@ const search = async () => {
     paginationConfig.total = res.data.total;
 };
 
-const onRecover = async (row: Backup.RecordInfo) => {
+const onRecover = async (row: Database.FileRecord) => {
     let params = {
         mysqlName: mysqlName.value,
         dbName: dbName.value,
-        backupName: row.fileDir + row.fileName,
+        fileDir: row.fileDir,
+        fileName: row.fileName,
     };
-    await recover(params);
+    await recoverByUpload(params);
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };
 
@@ -115,8 +119,16 @@ const uploaderFiles = ref<UploadFiles>([]);
 const uploadRef = ref<UploadInstance>();
 
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
-    if (rawFile.name.endsWith('.sql') || rawFile.name.endsWith('gz') || rawFile.name.endsWith('.zip')) {
+    if (
+        rawFile.name.endsWith('.sql') ||
+        rawFile.name.endsWith('.gz') ||
+        rawFile.name.endsWith('.zip') ||
+        rawFile.name.endsWith('.tgz')
+    ) {
         ElMessage.error(i18n.global.t('database.unSupportType'));
+        return false;
+    } else if (rawFile.size / 1024 / 1024 > 10) {
+        ElMessage.error(i18n.global.t('database.unSupportSize'));
         return false;
     }
     return true;
@@ -145,29 +157,32 @@ const onSubmit = () => {
     });
 };
 
-const onBatchDelete = async (row: Backup.RecordInfo | null) => {
-    let ids: Array<number> = [];
+const onBatchDelete = async (row: Database.FileRecord | null) => {
+    let names: Array<string> = [];
+    let fileDir: string = '';
     if (row) {
-        ids.push(row.id);
+        fileDir = row.fileDir;
+        names.push(row.fileName);
     } else {
-        selects.value.forEach((item: Backup.RecordInfo) => {
-            ids.push(item.id);
+        selects.value.forEach((item: Database.FileRecord) => {
+            fileDir = item.fileDir;
+            names.push(item.fileName);
         });
     }
-    await useDeleteData(deleteBackupRecord, { ids: ids }, 'commons.msg.delete', true);
+    await useDeleteData(deleteDatabaseFile, { fileDir: fileDir, names: names }, 'commons.msg.delete', true);
     search();
 };
 
 const buttons = [
     {
         label: i18n.global.t('commons.button.recover'),
-        click: (row: Backup.RecordInfo) => {
+        click: (row: Database.FileRecord) => {
             onRecover(row);
         },
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        click: (row: Backup.RecordInfo) => {
+        click: (row: Database.FileRecord) => {
             onBatchDelete(row);
         },
     },

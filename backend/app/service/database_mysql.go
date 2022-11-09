@@ -1,9 +1,11 @@
 package service
 
 import (
+	"bufio"
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"mime/multipart"
 	"os"
@@ -19,6 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -33,8 +36,10 @@ type IMysqlService interface {
 	Create(mysqlDto dto.MysqlDBCreate) error
 	ChangeInfo(info dto.ChangeDBInfo) error
 	UpdateVariables(mysqlName string, updatas []dto.MysqlVariablesUpdate) error
+	UpdateConfByFile(info dto.MysqlConfUpdateByFile) error
 
 	UpFile(mysqlName string, files []*multipart.FileHeader) error
+	RecoverByUpload(req dto.UploadRecover) error
 	SearchUpListWithPage(req dto.SearchDBWithPage) (int64, interface{}, error)
 	Backup(db dto.BackupDB) error
 	Recover(db dto.RecoverDB) error
@@ -65,28 +70,23 @@ func (u *MysqlService) SearchWithPage(search dto.SearchDBWithPage) (int64, inter
 
 func (u *MysqlService) SearchUpListWithPage(req dto.SearchDBWithPage) (int64, interface{}, error) {
 	var (
-		list      []dto.RedisBackupRecords
-		backDatas []dto.RedisBackupRecords
+		list      []dto.DatabaseFileRecords
+		backDatas []dto.DatabaseFileRecords
 	)
-	redisInfo, err := mysqlRepo.LoadBaseInfoByName(req.MysqlName)
+	localDir, appKey, err := loadBackupDirAndKey(req.MysqlName)
 	if err != nil {
-		return 0, nil, err
+		return 0, list, nil
 	}
-	backupLocal, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
-	if err != nil {
-		return 0, nil, err
-	}
-	localDir, err := loadLocalDir(backupLocal)
-	if err != nil {
-		return 0, nil, err
-	}
-	uploadDir := fmt.Sprintf("%s/database/%s/%s/upload", localDir, redisInfo.Key, redisInfo.Name)
+	uploadDir := fmt.Sprintf("%s/database/%s/%s/upload", localDir, appKey, req.MysqlName)
 	if _, err := os.Stat(uploadDir); err != nil {
 		return 0, list, nil
 	}
 	_ = filepath.Walk(uploadDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
 		if !info.IsDir() {
-			list = append(list, dto.RedisBackupRecords{
+			list = append(list, dto.DatabaseFileRecords{
 				CreatedAt: info.ModTime().Format("2006-01-02 15:04:05"),
 				Size:      int(info.Size()),
 				FileDir:   uploadDir,
@@ -97,7 +97,7 @@ func (u *MysqlService) SearchUpListWithPage(req dto.SearchDBWithPage) (int64, in
 	})
 	total, start, end := len(list), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
-		backDatas = make([]dto.RedisBackupRecords, 0)
+		backDatas = make([]dto.DatabaseFileRecords, 0)
 	} else {
 		if end >= total {
 			end = total
@@ -108,19 +108,11 @@ func (u *MysqlService) SearchUpListWithPage(req dto.SearchDBWithPage) (int64, in
 }
 
 func (u *MysqlService) UpFile(mysqlName string, files []*multipart.FileHeader) error {
-	backupLocal, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
+	localDir, appKey, err := loadBackupDirAndKey(mysqlName)
 	if err != nil {
 		return err
 	}
-	app, err := mysqlRepo.LoadBaseInfoByName(mysqlName)
-	if err != nil {
-		return err
-	}
-	localDir, err := loadLocalDir(backupLocal)
-	if err != nil {
-		return err
-	}
-	dstDir := fmt.Sprintf("%s/database/%s/%s/upload", localDir, app.Key, mysqlName)
+	dstDir := fmt.Sprintf("%s/database/%s/%s/upload", localDir, appKey, mysqlName)
 	if _, err := os.Stat(dstDir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dstDir, os.ModePerm); err != nil {
 			if err != nil {
@@ -139,6 +131,85 @@ func (u *MysqlService) UpFile(mysqlName string, files []*multipart.FileHeader) e
 			return err
 		}
 		defer out.Close()
+		_, _ = io.Copy(out, src)
+	}
+	return nil
+}
+
+func (u *MysqlService) RecoverByUpload(req dto.UploadRecover) error {
+	app, err := mysqlRepo.LoadBaseInfoByName(req.MysqlName)
+	if err != nil {
+		return err
+	}
+	localDir, err := loadLocalDir()
+	if err != nil {
+		return err
+	}
+	file := req.FileDir + "/" + req.FileName
+	if !strings.HasSuffix(req.FileName, ".sql") && !strings.HasSuffix(req.FileName, ".gz") {
+		fileOp := files.NewFileOp()
+		fileNameItem := time.Now().Format("20060102150405")
+		dstDir := fmt.Sprintf("%s/database/%s/%s/upload/tmp/%s", localDir, app.Key, req.MysqlName, fileNameItem)
+		if _, err := os.Stat(dstDir); err != nil && os.IsNotExist(err) {
+			if err = os.MkdirAll(dstDir, os.ModePerm); err != nil {
+				if err != nil {
+					return fmt.Errorf("mkdir %s failed, err: %v", dstDir, err)
+				}
+			}
+		}
+		var compressType files.CompressType
+		switch {
+		case strings.HasSuffix(req.FileName, ".tar.gz"), strings.HasSuffix(req.FileName, ".tgz"):
+			compressType = files.TarGz
+		case strings.HasSuffix(req.FileName, ".zip"):
+			compressType = files.Zip
+		}
+		if err := fileOp.Decompress(req.FileDir+"/"+req.FileName, dstDir, compressType); err != nil {
+			_ = os.RemoveAll(dstDir)
+			return err
+		}
+		hasTestSql := false
+		_ = filepath.Walk(dstDir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return nil
+			}
+			if !info.IsDir() && info.Name() == "test.sql" {
+				hasTestSql = true
+				file = path
+			}
+			return nil
+		})
+		if !hasTestSql {
+			_ = os.RemoveAll(dstDir)
+			return fmt.Errorf("no such file named test.sql in %s, err: %v", req.FileName, err)
+		}
+		defer func() {
+			_ = os.RemoveAll(dstDir)
+		}()
+	}
+
+	fi, _ := os.Open(file)
+	defer fi.Close()
+	cmd := exec.Command("docker", "exec", "-i", app.ContainerName, "mysql", "-uroot", "-p"+app.Password, req.DBName)
+	if strings.HasSuffix(req.FileName, ".gz") {
+		gzipFile, err := os.Open(file)
+		if err != nil {
+			return err
+		}
+		defer gzipFile.Close()
+		gzipReader, err := gzip.NewReader(gzipFile)
+		if err != nil {
+			return err
+		}
+		defer gzipReader.Close()
+		cmd.Stdin = gzipReader
+	} else {
+		cmd.Stdin = fi
+	}
+	stdout, err := cmd.CombinedOutput()
+	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
+	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
+		return errors.New(stdStr)
 	}
 	return nil
 }
@@ -175,7 +246,11 @@ func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
 	if mysqlDto.Username == "root" {
 		return errors.New("Cannot set root as user name")
 	}
-	mysql, _ := mysqlRepo.Get(commonRepo.WithByName(mysqlDto.Name))
+	app, err := mysqlRepo.LoadBaseInfoByName(mysqlDto.MysqlName)
+	if err != nil {
+		return err
+	}
+	mysql, _ := mysqlRepo.Get(commonRepo.WithByName(mysqlDto.Name), mysqlRepo.WithByMysqlName(app.Key))
 	if mysql.ID != 0 {
 		return constant.ErrRecordExist
 	}
@@ -183,15 +258,11 @@ func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 
-	app, err := mysqlRepo.LoadBaseInfoByName(mysqlDto.MysqlName)
-	if err != nil {
-		return err
-	}
 	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create database if not exists %s character set=%s", mysqlDto.Name, mysqlDto.Format)); err != nil {
 		return err
 	}
 	tmpPermission := mysqlDto.Permission
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create user if not exists '%s'@'%s' identified by '%s';", mysqlDto.Name, tmpPermission, mysqlDto.Password)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create user if not exists '%s'@'%s' identified by '%s';", mysqlDto.Username, tmpPermission, mysqlDto.Password)); err != nil {
 		return err
 	}
 	grantStr := fmt.Sprintf("grant all privileges on %s.* to '%s'@'%s'", mysqlDto.Name, mysqlDto.Username, tmpPermission)
@@ -208,19 +279,11 @@ func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
 }
 
 func (u *MysqlService) Backup(db dto.BackupDB) error {
-	backupLocal, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
+	localDir, appKey, err := loadBackupDirAndKey(db.MysqlName)
 	if err != nil {
 		return err
 	}
-	app, err := mysqlRepo.LoadBaseInfoByName(db.MysqlName)
-	if err != nil {
-		return err
-	}
-	localDir, err := loadLocalDir(backupLocal)
-	if err != nil {
-		return err
-	}
-	backupDir := fmt.Sprintf("database/%s/%s/%s", app.Key, db.MysqlName, db.DBName)
+	backupDir := fmt.Sprintf("database/%s/%s/%s", appKey, db.MysqlName, db.DBName)
 	fileName := fmt.Sprintf("%s_%s.sql.gz", db.DBName, time.Now().Format("20060102150405"))
 	if err := backupMysql("LOCAL", localDir, backupDir, db.MysqlName, db.DBName, fileName); err != nil {
 		return err
@@ -235,12 +298,12 @@ func (u *MysqlService) Recover(db dto.RecoverDB) error {
 	}
 	gzipFile, err := os.Open(db.BackupName)
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 	defer gzipFile.Close()
 	gzipReader, err := gzip.NewReader(gzipFile)
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 	defer gzipReader.Close()
 	cmd := exec.Command("docker", "exec", "-i", app.ContainerName, "mysql", "-uroot", "-p"+app.Password, db.DBName)
@@ -353,6 +416,26 @@ func (u *MysqlService) ChangeInfo(info dto.ChangeDBInfo) error {
 
 	_ = mysqlRepo.Update(mysql.ID, map[string]interface{}{"permission": info.Value})
 
+	return nil
+}
+
+func (u *MysqlService) UpdateConfByFile(info dto.MysqlConfUpdateByFile) error {
+	app, err := mysqlRepo.LoadBaseInfoByName(info.MysqlName)
+	if err != nil {
+		return err
+	}
+	path := fmt.Sprintf("%s/%s/%s/conf/my.cnf", constant.AppInstallDir, app.Key, app.Name)
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0640)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	write := bufio.NewWriter(file)
+	_, _ = write.WriteString(info.File)
+	write.Flush()
+	if _, err := compose.Restart(fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, app.Key, app.Name)); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -568,12 +651,16 @@ func backupMysql(backupType, baseDir, backupDir, mysqlName, dbName, fileName str
 
 func updateMyCnf(oldFiles []string, group string, param string, value interface{}) []string {
 	isOn := false
+	hasGroup := false
 	hasKey := false
 	regItem, _ := regexp.Compile(`\[*\]`)
 	var newFiles []string
+	i := 0
 	for _, line := range oldFiles {
+		i++
 		if strings.HasPrefix(line, group) {
 			isOn = true
+			hasGroup = true
 			newFiles = append(newFiles, line)
 			continue
 		}
@@ -586,19 +673,31 @@ func updateMyCnf(oldFiles []string, group string, param string, value interface{
 			hasKey = true
 			continue
 		}
-		isDeadLine := regItem.Match([]byte(line))
-		if !isDeadLine {
+		if regItem.Match([]byte(line)) || i == len(oldFiles) {
+			isOn = false
+			if !hasKey {
+				newFiles = append(newFiles, fmt.Sprintf("%s=%v", param, value))
+			}
 			newFiles = append(newFiles, line)
 			continue
 		}
-		if !hasKey {
-			newFiles = append(newFiles, fmt.Sprintf("%s=%v\n", param, value))
-			newFiles = append(newFiles, line)
-		}
+		newFiles = append(newFiles, line)
 	}
-	if !isOn {
+	if !hasGroup {
 		newFiles = append(newFiles, group+"\n")
 		newFiles = append(newFiles, fmt.Sprintf("%s=%v\n", param, value))
 	}
 	return newFiles
+}
+
+func loadBackupDirAndKey(mysqlName string) (string, string, error) {
+	app, err := mysqlRepo.LoadBaseInfoByName(mysqlName)
+	if err != nil {
+		return "", "", err
+	}
+	localDir, err := loadLocalDir()
+	if err != nil {
+		return "", "", err
+	}
+	return localDir, app.Key, nil
 }

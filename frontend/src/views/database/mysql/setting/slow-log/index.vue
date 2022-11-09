@@ -71,7 +71,7 @@ const acceptParams = (params: DialogProps): void => {
     variables.long_query_time = Number(params.variables.long_query_time);
 
     if (variables.slow_query_log === 'ON') {
-        let path = `/opt/1Panel/data/apps/${mysqlKey.value}/${mysqlName.value}/data/onepanel-slow.log`;
+        let path = `/opt/1Panel/data/apps/${mysqlKey.value}/${mysqlName.value}/data/1Panel-slow.log`;
         loadMysqlSlowlogs(path);
     }
     oldVariables.value = { ...variables };
@@ -91,10 +91,10 @@ const onSave = async () => {
     if (variables.slow_query_log !== oldVariables.value.slow_query_log) {
         param.push({ param: 'slow_query_log', value: variables.slow_query_log });
     }
-    if (variables.long_query_time !== oldVariables.value.long_query_time) {
+    if (variables.slow_query_log === 'ON') {
         param.push({ param: 'long_query_time', value: variables.long_query_time });
+        param.push({ param: 'slow_query_log_file', value: '/var/lib/mysql/1Panel-slow.log' });
     }
-    param.push({ param: 'slow_query_log_file', value: '/var/lib/mysql/onepanel-slow.log' });
     await updateMysqlVariables(mysqlName.value, param);
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };

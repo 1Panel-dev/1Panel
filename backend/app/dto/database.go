@@ -131,6 +131,13 @@ type RecoverDB struct {
 	BackupName string `json:"backupName" validate:"required"`
 }
 
+type UploadRecover struct {
+	MysqlName string `json:"mysqlName" validate:"required"`
+	DBName    string `json:"dbName" validate:"required"`
+	FileName  string `json:"fileName"`
+	FileDir   string `json:"fileDir"`
+}
+
 // redis
 type RedisConfUpdate struct {
 	Timeout     string `json:"timeout"`
@@ -181,7 +188,7 @@ type RedisStatus struct {
 	LatestForkUsec           string `json:"latest_fork_usec"`
 }
 
-type RedisBackupRecords struct {
+type DatabaseFileRecords struct {
 	FileName  string `json:"fileName"`
 	FileDir   string `json:"fileDir"`
 	CreatedAt string `json:"createdAt"`
