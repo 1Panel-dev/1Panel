@@ -36,7 +36,7 @@
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" @search="search" :data="data">
                 <template #toolbar>
                     <el-button type="primary" @click="onOpenDialog()">{{ $t('commons.button.create') }}</el-button>
-                    <el-button @click="onOpenDialog()">phpMyAdmin</el-button>
+                    <el-button>phpMyAdmin</el-button>
                     <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                         {{ $t('commons.button.delete') }}
                     </el-button>
@@ -44,7 +44,26 @@
                 <el-table-column type="selection" fix />
                 <el-table-column :label="$t('commons.table.name')" prop="name" />
                 <el-table-column :label="$t('auth.username')" prop="username" />
-                <el-table-column :label="$t('auth.password')" prop="password" />
+                <el-table-column :label="$t('auth.password')" prop="password">
+                    <template #default="{ row }">
+                        <div v-if="!row.showPassword">
+                            <span style="float: left">***********</span>
+                            <div style="margin-top: 2px; cursor: pointer">
+                                <el-icon style="margin-left: 5px" @click="row.showPassword = true" :size="16">
+                                    <View />
+                                </el-icon>
+                            </div>
+                        </div>
+                        <div v-else>
+                            <span style="float: left">{{ row.password }}</span>
+                            <div style="margin-top: 4px; cursor: pointer">
+                                <el-icon style="margin-left: 5px" @click="row.showPassword = false" :size="16">
+                                    <Hide />
+                                </el-icon>
+                            </div>
+                        </div>
+                    </template>
+                </el-table-column>
                 <el-table-column :label="$t('commons.table.description')" prop="description" />
                 <el-table-column
                     prop="createdAt"
@@ -274,9 +293,10 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.loadBackup'),
-        click: () => {
+        click: (row: Database.MysqlDBInfo) => {
             let params = {
                 mysqlName: mysqlName.value,
+                dbName: row.name,
             };
             uploadRef.value!.acceptParams(params);
         },

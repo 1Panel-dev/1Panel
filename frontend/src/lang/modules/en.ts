@@ -25,6 +25,10 @@ export default {
             handle: 'Handle',
             expand: 'Expand',
             log: 'Log',
+            back: 'Back',
+            recover: 'Recover',
+            upload: 'Upload',
+            download: 'Download',
             saveAndEnable: 'Save and enable',
         },
         search: {
@@ -173,6 +177,13 @@ export default {
         confChange: 'Configuration change',
         portHelper:
             'This port is the exposed port of the container. You need to save the modification separately and restart the container!',
+
+        unSupportType: 'Current file type is not supported!',
+        unSupportSize: 'The uploaded file exceeds 10M, please confirm!',
+        selectFile: 'Select file',
+        supportUpType: 'Only sql, zip, sql.gz, and (tar.gz gz tgz) files within 10 MB are supported',
+        zipFormat:
+            'zip, tar.gz compressed package structure: test.zip or test.tar.gz compressed package must contain test.sql',
 
         currentStatus: 'Current state',
         runTime: 'Startup time',

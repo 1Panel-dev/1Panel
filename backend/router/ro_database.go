@@ -26,6 +26,7 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		withRecordRouter.POST("/backup", baseApi.BackupMysql)
 		withRecordRouter.POST("/uplist", baseApi.MysqlUpList)
 		withRecordRouter.POST("/uplist/upload/:mysqlName", baseApi.UploadMysqlFiles)
+		withRecordRouter.POST("/recover/byupload", baseApi.RecoverMysqlByUpload)
 		withRecordRouter.POST("/recover", baseApi.RecoverMysql)
 		withRecordRouter.POST("/backups/search", baseApi.SearchDBBackups)
 		withRecordRouter.POST("/del", baseApi.DeleteMysql)

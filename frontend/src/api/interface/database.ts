@@ -17,6 +17,12 @@ export namespace Database {
         dbName: string;
         backupName: string;
     }
+    export interface RecoverByUpload {
+        mysqlName: string;
+        dbName: string;
+        fileName: string;
+        fileDir: string;
+    }
     export interface MysqlDBInfo {
         id: number;
         createdAt: Date;
@@ -167,7 +173,7 @@ export namespace Database {
         createdAt: string;
         size: string;
     }
-    export interface RedisBackupDelete {
+    export interface FileRecordDelete {
         fileDir: string;
         names: Array<string>;
     }

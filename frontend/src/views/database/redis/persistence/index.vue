@@ -124,7 +124,7 @@ import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { Database } from '@/api/interface/database';
 import {
     backupRedis,
-    deleteBackupRedis,
+    deleteDatabaseFile,
     recoverRedis,
     redisBackupRedisRecords,
     RedisPersistenceConf,
@@ -166,7 +166,6 @@ const data = ref();
 const selects = ref<any>([]);
 const currentRow = ref();
 const confirmDialogRef = ref();
-const submitInput = ref();
 const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 10,
@@ -199,35 +198,33 @@ const onBackup = async () => {
     loadBackupRecords();
 };
 const onRecover = async () => {
-    if (submitInput.value === i18n.global.t('database.submitIt')) {
-        let param = {
-            fileName: currentRow.value.fileName,
-            fileDir: currentRow.value.fileDir,
-        };
-        await recoverRedis(param);
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-    }
+    let param = {
+        fileName: currentRow.value.fileName,
+        fileDir: currentRow.value.fileDir,
+    };
+    await recoverRedis(param);
+    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };
 
-const onBatchDelete = async (row: Database.RedisBackupRecord | null) => {
+const onBatchDelete = async (row: Database.FileRecord | null) => {
     let names: Array<string> = [];
     let fileDir: string = '';
     if (row) {
         fileDir = row.fileDir;
         names.push(row.fileName);
     } else {
-        selects.value.forEach((item: Database.RedisBackupRecord) => {
+        selects.value.forEach((item: Database.FileRecord) => {
             fileDir = item.fileDir;
             names.push(item.fileName);
         });
     }
-    await useDeleteData(deleteBackupRedis, { fileDir: fileDir, names: names }, 'commons.msg.delete', true);
+    await useDeleteData(deleteDatabaseFile, { fileDir: fileDir, names: names }, 'commons.msg.delete', true);
     loadBackupRecords();
 };
 const buttons = [
     {
         label: i18n.global.t('commons.button.recover'),
-        click: (row: Database.RedisBackupRecord) => {
+        click: (row: Database.FileRecord) => {
             currentRow.value = row;
             let params = {
                 header: i18n.global.t('commons.button.recover'),
@@ -239,7 +236,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        click: (row: Database.RedisBackupRecord) => {
+        click: (row: Database.FileRecord) => {
             onBatchDelete(row);
         },
     },

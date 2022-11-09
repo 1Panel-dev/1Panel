@@ -91,7 +91,7 @@ const onRecover = async (row: Backup.RecordInfo) => {
     let params = {
         mysqlName: mysqlName.value,
         dbName: dbName.value,
-        backupName: row.fileDir + row.fileName,
+        backupName: row.fileDir + '/' + row.fileName,
     };
     await recover(params);
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
