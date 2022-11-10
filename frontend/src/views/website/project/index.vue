@@ -1,6 +1,6 @@
 <template>
     <LayoutContent :header="'网站'">
-        <ComplexTable :data="data" @search="search()">
+        <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search()">
             <template #toolbar>
                 <el-button type="primary" plain @click="openCreate">{{ $t('commons.button.create') }}</el-button>
                 <el-button type="primary" plain @click="openGroup">{{ $t('website.group') }}</el-button>
@@ -63,11 +63,12 @@ const search = async () => {
 
     SearchWebSites(req).then((res) => {
         data.value = res.data.items;
+        paginationConfig.total = res.data.total;
     });
 };
 
 const openConfig = (id: number) => {
-    router.push({ name: 'WebsiteConfig', params: { id: id } });
+    router.push({ name: 'WebsiteConfig', params: { id: id, tab: 'ssl' } });
 };
 
 const buttons = [

@@ -34,4 +34,5 @@ var (
 	commandService         = service.ServiceGroupApp.CommandService
 	websiteGroupService    = service.ServiceGroupApp.WebsiteGroupService
 	websiteService         = service.ServiceGroupApp.WebsiteService
+	webSiteDnsAccountService = service.ServiceGroupApp.WebSiteDnsAccountService
 )

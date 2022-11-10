@@ -1,5 +1,5 @@
 import http from '@/api';
-import { ResPage } from '../interface';
+import { ReqPage, ResPage } from '../interface';
 import { WebSite } from '../interface/website';
 
 export const SearchWebSites = (req: WebSite.WebSiteSearch) => {
@@ -56,4 +56,20 @@ export const GetNginxConfig = (req: WebSite.NginxConfigReq) => {
 
 export const UpdateNginxConfig = (req: WebSite.NginxConfigReq) => {
     return http.post<any>(`/websites/config/update`, req);
+};
+
+export const SearchDnsAccount = (req: ReqPage) => {
+    return http.post<ResPage<WebSite.DnsAccount>>(`/websites/dns`, req);
+};
+
+export const CreateDnsAccount = (req: WebSite.DnsAccountCreate) => {
+    return http.post<any>(`/websites/dns/create`, req);
+};
+
+export const UpdateDnsAccount = (req: WebSite.DnsAccountUpdate) => {
+    return http.post<any>(`/websites/dns/update`, req);
+};
+
+export const DeleteDnsAccount = (id: number) => {
+    return http.delete<any>(`/websites/dns/${id}`);
 };

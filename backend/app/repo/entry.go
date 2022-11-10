@@ -23,6 +23,7 @@ type RepoGroup struct {
 	WebSiteRepo
 	WebSiteDomainRepo
 	WebSiteGroupRepo
+	WebsiteDnsAccountRepo
 }
 
 var RepoGroupApp = new(RepoGroup)

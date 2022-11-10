@@ -28,6 +28,7 @@ type ServiceGroup struct {
 	OperationService
 	WebsiteGroupService
 	WebsiteService
+	WebSiteDnsAccountService
 }
 
 var ServiceGroupApp = new(ServiceGroup)
@@ -62,4 +63,5 @@ var (
 	websiteRepo            = repo.RepoGroupApp.WebSiteRepo
 	websiteGroupRepo       = repo.RepoGroupApp.WebSiteGroupRepo
 	websiteDomainRepo      = repo.RepoGroupApp.WebSiteDomainRepo
+	websiteDnsRepo         = repo.RepoGroupApp.WebsiteDnsAccountRepo
 )
