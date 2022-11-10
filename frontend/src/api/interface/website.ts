@@ -84,4 +84,23 @@ export namespace WebSite {
         isRepeatKey: string;
         params: string[];
     }
+
+    export interface DnsAccount extends CommonModel {
+        name: string;
+        type: string;
+        authorization: Object;
+    }
+
+    export interface DnsAccountCreate {
+        name: string;
+        type: string;
+        authorization: Object;
+    }
+
+    export interface DnsAccountUpdate {
+        id: number;
+        name: string;
+        type: string;
+        authorization: Object;
+    }
 }

@@ -232,7 +232,7 @@ func (w WebsiteService) UpdateNginxConfigByScope(req dto.NginxConfigReq) error {
 		return err
 	}
 	if req.Operate == dto.ConfigDel {
-		return deleteNginxConfig(website, keys, req.Scope)
+		return deleteNginxConfig(website, keys)
 	}
 
 	return updateNginxConfig(website, getNginxParams(req.Params, keys), req.Scope)

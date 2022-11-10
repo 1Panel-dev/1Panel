@@ -57,7 +57,7 @@ func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) e
 		return err
 	}
 
-	nginxFileName := website.PrimaryDomain + ".conf"
+	nginxFileName := website.Alias + ".conf"
 	configPath := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "conf", "conf.d", nginxFileName)
 
 	nginxContent := string(nginx_conf.WebsiteDefault)
@@ -111,7 +111,7 @@ func delNginxConfig(website model.WebSite) error {
 		return err
 	}
 
-	nginxFileName := website.PrimaryDomain + ".conf"
+	nginxFileName := website.Alias + ".conf"
 	configPath := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "conf", "conf.d", nginxFileName)
 	fileOp := files.NewFileOp()
 
@@ -139,7 +139,7 @@ func nginxCheckAndReload(oldContent string, filePath string, containerName strin
 	return nil
 }
 
-func getNginxConfig(primaryDomain string) (dto.NginxConfig, error) {
+func getNginxConfig(alias string) (dto.NginxConfig, error) {
 	var nginxConfig dto.NginxConfig
 	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
 	if err != nil {
@@ -150,7 +150,7 @@ func getNginxConfig(primaryDomain string) (dto.NginxConfig, error) {
 		return nginxConfig, err
 	}
 
-	configPath := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "conf", "conf.d", primaryDomain+".conf")
+	configPath := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "conf", "conf.d", alias+".conf")
 	content, err := os.ReadFile(configPath)
 	if err != nil {
 		return nginxConfig, err
@@ -167,7 +167,7 @@ func getNginxConfig(primaryDomain string) (dto.NginxConfig, error) {
 
 func addListenAndServerName(website model.WebSite, ports []int, domains []string) error {
 
-	nginxConfig, err := getNginxConfig(website.PrimaryDomain)
+	nginxConfig, err := getNginxConfig(website.Alias)
 	if err != nil {
 		return nil
 	}
@@ -187,7 +187,7 @@ func addListenAndServerName(website model.WebSite, ports []int, domains []string
 
 func deleteListenAndServerName(website model.WebSite, ports []int, domains []string) error {
 
-	nginxConfig, err := getNginxConfig(website.PrimaryDomain)
+	nginxConfig, err := getNginxConfig(website.Alias)
 	if err != nil {
 		return nil
 	}
@@ -207,7 +207,7 @@ func deleteListenAndServerName(website model.WebSite, ports []int, domains []str
 }
 
 func getNginxConfigByKeys(website model.WebSite, keys []string) ([]dto.NginxParam, error) {
-	nginxConfig, err := getNginxConfig(website.PrimaryDomain)
+	nginxConfig, err := getNginxConfig(website.Alias)
 	if err != nil {
 		return nil, err
 	}
@@ -233,7 +233,7 @@ func getNginxConfigByKeys(website model.WebSite, keys []string) ([]dto.NginxPara
 }
 
 func updateNginxConfig(website model.WebSite, params []dto.NginxParam, scope dto.NginxScope) error {
-	nginxConfig, err := getNginxConfig(website.PrimaryDomain)
+	nginxConfig, err := getNginxConfig(website.Alias)
 	if err != nil {
 		return err
 	}
@@ -270,8 +270,8 @@ func updateConfig(config *components.Config, scope dto.NginxScope) {
 	}
 }
 
-func deleteNginxConfig(website model.WebSite, keys []string, scope dto.NginxScope) error {
-	nginxConfig, err := getNginxConfig(website.PrimaryDomain)
+func deleteNginxConfig(website model.WebSite, keys []string) error {
+	nginxConfig, err := getNginxConfig(website.Alias)
 	if err != nil {
 		return err
 	}
@@ -324,8 +324,8 @@ func getNginxParams(params interface{}, keys []string) []dto.NginxParam {
 	var nginxParams []dto.NginxParam
 
 	switch params.(type) {
-	case map[string]string:
-		return handleParamMap(params.(map[string]string), keys)
+	case map[string]interface{}:
+		return handleParamMap(toMapStr(params.(map[string]interface{})), keys)
 	case []interface{}:
 
 		if mArray, ok := params.([]interface{}); ok {

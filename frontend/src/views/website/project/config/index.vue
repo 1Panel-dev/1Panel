@@ -1,9 +1,13 @@
 <template>
     <LayoutContent :header="'网站设置'" :back-name="'Website'">
-        <el-tabs type="card">
-            <el-tab-pane label="基本">
-                <Basic :id="id"></Basic>
+        <el-tabs v-model="index" @click="changeTab(index)">
+            <el-tab-pane label="基本" name="basic">
+                <Basic :id="id" v-if="index === 'basic'"></Basic>
             </el-tab-pane>
+            <el-tab-pane label="证书" name="ssl">
+                <SSL :id="id" v-if="index === 'ssl'"></SSL>
+            </el-tab-pane>
+            <el-tab-pane label="安全">反代</el-tab-pane>
             <el-tab-pane label="备份">反代</el-tab-pane>
             <el-tab-pane label="源文">反代</el-tab-pane>
         </el-tabs>
@@ -12,17 +16,35 @@
 
 <script setup lang="ts">
 import LayoutContent from '@/layout/layout-content.vue';
-import { computed } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import Basic from './basic/index.vue';
+import SSL from './ssl/index.vue';
+import router from '@/routers';
 
 const props = defineProps({
     id: {
         type: Number,
         default: 0,
     },
+    tab: {
+        type: String,
+        default: 'basic',
+    },
 });
 
 const id = computed(() => {
     return props.id;
+});
+
+let index = ref('basic');
+
+const changeTab = (index: string) => {
+    router.replace({ name: 'WebsiteConfig', params: { id: id.value, tab: index } });
+};
+
+onMounted(() => {
+    if (props.tab !== index.value) {
+        index.value = props.tab;
+    }
 });
 </script>

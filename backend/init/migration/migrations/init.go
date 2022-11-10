@@ -194,3 +194,13 @@ var AddTableWebsite = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddTableDnsAccount = &gormigrate.Migration{
+	ID: "20201009-add-table-dns",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.WebsiteDnsAccount{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

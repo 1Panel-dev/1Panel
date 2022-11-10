@@ -19,7 +19,7 @@ const webSiteRouter = {
             },
         },
         {
-            path: '/websites/:id/config',
+            path: '/websites/:id/config/:tab',
             name: 'WebsiteConfig',
             component: () => import('@/views/website/project/config/index.vue'),
             hidden: true,
