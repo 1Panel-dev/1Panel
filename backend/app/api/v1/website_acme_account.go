@@ -7,13 +7,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (b *BaseApi) PageWebsiteDnsAccount(c *gin.Context) {
+func (b *BaseApi) PageWebsiteAcmeAccount(c *gin.Context) {
 	var req dto.PageInfo
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	total, accounts, err := websiteDnsAccountService.Page(req)
+	total, accounts, err := websiteAcmeAccountService.Page(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -24,33 +24,21 @@ func (b *BaseApi) PageWebsiteDnsAccount(c *gin.Context) {
 	})
 }
 
-func (b *BaseApi) CreateWebsiteDnsAccount(c *gin.Context) {
-	var req dto.WebsiteDnsAccountCreate
+func (b *BaseApi) CreateWebsiteAcmeAccount(c *gin.Context) {
+	var req dto.WebsiteAcmeAccountCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if _, err := websiteDnsAccountService.Create(req); err != nil {
+	res, err := websiteAcmeAccountService.Create(req)
+	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithData(c, res)
 }
 
-func (b *BaseApi) UpdateWebsiteDnsAccount(c *gin.Context) {
-	var req dto.WebsiteDnsAccountUpdate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if _, err := websiteDnsAccountService.Update(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, nil)
-}
-
-func (b *BaseApi) DeleteWebsiteDnsAccount(c *gin.Context) {
+func (b *BaseApi) DeleteWebsiteAcmeAccount(c *gin.Context) {
 
 	id, err := helper.GetParamID(c)
 	if err != nil {
@@ -58,7 +46,7 @@ func (b *BaseApi) DeleteWebsiteDnsAccount(c *gin.Context) {
 		return
 	}
 
-	if err := websiteDnsAccountService.Delete(id); err != nil {
+	if err := websiteAcmeAccountService.Delete(id); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

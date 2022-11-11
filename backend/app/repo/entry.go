@@ -24,6 +24,8 @@ type RepoGroup struct {
 	WebSiteDomainRepo
 	WebSiteGroupRepo
 	WebsiteDnsAccountRepo
+	WebsiteSSLRepo
+	WebsiteAcmeAccountRepo
 }
 
 var RepoGroupApp = new(RepoGroup)

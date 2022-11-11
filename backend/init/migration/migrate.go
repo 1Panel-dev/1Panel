@@ -18,7 +18,6 @@ func Init() {
 		migrations.AddTableApp,
 		migrations.AddTableImageRepo,
 		migrations.AddTableWebsite,
-		migrations.AddTableDnsAccount,
 		migrations.AddTableDatabaseMysql,
 	})
 	if err := m.Migrate(); err != nil {

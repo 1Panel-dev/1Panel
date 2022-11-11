@@ -60,10 +60,6 @@ const accountData = ref<AccountProps>({
 
 const types = [
     {
-        label: i18n.global.t('website.manual'),
-        value: 'Manual',
-    },
-    {
         label: 'DnsPod',
         value: 'DnsPod',
     },
@@ -93,7 +89,7 @@ let rules = ref({
 let account = ref({
     id: 0,
     name: '',
-    type: '',
+    type: 'DnsPod',
     authorization: {},
 });
 const em = defineEmits(['close']);
@@ -108,14 +104,13 @@ const resetForm = () => {
     account.value = {
         id: 0,
         name: '',
-        type: '',
+        type: 'DnsPod',
         authorization: {},
     };
     accountForm.value?.resetFields();
 };
 
 const acceptParams = async (props: AccountProps) => {
-    resetForm();
     accountData.value.mode = props.mode;
     if (props.mode === 'edit') {
         account.value = props.form;

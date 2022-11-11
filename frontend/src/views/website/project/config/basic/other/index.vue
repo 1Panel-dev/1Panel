@@ -13,7 +13,7 @@
                     <el-input v-model="form.primaryDomain"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('website.group')" prop="webSiteGroupID">
-                    <el-select v-model="form.webSiteGroupID">
+                    <el-select v-model="form.webSiteGroupId">
                         <el-option
                             v-for="(group, index) in groups"
                             :key="index"
@@ -59,11 +59,11 @@ let form = reactive({
     id: websiteId.value,
     primaryDomain: '',
     remark: '',
-    webSiteGroupID: 0,
+    webSiteGroupId: 0,
 });
 let rules = ref({
     primaryDomain: [Rules.requiredInput],
-    webSiteGroupID: [Rules.requiredSelect],
+    webSiteGroupId: [Rules.requiredSelect],
 });
 let groups = ref<WebSite.Group[]>([]);
 
@@ -91,7 +91,7 @@ const search = () => {
             // form.id = res.data.id;
             form.primaryDomain = res.data.primaryDomain;
             form.remark = res.data.remark;
-            form.webSiteGroupID = res.data.webSiteGroupID;
+            form.webSiteGroupId = res.data.webSiteGroupId;
         });
     });
 };

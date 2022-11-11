@@ -704,5 +704,8 @@ export default {
         manual: '手动解析',
         key: '密钥',
         check: '查看',
+        accountManage: '账户管理',
+        email: '邮箱',
+        addAccount: '新增账户',
     },
 };

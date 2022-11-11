@@ -181,7 +181,7 @@ var AddTableDatabaseMysql = &gormigrate.Migration{
 var AddTableWebsite = &gormigrate.Migration{
 	ID: "20201009-add-table-website",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.WebSite{}, &model.WebSiteDomain{}, &model.WebSiteGroup{}); err != nil {
+		if err := tx.AutoMigrate(&model.WebSite{}, &model.WebSiteDomain{}, &model.WebSiteGroup{}, &model.WebsiteDnsAccount{}, &model.WebSiteSSL{}, &model.WebsiteAcmeAccount{}); err != nil {
 			return err
 		}
 		item := &model.WebSiteGroup{
@@ -189,16 +189,6 @@ var AddTableWebsite = &gormigrate.Migration{
 			Default: true,
 		}
 		if err := tx.Create(item).Error; err != nil {
-			return err
-		}
-		return nil
-	},
-}
-
-var AddTableDnsAccount = &gormigrate.Migration{
-	ID: "20201009-add-table-dns",
-	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.WebsiteDnsAccount{}); err != nil {
 			return err
 		}
 		return nil

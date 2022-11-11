@@ -8,15 +8,15 @@ export namespace WebSite {
         remark: string;
         domains: string[];
         appType: string;
-        appInstallID?: number;
-        webSiteGroupID: number;
+        appInstallId?: number;
+        webSiteGroupId: number;
         otherDomains: string;
         appinstall?: NewAppInstall;
     }
 
     export interface NewAppInstall {
         name: string;
-        appDetailID: number;
+        appDetailId: number;
         params: any;
     }
 
@@ -36,8 +36,8 @@ export namespace WebSite {
         alias: string;
         remark: string;
         appType: string;
-        appInstallID: number;
-        webSiteGroupID: number;
+        appInstallId: number;
+        webSiteGroupId: number;
         otherDomains: string;
     }
 
@@ -45,7 +45,7 @@ export namespace WebSite {
         id: number;
         primaryDomain: string;
         remark: string;
-        webSiteGroupID: number;
+        webSiteGroupId: number;
     }
 
     export interface Group extends CommonModel {
@@ -102,5 +102,25 @@ export namespace WebSite {
         name: string;
         type: string;
         authorization: Object;
+    }
+
+    export interface SSL extends CommonModel {
+        privateKey: string;
+        pem: string;
+        domain: string;
+        certURL: string;
+        type: string;
+        issuerName: string;
+        expireDate: string;
+        startDate: string;
+    }
+
+    export interface AcmeAccount extends CommonModel {
+        email: string;
+        url: string;
+    }
+
+    export interface AcmeAccountCreate {
+        email: string;
     }
 }

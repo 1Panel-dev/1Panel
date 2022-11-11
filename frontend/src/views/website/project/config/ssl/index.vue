@@ -6,8 +6,9 @@
         <el-tab-pane :label="$t('website.dnsAccount')">
             <Account :id="id" v-if="index == '1'"></Account>
         </el-tab-pane>
-        <el-tab-pane :label="$t('website.applySSL')"></el-tab-pane>
-        <el-tab-pane :label="$t('website.SSLList')"></el-tab-pane>
+        <el-tab-pane :label="$t('website.applySSL')">
+            <SSL v-if="index == '2'"></SSL>
+        </el-tab-pane>
     </el-tabs>
 </template>
 
@@ -15,6 +16,7 @@
 import { computed, ref } from 'vue';
 import Current from './current/index.vue';
 import Account from './account/index.vue';
+import SSL from './ssl/index.vue';
 
 const props = defineProps({
     id: {

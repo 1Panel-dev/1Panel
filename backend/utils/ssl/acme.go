@@ -1,6 +1,7 @@
 package ssl
 
 import (
+	"crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -10,8 +11,9 @@ import (
 	"github.com/go-acme/lego/v4/registration"
 )
 
-func GetPrivateKey(priKey *rsa.PrivateKey) []byte {
-	derStream := x509.MarshalPKCS1PrivateKey(priKey)
+func GetPrivateKey(priKey crypto.PrivateKey) []byte {
+	rsaKey := priKey.(*rsa.PrivateKey)
+	derStream := x509.MarshalPKCS1PrivateKey(rsaKey)
 	block := &pem.Block{
 		Type:  "privateKey",
 		Bytes: derStream,
@@ -25,9 +27,10 @@ func NewRegisterClient(email string) (*AcmeClient, error) {
 	if err != nil {
 		panic(err)
 	}
+
 	myUser := &AcmeUser{
 		Email: email,
-		key:   priKey,
+		Key:   priKey,
 	}
 	config := newConfig(myUser)
 	client, err := lego.NewClient(config)
@@ -58,7 +61,7 @@ func NewPrivateKeyClient(email string, privateKey string) (*AcmeClient, error) {
 	}
 	myUser := &AcmeUser{
 		Email: email,
-		key:   priKey,
+		Key:   priKey,
 	}
 	config := newConfig(myUser)
 	client, err := lego.NewClient(config)
