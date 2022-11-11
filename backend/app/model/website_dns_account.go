@@ -6,3 +6,7 @@ type WebsiteDnsAccount struct {
 	Type          string `gorm:"type:varchar(64);not null" json:"type"`
 	Authorization string `gorm:"type:varchar(256);not null" json:"_"`
 }
+
+func (w WebsiteDnsAccount) TableName() string {
+	return "website_dns_accounts"
+}

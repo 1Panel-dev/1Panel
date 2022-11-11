@@ -32,7 +32,10 @@ var (
 
 	operationService = service.ServiceGroupApp.OperationService
 	commandService         = service.ServiceGroupApp.CommandService
+
 	websiteGroupService    = service.ServiceGroupApp.WebsiteGroupService
 	websiteService         = service.ServiceGroupApp.WebsiteService
-	webSiteDnsAccountService = service.ServiceGroupApp.WebSiteDnsAccountService
+	websiteDnsAccountService  = service.ServiceGroupApp.WebSiteDnsAccountService
+	websiteSSLService         = service.ServiceGroupApp.WebSiteSSLService
+	websiteAcmeAccountService = service.ServiceGroupApp.WebSiteAcmeAccountService
 )

@@ -73,3 +73,19 @@ export const UpdateDnsAccount = (req: WebSite.DnsAccountUpdate) => {
 export const DeleteDnsAccount = (id: number) => {
     return http.delete<any>(`/websites/dns/${id}`);
 };
+
+export const SearchSSL = (req: ReqPage) => {
+    return http.post<ResPage<WebSite.SSL>>(`/websites/ssl`, req);
+};
+
+export const SearchAcmeAccount = (req: ReqPage) => {
+    return http.post<ResPage<WebSite.AcmeAccount>>(`/websites/acme/search`, req);
+};
+
+export const CreateAcmeAccount = (req: WebSite.AcmeAccountCreate) => {
+    return http.post<WebSite.AcmeAccount>(`/websites/acme`, req);
+};
+
+export const DeleteAcmeAccount = (id: number) => {
+    return http.delete<any>(`/websites/acme/${id}`);
+};
