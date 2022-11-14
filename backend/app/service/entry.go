@@ -12,6 +12,7 @@ type ServiceGroup struct {
 	ImageService
 	ImageRepoService
 	ComposeTemplateService
+	DockerService
 
 	MysqlService
 	RedisService

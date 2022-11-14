@@ -223,4 +223,18 @@ export namespace Container {
     export interface BatchDelete {
         ids: Array<string>;
     }
+
+    export interface DaemonJsonUpdateByFile {
+        path: string;
+        file: string;
+    }
+
+    export interface DaemonJsonConf {
+        status: string;
+        bip: string;
+        registryMirrors: Array<string>;
+        insecureRegistries: Array<string>;
+        liveRestore: boolean;
+        cgroupDriver: string;
+    }
 }

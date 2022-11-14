@@ -83,7 +83,6 @@ import { ChangePort } from '@/api/modules/app';
 const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
 
-const restartNow = ref(false);
 const form = reactive({
     name: '',
     port: 6379,
@@ -166,10 +165,9 @@ const onSaveFile = async () => {
 const onSubmitSave = async () => {
     let param = {
         file: mysqlConf.value,
-        restartNow: restartNow.value,
+        restartNow: true,
     };
     await updateRedisConfByFile(param);
-    restartNow.value = false;
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };
 

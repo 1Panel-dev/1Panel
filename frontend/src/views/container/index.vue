@@ -38,6 +38,14 @@
                 >
                     {{ $t('container.composeTemplate') }}
                 </el-radio-button>
+                <el-radio-button
+                    class="topButton"
+                    size="large"
+                    @click="routerTo('/containers/setting')"
+                    label="setting"
+                >
+                    {{ $t('container.setting') }}
+                </el-radio-button>
             </el-radio-group>
         </el-card>
     </div>

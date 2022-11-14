@@ -119,3 +119,14 @@ export const upCompose = (params: Container.ComposeCreate) => {
 export const ComposeOperator = (params: Container.ComposeOpration) => {
     return http.post(`/containers/compose/operate`, params);
 };
+
+// docker
+export const loadDaemonJson = () => {
+    return http.get<Container.DaemonJsonConf>(`/containers/daemonjson`);
+};
+export const updateDaemonJson = (params: Container.DaemonJsonConf) => {
+    return http.post(`/containers/daemonjson/update`, params);
+};
+export const updateDaemonJsonByfile = (params: Container.DaemonJsonUpdateByFile) => {
+    return http.post(`/containers/daemonjson/update/byfile`, params);
+};

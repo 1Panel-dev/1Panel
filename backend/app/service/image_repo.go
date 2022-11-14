@@ -75,7 +75,7 @@ func (u *ImageRepoService) Create(imageRepoDto dto.ImageRepoCreate) error {
 		if err != nil {
 			return err
 		}
-		if err := ioutil.WriteFile(constant.DaemonJsonDir, newJson, 0777); err != nil {
+		if err := ioutil.WriteFile(constant.DaemonJsonDir, newJson, 0640); err != nil {
 			return err
 		}
 	}
