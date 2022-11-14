@@ -18,6 +18,7 @@ var (
 	composeTemplateService = service.ServiceGroupApp.ComposeTemplateService
 	imageRepoService       = service.ServiceGroupApp.ImageRepoService
 	imageService           = service.ServiceGroupApp.ImageService
+	dockerService          = service.ServiceGroupApp.DockerService
 
 	mysqlService = service.ServiceGroupApp.MysqlService
 	redisService = service.ServiceGroupApp.RedisService

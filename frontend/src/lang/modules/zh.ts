@@ -387,6 +387,12 @@ export default {
         down: '删除',
         up: '启动',
         operatorComposeHelper: '将对选中 Compose 进行 {0} 操作，是否继续？',
+
+        setting: '容器配置',
+        mirrors: '镜像加速',
+        mirrorsHelper: '为空则关闭镜像加速；优先使用加速 URL 执行操作，请求超时将跳过使用默认加速方式',
+        registries: '私有仓库',
+        liveHelper: '停止 docker 服务时，是否关闭所有容器',
     },
     cronjob: {
         cronTask: '计划任务',

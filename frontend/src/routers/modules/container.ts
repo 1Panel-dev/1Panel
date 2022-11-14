@@ -67,8 +67,17 @@ const containerRouter = {
         },
         {
             path: 'template',
-            name: 'composeTemplate',
+            name: 'ComposeTemplate',
             component: () => import('@/views/container/template/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/containers',
+            },
+        },
+        {
+            path: 'setting',
+            name: 'ContainerSetting',
+            component: () => import('@/views/container/setting/index.vue'),
             hidden: true,
             meta: {
                 activeMenu: '/containers',
