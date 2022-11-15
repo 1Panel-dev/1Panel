@@ -332,7 +332,7 @@ const weekOptions = [
 const timeRangeLoad = ref<Array<any>>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
 const searchInfo = reactive({
     page: 1,
-    pageSize: 5,
+    pageSize: 10,
     recordTotal: 0,
     cronjobID: 0,
     startTime: new Date(new Date().setHours(0, 0, 0, 0)),

@@ -49,14 +49,11 @@ const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
     page: 1,
-    pageSize: 5,
+    pageSize: 10,
     total: 0,
 });
-const commandSearch = reactive({
-    page: 1,
-    pageSize: 5,
-    info: '',
-});
+const info = ref();
+
 type FormInstance = InstanceType<typeof ElForm>;
 const commandInfoRef = ref<FormInstance>();
 const rules = reactive({
@@ -136,9 +133,12 @@ const buttons = [
 ];
 
 const search = async () => {
-    commandSearch.page = paginationConfig.page;
-    commandSearch.pageSize = paginationConfig.pageSize;
-    const res = await getCommandPage(commandSearch);
+    let params = {
+        page: paginationConfig.page,
+        pageSize: paginationConfig.pageSize,
+        info: info.value,
+    };
+    const res = await getCommandPage(params);
     data.value = res.data.items;
     paginationConfig.total = res.data.total;
 };

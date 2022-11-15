@@ -19,13 +19,13 @@ type RepoGroup struct {
 	GroupRepo
 	SettingRepo
 	BackupRepo
-	OperationRepo
 	WebSiteRepo
 	WebSiteDomainRepo
 	WebSiteGroupRepo
 	WebsiteDnsAccountRepo
 	WebsiteSSLRepo
 	WebsiteAcmeAccountRepo
+	LogRepo
 }
 
 var RepoGroupApp = new(RepoGroup)

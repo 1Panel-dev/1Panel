@@ -8,7 +8,7 @@ type RouterGroup struct {
 	ContainerRouter
 	CommandRouter
 	MonitorRouter
-	OperationLogRouter
+	LogRouter
 	FileRouter
 	TerminalRouter
 	CronjobRouter

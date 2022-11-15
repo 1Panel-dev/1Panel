@@ -7,14 +7,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type OperationLogRouter struct{}
+type LogRouter struct{}
 
-func (s *OperationLogRouter) InitOperationLogRouter(Router *gin.RouterGroup) {
-	operationRouter := Router.Group("operations")
+func (s *LogRouter) InitLogRouter(Router *gin.RouterGroup) {
+	operationRouter := Router.Group("logs")
 	operationRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		operationRouter.POST("", baseApi.GetOperationList)
-		operationRouter.POST("/del", baseApi.DeleteOperation)
+		operationRouter.POST("login", baseApi.GetLoginLogs)
+		operationRouter.POST("operation", baseApi.GetOperationLogs)
 	}
 }

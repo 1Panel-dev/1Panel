@@ -71,7 +71,7 @@ func (u *ImageRepoService) Create(imageRepoDto dto.ImageRepoCreate) error {
 				deamonMap["insecure-registries"] = k
 			}
 		}
-		newJson, err := json.Marshal(deamonMap)
+		newJson, err := json.MarshalIndent(deamonMap, "", "\t")
 		if err != nil {
 			return err
 		}

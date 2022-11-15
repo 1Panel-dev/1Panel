@@ -142,7 +142,7 @@ export default {
         terminal: '终端',
         settings: '面板设置',
         toolbox: '工具箱',
-        operations: '操作日志',
+        logs: '面板日志',
     },
     home: {
         welcome: '欢迎使用',
@@ -487,7 +487,14 @@ export default {
         key: '密钥',
         emptyTerminal: '暂无终端连接',
     },
-    operations: {
+    logs: {
+        operation: '操作日志',
+        login: '登录日志',
+        loginIP: '登录 IP',
+        loginAddress: '登录地址',
+        loginAgent: '用户代理',
+        loginStatus: '登录状态',
+        system: '系统日志',
         detail: {
             users: '用户',
             hosts: '主机',
@@ -496,6 +503,7 @@ export default {
             backups: '备份账号',
             settings: '面板设置',
             cronjobs: '计划任务',
+            databases: '数据库',
             status: '状态修改',
             auth: '用户',
             post: '创建',
@@ -503,6 +511,8 @@ export default {
             update: '更新',
             delete: '删除',
             login: '登录',
+            backup: '备份',
+            recover: '恢复',
             logout: '退出',
             del: '删除',
         },

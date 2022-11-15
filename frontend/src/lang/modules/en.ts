@@ -142,7 +142,7 @@ export default {
         terminal: 'Terminal',
         settings: 'Setting',
         toolbox: 'Toolbox',
-        operations: 'Operation Records',
+        logs: 'Log',
     },
     home: {
         welcome: 'Welcome',
@@ -475,6 +475,13 @@ export default {
         emptyTerminal: 'No terminal is currently connected',
     },
     operations: {
+        operation: 'Operation logs',
+        login: 'Login logs',
+        system: 'System logs',
+        loginIP: 'Login IP',
+        loginAddress: 'Login address',
+        loginAgent: 'Login agent',
+        loginStatus: 'Login status',
         detail: {
             users: 'User',
             hosts: 'Host',
@@ -483,6 +490,7 @@ export default {
             backups: 'Backup Account',
             settings: 'Panel Setting',
             cronjobs: 'Cronjob',
+            databases: 'Database',
             status: ' Update status',
             auth: 'User',
             login: ' login',
@@ -493,7 +501,6 @@ export default {
             delete: ' delete',
             del: 'delete',
         },
-        operatoin: 'operatoin',
         status: 'status',
         request: 'request',
         response: 'response',
