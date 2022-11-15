@@ -3,6 +3,12 @@
         <Submenu activeName="operation" />
         <el-card style="margin-top: 20px">
             <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
+                <template #toolbar>
+                    <el-button type="primary" @click="onClean()">
+                        {{ $t('logs.deleteLogs') }}
+                    </el-button>
+                </template>
+
                 <el-table-column :label="$t('logs.operatoin')" fix>
                     <template #default="{ row }">
                         {{ fmtOperation(row) }}
@@ -65,19 +71,24 @@
                 />
             </ComplexTable>
         </el-card>
+
+        <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmitClean"></ConfirmDialog>
     </div>
 </template>
 
 <script setup lang="ts">
 import ComplexTable from '@/components/complex-table/index.vue';
+import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { dateFromat } from '@/utils/util';
-import { getOperationLogs } from '@/api/modules/log';
+import { cleanLogs, getOperationLogs } from '@/api/modules/log';
 import Submenu from '@/views/log/index.vue';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import { Log } from '@/api/interface/log';
 import i18n from '@/lang';
+import { ElMessage } from 'element-plus';
 
 const data = ref();
+const confirmDialogRef = ref();
 const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 15,
@@ -129,6 +140,21 @@ const fmtBody = (value: string) => {
     } catch (err) {
         return value;
     }
+};
+
+const onClean = async () => {
+    let params = {
+        header: i18n.global.t('logs.deleteLogs'),
+        operationInfo: i18n.global.t('commons.msg.delete'),
+        submitInputInfo: i18n.global.t('logs.deleteLogs'),
+    };
+    confirmDialogRef.value!.acceptParams(params);
+};
+
+const onSubmitClean = async () => {
+    await cleanLogs('operation');
+    search();
+    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 onMounted(() => {

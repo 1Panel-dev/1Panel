@@ -8,15 +8,21 @@ import (
 type LogRepo struct{}
 
 type ILogRepo interface {
+	CleanLogin() error
 	CreateLoginLog(user *model.LoginLog) error
 	PageLoginLog(limit, offset int, opts ...DBOption) (int64, []model.LoginLog, error)
 
+	CleanOperation() error
 	CreateOperationLog(user *model.OperationLog) error
 	PageOperationLog(limit, offset int, opts ...DBOption) (int64, []model.OperationLog, error)
 }
 
 func NewILogRepo() ILogRepo {
 	return &LogRepo{}
+}
+
+func (u *LogRepo) CleanLogin() error {
+	return global.DB.Exec("delete from login_logs;").Error
 }
 
 func (u *LogRepo) CreateLoginLog(log *model.LoginLog) error {
@@ -33,6 +39,10 @@ func (u *LogRepo) PageLoginLog(page, size int, opts ...DBOption) (int64, []model
 	db = db.Count(&count)
 	err := db.Limit(size).Offset(size * (page - 1)).Find(&ops).Error
 	return count, ops, err
+}
+
+func (u *LogRepo) CleanOperation() error {
+	return global.DB.Exec("delete from operation_logs").Error
 }
 
 func (u *LogRepo) CreateOperationLog(log *model.OperationLog) error {

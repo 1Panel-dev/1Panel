@@ -3,6 +3,12 @@
         <Submenu activeName="login" />
         <el-card style="margin-top: 20px">
             <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
+                <template #toolbar>
+                    <el-button type="primary" @click="onClean()">
+                        {{ $t('logs.deleteLogs') }}
+                    </el-button>
+                </template>
+
                 <el-table-column min-width="40" :label="$t('logs.loginIP')" prop="ip" />
                 <el-table-column min-width="40" :label="$t('logs.loginAddress')" prop="address" />
                 <el-table-column :label="$t('logs.loginAgent')" show-overflow-tooltip prop="agent" />
@@ -26,17 +32,22 @@
                 />
             </ComplexTable>
         </el-card>
+        <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmitClean"></ConfirmDialog>
     </div>
 </template>
 
 <script setup lang="ts">
 import ComplexTable from '@/components/complex-table/index.vue';
+import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { dateFromat } from '@/utils/util';
-import { getLoginLogs } from '@/api/modules/log';
+import { cleanLogs, getLoginLogs } from '@/api/modules/log';
 import Submenu from '@/views/log/index.vue';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
+import i18n from '@/lang';
+import { ElMessage } from 'element-plus';
 
 const data = ref();
+const confirmDialogRef = ref();
 const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 15,
@@ -51,6 +62,21 @@ const search = async () => {
     const res = await getLoginLogs(params);
     data.value = res.data.items;
     paginationConfig.total = res.data.total;
+};
+
+const onClean = async () => {
+    let params = {
+        header: i18n.global.t('logs.deleteLogs'),
+        operationInfo: i18n.global.t('commons.msg.delete'),
+        submitInputInfo: i18n.global.t('logs.deleteLogs'),
+    };
+    confirmDialogRef.value!.acceptParams(params);
+};
+
+const onSubmitClean = async () => {
+    await cleanLogs('login');
+    search();
+    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 onMounted(() => {
