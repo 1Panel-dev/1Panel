@@ -5,10 +5,12 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/captcha"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/backend/utils/qqwry"
 	"github.com/gin-gonic/gin"
 )
 
@@ -30,6 +32,7 @@ func (b *BaseApi) Login(c *gin.Context) {
 	}
 
 	user, err := authService.Login(c, req)
+	go saveLoginLogs(c, err)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -101,4 +104,23 @@ func (b *BaseApi) SafeEntrance(c *gin.Context) {
 	c.SetCookie(codeWithMD5, cookieValue, 604800, "", "", false, false)
 
 	helper.SuccessWithData(c, nil)
+}
+
+func saveLoginLogs(c *gin.Context, err error) {
+	var logs model.LoginLog
+	if err != nil {
+		logs.Status = constant.StatusFailed
+		logs.Message = err.Error()
+	} else {
+		logs.Status = constant.StatusSuccess
+	}
+	logs.IP = c.ClientIP()
+	qqWry, err := qqwry.NewQQwry()
+	if err != nil {
+		global.LOG.Errorf("load qqwry datas failed: %s", err)
+	}
+	res := qqWry.Find(logs.IP)
+	logs.Agent = c.GetHeader("User-Agent")
+	logs.Address = res.Area
+	_ = logService.CreateLoginLog(logs)
 }

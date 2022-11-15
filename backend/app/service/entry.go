@@ -27,12 +27,13 @@ type ServiceGroup struct {
 	SettingService
 	BackupService
 
-	OperationService
 	WebsiteGroupService
 	WebsiteService
 	WebSiteDnsAccountService
 	WebSiteSSLService
 	WebSiteAcmeAccountService
+
+	LogService
 }
 
 var ServiceGroupApp = new(ServiceGroup)
@@ -63,11 +64,12 @@ var (
 	settingRepo = repo.RepoGroupApp.SettingRepo
 	backupRepo  = repo.RepoGroupApp.BackupRepo
 
-	operationRepo     = repo.RepoGroupApp.OperationRepo
 	websiteRepo       = repo.RepoGroupApp.WebSiteRepo
 	websiteGroupRepo  = repo.RepoGroupApp.WebSiteGroupRepo
 	websiteDomainRepo = repo.RepoGroupApp.WebSiteDomainRepo
 	websiteDnsRepo    = repo.RepoGroupApp.WebsiteDnsAccountRepo
 	websiteSSLRepo    = repo.RepoGroupApp.WebsiteSSLRepo
 	websiteAcmeRepo   = repo.RepoGroupApp.WebsiteAcmeAccountRepo
+
+	logRepo = repo.RepoGroupApp.LogRepo
 )
