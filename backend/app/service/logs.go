@@ -19,6 +19,8 @@ type ILogService interface {
 
 	CreateOperationLog(operation model.OperationLog) error
 	PageOperationLog(search dto.PageInfo) (int64, interface{}, error)
+
+	CleanLogs(logtype string) error
 }
 
 func NewILogService() ILogService {
@@ -68,6 +70,13 @@ func (u *LogService) PageOperationLog(search dto.PageInfo) (int64, interface{}, 
 		dtoOps = append(dtoOps, item)
 	}
 	return total, dtoOps, err
+}
+
+func (u *LogService) CleanLogs(logtype string) error {
+	if logtype == "operation" {
+		return logRepo.CleanOperation()
+	}
+	return logRepo.CleanLogin()
 }
 
 func filterSensitive(vars string) string {

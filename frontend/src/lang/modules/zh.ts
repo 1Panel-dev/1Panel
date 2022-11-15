@@ -495,6 +495,7 @@ export default {
         loginAgent: '用户代理',
         loginStatus: '登录状态',
         system: '系统日志',
+        deleteLogs: '清空日志',
         detail: {
             users: '用户',
             hosts: '主机',

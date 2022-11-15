@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"errors"
+
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -43,4 +45,19 @@ func (b *BaseApi) GetOperationLogs(c *gin.Context) {
 		Items: list,
 		Total: total,
 	})
+}
+
+func (b *BaseApi) CleanLogs(c *gin.Context) {
+	logtype, ok := c.Params.Get("logtype")
+	if !ok {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, errors.New("error logtype in path"))
+		return
+	}
+
+	if err := logService.CleanLogs(logtype); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
 }
