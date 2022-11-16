@@ -12,6 +12,7 @@ services:
       - ./conf/nginx.conf:/etc/nginx/nginx.conf
       - ./log:/var/log/nginx
       - ./conf/conf.d:/etc/nginx/conf.d/
+      - ./ssl:/etc/nginx/ssl
 
 networks:
   1panel:

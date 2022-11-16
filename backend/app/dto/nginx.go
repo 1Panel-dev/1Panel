@@ -21,6 +21,7 @@ type NginxScope string
 const (
 	Index     NginxScope = "index"
 	LimitConn NginxScope = "limit-conn"
+	SSL       NginxScope = "ssl"
 )
 
 type NginxOp string
@@ -34,6 +35,7 @@ const (
 var ScopeKeyMap = map[NginxScope][]string{
 	Index:     {"index"},
 	LimitConn: {"limit_conn", "limit_rate", "limit_conn_zone"},
+	SSL:       {"ssl_certificate", "ssl_certificate_key"},
 }
 
 var RepeatKeys = map[string]struct {

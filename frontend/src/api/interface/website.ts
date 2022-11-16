@@ -14,6 +14,19 @@ export namespace WebSite {
         appinstall?: NewAppInstall;
     }
 
+    export interface WebSiteDTO extends CommonModel {
+        primaryDomain: string;
+        type: string;
+        alias: string;
+        remark: string;
+        domains: WebSite.Domain[];
+        appType: string;
+        appInstallId?: number;
+        webSiteGroupId: number;
+        otherDomains: string;
+        appinstall?: NewAppInstall;
+    }
+
     export interface NewAppInstall {
         name: string;
         appDetailId: number;
@@ -115,6 +128,19 @@ export namespace WebSite {
         startDate: string;
     }
 
+    export interface SSLCreate {
+        domains: string[];
+        provider: string;
+        websiteId: number;
+        acmeAccountId: number;
+        dnsAccountId: number;
+    }
+
+    export interface SSLApply {
+        websiteId: number;
+        SSLId: number;
+    }
+
     export interface AcmeAccount extends CommonModel {
         email: string;
         url: string;
@@ -122,5 +148,16 @@ export namespace WebSite {
 
     export interface AcmeAccountCreate {
         email: string;
+    }
+
+    export interface DNSResolveReq {
+        domains: string[];
+        acmeAccountId: number;
+    }
+
+    export interface DNSResolve {
+        key: string;
+        value: string;
+        type: string;
     }
 }

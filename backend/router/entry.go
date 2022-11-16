@@ -18,6 +18,7 @@ type RouterGroup struct {
 	WebsiteGroupRouter
 	WebsiteDnsAccountRouter
 	WebsiteAcmeAccountRouter
+	WebsiteSSLRouter
 	DatabaseRouter
 }
 

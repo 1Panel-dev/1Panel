@@ -16,15 +16,15 @@
 
 <script setup lang="ts">
 import LayoutContent from '@/layout/layout-content.vue';
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import Basic from './basic/index.vue';
 import SSL from './ssl/index.vue';
 import router from '@/routers';
 
 const props = defineProps({
     id: {
-        type: Number,
-        default: 0,
+        type: String,
+        default: '0',
     },
     tab: {
         type: String,
@@ -32,10 +32,7 @@ const props = defineProps({
     },
 });
 
-const id = computed(() => {
-    return props.id;
-});
-
+let id = ref(0);
 let index = ref('basic');
 
 const changeTab = (index: string) => {
@@ -43,6 +40,7 @@ const changeTab = (index: string) => {
 };
 
 onMounted(() => {
+    id.value = Number(props.id);
     if (props.tab !== index.value) {
         index.value = props.tab;
     }

@@ -28,7 +28,7 @@ func (w WebSiteRepo) Page(page, size int, opts ...DBOption) (int64, []model.WebS
 func (w WebSiteRepo) GetFirst(opts ...DBOption) (model.WebSite, error) {
 	var website model.WebSite
 	db := getDb(opts...).Model(&model.WebSite{})
-	if err := db.First(&website).Error; err != nil {
+	if err := db.Preload("Domains").First(&website).Error; err != nil {
 		return website, err
 	}
 	return website, nil

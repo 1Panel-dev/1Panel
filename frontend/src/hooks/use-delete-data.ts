@@ -31,7 +31,7 @@ export const useDeleteData = <P = any, R = any>(
                 if (!res) return reject(false);
                 ElMessage({
                     type: 'success',
-                    message: i18n.global.t('commons.msg.deleteSuccess'),
+                    message: i18n.global.t('commons.msg.operationSuccess'),
                 });
                 resolve(true);
             })

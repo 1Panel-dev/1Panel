@@ -1,8 +1,18 @@
 package repo
 
-import "github.com/1Panel-dev/1Panel/backend/app/model"
+import (
+	"context"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"gorm.io/gorm"
+)
 
 type WebsiteSSLRepo struct {
+}
+
+func (w WebsiteSSLRepo) ByAlias(alias string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("alias = ?", alias)
+	}
 }
 
 func (w WebsiteSSLRepo) Page(page, size int, opts ...DBOption) (int64, []model.WebSiteSSL, error) {
@@ -14,8 +24,17 @@ func (w WebsiteSSLRepo) Page(page, size int, opts ...DBOption) (int64, []model.W
 	return count, sslList, err
 }
 
-func (w WebsiteSSLRepo) Create(ssl model.WebSiteSSL) error {
-	return getDb().Create(&ssl).Error
+func (w WebsiteSSLRepo) GetFirst(opts ...DBOption) (model.WebSiteSSL, error) {
+	var website model.WebSiteSSL
+	db := getDb(opts...).Model(&model.WebSiteSSL{})
+	if err := db.First(&website).Error; err != nil {
+		return website, err
+	}
+	return website, nil
+}
+
+func (w WebsiteSSLRepo) Create(ctx context.Context, ssl *model.WebSiteSSL) error {
+	return getTx(ctx).Create(ssl).Error
 }
 
 func (w WebsiteSSLRepo) Save(ssl model.WebSiteSSL) error {

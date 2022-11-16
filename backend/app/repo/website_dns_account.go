@@ -16,6 +16,15 @@ func (w WebsiteDnsAccountRepo) Page(page, size int, opts ...DBOption) (int64, []
 	return count, accounts, err
 }
 
+func (w WebsiteDnsAccountRepo) GetFirst(opts ...DBOption) (model.WebsiteDnsAccount, error) {
+	var account model.WebsiteDnsAccount
+	db := getDb(opts...).Model(&model.WebsiteDnsAccount{})
+	if err := db.First(&account).Error; err != nil {
+		return account, err
+	}
+	return account, nil
+}
+
 func (w WebsiteDnsAccountRepo) Create(account model.WebsiteDnsAccount) error {
 	return getDb().Create(&account).Error
 }

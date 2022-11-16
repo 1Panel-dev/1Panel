@@ -65,7 +65,7 @@ const types = [
     },
     {
         label: i18n.global.t('website.aliyun'),
-        value: 'Aliyun',
+        value: 'AliYun',
     },
     {
         label: 'CloudFlare',
