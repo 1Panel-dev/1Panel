@@ -10,14 +10,14 @@ const hostRouter = {
         title: 'menu.host',
     },
     children: [
-        {
-            path: '/hosts/security',
-            name: 'Security',
-            component: () => import('@/views/host/security/index.vue'),
-            meta: {
-                title: 'menu.security',
-            },
-        },
+        // {
+        //     path: '/hosts/security',
+        //     name: 'Security',
+        //     component: () => import('@/views/host/security/index.vue'),
+        //     meta: {
+        //         title: 'menu.security',
+        //     },
+        // },
         {
             path: '/hosts/files',
             name: 'File',

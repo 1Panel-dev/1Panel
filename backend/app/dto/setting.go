@@ -13,6 +13,7 @@ type SettingInfo struct {
 
 	ServerPort             int    `json:"serverPort"`
 	SecurityEntrance       string `json:"securityEntrance"`
+	ExpirationDays         int    `json:"expirationDays"`
 	ExpirationTime         string `json:"expirationTime"`
 	ComplexityVerification string `json:"complexityVerification"`
 	MFAStatus              string `json:"mfaStatus"`

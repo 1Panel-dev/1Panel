@@ -56,6 +56,7 @@ let form = ref<Setting.SettingInfo>({
     language: '',
     serverPort: 8888,
     securityEntrance: '',
+    expirationDays: 0,
     expirationTime: '',
     complexityVerification: '',
     mfaStatus: '',
@@ -72,6 +73,7 @@ const search = async () => {
     const res = await getSettingInfo();
     form.value = res.data;
     form.value.password = '******';
+    form.value.expirationTime = form.value.expirationDays === 0 ? '-' : form.value.expirationTime;
 };
 
 const { switchDark } = useTheme();

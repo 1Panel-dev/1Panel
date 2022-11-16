@@ -148,9 +148,9 @@
                 </el-row>
             </el-card>
         </el-form>
-        <el-dialog v-model="timeoutVisiable" :title="$t('setting.changePassword')" width="30%">
+        <el-dialog v-model="timeoutVisiable" :title="$t('setting.expirationTime')" width="30%">
             <el-form ref="timeoutFormRef" label-width="80px" label-position="left" :model="timeoutForm">
-                <el-form-item :label="$t('setting.oldPassword')" prop="days" :rules="Rules.number">
+                <el-form-item :label="$t('setting.days')" prop="days" :rules="Rules.number">
                     <el-input clearable v-model.number="timeoutForm.days" />
                 </el-form-item>
             </el-form>
@@ -194,7 +194,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const timeoutFormRef = ref<FormInstance>();
 const timeoutVisiable = ref<boolean>(false);
 const timeoutForm = reactive({
-    days: 10,
+    days: 0,
 });
 
 const isMFAShow = ref<boolean>(false);
@@ -237,14 +237,17 @@ const submitTimeout = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         let time = new Date(new Date().getTime() + 3600 * 1000 * 24 * timeoutForm.days);
-        await updateSetting({ key: 'expirationTime', value: dateFromat(0, 0, time) });
+        await updateSetting({ key: 'ExpirationDays', value: timeoutForm.days + '' });
         form.settingInfo.expirationTime = dateFromat(0, 0, time);
         timeoutVisiable.value = false;
     });
 };
 
 function loadTimeOut() {
+    if (form.settingInfo.expirationDays === 0) {
+        return '-';
+    }
     let staytimeGap = new Date(form.settingInfo.expirationTime).getTime() - new Date().getTime();
-    return Math.floor(staytimeGap / (3600 * 1000 * 24));
+    return staytimeGap < 0 ? '-' : Math.floor(staytimeGap / (3600 * 1000 * 24));
 }
 </script>

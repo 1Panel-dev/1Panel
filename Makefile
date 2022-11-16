@@ -1,8 +1,8 @@
 GOCMD=go
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
-GOARCH=$(shell go env GOARCH)
-GOOS=$(shell go env GOOS )
+GOARCH=amd64
+GOOS=linux
 
 BASE_PAH := $(shell pwd)
 BUILD_PATH = $(BASE_PAH)/build
@@ -16,7 +16,6 @@ build_web:
 
 build_bin:
 	cd $(SERVER_PATH) \
-    && GOOS=$(GOOS) GOARCH=$(GOARCH)  $(GOBUILD) -trimpath  -ldflags "-s -w"  -o $(BUILD_PATH)/$(APP_NAME) $(MAIN)
+    && CGO_ENABLED=1 GOOS=$(GOOS) GOARCH=$(GOARCH) CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ $(GOBUILD) -trimpath -ldflags '-s -w --extldflags "-static -fpic"'  -o $(BUILD_PATH)/$(APP_NAME) $(MAIN)
 
 build_all: build_web  build_bin
-

@@ -66,7 +66,13 @@
                     {{ loadBackupName(row.targetDir) }}
                 </template>
             </el-table-column>
-            <fu-table-operations type="icon" :buttons="buttons" :label="$t('commons.table.operate')" fix />
+            <fu-table-operations
+                width="200px"
+                :buttons="buttons"
+                :ellipsis="10"
+                :label="$t('commons.table.operate')"
+                fix
+            />
         </ComplexTable>
 
         <OperatrDialog @search="search" ref="dialogRef" />

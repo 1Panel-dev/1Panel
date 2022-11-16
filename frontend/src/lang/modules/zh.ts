@@ -619,6 +619,7 @@ export default {
         safeEntrance: '安全入口',
         safeEntranceHelper: '面板管理入口，设置后只能通过指定安全入口登录面板，如: onepanel',
         expirationTime: '密码过期时间',
+        days: '过期天数',
         expiredHelper: '当前密码已过期，请重新修改密码：',
         timeoutHelper: '【 {0} 天后 】面板密码即将过期，过期后需要重新设置密码',
         complexity: '密码复杂度验证',
