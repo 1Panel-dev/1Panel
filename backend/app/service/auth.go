@@ -2,6 +2,7 @@ package service
 
 import (
 	"strconv"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -18,12 +19,30 @@ type AuthService struct{}
 type IAuthService interface {
 	SafetyStatus(c *gin.Context) error
 	VerifyCode(code string) (bool, error)
+	SafeEntrance(c *gin.Context, code string) error
 	Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error)
 	LogOut(c *gin.Context) error
 }
 
 func NewIAuthService() IAuthService {
 	return &AuthService{}
+}
+
+func (u *AuthService) SafeEntrance(c *gin.Context, code string) error {
+	codeWithMD5 := encrypt.Md5(code)
+	cookieValue, _ := encrypt.StringEncrypt(codeWithMD5)
+	c.SetCookie(codeWithMD5, cookieValue, 604800, "", "", false, false)
+
+	expiredSetting, err := settingRepo.Get(settingRepo.WithByKey("ExpirationDays"))
+	if err != nil {
+		return err
+	}
+	timeout, _ := strconv.Atoi(expiredSetting.Value)
+	c.SetCookie(constant.PasswordExpiredName, encrypt.Md5(time.Now().Format("20060102150405")), 86400*timeout, "", "", false, false)
+	if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006.01.02 15:04:05")); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *AuthService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error) {

@@ -9,7 +9,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/captcha"
-	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/backend/utils/qqwry"
 	"github.com/gin-gonic/gin"
 )
@@ -99,9 +98,10 @@ func (b *BaseApi) SafeEntrance(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrUnSafety, constant.ErrTypeNotSafety, errors.New("missing code"))
 		return
 	}
-	codeWithMD5 := encrypt.Md5(code)
-	cookieValue, _ := encrypt.StringEncrypt(codeWithMD5)
-	c.SetCookie(codeWithMD5, cookieValue, 604800, "", "", false, false)
+	if err := authService.SafeEntrance(c, code); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrUnSafety, constant.ErrTypeNotSafety, errors.New("missing code"))
+		return
+	}
 
 	helper.SuccessWithData(c, nil)
 }

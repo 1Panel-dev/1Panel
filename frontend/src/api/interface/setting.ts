@@ -13,6 +13,7 @@ export namespace Setting {
 
         serverPort: number;
         securityEntrance: string;
+        expirationDays: number;
         expirationTime: string;
         complexityVerification: string;
         mfaStatus: string;

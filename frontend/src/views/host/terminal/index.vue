@@ -358,6 +358,7 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
+        hostInfo.groupBelong = 'default';
         switch (ops) {
             case 'testConn':
                 await testConn(hostInfo);

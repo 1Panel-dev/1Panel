@@ -57,7 +57,7 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "Password", Value: "Sr2qOhssQNg8rGRvqyWhsBDJx+tV5VfLEZXdbax//dA="}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "Email", Value: ""}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "Email", Value: "test@qq.com"}).Error; err != nil {
 			return err
 		}
 
@@ -67,7 +67,7 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "Language", Value: "zh"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "Theme", Value: "auto"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "Theme", Value: "light"}).Error; err != nil {
 			return err
 		}
 

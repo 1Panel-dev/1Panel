@@ -1,14 +1,16 @@
 package db
 
-import "github.com/1Panel-dev/1Panel/backend/global"
+import (
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+)
 
 func Init() {
-	switch global.CONF.System.DbType {
-	case "mysql":
-		global.DB = MysqlGorm()
-	case "sqlite":
-		global.DB = SqliteGorm()
-	default:
-		global.DB = MysqlGorm()
+	s := global.CONF.Sqlite
+	db, err := gorm.Open(sqlite.Open(s.Dsn()), &gorm.Config{})
+	if err != nil {
+		panic(err)
 	}
+	global.DB = db
 }

@@ -43,6 +43,7 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	info.MonitorStoreDays, _ = strconv.Atoi(settingMap["MonitorStoreDays"])
 	info.ServerPort, _ = strconv.Atoi(settingMap["ServerPort"])
 	info.SessionTimeout, _ = strconv.Atoi(settingMap["SessionTimeout"])
+	info.ExpirationDays, _ = strconv.Atoi(settingMap["ExpirationDays"])
 	info.LocalTime = time.Now().Format("2006-01-02 15:04:05")
 	return &info, err
 }

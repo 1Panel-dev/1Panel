@@ -32,7 +32,12 @@
                         {{ dateFromat(0, 0, row.createdAt) }}
                     </template>
                 </el-table-column>
-                <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" />
+                <fu-table-operations
+                    width="200px"
+                    :ellipsis="10"
+                    :buttons="buttons"
+                    :label="$t('commons.table.operate')"
+                />
             </ComplexTable>
         </el-card>
 

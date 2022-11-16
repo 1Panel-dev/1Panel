@@ -605,6 +605,7 @@ export default {
         safeEntranceHelper:
             'Panel management portal. You can log in to the panel only through a specified security portal, for example: onepanel',
         expirationTime: 'Expiration Time',
+        days: 'Expiration Days',
         expiredHelper: 'The current password has expired. Please change the password again.',
         timeoutHelper:
             '[ {0} days ] The panel password is about to expire. After the expiration, you need to reset the password',

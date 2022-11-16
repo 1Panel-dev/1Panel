@@ -57,7 +57,13 @@
                     :formatter="dateFromat"
                     show-overflow-tooltip
                 />
-                <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
+                <fu-table-operations
+                    width="200px"
+                    :ellipsis="10"
+                    :buttons="buttons"
+                    :label="$t('commons.table.operate')"
+                    fix
+                />
             </ComplexTable>
         </el-card>
 

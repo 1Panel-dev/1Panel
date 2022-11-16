@@ -21,13 +21,13 @@ func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		baRouter.GET("/exec", baseApi.ContainerExec)
+		baRouter.GET("/stats/:id", baseApi.ContainerStats)
 
 		baRouter.POST("/search", baseApi.SearchContainer)
 		baRouter.POST("/inspect", baseApi.Inspect)
 		baRouter.POST("", baseApi.ContainerCreate)
 		withRecordRouter.POST("operate", baseApi.ContainerOperation)
 		withRecordRouter.POST("/log", baseApi.ContainerLogs)
-		withRecordRouter.GET("/stats/:id", baseApi.ContainerStats)
 
 		baRouter.POST("/repo/search", baseApi.SearchRepo)
 		baRouter.PUT("/repo/:id", baseApi.UpdateRepo)
