@@ -6,8 +6,34 @@ type WebsiteSSLDTO struct {
 	model.WebSiteSSL
 }
 
+type SSLProvider string
+
+const (
+	DNSAccount = "dnsAccount"
+	DnsCommon  = "dnsCommon"
+	Http       = "http"
+)
+
 type WebsiteSSLCreate struct {
-	Name          string            `json:"name" validate:"required"`
-	Type          string            `json:"type" validate:"required"`
-	Authorization map[string]string `json:"authorization" validate:"required"`
+	Domains       []string    `json:"domains" validate:"required"`
+	Provider      SSLProvider `json:"provider" validate:"required"`
+	WebsiteID     uint        `json:"websiteId" validate:"required"`
+	AcmeAccountID uint        `json:"acmeAccountId"`
+	DnsAccountID  uint        `json:"dnsAccountId"`
+}
+
+type WebsiteSSLApply struct {
+	WebsiteID uint `json:"websiteId" validate:"required"`
+	SSLID     uint `json:"SSLId" validate:"required"`
+}
+
+type WebsiteDNSReq struct {
+	Domains       []string `json:"domains" validate:"required"`
+	AcmeAccountID uint     `json:"acmeAccountId"  validate:"required"`
+}
+
+type WebsiteDNSRes struct {
+	Key   string `json:"resolve"`
+	Value string `json:"value"`
+	Type  string `json:"type"`
 }

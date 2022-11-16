@@ -14,6 +14,15 @@ func (w WebsiteAcmeAccountRepo) Page(page, size int, opts ...DBOption) (int64, [
 	return count, accounts, err
 }
 
+func (w WebsiteAcmeAccountRepo) GetFirst(opts ...DBOption) (model.WebsiteAcmeAccount, error) {
+	var account model.WebsiteAcmeAccount
+	db := getDb(opts...).Model(&model.WebsiteAcmeAccount{})
+	if err := db.First(&account).Error; err != nil {
+		return account, err
+	}
+	return account, nil
+}
+
 func (w WebsiteAcmeAccountRepo) Create(account model.WebsiteAcmeAccount) error {
 	return getDb().Create(&account).Error
 }

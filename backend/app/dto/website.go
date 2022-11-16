@@ -28,6 +28,10 @@ type WebSiteCreate struct {
 	WebSiteGroupID uint          `json:"webSiteGroupID" validate:"required"`
 }
 
+type WebsiteDTO struct {
+	model.WebSite
+}
+
 type WebSiteUpdate struct {
 	ID             uint   `json:"id" validate:"required"`
 	PrimaryDomain  string `json:"primaryDomain" validate:"required"`

@@ -15,6 +15,7 @@ import (
 	"gorm.io/gorm"
 	"os"
 	"path"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -258,16 +259,38 @@ func updateNginxConfig(website model.WebSite, params []dto.NginxParam, scope dto
 }
 
 func updateConfig(config *components.Config, scope dto.NginxScope) {
-	if scope == dto.LimitConn {
-		limit := parser.NewStringParser(string(nginx_conf.Limit)).Parse()
-		for _, dir := range limit.GetDirectives() {
-			newDir := components.Directive{
-				Name:       dir.GetName(),
-				Parameters: dir.GetParameters(),
-			}
-			config.UpdateDirectiveBySecondKey(dir.GetName(), dir.GetParameters()[0], newDir)
-		}
+	newConfig := &components.Config{}
+	switch scope {
+	case dto.LimitConn:
+		newConfig = parser.NewStringParser(string(nginx_conf.Limit)).Parse()
 	}
+	if reflect.DeepEqual(newConfig, &components.Config{}) {
+		return
+	}
+
+	for _, dir := range newConfig.GetDirectives() {
+		newDir := components.Directive{
+			Name:       dir.GetName(),
+			Parameters: dir.GetParameters(),
+		}
+		config.UpdateDirectiveBySecondKey(dir.GetName(), dir.GetParameters()[0], newDir)
+	}
+}
+
+func getNginxParamsFromStaticFile(scope dto.NginxScope) []dto.NginxParam {
+	var nginxParams []dto.NginxParam
+	newConfig := &components.Config{}
+	switch scope {
+	case dto.SSL:
+		newConfig = parser.NewStringParser(string(nginx_conf.SSL)).Parse()
+	}
+	for _, dir := range newConfig.GetDirectives() {
+		nginxParams = append(nginxParams, dto.NginxParam{
+			Name:   dir.GetName(),
+			Params: dir.GetParameters(),
+		})
+	}
+	return nginxParams
 }
 
 func deleteNginxConfig(website model.WebSite, keys []string) error {
@@ -283,6 +306,48 @@ func deleteNginxConfig(website model.WebSite, keys []string) error {
 		return err
 	}
 	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxConfig.ContainerName)
+}
+
+func createPemFile(websiteSSL model.WebSiteSSL) error {
+	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
+	if err != nil {
+		return err
+	}
+	nginxInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithAppId(nginxApp.ID))
+	if err != nil {
+		return err
+	}
+
+	configDir := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "ssl", websiteSSL.Alias)
+	fileOp := files.NewFileOp()
+
+	if !fileOp.Stat(configDir) {
+		if err := fileOp.CreateDir(configDir, 0775); err != nil {
+			return err
+		}
+	}
+
+	fullChainFile := path.Join(configDir, "fullchain.pem")
+	privatePemFile := path.Join(configDir, "privkey.pem")
+
+	if !fileOp.Stat(fullChainFile) {
+		if err := fileOp.CreateFile(fullChainFile); err != nil {
+			return err
+		}
+	}
+	if !fileOp.Stat(privatePemFile) {
+		if err := fileOp.CreateFile(privatePemFile); err != nil {
+			return err
+		}
+	}
+
+	if err := fileOp.WriteFile(fullChainFile, strings.NewReader(websiteSSL.Pem), 0644); err != nil {
+		return err
+	}
+	if err := fileOp.WriteFile(privatePemFile, strings.NewReader(websiteSSL.PrivateKey), 0644); err != nil {
+		return err
+	}
+	return nil
 }
 
 func getParamArray(key string, param interface{}) []string {

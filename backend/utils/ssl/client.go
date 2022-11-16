@@ -7,6 +7,7 @@ import (
 	"github.com/go-acme/lego/v4/challenge"
 	"github.com/go-acme/lego/v4/challenge/dns01"
 	"github.com/go-acme/lego/v4/lego"
+	"github.com/go-acme/lego/v4/providers/dns/alidns"
 	"github.com/go-acme/lego/v4/providers/dns/dnspod"
 	"github.com/go-acme/lego/v4/registration"
 	"github.com/pkg/errors"
@@ -58,7 +59,8 @@ func NewAcmeClient(email, privateKey string) (*AcmeClient, error) {
 type DnsType string
 
 const (
-	DnsPod DnsType = "dnsPod"
+	DnsPod DnsType = "DnsPod"
+	AliYun DnsType = "AliYun"
 )
 
 type DNSParam struct {
@@ -87,9 +89,37 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string) error {
 			return err
 		}
 	}
+	if dnsType == AliYun {
+		alidnsConfig := alidns.NewDefaultConfig()
+		alidnsConfig.SecretKey = param.SecretKey
+		alidnsConfig.APIKey = param.AccessKey
+		p, err = alidns.NewDNSProviderConfig(alidnsConfig)
+		if err != nil {
+			return err
+		}
+	}
 
 	return c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(6*time.Minute))
 }
+
+func (c *AcmeClient) UseManualDns(domains []string) (*Resolve, error) {
+	p := &manualDnsProvider{}
+	if err := c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(6*time.Minute)); err != nil {
+		return nil, nil
+	}
+
+	request := certificate.ObtainRequest{
+		Domains: domains,
+		Bundle:  true,
+	}
+
+	_, err := c.Client.Certificate.Obtain(request)
+	if err != nil {
+		return nil, err
+	}
+	return p.Resolve, nil
+}
+
 func (c *AcmeClient) UseHTTP() {
 
 }
@@ -107,4 +137,30 @@ func (c *AcmeClient) GetSSL(domains []string) (certificate.Resource, error) {
 	}
 
 	return *certificates, nil
+}
+
+type Resolve struct {
+	Key   string
+	Value string
+}
+
+type manualDnsProvider struct {
+	Resolve *Resolve
+}
+
+func (p *manualDnsProvider) Present(domain, token, keyAuth string) error {
+	fqdn, value := dns01.GetRecord(domain, keyAuth)
+	p.Resolve = &Resolve{
+		Key:   fqdn,
+		Value: value,
+	}
+	return nil
+}
+
+func (p *manualDnsProvider) CleanUp(domain, token, keyAuth string) error {
+	return nil
+}
+
+func (c *AcmeClient) GetDNSResolve() {
+
 }

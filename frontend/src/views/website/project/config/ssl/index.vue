@@ -7,7 +7,7 @@
             <Account :id="id" v-if="index == '1'"></Account>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.applySSL')">
-            <SSL v-if="index == '2'"></SSL>
+            <SSL :id="id" v-if="index == '2'"></SSL>
         </el-tab-pane>
     </el-tabs>
 </template>

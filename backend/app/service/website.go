@@ -99,12 +99,14 @@ func (w WebsiteService) UpdateWebsite(req dto.WebSiteUpdate) error {
 	return websiteRepo.Save(context.TODO(), &website)
 }
 
-func (w WebsiteService) GetWebsite(id uint) (model.WebSite, error) {
+func (w WebsiteService) GetWebsite(id uint) (dto.WebsiteDTO, error) {
+	var res dto.WebsiteDTO
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
 	if err != nil {
-		return website, err
+		return res, err
 	}
-	return website, nil
+	res.WebSite = website
+	return res, nil
 }
 
 func (w WebsiteService) DeleteWebSite(req dto.WebSiteDel) error {
