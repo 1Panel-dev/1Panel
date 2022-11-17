@@ -14,7 +14,7 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
-            <div v-if="account.type === 'Aliyun'">
+            <div v-if="account.type === 'AliYun'">
                 <el-form-item label="AccessKey" prop="authorization.accessKey">
                     <el-input v-model="account.authorization['accessKey']"></el-input>
                 </el-form-item>

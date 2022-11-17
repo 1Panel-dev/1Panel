@@ -68,7 +68,7 @@ const search = async () => {
 };
 
 const openConfig = (id: number) => {
-    router.push({ name: 'WebsiteConfig', params: { id: id, tab: 'ssl' } });
+    router.push({ name: 'WebsiteConfig', params: { id: id, tab: 'basic' } });
 };
 
 const buttons = [

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"crypto/x509"
+	"encoding/pem"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
@@ -31,54 +32,114 @@ func (w WebSiteSSLService) Create(create dto.WebsiteSSLCreate) (dto.WebsiteSSLCr
 	if err != nil {
 		return res, err
 	}
-	dnsAccount, err := websiteDnsRepo.GetFirst(commonRepo.WithByID(create.DnsAccountID))
-	if err != nil {
-		return res, err
-	}
+
 	client, err := ssl.NewPrivateKeyClient(acmeAccount.Email, acmeAccount.PrivateKey)
 	if err != nil {
 		return res, err
 	}
-	if create.Provider == dto.Http {
 
-	} else {
+	switch create.Provider {
+	case dto.DNSAccount:
+		dnsAccount, err := websiteDnsRepo.GetFirst(commonRepo.WithByID(create.DnsAccountID))
+
+		if err != nil {
+			return res, err
+		}
+
 		if err := client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization); err != nil {
 			return res, err
 		}
+	case dto.Http:
+	case dto.DnsManual:
+
 	}
 
-	resource, err := client.GetSSL(create.Domains)
+	domains := []string{create.PrimaryDomain}
+	otherDomainArray := strings.Split(create.OtherDomains, "\n")
+	if create.OtherDomains != "" {
+		domains = append(otherDomainArray, domains...)
+	}
+	resource, err := client.ObtainSSL(domains)
 	if err != nil {
 		return res, err
 	}
-
 	var websiteSSL model.WebSiteSSL
-
-	//TODO 判断同一个账号下的证书
-	websiteSSL.Alias = create.Domains[0]
-	websiteSSL.Domain = strings.Join(create.Domains, ",")
+	websiteSSL.DnsAccountID = create.DnsAccountID
+	websiteSSL.AcmeAccountID = acmeAccount.ID
+	websiteSSL.Provider = string(create.Provider)
+	websiteSSL.Domains = strings.Join(otherDomainArray, ",")
+	websiteSSL.PrimaryDomain = create.PrimaryDomain
 	websiteSSL.PrivateKey = string(resource.PrivateKey)
 	websiteSSL.Pem = string(resource.Certificate)
 	websiteSSL.CertURL = resource.CertURL
-
-	cert, err := x509.ParseCertificate([]byte(websiteSSL.Pem))
+	certBlock, _ := pem.Decode(resource.Certificate)
+	cert, err := x509.ParseCertificate(certBlock.Bytes)
 	if err != nil {
 		return dto.WebsiteSSLCreate{}, err
 	}
 	websiteSSL.ExpireDate = cert.NotAfter
 	websiteSSL.StartDate = cert.NotBefore
 	websiteSSL.Type = cert.Issuer.CommonName
-	websiteSSL.IssuerName = cert.Issuer.Organization[0]
+	websiteSSL.Organization = cert.Issuer.Organization[0]
 
-	if err := createPemFile(websiteSSL); err != nil {
-		return dto.WebsiteSSLCreate{}, err
-	}
+	//if err := createPemFile(websiteSSL); err != nil {
+	//	return dto.WebsiteSSLCreate{}, err
+	//}
 
 	if err := websiteSSLRepo.Create(context.TODO(), &websiteSSL); err != nil {
 		return res, err
 	}
 
 	return create, nil
+}
+
+func (w WebSiteSSLService) Renew(sslId uint) error {
+
+	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(sslId))
+	if err != nil {
+		return err
+	}
+	acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(websiteSSL.AcmeAccountID))
+	if err != nil {
+		return err
+	}
+
+	client, err := ssl.NewPrivateKeyClient(acmeAccount.Email, acmeAccount.PrivateKey)
+	if err != nil {
+		return err
+	}
+	switch websiteSSL.Provider {
+	case dto.DNSAccount:
+		dnsAccount, err := websiteDnsRepo.GetFirst(commonRepo.WithByID(websiteSSL.DnsAccountID))
+		if err != nil {
+			return err
+		}
+		if err := client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization); err != nil {
+			return err
+		}
+	case dto.Http:
+	case dto.DnsManual:
+
+	}
+
+	resource, err := client.RenewSSL(websiteSSL.CertURL)
+	if err != nil {
+		return err
+	}
+	websiteSSL.PrivateKey = string(resource.PrivateKey)
+	websiteSSL.Pem = string(resource.Certificate)
+	websiteSSL.CertURL = resource.CertURL
+	certBlock, _ := pem.Decode(resource.Certificate)
+	cert, err := x509.ParseCertificate(certBlock.Bytes)
+	if err != nil {
+		return err
+	}
+	websiteSSL.ExpireDate = cert.NotAfter
+	websiteSSL.StartDate = cert.NotBefore
+	websiteSSL.Type = cert.Issuer.CommonName
+	websiteSSL.Organization = cert.Issuer.Organization[0]
+
+	return websiteSSLRepo.Save(websiteSSL)
 }
 
 func (w WebSiteSSLService) Apply(apply dto.WebsiteSSLApply) (dto.WebsiteSSLApply, error) {
@@ -96,10 +157,10 @@ func (w WebSiteSSLService) Apply(apply dto.WebsiteSSLApply) (dto.WebsiteSSLApply
 	nginxParams := getNginxParamsFromStaticFile(dto.SSL)
 	for i, param := range nginxParams {
 		if param.Name == "ssl_certificate" {
-			nginxParams[i].Params = []string{path.Join("/etc/nginx/ssl", websiteSSL.Alias, "fullchain.pem")}
+			nginxParams[i].Params = []string{path.Join("/etc/nginx/ssl", websiteSSL.PrimaryDomain, "fullchain.pem")}
 		}
 		if param.Name == "ssl_certificate_key" {
-			nginxParams[i].Params = []string{path.Join("/etc/nginx/ssl", websiteSSL.Alias, "privkey.pem")}
+			nginxParams[i].Params = []string{path.Join("/etc/nginx/ssl", websiteSSL.PrimaryDomain, "privkey.pem")}
 		}
 	}
 	if err := updateNginxConfig(website, nginxParams, dto.SSL); err != nil {
@@ -131,6 +192,20 @@ func (w WebSiteSSLService) GetDNSResolve(req dto.WebsiteDNSReq) (dto.WebsiteDNSR
 	res.Key = re.Key
 	res.Value = re.Value
 	res.Type = "TXT"
+	return res, nil
+}
+
+func (w WebSiteSSLService) GetWebsiteSSL(websiteId uint) (dto.WebsiteSSLDTO, error) {
+	var res dto.WebsiteSSLDTO
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteId))
+	if err != nil {
+		return res, err
+	}
+	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(website.WebSiteSSLID))
+	if err != nil {
+		return res, err
+	}
+	res.WebSiteSSL = websiteSSL
 	return res, nil
 }
 

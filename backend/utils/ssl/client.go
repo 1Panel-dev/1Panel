@@ -99,12 +99,12 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string) error {
 		}
 	}
 
-	return c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(6*time.Minute))
+	return c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(3*time.Minute))
 }
 
 func (c *AcmeClient) UseManualDns(domains []string) (*Resolve, error) {
 	p := &manualDnsProvider{}
-	if err := c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(6*time.Minute)); err != nil {
+	if err := c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(3*time.Minute)); err != nil {
 		return nil, nil
 	}
 
@@ -124,7 +124,7 @@ func (c *AcmeClient) UseHTTP() {
 
 }
 
-func (c *AcmeClient) GetSSL(domains []string) (certificate.Resource, error) {
+func (c *AcmeClient) ObtainSSL(domains []string) (certificate.Resource, error) {
 
 	request := certificate.ObtainRequest{
 		Domains: domains,
@@ -132,6 +132,20 @@ func (c *AcmeClient) GetSSL(domains []string) (certificate.Resource, error) {
 	}
 
 	certificates, err := c.Client.Certificate.Obtain(request)
+	if err != nil {
+		return certificate.Resource{}, err
+	}
+
+	return *certificates, nil
+}
+
+func (c *AcmeClient) RenewSSL(certUrl string) (certificate.Resource, error) {
+
+	certificates, err := c.Client.Certificate.Get(certUrl, true)
+	if err != nil {
+		return certificate.Resource{}, err
+	}
+	certificates, err = c.Client.Certificate.Renew(*certificates, true, true, "")
 	if err != nil {
 		return certificate.Resource{}, err
 	}

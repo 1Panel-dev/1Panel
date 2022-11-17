@@ -98,8 +98,16 @@ export const DeleteSSL = (id: number) => {
     return http.delete<any>(`/websites/ssl/${id}`);
 };
 
+export const GetWebsiteSSL = (websiteId: number) => {
+    return http.get<WebSite.SSL>(`/websites/ssl/${websiteId}`);
+};
+
 export const ApplySSL = (req: WebSite.SSLApply) => {
     return http.post<WebSite.SSLApply>(`/websites/ssl/apply`, req);
+};
+
+export const RenewSSL = (req: WebSite.SSLRenew) => {
+    return http.post<any>(`/websites/ssl/renew`, req);
 };
 
 export const GetDnsResolve = (req: WebSite.DNSResolveReq) => {

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <el-dialog v-model="open" :title="$t('website.dnsAccountManage')">
         <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
             <template #toolbar>
                 <el-button type="primary" plain @click="openCreate">{{ $t('commons.button.create') }}</el-button>
@@ -20,7 +20,7 @@
             />
         </ComplexTable>
         <Create ref="createRef" @close="search()"></Create>
-    </div>
+    </el-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -40,6 +40,7 @@ const paginationConfig = reactive({
 let data = ref<WebSite.DnsAccount[]>();
 let createRef = ref();
 let loading = ref(false);
+let open = ref(false);
 
 const buttons = [
     {
@@ -49,6 +50,11 @@ const buttons = [
         },
     },
 ];
+
+const acceptParams = () => {
+    search();
+    open.value = true;
+};
 
 const search = () => {
     const req = {
@@ -78,5 +84,9 @@ const deleteAccount = async (id: number) => {
 
 onMounted(() => {
     search();
+});
+
+defineExpose({
+    acceptParams,
 });
 </script>

@@ -10,15 +10,15 @@ type SSLProvider string
 
 const (
 	DNSAccount = "dnsAccount"
-	DnsCommon  = "dnsCommon"
+	DnsManual  = "dnsManual"
 	Http       = "http"
 )
 
 type WebsiteSSLCreate struct {
-	Domains       []string    `json:"domains" validate:"required"`
+	PrimaryDomain string      `json:"primaryDomain" validate:"required"`
+	OtherDomains  string      `json:"otherDomains"`
 	Provider      SSLProvider `json:"provider" validate:"required"`
-	WebsiteID     uint        `json:"websiteId" validate:"required"`
-	AcmeAccountID uint        `json:"acmeAccountId"`
+	AcmeAccountID uint        `json:"acmeAccountId" validate:"required"`
 	DnsAccountID  uint        `json:"dnsAccountId"`
 }
 
@@ -36,4 +36,8 @@ type WebsiteDNSRes struct {
 	Key   string `json:"resolve"`
 	Value string `json:"value"`
 	Type  string `json:"type"`
+}
+
+type WebsiteSSLRenew struct {
+	SSLID uint `json:"SSLId" validate:"required"`
 }

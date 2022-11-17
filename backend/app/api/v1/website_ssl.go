@@ -38,6 +38,19 @@ func (b *BaseApi) CreateWebsiteSSL(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
+func (b *BaseApi) RenewWebsiteSSL(c *gin.Context) {
+	var req dto.WebsiteSSLRenew
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteSSLService.Renew(req.SSLID); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
 func (b *BaseApi) ApplyWebsiteSSL(c *gin.Context) {
 	var req dto.WebsiteSSLApply
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -73,10 +86,24 @@ func (b *BaseApi) DeleteWebsiteSSL(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-
 	if err := websiteSSLService.Delete(id); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) GetWebsiteSSL(c *gin.Context) {
+
+	websiteId, err := helper.GetIntParamByKey(c, "websiteId")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	websiteSSL, err := websiteSSLService.GetWebsiteSSL(websiteId)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, websiteSSL)
 }

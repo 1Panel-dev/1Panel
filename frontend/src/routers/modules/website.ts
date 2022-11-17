@@ -13,19 +13,27 @@ const webSiteRouter = {
         {
             path: '/websites',
             name: 'Website',
-            component: () => import('@/views/website/project/index.vue'),
+            component: () => import('@/views/website/website/index.vue'),
             meta: {
-                title: 'menu.project',
+                title: 'menu.website',
             },
         },
         {
             path: '/websites/:id/config/:tab',
             name: 'WebsiteConfig',
-            component: () => import('@/views/website/project/config/index.vue'),
+            component: () => import('@/views/website/website/config/index.vue'),
             hidden: true,
             props: true,
             meta: {
                 activeMenu: '/websites',
+            },
+        },
+        {
+            path: '/websites/ssl',
+            name: 'SSL',
+            component: () => import('@/views/website/ssl/index.vue'),
+            meta: {
+                title: 'menu.ssl',
             },
         },
         {
@@ -34,14 +42,6 @@ const webSiteRouter = {
             component: () => import('@/views/website/config/index.vue'),
             meta: {
                 title: 'menu.config',
-            },
-        },
-        {
-            path: '/websites/firewall',
-            name: 'Firewall',
-            component: () => import('@/views/website/project/index.vue'),
-            meta: {
-                title: 'menu.firewall',
             },
         },
     ],
