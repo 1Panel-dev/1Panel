@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="open" :title="$t('website.accountManage')">
+    <el-dialog v-model="open" :title="$t('website.acmeAccountManage')">
         <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
             <template #toolbar>
                 <el-button type="primary" plain @click="openCreate">{{ $t('commons.button.create') }}</el-button>
@@ -66,9 +66,7 @@ const openCreate = () => {
 };
 
 const deleteAccount = async (id: number) => {
-    loading.value = true;
-    await useDeleteData(DeleteAcmeAccount, id, 'commons.msg.delete', false);
-    loading.value = false;
+    await useDeleteData(DeleteAcmeAccount, id, 'commons.msg.delete', loading.value);
     search();
 };
 

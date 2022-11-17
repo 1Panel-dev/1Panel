@@ -4,10 +4,16 @@
             ref="sslForm"
             label-position="right"
             :model="ssl"
-            label-width="150px"
+            label-width="125px"
             :rules="rules"
             v-loading="loading"
         >
+            <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
+                <el-input v-model="ssl.primaryDomain"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('website.otherDomains')" prop="otherDomains">
+                <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" v-model="ssl.otherDomains"></el-input>
+            </el-form-item>
             <el-form-item :label="$t('website.acmeAccount')" prop="acmeAccountId">
                 <el-select v-model="ssl.acmeAccountId">
                     <el-option
@@ -21,7 +27,7 @@
             <el-form-item :label="$t('website.provider')" prop="provider">
                 <el-radio-group v-model="ssl.provider">
                     <el-radio label="dnsAccount">{{ $t('website.dnsAccount') }}</el-radio>
-                    <el-radio label="dnsCommon">{{ $t('website.dnsCommon') }}</el-radio>
+                    <el-radio label="dnsManual">{{ $t('website.dnsCommon') }}</el-radio>
                     <el-radio label="http">HTTP</el-radio>
                 </el-radio-group>
             </el-form-item>
@@ -35,18 +41,18 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item :label="$t('website.domain')" prop="domains">
+            <!-- <el-form-item :label="$t('website.domain')" prop="domains">
                 <el-checkbox-group v-model="ssl.domains">
                     <el-checkbox v-for="domain in domains" :key="domain.domain" :label="domain.domain"></el-checkbox>
                 </el-checkbox-group>
-            </el-form-item>
-            <el-form-item>
+            </el-form-item> -->
+            <!-- <el-form-item>
                 <div>
                     <span>解析域名: {{ dnsResolve.key }}</span>
                     <span>记录值: {{ dnsResolve.value }}</span>
                     <span>类型: {{ dnsResolve.type }}</span>
                 </div>
-            </el-form-item>
+            </el-form-item> -->
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -61,7 +67,7 @@
 
 <script lang="ts" setup>
 import { WebSite } from '@/api/interface/website';
-import { CreateSSL, GetDnsResolve, GetWebsite, SearchAcmeAccount, SearchDnsAccount } from '@/api/modules/website';
+import { CreateSSL, SearchAcmeAccount, SearchDnsAccount } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElMessage, FormInstance } from 'element-plus';
@@ -90,26 +96,27 @@ let acmeReq = reactive({
 });
 let dnsAccounts = ref<WebSite.DnsAccount[]>();
 let acmeAccounts = ref<WebSite.AcmeAccount[]>();
-let domains = ref<WebSite.Domain[]>([]);
+// let domains = ref<WebSite.Domain[]>([]);
 let sslForm = ref<FormInstance>();
 let rules = ref({
+    primaryDomain: [Rules.requiredInput],
     acmeAccountId: [Rules.requiredSelectBusiness],
     dnsAccountId: [Rules.requiredSelectBusiness],
     provider: [Rules.requiredInput],
-    domains: [Rules.requiredSelect],
 });
 let ssl = ref({
-    domains: [],
+    primaryDomain: '',
+    otherDomains: '',
     provider: 'dnsAccount',
     websiteId: 0,
     acmeAccountId: 0,
     dnsAccountId: 0,
 });
-let dnsResolve = ref<WebSite.DNSResolve>({
-    key: '',
-    value: '',
-    type: '',
-});
+// let dnsResolve = ref<WebSite.DNSResolve>({
+//     key: '',
+//     value: '',
+//     type: '',
+// });
 let hasResolve = ref(false);
 
 const em = defineEmits(['close']);
@@ -121,7 +128,8 @@ const handleClose = () => {
 const resetForm = () => {
     sslForm.value?.resetFields();
     ssl.value = {
-        domains: [],
+        primaryDomain: '',
+        otherDomains: '',
         provider: 'dnsAccount',
         websiteId: 0,
         acmeAccountId: 0,
@@ -132,7 +140,7 @@ const resetForm = () => {
 const acceptParams = () => {
     resetForm();
     ssl.value.websiteId = Number(id.value);
-    getWebsite(id.value);
+    // getWebsite(id.value);
     getAcmeAccounts();
     getDnsAccounts();
     open.value = true;
@@ -154,32 +162,36 @@ const getDnsAccounts = async () => {
     }
 };
 
-const getWebsite = async (id: number) => {
-    domains.value = (await GetWebsite(id)).data.domains || [];
-};
+// const getWebsite = async (id: number) => {
+//     domains.value = (await GetWebsite(id)).data.domains || [];
+// };
 
-const getDnsResolve = async (acmeAccountId: number, domains: string[]) => {
-    hasResolve.value = false;
-    const res = await GetDnsResolve({ acmeAccountId: acmeAccountId, domains: domains });
-    if (res.data) {
-        dnsResolve.value = res.data;
-        hasResolve.value = true;
-    }
-};
+// const getDnsResolve = async (acmeAccountId: number, domains: string[]) => {
+//     hasResolve.value = false;
+//     const res = await GetDnsResolve({ acmeAccountId: acmeAccountId, domains: domains });
+//     if (res.data) {
+//         dnsResolve.value = res.data;
+//         hasResolve.value = true;
+//     }
+// };
 
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
-    await formEl.validate(async (valid) => {
+    await formEl.validate((valid) => {
         if (!valid) {
             return;
         }
-        if (ssl.value.provider != 'dnsCommon' || hasResolve.value) {
+        if (ssl.value.provider != 'dnsManual' || hasResolve.value) {
             loading.value = true;
-            await CreateSSL(ssl.value);
-            ElMessage.success(i18n.global.t('commons.msg.createSuccess'));
-            loading.value = false;
+            CreateSSL(ssl.value)
+                .then(() => {
+                    ElMessage.success(i18n.global.t('commons.msg.createSuccess'));
+                })
+                .finally(() => {
+                    loading.value = false;
+                });
         } else {
-            getDnsResolve(ssl.value.acmeAccountId, ssl.value.domains);
+            // getDnsResolve(ssl.value.acmeAccountId, ssl.value.domains);
         }
     });
 };

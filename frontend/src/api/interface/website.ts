@@ -118,9 +118,10 @@ export namespace WebSite {
     }
 
     export interface SSL extends CommonModel {
+        primaryDomain: string;
         privateKey: string;
         pem: string;
-        domain: string;
+        otherDomains: string;
         certURL: string;
         type: string;
         issuerName: string;
@@ -129,15 +130,19 @@ export namespace WebSite {
     }
 
     export interface SSLCreate {
-        domains: string[];
+        primaryDomain: string;
+        otherDomains: string;
         provider: string;
-        websiteId: number;
         acmeAccountId: number;
         dnsAccountId: number;
     }
 
     export interface SSLApply {
         websiteId: number;
+        SSLId: number;
+    }
+
+    export interface SSLRenew {
         SSLId: number;
     }
 

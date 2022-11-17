@@ -37,6 +37,7 @@ export const useDeleteData = <P = any, R = any>(
             })
             .finally(() => {
                 loading = false;
-            });
+            })
+            .catch(() => {});
     });
 };

@@ -4,9 +4,6 @@
             <el-tab-pane label="基本" name="basic">
                 <Basic :id="id" v-if="index === 'basic'"></Basic>
             </el-tab-pane>
-            <el-tab-pane label="证书" name="ssl">
-                <SSL :id="id" v-if="index === 'ssl'"></SSL>
-            </el-tab-pane>
             <el-tab-pane label="安全">反代</el-tab-pane>
             <el-tab-pane label="备份">反代</el-tab-pane>
             <el-tab-pane label="源文">反代</el-tab-pane>
@@ -18,7 +15,6 @@
 import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, ref } from 'vue';
 import Basic from './basic/index.vue';
-import SSL from './ssl/index.vue';
 import router from '@/routers';
 
 const props = defineProps({

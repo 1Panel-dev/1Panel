@@ -318,7 +318,7 @@ func createPemFile(websiteSSL model.WebSiteSSL) error {
 		return err
 	}
 
-	configDir := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "ssl", websiteSSL.Alias)
+	configDir := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "ssl", websiteSSL.PrimaryDomain)
 	fileOp := files.NewFileOp()
 
 	if !fileOp.Stat(configDir) {
