@@ -14,7 +14,7 @@ const (
 	ComposeOpRestart = "restart"
 	ComposeOpRemove  = "remove"
 
-	DaemonJsonDir      = "/System/Volumes/Data/Users/slooop/.docker/daemon.json"
+	DaemonJsonDir      = "/opt/1Panel/docker/config/daemon.json"
 	TmpDockerBuildDir  = "/opt/1Panel/data/docker/build"
 	TmpComposeBuildDir = "/opt/1Panel/data/docker/compose"
 )

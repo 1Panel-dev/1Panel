@@ -9,24 +9,23 @@
             <div style="justify-self: center">
                 <img style="width: 80px" src="@/assets/images/ko_image.png" />
             </div>
-            <h1>1Panel</h1>
             <h3>{{ $t('setting.description') }}</h3>
-            <h3>v0.0.1</h3>
+            <h3>v1.0.0</h3>
             <div style="margin-top: 10px">
-                <svg-icon style="font-size: 9px" iconName="p-huaban88"></svg-icon>
                 <el-link @click="toGithub">
-                    <span>{{ $t('setting.project') }}</span>
+                    <svg-icon style="font-size: 9px; margin-bottom: 8px" iconName="p-huaban88"></svg-icon>
+                    <span style="line-height: 20px">{{ $t('setting.project') }}</span>
                 </el-link>
-                <svg-icon style="font-size: 9px; margin-left: 15px" iconName="p-bug"></svg-icon>
-                <el-link @click="toIssue">
+                <el-link @click="toIssue" style="margin-left: 15px">
+                    <svg-icon style="font-size: 9px; margin-bottom: 8px" iconName="p-bug"></svg-icon>
                     <span>{{ $t('setting.issue') }}</span>
                 </el-link>
-                <svg-icon style="font-size: 9px; margin-left: 15px" iconName="p-taolun"></svg-icon>
-                <el-link @click="toTalk">
+                <el-link @click="toTalk" style="margin-left: 15px">
+                    <svg-icon style="font-size: 9px; margin-bottom: 8px" iconName="p-taolun"></svg-icon>
                     <span>{{ $t('setting.chat') }}</span>
                 </el-link>
-                <svg-icon style="font-size: 9px; margin-left: 15px" iconName="p-star"></svg-icon>
-                <el-link @click="toGithubStar">
+                <el-link @click="toGithubStar" style="margin-left: 15px">
+                    <svg-icon style="font-size: 9px; margin-bottom: 6px" iconName="p-star"></svg-icon>
                     <span>{{ $t('setting.star') }}</span>
                 </el-link>
             </div>

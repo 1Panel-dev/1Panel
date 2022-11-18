@@ -18,8 +18,18 @@
                 </el-radio-button>
             </el-radio-group>
         </el-card>
-        <Panel v-if="activeNames === 'all' || activeNames === 'panel'" :settingInfo="form" @on-save="SaveSetting" />
-        <Safe v-if="activeNames === 'all' || activeNames === 'safe'" :settingInfo="form" @on-save="SaveSetting" />
+        <Panel
+            v-if="activeNames === 'all' || activeNames === 'panel'"
+            :settingInfo="form"
+            @on-save="SaveSetting"
+            @search="search"
+        />
+        <Safe
+            v-if="activeNames === 'all' || activeNames === 'safe'"
+            :settingInfo="form"
+            @on-save="SaveSetting"
+            @search="search"
+        />
         <Backup v-if="activeNames === 'all' || activeNames === 'backup'" :settingInfo="form" @on-save="SaveSetting" />
         <Monitor v-if="activeNames === 'all' || activeNames === 'monitor'" :settingInfo="form" @on-save="SaveSetting" />
         <About v-if="activeNames === 'all' || activeNames === 'about'" />

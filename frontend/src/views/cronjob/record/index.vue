@@ -114,7 +114,7 @@
                             </el-col>
                             <el-col :span="8" v-if="dialogData.rowData!.type === 'database'">
                                 <el-form-item :label="$t('cronjob.database')">
-                                    {{ dialogData.rowData!.database }}
+                                    {{ dialogData.rowData!.dbName }}
                                 </el-form-item>
                             </el-col>
                             <el-col :span="8" v-if="dialogData.rowData!.type === 'directory'">

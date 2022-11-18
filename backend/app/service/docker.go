@@ -5,9 +5,12 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/pkg/errors"
 )
 
 type DockerService struct{}
@@ -32,7 +35,7 @@ type daemonJsonItem struct {
 }
 
 func (u *DockerService) LoadDockerConf() (*dto.DaemonJsonConf, error) {
-	file, err := ioutil.ReadFile("/opt/1Panel/docker/daemon.json")
+	file, err := ioutil.ReadFile(constant.DaemonJsonDir)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +71,7 @@ func (u *DockerService) LoadDockerConf() (*dto.DaemonJsonConf, error) {
 }
 
 func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
-	file, err := ioutil.ReadFile("/opt/1Panel/docker/daemon.json")
+	file, err := ioutil.ReadFile(constant.DaemonJsonDir)
 	if err != nil {
 		return err
 	}
@@ -100,8 +103,14 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 	if err != nil {
 		return err
 	}
-	if err := ioutil.WriteFile("/opt/1Panel/docker/daemon.json", newJson, 0640); err != nil {
+	if err := ioutil.WriteFile(constant.DaemonJsonDir, newJson, 0640); err != nil {
 		return err
+	}
+
+	cmd := exec.Command("systemctl", "restart", "docker")
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return errors.New(string(stdout))
 	}
 	return nil
 }
@@ -116,10 +125,10 @@ func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
 	_, _ = write.WriteString(req.File)
 	write.Flush()
 
-	// cmd := exec.Command("systemctl", "restart", "docker")
-	// stdout, err := cmd.CombinedOutput()
-	// if err != nil {
-	// 	return errors.New(string(stdout))
-	// }
+	cmd := exec.Command("systemctl", "restart", "docker")
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return errors.New(string(stdout))
+	}
 	return nil
 }

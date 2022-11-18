@@ -2,11 +2,11 @@
     <div>
         <el-card class="topCard">
             <el-radio-group v-model="active">
-                <el-radio-button class="topButton" size="large" @click="routerTo('/logs')" label="login">
-                    {{ $t('logs.login') }}
-                </el-radio-button>
-                <el-radio-button class="topButton" size="large" @click="routerTo('/logs/operation')" label="operation">
+                <el-radio-button class="topButton" size="large" @click="routerTo('/logs')" label="operation">
                     {{ $t('logs.operation') }}
+                </el-radio-button>
+                <el-radio-button class="topButton" size="large" @click="routerTo('/logs/login')" label="login">
+                    {{ $t('logs.login') }}
                 </el-radio-button>
                 <el-radio-button class="topButton" size="large" @click="routerTo('/logs/system')" label="system">
                     {{ $t('logs.system') }}

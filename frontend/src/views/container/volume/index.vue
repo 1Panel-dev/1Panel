@@ -34,33 +34,7 @@
             </ComplexTable>
         </el-card>
 
-        <el-dialog v-model="detailVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="70%">
-            <template #header>
-                <div class="card-header">
-                    <span>{{ $t('commons.button.view') }}</span>
-                </div>
-            </template>
-            <codemirror
-                :autofocus="true"
-                placeholder="None data"
-                :indent-with-tab="true"
-                :tabSize="4"
-                style="max-height: 500px"
-                :lineWrapping="true"
-                :matchBrackets="true"
-                theme="cobalt"
-                :styleActiveLine="true"
-                :extensions="extensions"
-                v-model="detailInfo"
-                :readOnly="true"
-            />
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="detailVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                </span>
-            </template>
-        </el-dialog>
-
+        <CodemirrorDialog ref="codemirror" />
         <CreateDialog @search="search" ref="dialogCreateRef" />
     </div>
 </template>
@@ -69,9 +43,7 @@
 import ComplexTable from '@/components/complex-table/index.vue';
 import CreateDialog from '@/views/container/volume/create/index.vue';
 import Submenu from '@/views/container/index.vue';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
+import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFromat } from '@/utils/util';
 import { deleteVolume, searchVolume, inspect } from '@/api/modules/container';
@@ -79,9 +51,8 @@ import { Container } from '@/api/interface/container';
 import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';
 
-const detailVisiable = ref<boolean>(false);
 const detailInfo = ref();
-const extensions = [javascript(), oneDark];
+const codemirror = ref();
 
 const data = ref();
 const selects = ref<any>([]);
@@ -116,7 +87,11 @@ const search = async () => {
 const onInspect = async (id: string) => {
     const res = await inspect({ id: id, type: 'volume' });
     detailInfo.value = JSON.stringify(JSON.parse(res.data), null, 2);
-    detailVisiable.value = true;
+    let param = {
+        header: i18n.global.t('commons.button.view'),
+        detailInfo: detailInfo.value,
+    };
+    codemirror.value!.acceptParams(param);
 };
 
 const batchDelete = async (row: Container.VolumeInfo | null) => {

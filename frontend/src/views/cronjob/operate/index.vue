@@ -12,7 +12,11 @@
                     style="width: 100%"
                     v-model="dialogData.rowData!.type"
                 >
-                    <el-option v-for="item in typeOptions" :key="item.label" :value="item.value" :label="item.label" />
+                    <el-option value="shell" :label="$t('cronjob.shell')" />
+                    <el-option value="website" :label="$t('cronjob.website')" />
+                    <el-option value="database" :label="$t('cronjob.database')" />
+                    <el-option value="directory" :label="$t('cronjob.directory')" />
+                    <el-option value="curl" :label="$t('cronjob.curl')" />
                 </el-select>
             </el-form-item>
 
@@ -76,14 +80,9 @@
             </el-form-item>
 
             <div v-if="dialogData.rowData!.type === 'database'">
-                <el-form-item :label="$t('cronjob.database')" prop="database">
-                    <el-radio-group v-model="dialogData.rowData!.database" @change="changeDBVersion" class="ml-4">
-                        <el-radio v-for="item in mysqlVersionOptions" :key="item" :label="item" :value="item" />
-                    </el-radio-group>
-                </el-form-item>
                 <el-form-item :label="$t('cronjob.database')" prop="dbName">
                     <el-select style="width: 100%" clearable v-model="dialogData.rowData!.dbName">
-                        <el-option v-for="item in dbOptions" :key="item" :label="item" :value="item" />
+                        <el-option v-for="item in mysqlInfo.dbNames" :key="item" :label="item" :value="item" />
                     </el-select>
                 </el-form-item>
             </div>
@@ -170,7 +169,8 @@ import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { Cronjob } from '@/api/interface/cronjob';
 import { addCronjob, editCronjob } from '@/api/modules/cronjob';
-import { listDBByVersion, loadVersions } from '@/api/modules/database';
+import { loadDBNames } from '@/api/modules/database';
+import { CheckAppInstalled } from '@/api/modules/app';
 
 interface DialogProps {
     title: string;
@@ -186,12 +186,10 @@ const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     cronjobVisiable.value = true;
-    loadRunningOptions();
+    checkMysqlInstalled();
     loadBackups();
 };
 
-const mysqlVersionOptions = ref();
-const dbOptions = ref();
 const localDirID = ref();
 
 const websiteOptions = ref([
@@ -202,6 +200,13 @@ const websiteOptions = ref([
 const backupOptions = ref();
 
 const emit = defineEmits<{ (e: 'search'): void }>();
+
+const mysqlInfo = reactive({
+    isExist: false,
+    name: '',
+    version: '',
+    dbNames: [] as Array<string>,
+});
 
 const varifySpec = (rule: any, value: any, callback: any) => {
     switch (dialogData.value.rowData!.specType) {
@@ -247,13 +252,6 @@ const varifySpec = (rule: any, value: any, callback: any) => {
     }
     callback();
 };
-const typeOptions = [
-    { label: i18n.global.t('cronjob.shell'), value: 'shell' },
-    { label: i18n.global.t('cronjob.website'), value: 'website' },
-    { label: i18n.global.t('cronjob.database'), value: 'database' },
-    { label: i18n.global.t('cronjob.directory'), value: 'directory' },
-    { label: i18n.global.t('cronjob.curl') + ' URL', value: 'curl' },
-];
 
 const specOptions = [
     { label: i18n.global.t('cronjob.perMonth'), value: 'perMonth' },
@@ -287,7 +285,6 @@ const rules = reactive({
 
     script: [Rules.requiredInput],
     website: [Rules.requiredSelect],
-    database: [Rules.requiredSelect],
     dbName: [Rules.requiredSelect],
     url: [Rules.requiredInput],
     sourceDir: [Rules.requiredSelect],
@@ -313,20 +310,14 @@ const loadBackups = async () => {
     }
 };
 
-const loadRunningOptions = async () => {
-    const res = await loadVersions();
-    mysqlVersionOptions.value = res.data;
-    if (mysqlVersionOptions.value.length != 0) {
-        dialogData.value.rowData!.database = mysqlVersionOptions.value[0];
-        changeDBVersion();
-    }
-};
-const changeDBVersion = async () => {
-    dialogData.value.rowData!.dbName = '';
-    const res = await listDBByVersion(dialogData.value.rowData!.database);
-    dbOptions.value = res.data;
-    if (dbOptions.value.length != 0) {
-        dialogData.value.rowData!.dbName = dbOptions.value[0];
+const checkMysqlInstalled = async () => {
+    const res = await CheckAppInstalled('mysql');
+    mysqlInfo.isExist = res.data.isExist;
+    mysqlInfo.name = res.data.name;
+    mysqlInfo.version = res.data.version;
+    if (mysqlInfo.isExist) {
+        const data = await loadDBNames();
+        mysqlInfo.dbNames = data.data;
     }
 };
 

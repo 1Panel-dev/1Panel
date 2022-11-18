@@ -52,7 +52,6 @@ const slowLogs = ref();
 const confirmDialogRef = ref();
 
 const mysqlName = ref();
-const mysqlKey = ref();
 const variables = reactive({
     slow_query_log: 'OFF',
     long_query_time: 10,
@@ -61,17 +60,15 @@ const oldVariables = ref();
 
 interface DialogProps {
     mysqlName: string;
-    mysqlKey: string;
     variables: Database.MysqlVariables;
 }
 const acceptParams = (params: DialogProps): void => {
     mysqlName.value = params.mysqlName;
-    mysqlKey.value = params.mysqlKey;
     variables.slow_query_log = params.variables.slow_query_log;
     variables.long_query_time = Number(params.variables.long_query_time);
 
     if (variables.slow_query_log === 'ON') {
-        let path = `/opt/1Panel/data/apps/${mysqlKey.value}/${mysqlName.value}/data/1Panel-slow.log`;
+        let path = `/opt/1Panel/data/apps/mysql/${mysqlName.value}/data/1Panel-slow.log`;
         loadMysqlSlowlogs(path);
     }
     oldVariables.value = { ...variables };
@@ -95,7 +92,7 @@ const onSave = async () => {
         param.push({ param: 'long_query_time', value: variables.long_query_time });
         param.push({ param: 'slow_query_log_file', value: '/var/lib/mysql/1Panel-slow.log' });
     }
-    await updateMysqlVariables(mysqlName.value, param);
+    await updateMysqlVariables(param);
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };
 

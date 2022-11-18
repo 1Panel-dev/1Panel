@@ -175,7 +175,7 @@ import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { dateFromat } from '@/utils/util';
 
-const emit = defineEmits<{ (e: 'on-save', formEl: FormInstance | undefined, key: string, val: any): void }>();
+const emit = defineEmits(['on-save', 'search']);
 
 interface Props {
     settingInfo: any;
@@ -217,12 +217,14 @@ const handleMFA = async () => {
         isMFAShow.value = true;
     } else {
         await updateSetting({ key: 'MFAStatus', value: 'disable' });
+        emit('search');
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
     }
 };
 
 const onBind = async () => {
     await bindMFA({ code: mfaCode.value, secret: otp.secret });
+    emit('search');
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
     isMFAShow.value = false;
 };
@@ -238,6 +240,7 @@ const submitTimeout = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         let time = new Date(new Date().getTime() + 3600 * 1000 * 24 * timeoutForm.days);
         await updateSetting({ key: 'ExpirationDays', value: timeoutForm.days + '' });
+        emit('search');
         form.settingInfo.expirationTime = dateFromat(0, 0, time);
         timeoutVisiable.value = false;
     });

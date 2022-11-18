@@ -110,7 +110,7 @@
 <script lang="ts" setup>
 import { loadMysqlStatus } from '@/api/modules/database';
 import { computeSize } from '@/utils/util';
-import { reactive, ref } from 'vue';
+import { reactive } from 'vue';
 
 let mysqlStatus = reactive({
     run: 0,
@@ -136,17 +136,12 @@ let mysqlStatus = reactive({
     tableLocksWaited: 0,
 });
 
-const mysqlName = ref();
-interface DialogProps {
-    mysqlName: string;
-}
-const acceptParams = (params: DialogProps): void => {
-    mysqlName.value = params.mysqlName;
+const acceptParams = (): void => {
     loadStatus();
 };
 
 const loadStatus = async () => {
-    const res = await loadMysqlStatus(mysqlName.value);
+    const res = await loadMysqlStatus();
     let queryPerSecond = res.data.Questions / res.data.Uptime;
     let txPerSecond = (res.data!.Com_commit + res.data.Com_rollback) / res.data.Uptime;
 

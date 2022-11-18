@@ -16,7 +16,6 @@ type MysqlDBInfo struct {
 
 type MysqlDBCreate struct {
 	Name        string `json:"name" validate:"required"`
-	MysqlName   string `json:"mysqlName" validate:"required"`
 	Format      string `json:"format" validate:"required,oneof=utf8mb4 utf-8 gbk big5"`
 	Username    string `json:"username" validate:"required"`
 	Password    string `json:"password" validate:"required"`
@@ -106,7 +105,6 @@ type DBBaseInfo struct {
 	Port          int64  `json:"port"`
 	Password      string `json:"password"`
 	RemoteConn    bool   `json:"remoteConn"`
-	MysqlKey      string `json:"mysqlKey"`
 }
 
 type SearchDBWithPage struct {

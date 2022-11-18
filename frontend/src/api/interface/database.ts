@@ -1,9 +1,6 @@
 import { ReqPage } from '.';
 
 export namespace Database {
-    export interface Search extends ReqPage {
-        mysqlName: string;
-    }
     export interface SearchBackupRecord extends ReqPage {
         mysqlName: string;
         dbName: string;
@@ -47,7 +44,6 @@ export namespace Database {
     }
     export interface MysqlDBCreate {
         name: string;
-        mysqlName: string;
         format: string;
         username: string;
         password: string;

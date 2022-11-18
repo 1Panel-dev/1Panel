@@ -1,7 +1,7 @@
 import { Layout } from '@/routers/constant';
 
 const logsRouter = {
-    sort: 10,
+    sort: 7,
     path: '/logs',
     component: Layout,
     redirect: '/logs',
@@ -12,17 +12,17 @@ const logsRouter = {
     children: [
         {
             path: '',
-            name: 'LoginLog',
-            component: () => import('@/views/log/login/index.vue'),
+            name: 'OperationLog',
+            component: () => import('@/views/log/operation/index.vue'),
             hidden: true,
             meta: {
                 activeMenu: '/logs',
             },
         },
         {
-            path: 'operation',
-            name: 'OperationLog',
-            component: () => import('@/views/log/operation/index.vue'),
+            path: 'login',
+            name: 'LoginLog',
+            component: () => import('@/views/log/login/index.vue'),
             hidden: true,
             meta: {
                 activeMenu: '/logs',

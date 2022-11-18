@@ -1,6 +1,6 @@
 <template>
     <div class="demo-collapse" v-show="onSetting">
-        <el-card>
+        <el-card style="margin-top: 5px">
             <el-collapse v-model="activeName" accordion>
                 <el-collapse-item :title="$t('database.baseSetting')" name="1">
                     <el-form :model="baseInfo" ref="panelFormRef" label-width="120px">
@@ -116,7 +116,6 @@ const baseInfo = reactive({
     port: 3306,
     password: '',
     remoteConn: false,
-    mysqlKey: '',
     containerID: '',
 });
 const panelFormRef = ref<FormInstance>();
@@ -137,7 +136,6 @@ interface DialogProps {
 const dialogContainerLogRef = ref();
 const acceptParams = (params: DialogProps): void => {
     onSetting.value = true;
-    mysqlName.value = params.mysqlName;
     loadBaseInfo();
     loadVariables();
     loadSlowLogs();
@@ -155,7 +153,7 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
     }
     if (key === 'port') {
         let params = {
-            key: baseInfo.mysqlKey,
+            key: 'mysql',
             name: mysqlName.value,
             port: val,
         };
@@ -197,19 +195,19 @@ const loadContainerLog = async (containerID: string) => {
 };
 
 const loadBaseInfo = async () => {
-    const res = await loadMysqlBaseInfo(mysqlName.value);
+    const res = await loadMysqlBaseInfo();
+    mysqlName.value = res.data?.name;
     baseInfo.name = res.data?.name;
     baseInfo.port = res.data?.port;
     baseInfo.password = res.data?.password;
     baseInfo.remoteConn = res.data?.remoteConn;
-    baseInfo.mysqlKey = res.data?.mysqlKey;
     baseInfo.containerID = res.data?.containerName;
-    loadMysqlConf(`/opt/1Panel/data/apps/${baseInfo.mysqlKey}/${baseInfo.name}/conf/my.cnf`);
+    loadMysqlConf(`/opt/1Panel/data/apps/mysql/${baseInfo.name}/conf/my.cnf`);
     loadContainerLog(baseInfo.containerID);
 };
 
 const loadVariables = async () => {
-    const res = await loadMysqlVariables(mysqlName.value);
+    const res = await loadMysqlVariables();
     variables.value = res.data;
     variablesRef.value!.acceptParams({ mysqlName: mysqlName.value, variables: res.data });
 };
@@ -218,7 +216,6 @@ const loadSlowLogs = async () => {
     await Promise.all([loadBaseInfo(), loadVariables()]);
     let param = {
         mysqlName: mysqlName.value,
-        mysqlKey: baseInfo.mysqlKey,
         variables: variables.value,
     };
     slowLogRef.value!.acceptParams(param);

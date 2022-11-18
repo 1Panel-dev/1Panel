@@ -39,6 +39,12 @@ type AppInstallRequest struct {
 	Services    map[string]string      `json:"services"`
 }
 
+type CheckInstalled struct {
+	IsExist bool   `json:"isExist"`
+	Name    string `json:"name"`
+	Version string `json:"version"`
+}
+
 type AppInstalled struct {
 	model.AppInstall
 	Total   int    `json:"total"`

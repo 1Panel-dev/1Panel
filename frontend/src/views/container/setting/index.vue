@@ -2,11 +2,11 @@
     <div>
         <Submenu activeName="setting" />
         <el-card style="margin-top: 20px">
-            <el-radio-group v-model="confShowType">
+            <el-radio-group v-model="confShowType" @change="changeMode">
                 <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
                 <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
             </el-radio-group>
-            <el-form v-if="confShowType === 'base'" :model="form" ref="formRef" :rules="rules" label-width="120px">
+            <el-form v-if="confShowType === 'base'" :model="form" ref="formRef" label-width="120px">
                 <el-row style="margin-top: 20px">
                     <el-col :span="1"><br /></el-col>
                     <el-col :span="10">
@@ -27,7 +27,7 @@
                                 v-model="form.registries"
                             />
                         </el-form-item>
-                        <el-form-item label="bip" prop="bip">
+                        <el-form-item label="bip">
                             <el-input clearable v-model="form.bip" />
                         </el-form-item>
                         <el-form-item label="live-restore" prop="liveRestore">
@@ -84,7 +84,6 @@ import { LoadFile } from '@/api/modules/files';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import i18n from '@/lang';
 import { loadDaemonJson, updateDaemonJson, updateDaemonJsonByfile } from '@/api/modules/container';
-import { Rules } from '@/global/form-rules';
 
 const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
@@ -96,10 +95,6 @@ const form = reactive({
     registries: '',
     liveRestore: false,
     cgroupDriver: '',
-});
-
-const rules = reactive({
-    bip: [Rules.requiredInput],
 });
 
 const formRef = ref<FormInstance>();
@@ -132,7 +127,7 @@ const onSubmitSave = async () => {
     if (confShowType.value === 'all') {
         let param = {
             file: dockerConf.value,
-            path: '/opt/1Panel/docker/daemon.json',
+            path: '/opt/1Panel/docker/config/daemon.json',
         };
         await updateDaemonJsonByfile(param);
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
@@ -151,8 +146,16 @@ const onSubmitSave = async () => {
 };
 
 const loadMysqlConf = async () => {
-    const res = await LoadFile({ path: '/opt/1Panel/docker/daemon.json' });
+    const res = await LoadFile({ path: '/opt/1Panel/docker/config/daemon.json' });
     dockerConf.value = res.data;
+};
+
+const changeMode = async () => {
+    if (confShowType.value === 'all') {
+        loadMysqlConf();
+    } else {
+        search();
+    }
 };
 
 const search = async () => {
@@ -167,6 +170,5 @@ const search = async () => {
 
 onMounted(() => {
     search();
-    loadMysqlConf();
 });
 </script>

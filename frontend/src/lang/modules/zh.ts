@@ -157,6 +157,8 @@ export default {
         logout: '退出登录',
     },
     database: {
+        noMysql: '当前未检测到 {0} 数据库，请进入应用商店点击安装！',
+        goInstall: '去安装',
         source: '来源',
         backup: '备份数据库',
         permission: '权限',
@@ -649,7 +651,7 @@ export default {
         issue: '问题反馈',
         chat: '参与讨论',
         star: '点亮 Star',
-        description: '一个现代化的 Linux 面板工具',
+        description: '1Panel，一款现代化的开源 Linux 面板。',
     },
     app: {
         app: '应用',

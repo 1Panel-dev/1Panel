@@ -157,6 +157,8 @@ export default {
         logout: 'Logout',
     },
     database: {
+        noMysql: 'No {0} database is detected, please go to App Store and click Install!',
+        goInstall: 'Go to install',
         source: 'Source',
         backup: 'Database backup',
         permission: 'Permission',
@@ -637,7 +639,7 @@ export default {
         issue: 'Feedback',
         chat: 'Community Discussion',
         star: 'Star',
-        description: 'A modern Linux panel tool',
+        description: '1Panel, A modern open source Linux panel.',
     },
     app: {
         installed: 'installed',

@@ -1,7 +1,7 @@
 <template>
     <div v-if="settingShow">
         <el-card style="margin-top: 5px">
-            <el-radio-group v-model="confShowType">
+            <el-radio-group v-model="confShowType" @change="onChangeMode">
                 <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
                 <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
             </el-radio-group>
@@ -135,6 +135,14 @@ function callback(error: any) {
     }
 }
 
+const onChangeMode = async () => {
+    if (confShowType.value === 'all') {
+        loadMysqlConf();
+    } else {
+        loadform();
+    }
+};
+
 const onSave = async (formEl: FormInstance | undefined) => {
     if (confShowType.value === 'all') {
         onSaveFile();
@@ -149,6 +157,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
             maxmemory: form.maxmemory + '',
         };
         await updateRedisConf(param);
+        loadform();
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
     });
 };
@@ -179,10 +188,10 @@ const loadform = async () => {
     form.requirepass = res.data?.requirepass;
     form.maxmemory = Number(res.data?.maxmemory);
     form.port = Number(res.data?.port);
-    loadMysqlConf(`/opt/1Panel/data/apps/redis/${form.name}/conf/redis.conf`);
 };
 
-const loadMysqlConf = async (path: string) => {
+const loadMysqlConf = async () => {
+    let path = `/opt/1Panel/data/apps/redis/${form.name}/conf/redis.conf`;
     const res = await LoadFile({ path: path });
     mysqlConf.value = res.data;
 };

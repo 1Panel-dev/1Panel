@@ -1,86 +1,77 @@
 <template>
     <div>
         <Submenu activeName="mysql" />
-        <el-dropdown size="default" split-button style="margin-top: 20px; margin-bottom: 5px">
-            {{ mysqlName }}
-            <template #dropdown>
-                <el-dropdown-menu v-model="mysqlName">
-                    <el-dropdown-item v-for="item in mysqlVersions" :key="item" @click="onChangeVersion(item)">
-                        {{ item }}
-                    </el-dropdown-item>
-                </el-dropdown-menu>
-            </template>
-        </el-dropdown>
-        <el-button
-            v-if="!isOnSetting"
-            style="margin-top: 20px; margin-left: 10px"
-            size="default"
-            icon="Setting"
-            @click="onSetting"
-        >
-            {{ $t('database.setting') }}
-        </el-button>
-        <el-button
-            v-if="isOnSetting"
-            style="margin-top: 20px; margin-left: 10px"
-            size="default"
-            icon="Back"
-            @click="onBacklist"
-        >
-            {{ $t('database.backList') }}
-        </el-button>
+        <div v-if="!mysqlInfo.isExist" style="margin-top: 20px">
+            <el-alert :closable="false" :title="$t('database.noMysql', ['Mysql'])" type="info">
+                <el-link icon="Position" @click="goRouter('/apps')" type="primary">
+                    {{ $t('database.goInstall') }}
+                </el-link>
+            </el-alert>
+        </div>
+        <div v-else>
+            <el-button v-if="!isOnSetting" style="margin-top: 20px" size="default" icon="Setting" @click="onSetting">
+                {{ $t('database.setting') }}
+            </el-button>
+            <el-button v-if="isOnSetting" style="margin-top: 20px" size="default" icon="Back" @click="onBacklist">
+                {{ $t('database.backList') }}
+            </el-button>
 
-        <Setting ref="settingRef"></Setting>
+            <Setting ref="settingRef"></Setting>
 
-        <el-card v-if="!isOnSetting">
-            <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" @search="search" :data="data">
-                <template #toolbar>
-                    <el-button type="primary" @click="onOpenDialog()">{{ $t('commons.button.create') }}</el-button>
-                    <el-button>phpMyAdmin</el-button>
-                    <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
-                        {{ $t('commons.button.delete') }}
-                    </el-button>
-                </template>
-                <el-table-column type="selection" fix />
-                <el-table-column :label="$t('commons.table.name')" prop="name" />
-                <el-table-column :label="$t('auth.username')" prop="username" />
-                <el-table-column :label="$t('auth.password')" prop="password">
-                    <template #default="{ row }">
-                        <div v-if="!row.showPassword">
-                            <span style="float: left">***********</span>
-                            <div style="margin-top: 2px; cursor: pointer">
-                                <el-icon style="margin-left: 5px" @click="row.showPassword = true" :size="16">
-                                    <View />
-                                </el-icon>
-                            </div>
-                        </div>
-                        <div v-else>
-                            <span style="float: left">{{ row.password }}</span>
-                            <div style="margin-top: 4px; cursor: pointer">
-                                <el-icon style="margin-left: 5px" @click="row.showPassword = false" :size="16">
-                                    <Hide />
-                                </el-icon>
-                            </div>
-                        </div>
+            <el-card v-if="!isOnSetting" style="margin-top: 5px">
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    v-model:selects="selects"
+                    @search="search"
+                    :data="data"
+                >
+                    <template #toolbar>
+                        <el-button type="primary" @click="onOpenDialog()">{{ $t('commons.button.create') }}</el-button>
+                        <el-button>phpMyAdmin</el-button>
+                        <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
                     </template>
-                </el-table-column>
-                <el-table-column :label="$t('commons.table.description')" prop="description" />
-                <el-table-column
-                    prop="createdAt"
-                    :label="$t('commons.table.date')"
-                    :formatter="dateFromat"
-                    show-overflow-tooltip
-                />
-                <fu-table-operations
-                    width="300px"
-                    :buttons="buttons"
-                    :ellipsis="10"
-                    :label="$t('commons.table.operate')"
-                    fix
-                />
-            </ComplexTable>
-        </el-card>
-
+                    <el-table-column type="selection" fix />
+                    <el-table-column :label="$t('commons.table.name')" prop="name" />
+                    <el-table-column :label="$t('auth.username')" prop="username" />
+                    <el-table-column :label="$t('auth.password')" prop="password">
+                        <template #default="{ row }">
+                            <div v-if="!row.showPassword">
+                                <span style="float: left">***********</span>
+                                <div style="margin-top: 2px; cursor: pointer">
+                                    <el-icon style="margin-left: 5px" @click="row.showPassword = true" :size="16">
+                                        <View />
+                                    </el-icon>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <span style="float: left">{{ row.password }}</span>
+                                <div style="margin-top: 4px; cursor: pointer">
+                                    <el-icon style="margin-left: 5px" @click="row.showPassword = false" :size="16">
+                                        <Hide />
+                                    </el-icon>
+                                </div>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('commons.table.description')" prop="description" />
+                    <el-table-column
+                        prop="createdAt"
+                        :label="$t('commons.table.date')"
+                        :formatter="dateFromat"
+                        show-overflow-tooltip
+                    />
+                    <fu-table-operations
+                        width="300px"
+                        :buttons="buttons"
+                        :ellipsis="10"
+                        :label="$t('commons.table.operate')"
+                        fix
+                    />
+                </ComplexTable>
+            </el-card>
+        </div>
         <el-dialog v-model="changeVisiable" :destroy-on-close="true" width="30%">
             <template #header>
                 <div class="card-header">
@@ -140,16 +131,22 @@ import Setting from '@/views/database/mysql/setting/index.vue';
 import Submenu from '@/views/database/index.vue';
 import { dateFromat } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
-import { deleteMysqlDB, loadVersions, searchMysqlDBs, updateMysqlDBInfo } from '@/api/modules/database';
+import { deleteMysqlDB, searchMysqlDBs, updateMysqlDBInfo } from '@/api/modules/database';
 import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElForm, ElMessage } from 'element-plus';
 import { Database } from '@/api/interface/database';
 import { Rules } from '@/global/form-rules';
+import { CheckAppInstalled } from '@/api/modules/app';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const selects = ref<any>([]);
-const mysqlVersions = ref();
-const mysqlName = ref<string>('5.7');
+const mysqlInfo = reactive({
+    name: '',
+    version: '',
+    isExist: false,
+});
 const isOnSetting = ref<boolean>();
 
 const data = ref();
@@ -162,7 +159,7 @@ const paginationConfig = reactive({
 const dialogRef = ref();
 const onOpenDialog = async () => {
     let params = {
-        mysqlName: mysqlName.value,
+        mysqlName: mysqlInfo.name,
     };
     dialogRef.value!.acceptParams(params);
 };
@@ -170,7 +167,7 @@ const onOpenDialog = async () => {
 const dialogBackupRef = ref();
 const onOpenBackupDialog = async (dbName: string) => {
     let params = {
-        mysqlName: mysqlName.value,
+        mysqlName: mysqlInfo.name,
         dbName: dbName,
     };
     dialogBackupRef.value!.acceptParams(params);
@@ -182,7 +179,7 @@ const settingRef = ref();
 const onSetting = async () => {
     isOnSetting.value = true;
     let params = {
-        mysqlName: mysqlName.value,
+        mysqlName: mysqlInfo.name,
     };
     settingRef.value!.acceptParams(params);
 };
@@ -210,7 +207,7 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         changeForm.value = changeForm.operation === 'password' ? changeForm.password : changeForm.privilege;
-        changeForm.mysqlName = mysqlName.value;
+        changeForm.mysqlName = mysqlInfo.name;
         await updateMysqlDBInfo(changeForm);
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         search();
@@ -218,31 +215,24 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
     });
 };
 
-const loadRunningOptions = async () => {
-    const res = await loadVersions();
-    mysqlVersions.value = res.data;
-    if (mysqlVersions.value.length != 0) {
-        mysqlName.value = mysqlVersions.value[0];
+const checkMysqlInstalled = async () => {
+    const res = await CheckAppInstalled('mysql');
+    mysqlInfo.isExist = res.data.isExist;
+    mysqlInfo.name = res.data.name;
+    mysqlInfo.version = res.data.version;
+    if (mysqlInfo.isExist) {
         search();
     }
 };
 
-const onChangeVersion = async (val: string) => {
-    mysqlName.value = val;
-    search();
-    if (isOnSetting.value) {
-        let params = {
-            mysqlName: mysqlName.value,
-        };
-        settingRef.value!.acceptParams(params);
-    }
+const goRouter = async (path: string) => {
+    router.push({ path: path });
 };
 
 const search = async () => {
     let params = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
-        mysqlName: mysqlName.value,
     };
     const res = await searchMysqlDBs(params);
     data.value = res.data.items || [];
@@ -295,7 +285,7 @@ const buttons = [
         label: i18n.global.t('database.loadBackup'),
         click: (row: Database.MysqlDBInfo) => {
             let params = {
-                mysqlName: mysqlName.value,
+                mysqlName: mysqlInfo.name,
                 dbName: row.name,
             };
             uploadRef.value!.acceptParams(params);
@@ -310,6 +300,6 @@ const buttons = [
 ];
 
 onMounted(() => {
-    loadRunningOptions();
+    checkMysqlInstalled();
 });
 </script>
