@@ -138,15 +138,6 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 		if err := mysqlRepo.Create(ctx, &database); err != nil {
 			return err
 		}
-		//var database model.AppDatabase
-		//database.Dbname = dbConfig.DbName
-		//database.Username = dbConfig.DbUser
-		//database.Password = dbConfig.Password
-		//database.AppInstallId = dbInstall.ID
-		//database.Key = dbInstall.App.Key
-		//if err := dataBaseRepo.Create(ctx, &database); err != nil {
-		//	return err
-		//}
 		var installResource model.AppInstallResource
 		installResource.ResourceId = database.ID
 		installResource.AppInstallId = appInstall.ID

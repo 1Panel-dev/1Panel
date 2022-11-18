@@ -70,7 +70,7 @@ func ProcessData(c *Client, msg *WsMsg) {
 			}
 
 			process := &files.Process{}
-			json.Unmarshal(value, process)
+			_ = json.Unmarshal(value, process)
 			res = append(res, *process)
 		}
 		reByte, _ := json.Marshal(res)
