@@ -352,14 +352,14 @@ func createPemFile(websiteSSL model.WebSiteSSL) error {
 
 func getParamArray(key string, param interface{}) []string {
 	var res []string
-	switch param.(type) {
+	switch p := param.(type) {
 	case string:
 		if key == "index" {
-			res = strings.Split(param.(string), "\n")
+			res = strings.Split(p, "\n")
 			return res
 		}
 
-		res = strings.Split(param.(string), " ")
+		res = strings.Split(p, " ")
 		return res
 	}
 	return res
@@ -388,19 +388,15 @@ func handleParamMap(paramMap map[string]string, keys []string) []dto.NginxParam 
 func getNginxParams(params interface{}, keys []string) []dto.NginxParam {
 	var nginxParams []dto.NginxParam
 
-	switch params.(type) {
+	switch p := params.(type) {
 	case map[string]interface{}:
-		return handleParamMap(toMapStr(params.(map[string]interface{})), keys)
+		return handleParamMap(toMapStr(p), keys)
 	case []interface{}:
-
-		if mArray, ok := params.([]interface{}); ok {
-			for _, mA := range mArray {
-				if m, ok := mA.(map[string]interface{}); ok {
-					nginxParams = append(nginxParams, handleParamMap(toMapStr(m), keys)...)
-				}
+		for _, mA := range p {
+			if m, ok := mA.(map[string]interface{}); ok {
+				nginxParams = append(nginxParams, handleParamMap(toMapStr(m), keys)...)
 			}
 		}
-
 	}
 	return nginxParams
 }

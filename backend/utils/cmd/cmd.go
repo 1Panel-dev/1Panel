@@ -12,7 +12,7 @@ func Exec(cmdStr string) (string, error) {
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err != nil {
-		return string(stderr.Bytes()), err
+		return stderr.String(), err
 	}
-	return string(stdout.Bytes()), nil
+	return stdout.String(), nil
 }

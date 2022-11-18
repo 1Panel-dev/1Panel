@@ -422,9 +422,9 @@ func (f FileOp) Backup(srcFile string) (string, error) {
 	info, _ := f.Fs.Stat(backupPath)
 	if info != nil {
 		if info.IsDir() {
-			f.DeleteDir(backupPath)
+			_ = f.DeleteDir(backupPath)
 		} else {
-			f.DeleteFile(backupPath)
+			_ = f.DeleteFile(backupPath)
 		}
 	}
 	if err := f.Rename(srcFile, backupPath); err != nil {
