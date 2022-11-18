@@ -5,6 +5,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/configs"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"path"
 
 	"github.com/fsnotify/fsnotify"
@@ -42,5 +43,17 @@ func InitDir() {
 	constant.BackupDir = path.Join(constant.DefaultDataDir, "backup")
 	constant.AppBackupDir = path.Join(constant.BackupDir, "apps")
 
-	//TODO 创建文件夹
+	fileOp := files.NewFileOp()
+	createDir(fileOp, constant.DefaultDataDir)
+	createDir(fileOp, constant.ResourceDir)
+	createDir(fileOp, constant.AppResourceDir)
+	createDir(fileOp, constant.AppInstallDir)
+	createDir(fileOp, constant.BackupDir)
+	createDir(fileOp, constant.AppBackupDir)
+}
+
+func createDir(fileOp files.FileOp, dirPath string) {
+	if !fileOp.Stat(dirPath) {
+		_ = fileOp.CreateDir(dirPath, 0755)
+	}
 }

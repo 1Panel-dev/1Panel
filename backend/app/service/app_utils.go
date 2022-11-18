@@ -524,17 +524,16 @@ func getAppFromOss() error {
 		return err
 	}
 	appDir := constant.AppResourceDir
-	oldListFile := path.Join(appDir, "list.json")
-	content, err := os.ReadFile(oldListFile)
-	if err != nil {
-		return err
-	}
-	list := &dto.AppList{}
-	if err := json.Unmarshal(content, list); err != nil {
-		return err
-	}
-	if list.Version == ossConfig.Version {
-		return nil
+	content, _ := os.ReadFile(path.Join(appDir, "apps.json"))
+
+	if content != nil {
+		oldConfig := &dto.AppOssConfig{}
+		if err := json.Unmarshal(content, oldConfig); err != nil {
+			return err
+		}
+		if oldConfig.Version == ossConfig.Version {
+			return nil
+		}
 	}
 
 	fileOp := files.NewFileOp()
@@ -542,8 +541,7 @@ func getAppFromOss() error {
 		return err
 	}
 
-	packageName := path.Base(ossConfig.Package)
-	packagePath := path.Join(constant.ResourceDir, packageName)
+	packagePath := path.Join(constant.ResourceDir, path.Base(ossConfig.Package))
 	if err := fileOp.DownloadFile(ossConfig.Package, packagePath); err != nil {
 		return err
 	}
