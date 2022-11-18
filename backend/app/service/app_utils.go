@@ -34,19 +34,19 @@ var (
 	Delete DatabaseOp = "delete"
 )
 
-func execDockerCommand(database model.AppDatabase, dbInstall model.AppInstall, op DatabaseOp) error {
+func execDockerCommand(database model.DatabaseMysql, dbInstall model.AppInstall, op DatabaseOp) error {
 	var auth dto.AuthParam
 	var dbConfig dto.AppDatabase
 	dbConfig.Password = database.Password
 	dbConfig.DbUser = database.Username
-	dbConfig.DbName = database.Dbname
+	dbConfig.DbName = database.Name
 	_ = json.Unmarshal([]byte(dbInstall.Param), &auth)
 	execConfig := dto.ContainerExec{
 		ContainerName: dbInstall.ContainerName,
 		Auth:          auth,
 		DbParam:       dbConfig,
 	}
-	out, err := cmd.Exec(getSqlStr(database.Key, op, execConfig))
+	out, err := cmd.Exec(getSqlStr(dbInstall.Version, op, execConfig))
 	if err != nil {
 		return errors.New(out)
 	}
@@ -59,7 +59,7 @@ func getSqlStr(version string, operate DatabaseOp, exec dto.ContainerExec) strin
 
 	if strings.Contains(version, "5.7") {
 		if operate == Add {
-			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s  -e \"CREATE USER '%s'@'%%' IDENTIFIED BY '%s';\" -e \"create database %s;\" -e \"GRANT ALL ON %s.* TO '%s'@'%%' IDENTIFIED BY '%s';\" -e \"FLUSH PRIVILEGES;\"",
+			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s  -e \"CREATE USER IF NOT EXISTS '%s'@'%%' IDENTIFIED BY '%s';\" -e \"create database %s;\" -e \"GRANT ALL ON %s.* TO '%s'@'%%' IDENTIFIED BY '%s';\" -e \"FLUSH PRIVILEGES;\"",
 				exec.ContainerName, exec.Auth.RootPassword, param.DbUser, param.Password, param.DbName, param.DbName, param.DbUser, param.Password)
 		}
 		if operate == Delete {
@@ -70,7 +70,7 @@ func getSqlStr(version string, operate DatabaseOp, exec dto.ContainerExec) strin
 
 	if strings.Contains(version, "8.0") {
 		if operate == Add {
-			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s  -e \"CREATE USER '%s'@'%%' IDENTIFIED BY '%s';\" -e \"create database %s;\" -e \"GRANT ALL ON %s.* TO '%s'@'%%';\" -e \"FLUSH PRIVILEGES;\"",
+			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s  -e \"CREATE USER IF NOT EXISTS '%s'@'%%' IDENTIFIED BY '%s';\" -e \"create database %s;\" -e \"GRANT ALL ON %s.* TO '%s'@'%%';\" -e \"FLUSH PRIVILEGES;\"",
 				exec.ContainerName, exec.Auth.RootPassword, param.DbUser, param.Password, param.DbName, param.DbName, param.DbUser)
 		}
 		if operate == Delete {
@@ -128,15 +128,25 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 		if err != nil {
 			return err
 		}
-		var database model.AppDatabase
-		database.Dbname = dbConfig.DbName
+		var database model.DatabaseMysql
+		database.Name = dbConfig.DbName
 		database.Username = dbConfig.DbUser
 		database.Password = dbConfig.Password
-		database.AppInstallId = dbInstall.ID
-		database.Key = dbInstall.App.Key
-		if err := dataBaseRepo.Create(ctx, &database); err != nil {
+		database.MysqlName = dbInstall.Name
+		database.Format = "utf8mb4"
+		database.Permission = "127.0.0.1"
+		if err := mysqlRepo.Create(ctx, &database); err != nil {
 			return err
 		}
+		//var database model.AppDatabase
+		//database.Dbname = dbConfig.DbName
+		//database.Username = dbConfig.DbUser
+		//database.Password = dbConfig.Password
+		//database.AppInstallId = dbInstall.ID
+		//database.Key = dbInstall.App.Key
+		//if err := dataBaseRepo.Create(ctx, &database); err != nil {
+		//	return err
+		//}
 		var installResource model.AppInstallResource
 		installResource.ResourceId = database.ID
 		installResource.AppInstallId = appInstall.ID
@@ -186,18 +196,18 @@ func deleteLink(ctx context.Context, install *model.AppInstall) error {
 	}
 	for _, re := range resources {
 		if re.Key == "mysql" {
-			database, _ := dataBaseRepo.GetFirst(commonRepo.WithByID(re.ResourceId))
-			if reflect.DeepEqual(database, model.AppDatabase{}) {
+			database, _ := mysqlRepo.Get(commonRepo.WithByID(re.ResourceId))
+			if reflect.DeepEqual(database, model.DatabaseMysql{}) {
 				continue
 			}
-			appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(database.AppInstallId))
+			appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByName(database.MysqlName))
 			if err != nil {
-				return nil
+				return err
 			}
 			if err := execDockerCommand(database, appInstall, Delete); err != nil {
 				return err
 			}
-			if err := dataBaseRepo.DeleteBy(ctx, commonRepo.WithByID(database.ID)); err != nil {
+			if err := mysqlRepo.Delete(ctx, commonRepo.WithByID(database.ID)); err != nil {
 				return err
 			}
 		}
