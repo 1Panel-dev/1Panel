@@ -411,7 +411,7 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 }
 
 func copyAppData(key, version, installName string, params map[string]interface{}) (err error) {
-	resourceDir := path.Join(constant.AppResourceDir, key, version)
+	resourceDir := path.Join(constant.AppResourceDir, key, "versions", version)
 	installDir := path.Join(constant.AppInstallDir, key)
 	installVersionDir := path.Join(installDir, version)
 	fileOp := files.NewFileOp()

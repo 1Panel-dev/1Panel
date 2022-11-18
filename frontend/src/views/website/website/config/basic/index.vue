@@ -9,8 +9,9 @@
         <el-tab-pane :label="$t('website.rate')">
             <LimitConn :id="id" v-if="index == '2'"></LimitConn>
         </el-tab-pane>
+        <el-tab-pane :label="'HTTPS'"></el-tab-pane>
         <el-tab-pane :label="$t('website.other')">
-            <Other :id="id" v-if="index == '3'"></Other>
+            <Other :id="id" v-if="index == '4'"></Other>
         </el-tab-pane>
     </el-tabs>
 </template>

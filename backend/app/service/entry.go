@@ -6,6 +6,7 @@ type ServiceGroup struct {
 	AuthService
 
 	AppService
+	AppInstallService
 
 	ContainerService
 	ImageService
@@ -61,11 +62,11 @@ var (
 	settingRepo = repo.RepoGroupApp.SettingRepo
 	backupRepo  = repo.RepoGroupApp.BackupRepo
 
-	operationRepo = repo.RepoGroupApp.OperationRepo
-	websiteRepo            = repo.RepoGroupApp.WebSiteRepo
-	websiteGroupRepo       = repo.RepoGroupApp.WebSiteGroupRepo
-	websiteDomainRepo      = repo.RepoGroupApp.WebSiteDomainRepo
-	websiteDnsRepo         = repo.RepoGroupApp.WebsiteDnsAccountRepo
-	websiteSSLRepo         = repo.RepoGroupApp.WebsiteSSLRepo
-	websiteAcmeRepo        = repo.RepoGroupApp.WebsiteAcmeAccountRepo
+	operationRepo     = repo.RepoGroupApp.OperationRepo
+	websiteRepo       = repo.RepoGroupApp.WebSiteRepo
+	websiteGroupRepo  = repo.RepoGroupApp.WebSiteGroupRepo
+	websiteDomainRepo = repo.RepoGroupApp.WebSiteDomainRepo
+	websiteDnsRepo    = repo.RepoGroupApp.WebsiteDnsAccountRepo
+	websiteSSLRepo    = repo.RepoGroupApp.WebsiteSSLRepo
+	websiteAcmeRepo   = repo.RepoGroupApp.WebsiteAcmeAccountRepo
 )

@@ -126,11 +126,11 @@ type AppList struct {
 }
 
 type AppDefine struct {
-	Key                string   `json:"key"`
-	Name               string   `json:"name"`
-	Tags               []string `json:"tags"`
-	Versions           []string `json:"versions"`
-	Icon               string   `json:"icon"`
+	Key      string   `json:"key"`
+	Name     string   `json:"name"`
+	Tags     []string `json:"tags"`
+	Versions []string `json:"versions"`
+	//Icon               string   `json:"icon"`
 	Author             string   `json:"author"`
 	Source             string   `json:"source"`
 	ShortDesc          string   `json:"short_desc"`

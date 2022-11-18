@@ -720,5 +720,6 @@ export default {
         renewSSL: '续签',
         renewHelper: '确定续签证书？',
         renewSuccess: '续签证书',
+        config: '配置',
     },
 };

@@ -3,12 +3,9 @@ package service
 import (
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
-	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -17,10 +14,8 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
-	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"golang.org/x/net/context"
 	"gopkg.in/yaml.v3"
 )
 
@@ -114,56 +109,6 @@ func (a AppService) GetApp(id uint) (dto.AppDTO, error) {
 	return appDTO, nil
 }
 
-func (a AppService) PageInstalled(req dto.AppInstalledRequest) (int64, []dto.AppInstalled, error) {
-	total, installed, err := appInstallRepo.Page(req.Page, req.PageSize)
-	if err != nil {
-		return 0, nil, err
-	}
-	var installDTOs []dto.AppInstalled
-	for _, in := range installed {
-		installDto := dto.AppInstalled{
-			AppInstall: in,
-		}
-		installDTOs = append(installDTOs, installDto)
-	}
-
-	return total, installDTOs, nil
-}
-
-func (a AppService) SearchInstalled(req dto.AppInstalledRequest) ([]dto.AppInstalled, error) {
-	var installs []model.AppInstall
-	var err error
-	if req.Type != "" {
-		apps, err := appRepo.GetBy(appRepo.WithType(req.Type))
-		if err != nil {
-			return nil, err
-		}
-		var ids []uint
-		for _, app := range apps {
-			ids = append(ids, app.ID)
-		}
-		installs, err = appInstallRepo.GetBy(appInstallRepo.WithAppIdsIn(ids))
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		installs, err = appInstallRepo.GetBy()
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	var installDTOs []dto.AppInstalled
-	for _, in := range installs {
-		installDto := dto.AppInstalled{
-			AppInstall: in,
-		}
-		installDTOs = append(installDTOs, installDto)
-	}
-
-	return installDTOs, nil
-}
-
 func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, error) {
 
 	var (
@@ -182,120 +127,6 @@ func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, 
 	appDetailDTO.Params = paramMap
 	return appDetailDTO, nil
 }
-
-func (a AppService) PageInstallBackups(req dto.AppBackupRequest) (int64, []model.AppInstallBackup, error) {
-	return appInstallBackupRepo.Page(req.Page, req.PageSize, appInstallBackupRepo.WithAppInstallID(req.AppInstallID))
-}
-
-func (a AppService) OperateInstall(req dto.AppInstallOperate) error {
-	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallId))
-	if err != nil {
-		return err
-	}
-
-	dockerComposePath := install.GetComposePath()
-
-	switch req.Operate {
-	case dto.Up:
-		out, err := compose.Up(dockerComposePath)
-		if err != nil {
-			return handleErr(install, err, out)
-		}
-		install.Status = constant.Running
-	case dto.Down:
-		out, err := compose.Down(dockerComposePath)
-		if err != nil {
-			return handleErr(install, err, out)
-		}
-		install.Status = constant.Stopped
-	case dto.Restart:
-		out, err := compose.Restart(dockerComposePath)
-		if err != nil {
-			return handleErr(install, err, out)
-		}
-		install.Status = constant.Running
-	case dto.Delete:
-		tx, ctx := getTxAndContext()
-		if err := deleteAppInstall(ctx, install); err != nil {
-			tx.Rollback()
-			return err
-		}
-		tx.Commit()
-		return nil
-	case dto.Sync:
-		return a.SyncInstalled(install.ID)
-	case dto.Backup:
-		tx, ctx := getTxAndContext()
-		if err := backupInstall(ctx, install); err != nil {
-			tx.Rollback()
-			return err
-		}
-		tx.Commit()
-		return nil
-	case dto.Restore:
-		return restoreInstall(install, req.BackupId)
-	case dto.Update:
-		return updateInstall(install.ID, req.DetailId)
-	default:
-		return errors.New("operate not support")
-	}
-
-	return appInstallRepo.Save(&install)
-}
-
-func (a AppService) ChangeAppPort(req dto.PortUpdate) error {
-	var (
-		files    []string
-		newFiles []string
-	)
-	app, err := mysqlRepo.LoadBaseInfoByName(req.Name)
-	if err != nil {
-		return err
-	}
-
-	ComposeDir := fmt.Sprintf("%s/%s/%s", constant.AppInstallDir, req.Key, req.Name)
-	ComposeFile := fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, req.Key, req.Name)
-	path := fmt.Sprintf("%s/.env", ComposeDir)
-	lineBytes, err := ioutil.ReadFile(path)
-	if err != nil {
-		return err
-	} else {
-		files = strings.Split(string(lineBytes), "\n")
-	}
-	for _, line := range files {
-		if strings.HasPrefix(line, "PANEL_APP_PORT_HTTP=") {
-			newFiles = append(newFiles, fmt.Sprintf("PANEL_APP_PORT_HTTP=%v", req.Port))
-		} else {
-			newFiles = append(newFiles, line)
-		}
-	}
-	file, err := os.OpenFile(path, os.O_WRONLY, 0666)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	_, err = file.WriteString(strings.Join(newFiles, "\n"))
-	if err != nil {
-		return err
-	}
-
-	if err := mysqlRepo.UpdateDatabaseInfo(app.ID, map[string]interface{}{
-		"env": strings.ReplaceAll(app.Env, strconv.FormatInt(app.Port, 10), strconv.FormatInt(req.Port, 10)),
-	}); err != nil {
-		return err
-	}
-	stdout, err := compose.Down(ComposeFile)
-	if err != nil {
-		return errors.New(stdout)
-	}
-	stdout, err = compose.Up(ComposeFile)
-	if err != nil {
-		return errors.New(stdout)
-	}
-	return nil
-}
-
-
 
 func (a AppService) Install(name string, appDetailId uint, params map[string]interface{}) (*model.AppInstall, error) {
 
@@ -382,46 +213,6 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 	tx.Commit()
 	go upApp(appInstall.GetComposePath(), appInstall)
 	return &appInstall, nil
-}
-
-func (a AppService) SyncAllInstalled() error {
-	allList, err := appInstallRepo.GetBy()
-	if err != nil {
-		return err
-	}
-	go func() {
-		for _, i := range allList {
-			if err := a.SyncInstalled(i.ID); err != nil {
-				global.LOG.Errorf("sync install app[%s] error,mgs: %s", i.Name, err.Error())
-			}
-		}
-	}()
-	return nil
-}
-
-func (a AppService) DeleteBackup(req dto.AppBackupDeleteRequest) error {
-
-	backups, err := appInstallBackupRepo.GetBy(commonRepo.WithIdsIn(req.Ids))
-	if err != nil {
-		return err
-	}
-	fileOp := files.NewFileOp()
-
-	var errStr strings.Builder
-	for _, backup := range backups {
-		dst := path.Join(backup.Path, backup.Name)
-		if err := fileOp.DeleteFile(dst); err != nil {
-			errStr.WriteString(err.Error())
-			continue
-		}
-		if err := appInstallBackupRepo.Delete(context.TODO(), commonRepo.WithIdsIn(req.Ids)); err != nil {
-			errStr.WriteString(err.Error())
-		}
-	}
-	if errStr.String() != "" {
-		return errors.New(errStr.String())
-	}
-	return nil
 }
 
 func (a AppService) SyncInstalled(installId uint) error {
@@ -520,7 +311,6 @@ func (a AppService) SyncAppList() error {
 	}
 
 	appDir := constant.AppResourceDir
-	iconDir := path.Join(appDir, "icons")
 	listFile := path.Join(appDir, "list.json")
 
 	content, err := os.ReadFile(listFile)
@@ -553,7 +343,7 @@ func (a AppService) SyncAppList() error {
 	for _, l := range list.Items {
 
 		app := appsMap[l.Key]
-		icon, err := os.ReadFile(path.Join(iconDir, l.Icon))
+		icon, err := os.ReadFile(path.Join(appDir, l.Key, "metadata", "logo.png"))
 		if err != nil {
 			global.LOG.Errorf("get [%s] icon error: %s", l.Name, err.Error())
 			continue
@@ -567,7 +357,7 @@ func (a AppService) SyncAppList() error {
 
 		for _, v := range versions {
 			detail := detailsMap[v]
-			detailPath := path.Join(appDir, l.Key, v)
+			detailPath := path.Join(appDir, l.Key, "versions", v)
 			if _, err := os.Stat(detailPath); err != nil {
 				global.LOG.Errorf("get [%s] folder error: %s", detailPath, err.Error())
 				continue
@@ -611,8 +401,7 @@ func (a AppService) SyncAppList() error {
 		}
 	}
 
-	tx := global.DB.Begin()
-	ctx := context.WithValue(context.Background(), "db", tx)
+	tx, ctx := getTxAndContext()
 
 	if len(addAppArray) > 0 {
 		if err := appRepo.BatchCreate(ctx, addAppArray); err != nil {
@@ -741,48 +530,4 @@ func syncCanUpdate() {
 		}
 
 	}
-}
-
-func (a AppService) GetServices(key string) ([]dto.AppService, error) {
-	app, err := appRepo.GetFirst(appRepo.WithKey(key))
-	if err != nil {
-		return nil, err
-	}
-	installs, err := appInstallRepo.GetBy(appInstallRepo.WithAppId(app.ID), appInstallRepo.WithStatus(constant.Running))
-	if err != nil {
-		return nil, err
-	}
-	var res []dto.AppService
-	for _, install := range installs {
-		res = append(res, dto.AppService{
-			Label: install.Name,
-			Value: install.ServiceName,
-		})
-	}
-	return res, nil
-}
-
-func (a AppService) GetUpdateVersions(installId uint) ([]dto.AppVersion, error) {
-	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
-	var versions []dto.AppVersion
-	if err != nil {
-		return versions, err
-	}
-	app, err := appRepo.GetFirst(commonRepo.WithByID(install.AppId))
-	if err != nil {
-		return versions, err
-	}
-	details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))
-	if err != nil {
-		return versions, err
-	}
-	for _, detail := range details {
-		if common.CompareVersion(detail.Version, install.Version) {
-			versions = append(versions, dto.AppVersion{
-				Version:  detail.Version,
-				DetailId: detail.ID,
-			})
-		}
-	}
-	return versions, nil
 }
