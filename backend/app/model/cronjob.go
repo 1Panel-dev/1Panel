@@ -16,7 +16,6 @@ type Cronjob struct {
 
 	Script         string `gorm:"longtext" json:"script"`
 	Website        string `gorm:"type:varchar(64)" json:"website"`
-	Database       string `gorm:"type:varchar(64)" json:"database"`
 	DBName         string `gorm:"type:varchar(64)" json:"dbName"`
 	URL            string `gorm:"type:varchar(256)" json:"url"`
 	SourceDir      string `gorm:"type:varchar(256)" json:"sourceDir"`

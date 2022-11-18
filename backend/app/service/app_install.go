@@ -3,6 +3,12 @@ package service
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path"
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -12,11 +18,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
-	"io/ioutil"
-	"os"
-	"path"
-	"strconv"
-	"strings"
 )
 
 type AppInstallService struct {
@@ -36,6 +37,18 @@ func (a AppInstallService) Page(req dto.AppInstalledRequest) (int64, []dto.AppIn
 	}
 
 	return total, installDTOs, nil
+}
+
+func (a AppInstallService) CheckExist(key string) (*dto.CheckInstalled, error) {
+	app, err := appRepo.GetFirst(appRepo.WithKey(key))
+	if err != nil {
+		return nil, err
+	}
+	appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithAppId(app.ID))
+	if appInstall.ID != 0 {
+		return &dto.CheckInstalled{Name: appInstall.Name, IsExist: true, Version: appInstall.Version}, nil
+	}
+	return &dto.CheckInstalled{IsExist: false}, nil
 }
 
 func (a AppInstallService) Search(req dto.AppInstalledRequest) ([]dto.AppInstalled, error) {
@@ -221,7 +234,7 @@ func (a AppInstallService) ChangeAppPort(req dto.PortUpdate) error {
 		files    []string
 		newFiles []string
 	)
-	app, err := mysqlRepo.LoadBaseInfoByName(req.Name)
+	app, err := mysqlRepo.LoadBaseInfoByKey(req.Key)
 	if err != nil {
 		return err
 	}

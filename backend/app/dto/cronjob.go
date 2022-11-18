@@ -14,7 +14,6 @@ type CronjobCreate struct {
 	Script         string `json:"script"`
 	Website        string `json:"website"`
 	ExclusionRules string `json:"exclusionRules"`
-	Database       string `json:"database"`
 	DBName         string `json:"dbName"`
 	URL            string `json:"url"`
 	SourceDir      string `json:"sourceDir"`
@@ -34,7 +33,6 @@ type CronjobUpdate struct {
 	Script         string `json:"script"`
 	Website        string `json:"website"`
 	ExclusionRules string `json:"exclusionRules"`
-	Database       string `json:"database"`
 	DBName         string `json:"dbName"`
 	URL            string `json:"url"`
 	SourceDir      string `json:"sourceDir"`
@@ -66,7 +64,6 @@ type CronjobInfo struct {
 	Script         string `json:"script"`
 	Website        string `json:"website"`
 	ExclusionRules string `json:"exclusionRules"`
-	Database       string `json:"database"`
 	DBName         string `json:"dbName"`
 	URL            string `json:"url"`
 	SourceDir      string `json:"sourceDir"`

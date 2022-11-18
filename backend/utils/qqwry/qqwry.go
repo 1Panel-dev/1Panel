@@ -2,10 +2,10 @@ package qqwry
 
 import (
 	"encoding/binary"
-	"io/ioutil"
 	"net"
 	"strings"
 
+	"github.com/1Panel-dev/1Panel/cmd/server/qqwry"
 	"golang.org/x/text/encoding/simplifiedchinese"
 )
 
@@ -23,10 +23,7 @@ type QQwry struct {
 }
 
 func NewQQwry() (*QQwry, error) {
-	IpCommonDictionary, err := ioutil.ReadFile("/opt/1Panel/conf/qqwry.dat")
-	if err != nil {
-		return nil, err
-	}
+	IpCommonDictionary := qqwry.QQwryByte
 	return &QQwry{Data: IpCommonDictionary}, nil
 }
 

@@ -32,22 +32,6 @@
                         </el-input>
                     </el-form-item>
 
-                    <el-form-item :label="$t('auth.email')" :rules="Rules.email" prop="settingInfo.email">
-                        <el-input clearable v-model="form.settingInfo.email">
-                            <template #append>
-                                <el-button
-                                    @click="onSave(panelFormRef, 'Email', form.settingInfo.email)"
-                                    icon="Collection"
-                                >
-                                    {{ $t('commons.button.save') }}
-                                </el-button>
-                            </template>
-                        </el-input>
-                        <div>
-                            <span class="input-help">{{ $t('setting.emailHelper') }}</span>
-                        </div>
-                    </el-form-item>
-
                     <el-form-item
                         :label="$t('setting.title')"
                         :rules="Rules.requiredInput"
@@ -180,7 +164,7 @@ import i18n from '@/lang';
 import { GlobalStore } from '@/store';
 
 const globalStore = GlobalStore();
-const emit = defineEmits<{ (e: 'on-save', formEl: FormInstance | undefined, key: string, val: any): void }>();
+const emit = defineEmits(['on-save', 'search']);
 
 type FormInstance = InstanceType<typeof ElForm>;
 const passFormRef = ref<FormInstance>();
@@ -251,6 +235,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
 
 const onSyncTime = async () => {
     const res = await syncTime();
+    emit('search');
     form.settingInfo.localTime = res.data;
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };

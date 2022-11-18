@@ -4,14 +4,11 @@ import { Backup } from '../interface/backup';
 import { Database } from '../interface/database';
 import { File } from '@/api/interface/file';
 
-export const searchMysqlDBs = (params: Database.Search) => {
+export const searchMysqlDBs = (params: ReqPage) => {
     return http.post<ResPage<Database.MysqlDBInfo>>(`/databases/search`, params);
 };
-export const listDBByVersion = (params: string) => {
-    return http.get(`/databases/dbs/${params}`);
-};
 
-export const searchUpList = (params: Database.Search) => {
+export const searchUpList = (params: ReqPage) => {
     return http.post<ResPage<Database.FileRecord>>(`/databases/uplist`, params);
 };
 export const uploadFile = (mysqlName: string, params: FormData) => {
@@ -36,8 +33,8 @@ export const addMysqlDB = (params: Database.MysqlDBCreate) => {
 export const updateMysqlDBInfo = (params: Database.ChangeInfo) => {
     return http.put(`/databases/${params.id}`, params);
 };
-export const updateMysqlVariables = (mysqlName: string, params: Array<Database.VariablesUpdate>) => {
-    return http.post(`/databases/variables/update/${mysqlName}`, params);
+export const updateMysqlVariables = (params: Array<Database.VariablesUpdate>) => {
+    return http.post(`/databases/variables/update`, params);
 };
 export const updateMysqlConfByFile = (params: Database.MysqlConfUpdateByFile) => {
     return http.post(`/databases/conf/update/byfile`, params);
@@ -46,17 +43,17 @@ export const deleteMysqlDB = (params: { ids: number[] }) => {
     return http.post(`/databases/del`, params);
 };
 
-export const loadMysqlBaseInfo = (param: string) => {
-    return http.get<Database.BaseInfo>(`/databases/baseinfo/${param}`);
+export const loadMysqlBaseInfo = () => {
+    return http.get<Database.BaseInfo>(`/databases/baseinfo`);
 };
-export const loadMysqlVariables = (param: string) => {
-    return http.get<Database.MysqlVariables>(`/databases/variables/${param}`);
+export const loadMysqlVariables = () => {
+    return http.get<Database.MysqlVariables>(`/databases/variables`);
 };
-export const loadMysqlStatus = (param: string) => {
-    return http.get<Database.MysqlStatus>(`/databases/status/${param}`);
+export const loadMysqlStatus = () => {
+    return http.get<Database.MysqlStatus>(`/databases/status`);
 };
-export const loadVersions = () => {
-    return http.get(`/databases/versions`);
+export const loadDBNames = () => {
+    return http.get<Array<string>>(`/databases/dbs`);
 };
 
 // redis

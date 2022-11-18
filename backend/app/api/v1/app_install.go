@@ -1,12 +1,14 @@
 package v1
 
 import (
+	"errors"
+	"reflect"
+
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/gin-gonic/gin"
-	"reflect"
 )
 
 func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
@@ -35,6 +37,20 @@ func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 
 		helper.SuccessWithData(c, list)
 	}
+}
+
+func (b *BaseApi) CheckAppInstalld(c *gin.Context) {
+	key, ok := c.Params.Get("key")
+	if !ok {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error key in path"))
+		return
+	}
+	checkData, err := appInstallService.CheckExist(key)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, checkData)
 }
 
 func (b *BaseApi) SyncInstalled(c *gin.Context) {

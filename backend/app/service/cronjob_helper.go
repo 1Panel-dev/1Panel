@@ -78,7 +78,7 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 	if err != nil {
 		return "", err
 	}
-	app, err := mysqlRepo.LoadBaseInfoByName(cronjob.Database)
+	app, err := mysqlRepo.LoadBaseInfoByKey("mysql")
 	if err != nil {
 		return "", err
 	}
@@ -94,8 +94,8 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 
 	if cronjob.Type == "database" {
 		fileName = fmt.Sprintf("db_%s_%s.sql.gz", cronjob.DBName, time.Now().Format("20060102150405"))
-		backupDir = fmt.Sprintf("database/%s/%s/%s", app.Key, cronjob.Database, cronjob.DBName)
-		err = backupMysql(backup.Type, baseDir, backupDir, cronjob.Database, cronjob.DBName, fileName)
+		backupDir = fmt.Sprintf("database/mysql/%s/%s", app.Name, cronjob.DBName)
+		err = backupMysql(backup.Type, baseDir, backupDir, app.Name, cronjob.DBName, fileName)
 		if err != nil {
 			return "", err
 		}
