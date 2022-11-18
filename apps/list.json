@@ -12,27 +12,18 @@
     {
       "key": "Database",
       "name": "数据库"
+    },
+    {
+      "key": "Tool",
+      "name": "工具"
     }
   ],
   "items": [
     {
-      "key": "mysql5.7",
-      "name": "Mysql5.7",
+      "key": "mysql",
+      "name": "Mysql",
       "tags": ["Database"],
-      "versions": ["5.7.39"],
-      "short_desc": "常用关系型数据库",
-      "author": "Oracle",
-      "type": "runtime",
-      "required": [],
-      "crossVersionUpdate": false,
-      "limit": 1,
-      "source": "https://www.mysql.com"
-    },
-    {
-      "key": "mysql8.0",
-      "name": "Mysql8.0",
-      "tags": ["Database"],
-      "versions": ["8.0.30"],
+      "versions": ["5.7.39","8.0.30"],
       "short_desc": "常用关系型数据库",
       "author": "Oracle",
       "type": "runtime",
@@ -62,7 +53,7 @@
       "short_desc": "老牌博客网站模版",
       "author": "Wordpress",
       "type": "website",
-      "required": ["mysql8.0"],
+      "required": ["mysql"],
       "limit": 0,
       "crossVersionUpdate": true,
       "source": "http://wordpress.org/"
@@ -79,6 +70,45 @@
       "limit": 0,
       "crossVersionUpdate": true,
       "source": "https://redis.io/"
+    },
+    {
+      "key": "halo",
+      "name": "Halo",
+      "tags": ["WebSite"],
+      "versions": ["1.6.0"],
+      "short_desc": "现代化的CMS",
+      "author": "Halo",
+      "type": "website",
+      "required": ["mysql"],
+      "limit": 0,
+      "crossVersionUpdate": true,
+      "source": "https://halo.run/"
+    },
+    {
+      "key": "phpmyadmin",
+      "name": "phpmyadmin",
+      "tags": ["Tool"],
+      "versions": ["5.2.0"],
+      "short_desc": "Mysql 客户端",
+      "author": "phpmyadmin",
+      "type": "tool",
+      "required": ["mysql"],
+      "limit": 0,
+      "crossVersionUpdate": true,
+      "source": "https://www.phpmyadmin.net/"
+    },
+    {
+      "key": "redis-commander",
+      "name": "redis-commander",
+      "tags": ["Tool"],
+      "versions": ["0.8.0"],
+      "short_desc": "Redis 客户端",
+      "author": "redis-commander",
+      "type": "tool",
+      "required": ["redis"],
+      "limit": 0,
+      "crossVersionUpdate": true,
+      "source": "https://github.com/joeferner/redis-commander"
     }
   ]
 }

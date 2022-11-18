@@ -1,0 +1,15 @@
+version: '3'
+services:
+  1panel_phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2.0
+    container_name: 1panel_phpmyadmin
+    ports:
+      - ${PANEL_APP_PORT_HTTP}:80
+    environment:
+      - PMA_HOST=${PANEL_DB_HOST}
+    networks:
+      - 1panel
+
+networks:
+  1panel:
+    external: true

@@ -305,10 +305,10 @@ func (a AppService) SyncInstalled(installId uint) error {
 }
 
 func (a AppService) SyncAppList() error {
-	if err := getAppFromOss(); err != nil {
-		global.LOG.Errorf("get app from oss  error: %s", err.Error())
-		return err
-	}
+	//if err := getAppFromOss(); err != nil {
+	//	global.LOG.Errorf("get app from oss  error: %s", err.Error())
+	//	return err
+	//}
 
 	appDir := constant.AppResourceDir
 	listFile := path.Join(appDir, "list.json")
