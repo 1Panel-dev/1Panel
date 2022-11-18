@@ -21,7 +21,7 @@ func (a *AppRouter) InitAppRouter(Router *gin.RouterGroup) {
 		appRouter.GET("/detail/:appId/:version", baseApi.GetAppDetail)
 		appRouter.POST("/install", baseApi.InstallApp)
 		appRouter.GET("/installed/:appInstallId/versions", baseApi.GetUpdateVersions)
-		appRouter.POST("/installed", baseApi.SearchInstalled)
+		appRouter.POST("/installed", baseApi.SearchAppInstalled)
 		appRouter.POST("/installed/op", baseApi.OperateInstalled)
 		appRouter.POST("/installed/sync", baseApi.SyncInstalled)
 		appRouter.POST("/installed/backups", baseApi.SearchInstalledBackup)

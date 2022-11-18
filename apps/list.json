@@ -1,5 +1,5 @@
 {
-  "version": "0.0.2",
+  "version": "0.0.6",
   "tags": [
     {
       "key": "WebSite",
@@ -21,10 +21,9 @@
       "tags": ["Database"],
       "versions": ["5.7.39"],
       "short_desc": "常用关系型数据库",
-      "icon": "mysql.png",
       "author": "Oracle",
       "type": "runtime",
-      "required": [""],
+      "required": [],
       "crossVersionUpdate": false,
       "limit": 1,
       "source": "https://www.mysql.com"
@@ -35,10 +34,9 @@
       "tags": ["Database"],
       "versions": ["8.0.30"],
       "short_desc": "常用关系型数据库",
-      "icon": "mysql.png",
       "author": "Oracle",
       "type": "runtime",
-      "required": [""],
+      "required": [],
       "crossVersionUpdate": false,
       "limit": 1,
       "source": "https://www.mysql.com"
@@ -49,10 +47,9 @@
       "tags": ["Server"],
       "versions": ["1.23.1"],
       "short_desc": "高性能的HTTP和反向代理web服务器",
-      "icon": "nginx.png",
       "author": "Nginx",
       "type": "runtime",
-      "required": [""],
+      "required": [],
       "limit": 1,
       "crossVersionUpdate": true,
       "source": "http://nginx.org/"
@@ -63,7 +60,6 @@
       "tags": ["WebSite"],
       "versions": ["6.0.1","6.0.2"],
       "short_desc": "老牌博客网站模版",
-      "icon": "wordpress.png",
       "author": "Wordpress",
       "type": "website",
       "required": ["mysql8.0"],
@@ -77,10 +73,9 @@
       "tags": ["Database"],
       "versions": ["7.0.5","6.0.16"],
       "short_desc": "缓存数据库",
-      "icon": "redis.png",
       "author": "Salvatore Sanfilippo",
       "type": "runtime",
-      "required": [""],
+      "required": [],
       "limit": 0,
       "crossVersionUpdate": true,
       "source": "https://redis.io/"
