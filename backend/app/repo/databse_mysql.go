@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 
@@ -16,8 +17,8 @@ type IMysqlRepo interface {
 	WithByMysqlName(mysqlName string) DBOption
 	List(opts ...DBOption) ([]model.DatabaseMysql, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.DatabaseMysql, error)
-	Create(mysql *model.DatabaseMysql) error
-	Delete(opts ...DBOption) error
+	Create(ctx context.Context, mysql *model.DatabaseMysql) error
+	Delete(ctx context.Context, opts ...DBOption) error
 	Update(id uint, vars map[string]interface{}) error
 	LoadRunningVersion(keys []string) ([]string, error)
 	LoadBaseInfoByName(name string) (*RootInfo, error)
@@ -165,16 +166,12 @@ func (u *MysqlRepo) LoadRedisBaseInfo() (*RootInfo, error) {
 	return &info, nil
 }
 
-func (u *MysqlRepo) Create(mysql *model.DatabaseMysql) error {
-	return global.DB.Create(mysql).Error
+func (u *MysqlRepo) Create(ctx context.Context, mysql *model.DatabaseMysql) error {
+	return getTx(ctx).Create(mysql).Error
 }
 
-func (u *MysqlRepo) Delete(opts ...DBOption) error {
-	db := global.DB
-	for _, opt := range opts {
-		db = opt(db)
-	}
-	return db.Delete(&model.DatabaseMysql{}).Error
+func (u *MysqlRepo) Delete(ctx context.Context, opts ...DBOption) error {
+	return getTx(ctx, opts...).Delete(&model.DatabaseMysql{}).Error
 }
 
 func (u *MysqlRepo) Update(id uint, vars map[string]interface{}) error {
@@ -188,7 +185,7 @@ func (u *MysqlRepo) UpdateDatabaseInfo(id uint, vars map[string]interface{}) err
 	return nil
 }
 
-func (c *MysqlRepo) WithByMysqlName(mysqlName string) DBOption {
+func (u *MysqlRepo) WithByMysqlName(mysqlName string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("mysql_name = ?", mysqlName)
 	}

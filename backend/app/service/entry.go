@@ -48,7 +48,6 @@ var (
 	tagRepo                = repo.RepoGroupApp.TagRepo
 	appInstallRepo         = repo.RepoGroupApp.AppInstallRepo
 	appInstallResourceRepo = repo.RepoGroupApp.AppInstallResourceRpo
-	dataBaseRepo           = repo.RepoGroupApp.DatabaseRepo
 
 	mysqlRepo = repo.RepoGroupApp.MysqlRepo
 

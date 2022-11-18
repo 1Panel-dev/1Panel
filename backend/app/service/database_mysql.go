@@ -3,6 +3,7 @@ package service
 import (
 	"bufio"
 	"compress/gzip"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -272,7 +273,7 @@ func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
 	if err := excuteSql(app.ContainerName, app.Password, grantStr); err != nil {
 		return err
 	}
-	if err := mysqlRepo.Create(&mysql); err != nil {
+	if err := mysqlRepo.Create(context.TODO(), &mysql); err != nil {
 		return err
 	}
 	return nil
@@ -336,7 +337,7 @@ func (u *MysqlService) Delete(name string, ids []uint) error {
 				return err
 			}
 		}
-		_ = mysqlRepo.Delete(commonRepo.WithByID(db.ID))
+		_ = mysqlRepo.Delete(context.Background(), commonRepo.WithByID(db.ID))
 	}
 	return nil
 }
