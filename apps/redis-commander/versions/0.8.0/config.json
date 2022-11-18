@@ -1,0 +1,29 @@
+{
+  "formFields": [
+    {
+      "type": "service",
+      "key": "redis",
+      "labelZh": "Redis 服务",
+      "labelEn": "Redis Service",
+      "required": true,
+      "default": "",
+      "envKey": "PANEL_REDIS_HOST"
+    },
+    {
+      "type": "text",
+      "labelZh": "密码",
+      "labelEn": "Password",
+      "required": true,
+      "default": "eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81",
+        "envKey": "PANEL_DB_ROOT_PASSWORD"
+    },
+    {
+      "type": "number",
+      "labelZh": "端口",
+      "labelEn": "Port",
+      "required": true,
+      "default": 8081,
+      "envKey": "PANEL_APP_PORT_HTTP"
+    }
+  ]
+}

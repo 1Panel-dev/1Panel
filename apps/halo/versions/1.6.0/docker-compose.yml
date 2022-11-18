@@ -1,0 +1,24 @@
+version: "3"
+services:
+  1panel_halo:
+    image: halohub/halo:1.6.0
+    container_name: ${CONTAINER_NAME}
+    restart: always
+    networks:
+      - 1panel
+    volumes:
+      - ./data:/root/.halo
+    ports:
+      - ${PANEL_APP_PORT_HTTP}:8090
+    environment:
+      SERVER_PORT: 8090
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_DATASOURCE_URL: jdbc:mysql://${PANEL_DB_HOST}:3306/${PANEL_DB_NAME}?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: ${PANEL_DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${PANEL_DB_USER_PASSWORD}
+      HALO_ADMIN_PATH: admin
+      HALO_CACHE: memory
+
+networks:
+  1panel:
+    external: true

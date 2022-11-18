@@ -2,7 +2,7 @@
   "formFields": [
     {
       "type": "service",
-      "key": "mysql8.0",
+      "key": "mysql",
       "labelZh": "数据库服务",
       "labelEn": "Database Service",
       "required": true,

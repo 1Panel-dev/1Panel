@@ -1,0 +1,16 @@
+version: '3'
+services:
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    networks:
+      - 1panel
+    environment:
+      - REDIS_HOSTS=1panel:${PANEL_REDIS_HOST}:6379:0:${PANEL_DB_ROOT_PASSWORD}
+    ports:
+      - ${PANEL_APP_PORT_HTTP}:8081
+networks:
+  1panel:
+    external: true
