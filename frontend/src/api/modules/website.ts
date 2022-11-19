@@ -1,6 +1,7 @@
 import http from '@/api';
 import { ReqPage, ResPage } from '../interface';
 import { WebSite } from '../interface/website';
+import { File } from '../interface/file';
 
 export const SearchWebSites = (req: WebSite.WebSiteSearch) => {
     return http.post<ResPage<WebSite.WebSite>>(`/websites/search`, req);
@@ -16,6 +17,10 @@ export const UpdateWebsite = (req: WebSite.WebSiteUpdateReq) => {
 
 export const GetWebsite = (id: number) => {
     return http.get<WebSite.WebSiteDTO>(`/websites/${id}`);
+};
+
+export const GetWebsiteNginx = (id: number) => {
+    return http.get<File.File>(`/websites/${id}/nginx`);
 };
 
 export const DeleteWebsite = (req: WebSite.WebSiteDel) => {
