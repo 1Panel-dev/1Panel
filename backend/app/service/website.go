@@ -6,8 +6,10 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
+	"path"
 	"reflect"
 	"strings"
 	"time"
@@ -61,6 +63,9 @@ func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
 
 	otherDomainArray := strings.Split(create.OtherDomains, "\n")
 	for _, domain := range otherDomainArray {
+		if domain == "" {
+			continue
+		}
 		domainModel, err := getDomain(domain, website.ID)
 		if err != nil {
 			tx.Rollback()
@@ -238,4 +243,31 @@ func (w WebsiteService) UpdateNginxConfigByScope(req dto.NginxConfigReq) error {
 	}
 
 	return updateNginxConfig(website, getNginxParams(req.Params, keys), req.Scope)
+}
+
+func (w WebsiteService) GetWebsiteNginxConfig(websiteId uint) (dto.FileInfo, error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteId))
+	if err != nil {
+		return dto.FileInfo{}, err
+	}
+
+	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
+	if err != nil {
+		return dto.FileInfo{}, err
+	}
+	nginxInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithAppId(nginxApp.ID))
+	if err != nil {
+		return dto.FileInfo{}, err
+	}
+
+	configPath := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "conf", "conf.d", website.Alias+".conf")
+
+	info, err := files.NewFileInfo(files.FileOption{
+		Path:   configPath,
+		Expand: true,
+	})
+	if err != nil {
+		return dto.FileInfo{}, err
+	}
+	return dto.FileInfo{FileInfo: *info}, nil
 }

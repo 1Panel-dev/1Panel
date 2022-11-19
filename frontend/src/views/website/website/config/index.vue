@@ -8,7 +8,9 @@
                 <Safety :key="id" :id="id" v-if="index === 'safety'"></Safety>
             </el-tab-pane>
             <el-tab-pane label="备份">反代</el-tab-pane>
-            <el-tab-pane label="源文">反代</el-tab-pane>
+            <el-tab-pane label="源文" name="resource">
+                <Resource :key="id" :id="id" v-if="index === 'resource'"></Resource>
+            </el-tab-pane>
         </el-tabs>
     </LayoutContent>
 </template>
@@ -18,6 +20,7 @@ import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, ref } from 'vue';
 import Basic from './basic/index.vue';
 import Safety from './safety/index.vue';
+import Resource from './resource/index.vue';
 import router from '@/routers';
 
 const props = defineProps({

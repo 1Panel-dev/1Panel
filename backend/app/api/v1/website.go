@@ -80,6 +80,21 @@ func (b *BaseApi) GetWebSite(c *gin.Context) {
 	helper.SuccessWithData(c, website)
 }
 
+func (b *BaseApi) GetWebSiteNginx(c *gin.Context) {
+
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	fileInfo, err := websiteService.GetWebsiteNginxConfig(id)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, fileInfo)
+}
+
 func (b *BaseApi) GetWebDomains(c *gin.Context) {
 
 	websiteId, err := helper.GetIntParamByKey(c, "websiteId")
