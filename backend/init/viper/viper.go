@@ -43,13 +43,12 @@ func InitDir() {
 	constant.BackupDir = path.Join(constant.DefaultDataDir, "backup")
 	constant.AppBackupDir = path.Join(constant.BackupDir, "apps")
 
+	dirs := []string{constant.DefaultDataDir, constant.ResourceDir, constant.AppResourceDir, constant.AppInstallDir, constant.BackupDir, constant.AppBackupDir}
+
 	fileOp := files.NewFileOp()
-	createDir(fileOp, constant.DefaultDataDir)
-	createDir(fileOp, constant.ResourceDir)
-	createDir(fileOp, constant.AppResourceDir)
-	createDir(fileOp, constant.AppInstallDir)
-	createDir(fileOp, constant.BackupDir)
-	createDir(fileOp, constant.AppBackupDir)
+	for _, dir := range dirs {
+		createDir(fileOp, dir)
+	}
 }
 
 func createDir(fileOp files.FileOp, dirPath string) {

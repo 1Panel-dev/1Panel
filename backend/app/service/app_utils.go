@@ -419,6 +419,11 @@ func copyAppData(key, version, installName string, params map[string]interface{}
 	installDir := path.Join(constant.AppInstallDir, key)
 	installVersionDir := path.Join(installDir, version)
 	fileOp := files.NewFileOp()
+	if fileOp.Stat(installVersionDir) {
+		if err = fileOp.DeleteDir(installVersionDir); err != nil {
+			return
+		}
+	}
 	if err = fileOp.Copy(resourceDir, installVersionDir); err != nil {
 		return
 	}
