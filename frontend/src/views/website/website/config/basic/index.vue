@@ -9,7 +9,9 @@
         <el-tab-pane :label="$t('website.rate')">
             <LimitConn :id="id" v-if="index == '2'"></LimitConn>
         </el-tab-pane>
-        <el-tab-pane :label="'HTTPS'"></el-tab-pane>
+        <el-tab-pane :label="'HTTPS'">
+            <HTTPS :id="id" v-if="index == '3'"></HTTPS>
+        </el-tab-pane>
         <el-tab-pane :label="$t('website.other')">
             <Other :id="id" v-if="index == '4'"></Other>
         </el-tab-pane>
@@ -23,6 +25,7 @@ import Doamin from './domain/index.vue';
 import Default from './default-doc/index.vue';
 import LimitConn from './limit-conn/index.vue';
 import Other from './other/index.vue';
+import HTTPS from './https/index.vue';
 
 const props = defineProps({
     id: {

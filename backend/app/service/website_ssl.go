@@ -7,15 +7,17 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
-	"path"
 	"strings"
 )
 
 type WebSiteSSLService struct {
 }
 
-func (w WebSiteSSLService) Page(search dto.PageInfo) (int64, []dto.WebsiteSSLDTO, error) {
+func (w WebSiteSSLService) Page(search dto.WebsiteSSLSearch) (int64, []dto.WebsiteSSLDTO, error) {
 	total, sslList, err := websiteSSLRepo.Page(search.Page, search.PageSize, commonRepo.WithOrderBy("created_at desc"))
+	if err != nil {
+		return 0, nil, err
+	}
 	var sslDTOs []dto.WebsiteSSLDTO
 	for _, ssl := range sslList {
 		sslDTOs = append(sslDTOs, dto.WebsiteSSLDTO{
@@ -23,6 +25,20 @@ func (w WebSiteSSLService) Page(search dto.PageInfo) (int64, []dto.WebsiteSSLDTO
 		})
 	}
 	return total, sslDTOs, err
+}
+
+func (w WebSiteSSLService) Search() ([]dto.WebsiteSSLDTO, error) {
+	sslList, err := websiteSSLRepo.List()
+	if err != nil {
+		return nil, err
+	}
+	var sslDTOs []dto.WebsiteSSLDTO
+	for _, ssl := range sslList {
+		sslDTOs = append(sslDTOs, dto.WebsiteSSLDTO{
+			WebSiteSSL: ssl,
+		})
+	}
+	return sslDTOs, err
 }
 
 func (w WebSiteSSLService) Create(create dto.WebsiteSSLCreate) (dto.WebsiteSSLCreate, error) {
@@ -140,38 +156,6 @@ func (w WebSiteSSLService) Renew(sslId uint) error {
 	websiteSSL.Organization = cert.Issuer.Organization[0]
 
 	return websiteSSLRepo.Save(websiteSSL)
-}
-
-func (w WebSiteSSLService) Apply(apply dto.WebsiteSSLApply) (dto.WebsiteSSLApply, error) {
-	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(apply.SSLID))
-	if err != nil {
-		return dto.WebsiteSSLApply{}, err
-	}
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(apply.WebsiteID))
-	if err != nil {
-		return dto.WebsiteSSLApply{}, err
-	}
-	if err := createPemFile(websiteSSL); err != nil {
-		return dto.WebsiteSSLApply{}, err
-	}
-	nginxParams := getNginxParamsFromStaticFile(dto.SSL)
-	for i, param := range nginxParams {
-		if param.Name == "ssl_certificate" {
-			nginxParams[i].Params = []string{path.Join("/etc/nginx/ssl", websiteSSL.PrimaryDomain, "fullchain.pem")}
-		}
-		if param.Name == "ssl_certificate_key" {
-			nginxParams[i].Params = []string{path.Join("/etc/nginx/ssl", websiteSSL.PrimaryDomain, "privkey.pem")}
-		}
-	}
-	if err := updateNginxConfig(website, nginxParams, dto.SSL); err != nil {
-		return dto.WebsiteSSLApply{}, err
-	}
-	website.WebSiteSSLID = websiteSSL.ID
-	if err := websiteRepo.Save(context.TODO(), &website); err != nil {
-		return dto.WebsiteSSLApply{}, err
-	}
-
-	return apply, nil
 }
 
 func (w WebSiteSSLService) GetDNSResolve(req dto.WebsiteDNSReq) (dto.WebsiteDNSRes, error) {

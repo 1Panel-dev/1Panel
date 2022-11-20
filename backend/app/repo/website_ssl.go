@@ -33,6 +33,15 @@ func (w WebsiteSSLRepo) GetFirst(opts ...DBOption) (model.WebSiteSSL, error) {
 	return website, nil
 }
 
+func (w WebsiteSSLRepo) List(opts ...DBOption) ([]model.WebSiteSSL, error) {
+	var websites []model.WebSiteSSL
+	db := getDb(opts...).Model(&model.WebSiteSSL{})
+	if err := db.Find(&websites).Error; err != nil {
+		return websites, err
+	}
+	return websites, nil
+}
+
 func (w WebsiteSSLRepo) Create(ctx context.Context, ssl *model.WebSiteSSL) error {
 	return getTx(ctx).Create(ssl).Error
 }

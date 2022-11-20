@@ -5,23 +5,33 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/gin-gonic/gin"
+	"reflect"
 )
 
 func (b *BaseApi) PageWebsiteSSL(c *gin.Context) {
-	var req dto.PageInfo
+	var req dto.WebsiteSSLSearch
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	total, accounts, err := websiteSSLService.Page(req)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
+	if !reflect.DeepEqual(req.PageInfo, dto.PageInfo{}) {
+		total, accounts, err := websiteSSLService.Page(req)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+		helper.SuccessWithData(c, dto.PageResult{
+			Total: total,
+			Items: accounts,
+		})
+	} else {
+		list, err := websiteSSLService.Search()
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+		helper.SuccessWithData(c, list)
 	}
-	helper.SuccessWithData(c, dto.PageResult{
-		Total: total,
-		Items: accounts,
-	})
 }
 
 func (b *BaseApi) CreateWebsiteSSL(c *gin.Context) {
@@ -49,20 +59,6 @@ func (b *BaseApi) RenewWebsiteSSL(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, nil)
-}
-
-func (b *BaseApi) ApplyWebsiteSSL(c *gin.Context) {
-	var req dto.WebsiteSSLApply
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	res, err := websiteSSLService.Apply(req)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, res)
 }
 
 func (b *BaseApi) GetDNSResolve(c *gin.Context) {

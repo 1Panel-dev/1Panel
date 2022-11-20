@@ -26,5 +26,7 @@ func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/domains", baseApi.CreateWebDomain)
 		groupRouter.POST("/config", baseApi.GetNginxConfig)
 		groupRouter.POST("/config/update", baseApi.UpdateNginxConfig)
+		groupRouter.GET("/:id/https", baseApi.GetHTTPSConfig)
+		groupRouter.POST("/:id/https", baseApi.UpdateHTTPSConfig)
 	}
 }

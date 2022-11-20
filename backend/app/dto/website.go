@@ -69,3 +69,23 @@ type WebSiteDomainCreate struct {
 	Port      int    `json:"port"`
 	Domain    string `json:"domain"`
 }
+
+type WebsiteHTTPS struct {
+	Enable bool             `json:"enable"`
+	SSL    model.WebSiteSSL `json:"SSL"`
+}
+
+type SSlType string
+
+const (
+	SSLExisted SSlType = "existed"
+	SSLAuto    SSlType = "auto"
+	SSLManual  SSlType = "manual"
+)
+
+type WebsiteHTTPSOp struct {
+	WebsiteID    uint    `json:"websiteId"`
+	Enable       bool    `json:"enable"`
+	WebsiteSSLID uint    `json:"websiteSSLId"`
+	Type         SSlType `json:"type"`
+}

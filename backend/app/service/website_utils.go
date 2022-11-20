@@ -308,7 +308,7 @@ func deleteNginxConfig(website model.WebSite, keys []string) error {
 	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxConfig.ContainerName)
 }
 
-func createPemFile(websiteSSL model.WebSiteSSL) error {
+func createPemFile(website model.WebSite, websiteSSL model.WebSiteSSL) error {
 	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
 	if err != nil {
 		return err
@@ -318,7 +318,7 @@ func createPemFile(websiteSSL model.WebSiteSSL) error {
 		return err
 	}
 
-	configDir := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "ssl", websiteSSL.PrimaryDomain)
+	configDir := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "ssl", website.Alias)
 	fileOp := files.NewFileOp()
 
 	if !fileOp.Stat(configDir) {
@@ -347,6 +347,27 @@ func createPemFile(websiteSSL model.WebSiteSSL) error {
 	if err := fileOp.WriteFile(privatePemFile, strings.NewReader(websiteSSL.PrivateKey), 0644); err != nil {
 		return err
 	}
+	return nil
+}
+
+func applySSL(website model.WebSite, websiteSSL model.WebSiteSSL) error {
+
+	if err := createPemFile(website, websiteSSL); err != nil {
+		return err
+	}
+	nginxParams := getNginxParamsFromStaticFile(dto.SSL)
+	for i, param := range nginxParams {
+		if param.Name == "ssl_certificate" {
+			nginxParams[i].Params = []string{path.Join("/etc/nginx/ssl", website.Alias, "fullchain.pem")}
+		}
+		if param.Name == "ssl_certificate_key" {
+			nginxParams[i].Params = []string{path.Join("/etc/nginx/ssl", website.Alias, "privkey.pem")}
+		}
+	}
+	if err := updateNginxConfig(website, nginxParams, dto.SSL); err != nil {
+		return err
+	}
+
 	return nil
 }
 

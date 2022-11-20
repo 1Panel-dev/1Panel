@@ -14,6 +14,10 @@ const (
 	Http       = "http"
 )
 
+type WebsiteSSLSearch struct {
+	PageInfo
+}
+
 type WebsiteSSLCreate struct {
 	PrimaryDomain string      `json:"primaryDomain" validate:"required"`
 	OtherDomains  string      `json:"otherDomains"`
@@ -24,7 +28,7 @@ type WebsiteSSLCreate struct {
 
 type WebsiteSSLApply struct {
 	WebsiteID uint `json:"websiteId" validate:"required"`
-	SSLID     uint `json:"SSLId" validate:"required"`
+	Enable    bool `json:"enable"  validate:"required"`
 }
 
 type WebsiteDNSReq struct {
