@@ -165,4 +165,20 @@ export namespace WebSite {
         value: string;
         type: string;
     }
+
+    export interface SSLReq {
+        name?: string;
+    }
+
+    export interface HTTPSReq {
+        websiteId: number;
+        enable: boolean;
+        websiteSSLId: number;
+        type: string;
+    }
+
+    export interface HTTPSConfig {
+        enable: boolean;
+        SSL: SSL;
+    }
 }

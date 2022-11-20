@@ -95,6 +95,10 @@ export const SearchSSL = (req: ReqPage) => {
     return http.post<ResPage<WebSite.SSL>>(`/websites/ssl/search`, req);
 };
 
+export const ListSSL = (req: WebSite.SSLReq) => {
+    return http.post<WebSite.SSL[]>(`/websites/ssl/search`, req);
+};
+
 export const CreateSSL = (req: WebSite.SSLCreate) => {
     return http.post<WebSite.SSLCreate>(`/websites/ssl`, req);
 };
@@ -117,4 +121,12 @@ export const RenewSSL = (req: WebSite.SSLRenew) => {
 
 export const GetDnsResolve = (req: WebSite.DNSResolveReq) => {
     return http.post<WebSite.DNSResolve>(`/websites/ssl/resolve`, req);
+};
+
+export const GetHTTPSConfig = (id: number) => {
+    return http.get<WebSite.HTTPSConfig>(`/websites/${id}/https`);
+};
+
+export const UpdateHTTPSConfig = (req: WebSite.HTTPSReq) => {
+    return http.post<WebSite.HTTPSConfig>(`/websites/${req.websiteId}/https`, req);
 };

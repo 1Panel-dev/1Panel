@@ -185,6 +185,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             loading.value = true;
             CreateSSL(ssl.value)
                 .then(() => {
+                    handleClose();
                     ElMessage.success(i18n.global.t('commons.msg.createSuccess'));
                 })
                 .finally(() => {

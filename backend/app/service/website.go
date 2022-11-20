@@ -271,3 +271,52 @@ func (w WebsiteService) GetWebsiteNginxConfig(websiteId uint) (dto.FileInfo, err
 	}
 	return dto.FileInfo{FileInfo: *info}, nil
 }
+
+func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (dto.WebsiteHTTPS, error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteId))
+	if err != nil {
+		return dto.WebsiteHTTPS{}, err
+	}
+	var res dto.WebsiteHTTPS
+	if website.WebSiteSSLID == 0 {
+		res.Enable = false
+		return res, nil
+	}
+	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(website.WebSiteSSLID))
+	if err != nil {
+		return dto.WebsiteHTTPS{}, err
+	}
+	res.SSL = websiteSSL
+	res.Enable = true
+	return res, nil
+}
+
+func (w WebsiteService) OpWebsiteHTTPS(req dto.WebsiteHTTPSOp) (dto.WebsiteHTTPS, error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return dto.WebsiteHTTPS{}, err
+	}
+
+	var res dto.WebsiteHTTPS
+	res.Enable = req.Enable
+	ssl, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(req.WebsiteSSLID))
+	if err != nil {
+		return dto.WebsiteHTTPS{}, err
+	}
+
+	if req.Type == dto.SSLExisted {
+		website.WebSiteSSLID = ssl.ID
+		if err := websiteRepo.Save(context.TODO(), &website); err != nil {
+			return dto.WebsiteHTTPS{}, err
+		}
+		res.SSL = ssl
+	}
+
+	if req.Enable {
+		if err := applySSL(website, ssl); err != nil {
+			return dto.WebsiteHTTPS{}, err
+		}
+	}
+
+	return res, nil
+}

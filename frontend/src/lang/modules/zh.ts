@@ -739,5 +739,6 @@ export default {
         renewHelper: '确定续签证书？',
         renewSuccess: '续签证书',
         config: '配置',
+        enableHTTPS: '启用HTTPS',
     },
 };
