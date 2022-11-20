@@ -74,7 +74,7 @@ func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) e
 		server.UpdateListen(strconv.Itoa(domain.Port), false)
 	}
 	server.UpdateServerName(serverNames)
-	proxy := fmt.Sprintf("http://%s:%d", appInstall.ServiceName, appInstall.HttpPort)
+	proxy := fmt.Sprintf("http://127.0.0.1:%d", appInstall.HttpPort)
 	server.UpdateRootProxy([]string{proxy})
 
 	config.FilePath = configPath
