@@ -73,7 +73,7 @@ const search = (req: WebSite.NginxConfigReq) => {
     loading.value = true;
     GetNginxConfig(req)
         .then((res) => {
-            if (res.data.length > 0) {
+            if (res.data && res.data.length > 0) {
                 const indexParam = res.data[0];
                 let values = '';
                 for (const param of indexParam.params) {

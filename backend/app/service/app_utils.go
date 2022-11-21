@@ -264,10 +264,7 @@ func backupInstall(ctx context.Context, install model.AppInstall) error {
 	backup.AppDetailId = install.AppDetailId
 	backup.Param = install.Param
 
-	if err := appInstallBackupRepo.Create(ctx, backup); err != nil {
-		return err
-	}
-	return nil
+	return appInstallBackupRepo.Create(ctx, backup)
 }
 
 func restoreInstall(install model.AppInstall, backupId uint) error {
