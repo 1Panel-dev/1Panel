@@ -47,12 +47,18 @@ func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
 		Protocol:       constant.ProtocolHTTP,
 	}
 
-	if create.AppType == dto.NewApp {
-		install, err := ServiceGroupApp.Install(create.AppInstall.Name, create.AppInstall.AppDetailId, create.AppInstall.Params)
-		if err != nil {
+	if create.Type == "deployment" {
+		if create.AppType == dto.NewApp {
+			install, err := ServiceGroupApp.Install(create.AppInstall.Name, create.AppInstall.AppDetailId, create.AppInstall.Params)
+			if err != nil {
+				return err
+			}
+			website.AppInstallID = install.ID
+		}
+	} else {
+		if err := createStaticHtml(website); err != nil {
 			return err
 		}
-		website.AppInstallID = install.ID
 	}
 
 	tx, ctx := getTxAndContext()

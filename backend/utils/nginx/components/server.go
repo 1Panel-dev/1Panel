@@ -127,26 +127,41 @@ func (s *Server) UpdateServerName(names []string) {
 	s.UpdateDirectives("server_name", serverNameDirective)
 }
 
-func (s *Server) UpdateRootProxy(proxy []string) {
-	//TODD 根据ID修改
-	dirs := s.FindDirectives("location")
-	for _, dir := range dirs {
-		location, ok := dir.(*Location)
-		if ok && location.Match == "/" {
-			newDir := Directive{
-				Name:       "location",
-				Parameters: []string{"/"},
-				Block:      &Block{},
-			}
-			block := &Block{}
-			block.Directives = append(block.Directives, &Directive{
-				Name:       "proxy_pass",
-				Parameters: proxy,
-			})
-			newDir.Block = block
-			s.UpdateDirectiveBySecondKey("location", "/", newDir)
-		}
+func (s *Server) UpdateRoot(path string) {
+	rootDir := Directive{
+		Name:       "root",
+		Parameters: []string{path},
 	}
+	s.UpdateDirectives("root", rootDir)
+}
+
+func (s *Server) UpdateRootLocation() {
+	newDir := Directive{
+		Name:       "location",
+		Parameters: []string{"/"},
+		Block:      &Block{},
+	}
+	block := &Block{}
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "root",
+		Parameters: []string{"index.html"},
+	})
+	newDir.Block = block
+}
+
+func (s *Server) UpdateRootProxy(proxy []string) {
+	newDir := Directive{
+		Name:       "location",
+		Parameters: []string{"/"},
+		Block:      &Block{},
+	}
+	block := &Block{}
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "proxy_pass",
+		Parameters: proxy,
+	})
+	newDir.Block = block
+	s.UpdateDirectiveBySecondKey("location", "/", newDir)
 }
 
 func (s *Server) UpdateDirectiveBySecondKey(name string, key string, directive Directive) {
