@@ -10,5 +10,6 @@ services:
       - ./log:/var/log/nginx
       - ./conf/conf.d:/etc/nginx/conf.d/
       - ./ssl:/etc/nginx/ssl
+      - ./www:/www/root/
 
 

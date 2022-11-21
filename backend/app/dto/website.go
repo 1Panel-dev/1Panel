@@ -21,7 +21,7 @@ type WebSiteCreate struct {
 	Alias          string        `json:"alias" validate:"required"`
 	Remark         string        `json:"remark"`
 	OtherDomains   string        `json:"otherDomains"`
-	AppType        AppType       `json:"appType" validate:"required"`
+	AppType        AppType       `json:"appType"`
 	AppInstall     NewAppInstall `json:"appInstall"`
 	AppID          uint          `json:"appID"`
 	AppInstallID   uint          `json:"appInstallID"`

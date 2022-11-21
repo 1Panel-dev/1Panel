@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <el-row :gutter="20">
+        <el-row :gutter="5">
             <el-col :span="12">
                 <el-input v-model="req.name" @blur="searchByName"></el-input>
             </el-col>
@@ -12,7 +12,7 @@
             <el-col :span="1">
                 <el-button @click="sync">{{ $t('app.sync') }}</el-button>
             </el-col>
-            <el-col v-for="(app, index) in apps" :key="index" :xs="8" :sm="8" :lg="4">
+            <el-col v-for="(app, index) in apps" :key="index" :span="6">
                 <div @click="getAppDetail(app.id)">
                     <el-card :body-style="{ padding: '0px' }" class="a-card">
                         <el-row :gutter="24">
@@ -123,13 +123,13 @@ onMounted(() => {
     padding: 5px;
 
     .icon {
-        width: 100%;
+        width: 95%;
         height: 80%;
         padding: 10%;
         margin-top: 5px;
         .image {
-            width: auto;
-            height: auto;
+            width: 80%;
+            height: 80%;
         }
     }
 

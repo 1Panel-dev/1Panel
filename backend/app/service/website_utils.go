@@ -43,6 +43,35 @@ func getDomain(domainStr string, websiteID uint) (model.WebSiteDomain, error) {
 	return model.WebSiteDomain{}, nil
 }
 
+func createStaticHtml(website *model.WebSite) error {
+	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
+	if err != nil {
+		return err
+	}
+	nginxInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithAppId(nginxApp.ID))
+	if err != nil {
+		return err
+	}
+	indexFolder := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "www", website.Alias)
+	indexPath := path.Join(indexFolder, "index.html")
+	indexContent := string(nginx_conf.Index)
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(indexFolder) {
+		if err := fileOp.CreateDir(indexFolder, 0755); err != nil {
+			return err
+		}
+	}
+	if !fileOp.Stat(indexPath) {
+		if err := fileOp.CreateFile(indexPath); err != nil {
+			return err
+		}
+	}
+	if err := fileOp.WriteFile(indexPath, strings.NewReader(indexContent), 0755); err != nil {
+		return err
+	}
+	return nil
+}
+
 func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) error {
 
 	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
@@ -53,14 +82,9 @@ func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) e
 	if err != nil {
 		return err
 	}
-	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
-	if err != nil {
-		return err
-	}
 
 	nginxFileName := website.Alias + ".conf"
 	configPath := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "conf", "conf.d", nginxFileName)
-
 	nginxContent := string(nginx_conf.WebsiteDefault)
 	config := parser.NewStringParser(nginxContent).Parse()
 	servers := config.FindServers()
@@ -74,8 +98,17 @@ func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) e
 		server.UpdateListen(strconv.Itoa(domain.Port), false)
 	}
 	server.UpdateServerName(serverNames)
-	proxy := fmt.Sprintf("http://127.0.0.1:%d", appInstall.HttpPort)
-	server.UpdateRootProxy([]string{proxy})
+	if website.Type == "deployment" {
+		appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+		if err != nil {
+			return err
+		}
+		proxy := fmt.Sprintf("http://127.0.0.1:%d", appInstall.HttpPort)
+		server.UpdateRootProxy([]string{proxy})
+	} else {
+		server.UpdateRoot(path.Join("/www/root", website.Alias))
+		server.UpdateRootLocation()
+	}
 
 	config.FilePath = configPath
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {

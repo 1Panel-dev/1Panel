@@ -15,3 +15,6 @@ var WebsiteDefault []byte
 
 //go:embed limit.conf
 var Limit []byte
+
+//go:embed index.html
+var Index []byte
