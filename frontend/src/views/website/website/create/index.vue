@@ -8,7 +8,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('website.group')" prop="webSiteGroupID">
-                <el-select v-model="website.webSiteGroupID">
+                <el-select v-model="website.webSiteGroupId">
                     <el-option
                         v-for="(group, index) in groups"
                         :key="index"
@@ -33,7 +33,7 @@
                     :label="$t('website.appInstalled')"
                     prop="appInstallID"
                 >
-                    <el-select v-model="website.appInstallID">
+                    <el-select v-model="website.appInstallId">
                         <el-option
                             v-for="(appInstall, index) in appInstalles"
                             :key="index"
@@ -94,7 +94,7 @@
                 ></el-input>
             </el-form-item>
             <el-form-item :label="$t('website.alias')" prop="alias">
-                <el-input v-model="website.alias"></el-input>
+                <el-input v-model="website.alias" :placeholder="$t('website.aliasHelper')"></el-input>
             </el-form-item>
             <el-form-item :label="$t('website.remark')" prop="remark">
                 <el-input v-model="website.remark"></el-input>
@@ -129,8 +129,8 @@ const website = ref({
     alias: '',
     remark: '',
     appType: 'installed',
-    appInstallID: 0,
-    webSiteGroupID: 1,
+    appInstallId: 0,
+    webSiteGroupId: 1,
     otherDomains: '',
     appinstall: {
         appID: 0,
@@ -180,7 +180,7 @@ const searchAppInstalled = () => {
     SearchAppInstalled({ type: 'website' }).then((res) => {
         appInstalles.value = res.data;
         if (res.data.length > 0) {
-            website.value.appInstallID = res.data[0].id;
+            website.value.appInstallId = res.data[0].id;
         }
     });
 };

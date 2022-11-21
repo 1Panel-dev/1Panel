@@ -64,7 +64,7 @@ const search = (req: WebSite.NginxConfigReq) => {
     loading.value = true;
     GetNginxConfig(req)
         .then((res) => {
-            if (res.data.length > 0) {
+            if (res.data && res.data.length > 0) {
                 enable.value = true;
                 for (const param of res.data) {
                     if (param.name === 'limit_conn') {

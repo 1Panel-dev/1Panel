@@ -672,14 +672,14 @@ export default {
         delete: '删除',
         deleteWarn: '删除操作会把数据一并删除,此操作不可回滚,是否继续?',
         syncSuccess: '同步成功',
-        canUpdate: '可更新',
+        canUpdate: '可升级',
         backup: '备份',
         backupName: '文件名称',
         backupPath: '文件路径',
         backupdate: '备份时间',
         restore: '回滚',
         restoreWarn: '回滚操作会重启应用,并替换数据,此操作不可回滚,是否继续?',
-        update: '更新',
+        update: '升级',
         versioneSelect: '请选择版本',
     },
     website: {
@@ -740,5 +740,6 @@ export default {
         renewSuccess: '续签证书',
         config: '配置',
         enableHTTPS: '启用HTTPS',
+        aliasHelper: '代号是网站目录的文件夹名称',
     },
 };

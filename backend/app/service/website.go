@@ -44,6 +44,7 @@ func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
 		ExpireDate:     defaultDate,
 		AppInstallID:   create.AppInstallID,
 		WebSiteGroupID: create.WebSiteGroupID,
+		Protocol:       constant.ProtocolHTTP,
 	}
 
 	if create.AppType == dto.NewApp {
@@ -313,9 +314,12 @@ func (w WebsiteService) OpWebsiteHTTPS(req dto.WebsiteHTTPSOp) (dto.WebsiteHTTPS
 	}
 
 	if req.Enable {
+		website.Protocol = constant.ProtocolHTTPS
 		if err := applySSL(website, ssl); err != nil {
 			return dto.WebsiteHTTPS{}, err
 		}
+	} else {
+		website.Protocol = constant.ProtocolHTTP
 	}
 
 	return res, nil

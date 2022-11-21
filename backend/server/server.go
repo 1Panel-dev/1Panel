@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/gob"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/init/app"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/cron"
@@ -23,6 +24,7 @@ import (
 )
 
 func Start() {
+	app.Init()
 	viper.Init()
 	log.Init()
 	db.Init()

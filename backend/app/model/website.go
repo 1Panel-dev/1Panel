@@ -4,6 +4,7 @@ import "time"
 
 type WebSite struct {
 	BaseModel
+	Protocol       string          `gorm:"type:varchar(64);not null" json:"protocol"`
 	PrimaryDomain  string          `gorm:"type:varchar(128);not null" json:"primaryDomain"`
 	Type           string          `gorm:"type:varchar(64);not null" json:"type"`
 	Alias          string          `gorm:"type:varchar(128);not null" json:"alias"`

@@ -108,7 +108,7 @@ const get = () => {
         if (res.data) {
             form.enable = res.data.enable;
         }
-        if (res.data?.SSL) {
+        if (res.data?.SSL && res.data?.SSL.id > 0) {
             form.websiteSSLId = res.data.SSL.id;
             websiteSSL.value = res.data.SSL;
         }
