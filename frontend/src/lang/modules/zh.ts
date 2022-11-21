@@ -30,6 +30,8 @@ export default {
             recover: '恢复',
             upload: '上传',
             download: '下载',
+            init: '初始化',
+            verify: '验证',
             saveAndEnable: '保存并启用',
         },
         search: {
@@ -74,15 +76,20 @@ export default {
             operateConfirm: '如果确认操作，请手动输入',
         },
         login: {
+            firstLogin: '首次登录，请创建初始管理员用户！',
+            username: '用户名',
+            password: '密码',
+            rePassword: '确认密码',
+            welcome: '欢迎回来，请输入用户名和密码登录！',
             captchaHelper: '请输入验证码',
             safeEntrance: '请使用正确的入口登录面板',
             reason: '错误原因：',
             reasonHelper:
                 '当前新安装的已经开启了安全入口登录，新装机器都会随机一个8位字符的安全入口名称，亦可以在面板设置处修改，如您没记录或不记得了，可以使用以下方式解决',
             solution: '解决方法：',
-            solutionHelper: '在SSH终端输入以下一种命令来解决 1.查看面板入口：/etc/init.d/bt default',
+            solutionHelper: '在 SSH 终端输入以下一种命令来解决 1.查看面板入口：/etc/init.d/bt default',
             warnning: '注意：【关闭安全入口】将使您的面板登录地址被直接暴露在互联网上，非常危险，请谨慎操作',
-            codeInput: '请输入MFA验证器的 6 位验证码',
+            codeInput: '请输入 MFA 验证器的 6 位验证码',
         },
         rule: {
             username: '请输入用户名',
@@ -119,11 +126,6 @@ export default {
             logout: '退出登录',
         },
     },
-    auth: {
-        username: '用户名',
-        email: '邮箱',
-        password: '密码',
-    },
     menu: {
         home: '概览',
         apps: '应用商店',
@@ -157,6 +159,7 @@ export default {
         logout: '退出登录',
     },
     database: {
+        create: '创建数据库',
         noMysql: '当前未检测到 {0} 数据库，请进入应用商店点击安装！',
         goInstall: '去安装',
         source: '来源',

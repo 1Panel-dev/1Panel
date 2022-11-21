@@ -34,8 +34,8 @@
                     </template>
                     <el-table-column type="selection" fix />
                     <el-table-column :label="$t('commons.table.name')" prop="name" />
-                    <el-table-column :label="$t('auth.username')" prop="username" />
-                    <el-table-column :label="$t('auth.password')" prop="password">
+                    <el-table-column :label="$t('commons.login.username')" prop="username" />
+                    <el-table-column :label="$t('commons.login.password')" prop="password">
                         <template #default="{ row }">
                             <div v-if="!row.showPassword">
                                 <span style="float: left">***********</span>
@@ -81,10 +81,14 @@
             <el-form>
                 <el-form ref="changeFormRef" :model="changeForm" label-width="80px">
                     <div v-if="changeForm.operation === 'password'">
-                        <el-form-item :label="$t('auth.username')" prop="userName">
+                        <el-form-item :label="$t('commons.login.username')" prop="userName">
                             <el-input disabled v-model="changeForm.userName"></el-input>
                         </el-form-item>
-                        <el-form-item :label="$t('auth.password')" prop="password" :rules="Rules.requiredInput">
+                        <el-form-item
+                            :label="$t('commons.login.password')"
+                            prop="password"
+                            :rules="Rules.requiredInput"
+                        >
                             <el-input type="password" clearable show-password v-model="changeForm.password"></el-input>
                         </el-form-item>
                     </div>

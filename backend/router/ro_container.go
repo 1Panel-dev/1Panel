@@ -26,8 +26,8 @@ func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
 		baRouter.POST("/search", baseApi.SearchContainer)
 		baRouter.POST("/inspect", baseApi.Inspect)
 		baRouter.POST("", baseApi.ContainerCreate)
+		baRouter.POST("/log", baseApi.ContainerLogs)
 		withRecordRouter.POST("operate", baseApi.ContainerOperation)
-		withRecordRouter.POST("/log", baseApi.ContainerLogs)
 
 		baRouter.POST("/repo/search", baseApi.SearchRepo)
 		baRouter.PUT("/repo/:id", baseApi.UpdateRepo)

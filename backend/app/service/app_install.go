@@ -42,7 +42,7 @@ func (a AppInstallService) Page(req dto.AppInstalledRequest) (int64, []dto.AppIn
 func (a AppInstallService) CheckExist(key string) (*dto.CheckInstalled, error) {
 	app, err := appRepo.GetFirst(appRepo.WithKey(key))
 	if err != nil {
-		return nil, err
+		return &dto.CheckInstalled{IsExist: false}, nil
 	}
 	appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithAppId(app.ID))
 	if appInstall.ID != 0 {

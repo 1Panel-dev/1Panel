@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
@@ -18,6 +19,8 @@ type AuthService struct{}
 
 type IAuthService interface {
 	SafetyStatus(c *gin.Context) error
+	CheckIsFirst() bool
+	InitUser(c *gin.Context, req dto.InitUser) error
 	VerifyCode(code string) (bool, error)
 	SafeEntrance(c *gin.Context, code string) error
 	Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error)
@@ -172,4 +175,41 @@ func (u *AuthService) SafetyStatus(c *gin.Context) error {
 		return errors.New("code not match")
 	}
 	return nil
+}
+
+func (u *AuthService) CheckIsFirst() bool {
+	user, _ := settingRepo.Get(settingRepo.WithByKey("UserName"))
+	pass, _ := settingRepo.Get(settingRepo.WithByKey("Password"))
+	return len(user.Value) == 0 || len(pass.Value) == 0
+}
+
+func (u *AuthService) InitUser(c *gin.Context, req dto.InitUser) error {
+	user, _ := settingRepo.Get(settingRepo.WithByKey("UserName"))
+	pass, _ := settingRepo.Get(settingRepo.WithByKey("Password"))
+	if len(user.Value) == 0 || len(pass.Value) == 0 {
+		newPass, err := encrypt.StringEncrypt(req.Password)
+		if err != nil {
+			return err
+		}
+		if err := settingRepo.Update("UserName", req.Name); err != nil {
+			return err
+		}
+		if err := settingRepo.Update("Password", newPass); err != nil {
+			return err
+		}
+		expiredSetting, err := settingRepo.Get(settingRepo.WithByKey("ExpirationDays"))
+		if err != nil {
+			return err
+		}
+		timeout, _ := strconv.Atoi(expiredSetting.Value)
+		if timeout != 0 {
+			c.SetCookie(constant.PasswordExpiredName, encrypt.Md5(time.Now().Format("20060102150405")), 86400*timeout, "", "", false, false)
+			if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006.01.02 15:04:05")); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	return fmt.Errorf("can't init user because user %s is in system", user.Value)
 }

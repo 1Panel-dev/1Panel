@@ -9,7 +9,11 @@
             <el-row>
                 <el-col :span="1"><br /></el-col>
                 <el-col :span="10">
-                    <el-form-item :label="$t('auth.username')" :rules="Rules.requiredInput" prop="settingInfo.userName">
+                    <el-form-item
+                        :label="$t('commons.login.username')"
+                        :rules="Rules.requiredInput"
+                        prop="settingInfo.userName"
+                    >
                         <el-input clearable v-model="form.settingInfo.userName">
                             <template #append>
                                 <el-button
@@ -22,7 +26,11 @@
                         </el-input>
                     </el-form-item>
 
-                    <el-form-item :label="$t('auth.password')" :rules="Rules.requiredInput" prop="settingInfo.password">
+                    <el-form-item
+                        :label="$t('commons.login.password')"
+                        :rules="Rules.requiredInput"
+                        prop="settingInfo.password"
+                    >
                         <el-input type="password" clearable disabled v-model="form.settingInfo.password">
                             <template #append>
                                 <el-button icon="Setting" @click="passwordVisiable = true">
