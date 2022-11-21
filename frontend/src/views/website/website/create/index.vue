@@ -7,7 +7,7 @@
                     <el-option :label="$t('website.static')" value="static"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item :label="$t('website.group')" prop="webSiteGroupID">
+            <el-form-item :label="$t('website.group')" prop="webSiteGroupId">
                 <el-select v-model="website.webSiteGroupId">
                     <el-option
                         v-for="(group, index) in groups"
@@ -31,7 +31,7 @@
                 <el-form-item
                     v-if="website.appType == 'installed'"
                     :label="$t('website.appInstalled')"
-                    prop="appInstallID"
+                    prop="appInstallId"
                 >
                     <el-select v-model="website.appInstallId">
                         <el-option
@@ -43,10 +43,10 @@
                     </el-select>
                 </el-form-item>
                 <div v-if="website.appType == 'new'">
-                    <el-form-item :label="$t('app.app')" prop="appinstall.appID">
+                    <el-form-item :label="$t('app.app')" prop="appinstall.appId">
                         <el-row :gutter="20">
                             <el-col :span="12">
-                                <el-select v-model="website.appinstall.appID" @change="getApp()">
+                                <el-select v-model="website.appinstall.appId" @change="getApp()">
                                     <el-option
                                         v-for="(app, index) in apps"
                                         :key="index"
@@ -133,9 +133,9 @@ const website = ref({
     webSiteGroupId: 1,
     otherDomains: '',
     appinstall: {
-        appID: 0,
+        appId: 0,
         name: '',
-        appDetailID: 0,
+        appDetailId: 0,
         params: {},
         version: '',
     },
@@ -144,12 +144,12 @@ let rules = ref({
     primaryDomain: [Rules.requiredInput],
     alias: [Rules.requiredInput],
     type: [Rules.requiredInput],
-    webSiteGroupID: [Rules.requiredSelectBusiness],
-    appInstallID: [Rules.requiredSelectBusiness],
+    webSiteGroupId: [Rules.requiredSelectBusiness],
+    appInstallId: [Rules.requiredSelectBusiness],
     appType: [Rules.requiredInput],
     appinstall: {
         name: [Rules.requiredInput],
-        appID: [Rules.requiredSelectBusiness],
+        appId: [Rules.requiredSelectBusiness],
         params: {},
     },
 });
@@ -189,14 +189,14 @@ const searchApp = () => {
     SearchApp(appReq).then((res) => {
         apps.value = res.data.items;
         if (res.data.items.length > 0) {
-            website.value.appinstall.appID = res.data.items[0].id;
+            website.value.appinstall.appId = res.data.items[0].id;
             getApp();
         }
     });
 };
 
 const getApp = () => {
-    GetApp(website.value.appinstall.appID).then((res) => {
+    GetApp(website.value.appinstall.appId).then((res) => {
         appVersions.value = res.data.versions;
         if (res.data.versions.length > 0) {
             website.value.appinstall.version = res.data.versions[0];
@@ -206,8 +206,8 @@ const getApp = () => {
 };
 
 const getAppDetail = (version: string) => {
-    GetAppDetail(website.value.appinstall.appID, version).then((res) => {
-        website.value.appinstall.appDetailID = res.data.id;
+    GetAppDetail(website.value.appinstall.appId, version).then((res) => {
+        website.value.appinstall.appDetailId = res.data.id;
         appDetail.value = res.data;
         appParams.value = res.data.params;
         paramKey.value++;
