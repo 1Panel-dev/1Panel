@@ -123,13 +123,16 @@ onMounted(() => {
     padding: 5px;
 
     .icon {
-        width: 95%;
-        height: 80%;
-        padding: 10%;
-        margin-top: 5px;
+        width: 80px;
+        height: 100%;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        text-align: center;
         .image {
             width: 80%;
             height: 80%;
+            margin: 0 auto;
         }
     }
 
