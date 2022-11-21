@@ -30,19 +30,3 @@ type OperationWithNameAndType struct {
 	Name string `json:"name" validate:"required"`
 	Type string `json:"type" validate:"required"`
 }
-
-type Login struct {
-	Name       string `json:"name" validate:"name,required"`
-	Password   string `json:"password" validate:"required"`
-	Captcha    string `json:"captcha"`
-	CaptchaID  string `json:"captchaID"`
-	AuthMethod string `json:"authMethod"`
-}
-
-type MFALogin struct {
-	Name       string `json:"name" validate:"name,required"`
-	Password   string `json:"password" validate:"required"`
-	Secret     string `json:"secret" validate:"required"`
-	Code       string `json:"code"`
-	AuthMethod string `json:"authMethod"`
-}

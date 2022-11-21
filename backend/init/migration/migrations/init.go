@@ -51,13 +51,13 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.AutoMigrate(&model.Setting{}); err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "UserName", Value: "admin"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "UserName", Value: ""}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "Password", Value: "Sr2qOhssQNg8rGRvqyWhsBDJx+tV5VfLEZXdbax//dA="}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "Password", Value: ""}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "Email", Value: "test@qq.com"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "Email", Value: ""}).Error; err != nil {
 			return err
 		}
 

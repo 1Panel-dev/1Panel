@@ -10,7 +10,7 @@
                 <el-row>
                     <el-col :span="1"><br /></el-col>
                     <el-col :span="10">
-                        <el-form-item
+                        <!-- <el-form-item
                             :label="$t('setting.panelPort')"
                             prop="settingInfo.serverPort"
                             :rules="Rules.number"
@@ -38,8 +38,8 @@
                                     {{ $t('setting.portHelper') }}
                                 </span>
                             </div>
-                        </el-form-item>
-                        <el-form-item
+                        </el-form-item> -->
+                        <!-- <el-form-item
                             :label="$t('setting.safeEntrance')"
                             prop="settingInfo.securityEntrance"
                             :rules="Rules.requiredInput"
@@ -61,7 +61,7 @@
                                     {{ $t('setting.safeEntranceHelper') }}
                                 </span>
                             </div>
-                        </el-form-item>
+                        </el-form-item> -->
                         <el-form-item
                             :label="$t('setting.expirationTime')"
                             prop="settingInfo.expirationTime"

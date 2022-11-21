@@ -15,10 +15,10 @@
                     <el-radio :label="false">{{ $t('commons.false') }}</el-radio>
                 </el-radio-group>
             </el-form-item>
-            <el-form-item v-if="dialogData.rowData!.auth" :label="$t('auth.username')" prop="username">
+            <el-form-item v-if="dialogData.rowData!.auth" :label="$t('commons.login.username')" prop="username">
                 <el-input v-model="dialogData.rowData!.username"></el-input>
             </el-form-item>
-            <el-form-item v-if="dialogData.rowData!.auth" :label="$t('auth.password')" prop="password">
+            <el-form-item v-if="dialogData.rowData!.auth" :label="$t('commons.login.password')" prop="password">
                 <el-input type="password" v-model="dialogData.rowData!.password"></el-input>
             </el-form-item>
             <el-form-item :label="$t('container.downloadUrl')" prop="downloadUrl">

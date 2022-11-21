@@ -30,7 +30,7 @@ func setWebStatic(rootRouter *gin.Engine) {
 	})
 	rootRouter.NoRoute(func(c *gin.Context) {
 		c.Writer.WriteHeader(http.StatusOK)
-		c.Writer.Write(web.IndexByte)
+		_, _ = c.Writer.Write(web.IndexByte)
 		c.Writer.Header().Add("Accept", "text/html")
 		c.Writer.Flush()
 	})
@@ -64,7 +64,7 @@ func Routers() *gin.Engine {
 	}
 
 	PrivateGroup := Router.Group("/api/v1")
-	PrivateGroup.Use(middleware.SafetyAuth())
+	// PrivateGroup.Use(middleware.SafetyAuth())
 	{
 		systemRouter.InitBaseRouter(PrivateGroup)
 		systemRouter.InitHostRouter(PrivateGroup)

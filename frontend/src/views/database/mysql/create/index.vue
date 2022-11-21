@@ -2,7 +2,7 @@
     <el-dialog v-model="createVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
         <template #header>
             <div class="card-header">
-                <span>创建数据库</span>
+                <span>{{ $t('database.create') }}</span>
             </div>
         </template>
         <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
@@ -18,10 +18,10 @@
                     </template>
                 </el-input>
             </el-form-item>
-            <el-form-item :label="$t('auth.username')" prop="username">
+            <el-form-item :label="$t('commons.login.username')" prop="username">
                 <el-input clearable v-model="form.username" />
             </el-form-item>
-            <el-form-item :label="$t('auth.password')" prop="password">
+            <el-form-item :label="$t('commons.login.password')" prop="password">
                 <el-input type="password" clearable show-password v-model="form.password" />
             </el-form-item>
 

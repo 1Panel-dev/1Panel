@@ -1,4 +1,4 @@
-import { Login } from '@/api/interface/index';
+import { Login } from '@/api/interface/auth';
 import http from '@/api';
 
 export const loginApi = (params: Login.ReqLoginForm) => {
@@ -23,4 +23,11 @@ export const entrance = (code: string) => {
 
 export const loginStatus = () => {
     return http.get<any>('/info');
+};
+
+export const checkIsFirst = () => {
+    return http.get<boolean>('/auth/status');
+};
+export const initUser = (params: Login.InitUser) => {
+    return http.post(`/auth/init`, params);
 };

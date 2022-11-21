@@ -29,6 +29,8 @@ export default {
             recover: 'Recover',
             upload: 'Upload',
             download: 'Download',
+            init: 'Init',
+            verify: 'Verify',
             saveAndEnable: 'Save and enable',
         },
         search: {
@@ -72,6 +74,11 @@ export default {
             operate: 'Operate',
         },
         login: {
+            firstLogin: 'First login, please create an initial administrator user!',
+            username: 'UserName',
+            password: 'Password',
+            rePassword: 'Confirm Password',
+            welcome: 'Welcome back, please enter your username and password to log in!',
             captchaHelper: 'Please enter the verification code',
             safeEntrance: 'Please use the correct entry to log in to the panel',
             reason: 'Cause of error:',
@@ -120,11 +127,6 @@ export default {
             logout: 'Logout',
         },
     },
-    auth: {
-        username: 'Username',
-        email: 'Email',
-        password: 'Password',
-    },
     menu: {
         home: 'Overview',
         apps: 'App Store',
@@ -157,6 +159,7 @@ export default {
         logout: 'Logout',
     },
     database: {
+        create: 'Create database',
         noMysql: 'No {0} database is detected, please go to App Store and click Install!',
         goInstall: 'Go to install',
         source: 'Source',
