@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -38,15 +39,29 @@ func (a AppInstallService) Page(req dto.AppInstalledRequest) (int64, []dto.AppIn
 }
 
 func (a AppInstallService) CheckExist(key string) (*dto.CheckInstalled, error) {
+	res := &dto.CheckInstalled{
+		IsExist: false,
+	}
 	app, err := appRepo.GetFirst(appRepo.WithKey(key))
 	if err != nil {
-		return &dto.CheckInstalled{IsExist: false}, nil
+		return res, nil
 	}
 	appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithAppId(app.ID))
-	if appInstall.ID != 0 {
-		return &dto.CheckInstalled{Name: appInstall.Name, IsExist: true, Version: appInstall.Version}, nil
+	if reflect.DeepEqual(appInstall, model.AppInstall{}) {
+		return res, nil
 	}
-	return &dto.CheckInstalled{IsExist: false}, nil
+	res.Name = appInstall.Name
+	res.App = app.Name
+	res.Version = appInstall.Version
+	res.CreatedAt = appInstall.CreatedAt
+	res.Status = appInstall.Status
+	res.AppInstallID = appInstall.ID
+	res.IsExist = true
+	if len(appInstall.Backups) > 0 {
+		res.LastBackupAt = appInstall.Backups[0].CreatedAt.Format("2006-01-02 15:04:05")
+	}
+
+	return res, nil
 }
 
 func (a AppInstallService) Search(req dto.AppInstalledRequest) ([]dto.AppInstalled, error) {

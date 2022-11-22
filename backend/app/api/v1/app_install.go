@@ -39,7 +39,7 @@ func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 	}
 }
 
-func (b *BaseApi) CheckAppInstalld(c *gin.Context) {
+func (b *BaseApi) CheckAppInstalled(c *gin.Context) {
 	key, ok := c.Params.Get("key")
 	if !ok {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error key in path"))

@@ -687,8 +687,11 @@ export default {
         update: '升级',
         versioneSelect: '请选择版本',
         operatorHelper: '将对选中应用进行 {0} 操作，是否继续？',
+        checkInstalledWarn: '未检测到',
+        gotoInstalled: '去安装',
     },
     website: {
+        website: '网站',
         primaryDomain: '主域名',
         otherDomains: '其他域名',
         type: '类型',
@@ -747,5 +750,7 @@ export default {
         config: '配置',
         enableHTTPS: '启用HTTPS',
         aliasHelper: '代号是网站目录的文件夹名称',
+        lastBackupAt: '上次备份时间',
+        null: '无',
     },
 };
