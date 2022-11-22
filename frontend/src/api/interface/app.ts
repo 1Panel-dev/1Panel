@@ -86,6 +86,11 @@ export namespace App {
         name: string;
         version: string;
         isExist: boolean;
+        app: string;
+        status: string;
+        createdAt: string;
+        lastBackupAt: string;
+        appInstallId: number;
     }
 
     export interface AppInstalledOp {

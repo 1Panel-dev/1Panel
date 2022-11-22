@@ -54,7 +54,10 @@ func (a AppInstallRepo) GetBy(opts ...DBOption) ([]model.AppInstall, error) {
 func (a AppInstallRepo) GetFirst(opts ...DBOption) (model.AppInstall, error) {
 	var install model.AppInstall
 	db := getDb(opts...).Model(&model.AppInstall{})
-	err := db.Preload("App").Preload("Backups").First(&install).Error
+	err := db.Preload("App").Preload("Backups", func(db *gorm.DB) *gorm.DB {
+		db = db.Order("created_at desc")
+		return db
+	}).First(&install).Error
 	return install, err
 }
 

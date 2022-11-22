@@ -2,6 +2,7 @@ package dto
 
 import (
 	"encoding/json"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 )
@@ -40,9 +41,14 @@ type AppInstallRequest struct {
 }
 
 type CheckInstalled struct {
-	IsExist bool   `json:"isExist"`
-	Name    string `json:"name"`
-	Version string `json:"version"`
+	IsExist      bool      `json:"isExist"`
+	Name         string    `json:"name"`
+	App          string    `json:"app"`
+	Version      string    `json:"version"`
+	Status       string    `json:"status"`
+	CreatedAt    time.Time `json:"createdAt"`
+	LastBackupAt string    `json:"lastBackupAt"`
+	AppInstallID uint      `json:"appInstallId"`
 }
 
 type AppInstalled struct {

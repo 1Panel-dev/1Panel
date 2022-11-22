@@ -76,10 +76,9 @@ func getTx(ctx context.Context, opts ...DBOption) *gorm.DB {
 		for _, opt := range opts {
 			tx = opt(tx)
 		}
-	} else {
-		return getDb(opts...)
+		return tx
 	}
-	return tx
+	return getDb(opts...)
 }
 
 func getDb(opts ...DBOption) *gorm.DB {

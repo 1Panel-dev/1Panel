@@ -57,13 +57,6 @@
         />
     </ComplexTable>
     <el-dialog v-model="open" :title="$t('commons.msg.operate')" :before-close="handleClose" width="30%">
-        <!-- <el-alert
-            v-if="operateReq.operate != 'update'"
-            :title="getMsg(operateReq.operate)"
-            type="warning"
-            :closable="false"
-            show-icon
-        /> -->
         <div style="text-align: center">
             <p>{{ $t('app.versioneSelect') }}</p>
             <el-select v-model="operateReq.detailId">
@@ -197,29 +190,6 @@ const onOperate = async (operation: string) => {
             });
     });
 };
-
-// const getMsg = (op: string) => {
-//     let tip = '';
-//     switch (op) {
-//         case 'up':
-//             tip = i18n.global.t('app.up');
-//             break;
-//         case 'down':
-//             tip = i18n.global.t('app.down');
-//             break;
-//         case 'restart':
-//             tip = i18n.global.t('app.restart');
-//             break;
-//         case 'delete':
-//             tip = i18n.global.t('app.deleteWarn');
-//             break;
-//         case 'sync':
-//             tip = i18n.global.t('app.sync');
-//             break;
-//         default:
-//     }
-//     return tip;
-// };
 
 const buttons = [
     {
