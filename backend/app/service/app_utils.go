@@ -488,6 +488,7 @@ func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
 			app = model.App{}
 		}
 		app.Name = item.Name
+		app.Limit = item.Limit
 		app.Key = item.Key
 		app.ShortDesc = item.ShortDesc
 		app.Author = item.Author

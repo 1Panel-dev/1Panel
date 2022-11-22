@@ -136,7 +136,7 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 	}
 	httpsPort, err := checkPort("PANEL_APP_PORT_HTTPS", params)
 	if err != nil {
-		return nil, fmt.Errorf("%d port is in used", httpPort)
+		return nil, fmt.Errorf("%d port is in used", httpsPort)
 	}
 
 	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(appDetailId))
@@ -483,51 +483,5 @@ func (a AppService) SyncAppList() error {
 
 	tx.Commit()
 
-	go syncCanUpdate()
 	return nil
-}
-
-func syncCanUpdate() {
-	apps, err := appRepo.GetBy()
-	if err != nil {
-		global.LOG.Errorf("sync update app error: %s", err.Error())
-	}
-	for _, app := range apps {
-		details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))
-		if err != nil {
-			global.LOG.Errorf("sync update app error: %s", err.Error())
-		}
-		var versions []string
-		for _, detail := range details {
-			versions = append(versions, detail.Version)
-		}
-		versions = common.GetSortedVersions(versions)
-		lastVersion := versions[0]
-
-		var updateDetailIds []uint
-		for _, detail := range details {
-			if lastVersion == detail.Version {
-				continue
-			}
-			if common.CompareVersion(lastVersion, detail.Version) && (app.CrossVersionUpdate || !common.IsCrossVersion(detail.Version, lastVersion)) {
-				updateDetailIds = append(updateDetailIds, detail.ID)
-			}
-		}
-		if err := appDetailRepo.BatchUpdateBy(map[string]interface{}{"last_version": ""}); err != nil {
-			global.LOG.Errorf("sync update app error: %s", err.Error())
-		}
-
-		if err := appInstallRepo.BatchUpdateBy(map[string]interface{}{"can_update": 0}); err != nil {
-			global.LOG.Errorf("sync update app error: %s", err.Error())
-		}
-		if len(updateDetailIds) > 0 {
-			if err := appDetailRepo.BatchUpdateBy(map[string]interface{}{"last_version": lastVersion}, commonRepo.WithIdsIn(updateDetailIds)); err != nil {
-				global.LOG.Errorf("sync update app error: %s", err.Error())
-			}
-			//if err := appInstallRepo.BatchUpdateBy(map[string]interface{}{"can_update": 1}, appInstallRepo.WithDetailIdsIn(updateDetailIds)); err != nil {
-			//	global.LOG.Errorf("sync update app error: %s", err.Error())
-			//}
-		}
-
-	}
 }
