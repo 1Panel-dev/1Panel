@@ -211,18 +211,18 @@ func updateInstall(installId uint, detailId uint) error {
 	if err != nil {
 		return err
 	}
-	oldDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(install.AppDetailId))
-	if err != nil {
-		return err
-	}
+	//oldDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(install.AppDetailId))
+	//if err != nil {
+	//	return err
+	//}
 
 	detail, err := appDetailRepo.GetFirst(commonRepo.WithByID(detailId))
 	if err != nil {
 		return err
 	}
-	if oldDetail.LastVersion == detail.Version {
-		install.CanUpdate = false
-	}
+	//if oldDetail.LastVersion == detail.Version {
+	//	install.CanUpdate = false
+	//}
 	if install.Version == detail.Version {
 		return errors.New("two version is same")
 	}
@@ -555,4 +555,39 @@ func getAppFromOss() error {
 		_ = fileOp.DeleteFile(packagePath)
 	}()
 	return nil
+}
+
+func handleInstalled(installed []model.AppInstall) ([]dto.AppInstalled, error) {
+	var res []dto.AppInstalled
+
+	for _, installed := range installed {
+
+		installDTO := dto.AppInstalled{
+			AppInstall: installed,
+		}
+
+		app, err := appRepo.GetFirst(commonRepo.WithByID(installed.AppId))
+		if err != nil {
+			return nil, err
+		}
+		details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))
+		if err != nil {
+			return nil, err
+		}
+		var versions []string
+		for _, detail := range details {
+			versions = append(versions, detail.Version)
+		}
+		versions = common.GetSortedVersions(versions)
+		lastVersion := versions[0]
+
+		if common.IsCrossVersion(installed.Version, lastVersion) {
+			installDTO.CanUpdate = app.CrossVersionUpdate
+		} else {
+			installDTO.CanUpdate = common.CompareVersion(lastVersion, installed.Version)
+		}
+		res = append(res, installDTO)
+	}
+
+	return res, nil
 }
