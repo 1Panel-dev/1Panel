@@ -524,9 +524,9 @@ func syncCanUpdate() {
 			if err := appDetailRepo.BatchUpdateBy(map[string]interface{}{"last_version": lastVersion}, commonRepo.WithIdsIn(updateDetailIds)); err != nil {
 				global.LOG.Errorf("sync update app error: %s", err.Error())
 			}
-			if err := appInstallRepo.BatchUpdateBy(map[string]interface{}{"can_update": 1}, appInstallRepo.WithDetailIdsIn(updateDetailIds)); err != nil {
-				global.LOG.Errorf("sync update app error: %s", err.Error())
-			}
+			//if err := appInstallRepo.BatchUpdateBy(map[string]interface{}{"can_update": 1}, appInstallRepo.WithDetailIdsIn(updateDetailIds)); err != nil {
+			//	global.LOG.Errorf("sync update app error: %s", err.Error())
+			//}
 		}
 
 	}

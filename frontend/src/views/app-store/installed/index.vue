@@ -97,7 +97,7 @@ import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { dateFromat } from '@/utils/util';
 import i18n from '@/lang';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import Backups from './backups.vue';
 import { App } from '@/api/interface/app';
 
@@ -154,7 +154,7 @@ const openOperate = (row: any, op: string) => {
             open.value = true;
         });
     } else {
-        open.value = true;
+        onOperate(op);
     }
 };
 
@@ -173,6 +173,29 @@ const operate = async () => {
 
 const handleClose = () => {
     open.value = false;
+};
+
+const onOperate = async (operation: string) => {
+    ElMessageBox.confirm(
+        i18n.global.t('app.operatorHelper', [i18n.global.t('app.' + operation)]),
+        i18n.global.t('app.' + operation),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        },
+    ).then(() => {
+        open.value = false;
+        loading.value = true;
+        InstalledOp(operateReq)
+            .then(() => {
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
+            .finally(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const getMsg = (op: string) => {

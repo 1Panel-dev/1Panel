@@ -686,6 +686,7 @@ export default {
         restoreWarn: '回滚操作会重启应用,并替换数据,此操作不可回滚,是否继续?',
         update: '升级',
         versioneSelect: '请选择版本',
+        operatorHelper: '将对选中应用进行 {0} 操作，是否继续？',
     },
     website: {
         primaryDomain: '主域名',

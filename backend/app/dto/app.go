@@ -47,10 +47,11 @@ type CheckInstalled struct {
 
 type AppInstalled struct {
 	model.AppInstall
-	Total   int    `json:"total"`
-	Ready   int    `json:"ready"`
-	AppName string `json:"appName"`
-	Icon    string `json:"icon"`
+	Total     int    `json:"total"`
+	Ready     int    `json:"ready"`
+	AppName   string `json:"appName"`
+	Icon      string `json:"icon"`
+	CanUpdate bool   `json:"canUpdate"`
 }
 
 type AppInstalledRequest struct {

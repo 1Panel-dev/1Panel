@@ -24,16 +24,14 @@ type AppInstallService struct {
 }
 
 func (a AppInstallService) Page(req dto.AppInstalledRequest) (int64, []dto.AppInstalled, error) {
-	total, installed, err := appInstallRepo.Page(req.Page, req.PageSize)
+	total, installs, err := appInstallRepo.Page(req.Page, req.PageSize)
 	if err != nil {
 		return 0, nil, err
 	}
-	var installDTOs []dto.AppInstalled
-	for _, in := range installed {
-		installDto := dto.AppInstalled{
-			AppInstall: in,
-		}
-		installDTOs = append(installDTOs, installDto)
+
+	installDTOs, err := handleInstalled(installs)
+	if err != nil {
+		return 0, nil, err
 	}
 
 	return total, installDTOs, nil
@@ -74,15 +72,7 @@ func (a AppInstallService) Search(req dto.AppInstalledRequest) ([]dto.AppInstall
 		}
 	}
 
-	var installDTOs []dto.AppInstalled
-	for _, in := range installs {
-		installDto := dto.AppInstalled{
-			AppInstall: in,
-		}
-		installDTOs = append(installDTOs, installDto)
-	}
-
-	return installDTOs, nil
+	return handleInstalled(installs)
 }
 
 func (a AppInstallService) Operate(req dto.AppInstallOperate) error {
