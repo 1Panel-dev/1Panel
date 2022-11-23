@@ -139,7 +139,7 @@ export default {
         cronjob: '计划任务',
         host: '主机',
         security: '安全',
-        files: '文件管理',
+        files: '文件',
         monitor: '监控',
         terminal: '终端',
         settings: '面板设置',
@@ -752,5 +752,6 @@ export default {
         aliasHelper: '代号是网站目录的文件夹名称',
         lastBackupAt: '上次备份时间',
         null: '无',
+        nginxConfig: 'Nginx配置',
     },
 };

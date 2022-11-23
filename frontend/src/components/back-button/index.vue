@@ -1,11 +1,9 @@
 <template>
-    <!-- <el-icon class="back-button" @click="jump">
-        <Back />
-    </el-icon> -->
     <el-page-header :content="header" @back="jump" />
 </template>
 
 <script setup lang="ts">
+import { inject } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 const props = defineProps({
@@ -13,9 +11,13 @@ const props = defineProps({
     name: String,
     to: Object,
     header: String,
+    reload: Boolean,
 });
 function jump() {
-    const { path, name, to } = props;
+    const { path, name, to, reload } = props;
+    if (reload) {
+        reloadPage();
+    }
     if (path) {
         router.push(path);
     }
@@ -26,16 +28,6 @@ function jump() {
         router.push(to);
     }
 }
+
+let reloadPage: Function = inject('reload');
 </script>
-
-<style lang="scss">
-// .back-button {
-//     cursor: pointer;
-//     margin-right: 10px;
-//     font-weight: 600;
-
-//     &:active {
-//         transform: scale(0.85);
-//     }
-// }
-</style>

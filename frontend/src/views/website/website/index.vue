@@ -1,9 +1,9 @@
 <template>
-    <div ref="websiteRef">
-        <LayoutContent>
-            <AppStatus :app-key="'nginx'" :parentRef="websiteRef"></AppStatus>
-            <br />
-            <el-card>
+    <LayoutContent>
+        <AppStatus :app-key="'nginx'" @setting="setting"></AppStatus>
+        <br />
+        <el-card v-if="!openNginxConfig">
+            <LayoutContent :header="$t('website.website')">
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search()">
                     <template #toolbar>
                         <el-button type="primary" plain @click="openCreate">
@@ -30,13 +30,16 @@
                         fix
                     />
                 </ComplexTable>
-            </el-card>
+            </LayoutContent>
+        </el-card>
+        <el-card v-if="openNginxConfig">
+            <NginxConfig></NginxConfig>
+        </el-card>
 
-            <CreateWebSite ref="createRef" @close="search"></CreateWebSite>
-            <DeleteWebsite ref="deleteRef" @close="search"></DeleteWebsite>
-            <WebSiteGroup ref="groupRef"></WebSiteGroup>
-        </LayoutContent>
-    </div>
+        <CreateWebSite ref="createRef" @close="search"></CreateWebSite>
+        <DeleteWebsite ref="deleteRef" @close="search"></DeleteWebsite>
+        <WebSiteGroup ref="groupRef"></WebSiteGroup>
+    </LayoutContent>
 </template>
 
 <script lang="ts" setup>
@@ -49,6 +52,7 @@ import WebSiteGroup from './group/index.vue';
 import { SearchWebSites } from '@/api/modules/website';
 import { WebSite } from '@/api/interface/website';
 import AppStatus from '@/components/app-status/index.vue';
+import NginxConfig from './nginx/index.vue';
 
 import i18n from '@/lang';
 import router from '@/routers';
@@ -56,7 +60,7 @@ import router from '@/routers';
 const createRef = ref();
 const deleteRef = ref();
 const groupRef = ref();
-const websiteRef = ref();
+let openNginxConfig = ref(false);
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -76,6 +80,9 @@ const search = async () => {
         data.value = res.data.items;
         paginationConfig.total = res.data.total;
     });
+};
+const setting = () => {
+    openNginxConfig.value = true;
 };
 
 const openConfig = (id: number) => {

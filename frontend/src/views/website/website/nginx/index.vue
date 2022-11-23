@@ -1,5 +1,5 @@
 <template>
-    <LayoutContent></LayoutContent>
+    <LayoutContent :header="$t('website.nginxConfig')" :reload="true"></LayoutContent>
 </template>
 
 <script lang="ts" setup>

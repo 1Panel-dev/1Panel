@@ -36,14 +36,6 @@ const webSiteRouter = {
                 title: 'menu.ssl',
             },
         },
-        {
-            path: '/websites/nginx',
-            name: 'Config',
-            component: () => import('@/views/website/config/index.vue'),
-            meta: {
-                title: 'menu.config',
-            },
-        },
     ],
 };
 
