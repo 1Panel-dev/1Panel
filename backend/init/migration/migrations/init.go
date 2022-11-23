@@ -87,7 +87,7 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "ExpirationTime", Value: time.Now().AddDate(0, 0, 10).Format("2006.01.02 15:04:05")}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "ExpirationDays", Value: "10"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "ExpirationDays", Value: "0"}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "ComplexityVerification", Value: "enable"}).Error; err != nil {
