@@ -51,6 +51,7 @@ func (a AppInstallService) CheckExist(key string) (*dto.CheckInstalled, error) {
 	if reflect.DeepEqual(appInstall, model.AppInstall{}) {
 		return res, nil
 	}
+	res.ContainerName = appInstall.ContainerName
 	res.Name = appInstall.Name
 	res.Version = appInstall.Version
 	res.CreatedAt = appInstall.CreatedAt

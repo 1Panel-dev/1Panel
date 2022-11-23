@@ -41,14 +41,15 @@ type AppInstallRequest struct {
 }
 
 type CheckInstalled struct {
-	IsExist      bool      `json:"isExist"`
-	Name         string    `json:"name"`
-	App          string    `json:"app"`
-	Version      string    `json:"version"`
-	Status       string    `json:"status"`
-	CreatedAt    time.Time `json:"createdAt"`
-	LastBackupAt string    `json:"lastBackupAt"`
-	AppInstallID uint      `json:"appInstallId"`
+	IsExist       bool      `json:"isExist"`
+	Name          string    `json:"name"`
+	App           string    `json:"app"`
+	Version       string    `json:"version"`
+	Status        string    `json:"status"`
+	CreatedAt     time.Time `json:"createdAt"`
+	LastBackupAt  string    `json:"lastBackupAt"`
+	AppInstallID  uint      `json:"appInstallId"`
+	ContainerName string    `json:"containerName"`
 }
 
 type AppInstalled struct {
