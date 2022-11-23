@@ -1,11 +1,11 @@
 <template>
     <el-config-provider :locale="i18nLocale" :button="config" :size="assemblySize">
-        <router-view></router-view>
+        <router-view v-if="isRouterAlive"></router-view>
     </el-config-provider>
 </template>
 
 <script setup lang="ts">
-import { reactive, computed } from 'vue';
+import { reactive, computed, ref, nextTick, provide } from 'vue';
 import { GlobalStore } from '@/store';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import en from 'element-plus/es/locale/lang/en';
@@ -24,6 +24,16 @@ const i18nLocale = computed((): any => {
 });
 
 const assemblySize = computed((): string => globalStore.assemblySize);
+
+let isRouterAlive = ref(true);
+
+const reload = () => {
+    isRouterAlive.value = false;
+    nextTick(function () {
+        isRouterAlive.value = true;
+    });
+};
+provide('reload', reload);
 </script>
 
 <style scoped lang="scss"></style>

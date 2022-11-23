@@ -7,8 +7,10 @@
                     :name="backName"
                     :to="backTo"
                     :header="header"
+                    :reload="reload"
                     v-if="showBack"
                 ></back-button>
+                <!-- <el-page-header @back="reload" v-if="showBack" :content="header"></el-page-header> -->
                 <span v-else>{{ header }}</span>
             </slot>
         </div>
@@ -37,11 +39,12 @@ const prop = defineProps({
     backPath: String,
     backName: String,
     backTo: Object,
+    reload: Boolean,
 });
 
 const showBack = computed(() => {
-    const { backPath, backName, backTo } = prop;
-    return backPath || backName || backTo;
+    const { backPath, backName, backTo, reload } = prop;
+    return backPath || backName || backTo || reload;
 });
 </script>
 
