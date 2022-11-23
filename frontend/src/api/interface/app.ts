@@ -91,6 +91,7 @@ export namespace App {
         createdAt: string;
         lastBackupAt: string;
         appInstallId: number;
+        containerName: string;
     }
 
     export interface AppInstalledOp {

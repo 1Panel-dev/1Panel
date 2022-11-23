@@ -1,6 +1,6 @@
 <template>
-    <LayoutContent>
-        <AppStatus :app-key="'nginx'" @setting="setting"></AppStatus>
+    <AppStatus :app-key="'nginx'" @setting="setting" @is-exist="checkExist"></AppStatus>
+    <LayoutContent v-if="nginxIsExist">
         <br />
         <el-card v-if="!openNginxConfig">
             <LayoutContent :header="$t('website.website')">
@@ -33,7 +33,7 @@
             </LayoutContent>
         </el-card>
         <el-card v-if="openNginxConfig">
-            <NginxConfig></NginxConfig>
+            <NginxConfig :containerName="containerName"></NginxConfig>
         </el-card>
 
         <CreateWebSite ref="createRef" @close="search"></CreateWebSite>
@@ -56,11 +56,14 @@ import NginxConfig from './nginx/index.vue';
 
 import i18n from '@/lang';
 import router from '@/routers';
+import { App } from '@/api/interface/app';
 
 const createRef = ref();
 const deleteRef = ref();
 const groupRef = ref();
 let openNginxConfig = ref(false);
+let nginxIsExist = ref(false);
+let containerName = ref('');
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -114,6 +117,11 @@ const openCreate = () => {
 
 const openGroup = () => {
     groupRef.value.acceptParams();
+};
+
+const checkExist = (data: App.CheckInstalled) => {
+    nginxIsExist.value = data.isExist;
+    containerName.value = data.containerName;
 };
 
 onMounted(() => {

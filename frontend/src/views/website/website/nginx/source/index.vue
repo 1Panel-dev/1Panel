@@ -55,7 +55,6 @@ const getNginx = async () => {
     const res = await GetNginx();
     data.value = res.data;
     content.value = data.value.content;
-    console.log(content.value);
 };
 
 onMounted(() => {

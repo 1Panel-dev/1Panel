@@ -1,7 +1,7 @@
 <template>
     <div>
-        <el-card class="app-card" v-loading="loading">
-            <div class="app-content" v-if="data.isExist">
+        <div class="app-content" v-if="data.isExist">
+            <el-card class="app-card" v-loading="loading">
                 <el-row :gutter="20">
                     <el-col :span="1">
                         <div>
@@ -32,22 +32,15 @@
                         <el-button type="primary" link @click="setting">{{ $t('commons.button.set') }}</el-button>
                     </el-col>
                 </el-row>
-            </div>
-            <div v-else>
-                <el-row>
-                    <el-col :span="2">
-                        {{ $t('app.checkInstalledWarn', [data.app]) }}
-                        <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
-                    </el-col>
-                    <el-col :span="3">
-                        <el-link icon="Position" @click="goRouter('/apps')" type="primary">
-                            {{ $t('database.goInstall') }}
-                        </el-link>
-                    </el-col>
-                </el-row>
-                <span></span>
-            </div>
-        </el-card>
+            </el-card>
+        </div>
+        <div v-else>
+            <el-alert :closable="false" :title="$t('app.checkInstalledWarn', [data.app])" type="info">
+                <el-link icon="Position" @click="goRouter('/apps')" type="primary">
+                    {{ $t('database.goInstall') }}
+                </el-link>
+            </el-alert>
+        </div>
     </div>
 </template>
 <script lang="ts" setup>
@@ -72,6 +65,7 @@ let data = ref({
     lastBackupAt: '',
     appInstallId: 0,
     isExist: false,
+    containerName: '',
 });
 let loading = ref(false);
 let operateReq = reactive({
@@ -79,7 +73,7 @@ let operateReq = reactive({
     operate: '',
 });
 
-const em = defineEmits(['setting']);
+const em = defineEmits(['setting', 'isExist']);
 const setting = () => {
     em('setting', false);
 };
@@ -92,6 +86,7 @@ const onCheck = async () => {
     loading.value = true;
     const res = await CheckAppInstalled(key.value);
     data.value = res.data;
+    em('isExist', res.data);
     operateReq.installId = res.data.appInstallId;
     loading.value = false;
 };
