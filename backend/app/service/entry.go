@@ -33,6 +33,8 @@ type ServiceGroup struct {
 	WebSiteSSLService
 	WebSiteAcmeAccountService
 
+	NginxService
+
 	LogService
 }
 
