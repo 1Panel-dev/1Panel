@@ -85,6 +85,7 @@ func Routers() *gin.Engine {
 		systemRouter.InitDatabaseRouter(PrivateGroup)
 		systemRouter.InitWebsiteSSLRouter(PrivateGroup)
 		systemRouter.InitWebsiteAcmeAccountRouter(PrivateGroup)
+		systemRouter.InitNginxRouter(PrivateGroup)
 	}
 
 	return Router

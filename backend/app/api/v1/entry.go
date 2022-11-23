@@ -40,5 +40,7 @@ var (
 	websiteSSLService         = service.ServiceGroupApp.WebSiteSSLService
 	websiteAcmeAccountService = service.ServiceGroupApp.WebSiteAcmeAccountService
 
+	nginxService = service.ServiceGroupApp.NginxService
+
 	logService = service.ServiceGroupApp.LogService
 )

@@ -753,5 +753,10 @@ export default {
         lastBackupAt: '上次备份时间',
         null: '无',
         nginxConfig: 'Nginx配置',
+        websiteConfig: '网站设置',
+        basic: '基本',
+        source: '源文',
+        security: '安全',
+        backup: '备份',
     },
 };
