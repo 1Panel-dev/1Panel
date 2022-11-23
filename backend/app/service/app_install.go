@@ -46,12 +46,12 @@ func (a AppInstallService) CheckExist(key string) (*dto.CheckInstalled, error) {
 	if err != nil {
 		return res, nil
 	}
+	res.App = app.Name
 	appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithAppId(app.ID))
 	if reflect.DeepEqual(appInstall, model.AppInstall{}) {
 		return res, nil
 	}
 	res.Name = appInstall.Name
-	res.App = app.Name
 	res.Version = appInstall.Version
 	res.CreatedAt = appInstall.CreatedAt
 	res.Status = appInstall.Status
