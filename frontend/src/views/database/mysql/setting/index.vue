@@ -1,94 +1,97 @@
 <template>
     <div class="demo-collapse" v-show="onSetting">
         <el-card style="margin-top: 5px">
-            <el-collapse v-model="activeName" accordion>
-                <el-collapse-item :title="$t('database.baseSetting')" name="1">
-                    <el-form :model="baseInfo" ref="panelFormRef" label-width="120px">
-                        <el-row>
-                            <el-col :span="1"><br /></el-col>
-                            <el-col :span="10">
-                                <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
-                                    <el-input clearable type="number" v-model.number="baseInfo.port">
-                                        <template #append>
-                                            <el-button
-                                                @click="onSave(panelFormRef, 'port', baseInfo.port)"
-                                                icon="Collection"
-                                            >
-                                                {{ $t('commons.button.save') }}
-                                            </el-button>
-                                        </template>
-                                    </el-input>
-                                </el-form-item>
-                                <el-form-item
-                                    :label="$t('setting.password')"
-                                    prop="password"
-                                    :rules="Rules.requiredInput"
-                                >
-                                    <el-input type="password" show-password clearable v-model="baseInfo.password">
-                                        <template #append>
-                                            <el-button
-                                                @click="onSave(panelFormRef, 'password', baseInfo.password)"
-                                                icon="Collection"
-                                            >
-                                                {{ $t('commons.button.save') }}
-                                            </el-button>
-                                        </template>
-                                    </el-input>
-                                </el-form-item>
-                                <el-form-item
-                                    :label="$t('database.remoteAccess')"
-                                    prop="remoteConn"
-                                    :rules="Rules.requiredSelect"
-                                >
-                                    <el-switch
-                                        v-model="baseInfo.remoteConn"
-                                        @change="onSave(panelFormRef, 'remoteConn', baseInfo.remoteConn)"
-                                    />
-                                    <span class="input-help">{{ $t('database.remoteConnHelper') }}</span>
-                                </el-form-item>
-                            </el-col>
-                        </el-row>
-                    </el-form>
-                </el-collapse-item>
-                <el-collapse-item :title="$t('database.confChange')" name="2">
-                    <codemirror
-                        :autofocus="true"
-                        placeholder="None data"
-                        :indent-with-tab="true"
-                        :tabSize="4"
-                        style="margin-top: 10px; max-height: 500px"
-                        :lineWrapping="true"
-                        :matchBrackets="true"
-                        theme="cobalt"
-                        :styleActiveLine="true"
-                        :extensions="extensions"
-                        v-model="mysqlConf"
-                        :readOnly="true"
-                    />
-                    <el-button type="primary" style="width: 120px; margin-top: 10px" @click="onSaveFile()">
-                        {{ $t('commons.button.save') }}
-                    </el-button>
-                </el-collapse-item>
-                <el-collapse-item :title="$t('database.currentStatus')" name="3">
-                    <Status ref="statusRef" />
-                </el-collapse-item>
-                <el-collapse-item :title="$t('database.performanceTuning')" name="4">
-                    <Variables ref="variablesRef" />
-                </el-collapse-item>
-                <el-collapse-item title="日志" name="5">
-                    <ContainerLog ref="dialogContainerLogRef" />
-                </el-collapse-item>
+            <LayoutContent :header="$t('database.setting')" :back-name="'Mysql'" :reload="true">
+                <el-collapse v-model="activeName" accordion>
+                    <el-collapse-item :title="$t('database.baseSetting')" name="1">
+                        <el-form :model="baseInfo" ref="panelFormRef" label-width="120px">
+                            <el-row>
+                                <el-col :span="1"><br /></el-col>
+                                <el-col :span="10">
+                                    <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
+                                        <el-input clearable type="number" v-model.number="baseInfo.port">
+                                            <template #append>
+                                                <el-button
+                                                    @click="onSave(panelFormRef, 'port', baseInfo.port)"
+                                                    icon="Collection"
+                                                >
+                                                    {{ $t('commons.button.save') }}
+                                                </el-button>
+                                            </template>
+                                        </el-input>
+                                    </el-form-item>
+                                    <el-form-item
+                                        :label="$t('setting.password')"
+                                        prop="password"
+                                        :rules="Rules.requiredInput"
+                                    >
+                                        <el-input type="password" show-password clearable v-model="baseInfo.password">
+                                            <template #append>
+                                                <el-button
+                                                    @click="onSave(panelFormRef, 'password', baseInfo.password)"
+                                                    icon="Collection"
+                                                >
+                                                    {{ $t('commons.button.save') }}
+                                                </el-button>
+                                            </template>
+                                        </el-input>
+                                    </el-form-item>
+                                    <el-form-item
+                                        :label="$t('database.remoteAccess')"
+                                        prop="remoteConn"
+                                        :rules="Rules.requiredSelect"
+                                    >
+                                        <el-switch
+                                            v-model="baseInfo.remoteConn"
+                                            @change="onSave(panelFormRef, 'remoteConn', baseInfo.remoteConn)"
+                                        />
+                                        <span class="input-help">{{ $t('database.remoteConnHelper') }}</span>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                        </el-form>
+                    </el-collapse-item>
+                    <el-collapse-item :title="$t('database.confChange')" name="2">
+                        <codemirror
+                            :autofocus="true"
+                            placeholder="None data"
+                            :indent-with-tab="true"
+                            :tabSize="4"
+                            style="margin-top: 10px; max-height: 500px"
+                            :lineWrapping="true"
+                            :matchBrackets="true"
+                            theme="cobalt"
+                            :styleActiveLine="true"
+                            :extensions="extensions"
+                            v-model="mysqlConf"
+                            :readOnly="true"
+                        />
+                        <el-button type="primary" style="width: 120px; margin-top: 10px" @click="onSaveFile()">
+                            {{ $t('commons.button.save') }}
+                        </el-button>
+                    </el-collapse-item>
+                    <el-collapse-item :title="$t('database.currentStatus')" name="3">
+                        <Status ref="statusRef" />
+                    </el-collapse-item>
+                    <el-collapse-item :title="$t('database.performanceTuning')" name="4">
+                        <Variables ref="variablesRef" />
+                    </el-collapse-item>
+                    <el-collapse-item title="日志" name="5">
+                        <ContainerLog ref="dialogContainerLogRef" />
+                    </el-collapse-item>
 
-                <el-collapse-item title="慢日志" name="6">
-                    <SlowLog ref="slowLogRef" />
-                </el-collapse-item>
-            </el-collapse>
+                    <el-collapse-item title="慢日志" name="6">
+                        <SlowLog ref="slowLogRef" />
+                    </el-collapse-item>
+                </el-collapse>
+            </LayoutContent>
         </el-card>
     </div>
 </template>
 
 <script lang="ts" setup>
 import { ElMessage, FormInstance } from 'element-plus';
+import LayoutContent from '@/layout/layout-content.vue';
 import ContainerLog from '@/components/container-log/index.vue';
 import Status from '@/views/database/mysql/setting/status/index.vue';
 import Variables from '@/views/database/mysql/setting/variables/index.vue';

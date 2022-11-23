@@ -1,66 +1,94 @@
 <template>
-    <div v-if="settingShow">
+    <div class="demo-collapse" v-show="settingShow">
         <el-card style="margin-top: 5px">
-            <el-radio-group v-model="confShowType" @change="onChangeMode">
-                <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
-                <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
-            </el-radio-group>
-            <el-form v-if="confShowType === 'base'" :model="form" ref="formRef" :rules="rules" label-width="120px">
-                <el-row style="margin-top: 20px">
-                    <el-col :span="1"><br /></el-col>
-                    <el-col :span="10">
-                        <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
-                            <el-input clearable type="number" v-model.number="form.port">
-                                <template #append>
-                                    <el-button @click="onChangePort(formRef)" icon="Collection">
-                                        {{ $t('commons.button.save') }}
-                                    </el-button>
-                                </template>
-                            </el-input>
-                            <span class="input-help">{{ $t('database.portHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item :label="$t('setting.password')" prop="requirepass">
-                            <el-input type="password" show-password clearable v-model="form.requirepass" />
-                            <span class="input-help">{{ $t('database.requirepassHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item :label="$t('database.timeout')" prop="timeout">
-                            <el-input clearable type="number" v-model.number="form.timeout" />
-                            <span class="input-help">{{ $t('database.timeoutHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item :label="$t('database.maxclients')" prop="maxclients">
-                            <el-input clearable type="number" v-model.number="form.maxclients" />
-                        </el-form-item>
-                        <el-form-item :label="$t('database.maxmemory')" prop="maxmemory">
-                            <el-input clearable type="number" v-model.number="form.maxmemory" />
-                            <span class="input-help">{{ $t('database.maxmemoryHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button type="primary" size="default" @click="onSave(formRef)" style="width: 90px">
+            <LayoutContent :header="$t('database.setting')" back-name="Redis" :reload="true">
+                <el-collapse v-model="activeName" accordion>
+                    <el-collapse-item :title="$t('database.baseSetting')" name="1">
+                        <el-radio-group v-model="confShowType" @change="onChangeMode">
+                            <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
+                            <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
+                        </el-radio-group>
+                        <el-form
+                            v-if="confShowType === 'base'"
+                            :model="form"
+                            ref="formRef"
+                            :rules="rules"
+                            label-width="120px"
+                        >
+                            <el-row style="margin-top: 20px">
+                                <el-col :span="1"><br /></el-col>
+                                <el-col :span="10">
+                                    <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
+                                        <el-input clearable type="number" v-model.number="form.port">
+                                            <template #append>
+                                                <el-button @click="onChangePort(formRef)" icon="Collection">
+                                                    {{ $t('commons.button.save') }}
+                                                </el-button>
+                                            </template>
+                                        </el-input>
+                                        <span class="input-help">{{ $t('database.portHelper') }}</span>
+                                    </el-form-item>
+                                    <el-form-item :label="$t('setting.password')" prop="requirepass">
+                                        <el-input type="password" show-password clearable v-model="form.requirepass" />
+                                        <span class="input-help">{{ $t('database.requirepassHelper') }}</span>
+                                    </el-form-item>
+                                    <el-form-item :label="$t('database.timeout')" prop="timeout">
+                                        <el-input clearable type="number" v-model.number="form.timeout" />
+                                        <span class="input-help">{{ $t('database.timeoutHelper') }}</span>
+                                    </el-form-item>
+                                    <el-form-item :label="$t('database.maxclients')" prop="maxclients">
+                                        <el-input clearable type="number" v-model.number="form.maxclients" />
+                                    </el-form-item>
+                                    <el-form-item :label="$t('database.maxmemory')" prop="maxmemory">
+                                        <el-input clearable type="number" v-model.number="form.maxmemory" />
+                                        <span class="input-help">{{ $t('database.maxmemoryHelper') }}</span>
+                                    </el-form-item>
+                                    <el-form-item>
+                                        <el-button
+                                            type="primary"
+                                            size="default"
+                                            @click="onSave(formRef)"
+                                            style="width: 90px"
+                                        >
+                                            {{ $t('commons.button.save') }}
+                                        </el-button>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                        </el-form>
+                        <div v-if="confShowType === 'all'">
+                            <codemirror
+                                :autofocus="true"
+                                placeholder="None data"
+                                :indent-with-tab="true"
+                                :tabSize="4"
+                                style="margin-top: 10px; height: calc(100vh - 280px)"
+                                :lineWrapping="true"
+                                :matchBrackets="true"
+                                theme="cobalt"
+                                :styleActiveLine="true"
+                                :extensions="extensions"
+                                v-model="mysqlConf"
+                                :readOnly="true"
+                            />
+                            <el-button
+                                type="primary"
+                                size="default"
+                                @click="onSaveFile"
+                                style="width: 90px; margin-top: 5px"
+                            >
                                 {{ $t('commons.button.save') }}
                             </el-button>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <div v-if="confShowType === 'all'">
-                <codemirror
-                    :autofocus="true"
-                    placeholder="None data"
-                    :indent-with-tab="true"
-                    :tabSize="4"
-                    style="margin-top: 10px; height: calc(100vh - 280px)"
-                    :lineWrapping="true"
-                    :matchBrackets="true"
-                    theme="cobalt"
-                    :styleActiveLine="true"
-                    :extensions="extensions"
-                    v-model="mysqlConf"
-                    :readOnly="true"
-                />
-                <el-button type="primary" size="default" @click="onSaveFile" style="width: 90px; margin-top: 5px">
-                    {{ $t('commons.button.save') }}
-                </el-button>
-            </div>
+                        </div>
+                    </el-collapse-item>
+                    <el-collapse-item :title="$t('database.status')" name="2">
+                        <Status ref="statusRef" />
+                    </el-collapse-item>
+                    <el-collapse-item :title="$t('database.persistence')" name="3">
+                        <Persistence ref="persistenceRef" />
+                    </el-collapse-item>
+                </el-collapse>
+            </LayoutContent>
         </el-card>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmitSave"></ConfirmDialog>
@@ -72,9 +100,12 @@ import { ElMessage, FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
+import LayoutContent from '@/layout/layout-content.vue';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { LoadFile } from '@/api/modules/files';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
+import Status from '@/views/database/redis/setting/status/index.vue';
+import Persistence from '@/views/database/redis/setting/persistence/index.vue';
 import { loadRedisConf, updateRedisConf, updateRedisConfByFile } from '@/api/modules/database';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
@@ -98,6 +129,10 @@ const rules = reactive({
     maxmemory: [Rules.number],
 });
 
+const activeName = ref('1');
+const statusRef = ref();
+const persistenceRef = ref();
+
 const formRef = ref<FormInstance>();
 const mysqlConf = ref();
 const confirmDialogRef = ref();
@@ -107,6 +142,8 @@ const settingShow = ref<boolean>(false);
 const acceptParams = (): void => {
     settingShow.value = true;
     loadform();
+    statusRef.value!.acceptParams();
+    persistenceRef.value!.acceptParams();
 };
 const onClose = (): void => {
     settingShow.value = false;
