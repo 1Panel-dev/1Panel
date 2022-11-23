@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/init/app"
+	"github.com/1Panel-dev/1Panel/backend/init/business"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/cron"
@@ -35,6 +36,7 @@ func Start() {
 	session.Init()
 	gin.SetMode(global.CONF.System.Level)
 	cron.Run()
+	business.Init()
 
 	rootRouter := router.Routers()
 	address := fmt.Sprintf(":%d", global.CONF.System.Port)
