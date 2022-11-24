@@ -47,3 +47,13 @@ func (b *BaseApi) UpdateNginxConfigBy(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, nil)
 }
+
+func (b *BaseApi) GetNginxStatus(c *gin.Context) {
+
+	res, err := nginxService.GetStatus()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}

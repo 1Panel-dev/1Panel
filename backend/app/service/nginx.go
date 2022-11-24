@@ -1,10 +1,13 @@
 package service
 
 import (
+	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"path"
+	"strings"
 )
 
 type NginxService struct {
@@ -45,4 +48,26 @@ func (n NginxService) UpdateConfigByScope(req dto.NginxConfigReq) error {
 		return nil
 	}
 	return updateHttpNginxConfig(getNginxParams(req.Params, keys))
+}
+
+func (n NginxService) GetStatus() (dto.NginxStatus, error) {
+	nginxInstall, err := getAppInstallByKey("nginx")
+	if err != nil {
+		return dto.NginxStatus{}, err
+	}
+	res, err := cmd.Exec(fmt.Sprintf("docker exec -i %s curl http://127.0.0.1/nginx_status", nginxInstall.ContainerName))
+	if err != nil {
+		return dto.NginxStatus{}, err
+	}
+	var status dto.NginxStatus
+	resArray := strings.Split(res, " ")
+	status.Active = resArray[2]
+	status.Accepts = resArray[7]
+	status.Handled = resArray[8]
+	status.Requests = resArray[9]
+	status.Reading = resArray[11]
+	status.Writing = resArray[13]
+	status.Waiting = resArray[15]
+
+	return status, nil
 }
