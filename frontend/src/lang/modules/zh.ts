@@ -759,5 +759,15 @@ export default {
         security: '安全',
         backup: '备份',
         log: '日志',
+        nginxPer: '性能调整',
+    },
+    nginx: {
+        serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',
+        clientHeaderBufferSizeHelper: '客户端请求的头buffer大小',
+        clientMaxBodySizeHelper: '最大上传文件',
+        keepaliveTimeoutHelper: '连接超时时间',
+        gzipMinLengthHelper: '最小压缩文件',
+        gzipCompLevelHelper: '压缩率',
+        gzipHelper: '是否开启压缩传输',
     },
 };

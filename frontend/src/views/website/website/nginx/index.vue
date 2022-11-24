@@ -7,6 +7,9 @@
             <el-collapse-item :title="$t('website.log')" name="2">
                 <ContainerLog ref="dialogContainerLogRef" />
             </el-collapse-item>
+            <el-collapse-item :title="$t('website.nginxPer')" name="3">
+                <NginxPer />
+            </el-collapse-item>
         </el-collapse>
     </LayoutContent>
 </template>
@@ -16,6 +19,7 @@ import LayoutContent from '@/layout/layout-content.vue';
 import Source from './source/index.vue';
 import { ref, watch } from 'vue';
 import ContainerLog from '@/components/container-log/index.vue';
+import NginxPer from './performance/index.vue';
 
 let activeName = ref('1');
 let dialogContainerLogRef = ref();

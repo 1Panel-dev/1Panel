@@ -67,9 +67,9 @@ func (h *Http) FindDirectives(directiveName string) []IDirective {
 }
 
 func (h *Http) UpdateDirectives(directiveName string, directive Directive) {
-	directives := make([]IDirective, len(h.GetDirectives()))
+	directives := h.Directives
 	index := -1
-	for i, dir := range h.GetDirectives() {
+	for i, dir := range directives {
 		if dir.GetName() == directiveName {
 			index = i
 			break
@@ -106,4 +106,21 @@ func (h *Http) RemoveDirectives(names []string) {
 
 func (h *Http) GetBlock() IBlock {
 	return h
+}
+
+func (h *Http) UpdateDirectiveBySecondKey(name string, key string, directive Directive) {
+	directives := h.Directives
+	index := -1
+	for i, dir := range directives {
+		if dir.GetName() == name && dir.GetParameters()[0] == key {
+			index = i
+			break
+		}
+	}
+	if index > -1 {
+		directives[index] = &directive
+	} else {
+		directives = append(directives, &directive)
+	}
+	h.Directives = directives
 }

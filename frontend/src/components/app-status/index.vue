@@ -29,6 +29,7 @@
                     </el-col>
                     <el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="6">
                         <el-button type="primary" link @click="onOperate('restart')">{{ $t('app.restart') }}</el-button>
+                        <el-divider direction="vertical" />
                         <el-button type="primary" link @click="setting">{{ $t('commons.button.set') }}</el-button>
                     </el-col>
                 </el-row>

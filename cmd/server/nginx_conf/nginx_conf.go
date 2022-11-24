@@ -18,3 +18,6 @@ var Limit []byte
 
 //go:embed index.html
 var Index []byte
+
+//go:embed http_per.conf
+var HttpPer []byte
