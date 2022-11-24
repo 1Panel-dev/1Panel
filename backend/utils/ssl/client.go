@@ -9,6 +9,7 @@ import (
 	"github.com/go-acme/lego/v4/lego"
 	"github.com/go-acme/lego/v4/providers/dns/alidns"
 	"github.com/go-acme/lego/v4/providers/dns/dnspod"
+	"github.com/go-acme/lego/v4/providers/http/webroot"
 	"github.com/go-acme/lego/v4/registration"
 	"github.com/pkg/errors"
 	"time"
@@ -120,8 +121,17 @@ func (c *AcmeClient) UseManualDns(domains []string) (*Resolve, error) {
 	return p.Resolve, nil
 }
 
-func (c *AcmeClient) UseHTTP() {
+func (c *AcmeClient) UseHTTP(path string) error {
+	httpProvider, err := webroot.NewHTTPProvider(path)
+	if err != nil {
+		return err
+	}
 
+	err = c.Client.Challenge.SetHTTP01Provider(httpProvider)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *AcmeClient) ObtainSSL(domains []string) (certificate.Resource, error) {

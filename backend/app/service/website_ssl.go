@@ -6,7 +6,9 @@ import (
 	"encoding/pem"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
+	"path"
 	"strings"
 )
 
@@ -66,6 +68,16 @@ func (w WebSiteSSLService) Create(create dto.WebsiteSSLCreate) (dto.WebsiteSSLCr
 			return res, err
 		}
 	case dto.Http:
+
+		appInstall, err := getAppInstallByKey("nginx")
+		if err != nil {
+			return dto.WebsiteSSLCreate{}, err
+		}
+
+		if err := client.UseHTTP(path.Join(constant.AppInstallDir, "nginx", appInstall.Name, "root")); err != nil {
+			return res, err
+		}
+
 	case dto.DnsManual:
 
 	}
