@@ -84,8 +84,10 @@ const (
 )
 
 type WebsiteHTTPSOp struct {
-	WebsiteID    uint    `json:"websiteId"`
-	Enable       bool    `json:"enable"`
+	WebsiteID    uint    `json:"websiteId" validate:"required"`
+	Enable       bool    `json:"enable" validate:"required"`
 	WebsiteSSLID uint    `json:"websiteSSLId"`
 	Type         SSlType `json:"type"`
+	PrivateKey   string  `json:"privateKey"`
+	Certificate  string  `json:"certificate"`
 }

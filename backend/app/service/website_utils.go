@@ -326,6 +326,19 @@ func getNginxParamsFromStaticFile(scope dto.NginxKey) []dto.NginxParam {
 	return nginxParams
 }
 
+func getKeysFromStaticFile(scope dto.NginxKey) []string {
+	var res []string
+	newConfig := &components.Config{}
+	switch scope {
+	case dto.SSL:
+		newConfig = parser.NewStringParser(string(nginx_conf.SSL)).Parse()
+	}
+	for _, dir := range newConfig.GetDirectives() {
+		res = append(res, dir.GetName())
+	}
+	return res
+}
+
 func deleteNginxConfig(website model.WebSite, keys []string) error {
 	nginxConfig, err := getNginxConfig(website.Alias)
 	if err != nil {
@@ -384,6 +397,17 @@ func createPemFile(website model.WebSite, websiteSSL model.WebSiteSSL) error {
 }
 
 func applySSL(website model.WebSite, websiteSSL model.WebSiteSSL) error {
+
+	nginxConfig, err := getNginxConfig(website.Alias)
+	if err != nil {
+		return nil
+	}
+	config := nginxConfig.Config
+	server := config.FindServers()[0]
+	server.UpdateListen("443", false)
+	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return err
+	}
 
 	if err := createPemFile(website, websiteSSL); err != nil {
 		return err

@@ -1,6 +1,6 @@
 <template>
     <el-row :gutter="20">
-        <el-col :span="20" :offset="2">
+        <el-col :span="10" :offset="2">
             <el-form
                 ref="httpsForm"
                 label-position="left"
@@ -18,7 +18,7 @@
                     <el-select v-model="form.type" @change="changeType()">
                         <el-option :label="'选择已有证书'" :value="'existed'"></el-option>
                         <el-option :label="'手动导入证书'" :value="'manual'"></el-option>
-                        <el-option :label="'自动生成证书'" :value="'auto'"></el-option>
+                        <!-- <el-option :label="'自动生成证书'" :value="'auto'"></el-option> -->
                     </el-select>
                 </el-form-item>
                 <el-form-item :label="' '" prop="websiteSSLId" v-if="form.type === 'existed'">
@@ -35,6 +35,14 @@
                         ></el-option>
                     </el-select>
                 </el-form-item>
+                <div v-if="form.type === 'manual'">
+                    <el-form-item :label="'密钥代码(pem格式)'" prop="privateKey">
+                        <el-input v-model="form.privateKey" :rows="6" type="textarea" />
+                    </el-form-item>
+                    <el-form-item :label="'证书代码(pem格式)'" prop="certificate">
+                        <el-input v-model="form.certificate" :rows="6" type="textarea" />
+                    </el-form-item>
+                </div>
                 <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
                     <el-descriptions :column="3" border direction="vertical">
                         <el-descriptions-item label="主域名">{{ websiteSSL.primaryDomain }}</el-descriptions-item>
@@ -77,12 +85,16 @@ let form = reactive({
     websiteId: id.value,
     websiteSSLId: undefined,
     type: 'existed',
+    privateKey: '',
+    certificate: '',
 });
 let loading = ref(false);
 const ssls = ref();
 let websiteSSL = ref();
 let rules = ref({
     type: [Rules.requiredSelect],
+    privateKey: [Rules.requiredInput],
+    certificate: [Rules.requiredInput],
 });
 
 const listSSL = () => {

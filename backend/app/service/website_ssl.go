@@ -59,25 +59,20 @@ func (w WebSiteSSLService) Create(create dto.WebsiteSSLCreate) (dto.WebsiteSSLCr
 	switch create.Provider {
 	case dto.DNSAccount:
 		dnsAccount, err := websiteDnsRepo.GetFirst(commonRepo.WithByID(create.DnsAccountID))
-
 		if err != nil {
 			return res, err
 		}
-
 		if err := client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization); err != nil {
 			return res, err
 		}
 	case dto.Http:
-
 		appInstall, err := getAppInstallByKey("nginx")
 		if err != nil {
 			return dto.WebsiteSSLCreate{}, err
 		}
-
 		if err := client.UseHTTP(path.Join(constant.AppInstallDir, "nginx", appInstall.Name, "root")); err != nil {
 			return res, err
 		}
-
 	case dto.DnsManual:
 
 	}
@@ -109,10 +104,6 @@ func (w WebSiteSSLService) Create(create dto.WebsiteSSLCreate) (dto.WebsiteSSLCr
 	websiteSSL.StartDate = cert.NotBefore
 	websiteSSL.Type = cert.Issuer.CommonName
 	websiteSSL.Organization = cert.Issuer.Organization[0]
-
-	//if err := createPemFile(websiteSSL); err != nil {
-	//	return dto.WebsiteSSLCreate{}, err
-	//}
 
 	if err := websiteSSLRepo.Create(context.TODO(), &websiteSSL); err != nil {
 		return res, err
@@ -146,6 +137,13 @@ func (w WebSiteSSLService) Renew(sslId uint) error {
 			return err
 		}
 	case dto.Http:
+		appInstall, err := getAppInstallByKey("nginx")
+		if err != nil {
+			return err
+		}
+		if err := client.UseHTTP(path.Join(constant.AppInstallDir, "nginx", appInstall.Name, "root")); err != nil {
+			return err
+		}
 	case dto.DnsManual:
 
 	}

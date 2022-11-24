@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"crypto/x509"
+	"encoding/pem"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -304,29 +306,80 @@ func (w WebsiteService) OpWebsiteHTTPS(req dto.WebsiteHTTPSOp) (dto.WebsiteHTTPS
 		return dto.WebsiteHTTPS{}, err
 	}
 
-	var res dto.WebsiteHTTPS
+	var (
+		res        dto.WebsiteHTTPS
+		websiteSSL model.WebSiteSSL
+	)
 	res.Enable = req.Enable
-	ssl, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(req.WebsiteSSLID))
-	if err != nil {
-		return dto.WebsiteHTTPS{}, err
-	}
 
 	if req.Type == dto.SSLExisted {
-		website.WebSiteSSLID = ssl.ID
+		websiteSSL, err = websiteSSLRepo.GetFirst(commonRepo.WithByID(req.WebsiteSSLID))
+		if err != nil {
+			return dto.WebsiteHTTPS{}, err
+		}
+		website.WebSiteSSLID = websiteSSL.ID
 		if err := websiteRepo.Save(context.TODO(), &website); err != nil {
 			return dto.WebsiteHTTPS{}, err
 		}
-		res.SSL = ssl
+		res.SSL = websiteSSL
+	}
+
+	if req.Type == dto.Manual {
+		certBlock, _ := pem.Decode([]byte(req.Certificate))
+		cert, err := x509.ParseCertificate(certBlock.Bytes)
+		if err != nil {
+			return dto.WebsiteHTTPS{}, err
+		}
+		websiteSSL.ExpireDate = cert.NotAfter
+		websiteSSL.StartDate = cert.NotBefore
+		websiteSSL.Type = cert.Issuer.CommonName
+		websiteSSL.Organization = cert.Issuer.Organization[0]
+		websiteSSL.PrimaryDomain = cert.Subject.CommonName
+		if len(cert.Subject.Names) > 0 {
+			var domains []string
+			for _, name := range cert.Subject.Names {
+				if v, ok := name.Value.(string); ok {
+					if v != cert.Subject.CommonName {
+						domains = append(domains, v)
+					}
+				}
+			}
+			if len(domains) > 0 {
+				websiteSSL.Domains = strings.Join(domains, "")
+			}
+		}
+
+		websiteSSL.Provider = dto.Manual
+		websiteSSL.PrivateKey = req.PrivateKey
+		websiteSSL.Pem = req.Certificate
+
+		res.SSL = websiteSSL
 	}
 
 	if req.Enable {
 		website.Protocol = constant.ProtocolHTTPS
-		if err := applySSL(website, ssl); err != nil {
+		if err := applySSL(website, websiteSSL); err != nil {
 			return dto.WebsiteHTTPS{}, err
 		}
 	} else {
 		website.Protocol = constant.ProtocolHTTP
+		website.WebSiteSSLID = 0
+		if err := deleteNginxConfig(website, getKeysFromStaticFile(dto.SSL)); err != nil {
+			return dto.WebsiteHTTPS{}, err
+		}
 	}
 
+	tx, ctx := getTxAndContext()
+	if websiteSSL.ID == 0 {
+		if err := websiteSSLRepo.Create(ctx, &websiteSSL); err != nil {
+			return dto.WebsiteHTTPS{}, err
+		}
+		website.WebSiteSSLID = websiteSSL.ID
+	}
+	if err := websiteRepo.Save(ctx, &website); err != nil {
+		return dto.WebsiteHTTPS{}, err
+	}
+
+	tx.Commit()
 	return res, nil
 }

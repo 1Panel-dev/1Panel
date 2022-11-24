@@ -12,6 +12,7 @@ const (
 	DNSAccount = "dnsAccount"
 	DnsManual  = "dnsManual"
 	Http       = "http"
+	Manual     = "manual"
 )
 
 type WebsiteSSLSearch struct {

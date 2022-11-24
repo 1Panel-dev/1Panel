@@ -172,8 +172,10 @@ export namespace WebSite {
     export interface HTTPSReq {
         websiteId: number;
         enable: boolean;
-        websiteSSLId: number;
+        websiteSSLId?: number;
         type: string;
+        certificate?: string;
+        privateKey?: string;
     }
 
     export interface HTTPSConfig {
