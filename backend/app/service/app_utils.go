@@ -211,18 +211,10 @@ func updateInstall(installId uint, detailId uint) error {
 	if err != nil {
 		return err
 	}
-	//oldDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(install.AppDetailId))
-	//if err != nil {
-	//	return err
-	//}
-
 	detail, err := appDetailRepo.GetFirst(commonRepo.WithByID(detailId))
 	if err != nil {
 		return err
 	}
-	//if oldDetail.LastVersion == detail.Version {
-	//	install.CanUpdate = false
-	//}
 	if install.Version == detail.Version {
 		return errors.New("two version is same")
 	}
@@ -591,4 +583,16 @@ func handleInstalled(installed []model.AppInstall) ([]dto.AppInstalled, error) {
 	}
 
 	return res, nil
+}
+
+func getAppInstallByKey(key string) (model.AppInstall, error) {
+	app, err := appRepo.GetFirst(appRepo.WithKey(key))
+	if err != nil {
+		return model.AppInstall{}, err
+	}
+	appInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithAppId(app.ID))
+	if err != nil {
+		return model.AppInstall{}, err
+	}
+	return appInstall, nil
 }

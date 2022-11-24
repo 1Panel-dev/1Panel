@@ -76,7 +76,6 @@ const search = (req: WebSite.NginxConfigReq) => {
                         }
                     }
                     if (param.name === 'limit_rate') {
-                        console.log(param.params[0].match(/\d+/g)?.join(''));
                         form.rate = Number(param.params[0].match(/\d+/g));
                     }
                 }

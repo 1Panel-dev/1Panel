@@ -10,18 +10,23 @@ type NginxConfig struct {
 }
 
 type NginxConfigReq struct {
-	Scope     NginxScope  `json:"scope"`
+	Scope     NginxKey    `json:"scope"`
 	Operate   NginxOp     `json:"operate"`
-	WebSiteID uint        `json:"webSiteId" validate:"required"`
+	WebSiteID uint        `json:"webSiteId"`
 	Params    interface{} `json:"params"`
 }
 
-type NginxScope string
+type NginxScopeReq struct {
+	Scope NginxKey `json:"scope"`
+}
+
+type NginxKey string
 
 const (
-	Index     NginxScope = "index"
-	LimitConn NginxScope = "limit-conn"
-	SSL       NginxScope = "ssl"
+	Index     NginxKey = "index"
+	LimitConn NginxKey = "limit-conn"
+	SSL       NginxKey = "ssl"
+	HttpPer   NginxKey = "http-per"
 )
 
 type NginxOp string
@@ -32,11 +37,20 @@ const (
 	ConfigDel    NginxOp = "delete"
 )
 
-var ScopeKeyMap = map[NginxScope][]string{
+var ScopeKeyMap = map[NginxKey][]string{
 	Index:     {"index"},
 	LimitConn: {"limit_conn", "limit_rate", "limit_conn_zone"},
 	SSL:       {"ssl_certificate", "ssl_certificate_key"},
+	HttpPer:   {"server_names_hash_bucket_size", "client_header_buffer_size", "client_max_body_size", "keepalive_timeout", "gzip", "gzip_min_length", "gzip_comp_level"},
 }
+
+type NginxScope string
+
+const (
+	NginxHttp   NginxScope = "http"
+	NginxServer NginxScope = "server"
+	NginxEvents NginxScope = "events"
+)
 
 var RepeatKeys = map[string]struct {
 }{
@@ -45,8 +59,7 @@ var RepeatKeys = map[string]struct {
 }
 
 type NginxParam struct {
-	Name        string   `json:"name"`
-	SecondKey   string   `json:"secondKey"`
-	IsRepeatKey bool     `json:"isRepeatKey"`
-	Params      []string `json:"params"`
+	Name      string   `json:"name"`
+	SecondKey string   `json:"secondKey"`
+	Params    []string `json:"params"`
 }

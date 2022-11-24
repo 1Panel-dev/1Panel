@@ -14,7 +14,7 @@
             v-model="content"
             :readOnly="true"
         />
-        <div style="float: right; margin-top: 10px">
+        <div style="margin-top: 10px">
             <el-button type="primary" @click="submit()" :loading="loading">
                 {{ $t('commons.button.save') }}
             </el-button>

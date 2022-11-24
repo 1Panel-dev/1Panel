@@ -26,3 +26,13 @@ func (c *Config) FindServers() []*Server {
 	}
 	return servers
 }
+
+func (c *Config) FindHttp() *Http {
+	var http *Http
+	directives := c.Block.FindDirectives("http")
+	if len(directives) > 0 {
+		http = directives[0].(*Http)
+	}
+
+	return http
+}

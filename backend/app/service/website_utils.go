@@ -175,11 +175,8 @@ func nginxCheckAndReload(oldContent string, filePath string, containerName strin
 
 func getNginxConfig(alias string) (dto.NginxConfig, error) {
 	var nginxConfig dto.NginxConfig
-	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
-	if err != nil {
-		return nginxConfig, err
-	}
-	nginxInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithAppId(nginxApp.ID))
+
+	nginxInstall, err := getAppInstallByKey("nginx")
 	if err != nil {
 		return nginxConfig, err
 	}
@@ -257,7 +254,6 @@ func getNginxConfigByKeys(website model.WebSite, keys []string) ([]dto.NginxPara
 				Params: dir.GetParameters(),
 			}
 			if isRepeatKey(key) {
-				nginxParam.IsRepeatKey = true
 				nginxParam.SecondKey = dir.GetParameters()[0]
 			}
 			res = append(res, nginxParam)
@@ -266,7 +262,7 @@ func getNginxConfigByKeys(website model.WebSite, keys []string) ([]dto.NginxPara
 	return res, nil
 }
 
-func updateNginxConfig(website model.WebSite, params []dto.NginxParam, scope dto.NginxScope) error {
+func updateNginxConfig(website model.WebSite, params []dto.NginxParam, scope dto.NginxKey) error {
 	nginxConfig, err := getNginxConfig(website.Alias)
 	if err != nil {
 		return err
@@ -279,7 +275,7 @@ func updateNginxConfig(website model.WebSite, params []dto.NginxParam, scope dto
 			Name:       p.Name,
 			Parameters: p.Params,
 		}
-		if p.IsRepeatKey {
+		if isRepeatKey(p.Name) {
 			server.UpdateDirectiveBySecondKey(p.Name, p.SecondKey, newDir)
 		} else {
 			server.UpdateDirectives(p.Name, newDir)
@@ -291,7 +287,7 @@ func updateNginxConfig(website model.WebSite, params []dto.NginxParam, scope dto
 	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxConfig.ContainerName)
 }
 
-func updateConfig(config *components.Config, scope dto.NginxScope) {
+func updateConfig(config *components.Config, scope dto.NginxKey) {
 	newConfig := &components.Config{}
 	switch scope {
 	case dto.LimitConn:
@@ -306,11 +302,15 @@ func updateConfig(config *components.Config, scope dto.NginxScope) {
 			Name:       dir.GetName(),
 			Parameters: dir.GetParameters(),
 		}
-		config.UpdateDirectiveBySecondKey(dir.GetName(), dir.GetParameters()[0], newDir)
+		if isRepeatKey(dir.GetName()) {
+			config.UpdateDirectiveBySecondKey(dir.GetName(), dir.GetParameters()[0], newDir)
+		} else {
+			config.UpdateDirectives(dir.GetName(), newDir)
+		}
 	}
 }
 
-func getNginxParamsFromStaticFile(scope dto.NginxScope) []dto.NginxParam {
+func getNginxParamsFromStaticFile(scope dto.NginxKey) []dto.NginxParam {
 	var nginxParams []dto.NginxParam
 	newConfig := &components.Config{}
 	switch scope {
@@ -429,7 +429,6 @@ func handleParamMap(paramMap map[string]string, keys []string) []dto.NginxParam 
 					Params: getParamArray(k, v),
 				}
 				if isRepeatKey(k) {
-					param.IsRepeatKey = true
 					param.SecondKey = param.Params[0]
 				}
 				nginxParams = append(nginxParams, param)

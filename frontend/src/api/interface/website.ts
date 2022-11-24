@@ -94,7 +94,6 @@ export namespace WebSite {
     export interface NginxParam {
         name: string;
         secondKey: string;
-        isRepeatKey: string;
         params: string[];
     }
 
