@@ -38,9 +38,10 @@ type WebsiteDNSReq struct {
 }
 
 type WebsiteDNSRes struct {
-	Key   string `json:"resolve"`
-	Value string `json:"value"`
-	Type  string `json:"type"`
+	Key    string `json:"resolve"`
+	Value  string `json:"value"`
+	Domain string `json:"domain"`
+	Err    string `json:"err"`
 }
 
 type WebsiteSSLRenew struct {

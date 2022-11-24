@@ -120,7 +120,7 @@ export const RenewSSL = (req: WebSite.SSLRenew) => {
 };
 
 export const GetDnsResolve = (req: WebSite.DNSResolveReq) => {
-    return http.post<WebSite.DNSResolve>(`/websites/ssl/resolve`, req);
+    return http.post<WebSite.DNSResolve[]>(`/websites/ssl/resolve`, req);
 };
 
 export const GetHTTPSConfig = (id: number) => {
