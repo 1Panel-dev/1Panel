@@ -1,0 +1,29 @@
+package ssl
+
+import (
+	"bytes"
+	"fmt"
+	"sort"
+)
+
+type obtainError map[string]error
+
+func (e obtainError) Error() string {
+	buffer := bytes.NewBufferString("error: one or more domains had a problem:\n")
+
+	var domains []string
+	for domain := range e {
+		domains = append(domains, domain)
+	}
+	sort.Strings(domains)
+
+	for _, domain := range domains {
+		buffer.WriteString(fmt.Sprintf("[%s] %s\n", domain, e[domain]))
+	}
+	return buffer.String()
+}
+
+type domainError struct {
+	Domain string
+	Error  error
+}

@@ -3,6 +3,8 @@ package ssl
 import (
 	"crypto"
 	"encoding/json"
+	"github.com/go-acme/lego/v4/acme"
+	"github.com/go-acme/lego/v4/acme/api"
 	"github.com/go-acme/lego/v4/certificate"
 	"github.com/go-acme/lego/v4/challenge"
 	"github.com/go-acme/lego/v4/challenge/dns01"
@@ -166,6 +168,7 @@ func (c *AcmeClient) RenewSSL(certUrl string) (certificate.Resource, error) {
 type Resolve struct {
 	Key   string
 	Value string
+	Err   string
 }
 
 type manualDnsProvider struct {
@@ -173,11 +176,6 @@ type manualDnsProvider struct {
 }
 
 func (p *manualDnsProvider) Present(domain, token, keyAuth string) error {
-	fqdn, value := dns01.GetRecord(domain, keyAuth)
-	p.Resolve = &Resolve{
-		Key:   fqdn,
-		Value: value,
-	}
 	return nil
 }
 
@@ -185,6 +183,60 @@ func (p *manualDnsProvider) CleanUp(domain, token, keyAuth string) error {
 	return nil
 }
 
-func (c *AcmeClient) GetDNSResolve() {
+func (c *AcmeClient) GetDNSResolve(domains []string) (map[string]Resolve, error) {
+	core, err := api.New(c.Config.HTTPClient, c.Config.UserAgent, c.Config.CADirURL, c.User.Registration.URI, c.User.Key)
+	if err != nil {
+		panic(err)
+	}
+	order, err := core.Orders.New(domains)
+	if err != nil {
+		panic(err)
+	}
+	resolves := make(map[string]Resolve)
+	resc, errc := make(chan acme.Authorization), make(chan domainError)
+	for _, authzURL := range order.Authorizations {
 
+		go func(authzURL string) {
+			authz, err := core.Authorizations.Get(authzURL)
+			if err != nil {
+				errc <- domainError{Domain: authz.Identifier.Value, Error: err}
+				return
+			}
+			resc <- authz
+		}(authzURL)
+
+	}
+
+	var responses []acme.Authorization
+	for i := 0; i < len(order.Authorizations); i++ {
+		select {
+		case res := <-resc:
+			responses = append(responses, res)
+		case err := <-errc:
+			resolves[err.Domain] = Resolve{Err: err.Error.Error()}
+		}
+	}
+	close(resc)
+	close(errc)
+
+	for _, auth := range responses {
+		domain := challenge.GetTargetedDomain(auth)
+		chlng, err := challenge.FindChallenge(challenge.DNS01, auth)
+		if err != nil {
+			resolves[domain] = Resolve{Err: err.Error()}
+			continue
+		}
+		keyAuth, err := core.GetKeyAuthorization(chlng.Token)
+		if err != nil {
+			resolves[domain] = Resolve{Err: err.Error()}
+			continue
+		}
+		fqdn, value := dns01.GetRecord(domain, keyAuth)
+		resolves[domain] = Resolve{
+			Key:   fqdn,
+			Value: value,
+		}
+	}
+
+	return resolves, nil
 }

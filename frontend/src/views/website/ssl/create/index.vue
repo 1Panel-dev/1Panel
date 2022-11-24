@@ -1,10 +1,10 @@
 <template>
-    <el-dialog v-model="open" :title="$t('commons.button.create')" width="30%" :before-close="handleClose">
+    <el-dialog v-model="open" :title="$t('commons.button.create')" width="60%" :before-close="handleClose">
         <el-form
             ref="sslForm"
             label-position="right"
             :model="ssl"
-            label-width="125px"
+            label-width="100px"
             :rules="rules"
             v-loading="loading"
         >
@@ -41,18 +41,21 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
-            <!-- <el-form-item :label="$t('website.domain')" prop="domains">
-                <el-checkbox-group v-model="ssl.domains">
-                    <el-checkbox v-for="domain in domains" :key="domain.domain" :label="domain.domain"></el-checkbox>
-                </el-checkbox-group>
-            </el-form-item> -->
-            <!-- <el-form-item>
-                <div>
-                    <span>解析域名: {{ dnsResolve.key }}</span>
-                    <span>记录值: {{ dnsResolve.value }}</span>
-                    <span>类型: {{ dnsResolve.type }}</span>
+            <el-form-item v-if="dnsResolve.length > 0">
+                <div v-for="(re, index) in dnsResolve" :key="index">
+                    <el-descriptions direction="vertical" :column="4" border>
+                        <el-descriptions-item label="域名">{{ re.domain }}</el-descriptions-item>
+                        <div v-if="re.err != ''">
+                            <el-descriptions-item label="错误">{{ re.err }}</el-descriptions-item>
+                        </div>
+                        <div v-else>
+                            <el-descriptions-item label="解析域名">{{ re.resolve }}</el-descriptions-item>
+                            <el-descriptions-item label="记录值">{{ re.value }}</el-descriptions-item>
+                            <el-descriptions-item label="类型">TXT</el-descriptions-item>
+                        </div>
+                    </el-descriptions>
                 </div>
-            </el-form-item> -->
+            </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -67,7 +70,7 @@
 
 <script lang="ts" setup>
 import { WebSite } from '@/api/interface/website';
-import { CreateSSL, SearchAcmeAccount, SearchDnsAccount } from '@/api/modules/website';
+import { CreateSSL, GetDnsResolve, SearchAcmeAccount, SearchDnsAccount } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElMessage, FormInstance } from 'element-plus';
@@ -112,11 +115,7 @@ let ssl = ref({
     acmeAccountId: 0,
     dnsAccountId: 0,
 });
-// let dnsResolve = ref<WebSite.DNSResolve>({
-//     key: '',
-//     value: '',
-//     type: '',
-// });
+let dnsResolve = ref<WebSite.DNSResolve[]>([]);
 let hasResolve = ref(false);
 
 const em = defineEmits(['close']);
@@ -166,14 +165,16 @@ const getDnsAccounts = async () => {
 //     domains.value = (await GetWebsite(id)).data.domains || [];
 // };
 
-// const getDnsResolve = async (acmeAccountId: number, domains: string[]) => {
-//     hasResolve.value = false;
-//     const res = await GetDnsResolve({ acmeAccountId: acmeAccountId, domains: domains });
-//     if (res.data) {
-//         dnsResolve.value = res.data;
-//         hasResolve.value = true;
-//     }
-// };
+const getDnsResolve = async (acmeAccountId: number, domains: string[]) => {
+    hasResolve.value = false;
+    loading.value = true;
+    const res = await GetDnsResolve({ acmeAccountId: acmeAccountId, domains: domains });
+    if (res.data) {
+        dnsResolve.value = res.data;
+        hasResolve.value = true;
+    }
+    loading.value = false;
+};
 
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
@@ -192,7 +193,12 @@ const submit = async (formEl: FormInstance | undefined) => {
                     loading.value = false;
                 });
         } else {
-            // getDnsResolve(ssl.value.acmeAccountId, ssl.value.domains);
+            let domains = [ssl.value.primaryDomain];
+            if (ssl.value.otherDomains != '') {
+                let otherDomains = ssl.value.otherDomains.split('\n');
+                domains = domains.concat(otherDomains);
+            }
+            getDnsResolve(ssl.value.acmeAccountId, domains);
         }
     });
 };

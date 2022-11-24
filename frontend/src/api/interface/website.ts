@@ -160,9 +160,10 @@ export namespace WebSite {
     }
 
     export interface DNSResolve {
-        key: string;
+        resolve: string;
         value: string;
-        type: string;
+        domain: string;
+        err: string;
     }
 
     export interface SSLReq {

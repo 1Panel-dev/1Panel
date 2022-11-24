@@ -168,24 +168,29 @@ func (w WebSiteSSLService) Renew(sslId uint) error {
 	return websiteSSLRepo.Save(websiteSSL)
 }
 
-func (w WebSiteSSLService) GetDNSResolve(req dto.WebsiteDNSReq) (dto.WebsiteDNSRes, error) {
+func (w WebSiteSSLService) GetDNSResolve(req dto.WebsiteDNSReq) ([]dto.WebsiteDNSRes, error) {
 	acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(req.AcmeAccountID))
 	if err != nil {
-		return dto.WebsiteDNSRes{}, err
+		return nil, err
 	}
 
 	client, err := ssl.NewPrivateKeyClient(acmeAccount.Email, acmeAccount.PrivateKey)
 	if err != nil {
-		return dto.WebsiteDNSRes{}, err
+		return nil, err
 	}
-	re, err := client.UseManualDns(req.Domains)
+	resolves, err := client.GetDNSResolve(req.Domains)
 	if err != nil {
-		return dto.WebsiteDNSRes{}, err
+		return nil, err
 	}
-	var res dto.WebsiteDNSRes
-	res.Key = re.Key
-	res.Value = re.Value
-	res.Type = "TXT"
+	var res []dto.WebsiteDNSRes
+	for k, v := range resolves {
+		res = append(res, dto.WebsiteDNSRes{
+			Domain: k,
+			Key:    v.Key,
+			Value:  v.Value,
+			Err:    v.Err,
+		})
+	}
 	return res, nil
 }
 
