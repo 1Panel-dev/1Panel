@@ -1,57 +1,64 @@
 <template>
     <div>
         <Submenu activeName="mysql" />
-        <AppStatus :app-key="'mysql'" style="margin-top: 20px" @setting="onSetting"></AppStatus>
-        <Setting ref="settingRef"></Setting>
+        <AppStatus :app-key="'mysql'" style="margin-top: 20px" @setting="onSetting" @is-exist="checkExist" />
+        <div v-if="mysqlIsExist">
+            <Setting ref="settingRef" style="margin-top: 20px" />
 
-        <el-card v-if="!isOnSetting" style="margin-top: 5px">
-            <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" @search="search" :data="data">
-                <template #toolbar>
-                    <el-button type="primary" @click="onOpenDialog()">{{ $t('commons.button.create') }}</el-button>
-                    <el-button>phpMyAdmin</el-button>
-                    <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
-                        {{ $t('commons.button.delete') }}
-                    </el-button>
-                </template>
-                <el-table-column type="selection" fix />
-                <el-table-column :label="$t('commons.table.name')" prop="name" />
-                <el-table-column :label="$t('commons.login.username')" prop="username" />
-                <el-table-column :label="$t('commons.login.password')" prop="password">
-                    <template #default="{ row }">
-                        <div v-if="!row.showPassword">
-                            <span style="float: left">***********</span>
-                            <div style="margin-top: 2px; cursor: pointer">
-                                <el-icon style="margin-left: 5px" @click="row.showPassword = true" :size="16">
-                                    <View />
-                                </el-icon>
-                            </div>
-                        </div>
-                        <div v-else>
-                            <span style="float: left">{{ row.password }}</span>
-                            <div style="margin-top: 4px; cursor: pointer">
-                                <el-icon style="margin-left: 5px" @click="row.showPassword = false" :size="16">
-                                    <Hide />
-                                </el-icon>
-                            </div>
-                        </div>
+            <el-card v-if="!isOnSetting" style="margin-top: 20px">
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    v-model:selects="selects"
+                    @search="search"
+                    :data="data"
+                >
+                    <template #toolbar>
+                        <el-button type="primary" @click="onOpenDialog()">{{ $t('commons.button.create') }}</el-button>
+                        <el-button>phpMyAdmin</el-button>
+                        <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
                     </template>
-                </el-table-column>
-                <el-table-column :label="$t('commons.table.description')" prop="description" />
-                <el-table-column
-                    prop="createdAt"
-                    :label="$t('commons.table.date')"
-                    :formatter="dateFromat"
-                    show-overflow-tooltip
-                />
-                <fu-table-operations
-                    width="300px"
-                    :buttons="buttons"
-                    :ellipsis="10"
-                    :label="$t('commons.table.operate')"
-                    fix
-                />
-            </ComplexTable>
-        </el-card>
+                    <el-table-column type="selection" fix />
+                    <el-table-column :label="$t('commons.table.name')" prop="name" />
+                    <el-table-column :label="$t('commons.login.username')" prop="username" />
+                    <el-table-column :label="$t('commons.login.password')" prop="password">
+                        <template #default="{ row }">
+                            <div v-if="!row.showPassword">
+                                <span style="float: left">***********</span>
+                                <div style="margin-top: 2px; cursor: pointer">
+                                    <el-icon style="margin-left: 5px" @click="row.showPassword = true" :size="16">
+                                        <View />
+                                    </el-icon>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <span style="float: left">{{ row.password }}</span>
+                                <div style="margin-top: 4px; cursor: pointer">
+                                    <el-icon style="margin-left: 5px" @click="row.showPassword = false" :size="16">
+                                        <Hide />
+                                    </el-icon>
+                                </div>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('commons.table.description')" prop="description" />
+                    <el-table-column
+                        prop="createdAt"
+                        :label="$t('commons.table.date')"
+                        :formatter="dateFromat"
+                        show-overflow-tooltip
+                    />
+                    <fu-table-operations
+                        width="300px"
+                        :buttons="buttons"
+                        :ellipsis="10"
+                        :label="$t('commons.table.operate')"
+                        fix
+                    />
+                </ComplexTable>
+            </el-card>
+        </div>
         <el-dialog v-model="changeVisiable" :destroy-on-close="true" width="30%">
             <template #header>
                 <div class="card-header">
@@ -122,13 +129,10 @@ import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElForm, ElMessage } from 'element-plus';
 import { Database } from '@/api/interface/database';
 import { Rules } from '@/global/form-rules';
+import { App } from '@/api/interface/app';
 
 const selects = ref<any>([]);
-const mysqlInfo = reactive({
-    name: '',
-    version: '',
-    isExist: false,
-});
+const mysqlName = ref();
 const isOnSetting = ref<boolean>();
 
 const data = ref();
@@ -138,10 +142,12 @@ const paginationConfig = reactive({
     total: 0,
 });
 
+const mysqlIsExist = ref(false);
+
 const dialogRef = ref();
 const onOpenDialog = async () => {
     let params = {
-        mysqlName: mysqlInfo.name,
+        mysqlName: mysqlName.value,
     };
     dialogRef.value!.acceptParams(params);
 };
@@ -149,7 +155,7 @@ const onOpenDialog = async () => {
 const dialogBackupRef = ref();
 const onOpenBackupDialog = async (dbName: string) => {
     let params = {
-        mysqlName: mysqlInfo.name,
+        mysqlName: mysqlName.value,
         dbName: dbName,
     };
     dialogBackupRef.value!.acceptParams(params);
@@ -161,7 +167,7 @@ const settingRef = ref();
 const onSetting = async () => {
     isOnSetting.value = true;
     let params = {
-        mysqlName: mysqlInfo.name,
+        mysqlName: mysqlName.value,
     };
     settingRef.value!.acceptParams(params);
 };
@@ -184,7 +190,7 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         changeForm.value = changeForm.operation === 'password' ? changeForm.password : changeForm.privilege;
-        changeForm.mysqlName = mysqlInfo.name;
+        changeForm.mysqlName = mysqlName.value;
         await updateMysqlDBInfo(changeForm);
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         search();
@@ -200,6 +206,14 @@ const search = async () => {
     const res = await searchMysqlDBs(params);
     data.value = res.data.items || [];
     paginationConfig.total = res.data.total;
+};
+
+const checkExist = (data: App.CheckInstalled) => {
+    mysqlIsExist.value = data.isExist;
+    mysqlName.value = data.name;
+    if (mysqlIsExist.value) {
+        search();
+    }
 };
 
 const onBatchDelete = async (row: Database.MysqlDBInfo | null) => {
@@ -248,7 +262,7 @@ const buttons = [
         label: i18n.global.t('database.loadBackup'),
         click: (row: Database.MysqlDBInfo) => {
             let params = {
-                mysqlName: mysqlInfo.name,
+                mysqlName: mysqlName.value,
                 dbName: row.name,
             };
             uploadRef.value!.acceptParams(params);

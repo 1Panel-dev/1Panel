@@ -1,47 +1,68 @@
 package service
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
-	"github.com/jinzhu/copier"
 	"github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/host"
+	"github.com/shirou/gopsutil/load"
+	"github.com/shirou/gopsutil/mem"
+	"github.com/shirou/gopsutil/net"
 )
 
 type DashboardService struct{}
 
 type IDashboardService interface {
-	LoadBaseInfo() (*dto.DashboardBase, error)
+	LoadBaseInfo(ioOption string, netOption string) (*dto.DashboardBase, error)
+	LoadCurrentInfo(ioOption string, netOption string) *dto.DashboardCurrent
 }
 
 func NewIDashboardService() IDashboardService {
 	return &DashboardService{}
 }
-func (u *DashboardService) LoadBaseInfo() (*dto.DashboardBase, error) {
+func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto.DashboardBase, error) {
 	var baseInfo dto.DashboardBase
 	hostInfo, err := host.Info()
 	if err != nil {
 		return nil, err
 	}
-	if err := copier.Copy(baseInfo, hostInfo); err != nil {
-		return nil, err
-	}
-	appInstall, err := appInstallRepo.GetBy()
+	baseInfo.Hostname = hostInfo.Hostname
+	baseInfo.OS = hostInfo.OS
+	baseInfo.Platform = hostInfo.Platform
+	baseInfo.PlatformFamily = hostInfo.PlatformFamily
+	baseInfo.PlatformVersion = hostInfo.PlatformVersion
+	baseInfo.KernelArch = hostInfo.KernelArch
+	baseInfo.KernelVersion = hostInfo.KernelVersion
+	ss, _ := json.Marshal(hostInfo)
+	baseInfo.VirtualizationSystem = string(ss)
+
+	apps, err := appRepo.GetBy()
 	if err != nil {
 		return nil, err
 	}
-	for _, app := range appInstall {
-		switch app.App.Key {
+	for _, app := range apps {
+		switch app.Key {
 		case "dateease":
-			baseInfo.DateeaseEnabled = true
+			baseInfo.DateeaseID = app.ID
 		case "halo":
-			baseInfo.HaloEnabled = true
+			baseInfo.HaloID = app.ID
 		case "metersphere":
-			baseInfo.MeterSphereEnabled = true
+			baseInfo.MeterSphereID = app.ID
 		case "jumpserver":
-			baseInfo.JumpServerEnabled = true
+			baseInfo.JumpServerID = app.ID
+		case "kubeoperator":
+			baseInfo.KubeoperatorID = app.ID
+		case "kubepi":
+			baseInfo.KubepiID = app.ID
 		}
+	}
+
+	appInstall, err := appInstallRepo.GetBy()
+	if err != nil {
+		return nil, err
 	}
 	baseInfo.AppInstalldNumber = len(appInstall)
 	dbs, err := mysqlRepo.List()
@@ -49,6 +70,11 @@ func (u *DashboardService) LoadBaseInfo() (*dto.DashboardBase, error) {
 		return nil, err
 	}
 	baseInfo.DatabaseNumber = len(dbs)
+	website, err := websiteRepo.GetBy()
+	if err != nil {
+		return nil, err
+	}
+	baseInfo.WebsiteNumber = len(website)
 	cornjobs, err := cronjobRepo.List()
 	if err != nil {
 		return nil, err
@@ -62,10 +88,85 @@ func (u *DashboardService) LoadBaseInfo() (*dto.DashboardBase, error) {
 	baseInfo.CPUModelName = cpuInfo[0].ModelName
 	baseInfo.CPUCores, _ = cpu.Counts(false)
 	baseInfo.CPULogicalCores, _ = cpu.Counts(true)
-	totalPercent, _ := cpu.Percent(1*time.Second, false)
+
+	baseInfo.CurrentInfo = *u.LoadCurrentInfo(ioOption, netOption)
+	return &baseInfo, nil
+}
+
+func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *dto.DashboardCurrent {
+	var currentInfo dto.DashboardCurrent
+	hostInfo, _ := host.Info()
+	currentInfo.Procs = hostInfo.Procs
+
+	currentInfo.CPUTotal, _ = cpu.Counts(true)
+	totalPercent, _ := cpu.Percent(0, false)
 	if len(totalPercent) == 1 {
-		baseInfo.CPUPercent = totalPercent[0]
+		currentInfo.CPUUsedPercent = totalPercent[0]
+		currentInfo.CPUUsed = currentInfo.CPUUsedPercent * 0.01 * float64(currentInfo.CPUTotal)
+	}
+	currentInfo.CPUPercent, _ = cpu.Percent(0, true)
+
+	loadInfo, _ := load.Avg()
+	currentInfo.Load1 = loadInfo.Load1
+	currentInfo.Load5 = loadInfo.Load5
+	currentInfo.Load15 = loadInfo.Load15
+	currentInfo.LoadUsagePercent = loadInfo.Load1 / (float64(currentInfo.CPUTotal*2) * 0.75) * 100
+
+	memoryInfo, _ := mem.VirtualMemory()
+	currentInfo.MemoryTotal = memoryInfo.Total
+	currentInfo.MemoryAvailable = memoryInfo.Available
+	currentInfo.MemoryUsed = memoryInfo.Used
+	currentInfo.MemoryUsedPercent = memoryInfo.UsedPercent
+
+	state, _ := disk.Usage("/")
+	currentInfo.Total = state.Total
+	currentInfo.Free = state.Free
+	currentInfo.Used = state.Used
+	currentInfo.UsedPercent = state.UsedPercent
+	currentInfo.InodesTotal = state.InodesTotal
+	currentInfo.InodesUsed = state.InodesUsed
+	currentInfo.InodesFree = state.InodesFree
+	currentInfo.InodesUsedPercent = state.InodesUsedPercent
+
+	if ioOption == "all" {
+		diskInfo, _ := disk.IOCounters()
+		for _, state := range diskInfo {
+			currentInfo.IOReadBytes += state.ReadBytes
+			currentInfo.IOWriteBytes += state.WriteBytes
+			currentInfo.IOCount += (state.ReadCount + state.WriteCount)
+			currentInfo.IOTime += state.ReadTime / 1000 / 1000
+			if state.WriteTime > state.ReadTime {
+				currentInfo.IOTime += state.WriteTime / 1000 / 1000
+			}
+		}
+	} else {
+		diskInfo, _ := disk.IOCounters(ioOption)
+		for _, state := range diskInfo {
+			currentInfo.IOReadBytes += state.ReadBytes
+			currentInfo.IOWriteBytes += state.WriteBytes
+			currentInfo.IOTime += state.ReadTime / 1000 / 1000
+			if state.WriteTime > state.ReadTime {
+				currentInfo.IOTime += state.WriteTime / 1000 / 1000
+			}
+		}
 	}
 
-	return &baseInfo, nil
+	if netOption == "all" {
+		netInfo, _ := net.IOCounters(false)
+		if len(netInfo) != 0 {
+			currentInfo.NetBytesSent = netInfo[0].BytesSent
+			currentInfo.NetBytesRecv = netInfo[0].BytesRecv
+		}
+	} else {
+		netInfo, _ := net.IOCounters(true)
+		for _, state := range netInfo {
+			if state.Name == netOption {
+				currentInfo.NetBytesSent = state.BytesSent
+				currentInfo.NetBytesRecv = state.BytesRecv
+			}
+		}
+	}
+
+	currentInfo.ShotTime = time.Now()
+	return &currentInfo
 }

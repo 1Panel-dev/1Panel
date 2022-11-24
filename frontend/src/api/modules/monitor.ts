@@ -8,3 +8,7 @@ export const loadMonitor = (param: Monitor.MonitorSearch) => {
 export const getNetworkOptions = () => {
     return http.get<Array<string>>(`/monitors/netoptions`);
 };
+
+export const getIOOptions = () => {
+    return http.get<Array<string>>(`/monitors/iooptions`);
+};

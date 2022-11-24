@@ -2,6 +2,7 @@ package router
 
 type RouterGroup struct {
 	BaseRouter
+	DashboardRouter
 	HostRouter
 	BackupRouter
 	GroupRouter
