@@ -14,4 +14,14 @@ export namespace Nginx {
         scope: string;
         params?: any;
     }
+
+    export interface NginxStatus {
+        accepts: string;
+        handled: string;
+        active: string;
+        requests: string;
+        reading: string;
+        writing: string;
+        waiting: string;
+    }
 }

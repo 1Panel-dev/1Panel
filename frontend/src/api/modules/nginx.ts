@@ -13,3 +13,7 @@ export const GetNginxConfigByScope = (req: Nginx.NginxScopeReq) => {
 export const UpdateNginxConfigByScope = (req: Nginx.NginxConfigReq) => {
     return http.post<any>(`/nginx/update`, req);
 };
+
+export const GetNginxStatus = () => {
+    return http.get<Nginx.NginxStatus>(`/nginx/status`);
+};

@@ -20,6 +20,16 @@ type NginxScopeReq struct {
 	Scope NginxKey `json:"scope"`
 }
 
+type NginxStatus struct {
+	Active   string `json:"active"`
+	Accepts  string `json:"accepts"`
+	Handled  string `json:"handled"`
+	Requests string `json:"requests"`
+	Reading  string `json:"reading"`
+	Writing  string `json:"writing"`
+	Waiting  string `json:"waiting"`
+}
+
 type NginxKey string
 
 const (

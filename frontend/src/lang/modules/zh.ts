@@ -769,5 +769,13 @@ export default {
         gzipMinLengthHelper: '最小压缩文件',
         gzipCompLevelHelper: '压缩率',
         gzipHelper: '是否开启压缩传输',
+        connections: '活动连接(Active connections)',
+        accepts: '总连接次数(accepts)',
+        handled: '总握手次数(handled)',
+        requests: '总握手次数(requests)',
+        reading: '请求数(Reading)',
+        writing: '响应数(Writing)',
+        waiting: '驻留进程(Waiting)',
+        status: '负载状态',
     },
 };
