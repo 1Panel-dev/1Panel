@@ -5,33 +5,37 @@
                 <el-card class="el-card">
                     <template #header>
                         <div class="card-header">
-                            <span>概 览</span>
+                            <span>{{ $t('home.overview') }}</span>
                         </div>
                     </template>
                     <el-row :gutter="20">
                         <el-col :span="12">
                             <el-card style="font-size: 12px; height: 80px; border-radius: 10px">
                                 <svg-icon style="float: left; margin-left: 5px" iconName="p-website"></svg-icon>
-                                <span style="float: left; margin-left: 5px; margin-top: 10px">网站</span>
+                                <span style="float: left; margin-left: 5px; margin-top: 10px">
+                                    {{ $t('menu.website') }}
+                                </span>
                                 <el-link
                                     style="float: right; font-size: 24px; margin-right: 5px"
                                     @click="goRouter('/websites')"
                                     type="primary"
                                 >
-                                    2
+                                    {{ baseInfo?.websiteNumber }}
                                 </el-link>
                             </el-card>
                         </el-col>
                         <el-col :span="12">
                             <el-card style="font-size: 12px; height: 80px; border-radius: 10px">
                                 <svg-icon style="float: left; margin-left: 5px" iconName="p-database"></svg-icon>
-                                <span style="float: left; margin-left: 5px; margin-top: 10px">数据库</span>
+                                <span style="float: left; margin-left: 5px; margin-top: 10px">
+                                    {{ $t('menu.database') }}
+                                </span>
                                 <el-link
                                     style="float: right; font-size: 24px; margin-right: 5px"
                                     @click="goRouter('/databases')"
                                     type="primary"
                                 >
-                                    5
+                                    {{ baseInfo?.databaseNumber }}
                                 </el-link>
                             </el-card>
                         </el-col>
@@ -40,26 +44,30 @@
                         <el-col :span="12">
                             <el-card style="font-size: 12px; height: 80px; border-radius: 10px">
                                 <svg-icon style="float: left; margin-left: 5px" iconName="p-plan"></svg-icon>
-                                <span style="float: left; margin-left: 5px; margin-top: 10px">定时任务</span>
+                                <span style="float: left; margin-left: 5px; margin-top: 10px">
+                                    {{ $t('menu.cronjob') }}
+                                </span>
                                 <el-link
                                     style="float: right; font-size: 24px; margin-right: 5px"
                                     @click="goRouter('/cronjobs')"
                                     type="primary"
                                 >
-                                    7
+                                    {{ baseInfo?.cronjobNumber }}
                                 </el-link>
                             </el-card>
                         </el-col>
                         <el-col :span="12">
                             <el-card style="font-size: 12px; height: 80px; border-radius: 10px">
                                 <svg-icon style="float: left; margin-left: 5px" iconName="p-appstore"></svg-icon>
-                                <span style="float: left; margin-left: 5px; margin-top: 10px">已安装应用</span>
+                                <span style="float: left; margin-left: 5px; margin-top: 10px">
+                                    {{ $t('home.appInstalled') }}
+                                </span>
                                 <el-link
                                     style="float: right; font-size: 24px; margin-right: 5px"
                                     @click="goRouter('/apps')"
                                     type="primary"
                                 >
-                                    3
+                                    {{ baseInfo?.appInstalldNumber }}
                                 </el-link>
                             </el-card>
                         </el-col>
@@ -67,194 +75,201 @@
                 </el-card>
             </el-col>
             <el-col :span="8">
-                <el-card class="el-card">
-                    <template #header>
-                        <div class="card-header">
-                            <span>状态</span>
-                        </div>
-                    </template>
-                    <el-row :gutter="10">
-                        <el-col :span="12" align="center">
-                            <el-progress type="dashboard" :width="80" :percentage="80">
-                                <template #default="{ percentage }">
-                                    <span class="percentage-value">{{ percentage }}%</span>
-                                    <span class="percentage-label">CPU</span>
-                                </template>
-                            </el-progress>
-                            <br />
-                            <span>(0.56 / 8.00) Core</span>
-                        </el-col>
-                        <el-col :span="12" align="center">
-                            <el-progress type="dashboard" :width="80" :percentage="30">
-                                <template #default="{ percentage }">
-                                    <span class="percentage-value">{{ percentage }}%</span>
-                                    <span class="percentage-label">内存</span>
-                                </template>
-                            </el-progress>
-                            <br />
-                            <span>(851 / 7812) MB</span>
-                        </el-col>
-                    </el-row>
-                    <el-row :gutter="10" style="margin-top: 30px">
-                        <el-col :span="12" align="center">
-                            <el-progress type="dashboard" :width="80" :percentage="50">
-                                <template #default="{ percentage }">
-                                    <span class="percentage-value">{{ percentage }}%</span>
-                                    <span class="percentage-label">负载</span>
-                                </template>
-                            </el-progress>
-                            <br />
-                            <span>(0.36 / 8.00) Core</span>
-                        </el-col>
-                        <el-col :span="12" align="center">
-                            <el-progress type="dashboard" :width="80" :percentage="40">
-                                <template #default="{ percentage }">
-                                    <span class="percentage-value">{{ percentage }}%</span>
-                                    <span class="percentage-label">磁盘</span>
-                                </template>
-                            </el-progress>
-                            <br />
-                            <span>(6.23 / 46.97) GB</span>
-                        </el-col>
-                    </el-row>
-                </el-card>
+                <Status ref="statuRef" />
             </el-col>
             <el-col :span="8">
                 <el-card class="el-card">
                     <template #header>
                         <div class="card-header">
-                            <span>系统信息</span>
+                            <span>{{ $t('home.systemInfo') }}</span>
                         </div>
                     </template>
                     <el-form>
-                        <el-form-item label="主机名称">ko-deploy</el-form-item>
-                        <el-form-item label="发行版本">centos-7.6.1810</el-form-item>
-                        <el-form-item label="内核版本">
-                            Linux version 3.10.0-957.el7.x86_64 (mockbuild@kbuilder.bsys.centos.org) (gcc version 4.8.5
-                            20150623 (Red Hat 4.8.5-36) (GCC) ) #1 SMP Thu Nov 8 23:39:32 UTC 2018
+                        <el-form-item :label="$t('home.hostname')">{{ baseInfo.hostname }}</el-form-item>
+                        <el-form-item :label="$t('home.platformVersion')">
+                            {{ baseInfo.platform }}-{{ baseInfo.platformVersion }}
                         </el-form-item>
-                        <el-form-item label="系统类型">x86_64</el-form-item>
+                        <el-form-item :label="$t('home.kernelVersion')">
+                            {{ baseInfo.kernelVersion }}
+                        </el-form-item>
+                        <el-form-item :label="$t('home.kernelArch')">{{ baseInfo.kernelArch }}</el-form-item>
                     </el-form>
                 </el-card>
             </el-col>
         </el-row>
         <el-row :gutter="20" style="margin-top: 20px" class="row-box">
             <el-col :span="12">
-                <el-card class="el-card">
-                    <template #header>
-                        <div class="card-header">
-                            <span>应用</span>
-                        </div>
-                    </template>
-                    <el-row :gutter="20">
-                        <el-col :span="12">
-                            <el-card @mouseover="hoverApp = 'halo'" @mouseleave="hoverApp = ''" style="height: 110px">
-                                <el-row>
-                                    <el-col :span="4">
-                                        <img style="width: 40px; height: 40px" src="./images/halo.jpg" alt="" />
-                                    </el-col>
-                                    <el-col :span="2"><br /></el-col>
-                                    <el-col :span="18">
-                                        <span style="font-size: 20px; color: #214bc8">Halo</span>
-                                        <div><span class="input-help">现代化开源建站 / CMS系统</span></div>
-                                    </el-col>
-                                </el-row>
-                                <div v-show="hoverApp === 'halo'" style="float: right; margin-top: 10px">
-                                    <el-button>停止</el-button>
-                                    <el-button>重启</el-button>
-                                </div>
-                            </el-card>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-card @mouseover="hoverApp = 'de'" @mouseleave="hoverApp = ''" style="height: 110px">
-                                <el-row>
-                                    <el-col :span="4">
-                                        <img style="width: 40px; height: 40px" src="./images/de.jpg" alt="" />
-                                    </el-col>
-                                    <el-col :span="2"><br /></el-col>
-                                    <el-col :span="18">
-                                        <span style="font-size: 20px; color: #0070d6">Dataease</span>
-                                        <div><span class="input-help">开源数据可视化分析工具</span></div>
-                                    </el-col>
-                                </el-row>
-                                <div v-show="hoverApp === 'de'" style="float: right; margin-top: 10px">
-                                    <el-button>启动</el-button>
-                                </div>
-                            </el-card>
-                        </el-col>
-                    </el-row>
-                    <el-row :gutter="20" style="margin-top: 20px">
-                        <el-col :span="12">
-                            <el-card @mouseover="hoverApp = 'js'" @mouseleave="hoverApp = ''" style="height: 110px">
-                                <el-row>
-                                    <el-col :span="4">
-                                        <img style="width: 40px; height: 40px" src="./images/js.jpg" alt="" />
-                                    </el-col>
-                                    <el-col :span="2"><br /></el-col>
-                                    <el-col :span="18">
-                                        <span style="font-size: 16px; color: #008d75">JumpServer</span>
-                                        <div><span class="input-help">广受欢迎的开源堡垒机</span></div>
-                                    </el-col>
-                                </el-row>
-                                <div v-show="hoverApp === 'js'" style="float: right; margin-top: 10px">
-                                    <el-button>停止</el-button>
-                                    <el-button>重启</el-button>
-                                </div>
-                            </el-card>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-card @mouseover="hoverApp = 'ms'" @mouseleave="hoverApp = ''" style="height: 110px">
-                                <el-row>
-                                    <el-col :span="4">
-                                        <img style="width: 40px; height: 40px" src="./images/ms.jpg" alt="" />
-                                    </el-col>
-                                    <el-col :span="2"><br /></el-col>
-                                    <el-col :span="18">
-                                        <span style="font-size: 16px; color: #723279">MeterSphere</span>
-                                        <div><span class="input-help">一站式开源持续测试平台</span></div>
-                                    </el-col>
-                                </el-row>
-                                <div v-show="hoverApp === 'ms'" style="float: right; margin-top: 10px">
-                                    <el-button>启动</el-button>
-                                </div>
-                            </el-card>
-                        </el-col>
-                    </el-row>
-                </el-card>
+                <App ref="appRef" />
             </el-col>
             <el-col :span="12">
                 <el-card class="el-card">
                     <el-radio-group v-model="chartOption" @change="changeOption">
-                        <el-radio-button label="io">流量</el-radio-button>
-                        <el-radio-button label="network">网络</el-radio-button>
+                        <el-radio-button label="network">{{ $t('home.network') }}</el-radio-button>
+                        <el-radio-button label="io">{{ $t('home.io') }}</el-radio-button>
                     </el-radio-group>
-                    <div v-if="chartOption === 'io'" id="ioChart" style="width: 100%; height: 320px"></div>
-                    <div v-if="chartOption === 'network'" id="networkChart" style="width: 100%; height: 320px"></div>
+                    <el-select
+                        v-if="chartOption === 'network'"
+                        @change="onLoadBaseInfo(false, 'network')"
+                        v-model="searchInfo.netOption"
+                        style="float: right"
+                    >
+                        <el-option v-for="item in netOptions" :key="item" :label="item" :value="item" />
+                    </el-select>
+                    <el-select
+                        v-if="chartOption === 'io'"
+                        v-model="searchInfo.ioOption"
+                        @change="onLoadBaseInfo(false, 'io')"
+                        style="float: right"
+                    >
+                        <el-option v-for="item in ioOptions" :key="item" :label="item" :value="item" />
+                    </el-select>
+                    <div style="margin-top: 20px" v-if="chartOption === 'network'">
+                        <el-tag>{{ $t('monitor.up') }}: {{ currentChartInfo.netBytesSent }} KB/s</el-tag>
+                        <el-tag style="margin-left: 20px">
+                            {{ $t('monitor.down') }}: {{ currentChartInfo.netBytesRecv }} KB/s
+                        </el-tag>
+                        <el-tag style="margin-left: 20px">
+                            {{ $t('home.totalSend') }}: {{ computeSize(currentInfo.netBytesSent) }}
+                        </el-tag>
+                        <el-tag style="margin-left: 20px">
+                            {{ $t('home.totalRecv') }}: {{ computeSize(currentInfo.netBytesRecv) }}
+                        </el-tag>
+                    </div>
+                    <div style="margin-top: 20px" v-if="chartOption === 'io'">
+                        <el-tag>{{ $t('monitor.read') }}: {{ currentChartInfo.ioReadBytes }} MB</el-tag>
+                        <el-tag style="margin-left: 20px">
+                            {{ $t('monitor.write') }}: {{ currentChartInfo.ioWriteBytes }} MB
+                        </el-tag>
+                        <el-tag style="margin-left: 20px">
+                            {{ $t('home.rwPerSecond') }}: {{ currentChartInfo.ioCount }} {{ $t('home.time') }}
+                        </el-tag>
+                        <el-tag style="margin-left: 20px">
+                            {{ $t('home.rwPerSecond') }}: {{ currentInfo.ioTime }} ms
+                        </el-tag>
+                    </div>
+                    <div
+                        v-if="chartOption === 'io'"
+                        id="ioChart"
+                        style="margin-top: 20px; width: 100%; height: 320px"
+                    ></div>
+                    <div
+                        v-if="chartOption === 'network'"
+                        id="networkChart"
+                        style="margin-top: 20px; width: 100%; height: 320px"
+                    ></div>
                 </el-card>
             </el-col>
         </el-row>
     </div>
 </template>
 
-<script setup lang="ts" name="dataVisualize">
-import { onMounted, onBeforeUnmount, ref } from 'vue';
+<script lang="ts" setup>
+import { onMounted, onBeforeUnmount, ref, reactive } from 'vue';
 import * as echarts from 'echarts';
+import Status from '@/views/home/status/index.vue';
+import App from '@/views/home/app/index.vue';
 import i18n from '@/lang';
-import { ContainerStats } from '@/api/modules/container';
-import { dateFromatForSecond } from '@/utils/util';
+import { Dashboard } from '@/api/interface/dashboard';
+import { dateFromatForSecond, computeSize } from '@/utils/util';
 import { useRouter } from 'vue-router';
+import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
+import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
 const router = useRouter();
 
-const hoverApp = ref();
-const chartOption = ref('io');
+const statuRef = ref();
+const appRef = ref();
+
+const chartOption = ref('network');
 let timer: NodeJS.Timer | null = null;
 let isInit = ref<boolean>(true);
 
-const ioReadDatas = ref<Array<string>>([]);
-const ioWriteDatas = ref<Array<string>>([]);
-const netTxDatas = ref<Array<string>>([]);
-const netRxDatas = ref<Array<string>>([]);
-const timeDatas = ref<Array<string>>([]);
+const ioReadBytes = ref<Array<number>>([]);
+const ioWriteBytes = ref<Array<number>>([]);
+const netBytesSents = ref<Array<number>>([]);
+const netBytesRecvs = ref<Array<number>>([]);
+const timeIODatas = ref<Array<string>>([]);
+const timeNetDatas = ref<Array<string>>([]);
+
+const ioOptions = ref();
+const netOptions = ref();
+const searchInfo = reactive({
+    ioOption: 'all',
+    netOption: 'all',
+});
+
+const baseInfo = ref<Dashboard.BaseInfo>({
+    haloID: 0,
+    dateeaseID: 0,
+    jumpserverID: 0,
+    metersphereID: 0,
+    kubeoperatorID: 0,
+    kubepiID: 0,
+
+    websiteNumber: 0,
+    databaseNumber: 0,
+    cronjobNumber: 0,
+    appInstalldNumber: 0,
+
+    hostname: '',
+    os: '',
+    platform: '',
+    platformFamily: '',
+    platformVersion: '',
+    kernelArch: '',
+    kernelVersion: '',
+    virtualizationSystem: '',
+
+    cpuCores: 0,
+    cpuLogicalCores: 0,
+    cpuModelName: '',
+    currentInfo: null,
+});
+const currentInfo = ref<Dashboard.CurrentInfo>({
+    procs: 0,
+
+    load1: 0,
+    load5: 0,
+    load15: 0,
+    loadUsagePercent: 0,
+
+    cpuPercent: [] as Array<number>,
+    cpuUsedPercent: 0,
+    cpuUsed: 0,
+    cpuTotal: 0,
+
+    memoryTotal: 0,
+    memoryAvailable: 0,
+    memoryUsed: 0,
+    MemoryUsedPercent: 0,
+
+    ioReadBytes: 0,
+    ioWriteBytes: 0,
+    ioTime: 0,
+    ioCount: 0,
+
+    total: 0,
+    free: 0,
+    used: 0,
+    usedPercent: 0,
+
+    inodesTotal: 0,
+    inodesUsed: 0,
+    inodesFree: 0,
+    inodesUsedPercent: 0,
+
+    netBytesSent: 0,
+    netBytesRecv: 0,
+
+    shotTime: new Date(),
+});
+const currentChartInfo = reactive({
+    ioReadBytes: 0,
+    ioWriteBytes: 0,
+    ioCount: 0,
+
+    netBytesSent: 0,
+    netBytesRecv: 0,
+});
 
 const changeOption = async () => {
     isInit.value = true;
@@ -265,92 +280,151 @@ const goRouter = async (path: string) => {
     router.push({ path: path });
 };
 
+const onLoadNetworkOptions = async () => {
+    const res = await getNetworkOptions();
+    netOptions.value = res.data;
+    searchInfo.netOption = netOptions.value && netOptions.value[0];
+};
+
+const onLoadIOOptions = async () => {
+    const res = await getIOOptions();
+    ioOptions.value = res.data;
+    searchInfo.ioOption = ioOptions.value && ioOptions.value[0];
+};
+
+const onLoadBaseInfo = async (isInit: boolean, range: string) => {
+    if (range === 'all' || range === 'io') {
+        ioReadBytes.value = [];
+        ioWriteBytes.value = [];
+        timeIODatas.value = [];
+    } else if (range === 'all' || range === 'network') {
+        netBytesSents.value = [];
+        netBytesRecvs.value = [];
+        timeNetDatas.value = [];
+    }
+    const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
+    baseInfo.value = res.data;
+    currentInfo.value = baseInfo.value.currentInfo;
+    onLoadCurrentInfo();
+    statuRef.value.acceptParams(currentInfo.value, baseInfo.value);
+    appRef.value.acceptParams(baseInfo.value);
+    if (isInit) {
+        window.addEventListener('resize', changeChartSize);
+        timer = setInterval(async () => {
+            onLoadCurrentInfo();
+        }, 3000);
+    }
+};
+
+const onLoadCurrentInfo = async () => {
+    const res = await loadCurrentInfo(searchInfo.ioOption, searchInfo.netOption);
+    currentChartInfo.netBytesSent = Number(
+        ((res.data.netBytesSent - currentInfo.value.netBytesSent) / 1024 / 3).toFixed(2),
+    );
+    netBytesSents.value.push(currentChartInfo.netBytesSent);
+    if (netBytesSents.value.length > 20) {
+        netBytesSents.value.splice(0, 1);
+    }
+    currentChartInfo.netBytesRecv = Number(
+        ((res.data.netBytesRecv - currentInfo.value.netBytesRecv) / 1024 / 3).toFixed(2),
+    );
+    netBytesRecvs.value.push(currentChartInfo.netBytesRecv);
+    if (netBytesRecvs.value.length > 20) {
+        netBytesRecvs.value.splice(0, 1);
+    }
+
+    currentChartInfo.ioReadBytes = Number(
+        ((res.data.ioReadBytes - currentInfo.value.ioReadBytes) / 1024 / 1024 / 3).toFixed(2),
+    );
+    ioReadBytes.value.push(currentChartInfo.ioReadBytes);
+    if (ioReadBytes.value.length > 20) {
+        ioReadBytes.value.splice(0, 1);
+    }
+    currentChartInfo.ioWriteBytes = Number(
+        ((res.data.ioWriteBytes - currentInfo.value.ioWriteBytes) / 1024 / 1024 / 3).toFixed(2),
+    );
+    ioWriteBytes.value.push(currentChartInfo.ioWriteBytes);
+    if (ioWriteBytes.value.length > 20) {
+        ioWriteBytes.value.splice(0, 1);
+    }
+    currentChartInfo.ioCount = Number(((res.data.ioCount - currentInfo.value.ioCount) / 3).toFixed(2));
+
+    timeIODatas.value.push(dateFromatForSecond(res.data.shotTime));
+    if (timeIODatas.value.length > 20) {
+        timeIODatas.value.splice(0, 1);
+    }
+    timeNetDatas.value.push(dateFromatForSecond(res.data.shotTime));
+    if (timeNetDatas.value.length > 20) {
+        timeNetDatas.value.splice(0, 1);
+    }
+    loadData();
+    currentInfo.value = res.data;
+    statuRef.value.acceptParams(currentInfo.value, baseInfo.value);
+};
+
 const loadData = async () => {
-    try {
-        const res = await ContainerStats('kubeoperator_nginx');
-        ioReadDatas.value.push(res.data.ioRead.toFixed(2));
-        if (ioReadDatas.value.length > 20) {
-            ioReadDatas.value.splice(0, 1);
-        }
-        ioWriteDatas.value.push(res.data.ioWrite.toFixed(2));
-        if (ioWriteDatas.value.length > 20) {
-            ioWriteDatas.value.splice(0, 1);
-        }
-        netTxDatas.value.push(res.data.networkTX.toFixed(2));
-        if (netTxDatas.value.length > 20) {
-            netTxDatas.value.splice(0, 1);
-        }
-        netRxDatas.value.push(res.data.networkRX.toFixed(2));
-        if (netRxDatas.value.length > 20) {
-            netRxDatas.value.splice(0, 1);
-        }
-        timeDatas.value.push(dateFromatForSecond(res.data.shotTime));
-        if (timeDatas.value.length > 20) {
-            timeDatas.value.splice(0, 1);
-        }
-        if (chartOption.value === 'io') {
-            let ioReadYDatas = {
-                name: i18n.global.t('monitor.read'),
-                type: 'line',
-                areaStyle: {
-                    color: '#ebdee3',
-                },
-                data: ioReadDatas.value,
-                showSymbol: false,
-            };
-            let ioWriteYDatas = {
-                name: i18n.global.t('monitor.write'),
-                type: 'line',
-                areaStyle: {
-                    color: '#ebdee3',
-                },
-                data: ioWriteDatas.value,
-                showSymbol: false,
-            };
-            freshChart(
-                'ioChart',
-                [i18n.global.t('monitor.read'), i18n.global.t('monitor.write')],
-                timeDatas.value,
-                [ioReadYDatas, ioWriteYDatas],
-                '流量',
-                'MB',
-            );
-        } else {
-            let netTxYDatas = {
-                name: i18n.global.t('monitor.up'),
-                type: 'line',
-                areaStyle: {
-                    color: '#ebdee3',
-                },
-                data: netTxDatas.value,
-                showSymbol: false,
-            };
-            let netRxYDatas = {
-                name: i18n.global.t('monitor.down'),
-                type: 'line',
-                areaStyle: {
-                    color: '#ebdee3',
-                },
-                data: netRxDatas.value,
-                showSymbol: false,
-            };
-            freshChart(
-                'networkChart',
-                [i18n.global.t('monitor.up'), i18n.global.t('monitor.down')],
-                timeDatas.value,
-                [netTxYDatas, netRxYDatas],
-                i18n.global.t('monitor.network'),
-                'KB/s',
-            );
-        }
-    } catch {
-        clearInterval(Number(timer));
-        timer = null;
+    if (chartOption.value === 'io') {
+        let ioReadYDatas = {
+            name: i18n.global.t('monitor.read'),
+            type: 'line',
+            smooth: true,
+            areaStyle: {
+                color: '#ebdee3',
+            },
+            data: ioReadBytes.value,
+            showSymbol: false,
+        };
+        let ioWriteYDatas = {
+            name: i18n.global.t('monitor.write'),
+            type: 'line',
+            smooth: true,
+            areaStyle: {
+                color: '#ebdee3',
+            },
+            data: ioWriteBytes.value,
+            showSymbol: false,
+        };
+        freshChart(
+            'ioChart',
+            [i18n.global.t('monitor.read'), i18n.global.t('monitor.write')],
+            timeIODatas.value,
+            [ioReadYDatas, ioWriteYDatas],
+            '流量',
+            'MB',
+        );
+    } else {
+        let netTxYDatas = {
+            name: i18n.global.t('monitor.up'),
+            type: 'line',
+            smooth: true,
+            areaStyle: {
+                color: '#ebdee3',
+            },
+            data: netBytesRecvs.value,
+            showSymbol: false,
+        };
+        let netRxYDatas = {
+            name: i18n.global.t('monitor.down'),
+            type: 'line',
+            smooth: true,
+            areaStyle: {
+                color: '#ebdee3',
+            },
+            data: netBytesSents.value,
+            showSymbol: false,
+        };
+        freshChart(
+            'networkChart',
+            [i18n.global.t('monitor.up'), i18n.global.t('monitor.down')],
+            timeNetDatas.value,
+            [netTxYDatas, netRxYDatas],
+            i18n.global.t('monitor.network'),
+            'KB/s',
+        );
     }
 };
 
 function freshChart(chartName: string, legendDatas: any, xDatas: any, yDatas: any, yTitle: string, formatStr: string) {
-    console.log(chartName, echarts.getInstanceByDom(document.getElementById(chartName) as HTMLElement));
     if (isInit.value) {
         echarts.init(document.getElementById(chartName) as HTMLElement);
         isInit.value = false;
@@ -393,11 +467,9 @@ function changeChartSize() {
 }
 
 onMounted(() => {
-    loadData();
-    window.addEventListener('resize', changeChartSize);
-    timer = setInterval(async () => {
-        loadData();
-    }, 3000);
+    onLoadNetworkOptions();
+    onLoadIOOptions();
+    onLoadBaseInfo(true, 'all');
 });
 
 onBeforeUnmount(() => {
@@ -408,15 +480,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.percentage-value {
-    display: block;
-    font-size: 16px;
-}
-.percentage-label {
-    display: block;
-    margin-top: 10px;
-    font-size: 12px;
-}
 .card-header {
     display: flex;
     justify-content: space-between;

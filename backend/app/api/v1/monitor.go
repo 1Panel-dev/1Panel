@@ -9,6 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/gin-gonic/gin"
+	"github.com/shirou/gopsutil/disk"
 	"github.com/shirou/gopsutil/net"
 )
 
@@ -87,6 +88,16 @@ func (b *BaseApi) GetNetworkOptions(c *gin.Context) {
 	var options []string
 	options = append(options, "all")
 	for _, net := range netStat {
+		options = append(options, net.Name)
+	}
+	helper.SuccessWithData(c, options)
+}
+
+func (b *BaseApi) GetIOOptions(c *gin.Context) {
+	diskStat, _ := disk.IOCounters()
+	var options []string
+	options = append(options, "all")
+	for _, net := range diskStat {
 		options = append(options, net.Name)
 	}
 	helper.SuccessWithData(c, options)
