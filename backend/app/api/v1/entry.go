@@ -9,7 +9,8 @@ type ApiGroup struct {
 var ApiGroupApp = new(ApiGroup)
 
 var (
-	authService = service.ServiceGroupApp.AuthService
+	authService      = service.ServiceGroupApp.AuthService
+	dashboardService = service.ServiceGroupApp.DashboardService
 
 	appService        = service.ServiceGroupApp.AppService
 	appInstallService = service.ServiceGroupApp.AppInstallService

@@ -18,5 +18,6 @@ func (s *MonitorRouter) InitMonitorRouter(Router *gin.RouterGroup) {
 	{
 		monitorRouter.POST("/search", baseApi.LoadMonitor)
 		monitorRouter.GET("/netoptions", baseApi.GetNetworkOptions)
+		monitorRouter.GET("/iooptions", baseApi.GetIOOptions)
 	}
 }

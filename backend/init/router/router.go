@@ -67,6 +67,7 @@ func Routers() *gin.Engine {
 	// PrivateGroup.Use(middleware.SafetyAuth())
 	{
 		systemRouter.InitBaseRouter(PrivateGroup)
+		systemRouter.InitDashboardRouter(PrivateGroup)
 		systemRouter.InitHostRouter(PrivateGroup)
 		systemRouter.InitBackupRouter(PrivateGroup)
 		systemRouter.InitGroupRouter(PrivateGroup)

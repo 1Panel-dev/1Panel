@@ -20,6 +20,7 @@ func PasswordExpired() gin.HandlerFunc {
 		expiredDays, _ := strconv.Atoi(setting.Value)
 		if expiredDays == 0 {
 			c.Next()
+			return
 		}
 
 		if _, err := c.Cookie(constant.PasswordExpiredName); err != nil {
