@@ -1,7 +1,7 @@
 version: '3'
 services:
   nginx1.23.1:
-    container_name: ${CONTAINER_NAME}
+    container_name: nginx1.23.1
     image: nginx:1.23.1
     restart: always
     network_mode: host
@@ -11,5 +11,6 @@ services:
       - ./conf/conf.d:/etc/nginx/conf.d/
       - ./ssl:/etc/nginx/ssl
       - ./www:/www/root/
+      - ./root:/usr/share/nginx/html
 
 
