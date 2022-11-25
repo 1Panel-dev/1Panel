@@ -19,12 +19,26 @@ func (w WebsiteGroupService) GetGroups() ([]model.WebSiteGroup, error) {
 }
 
 func (w WebsiteGroupService) UpdateGroup(update dto.WebSiteGroupUpdate) error {
-	return websiteGroupRepo.Save(&model.WebSiteGroup{
-		BaseModel: model.BaseModel{
-			ID: update.ID,
-		},
-		Name: update.Name,
-	})
+
+	if update.Default {
+		if err := websiteGroupRepo.CancelDefault(); err != nil {
+			return err
+		}
+		return websiteGroupRepo.Save(&model.WebSiteGroup{
+			BaseModel: model.BaseModel{
+				ID: update.ID,
+			},
+			Name:    update.Name,
+			Default: true,
+		})
+	} else {
+		return websiteGroupRepo.Save(&model.WebSiteGroup{
+			BaseModel: model.BaseModel{
+				ID: update.ID,
+			},
+			Name: update.Name,
+		})
+	}
 }
 
 func (w WebsiteGroupService) DeleteGroup(id uint) error {

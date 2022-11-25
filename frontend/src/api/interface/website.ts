@@ -70,6 +70,7 @@ export namespace WebSite {
     export interface GroupOp {
         name: string;
         id?: number;
+        default: boolean;
     }
 
     export interface Domain {

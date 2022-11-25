@@ -60,8 +60,9 @@ type WebSiteGroupCreate struct {
 }
 
 type WebSiteGroupUpdate struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
+	ID      uint   `json:"id"`
+	Name    string `json:"name"`
+	Default bool   `json:"default"`
 }
 
 type WebSiteDomainCreate struct {

@@ -763,6 +763,8 @@ export default {
         nginxPer: '性能调整',
         neverExpire: '永不过期',
         protocol: '协议',
+        setDefault: '设为默认',
+        default: '默认',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',
