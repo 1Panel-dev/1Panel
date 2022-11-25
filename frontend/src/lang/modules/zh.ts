@@ -307,6 +307,7 @@ export default {
 
         custom: '自定义',
         containerTerminal: '容器终端',
+        emptyUser: '为空时，将使用容器默认的用户登录',
 
         containerCreate: '容器创建',
         port: '端口',
@@ -625,6 +626,8 @@ export default {
         safeEntrance: '安全入口',
         safeEntranceHelper: '面板管理入口，设置后只能通过指定安全入口登录面板，如: onepanel',
         expirationTime: '密码过期时间',
+        unSetting: '未设置',
+        noneSetting: '为面板密码设置过期时间，过期后需要重新设置密码',
         days: '过期天数',
         expiredHelper: '当前密码已过期，请重新修改密码：',
         timeoutHelper: '【 {0} 天后 】面板密码即将过期，过期后需要重新设置密码',

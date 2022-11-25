@@ -1,18 +1,20 @@
 <template>
-    <div style="margin: 20px">
-        <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
-            <template #toolbar>
-                <el-button @click="onCreate()">{{ $t('commons.button.create') }}</el-button>
-                <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete(null)">
-                    {{ $t('commons.button.delete') }}
-                </el-button>
-            </template>
-            <el-table-column type="selection" fix />
-            <el-table-column :label="$t('commons.table.name')" min-width="100" prop="name" fix />
-            <el-table-column :label="$t('terminal.command')" min-width="300" show-overflow-tooltip prop="command" />
-            <fu-table-operations type="icon" :buttons="buttons" :label="$t('commons.table.operate')" fix />
-        </ComplexTable>
-
+    <div>
+        <Submenu activeName="command" />
+        <el-card style="margin-top: 20px">
+            <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
+                <template #toolbar>
+                    <el-button @click="onCreate()">{{ $t('commons.button.create') }}</el-button>
+                    <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete(null)">
+                        {{ $t('commons.button.delete') }}
+                    </el-button>
+                </template>
+                <el-table-column type="selection" fix />
+                <el-table-column :label="$t('commons.table.name')" min-width="100" prop="name" fix />
+                <el-table-column :label="$t('terminal.command')" min-width="300" show-overflow-tooltip prop="command" />
+                <fu-table-operations type="icon" :buttons="buttons" :label="$t('commons.table.operate')" fix />
+            </ComplexTable>
+        </el-card>
         <el-dialog v-model="cmdVisiable" :title="$t('terminal.addHost')" width="30%">
             <el-form ref="commandInfoRef" label-width="100px" label-position="left" :model="commandInfo" :rules="rules">
                 <el-form-item :label="$t('commons.table.name')" prop="name">
@@ -36,9 +38,10 @@
 
 <script setup lang="ts">
 import ComplexTable from '@/components/complex-table/index.vue';
+import Submenu from '@/views/host/terminal/index.vue';
 import { Command } from '@/api/interface/command';
 import { addCommand, editCommand, deleteCommand, getCommandPage } from '@/api/modules/command';
-import { reactive, ref } from '@vue/runtime-core';
+import { reactive, ref, onMounted } from 'vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
@@ -143,10 +146,7 @@ const search = async () => {
     paginationConfig.total = res.data.total;
 };
 
-function onInit() {
+onMounted(() => {
     search();
-}
-defineExpose({
-    onInit,
 });
 </script>

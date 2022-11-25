@@ -301,6 +301,7 @@ export default {
         last10Min: 'Last 10 Minutes',
 
         custom: 'Custom',
+        emptyUser: 'When empty, you will log in with the  default user of container',
         containerTerminal: 'Container terminal',
 
         containerCreate: 'Container create',
@@ -610,6 +611,9 @@ export default {
         safeEntranceHelper:
             'Panel management portal. You can log in to the panel only through a specified security portal, for example: onepanel',
         expirationTime: 'Expiration Time',
+        unSetting: 'Not set',
+        noneSetting:
+            'Set the expiration time for the panel password. After the expiration, you need to reset the password',
         days: 'Expiration Days',
         expiredHelper: 'The current password has expired. Please change the password again.',
         timeoutHelper:

@@ -182,7 +182,7 @@ const passRules = reactive({
         Rules.requiredInput,
         { min: 6, message: i18n.global.t('commons.rule.commonPassword'), trigger: 'blur' },
     ],
-    newPasswordComplexity: [Rules.password],
+    newPasswordComplexity: [Rules.requiredInput, Rules.password],
     retryPassword: [Rules.requiredInput, { validator: checkPassword, trigger: 'blur' }],
 });
 const passwordVisiable = ref<boolean>(false);
