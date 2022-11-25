@@ -6,18 +6,38 @@
             </template>
             <el-table-column :label="$t('commons.table.name')" prop="name">
                 <template #default="{ row }">
-                    <span v-if="!row.edit" @click="row.edit = true">{{ row.name }}</span>
-                    <el-input v-if="row.edit" v-model="row.name" @blur="row.edit = false"></el-input>
+                    <span v-if="!row.edit">
+                        {{ row.name }}
+                        <span v-if="row.default">({{ $t('website.default') }})</span>
+                    </span>
+                    <el-input v-if="row.edit" v-model="row.name"></el-input>
                 </template>
             </el-table-column>
             <el-table-column :label="$t('commons.table.operate')">
                 <template #default="{ row, $index }">
-                    <el-button link :disabled="row.default" type="primary" @click="saveGroup(row)">
-                        {{ $t('commons.button.save') }}
-                    </el-button>
-                    <el-button link :disabled="row.default" type="primary" @click="deleteGroup($index)">
-                        {{ $t('commons.button.delete') }}
-                    </el-button>
+                    <div>
+                        <el-button link v-if="row.edit" type="primary" @click="saveGroup(row, false)">
+                            {{ $t('commons.button.save') }}
+                        </el-button>
+                        <el-button link v-if="!row.edit" type="primary" @click="editGroup($index)">
+                            {{ $t('commons.button.edit') }}
+                        </el-button>
+                        <el-button
+                            link
+                            v-if="!row.edit"
+                            :disabled="row.default"
+                            type="primary"
+                            @click="deleteGroup($index)"
+                        >
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
+                        <el-button link v-if="row.edit" type="primary" @click="cancelEdit($index)">
+                            {{ $t('commons.button.cancel') }}
+                        </el-button>
+                        <el-button link v-if="!row.edit && !row.default" type="primary" @click="saveGroup(row, true)">
+                            {{ $t('website.setDefault') }}
+                        </el-button>
+                    </div>
                 </template>
             </el-table-column>
         </ComplexTable>
@@ -39,13 +59,13 @@ interface groupData {
 
 let open = ref(false);
 let data = ref<groupData[]>([]);
-
 const handleClose = () => {
     open.value = false;
     data.value = [];
 };
 
 const search = () => {
+    data.value = [];
     ListGroups().then((res) => {
         for (const d of res.data) {
             const g = {
@@ -59,18 +79,24 @@ const search = () => {
     });
 };
 
-const saveGroup = (create: groupData) => {
+const saveGroup = (create: groupData, isDefault: boolean) => {
     const group = {
         name: create.name,
         id: create.id,
+        default: create.default,
     };
+    if (isDefault) {
+        group.default = isDefault;
+    }
     if (create.id == 0) {
         CreateGroup(group).then(() => {
             ElMessage.success(i18n.global.t('commons.msg.createSuccess'));
+            search();
         });
     } else {
         UpdateGroup(group).then(() => {
             ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+            search();
         });
     }
 };
@@ -100,6 +126,18 @@ const deleteGroup = (index: number) => {
         });
     } else {
         data.value.splice(index, 1);
+    }
+};
+
+const editGroup = (index: number) => {
+    data.value[index].edit = true;
+};
+
+const cancelEdit = (index: number) => {
+    if (data.value[index].id == 0) {
+        data.value.splice(index, 1);
+    } else {
+        data.value[index].edit = false;
     }
 };
 
