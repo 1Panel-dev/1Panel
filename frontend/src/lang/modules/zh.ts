@@ -100,6 +100,7 @@ export default {
             commonName: '支持英文、中文、数字、.-_,长度1-30',
             complexityPassword: '请输入 8 位以上、必须含有字母、数字、特殊符号的密码',
             commonPassword: '请输入 6 位以上长度密码',
+            linuxName: '支持英文、数字、.-_,长度1-30',
             email: '请输入正确的邮箱',
             number: '请输入正确的数字',
             ip: '请输入正确的 IP 地址',

@@ -141,8 +141,8 @@ const website = ref({
     },
 });
 let rules = ref({
-    primaryDomain: [Rules.requiredInput],
-    alias: [Rules.requiredInput],
+    primaryDomain: [Rules.linuxName],
+    alias: [Rules.linuxName],
     type: [Rules.requiredInput],
     webSiteGroupId: [Rules.requiredSelectBusiness],
     appInstallId: [Rules.requiredSelectBusiness],
