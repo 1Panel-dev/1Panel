@@ -738,7 +738,7 @@ export default {
         acmeAccount: 'Acme 账户',
         provider: '验证方式',
         dnsCommon: '手动解析',
-        expireDate: '到期时间',
+        expireDate: '过期时间',
         brand: '品牌',
         deploySSL: '部署',
         deploySSLHelper: '确定部署证书？',
@@ -760,6 +760,8 @@ export default {
         backup: '备份',
         log: '日志',
         nginxPer: '性能调整',
+        neverExpire: '永不过期',
+        protocol: '协议',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',

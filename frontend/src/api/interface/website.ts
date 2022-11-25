@@ -12,6 +12,7 @@ export namespace WebSite {
         webSiteGroupId: number;
         otherDomains: string;
         appinstall?: NewAppInstall;
+        webSiteSSL: SSL;
     }
 
     export interface WebSiteDTO extends CommonModel {

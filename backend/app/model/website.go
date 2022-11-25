@@ -15,6 +15,7 @@ type WebSite struct {
 	WebSiteGroupID uint            `gorm:"type:integer" json:"webSiteGroupId"`
 	WebSiteSSLID   uint            `gorm:"type:integer" json:"webSiteSSLId"`
 	Domains        []WebSiteDomain `json:"domains"`
+	WebSiteSSL     WebSiteSSL      `json:"webSiteSSL"`
 }
 
 func (w WebSite) TableName() string {
