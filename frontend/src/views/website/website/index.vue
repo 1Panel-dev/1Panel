@@ -11,8 +11,6 @@
                                 {{ $t('commons.button.create') }}
                             </el-button>
                             <el-button type="primary" plain @click="openGroup">{{ $t('website.group') }}</el-button>
-                            <!-- <el-button type="primary" plain>{{ '修改默认页' }}</el-button>
-                <el-button type="primary" plain>{{ '默认站点' }}</el-button> -->
                         </template>
                         <el-table-column
                             :label="$t('commons.table.name')"
@@ -25,17 +23,14 @@
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('commons.table.status')" prop="status"></el-table-column>
-                        <!-- <el-table-column :label="'备份'" prop="backup"></el-table-column> -->
                         <el-table-column :label="$t('website.remark')" prop="remark"></el-table-column>
                         <el-table-column :label="$t('website.protocol')" prop="protocol"></el-table-column>
                         <el-table-column :label="$t('website.expireDate')">
                             <template #default="{ row }">
                                 <span v-if="row.protocol === 'HTTP'">{{ $t('website.neverExpire') }}</span>
-                                <!-- <span v-else>{{ row.webSiteSSL.id }}</span> -->
                                 <span v-else>{{ dateFromat(1, 1, row.webSiteSSL.expireDate) }}</span>
                             </template>
                         </el-table-column>
-                        <!-- <el-table-column :label="'SSL证书'" prop="ssl"></el-table-column> -->
                         <fu-table-operations
                             :ellipsis="1"
                             :buttons="buttons"

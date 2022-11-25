@@ -696,7 +696,7 @@ export default {
         otherDomains: '其他域名',
         type: '类型',
         static: '静态网站',
-        deployment: '一键部署',
+        deployment: '反向代理',
         proxy: '反向代理',
         alias: '代号',
         remark: '备注',
