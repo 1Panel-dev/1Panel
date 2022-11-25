@@ -729,7 +729,7 @@ export default {
         applySSL: '证书申请',
         SSLList: '证书列表',
         createDnsAccount: 'DNS账号',
-        aliyun: '阿里云',
+        aliyun: '阿里云DNS',
         manual: '手动解析',
         key: '密钥',
         check: '查看',

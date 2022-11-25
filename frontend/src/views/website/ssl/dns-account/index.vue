@@ -5,7 +5,12 @@
                 <el-button type="primary" plain @click="openCreate">{{ $t('commons.button.create') }}</el-button>
             </template>
             <el-table-column :label="$t('commons.table.name')" fix show-overflow-tooltip prop="name"></el-table-column>
-            <el-table-column :label="$t('commons.table.type')" prop="type"></el-table-column>
+            <el-table-column :label="$t('commons.table.type')" prop="type">
+                <template #default="{ row }">
+                    <span v-if="row.type == 'AliYun'">{{ $t('website.aliyun') }}</span>
+                    <span v-else>{{ row.type }}</span>
+                </template>
+            </el-table-column>
             <el-table-column :label="$t('website.key')">
                 <template #default="{ row }">
                     <el-link @click="openEdit(row)">{{ $t('website.check') }}</el-link>

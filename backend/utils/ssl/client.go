@@ -10,6 +10,7 @@ import (
 	"github.com/go-acme/lego/v4/challenge/dns01"
 	"github.com/go-acme/lego/v4/lego"
 	"github.com/go-acme/lego/v4/providers/dns/alidns"
+	"github.com/go-acme/lego/v4/providers/dns/cloudflare"
 	"github.com/go-acme/lego/v4/providers/dns/dnspod"
 	"github.com/go-acme/lego/v4/providers/http/webroot"
 	"github.com/go-acme/lego/v4/registration"
@@ -62,8 +63,9 @@ func NewAcmeClient(email, privateKey string) (*AcmeClient, error) {
 type DnsType string
 
 const (
-	DnsPod DnsType = "DnsPod"
-	AliYun DnsType = "AliYun"
+	DnsPod     DnsType = "DnsPod"
+	AliYun     DnsType = "AliYun"
+	Cloudflare DnsType = "Cloudflare"
 )
 
 type DNSParam struct {
@@ -97,6 +99,15 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string) error {
 		alidnsConfig.SecretKey = param.SecretKey
 		alidnsConfig.APIKey = param.AccessKey
 		p, err = alidns.NewDNSProviderConfig(alidnsConfig)
+		if err != nil {
+			return err
+		}
+	}
+	if dnsType == Cloudflare {
+		cloudflareConfig := cloudflare.NewDefaultConfig()
+		cloudflareConfig.AuthEmail = param.Email
+		cloudflareConfig.AuthKey = param.APIkey
+		p, err = cloudflare.NewDNSProviderConfig(cloudflareConfig)
 		if err != nil {
 			return err
 		}
