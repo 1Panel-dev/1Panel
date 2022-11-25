@@ -1,119 +1,143 @@
 <template>
-    <el-row style="margin-top: 20px" class="row-box" :gutter="20">
-        <el-col :span="8">
-            <el-card class="el-card">
-                <el-tooltip class="box-item" effect="dark" :content="$t('terminal.createConn')" placement="top-start">
-                    <el-button icon="Plus" @click="restHostForm" />
-                </el-tooltip>
-                <el-tooltip class="box-item" effect="dark" :content="$t('terminal.createGroup')" placement="top-start">
-                    <el-button icon="FolderAdd" @click="onGroupCreate" />
-                </el-tooltip>
-                <el-tooltip class="box-item" effect="dark" :content="$t('terminal.expand')" placement="top-start">
-                    <el-button icon="Expand" @click="setTreeStatus(true)" />
-                </el-tooltip>
-                <el-tooltip class="box-item" effect="dark" :content="$t('terminal.fold')" placement="top-start">
-                    <el-button icon="Fold" @click="setTreeStatus(false)" />
-                </el-tooltip>
-                <el-input @input="loadHostTree" clearable style="margin-top: 5px" v-model="searcConfig.info">
-                    <template #append><el-button icon="search" @click="loadHostTree" /></template>
-                </el-input>
-                <el-input v-if="groupInputShow" clearable style="margin-top: 5px" v-model="groupInputValue">
-                    <template #append>
-                        <el-button-group>
-                            <el-button icon="Check" @click="onCreateGroup" />
-                            <el-button icon="Close" @click="groupInputShow = false" />
-                        </el-button-group>
-                    </template>
-                </el-input>
-                <el-tree
-                    ref="tree"
-                    :expand-on-click-node="false"
-                    node-key="id"
-                    :default-expand-all="true"
-                    :data="hostTree"
-                    :props="defaultProps"
-                >
-                    <template #default="{ node, data }">
-                        <span class="custom-tree-node" @mouseover="hover = data.id" @mouseleave="hover = null">
-                            <span>
-                                <a @click="onEdit(node, data)">{{ node.label }}</a>
-                            </span>
-                            <el-button-group
-                                v-if="!(node.level === 1 && data.label === 'default') && data.id === hover"
-                            >
-                                <el-button icon="Edit" @click="onEdit(node, data)" />
-                                <el-button icon="Delete" @click="onDelete(node, data)" />
-                            </el-button-group>
-                        </span>
-                    </template>
-                </el-tree>
-            </el-card>
-        </el-col>
-        <el-col :span="16">
-            <el-card class="el-card">
-                <el-form ref="hostInfoRef" label-width="100px" label-position="left" :model="hostInfo" :rules="rules">
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input clearable v-model="hostInfo.name" />
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.table.group')" prop="groupBelong">
-                        <el-select filterable v-model="hostInfo.groupBelong" clearable style="width: 100%">
-                            <el-option v-for="item in groupList" :key="item.id" :label="item.name" :value="item.name" />
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item label="IP" prop="addr">
-                        <el-input clearable v-model="hostInfo.addr" />
-                    </el-form-item>
-                    <el-form-item :label="$t('terminal.port')" prop="port">
-                        <el-input clearable v-model.number="hostInfo.port" />
-                    </el-form-item>
-                    <el-form-item :label="$t('terminal.user')" prop="user">
-                        <el-input clearable v-model="hostInfo.user" />
-                    </el-form-item>
-                    <el-form-item :label="$t('terminal.authMode')" prop="authMode">
-                        <el-radio-group v-model="hostInfo.authMode">
-                            <el-radio label="password">{{ $t('terminal.passwordMode') }}</el-radio>
-                            <el-radio label="key">{{ $t('terminal.keyMode') }}</el-radio>
-                        </el-radio-group>
-                    </el-form-item>
-                    <el-form-item
-                        :label="$t('terminal.password')"
-                        v-if="hostInfo.authMode === 'password'"
-                        prop="password"
+    <div>
+        <Submenu activeName="host" />
+        <el-row class="row-box" style="margin-top: 20px" :gutter="20">
+            <el-col :span="8">
+                <el-card class="el-card">
+                    <el-tooltip
+                        class="box-item"
+                        effect="dark"
+                        :content="$t('terminal.createConn')"
+                        placement="top-start"
                     >
-                        <el-input clearable show-password type="password" v-model="hostInfo.password" />
-                    </el-form-item>
-                    <el-form-item :label="$t('terminal.key')" v-if="hostInfo.authMode === 'key'" prop="privateKey">
-                        <el-input clearable type="textarea" v-model="hostInfo.privateKey" />
-                    </el-form-item>
-                    <el-form-item :label="$t('commons.table.description')" prop="description">
-                        <el-input clearable type="textarea" v-model="hostInfo.description" />
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button @click="restHostForm">
-                            {{ $t('commons.button.reset') }}
-                        </el-button>
-                        <el-button @click="submitAddHost(hostInfoRef, 'testconn')">
-                            {{ $t('terminal.testConn') }}
-                        </el-button>
-                        <el-button
-                            v-if="hostOperation === 'create'"
-                            type="primary"
-                            @click="submitAddHost(hostInfoRef, 'create')"
+                        <el-button icon="Plus" @click="restHostForm" />
+                    </el-tooltip>
+                    <el-tooltip
+                        class="box-item"
+                        effect="dark"
+                        :content="$t('terminal.createGroup')"
+                        placement="top-start"
+                    >
+                        <el-button icon="FolderAdd" @click="onGroupCreate" />
+                    </el-tooltip>
+                    <el-tooltip class="box-item" effect="dark" :content="$t('terminal.expand')" placement="top-start">
+                        <el-button icon="Expand" @click="setTreeStatus(true)" />
+                    </el-tooltip>
+                    <el-tooltip class="box-item" effect="dark" :content="$t('terminal.fold')" placement="top-start">
+                        <el-button icon="Fold" @click="setTreeStatus(false)" />
+                    </el-tooltip>
+                    <el-input @input="loadHostTree" clearable style="margin-top: 5px" v-model="searcConfig.info">
+                        <template #append><el-button icon="search" @click="loadHostTree" /></template>
+                    </el-input>
+                    <el-input v-if="groupInputShow" clearable style="margin-top: 5px" v-model="groupInputValue">
+                        <template #append>
+                            <el-button-group>
+                                <el-button icon="Check" @click="onCreateGroup" />
+                                <el-button icon="Close" @click="groupInputShow = false" />
+                            </el-button-group>
+                        </template>
+                    </el-input>
+                    <el-tree
+                        ref="tree"
+                        :expand-on-click-node="false"
+                        node-key="id"
+                        :default-expand-all="true"
+                        :data="hostTree"
+                        :props="defaultProps"
+                    >
+                        <template #default="{ node, data }">
+                            <span class="custom-tree-node" @mouseover="hover = data.id" @mouseleave="hover = null">
+                                <span>
+                                    <a @click="onEdit(node, data)">{{ node.label }}</a>
+                                </span>
+                                <el-button-group
+                                    v-if="!(node.level === 1 && data.label === 'default') && data.id === hover"
+                                >
+                                    <el-button icon="Edit" @click="onEdit(node, data)" />
+                                    <el-button icon="Delete" @click="onDelete(node, data)" />
+                                </el-button-group>
+                            </span>
+                        </template>
+                    </el-tree>
+                </el-card>
+            </el-col>
+            <el-col :span="16">
+                <el-card class="el-card">
+                    <el-form
+                        ref="hostInfoRef"
+                        label-width="100px"
+                        label-position="left"
+                        :model="hostInfo"
+                        :rules="rules"
+                    >
+                        <el-form-item :label="$t('commons.table.name')" prop="name">
+                            <el-input clearable v-model="hostInfo.name" />
+                        </el-form-item>
+                        <el-form-item :label="$t('commons.table.group')" prop="groupBelong">
+                            <el-select filterable v-model="hostInfo.groupBelong" clearable style="width: 100%">
+                                <el-option
+                                    v-for="item in groupList"
+                                    :key="item.id"
+                                    :label="item.name"
+                                    :value="item.name"
+                                />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item label="IP" prop="addr">
+                            <el-input clearable v-model="hostInfo.addr" />
+                        </el-form-item>
+                        <el-form-item :label="$t('terminal.port')" prop="port">
+                            <el-input clearable v-model.number="hostInfo.port" />
+                        </el-form-item>
+                        <el-form-item :label="$t('terminal.user')" prop="user">
+                            <el-input clearable v-model="hostInfo.user" />
+                        </el-form-item>
+                        <el-form-item :label="$t('terminal.authMode')" prop="authMode">
+                            <el-radio-group v-model="hostInfo.authMode">
+                                <el-radio label="password">{{ $t('terminal.passwordMode') }}</el-radio>
+                                <el-radio label="key">{{ $t('terminal.keyMode') }}</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                        <el-form-item
+                            :label="$t('terminal.password')"
+                            v-if="hostInfo.authMode === 'password'"
+                            prop="password"
                         >
-                            {{ $t('commons.button.create') }}
-                        </el-button>
-                        <el-button
-                            v-if="hostOperation === 'edit'"
-                            type="primary"
-                            @click="submitAddHost(hostInfoRef, 'edit')"
-                        >
-                            {{ $t('commons.button.confirm') }}
-                        </el-button>
-                    </el-form-item>
-                </el-form>
-            </el-card>
-        </el-col>
-    </el-row>
+                            <el-input clearable show-password type="password" v-model="hostInfo.password" />
+                        </el-form-item>
+                        <el-form-item :label="$t('terminal.key')" v-if="hostInfo.authMode === 'key'" prop="privateKey">
+                            <el-input clearable type="textarea" v-model="hostInfo.privateKey" />
+                        </el-form-item>
+                        <el-form-item :label="$t('commons.table.description')" prop="description">
+                            <el-input clearable type="textarea" v-model="hostInfo.description" />
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button @click="restHostForm">
+                                {{ $t('commons.button.reset') }}
+                            </el-button>
+                            <el-button @click="submitAddHost(hostInfoRef, 'testconn')">
+                                {{ $t('terminal.testConn') }}
+                            </el-button>
+                            <el-button
+                                v-if="hostOperation === 'create'"
+                                type="primary"
+                                @click="submitAddHost(hostInfoRef, 'create')"
+                            >
+                                {{ $t('commons.button.create') }}
+                            </el-button>
+                            <el-button
+                                v-if="hostOperation === 'edit'"
+                                type="primary"
+                                @click="submitAddHost(hostInfoRef, 'edit')"
+                            >
+                                {{ $t('commons.button.confirm') }}
+                            </el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-card>
+            </el-col>
+        </el-row>
+    </div>
 </template>
 
 <script lang="ts" setup>
@@ -128,6 +152,7 @@ import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
 import type Node from 'element-plus/es/components/tree/src/model/node';
+import Submenu from '@/views/host/terminal/index.vue';
 
 type FormInstance = InstanceType<typeof ElForm>;
 const hostInfoRef = ref<FormInstance>();

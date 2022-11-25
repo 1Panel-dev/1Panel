@@ -10,14 +10,6 @@ const hostRouter = {
         title: 'menu.host',
     },
     children: [
-        // {
-        //     path: '/hosts/security',
-        //     name: 'Security',
-        //     component: () => import('@/views/host/security/index.vue'),
-        //     meta: {
-        //         title: 'menu.security',
-        //     },
-        // },
         {
             path: '/hosts/files',
             name: 'File',
@@ -35,9 +27,29 @@ const hostRouter = {
             },
         },
         {
-            path: '/host/terminal',
+            path: '/hosts/terminal',
             name: 'Terminal',
-            component: () => import('@/views/host/terminal/index.vue'),
+            component: () => import('@/views/host/terminal/terminal/index.vue'),
+            meta: {
+                title: 'menu.terminal',
+                keepAlive: true,
+            },
+        },
+        {
+            path: '/hosts/host',
+            name: 'TerminalHost',
+            hidden: true,
+            component: () => import('@/views/host/terminal/host/index.vue'),
+            meta: {
+                title: 'menu.terminal',
+                keepAlive: true,
+            },
+        },
+        {
+            path: '/hosts/command',
+            name: 'TerminalCommand',
+            hidden: true,
+            component: () => import('@/views/host/terminal/command/index.vue'),
             meta: {
                 title: 'menu.terminal',
                 keepAlive: true,

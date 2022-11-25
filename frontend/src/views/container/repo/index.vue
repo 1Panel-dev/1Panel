@@ -58,9 +58,8 @@ const search = async () => {
         pageSize: paginationConfig.pageSize,
     };
     await searchImageRepo(params).then((res) => {
-        if (res.data) {
-            data.value = res.data.items;
-        }
+        data.value = res.data.items || [];
+        paginationConfig.total = res.data.total;
     });
 };
 

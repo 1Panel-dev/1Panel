@@ -189,7 +189,11 @@ func (b *BaseApi) ContainerExec(c *gin.Context) {
 	if wshandleError(wsConn, errors.WithMessage(err, "New docker client failed.")) {
 		return
 	}
-	conf := types.ExecConfig{Tty: true, Cmd: []string{command}, AttachStderr: true, AttachStdin: true, AttachStdout: true, User: user}
+
+	conf := types.ExecConfig{Tty: true, Cmd: []string{command}, AttachStderr: true, AttachStdin: true, AttachStdout: true}
+	if len(user) != 0 {
+		conf.User = user
+	}
 	ir, err := client.ContainerExecCreate(context.TODO(), containerID, conf)
 	if wshandleError(wsConn, errors.WithMessage(err, "failed to set exec conf.")) {
 		return

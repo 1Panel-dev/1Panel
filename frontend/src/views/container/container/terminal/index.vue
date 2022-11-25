@@ -12,8 +12,9 @@
             </div>
         </template>
         <el-form ref="formRef" :model="form" label-width="80px">
-            <el-form-item label="User" prop="user" :rules="Rules.requiredInput">
-                <el-input style="width: 30%" clearable placeholder="root" v-model="form.user" />
+            <el-form-item label="User" prop="user">
+                <el-input style="width: 30%" clearable v-model="form.user" />
+                <span class="input-help">{{ $t('container.emptyUser') }}</span>
             </el-form-item>
             <el-form-item :label="$t('container.custom')" prop="custom">
                 <el-switch v-model="form.isCustom" @change="form.command = ''" />
@@ -77,7 +78,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     terminalVisiable.value = true;
     form.containerID = params.containerID;
     form.isCustom = false;
-    form.user = 'root';
+    form.user = '';
     form.command = '/bin/bash';
     terminalOpen.value = false;
     window.addEventListener('resize', changeTerminalSize);

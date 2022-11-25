@@ -67,32 +67,7 @@
             </ComplexTable>
         </el-card>
 
-        <el-dialog v-model="detailVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="70%">
-            <template #header>
-                <div class="card-header">
-                    <span>{{ $t('commons.button.view') }}</span>
-                </div>
-            </template>
-            <codemirror
-                :autofocus="true"
-                placeholder="None data"
-                :indent-with-tab="true"
-                :tabSize="4"
-                style="max-height: 500px"
-                :lineWrapping="true"
-                :matchBrackets="true"
-                theme="cobalt"
-                :styleActiveLine="true"
-                :extensions="extensions"
-                v-model="detailInfo"
-                :readOnly="true"
-            />
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="detailVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                </span>
-            </template>
-        </el-dialog>
+        <CodemirrorDialog ref="mydetail" />
 
         <el-dialog
             @close="onCloseLog"
@@ -174,6 +149,7 @@ import ComplexTable from '@/components/complex-table/index.vue';
 import CreateDialog from '@/views/container/container/create/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
+import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
 import Submenu from '@/views/container/index.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
@@ -201,8 +177,9 @@ const props = withDefaults(defineProps<Filters>(), {
     filters: '',
 });
 
-const detailVisiable = ref<boolean>(false);
 const detailInfo = ref();
+const mydetail = ref();
+
 const extensions = [javascript(), oneDark];
 const logVisiable = ref<boolean>(false);
 const logInfo = ref();
@@ -275,7 +252,11 @@ const onTerminal = (containerID: string) => {
 const onInspect = async (id: string) => {
     const res = await inspect({ id: id, type: 'container' });
     detailInfo.value = JSON.stringify(JSON.parse(res.data), null, 2);
-    detailVisiable.value = true;
+    let param = {
+        header: i18n.global.t('commons.button.view'),
+        detailInfo: detailInfo.value,
+    };
+    mydetail.value!.acceptParams(param);
 };
 
 const onLog = async (row: Container.ContainerInfo) => {
@@ -336,14 +317,14 @@ const checkStatus = (operation: string) => {
             return false;
         case 'stop':
             for (const item of selects.value) {
-                if (item.state === 'stopped') {
+                if (item.state === 'stopped' || item.state === 'exited') {
                     return true;
                 }
             }
             return false;
         case 'pause':
             for (const item of selects.value) {
-                if (item.state === 'paused') {
+                if (item.state === 'paused' || item.state === 'exited') {
                     return true;
                 }
             }

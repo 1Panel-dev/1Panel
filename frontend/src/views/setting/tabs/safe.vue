@@ -10,58 +10,6 @@
                 <el-row>
                     <el-col :span="1"><br /></el-col>
                     <el-col :span="10">
-                        <!-- <el-form-item
-                            :label="$t('setting.panelPort')"
-                            prop="settingInfo.serverPort"
-                            :rules="Rules.number"
-                        >
-                            <el-input clearable v-model="form.settingInfo.serverPort">
-                                <template #append>
-                                    <el-button
-                                        @click="onSave(panelFormRef, 'ServerPort', form.settingInfo.serverPort)"
-                                        icon="Collection"
-                                    >
-                                        {{ $t('commons.button.save') }}
-                                    </el-button>
-                                </template>
-                                <el-tooltip
-                                    class="box-item"
-                                    effect="dark"
-                                    content="Top Left prompts info"
-                                    placement="top-start"
-                                >
-                                    <el-icon style="font-size: 14px; margin-top: 8px"><WarningFilled /></el-icon>
-                                </el-tooltip>
-                            </el-input>
-                            <div>
-                                <span class="input-help">
-                                    {{ $t('setting.portHelper') }}
-                                </span>
-                            </div>
-                        </el-form-item> -->
-                        <!-- <el-form-item
-                            :label="$t('setting.safeEntrance')"
-                            prop="settingInfo.securityEntrance"
-                            :rules="Rules.requiredInput"
-                        >
-                            <el-input clearable v-model="form.settingInfo.securityEntrance">
-                                <template #append>
-                                    <el-button
-                                        @click="
-                                            onSave(panelFormRef, 'SecurityEntrance', form.settingInfo.securityEntrance)
-                                        "
-                                        icon="Collection"
-                                    >
-                                        {{ $t('commons.button.save') }}
-                                    </el-button>
-                                </template>
-                            </el-input>
-                            <div>
-                                <span class="input-help">
-                                    {{ $t('setting.safeEntranceHelper') }}
-                                </span>
-                            </div>
-                        </el-form-item> -->
                         <el-form-item
                             :label="$t('setting.expirationTime')"
                             prop="settingInfo.expirationTime"
@@ -75,8 +23,14 @@
                                 </template>
                             </el-input>
                             <div>
-                                <span class="input-help">
+                                <span
+                                    class="input-help"
+                                    v-if="form.settingInfo.expirationTime !== $t('setting.unSetting')"
+                                >
                                     {{ $t('setting.timeoutHelper', [loadTimeOut()]) }}
+                                </span>
+                                <span class="input-help" v-else>
+                                    {{ $t('setting.noneSetting') }}
                                 </span>
                             </div>
                         </el-form-item>
@@ -241,6 +195,7 @@ const submitTimeout = async (formEl: FormInstance | undefined) => {
         let time = new Date(new Date().getTime() + 3600 * 1000 * 24 * timeoutForm.days);
         await updateSetting({ key: 'ExpirationDays', value: timeoutForm.days + '' });
         emit('search');
+        loadTimeOut();
         form.settingInfo.expirationTime = dateFromat(0, 0, time);
         timeoutVisiable.value = false;
     });
@@ -248,9 +203,14 @@ const submitTimeout = async (formEl: FormInstance | undefined) => {
 
 function loadTimeOut() {
     if (form.settingInfo.expirationDays === 0) {
-        return '-';
+        form.settingInfo.expirationTime = i18n.global.t('setting.unSetting');
+        return i18n.global.t('setting.unSetting');
     }
     let staytimeGap = new Date(form.settingInfo.expirationTime).getTime() - new Date().getTime();
-    return staytimeGap < 0 ? '-' : Math.floor(staytimeGap / (3600 * 1000 * 24));
+    if (staytimeGap < 0) {
+        form.settingInfo.expirationTime = i18n.global.t('setting.unSetting');
+        return i18n.global.t('setting.unSetting');
+    }
+    return Math.floor(staytimeGap / (3600 * 1000 * 24));
 }
 </script>
