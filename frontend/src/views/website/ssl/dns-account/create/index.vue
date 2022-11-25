@@ -30,6 +30,14 @@
                     <el-input v-model="account.authorization['token']"></el-input>
                 </el-form-item>
             </div>
+            <div v-if="account.type === 'CloudFlare'">
+                <el-form-item label="EMAIL" prop="authorization.email">
+                    <el-input v-model="account.authorization['email']"></el-input>
+                </el-form-item>
+                <el-form-item label="API Key" prop="authorization.apiKey">
+                    <el-input v-model="account.authorization['apiKey']"></el-input>
+                </el-form-item>
+            </div>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -84,6 +92,8 @@ let rules = ref({
         secretKey: [Rules.requiredInput],
         id: [Rules.requiredInput],
         token: [Rules.requiredInput],
+        email: [Rules.requiredInput],
+        apiKey: [Rules.requiredInput],
     },
 });
 let account = ref({
