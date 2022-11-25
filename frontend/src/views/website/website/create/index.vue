@@ -83,7 +83,7 @@
                 </div>
             </div>
             <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
-                <el-input v-model="website.primaryDomain"></el-input>
+                <el-input v-model="website.primaryDomain" @input="changeAlias(website.primaryDomain)"></el-input>
             </el-form-item>
             <el-form-item :label="$t('website.otherDomains')" prop="otherDomains">
                 <el-input
@@ -129,7 +129,7 @@ const website = ref({
     alias: '',
     remark: '',
     appType: 'installed',
-    appInstallId: 0,
+    appInstallId: undefined,
     webSiteGroupId: 1,
     otherDomains: '',
     appinstall: {
@@ -250,6 +250,10 @@ const submit = async (formEl: FormInstance | undefined) => {
                 loading.value = false;
             });
     });
+};
+
+const changeAlias = (value: string) => {
+    website.value.alias = value;
 };
 
 defineExpose({
