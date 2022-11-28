@@ -4,7 +4,7 @@
             <template #toolbar>
                 <el-row>
                     <el-col :span="18">
-                        <el-button @click="sync">{{ $t('app.sync') }}</el-button>
+                        <el-button @click="sync" type="primary" plain="true">{{ $t('app.sync') }}</el-button>
                     </el-col>
                     <el-col :span="6">
                         <div style="float: right">

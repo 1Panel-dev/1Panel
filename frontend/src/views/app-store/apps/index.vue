@@ -2,7 +2,7 @@
     <el-card v-loading="loading">
         <el-row :gutter="5">
             <el-col :span="2">
-                <el-button @click="sync">{{ $t('app.sync') }}</el-button>
+                <el-button @click="sync" type="primary" plain="true">{{ $t('app.sync') }}</el-button>
             </el-col>
             <el-col :span="22">
                 <div style="float: right">
