@@ -364,6 +364,11 @@ func (w WebsiteService) OpWebsiteHTTPS(req dto.WebsiteHTTPSOp) (dto.WebsiteHTTPS
 	} else {
 		website.Protocol = constant.ProtocolHTTP
 		website.WebSiteSSLID = 0
+
+		if err := deleteListenAndServerName(website, []int{443}, []string{}); err != nil {
+			return dto.WebsiteHTTPS{}, err
+		}
+
 		if err := deleteNginxConfig(website, getKeysFromStaticFile(dto.SSL)); err != nil {
 			return dto.WebsiteHTTPS{}, err
 		}

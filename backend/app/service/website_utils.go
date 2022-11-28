@@ -404,7 +404,7 @@ func applySSL(website model.WebSite, websiteSSL model.WebSiteSSL) error {
 	}
 	config := nginxConfig.Config
 	server := config.FindServers()[0]
-	server.UpdateListen("443", false)
+	server.UpdateListen("443", false, "ssl")
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
