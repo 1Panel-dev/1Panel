@@ -3,9 +3,9 @@
         <Submenu activeName="mysql" />
         <AppStatus :app-key="'mysql'" style="margin-top: 20px" @setting="onSetting" @is-exist="checkExist" />
         <div v-if="mysqlIsExist">
-            <Setting ref="settingRef"></Setting>
+            <Setting ref="settingRef" style="margin-top: 20px" />
 
-            <el-card v-if="!isOnSetting" style="margin-top: 5px">
+            <el-card v-if="!isOnSetting" style="margin-top: 20px">
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
@@ -132,11 +132,7 @@ import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
 
 const selects = ref<any>([]);
-const mysqlInfo = reactive({
-    name: '',
-    version: '',
-    isExist: false,
-});
+const mysqlName = ref();
 const isOnSetting = ref<boolean>();
 
 const data = ref();
@@ -151,7 +147,7 @@ const mysqlIsExist = ref(false);
 const dialogRef = ref();
 const onOpenDialog = async () => {
     let params = {
-        mysqlName: mysqlInfo.name,
+        mysqlName: mysqlName.value,
     };
     dialogRef.value!.acceptParams(params);
 };
@@ -159,7 +155,7 @@ const onOpenDialog = async () => {
 const dialogBackupRef = ref();
 const onOpenBackupDialog = async (dbName: string) => {
     let params = {
-        mysqlName: mysqlInfo.name,
+        mysqlName: mysqlName.value,
         dbName: dbName,
     };
     dialogBackupRef.value!.acceptParams(params);
@@ -171,7 +167,7 @@ const settingRef = ref();
 const onSetting = async () => {
     isOnSetting.value = true;
     let params = {
-        mysqlName: mysqlInfo.name,
+        mysqlName: mysqlName.value,
     };
     settingRef.value!.acceptParams(params);
 };
@@ -194,7 +190,7 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         changeForm.value = changeForm.operation === 'password' ? changeForm.password : changeForm.privilege;
-        changeForm.mysqlName = mysqlInfo.name;
+        changeForm.mysqlName = mysqlName.value;
         await updateMysqlDBInfo(changeForm);
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         search();
@@ -214,6 +210,10 @@ const search = async () => {
 
 const checkExist = (data: App.CheckInstalled) => {
     mysqlIsExist.value = data.isExist;
+    mysqlName.value = data.name;
+    if (mysqlIsExist.value) {
+        search();
+    }
 };
 
 const onBatchDelete = async (row: Database.MysqlDBInfo | null) => {
@@ -262,7 +262,7 @@ const buttons = [
         label: i18n.global.t('database.loadBackup'),
         click: (row: Database.MysqlDBInfo) => {
             let params = {
-                mysqlName: mysqlInfo.name,
+                mysqlName: mysqlName.value,
                 dbName: row.name,
             };
             uploadRef.value!.acceptParams(params);

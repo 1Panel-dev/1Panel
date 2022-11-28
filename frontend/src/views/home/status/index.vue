@@ -35,7 +35,9 @@
                         </template>
                     </el-popover>
                     <br />
-                    <span>( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} ) Core</span>
+                    <span class="input-help">
+                        ( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} ) Core
+                    </span>
                 </el-col>
                 <el-col :span="12" align="center">
                     <el-progress type="dashboard" :width="80" :percentage="formatNumber(currentInfo.MemoryUsedPercent)">
@@ -45,9 +47,9 @@
                         </template>
                     </el-progress>
                     <br />
-                    <span>
+                    <span class="input-help">
                         ( {{ formatNumber(currentInfo.memoryUsed / 1024 / 1024) }} /
-                        {{ currentInfo.memoryTotal / 1024 / 1024 }} ) MB
+                        {{ formatNumber(currentInfo.memoryTotal / 1024 / 1024) }} ) MB
                     </span>
                 </el-col>
             </el-row>
@@ -77,7 +79,7 @@
                         </template>
                     </el-popover>
                     <br />
-                    <span>{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
+                    <span class="input-help">{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
                 </el-col>
                 <el-col :span="12" align="center">
                     <el-popover placement="bottom" :width="160" trigger="hover">
@@ -120,7 +122,7 @@
                     </el-popover>
 
                     <br />
-                    <span>
+                    <span class="input-help">
                         ( {{ formatNumber(currentInfo.used / 1024 / 1024 / 1024) }} /
                         {{ formatNumber(currentInfo.total / 1024 / 1024 / 1024) }} ) GB
                     </span>
@@ -132,13 +134,16 @@
 
 <script lang="ts" setup>
 import { Dashboard } from '@/api/interface/dashboard';
+import i18n from '@/lang';
 import { ref } from 'vue';
 
 const baseInfo = ref<Dashboard.BaseInfo>({
-    haloInstatllID: 0,
-    dateeaseInstatllID: 0,
-    jumpserverInstatllID: 0,
-    metersphereInstatllID: 0,
+    haloID: 0,
+    dateeaseID: 0,
+    jumpserverID: 0,
+    metersphereID: 0,
+    kubeoperatorID: 0,
+    kubepiID: 0,
 
     websiteNumber: 0,
     databaseNumber: 0,
@@ -208,15 +213,15 @@ function formatNumber(val: number) {
 
 function loadStatus(val: number) {
     if (val < 30) {
-        return '运行流畅';
+        return i18n.global.t('home.runSmoothly');
     }
     if (val < 70) {
-        return '运行正常';
+        return i18n.global.t('home.runNormal');
     }
     if (val < 80) {
-        return '运行缓慢';
+        return i18n.global.t('home.runSlowly');
     }
-    return '运行堵塞';
+    return i18n.global.t('home.runJam');
 }
 defineExpose({
     acceptParams,
