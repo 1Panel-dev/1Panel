@@ -1,17 +1,39 @@
 <template>
-    <div v-loading="loading">
+    <el-card v-loading="loading">
         <el-row :gutter="5">
-            <el-col :span="12">
-                <el-input v-model="req.name" @blur="searchByName"></el-input>
-            </el-col>
-            <el-col :span="11">
-                <el-select v-model="req.tags" multiple style="width: 100%" @change="changeTag">
-                    <el-option v-for="item in tags" :key="item.key" :label="item.name" :value="item.key"></el-option>
-                </el-select>
-            </el-col>
-            <el-col :span="1">
+            <el-col :span="2">
                 <el-button @click="sync">{{ $t('app.sync') }}</el-button>
             </el-col>
+            <el-col :span="22">
+                <div style="float: right">
+                    <el-input
+                        style="display: inline; margin-right: 5px"
+                        v-model="req.name"
+                        clearable
+                        @clear="searchByName('')"
+                    ></el-input>
+                    <el-button
+                        style="display: inline; margin-right: 5px"
+                        v-model="req.name"
+                        @click="searchByName(req.name)"
+                    >
+                        {{ '搜索' }}
+                    </el-button>
+                </div>
+            </el-col>
+        </el-row>
+        <br />
+        <el-row>
+            <el-button style="margin-right: 5px" @click="changeTag('all')" type="primary" :plain="activeTag !== 'all'">
+                {{ $t('app.all') }}
+            </el-button>
+            <div style="margin-right: 5px" :span="1" v-for="item in tags" :key="item.key">
+                <el-button @click="changeTag(item.key)" type="primary" :plain="activeTag !== item.key">
+                    {{ item.name }}
+                </el-button>
+            </div>
+        </el-row>
+        <el-row :gutter="5">
             <el-col v-for="(app, index) in apps" :key="index" :span="6">
                 <div @click="getAppDetail(app.id)">
                     <el-card :body-style="{ padding: '0px' }" class="a-card">
@@ -45,7 +67,7 @@
                 </div>
             </el-col>
         </el-row>
-    </div>
+    </el-card>
 </template>
 
 <script lang="ts" setup>
@@ -67,6 +89,7 @@ let apps = ref<App.App[]>([]);
 let tags = ref<App.Tag[]>([]);
 const colorArr = ['#6495ED', '#54FF9F', '#BEBEBE', '#FFF68F', '#FFFF00', '#8B0000'];
 let loading = ref(false);
+let activeTag = ref('all');
 
 const getColor = (index: number) => {
     return colorArr[index];
@@ -98,11 +121,17 @@ const sync = () => {
         });
 };
 
-const changeTag = () => {
+const changeTag = (key: string) => {
+    req.tags = [];
+    activeTag.value = key;
+    if (key !== 'all') {
+        req.tags = [key];
+    }
     search(req);
 };
 
-const searchByName = () => {
+const searchByName = (name: string) => {
+    req.name = name;
     search(req);
 };
 

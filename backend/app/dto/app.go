@@ -64,6 +64,7 @@ type AppInstalled struct {
 type AppInstalledRequest struct {
 	PageInfo
 	Type string `json:"type"`
+	Name string `json:"name"`
 }
 
 type AppBackupRequest struct {

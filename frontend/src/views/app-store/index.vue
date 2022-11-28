@@ -1,17 +1,16 @@
 <template>
     <div>
-        <el-row :gutter="20">
-            <el-col :span="24">
-                <div style="margin-bottom: 10px">
-                    <el-check-tag :checked="activeName === 'all'" @click="routerTo('/apps/all')">
-                        {{ $t('app.all') }}
-                    </el-check-tag>
-                    <el-check-tag :checked="activeName === 'installed'" @click="routerTo('/apps/installed')">
-                        {{ $t('app.installed') }}
-                    </el-check-tag>
-                </div>
-            </el-col>
-        </el-row>
+        <el-card class="topCard">
+            <el-radio-group v-model="activeName">
+                <el-radio-button class="topButton" size="large" @click="routerTo('/apps/all')" label="all">
+                    {{ $t('app.all') }}
+                </el-radio-button>
+                <el-radio-button class="topButton" size="large" @click="routerTo('/apps/installed')" label="installed">
+                    {{ $t('app.installed') }}
+                </el-radio-button>
+            </el-radio-group>
+        </el-card>
+        <br />
         <LayoutContent>
             <router-view></router-view>
         </LayoutContent>
@@ -23,6 +22,7 @@ import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
+
 const activeName = ref('all');
 
 const routerTo = (path: string) => {
@@ -43,4 +43,34 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss"></style>
+<style>
+.topCard {
+    --el-card-border-color: var(--el-border-color-light);
+    --el-card-border-radius: 4px;
+    --el-card-padding: 0px;
+    --el-card-bg-color: var(--el-fill-color-blank);
+}
+.topButton .el-radio-button__inner {
+    display: inline-block;
+    line-height: 1;
+    white-space: nowrap;
+    vertical-align: middle;
+    background: var(--el-button-bg-color, var(--el-fill-color-blank));
+    border: 0;
+    font-weight: 350;
+    border-left: 0;
+    color: var(--el-button-text-color, var(--el-text-color-regular));
+    text-align: center;
+    box-sizing: border-box;
+    outline: 0;
+    margin: 0;
+    position: relative;
+    cursor: pointer;
+    transition: var(--el-transition-all);
+    -webkit-user-select: none;
+    user-select: none;
+    padding: 8px 15px;
+    font-size: var(--el-font-size-base);
+    border-radius: 0;
+}
+</style>
