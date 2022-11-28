@@ -63,6 +63,9 @@ export namespace App {
         params: any;
     }
 
+    export interface AppInstallSearch extends ReqPage {
+        name?: string;
+    }
     export interface ChangePort {
         key: string;
         name: string;

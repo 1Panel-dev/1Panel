@@ -1,53 +1,60 @@
 <template>
-    <LayoutContent :header="$t('app.detail')" :back-name="'App'">
-        <div class="brief">
-            <el-row :gutter="20">
-                <el-col :span="4">
-                    <div class="icon">
-                        <el-image class="image" :src="'data:image/png;base64,' + app.icon"></el-image>
-                    </div>
-                </el-col>
-                <el-col :span="20">
-                    <div class="a-detail">
-                        <div class="a-name">
-                            <font size="5" style="font-weight: 800">{{ app.name }}</font>
+    <el-card>
+        <LayoutContent :header="$t('app.detail')" :back-name="'App'">
+            <div class="brief">
+                <el-row :gutter="20">
+                    <el-col :span="4">
+                        <div class="icon">
+                            <el-image class="image" :src="'data:image/png;base64,' + app.icon"></el-image>
                         </div>
-                        <div class="a-description">
-                            <span>
-                                <font>
-                                    {{ app.shortDesc }}
-                                </font>
-                            </span>
+                    </el-col>
+                    <el-col :span="20">
+                        <div class="a-detail">
+                            <div class="a-name">
+                                <font size="5" style="font-weight: 800">{{ app.name }}</font>
+                            </div>
+                            <div class="a-description">
+                                <span>
+                                    <font>
+                                        {{ app.shortDesc }}
+                                    </font>
+                                </span>
+                            </div>
+                            <br />
+                            <el-descriptions :column="1">
+                                <el-descriptions-item :label="$t('app.version')">
+                                    <el-select v-model="version" @change="getDetail(version)">
+                                        <el-option
+                                            v-for="(v, index) in app.versions"
+                                            :key="index"
+                                            :value="v"
+                                            :label="v"
+                                        >
+                                            {{ v }}
+                                        </el-option>
+                                    </el-select>
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('app.source')">
+                                    <el-link @click="toLink(app.source)">
+                                        <el-icon><Link /></el-icon>
+                                    </el-link>
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('app.author')">{{ app.author }}</el-descriptions-item>
+                            </el-descriptions>
+                            <div>
+                                <el-button @click="openInstall" type="primary">{{ $t('app.install') }}</el-button>
+                            </div>
                         </div>
-                        <br />
-                        <el-descriptions :column="1">
-                            <el-descriptions-item :label="$t('app.version')">
-                                <el-select v-model="version" @change="getDetail(version)">
-                                    <el-option v-for="(v, index) in app.versions" :key="index" :value="v" :label="v">
-                                        {{ v }}
-                                    </el-option>
-                                </el-select>
-                            </el-descriptions-item>
-                            <el-descriptions-item :label="$t('app.source')">
-                                <el-link @click="toLink(app.source)">
-                                    <el-icon><Link /></el-icon>
-                                </el-link>
-                            </el-descriptions-item>
-                            <el-descriptions-item :label="$t('app.author')">{{ app.author }}</el-descriptions-item>
-                        </el-descriptions>
-                        <div>
-                            <el-button @click="openInstall" type="primary">{{ $t('app.install') }}</el-button>
-                        </div>
-                    </div>
-                </el-col>
-            </el-row>
-        </div>
-        <el-divider border-style="double" />
-        <div class="detail" v-loading="loadingDetail">
-            <v-md-preview :text="appDetail.readme"></v-md-preview>
-        </div>
-        <Install ref="installRef"></Install>
-    </LayoutContent>
+                    </el-col>
+                </el-row>
+            </div>
+            <el-divider border-style="double" />
+            <div class="detail" v-loading="loadingDetail">
+                <v-md-preview :text="appDetail.readme"></v-md-preview>
+            </div>
+            <Install ref="installRef"></Install>
+        </LayoutContent>
+    </el-card>
 </template>
 
 <script lang="ts" setup>

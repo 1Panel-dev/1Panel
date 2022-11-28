@@ -114,7 +114,7 @@
 <script lang="ts" setup name="CreateWebSite">
 import { App } from '@/api/interface/app';
 import { WebSite } from '@/api/interface/website';
-import { GetApp, GetAppDetail, SearchApp, SearchAppInstalled } from '@/api/modules/app';
+import { GetApp, GetAppDetail, SearchApp, GetAppInstalled } from '@/api/modules/app';
 import { CreateWebsite, ListGroups } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -177,7 +177,7 @@ const handleClose = () => {
 };
 
 const searchAppInstalled = () => {
-    SearchAppInstalled({ type: 'website' }).then((res) => {
+    GetAppInstalled({ type: 'website' }).then((res) => {
         appInstalles.value = res.data;
         if (res.data.length > 0) {
             website.value.appInstallId = res.data[0].id;

@@ -1,91 +1,114 @@
 <template>
-    <div style="float: right; margin-bottom: 5px">
-        <el-button @click="sync">{{ $t('app.sync') }}</el-button>
-    </div>
-    <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" v-loading="loading">
-        <el-table-column :label="$t('app.name')" prop="name">
-            <template #default="{ row }">
-                {{ row.name }}
-                <el-tag round effect="dark" v-if="row.canUpdate">{{ $t('app.canUpdate') }}</el-tag>
+    <el-card>
+        <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" v-loading="loading">
+            <template #toolbar>
+                <el-row>
+                    <el-col :span="18">
+                        <el-button @click="sync">{{ $t('app.sync') }}</el-button>
+                    </el-col>
+                    <el-col :span="6">
+                        <div style="float: right">
+                            <el-input
+                                style="display: inline; margin-right: 5px"
+                                v-model="searchName"
+                                clearable
+                                @clear="search()"
+                            ></el-input>
+                            <el-button
+                                style="display: inline; margin-right: 5px"
+                                v-model="searchName"
+                                @click="search()"
+                            >
+                                {{ '搜索' }}
+                            </el-button>
+                        </div>
+                    </el-col>
+                </el-row>
             </template>
-        </el-table-column>
-        <!-- <el-table-column :label="$t('app.description')" prop="description"></el-table-column> -->
-        <el-table-column :label="$t('app.appName')" prop="app.name"></el-table-column>
-        <el-table-column :label="$t('app.version')" prop="version"></el-table-column>
-        <el-table-column :label="$t('app.backup')">
-            <template #default="{ row }">
-                <el-link :underline="false" @click="openBackups(row.id)" type="primary">
-                    {{ $t('app.backup') }} ({{ row.backups.length }})
-                </el-link>
-            </template>
-        </el-table-column>
-        <el-table-column :label="$t('app.status')">
-            <template #default="{ row }">
-                <el-popover
-                    v-if="row.status === 'Error'"
-                    placement="bottom"
-                    :width="400"
-                    trigger="hover"
-                    :content="row.message"
-                >
-                    <template #reference>
-                        <el-tag type="error">{{ row.status }}</el-tag>
-                    </template>
-                </el-popover>
+            <el-table-column :label="$t('app.name')" prop="name">
+                <template #default="{ row }">
+                    {{ row.name }}
+                    <el-tag round effect="dark" v-if="row.canUpdate">{{ $t('app.canUpdate') }}</el-tag>
+                </template>
+            </el-table-column>
+            <!-- <el-table-column :label="$t('app.description')" prop="description"></el-table-column> -->
+            <el-table-column :label="$t('app.appName')" prop="app.name"></el-table-column>
+            <el-table-column :label="$t('app.version')" prop="version"></el-table-column>
+            <el-table-column :label="$t('app.backup')">
+                <template #default="{ row }">
+                    <el-link :underline="false" @click="openBackups(row.id)" type="primary">
+                        {{ $t('app.backup') }} ({{ row.backups.length }})
+                    </el-link>
+                </template>
+            </el-table-column>
+            <el-table-column :label="$t('app.status')">
+                <template #default="{ row }">
+                    <el-popover
+                        v-if="row.status === 'Error'"
+                        placement="bottom"
+                        :width="400"
+                        trigger="hover"
+                        :content="row.message"
+                    >
+                        <template #reference>
+                            <el-tag type="error">{{ row.status }}</el-tag>
+                        </template>
+                    </el-popover>
 
-                <el-tag v-else>
-                    <el-icon v-if="row.status === 'Installing'" class="is-loading">
-                        <Loading />
-                    </el-icon>
-                    {{ row.status }}
-                </el-tag>
+                    <el-tag v-else>
+                        <el-icon v-if="row.status === 'Installing'" class="is-loading">
+                            <Loading />
+                        </el-icon>
+                        {{ row.status }}
+                    </el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column
+                prop="createdAt"
+                :label="$t('commons.table.date')"
+                :formatter="dateFromat"
+                show-overflow-tooltip
+            />
+            <fu-table-operations
+                width="300px"
+                :ellipsis="10"
+                :buttons="buttons"
+                :label="$t('commons.table.operate')"
+                fixed="right"
+                fix
+            />
+        </ComplexTable>
+        <el-dialog v-model="open" :title="$t('commons.msg.operate')" :before-close="handleClose" width="30%">
+            <div style="text-align: center">
+                <p>{{ $t('app.versioneSelect') }}</p>
+                <el-select v-model="operateReq.detailId">
+                    <el-option
+                        v-for="(version, index) in versions"
+                        :key="index"
+                        :value="version.detailId"
+                        :label="version.version"
+                    ></el-option>
+                </el-select>
+            </div>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button
+                        type="primary"
+                        @click="operate"
+                        :disabled="operateReq.operate == 'update' && versions == null"
+                    >
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </span>
             </template>
-        </el-table-column>
-        <el-table-column
-            prop="createdAt"
-            :label="$t('commons.table.date')"
-            :formatter="dateFromat"
-            show-overflow-tooltip
-        />
-        <fu-table-operations
-            width="300px"
-            :ellipsis="10"
-            :buttons="buttons"
-            :label="$t('commons.table.operate')"
-            fixed="right"
-            fix
-        />
-    </ComplexTable>
-    <el-dialog v-model="open" :title="$t('commons.msg.operate')" :before-close="handleClose" width="30%">
-        <div style="text-align: center">
-            <p>{{ $t('app.versioneSelect') }}</p>
-            <el-select v-model="operateReq.detailId">
-                <el-option
-                    v-for="(version, index) in versions"
-                    :key="index"
-                    :value="version.detailId"
-                    :label="version.version"
-                ></el-option>
-            </el-select>
-        </div>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button
-                    type="primary"
-                    @click="operate"
-                    :disabled="operateReq.operate == 'update' && versions == null"
-                >
-                    {{ $t('commons.button.confirm') }}
-                </el-button>
-            </span>
-        </template>
-    </el-dialog>
-    <Backups ref="backupRef" @close="search"></Backups>
+        </el-dialog>
+        <Backups ref="backupRef" @close="search"></Backups>
+    </el-card>
 </template>
 
 <script lang="ts" setup>
-import { GetAppInstalled, InstalledOp, SyncInstalledApp, GetAppUpdateVersions } from '@/api/modules/app';
+import { SearchAppInstalled, InstalledOp, SyncInstalledApp, GetAppUpdateVersions } from '@/api/modules/app';
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { dateFromat } from '@/utils/util';
@@ -110,6 +133,7 @@ let operateReq = reactive({
 });
 let versions = ref<App.VersionDetail[]>();
 const backupRef = ref();
+let searchName = ref('');
 
 const sync = () => {
     loading.value = true;
@@ -127,9 +151,10 @@ const search = () => {
     const req = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
+        name: searchName.value,
     };
 
-    GetAppInstalled(req).then((res) => {
+    SearchAppInstalled(req).then((res) => {
         data.value = res.data.items;
         paginationConfig.total = res.data.total;
     });

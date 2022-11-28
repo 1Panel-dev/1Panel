@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"io/ioutil"
 	"os"
 	"path"
@@ -25,7 +26,13 @@ type AppInstallService struct {
 }
 
 func (a AppInstallService) Page(req dto.AppInstalledRequest) (int64, []dto.AppInstalled, error) {
-	total, installs, err := appInstallRepo.Page(req.Page, req.PageSize)
+	var opts []repo.DBOption
+
+	if req.Name != "" {
+		opts = append(opts, commonRepo.WithLikeName(req.Name))
+	}
+
+	total, installs, err := appInstallRepo.Page(req.Page, req.PageSize, opts...)
 	if err != nil {
 		return 0, nil, err
 	}

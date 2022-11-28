@@ -1,5 +1,5 @@
 import http from '@/api';
-import { ReqPage, ResPage } from '../interface';
+import { ResPage } from '../interface';
 import { App } from '../interface/app';
 
 export const SyncApp = () => {
@@ -26,15 +26,15 @@ export const ChangePort = (params: App.ChangePort) => {
     return http.post<any>('apps/installed/port/change', params);
 };
 
-export const GetAppInstalled = (info: ReqPage) => {
-    return http.post<ResPage<App.AppInstalled>>('apps/installed', info);
+export const SearchAppInstalled = (search: App.AppInstallSearch) => {
+    return http.post<ResPage<App.AppInstalled>>('apps/installed', search);
 };
 
 export const CheckAppInstalled = (key: string) => {
     return http.get<App.CheckInstalled>(`apps/installed/check/${key}`);
 };
 
-export const SearchAppInstalled = (search: App.AppInstalledSearch) => {
+export const GetAppInstalled = (search: App.AppInstalledSearch) => {
     return http.post<App.AppInstalled[]>('apps/installed', search);
 };
 
