@@ -32,6 +32,7 @@ export default {
             init: 'Init',
             verify: 'Verify',
             saveAndEnable: 'Save and enable',
+            import: 'import',
         },
         search: {
             timeStart: 'Time start',
@@ -199,7 +200,7 @@ export default {
         noMysql: 'No {0} database is detected, please go to App Store and click Install!',
         goInstall: 'Go to install',
         source: 'Source',
-        backup: 'Database backup',
+        backup: 'Backup',
         permission: 'Permission',
         permissionLocal: 'Local server',
         permissionForIP: 'IP',

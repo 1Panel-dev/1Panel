@@ -33,6 +33,7 @@ export default {
             init: '初始化',
             verify: '验证',
             saveAndEnable: '保存并启用',
+            import: '导入',
         },
         search: {
             timeStart: '开始时间',
@@ -200,7 +201,7 @@ export default {
         noMysql: '当前未检测到 {0} 数据库，请进入应用商店点击安装！',
         goInstall: '去安装',
         source: '来源',
-        backup: '备份数据库',
+        backup: '备份',
         permission: '权限',
         permissionLocal: '本地服务器',
         permissionForIP: '指定 IP',
