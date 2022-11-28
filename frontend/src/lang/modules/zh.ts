@@ -163,6 +163,11 @@ export default {
         ioDelay: 'IO 延迟',
         time: '次',
 
+        runSmoothly: '运行流畅',
+        runNormal: '运行正常',
+        runSlowly: '运行缓慢',
+        runJam: '运行堵塞',
+
         core: '物理核心',
         logicCore: '逻辑核心',
         loadAverage: '最近 {0} 分钟平均负载',

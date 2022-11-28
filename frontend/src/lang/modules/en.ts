@@ -162,6 +162,11 @@ export default {
         ioDelay: 'IO delay',
         time: 'Times',
 
+        runSmoothly: 'Run smoothly',
+        runNormal: 'Run normal',
+        runSlowly: 'Run slowly',
+        runJam: 'Run Blockaged',
+
         core: 'Physical core',
         logicCore: 'Logic core',
         loadAverage: 'Average load in the last {0} minutes',

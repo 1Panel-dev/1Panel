@@ -4,9 +4,9 @@
 
         <AppStatus :app-key="'redis'" style="margin-top: 20px" @setting="onSetting" @is-exist="checkExist"></AppStatus>
         <div v-show="redisIsExist">
-            <Setting ref="settingRef"></Setting>
+            <Setting ref="settingRef" style="margin-top: 20px" />
 
-            <Terminal v-show="!isOnSetting" style="margin-top: 5px" ref="terminalRef"></Terminal>
+            <Terminal v-show="!isOnSetting" style="margin-top: 20px" ref="terminalRef" />
         </div>
     </div>
 </template>
