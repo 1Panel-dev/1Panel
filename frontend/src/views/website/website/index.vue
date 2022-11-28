@@ -32,7 +32,8 @@
                             </template>
                         </el-table-column>
                         <fu-table-operations
-                            :ellipsis="1"
+                            :ellipsis="10"
+                            width="260px"
                             :buttons="buttons"
                             :label="$t('commons.table.operate')"
                             fixed="right"
@@ -48,12 +49,16 @@
             <CreateWebSite ref="createRef" @close="search"></CreateWebSite>
             <DeleteWebsite ref="deleteRef" @close="search"></DeleteWebsite>
             <WebSiteGroup ref="groupRef"></WebSiteGroup>
+            <UploadDialog ref="uploadRef" />
+            <BackupRecords ref="dialogBackupRef" />
         </LayoutContent>
     </div>
 </template>
 
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
+import BackupRecords from '@/views/database/mysql/backup/index.vue';
+import UploadDialog from '@/views/database/mysql/upload/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import CreateWebSite from './create/index.vue';
@@ -103,11 +108,36 @@ const openConfig = (id: number) => {
     router.push({ name: 'WebsiteConfig', params: { id: id, tab: 'basic' } });
 };
 
+const uploadRef = ref();
+const dialogBackupRef = ref();
+const onOpenBackupDialog = async (dbName: string) => {
+    let params = {
+        mysqlName: 'test',
+        dbName: dbName,
+    };
+    dialogBackupRef.value!.acceptParams(params);
+};
 const buttons = [
     {
         label: i18n.global.t('website.config'),
         click: function (row: WebSite.WebSite) {
             openConfig(row.id);
+        },
+    },
+    {
+        label: i18n.global.t('database.backupList'),
+        click: (row: WebSite.WebSite) => {
+            onOpenBackupDialog(row.primaryDomain);
+        },
+    },
+    {
+        label: i18n.global.t('database.loadBackup'),
+        click: (row: WebSite.WebSite) => {
+            let params = {
+                mysqlName: 'test',
+                dbName: row.primaryDomain,
+            };
+            uploadRef.value!.acceptParams(params);
         },
     },
     {

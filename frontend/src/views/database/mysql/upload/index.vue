@@ -3,7 +3,7 @@
         <el-dialog v-model="upVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="70%">
             <template #header>
                 <div class="card-header">
-                    <span>{{ $t('database.backup') }}</span>
+                    <span>{{ $t('commons.button.import') }}</span>
                 </div>
             </template>
             <el-upload

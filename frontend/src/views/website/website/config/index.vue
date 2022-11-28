@@ -8,7 +8,6 @@
                 <el-tab-pane :label="$t('website.security')" name="safety">
                     <Safety :key="id" :id="id" v-if="index === 'safety'"></Safety>
                 </el-tab-pane>
-                <el-tab-pane :label="$t('website.backup')">反代</el-tab-pane>
                 <el-tab-pane :label="$t('website.source')" name="resource">
                     <Resource :key="id" :id="id" v-if="index === 'resource'"></Resource>
                 </el-tab-pane>
