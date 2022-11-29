@@ -3,13 +3,14 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"io/ioutil"
 	"os"
 	"path"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -247,7 +248,7 @@ func (a AppInstallService) ChangeAppPort(req dto.PortUpdate) error {
 		files    []string
 		newFiles []string
 	)
-	app, err := mysqlRepo.LoadBaseInfoByKey(req.Key)
+	app, err := appInstallRepo.LoadBaseInfoByKey(req.Key)
 	if err != nil {
 		return err
 	}

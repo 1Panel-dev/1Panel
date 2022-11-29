@@ -33,7 +33,6 @@ type MysqlService struct{}
 type IMysqlService interface {
 	SearchWithPage(search dto.PageInfo) (int64, interface{}, error)
 	ListDBName() ([]string, error)
-	SearchBackupsWithPage(search dto.SearchBackupsWithPage) (int64, interface{}, error)
 	Create(mysqlDto dto.MysqlDBCreate) error
 	ChangeInfo(info dto.ChangeDBInfo) error
 	UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
@@ -137,7 +136,7 @@ func (u *MysqlService) UpFile(mysqlName string, files []*multipart.FileHeader) e
 }
 
 func (u *MysqlService) RecoverByUpload(req dto.UploadRecover) error {
-	app, err := mysqlRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
 	if err != nil {
 		return err
 	}
@@ -223,26 +222,11 @@ func (u *MysqlService) ListDBName() ([]string, error) {
 	return dbNames, err
 }
 
-func (u *MysqlService) SearchBackupsWithPage(search dto.SearchBackupsWithPage) (int64, interface{}, error) {
-	app, err := mysqlRepo.LoadBaseInfoByKey("mysql")
-	if err != nil {
-		return 0, nil, err
-	}
-	searchDto := dto.BackupSearch{
-		Type:       "database-mysql",
-		PageInfo:   search.PageInfo,
-		Name:       app.Name,
-		DetailName: search.DBName,
-	}
-
-	return NewIBackupService().SearchRecordWithPage(searchDto)
-}
-
 func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
 	if mysqlDto.Username == "root" {
 		return errors.New("Cannot set root as user name")
 	}
-	app, err := mysqlRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
 	if err != nil {
 		return err
 	}
@@ -289,7 +273,7 @@ func (u *MysqlService) Backup(db dto.BackupDB) error {
 }
 
 func (u *MysqlService) Recover(db dto.RecoverDB) error {
-	app, err := mysqlRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
 	if err != nil {
 		return err
 	}
@@ -314,7 +298,7 @@ func (u *MysqlService) Recover(db dto.RecoverDB) error {
 }
 
 func (u *MysqlService) Delete(ids []uint) error {
-	app, err := mysqlRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
 	if err != nil {
 		return err
 	}
@@ -349,7 +333,7 @@ func (u *MysqlService) ChangeInfo(info dto.ChangeDBInfo) error {
 			return err
 		}
 	}
-	app, err := mysqlRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
 	if err != nil {
 		return err
 	}
@@ -417,7 +401,7 @@ func (u *MysqlService) ChangeInfo(info dto.ChangeDBInfo) error {
 }
 
 func (u *MysqlService) UpdateConfByFile(info dto.MysqlConfUpdateByFile) error {
-	app, err := mysqlRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
 	if err != nil {
 		return err
 	}
@@ -437,7 +421,7 @@ func (u *MysqlService) UpdateConfByFile(info dto.MysqlConfUpdateByFile) error {
 }
 
 func (u *MysqlService) UpdateVariables(updatas []dto.MysqlVariablesUpdate) error {
-	app, err := mysqlRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
 	if err != nil {
 		return err
 	}
@@ -479,7 +463,7 @@ func (u *MysqlService) UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
 
 func (u *MysqlService) LoadBaseInfo() (*dto.DBBaseInfo, error) {
 	var data dto.DBBaseInfo
-	app, err := mysqlRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
 	if err != nil {
 		return nil, err
 	}
@@ -502,7 +486,7 @@ func (u *MysqlService) LoadBaseInfo() (*dto.DBBaseInfo, error) {
 }
 
 func (u *MysqlService) LoadVariables() (*dto.MysqlVariables, error) {
-	app, err := mysqlRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
 	if err != nil {
 		return nil, err
 	}
@@ -520,7 +504,7 @@ func (u *MysqlService) LoadVariables() (*dto.MysqlVariables, error) {
 }
 
 func (u *MysqlService) LoadStatus() (*dto.MysqlStatus, error) {
-	app, err := mysqlRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
 	if err != nil {
 		return nil, err
 	}
@@ -604,7 +588,7 @@ func excuteSql(containerName, password, command string) error {
 }
 
 func backupMysql(backupType, baseDir, backupDir, mysqlName, dbName, fileName string) error {
-	app, err := mysqlRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
 	if err != nil {
 		return err
 	}

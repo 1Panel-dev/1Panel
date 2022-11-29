@@ -5,16 +5,21 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/app/dto"
-	"github.com/1Panel-dev/1Panel/backend/app/model"
-	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"github.com/pkg/errors"
-	"gorm.io/gorm"
+	"io"
+	"os"
+	"os/exec"
 	"path"
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"github.com/pkg/errors"
+	"gorm.io/gorm"
 )
 
 type WebsiteService struct {
@@ -98,6 +103,101 @@ func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
 	}
 
 	tx.Commit()
+	return nil
+}
+
+func (w WebsiteService) Backup(id uint) error {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return err
+	}
+	app, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+	if err != nil {
+		return err
+	}
+	resource, err := appInstallResourceRepo.GetFirst(appInstallResourceRepo.WithAppInstallId(website.AppInstallID))
+	if err != nil {
+		return err
+	}
+	mysqlInfo, err := appInstallRepo.LoadBaseInfoByKey(resource.Key)
+	if err != nil {
+		return err
+	}
+	nginxInfo, err := appInstallRepo.LoadBaseInfoByKey("nginx")
+	if err != nil {
+		return err
+	}
+	db, err := mysqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
+	if err != nil {
+		return err
+	}
+	localDir, err := loadLocalDir()
+	if err != nil {
+		return err
+	}
+	name := fmt.Sprintf("%s_%s", website.PrimaryDomain, time.Now().Format("20060102150405"))
+	backupDir := fmt.Sprintf("website/%s/%s", website.PrimaryDomain, name)
+	fullDir := fmt.Sprintf("%s/%s", localDir, backupDir)
+	if _, err := os.Stat(fullDir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(fullDir, os.ModePerm); err != nil {
+			if err != nil {
+				return fmt.Errorf("mkdir %s failed, err: %v", fullDir, err)
+			}
+		}
+	}
+	nginxConfFile := fmt.Sprintf("%s/nginx/%s/conf/conf.d/%s.conf", constant.AppInstallDir, nginxInfo.Name, website.PrimaryDomain)
+	src, err := os.OpenFile(nginxConfFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775)
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+	out, err := os.Create(fmt.Sprintf("%s/%s.conf", fullDir, website.PrimaryDomain))
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	_, _ = io.Copy(out, src)
+
+	if website.Type == "deployment" {
+		dbFile := fmt.Sprintf("%s/%s.sql", fullDir, website.PrimaryDomain)
+		outfile, _ := os.OpenFile(dbFile, os.O_RDWR|os.O_CREATE, 0755)
+		cmd := exec.Command("docker", "exec", mysqlInfo.ContainerName, "mysqldump", "-uroot", "-p"+mysqlInfo.Password, db.Name)
+		cmd.Stdout = outfile
+		_ = cmd.Run()
+		_ = cmd.Wait()
+
+		websiteDir := fmt.Sprintf("%s/%s/%s", constant.AppInstallDir, app.App.Key, app.Name)
+		if err := handleTar(websiteDir, fullDir, fmt.Sprintf("%s.web.tar.gz", website.PrimaryDomain), ""); err != nil {
+			return err
+		}
+	} else {
+		websiteDir := fmt.Sprintf("%s/nginx/%s/www/%s", constant.AppInstallDir, nginxInfo.Name, website.PrimaryDomain)
+		if err := handleTar(websiteDir, fullDir, fmt.Sprintf("%s.web.tar.gz", website.PrimaryDomain), ""); err != nil {
+			return err
+		}
+	}
+	tarDir := fmt.Sprintf("%s/website/%s", localDir, website.PrimaryDomain)
+	tarName := fmt.Sprintf("%s.tar.gz", name)
+	itemDir := strings.ReplaceAll(fullDir[strings.LastIndex(fullDir, "/"):], "/", "")
+	aheadDir := strings.ReplaceAll(fullDir, itemDir, "")
+	tarcmd := exec.Command("tar", "zcvf", fullDir+".tar.gz", "-C", aheadDir, itemDir)
+	stdout, err := tarcmd.CombinedOutput()
+	if err != nil {
+		return errors.New(string(stdout))
+	}
+
+	record := &model.BackupRecord{
+		Type:       "website-" + website.Type,
+		Name:       website.PrimaryDomain,
+		DetailName: "",
+		Source:     "LOCAL",
+		BackupType: "LOCAL",
+		FileDir:    tarDir,
+		FileName:   tarName,
+	}
+	if err := backupRepo.CreateRecord(record); err != nil {
+		global.LOG.Errorf("save backup record failed, err: %v", err)
+	}
 	return nil
 }
 

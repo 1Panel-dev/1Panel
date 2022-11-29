@@ -2,7 +2,10 @@ package repo
 
 import (
 	"context"
+	"encoding/json"
+
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"gorm.io/gorm"
 )
 
@@ -95,4 +98,49 @@ func (a AppInstallRepo) BatchUpdateBy(maps map[string]interface{}, opts ...DBOpt
 		db = db.Where("1=1")
 	}
 	return db.Debug().Updates(&maps).Error
+}
+
+type RootInfo struct {
+	ID            uint   `json:"id"`
+	Name          string `json:"name"`
+	Port          int64  `json:"port"`
+	Password      string `json:"password"`
+	ContainerName string `json:"containerName"`
+	Param         string `json:"param"`
+	Env           string `json:"env"`
+	Key           string `json:"key"`
+	Version       string `json:"version"`
+}
+
+func (u *AppInstallRepo) LoadBaseInfoByKey(key string) (*RootInfo, error) {
+	var (
+		app        model.App
+		appInstall model.AppInstall
+		info       RootInfo
+	)
+	if err := global.DB.Where("key = ?", key).First(&app).Error; err != nil {
+		return nil, err
+	}
+	if err := global.DB.Where("app_id = ?", app.ID).First(&appInstall).Error; err != nil {
+		return nil, err
+	}
+	envMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(appInstall.Env), &envMap); err != nil {
+		return nil, err
+	}
+	password, ok := envMap["PANEL_DB_ROOT_PASSWORD"].(string)
+	if ok {
+		info.Password = password
+	}
+	port, ok := envMap["PANEL_APP_PORT_HTTP"].(float64)
+	if ok {
+		info.Port = int64(port)
+	}
+	info.ID = appInstall.ID
+	info.ContainerName = appInstall.ContainerName
+	info.Name = appInstall.Name
+	info.Env = appInstall.Env
+	info.Param = appInstall.Param
+	info.Version = appInstall.Version
+	return &info, nil
 }

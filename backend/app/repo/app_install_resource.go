@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"gorm.io/gorm"
@@ -23,6 +24,16 @@ func (a AppInstallResourceRpo) GetBy(opts ...DBOption) ([]model.AppInstallResour
 		db = opt(db)
 	}
 	err := db.Find(&resources).Error
+	return resources, err
+}
+
+func (a AppInstallResourceRpo) GetFirst(opts ...DBOption) (model.AppInstallResource, error) {
+	db := global.DB.Model(&model.AppInstallResource{})
+	var resources model.AppInstallResource
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.First(&resources).Error
 	return resources, err
 }
 

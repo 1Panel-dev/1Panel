@@ -146,25 +146,6 @@ func (b *BaseApi) ListDBName(c *gin.Context) {
 	helper.SuccessWithData(c, list)
 }
 
-func (b *BaseApi) SearchDBBackups(c *gin.Context) {
-	var req dto.SearchBackupsWithPage
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-
-	total, list, err := mysqlService.SearchBackupsWithPage(req)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-
-	helper.SuccessWithData(c, dto.PageResult{
-		Items: list,
-		Total: total,
-	})
-}
-
 func (b *BaseApi) BackupMysql(c *gin.Context) {
 	var req dto.BackupDB
 	if err := c.ShouldBindJSON(&req); err != nil {

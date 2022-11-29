@@ -112,12 +112,6 @@ type SearchDBWithPage struct {
 	MysqlName string `json:"mysqlName" validate:"required"`
 }
 
-type SearchBackupsWithPage struct {
-	PageInfo
-	MysqlName string `json:"mysqlName" validate:"required"`
-	DBName    string `json:"dbName" validate:"required"`
-}
-
 type BackupDB struct {
 	MysqlName string `json:"mysqlName" validate:"required"`
 	DBName    string `json:"dbName" validate:"required"`

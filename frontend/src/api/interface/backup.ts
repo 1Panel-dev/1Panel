@@ -1,3 +1,5 @@
+import { ReqPage } from '.';
+
 export namespace Backup {
     export interface BackupInfo {
         id: number;
@@ -30,5 +32,10 @@ export namespace Backup {
         type: string;
         credential: string;
         vars: string;
+    }
+    export interface SearchBackupRecord extends ReqPage {
+        type: string;
+        name: string;
+        detailName: string;
     }
 }

@@ -24,6 +24,13 @@ type BackupSearch struct {
 	DetailName string `json:"detailName"`
 }
 
+type RecordSearch struct {
+	PageInfo
+	Type       string `json:"type" validate:"required"`
+	Name       string `json:"name" validate:"required"`
+	DetailName string `json:"detailName"`
+}
+
 type BackupRecords struct {
 	ID         uint      `json:"id"`
 	CreatedAt  time.Time `json:"createdAt"`
