@@ -11,6 +11,10 @@ export const CreateWebsite = (req: WebSite.WebSiteCreateReq) => {
     return http.post<any>(`/websites`, req);
 };
 
+export const BackupWebsite = (id: number) => {
+    return http.post(`/websites/backup/${id}`);
+};
+
 export const UpdateWebsite = (req: WebSite.WebSiteUpdateReq) => {
     return http.post<any>(`/websites/update`, req);
 };

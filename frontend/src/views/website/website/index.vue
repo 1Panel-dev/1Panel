@@ -57,7 +57,7 @@
 
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
-import BackupRecords from '@/views/database/mysql/backup/index.vue';
+import BackupRecords from '@/views/website/website/backup/index.vue';
 import UploadDialog from '@/views/database/mysql/upload/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
@@ -110,13 +110,7 @@ const openConfig = (id: number) => {
 
 const uploadRef = ref();
 const dialogBackupRef = ref();
-const onOpenBackupDialog = async (dbName: string) => {
-    let params = {
-        mysqlName: 'test',
-        dbName: dbName,
-    };
-    dialogBackupRef.value!.acceptParams(params);
-};
+
 const buttons = [
     {
         label: i18n.global.t('website.config'),
@@ -127,7 +121,12 @@ const buttons = [
     {
         label: i18n.global.t('database.backupList'),
         click: (row: WebSite.WebSite) => {
-            onOpenBackupDialog(row.primaryDomain);
+            let params = {
+                id: row.id,
+                type: row.type,
+                name: row.primaryDomain,
+            };
+            dialogBackupRef.value!.acceptParams(params);
         },
     },
     {

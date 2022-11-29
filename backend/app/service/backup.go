@@ -18,7 +18,7 @@ type BackupService struct{}
 
 type IBackupService interface {
 	List() ([]dto.BackupInfo, error)
-	SearchRecordWithPage(search dto.BackupSearch) (int64, []dto.BackupRecords, error)
+	SearchRecordsWithPage(search dto.RecordSearch) (int64, []dto.BackupRecords, error)
 	DownloadRecord(info dto.DownloadRecord) (string, error)
 	Create(backupDto dto.BackupOperate) error
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
@@ -45,7 +45,7 @@ func (u *BackupService) List() ([]dto.BackupInfo, error) {
 	return dtobas, err
 }
 
-func (u *BackupService) SearchRecordWithPage(search dto.BackupSearch) (int64, []dto.BackupRecords, error) {
+func (u *BackupService) SearchRecordsWithPage(search dto.RecordSearch) (int64, []dto.BackupRecords, error) {
 	total, records, err := backupRepo.PageRecord(
 		search.Page, search.PageSize,
 		commonRepo.WithOrderBy("created_at desc"),

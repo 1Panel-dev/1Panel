@@ -25,6 +25,7 @@ func (s *BackupRouter) InitBackupRouter(Router *gin.RouterGroup) {
 		baRouter.POST("/buckets", baseApi.ListBuckets)
 		withRecordRouter.POST("", baseApi.CreateBackup)
 		withRecordRouter.POST("/del", baseApi.DeleteBackup)
+		withRecordRouter.POST("/record/search", baseApi.SearchBackupRecords)
 		withRecordRouter.POST("/record/download", baseApi.DownloadRecord)
 		withRecordRouter.POST("/record/del", baseApi.DeleteBackupRecord)
 		withRecordRouter.PUT(":id", baseApi.UpdateBackup)

@@ -1,6 +1,5 @@
 import http from '@/api';
 import { ReqPage, ResPage } from '../interface';
-import { Backup } from '../interface/backup';
 import { Database } from '../interface/database';
 import { File } from '@/api/interface/file';
 
@@ -22,9 +21,6 @@ export const recover = (params: Database.Recover) => {
 };
 export const recoverByUpload = (params: Database.RecoverByUpload) => {
     return http.post(`/databases/recover/byupload`, params);
-};
-export const searchBackupRecords = (params: Database.SearchBackupRecord) => {
-    return http.post<ResPage<Backup.RecordInfo>>(`/databases/backups/search`, params);
 };
 
 export const addMysqlDB = (params: Database.MysqlDBCreate) => {

@@ -78,10 +78,6 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 	if err != nil {
 		return "", err
 	}
-	app, err := mysqlRepo.LoadBaseInfoByKey("mysql")
-	if err != nil {
-		return "", err
-	}
 	if cronjob.KeepLocal || cronjob.Type != "LOCAL" {
 		localDir, err := loadLocalDir()
 		if err != nil {
@@ -93,6 +89,10 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 	}
 
 	if cronjob.Type == "database" {
+		app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+		if err != nil {
+			return "", err
+		}
 		fileName = fmt.Sprintf("db_%s_%s.sql.gz", cronjob.DBName, time.Now().Format("20060102150405"))
 		backupDir = fmt.Sprintf("database/mysql/%s/%s", app.Name, cronjob.DBName)
 		err = backupMysql(backup.Type, baseDir, backupDir, app.Name, cronjob.DBName, fileName)

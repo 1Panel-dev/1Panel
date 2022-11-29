@@ -3,7 +3,7 @@
         <el-dialog v-model="backupVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="50%">
             <template #header>
                 <div class="card-header">
-                    <span>{{ $t('database.backup') }} - {{ dbName }}</span>
+                    <span>{{ $t('database.backup') }} - {{ websiteName }}</span>
                 </div>
             </template>
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" @search="search" :data="data">
@@ -36,11 +36,11 @@ import ComplexTable from '@/components/complex-table/index.vue';
 import { reactive, ref } from 'vue';
 import { dateFromat } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
-import { backup, recover } from '@/api/modules/database';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
 import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords } from '@/api/modules/backup';
 import { Backup } from '@/api/interface/backup';
+import { BackupWebsite } from '@/api/modules/website';
 
 const selects = ref<any>([]);
 
@@ -52,15 +52,19 @@ const paginationConfig = reactive({
 });
 
 const backupVisiable = ref(false);
-const mysqlName = ref();
-const dbName = ref();
+const websiteName = ref();
+const websiteID = ref();
+const websiteType = ref();
+
 interface DialogProps {
-    mysqlName: string;
-    dbName: string;
+    id: string;
+    type: string;
+    name: string;
 }
 const acceptParams = (params: DialogProps): void => {
-    mysqlName.value = params.mysqlName;
-    dbName.value = params.dbName;
+    websiteName.value = params.name;
+    websiteID.value = params.id;
+    websiteType.value = params.type;
     backupVisiable.value = true;
     search();
 };
@@ -69,9 +73,9 @@ const search = async () => {
     let params = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
-        type: 'database-mysql',
-        name: mysqlName.value,
-        detailName: dbName.value,
+        type: 'website-' + websiteType.value,
+        name: websiteName.value,
+        detailName: '',
     };
     const res = await searchBackupRecords(params);
     data.value = res.data.items || [];
@@ -79,23 +83,9 @@ const search = async () => {
 };
 
 const onBackup = async () => {
-    let params = {
-        mysqlName: mysqlName.value,
-        dbName: dbName.value,
-    };
-    await backup(params);
+    await BackupWebsite(websiteID.value);
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
     search();
-};
-
-const onRecover = async (row: Backup.RecordInfo) => {
-    let params = {
-        mysqlName: mysqlName.value,
-        dbName: dbName.value,
-        backupName: row.fileDir + '/' + row.fileName,
-    };
-    await recover(params);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const onDownload = async (row: Backup.RecordInfo) => {
@@ -134,12 +124,12 @@ const buttons = [
             onBatchDelete(row);
         },
     },
-    {
-        label: i18n.global.t('commons.button.recover'),
-        click: (row: Backup.RecordInfo) => {
-            onRecover(row);
-        },
-    },
+    // {
+    //     label: i18n.global.t('commons.button.recover'),
+    //     click: (row: Backup.RecordInfo) => {
+    //         onRecover(row);
+    //     },
+    // },
     {
         label: i18n.global.t('commons.button.download'),
         click: (row: Backup.RecordInfo) => {
