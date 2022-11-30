@@ -8,18 +8,19 @@ type Server struct {
 	Comment    string
 	Listens    []*ServerListen
 	Directives []IDirective
+	Line       int
 }
 
 func NewServer(directive IDirective) (*Server, error) {
 	server := &Server{}
 	if block := directive.GetBlock(); block != nil {
+		server.Line = directive.GetBlock().GetLine()
 		server.Comment = block.GetComment()
 		directives := block.GetDirectives()
 		for _, dir := range directives {
-
 			switch dir.GetName() {
 			case "listen":
-				server.Listens = append(server.Listens, NewServerListen(dir.GetParameters()))
+				server.Listens = append(server.Listens, NewServerListen(dir.GetParameters(), dir.GetLine()))
 			default:
 				server.Directives = append(server.Directives, dir)
 			}
@@ -52,6 +53,73 @@ func (s *Server) GetDirectives() []IDirective {
 	}
 	directives = append(directives, s.Directives...)
 	return directives
+}
+
+func (s *Server) FindDirectives(directiveName string) []IDirective {
+	directives := make([]IDirective, 0)
+	for _, directive := range s.Directives {
+		if directive.GetName() == directiveName {
+			directives = append(directives, directive)
+		}
+		if directive.GetBlock() != nil {
+			directives = append(directives, directive.GetBlock().FindDirectives(directiveName)...)
+		}
+	}
+
+	return directives
+}
+
+func (s *Server) UpdateDirective(key string, params []string) {
+	if key == "" || len(params) == 0 {
+		return
+	}
+	directives := s.GetDirectives()
+	index := -1
+	for i, dir := range directives {
+		if dir.GetName() == key {
+			if IsRepeatKey(key) {
+				oldParams := dir.GetParameters()
+				if !(len(oldParams) > 0 && oldParams[0] == params[0]) {
+					continue
+				}
+			}
+			index = i
+			break
+		}
+	}
+	newDirective := &Directive{
+		Name:       key,
+		Parameters: params,
+	}
+	if index > -1 {
+		directives[index] = newDirective
+	} else {
+		directives = append(directives, newDirective)
+	}
+	s.Directives = directives
+}
+
+func (s *Server) RemoveDirective(key string, params []string) {
+	directives := s.GetDirectives()
+	var newDirectives []IDirective
+	for _, dir := range directives {
+		if dir.GetName() == key {
+			if IsRepeatKey(key) {
+				oldParams := dir.GetParameters()
+				if len(oldParams) > 0 && oldParams[0] == params[0] {
+					continue
+				}
+			} else {
+				continue
+			}
+		}
+		newDirectives = append(newDirectives, dir)
+	}
+	s.Directives = newDirectives
+}
+
+func (s *Server) GetLine() int {
+	return s.Line
 }
 
 func (s *Server) AddListen(bind string, defaultServer bool, params ...string) {
@@ -120,19 +188,11 @@ func (s *Server) AddServerName(name string) {
 }
 
 func (s *Server) UpdateServerName(names []string) {
-	serverNameDirective := Directive{
-		Name:       "server_name",
-		Parameters: names,
-	}
-	s.UpdateDirectives("server_name", serverNameDirective)
+	s.UpdateDirective("server_name", names)
 }
 
 func (s *Server) UpdateRoot(path string) {
-	rootDir := Directive{
-		Name:       "root",
-		Parameters: []string{path},
-	}
-	s.UpdateDirectives("root", rootDir)
+	s.UpdateDirective("root", []string{path})
 }
 
 func (s *Server) UpdateRootLocation() {
@@ -191,56 +251,4 @@ func (s *Server) RemoveListenByBind(bind string) {
 		}
 	}
 	s.Listens = listens
-}
-
-func (s *Server) FindDirectives(directiveName string) []IDirective {
-	directives := make([]IDirective, 0)
-	for _, directive := range s.Directives {
-		if directive.GetName() == directiveName {
-			directives = append(directives, directive)
-		}
-		if directive.GetBlock() != nil {
-			directives = append(directives, directive.GetBlock().FindDirectives(directiveName)...)
-		}
-	}
-
-	return directives
-}
-
-func (s *Server) UpdateDirectives(directiveName string, directive Directive) {
-	directives := s.Directives
-	index := -1
-	for i, dir := range directives {
-		if dir.GetName() == directiveName {
-			index = i
-			break
-		}
-	}
-	if index > -1 {
-		directives[index] = &directive
-	} else {
-		directives = append(directives, &directive)
-	}
-	s.Directives = directives
-}
-
-func (s *Server) AddDirectives(directive Directive) {
-	directives := append(s.Directives, &directive)
-	s.Directives = directives
-}
-
-func (s *Server) RemoveDirectives(names []string) {
-	nameMaps := make(map[string]struct{}, len(names))
-	for _, name := range names {
-		nameMaps[name] = struct{}{}
-	}
-	directives := s.Directives
-	var newDirectives []IDirective
-	for _, dir := range directives {
-		if _, ok := nameMaps[dir.GetName()]; ok {
-			continue
-		}
-		newDirectives = append(newDirectives, dir)
-	}
-	s.Directives = newDirectives
 }

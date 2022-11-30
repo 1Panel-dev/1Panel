@@ -3,62 +3,27 @@ package nginx
 import (
 	"bytes"
 	"fmt"
-	components "github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
+	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
 	"io/ioutil"
-	"sort"
 	"strings"
 )
 
 var (
-	//NoIndentStyle default style
-	NoIndentStyle = &Style{
-		SortDirectives: false,
-		StartIndent:    0,
-		Indent:         0,
-	}
-
-	//IndentedStyle default style
 	IndentedStyle = &Style{
-		SortDirectives: false,
-		StartIndent:    0,
-		Indent:         4,
-	}
-
-	//NoIndentSortedStyle default style
-	NoIndentSortedStyle = &Style{
-		SortDirectives: true,
-		StartIndent:    0,
-		Indent:         0,
-	}
-
-	//NoIndentSortedSpaceStyle default style
-	NoIndentSortedSpaceStyle = &Style{
-		SortDirectives:    true,
 		SpaceBeforeBlocks: true,
 		StartIndent:       0,
-		Indent:            0,
+		Indent:            4,
 	}
 )
 
 type Style struct {
-	SortDirectives    bool
 	SpaceBeforeBlocks bool
 	StartIndent       int
 	Indent            int
 }
 
-func NewStyle() *Style {
-	style := &Style{
-		SortDirectives: false,
-		StartIndent:    0,
-		Indent:         4,
-	}
-	return style
-}
-
 func (s *Style) Iterate() *Style {
 	newStyle := &Style{
-		SortDirectives:    s.SortDirectives,
 		SpaceBeforeBlocks: s.SpaceBeforeBlocks,
 		StartIndent:       s.StartIndent + s.Indent,
 		Indent:            s.Indent,
@@ -91,23 +56,33 @@ func DumpDirective(d components.IDirective, style *Style) string {
 			buf.WriteString(d.GetComment())
 		}
 		buf.WriteString("\n")
-		buf.WriteString(DumpBlock(d.GetBlock(), style.Iterate()))
+		buf.WriteString(DumpBlock(d.GetBlock(), style.Iterate(), d.GetBlock().GetLine()))
 		buf.WriteString(fmt.Sprintf("\n%s}", strings.Repeat(" ", style.StartIndent)))
 	}
 	return buf.String()
 }
 
-func DumpBlock(b components.IBlock, style *Style) string {
+func DumpBlock(b components.IBlock, style *Style, startLine int) string {
 	var buf bytes.Buffer
-
-	directives := b.GetDirectives()
-	if style.SortDirectives {
-		sort.SliceStable(directives, func(i, j int) bool {
-			return directives[i].GetName() < directives[j].GetName()
-		})
+	line := startLine
+	if b.GetLine() > startLine {
+		for i := 0; i < b.GetLine()-startLine; i++ {
+			buf.WriteString("\n")
+		}
+		line = b.GetLine()
 	}
 
+	directives := b.GetDirectives()
+
 	for i, directive := range directives {
+
+		if directive.GetLine() > line {
+			for i := 0; i < b.GetLine()-line; i++ {
+				buf.WriteString("\n")
+			}
+			line = b.GetLine()
+		}
+
 		buf.WriteString(DumpDirective(directive, style))
 		if i != len(directives)-1 {
 			buf.WriteString("\n")
@@ -117,7 +92,7 @@ func DumpBlock(b components.IBlock, style *Style) string {
 }
 
 func DumpConfig(c *components.Config, style *Style) string {
-	return DumpBlock(c.Block, style)
+	return DumpBlock(c.Block, style, 1)
 }
 
 func WriteConfig(c *components.Config, style *Style) error {

@@ -1,6 +1,7 @@
 package components
 
 type Directive struct {
+	Line       int
 	Block      IBlock
 	Name       string
 	Comment    string
@@ -21,4 +22,8 @@ func (d *Directive) GetParameters() []string {
 
 func (d *Directive) GetBlock() IBlock {
 	return d.Block
+}
+
+func (d *Directive) GetLine() int {
+	return d.Line
 }

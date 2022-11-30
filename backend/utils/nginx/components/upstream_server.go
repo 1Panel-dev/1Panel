@@ -11,6 +11,7 @@ type UpstreamServer struct {
 	Address    string
 	Flags      []string
 	Parameters map[string]string
+	Line       int
 }
 
 func (uss *UpstreamServer) GetName() string {
@@ -58,6 +59,7 @@ func NewUpstreamServer(directive IDirective) *UpstreamServer {
 		Comment:    directive.GetComment(),
 		Flags:      make([]string, 0),
 		Parameters: make(map[string]string, 0),
+		Line:       directive.GetLine(),
 	}
 
 	for i, parameter := range directive.GetParameters() {
@@ -74,4 +76,8 @@ func NewUpstreamServer(directive IDirective) *UpstreamServer {
 	}
 
 	return uss
+}
+
+func (uss *UpstreamServer) GetLine() int {
+	return uss.Line
 }
