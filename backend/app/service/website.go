@@ -347,7 +347,7 @@ func (w WebsiteService) UpdateNginxConfigByScope(req dto.NginxConfigReq) error {
 		return err
 	}
 	if req.Operate == dto.ConfigDel {
-		return deleteNginxConfig(website, keys)
+		return deleteNginxConfig(website, constant.NginxScopeServer, keys)
 	}
 
 	return updateNginxConfig(website, getNginxParams(req.Params, keys), req.Scope)
@@ -468,7 +468,7 @@ func (w WebsiteService) OpWebsiteHTTPS(req dto.WebsiteHTTPSOp) (dto.WebsiteHTTPS
 			return dto.WebsiteHTTPS{}, err
 		}
 
-		if err := deleteNginxConfig(website, getKeysFromStaticFile(dto.SSL)); err != nil {
+		if err := deleteNginxConfig(website, constant.NginxScopeServer, getKeysFromStaticFile(dto.SSL)); err != nil {
 			return dto.WebsiteHTTPS{}, err
 		}
 	}

@@ -107,7 +107,6 @@ export namespace WebSite {
 
     export interface NginxParam {
         name: string;
-        secondKey: string;
         params: string[];
     }
 

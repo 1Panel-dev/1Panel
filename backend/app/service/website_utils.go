@@ -44,15 +44,12 @@ func getDomain(domainStr string, websiteID uint) (model.WebSiteDomain, error) {
 }
 
 func createStaticHtml(website *model.WebSite) error {
-	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
+	nginxInstall, err := getAppInstallByKey("nginx")
 	if err != nil {
 		return err
 	}
-	nginxInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithAppId(nginxApp.ID))
-	if err != nil {
-		return err
-	}
-	indexFolder := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "www", website.Alias)
+
+	indexFolder := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "www", "sites", website.Alias)
 	indexPath := path.Join(indexFolder, "index.html")
 	indexContent := string(nginx_conf.Index)
 	fileOp := files.NewFileOp()
@@ -72,14 +69,38 @@ func createStaticHtml(website *model.WebSite) error {
 	return nil
 }
 
+func createWebsiteFolder(nginxInstall model.AppInstall, website *model.WebSite) error {
+
+	nginxFolder := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name)
+	siteFolder := path.Join(nginxFolder, "www", "sites", website.Alias)
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(siteFolder) {
+		if err := fileOp.CreateDir(siteFolder, 0755); err != nil {
+			return err
+		}
+		if err := fileOp.CreateDir(path.Join(siteFolder, "log"), 0755); err != nil {
+			return err
+		}
+		if err := fileOp.CreateFile(path.Join(siteFolder, "log", "access.log")); err != nil {
+			return err
+		}
+		if err := fileOp.CreateDir(path.Join(siteFolder, "waf", "rules"), 0755); err != nil {
+			return err
+		}
+		if err := fileOp.CreateDir(path.Join(siteFolder, "data"), 0755); err != nil {
+			return err
+		}
+	}
+	return fileOp.CopyDir(path.Join(nginxFolder, "www", "common", "waf", "rules"), path.Join(siteFolder, "waf", "rules"))
+}
+
 func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) error {
 
-	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
+	nginxInstall, err := getAppInstallByKey("nginx")
 	if err != nil {
 		return err
 	}
-	nginxInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithAppId(nginxApp.ID))
-	if err != nil {
+	if err := createWebsiteFolder(nginxInstall, website); err != nil {
 		return err
 	}
 
@@ -98,6 +119,14 @@ func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) e
 		server.UpdateListen(strconv.Itoa(domain.Port), false)
 	}
 	server.UpdateServerName(serverNames)
+
+	siteFolder := path.Join("/www", "sites", website.Alias)
+	commonFolder := path.Join("/www", "common")
+	server.UpdateDirective("access_log", []string{path.Join(siteFolder, "log", "access.log")})
+	server.UpdateDirective("access_by_lua_file", []string{path.Join(commonFolder, "waf", "access.lua")})
+	server.UpdateDirective("set", []string{"$RulePath", path.Join(siteFolder, "waf", "rules")})
+	server.UpdateDirective("set", []string{"$logdir", path.Join(siteFolder, "waf", "log")})
+
 	if website.Type == "deployment" {
 		appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 		if err != nil {
@@ -106,7 +135,7 @@ func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) e
 		proxy := fmt.Sprintf("http://127.0.0.1:%d", appInstall.HttpPort)
 		server.UpdateRootProxy([]string{proxy})
 	} else {
-		server.UpdateRoot(path.Join("/www/root", website.Alias))
+		server.UpdateRoot(path.Join("/www/sites", website.Alias))
 		server.UpdateRootLocation()
 	}
 
@@ -114,15 +143,16 @@ func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) e
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
-	if err := opNginx(nginxInstall.ContainerName, "check"); err != nil {
+
+	if err := opNginx(nginxInstall.ContainerName, constant.NginxCheck); err != nil {
 		return err
 	}
-	return opNginx(nginxInstall.ContainerName, "reload")
+	return opNginx(nginxInstall.ContainerName, constant.NginxReload)
 }
 
 func opNginx(containerName, operate string) error {
 	nginxCmd := fmt.Sprintf("docker exec -i %s %s", containerName, "nginx -s reload")
-	if operate == "check" {
+	if operate == constant.NginxCheck {
 		nginxCmd = fmt.Sprintf("docker exec -i %s %s", containerName, "nginx -t")
 	}
 	if out, err := cmd.Exec(nginxCmd); err != nil {
@@ -160,12 +190,12 @@ func delNginxConfig(website model.WebSite) error {
 
 func nginxCheckAndReload(oldContent string, filePath string, containerName string) error {
 
-	if err := opNginx(containerName, "check"); err != nil {
+	if err := opNginx(containerName, constant.NginxCheck); err != nil {
 		_ = files.NewFileOp().WriteFile(filePath, strings.NewReader(oldContent), 0644)
 		return err
 	}
 
-	if err := opNginx(containerName, "reload"); err != nil {
+	if err := opNginx(containerName, constant.NginxReload); err != nil {
 		_ = files.NewFileOp().WriteFile(filePath, strings.NewReader(oldContent), 0644)
 		return err
 	}
@@ -253,9 +283,6 @@ func getNginxConfigByKeys(website model.WebSite, keys []string) ([]dto.NginxPara
 				Name:   dir.GetName(),
 				Params: dir.GetParameters(),
 			}
-			if isRepeatKey(key) {
-				nginxParam.SecondKey = dir.GetParameters()[0]
-			}
 			res = append(res, nginxParam)
 		}
 	}
@@ -271,15 +298,7 @@ func updateNginxConfig(website model.WebSite, params []dto.NginxParam, scope dto
 	updateConfig(config, scope)
 	server := config.FindServers()[0]
 	for _, p := range params {
-		newDir := components.Directive{
-			Name:       p.Name,
-			Parameters: p.Params,
-		}
-		if isRepeatKey(p.Name) {
-			server.UpdateDirectiveBySecondKey(p.Name, p.SecondKey, newDir)
-		} else {
-			server.UpdateDirectives(p.Name, newDir)
-		}
+		server.UpdateDirective(p.Name, p.Params)
 	}
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
@@ -298,15 +317,7 @@ func updateConfig(config *components.Config, scope dto.NginxKey) {
 	}
 
 	for _, dir := range newConfig.GetDirectives() {
-		newDir := components.Directive{
-			Name:       dir.GetName(),
-			Parameters: dir.GetParameters(),
-		}
-		if isRepeatKey(dir.GetName()) {
-			config.UpdateDirectiveBySecondKey(dir.GetName(), dir.GetParameters()[0], newDir)
-		} else {
-			config.UpdateDirectives(dir.GetName(), newDir)
-		}
+		config.UpdateDirective(dir.GetName(), dir.GetParameters())
 	}
 }
 
@@ -339,15 +350,24 @@ func getKeysFromStaticFile(scope dto.NginxKey) []string {
 	return res
 }
 
-func deleteNginxConfig(website model.WebSite, keys []string) error {
+func deleteNginxConfig(website model.WebSite, scope string, keys []string) error {
 	nginxConfig, err := getNginxConfig(website.Alias)
 	if err != nil {
 		return err
 	}
 	config := nginxConfig.Config
-	config.RemoveDirectives(keys)
-	server := config.FindServers()[0]
-	server.RemoveDirectives(keys)
+	if scope == constant.NginxScopeHttp {
+		http := config.FindHttp()
+		for _, key := range keys {
+			http.RemoveDirective(key, []string{})
+		}
+	}
+	if scope == constant.NginxScopeServer {
+		server := config.FindServers()[0]
+		for _, key := range keys {
+			server.RemoveDirective(key, []string{})
+		}
+	}
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
@@ -452,9 +472,6 @@ func handleParamMap(paramMap map[string]string, keys []string) []dto.NginxParam 
 					Name:   k,
 					Params: getParamArray(k, v),
 				}
-				if isRepeatKey(k) {
-					param.SecondKey = param.Params[0]
-				}
 				nginxParams = append(nginxParams, param)
 			}
 		}
@@ -476,14 +493,6 @@ func getNginxParams(params interface{}, keys []string) []dto.NginxParam {
 		}
 	}
 	return nginxParams
-}
-
-func isRepeatKey(key string) bool {
-
-	if _, ok := dto.RepeatKeys[key]; ok {
-		return true
-	}
-	return false
 }
 
 func toMapStr(m map[string]interface{}) map[string]string {

@@ -4,7 +4,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
-	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/parser"
 	"os"
 	"path"
@@ -49,9 +48,6 @@ func getHttpConfigByKeys(keys []string) ([]dto.NginxParam, error) {
 				Name:   dir.GetName(),
 				Params: dir.GetParameters(),
 			}
-			if isRepeatKey(key) {
-				nginxParam.SecondKey = dir.GetParameters()[0]
-			}
 			res = append(res, nginxParam)
 		}
 		if len(dirs) == 0 {
@@ -73,15 +69,7 @@ func updateHttpNginxConfig(params []dto.NginxParam) error {
 	config := nginxConfig.Config
 	http := config.FindHttp()
 	for _, p := range params {
-		newDir := components.Directive{
-			Name:       p.Name,
-			Parameters: p.Params,
-		}
-		if isRepeatKey(p.Name) {
-			http.UpdateDirectiveBySecondKey(p.Name, p.SecondKey, newDir)
-		} else {
-			http.UpdateDirectives(p.Name, newDir)
-		}
+		http.UpdateDirective(p.Name, p.Params)
 	}
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err

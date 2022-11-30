@@ -1,0 +1,6 @@
+\.(svn|htaccess|bash_history)
+\.(bak|inc|old|mdb|sql|backup|java|class)$
+(vhost|bbs|host|wwwroot|www|site|root|hytop|flashfxp).*\.rar
+(phpmyadmin|jmx-console|jmxinvokerservlet)
+java\.lang
+/(attachments|upimg|images|css|uploadfiles|html|uploads|templets|static|template|data|inc|forumdata|upload|includes|cache|avatar)/(\\w+).(php|jsp)

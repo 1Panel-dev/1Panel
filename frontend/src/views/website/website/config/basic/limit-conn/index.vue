@@ -68,10 +68,10 @@ const search = (req: WebSite.NginxConfigReq) => {
                 enable.value = true;
                 for (const param of res.data) {
                     if (param.name === 'limit_conn') {
-                        if (param.secondKey === 'perserver') {
+                        if (param.params[0] === 'perserver') {
                             form.perserver = Number(param.params[1]);
                         }
-                        if (param.secondKey === 'perip') {
+                        if (param.params[0] === 'perip') {
                             form.perip = Number(param.params[1]);
                         }
                     }
