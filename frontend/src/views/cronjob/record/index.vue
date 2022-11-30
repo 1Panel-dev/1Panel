@@ -262,8 +262,8 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
         page: searchInfo.page,
         pageSize: searchInfo.pageSize,
         cronjobID: dialogData.value.rowData!.id,
-        startTime: searchInfo.startTime,
-        endTime: searchInfo.endTime,
+        startTime: new Date(new Date().setHours(0, 0, 0, 0)),
+        endTime: new Date(),
         status: searchInfo.status ? 'Stoped' : '',
     };
     const res = await searchRecords(itemSearch);

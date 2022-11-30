@@ -26,6 +26,10 @@ export const GetWebsite = (id: number) => {
     return http.get<WebSite.WebSiteDTO>(`/websites/${id}`);
 };
 
+export const GetWebsiteOptions = () => {
+    return http.get<Array<string>>(`/websites/options`);
+};
+
 export const GetWebsiteNginx = (id: number) => {
     return http.get<File.File>(`/websites/${id}/nginx`);
 };

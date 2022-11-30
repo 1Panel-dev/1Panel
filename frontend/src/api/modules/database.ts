@@ -49,7 +49,7 @@ export const loadMysqlStatus = () => {
     return http.get<Database.MysqlStatus>(`/databases/status`);
 };
 export const loadDBNames = () => {
-    return http.get<Array<string>>(`/databases/dbs`);
+    return http.get<Array<string>>(`/databases/options`);
 };
 
 // redis

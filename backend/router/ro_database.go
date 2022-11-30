@@ -35,7 +35,7 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		cmdRouter.GET("/variables", baseApi.LoadVariables)
 		cmdRouter.GET("/status", baseApi.LoadStatus)
 		cmdRouter.GET("/baseinfo", baseApi.LoadBaseinfo)
-		cmdRouter.GET("/dbs", baseApi.ListDBName)
+		cmdRouter.GET("/options", baseApi.ListDBName)
 
 		cmdRouter.GET("/redis/persistence/conf", baseApi.LoadPersistenceConf)
 		cmdRouter.GET("/redis/status", baseApi.LoadRedisStatus)

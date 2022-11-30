@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"errors"
+
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -25,6 +27,15 @@ func (b *BaseApi) PageWebsite(c *gin.Context) {
 	})
 }
 
+func (b *BaseApi) GetWebsiteOptions(c *gin.Context) {
+	websites, err := websiteService.GetWebsiteOptions()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, websites)
+}
+
 func (b *BaseApi) CreateWebsite(c *gin.Context) {
 	var req dto.WebSiteCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -40,12 +51,12 @@ func (b *BaseApi) CreateWebsite(c *gin.Context) {
 }
 
 func (b *BaseApi) BackupWebsite(c *gin.Context) {
-	id, err := helper.GetParamID(c)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+	domain, ok := c.Params.Get("domain")
+	if !ok {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error domain in path"))
 		return
 	}
-	if err := websiteService.Backup(id); err != nil {
+	if err := websiteService.Backup(domain); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

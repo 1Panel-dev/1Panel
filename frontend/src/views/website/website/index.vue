@@ -22,6 +22,11 @@
                                 <el-link @click="openConfig(row.id)">{{ row.primaryDomain }}</el-link>
                             </template>
                         </el-table-column>
+                        <el-table-column :label="$t('commons.table.type')" fix prop="type">
+                            <template #default="{ row }">
+                                {{ $t('website.' + row.type) }}
+                            </template>
+                        </el-table-column>
                         <el-table-column :label="$t('commons.table.status')" prop="status"></el-table-column>
                         <el-table-column :label="$t('website.remark')" prop="remark"></el-table-column>
                         <el-table-column :label="$t('website.protocol')" prop="protocol"></el-table-column>
