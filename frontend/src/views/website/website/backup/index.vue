@@ -40,7 +40,7 @@ import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
 import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords } from '@/api/modules/backup';
 import { Backup } from '@/api/interface/backup';
-import { BackupWebsite } from '@/api/modules/website';
+import { BackupWebsite, RecoverWebsite } from '@/api/modules/website';
 
 const selects = ref<any>([]);
 
@@ -80,6 +80,16 @@ const search = async () => {
     const res = await searchBackupRecords(params);
     data.value = res.data.items || [];
     paginationConfig.total = res.data.total;
+};
+
+const onRecover = async (row: Backup.RecordInfo) => {
+    let params = {
+        websiteName: websiteName.value,
+        type: websiteType.value,
+        backupName: row.fileDir + '/' + row.fileName,
+    };
+    await RecoverWebsite(params);
+    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const onBackup = async () => {
@@ -124,12 +134,12 @@ const buttons = [
             onBatchDelete(row);
         },
     },
-    // {
-    //     label: i18n.global.t('commons.button.recover'),
-    //     click: (row: Backup.RecordInfo) => {
-    //         onRecover(row);
-    //     },
-    // },
+    {
+        label: i18n.global.t('commons.button.recover'),
+        click: (row: Backup.RecordInfo) => {
+            onRecover(row);
+        },
+    },
     {
         label: i18n.global.t('commons.button.download'),
         click: (row: Backup.RecordInfo) => {

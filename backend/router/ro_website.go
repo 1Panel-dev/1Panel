@@ -17,6 +17,7 @@ func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 	{
 		groupRouter.POST("", baseApi.CreateWebsite)
 		groupRouter.POST("/backup/:id", baseApi.BackupWebsite)
+		groupRouter.POST("/recover", baseApi.RecoverWebsite)
 		groupRouter.POST("/update", baseApi.UpdateWebSite)
 		groupRouter.GET("/:id", baseApi.GetWebSite)
 		groupRouter.GET("/:id/nginx", baseApi.GetWebSiteNginx)

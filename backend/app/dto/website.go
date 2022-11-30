@@ -51,6 +51,12 @@ type WebSiteDel struct {
 	DeleteBackup bool `json:"deleteBackup"`
 }
 
+type WebSiteRecover struct {
+	WebsiteName string `json:"websiteName" validate:"required"`
+	Type        string `json:"type" validate:"required"`
+	BackupName  string `json:"backupName" validate:"required"`
+}
+
 type WebSiteDTO struct {
 	model.WebSite
 }
