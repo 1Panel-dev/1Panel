@@ -38,6 +38,12 @@ export namespace WebSite {
         name: string;
     }
 
+    export interface WebSiteRecover {
+        websiteName: string;
+        type: string;
+        backupName: string;
+    }
+
     export interface WebSiteDel {
         id: number;
         deleteApp: boolean;

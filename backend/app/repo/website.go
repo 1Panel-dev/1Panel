@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -13,6 +14,12 @@ type WebSiteRepo struct {
 func (w WebSiteRepo) WithAppInstallId(appInstallId uint) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("app_install_id = ?", appInstallId)
+	}
+}
+
+func (w WebSiteRepo) WithByDomain(domain string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("primary_domain = ?", domain)
 	}
 }
 

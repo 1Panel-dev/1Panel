@@ -14,6 +14,9 @@ export const CreateWebsite = (req: WebSite.WebSiteCreateReq) => {
 export const BackupWebsite = (id: number) => {
     return http.post(`/websites/backup/${id}`);
 };
+export const RecoverWebsite = (req: WebSite.WebSiteRecover) => {
+    return http.post(`/websites/recover`, req);
+};
 
 export const UpdateWebsite = (req: WebSite.WebSiteUpdateReq) => {
     return http.post<any>(`/websites/update`, req);
