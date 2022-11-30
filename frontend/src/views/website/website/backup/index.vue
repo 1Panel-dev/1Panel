@@ -93,7 +93,7 @@ const onRecover = async (row: Backup.RecordInfo) => {
 };
 
 const onBackup = async () => {
-    await BackupWebsite(websiteID.value);
+    await BackupWebsite(websiteName.value);
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
     search();
 };

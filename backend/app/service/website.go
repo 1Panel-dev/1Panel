@@ -26,6 +26,20 @@ import (
 type WebsiteService struct {
 }
 
+type IWebsiteService interface {
+	PageWebSite(req dto.WebSiteReq) (int64, []dto.WebSiteDTO, error)
+	CreateWebsite(create dto.WebSiteCreate) error
+	GetWebsiteOptions() ([]string, error)
+	Backup(domain string) error
+	Recover(req dto.WebSiteRecover) error
+	UpdateWebsite(req dto.WebSiteUpdate) error
+	DeleteWebSite(req dto.WebSiteDel) error
+}
+
+func NewWebsiteService() IWebsiteService {
+	return &WebsiteService{}
+}
+
 func (w WebsiteService) PageWebSite(req dto.WebSiteReq) (int64, []dto.WebSiteDTO, error) {
 	var websiteDTOs []dto.WebSiteDTO
 	total, websites, err := websiteRepo.Page(req.Page, req.PageSize)
@@ -107,98 +121,28 @@ func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
 	return nil
 }
 
-func (w WebsiteService) Backup(id uint) error {
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
+func (w WebsiteService) GetWebsiteOptions() ([]string, error) {
+	webs, err := websiteRepo.GetBy()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	app, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
-	if err != nil {
-		return err
+	var datas []string
+	for _, web := range webs {
+		datas = append(datas, web.PrimaryDomain)
 	}
-	resource, err := appInstallResourceRepo.GetFirst(appInstallResourceRepo.WithAppInstallId(website.AppInstallID))
-	if err != nil {
-		return err
-	}
-	mysqlInfo, err := appInstallRepo.LoadBaseInfoByKey(resource.Key)
-	if err != nil {
-		return err
-	}
-	nginxInfo, err := appInstallRepo.LoadBaseInfoByKey("nginx")
-	if err != nil {
-		return err
-	}
-	db, err := mysqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
-	if err != nil {
-		return err
-	}
+	return datas, nil
+}
+
+func (w WebsiteService) Backup(domain string) error {
 	localDir, err := loadLocalDir()
 	if err != nil {
 		return err
 	}
-	name := fmt.Sprintf("%s_%s", website.PrimaryDomain, time.Now().Format("20060102150405"))
-	backupDir := fmt.Sprintf("website/%s/%s", website.PrimaryDomain, name)
-	fullDir := fmt.Sprintf("%s/%s", localDir, backupDir)
-	if _, err := os.Stat(fullDir); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(fullDir, os.ModePerm); err != nil {
-			if err != nil {
-				return fmt.Errorf("mkdir %s failed, err: %v", fullDir, err)
-			}
-		}
-	}
-	nginxConfFile := fmt.Sprintf("%s/nginx/%s/conf/conf.d/%s.conf", constant.AppInstallDir, nginxInfo.Name, website.PrimaryDomain)
-	src, err := os.OpenFile(nginxConfFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775)
-	if err != nil {
+	fileName := fmt.Sprintf("%s_%s", domain, time.Now().Format("20060102150405"))
+	backupDir := fmt.Sprintf("website/%s", domain)
+
+	if err := handleWebsiteBackup("LOCAL", localDir, backupDir, domain, fileName); err != nil {
 		return err
-	}
-	defer src.Close()
-	out, err := os.Create(fmt.Sprintf("%s/%s.conf", fullDir, website.PrimaryDomain))
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-	_, _ = io.Copy(out, src)
-
-	if website.Type == "deployment" {
-		dbFile := fmt.Sprintf("%s/%s.sql", fullDir, website.PrimaryDomain)
-		outfile, _ := os.OpenFile(dbFile, os.O_RDWR|os.O_CREATE, 0755)
-		cmd := exec.Command("docker", "exec", mysqlInfo.ContainerName, "mysqldump", "-uroot", "-p"+mysqlInfo.Password, db.Name)
-		cmd.Stdout = outfile
-		_ = cmd.Run()
-		_ = cmd.Wait()
-
-		websiteDir := fmt.Sprintf("%s/%s/%s", constant.AppInstallDir, app.App.Key, app.Name)
-		if err := handleTar(websiteDir, fullDir, fmt.Sprintf("%s.web.tar.gz", website.PrimaryDomain), ""); err != nil {
-			return err
-		}
-	} else {
-		websiteDir := fmt.Sprintf("%s/nginx/%s/www/%s", constant.AppInstallDir, nginxInfo.Name, website.PrimaryDomain)
-		if err := handleTar(websiteDir, fullDir, fmt.Sprintf("%s.web.tar.gz", website.PrimaryDomain), ""); err != nil {
-			return err
-		}
-	}
-	tarDir := fmt.Sprintf("%s/website/%s", localDir, website.PrimaryDomain)
-	tarName := fmt.Sprintf("%s.tar.gz", name)
-	itemDir := strings.ReplaceAll(fullDir[strings.LastIndex(fullDir, "/"):], "/", "")
-	aheadDir := strings.ReplaceAll(fullDir, itemDir, "")
-	tarcmd := exec.Command("tar", "zcvf", fullDir+".tar.gz", "-C", aheadDir, itemDir)
-	stdout, err := tarcmd.CombinedOutput()
-	if err != nil {
-		return errors.New(string(stdout))
-	}
-	_ = os.RemoveAll(fullDir)
-
-	record := &model.BackupRecord{
-		Type:       "website-" + website.Type,
-		Name:       website.PrimaryDomain,
-		DetailName: "",
-		Source:     "LOCAL",
-		BackupType: "LOCAL",
-		FileDir:    tarDir,
-		FileName:   tarName,
-	}
-	if err := backupRepo.CreateRecord(record); err != nil {
-		global.LOG.Errorf("save backup record failed, err: %v", err)
 	}
 	return nil
 }
@@ -576,4 +520,98 @@ func (w WebsiteService) OpWebsiteHTTPS(req dto.WebsiteHTTPSOp) (dto.WebsiteHTTPS
 
 	tx.Commit()
 	return res, nil
+}
+
+func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName string) error {
+	website, err := websiteRepo.GetFirst(websiteRepo.WithByDomain(domain))
+	if err != nil {
+		return err
+	}
+	app, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+	if err != nil {
+		return err
+	}
+	resource, err := appInstallResourceRepo.GetFirst(appInstallResourceRepo.WithAppInstallId(website.AppInstallID))
+	if err != nil {
+		return err
+	}
+	mysqlInfo, err := appInstallRepo.LoadBaseInfoByKey(resource.Key)
+	if err != nil {
+		return err
+	}
+	nginxInfo, err := appInstallRepo.LoadBaseInfoByKey("nginx")
+	if err != nil {
+		return err
+	}
+	db, err := mysqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
+	if err != nil {
+		return err
+	}
+
+	tmpDir := fmt.Sprintf("%s/%s/%s", baseDir, backupDir, backupName)
+	if _, err := os.Stat(tmpDir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(tmpDir, os.ModePerm); err != nil {
+			if err != nil {
+				return fmt.Errorf("mkdir %s failed, err: %v", tmpDir, err)
+			}
+		}
+	}
+	nginxConfFile := fmt.Sprintf("%s/nginx/%s/conf/conf.d/%s.conf", constant.AppInstallDir, nginxInfo.Name, website.PrimaryDomain)
+	src, err := os.OpenFile(nginxConfFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775)
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+	out, err := os.Create(fmt.Sprintf("%s/%s.conf", tmpDir, website.PrimaryDomain))
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	_, _ = io.Copy(out, src)
+
+	if website.Type == "deployment" {
+		dbFile := fmt.Sprintf("%s/%s.sql", tmpDir, website.PrimaryDomain)
+		outfile, _ := os.OpenFile(dbFile, os.O_RDWR|os.O_CREATE, 0755)
+		cmd := exec.Command("docker", "exec", mysqlInfo.ContainerName, "mysqldump", "-uroot", "-p"+mysqlInfo.Password, db.Name)
+		cmd.Stdout = outfile
+		_ = cmd.Run()
+		_ = cmd.Wait()
+
+		websiteDir := fmt.Sprintf("%s/%s/%s", constant.AppInstallDir, app.App.Key, app.Name)
+		if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.PrimaryDomain), ""); err != nil {
+			return err
+		}
+	} else {
+		websiteDir := fmt.Sprintf("%s/nginx/%s/www/%s", constant.AppInstallDir, nginxInfo.Name, website.PrimaryDomain)
+		if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.PrimaryDomain), ""); err != nil {
+			return err
+		}
+	}
+
+	itemDir := strings.ReplaceAll(tmpDir[strings.LastIndex(tmpDir, "/"):], "/", "")
+	aheadDir := strings.ReplaceAll(tmpDir, itemDir, "")
+	tarcmd := exec.Command("tar", "zcvf", tmpDir+".tar.gz", "-C", aheadDir, itemDir)
+	stdout, err := tarcmd.CombinedOutput()
+	if err != nil {
+		return errors.New(string(stdout))
+	}
+	_ = os.RemoveAll(tmpDir)
+
+	record := &model.BackupRecord{
+		Type:       "website-" + website.Type,
+		Name:       website.PrimaryDomain,
+		DetailName: "",
+		Source:     backupType,
+		BackupType: backupType,
+		FileDir:    backupDir,
+		FileName:   fmt.Sprintf("%s.tar.gz", backupName),
+	}
+	if baseDir != constant.TmpDir || backupType == "LOCAL" {
+		record.Source = "LOCAL"
+		record.FileDir = fmt.Sprintf("%s/%s", baseDir, backupDir)
+	}
+	if err := backupRepo.CreateRecord(record); err != nil {
+		global.LOG.Errorf("save backup record failed, err: %v", err)
+	}
+	return nil
 }

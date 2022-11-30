@@ -132,12 +132,21 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 	if _, ok := varMap["dir"]; !ok {
 		return "", errors.New("load local backup dir failed")
 	}
-	dir := fmt.Sprintf("%v/%s/%s/", varMap["dir"], cronjob.Type, cronjob.Name)
-	name := fmt.Sprintf("%s%s.tar.gz", dir, record.StartTime.Format("20060102150405"))
-	if cronjob.Type == "database" {
-		name = fmt.Sprintf("%s%s.gz", dir, record.StartTime.Format("20060102150405"))
+
+	switch cronjob.Type {
+	case "website":
+		return fmt.Sprintf("%v/website/%s/website_%s_%s.tar.gz", varMap["dir"], cronjob.Website, cronjob.Website, record.StartTime.Format("20060102150405")), nil
+	case "database":
+		mysqlInfo, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+		if err != nil {
+			return "", fmt.Errorf("load mysqlInfo failed, err: %v", err)
+		}
+		return fmt.Sprintf("%v/database/mysql/%s/%s/db_%s_%s.sql.gz", varMap["dir"], mysqlInfo.Name, cronjob.DBName, cronjob.DBName, record.StartTime.Format("20060102150405")), nil
+	case "directory":
+		return fmt.Sprintf("%v/%s/%s/%s.tar.gz", varMap["dir"], cronjob.Type, cronjob.Name, record.StartTime.Format("20060102150405")), nil
+	default:
+		return "", fmt.Errorf("not support type %s", cronjob.Type)
 	}
-	return name, nil
 }
 
 func (u *CronjobService) HandleOnce(id uint) error {

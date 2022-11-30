@@ -88,18 +88,25 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 		baseDir = constant.TmpDir
 	}
 
-	if cronjob.Type == "database" {
+	switch cronjob.Type {
+	case "database":
 		app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
 		if err != nil {
 			return "", err
 		}
-		fileName = fmt.Sprintf("db_%s_%s.sql.gz", cronjob.DBName, time.Now().Format("20060102150405"))
+		fileName = fmt.Sprintf("db_%s_%s.sql.gz", cronjob.DBName, startTime.Format("20060102150405"))
 		backupDir = fmt.Sprintf("database/mysql/%s/%s", app.Name, cronjob.DBName)
-		err = backupMysql(backup.Type, baseDir, backupDir, app.Name, cronjob.DBName, fileName)
-		if err != nil {
+		if err = backupMysql(backup.Type, baseDir, backupDir, app.Name, cronjob.DBName, fileName); err != nil {
 			return "", err
 		}
-	} else {
+	case "website":
+		fileName = fmt.Sprintf("website_%s_%s", cronjob.Website, startTime.Format("20060102150405"))
+		backupDir = fmt.Sprintf("website/%s", cronjob.Website)
+		if err := handleWebsiteBackup(backup.Type, baseDir, backupDir, cronjob.Website, fileName); err != nil {
+			return "", err
+		}
+		fileName = fileName + ".tar.gz"
+	default:
 		fileName = fmt.Sprintf("%s.tar.gz", startTime.Format("20060102150405"))
 		backupDir = fmt.Sprintf("%s/%s", cronjob.Type, cronjob.Name)
 		if err := handleTar(cronjob.SourceDir, baseDir+"/"+backupDir, fileName, cronjob.ExclusionRules); err != nil {

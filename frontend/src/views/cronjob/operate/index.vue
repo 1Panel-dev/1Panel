@@ -70,12 +70,7 @@
                     style="width: 100%"
                     v-model="dialogData.rowData!.website"
                 >
-                    <el-option
-                        v-for="item in websiteOptions"
-                        :key="item.label"
-                        :value="item.value"
-                        :label="item.label"
-                    />
+                    <el-option v-for="item in websiteOptions" :key="item" :value="item" :label="item" />
                 </el-select>
             </el-form-item>
 
@@ -117,7 +112,7 @@
                 </el-form-item>
                 <el-form-item v-if="dialogData.rowData!.targetDirID !== localDirID">
                     <el-checkbox v-model="dialogData.rowData!.keepLocal">
-                        同时保留本地备份（和云存储保留份数一致）
+                        {{ $t('cronjob.saveLocal') }}
                     </el-checkbox>
                 </el-form-item>
                 <el-form-item :label="$t('cronjob.retainCopies')" prop="retainCopies">
@@ -171,6 +166,7 @@ import { Cronjob } from '@/api/interface/cronjob';
 import { addCronjob, editCronjob } from '@/api/modules/cronjob';
 import { loadDBNames } from '@/api/modules/database';
 import { CheckAppInstalled } from '@/api/modules/app';
+import { GetWebsiteOptions } from '@/api/modules/website';
 
 interface DialogProps {
     title: string;
@@ -188,15 +184,12 @@ const acceptParams = (params: DialogProps): void => {
     cronjobVisiable.value = true;
     checkMysqlInstalled();
     loadBackups();
+    loadWebsites();
 };
 
 const localDirID = ref();
 
-const websiteOptions = ref([
-    { label: '所有', value: 'all' },
-    { label: '网站1', value: 'web1' },
-    { label: '网站2', value: 'web2' },
-]);
+const websiteOptions = ref();
 const backupOptions = ref();
 
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -308,6 +301,11 @@ const loadBackups = async () => {
         }
         backupOptions.value.push({ label: loadBackupName(item.type), value: item.id });
     }
+};
+
+const loadWebsites = async () => {
+    const res = await GetWebsiteOptions();
+    websiteOptions.value = res.data;
 };
 
 const checkMysqlInstalled = async () => {

@@ -443,6 +443,7 @@ export default {
         directory: 'Backup directory',
         sourceDir: 'Backup directory',
         exclusionRules: 'Exclusive rule',
+        saveLocal: 'Retain local backups (the same as the number of cloud storage copies)',
         url: 'URL Address',
         target: 'Target',
         retainCopies: 'Retain copies',

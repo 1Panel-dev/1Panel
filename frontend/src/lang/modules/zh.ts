@@ -457,6 +457,7 @@ export default {
         directory: '备份目录',
         sourceDir: '备份目录',
         exclusionRules: '排除规则',
+        saveLocal: '同时保留本地备份（和云存储保留份数一致）',
         url: 'URL 地址',
         target: '备份到',
         retainCopies: '保留份数',
