@@ -73,7 +73,7 @@ func (s *Server) UpdateDirective(key string, params []string) {
 	if key == "" || len(params) == 0 {
 		return
 	}
-	directives := s.GetDirectives()
+	directives := s.Directives
 	index := -1
 	for i, dir := range directives {
 		if dir.GetName() == key {
@@ -100,13 +100,13 @@ func (s *Server) UpdateDirective(key string, params []string) {
 }
 
 func (s *Server) RemoveDirective(key string, params []string) {
-	directives := s.GetDirectives()
+	directives := s.Directives
 	var newDirectives []IDirective
 	for _, dir := range directives {
 		if dir.GetName() == key {
-			if IsRepeatKey(key) {
+			if IsRepeatKey(key) && len(params) > 0 {
 				oldParams := dir.GetParameters()
-				if len(oldParams) > 0 && oldParams[0] == params[0] {
+				if oldParams[0] == params[0] {
 					continue
 				}
 			} else {

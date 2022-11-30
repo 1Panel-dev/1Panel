@@ -4,7 +4,6 @@ export namespace Nginx {
     }
     export interface NginxParam {
         name: string;
-        secondKey: string;
         params: string[];
     }
 
