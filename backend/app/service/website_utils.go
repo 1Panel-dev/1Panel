@@ -5,7 +5,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
@@ -13,9 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/cmd/server/nginx_conf"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
-	"os"
 	"path"
-	"reflect"
 	"strconv"
 	"strings"
 )
@@ -90,6 +87,9 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.WebSite) 
 		if err := fileOp.CreateDir(path.Join(siteFolder, "data"), 0755); err != nil {
 			return err
 		}
+		if err := fileOp.CreateDir(path.Join(siteFolder, "ssl"), 0755); err != nil {
+			return err
+		}
 	}
 	return fileOp.CopyDir(path.Join(nginxFolder, "www", "common", "waf", "rules"), path.Join(siteFolder, "waf", "rules"))
 }
@@ -125,7 +125,7 @@ func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) e
 	server.UpdateDirective("access_log", []string{path.Join(siteFolder, "log", "access.log")})
 	server.UpdateDirective("access_by_lua_file", []string{path.Join(commonFolder, "waf", "access.lua")})
 	server.UpdateDirective("set", []string{"$RulePath", path.Join(siteFolder, "waf", "rules")})
-	server.UpdateDirective("set", []string{"$logdir", path.Join(siteFolder, "waf", "log")})
+	server.UpdateDirective("set", []string{"$logdir", path.Join(siteFolder, "log")})
 
 	if website.Type == "deployment" {
 		appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
@@ -148,17 +148,6 @@ func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) e
 		return err
 	}
 	return opNginx(nginxInstall.ContainerName, constant.NginxReload)
-}
-
-func opNginx(containerName, operate string) error {
-	nginxCmd := fmt.Sprintf("docker exec -i %s %s", containerName, "nginx -s reload")
-	if operate == constant.NginxCheck {
-		nginxCmd = fmt.Sprintf("docker exec -i %s %s", containerName, "nginx -t")
-	}
-	if out, err := cmd.Exec(nginxCmd); err != nil {
-		return errors.New(out)
-	}
-	return nil
 }
 
 func delNginxConfig(website model.WebSite) error {
@@ -188,51 +177,14 @@ func delNginxConfig(website model.WebSite) error {
 	return opNginx(nginxInstall.ContainerName, "reload")
 }
 
-func nginxCheckAndReload(oldContent string, filePath string, containerName string) error {
-
-	if err := opNginx(containerName, constant.NginxCheck); err != nil {
-		_ = files.NewFileOp().WriteFile(filePath, strings.NewReader(oldContent), 0644)
-		return err
-	}
-
-	if err := opNginx(containerName, constant.NginxReload); err != nil {
-		_ = files.NewFileOp().WriteFile(filePath, strings.NewReader(oldContent), 0644)
-		return err
-	}
-
-	return nil
-}
-
-func getNginxConfig(alias string) (dto.NginxConfig, error) {
-	var nginxConfig dto.NginxConfig
-
-	nginxInstall, err := getAppInstallByKey("nginx")
-	if err != nil {
-		return nginxConfig, err
-	}
-
-	configPath := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "conf", "conf.d", alias+".conf")
-	content, err := os.ReadFile(configPath)
-	if err != nil {
-		return nginxConfig, err
-	}
-	config := parser.NewStringParser(string(content)).Parse()
-	config.FilePath = configPath
-	nginxConfig.Config = config
-	nginxConfig.OldContent = string(content)
-	nginxConfig.ContainerName = nginxInstall.ContainerName
-	nginxConfig.FilePath = configPath
-
-	return nginxConfig, nil
-}
-
 func addListenAndServerName(website model.WebSite, ports []int, domains []string) error {
 
-	nginxConfig, err := getNginxConfig(website.Alias)
+	nginxFull, err := getNginxFull(&website)
 	if err != nil {
 		return nil
 	}
-	config := nginxConfig.Config
+	nginxConfig := nginxFull.SiteConfig
+	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
 	for _, port := range ports {
 		server.AddListen(strconv.Itoa(port), false)
@@ -243,16 +195,17 @@ func addListenAndServerName(website model.WebSite, ports []int, domains []string
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
-	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxConfig.ContainerName)
+	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxFull.Install.ContainerName)
 }
 
 func deleteListenAndServerName(website model.WebSite, ports []int, domains []string) error {
 
-	nginxConfig, err := getNginxConfig(website.Alias)
+	nginxFull, err := getNginxFull(&website)
 	if err != nil {
 		return nil
 	}
-	config := nginxConfig.Config
+	nginxConfig := nginxFull.SiteConfig
+	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
 	for _, port := range ports {
 		server.DeleteListen(strconv.Itoa(port))
@@ -264,77 +217,7 @@ func deleteListenAndServerName(website model.WebSite, ports []int, domains []str
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
-	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxConfig.ContainerName)
-}
-
-func getNginxConfigByKeys(website model.WebSite, keys []string) ([]dto.NginxParam, error) {
-	nginxConfig, err := getNginxConfig(website.Alias)
-	if err != nil {
-		return nil, err
-	}
-	config := nginxConfig.Config
-	server := config.FindServers()[0]
-
-	var res []dto.NginxParam
-	for _, key := range keys {
-		dirs := server.FindDirectives(key)
-		for _, dir := range dirs {
-			nginxParam := dto.NginxParam{
-				Name:   dir.GetName(),
-				Params: dir.GetParameters(),
-			}
-			res = append(res, nginxParam)
-		}
-	}
-	return res, nil
-}
-
-func updateNginxConfig(website model.WebSite, params []dto.NginxParam, scope dto.NginxKey) error {
-	nginxConfig, err := getNginxConfig(website.Alias)
-	if err != nil {
-		return err
-	}
-	config := nginxConfig.Config
-	updateConfig(config, scope)
-	server := config.FindServers()[0]
-	for _, p := range params {
-		server.UpdateDirective(p.Name, p.Params)
-	}
-	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-		return err
-	}
-	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxConfig.ContainerName)
-}
-
-func updateConfig(config *components.Config, scope dto.NginxKey) {
-	newConfig := &components.Config{}
-	switch scope {
-	case dto.LimitConn:
-		newConfig = parser.NewStringParser(string(nginx_conf.Limit)).Parse()
-	}
-	if reflect.DeepEqual(newConfig, &components.Config{}) {
-		return
-	}
-
-	for _, dir := range newConfig.GetDirectives() {
-		config.UpdateDirective(dir.GetName(), dir.GetParameters())
-	}
-}
-
-func getNginxParamsFromStaticFile(scope dto.NginxKey) []dto.NginxParam {
-	var nginxParams []dto.NginxParam
-	newConfig := &components.Config{}
-	switch scope {
-	case dto.SSL:
-		newConfig = parser.NewStringParser(string(nginx_conf.SSL)).Parse()
-	}
-	for _, dir := range newConfig.GetDirectives() {
-		nginxParams = append(nginxParams, dto.NginxParam{
-			Name:   dir.GetName(),
-			Params: dir.GetParameters(),
-		})
-	}
-	return nginxParams
+	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxFull.Install.ContainerName)
 }
 
 func getKeysFromStaticFile(scope dto.NginxKey) []string {
@@ -350,30 +233,6 @@ func getKeysFromStaticFile(scope dto.NginxKey) []string {
 	return res
 }
 
-func deleteNginxConfig(website model.WebSite, scope string, keys []string) error {
-	nginxConfig, err := getNginxConfig(website.Alias)
-	if err != nil {
-		return err
-	}
-	config := nginxConfig.Config
-	if scope == constant.NginxScopeHttp {
-		http := config.FindHttp()
-		for _, key := range keys {
-			http.RemoveDirective(key, []string{})
-		}
-	}
-	if scope == constant.NginxScopeServer {
-		server := config.FindServers()[0]
-		for _, key := range keys {
-			server.RemoveDirective(key, []string{})
-		}
-	}
-	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-		return err
-	}
-	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxConfig.ContainerName)
-}
-
 func createPemFile(website model.WebSite, websiteSSL model.WebSiteSSL) error {
 	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
 	if err != nil {
@@ -384,7 +243,7 @@ func createPemFile(website model.WebSite, websiteSSL model.WebSiteSSL) error {
 		return err
 	}
 
-	configDir := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "ssl", website.Alias)
+	configDir := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "www", "sites", website.Alias, "ssl")
 	fileOp := files.NewFileOp()
 
 	if !fileOp.Stat(configDir) {
@@ -418,11 +277,11 @@ func createPemFile(website model.WebSite, websiteSSL model.WebSiteSSL) error {
 
 func applySSL(website model.WebSite, websiteSSL model.WebSiteSSL) error {
 
-	nginxConfig, err := getNginxConfig(website.Alias)
+	nginxFull, err := getNginxFull(&website)
 	if err != nil {
 		return nil
 	}
-	config := nginxConfig.Config
+	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
 	server.UpdateListen("443", false, "ssl")
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
@@ -432,16 +291,16 @@ func applySSL(website model.WebSite, websiteSSL model.WebSiteSSL) error {
 	if err := createPemFile(website, websiteSSL); err != nil {
 		return err
 	}
-	nginxParams := getNginxParamsFromStaticFile(dto.SSL)
+	nginxParams := getNginxParamsFromStaticFile(dto.SSL, []dto.NginxParam{})
 	for i, param := range nginxParams {
 		if param.Name == "ssl_certificate" {
-			nginxParams[i].Params = []string{path.Join("/etc/nginx/ssl", website.Alias, "fullchain.pem")}
+			nginxParams[i].Params = []string{path.Join("/www", "sites", website.Alias, "ssl", "fullchain.pem")}
 		}
 		if param.Name == "ssl_certificate_key" {
-			nginxParams[i].Params = []string{path.Join("/etc/nginx/ssl", website.Alias, "privkey.pem")}
+			nginxParams[i].Params = []string{path.Join("/www", "sites", website.Alias, "ssl", "privkey.pem")}
 		}
 	}
-	if err := updateNginxConfig(website, nginxParams, dto.SSL); err != nil {
+	if err := updateNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
 		return err
 	}
 
