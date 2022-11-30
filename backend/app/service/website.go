@@ -1,8 +1,10 @@
 package service
 
 import (
+	"bufio"
 	"context"
 	"crypto/x509"
+	"encoding/json"
 	"encoding/pem"
 	"fmt"
 	"io"
@@ -522,6 +524,11 @@ func (w WebsiteService) OpWebsiteHTTPS(req dto.WebsiteHTTPSOp) (dto.WebsiteHTTPS
 	return res, nil
 }
 
+type WebSiteInfo struct {
+	WebsiteName string `json:"websiteName"`
+	WebsiteType string `json:"websiteType"`
+}
+
 func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName string) error {
 	website, err := websiteRepo.GetFirst(websiteRepo.WithByDomain(domain))
 	if err != nil {
@@ -556,18 +563,12 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 			}
 		}
 	}
-	nginxConfFile := fmt.Sprintf("%s/nginx/%s/conf/conf.d/%s.conf", constant.AppInstallDir, nginxInfo.Name, website.PrimaryDomain)
-	src, err := os.OpenFile(nginxConfFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775)
-	if err != nil {
+	if err := saveNginxConf(nginxInfo.Name, website.PrimaryDomain, tmpDir); err != nil {
 		return err
 	}
-	defer src.Close()
-	out, err := os.Create(fmt.Sprintf("%s/%s.conf", tmpDir, website.PrimaryDomain))
-	if err != nil {
+	if err := saveWebsiteJson(&website, tmpDir); err != nil {
 		return err
 	}
-	defer out.Close()
-	_, _ = io.Copy(out, src)
 
 	if website.Type == "deployment" {
 		dbFile := fmt.Sprintf("%s/%s.sql", tmpDir, website.PrimaryDomain)
@@ -587,13 +588,8 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 			return err
 		}
 	}
-
-	itemDir := strings.ReplaceAll(tmpDir[strings.LastIndex(tmpDir, "/"):], "/", "")
-	aheadDir := strings.ReplaceAll(tmpDir, itemDir, "")
-	tarcmd := exec.Command("tar", "zcvf", tmpDir+".tar.gz", "-C", aheadDir, itemDir)
-	stdout, err := tarcmd.CombinedOutput()
-	if err != nil {
-		return errors.New(string(stdout))
+	if err := handleTar(tmpDir, fmt.Sprintf("%s/%s", baseDir, backupDir), backupName+".tar.gz", ""); err != nil {
+		return err
 	}
 	_ = os.RemoveAll(tmpDir)
 
@@ -613,5 +609,39 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 	if err := backupRepo.CreateRecord(record); err != nil {
 		global.LOG.Errorf("save backup record failed, err: %v", err)
 	}
+	return nil
+}
+
+func saveWebsiteJson(website *model.WebSite, tmpDir string) error {
+	var WebSiteInfo WebSiteInfo
+	WebSiteInfo.WebsiteType = website.Type
+	WebSiteInfo.WebsiteName = website.PrimaryDomain
+	remarkInfo, _ := json.Marshal(WebSiteInfo)
+	path := fmt.Sprintf("%s/website.json", tmpDir)
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	write := bufio.NewWriter(file)
+	_, _ = write.WriteString(string(remarkInfo))
+	write.Flush()
+	return nil
+}
+
+func saveNginxConf(nginxName, websiteDomain, tmpDir string) error {
+	nginxConfFile := fmt.Sprintf("%s/nginx/%s/conf/conf.d/%s.conf", constant.AppInstallDir, nginxName, websiteDomain)
+	src, err := os.OpenFile(nginxConfFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775)
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+	out, err := os.Create(fmt.Sprintf("%s/%s.conf", tmpDir, websiteDomain))
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	_, _ = io.Copy(out, src)
+
 	return nil
 }
