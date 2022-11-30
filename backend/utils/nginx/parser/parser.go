@@ -88,6 +88,7 @@ func (p *Parser) parseBlock() *components.Block {
 	context := &components.Block{
 		Comment:    "",
 		Directives: make([]components.IDirective, 0),
+		Line:       p.currentToken.Line,
 	}
 
 parsingloop:
@@ -100,6 +101,7 @@ parsingloop:
 		case p.curTokenIs(flag.Comment):
 			context.Directives = append(context.Directives, &components.Comment{
 				Detail: p.currentToken.Literal,
+				Line:   p.currentToken.Line,
 			})
 		}
 		p.nextToken()
@@ -111,6 +113,7 @@ parsingloop:
 func (p *Parser) parseStatement() components.IDirective {
 	d := &components.Directive{
 		Name: p.currentToken.Literal,
+		Line: p.currentToken.Line,
 	}
 
 	for p.nextToken(); p.currentToken.IsParameterEligible(); p.nextToken() {

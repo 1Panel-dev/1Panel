@@ -3,10 +3,10 @@ package components
 type IBlock interface {
 	GetDirectives() []IDirective
 	FindDirectives(directiveName string) []IDirective
-	UpdateDirectives(directiveName string, directive Directive)
-	AddDirectives(directive Directive)
-	RemoveDirectives(names []string)
+	RemoveDirective(name string, params []string)
+	UpdateDirective(name string, params []string)
 	GetComment() string
+	GetLine() int
 }
 
 type IDirective interface {
@@ -14,12 +14,5 @@ type IDirective interface {
 	GetParameters() []string
 	GetBlock() IBlock
 	GetComment() string
-}
-
-type FileDirective interface {
-	isFileDirective()
-}
-
-type IncludeDirective interface {
-	FileDirective
+	GetLine() int
 }

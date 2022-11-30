@@ -9,6 +9,7 @@ type Upstream struct {
 	UpstreamServers []*UpstreamServer
 	Directives      []IDirective
 	Comment         string
+	Line            int
 }
 
 func (us *Upstream) GetName() string {
@@ -33,7 +34,6 @@ func (us *Upstream) GetDirectives() []IDirective {
 	for _, uss := range us.UpstreamServers {
 		directives = append(directives, uss)
 	}
-
 	return directives
 }
 
@@ -41,6 +41,7 @@ func NewUpstream(directive IDirective) (*Upstream, error) {
 	parameters := directive.GetParameters()
 	us := &Upstream{
 		UpstreamName: parameters[0],
+		Line:         directive.GetLine(),
 	}
 
 	if block := directive.GetBlock(); block != nil {
@@ -76,35 +77,55 @@ func (us *Upstream) FindDirectives(directiveName string) []IDirective {
 	return directives
 }
 
-func (us *Upstream) UpdateDirectives(directiveName string, directive Directive) {
-	directives := make([]IDirective, 0)
-	for _, dir := range us.GetDirectives() {
-		if dir.GetName() == directiveName {
-			directives = append(directives, &directive)
-		} else {
-			directives = append(directives, dir)
+func (us *Upstream) UpdateDirective(key string, params []string) {
+	if key == "" || len(params) == 0 {
+		return
+	}
+	directives := us.GetDirectives()
+	index := -1
+	for i, dir := range directives {
+		if dir.GetName() == key {
+			if IsRepeatKey(key) {
+				oldParams := dir.GetParameters()
+				if !(len(oldParams) > 0 && oldParams[0] == params[0]) {
+					continue
+				}
+			}
+			index = i
+			break
 		}
 	}
-	us.Directives = directives
-}
-
-func (us *Upstream) AddDirectives(directive Directive) {
-	directives := append(us.GetDirectives(), &directive)
-	us.Directives = directives
-}
-
-func (us *Upstream) RemoveDirectives(names []string) {
-	nameMaps := make(map[string]struct{}, len(names))
-	for _, name := range names {
-		nameMaps[name] = struct{}{}
+	newDirective := &Directive{
+		Name:       key,
+		Parameters: params,
 	}
+	if index > -1 {
+		directives[index] = newDirective
+	} else {
+		directives = append(directives, newDirective)
+	}
+	us.Directives = directives
+}
+
+func (us *Upstream) RemoveDirective(key string, params []string) {
 	directives := us.GetDirectives()
 	var newDirectives []IDirective
 	for _, dir := range directives {
-		if _, ok := nameMaps[dir.GetName()]; ok {
-			continue
+		if dir.GetName() == key {
+			if IsRepeatKey(key) {
+				oldParams := dir.GetParameters()
+				if len(oldParams) > 0 && oldParams[0] == params[0] {
+					continue
+				}
+			} else {
+				continue
+			}
 		}
 		newDirectives = append(newDirectives, dir)
 	}
 	us.Directives = newDirectives
+}
+
+func (us *Upstream) GetLine() int {
+	return us.Line
 }

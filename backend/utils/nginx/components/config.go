@@ -36,3 +36,17 @@ func (c *Config) FindHttp() *Http {
 
 	return http
 }
+
+var repeatKeys = map[string]struct {
+}{
+	"limit_conn":      {},
+	"limit_conn_zone": {},
+	"set":             {},
+}
+
+func IsRepeatKey(key string) bool {
+	if _, ok := repeatKeys[key]; ok {
+		return true
+	}
+	return false
+}

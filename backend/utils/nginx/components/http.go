@@ -8,6 +8,7 @@ type Http struct {
 	Comment    string
 	Servers    []*Server
 	Directives []IDirective
+	Line       int
 }
 
 func (h *Http) GetComment() string {
@@ -17,11 +18,11 @@ func (h *Http) GetComment() string {
 func NewHttp(directive IDirective) (*Http, error) {
 	if block := directive.GetBlock(); block != nil {
 		http := &Http{
+			Line:       directive.GetBlock().GetLine(),
 			Servers:    []*Server{},
 			Directives: []IDirective{},
 			Comment:    block.GetComment(),
 		}
-
 		for _, directive := range block.GetDirectives() {
 			if server, ok := directive.(*Server); ok {
 				http.Servers = append(http.Servers, server)
@@ -66,38 +67,49 @@ func (h *Http) FindDirectives(directiveName string) []IDirective {
 	return directives
 }
 
-func (h *Http) UpdateDirectives(directiveName string, directive Directive) {
-	directives := h.Directives
+func (h *Http) UpdateDirective(key string, params []string) {
+	if key == "" || len(params) == 0 {
+		return
+	}
+	directives := h.GetDirectives()
 	index := -1
 	for i, dir := range directives {
-		if dir.GetName() == directiveName {
+		if dir.GetName() == key {
+			if IsRepeatKey(key) {
+				oldParams := dir.GetParameters()
+				if !(len(oldParams) > 0 && oldParams[0] == params[0]) {
+					continue
+				}
+			}
 			index = i
 			break
 		}
 	}
+	newDirective := &Directive{
+		Name:       key,
+		Parameters: params,
+	}
 	if index > -1 {
-		directives[index] = &directive
+		directives[index] = newDirective
 	} else {
-		directives = append(directives, &directive)
+		directives = append(directives, newDirective)
 	}
 	h.Directives = directives
 }
 
-func (h *Http) AddDirectives(directive Directive) {
-	directives := append(h.GetDirectives(), &directive)
-	h.Directives = directives
-}
-
-func (h *Http) RemoveDirectives(names []string) {
-	nameMaps := make(map[string]struct{}, len(names))
-	for _, name := range names {
-		nameMaps[name] = struct{}{}
-	}
+func (h *Http) RemoveDirective(key string, params []string) {
 	directives := h.GetDirectives()
 	var newDirectives []IDirective
 	for _, dir := range directives {
-		if _, ok := nameMaps[dir.GetName()]; ok {
-			continue
+		if dir.GetName() == key {
+			if IsRepeatKey(key) {
+				oldParams := dir.GetParameters()
+				if len(oldParams) > 0 && oldParams[0] == params[0] {
+					continue
+				}
+			} else {
+				continue
+			}
 		}
 		newDirectives = append(newDirectives, dir)
 	}
@@ -108,19 +120,6 @@ func (h *Http) GetBlock() IBlock {
 	return h
 }
 
-func (h *Http) UpdateDirectiveBySecondKey(name string, key string, directive Directive) {
-	directives := h.Directives
-	index := -1
-	for i, dir := range directives {
-		if dir.GetName() == name && dir.GetParameters()[0] == key {
-			index = i
-			break
-		}
-	}
-	if index > -1 {
-		directives[index] = &directive
-	} else {
-		directives = append(directives, &directive)
-	}
-	h.Directives = directives
+func (h *Http) GetLine() int {
+	return h.Line
 }

@@ -12,11 +12,13 @@ type ServerListen struct {
 	DefaultServer string
 	Parameters    []string
 	Comment       string
+	Line          int
 }
 
-func NewServerListen(params []string) *ServerListen {
+func NewServerListen(params []string, line int) *ServerListen {
 	server := &ServerListen{
 		Parameters: []string{},
+		Line:       line,
 	}
 	for _, param := range params {
 		if isBind(param) {
@@ -65,4 +67,8 @@ func (sl *ServerListen) AddDefaultServer() {
 
 func (sl *ServerListen) RemoveDefaultServe() {
 	sl.DefaultServer = ""
+}
+
+func (sl *ServerListen) GetLine() int {
+	return sl.Line
 }
