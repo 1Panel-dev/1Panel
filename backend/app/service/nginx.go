@@ -41,7 +41,7 @@ func (n NginxService) GetConfigByScope(req dto.NginxScopeReq) ([]dto.NginxParam,
 		return nil, nil
 	}
 
-	return getHttpConfigByKeys(keys)
+	return getNginxParamsByKeys(constant.NginxScopeHttp, keys, nil)
 }
 
 func (n NginxService) UpdateConfigByScope(req dto.NginxConfigReq) error {
@@ -49,7 +49,7 @@ func (n NginxService) UpdateConfigByScope(req dto.NginxConfigReq) error {
 	if !ok || len(keys) == 0 {
 		return nil
 	}
-	return updateHttpNginxConfig(getNginxParams(req.Params, keys))
+	return updateNginxConfig(constant.NginxScopeHttp, getNginxParams(req.Params, keys), nil)
 }
 
 func (n NginxService) GetStatus() (dto.NginxStatus, error) {

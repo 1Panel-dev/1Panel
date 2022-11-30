@@ -10,7 +10,7 @@ import (
 
 var (
 	IndentedStyle = &Style{
-		SpaceBeforeBlocks: true,
+		SpaceBeforeBlocks: false,
 		StartIndent:       0,
 		Indent:            4,
 	}

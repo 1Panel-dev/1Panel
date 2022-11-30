@@ -105,3 +105,8 @@ type WebsiteHTTPSOp struct {
 	PrivateKey   string  `json:"privateKey"`
 	Certificate  string  `json:"certificate"`
 }
+
+type WebsiteNginxConfig struct {
+	Enable bool         `json:"enable"`
+	Params []NginxParam `json:"params"`
+}

@@ -110,6 +110,11 @@ export namespace WebSite {
         params: string[];
     }
 
+    export interface NginxScopeConfig {
+        enable: boolean;
+        params: NginxParam[];
+    }
+
     export interface DnsAccount extends CommonModel {
         name: string;
         type: string;

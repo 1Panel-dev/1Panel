@@ -64,9 +64,12 @@ const search = (req: WebSite.NginxConfigReq) => {
     loading.value = true;
     GetNginxConfig(req)
         .then((res) => {
-            if (res.data && res.data.length > 0) {
-                enable.value = true;
-                for (const param of res.data) {
+            if (res.data) {
+                enable.value = res.data.enable;
+                if (res.data.enable == false) {
+                    req.operate = 'add';
+                }
+                for (const param of res.data.params) {
                     if (param.name === 'limit_conn') {
                         if (param.params[0] === 'perserver') {
                             form.perserver = Number(param.params[1]);
@@ -79,9 +82,6 @@ const search = (req: WebSite.NginxConfigReq) => {
                         form.rate = Number(param.params[0].match(/\d+/g));
                     }
                 }
-            } else {
-                enable.value = false;
-                req.operate = 'add';
             }
         })
         .finally(() => {
@@ -125,7 +125,7 @@ const changeEnable = () => {
     } else {
         req.operate = 'add';
     }
-    submit(limitForm.value);
+    // submit(limitForm.value);
 };
 
 onMounted(() => {

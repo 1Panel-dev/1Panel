@@ -321,7 +321,7 @@ func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
 	return websiteDomainRepo.DeleteBy(context.TODO(), commonRepo.WithByID(domainId))
 }
 
-func (w WebsiteService) GetNginxConfigByScope(req dto.NginxConfigReq) ([]dto.NginxParam, error) {
+func (w WebsiteService) GetNginxConfigByScope(req dto.NginxConfigReq) (*dto.WebsiteNginxConfig, error) {
 
 	keys, ok := dto.ScopeKeyMap[req.Scope]
 	if !ok || len(keys) == 0 {
@@ -332,8 +332,15 @@ func (w WebsiteService) GetNginxConfigByScope(req dto.NginxConfigReq) ([]dto.Ngi
 	if err != nil {
 		return nil, err
 	}
+	var config dto.WebsiteNginxConfig
+	params, err := getNginxParamsByKeys(constant.NginxScopeServer, keys, &website)
+	if err != nil {
+		return nil, err
+	}
+	config.Params = params
+	config.Enable = len(params[0].Params) > 0
 
-	return getNginxConfigByKeys(website, keys)
+	return &config, nil
 }
 
 func (w WebsiteService) UpdateNginxConfigByScope(req dto.NginxConfigReq) error {
@@ -347,10 +354,15 @@ func (w WebsiteService) UpdateNginxConfigByScope(req dto.NginxConfigReq) error {
 		return err
 	}
 	if req.Operate == dto.ConfigDel {
-		return deleteNginxConfig(website, constant.NginxScopeServer, keys)
+		return deleteNginxConfig(constant.NginxScopeServer, keys, &website)
 	}
-
-	return updateNginxConfig(website, getNginxParams(req.Params, keys), req.Scope)
+	params := getNginxParams(req.Params, keys)
+	if req.Operate == dto.ConfigNew {
+		if _, ok := dto.StaticFileKeyMap[req.Scope]; ok {
+			params = getNginxParamsFromStaticFile(req.Scope, params)
+		}
+	}
+	return updateNginxConfig(constant.NginxScopeServer, params, &website)
 }
 
 func (w WebsiteService) GetWebsiteNginxConfig(websiteId uint) (dto.FileInfo, error) {
@@ -468,7 +480,7 @@ func (w WebsiteService) OpWebsiteHTTPS(req dto.WebsiteHTTPSOp) (dto.WebsiteHTTPS
 			return dto.WebsiteHTTPS{}, err
 		}
 
-		if err := deleteNginxConfig(website, constant.NginxScopeServer, getKeysFromStaticFile(dto.SSL)); err != nil {
+		if err := deleteNginxConfig(constant.NginxScopeServer, getKeysFromStaticFile(dto.SSL), &website); err != nil {
 			return dto.WebsiteHTTPS{}, err
 		}
 	}

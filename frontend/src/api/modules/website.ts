@@ -70,7 +70,7 @@ export const CreateDomain = (req: WebSite.DomainCreate) => {
 };
 
 export const GetNginxConfig = (req: WebSite.NginxConfigReq) => {
-    return http.post<WebSite.NginxParam[]>(`/websites/config`, req);
+    return http.post<WebSite.NginxScopeConfig>(`/websites/config`, req);
 };
 
 export const UpdateNginxConfig = (req: WebSite.NginxConfigReq) => {
