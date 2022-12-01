@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -88,7 +89,7 @@ func checkPort(key string, params map[string]interface{}) (int, error) {
 	if ok {
 		portN := int(math.Ceil(port.(float64)))
 		if common.ScanPort(portN) {
-			return portN, errors.New("port is in used")
+			return portN, buserr.New(constant.ErrPortInUsed, portN, nil)
 		} else {
 			return portN, nil
 		}

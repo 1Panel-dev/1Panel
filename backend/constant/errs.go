@@ -41,3 +41,8 @@ var (
 	ErrTypePasswordExpired = "ErrPasswordExpired"
 	ErrTypeNotSafety       = "ErrNotSafety"
 )
+
+// app
+var (
+	ErrPortInUsed = "ErrPortInUsed"
+)
