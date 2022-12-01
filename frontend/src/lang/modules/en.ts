@@ -695,6 +695,9 @@ export default {
         author: 'author',
         source: 'source',
         sync: 'sync',
+        supportUpType: '.tar.gz files are supported only',
+        zipFormat:
+            '.tar.gz compressed package structure: test.tar.gz compressed package must contain the website.json file',
         appName: 'App Name',
         status: 'status',
         container: 'Container',

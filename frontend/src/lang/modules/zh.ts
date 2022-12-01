@@ -739,6 +739,8 @@ export default {
         type: '类型',
         static: '静态网站',
         deployment: '反向代理',
+        supportUpType: '仅支持 tar.gz 文件',
+        zipFormat: 'tar.gz 压缩包结构：test.tar.gz 压缩包内，必需包含 website.json 文件',
         proxy: '反向代理',
         alias: '代号',
         remark: '备注',
