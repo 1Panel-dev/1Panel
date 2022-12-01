@@ -169,10 +169,6 @@ export namespace Database {
         createdAt: string;
         size: string;
     }
-    export interface FileRecordDelete {
-        fileDir: string;
-        names: Array<string>;
-    }
     export interface RedisRecover {
         fileName: string;
         fileDir: string;

@@ -34,6 +34,11 @@ type FileDelete struct {
 	IsDir bool
 }
 
+type FileBatchDelete struct {
+	IsDir bool
+	Paths []string
+}
+
 type FileCompress struct {
 	Files   []string
 	Dst     string

@@ -1,8 +1,6 @@
 package v1
 
 import (
-	"errors"
-
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -42,50 +40,6 @@ func (b *BaseApi) UpdateMysql(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, nil)
-}
-
-func (b *BaseApi) UploadMysqlFiles(c *gin.Context) {
-	form, err := c.MultipartForm()
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	files := form.File["file"]
-
-	mysqlName, ok := c.Params.Get("mysqlName")
-	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error mysqlName in path"))
-		return
-	}
-	if err := mysqlService.UpFile(mysqlName, files); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-
-	helper.SuccessWithData(c, nil)
-}
-
-func (b *BaseApi) MysqlUpList(c *gin.Context) {
-	var req dto.SearchDBWithPage
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-
-	total, list, err := mysqlService.SearchUpListWithPage(req)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-
-	helper.SuccessWithData(c, dto.PageResult{
-		Items: list,
-		Total: total,
-	})
 }
 
 func (b *BaseApi) UpdateMysqlVariables(c *gin.Context) {

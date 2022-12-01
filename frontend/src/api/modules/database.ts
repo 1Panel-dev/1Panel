@@ -1,18 +1,11 @@
 import http from '@/api';
 import { ReqPage, ResPage } from '../interface';
 import { Database } from '../interface/database';
-import { File } from '@/api/interface/file';
 
 export const searchMysqlDBs = (params: ReqPage) => {
     return http.post<ResPage<Database.MysqlDBInfo>>(`/databases/search`, params);
 };
 
-export const searchUpList = (params: ReqPage) => {
-    return http.post<ResPage<Database.FileRecord>>(`/databases/uplist`, params);
-};
-export const uploadFile = (mysqlName: string, params: FormData) => {
-    return http.upload<File.File>(`/databases/uplist/upload/${mysqlName}`, params);
-};
 export const backup = (params: Database.Backup) => {
     return http.post(`/databases/backup`, params);
 };
@@ -79,7 +72,4 @@ export const recoverRedis = (param: Database.RedisRecover) => {
 };
 export const redisBackupRedisRecords = (param: ReqPage) => {
     return http.post<ResPage<Database.FileRecord>>(`/databases/redis/backup/records`, param);
-};
-export const deleteDatabaseFile = (param: Database.FileRecordDelete) => {
-    return http.post(`/databases/redis/backup/del`, param);
 };

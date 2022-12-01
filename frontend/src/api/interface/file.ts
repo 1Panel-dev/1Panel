@@ -51,6 +51,11 @@ export namespace File {
         isDir: boolean;
     }
 
+    export interface FileBatchDelete {
+        isDir: boolean;
+        paths: Array<string>;
+    }
+
     export interface FileCompress {
         files: string[];
         type: string;
