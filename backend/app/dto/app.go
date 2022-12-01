@@ -177,3 +177,8 @@ type AppFormFields struct {
 	Default  string `json:"default"`
 	EnvKey   string `json:"env_variable"`
 }
+
+type AppResource struct {
+	Type string `json:"type"`
+	Name string `json:"name"`
+}

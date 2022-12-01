@@ -733,6 +733,10 @@ export default {
         gotoInstalled: '去安装',
         search: '搜索',
         limitHelper: '该应用已安装，不支持重复安装',
+        deleteHelper: '应用已经关联以下资源，无法删除',
+        checkTitle: '提示',
+        website: '网站',
+        database: '数据库',
     },
     website: {
         website: '网站',

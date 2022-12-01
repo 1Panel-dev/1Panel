@@ -175,6 +175,10 @@ func deleteAppInstall(ctx context.Context, install model.AppInstall) error {
 	if err := deleteLink(ctx, &install); err != nil {
 		return err
 	}
+	backups, _ := appInstallBackupRepo.GetBy(appInstallBackupRepo.WithAppInstallID(install.ID))
+	for _, backup := range backups {
+		_ = op.DeleteDir(backup.Path)
+	}
 	if err := appInstallBackupRepo.Delete(ctx, appInstallBackupRepo.WithAppInstallID(install.ID)); err != nil {
 		return err
 	}

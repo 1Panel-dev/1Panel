@@ -34,6 +34,10 @@ export const CheckAppInstalled = (key: string) => {
     return http.get<App.CheckInstalled>(`apps/installed/check/${key}`);
 };
 
+export const AppInstalledDeleteCheck = (appInstallId: number) => {
+    return http.get<App.AppInstallResource[]>(`apps/installed/delete/check/${appInstallId}`);
+};
+
 export const GetAppInstalled = (search: App.AppInstalledSearch) => {
     return http.post<App.AppInstalled[]>('apps/installed', search);
 };
