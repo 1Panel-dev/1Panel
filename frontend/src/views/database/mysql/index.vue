@@ -59,7 +59,7 @@
                 </ComplexTable>
             </el-card>
         </div>
-        <el-dialog v-model="changeVisiable" :destroy-on-close="true" width="30%">
+        <el-dialog v-model="changeVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
             <template #header>
                 <div class="card-header">
                     <span>{{ $t('database.changePassword') }}</span>

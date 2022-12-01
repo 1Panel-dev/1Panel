@@ -1,5 +1,12 @@
 <template>
-    <el-dialog v-model="open" :title="$t('website.delete')" width="40%" :before-close="handleClose">
+    <el-dialog
+        v-model="open"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        :title="$t('website.delete')"
+        width="40%"
+        :before-close="handleClose"
+    >
         <div style="text-align: center">
             <el-checkbox v-model="deleteReq.deleteApp" :label="$t('website.deleteApp')" />
             <el-checkbox v-model="deleteReq.deleteBackup" :label="$t('website.deleteBackup')" />

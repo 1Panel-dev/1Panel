@@ -1,6 +1,14 @@
 <template>
     <div>
-        <el-dialog v-model="open" :title="$t('file.deCompress')" :before-close="handleClose" width="30%" @open="onOpen">
+        <el-dialog
+            v-model="open"
+            :title="$t('file.deCompress')"
+            :destroy-on-close="true"
+            :close-on-click-modal="false"
+            :before-close="handleClose"
+            width="30%"
+            @open="onOpen"
+        >
             <el-form
                 ref="fileForm"
                 label-position="left"

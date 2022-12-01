@@ -4,7 +4,10 @@
         <el-card style="margin-top: 20px">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
                 <template #toolbar>
-                    <el-button-group>
+                    <el-button icon="Plus" type="primary" @click="onCreate()">
+                        {{ $t('commons.button.create') }}
+                    </el-button>
+                    <el-button-group style="margin-left: 10px">
                         <el-button :disabled="checkStatus('start')" @click="onOperate('start')">
                             {{ $t('container.start') }}
                         </el-button>
@@ -27,9 +30,6 @@
                             {{ $t('container.remove') }}
                         </el-button>
                     </el-button-group>
-                    <el-button icon="Plus" style="margin-left: 10px" @click="onCreate()">
-                        {{ $t('commons.button.create') }}
-                    </el-button>
                 </template>
                 <el-table-column type="selection" fix />
                 <el-table-column

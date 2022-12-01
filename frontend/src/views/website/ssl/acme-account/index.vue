@@ -1,5 +1,10 @@
 <template>
-    <el-dialog v-model="open" :title="$t('website.acmeAccountManage')">
+    <el-dialog
+        v-model="open"
+        :title="$t('website.acmeAccountManage')"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+    >
         <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
             <template #toolbar>
                 <el-button type="primary" plain @click="openCreate">{{ $t('commons.button.create') }}</el-button>

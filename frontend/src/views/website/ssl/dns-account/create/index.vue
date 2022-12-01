@@ -1,5 +1,12 @@
 <template>
-    <el-dialog v-model="open" :title="$t('website.createDnsAccount')" width="40%" :before-close="handleClose">
+    <el-dialog
+        v-model="open"
+        :title="$t('website.createDnsAccount')"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        width="40%"
+        :before-close="handleClose"
+    >
         <el-form ref="accountForm" label-position="right" :model="account" label-width="100px" :rules="rules">
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input v-model="account.name"></el-input>

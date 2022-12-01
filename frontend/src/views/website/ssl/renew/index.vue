@@ -1,5 +1,12 @@
 <template>
-    <el-dialog v-model="open" :title="$t('website.renewSSL')" width="30%" :before-close="handleClose">
+    <el-dialog
+        v-model="open"
+        :title="$t('website.renewSSL')"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        width="30%"
+        :before-close="handleClose"
+    >
         <div style="text-align: center">
             <span>是否确定续签?</span>
         </div>

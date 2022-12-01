@@ -2,6 +2,8 @@
     <el-dialog
         v-model="open"
         :before-close="handleClose"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
         :title="$t('commons.button.create')"
         width="30%"
         @open="onOpen"

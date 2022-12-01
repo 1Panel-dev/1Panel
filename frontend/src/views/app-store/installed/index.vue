@@ -78,7 +78,14 @@
                 fix
             />
         </ComplexTable>
-        <el-dialog v-model="open" :title="$t('commons.msg.operate')" :before-close="handleClose" width="30%">
+        <el-dialog
+            v-model="open"
+            :title="$t('commons.msg.operate')"
+            :destroy-on-close="true"
+            :close-on-click-modal="false"
+            :before-close="handleClose"
+            width="30%"
+        >
             <div style="text-align: center">
                 <p>{{ $t('app.versioneSelect') }}</p>
                 <el-select v-model="operateReq.detailId">

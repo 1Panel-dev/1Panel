@@ -1,5 +1,10 @@
 <template>
-    <el-dialog v-model="open" :title="$t('website.dnsAccountManage')">
+    <el-dialog
+        v-model="open"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        :title="$t('website.dnsAccountManage')"
+    >
         <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
             <template #toolbar>
                 <el-button type="primary" plain @click="openCreate">{{ $t('commons.button.create') }}</el-button>

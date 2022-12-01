@@ -1,5 +1,12 @@
 <template>
-    <el-dialog v-model="open" :title="$t('commons.button.create')" width="30%" :before-close="handleClose">
+    <el-dialog
+        v-model="open"
+        :title="$t('commons.button.create')"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        width="30%"
+        :before-close="handleClose"
+    >
         <el-form
             ref="accountForm"
             label-position="right"

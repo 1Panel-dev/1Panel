@@ -25,10 +25,10 @@
                     <table style="width: 100%" class="tab-table">
                         <tr v-if="form.exposedPorts.length !== 0">
                             <th scope="col" width="48%" align="left">
-                                <label>{{ $t('container.containerPort') }}</label>
+                                <label>{{ $t('container.serverPort') }}</label>
                             </th>
                             <th scope="col" width="48%" align="left">
-                                <label>{{ $t('container.serverPort') }}</label>
+                                <label>{{ $t('container.containerPort') }}</label>
                             </th>
                             <th align="left"></th>
                         </tr>
@@ -39,7 +39,7 @@
                                     :max="65535"
                                     style="width: 100%"
                                     controls-position="right"
-                                    v-model.number="row.containerPort"
+                                    v-model.number="row.hostPort"
                                 />
                             </td>
                             <td width="48%">
@@ -48,7 +48,7 @@
                                     :max="65535"
                                     style="width: 100%"
                                     controls-position="right"
-                                    v-model.number="row.hostPort"
+                                    v-model.number="row.containerPort"
                                 />
                             </td>
                             <td>
@@ -78,14 +78,18 @@
             </el-form-item>
             <el-form-item :label="$t('container.cpuQuota')" prop="nanoCPUs">
                 <el-input type="number" style="width: 40%" v-model.number="form.nanoCPUs">
-                    <template #append><div style="width: 60px">Core</div></template>
+                    <template #append>
+                        <el-select v-model="form.cpuUnit" disabled style="width: 65px">
+                            <el-option label="Core" value="Core" />
+                        </el-select>
+                    </template>
                 </el-input>
                 <span class="input-help">{{ $t('container.limitHelper') }}</span>
             </el-form-item>
             <el-form-item :label="$t('container.memoryLimit')" prop="memoryItem">
                 <el-input style="width: 40%" v-model.number="form.memoryItem">
                     <template #append>
-                        <el-select v-model="form.memoryUnit" placeholder="Select" style="width: 100px">
+                        <el-select v-model="form.memoryUnit" placeholder="Select" style="width: 65px">
                             <el-option label="KB" value="KB" />
                             <el-option label="MB" value="MB" />
                             <el-option label="GB" value="GB" />
@@ -98,19 +102,19 @@
                 <el-card style="width: 100%">
                     <table style="width: 100%" class="tab-table">
                         <tr v-if="form.volumes.length !== 0">
-                            <th scope="col" width="32%" align="left">
+                            <th scope="col" width="42%" align="left">
                                 <label>{{ $t('container.serverPath') }}</label>
                             </th>
-                            <th scope="col" width="32%" align="left">
+                            <th scope="col" width="12%" align="left">
                                 <label>{{ $t('container.mode') }}</label>
                             </th>
-                            <th scope="col" width="32%" align="left">
+                            <th scope="col" width="42%" align="left">
                                 <label>{{ $t('container.containerDir') }}</label>
                             </th>
                             <th align="left"></th>
                         </tr>
                         <tr v-for="(row, index) in form.volumes" :key="index">
-                            <td width="32%">
+                            <td width="42%">
                                 <el-select
                                     style="width: 100%"
                                     allow-create
@@ -126,13 +130,13 @@
                                     />
                                 </el-select>
                             </td>
-                            <td width="32%">
+                            <td width="12%">
                                 <el-select style="width: 100%" filterable v-model="row.mode">
                                     <el-option value="rw" :label="$t('container.modeRW')" />
                                     <el-option value="ro" :label="$t('container.modeR')" />
                                 </el-select>
                             </td>
-                            <td width="32%">
+                            <td width="42%">
                                 <el-input v-model="row.containerDir" />
                             </td>
                             <td>
@@ -204,6 +208,7 @@ const form = reactive({
     memory: 100,
     memoryItem: 100,
     memoryUnit: 'MB',
+    cpuUnit: 'Core',
     volumes: [] as Array<Container.Volume>,
     autoRemove: false,
     labels: [] as Array<string>,
@@ -237,8 +242,8 @@ const formRef = ref<FormInstance>();
 
 const handlePortsAdd = () => {
     let item = {
-        containerPort: 80,
-        hostPort: 8080,
+        containerPort: null,
+        hostPort: null,
     };
     form.exposedPorts.push(item);
 };

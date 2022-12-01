@@ -33,7 +33,7 @@
                     >
                         <el-input type="password" clearable disabled v-model="form.settingInfo.password">
                             <template #append>
-                                <el-button icon="Setting" @click="passwordVisiable = true">
+                                <el-button icon="Setting" @click="onChangePassword">
                                     {{ $t('commons.button.set') }}
                                 </el-button>
                             </template>
@@ -128,7 +128,13 @@
             </el-row>
         </el-card>
     </el-form>
-    <el-dialog v-model="passwordVisiable" :title="$t('setting.changePassword')" width="30%">
+    <el-dialog
+        v-model="passwordVisiable"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        :title="$t('setting.changePassword')"
+        width="30%"
+    >
         <el-form ref="passFormRef" label-width="80px" label-position="left" :model="passForm" :rules="passRules">
             <el-form-item :label="$t('setting.oldPassword')" prop="oldPassword">
                 <el-input type="password" show-password clearable v-model="passForm.oldPassword" />
@@ -224,6 +230,14 @@ function checkPassword(rule: any, value: any, callback: any) {
     }
     callback();
 }
+
+const onChangePassword = async () => {
+    passForm.oldPassword = '';
+    passForm.newPassword = '';
+    passForm.newPasswordComplexity = '';
+    passForm.retryPassword = '';
+    passwordVisiable.value = true;
+};
 
 const submitChangePassword = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;

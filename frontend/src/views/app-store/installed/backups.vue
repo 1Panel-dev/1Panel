@@ -3,6 +3,7 @@
         v-model="open"
         :title="$t('app.backup') + ' - ' + installData.appInstallName"
         width="70%"
+        :destroy-on-close="true"
         :before-close="handleClose"
         :close-on-click-modal="false"
     >
@@ -48,7 +49,14 @@
                 fix
             />
         </ComplexTable>
-        <el-dialog v-model="openRestorePage" :title="$t('commons.msg.operate')" width="30%" :show-close="false">
+        <el-dialog
+            v-model="openRestorePage"
+            :destroy-on-close="true"
+            :close-on-click-modal="false"
+            :title="$t('commons.msg.operate')"
+            width="30%"
+            :show-close="false"
+        >
             <el-alert :title="$t('app.restoreWarn')" type="warning" :closable="false" show-icon />
             <template #footer>
                 <span class="dialog-footer">
