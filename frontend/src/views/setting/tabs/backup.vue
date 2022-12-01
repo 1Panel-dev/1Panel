@@ -27,9 +27,6 @@
                         <el-form-item v-if="item.type === 'LOCAL'" label="Directory">
                             {{ item.varsJson['dir'] }}
                         </el-form-item>
-                        <el-form-item v-if="hasBucket(item.type)" label="Access Key ID">
-                            {{ item.varsJson['accessKey'] }}
-                        </el-form-item>
                         <el-form-item v-if="item.type === 'S3'" label="Region">
                             {{ item.varsJson['region'] }}
                         </el-form-item>
@@ -56,7 +53,13 @@
             </el-col>
         </el-row>
 
-        <el-dialog @close="search" v-model="backupVisiable" :title="$t('setting.backupAccount')" width="30%">
+        <el-dialog
+            @close="search"
+            v-model="backupVisiable"
+            :destroy-on-close="true"
+            :title="$t('setting.backupAccount')"
+            width="30%"
+        >
             <el-form ref="formRef" label-position="left" :model="form" label-width="160px">
                 <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
                     <el-select style="width: 100%" v-model="form.type" :disabled="operation === 'edit'">
@@ -81,7 +84,7 @@
                     </el-input>
                 </el-form-item>
                 <el-form-item
-                    v-if="hasBucket(form.type)"
+                    v-if="hasBucket(form.type) && operation !== 'edit'"
                     label="Access Key ID"
                     prop="varsJson.accessKey"
                     :rules="Rules.requiredInput"

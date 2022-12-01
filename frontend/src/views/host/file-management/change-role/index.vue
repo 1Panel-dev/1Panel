@@ -1,5 +1,13 @@
 <template>
-    <el-dialog v-model="open" :before-close="handleClose" :title="$t('file.setRole')" width="30%" @open="onOpen">
+    <el-dialog
+        v-model="open"
+        :before-close="handleClose"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        :title="$t('file.setRole')"
+        width="30%"
+        @open="onOpen"
+    >
         <FileRole v-loading="loading" :mode="mode" @get-mode="getMode"></FileRole>
         <template #footer>
             <span class="dialog-footer">

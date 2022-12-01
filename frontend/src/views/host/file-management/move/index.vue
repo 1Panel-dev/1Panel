@@ -1,5 +1,13 @@
 <template>
-    <el-dialog v-model="open" :title="title" :before-close="handleClose" width="30%" @open="onOpen">
+    <el-dialog
+        v-model="open"
+        :title="title"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        :before-close="handleClose"
+        width="30%"
+        @open="onOpen"
+    >
         <el-form
             ref="fileForm"
             label-position="left"

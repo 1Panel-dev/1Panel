@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="submitVisiable" :destroy-on-close="true" width="30%">
+    <el-dialog v-model="submitVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
         <template #header>
             <div class="card-header">
                 <span>{{ header }}</span>

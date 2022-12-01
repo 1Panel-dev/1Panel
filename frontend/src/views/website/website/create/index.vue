@@ -1,5 +1,12 @@
 <template>
-    <el-dialog v-model="open" :title="$t('website.create')" width="40%" :before-close="handleClose">
+    <el-dialog
+        v-model="open"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        :title="$t('website.create')"
+        width="40%"
+        :before-close="handleClose"
+    >
         <el-form ref="websiteForm" label-position="right" :model="website" label-width="130px" :rules="rules">
             <el-form-item :label="$t('website.type')" prop="type">
                 <el-select v-model="website.type">

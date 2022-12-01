@@ -1,5 +1,12 @@
 <template>
-    <el-dialog v-model="open" :title="$t('website.groupSetting')" width="40%" :before-close="handleClose">
+    <el-dialog
+        v-model="open"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        :title="$t('website.groupSetting')"
+        width="40%"
+        :before-close="handleClose"
+    >
         <ComplexTable :data="data" @search="search()">
             <template #toolbar>
                 <el-button type="primary" plain @click="openCreate">{{ $t('commons.button.create') }}</el-button>
