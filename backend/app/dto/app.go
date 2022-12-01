@@ -23,6 +23,7 @@ type AppDTO struct {
 
 type AppDetailDTO struct {
 	model.AppDetail
+	Enable bool        `json:"enable"`
 	Params interface{} `json:"params"`
 }
 

@@ -15,4 +15,6 @@ ErrNotSupportType: "The system does not support the current type: {{ .detail }}"
 
 
 #app
-ErrPortInUsed: "{{ .detail }} 端口已被占用"
+ErrPortInUsed: "{{ .detail }} port already in use"
+ErrAppLimit: "App exceeds install limit"
+ErrAppRequired: "{{ .detail }} app is required"

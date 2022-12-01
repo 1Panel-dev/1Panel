@@ -732,6 +732,7 @@ export default {
         checkInstalledWarn: '未检测到 {0} ,请进入应用商店点击安装!',
         gotoInstalled: '去安装',
         search: '搜索',
+        limitHelper: '该应用已安装，不支持重复安装',
     },
     website: {
         website: '网站',

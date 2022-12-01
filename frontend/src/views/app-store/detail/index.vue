@@ -42,7 +42,21 @@
                                 <el-descriptions-item :label="$t('app.author')">{{ app.author }}</el-descriptions-item>
                             </el-descriptions>
                             <div>
-                                <el-button @click="openInstall" type="primary">{{ $t('app.install') }}</el-button>
+                                <el-button :disabled="!appDetail.enable" @click="openInstall" type="primary">
+                                    {{ $t('app.install') }}
+                                </el-button>
+                            </div>
+                            <br />
+                            <div>
+                                <el-alert
+                                    style="width: 300px"
+                                    v-if="!appDetail.enable"
+                                    :title="$t('app.limitHelper')"
+                                    type="warning"
+                                    show-icon
+                                    :closable="false"
+                                />
+                                <!-- <span v-if="!appDetail.enable">{{ $t('app.limitHelper') }}</span> -->
                             </div>
                         </div>
                     </el-col>
