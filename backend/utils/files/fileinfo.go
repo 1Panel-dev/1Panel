@@ -149,10 +149,14 @@ func (f *FileInfo) listChildren(dir, showHidden bool, page, pageSize int) error 
 	start := (page - 1) * pageSize
 	end := pageSize + start
 	var result []*FileInfo
-	if start < 0 || start > f.ItemTotal || end < 0 || start > end || end > f.ItemTotal {
+	if start < 0 || start > f.ItemTotal || end < 0 || start > end {
 		result = items
 	} else {
-		result = items[start:end]
+		if end > f.ItemTotal {
+			result = items[start:]
+		} else {
+			result = items[start:end]
+		}
 	}
 
 	f.Items = result
