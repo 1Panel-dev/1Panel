@@ -1,5 +1,12 @@
 <template>
-    <el-dialog v-model="open" :title="$t('app.install')" width="40%" :before-close="handleClose" @opened="opened">
+    <el-dialog
+        v-model="open"
+        :title="$t('app.install')"
+        width="40%"
+        :before-close="handleClose"
+        @opened="opened"
+        :close-on-click-modal="false"
+    >
         <el-form ref="paramForm" label-position="left" :model="form" label-width="150px" :rules="rules">
             <el-form-item :label="$t('app.name')" prop="NAME">
                 <el-input v-model="form['NAME']"></el-input>
