@@ -116,7 +116,7 @@ const SaveSetting = async (formEl: FormInstance | undefined, key: string, val: a
     }
     let param = {
         key: key,
-        value: val,
+        value: val + '',
     };
     await updateSetting(param);
     ElMessage.success(i18n.t('commons.msg.operationSuccess'));

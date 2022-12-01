@@ -115,12 +115,12 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (settingForm.complexityVerification === 'disable' && passForm.newPassword === passForm.oldPassword) {
+        let password =
+            settingForm.complexityVerification === 'disable' ? passForm.newPassword : passForm.newPasswordComplexity;
+        if (password === passForm.oldPassword) {
             ElMessage.error(i18n.global.t('setting.duplicatePassword'));
             return;
         }
-        let password =
-            settingForm.complexityVerification === 'disable' ? passForm.newPassword : passForm.newPasswordComplexity;
         await handleExpired({ oldPassword: passForm.oldPassword, newPassword: password });
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         router.push({ name: 'home' });
