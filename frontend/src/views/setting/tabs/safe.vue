@@ -17,7 +17,7 @@
                         >
                             <el-input disabled v-model="form.settingInfo.expirationTime">
                                 <template #append>
-                                    <el-button @click="timeoutVisiable = true" icon="Collection">
+                                    <el-button @click="onChangeExoirationTime" icon="Setting">
                                         {{ $t('commons.button.set') }}
                                     </el-button>
                                 </template>
@@ -102,10 +102,17 @@
                 </el-row>
             </el-card>
         </el-form>
-        <el-dialog v-model="timeoutVisiable" :title="$t('setting.expirationTime')" width="30%">
+        <el-dialog
+            v-model="timeoutVisiable"
+            :destroy-on-close="true"
+            :close-on-click-modal="false"
+            :title="$t('setting.expirationTime')"
+            width="30%"
+        >
             <el-form ref="timeoutFormRef" label-width="80px" label-position="left" :model="timeoutForm">
                 <el-form-item :label="$t('setting.days')" prop="days" :rules="Rules.number">
                     <el-input clearable v-model.number="timeoutForm.days" />
+                    <span class="input-help">{{ $t('setting.expirationHelper') }}</span>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -138,6 +145,7 @@ const form = withDefaults(defineProps<Props>(), {
     settingInfo: {
         serverPort: '',
         securityEntrance: '',
+        expirationDays: 0,
         expirationTime: '',
         complexityVerification: '',
         mfaStatus: '',
@@ -186,6 +194,11 @@ const onBind = async () => {
 const onCancelMfaBind = async () => {
     form.settingInfo.mfaStatus = 'disable';
     isMFAShow.value = false;
+};
+
+const onChangeExoirationTime = async () => {
+    timeoutForm.days = form.settingInfo.expirationDays;
+    timeoutVisiable.value = true;
 };
 
 const submitTimeout = async (formEl: FormInstance | undefined) => {

@@ -356,8 +356,8 @@ export default {
         mount: 'Mount',
         serverPath: 'Server path',
         containerDir: 'Container path',
-        modeRW: 'Read-Write',
-        modeR: 'Read-Only',
+        modeRW: 'RW',
+        modeR: 'R',
         mode: 'Mode',
         env: 'Environment',
         restartPolicy: 'Restart policy',
@@ -652,6 +652,7 @@ export default {
         unSetting: 'Not set',
         noneSetting:
             'Set the expiration time for the panel password. After the expiration, you need to reset the password',
+        expirationHelper: 'If the password expiration time is [0] days, the password expiration function is disabled',
         days: 'Expiration Days',
         expiredHelper: 'The current password has expired. Please change the password again.',
         timeoutHelper:
