@@ -98,6 +98,11 @@ export namespace App {
         containerName: string;
     }
 
+    export interface AppInstallResource {
+        type: string;
+        name: string;
+    }
+
     export interface AppInstalledOp {
         installId: number;
         operate: string;

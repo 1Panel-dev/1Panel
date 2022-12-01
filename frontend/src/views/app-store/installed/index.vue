@@ -104,17 +104,25 @@
             </template>
         </el-dialog>
         <Backups ref="backupRef" @close="search"></Backups>
+        <AppResources ref="checkRef"></AppResources>
     </el-card>
 </template>
 
 <script lang="ts" setup>
-import { SearchAppInstalled, InstalledOp, SyncInstalledApp, GetAppUpdateVersions } from '@/api/modules/app';
+import {
+    SearchAppInstalled,
+    InstalledOp,
+    SyncInstalledApp,
+    GetAppUpdateVersions,
+    AppInstalledDeleteCheck,
+} from '@/api/modules/app';
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { dateFromat } from '@/utils/util';
 import i18n from '@/lang';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import Backups from './backups.vue';
+import AppResources from './check/index.vue';
 import { App } from '@/api/interface/app';
 
 let data = ref<any>();
@@ -133,6 +141,7 @@ let operateReq = reactive({
 });
 let versions = ref<App.VersionDetail[]>();
 const backupRef = ref();
+const checkRef = ref();
 let searchName = ref('');
 
 const sync = () => {
@@ -170,6 +179,15 @@ const openOperate = (row: any, op: string) => {
                 operateReq.detailId = res.data[0].detailId;
             }
             open.value = true;
+        });
+    } else if (op == 'delete') {
+        AppInstalledDeleteCheck(row.id).then((res) => {
+            const items = res.data;
+            if (res.data && res.data.length > 0) {
+                checkRef.value.acceptParams({ items: items });
+            } else {
+                onOperate(op);
+            }
         });
     } else {
         onOperate(op);

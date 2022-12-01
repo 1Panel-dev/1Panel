@@ -295,6 +295,58 @@ func (a AppInstallService) ChangeAppPort(req dto.PortUpdate) error {
 	return nil
 }
 
+func (a AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, error) {
+	var res []dto.AppResource
+	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
+	if err != nil {
+		return nil, err
+	}
+	app, err := appRepo.GetFirst(commonRepo.WithByID(appInstall.AppId))
+	if err != nil {
+		return nil, err
+	}
+	if app.Type == "website" {
+		websites, _ := websiteRepo.GetBy(websiteRepo.WithAppInstallId(appInstall.ID))
+		for _, website := range websites {
+			res = append(res, dto.AppResource{
+				Type: "website",
+				Name: website.PrimaryDomain,
+			})
+		}
+	}
+	if app.Key == "nginx" {
+		websites, _ := websiteRepo.GetBy()
+		for _, website := range websites {
+			res = append(res, dto.AppResource{
+				Type: "website",
+				Name: website.PrimaryDomain,
+			})
+		}
+	}
+	if app.Type == "runtime" {
+		resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(appInstall.ID))
+		for _, resource := range resources {
+			linkInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(resource.AppInstallId))
+			res = append(res, dto.AppResource{
+				Type: "app",
+				Name: linkInstall.Name,
+			})
+		}
+	}
+
+	if app.Key == "mysql" {
+		databases, _ := mysqlRepo.List()
+		for _, database := range databases {
+			res = append(res, dto.AppResource{
+				Type: "database",
+				Name: database.Name,
+			})
+		}
+	}
+
+	return res, nil
+}
+
 func syncById(installId uint) error {
 	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
 	if err != nil {

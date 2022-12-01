@@ -3,31 +3,31 @@
         <div class="app-content" v-if="data.isExist">
             <el-card class="app-card" v-loading="loading">
                 <el-row :gutter="20">
-                    <el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="1">
+                    <el-col :lg="2" :xl="1">
                         <div>
                             <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
                         </div>
                     </el-col>
-                    <el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="2">
+                    <el-col :lg="4" :xl="2">
                         <div>
                             {{ $t('app.version') }}:
                             <el-tag type="info">{{ data.version }}</el-tag>
                         </div>
                     </el-col>
-                    <el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="2">
+                    <el-col :lg="4" :xl="2">
                         <div>
                             {{ $t('commons.table.status') }}:
                             <el-tag type="success">{{ data.status }}</el-tag>
                         </div>
                     </el-col>
-                    <el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="2">
+                    <el-col :lg="8" :xl="4">
                         <div>
                             {{ $t('website.lastBackupAt') }}:
                             <el-tag v-if="data.lastBackupAt != ''" type="info">{{ data.lastBackupAt }}</el-tag>
-                            <span else>{{ $t('website.null') }}</span>
+                            <span v-else>{{ $t('website.null') }}</span>
                         </div>
                     </el-col>
-                    <el-col :xs="8" :sm="6" :md="4" :lg="3" :xl="6">
+                    <el-col :lg="4" :xl="6">
                         <el-button type="primary" link @click="onOperate('restart')">{{ $t('app.restart') }}</el-button>
                         <el-divider direction="vertical" />
                         <el-button type="primary" link @click="setting">{{ $t('commons.button.set') }}</el-button>

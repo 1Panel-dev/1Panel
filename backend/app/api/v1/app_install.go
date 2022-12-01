@@ -53,6 +53,22 @@ func (b *BaseApi) CheckAppInstalled(c *gin.Context) {
 	helper.SuccessWithData(c, checkData)
 }
 
+func (b *BaseApi) DeleteCheck(c *gin.Context) {
+
+	appInstallId, err := helper.GetIntParamByKey(c, "appInstallId")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+
+	checkData, err := appInstallService.DeleteCheck(appInstallId)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, checkData)
+}
+
 func (b *BaseApi) SyncInstalled(c *gin.Context) {
 	if err := appInstallService.SyncAll(); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
