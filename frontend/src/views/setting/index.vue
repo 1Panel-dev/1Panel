@@ -90,7 +90,7 @@ const { switchDark } = useTheme();
 
 const SaveSetting = async (formEl: FormInstance | undefined, key: string, val: any) => {
     if (!formEl) return;
-    const result = await formEl.validateField('settingInfo.' + key[0].toLowerCase(), callback);
+    const result = await formEl.validateField('settingInfo.' + key.replace(key[0], key[0].toLowerCase()), callback);
     if (!result) {
         return;
     }
@@ -109,7 +109,6 @@ const SaveSetting = async (formEl: FormInstance | undefined, key: string, val: a
         case 'PanelName':
             globalStore.setThemeConfig({ ...themeConfig.value, panelName: val });
             break;
-        case 'SessionTimeout':
         case 'MonitorStoreDays':
         case 'ServerPort':
             val = val + '';

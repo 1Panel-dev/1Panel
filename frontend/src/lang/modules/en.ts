@@ -336,6 +336,7 @@ export default {
         last4Hour: 'Last 4 Hours',
         lastHour: 'Last Hour',
         last10Min: 'Last 10 Minutes',
+        newName: 'New name',
 
         custom: 'Custom',
         emptyUser: 'When empty, you will log in with the  default user of container',
@@ -618,6 +619,7 @@ export default {
         languageHelper:
             'By default, it follows the browser language. This parameter takes effect only on the current browser',
         sessionTimeout: 'Timeout',
+        sessionTimeoutError: 'The minimum timeout is 300 seconds',
         sessionTimeoutHelper:
             'If you do not operate the panel for more than {0} seconds, the panel automatically logs out',
         syncTime: 'Synchronization time',
@@ -625,6 +627,7 @@ export default {
         oldPassword: 'Original password',
         newPassword: 'New password',
         retryPassword: 'Confirm password',
+        duplicatePassword: 'The new password cannot be the same as the original password, please re-enter!',
 
         backup: 'Backup',
         noTypeForCreate: 'No backup type is currently created',

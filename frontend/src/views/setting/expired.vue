@@ -3,7 +3,7 @@
         <el-card style="margin-top: 20px">
             <template #header>
                 <div class="card-header">
-                    <span style="font-size: 14px; font-weight: 500">当前密码已过期，请重新修改密码：</span>
+                    <span style="font-size: 14px; font-weight: 500">{{ $t('setting.expiredHelper') }}</span>
                 </div>
             </template>
             <el-row>
@@ -115,6 +115,10 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
+        if (settingForm.complexityVerification === 'disable' && passForm.newPassword === passForm.oldPassword) {
+            ElMessage.error(i18n.global.t('setting.duplicatePassword'));
+            return;
+        }
         let password =
             settingForm.complexityVerification === 'disable' ? passForm.newPassword : passForm.newPasswordComplexity;
         await handleExpired({ oldPassword: passForm.oldPassword, newPassword: password });

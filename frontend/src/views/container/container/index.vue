@@ -115,7 +115,7 @@
         </el-dialog>
 
         <el-dialog
-            @close="onCloseLog"
+            @close="search()"
             v-model="newNameVisiable"
             :destroy-on-close="true"
             :close-on-click-modal="false"
@@ -127,7 +127,7 @@
                 </div>
             </template>
             <el-form ref="newNameRef" :model="renameForm">
-                <el-form-item label="新名称" :rules="Rules.requiredInput" prop="newName">
+                <el-form-item :label="$t('container.newName')" :rules="Rules.requiredInput" prop="newName">
                     <el-input v-model="renameForm.newName"></el-input>
                 </el-form-item>
             </el-form>
@@ -296,7 +296,7 @@ const onSubmitName = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        ContainerOperator(renameForm);
+        await ContainerOperator(renameForm);
         search();
         newNameVisiable.value = false;
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));

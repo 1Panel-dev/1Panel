@@ -18,12 +18,6 @@
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('container.driver')" show-overflow-tooltip min-width="40" prop="driver" />
-                <el-table-column :label="$t('container.attachable')" min-width="40" prop="attachable" fix>
-                    <template #default="{ row }">
-                        <el-icon color="green" v-if="row.attachable"><Select /></el-icon>
-                        <el-icon color="red" v-if="!row.attachable"><CloseBold /></el-icon>
-                    </template>
-                </el-table-column>
                 <el-table-column :label="$t('container.subnet')" min-width="80" prop="subnet" fix />
                 <el-table-column :label="$t('container.gateway')" min-width="80" prop="gateway" fix />
                 <el-table-column :label="$t('container.tag')" min-width="140" fix>
