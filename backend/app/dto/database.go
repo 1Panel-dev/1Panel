@@ -190,7 +190,3 @@ type RedisBackupRecover struct {
 	FileName string `json:"fileName"`
 	FileDir  string `json:"fileDir"`
 }
-type RedisBackupDelete struct {
-	FileDir string   `json:"fileDir"`
-	Names   []string `json:"names"`
-}

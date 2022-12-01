@@ -63,7 +63,7 @@
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
 import BackupRecords from '@/views/website/website/backup/index.vue';
-import UploadDialog from '@/views/database/mysql/upload/index.vue';
+import UploadDialog from '@/views/website/website/upload/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import CreateWebSite from './create/index.vue';

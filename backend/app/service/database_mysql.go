@@ -6,9 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
-	"mime/multipart"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -38,9 +36,7 @@ type IMysqlService interface {
 	UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
 	UpdateConfByFile(info dto.MysqlConfUpdateByFile) error
 
-	UpFile(mysqlName string, files []*multipart.FileHeader) error
 	RecoverByUpload(req dto.UploadRecover) error
-	SearchUpListWithPage(req dto.SearchDBWithPage) (int64, interface{}, error)
 	Backup(db dto.BackupDB) error
 	Recover(db dto.RecoverDB) error
 
@@ -65,74 +61,6 @@ func (u *MysqlService) SearchWithPage(search dto.PageInfo) (int64, interface{}, 
 		dtoMysqls = append(dtoMysqls, item)
 	}
 	return total, dtoMysqls, err
-}
-
-func (u *MysqlService) SearchUpListWithPage(req dto.SearchDBWithPage) (int64, interface{}, error) {
-	var (
-		list      []dto.DatabaseFileRecords
-		backDatas []dto.DatabaseFileRecords
-	)
-	localDir, err := loadLocalDir()
-	if err != nil {
-		return 0, list, nil
-	}
-	uploadDir := fmt.Sprintf("%s/database/mysql/%s/upload", localDir, req.MysqlName)
-	if _, err := os.Stat(uploadDir); err != nil {
-		return 0, list, nil
-	}
-	_ = filepath.Walk(uploadDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return nil
-		}
-		if !info.IsDir() {
-			list = append(list, dto.DatabaseFileRecords{
-				CreatedAt: info.ModTime().Format("2006-01-02 15:04:05"),
-				Size:      int(info.Size()),
-				FileDir:   uploadDir,
-				FileName:  info.Name(),
-			})
-		}
-		return nil
-	})
-	total, start, end := len(list), (req.Page-1)*req.PageSize, req.Page*req.PageSize
-	if start > total {
-		backDatas = make([]dto.DatabaseFileRecords, 0)
-	} else {
-		if end >= total {
-			end = total
-		}
-		backDatas = list[start:end]
-	}
-	return int64(total), backDatas, nil
-}
-
-func (u *MysqlService) UpFile(mysqlName string, files []*multipart.FileHeader) error {
-	localDir, err := loadLocalDir()
-	if err != nil {
-		return err
-	}
-	dstDir := fmt.Sprintf("%s/database/mysql/%s/upload", localDir, mysqlName)
-	if _, err := os.Stat(dstDir); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(dstDir, os.ModePerm); err != nil {
-			if err != nil {
-				return fmt.Errorf("mkdir %s failed, err: %v", dstDir, err)
-			}
-		}
-	}
-	for _, file := range files {
-		src, err := file.Open()
-		if err != nil {
-			return err
-		}
-		defer src.Close()
-		out, err := os.Create(dstDir + "/" + file.Filename)
-		if err != nil {
-			return err
-		}
-		defer out.Close()
-		_, _ = io.Copy(out, src)
-	}
-	return nil
 }
 
 func (u *MysqlService) RecoverByUpload(req dto.UploadRecover) error {

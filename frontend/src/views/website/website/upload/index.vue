@@ -75,7 +75,7 @@ import { File } from '@/api/interface/file';
 import { BatchDeleteFile, GetFilesList, UploadFileData } from '@/api/modules/files';
 
 const selects = ref<any>([]);
-const baseDir = '/opt/1Panel/data/uploads/database/';
+const baseDir = '/opt/1Panel/data/uploads/website/';
 
 const data = ref();
 const paginationConfig = reactive({
@@ -173,7 +173,7 @@ const onBatchDelete = async (row: File.File | null) => {
             files.push(baseDir + item.name);
         });
     }
-    await useDeleteData(BatchDeleteFile, { paths: files, isDir: false }, 'commons.msg.delete', true);
+    await useDeleteData(BatchDeleteFile, { isDir: false, paths: files }, 'commons.msg.delete', true);
     search();
 };
 

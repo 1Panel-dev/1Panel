@@ -18,6 +18,10 @@ export const DeleteFile = (form: File.FileDelete) => {
     return http.post<File.File>('files/del', form);
 };
 
+export const BatchDeleteFile = (form: File.FileBatchDelete) => {
+    return http.post('files/batch/del', form);
+};
+
 export const ChangeFileMode = (form: File.FileCreate) => {
     return http.post<File.File>('files/mode', form);
 };

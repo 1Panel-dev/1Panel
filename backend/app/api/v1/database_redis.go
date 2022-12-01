@@ -128,24 +128,6 @@ func (b *BaseApi) RedisBackupList(c *gin.Context) {
 	})
 }
 
-func (b *BaseApi) RedisBackupDelete(c *gin.Context) {
-	var req dto.RedisBackupDelete
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-
-	for _, name := range req.Names {
-		fullPath := fmt.Sprintf("%s/%s", req.FileDir, name)
-		if err := os.Remove(fullPath); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-			return
-		}
-	}
-
-	helper.SuccessWithData(c, nil)
-}
-
 func (b *BaseApi) UpdateRedisConfByFile(c *gin.Context) {
 	var req dto.RedisConfUpdateByFile
 	if err := c.ShouldBindJSON(&req); err != nil {

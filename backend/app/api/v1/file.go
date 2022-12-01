@@ -1,10 +1,13 @@
 package v1
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"path"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -64,6 +67,20 @@ func (b *BaseApi) DeleteFile(c *gin.Context) {
 		return
 	}
 	err := fileService.Delete(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+func (b *BaseApi) BatchDeleteFile(c *gin.Context) {
+	var req dto.FileBatchDelete
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	err := fileService.BatchDelete(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -148,6 +165,19 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 	}
 	files := form.File["file"]
 	paths := form.Value["path"]
+	if len(paths) == 0 || !strings.Contains(paths[0], "/") {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error paths in request"))
+		return
+	}
+	dir := paths[0][:strings.LastIndex(paths[0], "/")]
+	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
+			if err != nil {
+				helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, fmt.Errorf("mkdir %s failed, err: %v", dir, err))
+				return
+			}
+		}
+	}
 	success := 0
 	for _, file := range files {
 		err := c.SaveUploadedFile(file, path.Join(paths[0], file.Filename))

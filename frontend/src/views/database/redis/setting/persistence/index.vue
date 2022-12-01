@@ -124,7 +124,6 @@ import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { Database } from '@/api/interface/database';
 import {
     backupRedis,
-    deleteDatabaseFile,
     recoverRedis,
     redisBackupRedisRecords,
     RedisPersistenceConf,
@@ -136,6 +135,7 @@ import { ElMessage, FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { computeSize } from '@/utils/util';
+import { BatchDeleteFile } from '@/api/modules/files';
 
 interface saveStruct {
     second: number;
@@ -207,18 +207,15 @@ const onRecover = async () => {
 };
 
 const onBatchDelete = async (row: Database.FileRecord | null) => {
-    let names: Array<string> = [];
-    let fileDir: string = '';
+    let files: Array<string> = [];
     if (row) {
-        fileDir = row.fileDir;
-        names.push(row.fileName);
+        files.push(row.fileDir + '/' + row.fileName);
     } else {
         selects.value.forEach((item: Database.FileRecord) => {
-            fileDir = item.fileDir;
-            names.push(item.fileName);
+            files.push(item.fileDir + '/' + item.fileName);
         });
     }
-    await useDeleteData(deleteDatabaseFile, { fileDir: fileDir, names: names }, 'commons.msg.delete', true);
+    await useDeleteData(BatchDeleteFile, { isDir: false, paths: files }, 'commons.msg.delete', true);
     loadBackupRecords();
 };
 const buttons = [

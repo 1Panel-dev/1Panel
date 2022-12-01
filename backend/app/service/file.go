@@ -2,17 +2,18 @@ package service
 
 import (
 	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
-	"io/fs"
-	"os"
-	"path/filepath"
-	"strings"
-	"time"
 )
 
 type FileService struct {
@@ -20,6 +21,9 @@ type FileService struct {
 
 func (f FileService) GetFileList(op dto.FileOption) (dto.FileInfo, error) {
 	var fileInfo dto.FileInfo
+	if _, err := os.Stat(op.Path); err != nil && os.IsNotExist(err) {
+		return fileInfo, nil
+	}
 	info, err := files.NewFileInfo(op.FileOption)
 	if err != nil {
 		return fileInfo, err
@@ -75,6 +79,24 @@ func (f FileService) Delete(op dto.FileDelete) error {
 	} else {
 		return fo.DeleteFile(op.Path)
 	}
+}
+
+func (f FileService) BatchDelete(op dto.FileBatchDelete) error {
+	fo := files.NewFileOp()
+	if op.IsDir {
+		for _, file := range op.Paths {
+			if err := fo.DeleteDir(file); err != nil {
+				return err
+			}
+		}
+	} else {
+		for _, file := range op.Paths {
+			if err := fo.DeleteFile(file); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func (f FileService) ChangeMode(op dto.FileCreate) error {
