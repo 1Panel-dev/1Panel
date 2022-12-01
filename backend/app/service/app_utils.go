@@ -243,8 +243,28 @@ func updateInstall(installId uint, detailId uint) error {
 func backupInstall(ctx context.Context, install model.AppInstall) error {
 	var backup model.AppInstallBackup
 	appPath := install.GetPath()
-	backupDir := path.Join(constant.BackupDir, install.App.Key, install.Name)
+
+	backupAccount, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
+	if err != nil {
+		return err
+	}
+	varMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(backupAccount.Vars), &varMap); err != nil {
+		return err
+	}
+	dir, ok := varMap["dir"]
+	if !ok {
+		return errors.New("load local backup dir failed")
+	}
+	baseDir, ok := dir.(string)
+	if !ok {
+		return errors.New("load local backup dir failed")
+	}
+	backupDir := path.Join(baseDir, "apps", install.App.Key, install.Name)
 	fileOp := files.NewFileOp()
+	if !fileOp.Stat(backupDir) {
+		_ = fileOp.CreateDir(backupDir, 0775)
+	}
 	now := time.Now()
 	day := now.Format("20060102150405")
 	fileName := fmt.Sprintf("%s_%s%s", install.Name, day, ".tar.gz")

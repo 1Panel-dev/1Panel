@@ -13,10 +13,8 @@ func Init() {
 	constant.ResourceDir = path.Join(constant.DefaultDataDir, "resource")
 	constant.AppResourceDir = path.Join(constant.ResourceDir, "apps")
 	constant.AppInstallDir = path.Join(constant.DefaultDataDir, "apps")
-	constant.BackupDir = path.Join(constant.DefaultDataDir, "backup")
-	constant.AppBackupDir = path.Join(constant.BackupDir, "apps")
 
-	dirs := []string{constant.DefaultDataDir, constant.ResourceDir, constant.AppResourceDir, constant.AppInstallDir, constant.BackupDir, constant.AppBackupDir}
+	dirs := []string{constant.DefaultDataDir, constant.ResourceDir, constant.AppResourceDir, constant.AppInstallDir}
 
 	fileOp := files.NewFileOp()
 	for _, dir := range dirs {
