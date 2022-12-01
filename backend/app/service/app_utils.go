@@ -246,8 +246,8 @@ func backupInstall(ctx context.Context, install model.AppInstall) error {
 	backupDir := path.Join(constant.BackupDir, install.App.Key, install.Name)
 	fileOp := files.NewFileOp()
 	now := time.Now()
-	day := now.Format("2006-01-02-15-04")
-	fileName := fmt.Sprintf("%s-%s-%s%s", install.Name, install.Version, day, ".tar.gz")
+	day := now.Format("20060102150405")
+	fileName := fmt.Sprintf("%s_%s%s", install.Name, day, ".tar.gz")
 	if err := fileOp.Compress([]string{appPath}, backupDir, fileName, files.TarGz); err != nil {
 		return err
 	}

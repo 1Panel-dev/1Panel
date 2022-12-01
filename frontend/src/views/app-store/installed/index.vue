@@ -36,7 +36,7 @@
             <el-table-column :label="$t('website.port')" prop="httpPort"></el-table-column>
             <el-table-column :label="$t('app.backup')">
                 <template #default="{ row }">
-                    <el-link :underline="false" @click="openBackups(row.id)" type="primary">
+                    <el-link :underline="false" @click="openBackups(row.id, row.name)" type="primary">
                         {{ $t('app.backup') }} ({{ row.backups.length }})
                     </el-link>
                 </template>
@@ -261,9 +261,10 @@ const buttons = [
     },
 ];
 
-const openBackups = (installId: number) => {
+const openBackups = (installId: number, installName: string) => {
     let params = {
         appInstallId: installId,
+        appInstallName: installName,
     };
     backupRef.value.acceptParams(params);
 };

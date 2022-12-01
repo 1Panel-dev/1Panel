@@ -1,11 +1,38 @@
 <template>
-    <el-dialog v-model="open" :title="$t('app.backup')" width="70%" :before-close="handleClose">
-        <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" v-loading="loading">
+    <el-dialog
+        v-model="open"
+        :title="$t('app.backup') + ' - ' + installData.appInstallName"
+        width="70%"
+        :before-close="handleClose"
+        :close-on-click-modal="false"
+    >
+        <ComplexTable
+            :pagination-config="paginationConfig"
+            :data="data"
+            @search="search"
+            v-loading="loading"
+            v-model:selects="selects"
+        >
             <template #toolbar>
-                <el-button type="primary" plain @click="backup">{{ $t('app.backup') }}</el-button>
+                <el-button type="primary" @click="backup">{{ $t('app.backup') }}</el-button>
+                <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete()">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
             </template>
-            <el-table-column :label="$t('app.backupName')" prop="name"></el-table-column>
-            <el-table-column :label="$t('app.backupPath')" prop="path"></el-table-column>
+            <el-table-column type="selection" fix />
+
+            <el-table-column
+                :label="$t('app.backupName')"
+                min-width="120px"
+                prop="name"
+                show-overflow-tooltip
+            ></el-table-column>
+            <el-table-column
+                :label="$t('app.backupPath')"
+                min-width="120px"
+                prop="path"
+                show-overflow-tooltip
+            ></el-table-column>
             <el-table-column
                 prop="createdAt"
                 :label="$t('app.backupdate')"
@@ -48,10 +75,13 @@ import { useDeleteData } from '@/hooks/use-delete-data';
 
 interface InstallRrops {
     appInstallId: number;
+    appInstallName: string;
 }
 const installData = ref<InstallRrops>({
     appInstallId: 0,
+    appInstallName: '',
 });
+const selects = ref<any>([]);
 let open = ref(false);
 let loading = ref(false);
 let data = ref<any>();
@@ -75,6 +105,7 @@ const handleClose = () => {
 
 const acceptParams = (props: InstallRrops) => {
     installData.value.appInstallId = props.appInstallId;
+    installData.value.appInstallName = props.appInstallName;
     search();
     open.value = true;
 };
@@ -128,11 +159,16 @@ const restore = async () => {
 };
 
 const deleteBackup = async (ids: number[]) => {
-    const req = {
-        ids: ids,
-    };
-    await useDeleteData(DelAppBackups, req, 'commons.msg.delete', loading.value);
+    await useDeleteData(DelAppBackups, { ids: ids }, 'commons.msg.delete', loading.value);
     search();
+};
+
+const onBatchDelete = () => {
+    let ids: Array<number> = [];
+    selects.value.forEach((item: any) => {
+        ids.push(item.id);
+    });
+    deleteBackup(ids);
 };
 
 const buttons = [
