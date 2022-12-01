@@ -341,6 +341,7 @@ export default {
         last4Hour: '最近 4 小时',
         lastHour: '最近 1 小时',
         last10Min: '最近 10 分钟',
+        newName: '新名称',
 
         custom: '自定义',
         containerTerminal: '容器终端',
@@ -636,12 +637,14 @@ export default {
         language: '系统语言',
         languageHelper: '默认跟随浏览器语言，设置后只对当前浏览器生效，更换浏览器后需要重新设置',
         sessionTimeout: '超时时间',
+        sessionTimeoutError: '最小超时时间为 300 秒',
         sessionTimeoutHelper: '如果用户超过 {0} 秒未操作面板，面板将自动退出登录',
         syncTime: '同步时间',
         changePassword: '密码修改',
         oldPassword: '原密码',
         newPassword: '新密码',
         retryPassword: '确认密码',
+        duplicatePassword: '新密码不能与原始密码一致，请重新输入！',
 
         backup: '备份',
         noTypeForCreate: '当前无可创建备份类型',

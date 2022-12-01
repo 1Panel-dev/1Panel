@@ -95,7 +95,7 @@
 
                     <el-form-item
                         :label="$t('setting.sessionTimeout')"
-                        :rules="Rules.number"
+                        :rules="sessionTimeoutRules"
                         prop="settingInfo.sessionTimeout"
                     >
                         <el-input v-model.number="form.settingInfo.sessionTimeout">
@@ -198,6 +198,11 @@ const passForm = reactive({
     newPasswordComplexity: '',
     retryPassword: '',
 });
+
+const sessionTimeoutRules = [
+    Rules.number,
+    { min: 300, type: 'number', message: i18n.global.t('setting.sessionTimeoutError'), trigger: 'blur' },
+];
 
 interface Props {
     settingInfo: any;
