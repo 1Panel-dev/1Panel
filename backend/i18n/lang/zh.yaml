@@ -12,3 +12,7 @@ ErrNotLogin: "用户未登录: {{ .detail }}"
 ErrNotSafety: "当前用户登录状态不安全: {{ .detail }}"
 ErrPasswordExpired: "当前密码已过期: {{ .detail }}"
 ErrNotSupportType: "系统暂不支持当前类型: {{ .detail }}"
+
+
+#app
+ErrPortInUsed: "{{ .detail }} 已被占用！"

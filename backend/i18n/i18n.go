@@ -11,15 +11,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func GetMsg(msg string) string {
-	content := ginI18n.MustGetMessage(msg)
-	if content == "" {
-		return msg
-	} else {
-		return content
-	}
-}
-
 func GetMsgWithMap(msg string, maps map[string]interface{}) string {
 	content := ""
 	if maps == nil {
@@ -38,6 +29,21 @@ func GetMsgWithMap(msg string, maps map[string]interface{}) string {
 	} else {
 		return content
 	}
+}
+
+func GetErrMsg(msg string, maps map[string]interface{}) string {
+	content := ""
+	if maps == nil {
+		content = ginI18n.MustGetMessage(&i18n.LocalizeConfig{
+			MessageID: msg,
+		})
+	} else {
+		content = ginI18n.MustGetMessage(&i18n.LocalizeConfig{
+			MessageID:    msg,
+			TemplateData: maps,
+		})
+	}
+	return content
 }
 
 //go:embed lang/*

@@ -3,7 +3,6 @@ package service
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -132,11 +131,11 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 
 	httpPort, err := checkPort("PANEL_APP_PORT_HTTP", params)
 	if err != nil {
-		return nil, fmt.Errorf("%d port is in used", httpPort)
+		return nil, err
 	}
 	httpsPort, err := checkPort("PANEL_APP_PORT_HTTPS", params)
 	if err != nil {
-		return nil, fmt.Errorf("%d port is in used", httpsPort)
+		return nil, err
 	}
 
 	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(appDetailId))

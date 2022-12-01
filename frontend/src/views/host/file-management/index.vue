@@ -115,7 +115,7 @@
                         :label="$t('file.updateTime')"
                         prop="modTime"
                         :formatter="dateFromat"
-                        min-width="100"
+                        min-width="150"
                         show-overflow-tooltip
                     ></el-table-column>
 
