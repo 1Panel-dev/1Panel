@@ -731,6 +731,7 @@ export default {
         operatorHelper: '将对选中应用进行 {0} 操作，是否继续？',
         checkInstalledWarn: '未检测到 {0} ,请进入应用商店点击安装!',
         gotoInstalled: '去安装',
+        search: '搜索',
     },
     website: {
         website: '网站',

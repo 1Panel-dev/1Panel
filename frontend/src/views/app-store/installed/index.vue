@@ -19,7 +19,7 @@
                                 v-model="searchName"
                                 @click="search()"
                             >
-                                {{ '搜索' }}
+                                {{ $t('app.search') }}
                             </el-button>
                         </div>
                     </el-col>
@@ -31,9 +31,9 @@
                     <el-tag round effect="dark" v-if="row.canUpdate">{{ $t('app.canUpdate') }}</el-tag>
                 </template>
             </el-table-column>
-            <!-- <el-table-column :label="$t('app.description')" prop="description"></el-table-column> -->
             <el-table-column :label="$t('app.appName')" prop="app.name"></el-table-column>
             <el-table-column :label="$t('app.version')" prop="version"></el-table-column>
+            <el-table-column :label="$t('website.port')" prop="httpPort"></el-table-column>
             <el-table-column :label="$t('app.backup')">
                 <template #default="{ row }">
                     <el-link :underline="false" @click="openBackups(row.id)" type="primary">
