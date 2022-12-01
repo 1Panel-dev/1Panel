@@ -43,45 +43,41 @@
                     v-model:selects="selects"
                     :data="data"
                     v-loading="loading"
-                    @search="search(req)"
+                    @search="search"
                 >
                     <template #toolbar>
-                        <el-button-group>
-                            <el-dropdown split-button type="primary" @command="handleCreate">
+                        <el-dropdown @command="handleCreate">
+                            <el-button type="primary" icon="Plus">
                                 {{ $t('commons.button.create') }}
-                                <template #dropdown>
-                                    <el-dropdown-menu>
-                                        <el-dropdown-item command="dir">
-                                            <svg-icon iconName="p-file-folder"></svg-icon>
-                                            {{ $t('file.dir') }}
-                                        </el-dropdown-item>
-                                        <el-dropdown-item command="file">
-                                            <svg-icon iconName="p-file-normal"></svg-icon>
-                                            {{ $t('file.file') }}
-                                        </el-dropdown-item>
-                                    </el-dropdown-menu>
-                                </template>
-                            </el-dropdown>
-                        </el-button-group>
+                                <el-icon class="el-icon--right"><arrow-down /></el-icon>
+                            </el-button>
+                            <template #dropdown>
+                                <el-dropdown-menu>
+                                    <el-dropdown-item command="dir">
+                                        <svg-icon iconName="p-file-folder"></svg-icon>
+                                        {{ $t('file.dir') }}
+                                    </el-dropdown-item>
+                                    <el-dropdown-item command="file">
+                                        <svg-icon iconName="p-file-normal"></svg-icon>
+                                        {{ $t('file.file') }}
+                                    </el-dropdown-item>
+                                </el-dropdown-menu>
+                            </template>
+                        </el-dropdown>
                         <el-button-group style="margin-left: 5px">
-                            <el-button type="primary" plain @click="openUpload">{{ $t('file.upload') }}</el-button>
+                            <el-button plain @click="openUpload">{{ $t('file.upload') }}</el-button>
                             <!-- <el-button type="primary" plain> {{ $t('file.search') }}</el-button> -->
-                            <el-button type="primary" plain @click="openWget">{{ $t('file.remoteFile') }}</el-button>
-                            <el-button type="primary" plain @click="openMove('copy')" :disabled="selects.length === 0">
+                            <el-button plain @click="openWget">{{ $t('file.remoteFile') }}</el-button>
+                            <el-button plain @click="openMove('copy')" :disabled="selects.length === 0">
                                 {{ $t('file.copy') }}
                             </el-button>
-                            <el-button type="primary" plain @click="openMove('cut')" :disabled="selects.length === 0">
+                            <el-button plain @click="openMove('cut')" :disabled="selects.length === 0">
                                 {{ $t('file.move') }}
                             </el-button>
-                            <el-button
-                                type="primary"
-                                plain
-                                @click="openCompress(selects)"
-                                :disabled="selects.length === 0"
-                            >
+                            <el-button plain @click="openCompress(selects)" :disabled="selects.length === 0">
                                 {{ $t('file.compress') }}
                             </el-button>
-                            <el-button type="primary" plain @click="openDownload" :disabled="selects.length === 0">
+                            <el-button plain @click="openDownload" :disabled="selects.length === 0">
                                 {{ $t('file.download') }}
                             </el-button>
                         </el-button-group>
@@ -239,14 +235,14 @@ const defaultProps = {
 };
 
 const paginationConfig = reactive({
-    page: 1,
+    currentPage: 1,
     pageSize: 100,
     total: 0,
 });
 
-const search = async (req: File.ReqFile) => {
+const search = async () => {
     loading.value = true;
-    req.page = paginationConfig.page;
+    req.page = paginationConfig.currentPage;
     req.pageSize = paginationConfig.pageSize;
     await GetFilesList(req)
         .then((res) => {
@@ -275,7 +271,7 @@ const open = async (row: File.File) => {
         } else {
             req.path = req.path + '/' + name;
         }
-        search(req);
+        search();
     } else {
         openCodeEditor(row);
     }
@@ -294,7 +290,7 @@ const jump = async (index: number) => {
         }
     }
     req.path = path;
-    search(req);
+    search();
 };
 
 const getTree = async (req: File.ReqFile, node: File.FileTree | null) => {
@@ -319,7 +315,7 @@ const getTree = async (req: File.ReqFile, node: File.FileTree | null) => {
 const clickNode = async (node: any) => {
     if (node.path) {
         req.path = node.path;
-        search(req);
+        search();
     }
 };
 
@@ -346,7 +342,7 @@ const handleCreate = (commnad: string) => {
 
 const delFile = async (row: File.File | null) => {
     await useDeleteData(DeleteFile, row as File.FileDelete, 'commons.msg.delete', loading.value);
-    search(req);
+    search();
 };
 
 const getFileSize = (size: number) => {
@@ -373,7 +369,7 @@ const getIconName = (extension: string) => {
 
 const closeCreate = () => {
     filePage.open = false;
-    search(req);
+    search();
 };
 
 const openMode = (item: File.File) => {
@@ -383,7 +379,7 @@ const openMode = (item: File.File) => {
 
 const closeMode = () => {
     modePage.open = false;
-    search(req);
+    search();
 };
 
 const openCompress = (items: File.File[]) => {
@@ -403,7 +399,7 @@ const openCompress = (items: File.File[]) => {
 
 const closeCompress = () => {
     compressPage.open = false;
-    search(req);
+    search();
 };
 
 const openDeCompress = (item: File.File) => {
@@ -421,7 +417,7 @@ const openDeCompress = (item: File.File) => {
 
 const closeDeCompress = () => {
     deCompressPage.open = false;
-    search(req);
+    search();
 };
 
 const openCodeEditor = (row: File.File) => {
@@ -444,7 +440,7 @@ const openUpload = () => {
 
 const closeUpload = () => {
     uploadPage.open = false;
-    search(req);
+    search();
 };
 
 const openWget = () => {
@@ -455,7 +451,7 @@ const openWget = () => {
 const closeWget = (submit: any) => {
     console.log(submit);
     wgetPage.open = false;
-    search(req);
+    search();
     if (submit) {
         openProcess();
     }
@@ -477,7 +473,7 @@ const openRename = (item: File.File) => {
 
 const closeRename = () => {
     renamePage.open = false;
-    search(req);
+    search();
 };
 
 const openMove = (type: string) => {
@@ -492,7 +488,7 @@ const openMove = (type: string) => {
 
 const clodeMove = () => {
     movePage.open = false;
-    search(req);
+    search();
 };
 
 const openDownload = () => {
@@ -507,7 +503,7 @@ const openDownload = () => {
 
 const closeDownload = () => {
     downloadPage.open = false;
-    search(req);
+    search();
 };
 const saveContent = (content: string) => {
     editorPage.loading = true;
@@ -527,7 +523,7 @@ const quickSave = (content: string) => {
 };
 
 onMounted(() => {
-    search(req);
+    search();
 });
 
 //TODO button增加v-if判断
