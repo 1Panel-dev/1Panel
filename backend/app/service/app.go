@@ -124,6 +124,16 @@ func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, 
 	_ = json.Unmarshal([]byte(detail.Params), &paramMap)
 	appDetailDTO.AppDetail = detail
 	appDetailDTO.Params = paramMap
+	appDetailDTO.Enable = true
+
+	app, err := appRepo.GetFirst(commonRepo.WithByID(detail.AppId))
+	if err != nil {
+		return appDetailDTO, err
+	}
+	if err := checkLimit(app); err != nil {
+		appDetailDTO.Enable = false
+	}
+
 	return appDetailDTO, nil
 }
 

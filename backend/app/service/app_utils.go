@@ -347,16 +347,23 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 	return containerNames, nil
 }
 
-func checkRequiredAndLimit(app model.App) error {
-
+func checkLimit(app model.App) error {
 	if app.Limit > 0 {
 		installs, err := appInstallRepo.GetBy(appInstallRepo.WithAppId(app.ID))
 		if err != nil {
 			return err
 		}
 		if len(installs) >= app.Limit {
-			return errors.New(fmt.Sprintf("app install limit %d", app.Limit))
+			return buserr.New(constant.ErrAppLimit, "", nil)
 		}
+	}
+	return nil
+}
+
+func checkRequiredAndLimit(app model.App) error {
+
+	if err := checkLimit(app); err != nil {
+		return err
 	}
 
 	if app.Required != "" {
@@ -383,7 +390,7 @@ func checkRequiredAndLimit(app model.App) error {
 
 			_, err = appInstallRepo.GetFirst(appInstallRepo.WithDetailIdsIn(detailIds))
 			if err != nil {
-				return errors.New(fmt.Sprintf("%s is required", requireApp.Key))
+				return buserr.New(constant.ErrAppRequired, requireApp.Name, nil)
 			}
 		}
 	}

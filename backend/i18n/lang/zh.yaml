@@ -16,3 +16,5 @@ ErrNotSupportType: "系统暂不支持当前类型: {{ .detail }}"
 
 #app
 ErrPortInUsed: "{{ .detail }} 已被占用！"
+ErrAppLimit: "应用超出安装数量限制"
+ErrAppRequired: "请先安装 {{ .detail }} 应用"

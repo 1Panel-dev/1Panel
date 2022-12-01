@@ -36,6 +36,7 @@ export namespace App {
         readme: string;
         params: AppParams;
         dockerCompose: string;
+        enbale: boolean;
     }
 
     export interface AppReq extends ReqPage {
