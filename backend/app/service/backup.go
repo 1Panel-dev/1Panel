@@ -152,7 +152,7 @@ func (u *BackupService) BatchDeleteRecord(ids []uint) error {
 	}
 	for _, record := range records {
 		if record.Source == "LOCAL" {
-			if err := os.Remove(record.FileDir + record.FileName); err != nil {
+			if err := os.Remove(record.FileDir + "/" + record.FileName); err != nil {
 				global.LOG.Errorf("remove file %s failed, err: %v", record.FileDir+record.FileName, err)
 			}
 		} else {

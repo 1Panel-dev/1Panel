@@ -138,8 +138,8 @@ const buttons = [
         label: i18n.global.t('database.loadBackup'),
         click: (row: WebSite.WebSite) => {
             let params = {
-                mysqlName: 'test',
-                dbName: row.primaryDomain,
+                websiteName: row.primaryDomain,
+                websiteType: row.type,
             };
             uploadRef.value!.acceptParams(params);
         },

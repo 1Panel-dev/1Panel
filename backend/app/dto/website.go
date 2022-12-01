@@ -57,6 +57,13 @@ type WebSiteRecover struct {
 	BackupName  string `json:"backupName" validate:"required"`
 }
 
+type WebSiteRecoverByFile struct {
+	WebsiteName string `json:"websiteName" validate:"required"`
+	Type        string `json:"type" validate:"required"`
+	FileDir     string `json:"fileDir" validate:"required"`
+	FileName    string `json:"fileName" validate:"required"`
+}
+
 type WebSiteDTO struct {
 	model.WebSite
 }

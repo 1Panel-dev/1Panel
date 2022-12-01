@@ -43,6 +43,12 @@ export namespace WebSite {
         type: string;
         backupName: string;
     }
+    export interface WebsiteRecoverByUpload {
+        websiteName: string;
+        type: string;
+        fileDir: string;
+        fileName: string;
+    }
 
     export interface WebSiteDel {
         id: number;

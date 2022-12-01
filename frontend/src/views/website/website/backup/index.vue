@@ -6,7 +6,13 @@
                     <span>{{ $t('database.backup') }} - {{ websiteName }}</span>
                 </div>
             </template>
-            <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" @search="search" :data="data">
+            <ComplexTable
+                v-loading="loading"
+                :pagination-config="paginationConfig"
+                v-model:selects="selects"
+                @search="search"
+                :data="data"
+            >
                 <template #toolbar>
                     <el-button type="primary" @click="onBackup()">
                         {{ $t('database.backup') }}
@@ -43,6 +49,7 @@ import { Backup } from '@/api/interface/backup';
 import { BackupWebsite, RecoverWebsite } from '@/api/modules/website';
 
 const selects = ref<any>([]);
+const loading = ref(false);
 
 const data = ref();
 const paginationConfig = reactive({
@@ -88,14 +95,28 @@ const onRecover = async (row: Backup.RecordInfo) => {
         type: websiteType.value,
         backupName: row.fileDir + '/' + row.fileName,
     };
-    await RecoverWebsite(params);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    loading.value = true;
+    await RecoverWebsite(params)
+        .then(() => {
+            loading.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 const onBackup = async () => {
-    await BackupWebsite(websiteName.value);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-    search();
+    loading.value = true;
+    await BackupWebsite(websiteName.value)
+        .then(() => {
+            loading.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            search();
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 const onDownload = async (row: Backup.RecordInfo) => {

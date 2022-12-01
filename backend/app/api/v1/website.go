@@ -63,6 +63,24 @@ func (b *BaseApi) BackupWebsite(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+func (b *BaseApi) RecoverWebsiteByUpload(c *gin.Context) {
+	var req dto.WebSiteRecoverByFile
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := websiteService.RecoverByUpload(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
 func (b *BaseApi) RecoverWebsite(c *gin.Context) {
 	var req dto.WebSiteRecover
 	if err := c.ShouldBindJSON(&req); err != nil {

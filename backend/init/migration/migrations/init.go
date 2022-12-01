@@ -131,7 +131,7 @@ var AddTableBackupAccount = &gormigrate.Migration{
 		}
 		item := &model.BackupAccount{
 			Type: "LOCAL",
-			Vars: "{\"dir\":\"/opt/1Panel/backup\"}",
+			Vars: "{\"dir\":\"/opt/1Panel/data/backup\"}",
 		}
 		if err := tx.Create(item).Error; err != nil {
 			return err
