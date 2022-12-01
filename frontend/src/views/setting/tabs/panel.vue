@@ -252,6 +252,10 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
             form.settingInfo.complexityVerification === 'disable'
                 ? passForm.newPassword
                 : passForm.newPasswordComplexity;
+        if (password === passForm.oldPassword) {
+            ElMessage.error(i18n.global.t('setting.duplicatePassword'));
+            return;
+        }
         await updatePassword({ oldPassword: passForm.oldPassword, newPassword: password });
         passwordVisiable.value = false;
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
