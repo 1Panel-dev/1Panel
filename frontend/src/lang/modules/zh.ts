@@ -666,6 +666,7 @@ export default {
         expirationTime: '密码过期时间',
         unSetting: '未设置',
         noneSetting: '为面板密码设置过期时间，过期后需要重新设置密码',
+        expirationHelper: '密码过期时间为 [0] 天时，则关闭密码过期功能',
         days: '过期天数',
         expiredHelper: '当前密码已过期，请重新修改密码：',
         timeoutHelper: '【 {0} 天后 】面板密码即将过期，过期后需要重新设置密码',
