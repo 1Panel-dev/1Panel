@@ -45,7 +45,9 @@ var (
 
 // app
 var (
-	ErrPortInUsed  = "ErrPortInUsed"
-	ErrAppLimit    = "ErrAppLimit"
-	ErrAppRequired = "ErrAppRequired"
+	ErrPortInUsed     = "ErrPortInUsed"
+	ErrAppLimit       = "ErrAppLimit"
+	ErrAppRequired    = "ErrAppRequired"
+	ErrFileCanNotRead = "ErrFileCanNotRead"
+	ErrFileToLarge    = "ErrFileToLarge"
 )

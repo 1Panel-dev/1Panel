@@ -21,3 +21,8 @@ ErrNameIsExist: "名称已存在"
 ErrPortInUsed: "{{ .detail }} 端口已被占用！"
 ErrAppLimit: "应用超出安装数量限制"
 ErrAppRequired: "请先安装 {{ .detail }} 应用"
+
+
+#file
+ErrFileCanNotRead: "文件不可读"
+ErrFileToLarge: "文件超过10M,无法打开"

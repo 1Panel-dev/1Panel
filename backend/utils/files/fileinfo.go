@@ -2,13 +2,14 @@ package files
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"os"
 	"path"
 	"path/filepath"
 	"syscall"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/afero"
 )
 
@@ -170,9 +171,36 @@ func (f *FileInfo) getContent() error {
 		if err != nil {
 			return nil
 		}
+		if detectBinary(cByte) {
+			return buserr.New(constant.ErrFileCanNotRead, "", nil)
+		}
 		f.Content = string(cByte)
 		return nil
 	} else {
-		return errors.New("file is too large!")
+		return buserr.New(constant.ErrFileToLarge, "", nil)
 	}
+}
+
+func detectBinary(buf []byte) bool {
+	var whiteByte int = 0
+	n := min(1024, len(buf))
+	for i := 0; i < n; i++ {
+		if (buf[i] >= 0x20) || buf[i] == 9 || buf[i] == 10 || buf[i] == 13 {
+			whiteByte++
+		} else if buf[i] <= 6 || (buf[i] >= 14 && buf[i] <= 31) {
+			return true
+		}
+	}
+
+	if whiteByte >= 1 {
+		return false
+	}
+	return true
+}
+
+func min(x, y int) int {
+	if x < y {
+		return x
+	}
+	return y
 }
