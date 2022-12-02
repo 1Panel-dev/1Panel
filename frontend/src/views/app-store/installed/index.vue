@@ -131,6 +131,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import Backups from './backups.vue';
 import AppResources from './check/index.vue';
 import { App } from '@/api/interface/app';
+import { useDeleteData } from '@/hooks/use-delete-data';
 
 let data = ref<any>();
 let loading = ref(false);
@@ -188,12 +189,12 @@ const openOperate = (row: any, op: string) => {
             open.value = true;
         });
     } else if (op == 'delete') {
-        AppInstalledDeleteCheck(row.id).then((res) => {
+        AppInstalledDeleteCheck(row.id).then(async (res) => {
             const items = res.data;
             if (res.data && res.data.length > 0) {
                 checkRef.value.acceptParams({ items: items });
             } else {
-                onOperate(op);
+                await useDeleteData(InstalledOp, operateReq, 'app.deleteWarn');
             }
         });
     } else {
@@ -228,16 +229,7 @@ const onOperate = async (operation: string) => {
             type: 'info',
         },
     ).then(() => {
-        open.value = false;
-        loading.value = true;
-        InstalledOp(operateReq)
-            .then(() => {
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-            })
-            .finally(() => {
-                loading.value = false;
-            });
+        operate();
     });
 };
 
