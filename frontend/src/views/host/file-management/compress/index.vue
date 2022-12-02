@@ -27,7 +27,7 @@
                 </el-input>
             </el-form-item>
             <el-form-item :label="$t('file.compressDst')" prop="dst">
-                <el-input v-model="form.dst">
+                <el-input v-model="form.dst" disabled>
                     <template #append><FileList :path="props.dst" @choose="getLinkPath"></FileList></template>
                 </el-input>
             </el-form-item>
