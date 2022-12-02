@@ -60,14 +60,14 @@
     },
     {
       "key": "redis",
-      "name": "redis",
+      "name": "Redis",
       "tags": ["Database"],
       "versions": ["7.0.5","6.0.16"],
       "short_desc": "高性能的 key-value 数据库",
       "author": "Salvatore Sanfilippo",
       "type": "runtime",
       "required": [],
-      "limit": 0,
+      "limit": 1,
       "crossVersionUpdate": true,
       "source": "https://redis.io/"
     },
