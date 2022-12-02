@@ -224,7 +224,7 @@ const onBatchDelete = async (row: Backup.BackupInfo | null) => {
     } else {
         ids.push(row.id);
     }
-    await useDeleteData(deleteBackup, { ids: ids }, 'commons.msg.delete', true);
+    await useDeleteData(deleteBackup, { ids: ids }, 'commons.msg.delete');
     search();
     restForm();
 };

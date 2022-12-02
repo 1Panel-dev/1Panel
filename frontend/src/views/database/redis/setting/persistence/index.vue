@@ -215,7 +215,7 @@ const onBatchDelete = async (row: Database.FileRecord | null) => {
             files.push(item.fileDir + '/' + item.fileName);
         });
     }
-    await useDeleteData(BatchDeleteFile, { isDir: false, paths: files }, 'commons.msg.delete', true);
+    await useDeleteData(BatchDeleteFile, { isDir: false, paths: files }, 'commons.msg.delete');
     loadBackupRecords();
 };
 const buttons = [

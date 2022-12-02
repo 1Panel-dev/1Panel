@@ -72,6 +72,6 @@ function onSave(formEl: FormInstance | undefined, key: string, val: any) {
 }
 
 const onClean = async () => {
-    await useDeleteData(cleanMonitors, {}, 'commons.msg.delete', true);
+    await useDeleteData(cleanMonitors, {}, 'commons.msg.delete');
 };
 </script>

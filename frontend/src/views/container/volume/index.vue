@@ -103,7 +103,7 @@ const batchDelete = async (row: Container.VolumeInfo | null) => {
     } else {
         ids.push(row.name);
     }
-    await useDeleteData(deleteVolume, { ids: ids }, 'commons.msg.delete', true);
+    await useDeleteData(deleteVolume, { ids: ids }, 'commons.msg.delete');
     search();
 };
 

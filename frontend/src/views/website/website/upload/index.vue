@@ -183,7 +183,7 @@ const onBatchDelete = async (row: File.File | null) => {
             files.push(baseDir.value + '/' + item.name);
         });
     }
-    await useDeleteData(BatchDeleteFile, { isDir: false, paths: files }, 'commons.msg.delete', true);
+    await useDeleteData(BatchDeleteFile, { isDir: false, paths: files }, 'commons.msg.delete');
     search();
 };
 

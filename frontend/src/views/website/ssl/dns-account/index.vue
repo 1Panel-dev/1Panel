@@ -87,7 +87,7 @@ const openEdit = (form: WebSite.DnsAccount) => {
 
 const deleteAccount = async (id: number) => {
     loading.value = true;
-    await useDeleteData(DeleteDnsAccount, id, 'commons.msg.delete', false);
+    await useDeleteData(DeleteDnsAccount, id, 'commons.msg.delete');
     loading.value = false;
     search();
 };
