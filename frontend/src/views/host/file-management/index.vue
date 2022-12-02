@@ -96,7 +96,7 @@
                             <el-link :underline="false" @click="openMode(row)">{{ row.mode }}</el-link>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('file.user')" prop="user"></el-table-column>
+                    <el-table-column :label="$t('file.user')" prop="user" show-overflow-tooltip></el-table-column>
                     <el-table-column :label="$t('file.group')" prop="group"></el-table-column>
                     <el-table-column :label="$t('file.size')" prop="size">
                         <template #default="{ row }">
@@ -425,8 +425,8 @@ const openCodeEditor = (row: File.File) => {
     codeReq.expand = true;
     GetFileContent(codeReq).then((res) => {
         editorPage.content = res.data.content;
+        editorPage.open = true;
     });
-    editorPage.open = true;
 };
 
 const closeCodeEditor = () => {
