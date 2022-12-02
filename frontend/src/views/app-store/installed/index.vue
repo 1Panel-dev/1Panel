@@ -195,6 +195,7 @@ const openOperate = (row: any, op: string) => {
                 checkRef.value.acceptParams({ items: items });
             } else {
                 await useDeleteData(InstalledOp, operateReq, 'app.deleteWarn');
+                search();
             }
         });
     } else {
