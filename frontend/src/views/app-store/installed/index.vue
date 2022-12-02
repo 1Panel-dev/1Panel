@@ -25,7 +25,7 @@
                     </el-col>
                 </el-row>
             </template>
-            <el-table-column :label="$t('app.name')" prop="name">
+            <el-table-column :label="$t('app.name')" prop="name" min-width="150px" show-overflow-tooltip>
                 <template #default="{ row }">
                     {{ row.name }}
                     <el-tag round effect="dark" v-if="row.canUpdate">{{ $t('app.canUpdate') }}</el-tag>
