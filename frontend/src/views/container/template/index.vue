@@ -4,7 +4,7 @@
         <el-card style="margin-top: 20px">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
                 <template #toolbar>
-                    <el-button type="primary" @click="onOpenDialog('create')">
+                    <el-button icon="Plus" type="primary" @click="onOpenDialog('create')">
                         {{ $t('commons.button.create') }}
                     </el-button>
                     <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">

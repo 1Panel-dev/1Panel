@@ -13,7 +13,9 @@
                     :data="data"
                 >
                     <template #toolbar>
-                        <el-button type="primary" @click="onOpenDialog()">{{ $t('commons.button.create') }}</el-button>
+                        <el-button type="primary" icon="Plus" @click="onOpenDialog()">
+                            {{ $t('commons.button.create') }}
+                        </el-button>
                         <el-button>phpMyAdmin</el-button>
                         <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                             {{ $t('commons.button.delete') }}

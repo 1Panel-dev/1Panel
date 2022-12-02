@@ -121,6 +121,7 @@
                             <el-button
                                 v-if="hostOperation === 'create'"
                                 type="primary"
+                                icon="Plus"
                                 @click="submitAddHost(hostInfoRef, 'create')"
                             >
                                 {{ $t('commons.button.create') }}

@@ -7,7 +7,7 @@
                 <LayoutContent :header="$t('website.website')">
                     <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search()">
                         <template #toolbar>
-                            <el-button type="primary" plain @click="openCreate">
+                            <el-button type="primary" icon="Plus" @click="openCreate">
                                 {{ $t('commons.button.create') }}
                             </el-button>
                             <el-button type="primary" plain @click="openGroup">{{ $t('website.group') }}</el-button>

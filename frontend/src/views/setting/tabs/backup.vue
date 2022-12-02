@@ -5,7 +5,7 @@
                 <span>{{ $t('setting.backup') }}</span>
             </div>
         </template>
-        <el-button type="primary" @click="onCreate">
+        <el-button type="primary" icon="Plus" @click="onCreate">
             {{ $t('commons.button.create') }}
         </el-button>
         <el-row :gutter="20" class="row-box">

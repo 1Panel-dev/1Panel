@@ -7,7 +7,7 @@
     >
         <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
             <template #toolbar>
-                <el-button type="primary" plain @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                <el-button type="primary" icon="Plus" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
             </template>
             <el-table-column :label="$t('website.email')" fix show-overflow-tooltip prop="email"></el-table-column>
             <el-table-column label="URL" show-overflow-tooltip prop="url"></el-table-column>

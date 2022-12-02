@@ -2,7 +2,9 @@
     <LayoutContent :header="$t('website.ssl')">
         <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
             <template #toolbar>
-                <el-button type="primary" plain @click="openSSL()">{{ $t('commons.button.create') }}</el-button>
+                <el-button type="primary" icon="Plus" @click="openSSL()">
+                    {{ $t('commons.button.create') }}
+                </el-button>
                 <el-button type="primary" plain @click="openAcmeAccount()">
                     {{ $t('website.acmeAccountManage') }}
                 </el-button>

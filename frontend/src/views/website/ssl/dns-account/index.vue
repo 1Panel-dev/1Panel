@@ -7,7 +7,7 @@
     >
         <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
             <template #toolbar>
-                <el-button type="primary" plain @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                <el-button type="primary" icon="Plus" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
             </template>
             <el-table-column :label="$t('commons.table.name')" fix show-overflow-tooltip prop="name"></el-table-column>
             <el-table-column :label="$t('commons.table.type')" prop="type">

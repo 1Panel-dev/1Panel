@@ -9,7 +9,7 @@
     >
         <ComplexTable :data="data" @search="search()">
             <template #toolbar>
-                <el-button type="primary" plain @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                <el-button type="primary" icon="Plus" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
             </template>
             <el-table-column :label="$t('commons.table.name')" prop="name">
                 <template #default="{ row }">
