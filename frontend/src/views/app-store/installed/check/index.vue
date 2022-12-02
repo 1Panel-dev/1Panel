@@ -11,7 +11,10 @@
             <el-col :span="12" :offset="6">
                 <br />
                 <el-descriptions border :column="1">
-                    <el-descriptions-item v-for="(item, key) in map" :key="key" :label="$t('app.' + item[0])">
+                    <el-descriptions-item v-for="(item, key) in map" :key="key">
+                        <template #label>
+                            <a href="javascript:void(0);" @click="toPage(item[0])">{{ $t('app.' + item[0]) }}</a>
+                        </template>
                         {{ map.get(item[0]).toString() }}
                     </el-descriptions-item>
                 </el-descriptions>
@@ -22,6 +25,8 @@
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 interface InstallRrops {
     items: App.AppInstallResource[];
@@ -46,6 +51,18 @@ const acceptParams = (props: InstallRrops) => {
         }
     });
     open.value = true;
+};
+
+const toPage = (key: string) => {
+    if (key === 'app') {
+        open.value = false;
+    }
+    if (key === 'website') {
+        router.push({ name: 'Website' });
+    }
+    if (key === 'database') {
+        router.push({ name: 'Mysql' });
+    }
 };
 
 defineExpose({
