@@ -157,9 +157,11 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
 	}
 	container, err := client.ContainerCreate(context.TODO(), config, hostConf, &network.NetworkingConfig{}, &v1.Platform{}, req.Name)
 	if err != nil {
+		_ = client.ContainerRemove(context.Background(), req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 		return err
 	}
 	if err := client.ContainerStart(context.TODO(), container.ID, types.ContainerStartOptions{}); err != nil {
+		_ = client.ContainerRemove(context.Background(), req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 		return fmt.Errorf("create successful but start failed, err: %v", err)
 	}
 	return nil
