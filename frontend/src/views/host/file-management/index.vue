@@ -341,7 +341,7 @@ const handleCreate = (commnad: string) => {
 };
 
 const delFile = async (row: File.File | null) => {
-    await useDeleteData(DeleteFile, row as File.FileDelete, 'commons.msg.delete', loading.value);
+    await useDeleteData(DeleteFile, row as File.FileDelete, 'commons.msg.delete');
     search();
 };
 

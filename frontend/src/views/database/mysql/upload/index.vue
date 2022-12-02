@@ -173,7 +173,7 @@ const onBatchDelete = async (row: File.File | null) => {
             files.push(baseDir + item.name);
         });
     }
-    await useDeleteData(BatchDeleteFile, { paths: files, isDir: false }, 'commons.msg.delete', true);
+    await useDeleteData(BatchDeleteFile, { paths: files, isDir: false }, 'commons.msg.delete');
     search();
 };
 

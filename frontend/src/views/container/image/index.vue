@@ -157,7 +157,7 @@ const batchDelete = async (option: string) => {
             ids.push(item);
         }
     }
-    await useDeleteData(imageRemove, { ids: ids }, 'commons.msg.delete', true);
+    await useDeleteData(imageRemove, { ids: ids }, 'commons.msg.delete');
     deleteVisiable.value = false;
     search();
 };

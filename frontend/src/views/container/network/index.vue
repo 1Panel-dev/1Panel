@@ -111,7 +111,7 @@ const batchDelete = async (row: Container.NetworkInfo | null) => {
     } else {
         ids.push(row.id);
     }
-    await useDeleteData(deleteNetwork, { ids: ids }, 'commons.msg.delete', true);
+    await useDeleteData(deleteNetwork, { ids: ids }, 'commons.msg.delete');
     search();
 };
 

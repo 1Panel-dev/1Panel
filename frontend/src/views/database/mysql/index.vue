@@ -227,7 +227,7 @@ const onBatchDelete = async (row: Database.MysqlDBInfo | null) => {
             ids.push(item.id);
         });
     }
-    await useDeleteData(deleteMysqlDB, { ids: ids }, 'commons.msg.delete', true);
+    await useDeleteData(deleteMysqlDB, { ids: ids }, 'commons.msg.delete');
     search();
 };
 const buttons = [

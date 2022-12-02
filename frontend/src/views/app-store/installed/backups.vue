@@ -167,7 +167,7 @@ const restore = async () => {
 };
 
 const deleteBackup = async (ids: number[]) => {
-    await useDeleteData(DelAppBackups, { ids: ids }, 'commons.msg.delete', loading.value);
+    await useDeleteData(DelAppBackups, { ids: ids }, 'commons.msg.delete');
     search();
 };
 

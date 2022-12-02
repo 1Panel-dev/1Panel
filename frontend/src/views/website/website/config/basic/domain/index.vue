@@ -49,7 +49,7 @@ const openCreate = () => {
 };
 
 const deleteDoamin = async (domainId: number) => {
-    await useDeleteData(DeleteDomain, domainId, 'commons.msg.delete', loading.value);
+    await useDeleteData(DeleteDomain, domainId, 'commons.msg.delete');
     search(id.value);
 };
 

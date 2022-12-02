@@ -141,7 +141,7 @@ const onBatchDelete = async (row: Container.RepoInfo | null) => {
             ids.push(item.id);
         });
     }
-    await useDeleteData(deleteComposeTemplate, { ids: ids }, 'commons.msg.delete', true);
+    await useDeleteData(deleteComposeTemplate, { ids: ids }, 'commons.msg.delete');
     search();
 };
 

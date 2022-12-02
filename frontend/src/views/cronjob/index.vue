@@ -164,7 +164,7 @@ const onBatchDelete = async (row: Cronjob.CronjobInfo | null) => {
             ids.push(item.id);
         });
     }
-    await useDeleteData(deleteCronjob, { ids: ids }, 'commons.msg.delete', true);
+    await useDeleteData(deleteCronjob, { ids: ids }, 'commons.msg.delete');
     search();
 };
 const beforeChangeStatus = () => {

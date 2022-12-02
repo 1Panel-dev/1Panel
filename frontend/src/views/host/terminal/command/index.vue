@@ -115,7 +115,7 @@ const batchDelete = async (row: Command.CommandInfo | null) => {
     } else {
         ids.push(row.id);
     }
-    await useDeleteData(deleteCommand, { ids: ids }, 'commons.msg.delete', true);
+    await useDeleteData(deleteCommand, { ids: ids }, 'commons.msg.delete');
     search();
 };
 

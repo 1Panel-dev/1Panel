@@ -144,7 +144,7 @@ const onBatchDelete = async (row: Backup.RecordInfo | null) => {
             ids.push(item.id);
         });
     }
-    await useDeleteData(deleteBackupRecord, { ids: ids }, 'commons.msg.delete', true);
+    await useDeleteData(deleteBackupRecord, { ids: ids }, 'commons.msg.delete');
     search();
 };
 
