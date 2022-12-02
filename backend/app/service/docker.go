@@ -85,9 +85,9 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 		deamonMap["insecure-registries"] = req.Registries
 	}
 	if len(req.Mirrors) == 0 {
-		delete(deamonMap, "insecure-mirrors")
+		delete(deamonMap, "registry-mirrors")
 	} else {
-		deamonMap["insecure-mirrors"] = req.Mirrors
+		deamonMap["registry-mirrors"] = req.Mirrors
 	}
 	if len(req.Bip) == 0 {
 		delete(deamonMap, "bip")

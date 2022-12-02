@@ -415,6 +415,8 @@ export default {
         imageRepo: 'Image repo',
         repoHelper: 'Does it include a mirror repository/organization/project?',
         auth: 'Auth',
+        mirrorHelper: 'One in a row, for example:\nhttps://hub-mirror.c.163.com \nhttps://reg-mirror.qiniu.com',
+        registrieHelper: 'One in a row, for example:\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: 'Compose',
         composeTemplate: 'Compose template',

@@ -39,7 +39,7 @@
                             v-model="quickCmd"
                             clearable
                             filterable
-                            @blur="quickInput(quickCmd)"
+                            @change="quickInput(quickCmd)"
                             style="width: 25%"
                             :placeholder="$t('terminal.quickCommand')"
                         >
@@ -267,6 +267,7 @@ function quickInput(val: any) {
     if (val !== '') {
         if (ctx) {
             ctx.refs[`Ref${terminalValue.value}`] && ctx.refs[`Ref${terminalValue.value}`][0].onSendMsg(val + '\n');
+            quickCmd.value = '';
         }
     }
 }

@@ -423,6 +423,8 @@ export default {
         imageRepo: '镜像仓库',
         repoHelper: '是否包含镜像仓库/组织/项目?',
         auth: '认证',
+        mirrorHelper: '一行一个，例：\nhttps://hub-mirror.c.163.com \nhttps://reg-mirror.qiniu.com',
+        registrieHelper: '一行一个，例：\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: '编排',
         composeTemplate: '编排模版',

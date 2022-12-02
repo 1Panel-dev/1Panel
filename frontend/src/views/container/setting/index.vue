@@ -13,8 +13,8 @@
                         <el-form-item :label="$t('container.mirrors')" prop="mirrors">
                             <el-input
                                 type="textarea"
-                                :placeholder="$t('container.tagHelper')"
-                                :autosize="{ minRows: 2, maxRows: 10 }"
+                                :placeholder="$t('container.mirrorHelper')"
+                                :autosize="{ minRows: 3, maxRows: 10 }"
                                 v-model="form.mirrors"
                             />
                             <span class="input-help">{{ $t('container.mirrorsHelper') }}</span>
@@ -22,8 +22,8 @@
                         <el-form-item :label="$t('container.registries')" prop="registries">
                             <el-input
                                 type="textarea"
-                                :placeholder="$t('container.tagHelper')"
-                                :autosize="{ minRows: 2, maxRows: 10 }"
+                                :placeholder="$t('container.registrieHelper')"
+                                :autosize="{ minRows: 3, maxRows: 10 }"
                                 v-model="form.registries"
                             />
                         </el-form-item>
@@ -127,21 +127,28 @@ const onSubmitSave = async () => {
     if (confShowType.value === 'all') {
         let param = {
             file: dockerConf.value,
-            path: '/opt/1Panel/docker/config/daemon.json',
+            path: '/opt/1Panel/docker/conf/daemon.json',
         };
         await updateDaemonJsonByfile(param);
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         return;
     }
+    let itemMirrors = form.mirrors.split('\n');
+    let itemRegistries = form.registries.split('\n');
     let param = {
         status: form.status,
         bip: form.bip,
-        registryMirrors: form.mirrors.split('\n'),
-        insecureRegistries: form.registries.split('\n'),
+        registryMirrors: itemMirrors.filter(function (el) {
+            return el !== null && el !== '' && el !== undefined;
+        }),
+        insecureRegistries: itemRegistries.filter(function (el) {
+            return el !== null && el !== '' && el !== undefined;
+        }),
         liveRestore: form.liveRestore,
         cgroupDriver: form.cgroupDriver,
     };
     await updateDaemonJson(param);
+    search();
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };
 
