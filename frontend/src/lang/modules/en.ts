@@ -99,6 +99,7 @@ export default {
             requiredInput: 'Please enter the required fields',
             requiredSelect: 'Please select the required fields',
             commonName: 'Support English, Chinese, numbers, .-_, length 1-30',
+            imageName: 'Support English, Chinese, numbers, :.-_, length 1-30',
             complexityPassword:
                 'Please enter a password with more than 8 characters and must contain letters, digits, and special symbols',
             commonPassword: 'Please enter a password with more than 6 characters',
@@ -636,6 +637,7 @@ export default {
         backup: 'Backup',
         noTypeForCreate: 'No backup type is currently created',
         serverDisk: 'Server disks',
+        currentPath: 'Current path',
         OSS: 'Ali OSS',
         S3: 'Amazon S3',
         backupAccount: 'Backup account',

@@ -47,7 +47,7 @@
             placeholder="Wait for build output..."
             :indent-with-tab="true"
             :tabSize="4"
-            style="max-height: 500px"
+            style="max-height: 300px"
             :lineWrapping="true"
             :matchBrackets="true"
             theme="cobalt"
@@ -100,7 +100,7 @@ const varifyPath = (rule: any, value: any, callback: any) => {
     callback();
 };
 const rules = reactive({
-    name: [Rules.requiredInput, Rules.name],
+    name: [Rules.requiredInput, Rules.imageName],
     from: [Rules.requiredSelect],
     dockerfile: [Rules.requiredInput, { validator: varifyPath, trigger: 'change', required: true }],
 });
@@ -110,6 +110,7 @@ const acceptParams = async () => {
     form.dockerfile = '';
     form.tagStr = '';
     form.name = '';
+    logInfo.value = '';
 };
 
 const emit = defineEmits<{ (e: 'search'): void }>();

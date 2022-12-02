@@ -106,6 +106,12 @@ const SaveSetting = async (formEl: FormInstance | undefined, key: string, val: a
             globalStore.setThemeConfig({ ...themeConfig.value, theme: val });
             switchDark();
             break;
+        case 'SessionTimeout':
+            if (Number(val) < 300) {
+                ElMessage.error(i18n.t('setting.sessionTimeoutError'));
+                search();
+                return;
+            }
         case 'PanelName':
             globalStore.setThemeConfig({ ...themeConfig.value, panelName: val });
             break;
