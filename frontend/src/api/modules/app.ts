@@ -51,7 +51,7 @@ export const SyncInstalledApp = () => {
 };
 
 export const GetAppService = (key: string | undefined) => {
-    return http.get<any>(`apps/services/${key}`);
+    return http.get<App.AppService[]>(`apps/services/${key}`);
 };
 
 export const GetAppBackups = (info: App.AppBackupReq) => {

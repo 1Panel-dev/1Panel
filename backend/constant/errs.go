@@ -40,6 +40,7 @@ var (
 	ErrTypeNotLogin        = "ErrNotLogin"
 	ErrTypePasswordExpired = "ErrPasswordExpired"
 	ErrTypeNotSafety       = "ErrNotSafety"
+	ErrNameIsExist         = "ErrNameIsExist"
 )
 
 // app

@@ -14,6 +14,9 @@ ErrPasswordExpired: "当前密码已过期: {{ .detail }}"
 ErrNotSupportType: "系统暂不支持当前类型: {{ .detail }}"
 
 
+#common
+ErrNameIsExist: "名称已存在"
+
 #app
 ErrPortInUsed: "{{ .detail }} 已被占用！"
 ErrAppLimit: "应用超出安装数量限制"

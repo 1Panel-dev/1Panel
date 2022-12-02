@@ -436,20 +436,21 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 }
 
 func copyAppData(key, version, installName string, params map[string]interface{}) (err error) {
-	resourceDir := path.Join(constant.AppResourceDir, key, "versions", version)
-	installDir := path.Join(constant.AppInstallDir, key)
-	installVersionDir := path.Join(installDir, version)
 	fileOp := files.NewFileOp()
-	if fileOp.Stat(installVersionDir) {
-		if err = fileOp.DeleteDir(installVersionDir); err != nil {
+	resourceDir := path.Join(constant.AppResourceDir, key, "versions", version)
+	installAppDir := path.Join(constant.AppInstallDir, key)
+	if !fileOp.Stat(installAppDir) {
+		if err = fileOp.CreateDir(installAppDir, 0755); err != nil {
 			return
 		}
 	}
-	if err = fileOp.Copy(resourceDir, installVersionDir); err != nil {
-		return
+	appDir := path.Join(installAppDir, installName)
+	if fileOp.Stat(appDir) {
+		if err = fileOp.DeleteDir(appDir); err != nil {
+			return
+		}
 	}
-	appDir := path.Join(installDir, installName)
-	if err = fileOp.Rename(installVersionDir, appDir); err != nil {
+	if err = fileOp.Copy(resourceDir, appDir); err != nil {
 		return
 	}
 	envPath := path.Join(appDir, ".env")

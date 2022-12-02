@@ -15,7 +15,11 @@
                 show-password
                 @change="updateParam"
             ></el-input>
-            <el-select v-model="form[p.envKey]" v-if="p.type == 'service'" @change="updateParam">
+            <el-select
+                v-model="form[p.envKey]"
+                v-if="p.type == 'service'"
+                @change="changeService(form[p.envKey], p.services)"
+            >
                 <el-option
                     v-for="service in p.services"
                     :key="service.label"
@@ -112,8 +116,6 @@ const handleParams = () => {
             emit('update:rules', rules);
             updateParam();
         }
-        console.log(rules);
-        console.log(paramObjs);
     }
 };
 
@@ -122,9 +124,25 @@ const getServices = async (envKey: string, key: string | undefined, pObj: ParamO
         pObj.services = res.data;
         if (res.data.length > 0) {
             form[envKey] = res.data[0].value;
+            if (res.data[0].config) {
+                Object.entries(res.data[0].config).forEach(([k, v]) => {
+                    form[k] = v;
+                });
+            }
             updateParam();
         }
     });
+};
+
+const changeService = (value: string, services: App.AppService[]) => {
+    services.forEach((item) => {
+        if (item.value === value) {
+            Object.entries(item.config).forEach(([k, v]) => {
+                form[k] = v;
+            });
+        }
+    });
+    updateParam();
 };
 
 onMounted(() => {

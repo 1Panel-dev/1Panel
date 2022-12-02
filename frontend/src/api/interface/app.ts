@@ -117,6 +117,7 @@ export namespace App {
     export interface AppService {
         label: string;
         value: string;
+        config?: Object;
     }
 
     export interface AppBackupReq extends ReqPage {
