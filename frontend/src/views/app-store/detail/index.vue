@@ -1,6 +1,6 @@
 <template>
     <el-card>
-        <LayoutContent :header="$t('app.detail')" :back-name="'App'">
+        <LayoutContent :header="$t('app.detail')" :back-name="'App'" :v-loading="loadingDetail">
             <div class="brief">
                 <el-row :gutter="20">
                     <el-col :span="4">
@@ -42,7 +42,7 @@
                                 <el-descriptions-item :label="$t('app.author')">{{ app.author }}</el-descriptions-item>
                             </el-descriptions>
                             <div>
-                                <el-button :disabled="!appDetail.enable" @click="openInstall" type="primary">
+                                <el-button v-if="appDetail.enable" @click="openInstall" type="primary">
                                     {{ $t('app.install') }}
                                 </el-button>
                             </div>
