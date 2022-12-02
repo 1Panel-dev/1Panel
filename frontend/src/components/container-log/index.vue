@@ -89,6 +89,7 @@ const onDownload = async () => {
 };
 
 interface DialogProps {
+    container: string;
     containerID: string;
 }
 
@@ -96,6 +97,7 @@ const acceptParams = (props: DialogProps): void => {
     logSearch.containerID = props.containerID;
     logSearch.mode = 'all';
     logSearch.isWatch = false;
+    logSearch.container = props.container;
     searchLogs();
     timer = setInterval(() => {
         if (logSearch.isWatch) {

@@ -47,6 +47,10 @@ func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 			res.Msg = i18n.GetMsgWithMap("ErrStructTransform", map[string]interface{}{"detail": err})
 		case errors.Is(constant.ErrCaptchaCode, err):
 			res.Msg = i18n.GetMsgWithMap("ErrCaptchaCode", map[string]interface{}{"detail": err})
+		case errors.Is(constant.ErrAuth, err):
+			res.Msg = i18n.GetMsgWithMap("ErrAuth", map[string]interface{}{"detail": err})
+		case errors.Is(constant.ErrInitialPassword, err):
+			res.Msg = i18n.GetMsgWithMap("ErrInitialPassword", map[string]interface{}{"detail": err})
 		default:
 			res.Msg = i18n.GetMsgWithMap(msgKey, map[string]interface{}{"detail": err})
 		}

@@ -25,9 +25,6 @@
                         v-model="row.status"
                         inline-prompt
                         size="default"
-                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949"
-                        active-text="Y"
-                        inactive-text="N"
                         active-value="Enable"
                         inactive-value="Disable"
                     />

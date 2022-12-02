@@ -19,6 +19,7 @@ const (
 // internal
 var (
 	ErrCaptchaCode     = errors.New("ErrCaptchaCode")
+	ErrAuth            = errors.New("ErrAuth")
 	ErrRecordExist     = errors.New("ErrRecordExist")
 	ErrRecordNotFound  = errors.New("ErrRecordNotFound")
 	ErrStructTransform = errors.New("ErrStructTransform")

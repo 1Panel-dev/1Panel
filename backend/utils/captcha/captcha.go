@@ -26,7 +26,7 @@ func VerifyCode(codeID string, code string) error {
 
 func CreateCaptcha() (*dto.CaptchaResponse, error) {
 	var driverString base64Captcha.DriverString
-	driverString.Source = "1234567890QWERTYUPLKJHGFDSAZXCVBNMqwertyuplkjhgfdsazxcvbnm"
+	driverString.Source = "1234567890QWERTYUPLKJHGFDSAZXCVBNMqwertyupkjhgfdsazxcvbnm"
 	driverString.Width = 120
 	driverString.Height = 50
 	driverString.NoiseCount = 0

@@ -124,15 +124,12 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 		write.Flush()
 		req.Path = path
 	}
-	go func() {
-		cmd := exec.Command("docker-compose", "-f", req.Path, "up", "-d")
-		stdout, err := cmd.CombinedOutput()
-		if err != nil {
-			global.LOG.Debugf("docker-compose up %s failed, err: %v", req.Name, err)
-			return
-		}
-		global.LOG.Debugf("docker-compose up %s successful, logs: %v", req.Name, string(stdout))
-	}()
+	cmd := exec.Command("docker-compose", "-f", req.Path, "up", "-d")
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return err
+	}
+	global.LOG.Debugf("docker-compose up %s successful, logs: %v", req.Name, string(stdout))
 
 	return nil
 }

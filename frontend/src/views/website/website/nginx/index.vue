@@ -39,7 +39,10 @@ watch(
     activeName,
     (newvalue) => {
         if (newvalue === '2') {
-            dialogContainerLogRef.value!.acceptParams({ containerID: props.containerName });
+            dialogContainerLogRef.value!.acceptParams({
+                containerID: props.containerName,
+                container: props.containerName,
+            });
         }
     },
     { immediate: true },

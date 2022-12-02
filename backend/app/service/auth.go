@@ -58,10 +58,10 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo,
 	}
 	pass, err := encrypt.StringDecrypt(passwrodSetting.Value)
 	if err != nil {
-		return nil, err
+		return nil, constant.ErrAuth
 	}
 	if info.Password != pass && nameSetting.Value == info.Name {
-		return nil, errors.New("login failed")
+		return nil, constant.ErrAuth
 	}
 	mfa, err := settingRepo.Get(settingRepo.WithByKey("MFAStatus"))
 	if err != nil {
@@ -89,10 +89,10 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin) (*dto.UserLogi
 	}
 	pass, err := encrypt.StringDecrypt(passwrodSetting.Value)
 	if err != nil {
-		return nil, err
+		return nil, constant.ErrAuth
 	}
 	if info.Password != pass && nameSetting.Value == info.Name {
-		return nil, errors.New("login failed")
+		return nil, constant.ErrAuth
 	}
 
 	return u.generateSession(c, info.Name, info.AuthMethod)
