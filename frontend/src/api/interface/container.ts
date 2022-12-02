@@ -102,6 +102,7 @@ export namespace Container {
     export interface NetworkInfo {
         id: string;
         name: string;
+        isSystem: boolean;
         labels: Array<string>;
         driver: string;
         ipamDriver: string;

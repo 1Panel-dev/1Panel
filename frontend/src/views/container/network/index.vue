@@ -11,10 +11,11 @@
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </template>
-                <el-table-column type="selection" fix />
+                <el-table-column type="selection" :selectable="selectable" fix />
                 <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip min-width="80" prop="name" fix>
                     <template #default="{ row }">
                         <el-link @click="onInspect(row.id)" type="primary">{{ row.name }}</el-link>
+                        <el-tag effect="dark" round v-if="row.isSystem" style="margin-left: 5px">system</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('container.driver')" show-overflow-tooltip min-width="40" prop="driver" />
@@ -81,6 +82,10 @@ const onCreate = async () => {
     dialogCreateRef.value!.acceptParams();
 };
 
+function selectable(row) {
+    return !row.isSystem;
+}
+
 const search = async () => {
     const params = {
         page: paginationConfig.page,
@@ -89,6 +94,9 @@ const search = async () => {
     await searchNetwork(params).then((res) => {
         if (res.data) {
             data.value = res.data.items;
+            for (const item of data.value) {
+                item.isSystem = isSystem(item.name);
+            }
         }
         paginationConfig.total = res.data.total;
     });
@@ -117,11 +125,18 @@ const onInspect = async (id: string) => {
     codemirror.value!.acceptParams(param);
 };
 
+function isSystem(val: string) {
+    return val === 'bridge' || val === '1panel' || val === 'none' || val === 'host';
+}
+
 const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         click: (row: Container.NetworkInfo) => {
             batchDelete(row);
+        },
+        disabled: (row: any) => {
+            return row.isSystem;
         },
     },
 ];

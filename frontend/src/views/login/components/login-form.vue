@@ -67,9 +67,6 @@
                         <div class="login-welcome">{{ $t('commons.login.codeInput') }}</div>
                         <div class="login-form">
                             <el-form-item>
-                                <span style="font-size: 14px">Secret: {{ mfaLoginForm.secret }}</span>
-                            </el-form-item>
-                            <el-form-item>
                                 <el-input
                                     size="default"
                                     :placeholder="$t('commons.login.captchaHelper')"

@@ -188,7 +188,7 @@ func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error 
 	case constant.ContainerOpRename:
 		err = client.ContainerRename(ctx, req.ContainerID, req.NewName)
 	case constant.ContainerOpRemove:
-		err = client.ContainerRemove(ctx, req.ContainerID, types.ContainerRemoveOptions{RemoveVolumes: true, RemoveLinks: true, Force: true})
+		err = client.ContainerRemove(ctx, req.ContainerID, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 	}
 	return err
 }

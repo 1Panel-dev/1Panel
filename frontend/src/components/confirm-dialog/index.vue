@@ -7,9 +7,11 @@
         </template>
         <div>
             <span style="font-size: 12px">{{ operationInfo }}</span>
-            <el-input v-model="submitInput"></el-input>
-            <span style="font-size: 12px">{{ $t('commons.msg.operateConfirm') }}</span>
-            <span style="font-size: 12px; color: red; font-weight: 500">'{{ submitInputInfo }}'</span>
+            <div style="margin-top: 10px">
+                <span style="font-size: 12px">{{ $t('commons.msg.operateConfirm') }}</span>
+                <span style="font-size: 12px; color: red; font-weight: 500">'{{ submitInputInfo }}'</span>
+            </div>
+            <el-input style="margin-top: 10px" v-model="submitInput"></el-input>
         </div>
         <template #footer>
             <span class="dialog-footer">
