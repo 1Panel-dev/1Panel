@@ -79,10 +79,26 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 	if err := json.Unmarshal(file, &deamonMap); err != nil {
 		return err
 	}
-	deamonMap["registry-mirrors"] = req.Mirrors
-	deamonMap["insecure-registries"] = req.Registries
-	deamonMap["bip"] = req.Bip
-	deamonMap["live-restore"] = req.LiveRestore
+	if len(req.Registries) == 0 {
+		delete(deamonMap, "insecure-registries")
+	} else {
+		deamonMap["insecure-registries"] = req.Registries
+	}
+	if len(req.Mirrors) == 0 {
+		delete(deamonMap, "insecure-mirrors")
+	} else {
+		deamonMap["insecure-mirrors"] = req.Mirrors
+	}
+	if len(req.Bip) == 0 {
+		delete(deamonMap, "bip")
+	} else {
+		deamonMap["bip"] = req.Bip
+	}
+	if !req.LiveRestore {
+		delete(deamonMap, "live-restore")
+	} else {
+		deamonMap["live-restore"] = req.LiveRestore
+	}
 	if opts, ok := deamonMap["exec-opts"]; ok {
 		if optsValue, isArray := opts.([]interface{}); isArray {
 			for i := 0; i < len(optsValue); i++ {

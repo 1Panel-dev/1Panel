@@ -349,7 +349,7 @@ export default {
         containerPort: 'Container port',
         serverPort: 'Host port',
         cmd: 'Command',
-        cmdHelper: 'one in a row, for example, echo "hello"',
+        cmdHelper: 'one in a row, for example: \n/bin/bash \necho "hello"',
         autoRemove: 'Auto remove',
         cpuQuota: 'NacosCPU',
         memoryLimit: 'Memory',
@@ -386,7 +386,7 @@ export default {
         size: 'Size',
         from: 'From',
         tag: 'Tag',
-        tagHelper: 'one in a row, for example, key=value',
+        tagHelper: 'one in a row, for example, \nkey1=value1\nkey2=value2',
         imageNameHelper: 'Image name and Tag, for example: nginx:latest',
 
         network: 'Network',

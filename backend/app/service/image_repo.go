@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"io/ioutil"
+	"os/exec"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -55,7 +56,7 @@ func (u *ImageRepoService) Create(imageRepoDto dto.ImageRepoCreate) error {
 	if imageRepo.ID != 0 {
 		return constant.ErrRecordExist
 	}
-	if imageRepo.Protocol == "http" {
+	if imageRepoDto.Protocol == "http" {
 		file, err := ioutil.ReadFile(constant.DaemonJsonDir)
 		if err != nil {
 			return err
@@ -84,6 +85,11 @@ func (u *ImageRepoService) Create(imageRepoDto dto.ImageRepoCreate) error {
 	}
 	if err := imageRepoRepo.Create(&imageRepo); err != nil {
 		return err
+	}
+	cmd := exec.Command("systemctl", "restart", "docker")
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return errors.New(string(stdout))
 	}
 	return nil
 }

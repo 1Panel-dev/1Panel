@@ -354,7 +354,7 @@ export default {
         containerPort: '容器端口',
         serverPort: '服务器端口',
         cmd: '启动命令',
-        cmdHelper: '一行一个，例： echo "hello"',
+        cmdHelper: '一行一个，例：\n/bin/bash \necho "hello"',
         autoRemove: '容器退出后自动删除容器',
         cpuQuota: 'CPU 限制',
         memoryLimit: '内存限制',
@@ -398,7 +398,7 @@ export default {
         size: '大小',
         from: '来源',
         tag: '标签',
-        tagHelper: '一行一个，例： key=value',
+        tagHelper: '一行一个，例： \nkey1=value1\nkey2=value2',
         imageNameHelper: '镜像名称及 Tag，例：nginx:latest',
 
         network: '网络',
