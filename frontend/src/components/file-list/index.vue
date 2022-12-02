@@ -17,7 +17,7 @@
             </BreadCrumbs>
         </div>
         <div>
-            <el-input :prefix-icon="Search"></el-input>
+            <!-- <el-input :prefix-icon="Search"></el-input> -->
             <el-table :data="data" highlight-current-row height="40vh">
                 <el-table-column width="40" fix>
                     <template #default="{ row }">
@@ -39,7 +39,7 @@
 <script lang="ts" setup>
 import { File } from '@/api/interface/file';
 import { GetFilesList } from '@/api/modules/files';
-import { Folder, Search } from '@element-plus/icons-vue';
+import { Folder } from '@element-plus/icons-vue';
 import BreadCrumbs from '@/components/bread-crumbs/index.vue';
 import BreadCrumbItem from '@/components/bread-crumbs/bread-crumbs-item.vue';
 import { onMounted, onUpdated, reactive, ref } from 'vue';

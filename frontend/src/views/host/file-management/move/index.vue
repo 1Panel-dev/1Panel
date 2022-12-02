@@ -17,7 +17,7 @@
             v-loading="loading"
         >
             <el-form-item :label="$t('file.path')" prop="newPath">
-                <el-input v-model="addForm.newPath">
+                <el-input v-model="addForm.newPath" disabled>
                     <template #append><FileList @choose="getPath" :dir="true"></FileList></template>
                 </el-input>
             </el-form-item>
