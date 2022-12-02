@@ -14,7 +14,7 @@
                 <el-table-column type="selection" fix />
                 <el-table-column :label="$t('commons.table.name')" min-width="100" prop="name" fix />
                 <el-table-column :label="$t('terminal.command')" min-width="300" show-overflow-tooltip prop="command" />
-                <fu-table-operations type="icon" :buttons="buttons" :label="$t('commons.table.operate')" fix />
+                <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
             </ComplexTable>
         </el-card>
         <el-dialog v-model="cmdVisiable" :title="$t('terminal.addHost')" width="30%">

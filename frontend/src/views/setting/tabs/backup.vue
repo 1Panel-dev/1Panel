@@ -17,14 +17,14 @@
                             <span style="font-size: 16px; font-weight: 500">&nbsp;{{ loadBackupName(item.type) }}</span>
                             <div style="float: right">
                                 <el-button @click="onEdit(item)">{{ $t('commons.button.edit') }}</el-button>
-                                <el-button @click="onBatchDelete(item)">
+                                <el-button v-if="item.type !== 'LOCAL'" @click="onBatchDelete(item)">
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </div>
                         </div>
                     </template>
                     <el-form label-position="left" label-width="130px">
-                        <el-form-item v-if="item.type === 'LOCAL'" label="Directory">
+                        <el-form-item v-if="item.type === 'LOCAL'" :label="$t('setting.currentPath')">
                             {{ item.varsJson['dir'] }}
                         </el-form-item>
                         <el-form-item v-if="item.type === 'S3'" label="Region">
@@ -73,7 +73,7 @@
                 </el-form-item>
                 <el-form-item
                     v-if="form.type === 'LOCAL'"
-                    label="Directory"
+                    :label="$t('setting.currentPath')"
                     prop="varsJson['dir']"
                     :rules="Rules.requiredInput"
                 >
