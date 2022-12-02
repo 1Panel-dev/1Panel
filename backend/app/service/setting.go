@@ -51,10 +51,9 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 func (u *SettingService) Update(c *gin.Context, key, value string) error {
 	if key == "ExpirationDays" {
 		timeout, _ := strconv.Atoi(value)
-		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006.01.02 15:04:05")); err != nil {
+		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006-01-02 15:04:05")); err != nil {
 			return err
 		}
-		c.SetCookie(constant.PasswordExpiredName, encrypt.Md5(time.Now().Format("20060102150405")), 86400*timeout, "", "", false, false)
 	}
 	if err := settingRepo.Update(key, value); err != nil {
 		return err
@@ -85,8 +84,7 @@ func (u *SettingService) HandlePasswordExpired(c *gin.Context, old, new string) 
 			return err
 		}
 		timeout, _ := strconv.Atoi(expiredSetting.Value)
-		c.SetCookie(constant.PasswordExpiredName, encrypt.Md5(time.Now().Format("20060102150405")), 86400*timeout, "", "", false, false)
-		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006.01.02 15:04:05")); err != nil {
+		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006-01-02 15:04:05")); err != nil {
 			return err
 		}
 		return nil

@@ -41,8 +41,7 @@ func (u *AuthService) SafeEntrance(c *gin.Context, code string) error {
 		return err
 	}
 	timeout, _ := strconv.Atoi(expiredSetting.Value)
-	c.SetCookie(constant.PasswordExpiredName, encrypt.Md5(time.Now().Format("20060102150405")), 86400*timeout, "", "", false, false)
-	if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006.01.02 15:04:05")); err != nil {
+	if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006-01-02 15:04:05")); err != nil {
 		return err
 	}
 	return nil
@@ -203,8 +202,7 @@ func (u *AuthService) InitUser(c *gin.Context, req dto.InitUser) error {
 		}
 		timeout, _ := strconv.Atoi(expiredSetting.Value)
 		if timeout != 0 {
-			c.SetCookie(constant.PasswordExpiredName, encrypt.Md5(time.Now().Format("20060102150405")), 86400*timeout, "", "", false, false)
-			if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006.01.02 15:04:05")); err != nil {
+			if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006-01-02 15:04:05")); err != nil {
 				return err
 			}
 		}
