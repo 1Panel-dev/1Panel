@@ -14,6 +14,9 @@ ErrPasswordExpired: "The current password has expired: {{ .detail }}"
 ErrNotSupportType: "The system does not support the current type: {{ .detail }}"
 
 
+#common
+ErrNameIsExist: "Name is already exist"
+
 #app
 ErrPortInUsed: "{{ .detail }} port already in use"
 ErrAppLimit: "App exceeds install limit"

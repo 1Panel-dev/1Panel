@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -210,9 +211,14 @@ func (a AppInstallService) GetServices(key string) ([]dto.AppService, error) {
 	}
 	var res []dto.AppService
 	for _, install := range installs {
+		paramMap := make(map[string]string)
+		if install.Param != "" {
+			_ = json.Unmarshal([]byte(install.Param), &paramMap)
+		}
 		res = append(res, dto.AppService{
-			Label: install.Name,
-			Value: install.ServiceName,
+			Label:  install.Name,
+			Value:  install.ServiceName,
+			Config: paramMap,
 		})
 	}
 	return res, nil

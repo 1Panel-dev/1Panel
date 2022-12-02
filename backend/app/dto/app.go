@@ -104,8 +104,9 @@ type PortUpdate struct {
 }
 
 type AppService struct {
-	Label string `json:"label"`
-	Value string `json:"value"`
+	Label  string      `json:"label"`
+	Value  string      `json:"value"`
+	Config interface{} `json:"config"`
 }
 
 type AppDatabase struct {

@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/base64"
 	"encoding/json"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"os"
 	"path"
 	"strings"
@@ -138,6 +139,11 @@ func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, 
 }
 
 func (a AppService) Install(name string, appDetailId uint, params map[string]interface{}) (*model.AppInstall, error) {
+
+	list, _ := appInstallRepo.GetBy(commonRepo.WithByName(name))
+	if len(list) > 0 {
+		return nil, buserr.New(constant.ErrNameIsExist, "", nil)
+	}
 
 	httpPort, err := checkPort("PANEL_APP_PORT_HTTP", params)
 	if err != nil {
