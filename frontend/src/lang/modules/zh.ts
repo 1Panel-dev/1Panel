@@ -725,7 +725,7 @@ export default {
         name: '名称',
         description: '描述',
         delete: '删除',
-        deleteWarn: '删除操作会把数据一并删除,此操作不可回滚,是否继续?',
+        deleteWarn: '删除操作会把所有数据和备份一并删除,此操作不可回滚,是否继续?',
         syncSuccess: '同步成功',
         canUpdate: '可升级',
         backup: '备份',
