@@ -60,96 +60,103 @@
             :title="$t('setting.backupAccount')"
             width="30%"
         >
-            <el-form ref="formRef" label-position="left" :model="form" label-width="160px">
-                <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
-                    <el-select style="width: 100%" v-model="form.type" :disabled="operation === 'edit'">
-                        <el-option
-                            v-for="item in typeOptions"
-                            :key="item.label"
-                            :value="item.value"
-                            :label="item.label"
-                        />
-                    </el-select>
-                </el-form-item>
-                <el-form-item
-                    v-if="form.type === 'LOCAL'"
-                    :label="$t('setting.currentPath')"
-                    prop="varsJson['dir']"
-                    :rules="Rules.requiredInput"
-                >
-                    <el-input v-model="form.varsJson['dir']">
-                        <template #append>
-                            <FileList @choose="loadDir" :dir="true"></FileList>
-                        </template>
-                    </el-input>
-                </el-form-item>
-                <el-form-item
-                    v-if="hasBucket(form.type) && operation !== 'edit'"
-                    label="Access Key ID"
-                    prop="varsJson.accessKey"
-                    :rules="Rules.requiredInput"
-                >
-                    <el-input v-model="form.varsJson['accessKey']" />
-                </el-form-item>
-                <el-form-item
-                    v-if="hasBucket(form.type)"
-                    label="Access Key Secret"
-                    prop="credential"
-                    :rules="Rules.requiredInput"
-                >
-                    <el-input show-password v-model="form.credential" />
-                </el-form-item>
-                <el-form-item
-                    v-if="form.type === 'S3'"
-                    label="Region"
-                    prop="varsJson.region"
-                    :rules="Rules.requiredInput"
-                >
-                    <el-input v-model="form.varsJson['region']" />
-                </el-form-item>
-                <el-form-item
-                    v-if="hasBucket(form.type)"
-                    label="Endpoint"
-                    prop="varsJson.endpoint"
-                    :rules="Rules.requiredInput"
-                >
-                    <el-input v-model="form.varsJson['endpoint']" />
-                </el-form-item>
-                <el-form-item
-                    v-if="form.type !== '' && hasBucket(form.type)"
-                    label="Bucket"
-                    prop="bucket"
-                    :rules="Rules.requiredSelect"
-                >
-                    <el-select style="width: 80%" v-model="form.bucket">
-                        <el-option v-for="item in buckets" :key="item" :value="item" />
-                    </el-select>
-                    <el-button style="width: 20%" plain @click="getBuckets">
-                        {{ $t('setting.loadBucket') }}
-                    </el-button>
-                </el-form-item>
-                <div v-if="form.type === 'SFTP'">
-                    <el-form-item :label="$t('setting.address')" prop="varsJson.address" :rules="Rules.requiredInput">
-                        <el-input v-model="form.varsJson['address']" />
-                    </el-form-item>
-                    <el-form-item :label="$t('setting.port')" prop="varsJson.port" :rules="[Rules.number]">
-                        <el-input-number :min="0" :max="65535" v-model.number="form.varsJson['port']" />
+            <div v-loading="loading">
+                <el-form ref="formRef" label-position="left" :model="form" label-width="160px">
+                    <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
+                        <el-select style="width: 100%" v-model="form.type" :disabled="operation === 'edit'">
+                            <el-option
+                                v-for="item in typeOptions"
+                                :key="item.label"
+                                :value="item.value"
+                                :label="item.label"
+                            />
+                        </el-select>
                     </el-form-item>
                     <el-form-item
-                        :label="$t('setting.username')"
-                        prop="varsJson.username"
-                        :rules="[Rules.requiredInput]"
+                        v-if="form.type === 'LOCAL'"
+                        :label="$t('setting.currentPath')"
+                        prop="varsJson['dir']"
+                        :rules="Rules.requiredInput"
                     >
-                        <el-input v-model="form.varsJson['username']" />
+                        <el-input v-model="form.varsJson['dir']">
+                            <template #append>
+                                <FileList @choose="loadDir" :dir="true"></FileList>
+                            </template>
+                        </el-input>
                     </el-form-item>
-                    <el-form-item :label="$t('setting.password')" prop="credential" :rules="[Rules.requiredInput]">
-                        <el-input type="password" show-password v-model="form.credential" />
+                    <el-form-item
+                        v-if="hasBucket(form.type) && operation !== 'edit'"
+                        label="Access Key ID"
+                        prop="varsJson.accessKey"
+                        :rules="Rules.requiredInput"
+                    >
+                        <el-input v-model="form.varsJson['accessKey']" />
                     </el-form-item>
-                    <el-form-item :label="$t('setting.path')" prop="bucket">
-                        <el-input v-model="form.bucket" />
+                    <el-form-item
+                        v-if="hasBucket(form.type)"
+                        label="Access Key Secret"
+                        prop="credential"
+                        :rules="Rules.requiredInput"
+                    >
+                        <el-input show-password v-model="form.credential" />
                     </el-form-item>
-                </div>
-            </el-form>
+                    <el-form-item
+                        v-if="form.type === 'S3'"
+                        label="Region"
+                        prop="varsJson.region"
+                        :rules="Rules.requiredInput"
+                    >
+                        <el-input v-model="form.varsJson['region']" />
+                    </el-form-item>
+                    <el-form-item
+                        v-if="hasBucket(form.type)"
+                        label="Endpoint"
+                        prop="varsJson.endpoint"
+                        :rules="Rules.requiredInput"
+                    >
+                        <el-input v-model="form.varsJson['endpoint']" />
+                    </el-form-item>
+                    <el-form-item
+                        v-if="form.type !== '' && hasBucket(form.type)"
+                        label="Bucket"
+                        prop="bucket"
+                        :rules="Rules.requiredSelect"
+                    >
+                        <el-select style="width: 80%" v-model="form.bucket">
+                            <el-option v-for="item in buckets" :key="item" :value="item" />
+                        </el-select>
+                        <el-button style="width: 20%" plain @click="getBuckets">
+                            {{ $t('setting.loadBucket') }}
+                        </el-button>
+                    </el-form-item>
+                    <div v-if="form.type === 'SFTP'">
+                        <el-form-item
+                            :label="$t('setting.address')"
+                            prop="varsJson.address"
+                            :rules="Rules.requiredInput"
+                        >
+                            <el-input v-model="form.varsJson['address']" />
+                        </el-form-item>
+                        <el-form-item :label="$t('setting.port')" prop="varsJson.port" :rules="[Rules.number]">
+                            <el-input-number :min="0" :max="65535" v-model.number="form.varsJson['port']" />
+                        </el-form-item>
+                        <el-form-item
+                            :label="$t('setting.username')"
+                            prop="varsJson.username"
+                            :rules="[Rules.requiredInput]"
+                        >
+                            <el-input v-model="form.varsJson['username']" />
+                        </el-form-item>
+                        <el-form-item :label="$t('setting.password')" prop="credential" :rules="[Rules.requiredInput]">
+                            <el-input type="password" show-password v-model="form.credential" />
+                        </el-form-item>
+                        <el-form-item :label="$t('setting.path')" prop="bucket">
+                            <el-input v-model="form.bucket" />
+                        </el-form-item>
+                    </div>
+                </el-form>
+            </div>
+
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="backupVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
@@ -177,6 +184,7 @@ const data = ref();
 const selects = ref<any>([]);
 const backupVisiable = ref<boolean>(false);
 const operation = ref<string>('create');
+const loading = ref(false);
 
 const form = reactive({
     id: 0,
@@ -275,8 +283,20 @@ function restForm() {
 }
 
 const getBuckets = async () => {
-    const res = await listBucket({ type: form.type, vars: JSON.stringify(form.varsJson), credential: form.credential });
-    buckets.value = res.data;
+    loading.value = true;
+    listBucket({
+        type: form.type,
+        vars: JSON.stringify(form.varsJson),
+        credential: form.credential,
+    })
+        .then((res) => {
+            loading.value = true;
+            buckets.value = res.data;
+        })
+        .finally(() => {
+            buckets.value = [];
+            loading.value = false;
+        });
 };
 const loadDir = async (path: string) => {
     form.varsJson['dir'] = path;

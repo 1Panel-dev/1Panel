@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <Submenu activeName="compose" />
         <el-card style="margin-top: 20px">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
@@ -77,6 +77,7 @@ import router from '@/routers';
 
 const data = ref();
 const selects = ref<any>([]);
+const loading = ref(false);
 
 const paginationConfig = reactive({
     page: 1,
@@ -89,12 +90,16 @@ const search = async () => {
         page: paginationConfig.page,
         pageSize: paginationConfig.pageSize,
     };
-    await searchCompose(params).then((res) => {
-        if (res.data) {
-            data.value = res.data.items;
+    loading.value = true;
+    await searchCompose(params)
+        .then((res) => {
+            loading.value = false;
+            data.value = res.data.items || [];
             paginationConfig.total = res.data.total;
-        }
-    });
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 const goContainer = async (name: string) => {

@@ -5,50 +5,52 @@
                 <span>{{ $t('container.compose') }}</span>
             </div>
         </template>
-        <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
-            <el-form-item :label="$t('container.name')" prop="name">
-                <el-input v-model="form.name"></el-input>
-            </el-form-item>
-            <el-form-item :label="$t('container.from')">
-                <el-radio-group v-model="form.from">
-                    <el-radio label="edit">{{ $t('container.edit') }}</el-radio>
-                    <el-radio label="path">{{ $t('container.pathSelect') }}</el-radio>
-                    <el-radio label="template">{{ $t('container.composeTemplate') }}</el-radio>
-                </el-radio-group>
-            </el-form-item>
-            <el-form-item v-if="form.from === 'path'" prop="path">
-                <el-input
-                    clearable
-                    :placeholder="$t('commons.example') + '/tmp/docker-compose.yml'"
-                    v-model="form.path"
-                >
-                    <template #append>
-                        <FileList @choose="loadDir" :dir="false"></FileList>
-                    </template>
-                </el-input>
-            </el-form-item>
-            <el-form-item v-if="form.from === 'template'" prop="template">
-                <el-select v-model="form.template">
-                    <el-option v-for="item in templateOptions" :key="item.id" :value="item.id" :label="item.name" />
-                </el-select>
-            </el-form-item>
-            <el-form-item v-if="form.from === 'edit'">
-                <codemirror
-                    :autofocus="true"
-                    placeholder="None data"
-                    :indent-with-tab="true"
-                    :tabSize="4"
-                    style="max-height: 500px; width: 100%"
-                    :lineWrapping="true"
-                    :matchBrackets="true"
-                    theme="cobalt"
-                    :styleActiveLine="true"
-                    :extensions="extensions"
-                    v-model="form.file"
-                    :readOnly="true"
-                />
-            </el-form-item>
-        </el-form>
+        <div v-loading="loading">
+            <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
+                <el-form-item :label="$t('container.name')" prop="name">
+                    <el-input v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item :label="$t('container.from')">
+                    <el-radio-group v-model="form.from">
+                        <el-radio label="edit">{{ $t('container.edit') }}</el-radio>
+                        <el-radio label="path">{{ $t('container.pathSelect') }}</el-radio>
+                        <el-radio label="template">{{ $t('container.composeTemplate') }}</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item v-if="form.from === 'path'" prop="path">
+                    <el-input
+                        clearable
+                        :placeholder="$t('commons.example') + '/tmp/docker-compose.yml'"
+                        v-model="form.path"
+                    >
+                        <template #append>
+                            <FileList @choose="loadDir" :dir="false"></FileList>
+                        </template>
+                    </el-input>
+                </el-form-item>
+                <el-form-item v-if="form.from === 'template'" prop="template">
+                    <el-select v-model="form.template">
+                        <el-option v-for="item in templateOptions" :key="item.id" :value="item.id" :label="item.name" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item v-if="form.from === 'edit'">
+                    <codemirror
+                        :autofocus="true"
+                        placeholder="None data"
+                        :indent-with-tab="true"
+                        :tabSize="4"
+                        style="max-height: 500px; width: 100%"
+                        :lineWrapping="true"
+                        :matchBrackets="true"
+                        theme="cobalt"
+                        :styleActiveLine="true"
+                        :extensions="extensions"
+                        v-model="form.file"
+                        :readOnly="true"
+                    />
+                </el-form-item>
+            </el-form>
+        </div>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="composeVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
@@ -74,6 +76,8 @@ import { listComposeTemplate, upCompose } from '@/api/modules/container';
 const extensions = [javascript(), oneDark];
 const composeVisiable = ref(false);
 const templateOptions = ref();
+
+const loading = ref(false);
 
 const varifyPath = (rule: any, value: any, callback: any) => {
     if (value.indexOf('docker-compose.yml') === -1) {
@@ -118,10 +122,17 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        await upCompose(form);
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        emit('search');
-        composeVisiable.value = false;
+        loading.value = true;
+        upCompose(form)
+            .then(() => {
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                loading.value = false;
+                emit('search');
+                composeVisiable.value = false;
+            })
+            .finally(() => {
+                loading.value = false;
+            });
     });
 };
 
