@@ -5,7 +5,7 @@
         :destroy-on-close="true"
         :close-on-click-modal="false"
         :title="$t('file.setRole')"
-        width="30%"
+        width="50%"
         @open="onOpen"
     >
         <FileRole v-loading="loading" :mode="mode" @get-mode="getMode"></FileRole>

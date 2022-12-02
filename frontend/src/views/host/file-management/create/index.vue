@@ -5,7 +5,7 @@
         :destroy-on-close="true"
         :close-on-click-modal="false"
         :title="$t('commons.button.create')"
-        width="30%"
+        width="50%"
         @open="onOpen"
     >
         <el-form
