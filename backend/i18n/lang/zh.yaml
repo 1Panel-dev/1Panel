@@ -18,6 +18,6 @@ ErrNotSupportType: "系统暂不支持当前类型: {{ .detail }}"
 ErrNameIsExist: "名称已存在"
 
 #app
-ErrPortInUsed: "{{ .detail }} 已被占用！"
+ErrPortInUsed: "{{ .detail }} 端口已被占用！"
 ErrAppLimit: "应用超出安装数量限制"
 ErrAppRequired: "请先安装 {{ .detail }} 应用"

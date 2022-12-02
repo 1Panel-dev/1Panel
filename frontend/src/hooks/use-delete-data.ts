@@ -20,18 +20,29 @@ export const useDeleteData = <P = any, R = any>(
         ElMessageBox.confirm(i18n.global.t(`${message}`) + '?', i18n.global.t('commons.msg.deleteTitle'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
+            closeOnClickModal: false,
+            closeOnPressEscape: false,
+            showClose: false,
             type: confirmType,
             draggable: true,
+            beforeClose: async (action, instance, done) => {
+                if (action === 'confirm') {
+                    instance.confirmButtonLoading = true;
+                    instance.cancelButtonLoading = true;
+                    const res = await api(params);
+                    done();
+                    if (!res) return reject(false);
+                    resolve(true);
+                    ElMessage({
+                        type: 'success',
+                        message: i18n.global.t('commons.msg.operationSuccess'),
+                    });
+                } else {
+                    done();
+                }
+            },
         })
-            .then(async () => {
-                const res = await api(params);
-                if (!res) return reject(false);
-                ElMessage({
-                    type: 'success',
-                    message: i18n.global.t('commons.msg.operationSuccess'),
-                });
-                resolve(true);
-            })
+            .then(() => {})
             .catch(() => {});
     });
 };
