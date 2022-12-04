@@ -2,6 +2,7 @@ package helper
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"net/http"
 	"strconv"
 
@@ -51,6 +52,8 @@ func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 			res.Msg = i18n.GetMsgWithMap("ErrAuth", map[string]interface{}{"detail": err})
 		case errors.Is(constant.ErrInitialPassword, err):
 			res.Msg = i18n.GetMsgWithMap("ErrInitialPassword", map[string]interface{}{"detail": err})
+		case errors.As(err, &buserr.BusinessError{}):
+			res.Msg = err.Error()
 		default:
 			res.Msg = i18n.GetMsgWithMap(msgKey, map[string]interface{}{"detail": err})
 		}

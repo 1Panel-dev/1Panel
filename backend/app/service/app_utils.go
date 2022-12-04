@@ -89,7 +89,7 @@ func checkPort(key string, params map[string]interface{}) (int, error) {
 	if ok {
 		portN := int(math.Ceil(port.(float64)))
 		if common.ScanPort(portN) {
-			return portN, buserr.New(constant.ErrPortInUsed, portN, nil)
+			return portN, buserr.WithMessage(constant.ErrPortInUsed, portN, nil)
 		} else {
 			return portN, nil
 		}
@@ -378,7 +378,7 @@ func checkLimit(app model.App) error {
 			return err
 		}
 		if len(installs) >= app.Limit {
-			return buserr.New(constant.ErrAppLimit, "", nil)
+			return buserr.New(constant.ErrAppLimit)
 		}
 	}
 	return nil
@@ -414,7 +414,7 @@ func checkRequiredAndLimit(app model.App) error {
 
 			_, err = appInstallRepo.GetFirst(appInstallRepo.WithDetailIdsIn(detailIds))
 			if err != nil {
-				return buserr.New(constant.ErrAppRequired, requireApp.Name, nil)
+				return buserr.WithMessage(constant.ErrAppRequired, requireApp.Name, nil)
 			}
 		}
 	}
@@ -439,6 +439,7 @@ func copyAppData(key, version, installName string, params map[string]interface{}
 	fileOp := files.NewFileOp()
 	resourceDir := path.Join(constant.AppResourceDir, key, "versions", version)
 	installAppDir := path.Join(constant.AppInstallDir, key)
+
 	if !fileOp.Stat(installAppDir) {
 		if err = fileOp.CreateDir(installAppDir, 0755); err != nil {
 			return
@@ -450,7 +451,11 @@ func copyAppData(key, version, installName string, params map[string]interface{}
 			return
 		}
 	}
-	if err = fileOp.Copy(resourceDir, appDir); err != nil {
+	if err = fileOp.Copy(resourceDir, installAppDir); err != nil {
+		return
+	}
+	versionDir := path.Join(installAppDir, version)
+	if err = fileOp.Rename(versionDir, appDir); err != nil {
 		return
 	}
 	envPath := path.Join(appDir, ".env")
