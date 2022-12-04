@@ -231,6 +231,7 @@ const acceptParams = async () => {
 
     await ListGroups().then((res) => {
         groups.value = res.data;
+        website.value.webSiteGroupId = res.data[0].id;
         open.value = true;
     });
     searchAppInstalled();
