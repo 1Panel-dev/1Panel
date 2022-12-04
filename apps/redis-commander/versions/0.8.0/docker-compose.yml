@@ -11,6 +11,8 @@ services:
       - REDIS_HOSTS=1panel:${PANEL_REDIS_HOST}:6379:0:${PANEL_DB_ROOT_PASSWORD}
     ports:
       - ${PANEL_APP_PORT_HTTP}:8081
+    labels:
+      createdBy: "apps"
 networks:
   1panel:
     external: true

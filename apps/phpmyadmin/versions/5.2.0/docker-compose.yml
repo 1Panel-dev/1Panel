@@ -9,6 +9,8 @@ services:
       - PMA_HOST=${PANEL_DB_HOST}
     networks:
       - 1panel
+    labels:
+      createdBy: "apps"
 
 networks:
   1panel:

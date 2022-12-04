@@ -81,9 +81,6 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.WebSite) 
 		if err := fileOp.CreateFile(path.Join(siteFolder, "log", "access.log")); err != nil {
 			return err
 		}
-		if err := fileOp.CreateDir(path.Join(siteFolder, "waf", "rules"), 0755); err != nil {
-			return err
-		}
 		if err := fileOp.CreateDir(path.Join(siteFolder, "data"), 0755); err != nil {
 			return err
 		}
@@ -91,7 +88,7 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.WebSite) 
 			return err
 		}
 	}
-	return fileOp.CopyDir(path.Join(nginxFolder, "www", "common", "waf", "rules"), path.Join(siteFolder, "waf", "rules"))
+	return fileOp.CopyDir(path.Join(nginxFolder, "www", "common", "waf", "rules"), path.Join(siteFolder, "waf"))
 }
 
 func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) error {

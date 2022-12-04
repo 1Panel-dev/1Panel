@@ -12,6 +12,9 @@ services:
       - ./data:/data
       - ./conf/redis.conf:/etc/redis/redis.conf
       - ./logs:/logs
+    labels:
+      createdBy: "apps"
+
 networks:
   1panel:
     external: true
