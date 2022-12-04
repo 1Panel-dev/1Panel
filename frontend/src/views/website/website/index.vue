@@ -27,7 +27,11 @@
                                 {{ $t('website.' + row.type) }}
                             </template>
                         </el-table-column>
-                        <el-table-column :label="$t('commons.table.status')" prop="status"></el-table-column>
+                        <el-table-column :label="$t('commons.table.status')" prop="status">
+                            <template #default="{ row }">
+                                <Status :status="row.status"></Status>
+                            </template>
+                        </el-table-column>
                         <el-table-column :label="$t('website.remark')" prop="remark"></el-table-column>
                         <el-table-column :label="$t('website.protocol')" prop="protocol"></el-table-column>
                         <el-table-column :label="$t('website.expireDate')">
@@ -74,6 +78,7 @@ import { WebSite } from '@/api/interface/website';
 import AppStatus from '@/components/app-status/index.vue';
 import NginxConfig from './nginx/index.vue';
 import { dateFromat } from '@/utils/util';
+import Status from '@/components/status/index.vue';
 
 import i18n from '@/lang';
 import router from '@/routers';

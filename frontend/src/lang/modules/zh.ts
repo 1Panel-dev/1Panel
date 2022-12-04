@@ -128,6 +128,11 @@ export default {
             changePassword: '修改密码',
             logout: '退出登录',
         },
+        status: {
+            running: '已启动',
+            stopped: '已停止',
+            error: '失败',
+        },
     },
     menu: {
         home: '概览',
