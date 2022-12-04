@@ -27,3 +27,7 @@ ErrAppRequired: "{{ .detail }} app is required"
 #file
 ErrFileCanNotRead: "File can not read"
 ErrFileToLarge: "file is too large"
+
+#website
+ErrDomainIsExist: "Domain is already exist"
+ErrAliasIsExist: "Alias is already exist"

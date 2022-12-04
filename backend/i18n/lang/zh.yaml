@@ -27,3 +27,7 @@ ErrAppRequired: "请先安装 {{ .detail }} 应用"
 #file
 ErrFileCanNotRead: "文件不可读"
 ErrFileToLarge: "文件超过10M,无法打开"
+
+#website
+ErrDomainIsExist: "域名已存在"
+ErrAliasIsExist: "代号已存在"

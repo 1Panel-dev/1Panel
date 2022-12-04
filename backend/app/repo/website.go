@@ -17,9 +17,15 @@ func (w WebSiteRepo) WithAppInstallId(appInstallId uint) DBOption {
 	}
 }
 
-func (w WebSiteRepo) WithByDomain(domain string) DBOption {
+func (w WebSiteRepo) WithDomain(domain string) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("primary_domain = ?", domain)
+	}
+}
+
+func (w WebSiteRepo) WithAlias(alias string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("alias = ?", alias)
 	}
 }
 

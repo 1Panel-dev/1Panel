@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"io"
 	"os"
 	"os/exec"
@@ -58,6 +59,16 @@ func (w WebsiteService) PageWebSite(req dto.WebSiteReq) (int64, []dto.WebSiteDTO
 }
 
 func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
+
+	if exist, _ := websiteRepo.GetBy(websiteRepo.WithDomain(create.PrimaryDomain)); len(exist) > 0 {
+		return buserr.New(constant.ErrNameIsExist)
+	}
+	if exist, _ := websiteRepo.GetBy(websiteRepo.WithAlias(create.Alias)); len(exist) > 0 {
+		return buserr.New(constant.ErrAliasIsExist)
+	}
+	if exist, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithDomain(create.PrimaryDomain)); len(exist) > 0 {
+		return buserr.New(constant.ErrDomainIsExist)
+	}
 
 	defaultDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
 	website := &model.WebSite{
@@ -167,7 +178,7 @@ func (w WebsiteService) RecoverByUpload(req dto.WebSiteRecoverByFile) error {
 		return errors.New("上传文件与选中网站不匹配，无法恢复")
 	}
 
-	website, err := websiteRepo.GetFirst(websiteRepo.WithByDomain(req.WebsiteName))
+	website, err := websiteRepo.GetFirst(websiteRepo.WithDomain(req.WebsiteName))
 	if err != nil {
 		return err
 	}
@@ -179,7 +190,7 @@ func (w WebsiteService) RecoverByUpload(req dto.WebSiteRecoverByFile) error {
 }
 
 func (w WebsiteService) Recover(req dto.WebSiteRecover) error {
-	website, err := websiteRepo.GetFirst(websiteRepo.WithByDomain(req.WebsiteName))
+	website, err := websiteRepo.GetFirst(websiteRepo.WithDomain(req.WebsiteName))
 	if err != nil {
 		return err
 	}
@@ -506,7 +517,7 @@ type WebSiteInfo struct {
 }
 
 func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName string) error {
-	website, err := websiteRepo.GetFirst(websiteRepo.WithByDomain(domain))
+	website, err := websiteRepo.GetFirst(websiteRepo.WithDomain(domain))
 	if err != nil {
 		return err
 	}
