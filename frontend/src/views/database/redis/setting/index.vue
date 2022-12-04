@@ -1,7 +1,7 @@
 <template>
     <div class="demo-collapse" v-show="settingShow">
         <el-card style="margin-top: 5px">
-            <LayoutContent :header="$t('database.setting')" back-name="Redis" :reload="true">
+            <LayoutContent :header="$t('database.setting')" back-name="Redis" :reload="true" v-loading="loading">
                 <el-collapse v-model="activeName" accordion>
                     <el-collapse-item :title="$t('database.baseSetting')" name="1">
                         <el-radio-group v-model="confShowType" @change="onChangeMode">
@@ -21,7 +21,7 @@
                                     <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
                                         <el-input clearable type="number" v-model.number="form.port">
                                             <template #append>
-                                                <el-button @click="onChangePort(formRef)" icon="Collection">
+                                                <el-button @click="onSavePort()" icon="Collection">
                                                     {{ $t('commons.button.save') }}
                                                 </el-button>
                                             </template>
@@ -44,12 +44,7 @@
                                         <span class="input-help">{{ $t('database.maxmemoryHelper') }}</span>
                                     </el-form-item>
                                     <el-form-item>
-                                        <el-button
-                                            type="primary"
-                                            size="default"
-                                            @click="onSave(formRef)"
-                                            style="width: 90px"
-                                        >
+                                        <el-button type="primary" @click="onSave(formRef)">
                                             {{ $t('commons.button.save') }}
                                         </el-button>
                                     </el-form-item>
@@ -92,6 +87,7 @@
         </el-card>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmitSave"></ConfirmDialog>
+        <ConfirmDialog ref="confirmDialogRef2" @confirm="onChangePort(formRef)"></ConfirmDialog>
     </div>
 </template>
 
@@ -113,6 +109,8 @@ import { ChangePort } from '@/api/modules/app';
 
 const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
+
+const loading = ref(false);
 
 const form = reactive({
     name: '',
@@ -136,6 +134,7 @@ const persistenceRef = ref();
 const formRef = ref<FormInstance>();
 const mysqlConf = ref();
 const confirmDialogRef = ref();
+const confirmDialogRef2 = ref();
 
 const settingShow = ref<boolean>(false);
 
@@ -149,6 +148,15 @@ const onClose = (): void => {
     settingShow.value = false;
 };
 
+const onSavePort = async () => {
+    let params = {
+        header: i18n.global.t('database.confChange'),
+        operationInfo: i18n.global.t('database.restartNowHelper1'),
+        submitInputInfo: i18n.global.t('database.restartNow'),
+    };
+    confirmDialogRef2.value!.acceptParams(params);
+};
+
 const onChangePort = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     const result = await formEl.validateField('port', callback);
@@ -160,9 +168,15 @@ const onChangePort = async (formEl: FormInstance | undefined) => {
         name: form.name,
         port: form.port,
     };
-    await ChangePort(params);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-    return;
+    loading.value = true;
+    await ChangePort(params)
+        .then(() => {
+            loading.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 function callback(error: any) {
     if (error) {
@@ -193,9 +207,16 @@ const onSave = async (formEl: FormInstance | undefined) => {
             requirepass: form.requirepass,
             maxmemory: form.maxmemory + '',
         };
-        await updateRedisConf(param);
-        loadform();
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        loading.value = true;
+        await updateRedisConf(param)
+            .then(() => {
+                loadform();
+                loading.value = false;
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .finally(() => {
+                loading.value = false;
+            });
     });
 };
 

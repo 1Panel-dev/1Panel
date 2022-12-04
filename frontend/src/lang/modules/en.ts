@@ -184,7 +184,7 @@ export default {
         jsInfo: 'The popular Open source fortress machine',
         msInfo: 'One-stop open source continuous testing platform',
         koInfo: 'Open source lightweight Kubernetes distribution',
-        kubepiInfo: 'Modern open source K8s panel',
+        kubepiInfo: 'Modern open source Kubernetes panel',
         goInstall: 'Go install',
     },
     tabs: {
@@ -275,6 +275,9 @@ export default {
         tableOpenCacheHelper: 'Table cache',
         maxConnectionsHelper: 'Max connections',
         restart: 'Restart',
+
+        log: 'Logs',
+        slowLog: 'Slowlogs',
 
         isOn: 'Is on',
         longQueryTime: 'Slow query threshold',

@@ -64,16 +64,8 @@
                         </el-form-item>
 
                         <el-form-item>
-                            <el-button
-                                icon="Collection"
-                                @click="onSaveStart(variableFormRef)"
-                                type="primary"
-                                size="default"
-                            >
+                            <el-button @click="onSaveStart(variableFormRef)" type="primary">
                                 {{ $t('commons.button.save') }}
-                            </el-button>
-                            <el-button icon="RefreshLeft" size="default">
-                                {{ $t('database.restart') }}
                             </el-button>
                         </el-form-item>
                     </el-col>
@@ -285,7 +277,7 @@ const onSaveVariables = async () => {
     if (oldVariables.value?.max_connections !== mysqlVariables.max_connections) {
         param.push({ param: 'max_connections', value: mysqlVariables.max_connections });
     }
-    await updateMysqlVariables(mysqlName.value, param);
+    await updateMysqlVariables(param);
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };
 

@@ -7,7 +7,13 @@
         :destroy-on-close="true"
     >
         <el-row>
-            <el-alert type="warning" :description="$t('app.deleteHelper')" center show-icon :closable="false" />
+            <el-alert
+                type="warning"
+                :description="$t('app.deleteHelper', [$t('app.app')])"
+                center
+                show-icon
+                :closable="false"
+            />
             <el-col :span="12" :offset="6">
                 <br />
                 <el-descriptions border :column="1">
