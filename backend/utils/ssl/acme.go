@@ -11,6 +11,11 @@ import (
 	"github.com/go-acme/lego/v4/registration"
 )
 
+type domainError struct {
+	Domain string
+	Error  error
+}
+
 func GetPrivateKey(priKey crypto.PrivateKey) []byte {
 	rsaKey := priKey.(*rsa.PrivateKey)
 	derStream := x509.MarshalPKCS1PrivateKey(rsaKey)
