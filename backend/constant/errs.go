@@ -51,10 +51,10 @@ var (
 	ErrAppRequired    = "ErrAppRequired"
 	ErrFileCanNotRead = "ErrFileCanNotRead"
 	ErrFileToLarge    = "ErrFileToLarge"
+	ErrNotInstall     = "ErrNotInstall"
 )
 
 //website
-
 var (
 	ErrDomainIsExist = "ErrDomainIsExist"
 	ErrAliasIsExist  = "ErrAliasIsExist"

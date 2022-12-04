@@ -712,6 +712,7 @@ export default {
     },
     app: {
         app: '应用',
+        installName: '安装名称',
         installed: '已安装',
         all: '全部',
         version: '版本',
@@ -826,6 +827,8 @@ export default {
         protocol: '协议',
         setDefault: '设为默认',
         default: '默认',
+        deleteHelper: '相关应用状态不正常，请检查',
+        toApp: '去已安装列表',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',

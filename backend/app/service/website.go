@@ -511,6 +511,55 @@ func (w WebsiteService) OpWebsiteHTTPS(req dto.WebsiteHTTPSOp) (dto.WebsiteHTTPS
 	return res, nil
 }
 
+func (w WebsiteService) PreInstallCheck(req dto.WebsiteInstallCheckReq) ([]dto.WebsitePreInstallCheck, error) {
+	var (
+		res      []dto.WebsitePreInstallCheck
+		checkIds []uint
+		showErr  = false
+	)
+
+	app, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
+	if err != nil {
+		return nil, err
+	}
+	appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithAppId(app.ID))
+	if reflect.DeepEqual(appInstall, model.AppInstall{}) {
+		res = append(res, dto.WebsitePreInstallCheck{
+			Name:    appInstall.Name,
+			AppName: app.Name,
+			Status:  buserr.WithMessage(constant.ErrNotInstall, app.Name, nil).Error(),
+			Version: appInstall.Version,
+		})
+		showErr = true
+	} else {
+		checkIds = append(req.InstallIds, appInstall.ID)
+	}
+	for _, id := range checkIds {
+		if err := syncById(id); err != nil {
+			return nil, err
+		}
+	}
+	if len(checkIds) > 0 {
+		installList, _ := appInstallRepo.GetBy(commonRepo.WithIdsIn(checkIds))
+		for _, install := range installList {
+			res = append(res, dto.WebsitePreInstallCheck{
+				Name:    install.Name,
+				Status:  install.Status,
+				Version: install.Version,
+				AppName: install.App.Name,
+			})
+			if install.Status != constant.StatusRunning {
+				showErr = true
+			}
+		}
+	}
+	if showErr {
+		return res, nil
+	} else {
+		return nil, nil
+	}
+}
+
 type WebSiteInfo struct {
 	WebsiteName string `json:"websiteName"`
 	WebsiteType string `json:"websiteType"`

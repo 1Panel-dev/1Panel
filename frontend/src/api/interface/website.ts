@@ -201,4 +201,15 @@ export namespace WebSite {
         enable: boolean;
         SSL: SSL;
     }
+
+    export interface CheckReq {
+        installIds?: number[];
+    }
+
+    export interface CheckRes {
+        name: string;
+        status: string;
+        version: string;
+        appName: string;
+    }
 }
