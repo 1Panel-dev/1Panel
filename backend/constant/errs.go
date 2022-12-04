@@ -52,3 +52,10 @@ var (
 	ErrFileCanNotRead = "ErrFileCanNotRead"
 	ErrFileToLarge    = "ErrFileToLarge"
 )
+
+//website
+
+var (
+	ErrDomainIsExist = "ErrDomainIsExist"
+	ErrAliasIsExist  = "ErrAliasIsExist"
+)
