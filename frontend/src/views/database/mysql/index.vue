@@ -17,9 +17,6 @@
                             {{ $t('commons.button.create') }}
                         </el-button>
                         <el-button>phpMyAdmin</el-button>
-                        <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
                     </template>
                     <el-table-column type="selection" fix />
                     <el-table-column :label="$t('commons.table.name')" prop="name" />
@@ -112,6 +109,8 @@
         <UploadDialog ref="uploadRef" />
         <OperatrDialog @search="search" ref="dialogRef" />
         <BackupRecords ref="dialogBackupRef" />
+
+        <AppResources ref="checkRef"></AppResources>
     </div>
 </template>
 
@@ -120,12 +119,13 @@ import ComplexTable from '@/components/complex-table/index.vue';
 import OperatrDialog from '@/views/database/mysql/create/index.vue';
 import BackupRecords from '@/views/database/mysql/backup/index.vue';
 import UploadDialog from '@/views/database/mysql/upload/index.vue';
+import AppResources from '@/views/database/mysql/check/index.vue';
 import Setting from '@/views/database/mysql/setting/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import Submenu from '@/views/database/index.vue';
 import { dateFromat } from '@/utils/util';
 import { reactive, ref } from 'vue';
-import { deleteMysqlDB, searchMysqlDBs, updateMysqlDBInfo } from '@/api/modules/database';
+import { deleteCheckMysqlDB, deleteMysqlDB, searchMysqlDBs, updateMysqlDBInfo } from '@/api/modules/database';
 import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElForm, ElMessage } from 'element-plus';
@@ -136,6 +136,8 @@ import { App } from '@/api/interface/app';
 const selects = ref<any>([]);
 const mysqlName = ref();
 const isOnSetting = ref<boolean>();
+
+const checkRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -218,17 +220,14 @@ const checkExist = (data: App.CheckInstalled) => {
     }
 };
 
-const onBatchDelete = async (row: Database.MysqlDBInfo | null) => {
-    let ids: Array<number> = [];
-    if (row) {
-        ids.push(row.id);
+const onDelete = async (row: Database.MysqlDBInfo) => {
+    const res = await deleteCheckMysqlDB(row.id);
+    if (res.data && res.data.length > 0) {
+        checkRef.value.acceptParams({ items: res.data });
     } else {
-        selects.value.forEach((item: Database.MysqlDBInfo) => {
-            ids.push(item.id);
-        });
+        await useDeleteData(deleteMysqlDB, row.id, 'app.deleteWarn');
+        search();
     }
-    await useDeleteData(deleteMysqlDB, { ids: ids }, 'commons.msg.delete');
-    search();
 };
 const buttons = [
     {
@@ -273,7 +272,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         click: (row: Database.MysqlDBInfo) => {
-            onBatchDelete(row);
+            onDelete(row);
         },
     },
 ];

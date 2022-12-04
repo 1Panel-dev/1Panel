@@ -40,7 +40,8 @@ type IMysqlService interface {
 	Backup(db dto.BackupDB) error
 	Recover(db dto.RecoverDB) error
 
-	Delete(ids []uint) error
+	DeleteCheck(id uint) ([]string, error)
+	Delete(id uint) error
 	LoadStatus() (*dto.MysqlStatus, error)
 	LoadVariables() (*dto.MysqlVariables, error)
 	LoadBaseInfo() (*dto.DBBaseInfo, error)
@@ -225,28 +226,46 @@ func (u *MysqlService) Recover(db dto.RecoverDB) error {
 	return nil
 }
 
-func (u *MysqlService) Delete(ids []uint) error {
+func (u *MysqlService) DeleteCheck(id uint) ([]string, error) {
+	var appInUsed []string
+	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	if err != nil {
+		return appInUsed, err
+	}
+
+	db, err := mysqlRepo.Get(commonRepo.WithByID(id))
+	if err != nil {
+		return appInUsed, err
+	}
+
+	apps, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithResourceId(app.ID), appInstallResourceRepo.WithLinkId(db.ID))
+	for _, app := range apps {
+		appInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(app.ID))
+		if appInstall.ID != 0 {
+			appInUsed = append(appInUsed, appInstall.Name)
+		}
+	}
+	return appInUsed, nil
+}
+
+func (u *MysqlService) Delete(id uint) error {
 	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
 	if err != nil {
 		return err
 	}
 
-	dbs, err := mysqlRepo.List(commonRepo.WithIdsIn(ids))
+	db, err := mysqlRepo.Get(commonRepo.WithByID(id))
 	if err != nil {
 		return err
 	}
 
-	for _, db := range dbs {
-		if len(db.Name) != 0 {
-			if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", db.Name, db.Permission)); err != nil {
-				return err
-			}
-			if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop database if exists %s", db.Name)); err != nil {
-				return err
-			}
-		}
-		_ = mysqlRepo.Delete(context.Background(), commonRepo.WithByID(db.ID))
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", db.Name, db.Permission)); err != nil {
+		return err
 	}
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop database if exists %s", db.Name)); err != nil {
+		return err
+	}
+	_ = mysqlRepo.Delete(context.Background(), commonRepo.WithByID(db.ID))
 	return nil
 }
 

@@ -23,6 +23,12 @@ func (a AppInstallResourceRpo) WithLinkId(linkId uint) DBOption {
 	}
 }
 
+func (a AppInstallResourceRpo) WithResourceId(resourceId uint) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("resource_id = ?", resourceId)
+	}
+}
+
 func (a AppInstallResourceRpo) GetBy(opts ...DBOption) ([]model.AppInstallResource, error) {
 	db := global.DB.Model(&model.AppInstallResource{})
 	var resources []model.AppInstallResource
