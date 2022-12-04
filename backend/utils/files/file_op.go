@@ -331,7 +331,7 @@ const (
 	Gz    CompressType = "gz"
 	Bz2   CompressType = "bz2"
 	Tar   CompressType = "tar"
-	TarGz CompressType = "tarGz"
+	TarGz CompressType = "tar.gz"
 	Xz    CompressType = "xz"
 )
 
