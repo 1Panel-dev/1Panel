@@ -17,7 +17,9 @@
                     <el-col :lg="4" :xl="2">
                         <div>
                             {{ $t('commons.table.status') }}:
-                            <el-tag type="success">{{ data.status }}</el-tag>
+                            <el-tag type="info">
+                                <Status :status="data.status"></Status>
+                            </el-tag>
                         </div>
                     </el-col>
                     <el-col :lg="8" :xl="4">
@@ -50,6 +52,7 @@ import i18n from '@/lang';
 import router from '@/routers';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
+import Status from '@/components/status/index.vue';
 
 const props = defineProps({
     appKey: {
