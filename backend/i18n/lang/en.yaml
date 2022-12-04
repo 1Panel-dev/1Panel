@@ -22,6 +22,7 @@ ErrNameIsExist: "Name is already exist"
 ErrPortInUsed: "{{ .detail }} port already in use"
 ErrAppLimit: "App exceeds install limit"
 ErrAppRequired: "{{ .detail }} app is required"
+ErrNotInstall: "App not installed"
 
 
 #file

@@ -48,6 +48,7 @@ func (a AppInstallService) Page(req dto.AppInstalledRequest) (int64, []dto.AppIn
 }
 
 func (a AppInstallService) CheckExist(key string) (*dto.CheckInstalled, error) {
+
 	res := &dto.CheckInstalled{
 		IsExist: false,
 	}
@@ -60,6 +61,10 @@ func (a AppInstallService) CheckExist(key string) (*dto.CheckInstalled, error) {
 	if reflect.DeepEqual(appInstall, model.AppInstall{}) {
 		return res, nil
 	}
+	if err := syncById(appInstall.ID); err != nil {
+		return nil, err
+	}
+
 	res.ContainerName = appInstall.ContainerName
 	res.Name = appInstall.Name
 	res.Version = appInstall.Version

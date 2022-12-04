@@ -144,3 +144,7 @@ export const GetHTTPSConfig = (id: number) => {
 export const UpdateHTTPSConfig = (req: WebSite.HTTPSReq) => {
     return http.post<WebSite.HTTPSConfig>(`/websites/${req.websiteId}/https`, req);
 };
+
+export const PreCheck = (req: WebSite.CheckReq) => {
+    return http.post<WebSite.CheckRes[]>(`/websites/check`, req);
+};

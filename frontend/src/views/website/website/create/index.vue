@@ -115,6 +115,7 @@
                 </el-button>
             </span>
         </template>
+        <Check ref="preCheckRef"></Check>
     </el-dialog>
 </template>
 
@@ -122,12 +123,13 @@
 import { App } from '@/api/interface/app';
 import { WebSite } from '@/api/interface/website';
 import { GetApp, GetAppDetail, SearchApp, GetAppInstalled } from '@/api/modules/app';
-import { CreateWebsite, ListGroups } from '@/api/modules/website';
+import { CreateWebsite, ListGroups, PreCheck } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElDialog, ElForm, FormInstance, ElMessage } from 'element-plus';
 import { reactive, ref } from 'vue';
 import Params from '@/views/app-store/detail/params/index.vue';
+import Check from '../check/index.vue';
 
 const websiteForm = ref<FormInstance>();
 const website = ref({
@@ -175,6 +177,7 @@ let appVersions = ref<string[]>([]);
 let appDetail = ref<App.AppDetail>();
 let appParams = ref<App.AppParams>();
 let paramKey = ref(1);
+let preCheckRef = ref();
 
 const em = defineEmits(['close']);
 
@@ -248,14 +251,21 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        CreateWebsite(website.value)
-            .then(() => {
-                ElMessage.success(i18n.global.t('commons.msg.createSuccess'));
-                handleClose();
-            })
-            .finally(() => {
+        PreCheck({}).then((res) => {
+            if (res.data) {
                 loading.value = false;
-            });
+                preCheckRef.value.acceptParams({ items: res.data });
+            } else {
+                CreateWebsite(website.value)
+                    .then(() => {
+                        ElMessage.success(i18n.global.t('commons.msg.createSuccess'));
+                        handleClose();
+                    })
+                    .finally(() => {
+                        loading.value = false;
+                    });
+            }
+        });
     });
 };
 

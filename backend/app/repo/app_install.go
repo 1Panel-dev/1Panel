@@ -112,7 +112,7 @@ type RootInfo struct {
 	Version       string `json:"version"`
 }
 
-func (u *AppInstallRepo) LoadBaseInfoByKey(key string) (*RootInfo, error) {
+func (a *AppInstallRepo) LoadBaseInfoByKey(key string) (*RootInfo, error) {
 	var (
 		app        model.App
 		appInstall model.AppInstall
