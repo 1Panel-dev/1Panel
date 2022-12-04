@@ -3,7 +3,7 @@ export enum CompressType {
     Gz = 'gz',
     Bz2 = 'bz2',
     Tar = 'tar',
-    TarGz = 'tarGz',
+    TarGz = 'tar.gz',
     Xz = 'xz',
 }
 
@@ -12,6 +12,6 @@ export enum CompressExtention {
     gz = '.gz',
     bz2 = '.tar.bz2',
     tar = '.tar',
-    tarGz = '.tar.gz',
+    'tar.gz' = '.tar.gz',
     xz = '.tar.xz',
 }
