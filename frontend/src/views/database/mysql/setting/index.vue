@@ -66,7 +66,7 @@
                             v-model="mysqlConf"
                             :readOnly="true"
                         />
-                        <el-button type="primary" style="width: 120px; margin-top: 10px" @click="onSaveFile()">
+                        <el-button type="primary" style="margin-top: 10px" @click="onSaveFile()">
                             {{ $t('commons.button.save') }}
                         </el-button>
                     </el-collapse-item>
@@ -76,11 +76,11 @@
                     <el-collapse-item :title="$t('database.performanceTuning')" name="4">
                         <Variables ref="variablesRef" />
                     </el-collapse-item>
-                    <el-collapse-item title="日志" name="5">
+                    <el-collapse-item :title="$t('database.log')" name="5">
                         <ContainerLog ref="dialogContainerLogRef" />
                     </el-collapse-item>
 
-                    <el-collapse-item title="慢日志" name="6">
+                    <el-collapse-item :title="$t('database.slowLog')" name="6">
                         <SlowLog ref="slowLogRef" />
                     </el-collapse-item>
                 </el-collapse>

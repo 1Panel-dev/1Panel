@@ -190,7 +190,7 @@ export default {
         jsInfo: '广受欢迎的开源堡垒机',
         msInfo: '一站式开源持续测试平台',
         koInfo: '开源的轻量级 Kubernetes 发行版',
-        kubepiInfo: '现代化的开源 K8s 面板',
+        kubepiInfo: '现代化的开源 Kubernetes 面板',
         goInstall: '去安装',
     },
     tabs: {
@@ -278,6 +278,9 @@ export default {
         tableOpenCacheHelper: '表缓存',
         maxConnectionsHelper: '最大连接数',
         restart: '重启数据库',
+
+        log: '日志',
+        slowLog: '慢日志',
 
         isOn: '是否开启',
         longQueryTime: '慢查询阈值',
@@ -751,7 +754,7 @@ export default {
         gotoInstalled: '去安装',
         search: '搜索',
         limitHelper: '该应用已安装，不支持重复安装',
-        deleteHelper: '应用已经关联以下资源，无法删除',
+        deleteHelper: '{0}已经关联以下资源，无法删除',
         checkTitle: '提示',
         website: '网站',
         database: '数据库',

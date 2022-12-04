@@ -53,6 +53,20 @@ func (b *BaseApi) CheckAppInstalled(c *gin.Context) {
 	helper.SuccessWithData(c, checkData)
 }
 
+func (b *BaseApi) LoadPort(c *gin.Context) {
+	key, ok := c.Params.Get("key")
+	if !ok {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error key in path"))
+		return
+	}
+	port, err := appInstallService.LoadPort(key)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, port)
+}
+
 func (b *BaseApi) DeleteCheck(c *gin.Context) {
 
 	appInstallId, err := helper.GetIntParamByKey(c, "appInstallId")

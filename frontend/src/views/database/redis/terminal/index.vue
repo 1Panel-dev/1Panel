@@ -1,7 +1,7 @@
 <template>
     <div v-show="terminalShow" style="height: 100%">
-        <el-card style="margin-top: 5px">
-            <div style="height: calc(100vh - 220px)" :id="'terminal-exec'"></div>
+        <el-card>
+            <div style="height: calc(100vh - 230px)" :id="'terminal-exec'"></div>
         </el-card>
     </div>
 </template>

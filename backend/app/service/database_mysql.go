@@ -240,7 +240,7 @@ func (u *MysqlService) DeleteCheck(id uint) ([]string, error) {
 
 	apps, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithResourceId(app.ID), appInstallResourceRepo.WithLinkId(db.ID))
 	for _, app := range apps {
-		appInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(app.ID))
+		appInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(app.AppInstallId))
 		if appInstall.ID != 0 {
 			appInUsed = append(appInUsed, appInstall.Name)
 		}

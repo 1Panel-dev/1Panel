@@ -79,6 +79,14 @@ func (a AppInstallService) CheckExist(key string) (*dto.CheckInstalled, error) {
 	return res, nil
 }
 
+func (a AppInstallService) LoadPort(key string) (int64, error) {
+	app, err := appInstallRepo.LoadBaseInfoByKey(key)
+	if err != nil {
+		return int64(0), nil
+	}
+	return app.Port, nil
+}
+
 func (a AppInstallService) Search(req dto.AppInstalledRequest) ([]dto.AppInstalled, error) {
 	var installs []model.AppInstall
 	var err error

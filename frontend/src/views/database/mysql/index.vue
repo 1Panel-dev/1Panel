@@ -16,7 +16,7 @@
                         <el-button type="primary" icon="Plus" @click="onOpenDialog()">
                             {{ $t('commons.button.create') }}
                         </el-button>
-                        <el-button>phpMyAdmin</el-button>
+                        <el-button @click="goDashboard" icon="Position">phpMyAdmin</el-button>
                     </template>
                     <el-table-column type="selection" fix />
                     <el-table-column :label="$t('commons.table.name')" prop="name" />
@@ -132,12 +132,14 @@ import { ElForm, ElMessage } from 'element-plus';
 import { Database } from '@/api/interface/database';
 import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
+import { GetAppPort } from '@/api/modules/app';
 
 const selects = ref<any>([]);
 const mysqlName = ref();
 const isOnSetting = ref<boolean>();
 
 const checkRef = ref();
+const phpadminPort = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -212,11 +214,21 @@ const search = async () => {
     paginationConfig.total = res.data.total;
 };
 
+const goDashboard = async () => {
+    window.open('http://localhost:' + phpadminPort.value, '_blank');
+};
+
+const loadDashboardPort = async () => {
+    const res = await GetAppPort('phpmyadmin');
+    phpadminPort.value = res.data;
+};
+
 const checkExist = (data: App.CheckInstalled) => {
     mysqlIsExist.value = data.isExist;
     mysqlName.value = data.name;
     if (mysqlIsExist.value) {
         search();
+        loadDashboardPort();
     }
 };
 
