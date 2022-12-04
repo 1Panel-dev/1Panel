@@ -115,6 +115,7 @@ const search = async (req: File.ReqFile) => {
 
 onMounted(() => {
     req.path = props.path;
+    rowName.value = '';
     search(req);
 });
 
