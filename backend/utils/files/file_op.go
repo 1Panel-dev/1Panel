@@ -231,8 +231,8 @@ func (f FileOp) CopyDir(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	//dstDir := filepath.Join(dst, srcInfo.Name())
-	if err := f.Fs.MkdirAll(dst, srcInfo.Mode()); err != nil {
+	dstDir := filepath.Join(dst, srcInfo.Name())
+	if err := f.Fs.MkdirAll(dstDir, srcInfo.Mode()); err != nil {
 		return err
 	}
 
@@ -245,15 +245,13 @@ func (f FileOp) CopyDir(src, dst string) error {
 
 	for _, obj := range obs {
 		fSrc := filepath.Join(src, obj.Name())
-		fDst := filepath.Join(dst, obj.Name())
-
 		if obj.IsDir() {
-			err = f.CopyDir(fSrc, fDst)
+			err = f.CopyDir(fSrc, dstDir)
 			if err != nil {
 				errs = append(errs, err)
 			}
 		} else {
-			err = f.CopyFile(fSrc, fDst)
+			err = f.CopyFile(fSrc, dstDir)
 			if err != nil {
 				errs = append(errs, err)
 			}
@@ -284,7 +282,12 @@ func (f FileOp) CopyFile(src, dst string) error {
 		return err
 	}
 
-	dstFile, err := f.Fs.OpenFile(dst, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775)
+	srcInfo, err := f.Fs.Stat(src)
+	if err != nil {
+		return err
+	}
+
+	dstFile, err := f.Fs.OpenFile(path.Join(dst, srcInfo.Name()), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775)
 	if err != nil {
 		return err
 	}
@@ -297,7 +300,7 @@ func (f FileOp) CopyFile(src, dst string) error {
 	if err != nil {
 		return err
 	}
-	if err = f.Fs.Chmod(dst, info.Mode()); err != nil {
+	if err = f.Fs.Chmod(dstFile.Name(), info.Mode()); err != nil {
 		return err
 	}
 

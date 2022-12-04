@@ -142,7 +142,7 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 
 	list, _ := appInstallRepo.GetBy(commonRepo.WithByName(name))
 	if len(list) > 0 {
-		return nil, buserr.New(constant.ErrNameIsExist, "", nil)
+		return nil, buserr.New(constant.ErrNameIsExist)
 	}
 
 	httpPort, err := checkPort("PANEL_APP_PORT_HTTP", params)

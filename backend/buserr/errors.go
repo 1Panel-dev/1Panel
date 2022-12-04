@@ -13,7 +13,12 @@ type BusinessError struct {
 
 func (e BusinessError) Error() string {
 
-	content := i18n.GetErrMsg(e.Msg, map[string]interface{}{"detail": e.Detail})
+	content := ""
+	if e.Detail != nil {
+		content = i18n.GetErrMsg(e.Msg, map[string]interface{}{"detail": e.Detail})
+	} else {
+		content = i18n.GetErrMsg(e.Msg, nil)
+	}
 	if content == "" {
 		if e.Err != nil {
 			return e.Err.Error()
@@ -23,7 +28,15 @@ func (e BusinessError) Error() string {
 	return content
 }
 
-func New(Key string, detail interface{}, err error) BusinessError {
+func New(Key string) BusinessError {
+	return BusinessError{
+		Msg:    Key,
+		Detail: nil,
+		Err:    nil,
+	}
+}
+
+func WithMessage(Key string, detail interface{}, err error) BusinessError {
 	return BusinessError{
 		Msg:    Key,
 		Detail: detail,

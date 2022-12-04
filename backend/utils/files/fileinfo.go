@@ -171,13 +171,13 @@ func (f *FileInfo) getContent() error {
 		if err != nil {
 			return nil
 		}
-		if detectBinary(cByte) {
-			return buserr.New(constant.ErrFileCanNotRead, "", nil)
+		if len(cByte) > 0 && detectBinary(cByte) {
+			return buserr.New(constant.ErrFileCanNotRead)
 		}
 		f.Content = string(cByte)
 		return nil
 	} else {
-		return buserr.New(constant.ErrFileToLarge, "", nil)
+		return buserr.New(constant.ErrFileToLarge)
 	}
 }
 
