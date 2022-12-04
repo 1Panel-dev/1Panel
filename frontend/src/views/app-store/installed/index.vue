@@ -31,7 +31,7 @@
                     <el-tag round effect="dark" v-if="row.canUpdate">{{ $t('app.canUpdate') }}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('app.appName')" prop="app.name"></el-table-column>
+            <el-table-column :label="$t('app.app')" prop="app.name"></el-table-column>
             <el-table-column :label="$t('app.version')" prop="version"></el-table-column>
             <el-table-column :label="$t('website.port')" prop="httpPort"></el-table-column>
             <el-table-column :label="$t('app.backup')">
@@ -52,13 +52,12 @@
                     >
                         <template #reference>{{ row.status }}</template>
                     </el-popover>
-
-                    <el-tag v-else>
+                    <div v-else>
                         <el-icon v-if="row.status === 'Installing'" class="is-loading">
                             <Loading />
                         </el-icon>
                         {{ row.status }}
-                    </el-tag>
+                    </div>
                 </template>
             </el-table-column>
             <el-table-column
