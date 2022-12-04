@@ -50,9 +50,7 @@
                         trigger="hover"
                         :content="row.message"
                     >
-                        <template #reference>
-                            <el-tag type="error">{{ row.status }}</el-tag>
-                        </template>
+                        <template #reference>{{ row.status }}</template>
                     </el-popover>
 
                     <el-tag v-else>

@@ -376,13 +376,17 @@ func syncById(installId uint) error {
 		errorContainers    []string
 		notFoundContainers []string
 		runningContainers  []string
+		exitedContainers   []string
 	)
 
 	for _, n := range containers {
-		if n.State != "running" {
-			errorContainers = append(errorContainers, n.Names[0])
-		} else {
+		switch n.State {
+		case "exited":
+			exitedContainers = append(exitedContainers, n.Names[0])
+		case "running":
 			runningContainers = append(runningContainers, n.Names[0])
+		default:
+			errorContainers = append(errorContainers, n.Names[0])
 		}
 	}
 	for _, old := range containerNames {
@@ -401,6 +405,7 @@ func syncById(installId uint) error {
 	containerCount := len(containers)
 	errCount := len(errorContainers)
 	notFoundCount := len(notFoundContainers)
+	existedCount := len(exitedContainers)
 	normalCount := len(containerNames)
 	runningCount := len(runningContainers)
 
@@ -409,15 +414,16 @@ func syncById(installId uint) error {
 		appInstall.Message = "container is not found"
 		return appInstallRepo.Save(&appInstall)
 	}
-	if errCount == 0 && notFoundCount == 0 {
+	if errCount == 0 && existedCount == 0 {
 		appInstall.Status = constant.Running
+		return appInstallRepo.Save(&appInstall)
+	}
+	if existedCount == normalCount {
+		appInstall.Status = constant.Stopped
 		return appInstallRepo.Save(&appInstall)
 	}
 	if errCount == normalCount {
 		appInstall.Status = constant.Error
-	}
-	if notFoundCount == normalCount {
-		appInstall.Status = constant.Stopped
 	}
 	if runningCount < normalCount {
 		appInstall.Status = constant.UnHealthy
