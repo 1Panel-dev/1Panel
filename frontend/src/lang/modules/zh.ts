@@ -629,6 +629,8 @@ export default {
         uploadSuccess: '上传成功!',
         downloadProcess: '下载进度',
         downloading: '正在下载...',
+        infoDetail: '文件属性',
+        type: '类型',
     },
     setting: {
         all: '全部',

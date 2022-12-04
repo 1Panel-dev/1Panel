@@ -170,6 +170,7 @@
                 @close="closeDownload"
             ></Download>
             <Process :open="processPage.open" @close="closeProcess"></Process>
+            <Detail ref="detailRef"></Detail>
         </el-row>
     </LayoutContent>
 </template>
@@ -205,6 +206,7 @@ import Move from './move/index.vue';
 import Download from './download/index.vue';
 import { Mimetypes } from '@/global/mimetype';
 import Process from './process/index.vue';
+import Detail from './detail/index.vue';
 
 const data = ref();
 let selects = ref<any>([]);
@@ -227,6 +229,7 @@ const wgetPage = reactive({ open: false, path: '' });
 const movePage = reactive({ open: false, oldPaths: [''], type: '' });
 const downloadPage = reactive({ open: false, paths: [''], name: '' });
 const processPage = reactive({ open: false });
+const detailRef = ref();
 
 const defaultProps = {
     children: 'children',
@@ -522,12 +525,10 @@ const quickSave = (content: string) => {
     });
 };
 
-onMounted(() => {
-    search();
-});
+const openDetail = (row: File.File) => {
+    detailRef.value.acceptParams({ path: row.path });
+};
 
-//TODO button增加v-if判断
-//openDeCompress 增加是否可以解压判断
 const buttons = [
     {
         label: i18n.global.t('file.open'),
@@ -560,8 +561,13 @@ const buttons = [
     },
     {
         label: i18n.global.t('file.info'),
+        click: openDetail,
     },
 ];
+
+onMounted(() => {
+    search();
+});
 </script>
 
 <style>
