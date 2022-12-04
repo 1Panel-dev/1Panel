@@ -5,7 +5,7 @@
         </template>
         <div>
             <BreadCrumbs>
-                <BreadCrumbItem @click="jump(-1)" :right="paths.length == 0">root</BreadCrumbItem>
+                <BreadCrumbItem @click="jump(-1)" :right="paths.length == 0">/</BreadCrumbItem>
                 <BreadCrumbItem
                     v-for="(item, key) in paths"
                     :key="key"
