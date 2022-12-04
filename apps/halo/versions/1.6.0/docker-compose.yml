@@ -18,7 +18,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${PANEL_DB_USER_PASSWORD}
       HALO_ADMIN_PATH: admin
       HALO_CACHE: memory
-
+    labels:
+      createdBy: "apps"
 networks:
   1panel:
     external: true

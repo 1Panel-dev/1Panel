@@ -20,7 +20,8 @@ services:
       --collation-server=utf8mb4_general_ci
       --explicit_defaults_for_timestamp=true
       --lower_case_table_names=1
-
+    labels:
+      createdBy: "apps"
 networks:
   1panel:
     external: true
