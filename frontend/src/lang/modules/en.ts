@@ -163,6 +163,8 @@ export default {
         rwPerSecond: 'RW per second',
         ioDelay: 'IO delay',
         time: 'Times',
+        uptime: 'Up Time',
+        runningTime: 'Running Time',
 
         runSmoothly: 'Run smoothly',
         runNormal: 'Run normal',

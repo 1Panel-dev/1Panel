@@ -169,6 +169,8 @@ export default {
         rwPerSecond: '每秒读写',
         ioDelay: 'IO 延迟',
         time: '次',
+        uptime: '启动时间',
+        runningTime: '运行时间',
 
         runSmoothly: '运行流畅',
         runNormal: '运行正常',

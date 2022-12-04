@@ -93,6 +93,8 @@
                             {{ baseInfo.kernelVersion }}
                         </el-form-item>
                         <el-form-item :label="$t('home.kernelArch')">{{ baseInfo.kernelArch }}</el-form-item>
+                        <el-form-item :label="$t('home.uptime')">{{ baseInfo.uptime }}</el-form-item>
+                        <el-form-item :label="$t('home.runningTime')">{{ baseInfo.timeSinceUptime }}</el-form-item>
                     </el-form>
                 </el-card>
             </el-col>
@@ -218,6 +220,8 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     kernelArch: '',
     kernelVersion: '',
     virtualizationSystem: '',
+    uptime: '',
+    timeSinceUptime: '',
 
     cpuCores: 0,
     cpuLogicalCores: 0,

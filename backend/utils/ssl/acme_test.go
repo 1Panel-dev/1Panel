@@ -8,6 +8,13 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"strconv"
+	"strings"
+	"testing"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/cenkalti/backoff/v4"
 	"github.com/go-acme/lego/v4/acme"
@@ -18,12 +25,6 @@ import (
 	"github.com/go-acme/lego/v4/challenge/dns01"
 	"github.com/go-acme/lego/v4/lego"
 	"github.com/go-acme/lego/v4/registration"
-	"io/ioutil"
-	"os"
-	"strconv"
-	"strings"
-	"testing"
-	"time"
 )
 
 type plainDnsProvider struct {
@@ -34,11 +35,6 @@ func (p *plainDnsProvider) Present(domain, token, keyAuth string) error {
 	fqdn, value := dns01.GetRecord(domain, keyAuth)
 	p.Key = fqdn
 	p.Value = value
-	return nil
-}
-
-func (p *plainDnsProvider) CleanUp(domain, token, keyAuth string) error {
-	fmt.Sprintf("%s,%s,%s", domain, token, keyAuth)
 	return nil
 }
 
@@ -263,10 +259,10 @@ func TestSSL(t *testing.T) {
 	//	panic(err)
 	//}
 
-	err = client.Challenge.SetDNS01Provider(&plainDnsProvider{}, dns01.AddDNSTimeout(6*time.Minute))
-	if err != nil {
-		panic(err)
-	}
+	// err = client.Challenge.SetDNS01Provider(&plainDnsProvider{}, dns01.AddDNSTimeout(6*time.Minute))
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	core, err := api.New(config.HTTPClient, config.UserAgent, config.CADirURL, reg.URI, priKey)
 	if err != nil {
