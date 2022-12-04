@@ -106,6 +106,25 @@
             </template>
         </el-dialog>
 
+        <el-dialog
+            v-model="phpVisiable"
+            :title="$t('app.checkTitle')"
+            width="30%"
+            :close-on-click-modal="false"
+            :destroy-on-close="true"
+        >
+            <el-alert :closable="false" :title="$t('app.checkInstalledWarn', ['phpMyAdmin'])" type="info">
+                <el-link icon="Position" @click="goRouter('/apps')" type="primary">
+                    {{ $t('database.goInstall') }}
+                </el-link>
+            </el-alert>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="phpVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                </span>
+            </template>
+        </el-dialog>
+
         <UploadDialog ref="uploadRef" />
         <OperatrDialog @search="search" ref="dialogRef" />
         <BackupRecords ref="dialogBackupRef" />
@@ -133,13 +152,16 @@ import { Database } from '@/api/interface/database';
 import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
 import { GetAppPort } from '@/api/modules/app';
+import router from '@/routers';
 
 const selects = ref<any>([]);
 const mysqlName = ref();
 const isOnSetting = ref<boolean>();
 
 const checkRef = ref();
+
 const phpadminPort = ref();
+const phpVisiable = ref(false);
 
 const data = ref();
 const paginationConfig = reactive({
@@ -214,7 +236,15 @@ const search = async () => {
     paginationConfig.total = res.data.total;
 };
 
+const goRouter = async (path: string) => {
+    router.push({ path: path });
+};
+
 const goDashboard = async () => {
+    if (phpadminPort.value === 0) {
+        phpVisiable.value = true;
+        return;
+    }
     window.open('http://localhost:' + phpadminPort.value, '_blank');
 };
 

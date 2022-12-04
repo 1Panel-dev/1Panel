@@ -20,6 +20,8 @@ export namespace Dashboard {
         kernelArch: string;
         kernelVersion: string;
         virtualizationSystem: string;
+        uptime: string;
+        timeSinceUptime: string;
 
         cpuCores: number;
         cpuLogicalCores: number;

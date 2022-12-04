@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.5+incompatible
 	github.com/aws/aws-sdk-go v1.44.99
+	github.com/cenkalti/backoff/v4 v4.1.3
 	github.com/compose-spec/compose-go v1.6.0
 	github.com/dgraph-io/badger/v3 v3.2103.2
 	github.com/docker/docker v20.10.18+incompatible
@@ -63,7 +64,6 @@ require (
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.1755 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
-	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cloudflare/cloudflare-go v0.49.0 // indirect
