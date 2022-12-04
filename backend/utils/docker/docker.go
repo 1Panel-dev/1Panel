@@ -66,12 +66,10 @@ func (c Client) CreateNetwork(name string) error {
 
 func (c Client) NetworkExist(name string) bool {
 	var options types.NetworkListOptions
-	var array []filters.KeyValuePair
-	array = append(array, filters.Arg("name", name))
+	options.Filters = filters.NewArgs(filters.Arg("name", name))
 	networks, err := c.cli.NetworkList(context.Background(), options)
 	if err != nil {
 		return false
 	}
-
 	return len(networks) > 0
 }

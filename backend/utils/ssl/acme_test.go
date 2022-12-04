@@ -6,18 +6,13 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strconv"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
-	"github.com/cenkalti/backoff/v4"
-	"github.com/go-acme/lego/v4/acme"
 	"github.com/go-acme/lego/v4/acme/api"
 	"github.com/go-acme/lego/v4/certcrypto"
 	"github.com/go-acme/lego/v4/certificate"
@@ -38,6 +33,11 @@ func (p *plainDnsProvider) Present(domain, token, keyAuth string) error {
 	return nil
 }
 
+func (p *plainDnsProvider) CleanUp(domain, token, keyAuth string) error {
+	fmt.Printf("%s,%s,%s", domain, token, keyAuth)
+	return nil
+}
+
 func TestCreatePrivate(t *testing.T) {
 	priKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -55,92 +55,6 @@ func TestCreatePrivate(t *testing.T) {
 	if err = pem.Encode(file, block); err != nil {
 		return
 	}
-}
-
-func checkChallengeStatus(chlng acme.ExtendedChallenge) (bool, error) {
-	switch chlng.Status {
-	case acme.StatusValid:
-		return true, nil
-	case acme.StatusPending, acme.StatusProcessing:
-		return false, nil
-	case acme.StatusInvalid:
-		return false, chlng.Error
-	default:
-		return false, errors.New("the server returned an unexpected state")
-	}
-}
-
-func checkAuthorizationStatus(authz acme.Authorization) (bool, error) {
-	switch authz.Status {
-	case acme.StatusValid:
-		return true, nil
-	case acme.StatusPending, acme.StatusProcessing:
-		return false, nil
-	case acme.StatusDeactivated, acme.StatusExpired, acme.StatusRevoked:
-		return false, fmt.Errorf("the authorization state %s", authz.Status)
-	case acme.StatusInvalid:
-		for _, chlg := range authz.Challenges {
-			if chlg.Status == acme.StatusInvalid && chlg.Error != nil {
-				return false, chlg.Error
-			}
-		}
-		return false, fmt.Errorf("the authorization state %s", authz.Status)
-	default:
-		return false, errors.New("the server returned an unexpected state")
-	}
-}
-
-func validate(core *api.Core, domain string, chlg acme.Challenge) error {
-	chlng, err := core.Challenges.New(chlg.URL)
-	if err != nil {
-		return fmt.Errorf("failed to initiate challenge: %w", err)
-	}
-
-	valid, err := checkChallengeStatus(chlng)
-	if err != nil {
-		return err
-	}
-
-	if valid {
-		return nil
-	}
-
-	ra, err := strconv.Atoi(chlng.RetryAfter)
-	if err != nil {
-		// The ACME server MUST return a Retry-After.
-		// If it doesn't, we'll just poll hard.
-		// Boulder does not implement the ability to retry challenges or the Retry-After header.
-		// https://github.com/letsencrypt/boulder/blob/master/docs/acme-divergences.md#section-82
-		ra = 5
-	}
-	initialInterval := time.Duration(ra) * time.Second
-
-	bo := backoff.NewExponentialBackOff()
-	bo.InitialInterval = initialInterval
-	bo.MaxInterval = 10 * initialInterval
-	bo.MaxElapsedTime = 100 * initialInterval
-
-	// After the path is sent, the ACME server will access our server.
-	// Repeatedly check the server for an updated status on our request.
-	operation := func() error {
-		authz, err := core.Authorizations.Get(chlng.AuthorizationURL)
-		if err != nil {
-			return backoff.Permanent(err)
-		}
-
-		valid, err := checkAuthorizationStatus(authz)
-		if err != nil {
-			return backoff.Permanent(err)
-		}
-
-		if valid {
-			return nil
-		}
-
-		return errors.New("the server didn't respond to our request")
-	}
-
-	return backoff.Retry(operation, bo)
 }
 
 func TestSSL(t *testing.T) {

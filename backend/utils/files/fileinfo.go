@@ -182,7 +182,7 @@ func (f *FileInfo) getContent() error {
 }
 
 func detectBinary(buf []byte) bool {
-	var whiteByte int = 0
+	whiteByte := 0
 	n := min(1024, len(buf))
 	for i := 0; i < n; i++ {
 		if (buf[i] >= 0x20) || buf[i] == 9 || buf[i] == 10 || buf[i] == 13 {
@@ -192,10 +192,7 @@ func detectBinary(buf []byte) bool {
 		}
 	}
 
-	if whiteByte >= 1 {
-		return false
-	}
-	return true
+	return whiteByte < 1
 }
 
 func min(x, y int) int {
