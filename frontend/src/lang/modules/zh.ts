@@ -139,6 +139,7 @@ export default {
             removing: '迁移中',
             paused: '暂停',
             exited: '停止',
+            installing: '安装中',
         },
     },
     menu: {
