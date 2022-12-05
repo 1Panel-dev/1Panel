@@ -140,8 +140,7 @@ func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, 
 
 func (a AppService) Install(name string, appDetailId uint, params map[string]interface{}) (*model.AppInstall, error) {
 
-	list, _ := appInstallRepo.GetBy(commonRepo.WithByName(name))
-	if len(list) > 0 {
+	if list, _ := appInstallRepo.GetBy(commonRepo.WithByName(name)); len(list) > 0 {
 		return nil, buserr.New(constant.ErrNameIsExist)
 	}
 

@@ -2,7 +2,8 @@
     <LayoutContent>
         <el-row :gutter="20">
             <el-col :span="5">
-                <el-scrollbar height="80vh">
+                <br />
+                <el-scrollbar height="85vh">
                     <el-tree
                         :data="fileTree"
                         :props="defaultProps"
@@ -25,6 +26,7 @@
             </el-col>
 
             <el-col :span="19">
+                <br />
                 <div class="path">
                     <BreadCrumbs>
                         <BreadCrumbItem @click="jump(-1)" :right="paths.length == 0">/</BreadCrumbItem>
