@@ -134,6 +134,11 @@ export default {
             running: '已启动',
             stopped: '已停止',
             error: '失败',
+            created: '已创建',
+            restarting: '重启中',
+            removing: '迁移中',
+            paused: '暂停',
+            exited: '停止',
         },
     },
     menu: {

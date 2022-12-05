@@ -8,13 +8,13 @@
                             <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
                         </div>
                     </el-col>
-                    <el-col :lg="4" :xl="2">
+                    <el-col :lg="3" :xl="2">
                         <div>
                             {{ $t('app.version') }}:
                             <el-tag type="info">{{ data.version }}</el-tag>
                         </div>
                     </el-col>
-                    <el-col :lg="4" :xl="2">
+                    <el-col :lg="3" :xl="2">
                         <div>
                             {{ $t('commons.table.status') }}:
                             <el-tag type="info">
@@ -22,7 +22,7 @@
                             </el-tag>
                         </div>
                     </el-col>
-                    <el-col :lg="8" :xl="4">
+                    <el-col :lg="5" :xl="4">
                         <div>
                             {{ $t('website.lastBackupAt') }}:
                             <el-tag v-if="data.lastBackupAt != ''" type="info">{{ data.lastBackupAt }}</el-tag>
