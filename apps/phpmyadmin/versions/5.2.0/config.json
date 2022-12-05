@@ -14,7 +14,7 @@
       "labelZh": "端口",
       "labelEn": "Port",
       "required": true,
-      "default": 8080,
+      "default": 8089,
       "envKey": "PANEL_APP_PORT_HTTP"
     }
   ]
