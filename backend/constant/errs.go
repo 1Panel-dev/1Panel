@@ -12,6 +12,7 @@ const (
 	CodeErrForbidden      = 403
 	CodeErrNotFound       = 404
 	CodePasswordExpired   = 405
+	CodeAuth              = 406
 	CodeErrInternalServer = 500
 	CodeErrHeader         = 406
 )

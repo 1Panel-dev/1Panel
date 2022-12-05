@@ -5,6 +5,14 @@
                 <el-radio-button class="topButton" size="large" @click="routerTo('/containers')" label="container">
                     {{ $t('container.container') }}
                 </el-radio-button>
+                <el-radio-button
+                    class="topButton"
+                    size="large"
+                    @click="routerTo('/containers/compose')"
+                    label="compose"
+                >
+                    {{ $t('container.compose') }}
+                </el-radio-button>
                 <el-radio-button class="topButton" size="large" @click="routerTo('/containers/image')" label="image">
                     {{ $t('container.image') }}
                 </el-radio-button>
@@ -21,14 +29,6 @@
                 </el-radio-button>
                 <el-radio-button class="topButton" size="large" @click="routerTo('/containers/repo')" label="repo">
                     {{ $t('container.repo') }}
-                </el-radio-button>
-                <el-radio-button
-                    class="topButton"
-                    size="large"
-                    @click="routerTo('/containers/compose')"
-                    label="compose"
-                >
-                    {{ $t('container.compose') }}
                 </el-radio-button>
                 <el-radio-button
                     class="topButton"

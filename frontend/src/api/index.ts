@@ -59,6 +59,9 @@ class RequestHttp {
                     router.push({ name: 'Expired' });
                     return data;
                 }
+                if (data.code == ResultEnum.ERRAUTH) {
+                    return data;
+                }
                 if (data.code && data.code !== ResultEnum.SUCCESS) {
                     ElMessage.error(data.msg);
                     return Promise.reject(data);

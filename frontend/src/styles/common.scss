@@ -125,6 +125,16 @@
   display: inline-block;
 }
 
+.input-error {
+    font-size: 12px;
+    word-break: break-all;
+    color: red;
+    transform: scale(0.9);
+    transform-origin: left;
+    width: 110%;
+    display: inline-block;
+  }
+
 .myTable {
     border-collapse: collapse;
     font-size: 12px;

@@ -8,8 +8,8 @@
             </template>
             <el-row :gutter="20">
                 <el-col :span="12">
-                    <div @click="goInstall(baseInfo.haloID)">
-                        <el-card style="height: 110px" @click="goInstall(baseInfo.haloID)">
+                    <div @click="goInstall()" style="cursor: pointer">
+                        <el-card style="height: 110px">
                             <el-row>
                                 <el-col :span="4">
                                     <img style="width: 40px; height: 40px" src="../images/halo.jpg" alt="" />
@@ -26,8 +26,8 @@
                     </div>
                 </el-col>
                 <el-col :span="12">
-                    <div @click="goInstall(baseInfo.dateeaseID)">
-                        <el-card style="height: 110px" @click="goInstall(baseInfo.dateeaseID)">
+                    <div @click="goInstall()" style="cursor: pointer">
+                        <el-card style="height: 110px">
                             <el-row>
                                 <el-col :span="4">
                                     <img style="width: 40px; height: 40px" src="../images/de.jpg" alt="" />
@@ -46,8 +46,8 @@
             </el-row>
             <el-row :gutter="20" style="margin-top: 20px">
                 <el-col :span="12">
-                    <div @click="goInstall(baseInfo.jumpserverID)">
-                        <el-card style="height: 110px" @click="goInstall(baseInfo.jumpserverID)">
+                    <div @click="goInstall()" style="cursor: pointer">
+                        <el-card style="height: 110px">
                             <el-row>
                                 <el-col :span="4">
                                     <img style="width: 40px; height: 40px" src="../images/js.jpg" alt="" />
@@ -64,8 +64,8 @@
                     </div>
                 </el-col>
                 <el-col :span="12">
-                    <div @click="goInstall(baseInfo.metersphereID)">
-                        <el-card style="height: 110px" @click="goInstall(baseInfo.metersphereID)">
+                    <div @click="goInstall()" style="cursor: pointer">
+                        <el-card style="height: 110px">
                             <el-row>
                                 <el-col :span="4">
                                     <img style="width: 40px; height: 40px" src="../images/ms.jpg" alt="" />
@@ -84,8 +84,8 @@
             </el-row>
             <el-row :gutter="20" style="margin-top: 20px">
                 <el-col :span="12">
-                    <div @click="goInstall(baseInfo.kubeoperatorID)">
-                        <el-card style="height: 110px" @click="goInstall(baseInfo.kubeoperatorID)">
+                    <div @click="goInstall()" style="cursor: pointer">
+                        <el-card style="height: 110px">
                             <el-row>
                                 <el-col :span="4">
                                     <img style="width: 40px; height: 40px" src="../images/ko.jpg" alt="" />
@@ -102,8 +102,8 @@
                     </div>
                 </el-col>
                 <el-col :span="12">
-                    <div @click="goInstall(baseInfo.kubepiID)">
-                        <el-card style="height: 110px" @click="goInstall(baseInfo.kubepiID)">
+                    <div @click="goInstall()" style="cursor: pointer">
+                        <el-card style="height: 110px">
                             <el-row>
                                 <el-col :span="4">
                                     <img style="width: 40px; height: 40px" src="../images/kubepi.jpg" alt="" />
@@ -148,11 +148,8 @@ const acceptParams = (base: Dashboard.BaseInfo): void => {
     baseInfo.value.kubepiID = base.kubepiID;
 };
 
-const goInstall = (id: number) => {
-    let params: { [key: string]: any } = {
-        id: id,
-    };
-    router.push({ name: 'AppDetail', params });
+const goInstall = () => {
+    router.push({ name: 'App' });
 };
 
 defineExpose({

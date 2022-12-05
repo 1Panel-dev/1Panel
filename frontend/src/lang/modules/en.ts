@@ -80,7 +80,9 @@ export default {
             password: 'Password',
             rePassword: 'Confirm Password',
             welcome: 'Welcome back, please enter your username and password to log in!',
+            errorAuthInfo: 'The user name or password you entered is incorrect, please re-enter!',
             captchaHelper: 'Please enter the verification code',
+            errorCaptcha: 'Incorrect verification code information!',
             safeEntrance: 'Please use the correct entry to log in to the panel',
             reason: 'Cause of error:',
             reasonHelper:
@@ -165,6 +167,9 @@ export default {
         time: 'Times',
         uptime: 'Up Time',
         runningTime: 'Running Time',
+        Day: 'Days',
+        Hour: 'Hours',
+        Minute: 'Minutes',
 
         runSmoothly: 'Run smoothly',
         runNormal: 'Run normal',
