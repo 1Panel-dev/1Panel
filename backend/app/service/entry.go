@@ -66,12 +66,12 @@ var (
 	settingRepo = repo.RepoGroupApp.SettingRepo
 	backupRepo  = repo.RepoGroupApp.BackupRepo
 
-	websiteRepo       = repo.RepoGroupApp.WebSiteRepo
+	websiteRepo       = repo.NewIWebsiteRepo()
 	websiteGroupRepo  = repo.RepoGroupApp.WebSiteGroupRepo
 	websiteDomainRepo = repo.RepoGroupApp.WebSiteDomainRepo
 	websiteDnsRepo    = repo.RepoGroupApp.WebsiteDnsAccountRepo
-	websiteSSLRepo    = repo.RepoGroupApp.WebsiteSSLRepo
-	websiteAcmeRepo   = repo.RepoGroupApp.WebsiteAcmeAccountRepo
+	websiteSSLRepo    = repo.NewISSLRepo()
+	websiteAcmeRepo   = repo.NewIAcmeAccountRepo()
 
 	logRepo = repo.RepoGroupApp.LogRepo
 )

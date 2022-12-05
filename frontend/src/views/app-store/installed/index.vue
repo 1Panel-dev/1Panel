@@ -56,7 +56,7 @@
                         <el-icon v-if="row.status === 'Installing'" class="is-loading">
                             <Loading />
                         </el-icon>
-                        {{ row.status }}
+                        <Status :status="row.status"></Status>
                     </div>
                 </template>
             </el-table-column>
@@ -129,6 +129,7 @@ import Backups from './backups.vue';
 import AppResources from './check/index.vue';
 import { App } from '@/api/interface/app';
 import { useDeleteData } from '@/hooks/use-delete-data';
+import Status from '@/components/status/index.vue';
 
 let data = ref<any>();
 let loading = ref(false);

@@ -119,8 +119,8 @@ let ssl = ref({
     otherDomains: '',
     provider: 'dnsAccount',
     websiteId: 0,
-    acmeAccountId: 0,
-    dnsAccountId: 0,
+    acmeAccountId: undefined,
+    dnsAccountId: undefined,
 });
 let dnsResolve = ref<WebSite.DNSResolve[]>([]);
 let hasResolve = ref(false);

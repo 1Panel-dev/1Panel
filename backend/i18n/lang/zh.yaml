@@ -22,7 +22,6 @@ ErrAppLimit: "应用超出安装数量限制"
 ErrAppRequired: "请先安装 {{ .detail }} 应用"
 ErrNotInstall: "应用未安装"
 
-
 #file
 ErrFileCanNotRead: "文件不可读"
 ErrFileToLarge: "文件超过10M,无法打开"
@@ -30,3 +29,7 @@ ErrFileToLarge: "文件超过10M,无法打开"
 #website
 ErrDomainIsExist: "域名已存在"
 ErrAliasIsExist: "代号已存在"
+
+#ssl
+ErrSSLCannotDelete: "证书正在被网站使用，无法删除"
+ErrAccountCannotDelete: "账号关联证书，无法删除"

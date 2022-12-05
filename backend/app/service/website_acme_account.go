@@ -3,6 +3,8 @@ package service
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
 )
 
@@ -37,5 +39,8 @@ func (w WebSiteAcmeAccountService) Create(create dto.WebsiteAcmeAccountCreate) (
 }
 
 func (w WebSiteAcmeAccountService) Delete(id uint) error {
+	if ssls, _ := websiteSSLRepo.List(websiteSSLRepo.WithByAcmeAccountId(id)); len(ssls) > 0 {
+		return buserr.New(constant.ErrAccountCannotDelete)
+	}
 	return websiteAcmeRepo.DeleteBy(commonRepo.WithByID(id))
 }

@@ -867,4 +867,9 @@ export default {
         waiting: '驻留进程(Waiting)',
         status: '负载状态',
     },
+    ssl: {
+        provider: '类型',
+        manualCreate: '手动创建',
+        acmeAccount: 'Acme 账号',
+    },
 };
