@@ -22,7 +22,7 @@
                             </el-tag>
                         </div>
                     </el-col>
-                    <el-col :lg="5" :xl="4">
+                    <el-col :lg="6" :xl="4">
                         <div>
                             {{ $t('website.lastBackupAt') }}:
                             <el-tag v-if="data.lastBackupAt != ''" type="info">{{ data.lastBackupAt }}</el-tag>
@@ -30,8 +30,6 @@
                         </div>
                     </el-col>
                     <el-col :lg="4" :xl="6">
-                        <el-button type="primary" link @click="onOperate('restart')">{{ $t('app.restart') }}</el-button>
-                        <el-divider direction="vertical" />
                         <el-button type="primary" link @click="setting">{{ $t('commons.button.set') }}</el-button>
                     </el-col>
                 </el-row>
@@ -47,10 +45,8 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { CheckAppInstalled, InstalledOp } from '@/api/modules/app';
-import i18n from '@/lang';
+import { CheckAppInstalled } from '@/api/modules/app';
 import router from '@/routers';
-import { ElMessage, ElMessageBox } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
 import Status from '@/components/status/index.vue';
 
@@ -93,29 +89,6 @@ const onCheck = async () => {
     em('isExist', res.data);
     operateReq.installId = res.data.appInstallId;
     loading.value = false;
-};
-
-const onOperate = async (operation: string) => {
-    operateReq.operate = operation;
-    ElMessageBox.confirm(
-        i18n.global.t('app.operatorHelper', [i18n.global.t('app.' + operation)]),
-        i18n.global.t('app.' + operation),
-        {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-            type: 'info',
-        },
-    ).then(() => {
-        loading.value = true;
-        InstalledOp(operateReq)
-            .then(() => {
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-                onCheck();
-            })
-            .finally(() => {
-                loading.value = false;
-            });
-    });
 };
 
 onMounted(() => {

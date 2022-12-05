@@ -82,7 +82,7 @@ export default {
             welcome: 'Welcome back, please enter your username and password to log in!',
             errorAuthInfo: 'The user name or password you entered is incorrect, please re-enter!',
             captchaHelper: 'Please enter the verification code',
-            errorCaptcha: 'Incorrect verification code information!',
+            errorCaptcha: 'Verification code error!',
             safeEntrance: 'Please use the correct entry to log in to the panel',
             reason: 'Cause of error:',
             reasonHelper:

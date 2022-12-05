@@ -84,7 +84,7 @@ export default {
             welcome: '欢迎回来，请输入用户名和密码登录！',
             errorAuthInfo: '您输入的用户名或密码不正确，请重新输入！',
             captchaHelper: '请输入验证码',
-            errorCaptcha: '错误的验证码信息！',
+            errorCaptcha: '验证码错误！',
             safeEntrance: '请使用正确的入口登录面板',
             reason: '错误原因：',
             reasonHelper:

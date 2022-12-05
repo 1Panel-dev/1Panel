@@ -4,10 +4,13 @@
 
         <AppStatus :app-key="'redis'" style="margin-top: 20px" @setting="onSetting" @is-exist="checkExist"></AppStatus>
         <div v-show="redisIsExist">
-            <Setting ref="settingRef" style="margin-top: 20px" />
+            <el-button style="margin-top: 20px" type="p" @click="goDashboard" icon="Position">
+                Redis-Commander
+            </el-button>
 
-            <el-button style="margin-top: 20px" type="p" @click="goDashboard" icon="Position">Redis-Command</el-button>
-            <Terminal v-show="!isOnSetting" ref="terminalRef" />
+            <Setting ref="settingRef" style="margin-top: 10px" />
+
+            <Terminal style="margin-top: 10px" v-show="!isOnSetting" ref="terminalRef" />
         </div>
 
         <el-dialog
@@ -17,7 +20,7 @@
             :close-on-click-modal="false"
             :destroy-on-close="true"
         >
-            <el-alert :closable="false" :title="$t('app.checkInstalledWarn', ['Redis-Command'])" type="info">
+            <el-alert :closable="false" :title="$t('app.checkInstalledWarn', ['Redis-Commander'])" type="info">
                 <el-link icon="Position" @click="goRouter('/apps')" type="primary">
                     {{ $t('database.goInstall') }}
                 </el-link>
