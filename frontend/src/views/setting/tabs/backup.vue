@@ -63,7 +63,12 @@
             <div v-loading="loading">
                 <el-form ref="formRef" label-position="left" :model="form" label-width="160px">
                     <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
-                        <el-select style="width: 100%" v-model="form.type" :disabled="operation === 'edit'">
+                        <el-select
+                            style="width: 100%"
+                            v-model="form.type"
+                            @change="changeType"
+                            :disabled="operation === 'edit'"
+                        >
                             <el-option
                                 v-for="item in typeOptions"
                                 :key="item.label"
@@ -254,6 +259,13 @@ const onEdit = (row: Backup.BackupInfo) => {
     backupVisiable.value = true;
 };
 
+const changeType = async (val: string) => {
+    let itemType = val;
+    restForm();
+    buckets.value = [];
+    form.type = itemType;
+};
+
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
@@ -290,10 +302,10 @@ const getBuckets = async () => {
         credential: form.credential,
     })
         .then((res) => {
-            loading.value = true;
+            loading.value = false;
             buckets.value = res.data;
         })
-        .finally(() => {
+        .catch(() => {
             buckets.value = [];
             loading.value = false;
         });
