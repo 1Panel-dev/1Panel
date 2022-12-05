@@ -29,20 +29,29 @@ export const useDeleteData = <P = any, R = any>(
                 if (action === 'confirm') {
                     instance.confirmButtonLoading = true;
                     instance.cancelButtonLoading = true;
-                    const res = await api(params);
-                    done();
-                    if (!res) return reject(false);
-                    resolve(true);
-                    ElMessage({
-                        type: 'success',
-                        message: i18n.global.t('commons.msg.operationSuccess'),
-                    });
+
+                    await api(params)
+                        .then((res) => {
+                            done();
+                            if (!res) return reject(false);
+                            resolve(true);
+                            ElMessage({
+                                type: 'success',
+                                message: i18n.global.t('commons.msg.operationSuccess'),
+                            });
+                        })
+                        .finally(() => {
+                            instance.confirmButtonLoading = false;
+                            instance.cancelButtonLoading = false;
+                        });
                 } else {
                     done();
                 }
             },
         })
-            .then(() => {})
+            .then(() => {
+                console.log('1111');
+            })
             .catch(() => {});
     });
 };
