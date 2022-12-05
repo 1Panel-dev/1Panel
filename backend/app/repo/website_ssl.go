@@ -6,12 +6,40 @@ import (
 	"gorm.io/gorm"
 )
 
+func NewISSLRepo() ISSLRepo {
+	return &WebsiteSSLRepo{}
+}
+
+type ISSLRepo interface {
+	WithByAlias(alias string) DBOption
+	WithByAcmeAccountId(acmeAccountId uint) DBOption
+	WithByDnsAccountId(dnsAccountId uint) DBOption
+	Page(page, size int, opts ...DBOption) (int64, []model.WebSiteSSL, error)
+	GetFirst(opts ...DBOption) (model.WebSiteSSL, error)
+	List(opts ...DBOption) ([]model.WebSiteSSL, error)
+	Create(ctx context.Context, ssl *model.WebSiteSSL) error
+	Save(ssl model.WebSiteSSL) error
+	DeleteBy(opts ...DBOption) error
+}
+
 type WebsiteSSLRepo struct {
 }
 
-func (w WebsiteSSLRepo) ByAlias(alias string) DBOption {
+func (w WebsiteSSLRepo) WithByAlias(alias string) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("alias = ?", alias)
+	}
+}
+
+func (w WebsiteSSLRepo) WithByAcmeAccountId(acmeAccountId uint) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("acme_account_id = ?", acmeAccountId)
+	}
+}
+
+func (w WebsiteSSLRepo) WithByDnsAccountId(dnsAccountId uint) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("dns_account_id = ?", dnsAccountId)
 	}
 }
 
@@ -20,14 +48,14 @@ func (w WebsiteSSLRepo) Page(page, size int, opts ...DBOption) (int64, []model.W
 	db := getDb(opts...).Model(&model.WebSiteSSL{})
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Debug().Limit(size).Offset(size * (page - 1)).Find(&sslList).Error
+	err := db.Limit(size).Offset(size * (page - 1)).Preload("AcmeAccount").Find(&sslList).Error
 	return count, sslList, err
 }
 
 func (w WebsiteSSLRepo) GetFirst(opts ...DBOption) (model.WebSiteSSL, error) {
 	var website model.WebSiteSSL
 	db := getDb(opts...).Model(&model.WebSiteSSL{})
-	if err := db.First(&website).Error; err != nil {
+	if err := db.Preload("AcmeAccount").First(&website).Error; err != nil {
 		return website, err
 	}
 	return website, nil
@@ -36,7 +64,7 @@ func (w WebsiteSSLRepo) GetFirst(opts ...DBOption) (model.WebSiteSSL, error) {
 func (w WebsiteSSLRepo) List(opts ...DBOption) ([]model.WebSiteSSL, error) {
 	var websites []model.WebSiteSSL
 	db := getDb(opts...).Model(&model.WebSiteSSL{})
-	if err := db.Find(&websites).Error; err != nil {
+	if err := db.Preload("AcmeAccount").Find(&websites).Error; err != nil {
 		return websites, err
 	}
 	return websites, nil

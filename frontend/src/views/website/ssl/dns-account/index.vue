@@ -18,7 +18,7 @@
             </el-table-column>
             <el-table-column :label="$t('website.key')">
                 <template #default="{ row }">
-                    <el-link @click="openEdit(row)">{{ $t('website.check') }}</el-link>
+                    <el-link type="primary" @click="openEdit(row)">{{ $t('website.check') }}</el-link>
                 </template>
             </el-table-column>
             <fu-table-operations

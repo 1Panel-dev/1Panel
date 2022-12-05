@@ -10,7 +10,7 @@
                 :loading="loading"
             >
                 <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
-                    <el-input v-model="form.primaryDomain"></el-input>
+                    <el-input v-model="form.primaryDomain" disabled></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('website.group')" prop="webSiteGroupID">
                     <el-select v-model="form.webSiteGroupId">

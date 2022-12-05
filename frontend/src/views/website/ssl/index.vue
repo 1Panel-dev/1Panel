@@ -1,49 +1,60 @@
 <template>
-    <LayoutContent :header="$t('website.ssl')">
-        <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
-            <template #toolbar>
-                <el-button type="primary" icon="Plus" @click="openSSL()">
-                    {{ $t('commons.button.create') }}
-                </el-button>
-                <el-button type="primary" plain @click="openAcmeAccount()">
-                    {{ $t('website.acmeAccountManage') }}
-                </el-button>
-                <el-button type="primary" plain @click="openDnsAccount()">
-                    {{ $t('website.dnsAccountManage') }}
-                </el-button>
-            </template>
-            <el-table-column
-                :label="$t('website.domain')"
-                fix
-                show-overflow-tooltip
-                prop="primaryDomain"
-            ></el-table-column>
-            <el-table-column
-                :label="$t('website.otherDomains')"
-                fix
-                show-overflow-tooltip
-                prop="domains"
-            ></el-table-column>
-            <el-table-column :label="$t('website.brand')" fix show-overflow-tooltip prop="type"></el-table-column>
-            <el-table-column
-                prop="expireDate"
-                :label="$t('website.expireDate')"
-                :formatter="dateFromat"
-                show-overflow-tooltip
-            />
-            <fu-table-operations
-                :ellipsis="1"
-                :buttons="buttons"
-                :label="$t('commons.table.operate')"
-                fixed="right"
-                fix
-            />
-        </ComplexTable>
-        <DnsAccount ref="dnsAccountRef"></DnsAccount>
-        <AcmeAccount ref="acmeAccountRef"></AcmeAccount>
-        <Create ref="sslCreateRef" @close="search()"></Create>
-        <Renew ref="renewRef" @close="search()"></Renew>
-    </LayoutContent>
+    <el-card>
+        <LayoutContent :header="$t('website.ssl')">
+            <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
+                <template #toolbar>
+                    <el-button type="primary" icon="Plus" @click="openSSL()">
+                        {{ $t('commons.button.create') }}
+                    </el-button>
+                    <el-button type="primary" plain @click="openAcmeAccount()">
+                        {{ $t('website.acmeAccountManage') }}
+                    </el-button>
+                    <el-button type="primary" plain @click="openDnsAccount()">
+                        {{ $t('website.dnsAccountManage') }}
+                    </el-button>
+                </template>
+                <el-table-column
+                    :label="$t('website.domain')"
+                    fix
+                    show-overflow-tooltip
+                    prop="primaryDomain"
+                ></el-table-column>
+                <el-table-column
+                    :label="$t('website.otherDomains')"
+                    fix
+                    show-overflow-tooltip
+                    prop="domains"
+                ></el-table-column>
+                <el-table-column :label="$t('ssl.provider')" fix show-overflow-tooltip prop="provider">
+                    <template #default="{ row }">{{ getProvider(row.provider) }}</template>
+                </el-table-column>
+                <el-table-column
+                    :label="$t('ssl.acmeAccount')"
+                    fix
+                    show-overflow-tooltip
+                    prop="acmeAccount.email"
+                ></el-table-column>
+                <el-table-column :label="$t('website.brand')" fix show-overflow-tooltip prop="type"></el-table-column>
+                <el-table-column
+                    prop="expireDate"
+                    :label="$t('website.expireDate')"
+                    :formatter="dateFromat"
+                    show-overflow-tooltip
+                />
+                <fu-table-operations
+                    :ellipsis="1"
+                    :buttons="buttons"
+                    :label="$t('commons.table.operate')"
+                    fixed="right"
+                    fix
+                />
+            </ComplexTable>
+            <DnsAccount ref="dnsAccountRef"></DnsAccount>
+            <AcmeAccount ref="acmeAccountRef"></AcmeAccount>
+            <Create ref="sslCreateRef" @close="search()"></Create>
+            <Renew ref="renewRef" @close="search()"></Renew>
+        </LayoutContent>
+    </el-card>
 </template>
 
 <script lang="ts" setup>
@@ -79,12 +90,6 @@ const buttons = [
             openRenewSSL(row.id);
         },
     },
-    // {
-    //     label: i18n.global.t('website.deploySSL'),
-    //     click: function (row: WebSite.WebSite) {
-    //         applySSL(row.id);
-    //     },
-    // },
     {
         label: i18n.global.t('app.delete'),
         click: function (row: WebSite.WebSite) {
@@ -129,23 +134,18 @@ const deleteSSL = async (id: number) => {
     search();
 };
 
-// const renewSSL = async (id: number) => {
-//     loading.value = true;
-//     await useDeleteData(RenewSSL, { SSLId: id }, 'website.renewHelper', false);
-//     loading.value = false;
-//     search();
-// };
-
-// const applySSL = async (sslId: number) => {
-//     loading.value = true;
-//     const apply = {
-//         websiteId: 0,
-//         SSLId: sslId,
-//     };
-//     await useDeleteData(ApplySSL, apply, 'website.deploySSLHelper', false);
-//     loading.value = false;
-//     search();
-// };
+const getProvider = (provider: string) => {
+    switch (provider) {
+        case 'dnsAccount':
+            return i18n.global.t('website.dnsAccount');
+        case 'dnsManual':
+            return i18n.global.t('website.dnsAccount');
+        case 'http':
+            return 'HTTP';
+        default:
+            return i18n.global.t('ssl.manualCreate');
+    }
+};
 
 onMounted(() => {
     search();

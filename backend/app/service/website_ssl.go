@@ -6,6 +6,7 @@ import (
 	"encoding/pem"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
 	"path"
@@ -209,5 +210,8 @@ func (w WebSiteSSLService) GetWebsiteSSL(websiteId uint) (dto.WebsiteSSLDTO, err
 }
 
 func (w WebSiteSSLService) Delete(id uint) error {
+	if websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(id)); len(websites) > 0 {
+		return buserr.New(constant.ErrSSLCannotDelete)
+	}
 	return websiteSSLRepo.DeleteBy(commonRepo.WithByID(id))
 }

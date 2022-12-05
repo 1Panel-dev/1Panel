@@ -19,7 +19,7 @@
                             prop="primaryDomain"
                         >
                             <template #default="{ row }">
-                                <el-link @click="openConfig(row.id)">{{ row.primaryDomain }}</el-link>
+                                <el-link type="primary" @click="openConfig(row.id)">{{ row.primaryDomain }}</el-link>
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('commons.table.type')" fix prop="type">

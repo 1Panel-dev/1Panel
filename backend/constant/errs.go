@@ -60,3 +60,9 @@ var (
 	ErrDomainIsExist = "ErrDomainIsExist"
 	ErrAliasIsExist  = "ErrAliasIsExist"
 )
+
+//ssl
+var (
+	ErrSSLCannotDelete     = "ErrSSLCannotDelete"
+	ErrAccountCannotDelete = "ErrAccountCannotDelete"
+)

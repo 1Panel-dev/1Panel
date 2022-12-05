@@ -30,3 +30,7 @@ ErrFileToLarge: "file is too large"
 #website
 ErrDomainIsExist: "Domain is already exist"
 ErrAliasIsExist: "Alias is already exist"
+
+#ssl
+ErrSSLCannotDelete: "The certificate is being used by the website and cannot be removed"
+ErrAccountCannotDelete: "The certificate associated with the account cannot be deleted"

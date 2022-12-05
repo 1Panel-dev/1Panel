@@ -3,6 +3,8 @@ package service
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"gopkg.in/square/go-jose.v2/json"
 )
 
@@ -24,7 +26,6 @@ func (w WebSiteDnsAccountService) Page(search dto.PageInfo) (int64, []dto.Websit
 }
 
 func (w WebSiteDnsAccountService) Create(create dto.WebsiteDnsAccountCreate) (dto.WebsiteDnsAccountCreate, error) {
-
 	authorization, err := json.Marshal(create.Authorization)
 	if err != nil {
 		return dto.WebsiteDnsAccountCreate{}, err
@@ -42,7 +43,6 @@ func (w WebSiteDnsAccountService) Create(create dto.WebsiteDnsAccountCreate) (dt
 }
 
 func (w WebSiteDnsAccountService) Update(update dto.WebsiteDnsAccountUpdate) (dto.WebsiteDnsAccountUpdate, error) {
-
 	authorization, err := json.Marshal(update.Authorization)
 	if err != nil {
 		return dto.WebsiteDnsAccountUpdate{}, err
@@ -63,5 +63,8 @@ func (w WebSiteDnsAccountService) Update(update dto.WebsiteDnsAccountUpdate) (dt
 }
 
 func (w WebSiteDnsAccountService) Delete(id uint) error {
+	if ssls, _ := websiteSSLRepo.List(websiteSSLRepo.WithByDnsAccountId(id)); len(ssls) > 0 {
+		return buserr.New(constant.ErrAccountCannotDelete)
+	}
 	return websiteDnsRepo.DeleteBy(commonRepo.WithByID(id))
 }
