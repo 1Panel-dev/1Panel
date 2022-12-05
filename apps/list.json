@@ -34,16 +34,16 @@
     },
     {
       "key": "nginx",
-      "name": "Nginx",
+      "name": "OpenResty",
       "tags": ["Server"],
-      "versions": ["1.23.1"],
-      "short_desc": "高性能的 HTTP 和反向代理服务器",
-      "author": "Nginx",
+      "versions": ["1.21.4"],
+      "short_desc": "基于 Nginx 和 LuaJIT 的高性能 Web 平台",
+      "author": "OpenResty",
       "type": "runtime",
       "required": [],
       "limit": 1,
       "crossVersionUpdate": true,
-      "source": "http://nginx.org/"
+      "source": "https://openresty.org/"
     },
     {
       "key": "wordpress",
