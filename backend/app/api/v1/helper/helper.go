@@ -2,16 +2,15 @@ package helper
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"net/http"
 	"strconv"
 
-	"github.com/pkg/errors"
-
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 )
 
 func GeneratePaginationFromReq(c *gin.Context) (*dto.PageInfo, bool) {
@@ -35,30 +34,32 @@ func GeneratePaginationFromReq(c *gin.Context) (*dto.PageInfo, bool) {
 
 func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 	res := dto.Response{
-		Code: code,
-		Msg:  "",
+		Code:    code,
+		Message: "",
 	}
 	if msgKey == constant.ErrTypeInternalServer {
 		switch {
 		case errors.Is(err, constant.ErrRecordExist):
-			res.Msg = i18n.GetMsgWithMap("ErrRecordExist", map[string]interface{}{"detail": err})
+			res.Message = i18n.GetMsgWithMap("ErrRecordExist", map[string]interface{}{"detail": err})
 		case errors.Is(constant.ErrRecordNotFound, err):
-			res.Msg = i18n.GetMsgWithMap("ErrRecordNotFound", map[string]interface{}{"detail": err})
+			res.Message = i18n.GetMsgWithMap("ErrRecordNotFound", map[string]interface{}{"detail": err})
 		case errors.Is(constant.ErrStructTransform, err):
-			res.Msg = i18n.GetMsgWithMap("ErrStructTransform", map[string]interface{}{"detail": err})
+			res.Message = i18n.GetMsgWithMap("ErrStructTransform", map[string]interface{}{"detail": err})
 		case errors.Is(constant.ErrCaptchaCode, err):
-			res.Msg = i18n.GetMsgWithMap("ErrCaptchaCode", map[string]interface{}{"detail": err})
+			res.Code = constant.CodeAuth
+			res.Message = "ErrCaptchaCode"
 		case errors.Is(constant.ErrAuth, err):
-			res.Msg = i18n.GetMsgWithMap("ErrAuth", map[string]interface{}{"detail": err})
+			res.Code = constant.CodeAuth
+			res.Message = "ErrAuth"
 		case errors.Is(constant.ErrInitialPassword, err):
-			res.Msg = i18n.GetMsgWithMap("ErrInitialPassword", map[string]interface{}{"detail": err})
+			res.Message = i18n.GetMsgWithMap("ErrInitialPassword", map[string]interface{}{"detail": err})
 		case errors.As(err, &buserr.BusinessError{}):
-			res.Msg = err.Error()
+			res.Message = err.Error()
 		default:
-			res.Msg = i18n.GetMsgWithMap(msgKey, map[string]interface{}{"detail": err})
+			res.Message = i18n.GetMsgWithMap(msgKey, map[string]interface{}{"detail": err})
 		}
 	} else {
-		res.Msg = i18n.GetMsgWithMap(msgKey, map[string]interface{}{"detail": err})
+		res.Message = i18n.GetMsgWithMap(msgKey, map[string]interface{}{"detail": err})
 	}
 	ctx.JSON(http.StatusOK, res)
 	ctx.Abort()
@@ -78,8 +79,8 @@ func SuccessWithData(ctx *gin.Context, data interface{}) {
 
 func SuccessWithMsg(ctx *gin.Context, msg string) {
 	res := dto.Response{
-		Code: constant.CodeSuccess,
-		Msg:  msg,
+		Code:    constant.CodeSuccess,
+		Message: msg,
 	}
 	ctx.JSON(http.StatusOK, res)
 	ctx.Abort()

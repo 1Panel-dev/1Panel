@@ -123,6 +123,9 @@
                                         </el-icon>
                                     </template>
                                 </el-input>
+                                <span v-if="errAuthInfo" class="input-error" style="line-height: 14px">
+                                    {{ $t('commons.login.errorAuthInfo') }}
+                                </span>
                             </el-form-item>
                             <el-form-item prop="captcha">
                                 <el-input
@@ -137,6 +140,9 @@
                                     :alt="$t('commons.login.captchaHelper')"
                                     @click="loginVerify()"
                                 />
+                                <span v-if="errCaptcha" class="input-error" style="line-height: 14px">
+                                    {{ $t('commons.login.errorCaptcha') }}
+                                </span>
                             </el-form-item>
                             <el-form-item>
                                 <el-button
@@ -169,6 +175,9 @@ import { Rules } from '@/global/form-rules';
 
 const globalStore = GlobalStore();
 const menuStore = MenuStore();
+
+const errAuthInfo = ref(false);
+const errCaptcha = ref(false);
 
 const isFirst = ref();
 
@@ -241,6 +250,19 @@ const login = (formEl: FormInstance | undefined) => {
                 authMethod: '',
             };
             const res = await loginApi(requestLoginForm);
+            if (res.code === 406) {
+                if (res.message === 'ErrCaptchaCode') {
+                    errCaptcha.value = true;
+                    errAuthInfo.value = false;
+                    loginVerify();
+                }
+                if (res.message === 'ErrAuth') {
+                    errCaptcha.value = false;
+                    errAuthInfo.value = true;
+                    loginVerify();
+                }
+                return;
+            }
             if (res.data.mfaStatus === 'enable') {
                 mfaShow.value = true;
                 mfaLoginForm.secret = res.data.mfaSecret;

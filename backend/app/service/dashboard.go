@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -43,10 +44,10 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 
 	cmd := exec.Command("uptime", "-s")
 	stdout, err := cmd.CombinedOutput()
-	if err != nil {
+	if err == nil {
 		baseInfo.Uptime = string(stdout)
-		uptime, err := time.Parse("2006-01-02 15:04:05", string(stdout))
-		if err != nil {
+		uptime, err := time.Parse("2006-01-02 15:04:05", strings.ReplaceAll(string(stdout), "\n", ""))
+		if err == nil {
 			hours := int(time.Since(uptime).Hours())
 			minutes := int(time.Since(uptime).Minutes())
 			baseInfo.TimeSinceUptime = fmt.Sprintf("%ddays %dhours %dmimutes", hours/24, hours%24, minutes-hours*60)

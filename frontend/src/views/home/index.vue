@@ -75,7 +75,14 @@
                 </el-card>
             </el-col>
             <el-col :span="8">
-                <Status ref="statuRef" />
+                <el-card class="el-card">
+                    <template #header>
+                        <div class="card-header">
+                            <span>{{ $t('commons.table.status') }}</span>
+                        </div>
+                    </template>
+                    <Status ref="statuRef" />
+                </el-card>
             </el-col>
             <el-col :span="8">
                 <el-card class="el-card">
@@ -309,6 +316,11 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
     baseInfo.value = res.data;
     currentInfo.value = baseInfo.value.currentInfo;
+    if (baseInfo.value.timeSinceUptime) {
+        baseInfo.value.timeSinceUptime.replaceAll('days', i18n.global.t('home.Day'));
+        baseInfo.value.timeSinceUptime.replaceAll('hours', i18n.global.t('home.Hour'));
+        baseInfo.value.timeSinceUptime.replaceAll('minutes', i18n.global.t('home.Minute'));
+    }
     onLoadCurrentInfo();
     statuRef.value.acceptParams(currentInfo.value, baseInfo.value);
     appRef.value.acceptParams(baseInfo.value);
@@ -393,7 +405,7 @@ const loadData = async () => {
             [i18n.global.t('monitor.read'), i18n.global.t('monitor.write')],
             timeIODatas.value,
             [ioReadYDatas, ioWriteYDatas],
-            '流量',
+            i18n.global.t('monitor.network'),
             'MB',
         );
     } else {

@@ -65,7 +65,7 @@ func (u *LogService) PageOperationLog(search dto.PageInfo) (int64, interface{}, 
 		}
 		item.Status = res.Code
 		if item.Status != 200 {
-			item.ErrorMessage = res.Msg
+			item.ErrorMessage = res.Message
 		}
 		dtoOps = append(dtoOps, item)
 	}
