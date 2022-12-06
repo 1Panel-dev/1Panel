@@ -59,12 +59,19 @@ const props = defineProps({
         type: String,
         default: 'url',
     },
+    paramKey: {
+        type: String,
+        default: 'url',
+    },
 });
 const id = computed(() => {
     return props.id;
 });
 const rule = computed(() => {
     return props.rule;
+});
+const key = computed(() => {
+    return props.paramKey;
 });
 
 let loading = ref(false);
@@ -141,25 +148,12 @@ const submit = async () => {
         });
 };
 
-const getKey = (rule: string) => {
-    switch (rule) {
-        case 'url':
-            return '$UrlDeny';
-        case 'whiteurl':
-            return '$whiteModule';
-        case 'post':
-            return '$postMatch';
-        case 'url':
-            return '$UrlDeny';
-        case 'url':
-            return '$UrlDeny';
-    }
-};
-
 onMounted(() => {
     req.value.websiteId = id.value;
     req.value.rule = rule.value;
-    enableUpdate.value.key = getKey(rule.value);
+    req.value.key = key.value;
+    enableUpdate.value.key = key.value;
+    enableUpdate.value.websiteId = id.value;
     get();
 });
 </script>

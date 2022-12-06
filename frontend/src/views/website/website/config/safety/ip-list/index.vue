@@ -1,6 +1,9 @@
 <template>
     <el-row>
         <el-col :span="10" :offset="2">
+            <el-form-item prop="enable" :label="$t('website.enable')">
+                <el-switch v-model="enableUpdate.enable" @change="updateEnable"></el-switch>
+            </el-form-item>
             <ComplexTable :data="data" v-loading="loading">
                 <template #toolbar>
                     <el-button type="primary" icon="Plus" @click="openCreate">
@@ -35,7 +38,7 @@
 </template>
 <script lang="ts" setup>
 import { WebSite } from '@/api/interface/website';
-import { GetWafConfig } from '@/api/modules/website';
+import { GetWafConfig, UpdateWafEnable } from '@/api/modules/website';
 import { computed, onMounted, reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { SaveFileContent } from '@/api/modules/files';
@@ -52,6 +55,10 @@ const props = defineProps({
         type: String,
         default: 'ipWhitelist',
     },
+    paramKey: {
+        type: String,
+        default: '$ipWhiteAllow',
+    },
 });
 const id = computed(() => {
     return props.id;
@@ -59,17 +66,25 @@ const id = computed(() => {
 const rule = computed(() => {
     return props.rule;
 });
+const key = computed(() => {
+    return props.paramKey;
+});
 
 let loading = ref(false);
 let data = ref([]);
 let req = ref<WebSite.WafReq>({
     websiteId: 0,
-    key: '',
+    key: '$ipWhiteAllow',
     rule: 'ipWhitelist',
 });
 let fileUpdate = reactive({
     path: '',
     content: '',
+});
+let enableUpdate = ref<WebSite.WafUpdate>({
+    websiteId: 0,
+    key: '$ipWhiteAllow',
+    enable: false,
 });
 
 const get = async () => {
@@ -88,7 +103,7 @@ const get = async () => {
             });
         });
     }
-
+    enableUpdate.value.enable = res.data.enable;
     fileUpdate.path = res.data.filePath;
 };
 
@@ -127,6 +142,13 @@ const submit = async () => {
         });
 };
 
+const updateEnable = async (enable: boolean) => {
+    enableUpdate.value.enable = enable;
+    loading.value = true;
+    await UpdateWafEnable(enableUpdate.value);
+    loading.value = false;
+};
+
 const checkIpRule = (row: any) => {
     if (checkIp(row.ip)) {
         row.error = i18n.global.t('commons.rule.ip');
@@ -138,6 +160,9 @@ const checkIpRule = (row: any) => {
 onMounted(() => {
     req.value.websiteId = id.value;
     req.value.rule = rule.value;
+    req.value.key = key.value;
+    enableUpdate.value.websiteId = id.value;
+    enableUpdate.value.key = key.value;
     get();
 });
 </script>
