@@ -9,3 +9,9 @@ type ComposeTemplate struct {
 	Path        string `gorm:"type:varchar(64)" json:"path"`
 	Content     string `gorm:"type:longtext" json:"content"`
 }
+
+type Compose struct {
+	BaseModel
+
+	Name string `gorm:"type:varchar(256)" json:"name"`
+}
