@@ -60,8 +60,10 @@
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="onSubmit(formRef)">{{ $t('container.build') }}</el-button>
                 <el-button @click="buildVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button type="primary" @click="onSubmit(formRef)">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
             </span>
         </template>
     </el-dialog>

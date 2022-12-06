@@ -63,10 +63,14 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button :disabled="deleteForm.deleteTags.length === 0" @click="batchDelete('byname')">
+                    <el-button @click="deleteVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button
+                        type="primary"
+                        :disabled="deleteForm.deleteTags.length === 0"
+                        @click="batchDelete('byname')"
+                    >
                         {{ $t('commons.button.delete') }}
                     </el-button>
-                    <el-button @click="deleteVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
                 </span>
             </template>
         </el-dialog>
