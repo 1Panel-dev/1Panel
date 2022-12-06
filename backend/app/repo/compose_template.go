@@ -14,6 +14,9 @@ type IComposeTemplateRepo interface {
 	Create(compose *model.ComposeTemplate) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
+
+	CreateRecord(compose *model.Compose) error
+	DeleteRecord(opts ...DBOption) error
 }
 
 func NewIComposeTemplateRepo() IComposeTemplateRepo {
@@ -66,4 +69,24 @@ func (u *ComposeTemplateRepo) Delete(opts ...DBOption) error {
 		db = opt(db)
 	}
 	return db.Delete(&model.ComposeTemplate{}).Error
+}
+
+func (u *ComposeTemplateRepo) ListRecord() ([]model.Compose, error) {
+	var composes []model.Compose
+	if err := global.DB.Find(&composes).Error; err != nil {
+		return nil, err
+	}
+	return composes, nil
+}
+
+func (u *ComposeTemplateRepo) CreateRecord(compose *model.Compose) error {
+	return global.DB.Create(compose).Error
+}
+
+func (u *ComposeTemplateRepo) DeleteRecord(opts ...DBOption) error {
+	db := global.DB
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	return db.Delete(&model.Compose{}).Error
 }

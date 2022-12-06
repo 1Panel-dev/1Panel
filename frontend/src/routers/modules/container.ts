@@ -11,9 +11,19 @@ const containerRouter = {
     },
     children: [
         {
-            path: ':filters?',
+            path: '',
             name: 'Container',
             component: () => import('@/views/container/container/index.vue'),
+            props: true,
+            hidden: true,
+            meta: {
+                activeMenu: '/containers',
+            },
+        },
+        {
+            path: 'composeDetail/:filters?',
+            name: 'ComposeDetail',
+            component: () => import('@/views/container/compose/detail/index.vue'),
             props: true,
             hidden: true,
             meta: {

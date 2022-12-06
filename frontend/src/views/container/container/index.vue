@@ -69,75 +69,8 @@
 
         <CodemirrorDialog ref="mydetail" />
 
-        <el-dialog
-            @close="onCloseLog"
-            v-model="logVisiable"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            width="70%"
-        >
-            <template #header>
-                <div class="card-header">
-                    <span>{{ $t('commons.button.log') }}</span>
-                </div>
-            </template>
-            <div>
-                <el-select @change="searchLogs" style="width: 10%; float: left" v-model="logSearch.mode">
-                    <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
-                </el-select>
-                <div style="margin-left: 20px; float: left">
-                    <el-checkbox border v-model="logSearch.isWatch">{{ $t('commons.button.watch') }}</el-checkbox>
-                </div>
-                <el-button style="margin-left: 20px" @click="onDownload" icon="Download">
-                    {{ $t('file.download') }}
-                </el-button>
-            </div>
-
-            <codemirror
-                :autofocus="true"
-                placeholder="None data"
-                :indent-with-tab="true"
-                :tabSize="4"
-                style="margin-top: 10px; max-height: 500px"
-                :lineWrapping="true"
-                :matchBrackets="true"
-                theme="cobalt"
-                :styleActiveLine="true"
-                :extensions="extensions"
-                v-model="logInfo"
-                :readOnly="true"
-            />
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="logVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                </span>
-            </template>
-        </el-dialog>
-
-        <el-dialog
-            @close="search()"
-            v-model="newNameVisiable"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            width="30%"
-        >
-            <template #header>
-                <div class="card-header">
-                    <span>{{ $t('container.rename') }}</span>
-                </div>
-            </template>
-            <el-form ref="newNameRef" :model="renameForm">
-                <el-form-item :label="$t('container.newName')" :rules="Rules.requiredInput" prop="newName">
-                    <el-input v-model="renameForm.newName"></el-input>
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="newNameVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button @click="onSubmitName(newNameRef)">{{ $t('commons.button.confirm') }}</el-button>
-                </span>
-            </template>
-        </el-dialog>
+        <ReNameDialog @search="search" ref="dialogReNameRef" />
+        <ContainerLogDialog ref="dialogContainerLogRef" />
         <CreateDialog @search="search" ref="dialogCreateRef" />
         <MonitorDialog ref="dialogMonitorRef" />
         <TerminalDialog ref="dialogTerminalRef" />
@@ -146,20 +79,18 @@
 
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
+import ReNameDialog from '@/views/container/container/rename/index.vue';
 import CreateDialog from '@/views/container/container/create/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
+import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
 import Submenu from '@/views/container/index.vue';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { reactive, onMounted, ref } from 'vue';
-import { dateFromat, dateFromatForName } from '@/utils/util';
-import { Rules } from '@/global/form-rules';
-import { ContainerOperator, inspect, logContainer, searchContainer } from '@/api/modules/container';
+import { dateFromat } from '@/utils/util';
+import { ContainerOperator, inspect, searchContainer } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
-import { ElForm, ElMessage, ElMessageBox, FormInstance } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 
 const data = ref();
@@ -180,45 +111,8 @@ const props = withDefaults(defineProps<Filters>(), {
 const detailInfo = ref();
 const mydetail = ref();
 
-const extensions = [javascript(), oneDark];
-const logVisiable = ref<boolean>(false);
-const logInfo = ref();
-const logSearch = reactive({
-    isWatch: false,
-    container: '',
-    containerID: '',
-    mode: 'all',
-});
-let timer: NodeJS.Timer | null = null;
-
-const newNameVisiable = ref<boolean>(false);
-type FormInstance = InstanceType<typeof ElForm>;
-const newNameRef = ref<FormInstance>();
-const renameForm = reactive({
-    containerID: '',
-    operation: 'rename',
-    newName: '',
-});
-
-const timeOptions = ref([
-    { label: i18n.global.t('container.all'), value: 'all' },
-    {
-        label: i18n.global.t('container.lastDay'),
-        value: new Date(new Date().getTime() - 3600 * 1000 * 24 * 1).getTime() / 1000 + '',
-    },
-    {
-        label: i18n.global.t('container.last4Hour'),
-        value: new Date(new Date().getTime() - 3600 * 1000 * 4).getTime() / 1000 + '',
-    },
-    {
-        label: i18n.global.t('container.lastHour'),
-        value: new Date(new Date().getTime() - 3600 * 1000).getTime() / 1000 + '',
-    },
-    {
-        label: i18n.global.t('container.last10Min'),
-        value: new Date(new Date().getTime() - 600 * 1000).getTime() / 1000 + '',
-    },
-]);
+const dialogContainerLogRef = ref();
+const dialogReNameRef = ref();
 
 const search = async () => {
     let filterItem = props.filters ? props.filters : '';
@@ -228,9 +122,8 @@ const search = async () => {
         filters: filterItem,
     };
     await searchContainer(params).then((res) => {
-        if (res.data) {
-            data.value = res.data.items;
-        }
+        data.value = res.data.items || [];
+        paginationConfig.total = res.data.total;
     });
 };
 
@@ -257,50 +150,6 @@ const onInspect = async (id: string) => {
         detailInfo: detailInfo.value,
     };
     mydetail.value!.acceptParams(param);
-};
-
-const onLog = async (row: Container.ContainerInfo) => {
-    logSearch.container = row.name;
-    logSearch.containerID = row.containerID;
-    searchLogs();
-    logVisiable.value = true;
-    timer = setInterval(() => {
-        if (logVisiable.value && logSearch.isWatch) {
-            searchLogs();
-        }
-    }, 1000 * 5);
-};
-const onCloseLog = async () => {
-    clearInterval(Number(timer));
-};
-const searchLogs = async () => {
-    const res = await logContainer(logSearch);
-    logInfo.value = res.data;
-};
-const onDownload = async () => {
-    const downloadUrl = window.URL.createObjectURL(new Blob([logInfo.value]));
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = downloadUrl;
-    a.download = logSearch.container + '-' + dateFromatForName(new Date()) + '.log';
-    const event = new MouseEvent('click');
-    a.dispatchEvent(event);
-};
-
-const onRename = async (row: Container.ContainerInfo) => {
-    renameForm.containerID = row.containerID;
-    renameForm.newName = '';
-    newNameVisiable.value = true;
-};
-const onSubmitName = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        await ContainerOperator(renameForm);
-        search();
-        newNameVisiable.value = false;
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-    });
 };
 
 const checkStatus = (operation: string) => {
@@ -390,13 +239,13 @@ const buttons = [
     {
         label: i18n.global.t('container.rename'),
         click: (row: Container.ContainerInfo) => {
-            onRename(row);
+            dialogReNameRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
         },
     },
     {
         label: i18n.global.t('commons.button.log'),
         click: (row: Container.ContainerInfo) => {
-            onLog(row);
+            dialogContainerLogRef.value!.acceptParams({ containerID: row.containerID });
         },
     },
 ];
