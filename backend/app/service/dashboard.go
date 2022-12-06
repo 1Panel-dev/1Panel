@@ -94,7 +94,7 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 	if err != nil {
 		return nil, err
 	}
-	baseInfo.DatabaseNumber = len(cornjobs)
+	baseInfo.CronjobNumber = len(cornjobs)
 
 	cpuInfo, err := cpu.Info()
 	if err != nil {

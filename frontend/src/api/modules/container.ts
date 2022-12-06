@@ -114,10 +114,13 @@ export const searchCompose = (params: ReqPage) => {
     return http.post<ResPage<Container.ComposeInfo>>(`/containers/compose/search`, params);
 };
 export const upCompose = (params: Container.ComposeCreate) => {
-    return http.post(`/containers/compose/up`, params);
+    return http.post(`/containers/compose`, params);
 };
-export const ComposeOperator = (params: Container.ComposeOpration) => {
+export const composeOperator = (params: Container.ComposeOpration) => {
     return http.post(`/containers/compose/operate`, params);
+};
+export const composeUpdate = (params: Container.ComposeUpdate) => {
+    return http.post(`/containers/compose/update`, params);
 };
 
 // docker

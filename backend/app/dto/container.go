@@ -133,6 +133,11 @@ type ComposeCreate struct {
 	Template uint   `json:"template"`
 }
 type ComposeOperation struct {
+	Name      string `json:"name" validate:"required"`
 	Path      string `json:"path" validate:"required"`
-	Operation string `json:"operation" validate:"required,oneof=up stop pause unpause restart down"`
+	Operation string `json:"operation" validate:"required,oneof=up stop down"`
+}
+type ComposeUpdate struct {
+	Path    string `json:"path" validate:"required"`
+	Content string `json:"content" validate:"required"`
 }

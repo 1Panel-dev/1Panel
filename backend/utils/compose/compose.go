@@ -1,9 +1,10 @@
 package compose
 
 import (
+	"os/exec"
+
 	"github.com/compose-spec/compose-go/loader"
 	"github.com/compose-spec/compose-go/types"
-	"os/exec"
 )
 
 func Up(filePath string) (string, error) {
@@ -26,6 +27,12 @@ func Stop(filePath string) (string, error) {
 
 func Restart(filePath string) (string, error) {
 	cmd := exec.Command("docker-compose", "-f", filePath, "restart")
+	stdout, err := cmd.CombinedOutput()
+	return string(stdout), err
+}
+
+func Operate(filePath, operation string) (string, error) {
+	cmd := exec.Command("docker-compose", "-f", filePath, operation)
 	stdout, err := cmd.CombinedOutput()
 	return string(stdout), err
 }

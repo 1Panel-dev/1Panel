@@ -196,6 +196,10 @@ export namespace Container {
         operation: string;
         path: string;
     }
+    export interface ComposeUpdate {
+        path: string;
+        content: string;
+    }
 
     export interface TemplateCreate {
         name: string;

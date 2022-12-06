@@ -36,8 +36,9 @@ func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
 		withRecordRouter.POST("/repo/del", baseApi.DeleteRepo)
 
 		baRouter.POST("/compose/search", baseApi.SearchCompose)
-		baRouter.POST("/compose/up", baseApi.CreateCompose)
+		baRouter.POST("/compose", baseApi.CreateCompose)
 		baRouter.POST("/compose/operate", baseApi.OperatorCompose)
+		baRouter.POST("/compose/update", baseApi.ComposeUpdate)
 
 		baRouter.POST("/template/search", baseApi.SearchComposeTemplate)
 		baRouter.PUT("/template/:id", baseApi.UpdateComposeTemplate)
