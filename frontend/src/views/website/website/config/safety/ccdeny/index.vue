@@ -9,7 +9,7 @@
                 :rules="rules"
                 :loading="loading"
             >
-                <el-form-item prop="enable" :label="$t('website.enableCC')">
+                <el-form-item prop="enable" :label="$t('website.enable')">
                     <el-switch v-model="form.enable" @change="updateEnable"></el-switch>
                 </el-form-item>
                 <el-form-item prop="cycle" :label="$t('website.cycle')">
