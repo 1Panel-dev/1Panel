@@ -193,6 +193,7 @@ export namespace Container {
         template: number;
     }
     export interface ComposeOpration {
+        name: string;
         operation: string;
         path: string;
     }

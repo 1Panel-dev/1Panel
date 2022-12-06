@@ -12,24 +12,7 @@
             <el-form-item :label="$t('container.description')">
                 <el-input v-model="dialogData.rowData!.description"></el-input>
             </el-form-item>
-            <el-form-item :label="$t('container.from')">
-                <el-radio-group v-model="dialogData.rowData!.from">
-                    <el-radio label="edit">{{ $t('container.edit') }}</el-radio>
-                    <el-radio label="path">{{ $t('container.pathSelect') }}</el-radio>
-                </el-radio-group>
-            </el-form-item>
-            <el-form-item v-if="dialogData.rowData!.from === 'path'" prop="path">
-                <el-input
-                    clearable
-                    :placeholder="$t('commons.example') + '/tmp/docker-compose.yml'"
-                    v-model="dialogData.rowData!.path"
-                >
-                    <template #append>
-                        <FileList @choose="loadDir" :dir="false"></FileList>
-                    </template>
-                </el-input>
-            </el-form-item>
-            <el-form-item v-if="dialogData.rowData!.from === 'edit'">
+            <el-form-item>
                 <codemirror
                     :autofocus="true"
                     placeholder="None data"
@@ -59,7 +42,6 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import FileList from '@/components/file-list/index.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -87,16 +69,8 @@ const acceptParams = (params: DialogProps): void => {
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
-const varifyPath = (rule: any, value: any, callback: any) => {
-    console.log(value, value.indexOf('docker-compose.yml'));
-    if (value.indexOf('docker-compose.yml') === -1) {
-        callback(new Error(i18n.global.t('commons.rule.selectHelper', ['docker-compose.yml'])));
-    }
-    callback();
-};
 const rules = reactive({
     name: [Rules.requiredInput, Rules.name],
-    path: [Rules.requiredInput, { validator: varifyPath, trigger: 'change', required: true }],
     content: [Rules.requiredInput],
 });
 
@@ -123,10 +97,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         emit('search');
         templateVisiable.value = false;
     });
-};
-
-const loadDir = async (path: string) => {
-    dialogData.value.rowData!.path = path;
 };
 
 defineExpose({

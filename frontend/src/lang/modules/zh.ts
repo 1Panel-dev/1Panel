@@ -355,7 +355,7 @@ export default {
         pause: '暂停',
         unpause: '恢复',
         rename: '重命名',
-        remove: '移除',
+        remove: '删除',
         container: '容器',
         upTime: '运行时长',
         all: '全部',
@@ -455,7 +455,8 @@ export default {
         containerNumber: '容器数量',
         down: '删除',
         up: '启动',
-        operatorComposeHelper: '将对选中 Compose 进行 {0} 操作，是否继续？',
+        composeDetailHelper: '该 compose 为 1Panel 编排外部创建。暂不支持启停操作。',
+        composeOperatorHelper: '将对 {0} 进行 {1} 操作，是否继续？',
 
         setting: '容器配置',
         mirrors: '镜像加速',

@@ -1,100 +1,102 @@
 <template>
     <div v-loading="loading">
-        <Submenu activeName="compose" />
-        <el-card style="margin-top: 20px">
-            <LayoutContent :header="'Compose-' + composeName" back-name="Compose" :reload="true">
-                <div>
-                    <el-button icon="VideoPause">停止</el-button>
-                    <el-button icon="Delete" plain type="danger">删除</el-button>
-                </div>
-                <el-card style="margin-top: 20px">
-                    <template #header>
-                        <div class="card-header">
-                            <span>Containers</span>
-                        </div>
+        <LayoutContent :header="'Compose-' + composeName" back-name="Compose" :reload="true">
+            <div v-if="createdBy === 'local'">
+                <el-button icon="VideoPlay" @click="onComposeOperate('start')">{{ $t('container.start') }}</el-button>
+                <el-button icon="VideoPause" @click="onComposeOperate('stop')">{{ $t('container.stop') }}</el-button>
+                <el-button icon="Delete" @click="onComposeOperate('down')" plain type="danger">
+                    {{ $t('container.remove') }}
+                </el-button>
+            </div>
+            <div v-else>
+                <el-alert :closable="false" show-icon :title="$t('container.composeDetailHelper')" type="info" />
+            </div>
+            <el-card style="margin-top: 20px">
+                <template #header>
+                    <div class="card-header">
+                        <span>Containers</span>
+                    </div>
+                </template>
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    v-model:selects="selects"
+                    :data="data"
+                    @search="search"
+                >
+                    <template #toolbar>
+                        <el-button-group>
+                            <el-button :disabled="checkStatus('start')" @click="onOperate('start')">
+                                {{ $t('container.start') }}
+                            </el-button>
+                            <el-button :disabled="checkStatus('stop')" @click="onOperate('stop')">
+                                {{ $t('container.stop') }}
+                            </el-button>
+                            <el-button :disabled="checkStatus('restart')" @click="onOperate('restart')">
+                                {{ $t('container.restart') }}
+                            </el-button>
+                            <el-button :disabled="checkStatus('kill')" @click="onOperate('kill')">
+                                {{ $t('container.kill') }}
+                            </el-button>
+                            <el-button :disabled="checkStatus('pause')" @click="onOperate('pause')">
+                                {{ $t('container.pause') }}
+                            </el-button>
+                            <el-button :disabled="checkStatus('unpause')" @click="onOperate('unpause')">
+                                {{ $t('container.unpause') }}
+                            </el-button>
+                            <el-button :disabled="checkStatus('remove')" @click="onOperate('remove')">
+                                {{ $t('container.remove') }}
+                            </el-button>
+                        </el-button-group>
                     </template>
-                    <ComplexTable
-                        :pagination-config="paginationConfig"
-                        v-model:selects="selects"
-                        :data="data"
-                        @search="search"
+                    <el-table-column type="selection" fix />
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        show-overflow-tooltip
+                        min-width="100"
+                        prop="name"
+                        fix
                     >
-                        <template #toolbar>
-                            <el-button-group>
-                                <el-button :disabled="checkStatus('start')" @click="onOperate('start')">
-                                    {{ $t('container.start') }}
-                                </el-button>
-                                <el-button :disabled="checkStatus('stop')" @click="onOperate('stop')">
-                                    {{ $t('container.stop') }}
-                                </el-button>
-                                <el-button :disabled="checkStatus('restart')" @click="onOperate('restart')">
-                                    {{ $t('container.restart') }}
-                                </el-button>
-                                <el-button :disabled="checkStatus('kill')" @click="onOperate('kill')">
-                                    {{ $t('container.kill') }}
-                                </el-button>
-                                <el-button :disabled="checkStatus('pause')" @click="onOperate('pause')">
-                                    {{ $t('container.pause') }}
-                                </el-button>
-                                <el-button :disabled="checkStatus('unpause')" @click="onOperate('unpause')">
-                                    {{ $t('container.unpause') }}
-                                </el-button>
-                                <el-button :disabled="checkStatus('remove')" @click="onOperate('remove')">
-                                    {{ $t('container.remove') }}
-                                </el-button>
-                            </el-button-group>
+                        <template #default="{ row }">
+                            <el-link @click="onInspect(row.containerID)" type="primary">{{ row.name }}</el-link>
                         </template>
-                        <el-table-column type="selection" fix />
-                        <el-table-column
-                            :label="$t('commons.table.name')"
-                            show-overflow-tooltip
-                            min-width="100"
-                            prop="name"
-                            fix
-                        >
-                            <template #default="{ row }">
-                                <el-link @click="onInspect(row.containerID)" type="primary">{{ row.name }}</el-link>
-                            </template>
-                        </el-table-column>
-                        <el-table-column
-                            :label="$t('container.image')"
-                            show-overflow-tooltip
-                            min-width="100"
-                            prop="imageName"
-                        />
-                        <el-table-column :label="$t('commons.table.status')" min-width="50" prop="state" fix />
-                        <el-table-column :label="$t('container.upTime')" min-width="100" prop="runTime" fix />
-                        <el-table-column
-                            prop="createTime"
-                            :label="$t('commons.table.date')"
-                            :formatter="dateFromat"
-                            show-overflow-tooltip
-                        />
-                        <fu-table-operations
-                            width="200px"
-                            :ellipsis="10"
-                            :buttons="buttons"
-                            :label="$t('commons.table.operate')"
-                            fix
-                        />
-                    </ComplexTable>
+                    </el-table-column>
+                    <el-table-column
+                        :label="$t('container.image')"
+                        show-overflow-tooltip
+                        min-width="100"
+                        prop="imageName"
+                    />
+                    <el-table-column :label="$t('commons.table.status')" min-width="50" prop="state" fix />
+                    <el-table-column :label="$t('container.upTime')" min-width="100" prop="runTime" fix />
+                    <el-table-column
+                        prop="createTime"
+                        :label="$t('commons.table.date')"
+                        :formatter="dateFromat"
+                        show-overflow-tooltip
+                    />
+                    <fu-table-operations
+                        width="200px"
+                        :ellipsis="10"
+                        :buttons="buttons"
+                        :label="$t('commons.table.operate')"
+                        fix
+                    />
+                </ComplexTable>
 
-                    <CodemirrorDialog ref="mydetail" />
+                <CodemirrorDialog ref="mydetail" />
 
-                    <ReNameDialog @search="search" ref="dialogReNameRef" />
-                    <ContainerLogDialog ref="dialogContainerLogRef" />
-                    <CreateDialog @search="search" ref="dialogCreateRef" />
-                    <MonitorDialog ref="dialogMonitorRef" />
-                    <TerminalDialog ref="dialogTerminalRef" />
-                </el-card>
-            </LayoutContent>
-        </el-card>
+                <ReNameDialog @search="search" ref="dialogReNameRef" />
+                <ContainerLogDialog ref="dialogContainerLogRef" />
+                <CreateDialog @search="search" ref="dialogCreateRef" />
+                <MonitorDialog ref="dialogMonitorRef" />
+                <TerminalDialog ref="dialogTerminalRef" />
+            </el-card>
+        </LayoutContent>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from 'vue';
-import Submenu from '@/views/container/index.vue';
+import { reactive, ref } from 'vue';
 import LayoutContent from '@/layout/layout-content.vue';
 import ReNameDialog from '@/views/container/container/rename/index.vue';
 import CreateDialog from '@/views/container/container/create/index.vue';
@@ -104,19 +106,30 @@ import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { dateFromat } from '@/utils/util';
-import { ContainerOperator, inspect, searchContainer } from '@/api/modules/container';
+import { composeOperator, ContainerOperator, inspect, searchContainer } from '@/api/modules/container';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { Container } from '@/api/interface/container';
 
-interface Filters {
-    filters?: string;
-}
-const props = withDefaults(defineProps<Filters>(), {
-    filters: '',
-});
-
 const composeName = ref();
+const composePath = ref();
+const filters = ref();
+const createdBy = ref();
+
+const emit = defineEmits<{ (e: 'back'): void }>();
+interface DialogProps {
+    createdBy: string;
+    name: string;
+    path: string;
+    filters: string;
+}
+const acceptParams = (props: DialogProps): void => {
+    composePath.value = props.path;
+    composeName.value = props.name;
+    filters.value = props.filters;
+    createdBy.value = props.createdBy;
+    search();
+};
 
 const data = ref();
 const selects = ref<any>([]);
@@ -129,8 +142,7 @@ const paginationConfig = reactive({
 const loading = ref(false);
 
 const search = async () => {
-    let filterItem = props.filters ? props.filters : '';
-    composeName.value = props.filters.replaceAll('com.docker.compose.project=', '');
+    let filterItem = filters.value;
     let params = {
         page: paginationConfig.page,
         pageSize: paginationConfig.pageSize,
@@ -173,20 +185,6 @@ const checkStatus = (operation: string) => {
                 }
             }
             return false;
-        case 'pause':
-            for (const item of selects.value) {
-                if (item.state === 'paused' || item.state === 'exited') {
-                    return true;
-                }
-            }
-            return false;
-        case 'unpause':
-            for (const item of selects.value) {
-                if (item.state !== 'paused') {
-                    return true;
-                }
-            }
-            return false;
     }
 };
 
@@ -216,6 +214,38 @@ const onOperate = async (operation: string) => {
             })
             .catch(() => {
                 search();
+            });
+    });
+};
+
+const onComposeOperate = async (operation: string) => {
+    ElMessageBox.confirm(
+        i18n.global.t('container.composeOperatorHelper', [composeName.value, i18n.global.t('container.' + operation)]),
+        i18n.global.t('container.' + operation),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        },
+    ).then(async () => {
+        let params = {
+            name: composeName.value,
+            path: composePath.value,
+            operation: operation,
+        };
+        loading.value = true;
+        await composeOperator(params)
+            .then(() => {
+                loading.value = false;
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                if (operation === 'down') {
+                    emit('back');
+                } else {
+                    search();
+                }
+            })
+            .catch(() => {
+                loading.value = false;
             });
     });
 };
@@ -265,7 +295,8 @@ const buttons = [
         },
     },
 ];
-onMounted(() => {
-    search();
+
+defineExpose({
+    acceptParams,
 });
 </script>

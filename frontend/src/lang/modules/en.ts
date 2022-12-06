@@ -446,7 +446,9 @@ export default {
         containerNumber: 'Container number',
         down: 'Down',
         up: 'Up',
-        operatorComposeHelper: '{0} will be performed on the selected compose. Do you want to continue?',
+        composeDetailHelper:
+            'The compose is created external to 1Panel. The start and stop operations are not supported.',
+        composeOperatorHelper: '{1} operation will be performed on {0}. Do you want to continue?',
     },
     cronjob: {
         cronTask: 'Task',
