@@ -13,6 +13,12 @@ func Up(filePath string) (string, error) {
 }
 
 func Down(filePath string) (string, error) {
+	cmd := exec.Command("docker-compose", "-f", filePath, "down")
+	stdout, err := cmd.CombinedOutput()
+	return string(stdout), err
+}
+
+func Stop(filePath string) (string, error) {
 	cmd := exec.Command("docker-compose", "-f", filePath, "stop")
 	stdout, err := cmd.CombinedOutput()
 	return string(stdout), err

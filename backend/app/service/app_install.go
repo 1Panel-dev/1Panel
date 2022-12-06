@@ -129,7 +129,7 @@ func (a AppInstallService) Operate(req dto.AppInstallOperate) error {
 		}
 		install.Status = constant.Running
 	case dto.Down:
-		out, err := compose.Down(dockerComposePath)
+		out, err := compose.Stop(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
 		}
