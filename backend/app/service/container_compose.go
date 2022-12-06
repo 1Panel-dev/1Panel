@@ -2,15 +2,17 @@ package service
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
@@ -40,6 +42,8 @@ func (u *ContainerService) PageCompose(req dto.PageInfo) (int64, interface{}, er
 	if err != nil {
 		return 0, nil, err
 	}
+
+	composeCreatedByLocal, _ := composeRepo.ListRecord()
 	composeMap := make(map[string]dto.ComposeInfo)
 	for _, container := range list {
 		if name, ok := container.Labels[composeProjectLabel]; ok {
@@ -72,8 +76,20 @@ func (u *ContainerService) PageCompose(req dto.PageInfo) (int64, interface{}, er
 				} else {
 					composeItem.Path = workdir
 				}
+				for i := 0; i < len(composeCreatedByLocal); i++ {
+					if composeCreatedByLocal[i].Name == name {
+						composeItem.CreatedBy = "local"
+						composeCreatedByLocal = append(composeCreatedByLocal[:i], composeCreatedByLocal[i+1:]...)
+						break
+					}
+				}
 				composeMap[name] = composeItem
 			}
+		}
+	}
+	for _, item := range composeCreatedByLocal {
+		if err := composeRepo.DeleteRecord(commonRepo.WithByName(item.Name)); err != nil {
+			fmt.Println(err)
 		}
 	}
 	for key, value := range composeMap {
@@ -124,23 +140,49 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 		write.Flush()
 		req.Path = path
 	}
-	cmd := exec.Command("docker-compose", "-f", req.Path, "up", "-d")
-	stdout, err := cmd.CombinedOutput()
-	if err != nil {
-		return err
+	if stdout, err := compose.Up(req.Path); err != nil {
+		return errors.New(string(stdout))
 	}
-	global.LOG.Debugf("docker-compose up %s successful, logs: %v", req.Name, string(stdout))
+	global.LOG.Debugf("docker-compose up %s successful", req.Name)
 
+	_ = composeRepo.CreateRecord(&model.Compose{Name: req.Name})
 	return nil
 }
 
 func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
-	cmd := exec.Command("docker-compose", "-f", req.Path, req.Operation)
-	stdout, err := cmd.CombinedOutput()
+	if _, err := os.Stat(req.Path); err != nil {
+		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
+	}
+	if stdout, err := compose.Operate(req.Path, req.Operation); err != nil {
+		return errors.New(string(stdout))
+	}
+	global.LOG.Debugf("docker-compose %s %s successful", req.Operation, req.Name)
+	if req.Operation == "down" {
+		_ = composeRepo.DeleteRecord(commonRepo.WithByName(req.Name))
+	}
+
+	return nil
+}
+
+func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
+	if _, err := os.Stat(req.Path); err != nil {
+		return fmt.Errorf("load file with path %s failed, %v", req.Path, err)
+	}
+	file, err := os.OpenFile(req.Path, os.O_WRONLY|os.O_TRUNC, 0640)
 	if err != nil {
 		return err
 	}
-	global.LOG.Debugf("docker-compose %s %s successful: logs: %v", req.Operation, req.Path, string(stdout))
+	defer file.Close()
+	write := bufio.NewWriter(file)
+	_, _ = write.WriteString(req.Content)
+	write.Flush()
 
-	return err
+	if stdout, err := compose.Down(req.Path); err != nil {
+		return errors.New(string(stdout))
+	}
+	if stdout, err := compose.Up(req.Path); err != nil {
+		return errors.New(string(stdout))
+	}
+
+	return nil
 }

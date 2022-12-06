@@ -153,7 +153,7 @@ const onSubmitSave = async () => {
 };
 
 const loadMysqlConf = async () => {
-    const res = await LoadFile({ path: '/opt/1Panel/docker/config/daemon.json' });
+    const res = await LoadFile({ path: '/opt/1Panel/docker/conf/daemon.json' });
     dockerConf.value = res.data;
 };
 

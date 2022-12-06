@@ -357,3 +357,21 @@ func (b *BaseApi) CreateVolume(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, nil)
 }
+
+func (b *BaseApi) ComposeUpdate(c *gin.Context) {
+	var req dto.ComposeUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := containerService.ComposeUpdate(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
