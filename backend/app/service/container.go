@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -67,6 +68,9 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 	if err != nil {
 		return 0, nil, err
 	}
+	sort.Slice(list, func(i, j int) bool {
+		return list[i].Created > list[j].Created
+	})
 	total, start, end := len(list), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
 		records = make([]types.Container, 0)

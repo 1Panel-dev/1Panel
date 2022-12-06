@@ -134,7 +134,7 @@ const acceptParams = (props: DialogProps): void => {
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
-    page: 1,
+    currentPage: 1,
     pageSize: 10,
     total: 0,
 });
@@ -144,7 +144,7 @@ const loading = ref(false);
 const search = async () => {
     let filterItem = filters.value;
     let params = {
-        page: paginationConfig.page,
+        page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         filters: filterItem,
     };

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -96,6 +97,9 @@ func (u *ContainerService) PageCompose(req dto.PageInfo) (int64, interface{}, er
 		value.Name = key
 		records = append(records, value)
 	}
+	sort.Slice(records, func(i, j int) bool {
+		return records[i].CreatedAt > records[j].CreatedAt
+	})
 	total, start, end := len(records), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
 		BackDatas = make([]dto.ComposeInfo, 0)

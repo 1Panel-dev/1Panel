@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
@@ -23,6 +24,9 @@ func (u *ContainerService) PageNetwork(req dto.PageInfo) (int64, interface{}, er
 		data    []dto.Network
 		records []types.NetworkResource
 	)
+	sort.Slice(list, func(i, j int) bool {
+		return list[i].Created.Before(list[j].Created)
+	})
 	total, start, end := len(list), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
 		records = make([]types.NetworkResource, 0)

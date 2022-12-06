@@ -96,7 +96,7 @@ import i18n from '@/lang';
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
-    page: 1,
+    currentPage: 1,
     pageSize: 10,
     total: 0,
 });
@@ -117,7 +117,7 @@ const dialogReNameRef = ref();
 const search = async () => {
     let filterItem = props.filters ? props.filters : '';
     let params = {
-        page: paginationConfig.page,
+        page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         filters: filterItem,
     };

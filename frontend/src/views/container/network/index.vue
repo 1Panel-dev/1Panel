@@ -68,7 +68,7 @@ const codemirror = ref();
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
-    page: 1,
+    currentPage: 1,
     pageSize: 10,
     total: 0,
 });
@@ -88,15 +88,13 @@ function selectable(row) {
 
 const search = async () => {
     const params = {
-        page: paginationConfig.page,
+        page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
     await searchNetwork(params).then((res) => {
-        if (res.data) {
-            data.value = res.data.items;
-            for (const item of data.value) {
-                item.isSystem = isSystem(item.name);
-            }
+        data.value = res.data.items || [];
+        for (const item of data.value) {
+            item.isSystem = isSystem(item.name);
         }
         paginationConfig.total = res.data.total;
     });
