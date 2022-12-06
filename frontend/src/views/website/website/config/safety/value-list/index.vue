@@ -1,13 +1,16 @@
 <template>
     <el-row>
         <el-col :span="10" :offset="2">
+            <el-form-item prop="enable" :label="$t('website.enable')">
+                <el-switch v-model="enableUpdate.enable" @change="updateEnable"></el-switch>
+            </el-form-item>
             <ComplexTable :data="data" v-loading="loading">
                 <template #toolbar>
                     <el-button type="primary" icon="Plus" @click="openCreate">
                         {{ $t('commons.button.add') }}
                     </el-button>
                 </template>
-                <el-table-column :label="'URL'">
+                <el-table-column :label="$t('website.value')">
                     <template #default="{ row }">
                         <fu-read-write-switch :data="row.value" v-model="row.edit" write-trigger="onDblclick">
                             <el-form-item :error="row.error">
@@ -21,7 +24,7 @@
                         </fu-read-write-switch>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('commons.table.operate')">
+                <el-table-column :label="$t('commons.table.operate')" width="100px">
                     <template #default="{ $index }">
                         <el-button link type="primary" @click="remove($index)">
                             {{ $t('commons.button.delete') }}
@@ -40,7 +43,7 @@
 </template>
 <script lang="ts" setup>
 import { WebSite } from '@/api/interface/website';
-import { GetWafConfig } from '@/api/modules/website';
+import { GetWafConfig, UpdateWafEnable } from '@/api/modules/website';
 import { computed, onMounted, reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { SaveFileContent } from '@/api/modules/files';
@@ -75,13 +78,18 @@ let fileUpdate = reactive({
     path: '',
     content: '',
 });
+let enableUpdate = ref<WebSite.WafUpdate>({
+    websiteId: 0,
+    key: '$UrlDeny',
+    enable: false,
+});
 
 const get = async () => {
     data.value = [];
     loading.value = true;
     const res = await GetWafConfig(req.value);
     loading.value = false;
-
+    enableUpdate.value.enable = res.data.enable;
     if (res.data.content != '') {
         const urlList = res.data.content.split('\n');
         urlList.forEach((value) => {
@@ -106,6 +114,13 @@ const openCreate = () => {
     data.value.unshift({ value: '', edit: true, error: '' });
 };
 
+const updateEnable = async (enable: boolean) => {
+    enableUpdate.value.enable = enable;
+    loading.value = true;
+    await UpdateWafEnable(enableUpdate.value);
+    loading.value = false;
+};
+
 const submit = async () => {
     let urlList = '';
     data.value.forEach((row) => {
@@ -126,9 +141,25 @@ const submit = async () => {
         });
 };
 
+const getKey = (rule: string) => {
+    switch (rule) {
+        case 'url':
+            return '$UrlDeny';
+        case 'whiteurl':
+            return '$whiteModule';
+        case 'post':
+            return '$postMatch';
+        case 'url':
+            return '$UrlDeny';
+        case 'url':
+            return '$UrlDeny';
+    }
+};
+
 onMounted(() => {
     req.value.websiteId = id.value;
     req.value.rule = rule.value;
+    enableUpdate.value.key = getKey(rule.value);
     get();
 });
 </script>
