@@ -1,6 +1,9 @@
 <template>
     <el-row>
         <el-col :span="10" :offset="2">
+            <el-form-item prop="enable" :label="$t('website.enable')">
+                <el-switch v-model="enableUpdate.enable" @change="updateEnable"></el-switch>
+            </el-form-item>
             <ComplexTable :data="data" v-loading="loading">
                 <template #toolbar>
                     <el-button type="primary" icon="Plus" @click="openCreate">
@@ -35,7 +38,7 @@
 </template>
 <script lang="ts" setup>
 import { WebSite } from '@/api/interface/website';
-import { GetWafConfig } from '@/api/modules/website';
+import { GetWafConfig, UpdateWafEnable } from '@/api/modules/website';
 import { computed, onMounted, reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { SaveFileContent } from '@/api/modules/files';
@@ -56,12 +59,17 @@ let loading = ref(false);
 let data = ref([]);
 let req = ref<WebSite.WafReq>({
     websiteId: 0,
-    key: '',
-    rule: 'blackfileExt',
+    key: '$fileExtDeny',
+    rule: 'fileExtBlockList',
 });
 let fileUpdate = reactive({
     path: '',
     content: '',
+});
+let enableUpdate = ref<WebSite.WafUpdate>({
+    websiteId: 0,
+    key: '$fileExtDeny',
+    enable: false,
 });
 
 const get = async () => {
@@ -82,6 +90,7 @@ const get = async () => {
     }
 
     fileUpdate.path = res.data.filePath;
+    enableUpdate.value.enable = res.data.enable;
 };
 
 const remove = (index: number) => {
@@ -112,8 +121,16 @@ const submit = async () => {
         });
 };
 
+const updateEnable = async (enable: boolean) => {
+    enableUpdate.value.enable = enable;
+    loading.value = true;
+    await UpdateWafEnable(enableUpdate.value);
+    loading.value = false;
+};
+
 onMounted(() => {
     req.value.websiteId = id.value;
+    enableUpdate.value.websiteId = id.value;
     get();
 });
 </script>
