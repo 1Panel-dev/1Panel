@@ -6,7 +6,9 @@
         <el-tab-pane :label="'IP白名单'" name="ipWhiteList">
             <IpWhiteList :id="id" v-if="index == 'ipWhiteList'"></IpWhiteList>
         </el-tab-pane>
-        <el-tab-pane :label="'黑名单'"></el-tab-pane>
+        <el-tab-pane :label="'IP 黑名单'" name="ipBlockList">
+            <IpBlockList :id="id" v-if="index == 'ipBlockList'"></IpBlockList>
+        </el-tab-pane>
         <el-tab-pane :label="'并发限制'"></el-tab-pane>
         <el-tab-pane :label="'请求限制'"></el-tab-pane>
         <el-tab-pane :label="'禁止爬虫'"></el-tab-pane>
@@ -16,6 +18,7 @@
 import { computed, ref } from 'vue';
 import CCDeny from './ccdeny/index.vue';
 import IpWhiteList from './ip-white-list/index.vue';
+import IpBlockList from './ip-block-list/index.vue';
 
 const props = defineProps({
     id: {
