@@ -73,14 +73,14 @@ const loading = ref(false);
 const isOnDetail = ref(false);
 
 const paginationConfig = reactive({
-    page: 1,
+    currentPage: 1,
     pageSize: 10,
     total: 0,
 });
 
 const search = async () => {
     let params = {
-        page: paginationConfig.page,
+        page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
     loading.value = true;

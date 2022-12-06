@@ -100,7 +100,7 @@ const data = ref();
 const repos = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
-    page: 1,
+    currentPage: 1,
     pageSize: 10,
     total: 0,
 });
@@ -120,13 +120,11 @@ const deleteForm = reactive({
 
 const search = async () => {
     const repoSearch = {
-        page: paginationConfig.page,
+        page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
     await searchImage(repoSearch).then((res) => {
-        if (res.data) {
-            data.value = res.data.items;
-        }
+        data.value = res.data.items || [];
         paginationConfig.total = res.data.total;
     });
 };

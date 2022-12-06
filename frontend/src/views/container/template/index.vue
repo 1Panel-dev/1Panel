@@ -85,20 +85,19 @@ const detailInfo = ref();
 const extensions = [javascript(), oneDark];
 
 const paginationConfig = reactive({
-    page: 1,
+    currentPage: 1,
     pageSize: 10,
     total: 0,
 });
 
 const search = async () => {
     let params = {
-        page: paginationConfig.page,
+        page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
     await searchComposeTemplate(params).then((res) => {
-        if (res.data) {
-            data.value = res.data.items;
-        }
+        data.value = res.data.items || [];
+        paginationConfig.total = res.data.total;
     });
 };
 

@@ -53,7 +53,7 @@ import { ElMessage } from 'element-plus';
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
-    page: 1,
+    currentPage: 1,
     pageSize: 10,
     total: 0,
 });
@@ -139,12 +139,12 @@ const buttons = [
 
 const search = async () => {
     let params = {
-        page: paginationConfig.page,
+        page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         info: info.value,
     };
     const res = await getCommandPage(params);
-    data.value = res.data.items;
+    data.value = res.data.items || [];
     paginationConfig.total = res.data.total;
 };
 

@@ -47,14 +47,14 @@ import i18n from '@/lang';
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
-    page: 1,
+    currentPage: 1,
     pageSize: 10,
     total: 0,
 });
 
 const search = async () => {
     let params = {
-        page: paginationConfig.page,
+        page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
     await searchImageRepo(params).then((res) => {

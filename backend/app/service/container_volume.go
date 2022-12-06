@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"sort"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -24,6 +25,9 @@ func (u *ContainerService) PageVolume(req dto.PageInfo) (int64, interface{}, err
 		data    []dto.Volume
 		records []*types.Volume
 	)
+	sort.Slice(list.Volumes, func(i, j int) bool {
+		return list.Volumes[i].CreatedAt > list.Volumes[j].CreatedAt
+	})
 	total, start, end := len(list.Volumes), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
 		records = make([]*types.Volume, 0)
