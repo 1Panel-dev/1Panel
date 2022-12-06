@@ -7,18 +7,23 @@
                         {{ $t('commons.button.add') }}
                     </el-button>
                 </template>
-                <el-table-column label="IP" prop="ip">
+                <el-table-column :label="'URL'">
                     <template #default="{ row }">
-                        <fu-read-write-switch :data="row.ip" v-model="row.edit" write-trigger="onDblclick">
+                        <fu-read-write-switch :data="row.value" v-model="row.edit" write-trigger="onDblclick">
                             <el-form-item :error="row.error">
-                                <el-input v-model="row.ip" @blur="row.edit = false" @input="checkIpRule(row)" />
+                                <el-input
+                                    type="textarea"
+                                    :autosize="{ minRows: 2, maxRows: 8 }"
+                                    v-model="row.value"
+                                    @blur="row.edit = false"
+                                />
                             </el-form-item>
                         </fu-read-write-switch>
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('commons.table.operate')">
                     <template #default="{ $index }">
-                        <el-button link type="primary" @click="removeIp($index)">
+                        <el-button link type="primary" @click="remove($index)">
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </template>
@@ -41,16 +46,22 @@ import ComplexTable from '@/components/complex-table/index.vue';
 import { SaveFileContent } from '@/api/modules/files';
 import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
-import { checkIp } from '@/utils/util';
 
 const props = defineProps({
     id: {
         type: Number,
         default: 0,
     },
+    rule: {
+        type: String,
+        default: 'url',
+    },
 });
 const id = computed(() => {
     return props.id;
+});
+const rule = computed(() => {
+    return props.rule;
 });
 
 let loading = ref(false);
@@ -58,7 +69,7 @@ let data = ref([]);
 let req = ref<WebSite.WafReq>({
     websiteId: 0,
     key: '',
-    rule: 'ipBlocklist',
+    rule: 'url',
 });
 let fileUpdate = reactive({
     path: '',
@@ -72,66 +83,52 @@ const get = async () => {
     loading.value = false;
 
     if (res.data.content != '') {
-        const ipList = JSON.parse(res.data.content);
-        ipList.forEach((value) => {
-            data.value.push({
-                ip: value,
-                eidt: false,
-                error: '',
-            });
+        const urlList = res.data.content.split('\n');
+        urlList.forEach((value) => {
+            if (value != '') {
+                data.value.push({
+                    value: value,
+                    eidt: false,
+                    error: '',
+                });
+            }
         });
     }
 
     fileUpdate.path = res.data.filePath;
 };
 
-const removeIp = (index: number) => {
+const remove = (index: number) => {
     data.value.splice(index, 1);
 };
 
 const openCreate = () => {
-    data.value.unshift({ id: '', edit: true, error: '' });
+    data.value.unshift({ value: '', edit: true, error: '' });
 };
 
 const submit = async () => {
-    let canCommit = true;
-    for (const row of data.value) {
-        console.log(row.ip);
-        console.log(row.error);
-        if (row.ip != '' && row.error != '') {
-            row.edit = true;
-            canCommit = false;
-        }
-    }
-    if (!canCommit) {
-        return;
-    }
-    let ipArray = [];
+    let urlList = '';
     data.value.forEach((row) => {
-        ipArray.push(row.ip);
+        if (row.value != '') {
+            urlList = urlList + row.value + '\n';
+        }
     });
 
-    fileUpdate.content = JSON.stringify(ipArray);
+    fileUpdate.content = urlList;
     loading.value = true;
     SaveFileContent(fileUpdate)
         .then(() => {
             ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+            get();
         })
         .finally(() => {
             loading.value = false;
         });
 };
 
-const checkIpRule = (row: any) => {
-    if (checkIp(row.ip)) {
-        row.error = i18n.global.t('commons.rule.ip');
-    } else {
-        row.error = '';
-    }
-};
-
 onMounted(() => {
     req.value.websiteId = id.value;
+    req.value.rule = rule.value;
     get();
 });
 </script>

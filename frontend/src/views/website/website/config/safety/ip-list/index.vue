@@ -48,9 +48,16 @@ const props = defineProps({
         type: Number,
         default: 0,
     },
+    rule: {
+        type: String,
+        default: 'ipWhitelist',
+    },
 });
 const id = computed(() => {
     return props.id;
+});
+const rule = computed(() => {
+    return props.rule;
 });
 
 let loading = ref(false);
@@ -90,14 +97,12 @@ const removeIp = (index: number) => {
 };
 
 const openCreate = () => {
-    data.value.unshift({ id: '', edit: true, error: '' });
+    data.value.unshift({ ip: '', edit: true, error: '' });
 };
 
 const submit = async () => {
     let canCommit = true;
     for (const row of data.value) {
-        console.log(row.ip);
-        console.log(row.error);
         if (row.ip != '' && row.error != '') {
             row.edit = true;
             canCommit = false;
@@ -132,6 +137,7 @@ const checkIpRule = (row: any) => {
 
 onMounted(() => {
     req.value.websiteId = id.value;
+    req.value.rule = rule.value;
     get();
 });
 </script>
