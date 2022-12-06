@@ -13,15 +13,17 @@ end
 
 local logpath = ngx.var.logdir
 local rulepath = ngx.var.RulePath
-local UrlDeny = optionIsOn(ngx.var.UrlDeny)
-local PostCheck = optionIsOn(ngx.var.postMatch)
-local CookieCheck = optionIsOn(ngx.var.cookieMatch)
-local WhiteCheck = optionIsOn(ngx.var.whiteModule)
-local attacklog = optionIsOn(ngx.var.attacklog)
+local attacklog = optionIsOn(ngx.var.attackLog)
+local Redirect=optionIsOn(ngx.var.redirect)
 local CCDeny = optionIsOn(ngx.var.CCDeny)
-local Redirect=optionIsOn(ngx.var.Redirect)
-
-
+local UrlBlockDeny = optionIsOn(ngx.var.urlBlockDeny)
+local UrlWhiteAllow = optionIsOn(ngx.var.urlWhiteAllow)
+local IpBlockDeny = optionIsOn(ngx.var.ipBlockDeny)
+local IpWhiteAllow = optionIsOn(ngx.var.ipWhiteAllow)
+local PostDeny = optionIsOn(ngx.var.postDeny)
+local ArgsDeny = optionIsOn(ngx.var.argsDeny)
+local CookieDeny = optionIsOn(ngx.var.cookieDeny)
+local FileExtDeny = optionIsOn(ngx.var.fileExtDeny)
 
 local function getClientIp()
 	IP  = ngx.var.remote_addr
@@ -90,18 +92,18 @@ end
 
 
 
-local urlrules=read_rule('url')
-local argsrules=read_rule('args')
-local uarules=read_rule('user-agent')
-local wturlrules=read_rule('whiteurl')
-local postrules=read_rule('post')
-local ckrules=read_rule('cookie')
-local ccrate=read_str('ccrate')
-local ipWhitelist=read_json('ipWhitelist')
-local ipBlocklist=read_json('ipBlocklist')
-local black_fileExt = read_json('blackfileExt')
-local html=read_str('html')
+local urlWhiteList=read_rule('urlWhiteList')
+local urlBlockList=read_rule('urlBlockList')
+local argsCheckList=read_rule('argsCheckList')
+local postCheckList=read_rule('postCheckList')
+local cookieBlockList=read_rule('cookieBlockList')
+local ipWhiteList=read_json('ipWhiteList')
+local ipBlockList=read_json('ipBlockList')
+local ccRate=read_str('ccRate')
+local fileExtBlockList = read_json('fileExtBlockList')
 
+local html=read_str('html')
+local uarules=read_rule('user-agent')
 
 local function say_html()
 	if Redirect then
@@ -113,9 +115,9 @@ local function say_html()
 end
 
 local function whiteurl()
-	if WhiteCheck then
-		if wturlrules ~=nil then
-			for _,rule in pairs(wturlrules) do
+	if UrlWhiteAllow then
+		if urlWhiteList ~=nil then
+			for _,rule in pairs(urlWhiteList) do
 				if ngxmatch(ngx.var.uri,rule,"isjo") then
 					return true
 				end
@@ -125,13 +127,15 @@ local function whiteurl()
 	return false
 end
 local function fileExtCheck(ext)
-	local items = Set(black_fileExt)
-	ext=string.lower(ext)
-	if ext then
-		for rule in pairs(items) do
-			if ngx.re.match(ext,rule,"isjo") then
-				log('POST',ngx.var.request_uri,"-","file attack with ext "..ext)
-				say_html()
+	if FileExtDeny then
+		local items = Set(fileExtBlockList)
+		ext=string.lower(ext)
+		if ext then
+			for rule in pairs(items) do
+				if ngx.re.match(ext,rule,"isjo") then
+					log('POST',ngx.var.request_uri,"-","file attack with ext "..ext)
+					say_html()
+				end
 			end
 		end
 	end
@@ -144,37 +148,39 @@ function Set (list)
 end
 
 local function args()
-    if argsrules then
-        for _,rule in pairs(argsrules) do
-            local uriArgs = ngx.req.get_uri_args()
-            for key, val in pairs(uriArgs) do
-                if type(val)=='table' then
-                    local t={}
-                    for k,v in pairs(val) do
-                        if v == true then
-                            v=""
-                        end
-                        table.insert(t,v)
-                    end
-                    data=table.concat(t, " ")
-                else
-                    data=val
-                end
-                if data and type(data) ~= "boolean" and rule ~="" and ngxmatch(unescape(data),rule,"isjo") then
-                    log('GET',ngx.var.request_uri,"-",rule)
-                    say_html()
-                    return true
-                end
-            end
-        end
-    end
+	if ArgsDeny then
+		if argsCheckList then
+			for _,rule in pairs(argsCheckList) do
+				local uriArgs = ngx.req.get_uri_args()
+				for key, val in pairs(uriArgs) do
+					if type(val)=='table' then
+						local t={}
+						for k,v in pairs(val) do
+							if v == true then
+								v=""
+							end
+							table.insert(t,v)
+						end
+						data=table.concat(t, " ")
+					else
+						data=val
+					end
+					if data and type(data) ~= "boolean" and rule ~="" and ngxmatch(unescape(data),rule,"isjo") then
+						log('GET',ngx.var.request_uri,"-",rule)
+						say_html()
+						return true
+					end
+				end
+			end
+		end
+	end
 	return false
 end
 
 
 local function url()
-	if UrlDeny then
-		for _,rule in pairs(urlrules) do
+	if UrlBlockDeny then
+		for _,rule in pairs(urlBlockList) do
 			if rule ~="" and ngxmatch(ngx.var.request_uri,rule,"isjo") then
 				log('GET',ngx.var.request_uri,"-",rule)
 				say_html()
@@ -199,7 +205,7 @@ function ua()
 	return false
 end
 function body(data)
-	for _,rule in pairs(postrules) do
+	for _,rule in pairs(postCheckList) do
 		if rule ~="" and data~="" and ngxmatch(unescape(data),rule,"isjo") then
 			log('POST',ngx.var.request_uri,data,rule)
 			say_html()
@@ -210,8 +216,8 @@ function body(data)
 end
 local function cookie()
 	local ck = ngx.var.http_cookie
-	if CookieCheck and ck then
-		for _,rule in pairs(ckrules) do
+	if CookieDeny and ck then
+		for _,rule in pairs(cookieBlockList) do
 			if rule ~="" and ngxmatch(ck,rule,"isjo") then
 				log('Cookie',ngx.var.request_uri,"-",rule)
 				say_html()
@@ -223,10 +229,10 @@ local function cookie()
 end
 
 local function denycc()
-	if CCDeny and ccrate then
+	if CCDeny and ccRate then
 		local uri=ngx.var.uri
-		CCcount=tonumber(string.match(ccrate,'(.*)/'))
-		CCseconds=tonumber(string.match(ccrate,'/(.*)'))
+		CCcount=tonumber(string.match(ccRate,'(.*)/'))
+		CCseconds=tonumber(string.match(ccRate,'/(.*)'))
 		local uri = getClientIp()..uri
 		local limit = ngx.shared.limit
 		local req,_=limit:get(uri)
@@ -263,10 +269,12 @@ local function get_boundary()
 end
 
 local function whiteip()
-	if next(ipWhitelist) ~= nil then
-		for _,ip in pairs(ipWhitelist) do
-			if getClientIp()==ip then
-				return true
+	if IpWhiteAllow then
+		if next(ipWhiteList) ~= nil then
+			for _,ip in pairs(ipWhiteList) do
+				if getClientIp()==ip then
+					return true
+				end
 			end
 		end
 	end
@@ -274,11 +282,13 @@ local function whiteip()
 end
 
 local function blockip()
-	if next(ipBlocklist) ~= nil then
-		for _,ip in pairs(ipBlocklist) do
-			if getClientIp()==ip then
-				ngx.exit(403)
-				return true
+	if IpBlockDeny then
+		if next(ipBlockList) ~= nil then
+			for _,ip in pairs(ipBlockList) do
+				if getClientIp()==ip then
+					ngx.exit(403)
+					return true
+				end
 			end
 		end
 	end
@@ -299,7 +309,7 @@ elseif ua() then
 elseif url() then
 elseif args() then
 elseif cookie() then
-elseif PostCheck then
+elseif PostDeny then
     if method=="POST" then   
             local boundary = get_boundary()
 	    if boundary then
