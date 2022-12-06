@@ -121,3 +121,9 @@ type WebsitePreInstallCheck struct {
 type WebsiteInstallCheckReq struct {
 	InstallIds []uint `json:"InstallIds"`
 }
+
+type WebsiteWafConfig struct {
+	Enable   bool   `json:"enable"`
+	FilePath string `json:"filePath"`
+	Content  string `json:"content"`
+}

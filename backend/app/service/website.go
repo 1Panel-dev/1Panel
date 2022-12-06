@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/request"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"os"
 	"path"
@@ -33,6 +34,18 @@ type IWebsiteService interface {
 	RecoverByUpload(req dto.WebSiteRecoverByFile) error
 	UpdateWebsite(req dto.WebSiteUpdate) error
 	DeleteWebSite(req dto.WebSiteDel) error
+	GetWebsite(id uint) (dto.WebsiteDTO, error)
+	CreateWebsiteDomain(create dto.WebSiteDomainCreate) (model.WebSiteDomain, error)
+	GetWebsiteDomain(websiteId uint) ([]model.WebSiteDomain, error)
+	DeleteWebsiteDomain(domainId uint) error
+	GetNginxConfigByScope(req dto.NginxConfigReq) (*dto.WebsiteNginxConfig, error)
+	UpdateNginxConfigByScope(req dto.NginxConfigReq) error
+	GetWebsiteNginxConfig(websiteId uint) (dto.FileInfo, error)
+	GetWebsiteHTTPS(websiteId uint) (dto.WebsiteHTTPS, error)
+	OpWebsiteHTTPS(req dto.WebsiteHTTPSOp) (dto.WebsiteHTTPS, error)
+	PreInstallCheck(req dto.WebsiteInstallCheckReq) ([]dto.WebsitePreInstallCheck, error)
+	GetWafConfig(req request.WebsiteWafReq) (dto.WebsiteWafConfig, error)
+	UpdateWafConfig(req request.WebsiteWafUpdate) error
 }
 
 func NewWebsiteService() IWebsiteService {
@@ -54,7 +67,6 @@ func (w WebsiteService) PageWebSite(req dto.WebSiteReq) (int64, []dto.WebSiteDTO
 }
 
 func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
-
 	if exist, _ := websiteRepo.GetBy(websiteRepo.WithDomain(create.PrimaryDomain)); len(exist) > 0 {
 		return buserr.New(constant.ErrNameIsExist)
 	}
@@ -229,7 +241,6 @@ func (w WebsiteService) GetWebsite(id uint) (dto.WebsiteDTO, error) {
 }
 
 func (w WebsiteService) DeleteWebSite(req dto.WebSiteDel) error {
-
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
 	if err != nil {
 		return err
@@ -296,7 +307,6 @@ func (w WebsiteService) GetWebsiteDomain(websiteId uint) ([]model.WebSiteDomain,
 }
 
 func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
-
 	webSiteDomain, err := websiteDomainRepo.GetFirst(commonRepo.WithByID(domainId))
 	if err != nil {
 		return err
@@ -328,7 +338,6 @@ func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
 }
 
 func (w WebsiteService) GetNginxConfigByScope(req dto.NginxConfigReq) (*dto.WebsiteNginxConfig, error) {
-
 	keys, ok := dto.ScopeKeyMap[req.Scope]
 	if !ok || len(keys) == 0 {
 		return nil, nil
@@ -350,7 +359,6 @@ func (w WebsiteService) GetNginxConfigByScope(req dto.NginxConfigReq) (*dto.Webs
 }
 
 func (w WebsiteService) UpdateNginxConfigByScope(req dto.NginxConfigReq) error {
-
 	keys, ok := dto.ScopeKeyMap[req.Scope]
 	if !ok || len(keys) == 0 {
 		return nil
@@ -553,4 +561,51 @@ func (w WebsiteService) PreInstallCheck(req dto.WebsiteInstallCheckReq) ([]dto.W
 	} else {
 		return nil, nil
 	}
+}
+
+func (w WebsiteService) GetWafConfig(req request.WebsiteWafReq) (dto.WebsiteWafConfig, error) {
+	var res dto.WebsiteWafConfig
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return res, nil
+	}
+
+	params, err := getNginxParamsByKeys(constant.NginxScopeServer, []string{"set"}, &website)
+	if err != nil {
+		return res, nil
+	}
+	for _, param := range params {
+		if param.Params[0] == req.Key {
+			res.Enable = len(param.Params) > 1 && param.Params[1] == "on"
+			break
+		}
+	}
+	nginxFull, err := getNginxFull(&website)
+	if err != nil {
+		return res, nil
+	}
+
+	filePath := path.Join(nginxFull.SiteDir, "sites", website.Alias, "waf", "rules", req.Rule)
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return res, nil
+	}
+	res.FilePath = filePath
+	res.Content = string(content)
+
+	return res, nil
+}
+
+func (w WebsiteService) UpdateWafConfig(req request.WebsiteWafUpdate) error {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return nil
+	}
+	updateValue := "on"
+	if !req.Enable {
+		updateValue = "off"
+	}
+	return updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{
+		{Name: "set", Params: []string{req.Key, updateValue}},
+	}, &website)
 }

@@ -850,6 +850,12 @@ export default {
         default: '默认',
         deleteHelper: '相关应用状态不正常，请检查',
         toApp: '去已安装列表',
+        enableCC: '开启CC攻击防护',
+        cycle: '周期',
+        frequency: '频率',
+        ccHelper: '{0} 秒内累计请求同一URL超过 {1} 次,触发CC防御,封锁此IP',
+        seconds: '秒',
+        count: '次',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',

@@ -76,6 +76,5 @@ var StaticFileKeyMap = map[NginxKey]struct {
 type NginxParam struct {
 	UpdateScope string   `json:"scope"`
 	Name        string   `json:"name"`
-	SecondKey   string   `json:"secondKey"`
 	Params      []string `json:"params"`
 }

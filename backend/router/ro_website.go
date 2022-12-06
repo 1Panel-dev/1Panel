@@ -33,5 +33,7 @@ func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/config/update", baseApi.UpdateNginxConfig)
 		groupRouter.GET("/:id/https", baseApi.GetHTTPSConfig)
 		groupRouter.POST("/:id/https", baseApi.UpdateHTTPSConfig)
+		groupRouter.POST("/waf/config", baseApi.GetWebsiteWafConfig)
+		groupRouter.POST("/waf/update", baseApi.UpdateWebsiteWafConfig)
 	}
 }
