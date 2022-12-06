@@ -148,3 +148,11 @@ export const UpdateHTTPSConfig = (req: WebSite.HTTPSReq) => {
 export const PreCheck = (req: WebSite.CheckReq) => {
     return http.post<WebSite.CheckRes[]>(`/websites/check`, req);
 };
+
+export const GetWafConfig = (req: WebSite.WafReq) => {
+    return http.post<WebSite.WafRes>(`/websites/waf/config`, req);
+};
+
+export const UpdateWafEnable = (req: WebSite.WafUpdate) => {
+    return http.post<any>(`/websites/waf/update`, req);
+};

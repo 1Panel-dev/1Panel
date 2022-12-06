@@ -73,10 +73,10 @@ const search = (req: WebSite.NginxConfigReq) => {
     loading.value = true;
     GetNginxConfig(req)
         .then((res) => {
-            if (res.data && res.data.length > 0) {
-                const indexParam = res.data[0];
+            if (res.data && res.data.params.length > 0) {
+                const params = res.data.params[0].params;
                 let values = '';
-                for (const param of indexParam.params) {
+                for (const param of params) {
                     values = values + param + '\n';
                 }
                 defaultModel.value.index = values;

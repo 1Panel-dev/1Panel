@@ -212,4 +212,22 @@ export namespace WebSite {
         version: string;
         appName: string;
     }
+
+    export interface WafReq {
+        websiteId: number;
+        key: string;
+        rule: string;
+    }
+
+    export interface WafRes {
+        enable: boolean;
+        filePath: string;
+        content: string;
+    }
+
+    export interface WafUpdate {
+        enable: boolean;
+        websiteId: number;
+        key: string;
+    }
 }
