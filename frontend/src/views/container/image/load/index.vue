@@ -16,8 +16,8 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="onSubmit(formRef)">{{ $t('container.import') }}</el-button>
                 <el-button @click="loadVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button type="primary" @click="onSubmit(formRef)">{{ $t('container.import') }}</el-button>
             </span>
         </template>
     </el-dialog>

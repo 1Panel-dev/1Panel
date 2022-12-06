@@ -32,10 +32,10 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="onSubmit(formRef)">
+                <el-button @click="saveVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button type="primary" @click="onSubmit(formRef)">
                     {{ $t('container.export') }}
                 </el-button>
-                <el-button @click="saveVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
             </span>
         </template>
     </el-dialog>

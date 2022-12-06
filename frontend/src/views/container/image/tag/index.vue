@@ -27,8 +27,8 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="onSubmit(formRef)">{{ $t('commons.button.save') }}</el-button>
                 <el-button @click="tagVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button type="primary" @click="onSubmit(formRef)">{{ $t('commons.button.save') }}</el-button>
             </span>
         </template>
     </el-dialog>

@@ -93,7 +93,9 @@
                                         <el-button @click="onCancelMfaBind">
                                             {{ $t('commons.button.cancel') }}
                                         </el-button>
-                                        <el-button @click="onBind">{{ $t('commons.button.saveAndEnable') }}</el-button>
+                                        <el-button type="primary" @click="onBind">
+                                            {{ $t('commons.button.saveAndEnable') }}
+                                        </el-button>
                                     </div>
                                 </ul>
                             </el-card>
@@ -118,7 +120,7 @@
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="timeoutVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button @click="submitTimeout(timeoutFormRef)">
+                    <el-button type="primary" @click="submitTimeout(timeoutFormRef)">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>
