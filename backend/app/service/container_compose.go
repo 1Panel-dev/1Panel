@@ -114,12 +114,8 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 		if err != nil {
 			return err
 		}
-		req.From = template.From
-		if req.From == "edit" {
-			req.File = template.Content
-		} else {
-			req.Path = template.Path
-		}
+		req.From = "edit"
+		req.File = template.Content
 	}
 	if req.From == "edit" {
 		dir := fmt.Sprintf("%s/%s", constant.TmpComposeBuildDir, req.Name)
@@ -159,6 +155,7 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 	global.LOG.Debugf("docker-compose %s %s successful", req.Operation, req.Name)
 	if req.Operation == "down" {
 		_ = composeRepo.DeleteRecord(commonRepo.WithByName(req.Name))
+		_ = os.RemoveAll(strings.ReplaceAll(req.Path, req.Name+"/docker-compose.yml", ""))
 	}
 
 	return nil

@@ -2,34 +2,49 @@
     <div v-loading="loading">
         <Submenu activeName="compose" />
         <el-card style="margin-top: 20px">
-            <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
-                <template #toolbar>
-                    <el-button icon="Plus" type="primary" @click="onOpenDialog()">
-                        {{ $t('commons.button.create') }}
-                    </el-button>
-                </template>
-                <el-table-column
-                    :label="$t('commons.table.name')"
-                    show-overflow-tooltip
-                    min-width="100"
-                    prop="name"
-                    fix
+            <div v-if="!isOnDetail">
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    v-model:selects="selects"
+                    :data="data"
+                    @search="search"
                 >
-                    <template #default="{ row }">
-                        <el-link @click="goContainer(row.name)" type="primary">{{ row.name }}</el-link>
+                    <template #toolbar>
+                        <el-button icon="Plus" type="primary" @click="onOpenDialog()">
+                            {{ $t('commons.button.create') }}
+                        </el-button>
                     </template>
-                </el-table-column>
-                <el-table-column :label="$t('container.from')" prop="createdBy" min-width="80" fix />
-                <el-table-column :label="$t('container.containerNumber')" prop="containerNumber" min-width="80" fix />
-                <el-table-column :label="$t('commons.table.createdAt')" prop="createdAt" min-width="80" fix />
-                <fu-table-operations
-                    width="200px"
-                    :ellipsis="10"
-                    :buttons="buttons"
-                    :label="$t('commons.table.operate')"
-                    fix
-                />
-            </ComplexTable>
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        show-overflow-tooltip
+                        min-width="100"
+                        prop="name"
+                        fix
+                    >
+                        <template #default="{ row }">
+                            <el-link @click="loadDetail(row)" type="primary">{{ row.name }}</el-link>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('container.from')" prop="createdBy" min-width="80" fix />
+                    <el-table-column
+                        :label="$t('container.containerNumber')"
+                        prop="containerNumber"
+                        min-width="80"
+                        fix
+                    />
+                    <el-table-column :label="$t('commons.table.createdAt')" prop="createdAt" min-width="80" fix />
+                    <fu-table-operations
+                        width="200px"
+                        :ellipsis="10"
+                        :buttons="buttons"
+                        :label="$t('commons.table.operate')"
+                        fix
+                    />
+                </ComplexTable>
+            </div>
+            <div v-show="isOnDetail">
+                <ComposeDetial @back="backList" ref="composeDetailRef" />
+            </div>
         </el-card>
 
         <EditDialog ref="dialogEditRef" />
@@ -40,13 +55,13 @@
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import { reactive, onMounted, ref } from 'vue';
-import CreateDialog from '@/views/container/compose/create/index.vue';
 import EditDialog from '@/views/container/compose/edit/index.vue';
+import CreateDialog from '@/views/container/compose/create/index.vue';
+import ComposeDetial from '@/views/container/compose/detail/index.vue';
 import Submenu from '@/views/container/index.vue';
 import { composeOperator, searchCompose } from '@/api/modules/container';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
-import router from '@/routers';
 import { Container } from '@/api/interface/container';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { LoadFile } from '@/api/modules/files';
@@ -54,6 +69,8 @@ import { LoadFile } from '@/api/modules/files';
 const data = ref();
 const selects = ref<any>([]);
 const loading = ref(false);
+
+const isOnDetail = ref(false);
 
 const paginationConfig = reactive({
     page: 1,
@@ -78,8 +95,20 @@ const search = async () => {
         });
 };
 
-const goContainer = async (name: string) => {
-    router.push({ name: 'ComposeDetail', params: { filters: 'com.docker.compose.project=' + name } });
+const composeDetailRef = ref();
+const loadDetail = async (row: Container.ComposeInfo) => {
+    let params = {
+        createdBy: row.createdBy,
+        name: row.name,
+        path: row.path,
+        filters: 'com.docker.compose.project=' + row.name,
+    };
+    isOnDetail.value = true;
+    composeDetailRef.value!.acceptParams(params);
+};
+const backList = async () => {
+    isOnDetail.value = false;
+    search();
 };
 
 const dialogRef = ref();
@@ -114,11 +143,17 @@ const buttons = [
         click: (row: Container.ComposeInfo) => {
             onEdit(row);
         },
+        disabled: (row: any) => {
+            return row.createdBy !== 'local';
+        },
     },
     {
         label: i18n.global.t('commons.button.delete'),
         click: (row: Container.ComposeInfo) => {
             onDelete(row);
+        },
+        disabled: (row: any) => {
+            return row.createdBy === 'apps';
         },
     },
 ];

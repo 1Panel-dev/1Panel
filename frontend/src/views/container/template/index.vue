@@ -77,7 +77,6 @@ import OperatorDialog from '@/views/container/template/operator/index.vue';
 import { deleteComposeTemplate, searchComposeTemplate } from '@/api/modules/container';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import i18n from '@/lang';
-import { LoadFile } from '@/api/modules/files';
 
 const data = ref();
 const selects = ref<any>([]);
@@ -104,14 +103,8 @@ const search = async () => {
 };
 
 const onOpenDetail = async (row: Container.TemplateInfo) => {
-    if (row.from === 'edit') {
-        detailInfo.value = row.content;
-        detailVisiable.value = true;
-    } else {
-        const res = await LoadFile({ path: row.path });
-        detailInfo.value = res.data;
-        detailVisiable.value = true;
-    }
+    detailInfo.value = row.content;
+    detailVisiable.value = true;
 };
 
 const dialogRef = ref();
@@ -119,10 +112,8 @@ const onOpenDialog = async (
     title: string,
     rowData: Partial<Container.TemplateInfo> = {
         name: '',
-        from: 'edit',
         description: '',
         path: '',
-        content: '',
     },
 ) => {
     let params = {

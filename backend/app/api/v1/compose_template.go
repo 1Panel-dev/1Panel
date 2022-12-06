@@ -89,8 +89,6 @@ func (b *BaseApi) UpdateComposeTemplate(c *gin.Context) {
 	}
 
 	upMap := make(map[string]interface{})
-	upMap["from"] = req.From
-	upMap["path"] = req.Path
 	upMap["content"] = req.Content
 	upMap["description"] = req.Description
 	if err := composeTemplateService.Update(id, upMap); err != nil {
