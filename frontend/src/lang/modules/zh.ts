@@ -856,6 +856,7 @@ export default {
         ccHelper: '{0} 秒内累计请求同一URL超过 {1} 次,触发CC防御,封锁此IP',
         seconds: '秒',
         count: '次',
+        mustSave: '修改之后需要保存才能生效,不合法的IP不会保存',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',

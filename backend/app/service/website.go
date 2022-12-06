@@ -570,16 +570,20 @@ func (w WebsiteService) GetWafConfig(req request.WebsiteWafReq) (dto.WebsiteWafC
 		return res, nil
 	}
 
-	params, err := getNginxParamsByKeys(constant.NginxScopeServer, []string{"set"}, &website)
-	if err != nil {
-		return res, nil
-	}
-	for _, param := range params {
-		if param.Params[0] == req.Key {
-			res.Enable = len(param.Params) > 1 && param.Params[1] == "on"
-			break
+	res.Enable = true
+	if req.Key != "" {
+		params, err := getNginxParamsByKeys(constant.NginxScopeServer, []string{"set"}, &website)
+		if err != nil {
+			return res, nil
+		}
+		for _, param := range params {
+			if param.Params[0] == req.Key {
+				res.Enable = len(param.Params) > 1 && param.Params[1] == "on"
+				break
+			}
 		}
 	}
+
 	nginxFull, err := getNginxFull(&website)
 	if err != nil {
 		return res, nil
