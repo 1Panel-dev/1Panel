@@ -459,6 +459,8 @@ export default {
         registries: 'Insecure registries',
         liveHelper: 'Whether to close all containers when stopping the docker service',
         daemonJsonPath: 'Conf Path',
+        serviceUnavailable: 'Docker service is not started at present, please click',
+        startIn: ' to start',
     },
     cronjob: {
         cronTask: 'Task',

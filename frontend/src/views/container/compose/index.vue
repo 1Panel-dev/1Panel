@@ -1,7 +1,14 @@
 <template>
     <div v-loading="loading">
         <Submenu activeName="compose" />
-        <el-card style="margin-top: 20px">
+        <el-card width="30%" v-if="dockerStatus != 'Running'" class="mask-prompt">
+            <span style="font-size: 14px">{{ $t('container.serviceUnavailable') }}</span>
+            <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="goSetting">
+                【 {{ $t('container.setting') }} 】
+            </el-button>
+            <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
+        </el-card>
+        <el-card style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
             <div v-if="!isOnDetail">
                 <ComplexTable
                     :pagination-config="paginationConfig"
@@ -59,12 +66,13 @@ import EditDialog from '@/views/container/compose/edit/index.vue';
 import CreateDialog from '@/views/container/compose/create/index.vue';
 import ComposeDetial from '@/views/container/compose/detail/index.vue';
 import Submenu from '@/views/container/index.vue';
-import { composeOperator, searchCompose } from '@/api/modules/container';
+import { composeOperator, loadDockerStatus, searchCompose } from '@/api/modules/container';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
 import { Container } from '@/api/interface/container';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { LoadFile } from '@/api/modules/files';
+import router from '@/routers';
 
 const data = ref();
 const selects = ref<any>([]);
@@ -77,6 +85,18 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
+
+const dockerStatus = ref();
+const loadStatus = async () => {
+    const res = await loadDockerStatus();
+    dockerStatus.value = res.data;
+    if (dockerStatus.value === 'Running') {
+        search();
+    }
+};
+const goSetting = async () => {
+    router.push({ name: 'ContainerSetting' });
+};
 
 const search = async () => {
     let params = {
@@ -158,6 +178,6 @@ const buttons = [
     },
 ];
 onMounted(() => {
-    search();
+    loadStatus();
 });
 </script>

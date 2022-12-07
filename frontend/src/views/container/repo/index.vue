@@ -1,7 +1,14 @@
 <template>
     <div>
         <Submenu activeName="repo" />
-        <el-card style="margin-top: 20px">
+        <el-card width="30%" v-if="dockerStatus != 'Running'" class="mask-prompt">
+            <span style="font-size: 14px">{{ $t('container.serviceUnavailable') }}</span>
+            <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="goSetting">
+                【 {{ $t('container.setting') }} 】
+            </el-button>
+            <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
+        </el-card>
+        <el-card style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
                 <template #toolbar>
                     <el-button icon="Plus" type="primary" @click="onOpenDialog('create')">
@@ -40,9 +47,10 @@ import Submenu from '@/views/container/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFromat } from '@/utils/util';
 import { Container } from '@/api/interface/container';
-import { deleteImageRepo, searchImageRepo } from '@/api/modules/container';
+import { deleteImageRepo, loadDockerStatus, searchImageRepo } from '@/api/modules/container';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import i18n from '@/lang';
+import router from '@/routers';
 
 const data = ref();
 const selects = ref<any>([]);
@@ -51,6 +59,18 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
+
+const dockerStatus = ref();
+const loadStatus = async () => {
+    const res = await loadDockerStatus();
+    dockerStatus.value = res.data;
+    if (dockerStatus.value === 'Running') {
+        search();
+    }
+};
+const goSetting = async () => {
+    router.push({ name: 'ContainerSetting' });
+};
 
 const search = async () => {
     let params = {
@@ -117,6 +137,6 @@ const buttons = [
 ];
 
 onMounted(() => {
-    search();
+    loadStatus();
 });
 </script>

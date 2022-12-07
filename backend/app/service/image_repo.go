@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"io/ioutil"
+	"os"
 	"os/exec"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -56,8 +57,24 @@ func (u *ImageRepoService) Create(imageRepoDto dto.ImageRepoCreate) error {
 	if imageRepo.ID != 0 {
 		return constant.ErrRecordExist
 	}
+
+	fileSetting, err := settingRepo.Get(settingRepo.WithByKey("DaemonJsonPath"))
+	if err != nil {
+		return err
+	}
+	if len(fileSetting.Value) == 0 {
+		return errors.New("error daemon.json path in request")
+	}
+	if _, err := os.Stat(fileSetting.Value); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(fileSetting.Value, os.ModePerm); err != nil {
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	if imageRepoDto.Protocol == "http" {
-		file, err := ioutil.ReadFile(constant.DaemonJsonDir)
+		file, err := ioutil.ReadFile(fileSetting.Value)
 		if err != nil {
 			return err
 		}
@@ -76,7 +93,7 @@ func (u *ImageRepoService) Create(imageRepoDto dto.ImageRepoCreate) error {
 		if err != nil {
 			return err
 		}
-		if err := ioutil.WriteFile(constant.DaemonJsonDir, newJson, 0640); err != nil {
+		if err := ioutil.WriteFile(fileSetting.Value, newJson, 0640); err != nil {
 			return err
 		}
 	}
