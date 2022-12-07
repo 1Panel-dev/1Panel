@@ -117,6 +117,8 @@ const initTerm = (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
+        let href = window.location.href;
+        let ipLocal = href.split('//')[1].split(':')[0];
         terminalOpen.value = true;
         let ifm = document.getElementById('terminal-exec') as HTMLInputElement | null;
         term = new Terminal({
@@ -134,7 +136,7 @@ const initTerm = (formEl: FormInstance | undefined) => {
         if (ifm) {
             term.open(ifm);
             terminalSocket = new WebSocket(
-                `ws://localhost:9999/api/v1/containers/exec?containerid=${form.containerID}&cols=${term.cols}&rows=${term.rows}&user=${form.user}&command=${form.command}`,
+                `ws://${ipLocal}:9999/api/v1/containers/exec?containerid=${form.containerID}&cols=${term.cols}&rows=${term.rows}&user=${form.user}&command=${form.command}`,
             );
             terminalSocket.onopen = runRealTerminal;
             terminalSocket.onmessage = onWSReceive;

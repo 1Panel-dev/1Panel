@@ -67,7 +67,9 @@ const goDashboard = async () => {
         commandVisiable.value = true;
         return;
     }
-    window.open('http://localhost:' + redisCommandPort.value, '_blank');
+    let href = window.location.href;
+    let ipLocal = href.split('//')[1].split(':')[0];
+    window.open(`http://${ipLocal}:${redisCommandPort.value}`, '_blank');
 };
 
 const loadDashboardPort = async () => {

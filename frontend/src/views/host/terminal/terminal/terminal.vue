@@ -59,6 +59,8 @@ const closeRealTerminal = (ev: CloseEvent) => {
 
 const initTerm = () => {
     let ifm = document.getElementById('terminal' + props.terminalID) as HTMLInputElement | null;
+    let href = window.location.href;
+    let ipLocal = href.split('//')[1].split(':')[0];
     term = new Terminal({
         lineHeight: 1.2,
         fontSize: 12,
@@ -75,11 +77,11 @@ const initTerm = () => {
         term.open(ifm);
         if (props.wsID === 0) {
             terminalSocket = new WebSocket(
-                `ws://localhost:9999/api/v1/terminals/local?cols=${term.cols}&rows=${term.rows}`,
+                `ws://${ipLocal}:9999/api/v1/terminals/local?cols=${term.cols}&rows=${term.rows}`,
             );
         } else {
             terminalSocket = new WebSocket(
-                `ws://localhost:9999/api/v1/terminals?id=${props.wsID}&cols=${term.cols}&rows=${term.rows}`,
+                `ws://${ipLocal}:9999/api/v1/terminals?id=${props.wsID}&cols=${term.cols}&rows=${term.rows}`,
             );
         }
         terminalSocket.onopen = runRealTerminal;

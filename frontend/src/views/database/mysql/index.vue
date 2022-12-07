@@ -245,7 +245,9 @@ const goDashboard = async () => {
         phpVisiable.value = true;
         return;
     }
-    window.open('http://localhost:' + phpadminPort.value, '_blank');
+    let href = window.location.href;
+    let ipLocal = href.split('//')[1].split(':')[0];
+    window.open(`http://${ipLocal}:${phpadminPort.value}`, '_blank');
 };
 
 const loadDashboardPort = async () => {
