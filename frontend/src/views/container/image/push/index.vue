@@ -1,5 +1,11 @@
 <template>
-    <el-dialog v-model="pushVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
+    <el-dialog
+        v-model="pushVisiable"
+        @close="onCloseLog"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        width="50%"
+    >
         <template #header>
             <div class="card-header">
                 <span>{{ $t('container.imagePush') }}</span>
@@ -22,10 +28,28 @@
                 </el-input>
             </el-form-item>
         </el-form>
+
+        <codemirror
+            v-if="logVisiable"
+            :autofocus="true"
+            placeholder="Wait for pull output..."
+            :indent-with-tab="true"
+            :tabSize="4"
+            style="max-height: 300px"
+            :lineWrapping="true"
+            :matchBrackets="true"
+            theme="cobalt"
+            :styleActiveLine="true"
+            :extensions="extensions"
+            v-model="logInfo"
+            :readOnly="true"
+        />
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="pushVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="onSubmit(formRef)">
+                <el-button :disabled="buttonDisabled" @click="pushVisiable = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabled="buttonDisabled" type="primary" @click="onSubmit(formRef)">
                     {{ $t('container.push') }}
                 </el-button>
             </span>
@@ -40,6 +64,10 @@ import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { imagePush } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
+import { Codemirror } from 'vue-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { oneDark } from '@codemirror/theme-one-dark';
+import { LoadFile } from '@/api/modules/files';
 
 const pushVisiable = ref(false);
 const form = reactive({
@@ -48,6 +76,13 @@ const form = reactive({
     repoID: 1,
     name: '',
 });
+
+const buttonDisabled = ref(false);
+
+const logVisiable = ref(false);
+const logInfo = ref();
+const extensions = [javascript(), oneDark];
+let timer: NodeJS.Timer | null = null;
 
 interface DialogProps {
     repos: Array<Container.RepoOptions>;
@@ -76,15 +111,26 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        try {
-            pushVisiable.value = false;
-            await imagePush(form);
-            emit('search');
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        } catch {
-            emit('search');
-        }
+        const res = await imagePush(form);
+        logVisiable.value = true;
+        buttonDisabled.value = true;
+        loadLogs(res.data);
+        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
     });
+};
+
+const loadLogs = async (path: string) => {
+    timer = setInterval(async () => {
+        if (logVisiable.value) {
+            const res = await LoadFile({ path: path });
+            logInfo.value = res.data;
+        }
+    }, 1000 * 3);
+};
+const onCloseLog = async () => {
+    emit('search');
+    clearInterval(Number(timer));
+    timer = null;
 };
 
 function loadDetailInfo(id: number) {
