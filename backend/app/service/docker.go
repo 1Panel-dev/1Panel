@@ -2,6 +2,7 @@ package service
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"os"
@@ -39,7 +40,12 @@ type daemonJsonItem struct {
 
 func (u *DockerService) LoadDockerStatus() string {
 	status := constant.StatusRunning
-	if _, err := docker.NewDockerClient(); err != nil {
+	cli, err := docker.NewDockerClient()
+	if err != nil {
+		status = constant.Stopped
+	}
+	pong, err := cli.Ping(context.Background())
+	if !pong.Experimental || err != nil {
 		status = constant.Stopped
 	}
 	return status

@@ -466,6 +466,8 @@ export default {
         registries: '私有仓库',
         liveHelper: '停止 docker 服务时，是否关闭所有容器',
         daemonJsonPath: '配置路径',
+        serviceUnavailable: '当前未启动 Docker 服务，请在',
+        startIn: '中开启',
     },
     cronjob: {
         cronTask: '计划任务',

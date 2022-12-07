@@ -1,7 +1,14 @@
 <template>
     <div>
         <Submenu activeName="network" />
-        <el-card style="margin-top: 20px">
+        <el-card width="30%" v-if="dockerStatus != 'Running'" class="mask-prompt">
+            <span style="font-size: 14px">{{ $t('container.serviceUnavailable') }}</span>
+            <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="goSetting">
+                【 {{ $t('container.setting') }} 】
+            </el-button>
+            <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
+        </el-card>
+        <el-card style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
                 <template #toolbar>
                     <el-button icon="Plus" type="primary" @click="onCreate()">
@@ -57,10 +64,11 @@ import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
 import Submenu from '@/views/container/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFromat } from '@/utils/util';
-import { deleteNetwork, searchNetwork, inspect } from '@/api/modules/container';
+import { deleteNetwork, searchNetwork, inspect, loadDockerStatus } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';
+import router from '@/routers';
 
 const detailInfo = ref();
 const codemirror = ref();
@@ -72,6 +80,18 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
+
+const dockerStatus = ref();
+const loadStatus = async () => {
+    const res = await loadDockerStatus();
+    dockerStatus.value = res.data;
+    if (dockerStatus.value === 'Running') {
+        search();
+    }
+};
+const goSetting = async () => {
+    router.push({ name: 'ContainerSetting' });
+};
 
 const dialogCreateRef = ref<DialogExpose>();
 
@@ -140,6 +160,6 @@ const buttons = [
 ];
 
 onMounted(() => {
-    search();
+    loadStatus();
 });
 </script>

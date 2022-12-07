@@ -1,7 +1,14 @@
 <template>
     <div v-loading="loading">
         <Submenu activeName="image" />
-        <el-card style="margin-top: 20px">
+        <el-card width="30%" v-if="dockerStatus != 'Running'" class="mask-prompt">
+            <span style="font-size: 14px">{{ $t('container.serviceUnavailable') }}</span>
+            <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="goSetting">
+                【 {{ $t('container.setting') }} 】
+            </el-button>
+            <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
+        </el-card>
+        <el-card style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
                 <template #toolbar>
                     <el-button @click="onOpenPull">
@@ -89,10 +96,11 @@ import Push from '@/views/container/image/push/index.vue';
 import Save from '@/views/container/image/save/index.vue';
 import Load from '@/views/container/image/load/index.vue';
 import Build from '@/views/container/image/build/index.vue';
-import { searchImage, listImageRepo, imageRemove } from '@/api/modules/container';
+import { searchImage, listImageRepo, imageRemove, loadDockerStatus } from '@/api/modules/container';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { useDeleteData } from '@/hooks/use-delete-data';
+import router from '@/routers';
 
 const loading = ref(false);
 
@@ -104,6 +112,19 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
+
+const dockerStatus = ref();
+const loadStatus = async () => {
+    const res = await loadDockerStatus();
+    dockerStatus.value = res.data;
+    if (dockerStatus.value === 'Running') {
+        search();
+        loadRepos();
+    }
+};
+const goSetting = async () => {
+    router.push({ name: 'ContainerSetting' });
+};
 
 const dialogPullRef = ref();
 const dialogTagRef = ref();
@@ -206,7 +227,6 @@ const buttons = [
 ];
 
 onMounted(() => {
-    search();
-    loadRepos();
+    loadStatus();
 });
 </script>
