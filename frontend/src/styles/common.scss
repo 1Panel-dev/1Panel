@@ -116,13 +116,13 @@
 }
 
 .input-help {
-  font-size: 12px;
-  word-break: break-all;
-  color: #4A4B4D;
-  transform: scale(0.9);
-  transform-origin: left;
-  width: 110%;
-  display: inline-block;
+    font-size: 12px;
+    word-break: break-all;
+    color: #4a4b4d;
+    transform: scale(0.9);
+    transform-origin: left;
+    width: 110%;
+    display: inline-block;
 }
 
 .input-error {
@@ -133,7 +133,7 @@
     transform-origin: left;
     width: 110%;
     display: inline-block;
-  }
+}
 
 .myTable {
     border-collapse: collapse;
@@ -150,7 +150,7 @@
 }
 
 .myTable td div {
-    margin-top: 2px
+    margin-top: 2px;
 }
 
 .myTable th {
@@ -168,4 +168,21 @@
 
 .myTable tr td:nth-child(even) {
     color: #85888e;
+}
+
+.mask {
+    width: 100%;
+    height: 100%;
+    opacity: 0.4;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.mask-prompt {
+    position: absolute;
+    z-index: 9999;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }

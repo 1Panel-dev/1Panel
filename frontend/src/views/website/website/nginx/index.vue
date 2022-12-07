@@ -1,17 +1,17 @@
 <template>
-    <LayoutContent :header="$t('website.nginxConfig')" :reload="true">
+    <LayoutContent :header="$t('nginx.nginxConfig')" :reload="true">
         <el-collapse v-model="activeName" accordion>
-            <el-collapse-item :title="$t('website.source')" name="1">
-                <Source></Source>
+            <el-collapse-item :title="$t('nginx.configResource')" name="1">
+                <Source v-if="activeName === '1'"></Source>
             </el-collapse-item>
-            <el-collapse-item :title="$t('website.log')" name="2">
-                <ContainerLog ref="dialogContainerLogRef" />
+            <el-collapse-item :title="$t('nginx.status')" name="2">
+                <Status v-if="activeName === '2'" :status="status" />
             </el-collapse-item>
             <el-collapse-item :title="$t('website.nginxPer')" name="3">
-                <NginxPer />
+                <NginxPer v-if="activeName === '3'" />
             </el-collapse-item>
-            <el-collapse-item :title="$t('nginx.status')" name="4">
-                <Status />
+            <el-collapse-item :title="$t('website.log')" name="4">
+                <ContainerLog ref="dialogContainerLogRef" />
             </el-collapse-item>
         </el-collapse>
     </LayoutContent>
@@ -33,12 +33,16 @@ const props = defineProps({
         type: String,
         default: '',
     },
+    status: {
+        type: String,
+        default: 'Running',
+    },
 });
 
 watch(
     activeName,
     (newvalue) => {
-        if (newvalue === '2') {
+        if (newvalue === '4') {
             dialogContainerLogRef.value!.acceptParams({
                 containerID: props.containerName,
                 container: props.containerName,
