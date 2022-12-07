@@ -21,6 +21,15 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 	helper.SuccessWithData(c, setting)
 }
 
+func (b *BaseApi) GetDaemonjson(c *gin.Context) {
+	value, err := settingService.GetDaemonjson()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, value)
+}
+
 func (b *BaseApi) UpdateSetting(c *gin.Context) {
 	var req dto.SettingUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {

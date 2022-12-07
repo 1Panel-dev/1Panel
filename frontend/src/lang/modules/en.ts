@@ -449,6 +449,16 @@ export default {
         composeDetailHelper:
             'The compose is created external to 1Panel. The start and stop operations are not supported.',
         composeOperatorHelper: '{1} operation will be performed on {0}. Do you want to continue?',
+
+        setting: 'Setting',
+        dockerStatus: 'Docker Service',
+        daemonJsonPathHelper: 'Ensure that the configuration path is the same as that specified in docker.service.',
+        mirrors: 'Registry mirrors',
+        mirrorsHelper:
+            'If empty, mirror acceleration is disabled. The accelerated URL is used first for the operation, and will skipped when the request times out',
+        registries: 'Insecure registries',
+        liveHelper: 'Whether to close all containers when stopping the docker service',
+        daemonJsonPath: 'Conf Path',
     },
     cronjob: {
         cronTask: 'Task',

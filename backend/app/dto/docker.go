@@ -13,3 +13,7 @@ type DaemonJsonConf struct {
 	LiveRestore  bool     `json:"liveRestore"`
 	CgroupDriver string   `json:"cgroupDriver"`
 }
+
+type DockerOperation struct {
+	Operation string `json:"operation" validate:"required,oneof=start restart stop"`
+}

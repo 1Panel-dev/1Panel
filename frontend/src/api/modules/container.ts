@@ -124,6 +124,9 @@ export const composeUpdate = (params: Container.ComposeUpdate) => {
 };
 
 // docker
+export const dockerOperate = (params: Container.DockerOperate) => {
+    return http.post(`/containers/docker/operate`, params);
+};
 export const loadDaemonJson = () => {
     return http.get<Container.DaemonJsonConf>(`/containers/daemonjson`);
 };
