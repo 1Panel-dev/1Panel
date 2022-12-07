@@ -234,7 +234,9 @@ export namespace Container {
         path: string;
         file: string;
     }
-
+    export interface DockerOperate {
+        operation: string;
+    }
     export interface DaemonJsonConf {
         status: string;
         bip: string;

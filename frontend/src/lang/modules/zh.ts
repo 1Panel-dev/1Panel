@@ -458,11 +458,14 @@ export default {
         composeDetailHelper: '该 compose 为 1Panel 编排外部创建。暂不支持启停操作。',
         composeOperatorHelper: '将对 {0} 进行 {1} 操作，是否继续？',
 
-        setting: '容器配置',
+        setting: '配置',
+        dockerStatus: 'Docker 服务',
+        daemonJsonPathHelper: '请保证配置路径与 docker.service 中指定的配置路径保持一致。',
         mirrors: '镜像加速',
         mirrorsHelper: '为空则关闭镜像加速；优先使用加速 URL 执行操作，请求超时将跳过使用默认加速方式',
         registries: '私有仓库',
         liveHelper: '停止 docker 服务时，是否关闭所有容器',
+        daemonJsonPath: '配置路径',
     },
     cronjob: {
         cronTask: '计划任务',

@@ -29,6 +29,10 @@ export const getMFA = () => {
     return http.get<Setting.MFAInfo>(`/settings/mfa`, {});
 };
 
+export const loadDaemonJsonPath = () => {
+    return http.get<string>(`/settings/daemonjson`, {});
+};
+
 export const bindMFA = (param: Setting.MFABind) => {
     return http.post(`/settings/mfa/bind`, param);
 };

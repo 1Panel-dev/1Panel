@@ -10,6 +10,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/pkg/errors"
 )
 
@@ -18,7 +19,9 @@ type DockerService struct{}
 type IDockerService interface {
 	UpdateConf(req dto.DaemonJsonConf) error
 	UpdateConfByFile(info dto.DaemonJsonUpdateByFile) error
-	LoadDockerConf() (*dto.DaemonJsonConf, error)
+	LoadDockerStatus() string
+	LoadDockerConf() *dto.DaemonJsonConf
+	OperateDocker(req dto.DockerOperation) error
 }
 
 func NewIDockerService() IDockerService {
@@ -34,22 +37,44 @@ type daemonJsonItem struct {
 	ExecOpts    []string `json:"exec-opts"`
 }
 
-func (u *DockerService) LoadDockerConf() (*dto.DaemonJsonConf, error) {
-	file, err := ioutil.ReadFile(constant.DaemonJsonDir)
+func (u *DockerService) LoadDockerStatus() string {
+	status := constant.StatusRunning
+	if _, err := docker.NewDockerClient(); err != nil {
+		status = constant.Stopped
+	}
+	return status
+}
+
+func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
+	status := constant.StatusRunning
+	if _, err := docker.NewDockerClient(); err != nil {
+		status = constant.Stopped
+	}
+	fileSetting, err := settingRepo.Get(settingRepo.WithByKey("DaemonJsonPath"))
 	if err != nil {
-		return nil, err
+		return &dto.DaemonJsonConf{Status: status}
+	}
+	if len(fileSetting.Value) == 0 {
+		return &dto.DaemonJsonConf{Status: status}
+	}
+	if _, err := os.Stat(fileSetting.Value); err != nil {
+		return &dto.DaemonJsonConf{Status: status}
+	}
+	file, err := ioutil.ReadFile(fileSetting.Value)
+	if err != nil {
+		return &dto.DaemonJsonConf{Status: status}
 	}
 	var conf daemonJsonItem
 	deamonMap := make(map[string]interface{})
 	if err := json.Unmarshal(file, &deamonMap); err != nil {
-		return nil, err
+		return &dto.DaemonJsonConf{Status: status}
 	}
 	arr, err := json.Marshal(deamonMap)
 	if err != nil {
-		return nil, err
+		return &dto.DaemonJsonConf{Status: status}
 	}
 	if err := json.Unmarshal(arr, &conf); err != nil {
-		return nil, err
+		return &dto.DaemonJsonConf{Status: status}
 	}
 	driver := "cgroupfs"
 	for _, opt := range conf.ExecOpts {
@@ -59,7 +84,7 @@ func (u *DockerService) LoadDockerConf() (*dto.DaemonJsonConf, error) {
 		}
 	}
 	data := dto.DaemonJsonConf{
-		Status:       conf.Status,
+		Status:       status,
 		Mirrors:      conf.Mirrors,
 		Registries:   conf.Registries,
 		Bip:          conf.Bip,
@@ -67,18 +92,32 @@ func (u *DockerService) LoadDockerConf() (*dto.DaemonJsonConf, error) {
 		CgroupDriver: driver,
 	}
 
-	return &data, nil
+	return &data
 }
 
 func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
-	file, err := ioutil.ReadFile(constant.DaemonJsonDir)
+	fileSetting, err := settingRepo.Get(settingRepo.WithByKey("DaemonJsonPath"))
+	if err != nil {
+		return err
+	}
+	if len(fileSetting.Value) == 0 {
+		return errors.New("error daemon.json path in request")
+	}
+	if _, err := os.Stat(fileSetting.Value); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(fileSetting.Value, os.ModePerm); err != nil {
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	file, err := ioutil.ReadFile(fileSetting.Value)
 	if err != nil {
 		return err
 	}
 	deamonMap := make(map[string]interface{})
-	if err := json.Unmarshal(file, &deamonMap); err != nil {
-		return err
-	}
+	_ = json.Unmarshal(file, &deamonMap)
+
 	if len(req.Registries) == 0 {
 		delete(deamonMap, "insecure-registries")
 	} else {
@@ -119,7 +158,7 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 	if err != nil {
 		return err
 	}
-	if err := ioutil.WriteFile(constant.DaemonJsonDir, newJson, 0640); err != nil {
+	if err := ioutil.WriteFile(fileSetting.Value, newJson, 0640); err != nil {
 		return err
 	}
 
@@ -142,6 +181,15 @@ func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
 	write.Flush()
 
 	cmd := exec.Command("systemctl", "restart", "docker")
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return errors.New(string(stdout))
+	}
+	return nil
+}
+
+func (u *DockerService) OperateDocker(req dto.DockerOperation) error {
+	cmd := exec.Command("systemctl", req.Operation, "docker")
 	stdout, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.New(string(stdout))
