@@ -5,7 +5,7 @@
                 <span>Tag {{ $t('container.image') }}</span>
             </div>
         </template>
-        <el-form ref="formRef" :model="form" label-width="80px">
+        <el-form v-loading="loading" ref="formRef" :model="form" label-width="80px">
             <el-form-item :label="$t('container.from')">
                 <el-checkbox v-model="form.fromRepo">{{ $t('container.imageRepo') }}</el-checkbox>
             </el-form-item>
@@ -27,8 +27,12 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="tagVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="onSubmit(formRef)">{{ $t('commons.button.save') }}</el-button>
+                <el-button :disabeld="loading" @click="tagVisiable = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabeld="loading" type="primary" @click="onSubmit(formRef)">
+                    {{ $t('commons.button.save') }}
+                </el-button>
             </span>
         </template>
     </el-dialog>
@@ -41,6 +45,8 @@ import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { imageTag } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
+
+const loading = ref(false);
 
 const tagVisiable = ref(false);
 const form = reactive({
@@ -77,17 +83,20 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        try {
-            if (!form.fromRepo) {
-                form.repoID = 0;
-            }
-            tagVisiable.value = false;
-            await imageTag(form);
-            emit('search');
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        } catch {
-            emit('search');
+        if (!form.fromRepo) {
+            form.repoID = 0;
         }
+        loading.value = true;
+        await imageTag(form)
+            .then(() => {
+                loading.value = false;
+                tagVisiable.value = false;
+                emit('search');
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     });
 };
 

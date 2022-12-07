@@ -11,15 +11,17 @@
                 <span>{{ $t('container.rename') }}</span>
             </div>
         </template>
-        <el-form ref="newNameRef" :model="renameForm">
+        <el-form ref="newNameRef" v-loading="loading" :model="renameForm">
             <el-form-item :label="$t('container.newName')" :rules="Rules.requiredInput" prop="newName">
                 <el-input v-model="renameForm.newName"></el-input>
             </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="newNameVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="onSubmitName(newNameRef)">
+                <el-button :disabled="loading" @click="newNameVisiable = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabled="loading" type="primary" @click="onSubmitName(newNameRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -33,6 +35,8 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { reactive, ref } from 'vue';
+
+const loading = ref(false);
 
 const renameForm = reactive({
     containerID: '',
@@ -51,10 +55,17 @@ const onSubmitName = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        await ContainerOperator(renameForm);
-        emit('search');
-        newNameVisiable.value = false;
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        loading.value = true;
+        await ContainerOperator(renameForm)
+            .then(() => {
+                loading.value = false;
+                emit('search');
+                newNameVisiable.value = false;
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     });
 };
 

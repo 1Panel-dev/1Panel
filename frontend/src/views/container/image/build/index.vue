@@ -55,13 +55,14 @@
             :extensions="extensions"
             v-model="logInfo"
             :readOnly="true"
-            ref="buildLogRef"
         />
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="buildVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="onSubmit(formRef)">
+                <el-button :disabled="buttonDisabled" @click="buildVisiable = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabled="buttonDisabled" type="primary" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -83,9 +84,10 @@ import { LoadFile } from '@/api/modules/files';
 
 const logVisiable = ref<boolean>(false);
 const logInfo = ref();
-const buildLogRef = ref();
 const extensions = [javascript(), oneDark];
 let timer: NodeJS.Timer | null = null;
+
+const buttonDisabled = ref(false);
 
 const buildVisiable = ref(false);
 const form = reactive({
@@ -113,6 +115,7 @@ const acceptParams = async () => {
     form.tagStr = '';
     form.name = '';
     logInfo.value = '';
+    buttonDisabled.value = false;
 };
 
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -128,6 +131,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             form.tags = form.tagStr.split('\n');
         }
         const res = await imageBuild(form);
+        buttonDisabled.value = true;
         logVisiable.value = true;
         loadLogs(res.data);
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));

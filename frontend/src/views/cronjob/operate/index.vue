@@ -343,11 +343,7 @@ function changeName(isChangeType: boolean, type: string) {
     }
     dialogData.value.rowData!.name = `${type}-test`;
 }
-function restForm() {
-    if (formRef.value) {
-        formRef.value.resetFields();
-    }
-}
+
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
@@ -361,7 +357,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         }
 
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        restForm();
         emit('search');
         cronjobVisiable.value = false;
     });

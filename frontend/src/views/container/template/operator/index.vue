@@ -5,7 +5,7 @@
                 <span>{{ title }}{{ $t('container.composeTemplate') }}</span>
             </div>
         </template>
-        <el-form ref="formRef" :model="dialogData.rowData" :rules="rules" label-width="80px">
+        <el-form v-loading="loading" ref="formRef" :model="dialogData.rowData" :rules="rules" label-width="80px">
             <el-form-item :label="$t('container.name')" prop="name">
                 <el-input :disabled="dialogData.title === 'edit'" v-model="dialogData.rowData!.name"></el-input>
             </el-form-item>
@@ -31,8 +31,10 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="templateVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="onSubmit(formRef)">
+                <el-button :disabled="loading" @click="templateVisiable = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -50,6 +52,8 @@ import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { Container } from '@/api/interface/container';
 import { createComposeTemplate, updateComposeTemplate } from '@/api/modules/container';
+
+const loading = ref(false);
 
 interface DialogProps {
     title: string;
@@ -77,25 +81,34 @@ const rules = reactive({
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
-function restForm() {
-    if (formRef.value) {
-        formRef.value.resetFields();
-    }
-}
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
+        loading.value = true;
         if (dialogData.value.title === 'create') {
-            await createComposeTemplate(dialogData.value.rowData!);
+            await createComposeTemplate(dialogData.value.rowData!)
+                .then(() => {
+                    loading.value = false;
+                    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                    emit('search');
+                    templateVisiable.value = false;
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+            return;
         }
-        if (dialogData.value.title === 'edit') {
-            await updateComposeTemplate(dialogData.value.rowData!);
-        }
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        restForm();
-        emit('search');
-        templateVisiable.value = false;
+        await updateComposeTemplate(dialogData.value.rowData!)
+            .then(() => {
+                loading.value = false;
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                emit('search');
+                templateVisiable.value = false;
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     });
 };
 

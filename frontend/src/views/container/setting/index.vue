@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <Submenu activeName="setting" />
         <el-card style="margin-top: 20px">
             <el-radio-group v-model="confShowType" @change="changeMode">
@@ -41,7 +41,7 @@
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item>
-                            <el-button type="primary" @click="onSave(formRef)" style="width: 90px; margin-top: 5px">
+                            <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
                                 {{ $t('commons.button.save') }}
                             </el-button>
                         </el-form-item>
@@ -63,7 +63,7 @@
                     v-model="dockerConf"
                     :readOnly="true"
                 />
-                <el-button type="primary" @click="onSaveFile" style="width: 90px; margin-top: 5px">
+                <el-button :disabled="loading" type="primary" @click="onSaveFile" style="margin-top: 5px">
                     {{ $t('commons.button.save') }}
                 </el-button>
             </div>
@@ -84,6 +84,8 @@ import { LoadFile } from '@/api/modules/files';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import i18n from '@/lang';
 import { loadDaemonJson, updateDaemonJson, updateDaemonJsonByfile } from '@/api/modules/container';
+
+const loading = ref(false);
 
 const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
@@ -129,8 +131,15 @@ const onSubmitSave = async () => {
             file: dockerConf.value,
             path: '/opt/1Panel/docker/conf/daemon.json',
         };
-        await updateDaemonJsonByfile(param);
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        loading.value = true;
+        await updateDaemonJsonByfile(param)
+            .then(() => {
+                loading.value = false;
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
         return;
     }
     let itemMirrors = form.mirrors.split('\n');
@@ -147,9 +156,16 @@ const onSubmitSave = async () => {
         liveRestore: form.liveRestore,
         cgroupDriver: form.cgroupDriver,
     };
-    await updateDaemonJson(param);
-    search();
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    loading.value = true;
+    await updateDaemonJson(param)
+        .then(() => {
+            loading.value = false;
+            search();
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const loadMysqlConf = async () => {

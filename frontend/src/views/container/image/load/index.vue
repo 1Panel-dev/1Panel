@@ -5,7 +5,7 @@
                 <span>{{ $t('container.importImage') }}</span>
             </div>
         </template>
-        <el-form ref="formRef" :model="form" label-width="80px">
+        <el-form v-loading="loading" ref="formRef" :model="form" label-width="80px">
             <el-form-item :label="$t('container.path')" :rules="Rules.requiredSelect" prop="path">
                 <el-input clearable v-model="form.path">
                     <template #append>
@@ -16,8 +16,12 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="loadVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="onSubmit(formRef)">{{ $t('container.import') }}</el-button>
+                <el-button :disabeld="loading" @click="loadVisiable = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabeld="loading" type="primary" @click="onSubmit(formRef)">
+                    {{ $t('container.import') }}
+                </el-button>
             </span>
         </template>
     </el-dialog>
@@ -30,6 +34,8 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { imageLoad } from '@/api/modules/container';
+
+const loading = ref(false);
 
 const loadVisiable = ref(false);
 const form = reactive({
@@ -50,14 +56,17 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        try {
-            loadVisiable.value = false;
-            await imageLoad(form);
-            emit('search');
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        } catch {
-            emit('search');
-        }
+        loading.value = true;
+        await imageLoad(form)
+            .then(() => {
+                loading.value = false;
+                loadVisiable.value = false;
+                emit('search');
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     });
 };
 

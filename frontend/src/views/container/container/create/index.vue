@@ -5,7 +5,7 @@
                 <span>{{ $t('container.containerCreate') }}</span>
             </div>
         </template>
-        <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
+        <el-form ref="formRef" v-loading="loading" :model="form" :rules="rules" label-width="80px">
             <el-form-item :label="$t('container.name')" prop="name">
                 <el-input clearable v-model="form.name" />
             </el-form-item>
@@ -179,8 +179,10 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="createVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="onSubmit(formRef)">
+                <el-button :disabled="loading" @click="createVisiable = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -195,6 +197,8 @@ import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { listImage, listVolume, createContainer } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
+
+const loading = ref(false);
 
 const createVisiable = ref(false);
 const form = reactive({
@@ -295,10 +299,17 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 form.memory = form.memoryItem * 1024 * 1024 * 1024;
                 break;
         }
-        await createContainer(form);
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        emit('search');
-        createVisiable.value = false;
+        loading.value = true;
+        await createContainer(form)
+            .then(() => {
+                loading.value = false;
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                emit('search');
+                createVisiable.value = false;
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     });
 };
 

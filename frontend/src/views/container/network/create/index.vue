@@ -5,7 +5,7 @@
                 <span>{{ $t('container.createNetwork') }}</span>
             </div>
         </template>
-        <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
+        <el-form ref="formRef" v-loading="loading" :model="form" :rules="rules" label-width="80px">
             <el-form-item :label="$t('container.networkName')" prop="name">
                 <el-input clearable v-model="form.name" />
             </el-form-item>
@@ -45,8 +45,10 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="createVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="onSubmit(formRef)">
+                <el-button :disabled="loading" @click="createVisiable = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -60,6 +62,8 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { createNetwork } from '@/api/modules/container';
+
+const loading = ref(false);
 
 const createVisiable = ref(false);
 const form = reactive({
@@ -87,12 +91,6 @@ const rules = reactive({
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
-
-function restForm() {
-    if (formRef.value) {
-        formRef.value.resetFields();
-    }
-}
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
@@ -103,11 +101,17 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (form.optionStr !== '') {
             form.options = form.optionStr.split('\n');
         }
-        await createNetwork(form);
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        restForm();
-        emit('search');
-        createVisiable.value = false;
+        loading.value = true;
+        await createNetwork(form)
+            .then(() => {
+                loading.value = false;
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                emit('search');
+                createVisiable.value = false;
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     });
 };
 
