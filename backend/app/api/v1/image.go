@@ -71,12 +71,13 @@ func (b *BaseApi) ImagePull(c *gin.Context) {
 		return
 	}
 
-	if err := imageService.ImagePull(req); err != nil {
+	logPath, err := imageService.ImagePull(req)
+	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithData(c, logPath)
 }
 
 func (b *BaseApi) ImagePush(c *gin.Context) {
@@ -90,12 +91,13 @@ func (b *BaseApi) ImagePush(c *gin.Context) {
 		return
 	}
 
-	if err := imageService.ImagePush(req); err != nil {
+	logPath, err := imageService.ImagePush(req)
+	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithData(c, logPath)
 }
 
 func (b *BaseApi) ImageRemove(c *gin.Context) {

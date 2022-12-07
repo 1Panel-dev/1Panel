@@ -2,13 +2,13 @@ package service
 
 import (
 	"bufio"
-	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -19,15 +19,18 @@ import (
 	"github.com/docker/docker/pkg/archive"
 )
 
+const dockerLogDir = constant.TmpDir + "/docker_logs"
+
 type ImageService struct{}
 
 type IImageService interface {
 	Page(req dto.PageInfo) (int64, interface{}, error)
 	List() ([]dto.Options, error)
-	ImagePull(req dto.ImagePull) error
+	ImageBuild(req dto.ImageBuild) (string, error)
+	ImagePull(req dto.ImagePull) (string, error)
 	ImageLoad(req dto.ImageLoad) error
 	ImageSave(req dto.ImageSave) error
-	ImagePush(req dto.ImagePush) error
+	ImagePush(req dto.ImagePush) (string, error)
 	ImageRemove(req dto.BatchDelete) error
 }
 
@@ -138,11 +141,13 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 	}
 	go func() {
 		defer file.Close()
+		defer tar.Close()
 		res, err := client.ImageBuild(context.TODO(), tar, opts)
 		if err != nil {
 			global.LOG.Errorf("build image %s failed, err: %v", req.Name, err)
 			return
 		}
+		defer res.Body.Close()
 		global.LOG.Debugf("build image %s successful!", req.Name)
 		_, _ = io.Copy(file, res.Body)
 	}()
@@ -150,28 +155,38 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 	return logName, nil
 }
 
-func (u *ImageService) ImagePull(req dto.ImagePull) error {
+func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 	client, err := docker.NewDockerClient()
 	if err != nil {
-		return err
+		return "", err
+	}
+	if _, err := os.Stat(dockerLogDir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(dockerLogDir, os.ModePerm); err != nil {
+			return "", err
+		}
+	}
+	path := fmt.Sprintf("%s/image_pull_%s_%s.log", dockerLogDir, strings.ReplaceAll(req.ImageName, ":", "_"), time.Now().Format("20060102150405"))
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		return "", err
 	}
 	if req.RepoID == 0 {
 		go func() {
+			defer file.Close()
 			out, err := client.ImagePull(context.TODO(), req.ImageName, types.ImagePullOptions{})
 			if err != nil {
 				global.LOG.Errorf("image %s pull failed, err: %v", req.ImageName, err)
 				return
 			}
 			defer out.Close()
-			buf := new(bytes.Buffer)
-			_, _ = buf.ReadFrom(out)
-			global.LOG.Debugf("image %s pull stdout: %v", req.ImageName, buf.String())
+			global.LOG.Debugf("pull image %s successful!", req.ImageName)
+			_, _ = io.Copy(file, out)
 		}()
-		return nil
+		return path, nil
 	}
 	repo, err := imageRepoRepo.Get(commonRepo.WithByID(req.RepoID))
 	if err != nil {
-		return err
+		return "", err
 	}
 	options := types.ImagePullOptions{}
 	if repo.Auth {
@@ -181,24 +196,24 @@ func (u *ImageService) ImagePull(req dto.ImagePull) error {
 		}
 		encodedJSON, err := json.Marshal(authConfig)
 		if err != nil {
-			return err
+			return "", err
 		}
 		authStr := base64.URLEncoding.EncodeToString(encodedJSON)
 		options.RegistryAuth = authStr
 	}
 	image := repo.DownloadUrl + "/" + req.ImageName
 	go func() {
+		defer file.Close()
 		out, err := client.ImagePull(context.TODO(), image, options)
 		if err != nil {
 			global.LOG.Errorf("image %s pull failed, err: %v", image, err)
 			return
 		}
 		defer out.Close()
-		buf := new(bytes.Buffer)
-		_, _ = buf.ReadFrom(out)
-		global.LOG.Debugf("image %s pull stdout: %v", image, buf.String())
+		global.LOG.Debugf("pull image %s successful!", req.ImageName)
+		_, _ = io.Copy(file, out)
 	}()
-	return nil
+	return path, nil
 }
 
 func (u *ImageService) ImageLoad(req dto.ImageLoad) error {
@@ -251,14 +266,14 @@ func (u *ImageService) ImageTag(req dto.ImageTag) error {
 	return nil
 }
 
-func (u *ImageService) ImagePush(req dto.ImagePush) error {
+func (u *ImageService) ImagePush(req dto.ImagePush) (string, error) {
 	client, err := docker.NewDockerClient()
 	if err != nil {
-		return err
+		return "", err
 	}
 	repo, err := imageRepoRepo.Get(commonRepo.WithByID(req.RepoID))
 	if err != nil {
-		return err
+		return "", err
 	}
 	options := types.ImagePushOptions{}
 	if repo.Auth {
@@ -268,7 +283,7 @@ func (u *ImageService) ImagePush(req dto.ImagePush) error {
 		}
 		encodedJSON, err := json.Marshal(authConfig)
 		if err != nil {
-			return err
+			return "", err
 		}
 		authStr := base64.URLEncoding.EncodeToString(encodedJSON)
 		options.RegistryAuth = authStr
@@ -276,22 +291,33 @@ func (u *ImageService) ImagePush(req dto.ImagePush) error {
 	newName := fmt.Sprintf("%s/%s", repo.DownloadUrl, req.Name)
 	if newName != req.TagName {
 		if err := client.ImageTag(context.TODO(), req.TagName, newName); err != nil {
-			return err
+			return "", err
 		}
 	}
+
+	if _, err := os.Stat(dockerLogDir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(dockerLogDir, os.ModePerm); err != nil {
+			return "", err
+		}
+	}
+	path := fmt.Sprintf("%s/image_push_%s_%s.log", dockerLogDir, strings.ReplaceAll(req.Name, ":", "_"), time.Now().Format("20060102150405"))
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		return "", err
+	}
 	go func() {
+		defer file.Close()
 		out, err := client.ImagePush(context.TODO(), newName, options)
 		if err != nil {
 			global.LOG.Errorf("image %s push failed, err: %v", req.TagName, err)
 			return
 		}
 		defer out.Close()
-		buf := new(bytes.Buffer)
-		_, _ = buf.ReadFrom(out)
-		global.LOG.Debugf("image %s push stdout: %v", req.TagName, buf.String())
+		global.LOG.Debugf("push image %s successful!", req.Name)
+		_, _ = io.Copy(file, out)
 	}()
 
-	return nil
+	return path, nil
 }
 
 func (u *ImageService) ImageRemove(req dto.BatchDelete) error {

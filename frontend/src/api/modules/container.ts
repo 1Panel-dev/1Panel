@@ -32,10 +32,10 @@ export const imageBuild = (params: Container.ImageBuild) => {
     return http.post<string>(`/containers/image/build`, params);
 };
 export const imagePull = (params: Container.ImagePull) => {
-    return http.post(`/containers/image/pull`, params);
+    return http.post<string>(`/containers/image/pull`, params);
 };
 export const imagePush = (params: Container.ImagePush) => {
-    return http.post(`/containers/image/push`, params);
+    return http.post<string>(`/containers/image/push`, params);
 };
 export const imageLoad = (params: Container.ImageLoad) => {
     return http.post(`/containers/image/load`, params);
