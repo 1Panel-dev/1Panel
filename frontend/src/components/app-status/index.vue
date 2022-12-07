@@ -3,7 +3,7 @@
         <div class="app-content" v-if="data.isExist">
             <el-card class="app-card" v-loading="loading">
                 <el-row :gutter="20">
-                    <el-col :lg="2" :xl="1">
+                    <el-col :lg="3" :xl="2">
                         <div>
                             <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
                         </div>
@@ -18,18 +18,20 @@
                         <div>
                             {{ $t('commons.table.status') }}:
                             <el-tag type="info">
-                                <Status :status="data.status"></Status>
+                                <Status :key="refresh" :status="data.status"></Status>
                             </el-tag>
                         </div>
                     </el-col>
-                    <el-col :lg="6" :xl="4">
-                        <div>
-                            {{ $t('website.lastBackupAt') }}:
-                            <el-tag v-if="data.lastBackupAt != ''" type="info">{{ data.lastBackupAt }}</el-tag>
-                            <span v-else>{{ $t('website.null') }}</span>
-                        </div>
-                    </el-col>
                     <el-col :lg="4" :xl="6">
+                        <el-button type="primary" v-if="data.status != 'Running'" link @click="onOperate('up')">
+                            {{ $t('app.up') }}
+                        </el-button>
+                        <el-button type="primary" v-if="data.status === 'Running'" link @click="onOperate('down')">
+                            {{ $t('app.down') }}
+                        </el-button>
+                        <el-divider direction="vertical" />
+                        <el-button type="primary" link @click="onOperate('restart')">{{ $t('app.restart') }}</el-button>
+                        <el-divider direction="vertical" />
                         <el-button type="primary" link @click="setting">{{ $t('commons.button.set') }}</el-button>
                     </el-col>
                 </el-row>
@@ -45,10 +47,12 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { CheckAppInstalled } from '@/api/modules/app';
+import { CheckAppInstalled, InstalledOp } from '@/api/modules/app';
 import router from '@/routers';
 import { onMounted, reactive, ref } from 'vue';
 import Status from '@/components/status/index.vue';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import i18n from '@/lang';
 
 const props = defineProps({
     appKey: {
@@ -72,6 +76,7 @@ let operateReq = reactive({
     installId: 0,
     operate: '',
 });
+let refresh = ref(1);
 
 const em = defineEmits(['setting', 'isExist']);
 const setting = () => {
@@ -89,6 +94,30 @@ const onCheck = async () => {
     em('isExist', res.data);
     operateReq.installId = res.data.appInstallId;
     loading.value = false;
+    refresh.value++;
+};
+
+const onOperate = async (operation: string) => {
+    operateReq.operate = operation;
+    ElMessageBox.confirm(
+        i18n.global.t('app.operatorHelper', [i18n.global.t('app.' + operation)]),
+        i18n.global.t('app.' + operation),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        },
+    ).then(() => {
+        loading.value = true;
+        InstalledOp(operateReq)
+            .then(() => {
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                onCheck();
+            })
+            .finally(() => {
+                loading.value = false;
+            });
+    });
 };
 
 onMounted(() => {

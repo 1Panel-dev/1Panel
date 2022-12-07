@@ -876,7 +876,9 @@ export default {
         reading: '请求数(Reading)',
         writing: '响应数(Writing)',
         waiting: '驻留进程(Waiting)',
-        status: '负载状态',
+        status: '当前状态',
+        nginxConfig: 'OpenResty 设置',
+        configResource: '配置修改',
     },
     ssl: {
         provider: '类型',

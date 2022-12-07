@@ -21,6 +21,13 @@ import { Nginx } from '@/api/interface/nginx';
 import { GetNginxStatus } from '@/api/modules/nginx';
 import { onMounted, ref } from 'vue';
 
+const props = defineProps({
+    status: {
+        type: String,
+        default: 'Running',
+    },
+});
+
 let data = ref<Nginx.NginxStatus>({
     accepts: '',
     handled: '',
@@ -32,6 +39,9 @@ let data = ref<Nginx.NginxStatus>({
 });
 
 const get = async () => {
+    if (props.status != 'Running') {
+        return;
+    }
     const res = await GetNginxStatus();
     data.value = res.data;
 };

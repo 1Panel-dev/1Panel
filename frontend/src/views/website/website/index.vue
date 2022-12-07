@@ -1,66 +1,73 @@
 <template>
     <div>
         <AppStatus :app-key="'nginx'" @setting="setting" @is-exist="checkExist"></AppStatus>
-        <LayoutContent v-if="nginxIsExist">
-            <br />
-            <el-card v-if="!openNginxConfig">
-                <LayoutContent :header="$t('website.website')">
-                    <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search()">
-                        <template #toolbar>
-                            <el-button type="primary" icon="Plus" @click="openCreate">
-                                {{ $t('commons.button.create') }}
-                            </el-button>
-                            <el-button type="primary" plain @click="openGroup">{{ $t('website.group') }}</el-button>
-                        </template>
-                        <el-table-column
-                            :label="$t('commons.table.name')"
-                            fix
-                            show-overflow-tooltip
-                            prop="primaryDomain"
-                        >
-                            <template #default="{ row }">
-                                <el-link type="primary" @click="openConfig(row.id)">{{ row.primaryDomain }}</el-link>
+        <div v-if="nginxIsExist" :class="{ mask: nginxStatus != 'Running' }">
+            <LayoutContent>
+                <br />
+                <el-card v-if="!openNginxConfig">
+                    <LayoutContent :header="$t('website.website')">
+                        <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search()">
+                            <template #toolbar>
+                                <el-button type="primary" icon="Plus" @click="openCreate">
+                                    {{ $t('commons.button.create') }}
+                                </el-button>
+                                <el-button type="primary" plain @click="openGroup">{{ $t('website.group') }}</el-button>
                             </template>
-                        </el-table-column>
-                        <el-table-column :label="$t('commons.table.type')" fix prop="type">
-                            <template #default="{ row }">
-                                {{ $t('website.' + row.type) }}
-                            </template>
-                        </el-table-column>
-                        <el-table-column :label="$t('commons.table.status')" prop="status">
-                            <template #default="{ row }">
-                                <Status :status="row.status"></Status>
-                            </template>
-                        </el-table-column>
-                        <el-table-column :label="$t('website.remark')" prop="remark"></el-table-column>
-                        <el-table-column :label="$t('website.protocol')" prop="protocol"></el-table-column>
-                        <el-table-column :label="$t('website.expireDate')">
-                            <template #default="{ row }">
-                                <span v-if="row.protocol === 'HTTP'">{{ $t('website.neverExpire') }}</span>
-                                <span v-else>{{ dateFromat(1, 1, row.webSiteSSL.expireDate) }}</span>
-                            </template>
-                        </el-table-column>
-                        <fu-table-operations
-                            :ellipsis="10"
-                            width="260px"
-                            :buttons="buttons"
-                            :label="$t('commons.table.operate')"
-                            fixed="right"
-                            fix
-                        />
-                    </ComplexTable>
-                </LayoutContent>
-            </el-card>
-            <el-card v-if="openNginxConfig">
-                <NginxConfig :containerName="containerName"></NginxConfig>
-            </el-card>
+                            <el-table-column
+                                :label="$t('commons.table.name')"
+                                fix
+                                show-overflow-tooltip
+                                prop="primaryDomain"
+                            >
+                                <template #default="{ row }">
+                                    <el-link type="primary" @click="openConfig(row.id)">
+                                        {{ row.primaryDomain }}
+                                    </el-link>
+                                </template>
+                            </el-table-column>
+                            <el-table-column :label="$t('commons.table.type')" fix prop="type">
+                                <template #default="{ row }">
+                                    {{ $t('website.' + row.type) }}
+                                </template>
+                            </el-table-column>
+                            <el-table-column :label="$t('commons.table.status')" prop="status">
+                                <template #default="{ row }">
+                                    <Status :status="row.status"></Status>
+                                </template>
+                            </el-table-column>
+                            <el-table-column :label="$t('website.remark')" prop="remark"></el-table-column>
+                            <el-table-column :label="$t('website.protocol')" prop="protocol"></el-table-column>
+                            <el-table-column :label="$t('website.expireDate')">
+                                <template #default="{ row }">
+                                    <span v-if="row.protocol === 'HTTP'">{{ $t('website.neverExpire') }}</span>
+                                    <span v-else>{{ dateFromat(1, 1, row.webSiteSSL.expireDate) }}</span>
+                                </template>
+                            </el-table-column>
+                            <fu-table-operations
+                                :ellipsis="10"
+                                width="260px"
+                                :buttons="buttons"
+                                :label="$t('commons.table.operate')"
+                                fixed="right"
+                                fix
+                            />
+                        </ComplexTable>
+                    </LayoutContent>
+                </el-card>
 
-            <CreateWebSite ref="createRef" @close="search"></CreateWebSite>
-            <DeleteWebsite ref="deleteRef" @close="search"></DeleteWebsite>
-            <WebSiteGroup ref="groupRef"></WebSiteGroup>
-            <UploadDialog ref="uploadRef" />
-            <BackupRecords ref="dialogBackupRef" />
-        </LayoutContent>
+                <CreateWebSite ref="createRef" @close="search"></CreateWebSite>
+                <DeleteWebsite ref="deleteRef" @close="search"></DeleteWebsite>
+                <WebSiteGroup ref="groupRef"></WebSiteGroup>
+                <UploadDialog ref="uploadRef" />
+                <BackupRecords ref="dialogBackupRef" />
+            </LayoutContent>
+        </div>
+        <el-card width="30%" v-if="nginxStatus != 'Running'" class="mask-prompt">
+            <span style="font-size: 14px">当前未启动 OpenResty 服务</span>
+        </el-card>
+        <el-card v-if="openNginxConfig">
+            <NginxConfig :containerName="containerName" :status="nginxStatus"></NginxConfig>
+        </el-card>
     </div>
 </template>
 
@@ -90,6 +97,7 @@ const groupRef = ref();
 let openNginxConfig = ref(false);
 let nginxIsExist = ref(false);
 let containerName = ref('');
+let nginxStatus = ref('');
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -172,6 +180,7 @@ const openGroup = () => {
 const checkExist = (data: App.CheckInstalled) => {
     nginxIsExist.value = data.isExist;
     containerName.value = data.containerName;
+    nginxStatus.value = data.status;
 };
 
 onMounted(() => {
