@@ -11,7 +11,7 @@
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </template>
-                <el-table-column type="selection" fix></el-table-column>
+                <el-table-column type="selection" fix />
                 <el-table-column
                     :label="$t('commons.table.name')"
                     show-overflow-tooltip

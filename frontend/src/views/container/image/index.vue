@@ -17,7 +17,7 @@
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </template>
-                <el-table-column type="selection" fix></el-table-column>
+                <el-table-column type="selection" fix />
                 <el-table-column label="ID" show-overflow-tooltip prop="id" min-width="60" />
                 <el-table-column :label="$t('container.tag')" prop="tags" min-width="160" fix>
                     <template #default="{ row }">
@@ -199,6 +199,7 @@ const buttons = [
         label: i18n.global.t('commons.button.delete'),
         click: (row: Container.ImageInfo) => {
             deleteForm.tags = row.tags;
+            deleteForm.deleteTags = [];
             deleteVisiable.value = true;
         },
     },

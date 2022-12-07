@@ -5,7 +5,7 @@
                 <span>{{ $t('container.exportImage') }}</span>
             </div>
         </template>
-        <el-form ref="formRef" :model="form" label-width="80px">
+        <el-form v-loading="loading" ref="formRef" :model="form" label-width="80px">
             <el-form-item label="Tag" :rules="Rules.requiredSelect" prop="tagName">
                 <el-select filterable v-model="form.tagName">
                     <el-option
@@ -32,8 +32,10 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="saveVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="onSubmit(formRef)">
+                <el-button :disabeld="loading" @click="saveVisiable = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabeld="loading" type="primary" @click="onSubmit(formRef)">
                     {{ $t('container.export') }}
                 </el-button>
             </span>
@@ -49,6 +51,8 @@ import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { imageSave } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
+
+const loading = ref(false);
 
 const saveVisiable = ref(false);
 const form = reactive({
@@ -85,14 +89,17 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        try {
-            saveVisiable.value = false;
-            await imageSave(form);
-            emit('search');
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        } catch {
-            emit('search');
-        }
+        loading.value = true;
+        await imageSave(form)
+            .then(() => {
+                loading.value = false;
+                saveVisiable.value = false;
+                emit('search');
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     });
 };
 
