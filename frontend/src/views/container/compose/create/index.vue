@@ -90,7 +90,7 @@ const form = reactive({
     from: 'edit',
     path: '',
     file: '',
-    template: 0,
+    template: null as number,
 });
 const rules = reactive({
     name: [Rules.requiredInput, Rules.name],

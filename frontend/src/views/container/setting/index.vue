@@ -176,6 +176,7 @@ const onOperator = async (operation: string) => {
         operation: operation,
     };
     await dockerOperate(param);
+    search();
     changeMode();
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };

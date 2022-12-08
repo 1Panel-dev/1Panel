@@ -2,7 +2,6 @@ package service
 
 import (
 	"bufio"
-	"context"
 	"encoding/json"
 	"io/ioutil"
 	"os"
@@ -11,7 +10,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/pkg/errors"
 )
 
@@ -40,20 +38,20 @@ type daemonJsonItem struct {
 
 func (u *DockerService) LoadDockerStatus() string {
 	status := constant.StatusRunning
-	cli, err := docker.NewDockerClient()
-	if err != nil {
+	cmd := exec.Command("systemctl", "is-active", "docker")
+	stdout, err := cmd.CombinedOutput()
+	if string(stdout) != "active\n" || err != nil {
 		status = constant.Stopped
 	}
-	pong, err := cli.Ping(context.Background())
-	if !pong.Experimental || err != nil {
-		status = constant.Stopped
-	}
+
 	return status
 }
 
 func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 	status := constant.StatusRunning
-	if _, err := docker.NewDockerClient(); err != nil {
+	cmd := exec.Command("systemctl", "is-active", "docker")
+	stdout, err := cmd.CombinedOutput()
+	if string(stdout) != "active\n" || err != nil {
 		status = constant.Stopped
 	}
 	fileSetting, err := settingRepo.Get(settingRepo.WithByKey("DaemonJsonPath"))
