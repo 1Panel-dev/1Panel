@@ -2,14 +2,13 @@ package log
 
 import (
 	"fmt"
-	"path"
+	"github.com/1Panel-dev/1Panel/backend/log"
 	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/configs"
 	"github.com/1Panel-dev/1Panel/backend/global"
 
-	"github.com/natefinch/lumberjack"
 	"github.com/sirupsen/logrus"
 )
 
@@ -17,24 +16,27 @@ func Init() {
 	l := logrus.New()
 	setOutput(l, global.CONF.LogConfig)
 	global.LOG = l
+	global.LOG.Info("init success")
 }
 
-func setOutput(log *logrus.Logger, config configs.LogConfig) {
-	filePath := path.Join(config.Path, config.LogName+config.LogSuffix)
-	logPrint := &lumberjack.Logger{
-		Filename:   filePath,
-		MaxSize:    config.LogSize,
-		MaxBackups: config.LogBackup,
-		MaxAge:     config.LogData,
-		Compress:   true,
+func setOutput(logger *logrus.Logger, config configs.LogConfig) {
+
+	writer, err := log.NewWriterFromConfig(&log.Config{
+		LogPath:       config.Path,
+		FileName:      config.LogName,
+		TimeTagFormat: "2006-01-02-15-04-05",
+		MaxRemain:     config.LogBackup,
+	})
+	if err != nil {
+		panic(err)
 	}
 	level, err := logrus.ParseLevel(config.Level)
 	if err != nil {
 		panic(err)
 	}
-	log.SetOutput(logPrint)
-	log.SetLevel(level)
-	log.SetFormatter(new(MineFormatter))
+	logger.SetOutput(writer)
+	logger.SetLevel(level)
+	logger.SetFormatter(new(MineFormatter))
 }
 
 type MineFormatter struct{}
