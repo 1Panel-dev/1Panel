@@ -20,6 +20,7 @@ type Config struct {
 	TimeTagFormat      string
 	LogPath            string
 	FileName           string
+	LogSuffix          string
 	MaxRemain          int
 	RollingTimePattern string
 }
@@ -35,6 +36,6 @@ type RollingWriter interface {
 }
 
 func FilePath(c *Config) (filepath string) {
-	filepath = path.Join(c.LogPath, c.FileName) + ".log"
+	filepath = path.Join(c.LogPath, c.FileName) + c.LogSuffix
 	return
 }
