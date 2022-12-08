@@ -47,7 +47,7 @@ func NewManager(c *Config) (Manager, error) {
 
 func (m *manager) GenLogFileName(c *Config) (filename string) {
 	m.lock.Lock()
-	filename = path.Join(c.LogPath, c.FileName+"-"+m.startAt.Format(c.TimeTagFormat)) + ".log"
+	filename = path.Join(c.LogPath, c.FileName+"-"+m.startAt.Format(c.TimeTagFormat)) + c.LogSuffix
 	m.startAt = time.Now()
 	m.lock.Unlock()
 	return

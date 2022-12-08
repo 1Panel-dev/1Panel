@@ -119,11 +119,13 @@ func NewWriterFromConfig(c *Config) (RollingWriter, error) {
 				continue
 			}
 
-			fileName := c.FileName + ".log."
-			if strings.Contains(fi.Name(), fileName) {
-				fileSuffix := path.Ext(fi.Name())
-				if len(fileSuffix) > 1 {
-					_, err := time.Parse(c.TimeTagFormat, fileSuffix[1:])
+			fileName := c.FileName
+			if strings.Contains(fi.Name(), fileName) && strings.Contains(fi.Name(), c.LogSuffix+".tar.gz") {
+				start := strings.Index(fi.Name(), "-")
+				end := strings.Index(fi.Name(), c.LogSuffix)
+				name := fi.Name()
+				if start > 0 && end > 0 {
+					_, err := time.Parse(c.TimeTagFormat, name[start+1:end])
 					if err == nil {
 						files = append(files, fi.Name())
 					}
@@ -131,10 +133,12 @@ func NewWriterFromConfig(c *Config) (RollingWriter, error) {
 			}
 		}
 		sort.Slice(files, func(i, j int) bool {
-			fileSuffix1 := path.Ext(files[i])
-			fileSuffix2 := path.Ext(files[j])
-			t1, _ := time.Parse(c.TimeTagFormat, fileSuffix1[1:])
-			t2, _ := time.Parse(c.TimeTagFormat, fileSuffix2[1:])
+			t1Start := strings.Index(files[i], "-")
+			t1End := strings.Index(files[i], c.LogSuffix)
+			t2Start := strings.Index(files[i], "-")
+			t2End := strings.Index(files[i], c.LogSuffix)
+			t1, _ := time.Parse(c.TimeTagFormat, files[i][t1Start+1:t1End])
+			t2, _ := time.Parse(c.TimeTagFormat, files[j][t2Start+1:t2End])
 			return t1.Before(t2)
 		})
 
