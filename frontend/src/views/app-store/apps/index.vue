@@ -52,16 +52,16 @@
                                 <el-col :span="16">
                                     <div class="a-detail">
                                         <div class="d-name">
-                                            <font size="3" style="font-weight: 700">{{ app.name }}</font>
+                                            <span style="font-weight: 500; font-size: 16px">
+                                                {{ app.name }}
+                                            </span>
                                         </div>
                                         <div class="d-description">
-                                            <font size="1">
-                                                <span>
-                                                    {{ app.shortDesc }}
-                                                </span>
-                                            </font>
+                                            <span>
+                                                {{ app.shortDesc }}
+                                            </span>
                                         </div>
-                                        <div class="d-tag">
+                                        <div class="d-tag" style="margin-top: 5px">
                                             <el-tag
                                                 v-for="(tag, ind) in app.tags"
                                                 :key="ind"
@@ -188,6 +188,7 @@ onMounted(() => {
         }
 
         .d-description {
+            margin-top: 5px;
             overflow: hidden;
             display: -webkit-box;
             -webkit-line-clamp: 2;

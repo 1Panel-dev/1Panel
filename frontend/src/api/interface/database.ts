@@ -113,7 +113,6 @@ export namespace Database {
     }
     export interface ChangeInfo {
         id: number;
-        mysqlName: string;
         operation: string;
         value: string;
     }

@@ -91,7 +91,6 @@ func (a AppInstallRepo) Page(page, size int, opts ...DBOption) (int64, []model.A
 }
 
 func (a AppInstallRepo) BatchUpdateBy(maps map[string]interface{}, opts ...DBOption) error {
-
 	db := getDb(opts...).Model(&model.AppInstall{})
 	if len(opts) == 0 {
 		db = db.Where("1=1")
