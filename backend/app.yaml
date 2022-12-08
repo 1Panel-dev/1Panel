@@ -5,14 +5,6 @@ system:
   data_dir:  /opt/1Panel/data
   app_oss: "https://1panel.oss-cn-hangzhou.aliyuncs.com/apps.json"
 
-mysql:
-  path: localhost
-  port: 3306
-  db_name: 1Panel
-  username: root
-  password: KubeOperator123@mysql
-  max_idle_conns: 10
-  max_open_conns: 100
 
 sqlite:
   path: /opt/1Panel/data/db
@@ -24,9 +16,7 @@ log:
   path: /opt/1Panel/log
   log_name: 1Panel
   log_suffix: .log
-  log_size: 50    #日志文件大小，单位是 MB
-  log_backup: 10  #最大过期日志保留个数
-  log_data: 7     #保留过期文件最大时间，单位 天
+  log_backup: 10  #最大日志保留个数
 
 cache:
   path: /opt/1Panel/data/cache
