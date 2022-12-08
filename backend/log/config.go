@@ -7,10 +7,6 @@ import (
 	"path"
 )
 
-const (
-	RollingTimePattern = "0 0  * * *"
-)
-
 var (
 	BufferSize         = 0x100000
 	DefaultFileMode    = os.FileMode(0644)
@@ -21,10 +17,11 @@ var (
 )
 
 type Config struct {
-	TimeTagFormat string
-	LogPath       string
-	FileName      string
-	MaxRemain     int
+	TimeTagFormat      string
+	LogPath            string
+	FileName           string
+	MaxRemain          int
+	RollingTimePattern string
 }
 
 type Manager interface {

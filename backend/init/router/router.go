@@ -38,8 +38,8 @@ func setWebStatic(rootRouter *gin.Engine) {
 
 func Routers() *gin.Engine {
 	Router := gin.Default()
-	//Router.Use(middleware.CSRF())
-	//Router.Use(middleware.LoadCsrfToken())
+	Router.Use(middleware.CSRF())
+	Router.Use(middleware.LoadCsrfToken())
 
 	setWebStatic(Router)
 	docs.SwaggerInfo.BasePath = "/api/v1"
@@ -64,7 +64,7 @@ func Routers() *gin.Engine {
 	}
 
 	PrivateGroup := Router.Group("/api/v1")
-	// PrivateGroup.Use(middleware.SafetyAuth())
+	//PrivateGroup.Use(middleware.SafetyAuth())
 	{
 		systemRouter.InitBaseRouter(PrivateGroup)
 		systemRouter.InitDashboardRouter(PrivateGroup)
