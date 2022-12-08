@@ -231,14 +231,16 @@ export default {
         backupList: '备份列表',
         backList: '返回列表',
         loadBackup: '导入备份',
-        setting: '数据库设置',
+        setting: 'Mysql 设置',
         remoteAccess: '远程访问',
+        remoteConnHelper: 'root 帐号远程连接 mysql 有安全风险，开启需谨慎！',
         changePassword: '改密',
 
-        baseSetting: '基础设置',
-        remoteConnHelper: 'root 帐号远程连接 mysql 有安全风险，开启需谨慎！',
-        confChange: '配置修改',
+        portSetting: '端口',
         portHelper: '该端口为容器对外暴露端口，修改需要单独保存并且重启容器！',
+
+        baseSetting: '基础设置',
+        confChange: '配置修改',
 
         unSupportType: '不支持当前文件类型！',
         unSupportSize: '上传文件超过 10M，请确认！',

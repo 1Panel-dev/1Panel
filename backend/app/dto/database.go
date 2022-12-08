@@ -84,8 +84,8 @@ type MysqlVariables struct {
 }
 
 type MysqlVariablesUpdate struct {
-	Param string      `json:"param"`
-	Value interface{} `json:"value"`
+	Param string `json:"param"`
+	Value int64  `json:"value"`
 }
 type MysqlConfUpdateByFile struct {
 	MysqlName string `json:"mysqlName" validate:"required"`

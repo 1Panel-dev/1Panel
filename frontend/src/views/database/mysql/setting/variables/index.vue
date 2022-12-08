@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-card>
+        <el-card v-loading="loading">
             <el-form :model="mysqlVariables" :rules="variablesRules" ref="variableFormRef" label-width="160px">
                 <el-row>
                     <el-col :span="1"><br /></el-col>
@@ -64,7 +64,7 @@
                         </el-form-item>
 
                         <el-form-item>
-                            <el-button @click="onSaveStart(variableFormRef)" type="primary">
+                            <el-button :disabled="loading" @click="onSaveStart(variableFormRef)" type="primary">
                                 {{ $t('commons.button.save') }}
                             </el-button>
                         </el-form-item>
@@ -111,6 +111,7 @@
                 </el-row>
             </el-form>
         </el-card>
+
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSaveVariables"></ConfirmDialog>
     </div>
 </template>
@@ -123,6 +124,8 @@ import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { updateMysqlVariables } from '@/api/modules/database';
 import i18n from '@/lang';
 import { planOptions } from './../helper';
+
+const loading = ref(false);
 
 const plan = ref();
 const confirmDialogRef = ref();
@@ -277,8 +280,15 @@ const onSaveVariables = async () => {
     if (oldVariables.value?.max_connections !== mysqlVariables.max_connections) {
         param.push({ param: 'max_connections', value: mysqlVariables.max_connections });
     }
-    await updateMysqlVariables(param);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    loading.value = true;
+    await updateMysqlVariables(param)
+        .then(() => {
+            loading.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 defineExpose({

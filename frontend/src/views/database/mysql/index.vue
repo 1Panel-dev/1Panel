@@ -19,8 +19,10 @@
                         <el-button @click="onChangeRootPassword" type="primary" plain>
                             {{ $t('database.rootPassword') }}
                         </el-button>
-                        <el-button @click="goDashboard">远程访问</el-button>
-                        <el-button @click="goDashboard" icon="Position">phpMyAdmin</el-button>
+                        <el-button @click="onChangeAccess" type="primary" plain>
+                            {{ $t('database.remoteAccess') }}
+                        </el-button>
+                        <el-button @click="goDashboard" type="primary" plain icon="Position">phpMyAdmin</el-button>
                     </template>
                     <el-table-column type="selection" fix />
                     <el-table-column :label="$t('commons.table.name')" prop="name" />
@@ -144,7 +146,8 @@
             </template>
         </el-dialog>
 
-        <RootPasswordDialog @search="search" ref="rootPasswordRef" />
+        <RootPasswordDialog ref="rootPasswordRef" />
+        <RemoteAccessDialog ref="remoteAccessRef" />
         <UploadDialog ref="uploadRef" />
         <OperatrDialog @search="search" ref="dialogRef" />
         <BackupRecords ref="dialogBackupRef" />
@@ -157,6 +160,7 @@
 import ComplexTable from '@/components/complex-table/index.vue';
 import OperatrDialog from '@/views/database/mysql/create/index.vue';
 import RootPasswordDialog from '@/views/database/mysql/password/index.vue';
+import RemoteAccessDialog from '@/views/database/mysql/remote/index.vue';
 import BackupRecords from '@/views/database/mysql/backup/index.vue';
 import UploadDialog from '@/views/database/mysql/upload/index.vue';
 import AppResources from '@/views/database/mysql/check/index.vue';
@@ -165,7 +169,13 @@ import AppStatus from '@/components/app-status/index.vue';
 import Submenu from '@/views/database/index.vue';
 import { dateFromat } from '@/utils/util';
 import { reactive, ref } from 'vue';
-import { deleteCheckMysqlDB, deleteMysqlDB, searchMysqlDBs, updateMysqlDBInfo } from '@/api/modules/database';
+import {
+    deleteCheckMysqlDB,
+    deleteMysqlDB,
+    loadMysqlBaseInfo,
+    searchMysqlDBs,
+    updateMysqlDBInfo,
+} from '@/api/modules/database';
 import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElForm, ElMessage } from 'element-plus';
@@ -215,6 +225,15 @@ const uploadRef = ref();
 const rootPasswordRef = ref();
 const onChangeRootPassword = async () => {
     rootPasswordRef.value!.acceptParams();
+};
+
+const remoteAccessRef = ref();
+const onChangeAccess = async () => {
+    const res = await loadMysqlBaseInfo();
+    let param = {
+        privilege: res.data.remoteConn,
+    };
+    remoteAccessRef.value!.acceptParams(param);
 };
 
 const settingRef = ref();

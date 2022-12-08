@@ -2,12 +2,13 @@
     <el-dialog v-model="dialogVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
         <template #header>
             <div class="card-header">
-                <span>{{ $t('database.rootPassword') }}</span>
+                <span>{{ $t('database.remoteAccess') }}</span>
             </div>
         </template>
         <el-form v-loading="loading" ref="formRef" :model="form" label-width="80px">
-            <el-form-item :label="$t('database.rootPassword')" :rules="Rules.requiredInput" prop="password">
-                <el-input type="password" show-password clearable v-model="form.password" />
+            <el-form-item :label="$t('database.remoteAccess')" :rules="Rules.requiredInput" prop="privilege">
+                <el-switch v-model="form.privilege" />
+                <span class="input-help">{{ $t('database.remoteConnHelper') }}</span>
             </el-form-item>
         </el-form>
 
@@ -36,7 +37,7 @@ const loading = ref(false);
 
 const dialogVisiable = ref(false);
 const form = reactive({
-    password: '',
+    privilege: '',
 });
 
 const confirmDialogRef = ref();
@@ -44,16 +45,20 @@ const confirmDialogRef = ref();
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
-const acceptParams = (): void => {
-    form.password = '';
+interface DialogProps {
+    privilege: string;
+}
+
+const acceptParams = (prop: DialogProps): void => {
+    form.privilege = prop.privilege;
     dialogVisiable.value = true;
 };
 
 const onSubmit = async () => {
     let param = {
         id: 0,
-        operation: 'password',
-        value: form.password,
+        operation: 'privilege',
+        value: form.privilege ? '%' : 'localhost',
     };
     loading.value = true;
     await updateMysqlDBInfo(param)
