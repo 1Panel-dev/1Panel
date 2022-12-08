@@ -3,6 +3,8 @@ package log
 import (
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/log"
+	"io"
+	"os"
 	"strings"
 	"time"
 
@@ -12,20 +14,26 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	TimeFormat         = "2006-01-02 15:04:05"
+	RollingTimePattern = "0 0  * * *"
+)
+
 func Init() {
 	l := logrus.New()
 	setOutput(l, global.CONF.LogConfig)
 	global.LOG = l
-	global.LOG.Info("init success")
+	global.LOG.Info("init logger successfully")
 }
 
 func setOutput(logger *logrus.Logger, config configs.LogConfig) {
 
 	writer, err := log.NewWriterFromConfig(&log.Config{
-		LogPath:       config.Path,
-		FileName:      config.LogName,
-		TimeTagFormat: "2006-01-02-15-04-05",
-		MaxRemain:     config.LogBackup,
+		LogPath:            config.Path,
+		FileName:           config.LogName,
+		TimeTagFormat:      TimeFormat,
+		MaxRemain:          config.LogBackup,
+		RollingTimePattern: RollingTimePattern,
 	})
 	if err != nil {
 		panic(err)
@@ -34,14 +42,14 @@ func setOutput(logger *logrus.Logger, config configs.LogConfig) {
 	if err != nil {
 		panic(err)
 	}
-	logger.SetOutput(writer)
+	fileAndStdoutWriter := io.MultiWriter(writer, os.Stdout)
+
+	logger.SetOutput(fileAndStdoutWriter)
 	logger.SetLevel(level)
 	logger.SetFormatter(new(MineFormatter))
 }
 
 type MineFormatter struct{}
-
-const TimeFormat = "2006-01-02 15:04:05"
 
 func (s *MineFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	var cstSh, _ = time.LoadLocation(global.CONF.LogConfig.TimeZone)

@@ -35,7 +35,7 @@ func NewManager(c *Config) (Manager, error) {
 		wg:      sync.WaitGroup{},
 	}
 
-	if _, err := m.cr.AddFunc(RollingTimePattern, func() {
+	if _, err := m.cr.AddFunc(c.RollingTimePattern, func() {
 		m.fire <- m.GenLogFileName(c)
 	}); err != nil {
 		return nil, err
