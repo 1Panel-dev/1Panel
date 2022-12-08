@@ -11,13 +11,11 @@
                     <el-col :span="20">
                         <div class="a-detail">
                             <div class="a-name">
-                                <font size="5" style="font-weight: 800">{{ app.name }}</font>
+                                <span style="font-weight: 500; font-size: 18px">{{ app.name }}</span>
                             </div>
                             <div class="a-description">
                                 <span>
-                                    <font>
-                                        {{ app.shortDesc }}
-                                    </font>
+                                    {{ app.shortDesc }}
                                 </span>
                             </div>
                             <br />

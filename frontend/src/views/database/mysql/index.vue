@@ -16,6 +16,10 @@
                         <el-button type="primary" icon="Plus" @click="onOpenDialog()">
                             {{ $t('commons.button.create') }}
                         </el-button>
+                        <el-button @click="onChangeRootPassword" type="primary" plain>
+                            {{ $t('database.rootPassword') }}
+                        </el-button>
+                        <el-button @click="goDashboard">远程访问</el-button>
                         <el-button @click="goDashboard" icon="Position">phpMyAdmin</el-button>
                     </template>
                     <el-table-column type="selection" fix />
@@ -23,19 +27,34 @@
                     <el-table-column :label="$t('commons.login.username')" prop="username" />
                     <el-table-column :label="$t('commons.login.password')" prop="password">
                         <template #default="{ row }">
-                            <div v-if="!row.showPassword">
-                                <span style="float: left">***********</span>
-                                <div style="margin-top: 2px; cursor: pointer">
-                                    <el-icon style="margin-left: 5px" @click="row.showPassword = true" :size="16">
+                            <div>
+                                <span style="float: left; line-height: 25px" v-if="!row.showPassword">***********</span>
+                                <div style="cursor: pointer; float: left" v-if="!row.showPassword">
+                                    <el-icon
+                                        style="margin-left: 5px; margin-top: 3px"
+                                        @click="row.showPassword = true"
+                                        :size="16"
+                                    >
                                         <View />
                                     </el-icon>
                                 </div>
-                            </div>
-                            <div v-else>
-                                <span style="float: left">{{ row.password }}</span>
-                                <div style="margin-top: 4px; cursor: pointer">
-                                    <el-icon style="margin-left: 5px" @click="row.showPassword = false" :size="16">
+                                <span style="float: left" v-if="row.showPassword">{{ row.password }}</span>
+                                <div style="cursor: pointer; float: left" v-if="row.showPassword">
+                                    <el-icon
+                                        style="margin-left: 5px; margin-top: 3px"
+                                        @click="row.showPassword = false"
+                                        :size="16"
+                                    >
                                         <Hide />
+                                    </el-icon>
+                                </div>
+                                <div style="cursor: pointer; float: left">
+                                    <el-icon
+                                        style="margin-left: 5px; margin-top: 3px"
+                                        :size="16"
+                                        @click="onCopyPassword(row)"
+                                    >
+                                        <DocumentCopy />
                                     </el-icon>
                                 </div>
                             </div>
@@ -125,6 +144,7 @@
             </template>
         </el-dialog>
 
+        <RootPasswordDialog @search="search" ref="rootPasswordRef" />
         <UploadDialog ref="uploadRef" />
         <OperatrDialog @search="search" ref="dialogRef" />
         <BackupRecords ref="dialogBackupRef" />
@@ -136,6 +156,7 @@
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import OperatrDialog from '@/views/database/mysql/create/index.vue';
+import RootPasswordDialog from '@/views/database/mysql/password/index.vue';
 import BackupRecords from '@/views/database/mysql/backup/index.vue';
 import UploadDialog from '@/views/database/mysql/upload/index.vue';
 import AppResources from '@/views/database/mysql/check/index.vue';
@@ -190,6 +211,11 @@ const onOpenBackupDialog = async (dbName: string) => {
 };
 
 const uploadRef = ref();
+
+const rootPasswordRef = ref();
+const onChangeRootPassword = async () => {
+    rootPasswordRef.value!.acceptParams();
+};
 
 const settingRef = ref();
 const onSetting = async () => {
@@ -262,6 +288,16 @@ const checkExist = (data: App.CheckInstalled) => {
         search();
         loadDashboardPort();
     }
+};
+
+const onCopyPassword = (row: Database.MysqlDBInfo) => {
+    let input = document.createElement('input');
+    input.value = row.password;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('Copy');
+    document.body.removeChild(input);
+    ElMessage.success(i18n.global.t('commons.msg.copySuccess'));
 };
 
 const onDelete = async (row: Database.MysqlDBInfo) => {

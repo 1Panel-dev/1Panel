@@ -303,10 +303,8 @@ func (u *MysqlService) ChangeInfo(info dto.ChangeDBInfo) error {
 				}
 			}
 		}
-		_ = mysqlRepo.UpdateDatabaseInfo(app.ID, map[string]interface{}{
-			"param": strings.ReplaceAll(app.Param, app.Password, info.Value),
-			"env":   strings.ReplaceAll(app.Env, app.Password, info.Value),
-		})
+		updateInstallInfoInDB("mysql", "password", info.Value)
+		updateInstallInfoInDB("phpmyadmin", "password", info.Value)
 		return nil
 	}
 

@@ -267,10 +267,6 @@ func (a AppInstallService) ChangeAppPort(req dto.PortUpdate) error {
 		files    []string
 		newFiles []string
 	)
-	app, err := appInstallRepo.LoadBaseInfoByKey(req.Key)
-	if err != nil {
-		return err
-	}
 
 	ComposeDir := fmt.Sprintf("%s/%s/%s", constant.AppInstallDir, req.Key, req.Name)
 	ComposeFile := fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, req.Key, req.Name)
@@ -298,11 +294,8 @@ func (a AppInstallService) ChangeAppPort(req dto.PortUpdate) error {
 		return err
 	}
 
-	if err := mysqlRepo.UpdateDatabaseInfo(app.ID, map[string]interface{}{
-		"env": strings.ReplaceAll(app.Env, strconv.FormatInt(app.Port, 10), strconv.FormatInt(req.Port, 10)),
-	}); err != nil {
-		return err
-	}
+	updateInstallInfoInDB(req.Key, "port", strconv.FormatInt(req.Port, 10))
+
 	stdout, err := compose.Down(ComposeFile)
 	if err != nil {
 		return errors.New(stdout)
@@ -481,4 +474,27 @@ func syncById(installId uint) error {
 	}
 	appInstall.Message = errMsg.String()
 	return appInstallRepo.Save(&appInstall)
+}
+
+func updateInstallInfoInDB(appKey, param string, value interface{}) {
+	if param != "password" && param != "port" {
+		return
+	}
+	appInstall, _ := appInstallRepo.LoadBaseInfoByKey(appKey)
+	if appInstall.ID == 0 {
+		return
+	}
+	oldVal, newVal := "", ""
+	if param == "password" {
+		oldVal = fmt.Sprintf("\"PANEL_DB_ROOT_PASSWORD\":\"%v\"", appInstall.Password)
+		newVal = fmt.Sprintf("\"PANEL_DB_ROOT_PASSWORD\":\"%v\"", value)
+	}
+	if param == "port" {
+		oldVal = fmt.Sprintf("\"PANEL_APP_PORT_HTTP\":%v", appInstall.Port)
+		newVal = fmt.Sprintf("\"PANEL_APP_PORT_HTTP\":%v", value)
+	}
+	_ = appInstallRepo.BatchUpdateBy(map[string]interface{}{
+		"param": strings.ReplaceAll(appInstall.Param, oldVal, newVal),
+		"env":   strings.ReplaceAll(appInstall.Env, oldVal, newVal),
+	}, commonRepo.WithByID(appInstall.ID))
 }

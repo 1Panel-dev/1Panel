@@ -47,12 +47,10 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 	if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "maxclients", req.Maxclients); err != nil {
 		return err
 	}
-	if err := mysqlRepo.UpdateDatabaseInfo(redisInfo.ID, map[string]interface{}{
-		"param": strings.ReplaceAll(redisInfo.Param, redisInfo.Password, req.Requirepass),
-		"env":   strings.ReplaceAll(redisInfo.Env, redisInfo.Password, req.Requirepass),
-	}); err != nil {
-		return err
-	}
+
+	updateInstallInfoInDB("redis", "password", req.Requirepass)
+	updateInstallInfoInDB("phpmyadmin", "password", req.Requirepass)
+
 	if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "requirepass", req.Requirepass); err != nil {
 		return err
 	}

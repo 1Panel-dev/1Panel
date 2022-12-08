@@ -65,6 +65,7 @@ export default {
             deleteSuccess: '删除成功',
             loginSuccess: '登录成功',
             operationSuccess: '操作成功',
+            copySuccess: '复制成功',
             notSupportOperation: '不支持的当前操作',
             requestTimeout: '请求超时,请稍后重试',
             infoTitle: '提示',

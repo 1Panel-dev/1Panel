@@ -64,6 +64,7 @@ export default {
             deleteSuccess: 'Delete Success',
             loginSuccess: 'Login Success',
             operationSuccess: 'Successful operation',
+            copySuccess: 'Copy Successful',
             notSupportOperation: 'This operation is not supported',
             requestTimeout: 'The request timed out, please try again later',
             infoTitle: 'Hint',
