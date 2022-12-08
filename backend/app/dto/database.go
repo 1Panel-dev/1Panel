@@ -93,9 +93,8 @@ type MysqlConfUpdateByFile struct {
 }
 
 type ChangeDBInfo struct {
-	ID        uint   `json:"id"`
-	Operation string `json:"operation" validate:"required,oneof=password privilege"`
-	Value     string `json:"value" validate:"required"`
+	ID    uint   `json:"id"`
+	Value string `json:"value" validate:"required"`
 }
 
 type DBBaseInfo struct {

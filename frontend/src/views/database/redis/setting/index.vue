@@ -1,7 +1,7 @@
 <template>
     <div class="demo-collapse" v-show="settingShow">
-        <el-card style="margin-top: 5px">
-            <LayoutContent :header="$t('database.setting')" back-name="Redis" :reload="true" v-loading="loading">
+        <el-card style="margin-top: 5px" v-loading="loading">
+            <LayoutContent :header="'Redis ' + $t('database.setting')" back-name="Redis" :reload="true">
                 <el-collapse v-model="activeName" accordion>
                     <el-collapse-item :title="$t('database.baseSetting')" name="1">
                         <el-radio-group v-model="confShowType" @change="onChangeMode">

@@ -1,7 +1,7 @@
 <template>
     <div class="demo-collapse" v-show="onSetting">
         <el-card style="margin-top: 5px" v-loading="loading">
-            <LayoutContent :header="$t('database.setting')" :back-name="'Mysql'" :reload="true">
+            <LayoutContent :header="'Mysql ' + $t('database.setting')" :back-name="'Mysql'" :reload="true">
                 <el-collapse v-model="activeName" accordion>
                     <el-collapse-item :title="$t('database.confChange')" name="1">
                         <codemirror
@@ -110,7 +110,6 @@ interface DialogProps {
 const dialogContainerLogRef = ref();
 const acceptParams = (params: DialogProps): void => {
     onSetting.value = true;
-    loading.value = true;
     loadBaseInfo();
     loadVariables();
     loadSlowLogs();
@@ -217,14 +216,9 @@ const loadSlowLogs = async () => {
 };
 
 const loadMysqlConf = async (path: string) => {
-    await LoadFile({ path: path })
-        .then((res) => {
-            loading.value = false;
-            mysqlConf.value = res.data;
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    const res = await LoadFile({ path: path });
+    loading.value = false;
+    mysqlConf.value = res.data;
 };
 
 defineExpose({

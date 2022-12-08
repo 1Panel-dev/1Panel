@@ -231,7 +231,7 @@ export default {
         backupList: '备份列表',
         backList: '返回列表',
         loadBackup: '导入备份',
-        setting: 'Mysql 设置',
+        setting: '设置',
         remoteAccess: '远程访问',
         remoteConnHelper: 'root 帐号远程连接 mysql 有安全风险，开启需谨慎！',
         changePassword: '改密',

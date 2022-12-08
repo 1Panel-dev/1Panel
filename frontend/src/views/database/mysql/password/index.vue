@@ -29,7 +29,7 @@ import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
-import { updateMysqlDBInfo } from '@/api/modules/database';
+import { updateMysqlPassword } from '@/api/modules/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 
 const loading = ref(false);
@@ -52,11 +52,10 @@ const acceptParams = (): void => {
 const onSubmit = async () => {
     let param = {
         id: 0,
-        operation: 'password',
         value: form.password,
     };
     loading.value = true;
-    await updateMysqlDBInfo(param)
+    await updateMysqlPassword(param)
         .then(() => {
             loading.value = false;
             ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));

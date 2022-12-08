@@ -4,7 +4,7 @@
 
         <AppStatus :app-key="'redis'" style="margin-top: 20px" @setting="onSetting" @is-exist="checkExist"></AppStatus>
         <div v-show="redisIsExist">
-            <el-button style="margin-top: 20px" type="p" @click="goDashboard" icon="Position">
+            <el-button style="margin-top: 20px" type="primary" plain @click="goDashboard" icon="Position">
                 Redis-Commander
             </el-button>
 

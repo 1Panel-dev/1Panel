@@ -32,7 +32,8 @@ type IMysqlService interface {
 	SearchWithPage(search dto.PageInfo) (int64, interface{}, error)
 	ListDBName() ([]string, error)
 	Create(mysqlDto dto.MysqlDBCreate) error
-	ChangeInfo(info dto.ChangeDBInfo) error
+	ChangeAccess(info dto.ChangeDBInfo) error
+	ChangePassword(info dto.ChangeDBInfo) error
 	UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
 	UpdateConfByFile(info dto.MysqlConfUpdateByFile) error
 
@@ -269,7 +270,7 @@ func (u *MysqlService) Delete(id uint) error {
 	return nil
 }
 
-func (u *MysqlService) ChangeInfo(info dto.ChangeDBInfo) error {
+func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 	var (
 		mysql model.DatabaseMysql
 		err   error
@@ -284,30 +285,54 @@ func (u *MysqlService) ChangeInfo(info dto.ChangeDBInfo) error {
 	if err != nil {
 		return err
 	}
-	if info.Operation == "password" {
-		if info.ID != 0 {
-			if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set password for %s@%s = password('%s')", mysql.Username, mysql.Permission, info.Value)); err != nil {
-				return err
-			}
-			_ = mysqlRepo.Update(mysql.ID, map[string]interface{}{"password": info.Value})
-			return nil
-		}
-		hosts, err := excuteSqlForRows(app.ContainerName, app.Password, "select host from mysql.user where user='root';")
-		if err != nil {
+
+	passwordChangeCMD := fmt.Sprintf("set password for '%s'@'%s' = password('%s')", mysql.Username, mysql.Permission, info.Value)
+	if app.Version != "5.7.39" {
+		passwordChangeCMD = fmt.Sprintf("ALTER USER '%s'@'%s' IDENTIFIED WITH mysql_native_password BY '%s';", mysql.Username, mysql.Permission, info.Value)
+	}
+	if info.ID != 0 {
+		if err := excuteSql(app.ContainerName, app.Password, passwordChangeCMD); err != nil {
 			return err
 		}
-		for _, host := range hosts {
-			if host == "%" || host == "localhost" {
-				if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("set password for root@'%s' = password('%s')", host, info.Value)); err != nil {
-					return err
-				}
-			}
-		}
-		updateInstallInfoInDB("mysql", "password", info.Value)
-		updateInstallInfoInDB("phpmyadmin", "password", info.Value)
+		_ = mysqlRepo.Update(mysql.ID, map[string]interface{}{"password": info.Value})
 		return nil
 	}
 
+	hosts, err := excuteSqlForRows(app.ContainerName, app.Password, "select host from mysql.user where user='root';")
+	if err != nil {
+		return err
+	}
+	for _, host := range hosts {
+		if host == "%" || host == "localhost" {
+			passwordRootChangeCMD := fmt.Sprintf("set password for 'root'@'%s' = password('%s')", host, info.Value)
+			if app.Version != "5.7.39" {
+				passwordRootChangeCMD = fmt.Sprintf("ALTER USER 'root'@'%s' IDENTIFIED WITH mysql_native_password BY '%s';", host, info.Value)
+			}
+			if err := excuteSql(app.ContainerName, app.Password, passwordRootChangeCMD); err != nil {
+				return err
+			}
+		}
+	}
+	updateInstallInfoInDB("mysql", "password", info.Value)
+	updateInstallInfoInDB("phpmyadmin", "password", info.Value)
+	return nil
+}
+
+func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
+	var (
+		mysql model.DatabaseMysql
+		err   error
+	)
+	if info.ID != 0 {
+		mysql, err = mysqlRepo.Get(commonRepo.WithByID(info.ID))
+		if err != nil {
+			return err
+		}
+	}
+	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	if err != nil {
+		return err
+	}
 	if info.ID == 0 {
 		mysql.Name = "*"
 		mysql.Username = "root"
