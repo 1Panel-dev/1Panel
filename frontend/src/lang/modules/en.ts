@@ -228,7 +228,7 @@ export default {
         backupList: 'Backup list',
         backList: 'Return',
         loadBackup: 'Import the backup',
-        setting: 'Database Settings',
+        setting: 'Mysql Settings',
         remoteAccess: 'Remote access',
         changePassword: 'Password change',
 
@@ -345,7 +345,7 @@ export default {
         operatorHelper: '{0} will be performed on the selected container. Do you want to continue?',
         start: 'Start',
         stop: 'Stop',
-        reStart: 'Restart',
+        restart: 'Restart',
         kill: 'Kill',
         pause: 'Pause',
         unpause: 'Unpause',

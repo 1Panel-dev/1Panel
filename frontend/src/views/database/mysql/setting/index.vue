@@ -1,57 +1,9 @@
 <template>
     <div class="demo-collapse" v-show="onSetting">
-        <el-card style="margin-top: 5px">
+        <el-card style="margin-top: 5px" v-loading="loading">
             <LayoutContent :header="$t('database.setting')" :back-name="'Mysql'" :reload="true">
                 <el-collapse v-model="activeName" accordion>
-                    <el-collapse-item :title="$t('database.baseSetting')" name="1">
-                        <el-form :model="baseInfo" ref="panelFormRef" label-width="120px">
-                            <el-row>
-                                <el-col :span="1"><br /></el-col>
-                                <el-col :span="10">
-                                    <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
-                                        <el-input clearable type="number" v-model.number="baseInfo.port">
-                                            <template #append>
-                                                <el-button
-                                                    @click="onSave(panelFormRef, 'port', baseInfo.port)"
-                                                    icon="Collection"
-                                                >
-                                                    {{ $t('commons.button.save') }}
-                                                </el-button>
-                                            </template>
-                                        </el-input>
-                                    </el-form-item>
-                                    <el-form-item
-                                        :label="$t('setting.password')"
-                                        prop="password"
-                                        :rules="Rules.requiredInput"
-                                    >
-                                        <el-input type="password" show-password clearable v-model="baseInfo.password">
-                                            <template #append>
-                                                <el-button
-                                                    @click="onSave(panelFormRef, 'password', baseInfo.password)"
-                                                    icon="Collection"
-                                                >
-                                                    {{ $t('commons.button.save') }}
-                                                </el-button>
-                                            </template>
-                                        </el-input>
-                                    </el-form-item>
-                                    <el-form-item
-                                        :label="$t('database.remoteAccess')"
-                                        prop="remoteConn"
-                                        :rules="Rules.requiredSelect"
-                                    >
-                                        <el-switch
-                                            v-model="baseInfo.remoteConn"
-                                            @change="onSave(panelFormRef, 'remoteConn', baseInfo.remoteConn)"
-                                        />
-                                        <span class="input-help">{{ $t('database.remoteConnHelper') }}</span>
-                                    </el-form-item>
-                                </el-col>
-                            </el-row>
-                        </el-form>
-                    </el-collapse-item>
-                    <el-collapse-item :title="$t('database.confChange')" name="2">
+                    <el-collapse-item :title="$t('database.confChange')" name="1">
                         <codemirror
                             :autofocus="true"
                             placeholder="None data"
@@ -66,15 +18,33 @@
                             v-model="mysqlConf"
                             :readOnly="true"
                         />
-                        <el-button type="primary" style="margin-top: 10px" @click="onSaveFile()">
+                        <el-button type="primary" style="margin-top: 10px" @click="onSaveConf">
                             {{ $t('commons.button.save') }}
                         </el-button>
                     </el-collapse-item>
-                    <el-collapse-item :title="$t('database.currentStatus')" name="3">
+                    <el-collapse-item :title="$t('database.currentStatus')" name="2">
                         <Status ref="statusRef" />
                     </el-collapse-item>
-                    <el-collapse-item :title="$t('database.performanceTuning')" name="4">
+                    <el-collapse-item :title="$t('database.performanceTuning')" name="3">
                         <Variables ref="variablesRef" />
+                    </el-collapse-item>
+                    <el-collapse-item :title="$t('database.portSetting')" name="4">
+                        <el-form :model="baseInfo" ref="panelFormRef" label-width="120px">
+                            <el-row>
+                                <el-col :span="1"><br /></el-col>
+                                <el-col :span="10">
+                                    <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
+                                        <el-input clearable type="number" v-model.number="baseInfo.port">
+                                            <template #append>
+                                                <el-button @click="onSavePort(panelFormRef)" icon="Collection">
+                                                    {{ $t('commons.button.save') }}
+                                                </el-button>
+                                            </template>
+                                        </el-input>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                        </el-form>
                     </el-collapse-item>
                     <el-collapse-item :title="$t('database.log')" name="5">
                         <ContainerLog ref="dialogContainerLogRef" />
@@ -86,6 +56,9 @@
                 </el-collapse>
             </LayoutContent>
         </el-card>
+
+        <ConfirmDialog ref="confirmPortRef" @confirm="onSubmitChangePort"></ConfirmDialog>
+        <ConfirmDialog ref="confirmConfRef" @confirm="onSubmitChangeConf"></ConfirmDialog>
     </div>
 </template>
 
@@ -96,20 +69,18 @@ import ContainerLog from '@/components/container-log/index.vue';
 import Status from '@/views/database/mysql/setting/status/index.vue';
 import Variables from '@/views/database/mysql/setting/variables/index.vue';
 import SlowLog from '@/views/database/mysql/setting/slow-log/index.vue';
+import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { LoadFile } from '@/api/modules/files';
-import {
-    loadMysqlBaseInfo,
-    loadMysqlVariables,
-    updateMysqlConfByFile,
-    updateMysqlDBInfo,
-} from '@/api/modules/database';
+import { loadMysqlBaseInfo, loadMysqlVariables, updateMysqlConfByFile } from '@/api/modules/database';
 import { ChangePort } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
+
+const loading = ref(false);
 
 const extensions = [javascript(), oneDark];
 const activeName = ref('1');
@@ -139,6 +110,7 @@ interface DialogProps {
 const dialogContainerLogRef = ref();
 const acceptParams = (params: DialogProps): void => {
     onSetting.value = true;
+    loading.value = true;
     loadBaseInfo();
     loadVariables();
     loadSlowLogs();
@@ -148,33 +120,36 @@ const onClose = (): void => {
     onSetting.value = false;
 };
 
-const onSave = async (formEl: FormInstance | undefined, key: string, val: any) => {
+const onSubmitChangePort = async () => {
+    let params = {
+        key: 'mysql',
+        name: mysqlName.value,
+        port: baseInfo.port,
+    };
+    loading.value = true;
+    await ChangePort(params)
+        .then(() => {
+            loading.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+const confirmPortRef = ref();
+const onSavePort = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
-    const result = await formEl.validateField(key, callback);
+    const result = await formEl.validateField('port', callback);
     if (!result) {
         return;
     }
-    if (key === 'port') {
-        let params = {
-            key: 'mysql',
-            name: mysqlName.value,
-            port: val,
-        };
-        await ChangePort(params);
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        return;
-    }
-    let changeForm = {
-        id: 0,
-        mysqlName: mysqlName.value,
-        value: val,
-        operation: key === 'remoteConn' ? 'privilege' : key,
+    let params = {
+        header: i18n.global.t('database.confChange'),
+        operationInfo: i18n.global.t('database.restartNowHelper'),
+        submitInputInfo: i18n.global.t('database.restartNow'),
     };
-    if (changeForm.operation === 'privilege') {
-        changeForm.value = val ? '%' : 'localhost';
-    }
-    await updateMysqlDBInfo(changeForm);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    confirmPortRef.value!.acceptParams(params);
+    return;
 };
 function callback(error: any) {
     if (error) {
@@ -184,13 +159,30 @@ function callback(error: any) {
     }
 }
 
-const onSaveFile = async () => {
+const onSubmitChangeConf = async () => {
     let param = {
         mysqlName: mysqlName.value,
         file: mysqlConf.value,
     };
-    await updateMysqlConfByFile(param);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    loading.value = true;
+    await updateMysqlConfByFile(param)
+        .then(() => {
+            loading.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+const confirmConfRef = ref();
+const onSaveConf = async () => {
+    let params = {
+        header: i18n.global.t('database.confChange'),
+        operationInfo: i18n.global.t('database.restartNowHelper'),
+        submitInputInfo: i18n.global.t('database.restartNow'),
+    };
+    confirmConfRef.value!.acceptParams(params);
+    return;
 };
 
 const loadContainerLog = async (containerID: string) => {
@@ -225,8 +217,14 @@ const loadSlowLogs = async () => {
 };
 
 const loadMysqlConf = async (path: string) => {
-    const res = await LoadFile({ path: path });
-    mysqlConf.value = res.data;
+    await LoadFile({ path: path })
+        .then((res) => {
+            loading.value = false;
+            mysqlConf.value = res.data;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 defineExpose({

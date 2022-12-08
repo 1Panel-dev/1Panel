@@ -88,6 +88,8 @@ func (u *ImageRepoService) Create(imageRepoDto dto.ImageRepoCreate) error {
 				k = append(k, imageRepoDto.DownloadUrl)
 				deamonMap["insecure-registries"] = k
 			}
+		} else {
+			deamonMap["insecure-registries"] = []string{imageRepoDto.DownloadUrl}
 		}
 		newJson, err := json.MarshalIndent(deamonMap, "", "\t")
 		if err != nil {

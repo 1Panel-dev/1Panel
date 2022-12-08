@@ -379,14 +379,8 @@ func (u *MysqlService) UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
 	} else {
 		files = strings.Split(string(lineBytes), "\n")
 	}
-	group := ""
+	group := "[mysqld]"
 	for _, info := range updatas {
-		switch info.Param {
-		case "key_buffer_size", "sort_buffer_size":
-			group = "[myisamchk]"
-		default:
-			group = "[mysqld]"
-		}
 		files = updateMyCnf(files, group, info.Param, info.Value)
 	}
 	file, err := os.OpenFile(path, os.O_WRONLY, 0666)
