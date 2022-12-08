@@ -174,7 +174,8 @@ import {
     deleteMysqlDB,
     loadMysqlBaseInfo,
     searchMysqlDBs,
-    updateMysqlDBInfo,
+    updateMysqlAccess,
+    updateMysqlPassword,
 } from '@/api/modules/database';
 import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';
@@ -262,12 +263,24 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        changeForm.value = changeForm.operation === 'password' ? changeForm.password : changeForm.privilege;
+        let param = {
+            id: changeForm.id,
+            value: '',
+        };
+        if (changeForm.operation === 'password') {
+            param.value = changeForm.password;
+            await updateMysqlPassword(param);
+            search();
+            changeVisiable.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            return;
+        }
+        param.value = changeForm.privilege;
         changeForm.mysqlName = mysqlName.value;
-        await updateMysqlDBInfo(changeForm);
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        await updateMysqlAccess(param);
         search();
         changeVisiable.value = false;
+        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
     });
 };
 

@@ -22,7 +22,8 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		withRecordRouter.POST("", baseApi.CreateMysql)
-		withRecordRouter.PUT("/:id", baseApi.UpdateMysql)
+		withRecordRouter.POST("/change/access", baseApi.ChangeMysqlAccess)
+		withRecordRouter.POST("/change/password", baseApi.ChangeMysqlPassword)
 		withRecordRouter.POST("/backup", baseApi.BackupMysql)
 		withRecordRouter.POST("/recover/byupload", baseApi.RecoverMysqlByUpload)
 		withRecordRouter.POST("/recover", baseApi.RecoverMysql)

@@ -13,7 +13,7 @@ const props = defineProps({
         default: 'runnning',
     },
 });
-let status = ref('');
+let status = ref('running');
 
 const getColor = (status: string) => {
     switch (status) {
