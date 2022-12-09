@@ -226,6 +226,7 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 	}
 	tx.Commit()
 	go upApp(appInstall.GetComposePath(), appInstall)
+	go updateToolApp(appInstall)
 	return &appInstall, nil
 }
 

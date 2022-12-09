@@ -29,6 +29,7 @@ ErrFileToLarge: "文件超过10M,无法打开"
 #website
 ErrDomainIsExist: "域名已存在"
 ErrAliasIsExist: "代号已存在"
+ErrAppDelete: ''
 
 #ssl
 ErrSSLCannotDelete: "证书正在被网站使用，无法删除"

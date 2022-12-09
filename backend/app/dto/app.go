@@ -183,3 +183,8 @@ type AppResource struct {
 	Type string `json:"type"`
 	Name string `json:"name"`
 }
+
+var AppToolMap = map[string]string{
+	"mysql": "phpmyadmin",
+	"redis": "redis-commander",
+}

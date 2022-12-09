@@ -3,7 +3,6 @@ package repo
 import (
 	"context"
 	"encoding/json"
-
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"gorm.io/gorm"
@@ -132,10 +131,7 @@ func (a *AppInstallRepo) LoadBaseInfoByKey(key string) (*RootInfo, error) {
 	if ok {
 		info.Password = password
 	}
-	port, ok := envMap["PANEL_APP_PORT_HTTP"].(float64)
-	if ok {
-		info.Port = int64(port)
-	}
+	info.Port = int64(appInstall.HttpPort)
 	info.ID = appInstall.ID
 	info.ContainerName = appInstall.ContainerName
 	info.Name = appInstall.Name
