@@ -17,3 +17,7 @@ export const UpdateNginxConfigByScope = (req: Nginx.NginxConfigReq) => {
 export const GetNginxStatus = () => {
     return http.get<Nginx.NginxStatus>(`/nginx/status`);
 };
+
+export const UpdateNginxConfigFile = (req: Nginx.NginxFileUpdate) => {
+    return http.post<any>(`/nginx/file`, req);
+};

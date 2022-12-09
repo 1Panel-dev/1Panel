@@ -183,3 +183,19 @@ func (b *BaseApi) ChangeAppPort(c *gin.Context) {
 
 	helper.SuccessWithData(c, nil)
 }
+
+func (b *BaseApi) GetDefaultConfig(c *gin.Context) {
+	key := c.Param("key")
+	if key == "" {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+
+	content, err := appInstallService.GetDefaultConfigByKey(key)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, content)
+}

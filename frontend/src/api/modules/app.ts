@@ -69,3 +69,7 @@ export const DelAppBackups = (req: App.AppBackupDelReq) => {
 export const GetAppUpdateVersions = (id: number) => {
     return http.get<any>(`apps/installed/${id}/versions`);
 };
+
+export const GetAppDefaultConfig = (key: string) => {
+    return http.get<string>(`apps/installed/conf/${key}`);
+};

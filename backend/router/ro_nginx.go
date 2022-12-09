@@ -19,5 +19,6 @@ func (a *NginxRouter) InitNginxRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/scope", baseApi.GetNginxConfigByScope)
 		groupRouter.POST("/update", baseApi.UpdateNginxConfigBy)
 		groupRouter.GET("/status", baseApi.GetNginxStatus)
+		groupRouter.POST("/file", baseApi.UpdateNginxFile)
 	}
 }
