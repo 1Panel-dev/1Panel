@@ -101,19 +101,24 @@ const slowLogRef = ref();
 
 const onSetting = ref<boolean>(false);
 const mysqlName = ref();
+const mysqlStatus = ref();
 const variables = ref();
 
 interface DialogProps {
     mysqlName: string;
+    status: string;
 }
 
 const dialogContainerLogRef = ref();
-const acceptParams = (params: DialogProps): void => {
+const acceptParams = (props: DialogProps): void => {
     onSetting.value = true;
+    mysqlStatus.value = props.status;
     loadBaseInfo();
-    loadVariables();
-    loadSlowLogs();
-    statusRef.value!.acceptParams({ mysqlName: params.mysqlName });
+    if (mysqlStatus.value === 'Running') {
+        loadVariables();
+        loadSlowLogs();
+        statusRef.value!.acceptParams({ mysqlName: props.mysqlName });
+    }
 };
 const onClose = (): void => {
     onSetting.value = false;
@@ -191,12 +196,9 @@ const loadContainerLog = async (containerID: string) => {
 const loadBaseInfo = async () => {
     const res = await loadMysqlBaseInfo();
     mysqlName.value = res.data?.name;
-    baseInfo.name = res.data?.name;
     baseInfo.port = res.data?.port;
-    baseInfo.password = res.data?.password;
-    baseInfo.remoteConn = res.data?.remoteConn;
     baseInfo.containerID = res.data?.containerName;
-    loadMysqlConf(`/opt/1Panel/data/apps/mysql/${baseInfo.name}/conf/my.cnf`);
+    loadMysqlConf(`/opt/1Panel/data/apps/mysql/${mysqlName.value}/conf/my.cnf`);
     loadContainerLog(baseInfo.containerID);
 };
 

@@ -37,7 +37,7 @@ const loading = ref(false);
 
 const dialogVisiable = ref(false);
 const form = reactive({
-    privilege: '',
+    privilege: false,
 });
 
 const confirmDialogRef = ref();
@@ -46,7 +46,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
 interface DialogProps {
-    privilege: string;
+    privilege: boolean;
 }
 
 const acceptParams = (prop: DialogProps): void => {

@@ -201,6 +201,16 @@ func (b *BaseApi) LoadBaseinfo(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+func (b *BaseApi) LoadRemoteAccess(c *gin.Context) {
+	isRemote, err := mysqlService.LoadRemoteAccess()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, isRemote)
+}
+
 func (b *BaseApi) LoadStatus(c *gin.Context) {
 	data, err := mysqlService.LoadStatus()
 	if err != nil {

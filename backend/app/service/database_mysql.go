@@ -46,6 +46,7 @@ type IMysqlService interface {
 	LoadStatus() (*dto.MysqlStatus, error)
 	LoadVariables() (*dto.MysqlVariables, error)
 	LoadBaseInfo() (*dto.DBBaseInfo, error)
+	LoadRemoteAccess() (bool, error)
 }
 
 func NewIMysqlService() IMysqlService {
@@ -266,6 +267,22 @@ func (u *MysqlService) Delete(id uint) error {
 	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop database if exists %s", db.Name)); err != nil {
 		return err
 	}
+
+	uploadDir := fmt.Sprintf("%s/uploads/%s/mysql/%s", constant.DefaultDataDir, app.Name, db.Name)
+	if _, err := os.Stat(uploadDir); err == nil {
+		_ = os.RemoveAll(uploadDir)
+	}
+
+	localDir, err := loadLocalDir()
+	if err != nil {
+		return err
+	}
+	backupDir := fmt.Sprintf("%s/database/mysql/%s/%s", localDir, db.MysqlName, db.Name)
+	if _, err := os.Stat(backupDir); err == nil {
+		_ = os.RemoveAll(backupDir)
+	}
+	_ = backupRepo.DeleteRecord(commonRepo.WithByType("database-mysql"), commonRepo.WithByName(app.Name), backupRepo.WithByDetailName(db.Name))
+
 	_ = mysqlRepo.Delete(context.Background(), commonRepo.WithByID(db.ID))
 	return nil
 }
@@ -406,7 +423,13 @@ func (u *MysqlService) UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
 	}
 	group := "[mysqld]"
 	for _, info := range updatas {
-		files = updateMyCnf(files, group, info.Param, info.Value)
+		if app.Version != "5.7.39" {
+			if info.Param == "query_cache_size" {
+				continue
+			}
+		}
+
+		files = updateMyCnf(files, group, info.Param, loadSizeUnit(info.Value))
 	}
 	file, err := os.OpenFile(path, os.O_WRONLY, 0666)
 	if err != nil {
@@ -434,19 +457,26 @@ func (u *MysqlService) LoadBaseInfo() (*dto.DBBaseInfo, error) {
 	data.ContainerName = app.ContainerName
 	data.Name = app.Name
 	data.Port = int64(app.Port)
-	data.Password = app.Password
 
+	return &data, nil
+}
+
+func (u *MysqlService) LoadRemoteAccess() (bool, error) {
+	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	if err != nil {
+		return false, err
+	}
 	hosts, err := excuteSqlForRows(app.ContainerName, app.Password, "select host from mysql.user where user='root';")
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 	for _, host := range hosts {
 		if host == "%" {
-			data.RemoteConn = true
-			break
+			return true, nil
 		}
 	}
-	return &data, nil
+
+	return false, nil
 }
 
 func (u *MysqlService) LoadVariables() (*dto.MysqlVariables, error) {
@@ -632,4 +662,14 @@ func updateMyCnf(oldFiles []string, group string, param string, value interface{
 		newFiles = append(newFiles, fmt.Sprintf("%s=%v\n", param, value))
 	}
 	return newFiles
+}
+
+func loadSizeUnit(value int64) string {
+	if value > 1048576 {
+		return fmt.Sprintf("%dM", value/1048576)
+	}
+	if value > 1024 {
+		return fmt.Sprintf("%dK", value/1024)
+	}
+	return fmt.Sprintf("%d", value)
 }

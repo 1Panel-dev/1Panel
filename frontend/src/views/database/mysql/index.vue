@@ -2,9 +2,16 @@
     <div>
         <Submenu activeName="mysql" />
         <AppStatus :app-key="'mysql'" style="margin-top: 20px" @setting="onSetting" @is-exist="checkExist" />
-        <div v-if="mysqlIsExist">
-            <Setting ref="settingRef" style="margin-top: 20px" />
+        <Setting ref="settingRef" style="margin-top: 20px" />
 
+        <el-card width="30%" v-if="mysqlStatus != 'Running' && !isOnSetting" class="mask-prompt">
+            <span style="font-size: 14px">{{ $t('database.mysqlBadStatus') }}</span>
+            <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="onSetting">
+                【 {{ $t('database.setting') }} 】
+            </el-button>
+            <span style="font-size: 14px">{{ $t('database.adjust') }}</span>
+        </el-card>
+        <div v-if="mysqlIsExist" :class="{ mask: mysqlStatus != 'Running' }">
             <el-card v-if="!isOnSetting" style="margin-top: 20px">
                 <ComplexTable
                     :pagination-config="paginationConfig"
@@ -172,7 +179,7 @@ import { reactive, ref } from 'vue';
 import {
     deleteCheckMysqlDB,
     deleteMysqlDB,
-    loadMysqlBaseInfo,
+    loadRemoteAccess,
     searchMysqlDBs,
     updateMysqlAccess,
     updateMysqlPassword,
@@ -203,6 +210,8 @@ const paginationConfig = reactive({
 });
 
 const mysqlIsExist = ref(false);
+const mysqlContainer = ref();
+const mysqlStatus = ref();
 
 const dialogRef = ref();
 const onOpenDialog = async () => {
@@ -230,9 +239,9 @@ const onChangeRootPassword = async () => {
 
 const remoteAccessRef = ref();
 const onChangeAccess = async () => {
-    const res = await loadMysqlBaseInfo();
+    const res = await loadRemoteAccess();
     let param = {
-        privilege: res.data.remoteConn,
+        privilege: res.data,
     };
     remoteAccessRef.value!.acceptParams(param);
 };
@@ -241,6 +250,7 @@ const settingRef = ref();
 const onSetting = async () => {
     isOnSetting.value = true;
     let params = {
+        status: mysqlStatus.value,
         mysqlName: mysqlName.value,
     };
     settingRef.value!.acceptParams(params);
@@ -316,6 +326,8 @@ const loadDashboardPort = async () => {
 const checkExist = (data: App.CheckInstalled) => {
     mysqlIsExist.value = data.isExist;
     mysqlName.value = data.name;
+    mysqlStatus.value = data.status;
+    mysqlContainer.value = data.containerName;
     if (mysqlIsExist.value) {
         search();
         loadDashboardPort();

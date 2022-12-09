@@ -138,6 +138,7 @@ export default {
             error: '失败',
             created: '已创建',
             restarting: '重启中',
+            unhealthy: '异常',
             removing: '迁移中',
             paused: '暂停',
             exited: '停止',
@@ -220,6 +221,8 @@ export default {
     database: {
         create: '创建数据库',
         noMysql: '当前未检测到 {0} 数据库，请进入应用商店点击安装！',
+        mysqlBadStatus: '当前 mysql 应用状态异常，请在',
+        adjust: '中查看原因或修改配置',
         goInstall: '去安装',
         source: '来源',
         backup: '备份',
