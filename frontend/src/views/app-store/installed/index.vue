@@ -56,7 +56,7 @@
                         <el-icon v-if="row.status === 'Installing'" class="is-loading">
                             <Loading />
                         </el-icon>
-                        <Status :status="row.status"></Status>
+                        <Status :key="row.status" :status="row.status"></Status>
                     </div>
                 </template>
             </el-table-column>

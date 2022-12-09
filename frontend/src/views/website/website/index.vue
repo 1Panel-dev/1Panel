@@ -32,7 +32,7 @@
                             </el-table-column>
                             <el-table-column :label="$t('commons.table.status')" prop="status">
                                 <template #default="{ row }">
-                                    <Status :status="row.status"></Status>
+                                    <Status :key="row.status" :status="row.status"></Status>
                                 </template>
                             </el-table-column>
                             <el-table-column :label="$t('website.remark')" prop="remark"></el-table-column>
