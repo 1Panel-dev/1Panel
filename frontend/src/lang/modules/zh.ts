@@ -777,6 +777,8 @@ export default {
         checkTitle: '提示',
         website: '网站',
         database: '数据库',
+        defaultConfig: '默认配置',
+        defaultConfigHelper: '已恢复为默认配置，保存后生效',
     },
     website: {
         website: '网站',

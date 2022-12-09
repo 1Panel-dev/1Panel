@@ -23,4 +23,10 @@ export namespace Nginx {
         writing: string;
         waiting: string;
     }
+
+    export interface NginxFileUpdate {
+        content: string;
+        filePath: string;
+        backup: boolean;
+    }
 }

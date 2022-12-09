@@ -31,5 +31,6 @@ func (a *AppRouter) InitAppRouter(Router *gin.RouterGroup) {
 		appRouter.POST("/installed/backups/del", baseApi.DeleteAppBackup)
 		appRouter.POST("/installed/port/change", baseApi.ChangeAppPort)
 		appRouter.GET("/services/:key", baseApi.GetServices)
+		appRouter.GET("/installed/conf/:key", baseApi.GetDefaultConfig)
 	}
 }

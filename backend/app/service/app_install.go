@@ -366,6 +366,28 @@ func (a AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, error
 	return res, nil
 }
 
+func (a AppInstallService) GetDefaultConfigByKey(key string) (string, error) {
+	appInstall, err := getAppInstallByKey(key)
+	if err != nil {
+		return "", err
+	}
+	filePath := path.Join(constant.AppResourceDir, appInstall.App.Key, "versions", appInstall.Version, "conf")
+	if key == "mysql" {
+		filePath = path.Join(filePath, "my.cnf")
+	}
+	if key == "redis" {
+		filePath = path.Join(filePath, "redis.conf")
+	}
+	if key == "nginx" {
+		filePath = path.Join(filePath, "nginx.conf")
+	}
+	contentByte, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+	return string(contentByte), nil
+}
+
 func syncById(installId uint) error {
 	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
 	if err != nil {
