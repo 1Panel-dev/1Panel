@@ -47,6 +47,9 @@ export const loadMysqlVariables = () => {
 export const loadMysqlStatus = () => {
     return http.get<Database.MysqlStatus>(`/databases/status`);
 };
+export const loadRemoteAccess = () => {
+    return http.get<boolean>(`/databases/remote`);
+};
 export const loadDBNames = () => {
     return http.get<Array<string>>(`/databases/options`);
 };

@@ -101,8 +101,6 @@ type DBBaseInfo struct {
 	Name          string `json:"name"`
 	ContainerName string `json:"containerName"`
 	Port          int64  `json:"port"`
-	Password      string `json:"password"`
-	RemoteConn    bool   `json:"remoteConn"`
 }
 
 type SearchDBWithPage struct {

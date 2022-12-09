@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <LayoutContent :header="'Compose-' + composeName" back-name="Compose" :reload="true">
+        <LayoutContent :header="composeName" back-name="Compose" :reload="true">
             <div v-if="createdBy === 'local'">
                 <el-button icon="VideoPlay" @click="onComposeOperate('start')">{{ $t('container.start') }}</el-button>
                 <el-button icon="VideoPause" @click="onComposeOperate('stop')">{{ $t('container.stop') }}</el-button>
@@ -14,7 +14,7 @@
             <el-card style="margin-top: 20px">
                 <template #header>
                     <div class="card-header">
-                        <span>Containers</span>
+                        <span>{{ $t('container.container') }}</span>
                     </div>
                 </template>
                 <ComplexTable
