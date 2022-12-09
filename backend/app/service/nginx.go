@@ -1,14 +1,13 @@
 package service
 
 import (
-	"errors"
-	"fmt"
+	"io/ioutil"
+	"net/http"
 	"path"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 )
 
@@ -16,14 +15,11 @@ type NginxService struct {
 }
 
 func (n NginxService) GetNginxConfig() (dto.FileInfo, error) {
-
 	nginxInstall, err := getAppInstallByKey("nginx")
 	if err != nil {
 		return dto.FileInfo{}, err
 	}
-
 	configPath := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "conf", "nginx.conf")
-
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:   configPath,
 		Expand: true,
@@ -35,12 +31,10 @@ func (n NginxService) GetNginxConfig() (dto.FileInfo, error) {
 }
 
 func (n NginxService) GetConfigByScope(req dto.NginxScopeReq) ([]dto.NginxParam, error) {
-
 	keys, ok := dto.ScopeKeyMap[req.Scope]
 	if !ok || len(keys) == 0 {
 		return nil, nil
 	}
-
 	return getNginxParamsByKeys(constant.NginxScopeHttp, keys, nil)
 }
 
@@ -53,16 +47,16 @@ func (n NginxService) UpdateConfigByScope(req dto.NginxConfigReq) error {
 }
 
 func (n NginxService) GetStatus() (dto.NginxStatus, error) {
-	nginxInstall, err := getAppInstallByKey("nginx")
+	res, err := http.Get("http://127.0.0.1/nginx_status")
 	if err != nil {
 		return dto.NginxStatus{}, err
 	}
-	res, err := cmd.Exec(fmt.Sprintf("docker exec -i %s curl http://127.0.0.1/nginx_status", nginxInstall.ContainerName))
+	content, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return dto.NginxStatus{}, errors.New(res)
+		return dto.NginxStatus{}, err
 	}
 	var status dto.NginxStatus
-	resArray := strings.Split(res, " ")
+	resArray := strings.Split(string(content), " ")
 	status.Active = resArray[2]
 	status.Accepts = resArray[7]
 	status.Handled = resArray[8]
@@ -70,6 +64,5 @@ func (n NginxService) GetStatus() (dto.NginxStatus, error) {
 	status.Reading = resArray[11]
 	status.Writing = resArray[13]
 	status.Waiting = resArray[15]
-
 	return status, nil
 }
