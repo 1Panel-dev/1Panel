@@ -23,7 +23,7 @@ ErrAppRequired: "请先安装 {{ .detail }} 应用"
 ErrNotInstall: "应用未安装"
 
 #file
-ErrFileCanNotRead: "文件不可读"
+ErrFileCanNotRead: "此文件不支持预览"
 ErrFileToLarge: "文件超过10M,无法打开"
 
 #website
