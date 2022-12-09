@@ -177,7 +177,7 @@ func (f *FileInfo) getContent() error {
 		f.Content = string(cByte)
 		return nil
 	} else {
-		return buserr.New(constant.ErrFileToLarge)
+		return buserr.New(constant.ErrFileCanNotRead)
 	}
 }
 
