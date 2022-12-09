@@ -634,3 +634,53 @@ func getAppInstallByKey(key string) (model.AppInstall, error) {
 	}
 	return appInstall, nil
 }
+
+func updateToolApp(installed model.AppInstall) {
+	tooKey, ok := dto.AppToolMap[installed.App.Key]
+	if !ok {
+		return
+	}
+	toolInstall, _ := getAppInstallByKey(tooKey)
+	if reflect.DeepEqual(toolInstall, model.AppInstall{}) {
+		return
+	}
+	paramMap := make(map[string]string)
+	_ = json.Unmarshal([]byte(installed.Param), &paramMap)
+	envMap := make(map[string]interface{})
+	_ = json.Unmarshal([]byte(toolInstall.Env), &envMap)
+	if password, ok := paramMap["PANEL_DB_ROOT_PASSWORD"]; ok {
+		envMap["PANEL_DB_ROOT_PASSWORD"] = password
+	}
+	if _, ok := envMap["PANEL_REDIS_HOST"]; ok {
+		envMap["PANEL_REDIS_HOST"] = installed.ServiceName
+	}
+	if _, ok := envMap["PANEL_DB_HOST"]; ok {
+		envMap["PANEL_DB_HOST"] = installed.ServiceName
+	}
+
+	envPath := path.Join(toolInstall.GetPath(), ".env")
+	contentByte, err := json.Marshal(envMap)
+	if err != nil {
+		global.LOG.Errorf("update tool app [%s] error : %s", toolInstall.Name, err.Error())
+		return
+	}
+	envFileMap := make(map[string]string)
+	handleMap(envMap, envFileMap)
+	if err = godotenv.Write(envFileMap, envPath); err != nil {
+		global.LOG.Errorf("update tool app [%s] error : %s", toolInstall.Name, err.Error())
+		return
+	}
+	toolInstall.Env = string(contentByte)
+	if err := appInstallRepo.Save(&toolInstall); err != nil {
+		global.LOG.Errorf("update tool app [%s] error : %s", toolInstall.Name, err.Error())
+		return
+	}
+	if out, err := compose.Down(toolInstall.GetComposePath()); err != nil {
+		global.LOG.Errorf("update tool app [%s] error : %s", toolInstall.Name, out)
+		return
+	}
+	if out, err := compose.Up(toolInstall.GetComposePath()); err != nil {
+		global.LOG.Errorf("update tool app [%s] error : %s", toolInstall.Name, out)
+		return
+	}
+}

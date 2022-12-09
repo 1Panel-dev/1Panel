@@ -93,7 +93,7 @@
       "author": "phpmyadmin",
       "type": "tool",
       "required": ["mysql"],
-      "limit": 0,
+      "limit": 1,
       "crossVersionUpdate": true,
       "source": "https://www.phpmyadmin.net/"
     },
@@ -106,7 +106,7 @@
       "author": "redis-commander",
       "type": "tool",
       "required": ["redis"],
-      "limit": 0,
+      "limit": 1,
       "crossVersionUpdate": true,
       "source": "https://github.com/joeferner/redis-commander"
     }
