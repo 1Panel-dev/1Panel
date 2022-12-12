@@ -1,14 +1,14 @@
 <template>
     <el-dialog
         v-model="open"
-        :destroy-on-close="true"
         :close-on-click-modal="false"
         :title="$t('website.delete')"
         width="40%"
         :before-close="handleClose"
     >
-        <div style="text-align: center">
-            <el-checkbox v-model="deleteReq.deleteApp" :label="$t('website.deleteApp')" />
+        <div style="text-align: center" :key="key">
+            <el-checkbox v-model="deleteReq.forceDelete" :label="$t('website.forceDelete')" />
+            <el-checkbox v-if="type === 'deployment'" v-model="deleteReq.deleteApp" :label="$t('website.deleteApp')" />
             <el-checkbox v-model="deleteReq.deleteBackup" :label="$t('website.deleteBackup')" />
         </div>
         <template #footer>
@@ -26,22 +26,19 @@
 import { DeleteWebsite } from '@/api/modules/website';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
-import { reactive, ref } from 'vue';
+import { ref } from 'vue';
+import { WebSite } from '@/api/interface/website';
 
-// interface DeleteProps {
-//     id: number;
-// }
-// const deleteData = ref<DeleteProps>({
-//     id: 0,
-// });
-
+let key = 1;
 let open = ref(false);
 let loading = ref(false);
-let deleteReq = reactive({
+let deleteReq = ref({
     id: 0,
     deleteApp: false,
     deleteBackup: false,
+    forceDelete: false,
 });
+let type = ref('');
 const em = defineEmits(['close']);
 
 const handleClose = () => {
@@ -49,14 +46,21 @@ const handleClose = () => {
     em('close', false);
 };
 
-const acceptParams = async (id: number) => {
-    deleteReq.id = id;
+const acceptParams = async (website: WebSite.WebSite) => {
+    deleteReq.value = {
+        id: 0,
+        deleteApp: false,
+        deleteBackup: false,
+        forceDelete: false,
+    };
+    deleteReq.value.id = website.id;
+    type.value = website.type;
     open.value = true;
 };
 
 const submit = () => {
     loading.value = true;
-    DeleteWebsite(deleteReq)
+    DeleteWebsite(deleteReq.value)
         .then(() => {
             handleClose();
             ElMessage.success(i18n.global.t('commons.msg.deleteSuccess'));

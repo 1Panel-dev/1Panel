@@ -30,6 +30,7 @@ ErrFileToLarge: "file is too large"
 #website
 ErrDomainIsExist: "Domain is already exist"
 ErrAliasIsExist: "Alias is already exist"
+ErrAppDelete: 'Other Website use this App'
 
 #ssl
 ErrSSLCannotDelete: "The certificate is being used by the website and cannot be removed"

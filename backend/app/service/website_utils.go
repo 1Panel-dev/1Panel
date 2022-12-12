@@ -74,7 +74,6 @@ func createStaticHtml(website *model.WebSite) error {
 }
 
 func createWebsiteFolder(nginxInstall model.AppInstall, website *model.WebSite) error {
-
 	nginxFolder := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name)
 	siteFolder := path.Join(nginxFolder, "www", "sites", website.Alias)
 	fileOp := files.NewFileOp()
@@ -99,7 +98,6 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.WebSite) 
 }
 
 func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) error {
-
 	nginxInstall, err := getAppInstallByKey("nginx")
 	if err != nil {
 		return err
@@ -131,16 +129,19 @@ func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) e
 	server.UpdateDirective("set", []string{"$RulePath", path.Join(siteFolder, "waf", "rules")})
 	server.UpdateDirective("set", []string{"$logdir", path.Join(siteFolder, "log")})
 
-	if website.Type == "deployment" {
+	switch website.Type {
+	case constant.Deployment:
 		appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 		if err != nil {
 			return err
 		}
 		proxy := fmt.Sprintf("http://127.0.0.1:%d", appInstall.HttpPort)
 		server.UpdateRootProxy([]string{proxy})
-	} else {
+	case constant.Static:
 		server.UpdateRoot(path.Join("/www/sites", website.Alias))
 		server.UpdateRootLocation()
+	case constant.Proxy:
+		server.UpdateRootProxy([]string{website.Proxy})
 	}
 
 	config.FilePath = configPath
@@ -154,8 +155,7 @@ func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) e
 	return opNginx(nginxInstall.ContainerName, constant.NginxReload)
 }
 
-func delNginxConfig(website model.WebSite) error {
-
+func delNginxConfig(website model.WebSite, force bool) error {
 	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
 	if err != nil {
 		return err
@@ -178,11 +178,16 @@ func delNginxConfig(website model.WebSite) error {
 	if err := fileOp.DeleteFile(configPath); err != nil {
 		return err
 	}
-	return opNginx(nginxInstall.ContainerName, "reload")
+	if err := opNginx(nginxInstall.ContainerName, "reload"); err != nil {
+		if force {
+			return nil
+		}
+		return err
+	}
+	return nil
 }
 
 func addListenAndServerName(website model.WebSite, ports []int, domains []string) error {
-
 	nginxFull, err := getNginxFull(&website)
 	if err != nil {
 		return nil
@@ -203,7 +208,6 @@ func addListenAndServerName(website model.WebSite, ports []int, domains []string
 }
 
 func deleteListenAndServerName(website model.WebSite, ports []int, domains []string) error {
-
 	nginxFull, err := getNginxFull(&website)
 	if err != nil {
 		return nil
@@ -280,7 +284,6 @@ func createPemFile(website model.WebSite, websiteSSL model.WebSiteSSL) error {
 }
 
 func applySSL(website model.WebSite, websiteSSL model.WebSiteSSL) error {
-
 	nginxFull, err := getNginxFull(&website)
 	if err != nil {
 		return nil
@@ -398,7 +401,7 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 		return err
 	}
 
-	if website.Type == "deployment" {
+	if website.Type == constant.Deployment {
 		if err := mysqlOpration(&website, "backup", tmpDir); err != nil {
 			return err
 		}
@@ -451,7 +454,7 @@ func handleWebsiteRecover(website *model.WebSite, fileDir string) error {
 		return err
 	}
 
-	if website.Type == "deployment" {
+	if website.Type == constant.Deployment {
 		if err := mysqlOpration(website, "recover", fileDir); err != nil {
 			return err
 		}

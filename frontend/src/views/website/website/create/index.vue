@@ -1,17 +1,24 @@
 <template>
     <el-dialog
         v-model="open"
-        :destroy-on-close="true"
         :close-on-click-modal="false"
         :title="$t('website.create')"
         width="40%"
         :before-close="handleClose"
     >
-        <el-form ref="websiteForm" label-position="right" :model="website" label-width="130px" :rules="rules">
+        <el-form
+            ref="websiteForm"
+            label-position="right"
+            :model="website"
+            label-width="130px"
+            :rules="rules"
+            :validate-on-rule-change="false"
+        >
             <el-form-item :label="$t('website.type')" prop="type">
                 <el-select v-model="website.type">
                     <el-option :label="$t('website.deployment')" value="deployment"></el-option>
                     <el-option :label="$t('website.static')" value="static"></el-option>
+                    <el-option :label="$t('website.proxy')" value="proxy"></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('website.group')" prop="webSiteGroupId">
@@ -103,6 +110,9 @@
             <el-form-item :label="$t('website.alias')" prop="alias">
                 <el-input v-model="website.alias" :placeholder="$t('website.aliasHelper')"></el-input>
             </el-form-item>
+            <el-form-item v-if="website.type === 'proxy'" :label="$t('website.proxyAddress')" prop="proxy">
+                <el-input v-model="website.proxy" :placeholder="$t('website.proxyHelper')"></el-input>
+            </el-form-item>
             <el-form-item :label="$t('website.remark')" prop="remark">
                 <el-input v-model="website.remark"></el-input>
             </el-form-item>
@@ -141,6 +151,7 @@ const website = ref({
     appInstallId: undefined,
     webSiteGroupId: 1,
     otherDomains: '',
+    proxy: '',
     appinstall: {
         appId: 0,
         name: '',
@@ -149,15 +160,16 @@ const website = ref({
         version: '',
     },
 });
-let rules = ref({
+let rules = reactive({
     primaryDomain: [Rules.linuxName],
     alias: [Rules.linuxName],
     type: [Rules.requiredInput],
     webSiteGroupId: [Rules.requiredSelectBusiness],
     appInstallId: [Rules.requiredSelectBusiness],
     appType: [Rules.requiredInput],
+    proxy: [Rules.requiredInput],
     appinstall: {
-        name: [Rules.requiredInput],
+        name: [Rules.linuxName],
         appId: [Rules.requiredSelectBusiness],
         params: {},
     },

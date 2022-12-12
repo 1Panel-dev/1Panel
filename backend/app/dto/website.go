@@ -21,6 +21,7 @@ type WebSiteCreate struct {
 	Alias          string        `json:"alias" validate:"required"`
 	Remark         string        `json:"remark"`
 	OtherDomains   string        `json:"otherDomains"`
+	Proxy          string        `json:"proxy"`
 	AppType        AppType       `json:"appType"`
 	AppInstall     NewAppInstall `json:"appInstall"`
 	AppID          uint          `json:"appID"`
@@ -43,12 +44,6 @@ type NewAppInstall struct {
 	Name        string                 `json:"name"`
 	AppDetailId uint                   `json:"appDetailID"`
 	Params      map[string]interface{} `json:"params"`
-}
-
-type WebSiteDel struct {
-	ID           uint `json:"id"`
-	DeleteApp    bool `json:"deleteApp"`
-	DeleteBackup bool `json:"deleteBackup"`
 }
 
 type WebSiteRecover struct {

@@ -14,3 +14,9 @@ const (
 	ProtocolHTTP  = "HTTP"
 	ProtocolHTTPS = "HTTPS"
 )
+
+const (
+	Deployment = "deployment"
+	Static     = "static"
+	Proxy      = "proxy"
+)

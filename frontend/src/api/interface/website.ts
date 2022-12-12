@@ -54,6 +54,7 @@ export namespace WebSite {
         id: number;
         deleteApp: boolean;
         deleteBackup: boolean;
+        forceDelete: boolean;
     }
 
     export interface WebSiteCreateReq {
@@ -65,6 +66,7 @@ export namespace WebSite {
         appInstallId: number;
         webSiteGroupId: number;
         otherDomains: string;
+        proxy: string;
     }
 
     export interface WebSiteUpdateReq {
