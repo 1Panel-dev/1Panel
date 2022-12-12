@@ -22,10 +22,18 @@
                             {{ $t('commons.button.save') }}
                         </el-button>
                     </el-collapse-item>
-                    <el-collapse-item :title="$t('database.currentStatus')" name="2">
+                    <el-collapse-item
+                        :disabled="mysqlStatus !== 'Running'"
+                        :title="$t('database.currentStatus')"
+                        name="2"
+                    >
                         <Status ref="statusRef" />
                     </el-collapse-item>
-                    <el-collapse-item :title="$t('database.performanceTuning')" name="3">
+                    <el-collapse-item
+                        :disabled="mysqlStatus !== 'Running'"
+                        :title="$t('database.performanceTuning')"
+                        name="3"
+                    >
                         <Variables ref="variablesRef" />
                     </el-collapse-item>
                     <el-collapse-item :title="$t('database.portSetting')" name="4">
@@ -50,7 +58,7 @@
                         <ContainerLog ref="dialogContainerLogRef" />
                     </el-collapse-item>
 
-                    <el-collapse-item :title="$t('database.slowLog')" name="6">
+                    <el-collapse-item :disabled="mysqlStatus !== 'Running'" :title="$t('database.slowLog')" name="6">
                         <SlowLog ref="slowLogRef" />
                     </el-collapse-item>
                 </el-collapse>

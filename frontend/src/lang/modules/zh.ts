@@ -76,6 +76,7 @@ export default {
             uploadSuccess: '上传成功',
             operate: '操作',
             operateConfirm: '如果确认操作，请手动输入',
+            inputOrSelect: '请选择或输入',
         },
         login: {
             firstLogin: '首次登录，请创建初始管理员用户！',

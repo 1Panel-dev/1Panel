@@ -74,6 +74,7 @@ export default {
             updateSuccess: 'Update Success',
             uploadSuccess: 'Update Success',
             operate: 'Operate',
+            inputOrSelect: 'Please select or enter',
         },
         login: {
             firstLogin: 'First login, please create an initial administrator user!',

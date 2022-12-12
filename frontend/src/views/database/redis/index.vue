@@ -11,14 +11,21 @@
             v-model:loading="loading"
         ></AppStatus>
 
+        <el-button style="margin-top: 20px" type="primary" plain @click="goDashboard" icon="Position">
+            Redis-Commander
+        </el-button>
+
         <Setting ref="settingRef" style="margin-top: 10px" />
 
-        <div v-show="redisIsExist">
-            <el-button style="margin-top: 20px" type="primary" plain @click="goDashboard" icon="Position">
-                Redis-Commander
+        <el-card width="30%" v-if="redisStatus != 'Running' && !isOnSetting && redisIsExist" class="mask-prompt">
+            <span style="font-size: 14px">{{ $t('database.mysqlBadStatus') }}</span>
+            <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="onSetting">
+                【 {{ $t('database.setting') }} 】
             </el-button>
-
-            <Terminal style="margin-top: 10px" v-show="!isOnSetting" ref="terminalRef" />
+            <span style="font-size: 14px">{{ $t('database.adjust') }}</span>
+        </el-card>
+        <div v-show="redisIsExist" :class="{ mask: redisStatus != 'Running' }">
+            <Terminal style="margin-top: 10px" ref="terminalRef" />
         </div>
 
         <el-dialog
@@ -58,7 +65,7 @@ const terminalRef = ref();
 const settingRef = ref();
 const isOnSetting = ref(false);
 const redisIsExist = ref(false);
-const redisSattus = ref();
+const redisStatus = ref();
 
 const redisCommandPort = ref();
 const commandVisiable = ref(false);
@@ -66,7 +73,7 @@ const commandVisiable = ref(false);
 const onSetting = async () => {
     isOnSetting.value = true;
     terminalRef.value.onClose();
-    settingRef.value!.acceptParams({ status: redisSattus.value });
+    settingRef.value!.acceptParams({ status: redisStatus.value });
 };
 
 const goRouter = async (path: string) => {
@@ -90,9 +97,9 @@ const loadDashboardPort = async () => {
 
 const checkExist = (data: App.CheckInstalled) => {
     redisIsExist.value = data.isExist;
-    redisSattus.value = data.status;
+    redisStatus.value = data.status;
     loading.value = false;
-    if (redisIsExist.value) {
+    if (redisStatus.value === 'Running') {
         loadDashboardPort();
         terminalRef.value.acceptParams();
     }

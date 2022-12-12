@@ -263,19 +263,7 @@ func (a AppInstallService) GetUpdateVersions(installId uint) ([]dto.AppVersion, 
 }
 
 func (a AppInstallService) ChangeAppPort(req dto.PortUpdate) error {
-	ComposeFile := fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, req.Key, req.Name)
-
-	updateInstallInfoInDB(req.Key, "port", strconv.FormatInt(req.Port, 10))
-
-	stdout, err := compose.Down(ComposeFile)
-	if err != nil {
-		return errors.New(stdout)
-	}
-	stdout, err = compose.Up(ComposeFile)
-	if err != nil {
-		return errors.New(stdout)
-	}
-	return nil
+	return updateInstallInfoInDB(req.Key, "port", true, strconv.FormatInt(req.Port, 10))
 }
 
 func (a AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, error) {
@@ -447,18 +435,18 @@ func syncById(installId uint) error {
 	return appInstallRepo.Save(&appInstall)
 }
 
-func updateInstallInfoInDB(appKey, param string, value interface{}) {
+func updateInstallInfoInDB(appKey, param string, isRestart bool, value interface{}) error {
 	if param != "password" && param != "port" {
-		return
+		return nil
 	}
 	appInstall, err := appInstallRepo.LoadBaseInfoByKey(appKey)
 	if err != nil {
-		return
+		return nil
 	}
 	envPath := fmt.Sprintf("%s/%s/%s/.env", constant.AppInstallDir, appKey, appInstall.Name)
 	lineBytes, err := ioutil.ReadFile(envPath)
 	if err != nil {
-		return
+		return err
 	}
 	envKey := "PANEL_DB_ROOT_PASSWORD="
 	if param == "port" {
@@ -475,12 +463,12 @@ func updateInstallInfoInDB(appKey, param string, value interface{}) {
 	}
 	file, err := os.OpenFile(envPath, os.O_WRONLY|os.O_TRUNC, 0666)
 	if err != nil {
-		return
+		return err
 	}
 	defer file.Close()
 	_, err = file.WriteString(strings.Join(newFiles, "\n"))
 	if err != nil {
-		return
+		return err
 	}
 
 	oldVal, newVal := "", ""
@@ -502,4 +490,15 @@ func updateInstallInfoInDB(appKey, param string, value interface{}) {
 			"http_port": value,
 		}, commonRepo.WithByID(appInstall.ID))
 	}
+
+	ComposeFile := fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, appKey, appInstall.Name)
+	stdout, err := compose.Down(ComposeFile)
+	if err != nil {
+		return errors.New(stdout)
+	}
+	stdout, err = compose.Up(ComposeFile)
+	if err != nil {
+		return errors.New(stdout)
+	}
+	return nil
 }

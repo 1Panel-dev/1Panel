@@ -23,7 +23,7 @@ export const updateMysqlAccess = (params: Database.ChangeInfo) => {
     return http.post(`/databases/change/access`, params);
 };
 export const updateMysqlPassword = (params: Database.ChangeInfo) => {
-    return http.post(`/databases/change/[password]`, params);
+    return http.post(`/databases/change/password`, params);
 };
 export const updateMysqlVariables = (params: Array<Database.VariablesUpdate>) => {
     return http.post(`/databases/variables/update`, params);
