@@ -119,6 +119,7 @@
                                     style="width: 100%"
                                     allow-create
                                     clearable
+                                    :placeholder="$t('commons.msg.inputOrSelect')"
                                     filterable
                                     v-model="row.sourceDir"
                                 >

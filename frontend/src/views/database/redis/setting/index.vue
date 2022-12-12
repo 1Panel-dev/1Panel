@@ -74,20 +74,19 @@
                                 v-model="redisConf"
                                 :readOnly="true"
                             />
-                            <el-button
-                                type="primary"
-                                size="default"
-                                @click="onSaveFile"
-                                style="width: 90px; margin-top: 5px"
-                            >
+                            <el-button type="primary" @click="onSaveFile" style="margin-top: 5px">
                                 {{ $t('commons.button.save') }}
                             </el-button>
                         </div>
                     </el-collapse-item>
-                    <el-collapse-item :title="$t('database.status')" name="2">
+                    <el-collapse-item :disabled="redisStatus !== 'Running'" :title="$t('database.status')" name="2">
                         <Status ref="statusRef" />
                     </el-collapse-item>
-                    <el-collapse-item :title="$t('database.persistence')" name="3">
+                    <el-collapse-item
+                        :disabled="redisStatus !== 'Running'"
+                        :title="$t('database.persistence')"
+                        name="3"
+                    >
                         <Persistence ref="persistenceRef" />
                     </el-collapse-item>
                 </el-collapse>
@@ -275,8 +274,15 @@ const onSubmitSave = async () => {
         file: redisConf.value,
         restartNow: true,
     };
-    await updateRedisConfByFile(param);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    loading.value = true;
+    await updateRedisConfByFile(param)
+        .then(() => {
+            loading.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = true;
+        });
 };
 
 const loadform = async () => {

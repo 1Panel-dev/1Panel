@@ -63,22 +63,11 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 }
 
 func (u *RedisService) ChangePassword(req dto.ChangeDBInfo) error {
-	redisInfo, err := appInstallRepo.LoadBaseInfoByKey("redis")
-	if err != nil {
+	if err := updateInstallInfoInDB("redis", "password", true, req.Value); err != nil {
 		return err
 	}
-	ComposeFile := fmt.Sprintf("%s/redis/%s/docker-compose.yml", constant.AppInstallDir, redisInfo.Name)
-
-	updateInstallInfoInDB("redis", "password", req.Value)
-	updateInstallInfoInDB("redis-commander", "password", req.Value)
-
-	stdout, err := compose.Down(ComposeFile)
-	if err != nil {
-		return errors.New(stdout)
-	}
-	stdout, err = compose.Up(ComposeFile)
-	if err != nil {
-		return errors.New(stdout)
+	if err := updateInstallInfoInDB("redis-commander", "password", true, req.Value); err != nil {
+		return err
 	}
 
 	return nil

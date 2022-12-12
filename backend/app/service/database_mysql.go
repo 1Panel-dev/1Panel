@@ -330,8 +330,12 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 			}
 		}
 	}
-	updateInstallInfoInDB("mysql", "password", info.Value)
-	updateInstallInfoInDB("phpmyadmin", "password", info.Value)
+	if err := updateInstallInfoInDB("mysql", "password", false, info.Value); err != nil {
+		return err
+	}
+	if err := updateInstallInfoInDB("phpmyadmin", "password", true, info.Value); err != nil {
+		return err
+	}
 	return nil
 }
 
