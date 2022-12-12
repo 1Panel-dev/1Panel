@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="app-content" v-if="data.isExist">
-            <el-card class="app-card" v-loading="loading">
+            <el-card class="app-card">
                 <el-row :gutter="20">
                     <el-col :lg="3" :xl="2">
                         <div>
@@ -71,14 +71,13 @@ let data = ref({
     isExist: false,
     containerName: '',
 });
-let loading = ref(false);
 let operateReq = reactive({
     installId: 0,
     operate: '',
 });
 let refresh = ref(1);
 
-const em = defineEmits(['setting', 'isExist']);
+const em = defineEmits(['setting', 'isExist', 'before', 'update:loading']);
 const setting = () => {
     em('setting', false);
 };
@@ -88,12 +87,10 @@ const goRouter = async (path: string) => {
 };
 
 const onCheck = async () => {
-    loading.value = true;
     const res = await CheckAppInstalled(key.value);
     data.value = res.data;
     em('isExist', res.data);
     operateReq.installId = res.data.appInstallId;
-    loading.value = false;
     refresh.value++;
 };
 
@@ -108,14 +105,16 @@ const onOperate = async (operation: string) => {
             type: 'info',
         },
     ).then(() => {
-        loading.value = true;
+        em('update:loading', true);
+        em('before');
         InstalledOp(operateReq)
             .then(() => {
+                em('update:loading', false);
                 ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
                 onCheck();
             })
-            .finally(() => {
-                loading.value = false;
+            .catch(() => {
+                em('update:loading', false);
             });
     });
 };

@@ -101,7 +101,7 @@ export default {
             rePassword: 'The passwords are inconsistent. Please check and re-enter the password',
             requiredInput: 'Please enter the required fields',
             requiredSelect: 'Please select the required fields',
-            commonName: 'Support English, Chinese, numbers, .-_, length 1-30',
+            commonName: 'Support English, numbers, _, length 1-30',
             imageName: 'Support English, Chinese, numbers, :.-_, length 1-30',
             complexityPassword:
                 'Please enter a password with more than 8 characters and must contain letters, digits, and special symbols',

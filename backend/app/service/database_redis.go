@@ -63,40 +63,11 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 }
 
 func (u *RedisService) ChangePassword(req dto.ChangeDBInfo) error {
-	var (
-		files    []string
-		newFiles []string
-	)
-
 	redisInfo, err := appInstallRepo.LoadBaseInfoByKey("redis")
 	if err != nil {
 		return err
 	}
-	ComposeDir := fmt.Sprintf("%s/redis/%s", constant.AppInstallDir, redisInfo.Name)
 	ComposeFile := fmt.Sprintf("%s/redis/%s/docker-compose.yml", constant.AppInstallDir, redisInfo.Name)
-	path := fmt.Sprintf("%s/.env", ComposeDir)
-	lineBytes, err := ioutil.ReadFile(path)
-	if err != nil {
-		return err
-	} else {
-		files = strings.Split(string(lineBytes), "\n")
-	}
-	for _, line := range files {
-		if strings.HasPrefix(line, "PANEL_DB_ROOT_PASSWORD=") {
-			newFiles = append(newFiles, fmt.Sprintf("PANEL_DB_ROOT_PASSWORD=%v", req.Value))
-		} else {
-			newFiles = append(newFiles, line)
-		}
-	}
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0666)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	_, err = file.WriteString(strings.Join(newFiles, "\n"))
-	if err != nil {
-		return err
-	}
 
 	updateInstallInfoInDB("redis", "password", req.Value)
 	updateInstallInfoInDB("redis-commander", "password", req.Value)

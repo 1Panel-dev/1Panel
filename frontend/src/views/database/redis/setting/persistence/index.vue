@@ -1,5 +1,5 @@
 <template>
-    <div v-if="persistenceShow">
+    <div v-if="persistenceShow" v-loading="loading">
         <el-row :gutter="20" style="margin-top: 5px" class="row-box">
             <el-col :span="12">
                 <el-card class="el-card">
@@ -133,6 +133,8 @@ import { useDeleteData } from '@/hooks/use-delete-data';
 import { computeSize } from '@/utils/util';
 import { BatchDeleteFile } from '@/api/modules/files';
 
+const loading = ref(false);
+
 interface saveStruct {
     second: number;
     count: number;
@@ -194,17 +196,31 @@ const loadBackupRecords = async () => {
     paginationConfig.total = res.data.total;
 };
 const onBackup = async () => {
-    await backupRedis();
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-    loadBackupRecords();
+    loading.value = true;
+    await backupRedis()
+        .then(() => {
+            loading.value = false;
+            loadBackupRecords();
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 const onRecover = async () => {
     let param = {
         fileName: currentRow.value.fileName,
         fileDir: currentRow.value.fileDir,
     };
-    await recoverRedis(param);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    loading.value = true;
+    await recoverRedis(param)
+        .then(() => {
+            loading.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onBatchDelete = async (row: Database.FileRecord | null) => {
@@ -249,9 +265,15 @@ const onSave = async (formEl: FormInstance | undefined, type: string) => {
             param.type = type;
             param.appendfsync = form.appendfsync;
             param.appendonly = form.appendonly;
-            await updateRedisPersistenceConf(param);
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-            return;
+            loading.value = true;
+            await updateRedisPersistenceConf(param)
+                .then(() => {
+                    loading.value = false;
+                    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
         });
         return;
     }
@@ -265,8 +287,15 @@ const onSave = async (formEl: FormInstance | undefined, type: string) => {
     }
     param.type = type;
     param.save = itemSaves.join(' ');
-    await updateRedisPersistenceConf(param);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    loading.value = true;
+    await updateRedisPersistenceConf(param)
+        .then(() => {
+            loading.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const loadform = async () => {

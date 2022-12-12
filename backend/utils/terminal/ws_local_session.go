@@ -42,15 +42,8 @@ func (sws *LocalWsSession) handleSlaveEvent(exitCh chan bool) {
 		case <-exitCh:
 			return
 		default:
-			n, err := sws.slave.Read(buffer)
-			if err != nil {
-				global.LOG.Errorf("read buffer from slave failed, err: %v", err)
-			}
-
-			err = sws.masterWrite(buffer[:n])
-			if err != nil {
-				global.LOG.Errorf("handle master read event failed, err: %v", err)
-			}
+			n, _ := sws.slave.Read(buffer)
+			_ = sws.masterWrite(buffer[:n])
 		}
 	}
 }
