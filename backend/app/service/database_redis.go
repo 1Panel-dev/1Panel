@@ -22,6 +22,7 @@ type RedisService struct{}
 type IRedisService interface {
 	UpdateConf(req dto.RedisConfUpdate) error
 	UpdatePersistenceConf(req dto.RedisConfPersistenceUpdate) error
+	ChangePassword(info dto.ChangeDBInfo) error
 
 	LoadStatus() (*dto.RedisStatus, error)
 	LoadConf() (*dto.RedisConf, error)
@@ -48,12 +49,6 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 		return err
 	}
 
-	updateInstallInfoInDB("redis", "password", req.Requirepass)
-	updateInstallInfoInDB("phpmyadmin", "password", req.Requirepass)
-
-	if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "requirepass", req.Requirepass); err != nil {
-		return err
-	}
 	if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "maxmemory", req.Maxmemory); err != nil {
 		return err
 	}
@@ -64,6 +59,57 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 	if err != nil {
 		return errors.New(string(stdout))
 	}
+	return nil
+}
+
+func (u *RedisService) ChangePassword(req dto.ChangeDBInfo) error {
+	var (
+		files    []string
+		newFiles []string
+	)
+
+	redisInfo, err := appInstallRepo.LoadBaseInfoByKey("redis")
+	if err != nil {
+		return err
+	}
+	ComposeDir := fmt.Sprintf("%s/redis/%s", constant.AppInstallDir, redisInfo.Name)
+	ComposeFile := fmt.Sprintf("%s/redis/%s/docker-compose.yml", constant.AppInstallDir, redisInfo.Name)
+	path := fmt.Sprintf("%s/.env", ComposeDir)
+	lineBytes, err := ioutil.ReadFile(path)
+	if err != nil {
+		return err
+	} else {
+		files = strings.Split(string(lineBytes), "\n")
+	}
+	for _, line := range files {
+		if strings.HasPrefix(line, "PANEL_DB_ROOT_PASSWORD=") {
+			newFiles = append(newFiles, fmt.Sprintf("PANEL_DB_ROOT_PASSWORD=%v", req.Value))
+		} else {
+			newFiles = append(newFiles, line)
+		}
+	}
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0666)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	_, err = file.WriteString(strings.Join(newFiles, "\n"))
+	if err != nil {
+		return err
+	}
+
+	updateInstallInfoInDB("redis", "password", req.Value)
+	updateInstallInfoInDB("redis-commander", "password", req.Value)
+
+	stdout, err := compose.Down(ComposeFile)
+	if err != nil {
+		return errors.New(stdout)
+	}
+	stdout, err = compose.Up(ComposeFile)
+	if err != nil {
+		return errors.New(stdout)
+	}
+
 	return nil
 }
 
@@ -132,18 +178,10 @@ func (u *RedisService) LoadConf() (*dto.RedisConf, error) {
 	item.ContainerName = redisInfo.ContainerName
 	item.Name = redisInfo.Name
 	item.Port = redisInfo.Port
-	if item.Timeout, err = configGetStr(redisInfo.ContainerName, redisInfo.Password, "timeout"); err != nil {
-		return nil, err
-	}
-	if item.Maxclients, err = configGetStr(redisInfo.ContainerName, redisInfo.Password, "maxclients"); err != nil {
-		return nil, err
-	}
-	if item.Requirepass, err = configGetStr(redisInfo.ContainerName, redisInfo.Password, "requirepass"); err != nil {
-		return nil, err
-	}
-	if item.Maxmemory, err = configGetStr(redisInfo.ContainerName, redisInfo.Password, "maxmemory"); err != nil {
-		return nil, err
-	}
+	item.Requirepass = redisInfo.Password
+	item.Timeout, _ = configGetStr(redisInfo.ContainerName, redisInfo.Password, "timeout")
+	item.Maxclients, _ = configGetStr(redisInfo.ContainerName, redisInfo.Password, "maxclients")
+	item.Maxmemory, _ = configGetStr(redisInfo.ContainerName, redisInfo.Password, "maxmemory")
 	return &item, nil
 }
 

@@ -240,7 +240,7 @@ func (u *MysqlService) DeleteCheck(id uint) ([]string, error) {
 		return appInUsed, err
 	}
 
-	apps, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithResourceId(app.ID), appInstallResourceRepo.WithLinkId(db.ID))
+	apps, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(app.ID), appInstallResourceRepo.WithResourceId(db.ID))
 	for _, app := range apps {
 		appInstall, _ := appInstallRepo.GetFirst(commonRepo.WithByID(app.AppInstallId))
 		if appInstall.ID != 0 {
@@ -431,7 +431,7 @@ func (u *MysqlService) UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
 
 		files = updateMyCnf(files, group, info.Param, loadSizeUnit(info.Value))
 	}
-	file, err := os.OpenFile(path, os.O_WRONLY, 0666)
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0666)
 	if err != nil {
 		return err
 	}

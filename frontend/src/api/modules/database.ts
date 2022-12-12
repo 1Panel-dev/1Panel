@@ -64,6 +64,9 @@ export const loadRedisConf = () => {
 export const RedisPersistenceConf = () => {
     return http.get<Database.RedisPersistenceConf>(`/databases/redis/persistence/conf`);
 };
+export const changeRedisPassword = (params: Database.ChangeInfo) => {
+    return http.post(`/databases/redis/password`, params);
+};
 export const updateRedisPersistenceConf = (params: Database.RedisConfPersistenceUpdate) => {
     return http.post(`/databases/redis/conf/update/persistence`, params);
 };

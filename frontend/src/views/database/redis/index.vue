@@ -48,6 +48,7 @@ const terminalRef = ref();
 const settingRef = ref();
 const isOnSetting = ref(false);
 const redisIsExist = ref(false);
+const redisSattus = ref();
 
 const redisCommandPort = ref();
 const commandVisiable = ref(false);
@@ -55,7 +56,7 @@ const commandVisiable = ref(false);
 const onSetting = async () => {
     isOnSetting.value = true;
     terminalRef.value.onClose();
-    settingRef.value!.acceptParams();
+    settingRef.value!.acceptParams({ status: redisSattus.value });
 };
 
 const goRouter = async (path: string) => {
@@ -79,6 +80,7 @@ const loadDashboardPort = async () => {
 
 const checkExist = (data: App.CheckInstalled) => {
     redisIsExist.value = data.isExist;
+    redisSattus.value = data.status;
     if (redisIsExist.value) {
         loadDashboardPort();
         terminalRef.value.acceptParams();

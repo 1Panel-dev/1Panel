@@ -29,25 +29,33 @@
                                         <span class="input-help">{{ $t('database.portHelper') }}</span>
                                     </el-form-item>
                                     <el-form-item :label="$t('setting.password')" prop="requirepass">
-                                        <el-input type="password" show-password clearable v-model="form.requirepass" />
+                                        <el-input type="password" show-password clearable v-model="form.requirepass">
+                                            <template #append>
+                                                <el-button @click="onSavePassword()" icon="Collection">
+                                                    {{ $t('commons.button.save') }}
+                                                </el-button>
+                                            </template>
+                                        </el-input>
                                         <span class="input-help">{{ $t('database.requirepassHelper') }}</span>
                                     </el-form-item>
-                                    <el-form-item :label="$t('database.timeout')" prop="timeout">
-                                        <el-input clearable type="number" v-model.number="form.timeout" />
-                                        <span class="input-help">{{ $t('database.timeoutHelper') }}</span>
-                                    </el-form-item>
-                                    <el-form-item :label="$t('database.maxclients')" prop="maxclients">
-                                        <el-input clearable type="number" v-model.number="form.maxclients" />
-                                    </el-form-item>
-                                    <el-form-item :label="$t('database.maxmemory')" prop="maxmemory">
-                                        <el-input clearable type="number" v-model.number="form.maxmemory" />
-                                        <span class="input-help">{{ $t('database.maxmemoryHelper') }}</span>
-                                    </el-form-item>
-                                    <el-form-item>
-                                        <el-button type="primary" @click="onSave(formRef)">
-                                            {{ $t('commons.button.save') }}
-                                        </el-button>
-                                    </el-form-item>
+                                    <div v-if="redisStatus === 'Running'">
+                                        <el-form-item :label="$t('database.timeout')" prop="timeout">
+                                            <el-input clearable type="number" v-model.number="form.timeout" />
+                                            <span class="input-help">{{ $t('database.timeoutHelper') }}</span>
+                                        </el-form-item>
+                                        <el-form-item :label="$t('database.maxclients')" prop="maxclients">
+                                            <el-input clearable type="number" v-model.number="form.maxclients" />
+                                        </el-form-item>
+                                        <el-form-item :label="$t('database.maxmemory')" prop="maxmemory">
+                                            <el-input clearable type="number" v-model.number="form.maxmemory" />
+                                            <span class="input-help">{{ $t('database.maxmemoryHelper') }}</span>
+                                        </el-form-item>
+                                        <el-form-item>
+                                            <el-button type="primary" @click="onSave(formRef)">
+                                                {{ $t('commons.button.save') }}
+                                            </el-button>
+                                        </el-form-item>
+                                    </div>
                                 </el-col>
                             </el-row>
                         </el-form>
@@ -63,7 +71,7 @@
                                 theme="cobalt"
                                 :styleActiveLine="true"
                                 :extensions="extensions"
-                                v-model="mysqlConf"
+                                v-model="redisConf"
                                 :readOnly="true"
                             />
                             <el-button
@@ -88,6 +96,7 @@
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmitSave"></ConfirmDialog>
         <ConfirmDialog ref="confirmDialogRef2" @confirm="onChangePort(formRef)"></ConfirmDialog>
+        <ConfirmDialog ref="confirmDialogRef3" @confirm="onChangePassword()"></ConfirmDialog>
     </div>
 </template>
 
@@ -102,7 +111,7 @@ import { LoadFile } from '@/api/modules/files';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import Status from '@/views/database/redis/setting/status/index.vue';
 import Persistence from '@/views/database/redis/setting/persistence/index.vue';
-import { loadRedisConf, updateRedisConf, updateRedisConfByFile } from '@/api/modules/database';
+import { changeRedisPassword, loadRedisConf, updateRedisConf, updateRedisConfByFile } from '@/api/modules/database';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { ChangePort } from '@/api/modules/app';
@@ -131,18 +140,25 @@ const activeName = ref('1');
 const statusRef = ref();
 const persistenceRef = ref();
 
+const redisStatus = ref();
+
 const formRef = ref<FormInstance>();
-const mysqlConf = ref();
+const redisConf = ref();
 const confirmDialogRef = ref();
 const confirmDialogRef2 = ref();
 
 const settingShow = ref<boolean>(false);
 
-const acceptParams = (): void => {
+interface DialogProps {
+    status: string;
+}
+
+const acceptParams = (prop: DialogProps): void => {
+    redisStatus.value = prop.status;
     settingShow.value = true;
     loadform();
-    statusRef.value!.acceptParams();
-    persistenceRef.value!.acceptParams();
+    statusRef.value!.acceptParams({ status: prop.status });
+    persistenceRef.value!.acceptParams({ status: prop.status });
 };
 const onClose = (): void => {
     settingShow.value = false;
@@ -155,6 +171,31 @@ const onSavePort = async () => {
         submitInputInfo: i18n.global.t('database.restartNow'),
     };
     confirmDialogRef2.value!.acceptParams(params);
+};
+
+const confirmDialogRef3 = ref();
+const onSavePassword = async () => {
+    let params = {
+        header: i18n.global.t('database.confChange'),
+        operationInfo: i18n.global.t('database.restartNowHelper1'),
+        submitInputInfo: i18n.global.t('database.restartNow'),
+    };
+    confirmDialogRef3.value!.acceptParams(params);
+};
+const onChangePassword = async () => {
+    loading.value = true;
+    let param = {
+        id: 0,
+        value: form.requirepass,
+    };
+    changeRedisPassword(param)
+        .then(() => {
+            loading.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 const onChangePort = async (formEl: FormInstance | undefined) => {
@@ -188,7 +229,7 @@ function callback(error: any) {
 
 const onChangeMode = async () => {
     if (confShowType.value === 'all') {
-        loadMysqlConf();
+        loadredisConf();
     } else {
         loadform();
     }
@@ -231,7 +272,7 @@ const onSaveFile = async () => {
 
 const onSubmitSave = async () => {
     let param = {
-        file: mysqlConf.value,
+        file: redisConf.value,
         restartNow: true,
     };
     await updateRedisConfByFile(param);
@@ -239,19 +280,26 @@ const onSubmitSave = async () => {
 };
 
 const loadform = async () => {
-    const res = await loadRedisConf();
-    form.name = res.data?.name;
-    form.timeout = Number(res.data?.timeout);
-    form.maxclients = Number(res.data?.maxclients);
-    form.requirepass = res.data?.requirepass;
-    form.maxmemory = Number(res.data?.maxmemory);
-    form.port = Number(res.data?.port);
+    loading.value = true;
+    await loadRedisConf()
+        .then((res) => {
+            loading.value = false;
+            form.name = res.data?.name;
+            form.timeout = Number(res.data?.timeout);
+            form.maxclients = Number(res.data?.maxclients);
+            form.requirepass = res.data?.requirepass;
+            form.maxmemory = Number(res.data?.maxmemory);
+            form.port = Number(res.data?.port);
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
-const loadMysqlConf = async () => {
+const loadredisConf = async () => {
     let path = `/opt/1Panel/data/apps/redis/${form.name}/conf/redis.conf`;
     const res = await LoadFile({ path: path });
-    mysqlConf.value = res.data;
+    redisConf.value = res.data;
 };
 
 defineExpose({

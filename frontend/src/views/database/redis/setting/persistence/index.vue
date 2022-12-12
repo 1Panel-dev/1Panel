@@ -28,11 +28,7 @@
                                         </el-radio-group>
                                     </el-form-item>
                                 </el-form>
-                                <el-button
-                                    type="primary"
-                                    @click="onSave(formRef, 'aof')"
-                                    style="bottom: 10px; width: 90px"
-                                >
+                                <el-button type="primary" @click="onSave(formRef, 'aof')" style="bottom: 10px">
                                     {{ $t('commons.button.save') }}
                                 </el-button>
                             </el-col>
@@ -52,7 +48,7 @@
                             <td width="32%">
                                 <el-input type="number" v-model="row.second"></el-input>
                             </td>
-                            <td width="55px">
+                            <td width="60px">
                                 <span>{{ $t('database.rdbHelper1') }}</span>
                             </td>
                             <td width="32%">
@@ -76,7 +72,7 @@
                     <div>
                         <span style="margin-left: 2px; margin-top: 5px">{{ $t('database.rdbHelper3') }}</span>
                     </div>
-                    <el-button type="primary" @click="onSave(undefined, 'rbd')" style="margin-top: 10px; width: 90px">
+                    <el-button type="primary" @click="onSave(undefined, 'rbd')" style="margin-top: 10px">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </el-card>
@@ -152,11 +148,16 @@ const rules = reactive({
 });
 const formRef = ref<FormInstance>();
 
+interface DialogProps {
+    status: string;
+}
 const persistenceShow = ref(false);
-const acceptParams = (): void => {
+const acceptParams = (prop: DialogProps): void => {
     persistenceShow.value = true;
-    loadform();
-    loadBackupRecords();
+    if (prop.status === 'Running') {
+        loadform();
+        loadBackupRecords();
+    }
 };
 const onClose = (): void => {
     persistenceShow.value = false;

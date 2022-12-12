@@ -17,7 +17,7 @@ export const useDeleteData = <P = any, R = any>(
     confirmType: HandleData.MessageType = 'error',
 ) => {
     return new Promise((resolve, reject) => {
-        ElMessageBox.confirm(i18n.global.t(`${message}`) + '?', i18n.global.t('commons.msg.deleteTitle'), {
+        ElMessageBox.confirm(i18n.global.t(`${message}`), i18n.global.t('commons.msg.deleteTitle'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
             closeOnClickModal: false,

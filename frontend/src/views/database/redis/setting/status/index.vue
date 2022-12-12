@@ -100,9 +100,14 @@ const redisStatus = reactive({
 
 const statusShow = ref(false);
 
-const acceptParams = (): void => {
+interface DialogProps {
+    status: string;
+}
+const acceptParams = (prop: DialogProps): void => {
     statusShow.value = true;
-    loadStatus();
+    if (prop.status === 'Running') {
+        loadStatus();
+    }
 };
 const onClose = (): void => {
     statusShow.value = false;
