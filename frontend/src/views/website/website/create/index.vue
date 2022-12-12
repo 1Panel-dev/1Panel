@@ -169,7 +169,7 @@ let rules = reactive({
     appType: [Rules.requiredInput],
     proxy: [Rules.requiredInput],
     appinstall: {
-        name: [Rules.linuxName],
+        name: [Rules.name],
         appId: [Rules.requiredSelectBusiness],
         params: {},
     },

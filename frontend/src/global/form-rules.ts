@@ -67,6 +67,19 @@ const checkLinuxName = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkDomain = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.domain')));
+    } else {
+        const reg = /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.domain')));
+        } else {
+            callback();
+        }
+    }
+};
+
 interface CommonRule {
     requiredInput: FormItemRule;
     requiredSelect: FormItemRule;
@@ -79,6 +92,7 @@ interface CommonRule {
     number: FormItemRule;
     ip: FormItemRule;
     port: FormItemRule;
+    domain: FormItemRule;
 }
 
 export const Rules: CommonRule = {
@@ -144,5 +158,10 @@ export const Rules: CommonRule = {
         max: 65535,
         type: 'number',
         message: i18n.global.t('commons.rule.port'),
+    },
+    domain: {
+        required: true,
+        validator: checkDomain,
+        trigger: 'blur',
     },
 };
