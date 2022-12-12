@@ -109,6 +109,19 @@
       "limit": 1,
       "crossVersionUpdate": true,
       "source": "https://github.com/joeferner/redis-commander"
+    },
+    {
+      "key": "minio",
+      "name": "MinIO",
+      "tags": ["Tool"],
+      "versions": ["RELEASE.2022-08-13T21-54-44Z"],
+      "short_desc": "开源的对象存储服务器",
+      "author": "minio",
+      "type": "tool",
+      "required": [],
+      "limit": 1,
+      "crossVersionUpdate": true,
+      "source": "https://github.com/minio/minio"
     }
   ]
 }

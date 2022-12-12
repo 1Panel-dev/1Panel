@@ -31,8 +31,8 @@
                     <el-tag round effect="dark" v-if="row.canUpdate">{{ $t('app.canUpdate') }}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('app.app')" prop="app.name"></el-table-column>
-            <el-table-column :label="$t('app.version')" prop="version"></el-table-column>
+            <el-table-column :label="$t('app.app')" prop="app.name" show-overflow-tooltip></el-table-column>
+            <el-table-column :label="$t('app.version')" prop="version" show-overflow-tooltip></el-table-column>
             <el-table-column :label="$t('website.port')" prop="httpPort"></el-table-column>
             <el-table-column :label="$t('app.backup')">
                 <template #default="{ row }">
