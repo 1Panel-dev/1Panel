@@ -570,7 +570,8 @@ func getAppFromOss() error {
 	}
 
 	fileOp := files.NewFileOp()
-	if _, err := fileOp.Backup(appDir); err != nil {
+
+	if _, err := fileOp.CopyAndBackup(appDir); err != nil {
 		return err
 	}
 

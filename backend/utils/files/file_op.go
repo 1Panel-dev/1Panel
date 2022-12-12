@@ -433,5 +433,23 @@ func (f FileOp) Backup(srcFile string) (string, error) {
 	if err := f.Rename(srcFile, backupPath); err != nil {
 		return backupPath, err
 	}
+
+	return backupPath, nil
+}
+
+func (f FileOp) CopyAndBackup(src string) (string, error) {
+	backupPath := src + "_bak"
+	info, _ := f.Fs.Stat(backupPath)
+	if info != nil {
+		if info.IsDir() {
+			_ = f.DeleteDir(backupPath)
+		} else {
+			_ = f.DeleteFile(backupPath)
+		}
+	}
+	_ = f.CreateDir(backupPath, 0755)
+	if err := f.Copy(src, backupPath); err != nil {
+		return backupPath, err
+	}
 	return backupPath, nil
 }
