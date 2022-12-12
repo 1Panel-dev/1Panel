@@ -166,13 +166,13 @@ const buttons = [
     {
         label: i18n.global.t('app.delete'),
         click: function (row: WebSite.WebSite) {
-            openDelete(row.id);
+            openDelete(row);
         },
     },
 ];
 
-const openDelete = (id: number) => {
-    deleteRef.value.acceptParams(id);
+const openDelete = (website: WebSite.WebSite) => {
+    deleteRef.value.acceptParams(website);
 };
 
 const openCreate = () => {
