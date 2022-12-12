@@ -263,36 +263,7 @@ func (a AppInstallService) GetUpdateVersions(installId uint) ([]dto.AppVersion, 
 }
 
 func (a AppInstallService) ChangeAppPort(req dto.PortUpdate) error {
-	var (
-		files    []string
-		newFiles []string
-	)
-
-	ComposeDir := fmt.Sprintf("%s/%s/%s", constant.AppInstallDir, req.Key, req.Name)
 	ComposeFile := fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, req.Key, req.Name)
-	path := fmt.Sprintf("%s/.env", ComposeDir)
-	lineBytes, err := ioutil.ReadFile(path)
-	if err != nil {
-		return err
-	} else {
-		files = strings.Split(string(lineBytes), "\n")
-	}
-	for _, line := range files {
-		if strings.HasPrefix(line, "PANEL_APP_PORT_HTTP=") {
-			newFiles = append(newFiles, fmt.Sprintf("PANEL_APP_PORT_HTTP=%v", req.Port))
-		} else {
-			newFiles = append(newFiles, line)
-		}
-	}
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0666)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	_, err = file.WriteString(strings.Join(newFiles, "\n"))
-	if err != nil {
-		return err
-	}
 
 	updateInstallInfoInDB(req.Key, "port", strconv.FormatInt(req.Port, 10))
 
@@ -484,6 +455,34 @@ func updateInstallInfoInDB(appKey, param string, value interface{}) {
 	if err != nil {
 		return
 	}
+	envPath := fmt.Sprintf("%s/%s/%s/.env", constant.AppInstallDir, appKey, appInstall.Name)
+	lineBytes, err := ioutil.ReadFile(envPath)
+	if err != nil {
+		return
+	}
+	envKey := "PANEL_DB_ROOT_PASSWORD="
+	if param == "port" {
+		envKey = "PANEL_APP_PORT_HTTP="
+	}
+	files := strings.Split(string(lineBytes), "\n")
+	var newFiles []string
+	for _, line := range files {
+		if strings.HasPrefix(line, envKey) {
+			newFiles = append(newFiles, fmt.Sprintf("%s%v", envKey, value))
+		} else {
+			newFiles = append(newFiles, line)
+		}
+	}
+	file, err := os.OpenFile(envPath, os.O_WRONLY|os.O_TRUNC, 0666)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+	_, err = file.WriteString(strings.Join(newFiles, "\n"))
+	if err != nil {
+		return
+	}
+
 	oldVal, newVal := "", ""
 	if param == "password" {
 		oldVal = fmt.Sprintf("\"PANEL_DB_ROOT_PASSWORD\":\"%v\"", appInstall.Password)
@@ -492,6 +491,7 @@ func updateInstallInfoInDB(appKey, param string, value interface{}) {
 			"param": strings.ReplaceAll(appInstall.Param, oldVal, newVal),
 			"env":   strings.ReplaceAll(appInstall.Env, oldVal, newVal),
 		}, commonRepo.WithByID(appInstall.ID))
+
 	}
 	if param == "port" {
 		oldVal = fmt.Sprintf("\"PANEL_APP_PORT_HTTP\":%v", appInstall.Port)

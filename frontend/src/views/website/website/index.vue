@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <AppStatus :app-key="'nginx'" @setting="setting" @is-exist="checkExist"></AppStatus>
+    <div v-loading="loading">
+        <AppStatus :app-key="'nginx'" @setting="setting" v-model:loading="loading" @is-exist="checkExist"></AppStatus>
         <div v-if="nginxIsExist" :class="{ mask: nginxStatus != 'Running' }">
             <LayoutContent>
                 <br />
@@ -96,6 +96,8 @@ import Status from '@/components/status/index.vue';
 import i18n from '@/lang';
 import router from '@/routers';
 import { App } from '@/api/interface/app';
+
+const loading = ref(false);
 
 const createRef = ref();
 const deleteRef = ref();

@@ -142,7 +142,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { Host } from '@/api/interface/host';
@@ -311,12 +311,9 @@ const onEdit = async (node: Node, data: Tree) => {
     }
 };
 
-function onInit() {
+onMounted(() => {
     loadHostTree();
     loadGroups();
-}
-defineExpose({
-    onInit,
 });
 </script>
 

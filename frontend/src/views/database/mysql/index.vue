@@ -1,7 +1,13 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <Submenu activeName="mysql" />
-        <AppStatus :app-key="'mysql'" style="margin-top: 20px" @setting="onSetting" @is-exist="checkExist" />
+        <AppStatus
+            :app-key="'mysql'"
+            style="margin-top: 20px"
+            v-model:loading="loading"
+            @setting="onSetting"
+            @is-exist="checkExist"
+        />
         <Setting ref="settingRef" style="margin-top: 20px" />
 
         <el-card width="30%" v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist" class="mask-prompt">
@@ -193,6 +199,8 @@ import { App } from '@/api/interface/app';
 import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
 
+const loading = ref(false);
+
 const selects = ref<any>([]);
 const mysqlName = ref();
 const isOnSetting = ref<boolean>();
@@ -353,6 +361,7 @@ const onDelete = async (row: Database.MysqlDBInfo) => {
         search();
     }
 };
+
 const buttons = [
     {
         label: i18n.global.t('database.changePassword'),

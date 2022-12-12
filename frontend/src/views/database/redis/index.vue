@@ -1,14 +1,22 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <Submenu activeName="redis" />
 
-        <AppStatus :app-key="'redis'" style="margin-top: 20px" @setting="onSetting" @is-exist="checkExist"></AppStatus>
+        <AppStatus
+            :app-key="'redis'"
+            style="margin-top: 20px"
+            @before="onBefore"
+            @setting="onSetting"
+            @is-exist="checkExist"
+            v-model:loading="loading"
+        ></AppStatus>
+
+        <Setting ref="settingRef" style="margin-top: 10px" />
+
         <div v-show="redisIsExist">
             <el-button style="margin-top: 20px" type="primary" plain @click="goDashboard" icon="Position">
                 Redis-Commander
             </el-button>
-
-            <Setting ref="settingRef" style="margin-top: 10px" />
 
             <Terminal style="margin-top: 10px" v-show="!isOnSetting" ref="terminalRef" />
         </div>
@@ -43,6 +51,8 @@ import { ref } from 'vue';
 import { App } from '@/api/interface/app';
 import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
+
+const loading = ref(false);
 
 const terminalRef = ref();
 const settingRef = ref();
@@ -81,9 +91,15 @@ const loadDashboardPort = async () => {
 const checkExist = (data: App.CheckInstalled) => {
     redisIsExist.value = data.isExist;
     redisSattus.value = data.status;
+    loading.value = false;
     if (redisIsExist.value) {
         loadDashboardPort();
         terminalRef.value.acceptParams();
     }
+};
+
+const onBefore = () => {
+    terminalRef.value!.onClose();
+    loading.value = true;
 };
 </script>
