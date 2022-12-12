@@ -100,7 +100,7 @@ func (b *BaseApi) RecoverWebsite(c *gin.Context) {
 }
 
 func (b *BaseApi) DeleteWebSite(c *gin.Context) {
-	var req dto.WebSiteDel
+	var req request.WebSiteDel
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

@@ -14,6 +14,7 @@ type WebSite struct {
 	AppInstallID   uint            `gorm:"type:integer" json:"appInstallId"`
 	WebSiteGroupID uint            `gorm:"type:integer" json:"webSiteGroupId"`
 	WebSiteSSLID   uint            `gorm:"type:integer" json:"webSiteSSLId"`
+	Proxy          string          `gorm:"type:varchar(128);not null" json:"proxy"`
 	Domains        []WebSiteDomain `json:"domains"`
 	WebSiteSSL     WebSiteSSL      `json:"webSiteSSL"`
 }

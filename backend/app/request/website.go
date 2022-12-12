@@ -11,3 +11,10 @@ type WebsiteWafUpdate struct {
 	Key       string `json:"key" validate:"required"`
 	Enable    bool   `json:"enable" validate:"required"`
 }
+
+type WebSiteDel struct {
+	ID           uint `json:"id" validate:"required"`
+	DeleteApp    bool `json:"deleteApp"`
+	DeleteBackup bool `json:"deleteBackup"`
+	ForceDelete  bool `json:"forceDelete"`
+}

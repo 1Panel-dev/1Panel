@@ -33,7 +33,7 @@ type IWebsiteService interface {
 	Recover(req dto.WebSiteRecover) error
 	RecoverByUpload(req dto.WebSiteRecoverByFile) error
 	UpdateWebsite(req dto.WebSiteUpdate) error
-	DeleteWebSite(req dto.WebSiteDel) error
+	DeleteWebSite(req request.WebSiteDel) error
 	GetWebsite(id uint) (dto.WebsiteDTO, error)
 	CreateWebsiteDomain(create dto.WebSiteDomainCreate) (model.WebSiteDomain, error)
 	GetWebsiteDomain(websiteId uint) ([]model.WebSiteDomain, error)
@@ -88,9 +88,11 @@ func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
 		AppInstallID:   create.AppInstallID,
 		WebSiteGroupID: create.WebSiteGroupID,
 		Protocol:       constant.ProtocolHTTP,
+		Proxy:          create.Proxy,
 	}
 
-	if create.Type == "deployment" {
+	switch create.Type {
+	case constant.Deployment:
 		if create.AppType == dto.NewApp {
 			install, err := ServiceGroupApp.Install(create.AppInstall.Name, create.AppInstall.AppDetailId, create.AppInstall.Params)
 			if err != nil {
@@ -98,7 +100,7 @@ func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
 			}
 			website.AppInstallID = install.ID
 		}
-	} else {
+	case constant.Static:
 		if err := createStaticHtml(website); err != nil {
 			return err
 		}
@@ -240,12 +242,12 @@ func (w WebsiteService) GetWebsite(id uint) (dto.WebsiteDTO, error) {
 	return res, nil
 }
 
-func (w WebsiteService) DeleteWebSite(req dto.WebSiteDel) error {
+func (w WebsiteService) DeleteWebSite(req request.WebSiteDel) error {
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
-	if err := delNginxConfig(website); err != nil {
+	if err := delNginxConfig(website, req.ForceDelete); err != nil {
 		return err
 	}
 	tx, ctx := getTxAndContext()
@@ -253,7 +255,7 @@ func (w WebsiteService) DeleteWebSite(req dto.WebSiteDel) error {
 	if req.DeleteApp {
 		websites, _ := websiteRepo.GetBy(websiteRepo.WithAppInstallId(website.AppInstallID))
 		if len(websites) > 1 {
-			return errors.New("other website use this app")
+			return buserr.New(constant.ErrAppDelete)
 		}
 		appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
