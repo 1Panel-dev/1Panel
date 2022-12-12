@@ -4,7 +4,7 @@
         <AppStatus :app-key="'mysql'" style="margin-top: 20px" @setting="onSetting" @is-exist="checkExist" />
         <Setting ref="settingRef" style="margin-top: 20px" />
 
-        <el-card width="30%" v-if="mysqlStatus != 'Running' && !isOnSetting" class="mask-prompt">
+        <el-card width="30%" v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist" class="mask-prompt">
             <span style="font-size: 14px">{{ $t('database.mysqlBadStatus') }}</span>
             <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="onSetting">
                 【 {{ $t('database.setting') }} 】

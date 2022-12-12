@@ -66,6 +66,23 @@ func (b *BaseApi) UpdateRedisConf(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+func (b *BaseApi) ChangeRedisPassword(c *gin.Context) {
+	var req dto.ChangeDBInfo
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := redisService.ChangePassword(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
 func (b *BaseApi) UpdateRedisPersistenceConf(c *gin.Context) {
 	var req dto.RedisConfPersistenceUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {

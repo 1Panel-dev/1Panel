@@ -307,7 +307,8 @@ export default {
         timeoutHelper: 'Idle connection timeout period. 0 indicates that the connection is on continuously',
         maxclients: 'Max clients',
         requirepass: 'Password',
-        requirepassHelper: 'Leaving a blank indicates that no password has been set',
+        requirepassHelper:
+            'Leave this blank to indicate that no password has been set. Changes need to be saved separately and the container restarted!',
         databases: 'Number of databases',
         maxmemory: 'Maximum memory usage',
         maxmemoryHelper: '0 indicates no restriction',

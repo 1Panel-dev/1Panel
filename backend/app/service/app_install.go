@@ -284,7 +284,7 @@ func (a AppInstallService) ChangeAppPort(req dto.PortUpdate) error {
 			newFiles = append(newFiles, line)
 		}
 	}
-	file, err := os.OpenFile(path, os.O_WRONLY, 0666)
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0666)
 	if err != nil {
 		return err
 	}
@@ -480,21 +480,26 @@ func updateInstallInfoInDB(appKey, param string, value interface{}) {
 	if param != "password" && param != "port" {
 		return
 	}
-	appInstall, _ := appInstallRepo.LoadBaseInfoByKey(appKey)
-	if appInstall.ID == 0 {
+	appInstall, err := appInstallRepo.LoadBaseInfoByKey(appKey)
+	if err != nil {
 		return
 	}
 	oldVal, newVal := "", ""
 	if param == "password" {
 		oldVal = fmt.Sprintf("\"PANEL_DB_ROOT_PASSWORD\":\"%v\"", appInstall.Password)
 		newVal = fmt.Sprintf("\"PANEL_DB_ROOT_PASSWORD\":\"%v\"", value)
+		_ = appInstallRepo.BatchUpdateBy(map[string]interface{}{
+			"param": strings.ReplaceAll(appInstall.Param, oldVal, newVal),
+			"env":   strings.ReplaceAll(appInstall.Env, oldVal, newVal),
+		}, commonRepo.WithByID(appInstall.ID))
 	}
 	if param == "port" {
 		oldVal = fmt.Sprintf("\"PANEL_APP_PORT_HTTP\":%v", appInstall.Port)
 		newVal = fmt.Sprintf("\"PANEL_APP_PORT_HTTP\":%v", value)
+		_ = appInstallRepo.BatchUpdateBy(map[string]interface{}{
+			"param":     strings.ReplaceAll(appInstall.Param, oldVal, newVal),
+			"env":       strings.ReplaceAll(appInstall.Env, oldVal, newVal),
+			"http_port": value,
+		}, commonRepo.WithByID(appInstall.ID))
 	}
-	_ = appInstallRepo.BatchUpdateBy(map[string]interface{}{
-		"param": strings.ReplaceAll(appInstall.Param, oldVal, newVal),
-		"env":   strings.ReplaceAll(appInstall.Env, oldVal, newVal),
-	}, commonRepo.WithByID(appInstall.ID))
 }

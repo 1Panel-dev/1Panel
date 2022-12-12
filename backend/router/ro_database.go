@@ -42,6 +42,7 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		cmdRouter.GET("/redis/status", baseApi.LoadRedisStatus)
 		cmdRouter.GET("/redis/conf", baseApi.LoadRedisConf)
 		cmdRouter.GET("/redis/exec", baseApi.RedisExec)
+		cmdRouter.POST("/redis/password", baseApi.ChangeRedisPassword)
 		cmdRouter.POST("/redis/backup", baseApi.RedisBackup)
 		cmdRouter.POST("/redis/recover", baseApi.RedisRecover)
 		cmdRouter.POST("/redis/backup/records", baseApi.RedisBackupList)
