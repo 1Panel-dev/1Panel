@@ -178,7 +178,12 @@ func delNginxConfig(website model.Website, force bool) error {
 	if err := fileOp.DeleteFile(configPath); err != nil {
 		return err
 	}
-	if err := opNginx(nginxInstall.ContainerName, "reload"); err != nil {
+	sitePath := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "www", "sites", website.PrimaryDomain)
+	if fileOp.Stat(sitePath) {
+		_ = fileOp.DeleteDir(sitePath)
+	}
+
+	if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
 		if force {
 			return nil
 		}

@@ -197,7 +197,7 @@ func (b *BaseApi) CreateWebDomain(c *gin.Context) {
 }
 
 func (b *BaseApi) GetNginxConfig(c *gin.Context) {
-	var req dto.NginxConfigReq
+	var req request.NginxScopeReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -211,7 +211,7 @@ func (b *BaseApi) GetNginxConfig(c *gin.Context) {
 }
 
 func (b *BaseApi) UpdateNginxConfig(c *gin.Context) {
-	var req dto.NginxConfigReq
+	var req request.NginxConfigUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

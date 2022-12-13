@@ -2,7 +2,6 @@ package v1
 
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
-	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/gin-gonic/gin"
@@ -18,7 +17,7 @@ func (b *BaseApi) GetNginx(c *gin.Context) {
 }
 
 func (b *BaseApi) GetNginxConfigByScope(c *gin.Context) {
-	var req dto.NginxScopeReq
+	var req request.NginxScopeReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -32,13 +31,12 @@ func (b *BaseApi) GetNginxConfigByScope(c *gin.Context) {
 	helper.SuccessWithData(c, params)
 }
 
-func (b *BaseApi) UpdateNginxConfigBy(c *gin.Context) {
-	var req dto.NginxConfigReq
+func (b *BaseApi) UpdateNginxConfigByScope(c *gin.Context) {
+	var req request.NginxConfigUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-
 	if err := nginxService.UpdateConfigByScope(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

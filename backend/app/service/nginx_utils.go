@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
@@ -62,12 +63,12 @@ func getNginxFull(website *model.Website) (dto.NginxFull, error) {
 	return nginxFull, nil
 }
 
-func getNginxParamsByKeys(scope string, keys []string, website *model.Website) ([]dto.NginxParam, error) {
+func getNginxParamsByKeys(scope string, keys []string, website *model.Website) ([]response.NginxParam, error) {
 	nginxFull, err := getNginxFull(website)
 	if err != nil {
 		return nil, err
 	}
-	var res []dto.NginxParam
+	var res []response.NginxParam
 	var block components.IBlock
 	if scope == constant.NginxScopeHttp {
 		block = nginxFull.RootConfig.Config.FindHttp()
@@ -77,14 +78,14 @@ func getNginxParamsByKeys(scope string, keys []string, website *model.Website) (
 	for _, key := range keys {
 		dirs := block.FindDirectives(key)
 		for _, dir := range dirs {
-			nginxParam := dto.NginxParam{
+			nginxParam := response.NginxParam{
 				Name:   dir.GetName(),
 				Params: dir.GetParameters(),
 			}
 			res = append(res, nginxParam)
 		}
 		if len(dirs) == 0 {
-			nginxParam := dto.NginxParam{
+			nginxParam := response.NginxParam{
 				Name:   key,
 				Params: []string{},
 			}
