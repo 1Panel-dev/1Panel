@@ -325,7 +325,7 @@ func (u *ImageService) ImageRemove(req dto.BatchDelete) error {
 	if err != nil {
 		return err
 	}
-	for _, ids := range req.Ids {
+	for _, ids := range req.Names {
 		if _, err := client.ImageRemove(context.TODO(), ids, types.ImageRemoveOptions{Force: true, PruneChildren: true}); err != nil {
 			return err
 		}

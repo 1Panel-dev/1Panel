@@ -1,0 +1,817 @@
+[
+    {
+        "api": "/api/v1/containers",
+        "method": "POST",
+        "bodyKeys": [
+            "name",
+            "image"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建容器 name[image]",
+        "formatEN": "create container name[image]"
+    },
+    {
+        "api": "/api/v1/containers/operate",
+        "method": "POST",
+        "bodyKeys": [
+            "name",
+            "operation",
+            "newName"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "容器 [name] 执行 [operation] newName",
+        "formatEN": "container [operation] [name] newName"
+    },
+    {
+        "api": "/api/v1/containers/repo",
+        "method": "POST",
+        "bodyKeys": [
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建镜像仓库 [name]",
+        "formatEN": "create image repo [name]"
+    },
+    {
+        "api": "/api/v1/containers/repo/update",
+        "method": "POST",
+        "bodyKeys": [
+            "id"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "id",
+                "isList": false,
+                "db": "image_repos",
+                "key": "name",
+                "value": "name"
+            }
+        ],
+        "formatZH": "更新镜像仓库 [name]",
+        "formatEN": "update image repo information [name]"
+    },
+    {
+        "api": "/api/v1/containers/repo/del",
+        "method": "POST",
+        "bodyKeys": [
+            "ids"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "ids",
+                "isList": true,
+                "db": "image_repos",
+                "key": "name",
+                "value": "names"
+            }
+        ],
+        "formatZH": "删除镜像仓库 names",
+        "formatEN": "delete image repo names"
+    },
+    {
+        "api": "/api/v1/containers/compose",
+        "method": "POST",
+        "bodyKeys": [
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建 compose [name]",
+        "formatEN": "create compose [name]"
+    },
+    {
+        "api": "/api/v1/containers/compose/operate",
+        "method": "POST",
+        "bodyKeys": [
+            "name",
+            "operation"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "compose [operation] [name]",
+        "formatEN": "compose [operation] [name]"
+    },
+    {
+        "api": "/api/v1/containers/compose/update",
+        "method": "POST",
+        "bodyKeys": [
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "更新 compose [name]",
+        "formatEN": "update compose information [name]"
+    },
+    {
+        "api": "/api/v1/containers/template/update",
+        "method": "POST",
+        "bodyKeys": [
+            "id"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "id",
+                "isList": false,
+                "db": "compose_templates",
+                "key": "name",
+                "value": "name"
+            }
+        ],
+        "formatZH": "更新 compose 模版 [name]",
+        "formatEN": "update compose template information [name]"
+    },
+    {
+        "api": "/api/v1/containers/template",
+        "method": "POST",
+        "bodyKeys": [
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建 compose 模版 [name]",
+        "formatEN": "create compose template [name]"
+    },
+    {
+        "api": "/api/v1/containers/template/del",
+        "method": "POST",
+        "bodyKeys": [
+            "ids"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "ids",
+                "isList": true,
+                "db": "compose_templates",
+                "key": "name",
+                "value": "names"
+            }
+        ],
+        "formatZH": "删除 compose 模版 names",
+        "formatEN": "delete compose template names"
+    },
+    {
+        "api": "/api/v1/containers/image/pull",
+        "method": "POST",
+        "bodyKeys": [
+            "repoID",
+            "imageName"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "repoID",
+                "isList": false,
+                "db": "image_repos",
+                "key": "name",
+                "value": "reponame"
+            }
+        ],
+        "formatZH": "镜像拉取 [reponame]imageName",
+        "formatEN": "image pull [reponame]imageName"
+    },
+    {
+        "api": "/api/v1/containers/image/push",
+        "method": "POST",
+        "bodyKeys": [
+            "repoID",
+            "tagName",
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "repoID",
+                "isList": false,
+                "db": "image_repos",
+                "key": "name",
+                "value": "reponame"
+            }
+        ],
+        "formatZH": "[tagName] 推送到 [reponame]name",
+        "formatEN": "push [tagName] to [reponame]name"
+    },
+    {
+        "api": "/api/v1/containers/image/save",
+        "method": "POST",
+        "bodyKeys": [
+            "tagName",
+            "path",
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "保留 [tagName] 为 [path/name]",
+        "formatEN": "save [tagName] as [path/name]"
+    },
+    {
+        "api": "/api/v1/containers/image/load",
+        "method": "POST",
+        "bodyKeys": [
+            "path"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "从 [path] 加载镜像",
+        "formatEN": "load image from [path]"
+    },
+    {
+        "api": "/api/v1/containers/image/remove",
+        "method": "POST",
+        "bodyKeys": [
+            "names"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "移除镜像 names",
+        "formatEN": "remove image names"
+    },
+    {
+        "api": "/api/v1/containers/image/tag",
+        "method": "POST",
+        "bodyKeys": [
+            "repoID",
+            "targetName"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "repoID",
+                "isList": false,
+                "db": "image_repos",
+                "key": "name",
+                "value": "reponame"
+            }
+        ],
+        "formatZH": "tag 镜像 [reponame]targetName",
+        "formatEN": "tag image [reponame]targetName"
+    },
+    {
+        "api": "/api/v1/containers/image/build",
+        "method": "POST",
+        "bodyKeys": [
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "构建镜像 [name]",
+        "formatEN": "build image [name]"
+    },
+    {
+        "api": "/api/v1/containers/network",
+        "method": "POST",
+        "bodyKeys": [
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建容器网络 name",
+        "formatEN": "create container network [name]"
+    },
+    {
+        "api": "/api/v1/containers/network/del",
+        "method": "POST",
+        "bodyKeys": [
+            "names"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "删除容器网络 names",
+        "formatEN": "delete container network names"
+    },
+    {
+        "api": "/api/v1/containers/volume",
+        "method": "POST",
+        "bodyKeys": [
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建容器存储卷 [name]",
+        "formatEN": "create container volume [name]"
+    },
+    {
+        "api": "/api/v1/containers/volume/del",
+        "method": "POST",
+        "bodyKeys": [
+            "names"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "删除容器存储卷 names",
+        "formatEN": "delete container volume names"
+    },
+    {
+        "api": "/api/v1/containers/docker/operate",
+        "method": "POST",
+        "bodyKeys": [
+            "operation"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "docker 服务 [operation]",
+        "formatEN": "operation docker service"
+    },
+    {
+        "api": "/api/v1/containers/daemonjson/update",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "更新 docker daemon.json 配置",
+        "formatEN": "Updated the docker daemon.json configuration"
+    },
+    {
+        "api": "/api/v1/containers/daemonjson/update/byfile",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "更新 docker daemon.json 配置",
+        "formatEN": "Updated the docker daemon.json configuration"
+    },
+    {
+        "api": "/api/v1/cronjobs/del",
+        "method": "POST",
+        "bodyKeys": [
+            "ids"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "ids",
+                "isList": true,
+                "db": "cronjobs",
+                "key": "name",
+                "value": "names"
+            }
+        ],
+        "formatZH": "删除计划任务 names",
+        "formatEN": "delete cronjob names"
+    },
+    {
+        "api": "/api/v1/cronjobs/update",
+        "method": "POST",
+        "bodyKeys": [
+            "id"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "id",
+                "isList": false,
+                "db": "cronjobs",
+                "key": "name",
+                "value": "name"
+            }
+        ],
+        "formatZH": "更新计划任务 [name]",
+        "formatEN": "update cronjob [name]"
+    },
+    {
+        "api": "/api/v1/cronjobs/status",
+        "method": "POST",
+        "bodyKeys": [
+            "id",
+            "status"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "id",
+                "isList": false,
+                "db": "cronjobs",
+                "key": "name",
+                "value": "name"
+            }
+        ],
+        "formatZH": "修改计划任务 [name] 状态为 [status]",
+        "formatEN": "change the status of cronjob [name] to [status]."
+    },
+    {
+        "api": "/api/v1/cronjobs/handle",
+        "method": "POST",
+        "bodyKeys": [
+            "id"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "id",
+                "isList": false,
+                "db": "cronjobs",
+                "key": "name",
+                "value": "name"
+            }
+        ],
+        "formatZH": "手动执行计划任务 [name]",
+        "formatEN": "manually execute the cronjob [name]"
+    },
+    {
+        "api": "/api/v1/databases",
+        "method": "POST",
+        "bodyKeys": [
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建 mysql 数据库 [name]",
+        "formatEN": "create mysql database [name]"
+    },
+    {
+        "api": "/api/v1/databases/backup",
+        "method": "POST",
+        "bodyKeys": [
+            "mysqlName",
+            "dbName"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "备份 mysql 数据库 mysqlName[dbName]",
+        "formatEN": "backup mysql database mysqlName[dbName]"
+    },
+    {
+        "api": "/api/v1/databases/recover",
+        "method": "POST",
+        "bodyKeys": [
+            "mysqlName",
+            "dbName",
+            "backupName"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "恢复 mysql 数据库 mysqlName[dbName] backupName",
+        "formatEN": "恢复 mysql 数据库 mysqlName[dbName] backupName"
+    },
+    {
+        "api": "/api/v1/databases/recover/byupload",
+        "method": "POST",
+        "bodyKeys": [
+            "fileDir",
+            "fileName",
+            "mysqlName",
+            "dbName"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "mysql 数据库从 [fileDir/fileName] 恢复 [mysqlName]dbName",
+        "formatEN": "mysql database recover [fileDir/fileName] from [mysqlName]dbName"
+    },
+    {
+        "api": "/api/v1/databases/del",
+        "method": "POST",
+        "bodyKeys": [
+            "id"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "id",
+                "isList": false,
+                "db": "database_mysqls",
+                "key": "name",
+                "value": "name"
+            }
+        ],
+        "formatZH": "删除 mysql 数据库 [name]",
+        "formatEN": "delete mysql database [name]"
+    },
+    {
+        "api": "/api/v1/databases/variables/update",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "调整 mysql 数据库性能参数",
+        "formatEN": "adjust mysql database performance parameters"
+    },
+    {
+        "api": "/api/v1/databases/conffile/update",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "更新 mysql 数据库配置信息",
+        "formatEN": "update the mysql database configuration information"
+    },
+    {
+        "api": "/api/v1/databases/redis/password",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "修改 redis 数据库密码",
+        "formatEN": "change the password of the redis database"
+    },
+    {
+        "api": "/api/v1/databases/redis/backup",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "备份 redis 数据库",
+        "formatEN": "backup redis database"
+    },
+    {
+        "api": "/api/v1/databases/redis/recover",
+        "method": "POST",
+        "bodyKeys": [
+            "fileDir",
+            "fileName"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "redis 数据库从 fileDir/fileName 恢复",
+        "formatEN": "redis database recover from fileDir/fileName"
+    },
+    {
+        "api": "/api/v1/databases/redis/conf/update",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "更新 redis 数据库配置信息",
+        "formatEN": "update the redis database configuration information"
+    },
+    {
+        "api": "/api/v1/databases/redis/conffile/update",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "更新 redis 数据库配置信息",
+        "formatEN": "update the redis database configuration information"
+    },
+    {
+        "api": "/api/v1/databases/redis/persistence/update",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "redis 数据库持久化配置更新",
+        "formatEN": "redis database persistence configuration update"
+    },
+    {
+        "api": "/api/v1/commands",
+        "method": "POST",
+        "bodyKeys": [
+            "name",
+            "command"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建快捷命令 name[command]",
+        "formatEN": "create quick command name[command]"
+    },
+    {
+        "api": "/api/v1/commands/del",
+        "method": "POST",
+        "bodyKeys": [
+            "ids"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "ids",
+                "isList": true,
+                "db": "commands",
+                "key": "name",
+                "value": "names"
+            }
+        ],
+        "formatZH": "删除快捷命令 names",
+        "formatEN": "delete quick command names"
+    },
+    {
+        "api": "/api/v1/commands/update",
+        "method": "POST",
+        "bodyKeys": [
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "更新快捷命令 [name]",
+        "formatEN": "update quick command [name]"
+    },
+    {
+        "api": "/api/v1/backups",
+        "method": "POST",
+        "bodyKeys": [
+            "type"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建备份账号 [type]",
+        "formatEN": "create backup account [type]"
+    },
+    {
+        "api": "/api/v1/backups/del",
+        "method": "POST",
+        "bodyKeys": [
+            "ids"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "ids",
+                "isList": true,
+                "db": "backup_accounts",
+                "key": "type",
+                "value": "types"
+            }
+        ],
+        "formatZH": "删除备份账号 [types]",
+        "formatEN": "delete backup account [types]"
+    },
+    {
+        "api": "/api/v1/backups/update",
+        "method": "POST",
+        "bodyKeys": [
+            "type"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "更新备份账号 [types]",
+        "formatEN": "update backup account [types]"
+    },
+    {
+        "api": "/api/v1/backups/record/download",
+        "method": "POST",
+        "bodyKeys": [
+            "source",
+            "fileName"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "下载备份记录 [source]fileName",
+        "formatEN": "download backup records [source]fileName"
+    },
+    {
+        "api": "/api/v1/backups/record/del",
+        "method": "POST",
+        "bodyKeys": [
+            "ids"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "ids",
+                "isList": true,
+                "db": "backup_records",
+                "key": "file_name",
+                "value": "files"
+            }
+        ],
+        "formatZH": "删除备份记录 [files]",
+        "formatEN": "delete backup records [files]"
+    },
+    {
+        "api": "/api/v1/groups/del",
+        "method": "POST",
+        "bodyKeys": [
+            "id"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "id",
+                "isList": false,
+                "db": "groups",
+                "key": "name",
+                "value": "name"
+            }
+        ],
+        "formatZH": "删除组 [name]",
+        "formatEN": "delete group [name]"
+    },
+    {
+        "api": "/api/v1/groups/update",
+        "method": "POST",
+        "bodyKeys": [
+            "name",
+            "type"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "更新组 [name]type",
+        "formatEN": "update group [name]type"
+    },
+    {
+        "api": "/api/v1/groups",
+        "method": "POST",
+        "bodyKeys": [
+            "name",
+            "type"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建组 [name]type",
+        "formatEN": "create group [name]type"
+    },
+    {
+        "api": "/api/v1/hosts/del",
+        "method": "POST",
+        "bodyKeys": [
+            "id"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "id",
+                "isList": false,
+                "db": "hosts",
+                "key": "addr",
+                "value": "addr"
+            }
+        ],
+        "formatZH": "删除主机 [addr]",
+        "formatEN": "delete host [addr]"
+    },
+    {
+        "api": "/api/v1/hosts/update",
+        "method": "POST",
+        "bodyKeys": [
+            "name",
+            "addr"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "更新主机信息 [name]addr",
+        "formatEN": "update host [name]addr"
+    },
+    {
+        "api": "/api/v1/hosts",
+        "method": "POST",
+        "bodyKeys": [
+            "name",
+            "addr"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建主机 [name]addr",
+        "formatEN": "create host [name]addr"
+    },
+    {
+        "api": "/api/v1/settings/expired/handle",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "重置过期密码",
+        "formatEN": "reset an expired Password"
+    },
+    {
+        "api": "/api/v1/settings/update",
+        "method": "POST",
+        "bodyKeys": [
+            "key",
+            "value"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "修改系统配置 [key] => [value]",
+        "formatEN": "update system setting [key] => [value]"
+    },
+    {
+        "api": "/api/v1/settings/password/update",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "修改系统密码",
+        "formatEN": "update system password"
+    },
+    {
+        "api": "/api/v1/settings/time/sync",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "系统时间同步",
+        "formatEN": "sync system time"
+    },
+    {
+        "api": "/api/v1/settings/monitor/clean",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "清空监控数据",
+        "formatEN": "clean monitor datas"
+    },
+    {
+        "api": "/api/v1/settings/mfa/bind",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "mfa 绑定",
+        "formatEN": "bind mfa"
+    }
+]

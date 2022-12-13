@@ -18,9 +18,9 @@ export const testConn = (params: Host.HostConnTest) => {
 };
 
 export const editHost = (params: Host.HostOperate) => {
-    return http.put(`/hosts/` + params.id, params);
+    return http.post(`/hosts/update`, params);
 };
 
 export const deleteHost = (id: number) => {
-    return http.delete(`/hosts/` + id);
+    return http.post(`/hosts/del`, { id: id });
 };

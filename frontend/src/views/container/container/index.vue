@@ -56,7 +56,11 @@
                     min-width="100"
                     prop="imageName"
                 />
-                <el-table-column :label="$t('commons.table.status')" min-width="50" prop="state" fix />
+                <el-table-column :label="$t('commons.table.status')" min-width="50" prop="state" fix>
+                    <template #default="{ row }">
+                        <Status :key="row.state" :status="row.state"></Status>
+                    </template>
+                </el-table-column>
                 <el-table-column :label="$t('container.upTime')" min-width="100" prop="runTime" fix />
                 <el-table-column
                     prop="createTime"
@@ -92,6 +96,7 @@ import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
+import Status from '@/components/status/index.vue';
 import Submenu from '@/views/container/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFromat } from '@/utils/util';
@@ -220,7 +225,7 @@ const onOperate = async (operation: string) => {
         let ps = [];
         for (const item of selects.value) {
             const param = {
-                containerID: item.containerID,
+                name: item.name,
                 operation: operation,
                 newName: '',
             };
@@ -259,7 +264,8 @@ const buttons = [
     {
         label: i18n.global.t('container.rename'),
         click: (row: Container.ContainerInfo) => {
-            dialogReNameRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
+            console.log(row.name);
+            dialogReNameRef.value!.acceptParams({ container: row.name });
         },
     },
     {

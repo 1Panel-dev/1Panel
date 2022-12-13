@@ -127,17 +127,12 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	id, err := helper.GetParamID(c)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
 
 	upMap := make(map[string]interface{})
 	upMap["bucket"] = req.Bucket
 	upMap["credential"] = req.Credential
 	upMap["vars"] = req.Vars
-	if err := backupService.Update(id, upMap); err != nil {
+	if err := backupService.Update(req.ID, upMap); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

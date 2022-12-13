@@ -26,13 +26,17 @@ func (b *BaseApi) CreateGroup(c *gin.Context) {
 }
 
 func (b *BaseApi) DeleteGroup(c *gin.Context) {
-	id, err := helper.GetParamID(c)
-	if err != nil {
+	var req dto.OperateByID
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 
-	if err := groupService.Delete(id); err != nil {
+	if err := groupService.Delete(req.ID); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -49,13 +53,8 @@ func (b *BaseApi) UpdateGroup(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	id, err := helper.GetParamID(c)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
 
-	if err := groupService.Update(id, req.Name); err != nil {
+	if err := groupService.Update(req.ID, req.Name); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

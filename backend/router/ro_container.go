@@ -13,41 +13,36 @@ func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
-	withRecordRouter := Router.Group("containers").
-		Use(middleware.JwtAuth()).
-		Use(middleware.SessionAuth()).
-		Use(middleware.PasswordExpired()).
-		Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		baRouter.GET("/exec", baseApi.ContainerExec)
 		baRouter.GET("/stats/:id", baseApi.ContainerStats)
 
-		baRouter.POST("/search", baseApi.SearchContainer)
-		baRouter.POST("/inspect", baseApi.Inspect)
 		baRouter.POST("", baseApi.ContainerCreate)
-		baRouter.POST("/log", baseApi.ContainerLogs)
-		withRecordRouter.POST("operate", baseApi.ContainerOperation)
+		baRouter.POST("/search", baseApi.SearchContainer)
+		baRouter.POST("/search/log", baseApi.ContainerLogs)
+		baRouter.POST("/inspect", baseApi.Inspect)
+		baRouter.POST("/operate", baseApi.ContainerOperation)
 
-		baRouter.POST("/repo/search", baseApi.SearchRepo)
-		baRouter.PUT("/repo/:id", baseApi.UpdateRepo)
 		baRouter.GET("/repo", baseApi.ListRepo)
-		withRecordRouter.POST("/repo", baseApi.CreateRepo)
-		withRecordRouter.POST("/repo/del", baseApi.DeleteRepo)
+		baRouter.POST("/repo/search", baseApi.SearchRepo)
+		baRouter.POST("/repo/update", baseApi.UpdateRepo)
+		baRouter.POST("/repo", baseApi.CreateRepo)
+		baRouter.POST("/repo/del", baseApi.DeleteRepo)
 
 		baRouter.POST("/compose/search", baseApi.SearchCompose)
 		baRouter.POST("/compose", baseApi.CreateCompose)
 		baRouter.POST("/compose/operate", baseApi.OperatorCompose)
 		baRouter.POST("/compose/update", baseApi.ComposeUpdate)
 
-		baRouter.POST("/template/search", baseApi.SearchComposeTemplate)
-		baRouter.PUT("/template/:id", baseApi.UpdateComposeTemplate)
 		baRouter.GET("/template", baseApi.ListComposeTemplate)
-		withRecordRouter.POST("/template", baseApi.CreateComposeTemplate)
-		withRecordRouter.POST("/template/del", baseApi.DeleteComposeTemplate)
+		baRouter.POST("/template/search", baseApi.SearchComposeTemplate)
+		baRouter.POST("/template/update", baseApi.UpdateComposeTemplate)
+		baRouter.POST("/template", baseApi.CreateComposeTemplate)
+		baRouter.POST("/template/del", baseApi.DeleteComposeTemplate)
 
-		baRouter.POST("/image/search", baseApi.SearchImage)
 		baRouter.GET("/image", baseApi.ListImage)
+		baRouter.POST("/image/search", baseApi.SearchImage)
 		baRouter.POST("/image/pull", baseApi.ImagePull)
 		baRouter.POST("/image/push", baseApi.ImagePush)
 		baRouter.POST("/image/save", baseApi.ImageSave)
@@ -56,12 +51,12 @@ func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
 		baRouter.POST("/image/tag", baseApi.ImageTag)
 		baRouter.POST("/image/build", baseApi.ImageBuild)
 
+		baRouter.GET("/volume", baseApi.ListVolume)
 		baRouter.POST("/network/del", baseApi.DeleteNetwork)
 		baRouter.POST("/network/search", baseApi.SearchNetwork)
 		baRouter.POST("/network", baseApi.CreateNetwork)
 		baRouter.POST("/volume/del", baseApi.DeleteVolume)
 		baRouter.POST("/volume/search", baseApi.SearchVolume)
-		baRouter.GET("/volume", baseApi.ListVolume)
 		baRouter.POST("/volume", baseApi.CreateVolume)
 
 		baRouter.GET("/daemonjson", baseApi.LoadDaemonJson)

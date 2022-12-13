@@ -97,13 +97,8 @@ func (b *BaseApi) UpdateCronjob(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	id, err := helper.GetParamID(c)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
 
-	if err := cronjobService.Update(id, req); err != nil {
+	if err := cronjobService.Update(req.ID, req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -148,12 +143,17 @@ func (b *BaseApi) TargetDownload(c *gin.Context) {
 }
 
 func (b *BaseApi) HandleOnce(c *gin.Context) {
-	id, err := helper.GetParamID(c)
-	if err != nil {
+	var req dto.OperateByID
+	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if err := cronjobService.HandleOnce(id); err != nil {
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := cronjobService.HandleOnce(req.ID); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

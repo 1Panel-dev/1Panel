@@ -14,6 +14,10 @@ type OperationWithName struct {
 	Name string `json:"name" validate:"required"`
 }
 
+type OperateByID struct {
+	ID uint `json:"id" validate:"required"`
+}
+
 type BatchDeleteReq struct {
 	Ids []uint `json:"ids" validate:"required"`
 }

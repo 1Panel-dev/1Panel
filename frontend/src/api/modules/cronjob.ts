@@ -11,7 +11,7 @@ export const addCronjob = (params: Cronjob.CronjobCreate) => {
 };
 
 export const editCronjob = (params: Cronjob.CronjobUpdate) => {
-    return http.put(`/cronjobs/${params.id}`, params);
+    return http.post(`/cronjobs/update`, params);
 };
 
 export const deleteCronjob = (params: { ids: number[] }) => {

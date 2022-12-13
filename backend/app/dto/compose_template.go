@@ -9,6 +9,7 @@ type ComposeTemplateCreate struct {
 }
 
 type ComposeTemplateUpdate struct {
+	ID          uint   `json:"id"`
 	Description string `json:"description"`
 	Content     string `json:"content"`
 }

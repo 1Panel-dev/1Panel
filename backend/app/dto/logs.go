@@ -5,23 +5,20 @@ import (
 )
 
 type OperationLog struct {
-	ID     uint   `json:"id"`
-	Group  string `json:"group"`
-	Source string `json:"source"`
-	Action string `json:"action"`
+	ID    uint   `json:"id"`
+	Group string `json:"group"`
 
 	IP        string `json:"ip"`
 	Path      string `json:"path"`
 	Method    string `json:"method"`
 	UserAgent string `json:"userAgent"`
-	Body      string `json:"body"`
-	Resp      string `json:"resp"`
 
-	Status       int           `json:"status"`
-	Latency      time.Duration `json:"latency"`
-	ErrorMessage string        `json:"errorMessage"`
+	Latency time.Duration `json:"latency"`
+	Status  string        `json:"status"`
+	Message string        `json:"message"`
 
-	Detail    string    `json:"detail"`
+	DetailZH  string    `json:"detailZH"`
+	DetailEN  string    `json:"detailEN"`
 	CreatedAt time.Time `json:"createdAt"`
 }
 

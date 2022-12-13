@@ -3,59 +3,98 @@ package middleware
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/app/service"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/cmd/server/operation"
 	"github.com/gin-gonic/gin"
 )
 
-func OperationRecord() gin.HandlerFunc {
+func OperationLog() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var body []byte
-		if strings.Contains(c.Request.URL.Path, "search") {
+		if strings.Contains(c.Request.URL.Path, "search") || c.Request.Method == http.MethodGet {
 			c.Next()
 			return
 		}
 
-		if c.Request.Method == http.MethodGet {
-			query := c.Request.URL.RawQuery
-			query, _ = url.QueryUnescape(query)
-			split := strings.Split(query, "&")
-			m := make(map[string]string)
-			for _, v := range split {
-				kv := strings.Split(v, "=")
-				if len(kv) == 2 {
-					m[kv[0]] = kv[1]
-				}
-			}
-			body, _ = json.Marshal(&m)
-		} else {
-			var err error
-			body, err = ioutil.ReadAll(c.Request.Body)
-			if err != nil {
-				global.LOG.Errorf("read body from request failed, err: %v", err)
-			} else {
-				c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
-			}
-		}
-		pathInfo := loadLogInfo(c.Request.URL.Path)
-
+		group := loadLogInfo(c.Request.URL.Path)
 		record := model.OperationLog{
-			Group:     pathInfo.group,
-			Source:    pathInfo.source,
-			Action:    pathInfo.action,
+			Group:     group,
 			IP:        c.ClientIP(),
 			Method:    c.Request.Method,
 			Path:      c.Request.URL.Path,
 			UserAgent: c.Request.UserAgent(),
-			Body:      string(body),
 		}
+		var (
+			operationDics []operationJson
+			operationDic  operationJson
+		)
+		if err := json.Unmarshal(operation.OperationJosn, &operationDics); err != nil {
+			c.Next()
+			return
+		}
+		for _, dic := range operationDics {
+			if dic.API == record.Path && dic.Method == record.Method {
+				operationDic = dic
+				break
+			}
+		}
+		if len(operationDic.API) == 0 {
+			c.Next()
+			return
+		}
+
+		formatMap := make(map[string]interface{})
+		if len(operationDic.BodyKeys) != 0 {
+			body, err := ioutil.ReadAll(c.Request.Body)
+			if err == nil {
+				c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+			}
+			bodyMap := make(map[string]interface{})
+			_ = json.Unmarshal(body, &bodyMap)
+			for _, key := range operationDic.BodyKeys {
+				if _, ok := bodyMap[key]; ok {
+					formatMap[key] = bodyMap[key]
+				}
+			}
+		}
+		if len(operationDic.BeforeFuntions) != 0 {
+			for _, funcs := range operationDic.BeforeFuntions {
+				for key, value := range formatMap {
+					if funcs.Info == key {
+						var names []string
+						if funcs.IsList {
+							if key == "ids" {
+								sql := fmt.Sprintf("SELECT %s FROM %s where id in (?);", funcs.Key, funcs.DB)
+								fmt.Println(value)
+								_ = global.DB.Raw(sql, value).Scan(&names)
+							}
+						} else {
+							_ = global.DB.Raw(fmt.Sprintf("select %s from %s where %s = ?;", funcs.Key, funcs.DB, key), value).Scan(&names)
+						}
+						formatMap[funcs.Value] = strings.Join(names, ",")
+						break
+					}
+				}
+			}
+		}
+		var values []interface{}
+		for key, value := range formatMap {
+			if strings.Contains(operationDic.FormatEN, key) {
+				operationDic.FormatZH = strings.ReplaceAll(operationDic.FormatZH, key, "%v")
+				operationDic.FormatEN = strings.ReplaceAll(operationDic.FormatEN, key, "%v")
+				values = append(values, value)
+			}
+		}
+		record.DetailZH = fmt.Sprintf(operationDic.FormatZH, values...)
+		record.DetailEN = fmt.Sprintf(operationDic.FormatEN, values...)
 
 		writer := responseBodyWriter{
 			ResponseWriter: c.Writer,
@@ -66,14 +105,44 @@ func OperationRecord() gin.HandlerFunc {
 
 		c.Next()
 
+		var res response
+		_ = json.Unmarshal(writer.body.Bytes(), &res)
+		if res.Code == 200 {
+			record.Status = constant.StatusSuccess
+		} else {
+			record.Status = constant.StatusFailed
+			record.Message = res.Message
+		}
+
 		latency := time.Since(now)
 		record.Latency = latency
-		record.Resp = writer.body.String()
 
 		if err := service.NewILogService().CreateOperationLog(record); err != nil {
 			global.LOG.Errorf("create operation record failed, err: %v", err)
 		}
 	}
+}
+
+type operationJson struct {
+	API            string         `json:"api"`
+	Method         string         `json:"method"`
+	BodyKeys       []string       `json:"bodyKeys"`
+	ParamKeys      []string       `json:"paramKeys"`
+	BeforeFuntions []functionInfo `json:"beforeFuntions"`
+	FormatZH       string         `json:"formatZH"`
+	FormatEN       string         `json:"formatEN"`
+}
+type functionInfo struct {
+	Info   string `json:"info"`
+	IsList bool   `json:"isList"`
+	DB     string `json:"db"`
+	Key    string `json:"key"`
+	Value  string `json:"value"`
+}
+
+type response struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
 
 type responseBodyWriter struct {
@@ -86,26 +155,14 @@ func (r responseBodyWriter) Write(b []byte) (int, error) {
 	return r.ResponseWriter.Write(b)
 }
 
-type pathInfo struct {
-	group  string
-	source string
-	action string
-}
-
-func loadLogInfo(path string) pathInfo {
+func loadLogInfo(path string) string {
 	path = strings.ReplaceAll(path, "/api/v1", "")
 	if !strings.Contains(path, "/") {
-		return pathInfo{}
+		return ""
 	}
 	pathArrys := strings.Split(path, "/")
 	if len(pathArrys) < 2 {
-		return pathInfo{}
+		return ""
 	}
-	if len(pathArrys) == 2 {
-		return pathInfo{group: pathArrys[1]}
-	}
-	if len(pathArrys) == 3 {
-		return pathInfo{group: pathArrys[1], source: pathArrys[2]}
-	}
-	return pathInfo{group: pathArrys[1], source: pathArrys[2], action: pathArrys[3]}
+	return pathArrys[1]
 }

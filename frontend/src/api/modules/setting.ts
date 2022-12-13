@@ -6,15 +6,15 @@ export const getSettingInfo = () => {
 };
 
 export const updateSetting = (param: Setting.SettingUpdate) => {
-    return http.put(`/settings`, param);
+    return http.post(`/settings`, param);
 };
 
 export const updatePassword = (param: Setting.PasswordUpdate) => {
-    return http.put(`/settings/password`, param);
+    return http.post(`/settings/password`, param);
 };
 
 export const handleExpired = (param: Setting.PasswordUpdate) => {
-    return http.put(`/settings/expired/handle`, param);
+    return http.post(`/settings/expired/handle`, param);
 };
 
 export const syncTime = () => {

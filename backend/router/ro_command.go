@@ -14,17 +14,12 @@ func (s *CommandRouter) InitCommandRouter(Router *gin.RouterGroup) {
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
-	withRecordRouter := Router.Group("commands").
-		Use(middleware.JwtAuth()).
-		Use(middleware.SessionAuth()).
-		Use(middleware.PasswordExpired()).
-		Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		withRecordRouter.POST("", baseApi.CreateCommand)
-		withRecordRouter.POST("/del", baseApi.DeleteCommand)
-		withRecordRouter.PUT(":id", baseApi.UpdateCommand)
-		cmdRouter.POST("/search", baseApi.SearchCommand)
 		cmdRouter.GET("", baseApi.ListCommand)
+		cmdRouter.POST("", baseApi.CreateCommand)
+		cmdRouter.POST("/del", baseApi.DeleteCommand)
+		cmdRouter.POST("/search", baseApi.SearchCommand)
+		cmdRouter.POST("/update", baseApi.UpdateCommand)
 	}
 }

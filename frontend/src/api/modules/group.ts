@@ -10,9 +10,9 @@ export const addGroup = (params: Group.GroupOperate) => {
 };
 
 export const editGroup = (params: Group.GroupOperate) => {
-    return http.put(`/groups/` + params.id, params);
+    return http.post(`/groups/update`, params);
 };
 
 export const deleteGroup = (id: number) => {
-    return http.delete(`/groups/` + id);
+    return http.post(`/groups/del`, { id: id });
 };

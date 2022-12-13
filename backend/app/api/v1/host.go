@@ -90,13 +90,17 @@ func (b *BaseApi) GetHostInfo(c *gin.Context) {
 }
 
 func (b *BaseApi) DeleteHost(c *gin.Context) {
-	id, err := helper.GetParamID(c)
-	if err != nil {
+	var req dto.OperateByID
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 
-	if err := hostService.Delete(id); err != nil {
+	if err := hostService.Delete(req.ID); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -113,11 +117,6 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	id, err := helper.GetParamID(c)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
 
 	upMap := make(map[string]interface{})
 	upMap["name"] = req.Name
@@ -128,7 +127,7 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 	upMap["auth_mode"] = req.AuthMode
 	upMap["password"] = req.Password
 	upMap["private_key"] = req.PrivateKey
-	if err := hostService.Update(id, upMap); err != nil {
+	if err := hostService.Update(req.ID, upMap); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

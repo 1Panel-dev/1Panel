@@ -5,6 +5,7 @@ import (
 )
 
 type HostOperate struct {
+	ID          uint   `json:"id"`
 	GroupBelong string `json:"groupBelong" validate:"required"`
 	Name        string `json:"name" validate:"required"`
 	Addr        string `json:"addr" validate:"required,ip"`

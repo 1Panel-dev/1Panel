@@ -2,7 +2,7 @@ import { ReqPage } from '.';
 
 export namespace Container {
     export interface ContainerOperate {
-        containerID: string;
+        name: string;
         operation: string;
         newName: string;
     }
@@ -198,6 +198,7 @@ export namespace Container {
         path: string;
     }
     export interface ComposeUpdate {
+        name: string;
         path: string;
         content: string;
     }
@@ -227,7 +228,7 @@ export namespace Container {
     }
 
     export interface BatchDelete {
-        ids: Array<string>;
+        names: Array<string>;
     }
 
     export interface DaemonJsonUpdateByFile {

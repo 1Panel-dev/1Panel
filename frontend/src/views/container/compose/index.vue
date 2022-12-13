@@ -156,6 +156,7 @@ const dialogEditRef = ref();
 const onEdit = async (row: Container.ComposeInfo) => {
     const res = await LoadFile({ path: row.path });
     let params = {
+        name: row.name,
         path: row.path,
         content: res.data,
     };

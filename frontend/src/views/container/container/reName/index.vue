@@ -39,7 +39,7 @@ import { reactive, ref } from 'vue';
 const loading = ref(false);
 
 const renameForm = reactive({
-    containerID: '',
+    name: '',
     operation: 'rename',
     newName: '',
 });
@@ -70,11 +70,12 @@ const onSubmitName = async (formEl: FormInstance | undefined) => {
 };
 
 interface DialogProps {
-    containerID: string;
+    container: string;
 }
 
 const acceptParams = (props: DialogProps): void => {
-    renameForm.containerID = props.containerID;
+    console.log(props.container);
+    renameForm.name = props.container;
     renameForm.newName = '';
     newNameVisiable.value = true;
 };

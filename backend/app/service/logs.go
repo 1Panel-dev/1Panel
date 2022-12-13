@@ -1,12 +1,9 @@
 package service
 
 import (
-	"encoding/json"
-
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 )
@@ -56,17 +53,6 @@ func (u *LogService) PageOperationLog(search dto.PageInfo) (int64, interface{}, 
 		if err := copier.Copy(&item, &op); err != nil {
 			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
-		item.Body = filterSensitive(item.Body)
-		var res dto.Response
-		if err := json.Unmarshal([]byte(item.Resp), &res); err != nil {
-			global.LOG.Errorf("unmarshal failed, err: %+v", err)
-			dtoOps = append(dtoOps, item)
-			continue
-		}
-		item.Status = res.Code
-		if item.Status != 200 {
-			item.ErrorMessage = res.Message
-		}
 		dtoOps = append(dtoOps, item)
 	}
 	return total, dtoOps, err
@@ -77,25 +63,4 @@ func (u *LogService) CleanLogs(logtype string) error {
 		return logRepo.CleanOperation()
 	}
 	return logRepo.CleanLogin()
-}
-
-func filterSensitive(vars string) string {
-	var Sensitives = []string{"password", "Password", "credential", "privateKey"}
-	ops := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(vars), &ops); err != nil {
-		return vars
-	}
-	for k := range ops {
-		for _, sen := range Sensitives {
-			if k == sen {
-				delete(ops, k)
-				continue
-			}
-		}
-	}
-	backStr, err := json.Marshal(ops)
-	if err != nil {
-		return ""
-	}
-	return string(backStr)
 }
