@@ -3,6 +3,7 @@ package dto
 import "time"
 
 type BackupOperate struct {
+	ID         uint   `json:"id"`
 	Type       string `json:"type" validate:"required"`
 	Bucket     string `json:"bucket"`
 	Credential string `json:"credential"`

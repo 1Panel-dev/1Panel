@@ -16,7 +16,7 @@
                 prop="repoID"
             >
                 <el-select style="width: 100%" filterable v-model="form.repoID">
-                    <el-option v-for="item in dialogData.repos" :key="item.id" :value="item.id" :label="item.name" />
+                    <el-option v-for="item in repos" :key="item.id" :value="item.id" :label="item.name" />
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('container.imageName')" :rules="Rules.requiredInput" prop="targetName">
@@ -49,6 +49,7 @@ import { Container } from '@/api/interface/container';
 const loading = ref(false);
 
 const tagVisiable = ref(false);
+const repos = ref();
 const form = reactive({
     sourceID: '',
     fromRepo: true,
@@ -60,10 +61,6 @@ interface DialogProps {
     repos: Array<Container.RepoOptions>;
     sourceID: string;
 }
-const dialogData = ref<DialogProps>({
-    repos: [] as Array<Container.RepoOptions>,
-    sourceID: '',
-});
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
     tagVisiable.value = true;
@@ -71,7 +68,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     form.sourceID = params.sourceID;
     form.targetName = '';
     form.fromRepo = true;
-    dialogData.value.repos = params.repos;
+    repos.value = params.repos;
 };
 
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -101,7 +98,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
 };
 
 function loadDetailInfo(id: number) {
-    for (const item of dialogData.value.repos) {
+    for (const item of repos.value) {
         if (item.id === id) {
             return item.downloadUrl;
         }

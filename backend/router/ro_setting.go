@@ -14,17 +14,12 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
-	withRecordRouter := Router.Group("settings").
-		Use(middleware.JwtAuth()).
-		Use(middleware.SessionAuth()).
-		Use(middleware.PasswordExpired()).
-		Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		baseRouter.POST("/search", baseApi.GetSettingInfo)
-		baseRouter.PUT("/expired/handle", baseApi.HandlePasswordExpired)
-		withRecordRouter.PUT("", baseApi.UpdateSetting)
-		settingRouter.PUT("/password", baseApi.UpdatePassword)
+		baseRouter.POST("/expired/handle", baseApi.HandlePasswordExpired)
+		baseRouter.POST("/update", baseApi.UpdateSetting)
+		settingRouter.POST("/password/update", baseApi.UpdatePassword)
 		settingRouter.POST("/time/sync", baseApi.SyncTime)
 		settingRouter.POST("/monitor/clean", baseApi.CleanMonitor)
 		settingRouter.GET("/mfa", baseApi.GetMFA)

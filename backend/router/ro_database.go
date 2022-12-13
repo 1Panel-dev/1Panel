@@ -14,23 +14,18 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
-	withRecordRouter := Router.Group("databases").
-		Use(middleware.JwtAuth()).
-		Use(middleware.SessionAuth()).
-		Use(middleware.PasswordExpired()).
-		Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		withRecordRouter.POST("", baseApi.CreateMysql)
-		withRecordRouter.POST("/change/access", baseApi.ChangeMysqlAccess)
-		withRecordRouter.POST("/change/password", baseApi.ChangeMysqlPassword)
-		withRecordRouter.POST("/backup", baseApi.BackupMysql)
-		withRecordRouter.POST("/recover/byupload", baseApi.RecoverMysqlByUpload)
-		withRecordRouter.POST("/recover", baseApi.RecoverMysql)
-		withRecordRouter.POST("/del/check/:id", baseApi.DeleteCheckMysql)
-		withRecordRouter.POST("/del/:id", baseApi.DeleteMysql)
-		withRecordRouter.POST("/variables/update", baseApi.UpdateMysqlVariables)
-		withRecordRouter.POST("/conf/update/byfile", baseApi.UpdateMysqlConfByFile)
+		cmdRouter.POST("", baseApi.CreateMysql)
+		cmdRouter.POST("/change/access", baseApi.ChangeMysqlAccess)
+		cmdRouter.POST("/change/password", baseApi.ChangeMysqlPassword)
+		cmdRouter.POST("/backup", baseApi.BackupMysql)
+		cmdRouter.POST("/recover/byupload", baseApi.RecoverMysqlByUpload)
+		cmdRouter.POST("/recover", baseApi.RecoverMysql)
+		cmdRouter.POST("/del/check", baseApi.DeleteCheckMysql)
+		cmdRouter.POST("/del", baseApi.DeleteMysql)
+		cmdRouter.POST("/variables/update", baseApi.UpdateMysqlVariables)
+		cmdRouter.POST("/conffile/update", baseApi.UpdateMysqlConfByFile)
 		cmdRouter.POST("/search", baseApi.SearchMysql)
 		cmdRouter.GET("/variables", baseApi.LoadVariables)
 		cmdRouter.GET("/status", baseApi.LoadStatus)
@@ -45,9 +40,9 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/redis/password", baseApi.ChangeRedisPassword)
 		cmdRouter.POST("/redis/backup", baseApi.RedisBackup)
 		cmdRouter.POST("/redis/recover", baseApi.RedisRecover)
-		cmdRouter.POST("/redis/backup/records", baseApi.RedisBackupList)
+		cmdRouter.POST("/redis/backuplist/search", baseApi.RedisBackupList)
 		cmdRouter.POST("/redis/conf/update", baseApi.UpdateRedisConf)
-		cmdRouter.POST("/redis/conf/update/byfile", baseApi.UpdateRedisConfByFile)
-		cmdRouter.POST("/redis/conf/update/persistence", baseApi.UpdateRedisPersistenceConf)
+		cmdRouter.POST("/redis/conffile/update", baseApi.UpdateRedisConfByFile)
+		cmdRouter.POST("/redis/persistence/update", baseApi.UpdateRedisPersistenceConf)
 	}
 }

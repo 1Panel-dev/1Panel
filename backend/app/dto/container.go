@@ -65,9 +65,9 @@ type ContainerLog struct {
 }
 
 type ContainerOperation struct {
-	ContainerID string `json:"containerID" validate:"required"`
-	Operation   string `json:"operation" validate:"required,oneof=start stop restart kill pause unpause rename remove"`
-	NewName     string `json:"newName"`
+	Name      string `json:"name" validate:"required"`
+	Operation string `json:"operation" validate:"required,oneof=start stop restart kill pause unpause rename remove"`
+	NewName   string `json:"newName"`
 }
 
 type Network struct {
@@ -106,7 +106,7 @@ type VolumeCreat struct {
 }
 
 type BatchDelete struct {
-	Ids []string `json:"ids" validate:"required"`
+	Names []string `json:"names" validate:"required"`
 }
 
 type ComposeInfo struct {
@@ -138,6 +138,7 @@ type ComposeOperation struct {
 	Operation string `json:"operation" validate:"required,oneof=start stop down"`
 }
 type ComposeUpdate struct {
+	Name    string `json:"name" validate:"required"`
 	Path    string `json:"path" validate:"required"`
 	Content string `json:"content" validate:"required"`
 }

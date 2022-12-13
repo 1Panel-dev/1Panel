@@ -29,13 +29,13 @@ export const updateMysqlVariables = (params: Array<Database.VariablesUpdate>) =>
     return http.post(`/databases/variables/update`, params);
 };
 export const updateMysqlConfByFile = (params: Database.MysqlConfUpdateByFile) => {
-    return http.post(`/databases/conf/update/byfile`, params);
+    return http.post(`/databases/conffile/update`, params);
 };
 export const deleteCheckMysqlDB = (id: number) => {
-    return http.post<Array<string>>(`/databases/del/check/${id}`);
+    return http.post<Array<string>>(`/databases/del/check`, { id: id });
 };
 export const deleteMysqlDB = (id: number) => {
-    return http.post(`/databases/del/${id}`);
+    return http.post(`/databases/del`, { id: id });
 };
 
 export const loadMysqlBaseInfo = () => {
@@ -68,13 +68,13 @@ export const changeRedisPassword = (params: Database.ChangeInfo) => {
     return http.post(`/databases/redis/password`, params);
 };
 export const updateRedisPersistenceConf = (params: Database.RedisConfPersistenceUpdate) => {
-    return http.post(`/databases/redis/conf/update/persistence`, params);
+    return http.post(`/databases/redis/persistence/update`, params);
 };
 export const updateRedisConf = (params: Database.RedisConfUpdate) => {
     return http.post(`/databases/redis/conf/update`, params);
 };
 export const updateRedisConfByFile = (params: Database.RedisConfUpdateByFile) => {
-    return http.post(`/databases/redis/conf/update/byfile`, params);
+    return http.post(`/databases/redis/conffile/update`, params);
 };
 export const backupRedis = () => {
     return http.post(`/databases/redis/backup`);

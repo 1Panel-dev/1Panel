@@ -20,9 +20,6 @@
                     <el-button @click="onOpenBuild">
                         {{ $t('container.build') }}
                     </el-button>
-                    <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete('byid')">
-                        {{ $t('commons.button.delete') }}
-                    </el-button>
                 </template>
                 <el-table-column type="selection" fix />
                 <el-table-column label="ID" show-overflow-tooltip prop="id" min-width="60" />
@@ -71,11 +68,7 @@
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="deleteVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button
-                        type="primary"
-                        :disabled="deleteForm.deleteTags.length === 0"
-                        @click="batchDelete('byname')"
-                    >
+                    <el-button type="primary" :disabled="deleteForm.deleteTags.length === 0" @click="batchDelete()">
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </span>
@@ -156,7 +149,7 @@ const loadRepos = async () => {
 
 const onOpenPull = () => {
     let params = {
-        repos: repos,
+        repos: repos.value,
     };
     dialogPullRef.value!.acceptParams(params);
 };
@@ -169,18 +162,12 @@ const onOpenload = () => {
     dialogLoadRef.value!.acceptParams();
 };
 
-const batchDelete = async (option: string) => {
-    let ids: Array<string> = [];
-    if (option === 'byid') {
-        selects.value.forEach((item: Container.NetworkInfo) => {
-            ids.push(item.id);
-        });
-    } else {
-        for (const item of deleteForm.deleteTags) {
-            ids.push(item);
-        }
+const batchDelete = async () => {
+    let names: Array<string> = [];
+    for (const item of deleteForm.deleteTags) {
+        names.push(item);
     }
-    await useDeleteData(imageRemove, { ids: ids }, 'commons.msg.delete');
+    await useDeleteData(imageRemove, { names: names }, 'commons.msg.delete');
     deleteVisiable.value = false;
     search();
 };

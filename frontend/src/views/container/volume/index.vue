@@ -113,15 +113,15 @@ const onInspect = async (id: string) => {
 };
 
 const batchDelete = async (row: Container.VolumeInfo | null) => {
-    let ids: Array<string> = [];
+    let names: Array<string> = [];
     if (row === null) {
         selects.value.forEach((item: Container.VolumeInfo) => {
-            ids.push(item.name);
+            names.push(item.name);
         });
     } else {
-        ids.push(row.name);
+        names.push(row.name);
     }
-    await useDeleteData(deleteVolume, { ids: ids }, 'commons.msg.delete');
+    await useDeleteData(deleteVolume, { names: names }, 'commons.msg.delete');
     search();
 };
 

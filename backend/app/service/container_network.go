@@ -66,7 +66,7 @@ func (u *ContainerService) DeleteNetwork(req dto.BatchDelete) error {
 	if err != nil {
 		return err
 	}
-	for _, id := range req.Ids {
+	for _, id := range req.Names {
 		if err := client.NetworkRemove(context.TODO(), id); err != nil {
 			return err
 		}

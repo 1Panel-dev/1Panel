@@ -14,16 +14,11 @@ func (s *GroupRouter) InitGroupRouter(Router *gin.RouterGroup) {
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
-	withRecordRouter := Router.Group("groups").
-		Use(middleware.JwtAuth()).
-		Use(middleware.SessionAuth()).
-		Use(middleware.PasswordExpired()).
-		Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		withRecordRouter.POST("", baseApi.CreateGroup)
-		withRecordRouter.DELETE(":id", baseApi.DeleteGroup)
-		withRecordRouter.PUT(":id", baseApi.UpdateGroup)
+		groupRouter.POST("", baseApi.CreateGroup)
+		groupRouter.POST("/del", baseApi.DeleteGroup)
+		groupRouter.POST("/update", baseApi.UpdateGroup)
 		groupRouter.POST("/search", baseApi.ListGroup)
 		groupRouter.GET(":id", baseApi.GetGroupInfo)
 	}

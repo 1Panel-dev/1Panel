@@ -14,16 +14,11 @@ func (s *HostRouter) InitHostRouter(Router *gin.RouterGroup) {
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
-	withRecordRouter := Router.Group("hosts").
-		Use(middleware.JwtAuth()).
-		Use(middleware.SessionAuth()).
-		Use(middleware.PasswordExpired()).
-		Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		withRecordRouter.POST("", baseApi.CreateHost)
-		withRecordRouter.DELETE(":id", baseApi.DeleteHost)
-		withRecordRouter.PUT(":id", baseApi.UpdateHost)
+		hostRouter.POST("", baseApi.CreateHost)
+		hostRouter.POST("/del", baseApi.DeleteHost)
+		hostRouter.POST("/update", baseApi.UpdateHost)
 		hostRouter.POST("/search", baseApi.HostTree)
 		hostRouter.POST("/testconn", baseApi.TestConn)
 		hostRouter.GET(":id", baseApi.GetHostInfo)

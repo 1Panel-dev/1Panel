@@ -180,21 +180,21 @@ func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error 
 	}
 	switch req.Operation {
 	case constant.ContainerOpStart:
-		err = client.ContainerStart(ctx, req.ContainerID, types.ContainerStartOptions{})
+		err = client.ContainerStart(ctx, req.Name, types.ContainerStartOptions{})
 	case constant.ContainerOpStop:
-		err = client.ContainerStop(ctx, req.ContainerID, nil)
+		err = client.ContainerStop(ctx, req.Name, nil)
 	case constant.ContainerOpRestart:
-		err = client.ContainerRestart(ctx, req.ContainerID, nil)
+		err = client.ContainerRestart(ctx, req.Name, nil)
 	case constant.ContainerOpKill:
-		err = client.ContainerKill(ctx, req.ContainerID, "SIGKILL")
+		err = client.ContainerKill(ctx, req.Name, "SIGKILL")
 	case constant.ContainerOpPause:
-		err = client.ContainerPause(ctx, req.ContainerID)
+		err = client.ContainerPause(ctx, req.Name)
 	case constant.ContainerOpUnpause:
-		err = client.ContainerUnpause(ctx, req.ContainerID)
+		err = client.ContainerUnpause(ctx, req.Name)
 	case constant.ContainerOpRename:
-		err = client.ContainerRename(ctx, req.ContainerID, req.NewName)
+		err = client.ContainerRename(ctx, req.Name, req.NewName)
 	case constant.ContainerOpRemove:
-		err = client.ContainerRemove(ctx, req.ContainerID, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
+		err = client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 	}
 	return err
 }

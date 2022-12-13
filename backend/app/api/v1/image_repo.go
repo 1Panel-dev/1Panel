@@ -86,11 +86,6 @@ func (b *BaseApi) UpdateRepo(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	id, err := helper.GetParamID(c)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
 
 	upMap := make(map[string]interface{})
 	upMap["download_url"] = req.DownloadUrl
@@ -98,7 +93,7 @@ func (b *BaseApi) UpdateRepo(c *gin.Context) {
 	upMap["username"] = req.Username
 	upMap["password"] = req.Password
 	upMap["auth"] = req.Auth
-	if err := imageRepoService.Update(id, upMap); err != nil {
+	if err := imageRepoService.Update(req.ID, upMap); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

@@ -9,7 +9,7 @@ export const createContainer = (params: Container.ContainerCreate) => {
     return http.post(`/containers`, params);
 };
 export const logContainer = (params: Container.ContainerLogSearch) => {
-    return http.post<string>(`/containers/log`, params);
+    return http.post<string>(`/containers/search/log`, params);
 };
 export const ContainerStats = (id: string) => {
     return http.get<Container.ContainerStats>(`/containers/stats/${id}`);
@@ -86,7 +86,7 @@ export const createImageRepo = (params: Container.RepoCreate) => {
     return http.post(`/containers/repo`, params);
 };
 export const updateImageRepo = (params: Container.RepoUpdate) => {
-    return http.put(`/containers/repo/${params.id}`, params);
+    return http.post(`/containers/repo/update`, params);
 };
 export const deleteImageRepo = (params: { ids: number[] }) => {
     return http.post(`/containers/repo/del`, params);
@@ -106,7 +106,7 @@ export const createComposeTemplate = (params: Container.TemplateCreate) => {
     return http.post(`/containers/template`, params);
 };
 export const updateComposeTemplate = (params: Container.TemplateUpdate) => {
-    return http.put(`/containers/template/${params.id}`, params);
+    return http.post(`/containers/template/update`, params);
 };
 
 // compose

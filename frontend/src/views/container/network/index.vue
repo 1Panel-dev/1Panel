@@ -121,15 +121,15 @@ const search = async () => {
 };
 
 const batchDelete = async (row: Container.NetworkInfo | null) => {
-    let ids: Array<string> = [];
+    let names: Array<string> = [];
     if (row === null) {
         selects.value.forEach((item: Container.NetworkInfo) => {
-            ids.push(item.id);
+            names.push(item.name);
         });
     } else {
-        ids.push(row.id);
+        names.push(row.name);
     }
-    await useDeleteData(deleteNetwork, { ids: ids }, 'commons.msg.delete');
+    await useDeleteData(deleteNetwork, { names: names }, 'commons.msg.delete');
     search();
 };
 

@@ -14,18 +14,13 @@ func (s *CronjobRouter) InitCronjobRouter(Router *gin.RouterGroup) {
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
-	withRecordRouter := Router.Group("cronjobs").
-		Use(middleware.JwtAuth()).
-		Use(middleware.SessionAuth()).
-		Use(middleware.PasswordExpired()).
-		Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		withRecordRouter.POST("", baseApi.CreateCronjob)
-		withRecordRouter.POST("/del", baseApi.DeleteCronjob)
-		withRecordRouter.PUT(":id", baseApi.UpdateCronjob)
-		withRecordRouter.POST("/status", baseApi.UpdateCronjobStatus)
-		cmdRouter.POST("/handle/:id", baseApi.HandleOnce)
+		cmdRouter.POST("", baseApi.CreateCronjob)
+		cmdRouter.POST("/del", baseApi.DeleteCronjob)
+		cmdRouter.POST("/update", baseApi.UpdateCronjob)
+		cmdRouter.POST("/status", baseApi.UpdateCronjobStatus)
+		cmdRouter.POST("/handle", baseApi.HandleOnce)
 		cmdRouter.POST("/download", baseApi.TargetDownload)
 		cmdRouter.POST("/search", baseApi.SearchCronjob)
 		cmdRouter.POST("/search/records", baseApi.SearchJobRecords)

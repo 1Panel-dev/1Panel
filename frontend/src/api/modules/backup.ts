@@ -11,7 +11,7 @@ export const addBackup = (params: Backup.BackupOperate) => {
 };
 
 export const editBackup = (params: Backup.BackupOperate) => {
-    return http.put(`/backups/` + params.id, params);
+    return http.post(`/backups/update`, params);
 };
 
 export const deleteBackup = (params: { ids: number[] }) => {

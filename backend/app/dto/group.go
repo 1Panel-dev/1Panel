@@ -1,6 +1,7 @@
 package dto
 
 type GroupOperate struct {
+	ID   uint   `json:"id"`
 	Name string `json:"name" validate:"required"`
 	Type string `json:"type" validate:"required"`
 }

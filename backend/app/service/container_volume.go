@@ -77,7 +77,7 @@ func (u *ContainerService) DeleteVolume(req dto.BatchDelete) error {
 	if err != nil {
 		return err
 	}
-	for _, id := range req.Ids {
+	for _, id := range req.Names {
 		if err := client.VolumeRemove(context.TODO(), id, true); err != nil {
 			return err
 		}

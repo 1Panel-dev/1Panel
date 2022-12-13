@@ -48,9 +48,11 @@ const composeVisiable = ref(false);
 const extensions = [javascript(), oneDark];
 const path = ref();
 const content = ref();
+const name = ref();
 
 const onSubmitEdit = async () => {
     const param = {
+        name: name.value,
         path: path.value,
         content: content.value,
     };
@@ -67,6 +69,7 @@ const onSubmitEdit = async () => {
 };
 
 interface DialogProps {
+    name: string;
     path: string;
     content: string;
 }
@@ -74,6 +77,7 @@ interface DialogProps {
 const acceptParams = (props: DialogProps): void => {
     composeVisiable.value = true;
     path.value = props.path;
+    name.value = props.name;
     content.value = props.content;
 };
 

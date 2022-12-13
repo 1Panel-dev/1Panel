@@ -15,7 +15,7 @@ export const addCommand = (params: Command.CommandOperate) => {
 };
 
 export const editCommand = (params: Command.CommandOperate) => {
-    return http.put(`/commands/${params.id}`, params);
+    return http.post(`/commands/update`, params);
 };
 
 export const deleteCommand = (params: { ids: number[] }) => {

@@ -17,7 +17,7 @@
                 <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
             </ComplexTable>
         </el-card>
-        <el-dialog v-model="cmdVisiable" :title="$t('terminal.addHost')" width="30%">
+        <el-dialog v-model="cmdVisiable" :title="$t('commons.button.' + operate)" width="30%">
             <el-form ref="commandInfoRef" label-width="100px" label-position="left" :model="commandInfo" :rules="rules">
                 <el-form-item :label="$t('commons.table.name')" prop="name">
                     <el-input clearable v-model="commandInfo.name" />

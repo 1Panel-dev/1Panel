@@ -82,16 +82,11 @@ func (b *BaseApi) UpdateCommand(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	id, err := helper.GetParamID(c)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
 
 	upMap := make(map[string]interface{})
 	upMap["name"] = req.Name
 	upMap["command"] = req.Command
-	if err := commandService.Update(id, upMap); err != nil {
+	if err := commandService.Update(req.ID, upMap); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

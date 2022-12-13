@@ -23,6 +23,7 @@ type CronjobCreate struct {
 }
 
 type CronjobUpdate struct {
+	ID       uint   `json:"id" validate:"required"`
 	Name     string `json:"name" validate:"required"`
 	SpecType string `json:"specType" validate:"required"`
 	Week     int    `json:"week" validate:"number,max=7,min=1"`
