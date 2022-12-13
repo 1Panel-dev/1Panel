@@ -285,7 +285,7 @@ func (a AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, error
 			})
 		}
 	}
-	if app.Key == "nginx" {
+	if app.Key == constant.AppNginx {
 		websites, _ := websiteRepo.GetBy()
 		for _, website := range websites {
 			res = append(res, dto.AppResource{
@@ -305,7 +305,7 @@ func (a AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, error
 		}
 	}
 
-	if app.Key == "mysql" {
+	if app.Key == constant.AppMysql {
 		databases, _ := mysqlRepo.List()
 		for _, database := range databases {
 			res = append(res, dto.AppResource{
@@ -324,13 +324,13 @@ func (a AppInstallService) GetDefaultConfigByKey(key string) (string, error) {
 		return "", err
 	}
 	filePath := path.Join(constant.AppResourceDir, appInstall.App.Key, "versions", appInstall.Version, "conf")
-	if key == "mysql" {
+	if key == constant.AppMysql {
 		filePath = path.Join(filePath, "my.cnf")
 	}
-	if key == "redis" {
+	if key == constant.AppRedis {
 		filePath = path.Join(filePath, "redis.conf")
 	}
-	if key == "nginx" {
+	if key == constant.AppNginx {
 		filePath = path.Join(filePath, "nginx.conf")
 	}
 	contentByte, err := os.ReadFile(filePath)

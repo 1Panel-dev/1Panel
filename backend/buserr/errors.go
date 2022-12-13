@@ -12,7 +12,6 @@ type BusinessError struct {
 }
 
 func (e BusinessError) Error() string {
-
 	content := ""
 	if e.Detail != nil {
 		content = i18n.GetErrMsg(e.Msg, map[string]interface{}{"detail": e.Detail})

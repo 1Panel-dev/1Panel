@@ -11,4 +11,8 @@ const (
 
 	AppNormal   = "Normal"
 	AppTakeDown = "TakeDown"
+
+	AppNginx = "nginx"
+	AppMysql = "mysql"
+	AppRedis = "redis"
 )

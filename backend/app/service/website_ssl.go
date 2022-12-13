@@ -67,11 +67,11 @@ func (w WebsiteSSLService) Create(create dto.WebsiteSSLCreate) (dto.WebsiteSSLCr
 			return res, err
 		}
 	case dto.Http:
-		appInstall, err := getAppInstallByKey("nginx")
+		appInstall, err := getAppInstallByKey(constant.AppNginx)
 		if err != nil {
 			return dto.WebsiteSSLCreate{}, err
 		}
-		if err := client.UseHTTP(path.Join(constant.AppInstallDir, "nginx", appInstall.Name, "root")); err != nil {
+		if err := client.UseHTTP(path.Join(constant.AppInstallDir, constant.AppNginx, appInstall.Name, "root")); err != nil {
 			return res, err
 		}
 	case dto.DnsManual:
@@ -138,11 +138,11 @@ func (w WebsiteSSLService) Renew(sslId uint) error {
 			return err
 		}
 	case dto.Http:
-		appInstall, err := getAppInstallByKey("nginx")
+		appInstall, err := getAppInstallByKey(constant.AppNginx)
 		if err != nil {
 			return err
 		}
-		if err := client.UseHTTP(path.Join(constant.AppInstallDir, "nginx", appInstall.Name, "root")); err != nil {
+		if err := client.UseHTTP(path.Join(constant.AppInstallDir, constant.AppNginx, appInstall.Name, "root")); err != nil {
 			return err
 		}
 	case dto.DnsManual:
