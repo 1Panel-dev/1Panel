@@ -388,7 +388,7 @@ func (w WebsiteService) GetWebsiteNginxConfig(websiteId uint) (dto.FileInfo, err
 		return dto.FileInfo{}, err
 	}
 
-	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
+	nginxApp, err := appRepo.GetFirst(appRepo.WithKey(constant.AppNginx))
 	if err != nil {
 		return dto.FileInfo{}, err
 	}
@@ -397,7 +397,7 @@ func (w WebsiteService) GetWebsiteNginxConfig(websiteId uint) (dto.FileInfo, err
 		return dto.FileInfo{}, err
 	}
 
-	configPath := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "conf", "conf.d", website.Alias+".conf")
+	configPath := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name, "conf", "conf.d", website.Alias+".conf")
 
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:   configPath,
@@ -524,7 +524,7 @@ func (w WebsiteService) PreInstallCheck(req request.WebsiteInstallCheckReq) ([]r
 		showErr  = false
 	)
 
-	app, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
+	app, err := appRepo.GetFirst(appRepo.WithKey(constant.AppNginx))
 	if err != nil {
 		return nil, err
 	}

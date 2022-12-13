@@ -19,11 +19,11 @@ type NginxService struct {
 }
 
 func (n NginxService) GetNginxConfig() (dto.FileInfo, error) {
-	nginxInstall, err := getAppInstallByKey("nginx")
+	nginxInstall, err := getAppInstallByKey(constant.AppNginx)
 	if err != nil {
 		return dto.FileInfo{}, err
 	}
-	configPath := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name, "conf", "nginx.conf")
+	configPath := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name, "conf", "nginx.conf")
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:   configPath,
 		Expand: true,
@@ -95,7 +95,7 @@ func (n NginxService) UpdateConfigFile(req request.NginxConfigFileUpdate) error 
 	if err := fileOp.WriteFile(req.FilePath, strings.NewReader(req.Content), 0644); err != nil {
 		return err
 	}
-	nginxInstall, err := getAppInstallByKey("nginx")
+	nginxInstall, err := getAppInstallByKey(constant.AppNginx)
 	if err != nil {
 		return err
 	}
