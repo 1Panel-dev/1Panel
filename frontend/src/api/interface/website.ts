@@ -1,7 +1,7 @@
 import { CommonModel, ReqPage } from '.';
 
-export namespace WebSite {
-    export interface WebSite extends CommonModel {
+export namespace Website {
+    export interface Website extends CommonModel {
         primaryDomain: string;
         type: string;
         alias: string;
@@ -13,19 +13,6 @@ export namespace WebSite {
         otherDomains: string;
         appinstall?: NewAppInstall;
         webSiteSSL: SSL;
-    }
-
-    export interface WebSiteDTO extends CommonModel {
-        primaryDomain: string;
-        type: string;
-        alias: string;
-        remark: string;
-        domains: WebSite.Domain[];
-        appType: string;
-        appInstallId?: number;
-        webSiteGroupId: number;
-        otherDomains: string;
-        appinstall?: NewAppInstall;
     }
 
     export interface NewAppInstall {
@@ -98,6 +85,10 @@ export namespace WebSite {
         websiteId: number;
         port: number;
         domain: string;
+    }
+
+    export interface DomainDelete {
+        id: number;
     }
 
     export interface NginxConfigReq {

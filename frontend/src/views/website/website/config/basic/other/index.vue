@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts" setup>
-import { WebSite } from '@/api/interface/website';
+import { Website } from '@/api/interface/website';
 import { GetWebsite, UpdateWebsite } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import { computed, onMounted, reactive, ref } from 'vue';
@@ -65,7 +65,7 @@ let rules = ref({
     primaryDomain: [Rules.requiredInput],
     webSiteGroupId: [Rules.requiredSelect],
 });
-let groups = ref<WebSite.Group[]>([]);
+let groups = ref<Website.Group[]>([]);
 
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;

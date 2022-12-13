@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts" setup>
-import { WebSite } from '@/api/interface/website';
+import { Website } from '@/api/interface/website';
 import { SaveFileContent } from '@/api/modules/files';
 import { GetWafConfig, UpdateWafEnable } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
@@ -57,19 +57,19 @@ const id = computed(() => {
     return props.id;
 });
 
-let data = ref<WebSite.WafRes>();
+let data = ref<Website.WafRes>();
 let loading = ref(false);
 let form = reactive({
     enable: false,
     cycle: 60,
     frequency: 120,
 });
-let req = ref<WebSite.WafReq>({
+let req = ref<Website.WafReq>({
     websiteId: 0,
     key: '$CCDeny',
     rule: 'ccrate',
 });
-let enableUpdate = ref<WebSite.WafUpdate>({
+let enableUpdate = ref<Website.WafUpdate>({
     websiteId: 0,
     key: '$CCDeny',
     enable: false,

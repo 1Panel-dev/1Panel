@@ -37,7 +37,7 @@
     </el-row>
 </template>
 <script lang="ts" setup>
-import { WebSite } from '@/api/interface/website';
+import { Website } from '@/api/interface/website';
 import { GetWafConfig, UpdateWafEnable } from '@/api/modules/website';
 import { computed, onMounted, reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
@@ -72,7 +72,7 @@ const key = computed(() => {
 
 let loading = ref(false);
 let data = ref([]);
-let req = ref<WebSite.WafReq>({
+let req = ref<Website.WafReq>({
     websiteId: 0,
     key: '$ipWhiteAllow',
     rule: 'ipWhitelist',
@@ -81,7 +81,7 @@ let fileUpdate = reactive({
     path: '',
     content: '',
 });
-let enableUpdate = ref<WebSite.WafUpdate>({
+let enableUpdate = ref<Website.WafUpdate>({
     websiteId: 0,
     key: '$ipWhiteAllow',
     enable: false,

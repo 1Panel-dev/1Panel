@@ -23,7 +23,7 @@
     </el-dialog>
 </template>
 <script lang="ts" setup>
-import { WebSite } from '@/api/interface/website';
+import { Website } from '@/api/interface/website';
 import { DeleteAcmeAccount, SearchAcmeAccount } from '@/api/modules/website';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
@@ -44,7 +44,7 @@ const paginationConfig = reactive({
 const buttons = [
     {
         label: i18n.global.t('app.delete'),
-        click: function (row: WebSite.AcmeAccount) {
+        click: function (row: Website.AcmeAccount) {
             deleteAccount(row.id);
         },
     },

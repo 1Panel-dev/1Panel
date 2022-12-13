@@ -1,7 +1,6 @@
 <template>
     <el-dialog
         v-model="open"
-        :destroy-on-close="true"
         :close-on-click-modal="false"
         :title="$t('website.create')"
         width="40%"
@@ -36,7 +35,7 @@ import { ref } from 'vue';
 const domainForm = ref<FormInstance>();
 
 let rules = ref({
-    domain: [Rules.requiredInput],
+    domain: [Rules.requiredInput, Rules.domain],
     port: [Rules.requiredInput],
 });
 
@@ -50,6 +49,7 @@ let domain = ref({
 
 const em = defineEmits(['close']);
 const handleClose = () => {
+    domainForm.value?.resetFields();
     open.value = false;
     em('close', false);
 };

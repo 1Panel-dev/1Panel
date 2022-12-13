@@ -13,80 +13,80 @@ type IWebsiteRepo interface {
 	WithDomain(domain string) DBOption
 	WithAlias(alias string) DBOption
 	WithWebsiteSSLID(sslId uint) DBOption
-	Page(page, size int, opts ...DBOption) (int64, []model.WebSite, error)
-	GetFirst(opts ...DBOption) (model.WebSite, error)
-	GetBy(opts ...DBOption) ([]model.WebSite, error)
-	Save(ctx context.Context, app *model.WebSite) error
+	Page(page, size int, opts ...DBOption) (int64, []model.Website, error)
+	GetFirst(opts ...DBOption) (model.Website, error)
+	GetBy(opts ...DBOption) ([]model.Website, error)
+	Save(ctx context.Context, app *model.Website) error
 	DeleteBy(ctx context.Context, opts ...DBOption) error
-	Create(ctx context.Context, app *model.WebSite) error
+	Create(ctx context.Context, app *model.Website) error
 }
 
 func NewIWebsiteRepo() IWebsiteRepo {
-	return &WebSiteRepo{}
+	return &WebsiteRepo{}
 }
 
-type WebSiteRepo struct {
+type WebsiteRepo struct {
 }
 
-func (w *WebSiteRepo) WithAppInstallId(appInstallId uint) DBOption {
+func (w *WebsiteRepo) WithAppInstallId(appInstallId uint) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("app_install_id = ?", appInstallId)
 	}
 }
 
-func (w *WebSiteRepo) WithDomain(domain string) DBOption {
+func (w *WebsiteRepo) WithDomain(domain string) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("primary_domain = ?", domain)
 	}
 }
 
-func (w *WebSiteRepo) WithAlias(alias string) DBOption {
+func (w *WebsiteRepo) WithAlias(alias string) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("alias = ?", alias)
 	}
 }
 
-func (w *WebSiteRepo) WithWebsiteSSLID(sslId uint) DBOption {
+func (w *WebsiteRepo) WithWebsiteSSLID(sslId uint) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("web_site_ssl_id = ?", sslId)
 	}
 }
 
-func (w *WebSiteRepo) Page(page, size int, opts ...DBOption) (int64, []model.WebSite, error) {
-	var websites []model.WebSite
-	db := getDb(opts...).Model(&model.WebSite{})
+func (w *WebsiteRepo) Page(page, size int, opts ...DBOption) (int64, []model.Website, error) {
+	var websites []model.Website
+	db := getDb(opts...).Model(&model.Website{})
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Debug().Limit(size).Offset(size * (page - 1)).Preload("WebSiteSSL").Find(&websites).Error
+	err := db.Debug().Limit(size).Offset(size * (page - 1)).Preload("WebsiteSSL").Find(&websites).Error
 	return count, websites, err
 }
 
-func (w *WebSiteRepo) GetFirst(opts ...DBOption) (model.WebSite, error) {
-	var website model.WebSite
-	db := getDb(opts...).Model(&model.WebSite{})
+func (w *WebsiteRepo) GetFirst(opts ...DBOption) (model.Website, error) {
+	var website model.Website
+	db := getDb(opts...).Model(&model.Website{})
 	if err := db.Preload("Domains").First(&website).Error; err != nil {
 		return website, err
 	}
 	return website, nil
 }
 
-func (w *WebSiteRepo) GetBy(opts ...DBOption) ([]model.WebSite, error) {
-	var websites []model.WebSite
-	db := getDb(opts...).Model(&model.WebSite{})
+func (w *WebsiteRepo) GetBy(opts ...DBOption) ([]model.Website, error) {
+	var websites []model.Website
+	db := getDb(opts...).Model(&model.Website{})
 	if err := db.Find(&websites).Error; err != nil {
 		return websites, err
 	}
 	return websites, nil
 }
 
-func (w *WebSiteRepo) Create(ctx context.Context, app *model.WebSite) error {
+func (w *WebsiteRepo) Create(ctx context.Context, app *model.Website) error {
 	return getTx(ctx).Omit(clause.Associations).Create(app).Error
 }
 
-func (w *WebSiteRepo) Save(ctx context.Context, app *model.WebSite) error {
+func (w *WebsiteRepo) Save(ctx context.Context, app *model.Website) error {
 	return getTx(ctx).Omit(clause.Associations).Save(app).Error
 }
 
-func (w *WebSiteRepo) DeleteBy(ctx context.Context, opts ...DBOption) error {
-	return getTx(ctx, opts...).Delete(&model.WebSite{}).Error
+func (w *WebsiteRepo) DeleteBy(ctx context.Context, opts ...DBOption) error {
+	return getTx(ctx, opts...).Delete(&model.Website{}).Error
 }

@@ -6,7 +6,8 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/app/request"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"os"
 	"path"
@@ -26,25 +27,25 @@ type WebsiteService struct {
 }
 
 type IWebsiteService interface {
-	PageWebSite(req dto.WebSiteReq) (int64, []dto.WebSiteDTO, error)
-	CreateWebsite(create dto.WebSiteCreate) error
+	PageWebsite(req request.WebsiteSearch) (int64, []response.WebsiteDTO, error)
+	CreateWebsite(create request.WebsiteCreate) error
 	GetWebsiteOptions() ([]string, error)
 	Backup(domain string) error
-	Recover(req dto.WebSiteRecover) error
-	RecoverByUpload(req dto.WebSiteRecoverByFile) error
-	UpdateWebsite(req dto.WebSiteUpdate) error
-	DeleteWebSite(req request.WebSiteDel) error
-	GetWebsite(id uint) (dto.WebsiteDTO, error)
-	CreateWebsiteDomain(create dto.WebSiteDomainCreate) (model.WebSiteDomain, error)
-	GetWebsiteDomain(websiteId uint) ([]model.WebSiteDomain, error)
+	Recover(req request.WebsiteRecover) error
+	RecoverByUpload(req request.WebsiteRecoverByFile) error
+	UpdateWebsite(req request.WebsiteUpdate) error
+	DeleteWebsite(req request.WebsiteDelete) error
+	GetWebsite(id uint) (response.WebsiteDTO, error)
+	CreateWebsiteDomain(create request.WebsiteDomainCreate) (model.WebsiteDomain, error)
+	GetWebsiteDomain(websiteId uint) ([]model.WebsiteDomain, error)
 	DeleteWebsiteDomain(domainId uint) error
-	GetNginxConfigByScope(req dto.NginxConfigReq) (*dto.WebsiteNginxConfig, error)
+	GetNginxConfigByScope(req dto.NginxConfigReq) (*response.WebsiteNginxConfig, error)
 	UpdateNginxConfigByScope(req dto.NginxConfigReq) error
 	GetWebsiteNginxConfig(websiteId uint) (dto.FileInfo, error)
-	GetWebsiteHTTPS(websiteId uint) (dto.WebsiteHTTPS, error)
-	OpWebsiteHTTPS(req dto.WebsiteHTTPSOp) (dto.WebsiteHTTPS, error)
-	PreInstallCheck(req dto.WebsiteInstallCheckReq) ([]dto.WebsitePreInstallCheck, error)
-	GetWafConfig(req request.WebsiteWafReq) (dto.WebsiteWafConfig, error)
+	GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, error)
+	OpWebsiteHTTPS(req request.WebsiteHTTPSOp) (response.WebsiteHTTPS, error)
+	PreInstallCheck(req request.WebsiteInstallCheckReq) ([]response.WebsitePreInstallCheck, error)
+	GetWafConfig(req request.WebsiteWafReq) (response.WebsiteWafConfig, error)
 	UpdateWafConfig(req request.WebsiteWafUpdate) error
 }
 
@@ -52,21 +53,21 @@ func NewWebsiteService() IWebsiteService {
 	return &WebsiteService{}
 }
 
-func (w WebsiteService) PageWebSite(req dto.WebSiteReq) (int64, []dto.WebSiteDTO, error) {
-	var websiteDTOs []dto.WebSiteDTO
+func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []response.WebsiteDTO, error) {
+	var websiteDTOs []response.WebsiteDTO
 	total, websites, err := websiteRepo.Page(req.Page, req.PageSize)
 	if err != nil {
 		return 0, nil, err
 	}
 	for _, web := range websites {
-		websiteDTOs = append(websiteDTOs, dto.WebSiteDTO{
-			WebSite: web,
+		websiteDTOs = append(websiteDTOs, response.WebsiteDTO{
+			Website: web,
 		})
 	}
 	return total, websiteDTOs, nil
 }
 
-func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
+func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) error {
 	if exist, _ := websiteRepo.GetBy(websiteRepo.WithDomain(create.PrimaryDomain)); len(exist) > 0 {
 		return buserr.New(constant.ErrNameIsExist)
 	}
@@ -78,7 +79,7 @@ func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
 	}
 
 	defaultDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
-	website := &model.WebSite{
+	website := &model.Website{
 		PrimaryDomain:  create.PrimaryDomain,
 		Type:           create.Type,
 		Alias:          create.Alias,
@@ -86,14 +87,14 @@ func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
 		Status:         constant.WebRunning,
 		ExpireDate:     defaultDate,
 		AppInstallID:   create.AppInstallID,
-		WebSiteGroupID: create.WebSiteGroupID,
+		WebsiteGroupID: create.WebsiteGroupID,
 		Protocol:       constant.ProtocolHTTP,
 		Proxy:          create.Proxy,
 	}
 
 	switch create.Type {
 	case constant.Deployment:
-		if create.AppType == dto.NewApp {
+		if create.AppType == constant.NewApp {
 			install, err := ServiceGroupApp.Install(create.AppInstall.Name, create.AppInstall.AppDetailId, create.AppInstall.Params)
 			if err != nil {
 				return err
@@ -110,8 +111,8 @@ func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
 	if err := websiteRepo.Create(ctx, website); err != nil {
 		return err
 	}
-	var domains []model.WebSiteDomain
-	domains = append(domains, model.WebSiteDomain{Domain: website.PrimaryDomain, WebSiteID: website.ID, Port: 80})
+	var domains []model.WebsiteDomain
+	domains = append(domains, model.WebsiteDomain{Domain: website.PrimaryDomain, WebsiteID: website.ID, Port: 80})
 
 	otherDomainArray := strings.Split(create.OtherDomains, "\n")
 	for _, domain := range otherDomainArray {
@@ -123,7 +124,7 @@ func (w WebsiteService) CreateWebsite(create dto.WebSiteCreate) error {
 			tx.Rollback()
 			return err
 		}
-		if reflect.DeepEqual(domainModel, model.WebSiteDomain{}) {
+		if reflect.DeepEqual(domainModel, model.WebsiteDomain{}) {
 			continue
 		}
 		domains = append(domains, domainModel)
@@ -170,7 +171,7 @@ func (w WebsiteService) Backup(domain string) error {
 	return nil
 }
 
-func (w WebsiteService) RecoverByUpload(req dto.WebSiteRecoverByFile) error {
+func (w WebsiteService) RecoverByUpload(req request.WebsiteRecoverByFile) error {
 	if err := handleUnTar(fmt.Sprintf("%s/%s", req.FileDir, req.FileName), req.FileDir); err != nil {
 		return err
 	}
@@ -179,7 +180,7 @@ func (w WebsiteService) RecoverByUpload(req dto.WebSiteRecoverByFile) error {
 	if err != nil {
 		return err
 	}
-	var websiteInfo WebSiteInfo
+	var websiteInfo WebsiteInfo
 	if err := json.Unmarshal(webJson, &websiteInfo); err != nil {
 		return err
 	}
@@ -198,7 +199,7 @@ func (w WebsiteService) RecoverByUpload(req dto.WebSiteRecoverByFile) error {
 	return nil
 }
 
-func (w WebsiteService) Recover(req dto.WebSiteRecover) error {
+func (w WebsiteService) Recover(req request.WebsiteRecover) error {
 	website, err := websiteRepo.GetFirst(websiteRepo.WithDomain(req.WebsiteName))
 	if err != nil {
 		return err
@@ -220,29 +221,29 @@ func (w WebsiteService) Recover(req dto.WebSiteRecover) error {
 	return nil
 }
 
-func (w WebsiteService) UpdateWebsite(req dto.WebSiteUpdate) error {
+func (w WebsiteService) UpdateWebsite(req request.WebsiteUpdate) error {
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
 	website.PrimaryDomain = req.PrimaryDomain
-	website.WebSiteGroupID = req.WebSiteGroupID
+	website.WebsiteGroupID = req.WebsiteGroupID
 	website.Remark = req.Remark
 
 	return websiteRepo.Save(context.TODO(), &website)
 }
 
-func (w WebsiteService) GetWebsite(id uint) (dto.WebsiteDTO, error) {
-	var res dto.WebsiteDTO
+func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
+	var res response.WebsiteDTO
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
 	if err != nil {
 		return res, err
 	}
-	res.WebSite = website
+	res.Website = website
 	return res, nil
 }
 
-func (w WebsiteService) DeleteWebSite(req request.WebSiteDel) error {
+func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
 	if err != nil {
 		return err
@@ -272,7 +273,7 @@ func (w WebsiteService) DeleteWebSite(req request.WebSiteDel) error {
 		tx.Rollback()
 		return err
 	}
-	if err := websiteDomainRepo.DeleteBy(ctx, websiteDomainRepo.WithWebSiteId(req.ID)); err != nil {
+	if err := websiteDomainRepo.DeleteBy(ctx, websiteDomainRepo.WithWebsiteId(req.ID)); err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -280,32 +281,32 @@ func (w WebsiteService) DeleteWebSite(req request.WebSiteDel) error {
 	return nil
 }
 
-func (w WebsiteService) CreateWebsiteDomain(create dto.WebSiteDomainCreate) (model.WebSiteDomain, error) {
-	var domainModel model.WebSiteDomain
+func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) (model.WebsiteDomain, error) {
+	var domainModel model.WebsiteDomain
 	var ports []int
 	var domains []string
 
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(create.WebSiteID))
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(create.WebsiteID))
 	if err != nil {
 		return domainModel, err
 	}
-	if oldDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebSiteId(create.WebSiteID), websiteDomainRepo.WithPort(create.Port)); len(oldDomains) == 0 {
+	if oldDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(create.WebsiteID), websiteDomainRepo.WithPort(create.Port)); len(oldDomains) == 0 {
 		ports = append(ports, create.Port)
 	}
 	domains = append(domains, create.Domain)
 	if err := addListenAndServerName(website, ports, domains); err != nil {
 		return domainModel, err
 	}
-	domainModel = model.WebSiteDomain{
+	domainModel = model.WebsiteDomain{
 		Domain:    create.Domain,
 		Port:      create.Port,
-		WebSiteID: create.WebSiteID,
+		WebsiteID: create.WebsiteID,
 	}
 	return domainModel, websiteDomainRepo.Create(context.TODO(), &domainModel)
 }
 
-func (w WebsiteService) GetWebsiteDomain(websiteId uint) ([]model.WebSiteDomain, error) {
-	return websiteDomainRepo.GetBy(websiteDomainRepo.WithWebSiteId(websiteId))
+func (w WebsiteService) GetWebsiteDomain(websiteId uint) ([]model.WebsiteDomain, error) {
+	return websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(websiteId))
 }
 
 func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
@@ -314,20 +315,20 @@ func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
 		return err
 	}
 
-	if websiteDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebSiteId(webSiteDomain.WebSiteID)); len(websiteDomains) == 1 {
+	if websiteDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(webSiteDomain.WebsiteID)); len(websiteDomains) == 1 {
 		return fmt.Errorf("can not delete last domain")
 	}
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(webSiteDomain.WebSiteID))
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(webSiteDomain.WebsiteID))
 	if err != nil {
 		return err
 	}
 	var ports []int
-	if oldDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebSiteId(webSiteDomain.WebSiteID), websiteDomainRepo.WithPort(webSiteDomain.Port)); len(oldDomains) == 1 {
+	if oldDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(webSiteDomain.WebsiteID), websiteDomainRepo.WithPort(webSiteDomain.Port)); len(oldDomains) == 1 {
 		ports = append(ports, webSiteDomain.Port)
 	}
 
 	var domains []string
-	if oldDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebSiteId(webSiteDomain.WebSiteID), websiteDomainRepo.WithDomain(webSiteDomain.Domain)); len(oldDomains) == 1 {
+	if oldDomains, _ := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(webSiteDomain.WebsiteID), websiteDomainRepo.WithDomain(webSiteDomain.Domain)); len(oldDomains) == 1 {
 		domains = append(domains, webSiteDomain.Domain)
 	}
 	if len(ports) > 0 || len(domains) > 0 {
@@ -339,17 +340,17 @@ func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
 	return websiteDomainRepo.DeleteBy(context.TODO(), commonRepo.WithByID(domainId))
 }
 
-func (w WebsiteService) GetNginxConfigByScope(req dto.NginxConfigReq) (*dto.WebsiteNginxConfig, error) {
+func (w WebsiteService) GetNginxConfigByScope(req dto.NginxConfigReq) (*response.WebsiteNginxConfig, error) {
 	keys, ok := dto.ScopeKeyMap[req.Scope]
 	if !ok || len(keys) == 0 {
 		return nil, nil
 	}
 
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebSiteID))
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
 	if err != nil {
 		return nil, err
 	}
-	var config dto.WebsiteNginxConfig
+	var config response.WebsiteNginxConfig
 	params, err := getNginxParamsByKeys(constant.NginxScopeServer, keys, &website)
 	if err != nil {
 		return nil, err
@@ -365,7 +366,7 @@ func (w WebsiteService) UpdateNginxConfigByScope(req dto.NginxConfigReq) error {
 	if !ok || len(keys) == 0 {
 		return nil
 	}
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebSiteID))
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
@@ -408,54 +409,54 @@ func (w WebsiteService) GetWebsiteNginxConfig(websiteId uint) (dto.FileInfo, err
 	return dto.FileInfo{FileInfo: *info}, nil
 }
 
-func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (dto.WebsiteHTTPS, error) {
+func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, error) {
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteId))
 	if err != nil {
-		return dto.WebsiteHTTPS{}, err
+		return response.WebsiteHTTPS{}, err
 	}
-	var res dto.WebsiteHTTPS
-	if website.WebSiteSSLID == 0 {
+	var res response.WebsiteHTTPS
+	if website.WebsiteSSLID == 0 {
 		res.Enable = false
 		return res, nil
 	}
-	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(website.WebSiteSSLID))
+	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(website.WebsiteSSLID))
 	if err != nil {
-		return dto.WebsiteHTTPS{}, err
+		return response.WebsiteHTTPS{}, err
 	}
 	res.SSL = websiteSSL
 	res.Enable = true
 	return res, nil
 }
 
-func (w WebsiteService) OpWebsiteHTTPS(req dto.WebsiteHTTPSOp) (dto.WebsiteHTTPS, error) {
+func (w WebsiteService) OpWebsiteHTTPS(req request.WebsiteHTTPSOp) (response.WebsiteHTTPS, error) {
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
 	if err != nil {
-		return dto.WebsiteHTTPS{}, err
+		return response.WebsiteHTTPS{}, err
 	}
 
 	var (
-		res        dto.WebsiteHTTPS
-		websiteSSL model.WebSiteSSL
+		res        response.WebsiteHTTPS
+		websiteSSL model.WebsiteSSL
 	)
 	res.Enable = req.Enable
 
-	if req.Type == dto.SSLExisted {
+	if req.Type == constant.SSLExisted {
 		websiteSSL, err = websiteSSLRepo.GetFirst(commonRepo.WithByID(req.WebsiteSSLID))
 		if err != nil {
-			return dto.WebsiteHTTPS{}, err
+			return response.WebsiteHTTPS{}, err
 		}
-		website.WebSiteSSLID = websiteSSL.ID
+		website.WebsiteSSLID = websiteSSL.ID
 		if err := websiteRepo.Save(context.TODO(), &website); err != nil {
-			return dto.WebsiteHTTPS{}, err
+			return response.WebsiteHTTPS{}, err
 		}
 		res.SSL = websiteSSL
 	}
 
-	if req.Type == dto.Manual {
+	if req.Type == constant.SSLManual {
 		certBlock, _ := pem.Decode([]byte(req.Certificate))
 		cert, err := x509.ParseCertificate(certBlock.Bytes)
 		if err != nil {
-			return dto.WebsiteHTTPS{}, err
+			return response.WebsiteHTTPS{}, err
 		}
 		websiteSSL.ExpireDate = cert.NotAfter
 		websiteSSL.StartDate = cert.NotBefore
@@ -486,39 +487,39 @@ func (w WebsiteService) OpWebsiteHTTPS(req dto.WebsiteHTTPSOp) (dto.WebsiteHTTPS
 	if req.Enable {
 		website.Protocol = constant.ProtocolHTTPS
 		if err := applySSL(website, websiteSSL); err != nil {
-			return dto.WebsiteHTTPS{}, err
+			return response.WebsiteHTTPS{}, err
 		}
 	} else {
 		website.Protocol = constant.ProtocolHTTP
-		website.WebSiteSSLID = 0
+		website.WebsiteSSLID = 0
 
 		if err := deleteListenAndServerName(website, []int{443}, []string{}); err != nil {
-			return dto.WebsiteHTTPS{}, err
+			return response.WebsiteHTTPS{}, err
 		}
 
 		if err := deleteNginxConfig(constant.NginxScopeServer, getKeysFromStaticFile(dto.SSL), &website); err != nil {
-			return dto.WebsiteHTTPS{}, err
+			return response.WebsiteHTTPS{}, err
 		}
 	}
 
 	tx, ctx := getTxAndContext()
 	if websiteSSL.ID == 0 {
 		if err := websiteSSLRepo.Create(ctx, &websiteSSL); err != nil {
-			return dto.WebsiteHTTPS{}, err
+			return response.WebsiteHTTPS{}, err
 		}
-		website.WebSiteSSLID = websiteSSL.ID
+		website.WebsiteSSLID = websiteSSL.ID
 	}
 	if err := websiteRepo.Save(ctx, &website); err != nil {
-		return dto.WebsiteHTTPS{}, err
+		return response.WebsiteHTTPS{}, err
 	}
 
 	tx.Commit()
 	return res, nil
 }
 
-func (w WebsiteService) PreInstallCheck(req dto.WebsiteInstallCheckReq) ([]dto.WebsitePreInstallCheck, error) {
+func (w WebsiteService) PreInstallCheck(req request.WebsiteInstallCheckReq) ([]response.WebsitePreInstallCheck, error) {
 	var (
-		res      []dto.WebsitePreInstallCheck
+		res      []response.WebsitePreInstallCheck
 		checkIds []uint
 		showErr  = false
 	)
@@ -529,7 +530,7 @@ func (w WebsiteService) PreInstallCheck(req dto.WebsiteInstallCheckReq) ([]dto.W
 	}
 	appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithAppId(app.ID))
 	if reflect.DeepEqual(appInstall, model.AppInstall{}) {
-		res = append(res, dto.WebsitePreInstallCheck{
+		res = append(res, response.WebsitePreInstallCheck{
 			Name:    appInstall.Name,
 			AppName: app.Name,
 			Status:  buserr.WithMessage(constant.ErrNotInstall, app.Name, nil).Error(),
@@ -547,7 +548,7 @@ func (w WebsiteService) PreInstallCheck(req dto.WebsiteInstallCheckReq) ([]dto.W
 	if len(checkIds) > 0 {
 		installList, _ := appInstallRepo.GetBy(commonRepo.WithIdsIn(checkIds))
 		for _, install := range installList {
-			res = append(res, dto.WebsitePreInstallCheck{
+			res = append(res, response.WebsitePreInstallCheck{
 				Name:    install.Name,
 				Status:  install.Status,
 				Version: install.Version,
@@ -565,8 +566,8 @@ func (w WebsiteService) PreInstallCheck(req dto.WebsiteInstallCheckReq) ([]dto.W
 	}
 }
 
-func (w WebsiteService) GetWafConfig(req request.WebsiteWafReq) (dto.WebsiteWafConfig, error) {
-	var res dto.WebsiteWafConfig
+func (w WebsiteService) GetWafConfig(req request.WebsiteWafReq) (response.WebsiteWafConfig, error) {
+	var res response.WebsiteWafConfig
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
 	if err != nil {
 		return res, nil

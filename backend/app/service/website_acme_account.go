@@ -8,10 +8,10 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
 )
 
-type WebSiteAcmeAccountService struct {
+type WebsiteAcmeAccountService struct {
 }
 
-func (w WebSiteAcmeAccountService) Page(search dto.PageInfo) (int64, []dto.WebsiteAcmeAccountDTO, error) {
+func (w WebsiteAcmeAccountService) Page(search dto.PageInfo) (int64, []dto.WebsiteAcmeAccountDTO, error) {
 	total, accounts, err := websiteAcmeRepo.Page(search.Page, search.PageSize, commonRepo.WithOrderBy("created_at desc"))
 	var accountDTOs []dto.WebsiteAcmeAccountDTO
 	for _, account := range accounts {
@@ -22,7 +22,7 @@ func (w WebSiteAcmeAccountService) Page(search dto.PageInfo) (int64, []dto.Websi
 	return total, accountDTOs, err
 }
 
-func (w WebSiteAcmeAccountService) Create(create dto.WebsiteAcmeAccountCreate) (dto.WebsiteAcmeAccountDTO, error) {
+func (w WebsiteAcmeAccountService) Create(create dto.WebsiteAcmeAccountCreate) (dto.WebsiteAcmeAccountDTO, error) {
 	client, err := ssl.NewAcmeClient(create.Email, "")
 	if err != nil {
 		return dto.WebsiteAcmeAccountDTO{}, err
@@ -38,7 +38,7 @@ func (w WebSiteAcmeAccountService) Create(create dto.WebsiteAcmeAccountCreate) (
 	return dto.WebsiteAcmeAccountDTO{WebsiteAcmeAccount: acmeAccount}, nil
 }
 
-func (w WebSiteAcmeAccountService) Delete(id uint) error {
+func (w WebsiteAcmeAccountService) Delete(id uint) error {
 	if ssls, _ := websiteSSLRepo.List(websiteSSLRepo.WithByAcmeAccountId(id)); len(ssls) > 0 {
 		return buserr.New(constant.ErrAccountCannotDelete)
 	}

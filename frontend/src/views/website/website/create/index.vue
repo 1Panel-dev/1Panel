@@ -131,7 +131,7 @@
 
 <script lang="ts" setup name="CreateWebSite">
 import { App } from '@/api/interface/app';
-import { WebSite } from '@/api/interface/website';
+import { Website } from '@/api/interface/website';
 import { GetApp, GetAppDetail, SearchApp, GetAppInstalled } from '@/api/modules/app';
 import { CreateWebsite, ListGroups, PreCheck } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
@@ -177,7 +177,7 @@ let rules = reactive({
 
 let open = ref(false);
 let loading = ref(false);
-let groups = ref<WebSite.Group[]>([]);
+let groups = ref<Website.Group[]>([]);
 let appInstalles = ref<App.AppInstalled[]>([]);
 let appReq = reactive({
     type: 'website',

@@ -6,13 +6,9 @@ const (
 	Error      = "Error"
 	Stopped    = "Stopped"
 	Installing = "Installing"
-)
 
-const (
 	ContainerPrefix = "1Panel-"
-)
 
-const (
 	AppNormal   = "Normal"
 	AppTakeDown = "TakeDown"
 )

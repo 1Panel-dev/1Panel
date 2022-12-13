@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/1Panel-dev/1Panel/backend/app/request"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"io/ioutil"
 	"net/http"
 	"os"

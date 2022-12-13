@@ -37,9 +37,9 @@ var (
 
 	websiteGroupService       = service.ServiceGroupApp.WebsiteGroupService
 	websiteService            = service.ServiceGroupApp.WebsiteService
-	websiteDnsAccountService  = service.ServiceGroupApp.WebSiteDnsAccountService
-	websiteSSLService         = service.ServiceGroupApp.WebSiteSSLService
-	websiteAcmeAccountService = service.ServiceGroupApp.WebSiteAcmeAccountService
+	websiteDnsAccountService  = service.ServiceGroupApp.WebsiteDnsAccountService
+	websiteSSLService         = service.ServiceGroupApp.WebsiteSSLService
+	websiteAcmeAccountService = service.ServiceGroupApp.WebsiteAcmeAccountService
 
 	nginxService = service.ServiceGroupApp.NginxService
 

@@ -18,9 +18,9 @@ type RepoGroup struct {
 	GroupRepo
 	SettingRepo
 	BackupRepo
-	WebSiteRepo
-	WebSiteDomainRepo
-	WebSiteGroupRepo
+	WebsiteRepo
+	WebsiteDomainRepo
+	WebsiteGroupRepo
 	WebsiteDnsAccountRepo
 	WebsiteSSLRepo
 	WebsiteAcmeAccountRepo

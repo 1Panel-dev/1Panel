@@ -27,7 +27,7 @@ import { DeleteWebsite } from '@/api/modules/website';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
 import { ref } from 'vue';
-import { WebSite } from '@/api/interface/website';
+import { Website } from '@/api/interface/website';
 
 let key = 1;
 let open = ref(false);
@@ -46,7 +46,7 @@ const handleClose = () => {
     em('close', false);
 };
 
-const acceptParams = async (website: WebSite.WebSite) => {
+const acceptParams = async (website: Website.Website) => {
     deleteReq.value = {
         id: 0,
         deleteApp: false,

@@ -3,7 +3,7 @@ package dto
 import "github.com/1Panel-dev/1Panel/backend/app/model"
 
 type WebsiteSSLDTO struct {
-	model.WebSiteSSL
+	model.WebsiteSSL
 }
 
 type SSLProvider string

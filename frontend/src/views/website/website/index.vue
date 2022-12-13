@@ -86,8 +86,8 @@ import { onMounted, reactive, ref } from '@vue/runtime-core';
 import CreateWebSite from './create/index.vue';
 import DeleteWebsite from './delete/index.vue';
 import WebSiteGroup from './group/index.vue';
-import { SearchWebSites } from '@/api/modules/website';
-import { WebSite } from '@/api/interface/website';
+import { SearchWebsites } from '@/api/modules/website';
+import { Website } from '@/api/interface/website';
 import AppStatus from '@/components/app-status/index.vue';
 import NginxConfig from './nginx/index.vue';
 import { dateFromat } from '@/utils/util';
@@ -121,7 +121,7 @@ const search = async () => {
         pageSize: paginationConfig.pageSize,
     };
 
-    SearchWebSites(req).then((res) => {
+    SearchWebsites(req).then((res) => {
         data.value = res.data.items;
         paginationConfig.total = res.data.total;
     });
@@ -140,13 +140,13 @@ const dialogBackupRef = ref();
 const buttons = [
     {
         label: i18n.global.t('website.config'),
-        click: function (row: WebSite.WebSite) {
+        click: function (row: Website.Website) {
             openConfig(row.id);
         },
     },
     {
         label: i18n.global.t('database.backupList'),
-        click: (row: WebSite.WebSite) => {
+        click: (row: Website.Website) => {
             let params = {
                 id: row.id,
                 type: row.type,
@@ -157,7 +157,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('database.loadBackup'),
-        click: (row: WebSite.WebSite) => {
+        click: (row: Website.Website) => {
             let params = {
                 websiteName: row.primaryDomain,
                 websiteType: row.type,
@@ -167,13 +167,13 @@ const buttons = [
     },
     {
         label: i18n.global.t('app.delete'),
-        click: function (row: WebSite.WebSite) {
+        click: function (row: Website.Website) {
             openDelete(row);
         },
     },
 ];
 
-const openDelete = (website: WebSite.WebSite) => {
+const openDelete = (website: Website.Website) => {
     deleteRef.value.acceptParams(website);
 };
 

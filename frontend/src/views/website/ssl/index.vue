@@ -68,7 +68,7 @@ import Renew from './renew/index.vue';
 import Create from './create/index.vue';
 import { dateFromat } from '@/utils/util';
 import i18n from '@/lang';
-import { WebSite } from '@/api/interface/website';
+import { Website } from '@/api/interface/website';
 import { useDeleteData } from '@/hooks/use-delete-data';
 
 const paginationConfig = reactive({
@@ -86,13 +86,13 @@ let loading = ref(false);
 const buttons = [
     {
         label: i18n.global.t('website.renewSSL'),
-        click: function (row: WebSite.WebSite) {
+        click: function (row: Website.Website) {
             openRenewSSL(row.id);
         },
     },
     {
         label: i18n.global.t('app.delete'),
-        click: function (row: WebSite.WebSite) {
+        click: function (row: Website.Website) {
             deleteSSL(row.id);
         },
     },

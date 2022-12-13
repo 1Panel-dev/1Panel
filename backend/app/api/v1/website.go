@@ -4,19 +4,19 @@ import (
 	"errors"
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
-	"github.com/1Panel-dev/1Panel/backend/app/request"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/gin-gonic/gin"
 )
 
 func (b *BaseApi) PageWebsite(c *gin.Context) {
-	var req dto.WebSiteReq
+	var req request.WebsiteSearch
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	total, websites, err := websiteService.PageWebSite(req)
+	total, websites, err := websiteService.PageWebsite(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -37,7 +37,7 @@ func (b *BaseApi) GetWebsiteOptions(c *gin.Context) {
 }
 
 func (b *BaseApi) CreateWebsite(c *gin.Context) {
-	var req dto.WebSiteCreate
+	var req request.WebsiteCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -64,7 +64,7 @@ func (b *BaseApi) BackupWebsite(c *gin.Context) {
 }
 
 func (b *BaseApi) RecoverWebsiteByUpload(c *gin.Context) {
-	var req dto.WebSiteRecoverByFile
+	var req request.WebsiteRecoverByFile
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -82,7 +82,7 @@ func (b *BaseApi) RecoverWebsiteByUpload(c *gin.Context) {
 }
 
 func (b *BaseApi) RecoverWebsite(c *gin.Context) {
-	var req dto.WebSiteRecover
+	var req request.WebsiteRecover
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -99,13 +99,13 @@ func (b *BaseApi) RecoverWebsite(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-func (b *BaseApi) DeleteWebSite(c *gin.Context) {
-	var req request.WebSiteDel
+func (b *BaseApi) DeleteWebsite(c *gin.Context) {
+	var req request.WebsiteDelete
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	err := websiteService.DeleteWebSite(req)
+	err := websiteService.DeleteWebsite(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -113,8 +113,8 @@ func (b *BaseApi) DeleteWebSite(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-func (b *BaseApi) UpdateWebSite(c *gin.Context) {
-	var req dto.WebSiteUpdate
+func (b *BaseApi) UpdateWebsite(c *gin.Context) {
+	var req request.WebsiteUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -126,8 +126,7 @@ func (b *BaseApi) UpdateWebSite(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-func (b *BaseApi) GetWebSite(c *gin.Context) {
-
+func (b *BaseApi) GetWebsite(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
@@ -141,8 +140,7 @@ func (b *BaseApi) GetWebSite(c *gin.Context) {
 	helper.SuccessWithData(c, website)
 }
 
-func (b *BaseApi) GetWebSiteNginx(c *gin.Context) {
-
+func (b *BaseApi) GetWebsiteNginx(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
@@ -157,13 +155,11 @@ func (b *BaseApi) GetWebSiteNginx(c *gin.Context) {
 }
 
 func (b *BaseApi) GetWebDomains(c *gin.Context) {
-
 	websiteId, err := helper.GetIntParamByKey(c, "websiteId")
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
 		return
 	}
-
 	list, err := websiteService.GetWebsiteDomain(websiteId)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -173,14 +169,13 @@ func (b *BaseApi) GetWebDomains(c *gin.Context) {
 }
 
 func (b *BaseApi) DeleteWebDomain(c *gin.Context) {
-
-	id, err := helper.GetParamID(c)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+	var req request.WebsiteDomainDelete
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 
-	if err := websiteService.DeleteWebsiteDomain(id); err != nil {
+	if err := websiteService.DeleteWebsiteDomain(req.ID); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -188,7 +183,7 @@ func (b *BaseApi) DeleteWebDomain(c *gin.Context) {
 }
 
 func (b *BaseApi) CreateWebDomain(c *gin.Context) {
-	var req dto.WebSiteDomainCreate
+	var req request.WebsiteDomainCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -243,7 +238,7 @@ func (b *BaseApi) GetHTTPSConfig(c *gin.Context) {
 }
 
 func (b *BaseApi) UpdateHTTPSConfig(c *gin.Context) {
-	var req dto.WebsiteHTTPSOp
+	var req request.WebsiteHTTPSOp
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -257,7 +252,7 @@ func (b *BaseApi) UpdateHTTPSConfig(c *gin.Context) {
 }
 
 func (b *BaseApi) CreateWebsiteCheck(c *gin.Context) {
-	var req dto.WebsiteInstallCheckReq
+	var req request.WebsiteInstallCheckReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
