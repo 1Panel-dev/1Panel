@@ -17,30 +17,15 @@ type NginxFull struct {
 }
 
 type NginxConfig struct {
-	FilePath   string             `json:"filePath"`
-	Config     *components.Config `json:"config"`
-	OldContent string             `json:"oldContent"`
+	FilePath   string
+	Config     *components.Config
+	OldContent string
 }
 
-type NginxConfigReq struct {
-	Scope     NginxKey    `json:"scope"`
-	Operate   NginxOp     `json:"operate"`
-	WebsiteID uint        `json:"webSiteId"`
-	Params    interface{} `json:"params"`
-}
-
-type NginxScopeReq struct {
-	Scope NginxKey `json:"scope"`
-}
-
-type NginxStatus struct {
-	Active   string `json:"active"`
-	Accepts  string `json:"accepts"`
-	Handled  string `json:"handled"`
-	Requests string `json:"requests"`
-	Reading  string `json:"reading"`
-	Writing  string `json:"writing"`
-	Waiting  string `json:"waiting"`
+type NginxParam struct {
+	UpdateScope string
+	Name        string
+	Params      []string
 }
 
 type NginxKey string
@@ -50,14 +35,6 @@ const (
 	LimitConn NginxKey = "limit-conn"
 	SSL       NginxKey = "ssl"
 	HttpPer   NginxKey = "http-per"
-)
-
-type NginxOp string
-
-const (
-	ConfigNew    NginxOp = "add"
-	ConfigUpdate NginxOp = "update"
-	ConfigDel    NginxOp = "delete"
 )
 
 var ScopeKeyMap = map[NginxKey][]string{
@@ -71,10 +48,4 @@ var StaticFileKeyMap = map[NginxKey]struct {
 }{
 	SSL:       {},
 	LimitConn: {},
-}
-
-type NginxParam struct {
-	UpdateScope string   `json:"scope"`
-	Name        string   `json:"name"`
-	Params      []string `json:"params"`
 }

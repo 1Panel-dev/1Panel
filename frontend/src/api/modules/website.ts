@@ -71,7 +71,7 @@ export const CreateDomain = (req: Website.DomainCreate) => {
     return http.post<any>(`/websites/domains`, req);
 };
 
-export const GetNginxConfig = (req: Website.NginxConfigReq) => {
+export const GetNginxConfig = (req: Website.NginxScopeReq) => {
     return http.post<Website.NginxScopeConfig>(`/websites/config`, req);
 };
 

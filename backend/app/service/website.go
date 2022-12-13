@@ -39,8 +39,8 @@ type IWebsiteService interface {
 	CreateWebsiteDomain(create request.WebsiteDomainCreate) (model.WebsiteDomain, error)
 	GetWebsiteDomain(websiteId uint) ([]model.WebsiteDomain, error)
 	DeleteWebsiteDomain(domainId uint) error
-	GetNginxConfigByScope(req dto.NginxConfigReq) (*response.WebsiteNginxConfig, error)
-	UpdateNginxConfigByScope(req dto.NginxConfigReq) error
+	GetNginxConfigByScope(req request.NginxScopeReq) (*response.WebsiteNginxConfig, error)
+	UpdateNginxConfigByScope(req request.NginxConfigUpdate) error
 	GetWebsiteNginxConfig(websiteId uint) (dto.FileInfo, error)
 	GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, error)
 	OpWebsiteHTTPS(req request.WebsiteHTTPSOp) (response.WebsiteHTTPS, error)
@@ -340,7 +340,7 @@ func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
 	return websiteDomainRepo.DeleteBy(context.TODO(), commonRepo.WithByID(domainId))
 }
 
-func (w WebsiteService) GetNginxConfigByScope(req dto.NginxConfigReq) (*response.WebsiteNginxConfig, error) {
+func (w WebsiteService) GetNginxConfigByScope(req request.NginxScopeReq) (*response.WebsiteNginxConfig, error) {
 	keys, ok := dto.ScopeKeyMap[req.Scope]
 	if !ok || len(keys) == 0 {
 		return nil, nil
@@ -361,7 +361,7 @@ func (w WebsiteService) GetNginxConfigByScope(req dto.NginxConfigReq) (*response
 	return &config, nil
 }
 
-func (w WebsiteService) UpdateNginxConfigByScope(req dto.NginxConfigReq) error {
+func (w WebsiteService) UpdateNginxConfigByScope(req request.NginxConfigUpdate) error {
 	keys, ok := dto.ScopeKeyMap[req.Scope]
 	if !ok || len(keys) == 0 {
 		return nil
@@ -370,11 +370,11 @@ func (w WebsiteService) UpdateNginxConfigByScope(req dto.NginxConfigReq) error {
 	if err != nil {
 		return err
 	}
-	if req.Operate == dto.ConfigDel {
+	if req.Operate == constant.ConfigDel {
 		return deleteNginxConfig(constant.NginxScopeServer, keys, &website)
 	}
 	params := getNginxParams(req.Params, keys)
-	if req.Operate == dto.ConfigNew {
+	if req.Operate == constant.ConfigNew {
 		if _, ok := dto.StaticFileKeyMap[req.Scope]; ok {
 			params = getNginxParamsFromStaticFile(req.Scope, params)
 		}

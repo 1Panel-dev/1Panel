@@ -1,7 +1,6 @@
 package response
 
 import (
-	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 )
 
@@ -17,8 +16,8 @@ type WebsitePreInstallCheck struct {
 }
 
 type WebsiteNginxConfig struct {
-	Enable bool             `json:"enable"`
-	Params []dto.NginxParam `json:"params"`
+	Enable bool         `json:"enable"`
+	Params []NginxParam `json:"params"`
 }
 
 type WebsiteWafConfig struct {

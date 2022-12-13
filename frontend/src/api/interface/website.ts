@@ -98,6 +98,11 @@ export namespace Website {
         params?: any;
     }
 
+    export interface NginxScopeReq {
+        websiteId: number;
+        scope: string;
+    }
+
     export interface NginxParam {
         name: string;
         params: string[];

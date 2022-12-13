@@ -4,9 +4,11 @@ const (
 	NginxScopeServer = "server"
 	NginxScopeHttp   = "http"
 	NginxScopeOut    = "out"
-)
 
-const (
 	NginxReload = "reload"
 	NginxCheck  = "check"
+
+	ConfigNew    = "add"
+	ConfigUpdate = "update"
+	ConfigDel    = "delete"
 )

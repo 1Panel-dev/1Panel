@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -33,7 +34,7 @@ func (n NginxService) GetNginxConfig() (dto.FileInfo, error) {
 	return dto.FileInfo{FileInfo: *info}, nil
 }
 
-func (n NginxService) GetConfigByScope(req dto.NginxScopeReq) ([]dto.NginxParam, error) {
+func (n NginxService) GetConfigByScope(req request.NginxScopeReq) ([]response.NginxParam, error) {
 	keys, ok := dto.ScopeKeyMap[req.Scope]
 	if !ok || len(keys) == 0 {
 		return nil, nil
@@ -41,7 +42,7 @@ func (n NginxService) GetConfigByScope(req dto.NginxScopeReq) ([]dto.NginxParam,
 	return getNginxParamsByKeys(constant.NginxScopeHttp, keys, nil)
 }
 
-func (n NginxService) UpdateConfigByScope(req dto.NginxConfigReq) error {
+func (n NginxService) UpdateConfigByScope(req request.NginxConfigUpdate) error {
 	keys, ok := dto.ScopeKeyMap[req.Scope]
 	if !ok || len(keys) == 0 {
 		return nil
@@ -49,16 +50,16 @@ func (n NginxService) UpdateConfigByScope(req dto.NginxConfigReq) error {
 	return updateNginxConfig(constant.NginxScopeHttp, getNginxParams(req.Params, keys), nil)
 }
 
-func (n NginxService) GetStatus() (dto.NginxStatus, error) {
+func (n NginxService) GetStatus() (response.NginxStatus, error) {
 	res, err := http.Get("http://127.0.0.1/nginx_status")
 	if err != nil {
-		return dto.NginxStatus{}, err
+		return response.NginxStatus{}, err
 	}
 	content, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return dto.NginxStatus{}, err
+		return response.NginxStatus{}, err
 	}
-	var status dto.NginxStatus
+	var status response.NginxStatus
 	resArray := strings.Split(string(content), " ")
 	status.Active = resArray[2]
 	status.Accepts = resArray[7]

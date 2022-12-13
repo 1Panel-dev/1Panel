@@ -57,12 +57,16 @@ let req = reactive({
     websiteId: websiteId.value,
     params: [{}],
 });
+let scopeReq = reactive({
+    scope: 'limit-conn',
+    websiteId: websiteId.value,
+});
 let enable = ref(false);
 let loading = ref(false);
 
-const search = (req: Website.NginxConfigReq) => {
+const search = (scopeReq: Website.NginxScopeReq) => {
     loading.value = true;
-    GetNginxConfig(req)
+    GetNginxConfig(scopeReq)
         .then((res) => {
             if (res.data) {
                 enable.value = res.data.enable;
@@ -125,10 +129,9 @@ const changeEnable = () => {
     } else {
         req.operate = 'add';
     }
-    // submit(limitForm.value);
 };
 
 onMounted(() => {
-    search(req);
+    search(scopeReq);
 });
 </script>
