@@ -17,7 +17,7 @@ import (
 	"strings"
 )
 
-func getNginxFull(website *model.WebSite) (dto.NginxFull, error) {
+func getNginxFull(website *model.Website) (dto.NginxFull, error) {
 	var nginxFull dto.NginxFull
 	nginxInstall, err := getAppInstallByKey("nginx")
 	if err != nil {
@@ -62,7 +62,7 @@ func getNginxFull(website *model.WebSite) (dto.NginxFull, error) {
 	return nginxFull, nil
 }
 
-func getNginxParamsByKeys(scope string, keys []string, website *model.WebSite) ([]dto.NginxParam, error) {
+func getNginxParamsByKeys(scope string, keys []string, website *model.Website) ([]dto.NginxParam, error) {
 	nginxFull, err := getNginxFull(website)
 	if err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ func getNginxParamsByKeys(scope string, keys []string, website *model.WebSite) (
 	return res, nil
 }
 
-func updateNginxConfig(scope string, params []dto.NginxParam, website *model.WebSite) error {
+func updateNginxConfig(scope string, params []dto.NginxParam, website *model.Website) error {
 
 	nginxFull, err := getNginxFull(website)
 	if err != nil {
@@ -126,7 +126,7 @@ func updateNginxConfig(scope string, params []dto.NginxParam, website *model.Web
 	return nginxCheckAndReload(config.OldContent, config.FilePath, nginxFull.Install.ContainerName)
 }
 
-func deleteNginxConfig(scope string, keys []string, website *model.WebSite) error {
+func deleteNginxConfig(scope string, keys []string, website *model.Website) error {
 	nginxFull, err := getNginxFull(website)
 	if err != nil {
 		return err

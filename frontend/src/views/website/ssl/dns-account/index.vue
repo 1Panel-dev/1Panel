@@ -36,7 +36,7 @@
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import Create from './create/index.vue';
-import { WebSite } from '@/api/interface/website';
+import { Website } from '@/api/interface/website';
 import { DeleteDnsAccount, SearchDnsAccount } from '@/api/modules/website';
 import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
@@ -47,7 +47,7 @@ const paginationConfig = reactive({
     pageSize: 20,
     total: 0,
 });
-let data = ref<WebSite.DnsAccount[]>();
+let data = ref<Website.DnsAccount[]>();
 let createRef = ref();
 let loading = ref(false);
 let open = ref(false);
@@ -55,7 +55,7 @@ let open = ref(false);
 const buttons = [
     {
         label: i18n.global.t('app.delete'),
-        click: function (row: WebSite.WebSite) {
+        click: function (row: Website.Website) {
             deleteAccount(row.id);
         },
     },
@@ -81,7 +81,7 @@ const openCreate = () => {
     createRef.value.acceptParams({ mode: 'add' });
 };
 
-const openEdit = (form: WebSite.DnsAccount) => {
+const openEdit = (form: Website.DnsAccount) => {
     createRef.value.acceptParams({ mode: 'edit', form: form });
 };
 

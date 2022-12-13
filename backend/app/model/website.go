@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-type WebSite struct {
+type Website struct {
 	BaseModel
 	Protocol       string          `gorm:"type:varchar(64);not null" json:"protocol"`
 	PrimaryDomain  string          `gorm:"type:varchar(128);not null" json:"primaryDomain"`
@@ -12,13 +12,13 @@ type WebSite struct {
 	Status         string          `gorm:"type:varchar(64);not null" json:"status"`
 	ExpireDate     time.Time       `json:"expireDate"`
 	AppInstallID   uint            `gorm:"type:integer" json:"appInstallId"`
-	WebSiteGroupID uint            `gorm:"type:integer" json:"webSiteGroupId"`
-	WebSiteSSLID   uint            `gorm:"type:integer" json:"webSiteSSLId"`
+	WebsiteGroupID uint            `gorm:"type:integer" json:"webSiteGroupId"`
+	WebsiteSSLID   uint            `gorm:"type:integer" json:"webSiteSSLId"`
 	Proxy          string          `gorm:"type:varchar(128);not null" json:"proxy"`
-	Domains        []WebSiteDomain `json:"domains"`
-	WebSiteSSL     WebSiteSSL      `json:"webSiteSSL"`
+	Domains        []WebsiteDomain `json:"domains"`
+	WebsiteSSL     WebsiteSSL      `json:"webSiteSSL"`
 }
 
-func (w WebSite) TableName() string {
+func (w Website) TableName() string {
 	return "websites"
 }

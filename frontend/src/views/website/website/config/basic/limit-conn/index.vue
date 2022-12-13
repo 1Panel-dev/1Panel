@@ -25,7 +25,7 @@
 
 <script lang="ts" setup>
 import { Rules } from '@/global/form-rules';
-import { WebSite } from '@/api/interface/website';
+import { Website } from '@/api/interface/website';
 import { GetNginxConfig, UpdateNginxConfig } from '@/api/modules/website';
 import { ElMessage, FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
@@ -60,7 +60,7 @@ let req = reactive({
 let enable = ref(false);
 let loading = ref(false);
 
-const search = (req: WebSite.NginxConfigReq) => {
+const search = (req: Website.NginxConfigReq) => {
     loading.value = true;
     GetNginxConfig(req)
         .then((res) => {

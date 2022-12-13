@@ -2,7 +2,7 @@ package v1
 
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
-	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/gin-gonic/gin"
 )
@@ -17,7 +17,7 @@ func (b *BaseApi) GetWebGroups(c *gin.Context) {
 }
 
 func (b *BaseApi) CreateWebGroup(c *gin.Context) {
-	var req dto.WebSiteGroupCreate
+	var req request.WebsiteGroupCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -30,7 +30,7 @@ func (b *BaseApi) CreateWebGroup(c *gin.Context) {
 }
 
 func (b *BaseApi) UpdateWebGroup(c *gin.Context) {
-	var req dto.WebSiteGroupUpdate
+	var req request.WebsiteGroupUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -43,13 +43,11 @@ func (b *BaseApi) UpdateWebGroup(c *gin.Context) {
 }
 
 func (b *BaseApi) DeleteWebGroup(c *gin.Context) {
-
 	groupId, err := helper.GetIntParamByKey(c, "groupId")
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
 		return
 	}
-
 	if err := websiteGroupService.DeleteGroup(groupId); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

@@ -8,10 +8,10 @@ import (
 	"gopkg.in/square/go-jose.v2/json"
 )
 
-type WebSiteDnsAccountService struct {
+type WebsiteDnsAccountService struct {
 }
 
-func (w WebSiteDnsAccountService) Page(search dto.PageInfo) (int64, []dto.WebsiteDnsAccountDTO, error) {
+func (w WebsiteDnsAccountService) Page(search dto.PageInfo) (int64, []dto.WebsiteDnsAccountDTO, error) {
 	total, accounts, err := websiteDnsRepo.Page(search.Page, search.PageSize, commonRepo.WithOrderBy("created_at desc"))
 	var accountDTOs []dto.WebsiteDnsAccountDTO
 	for _, account := range accounts {
@@ -25,7 +25,7 @@ func (w WebSiteDnsAccountService) Page(search dto.PageInfo) (int64, []dto.Websit
 	return total, accountDTOs, err
 }
 
-func (w WebSiteDnsAccountService) Create(create dto.WebsiteDnsAccountCreate) (dto.WebsiteDnsAccountCreate, error) {
+func (w WebsiteDnsAccountService) Create(create dto.WebsiteDnsAccountCreate) (dto.WebsiteDnsAccountCreate, error) {
 	authorization, err := json.Marshal(create.Authorization)
 	if err != nil {
 		return dto.WebsiteDnsAccountCreate{}, err
@@ -42,7 +42,7 @@ func (w WebSiteDnsAccountService) Create(create dto.WebsiteDnsAccountCreate) (dt
 	return create, nil
 }
 
-func (w WebSiteDnsAccountService) Update(update dto.WebsiteDnsAccountUpdate) (dto.WebsiteDnsAccountUpdate, error) {
+func (w WebsiteDnsAccountService) Update(update dto.WebsiteDnsAccountUpdate) (dto.WebsiteDnsAccountUpdate, error) {
 	authorization, err := json.Marshal(update.Authorization)
 	if err != nil {
 		return dto.WebsiteDnsAccountUpdate{}, err
@@ -62,7 +62,7 @@ func (w WebSiteDnsAccountService) Update(update dto.WebsiteDnsAccountUpdate) (dt
 	return update, nil
 }
 
-func (w WebSiteDnsAccountService) Delete(id uint) error {
+func (w WebsiteDnsAccountService) Delete(id uint) error {
 	if ssls, _ := websiteSSLRepo.List(websiteSSLRepo.WithByDnsAccountId(id)); len(ssls) > 0 {
 		return buserr.New(constant.ErrAccountCannotDelete)
 	}

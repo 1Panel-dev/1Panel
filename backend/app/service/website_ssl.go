@@ -13,10 +13,10 @@ import (
 	"strings"
 )
 
-type WebSiteSSLService struct {
+type WebsiteSSLService struct {
 }
 
-func (w WebSiteSSLService) Page(search dto.WebsiteSSLSearch) (int64, []dto.WebsiteSSLDTO, error) {
+func (w WebsiteSSLService) Page(search dto.WebsiteSSLSearch) (int64, []dto.WebsiteSSLDTO, error) {
 	total, sslList, err := websiteSSLRepo.Page(search.Page, search.PageSize, commonRepo.WithOrderBy("created_at desc"))
 	if err != nil {
 		return 0, nil, err
@@ -24,13 +24,13 @@ func (w WebSiteSSLService) Page(search dto.WebsiteSSLSearch) (int64, []dto.Websi
 	var sslDTOs []dto.WebsiteSSLDTO
 	for _, ssl := range sslList {
 		sslDTOs = append(sslDTOs, dto.WebsiteSSLDTO{
-			WebSiteSSL: ssl,
+			WebsiteSSL: ssl,
 		})
 	}
 	return total, sslDTOs, err
 }
 
-func (w WebSiteSSLService) Search() ([]dto.WebsiteSSLDTO, error) {
+func (w WebsiteSSLService) Search() ([]dto.WebsiteSSLDTO, error) {
 	sslList, err := websiteSSLRepo.List()
 	if err != nil {
 		return nil, err
@@ -38,13 +38,13 @@ func (w WebSiteSSLService) Search() ([]dto.WebsiteSSLDTO, error) {
 	var sslDTOs []dto.WebsiteSSLDTO
 	for _, ssl := range sslList {
 		sslDTOs = append(sslDTOs, dto.WebsiteSSLDTO{
-			WebSiteSSL: ssl,
+			WebsiteSSL: ssl,
 		})
 	}
 	return sslDTOs, err
 }
 
-func (w WebSiteSSLService) Create(create dto.WebsiteSSLCreate) (dto.WebsiteSSLCreate, error) {
+func (w WebsiteSSLService) Create(create dto.WebsiteSSLCreate) (dto.WebsiteSSLCreate, error) {
 
 	var res dto.WebsiteSSLCreate
 	acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(create.AcmeAccountID))
@@ -87,7 +87,7 @@ func (w WebSiteSSLService) Create(create dto.WebsiteSSLCreate) (dto.WebsiteSSLCr
 	if err != nil {
 		return res, err
 	}
-	var websiteSSL model.WebSiteSSL
+	var websiteSSL model.WebsiteSSL
 	websiteSSL.DnsAccountID = create.DnsAccountID
 	websiteSSL.AcmeAccountID = acmeAccount.ID
 	websiteSSL.Provider = string(create.Provider)
@@ -113,7 +113,7 @@ func (w WebSiteSSLService) Create(create dto.WebsiteSSLCreate) (dto.WebsiteSSLCr
 	return create, nil
 }
 
-func (w WebSiteSSLService) Renew(sslId uint) error {
+func (w WebsiteSSLService) Renew(sslId uint) error {
 
 	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(sslId))
 	if err != nil {
@@ -169,7 +169,7 @@ func (w WebSiteSSLService) Renew(sslId uint) error {
 	return websiteSSLRepo.Save(websiteSSL)
 }
 
-func (w WebSiteSSLService) GetDNSResolve(req dto.WebsiteDNSReq) ([]dto.WebsiteDNSRes, error) {
+func (w WebsiteSSLService) GetDNSResolve(req dto.WebsiteDNSReq) ([]dto.WebsiteDNSRes, error) {
 	acmeAccount, err := websiteAcmeRepo.GetFirst(commonRepo.WithByID(req.AcmeAccountID))
 	if err != nil {
 		return nil, err
@@ -195,21 +195,21 @@ func (w WebSiteSSLService) GetDNSResolve(req dto.WebsiteDNSReq) ([]dto.WebsiteDN
 	return res, nil
 }
 
-func (w WebSiteSSLService) GetWebsiteSSL(websiteId uint) (dto.WebsiteSSLDTO, error) {
+func (w WebsiteSSLService) GetWebsiteSSL(websiteId uint) (dto.WebsiteSSLDTO, error) {
 	var res dto.WebsiteSSLDTO
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteId))
 	if err != nil {
 		return res, err
 	}
-	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(website.WebSiteSSLID))
+	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(website.WebsiteSSLID))
 	if err != nil {
 		return res, err
 	}
-	res.WebSiteSSL = websiteSSL
+	res.WebsiteSSL = websiteSSL
 	return res, nil
 }
 
-func (w WebSiteSSLService) Delete(id uint) error {
+func (w WebsiteSSLService) Delete(id uint) error {
 	if websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(id)); len(websites) > 0 {
 		return buserr.New(constant.ErrSSLCannotDelete)
 	}

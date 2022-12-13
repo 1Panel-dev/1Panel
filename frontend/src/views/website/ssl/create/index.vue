@@ -76,7 +76,7 @@
 </template>
 
 <script lang="ts" setup>
-import { WebSite } from '@/api/interface/website';
+import { Website } from '@/api/interface/website';
 import { CreateSSL, GetDnsResolve, SearchAcmeAccount, SearchDnsAccount } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -104,9 +104,9 @@ let acmeReq = reactive({
     page: 1,
     pageSize: 20,
 });
-let dnsAccounts = ref<WebSite.DnsAccount[]>();
-let acmeAccounts = ref<WebSite.AcmeAccount[]>();
-// let domains = ref<WebSite.Domain[]>([]);
+let dnsAccounts = ref<Website.DnsAccount[]>();
+let acmeAccounts = ref<Website.AcmeAccount[]>();
+// let domains = ref<Website.Domain[]>([]);
 let sslForm = ref<FormInstance>();
 let rules = ref({
     primaryDomain: [Rules.requiredInput],
@@ -122,7 +122,7 @@ let ssl = ref({
     acmeAccountId: undefined,
     dnsAccountId: undefined,
 });
-let dnsResolve = ref<WebSite.DNSResolve[]>([]);
+let dnsResolve = ref<Website.DNSResolve[]>([]);
 let hasResolve = ref(false);
 
 const em = defineEmits(['close']);
@@ -167,10 +167,6 @@ const getDnsAccounts = async () => {
         ssl.value.dnsAccountId = res.data.items[0].id;
     }
 };
-
-// const getWebsite = async (id: number) => {
-//     domains.value = (await GetWebsite(id)).data.domains || [];
-// };
 
 const getDnsResolve = async (acmeAccountId: number, domains: string[]) => {
     hasResolve.value = false;

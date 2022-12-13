@@ -7,7 +7,7 @@ import (
 
 type NginxFull struct {
 	Install    model.AppInstall
-	Website    model.WebSite
+	Website    model.Website
 	ConfigDir  string
 	ConfigFile string
 	SiteDir    string
@@ -25,7 +25,7 @@ type NginxConfig struct {
 type NginxConfigReq struct {
 	Scope     NginxKey    `json:"scope"`
 	Operate   NginxOp     `json:"operate"`
-	WebSiteID uint        `json:"webSiteId"`
+	WebsiteID uint        `json:"webSiteId"`
 	Params    interface{} `json:"params"`
 }
 

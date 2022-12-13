@@ -62,7 +62,7 @@
     </el-row>
 </template>
 <script lang="ts" setup>
-import { WebSite } from '@/api/interface/website';
+import { Website } from '@/api/interface/website';
 import { GetHTTPSConfig, ListSSL, UpdateHTTPSConfig } from '@/api/modules/website';
 import { ElMessage, FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
@@ -104,7 +104,7 @@ const listSSL = () => {
 };
 
 const changeSSl = (sslid: number) => {
-    const res = ssls.value.filter((element: WebSite.SSL) => {
+    const res = ssls.value.filter((element: Website.SSL) => {
         return element.id == sslid;
     });
     websiteSSL.value = res[0];

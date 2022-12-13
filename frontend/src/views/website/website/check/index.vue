@@ -29,13 +29,13 @@
     </el-dialog>
 </template>
 <script lang="ts" setup>
-import { WebSite } from '@/api/interface/website';
+import { Website } from '@/api/interface/website';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 
 interface InstallRrops {
-    items: WebSite.CheckRes[];
+    items: Website.CheckRes[];
 }
 
 let open = ref(false);

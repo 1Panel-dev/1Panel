@@ -24,9 +24,9 @@ import (
 	"strings"
 )
 
-func getDomain(domainStr string, websiteID uint) (model.WebSiteDomain, error) {
-	domain := model.WebSiteDomain{
-		WebSiteID: websiteID,
+func getDomain(domainStr string, websiteID uint) (model.WebsiteDomain, error) {
+	domain := model.WebsiteDomain{
+		WebsiteID: websiteID,
 	}
 	domainArray := strings.Split(domainStr, ":")
 	if len(domainArray) == 1 {
@@ -39,15 +39,15 @@ func getDomain(domainStr string, websiteID uint) (model.WebSiteDomain, error) {
 		portStr := domainArray[1]
 		portN, err := strconv.Atoi(portStr)
 		if err != nil {
-			return model.WebSiteDomain{}, err
+			return model.WebsiteDomain{}, err
 		}
 		domain.Port = portN
 		return domain, nil
 	}
-	return model.WebSiteDomain{}, nil
+	return model.WebsiteDomain{}, nil
 }
 
-func createStaticHtml(website *model.WebSite) error {
+func createStaticHtml(website *model.Website) error {
 	nginxInstall, err := getAppInstallByKey("nginx")
 	if err != nil {
 		return err
@@ -73,7 +73,7 @@ func createStaticHtml(website *model.WebSite) error {
 	return nil
 }
 
-func createWebsiteFolder(nginxInstall model.AppInstall, website *model.WebSite) error {
+func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) error {
 	nginxFolder := path.Join(constant.AppInstallDir, "nginx", nginxInstall.Name)
 	siteFolder := path.Join(nginxFolder, "www", "sites", website.Alias)
 	fileOp := files.NewFileOp()
@@ -97,7 +97,7 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.WebSite) 
 	return fileOp.CopyDir(path.Join(nginxFolder, "www", "common", "waf", "rules"), path.Join(siteFolder, "waf"))
 }
 
-func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) error {
+func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain) error {
 	nginxInstall, err := getAppInstallByKey("nginx")
 	if err != nil {
 		return err
@@ -155,7 +155,7 @@ func configDefaultNginx(website *model.WebSite, domains []model.WebSiteDomain) e
 	return opNginx(nginxInstall.ContainerName, constant.NginxReload)
 }
 
-func delNginxConfig(website model.WebSite, force bool) error {
+func delNginxConfig(website model.Website, force bool) error {
 	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
 	if err != nil {
 		return err
@@ -187,7 +187,7 @@ func delNginxConfig(website model.WebSite, force bool) error {
 	return nil
 }
 
-func addListenAndServerName(website model.WebSite, ports []int, domains []string) error {
+func addListenAndServerName(website model.Website, ports []int, domains []string) error {
 	nginxFull, err := getNginxFull(&website)
 	if err != nil {
 		return nil
@@ -207,7 +207,7 @@ func addListenAndServerName(website model.WebSite, ports []int, domains []string
 	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxFull.Install.ContainerName)
 }
 
-func deleteListenAndServerName(website model.WebSite, ports []int, domains []string) error {
+func deleteListenAndServerName(website model.Website, ports []int, domains []string) error {
 	nginxFull, err := getNginxFull(&website)
 	if err != nil {
 		return nil
@@ -241,7 +241,7 @@ func getKeysFromStaticFile(scope dto.NginxKey) []string {
 	return res
 }
 
-func createPemFile(website model.WebSite, websiteSSL model.WebSiteSSL) error {
+func createPemFile(website model.Website, websiteSSL model.WebsiteSSL) error {
 	nginxApp, err := appRepo.GetFirst(appRepo.WithKey("nginx"))
 	if err != nil {
 		return err
@@ -283,7 +283,7 @@ func createPemFile(website model.WebSite, websiteSSL model.WebSiteSSL) error {
 	return nil
 }
 
-func applySSL(website model.WebSite, websiteSSL model.WebSiteSSL) error {
+func applySSL(website model.Website, websiteSSL model.WebsiteSSL) error {
 	nginxFull, err := getNginxFull(&website)
 	if err != nil {
 		return nil
@@ -369,7 +369,7 @@ func toMapStr(m map[string]interface{}) map[string]string {
 	return ret
 }
 
-type WebSiteInfo struct {
+type WebsiteInfo struct {
 	WebsiteName string `json:"websiteName"`
 	WebsiteType string `json:"websiteType"`
 }
@@ -444,7 +444,7 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 	return nil
 }
 
-func handleWebsiteRecover(website *model.WebSite, fileDir string) error {
+func handleWebsiteRecover(website *model.Website, fileDir string) error {
 	nginxInfo, err := appInstallRepo.LoadBaseInfoByKey("nginx")
 	if err != nil {
 		return err
@@ -486,7 +486,7 @@ func handleWebsiteRecover(website *model.WebSite, fileDir string) error {
 	return nil
 }
 
-func mysqlOpration(website *model.WebSite, operation, filePath string) error {
+func mysqlOpration(website *model.Website, operation, filePath string) error {
 	mysqlInfo, err := appInstallRepo.LoadBaseInfoByKey("mysql")
 	if err != nil {
 		return err
@@ -523,11 +523,11 @@ func mysqlOpration(website *model.WebSite, operation, filePath string) error {
 	return nil
 }
 
-func saveWebsiteJson(website *model.WebSite, tmpDir string) error {
-	var WebSiteInfo WebSiteInfo
-	WebSiteInfo.WebsiteType = website.Type
-	WebSiteInfo.WebsiteName = website.PrimaryDomain
-	remarkInfo, _ := json.Marshal(WebSiteInfo)
+func saveWebsiteJson(website *model.Website, tmpDir string) error {
+	var websiteInfo WebsiteInfo
+	websiteInfo.WebsiteType = website.Type
+	websiteInfo.WebsiteName = website.PrimaryDomain
+	remarkInfo, _ := json.Marshal(websiteInfo)
 	path := fmt.Sprintf("%s/website.json", tmpDir)
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {

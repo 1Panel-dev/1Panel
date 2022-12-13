@@ -15,20 +15,22 @@ func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
+		groupRouter.POST("/search", baseApi.PageWebsite)
 		groupRouter.POST("", baseApi.CreateWebsite)
 		groupRouter.POST("/check", baseApi.CreateWebsiteCheck)
 		groupRouter.GET("/options", baseApi.GetWebsiteOptions)
+		groupRouter.POST("/update", baseApi.UpdateWebsite)
+		groupRouter.GET("/:id", baseApi.GetWebsite)
+		groupRouter.POST("/del", baseApi.DeleteWebsite)
 		groupRouter.POST("/backup/:domain", baseApi.BackupWebsite)
 		groupRouter.POST("/recover", baseApi.RecoverWebsite)
 		groupRouter.POST("/recover/byupload", baseApi.RecoverWebsiteByUpload)
-		groupRouter.POST("/update", baseApi.UpdateWebSite)
-		groupRouter.GET("/:id", baseApi.GetWebSite)
-		groupRouter.GET("/:id/nginx", baseApi.GetWebSiteNginx)
-		groupRouter.POST("/search", baseApi.PageWebsite)
-		groupRouter.POST("/del", baseApi.DeleteWebSite)
+
 		groupRouter.GET("/domains/:websiteId", baseApi.GetWebDomains)
-		groupRouter.DELETE("/domains/:id", baseApi.DeleteWebDomain)
+		groupRouter.POST("/domains/del", baseApi.DeleteWebDomain)
 		groupRouter.POST("/domains", baseApi.CreateWebDomain)
+
+		groupRouter.GET("/:id/nginx", baseApi.GetWebsiteNginx)
 		groupRouter.POST("/config", baseApi.GetNginxConfig)
 		groupRouter.POST("/config/update", baseApi.UpdateNginxConfig)
 		groupRouter.GET("/:id/https", baseApi.GetHTTPSConfig)

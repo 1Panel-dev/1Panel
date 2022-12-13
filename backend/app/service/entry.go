@@ -30,9 +30,9 @@ type ServiceGroup struct {
 
 	WebsiteGroupService
 	WebsiteService
-	WebSiteDnsAccountService
-	WebSiteSSLService
-	WebSiteAcmeAccountService
+	WebsiteDnsAccountService
+	WebsiteSSLService
+	WebsiteAcmeAccountService
 
 	NginxService
 
@@ -67,8 +67,8 @@ var (
 	backupRepo  = repo.RepoGroupApp.BackupRepo
 
 	websiteRepo       = repo.NewIWebsiteRepo()
-	websiteGroupRepo  = repo.RepoGroupApp.WebSiteGroupRepo
-	websiteDomainRepo = repo.RepoGroupApp.WebSiteDomainRepo
+	websiteGroupRepo  = repo.RepoGroupApp.WebsiteGroupRepo
+	websiteDomainRepo = repo.RepoGroupApp.WebsiteDomainRepo
 	websiteDnsRepo    = repo.RepoGroupApp.WebsiteDnsAccountRepo
 	websiteSSLRepo    = repo.NewISSLRepo()
 	websiteAcmeRepo   = repo.NewIAcmeAccountRepo()

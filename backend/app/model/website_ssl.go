@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-type WebSiteSSL struct {
+type WebsiteSSL struct {
 	BaseModel
 	PrimaryDomain string             `gorm:"type:varchar(256);not null" json:"primaryDomain"`
 	PrivateKey    string             `gorm:"type:longtext;not null" json:"privateKey"`
@@ -19,6 +19,6 @@ type WebSiteSSL struct {
 	StartDate     time.Time          `json:"startDate"`
 }
 
-func (w WebSiteSSL) TableName() string {
+func (w WebsiteSSL) TableName() string {
 	return "website_ssls"
 }

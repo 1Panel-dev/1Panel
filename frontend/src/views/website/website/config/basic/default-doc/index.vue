@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts" setup>
-import { WebSite } from '@/api/interface/website';
+import { Website } from '@/api/interface/website';
 import { GetNginxConfig, UpdateNginxConfig } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import { ElMessage, FormInstance } from 'element-plus';
@@ -69,7 +69,7 @@ const submit = async (formEl: FormInstance | undefined) => {
     });
 };
 
-const search = (req: WebSite.NginxConfigReq) => {
+const search = (req: Website.NginxConfigReq) => {
     loading.value = true;
     GetNginxConfig(req)
         .then((res) => {

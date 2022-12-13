@@ -185,10 +185,10 @@ var AddTableDatabaseMysql = &gormigrate.Migration{
 var AddTableWebsite = &gormigrate.Migration{
 	ID: "20201009-add-table-website",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.WebSite{}, &model.WebSiteDomain{}, &model.WebSiteGroup{}, &model.WebsiteDnsAccount{}, &model.WebSiteSSL{}, &model.WebsiteAcmeAccount{}); err != nil {
+		if err := tx.AutoMigrate(&model.Website{}, &model.WebsiteDomain{}, &model.WebsiteGroup{}, &model.WebsiteDnsAccount{}, &model.WebsiteSSL{}, &model.WebsiteAcmeAccount{}); err != nil {
 			return err
 		}
-		item := &model.WebSiteGroup{
+		item := &model.WebsiteGroup{
 			Name:    "默认分组",
 			Default: true,
 		}
