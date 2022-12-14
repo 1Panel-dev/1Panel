@@ -3,6 +3,8 @@ package v1
 import (
 	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -19,7 +21,7 @@ import (
 )
 
 func (b *BaseApi) ListFiles(c *gin.Context) {
-	var req dto.FileOption
+	var req request.FileOption
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -33,7 +35,7 @@ func (b *BaseApi) ListFiles(c *gin.Context) {
 }
 
 func (b *BaseApi) GetFileTree(c *gin.Context) {
-	var req dto.FileOption
+	var req request.FileOption
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -47,7 +49,7 @@ func (b *BaseApi) GetFileTree(c *gin.Context) {
 }
 
 func (b *BaseApi) CreateFile(c *gin.Context) {
-	var req dto.FileCreate
+	var req request.FileCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -61,7 +63,7 @@ func (b *BaseApi) CreateFile(c *gin.Context) {
 }
 
 func (b *BaseApi) DeleteFile(c *gin.Context) {
-	var req dto.FileDelete
+	var req request.FileDelete
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -75,7 +77,7 @@ func (b *BaseApi) DeleteFile(c *gin.Context) {
 }
 
 func (b *BaseApi) BatchDeleteFile(c *gin.Context) {
-	var req dto.FileBatchDelete
+	var req request.FileBatchDelete
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -89,7 +91,7 @@ func (b *BaseApi) BatchDeleteFile(c *gin.Context) {
 }
 
 func (b *BaseApi) ChangeFileMode(c *gin.Context) {
-	var req dto.FileCreate
+	var req request.FileCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -103,7 +105,7 @@ func (b *BaseApi) ChangeFileMode(c *gin.Context) {
 }
 
 func (b *BaseApi) CompressFile(c *gin.Context) {
-	var req dto.FileCompress
+	var req request.FileCompress
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -117,7 +119,7 @@ func (b *BaseApi) CompressFile(c *gin.Context) {
 }
 
 func (b *BaseApi) DeCompressFile(c *gin.Context) {
-	var req dto.FileDeCompress
+	var req request.FileDeCompress
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -131,7 +133,7 @@ func (b *BaseApi) DeCompressFile(c *gin.Context) {
 }
 
 func (b *BaseApi) GetContent(c *gin.Context) {
-	var req dto.FileOption
+	var req request.FileOption
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -145,7 +147,7 @@ func (b *BaseApi) GetContent(c *gin.Context) {
 }
 
 func (b *BaseApi) SaveContent(c *gin.Context) {
-	var req dto.FileEdit
+	var req request.FileEdit
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -191,7 +193,7 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 }
 
 func (b *BaseApi) ChangeFileName(c *gin.Context) {
-	var req dto.FileRename
+	var req request.FileRename
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -204,7 +206,7 @@ func (b *BaseApi) ChangeFileName(c *gin.Context) {
 }
 
 func (b *BaseApi) WgetFile(c *gin.Context) {
-	var req dto.FileWget
+	var req request.FileWget
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -214,13 +216,13 @@ func (b *BaseApi) WgetFile(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, dto.FileWgetRes{
+	helper.SuccessWithData(c, response.FileWgetRes{
 		Key: key,
 	})
 }
 
 func (b *BaseApi) MoveFile(c *gin.Context) {
-	var req dto.FileMove
+	var req request.FileMove
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -233,7 +235,7 @@ func (b *BaseApi) MoveFile(c *gin.Context) {
 }
 
 func (b *BaseApi) Download(c *gin.Context) {
-	var req dto.FileDownload
+	var req request.FileDownload
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -247,7 +249,7 @@ func (b *BaseApi) Download(c *gin.Context) {
 }
 
 func (b *BaseApi) Size(c *gin.Context) {
-	var req dto.DirSizeReq
+	var req request.DirSizeReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -303,7 +305,7 @@ func (b *BaseApi) Ws(c *gin.Context) {
 }
 
 func (b *BaseApi) Keys(c *gin.Context) {
-	res := &dto.FileProcessKeys{}
+	res := &response.FileProcessKeys{}
 	keys, err := global.CACHE.PrefixScanKey("file-wget-")
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
