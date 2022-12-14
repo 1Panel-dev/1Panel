@@ -1,0 +1,17 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "开源Linux面板",
+        "title": "1Panel",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {},
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost",
+    "basePath": "/api/v1",
+    "paths": {}
+}

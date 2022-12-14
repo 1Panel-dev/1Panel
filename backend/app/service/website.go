@@ -41,7 +41,7 @@ type IWebsiteService interface {
 	DeleteWebsiteDomain(domainId uint) error
 	GetNginxConfigByScope(req request.NginxScopeReq) (*response.WebsiteNginxConfig, error)
 	UpdateNginxConfigByScope(req request.NginxConfigUpdate) error
-	GetWebsiteNginxConfig(websiteId uint) (dto.FileInfo, error)
+	GetWebsiteNginxConfig(websiteId uint) (response.FileInfo, error)
 	GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, error)
 	OpWebsiteHTTPS(req request.WebsiteHTTPSOp) (response.WebsiteHTTPS, error)
 	PreInstallCheck(req request.WebsiteInstallCheckReq) ([]response.WebsitePreInstallCheck, error)
@@ -382,19 +382,19 @@ func (w WebsiteService) UpdateNginxConfigByScope(req request.NginxConfigUpdate) 
 	return updateNginxConfig(constant.NginxScopeServer, params, &website)
 }
 
-func (w WebsiteService) GetWebsiteNginxConfig(websiteId uint) (dto.FileInfo, error) {
+func (w WebsiteService) GetWebsiteNginxConfig(websiteId uint) (response.FileInfo, error) {
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteId))
 	if err != nil {
-		return dto.FileInfo{}, err
+		return response.FileInfo{}, err
 	}
 
 	nginxApp, err := appRepo.GetFirst(appRepo.WithKey(constant.AppNginx))
 	if err != nil {
-		return dto.FileInfo{}, err
+		return response.FileInfo{}, err
 	}
 	nginxInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithAppId(nginxApp.ID))
 	if err != nil {
-		return dto.FileInfo{}, err
+		return response.FileInfo{}, err
 	}
 
 	configPath := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name, "conf", "conf.d", website.Alias+".conf")
@@ -404,9 +404,9 @@ func (w WebsiteService) GetWebsiteNginxConfig(websiteId uint) (dto.FileInfo, err
 		Expand: true,
 	})
 	if err != nil {
-		return dto.FileInfo{}, err
+		return response.FileInfo{}, err
 	}
-	return dto.FileInfo{FileInfo: *info}, nil
+	return response.FileInfo{FileInfo: *info}, nil
 }
 
 func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, error) {

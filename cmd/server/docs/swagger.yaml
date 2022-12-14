@@ -1,0 +1,13 @@
+basePath: /api/v1
+host: localhost
+info:
+  contact: {}
+  description: 开源Linux面板
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: 1Panel
+  version: "1.0"
+paths: {}
+swagger: "2.0"

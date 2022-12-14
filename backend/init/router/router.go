@@ -5,10 +5,10 @@ import (
 	"net/http"
 
 	v1 "github.com/1Panel-dev/1Panel/backend/app/api/v1"
-	"github.com/1Panel-dev/1Panel/backend/docs"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/1Panel-dev/1Panel/backend/middleware"
 	rou "github.com/1Panel-dev/1Panel/backend/router"
+	"github.com/1Panel-dev/1Panel/cmd/server/docs"
 	"github.com/1Panel-dev/1Panel/cmd/server/web"
 	ginI18n "github.com/gin-contrib/i18n"
 	"github.com/gin-gonic/gin"
@@ -38,17 +38,19 @@ func setWebStatic(rootRouter *gin.Engine) {
 
 func Routers() *gin.Engine {
 	Router := gin.Default()
+
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
 	Router.Use(middleware.OperationLog())
 	Router.Use(middleware.CSRF())
 	Router.Use(middleware.LoadCsrfToken())
 
 	setWebStatic(Router)
-	docs.SwaggerInfo.BasePath = "/api/v1"
 
 	Router.Use(i18n.GinI18nLocalize())
 	Router.GET("/api/v1/info", v1.ApiGroupApp.BaseApi.GetSafetyStatus)
 	Router.GET("/api/v1/:code", v1.ApiGroupApp.BaseApi.SafeEntrance)
-	Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	Router.SetFuncMap(template.FuncMap{
 		"Localize": ginI18n.GetMessage,

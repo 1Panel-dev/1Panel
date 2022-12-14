@@ -18,10 +18,10 @@ import (
 type NginxService struct {
 }
 
-func (n NginxService) GetNginxConfig() (dto.FileInfo, error) {
+func (n NginxService) GetNginxConfig() (response.FileInfo, error) {
 	nginxInstall, err := getAppInstallByKey(constant.AppNginx)
 	if err != nil {
-		return dto.FileInfo{}, err
+		return response.FileInfo{}, err
 	}
 	configPath := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name, "conf", "nginx.conf")
 	info, err := files.NewFileInfo(files.FileOption{
@@ -29,9 +29,9 @@ func (n NginxService) GetNginxConfig() (dto.FileInfo, error) {
 		Expand: true,
 	})
 	if err != nil {
-		return dto.FileInfo{}, err
+		return response.FileInfo{}, err
 	}
-	return dto.FileInfo{FileInfo: *info}, nil
+	return response.FileInfo{FileInfo: *info}, nil
 }
 
 func (n NginxService) GetConfigByScope(req request.NginxScopeReq) ([]response.NginxParam, error) {
