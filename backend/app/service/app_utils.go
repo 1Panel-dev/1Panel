@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"io/ioutil"
 	"math"
@@ -589,12 +590,12 @@ func getAppFromOss() error {
 	return nil
 }
 
-func handleInstalled(installed []model.AppInstall) ([]dto.AppInstalled, error) {
-	var res []dto.AppInstalled
+func handleInstalled(installed []model.AppInstall) ([]response.AppInstalledDTO, error) {
+	var res []response.AppInstalledDTO
 
 	for _, installed := range installed {
 
-		installDTO := dto.AppInstalled{
+		installDTO := response.AppInstalledDTO{
 			AppInstall: installed,
 		}
 
