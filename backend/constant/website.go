@@ -20,4 +20,9 @@ const (
 	SSLExisted = "existed"
 	SSLAuto    = "auto"
 	SSLManual  = "manual"
+
+	DNSAccount = "dnsAccount"
+	DnsManual  = "dnsManual"
+	Http       = "http"
+	Manual     = "manual"
 )

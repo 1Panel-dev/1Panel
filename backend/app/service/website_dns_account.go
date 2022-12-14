@@ -2,6 +2,8 @@ package service
 
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -11,13 +13,13 @@ import (
 type WebsiteDnsAccountService struct {
 }
 
-func (w WebsiteDnsAccountService) Page(search dto.PageInfo) (int64, []dto.WebsiteDnsAccountDTO, error) {
+func (w WebsiteDnsAccountService) Page(search dto.PageInfo) (int64, []response.WebsiteDnsAccountDTO, error) {
 	total, accounts, err := websiteDnsRepo.Page(search.Page, search.PageSize, commonRepo.WithOrderBy("created_at desc"))
-	var accountDTOs []dto.WebsiteDnsAccountDTO
+	var accountDTOs []response.WebsiteDnsAccountDTO
 	for _, account := range accounts {
 		auth := make(map[string]string)
 		_ = json.Unmarshal([]byte(account.Authorization), &auth)
-		accountDTOs = append(accountDTOs, dto.WebsiteDnsAccountDTO{
+		accountDTOs = append(accountDTOs, response.WebsiteDnsAccountDTO{
 			WebsiteDnsAccount: account,
 			Authorization:     auth,
 		})
@@ -25,10 +27,10 @@ func (w WebsiteDnsAccountService) Page(search dto.PageInfo) (int64, []dto.Websit
 	return total, accountDTOs, err
 }
 
-func (w WebsiteDnsAccountService) Create(create dto.WebsiteDnsAccountCreate) (dto.WebsiteDnsAccountCreate, error) {
+func (w WebsiteDnsAccountService) Create(create request.WebsiteDnsAccountCreate) (request.WebsiteDnsAccountCreate, error) {
 	authorization, err := json.Marshal(create.Authorization)
 	if err != nil {
-		return dto.WebsiteDnsAccountCreate{}, err
+		return request.WebsiteDnsAccountCreate{}, err
 	}
 
 	if err := websiteDnsRepo.Create(model.WebsiteDnsAccount{
@@ -36,16 +38,16 @@ func (w WebsiteDnsAccountService) Create(create dto.WebsiteDnsAccountCreate) (dt
 		Type:          create.Type,
 		Authorization: string(authorization),
 	}); err != nil {
-		return dto.WebsiteDnsAccountCreate{}, err
+		return request.WebsiteDnsAccountCreate{}, err
 	}
 
 	return create, nil
 }
 
-func (w WebsiteDnsAccountService) Update(update dto.WebsiteDnsAccountUpdate) (dto.WebsiteDnsAccountUpdate, error) {
+func (w WebsiteDnsAccountService) Update(update request.WebsiteDnsAccountUpdate) (request.WebsiteDnsAccountUpdate, error) {
 	authorization, err := json.Marshal(update.Authorization)
 	if err != nil {
-		return dto.WebsiteDnsAccountUpdate{}, err
+		return request.WebsiteDnsAccountUpdate{}, err
 	}
 
 	if err := websiteDnsRepo.Save(model.WebsiteDnsAccount{
@@ -56,7 +58,7 @@ func (w WebsiteDnsAccountService) Update(update dto.WebsiteDnsAccountUpdate) (dt
 		Type:          update.Type,
 		Authorization: string(authorization),
 	}); err != nil {
-		return dto.WebsiteDnsAccountUpdate{}, err
+		return request.WebsiteDnsAccountUpdate{}, err
 	}
 
 	return update, nil
