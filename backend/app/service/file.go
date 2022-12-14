@@ -2,13 +2,14 @@ package service
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
@@ -19,8 +20,8 @@ import (
 type FileService struct {
 }
 
-func (f FileService) GetFileList(op dto.FileOption) (dto.FileInfo, error) {
-	var fileInfo dto.FileInfo
+func (f FileService) GetFileList(op request.FileOption) (response.FileInfo, error) {
+	var fileInfo response.FileInfo
 	if _, err := os.Stat(op.Path); err != nil && os.IsNotExist(err) {
 		return fileInfo, nil
 	}
@@ -32,20 +33,20 @@ func (f FileService) GetFileList(op dto.FileOption) (dto.FileInfo, error) {
 	return fileInfo, nil
 }
 
-func (f FileService) GetFileTree(op dto.FileOption) ([]dto.FileTree, error) {
-	var treeArray []dto.FileTree
+func (f FileService) GetFileTree(op request.FileOption) ([]response.FileTree, error) {
+	var treeArray []response.FileTree
 	info, err := files.NewFileInfo(op.FileOption)
 	if err != nil {
 		return nil, err
 	}
-	node := dto.FileTree{
+	node := response.FileTree{
 		ID:   common.GetUuid(),
 		Name: info.Name,
 		Path: info.Path,
 	}
 	for _, v := range info.Items {
 		if v.IsDir {
-			node.Children = append(node.Children, dto.FileTree{
+			node.Children = append(node.Children, response.FileTree{
 				ID:   common.GetUuid(),
 				Name: v.Name,
 				Path: v.Path,
@@ -55,7 +56,7 @@ func (f FileService) GetFileTree(op dto.FileOption) ([]dto.FileTree, error) {
 	return append(treeArray, node), nil
 }
 
-func (f FileService) Create(op dto.FileCreate) error {
+func (f FileService) Create(op request.FileCreate) error {
 
 	fo := files.NewFileOp()
 	if fo.Stat(op.Path) {
@@ -72,7 +73,7 @@ func (f FileService) Create(op dto.FileCreate) error {
 	}
 }
 
-func (f FileService) Delete(op dto.FileDelete) error {
+func (f FileService) Delete(op request.FileDelete) error {
 	fo := files.NewFileOp()
 	if op.IsDir {
 		return fo.DeleteDir(op.Path)
@@ -81,7 +82,7 @@ func (f FileService) Delete(op dto.FileDelete) error {
 	}
 }
 
-func (f FileService) BatchDelete(op dto.FileBatchDelete) error {
+func (f FileService) BatchDelete(op request.FileBatchDelete) error {
 	fo := files.NewFileOp()
 	if op.IsDir {
 		for _, file := range op.Paths {
@@ -99,12 +100,12 @@ func (f FileService) BatchDelete(op dto.FileBatchDelete) error {
 	return nil
 }
 
-func (f FileService) ChangeMode(op dto.FileCreate) error {
+func (f FileService) ChangeMode(op request.FileCreate) error {
 	fo := files.NewFileOp()
 	return fo.Chmod(op.Path, fs.FileMode(op.Mode))
 }
 
-func (f FileService) Compress(c dto.FileCompress) error {
+func (f FileService) Compress(c request.FileCompress) error {
 	fo := files.NewFileOp()
 	if !c.Replace && fo.Stat(filepath.Join(c.Dst, c.Name)) {
 		return errors.New("file is exist")
@@ -113,20 +114,20 @@ func (f FileService) Compress(c dto.FileCompress) error {
 	return fo.Compress(c.Files, c.Dst, c.Name, files.CompressType(c.Type))
 }
 
-func (f FileService) DeCompress(c dto.FileDeCompress) error {
+func (f FileService) DeCompress(c request.FileDeCompress) error {
 	fo := files.NewFileOp()
 	return fo.Decompress(c.Path, c.Dst, files.CompressType(c.Type))
 }
 
-func (f FileService) GetContent(op dto.FileOption) (dto.FileInfo, error) {
+func (f FileService) GetContent(op request.FileOption) (response.FileInfo, error) {
 	info, err := files.NewFileInfo(op.FileOption)
 	if err != nil {
-		return dto.FileInfo{}, err
+		return response.FileInfo{}, err
 	}
-	return dto.FileInfo{FileInfo: *info}, nil
+	return response.FileInfo{FileInfo: *info}, nil
 }
 
-func (f FileService) SaveContent(edit dto.FileEdit) error {
+func (f FileService) SaveContent(edit request.FileEdit) error {
 
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:   edit.Path,
@@ -140,18 +141,18 @@ func (f FileService) SaveContent(edit dto.FileEdit) error {
 	return fo.WriteFile(edit.Path, strings.NewReader(edit.Content), info.FileMode)
 }
 
-func (f FileService) ChangeName(re dto.FileRename) error {
+func (f FileService) ChangeName(req request.FileRename) error {
 	fo := files.NewFileOp()
-	return fo.Rename(re.OldName, re.NewName)
+	return fo.Rename(req.OldName, req.NewName)
 }
 
-func (f FileService) Wget(w dto.FileWget) (string, error) {
+func (f FileService) Wget(w request.FileWget) (string, error) {
 	fo := files.NewFileOp()
 	key := "file-wget-" + uuid.NewV4().String()
 	return key, fo.DownloadFileWithProcess(w.Url, filepath.Join(w.Path, w.Name), key)
 }
 
-func (f FileService) MvFile(m dto.FileMove) error {
+func (f FileService) MvFile(m request.FileMove) error {
 	fo := files.NewFileOp()
 	if m.Type == "cut" {
 		return fo.Cut(m.OldPaths, m.NewPath)
@@ -177,7 +178,7 @@ func (f FileService) MvFile(m dto.FileMove) error {
 	return nil
 }
 
-func (f FileService) FileDownload(d dto.FileDownload) (string, error) {
+func (f FileService) FileDownload(d request.FileDownload) (string, error) {
 	tempPath := filepath.Join(os.TempDir(), fmt.Sprintf("%d", time.Now().UnixNano()))
 	if err := os.MkdirAll(tempPath, os.ModePerm); err != nil {
 		return "", err
@@ -190,11 +191,11 @@ func (f FileService) FileDownload(d dto.FileDownload) (string, error) {
 	return filePath, nil
 }
 
-func (f FileService) DirSize(req dto.DirSizeReq) (dto.DirSizeRes, error) {
+func (f FileService) DirSize(req request.DirSizeReq) (response.DirSizeRes, error) {
 	fo := files.NewFileOp()
 	size, err := fo.GetDirSize(req.Path)
 	if err != nil {
-		return dto.DirSizeRes{}, err
+		return response.DirSizeRes{}, err
 	}
-	return dto.DirSizeRes{Size: size}, nil
+	return response.DirSizeRes{Size: size}, nil
 }
