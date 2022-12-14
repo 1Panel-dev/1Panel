@@ -1,8 +1,10 @@
 package main
 
 import (
-	"github.com/1Panel-dev/1Panel/backend/server"
+	"fmt"
+	"github.com/1Panel-dev/1Panel/cmd/server/cmd"
 	_ "github.com/1Panel-dev/1Panel/cmd/server/docs"
+	"os"
 )
 
 // @title 1Panel
@@ -18,5 +20,8 @@ import (
 
 //go:generate swag init -o ./docs -d ../../backend/app/api/v1 -g ../../../../cmd/server/main.go
 func main() {
-	server.Start()
+	if err := cmd.RootCmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 }
