@@ -143,6 +143,8 @@ export default {
             removing: 'removing',
             paused: 'paused',
             exited: 'exited',
+            enabled: 'Enabled',
+            disabled: 'Disabled',
         },
     },
     menu: {
@@ -469,6 +471,9 @@ export default {
     },
     cronjob: {
         cronTask: 'Task',
+        changeStatus: 'Change status',
+        disableMsg: 'The cronjob cannot continue to run after it is stopped. Do you want to stop it?',
+        enableMsg: 'The cronjob has been stopped. Enable now?',
         taskType: 'Task type',
         shell: 'shell',
         website: 'website',
@@ -495,6 +500,7 @@ export default {
         perWeek: 'Per week',
         perHour: 'Per hour',
         perNDay: 'Every N days',
+        perDay: 'Every days',
         perNHour: 'Every N hours',
         perNMinute: 'Every N minutes',
         per: 'Every ',

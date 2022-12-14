@@ -32,6 +32,7 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 		if errExec != nil {
 			err = errors.New(string(stdout))
 		}
+		message = stdout
 	case "website":
 		record.File, err = u.HandleBackup(cronjob, record.StartTime)
 	case "database":
@@ -61,9 +62,11 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 		cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), string(message))
 		return
 	}
-	record.Records, err = mkdirAndWriteFile(cronjob, record.StartTime, message)
-	if err != nil {
-		global.LOG.Errorf("save file %s failed, err: %v", record.Records, err)
+	if len(message) != 0 {
+		record.Records, err = mkdirAndWriteFile(cronjob, record.StartTime, message)
+		if err != nil {
+			global.LOG.Errorf("save file %s failed, err: %v", record.Records, err)
+		}
 	}
 	cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
 }
@@ -143,8 +146,11 @@ func (u *CronjobService) HandleDelete(id uint) error {
 	global.Cron.Remove(cron.EntryID(cronjob.EntryID))
 	_ = cronjobRepo.DeleteRecord(cronjobRepo.WithByJobID(int(id)))
 
-	if err := os.RemoveAll(fmt.Sprintf("%s/%s-%v", constant.TaskDir, commonDir, cronjob.ID)); err != nil {
-		global.LOG.Errorf("rm file %s/%s-%v failed, err: %v", constant.TaskDir, commonDir, cronjob.ID, err)
+	dir := fmt.Sprintf("%s/%s/%s", constant.TaskDir, cronjob.Type, cronjob.Name)
+	if _, err := os.Stat(dir); err == nil {
+		if err := os.RemoveAll(dir); err != nil {
+			global.LOG.Errorf("rm file %s/%s failed, err: %v", constant.TaskDir, commonDir, err)
+		}
 	}
 	return nil
 }

@@ -191,35 +191,26 @@
                                 </el-form-item>
                             </el-col>
                         </el-row>
-                        <el-row>
+                        <el-row v-if="currentRecord?.records">
                             <el-col :span="24">
                                 <el-form-item :label="$t('commons.table.records')">
-                                    <span style="color: red" v-if="currentRecord?.status! === 'Failed'">
-                                        {{ currentRecord?.message }}
-                                    </span>
-                                    <div v-else>
-                                        <el-popover
-                                            placement="right"
-                                            :width="600"
-                                            trigger="click"
-                                            style="white-space: pre-wrap"
-                                        >
-                                            <div style="margin-left: 20px; max-height: 400px; overflow: auto">
-                                                <span style="white-space: pre-wrap">
-                                                    {{ currentRecordDetail }}
-                                                </span>
-                                            </div>
-                                            <template #reference>
-                                                <el-button
-                                                    type="primary"
-                                                    link
-                                                    @click="loadRecord(currentRecord?.records!)"
-                                                >
-                                                    {{ $t('commons.button.expand') }}
-                                                </el-button>
-                                            </template>
-                                        </el-popover>
-                                    </div>
+                                    <el-popover
+                                        placement="right"
+                                        :width="600"
+                                        trigger="click"
+                                        style="white-space: pre-wrap"
+                                    >
+                                        <div style="margin-left: 20px; max-height: 400px; overflow: auto">
+                                            <span style="white-space: pre-wrap">
+                                                {{ currentRecordDetail }}
+                                            </span>
+                                        </div>
+                                        <template #reference>
+                                            <el-button type="primary" link @click="loadRecord(currentRecord?.records!)">
+                                                {{ $t('commons.button.expand') }}
+                                            </el-button>
+                                        </template>
+                                    </el-popover>
                                 </el-form-item>
                             </el-col>
                         </el-row>
