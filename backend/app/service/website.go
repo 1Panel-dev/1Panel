@@ -477,7 +477,7 @@ func (w WebsiteService) OpWebsiteHTTPS(req request.WebsiteHTTPSOp) (response.Web
 			}
 		}
 
-		websiteSSL.Provider = dto.Manual
+		websiteSSL.Provider = constant.Manual
 		websiteSSL.PrivateKey = req.PrivateKey
 		websiteSSL.Pem = req.Certificate
 
