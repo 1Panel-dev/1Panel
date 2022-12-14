@@ -34,6 +34,6 @@ export const download = (params: Cronjob.Download) => {
     return http.download<BlobPart>(`cronjobs/download`, params, { responseType: 'blob' });
 };
 
-export const handleOnce = (params: number) => {
-    return http.post(`cronjobs/handle/${params}`);
+export const handleOnce = (id: number) => {
+    return http.post(`cronjobs/handle`, { id: id });
 };

@@ -146,6 +146,8 @@ export default {
             paused: '暂停',
             exited: '停止',
             installing: '安装中',
+            enabled: '已启用',
+            disabled: '已停止',
         },
     },
     menu: {
@@ -481,6 +483,9 @@ export default {
     },
     cronjob: {
         cronTask: '计划任务',
+        changeStatus: '状态修改',
+        disableMsg: '计划任务停止后将无法继续运行，是否停止？',
+        enableMsg: '该计划任务已停止，是否启用？',
         taskType: '任务类型',
         shell: 'Shell 脚本',
         website: '备份网站',
@@ -507,6 +512,7 @@ export default {
         perWeek: '每周',
         perHour: '每小时',
         perNDay: '每隔 N 日',
+        perDay: '每天',
         perNHour: '每隔 N 时',
         perNMinute: '每隔 N 分钟',
         per: '每隔',

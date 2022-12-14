@@ -262,7 +262,7 @@ func (u *CronjobService) AddCronJob(cronjob *model.Cronjob) (int, error) {
 }
 
 func mkdirAndWriteFile(cronjob *model.Cronjob, startTime time.Time, msg []byte) (string, error) {
-	dir := fmt.Sprintf("%s/%s/%s-%v", constant.TaskDir, cronjob.Type, cronjob.Name, cronjob.ID)
+	dir := fmt.Sprintf("%s/%s/%s", constant.TaskDir, cronjob.Type, cronjob.Name)
 	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
 			return "", err
@@ -289,6 +289,8 @@ func loadSpec(cronjob model.Cronjob) string {
 		return fmt.Sprintf("%v %v * * %v", cronjob.Minute, cronjob.Hour, cronjob.Week)
 	case "perNDay":
 		return fmt.Sprintf("%v %v */%v * *", cronjob.Minute, cronjob.Hour, cronjob.Day)
+	case "perDay":
+		return fmt.Sprintf("%v %v * * *", cronjob.Minute, cronjob.Hour)
 	case "perNHour":
 		return fmt.Sprintf("%v */%v * * *", cronjob.Minute, cronjob.Hour)
 	case "perHour":

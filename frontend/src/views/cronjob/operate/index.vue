@@ -226,6 +226,16 @@ const varifySpec = (rule: any, value: any, callback: any) => {
                 callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
             }
             break;
+        case 'perDay':
+            if (
+                !(
+                    Number.isInteger(dialogData.value.rowData!.hour) &&
+                    Number.isInteger(dialogData.value.rowData!.minute)
+                )
+            ) {
+                callback(new Error(i18n.global.t('cronjob.cronSpecRule')));
+            }
+            break;
         case 'perNHour':
             if (
                 !(
@@ -250,6 +260,7 @@ const specOptions = [
     { label: i18n.global.t('cronjob.perMonth'), value: 'perMonth' },
     { label: i18n.global.t('cronjob.perWeek'), value: 'perWeek' },
     { label: i18n.global.t('cronjob.perNDay'), value: 'perNDay' },
+    { label: i18n.global.t('cronjob.perDay'), value: 'perDay' },
     { label: i18n.global.t('cronjob.perNHour'), value: 'perNHour' },
     { label: i18n.global.t('cronjob.perHour'), value: 'perHour' },
     { label: i18n.global.t('cronjob.perNMinute'), value: 'perNMinute' },
@@ -341,7 +352,7 @@ function changeName(isChangeType: boolean, type: string) {
             }
         }
     }
-    dialogData.value.rowData!.name = `${type}-test`;
+    dialogData.value.rowData!.name = `${type}_test`;
 }
 
 const onSubmit = async (formEl: FormInstance | undefined) => {

@@ -19,15 +19,18 @@
             <el-table-column :label="$t('cronjob.taskName')" prop="name" />
             <el-table-column :label="$t('commons.table.status')" prop="status">
                 <template #default="{ row }">
-                    <el-switch
-                        @change="onChangeStatus(row)"
-                        :before-change="beforeChangeStatus"
-                        v-model="row.status"
-                        inline-prompt
-                        size="default"
-                        active-value="Enable"
-                        inactive-value="Disable"
-                    />
+                    <el-button
+                        v-if="row.status === 'Enable'"
+                        @click="onChangeStatus(row.id, 'disable')"
+                        link
+                        type="success"
+                        icon="VideoPlay"
+                    >
+                        {{ $t('commons.status.enabled') }}
+                    </el-button>
+                    <el-button v-else link type="danger" @click="onChangeStatus(row.id, 'enable')" icon="VideoPause">
+                        {{ $t('commons.status.disabled') }}
+                    </el-button>
                 </template>
             </el-table-column>
             <el-table-column :label="$t('cronjob.cronSpec')">
@@ -90,10 +93,9 @@ import { loadBackupName } from '@/views/setting/helper';
 import i18n from '@/lang';
 import { Cronjob } from '@/api/interface/cronjob';
 import { useDeleteData } from '@/hooks/use-delete-data';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 
 const selects = ref<any>([]);
-const switchState = ref<boolean>(false);
 
 const data = ref();
 const paginationConfig = reactive({
@@ -164,17 +166,19 @@ const onBatchDelete = async (row: Cronjob.CronjobInfo | null) => {
     await useDeleteData(deleteCronjob, { ids: ids }, 'commons.msg.delete');
     search();
 };
-const beforeChangeStatus = () => {
-    switchState.value = true;
-    return switchState.value;
-};
-const onChangeStatus = async (row: Cronjob.CronjobInfo) => {
-    if (switchState.value) {
-        await updateStatus({ id: row.id, status: row.status });
+
+const onChangeStatus = async (id: number, status: string) => {
+    ElMessageBox.confirm(i18n.global.t('cronjob.' + status + 'Msg'), i18n.global.t('cronjob.changeStatus'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).then(async () => {
+        let itemStatus = status === 'enable' ? 'Enable' : 'Disable';
+        await updateStatus({ id: id, status: itemStatus });
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         search();
-    }
+    });
 };
+
 const onHandle = async (row: Cronjob.CronjobInfo) => {
     await handleOnce(row.id);
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
