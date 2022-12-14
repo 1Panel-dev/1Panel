@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"io/ioutil"
 	"os"
 	"path"
@@ -27,7 +29,7 @@ import (
 type AppInstallService struct {
 }
 
-func (a AppInstallService) Page(req dto.AppInstalledRequest) (int64, []dto.AppInstalled, error) {
+func (a AppInstallService) Page(req request.AppInstalledSearch) (int64, []response.AppInstalledDTO, error) {
 	var opts []repo.DBOption
 
 	if req.Name != "" {
@@ -47,9 +49,9 @@ func (a AppInstallService) Page(req dto.AppInstalledRequest) (int64, []dto.AppIn
 	return total, installDTOs, nil
 }
 
-func (a AppInstallService) CheckExist(key string) (*dto.CheckInstalled, error) {
+func (a AppInstallService) CheckExist(key string) (*response.AppInstalledCheck, error) {
 
-	res := &dto.CheckInstalled{
+	res := &response.AppInstalledCheck{
 		IsExist: false,
 	}
 	app, err := appRepo.GetFirst(appRepo.WithKey(key))
@@ -87,7 +89,7 @@ func (a AppInstallService) LoadPort(key string) (int64, error) {
 	return app.Port, nil
 }
 
-func (a AppInstallService) Search(req dto.AppInstalledRequest) ([]dto.AppInstalled, error) {
+func (a AppInstallService) Search(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error) {
 	var installs []model.AppInstall
 	var err error
 	if req.Type != "" {
@@ -113,7 +115,7 @@ func (a AppInstallService) Search(req dto.AppInstalledRequest) ([]dto.AppInstall
 	return handleInstalled(installs)
 }
 
-func (a AppInstallService) Operate(req dto.AppInstallOperate) error {
+func (a AppInstallService) Operate(req request.AppInstalledOperate) error {
 	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallId))
 	if err != nil {
 		return err
@@ -122,25 +124,25 @@ func (a AppInstallService) Operate(req dto.AppInstallOperate) error {
 	dockerComposePath := install.GetComposePath()
 
 	switch req.Operate {
-	case dto.Up:
+	case constant.Up:
 		out, err := compose.Up(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
 		}
 		install.Status = constant.Running
-	case dto.Down:
+	case constant.Down:
 		out, err := compose.Stop(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
 		}
 		install.Status = constant.Stopped
-	case dto.Restart:
+	case constant.Restart:
 		out, err := compose.Restart(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
 		}
 		install.Status = constant.Running
-	case dto.Delete:
+	case constant.Delete:
 		tx, ctx := getTxAndContext()
 		if err := deleteAppInstall(ctx, install); err != nil {
 			tx.Rollback()
@@ -148,9 +150,9 @@ func (a AppInstallService) Operate(req dto.AppInstallOperate) error {
 		}
 		tx.Commit()
 		return nil
-	case dto.Sync:
+	case constant.Sync:
 		return syncById(install.ID)
-	case dto.Backup:
+	case constant.Backup:
 		tx, ctx := getTxAndContext()
 		if err := backupInstall(ctx, install); err != nil {
 			tx.Rollback()
@@ -158,9 +160,9 @@ func (a AppInstallService) Operate(req dto.AppInstallOperate) error {
 		}
 		tx.Commit()
 		return nil
-	case dto.Restore:
+	case constant.Restore:
 		return restoreInstall(install, req.BackupId)
-	case dto.Update:
+	case constant.Update:
 		return updateInstall(install.ID, req.DetailId)
 	default:
 		return errors.New("operate not support")
@@ -184,11 +186,11 @@ func (a AppInstallService) SyncAll() error {
 	return nil
 }
 
-func (a AppInstallService) PageInstallBackups(req dto.AppBackupRequest) (int64, []model.AppInstallBackup, error) {
+func (a AppInstallService) PageInstallBackups(req request.AppBackupSearch) (int64, []model.AppInstallBackup, error) {
 	return appInstallBackupRepo.Page(req.Page, req.PageSize, appInstallBackupRepo.WithAppInstallID(req.AppInstallID))
 }
 
-func (a AppInstallService) DeleteBackup(req dto.AppBackupDeleteRequest) error {
+func (a AppInstallService) DeleteBackup(req request.AppBackupDelete) error {
 
 	backups, err := appInstallBackupRepo.GetBy(commonRepo.WithIdsIn(req.Ids))
 	if err != nil {
@@ -213,7 +215,7 @@ func (a AppInstallService) DeleteBackup(req dto.AppBackupDeleteRequest) error {
 	return nil
 }
 
-func (a AppInstallService) GetServices(key string) ([]dto.AppService, error) {
+func (a AppInstallService) GetServices(key string) ([]response.AppService, error) {
 	app, err := appRepo.GetFirst(appRepo.WithKey(key))
 	if err != nil {
 		return nil, err
@@ -222,13 +224,13 @@ func (a AppInstallService) GetServices(key string) ([]dto.AppService, error) {
 	if err != nil {
 		return nil, err
 	}
-	var res []dto.AppService
+	var res []response.AppService
 	for _, install := range installs {
 		paramMap := make(map[string]string)
 		if install.Param != "" {
 			_ = json.Unmarshal([]byte(install.Param), &paramMap)
 		}
-		res = append(res, dto.AppService{
+		res = append(res, response.AppService{
 			Label:  install.Name,
 			Value:  install.ServiceName,
 			Config: paramMap,
@@ -262,7 +264,7 @@ func (a AppInstallService) GetUpdateVersions(installId uint) ([]dto.AppVersion, 
 	return versions, nil
 }
 
-func (a AppInstallService) ChangeAppPort(req dto.PortUpdate) error {
+func (a AppInstallService) ChangeAppPort(req request.PortUpdate) error {
 	return updateInstallInfoInDB(req.Key, "port", true, strconv.FormatInt(req.Port, 10))
 }
 

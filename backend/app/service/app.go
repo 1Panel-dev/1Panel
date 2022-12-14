@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -22,7 +24,7 @@ import (
 type AppService struct {
 }
 
-func (a AppService) PageApp(req dto.AppRequest) (interface{}, error) {
+func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 
 	var opts []repo.DBOption
 	opts = append(opts, commonRepo.WithOrderBy("name"))
@@ -52,14 +54,14 @@ func (a AppService) PageApp(req dto.AppRequest) (interface{}, error) {
 
 		opts = append(opts, commonRepo.WithIdsIn(appIds))
 	}
-	var res dto.AppRes
+	var res response.AppRes
 	total, apps, err := appRepo.Page(req.Page, req.PageSize, opts...)
 	if err != nil {
 		return nil, err
 	}
-	var appDTOs []*dto.AppDTO
+	var appDTOs []*response.AppDTO
 	for _, a := range apps {
-		appDTO := &dto.AppDTO{
+		appDTO := &response.AppDTO{
 			App: a,
 		}
 		appDTOs = append(appDTOs, appDTO)
@@ -88,8 +90,8 @@ func (a AppService) PageApp(req dto.AppRequest) (interface{}, error) {
 	return res, nil
 }
 
-func (a AppService) GetApp(id uint) (dto.AppDTO, error) {
-	var appDTO dto.AppDTO
+func (a AppService) GetApp(id uint) (response.AppDTO, error) {
+	var appDTO response.AppDTO
 	app, err := appRepo.GetFirst(commonRepo.WithByID(id))
 	if err != nil {
 		return appDTO, err
@@ -109,10 +111,9 @@ func (a AppService) GetApp(id uint) (dto.AppDTO, error) {
 	return appDTO, nil
 }
 
-func (a AppService) GetAppDetail(appId uint, version string) (dto.AppDetailDTO, error) {
-
+func (a AppService) GetAppDetail(appId uint, version string) (response.AppDetailDTO, error) {
 	var (
-		appDetailDTO dto.AppDetailDTO
+		appDetailDTO response.AppDetailDTO
 		opts         []repo.DBOption
 	)
 

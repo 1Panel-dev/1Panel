@@ -2,6 +2,7 @@ package v1
 
 import (
 	"errors"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"reflect"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
@@ -12,7 +13,7 @@ import (
 )
 
 func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
-	var req dto.AppInstalledRequest
+	var req request.AppInstalledSearch
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -68,7 +69,6 @@ func (b *BaseApi) LoadPort(c *gin.Context) {
 }
 
 func (b *BaseApi) DeleteCheck(c *gin.Context) {
-
 	appInstallId, err := helper.GetIntParamByKey(c, "appInstallId")
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
@@ -92,7 +92,7 @@ func (b *BaseApi) SyncInstalled(c *gin.Context) {
 }
 
 func (b *BaseApi) SearchInstalledBackup(c *gin.Context) {
-	var req dto.AppBackupRequest
+	var req request.AppBackupSearch
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -110,7 +110,7 @@ func (b *BaseApi) SearchInstalledBackup(c *gin.Context) {
 }
 
 func (b *BaseApi) OperateInstalled(c *gin.Context) {
-	var req dto.AppInstallOperate
+	var req request.AppInstalledOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -124,7 +124,7 @@ func (b *BaseApi) OperateInstalled(c *gin.Context) {
 }
 
 func (b *BaseApi) DeleteAppBackup(c *gin.Context) {
-	var req dto.AppBackupDeleteRequest
+	var req request.AppBackupDelete
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -137,7 +137,6 @@ func (b *BaseApi) DeleteAppBackup(c *gin.Context) {
 }
 
 func (b *BaseApi) GetServices(c *gin.Context) {
-
 	key := c.Param("key")
 	services, err := appInstallService.GetServices(key)
 	if err != nil {
@@ -149,7 +148,6 @@ func (b *BaseApi) GetServices(c *gin.Context) {
 }
 
 func (b *BaseApi) GetUpdateVersions(c *gin.Context) {
-
 	appInstallId, err := helper.GetIntParamByKey(c, "appInstallId")
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
@@ -166,7 +164,7 @@ func (b *BaseApi) GetUpdateVersions(c *gin.Context) {
 }
 
 func (b *BaseApi) ChangeAppPort(c *gin.Context) {
-	var req dto.PortUpdate
+	var req request.PortUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

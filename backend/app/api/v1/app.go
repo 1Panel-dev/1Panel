@@ -2,24 +2,22 @@ package v1
 
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
-	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/gin-gonic/gin"
 )
 
 func (b *BaseApi) SearchApp(c *gin.Context) {
-	var req dto.AppRequest
+	var req request.AppSearch
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-
 	list, err := appService.PageApp(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-
 	helper.SuccessWithData(c, list)
 }
 
@@ -32,7 +30,6 @@ func (b *BaseApi) SyncApp(c *gin.Context) {
 }
 
 func (b *BaseApi) GetApp(c *gin.Context) {
-
 	id, err := helper.GetParamID(c)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
@@ -46,13 +43,11 @@ func (b *BaseApi) GetApp(c *gin.Context) {
 	helper.SuccessWithData(c, appDTO)
 }
 func (b *BaseApi) GetAppDetail(c *gin.Context) {
-
 	appId, err := helper.GetIntParamByKey(c, "appId")
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
 		return
 	}
-
 	version := c.Param("version")
 	appDetailDTO, err := appService.GetAppDetail(appId, version)
 	if err != nil {
@@ -63,7 +58,7 @@ func (b *BaseApi) GetAppDetail(c *gin.Context) {
 }
 
 func (b *BaseApi) InstallApp(c *gin.Context) {
-	var req dto.AppInstallRequest
+	var req request.AppInstallCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -73,6 +68,5 @@ func (b *BaseApi) InstallApp(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-
 	helper.SuccessWithData(c, install)
 }

@@ -16,3 +16,16 @@ const (
 	AppMysql = "mysql"
 	AppRedis = "redis"
 )
+
+type AppOperate string
+
+var (
+	Up      AppOperate = "up"
+	Down    AppOperate = "down"
+	Restart AppOperate = "restart"
+	Delete  AppOperate = "delete"
+	Sync    AppOperate = "sync"
+	Backup  AppOperate = "backup"
+	Restore AppOperate = "restore"
+	Update  AppOperate = "update"
+)
