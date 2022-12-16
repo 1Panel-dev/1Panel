@@ -206,7 +206,6 @@ func (c *AcmeClient) GetDNSResolve(domains []string) (map[string]Resolve, error)
 	resolves := make(map[string]Resolve)
 	resc, errc := make(chan acme.Authorization), make(chan domainError)
 	for _, authzURL := range order.Authorizations {
-
 		go func(authzURL string) {
 			authz, err := core.Authorizations.Get(authzURL)
 			if err != nil {
@@ -215,7 +214,6 @@ func (c *AcmeClient) GetDNSResolve(domains []string) (map[string]Resolve, error)
 			}
 			resc <- authz
 		}(authzURL)
-
 	}
 
 	var responses []acme.Authorization
