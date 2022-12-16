@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -171,7 +172,7 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error paths in request"))
 		return
 	}
-	dir := paths[0][:strings.LastIndex(paths[0], "/")]
+	dir := path.Dir(paths[0])
 	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
 			if err != nil {
@@ -181,15 +182,21 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 		}
 	}
 	success := 0
+	failures := make(buserr.MultiErr)
 	for _, file := range files {
-		err := c.SaveUploadedFile(file, path.Join(paths[0], file.Filename))
-		if err != nil {
-			global.LOG.Errorf("upload [%s] file failed, err: %v", file.Filename, err)
+		if err := c.SaveUploadedFile(file, path.Join(paths[0], file.Filename)); err != nil {
+			e := fmt.Errorf("upload [%s] file failed, err: %v", file.Filename, err)
+			failures[file.Filename] = e
+			global.LOG.Error(e)
 			continue
 		}
 		success++
 	}
-	helper.SuccessWithMsg(c, fmt.Sprintf("%d files upload success", success))
+	if success == 0 {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, failures)
+	} else {
+		helper.SuccessWithMsg(c, fmt.Sprintf("%d files upload success", success))
+	}
 }
 
 func (b *BaseApi) ChangeFileName(c *gin.Context) {
