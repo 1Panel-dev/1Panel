@@ -87,13 +87,7 @@ func (b *BaseApi) UpdateRepo(c *gin.Context) {
 		return
 	}
 
-	upMap := make(map[string]interface{})
-	upMap["download_url"] = req.DownloadUrl
-	upMap["protocol"] = req.Protocol
-	upMap["username"] = req.Username
-	upMap["password"] = req.Password
-	upMap["auth"] = req.Auth
-	if err := imageRepoService.Update(req.ID, upMap); err != nil {
+	if err := imageRepoService.Update(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

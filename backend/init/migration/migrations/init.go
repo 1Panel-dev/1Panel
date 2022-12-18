@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
@@ -167,6 +168,7 @@ var AddTableImageRepo = &gormigrate.Migration{
 		item := &model.ImageRepo{
 			Name:        "Docker Hub",
 			DownloadUrl: "docker.io",
+			Status:      constant.StatusSuccess,
 		}
 		if err := tx.Create(item).Error; err != nil {
 			return err

@@ -28,6 +28,9 @@ type ImageRepoInfo struct {
 	Protocol    string    `json:"protocol"`
 	Username    string    `json:"username"`
 	Auth        bool      `json:"auth"`
+
+	Status  string `json:"status"`
+	Message string `json:"message"`
 }
 
 type ImageRepoOption struct {

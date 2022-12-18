@@ -65,9 +65,6 @@
                                 v-model="form.registries"
                             />
                         </el-form-item>
-                        <el-form-item label="bip">
-                            <el-input clearable v-model="form.bip" />
-                        </el-form-item>
                         <el-form-item label="live-restore" prop="liveRestore">
                             <el-switch v-model="form.liveRestore"></el-switch>
                             <span class="input-help">{{ $t('container.liveHelper') }}</span>
@@ -138,7 +135,6 @@ const loadLoadDir = async (path: string) => {
 
 const form = reactive({
     status: '',
-    bip: '',
     mirrors: '',
     registries: '',
     liveRestore: false,
@@ -212,7 +208,6 @@ const onSubmitSave = async () => {
     let itemRegistries = form.registries.split('\n');
     let param = {
         status: form.status,
-        bip: form.bip,
         registryMirrors: itemMirrors.filter(function (el) {
             return el !== null && el !== '' && el !== undefined;
         }),
@@ -254,7 +249,6 @@ const changeMode = async () => {
 
 const search = async () => {
     const res = await loadDaemonJson();
-    form.bip = res.data.bip;
     form.status = res.data.status;
     form.cgroupDriver = res.data.cgroupDriver;
     form.liveRestore = res.data.liveRestore;

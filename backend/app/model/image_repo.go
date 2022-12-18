@@ -9,4 +9,7 @@ type ImageRepo struct {
 	Username    string `gorm:"type:varchar(256)" json:"username"`
 	Password    string `gorm:"type:varchar(256)" json:"password"`
 	Auth        bool   `gorm:"type:varchar(256)" json:"auth"`
+
+	Status  string `gorm:"type:varchar(64)" json:"status"`
+	Message string `gorm:"type:varchar(256)" json:"message"`
 }
