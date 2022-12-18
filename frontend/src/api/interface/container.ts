@@ -240,7 +240,6 @@ export namespace Container {
     }
     export interface DaemonJsonConf {
         status: string;
-        bip: string;
         registryMirrors: Array<string>;
         insecureRegistries: Array<string>;
         liveRestore: boolean;

@@ -31,18 +31,17 @@ type daemonJsonItem struct {
 	Status      string   `json:"status"`
 	Mirrors     []string `json:"registry-mirrors"`
 	Registries  []string `json:"insecure-registries"`
-	Bip         string   `json:"bip"`
 	LiveRestore bool     `json:"live-restore"`
 	ExecOpts    []string `json:"exec-opts"`
 }
 
 func (u *DockerService) LoadDockerStatus() string {
 	status := constant.StatusRunning
-	cmd := exec.Command("systemctl", "is-active", "docker")
-	stdout, err := cmd.CombinedOutput()
-	if string(stdout) != "active\n" || err != nil {
-		status = constant.Stopped
-	}
+	// cmd := exec.Command("systemctl", "is-active", "docker")
+	// stdout, err := cmd.CombinedOutput()
+	// if string(stdout) != "active\n" || err != nil {
+	// 	status = constant.Stopped
+	// }
 
 	return status
 }
@@ -91,7 +90,6 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 		Status:       status,
 		Mirrors:      conf.Mirrors,
 		Registries:   conf.Registries,
-		Bip:          conf.Bip,
 		LiveRestore:  conf.LiveRestore,
 		CgroupDriver: driver,
 	}
@@ -131,11 +129,6 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 		delete(deamonMap, "registry-mirrors")
 	} else {
 		deamonMap["registry-mirrors"] = req.Mirrors
-	}
-	if len(req.Bip) == 0 {
-		delete(deamonMap, "bip")
-	} else {
-		deamonMap["bip"] = req.Bip
 	}
 	if !req.LiveRestore {
 		delete(deamonMap, "live-restore")

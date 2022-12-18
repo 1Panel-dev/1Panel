@@ -259,10 +259,10 @@ const varifySpec = (rule: any, value: any, callback: any) => {
 const specOptions = [
     { label: i18n.global.t('cronjob.perMonth'), value: 'perMonth' },
     { label: i18n.global.t('cronjob.perWeek'), value: 'perWeek' },
-    { label: i18n.global.t('cronjob.perNDay'), value: 'perNDay' },
     { label: i18n.global.t('cronjob.perDay'), value: 'perDay' },
-    { label: i18n.global.t('cronjob.perNHour'), value: 'perNHour' },
     { label: i18n.global.t('cronjob.perHour'), value: 'perHour' },
+    { label: i18n.global.t('cronjob.perNDay'), value: 'perNDay' },
+    { label: i18n.global.t('cronjob.perNHour'), value: 'perNHour' },
     { label: i18n.global.t('cronjob.perNMinute'), value: 'perNMinute' },
 ];
 const weekOptions = [

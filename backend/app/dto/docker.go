@@ -9,7 +9,6 @@ type DaemonJsonConf struct {
 	Status       string   `json:"status"`
 	Mirrors      []string `json:"registryMirrors"`
 	Registries   []string `json:"insecureRegistries"`
-	Bip          string   `json:"bip"`
 	LiveRestore  bool     `json:"liveRestore"`
 	CgroupDriver string   `json:"cgroupDriver"`
 }

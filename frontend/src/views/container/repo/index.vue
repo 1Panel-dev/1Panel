@@ -28,6 +28,16 @@
                     fix
                 />
                 <el-table-column :label="$t('container.protocol')" prop="protocol" min-width="60" fix />
+                <el-table-column :label="$t('commons.table.status')" prop="status" min-width="60" fix>
+                    <template #default="{ row }">
+                        <el-tag v-if="row.status === 'Success'" type="success">
+                            {{ $t('commons.status.success') }}
+                        </el-tag>
+                        <el-tooltip v-else effect="dark" :content="row.message" placement="bottom">
+                            <el-tag type="danger">{{ $t('commons.status.failed') }}</el-tag>
+                        </el-tooltip>
+                    </template>
+                </el-table-column>
                 <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
                     <template #default="{ row }">
                         {{ dateFromat(0, 0, row.createdAt) }}

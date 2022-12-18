@@ -6,6 +6,7 @@ import (
 	"io"
 	mathRand "math/rand"
 	"net"
+	"reflect"
 	"regexp"
 	"sort"
 	"strconv"
@@ -103,4 +104,15 @@ func ExistWithStrArray(str string, arr []string) bool {
 func IsNum(s string) bool {
 	_, err := strconv.ParseFloat(s, 64)
 	return err == nil
+}
+
+func RemoveRepeatElement(a interface{}) (ret []interface{}) {
+	va := reflect.ValueOf(a)
+	for i := 0; i < va.Len(); i++ {
+		if i > 0 && reflect.DeepEqual(va.Index(i-1).Interface(), va.Index(i).Interface()) {
+			continue
+		}
+		ret = append(ret, va.Index(i).Interface())
+	}
+	return ret
 }

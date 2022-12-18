@@ -43,8 +43,8 @@ func Routers() *gin.Engine {
 	Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	Router.Use(middleware.OperationLog())
-	Router.Use(middleware.CSRF())
-	Router.Use(middleware.LoadCsrfToken())
+	// Router.Use(middleware.CSRF())
+	// Router.Use(middleware.LoadCsrfToken())
 
 	setWebStatic(Router)
 
