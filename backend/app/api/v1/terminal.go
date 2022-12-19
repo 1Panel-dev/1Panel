@@ -79,48 +79,6 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 	}
 }
 
-func (b *BaseApi) LocalWsSsh(c *gin.Context) {
-	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-
-	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		global.LOG.Errorf("gin context http handler failed, err: %v", err)
-		return
-	}
-	defer wsConn.Close()
-
-	slave, err := terminal.NewCommand()
-	if wshandleError(wsConn, err) {
-		return
-	}
-	defer slave.Close()
-
-	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave)
-	if wshandleError(wsConn, err) {
-		return
-	}
-
-	quitChan := make(chan bool, 3)
-	tty.Start(quitChan)
-	go slave.Wait(quitChan)
-
-	<-quitChan
-
-	global.LOG.Info("websocket finished")
-	if wshandleError(wsConn, err) {
-		return
-	}
-}
-
 func wshandleError(ws *websocket.Conn, err error) bool {
 	if err != nil {
 		global.LOG.Errorf("handler ws faled:, err: %v", err)
