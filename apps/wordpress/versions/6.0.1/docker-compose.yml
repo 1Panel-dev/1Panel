@@ -17,7 +17,7 @@ services:
       WORDPRESS_DB_PASSWORD: ${PANEL_DB_USER_PASSWORD}
       WORDPRESS_DEBUG: 1
     labels:
-      createdBy: "apps"
+      createdBy: "Apps"
 
 networks:
   1panel:

@@ -21,7 +21,7 @@ services:
       --explicit_defaults_for_timestamp=true
       --lower_case_table_names=1
     labels:
-      createdBy: "apps"
+      createdBy: "Apps"
 networks:
   1panel:
     external: true

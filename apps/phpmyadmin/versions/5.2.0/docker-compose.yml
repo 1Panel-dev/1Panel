@@ -10,7 +10,7 @@ services:
     networks:
       - 1panel
     labels:
-      createdBy: "apps"
+      createdBy: "Apps"
 
 networks:
   1panel:

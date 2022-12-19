@@ -16,7 +16,7 @@ services:
       - ./conf/my.cnf:/etc/my.cnf
       - ./log:/var/log/mysql
     labels:
-      createdBy: "apps"
+      createdBy: "Apps"
 
 networks:
   1panel:

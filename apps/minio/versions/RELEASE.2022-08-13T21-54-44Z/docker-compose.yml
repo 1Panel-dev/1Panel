@@ -20,6 +20,8 @@ services:
         - 1panel
       volumes:
         - ./data:/data
+      labels:
+        createdBy: "Apps"
 
 networks:
   1panel:
