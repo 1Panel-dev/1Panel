@@ -12,7 +12,7 @@ services:
     ports:
       - ${PANEL_APP_PORT_HTTP}:8081
     labels:
-      createdBy: "apps"
+      createdBy: "Apps"
 networks:
   1panel:
     external: true

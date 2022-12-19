@@ -11,4 +11,4 @@ services:
       - ./www:/www
       - ./root:/usr/share/nginx/html
     labels:
-      createdBy: "apps"
+      createdBy: "Apps"

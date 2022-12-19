@@ -19,7 +19,7 @@ services:
       HALO_ADMIN_PATH: admin
       HALO_CACHE: memory
     labels:
-      createdBy: "apps"
+      createdBy: "Apps"
 networks:
   1panel:
     external: true

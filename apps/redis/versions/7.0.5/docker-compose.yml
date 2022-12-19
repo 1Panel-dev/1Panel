@@ -13,7 +13,7 @@ services:
       - ./conf/redis.conf:/etc/redis/redis.conf
       - ./logs:/logs
     labels:
-      createdBy: "apps"
+      createdBy: "Apps"
 
 networks:
   1panel:
