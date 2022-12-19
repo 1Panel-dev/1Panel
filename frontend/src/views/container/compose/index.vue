@@ -34,7 +34,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('container.from')" prop="createdBy" min-width="80" fix>
                         <template #default="{ row }">
-                            <span v-if="row.createdBy === ''">local</span>
+                            <span v-if="row.createdBy === ''">Local</span>
                             <span v-else>{{ row.createdBy }}</span>
                         </template>
                     </el-table-column>

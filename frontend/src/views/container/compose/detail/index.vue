@@ -1,7 +1,7 @@
 <template>
     <div v-loading="loading">
         <LayoutContent :header="composeName" back-name="Compose" :reload="true">
-            <div v-if="createdBy === 'local'">
+            <div v-if="createdBy === '1Panel'">
                 <el-button icon="VideoPlay" @click="onComposeOperate('start')">{{ $t('container.start') }}</el-button>
                 <el-button icon="VideoPause" @click="onComposeOperate('stop')">{{ $t('container.stop') }}</el-button>
                 <el-button icon="Delete" @click="onComposeOperate('down')" plain type="danger">

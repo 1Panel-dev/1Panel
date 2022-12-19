@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -62,45 +63,8 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 	if imageRepo.ID != 0 {
 		return constant.ErrRecordExist
 	}
-
-	fileSetting, err := settingRepo.Get(settingRepo.WithByKey("DaemonJsonPath"))
-	if err != nil {
-		return err
-	}
-	if len(fileSetting.Value) == 0 {
-		return errors.New("error daemon.json")
-	}
-	if _, err := os.Stat(fileSetting.Value); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(fileSetting.Value, os.ModePerm); err != nil {
-			if err != nil {
-				return err
-			}
-		}
-	}
 	if req.Protocol == "http" {
-		file, err := ioutil.ReadFile(fileSetting.Value)
-		if err != nil {
-			return err
-		}
-
-		deamonMap := make(map[string]interface{})
-		if err := json.Unmarshal(file, &deamonMap); err != nil {
-			return err
-		}
-		if _, ok := deamonMap["insecure-registries"]; ok {
-			if k, v := deamonMap["insecure-registries"].([]interface{}); v {
-				deamonMap["insecure-registries"] = common.RemoveRepeatElement(append(k, req.DownloadUrl))
-			}
-		} else {
-			deamonMap["insecure-registries"] = []string{req.DownloadUrl}
-		}
-		newJson, err := json.MarshalIndent(deamonMap, "", "\t")
-		if err != nil {
-			return err
-		}
-		if err := ioutil.WriteFile(fileSetting.Value, newJson, 0640); err != nil {
-			return err
-		}
+		_ = u.handleRegistries(req.DownloadUrl, "", "create")
 	}
 
 	if err := copier.Copy(&imageRepo, &req); err != nil {
@@ -123,10 +87,6 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 	return nil
 }
 
-type DeamonJson struct {
-	InsecureRegistries []string `json:"insecure-registries"`
-}
-
 func (u *ImageRepoService) BatchDelete(ids []uint) error {
 	for _, id := range ids {
 		if id == 1 {
@@ -137,47 +97,10 @@ func (u *ImageRepoService) BatchDelete(ids []uint) error {
 	if err != nil {
 		return err
 	}
-	fileSetting, err := settingRepo.Get(settingRepo.WithByKey("DaemonJsonPath"))
-	if err != nil {
-		return err
-	}
-	if len(fileSetting.Value) == 0 {
-		return errors.New("error daemon.json")
-	}
-
-	deamonMap := make(map[string]interface{})
-	file, err := ioutil.ReadFile(fileSetting.Value)
-	if err != nil {
-		return err
-	}
-	if err := json.Unmarshal(file, &deamonMap); err != nil {
-		return err
-	}
-	iRegistries := deamonMap["insecure-registries"]
-	registries, _ := iRegistries.([]string)
-	if len(registries) != 0 {
-		for _, repo := range repos {
-			if repo.Protocol == "http" {
-				for i, regi := range registries {
-					if regi == repo.DownloadUrl {
-						registries = append(registries[:i], registries[i+1:]...)
-					}
-				}
-			}
-		}
-	}
-	if len(registries) == 0 {
-		delete(deamonMap, "insecure-registries")
-	}
-	newJson, err := json.MarshalIndent(deamonMap, "", "\t")
-	if err != nil {
-		return err
-	}
-	if err := ioutil.WriteFile(fileSetting.Value, newJson, 0640); err != nil {
-		return err
-	}
-
 	for _, repo := range repos {
+		if repo.Protocol == "http" {
+			_ = u.handleRegistries("", repo.DownloadUrl, "delete")
+		}
 		if repo.Auth {
 			cmd := exec.Command("docker", "logout", fmt.Sprintf("%s://%s", repo.Protocol, repo.DownloadUrl))
 			_, _ = cmd.CombinedOutput()
@@ -198,6 +121,17 @@ func (u *ImageRepoService) BatchDelete(ids []uint) error {
 func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 	if req.ID == 1 {
 		return errors.New("The default value cannot be deleted !")
+	}
+	repo, err := imageRepoRepo.Get(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	if repo.DownloadUrl != req.DownloadUrl {
+		_ = u.handleRegistries(req.DownloadUrl, repo.DownloadUrl, "update")
+		if repo.Auth {
+			cmd := exec.Command("docker", "logout", fmt.Sprintf("%s://%s", repo.Protocol, repo.DownloadUrl))
+			_, _ = cmd.CombinedOutput()
+		}
 	}
 
 	upMap := make(map[string]interface{})
@@ -226,4 +160,64 @@ func (u *ImageRepoService) checkConn(host, user, password string) error {
 		return nil
 	}
 	return errors.New(string(stdout))
+}
+
+func (u *ImageRepoService) handleRegistries(newHost, delHost, handle string) error {
+	fileSetting, err := settingRepo.Get(settingRepo.WithByKey("DaemonJsonPath"))
+	if err != nil {
+		return err
+	}
+	if len(fileSetting.Value) == 0 {
+		return errors.New("error daemon.json in settings")
+	}
+	if _, err := os.Stat(path.Dir(fileSetting.Value)); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(fileSetting.Value, os.ModePerm); err != nil {
+			if err != nil {
+				return err
+			}
+		}
+		_, _ = os.Create(fileSetting.Value)
+	}
+
+	deamonMap := make(map[string]interface{})
+	file, err := ioutil.ReadFile(fileSetting.Value)
+	if err != nil {
+		return err
+	}
+	if err := json.Unmarshal(file, &deamonMap); err != nil {
+		return err
+	}
+
+	iRegistries := deamonMap["insecure-registries"]
+	registries, _ := iRegistries.([]interface{})
+	switch handle {
+	case "create":
+		registries = common.RemoveRepeatElement(append(registries, newHost))
+	case "update":
+		registries = common.RemoveRepeatElement(append(registries, newHost))
+		for i, regi := range registries {
+			if regi == delHost {
+				registries = append(registries[:i], registries[i+1:]...)
+			}
+		}
+	case "delete":
+		for i, regi := range registries {
+			if regi == delHost {
+				registries = append(registries[:i], registries[i+1:]...)
+			}
+		}
+	}
+	if len(registries) == 0 {
+		delete(deamonMap, "insecure-registries")
+	} else {
+		deamonMap["insecure-registries"] = registries
+	}
+	newJson, err := json.MarshalIndent(deamonMap, "", "\t")
+	if err != nil {
+		return err
+	}
+	if err := ioutil.WriteFile(fileSetting.Value, newJson, 0640); err != nil {
+		return err
+	}
+	return nil
 }

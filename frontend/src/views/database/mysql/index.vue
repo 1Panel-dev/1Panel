@@ -148,7 +148,7 @@
             :destroy-on-close="true"
         >
             <el-alert :closable="false" :title="$t('app.checkInstalledWarn', ['phpMyAdmin'])" type="info">
-                <el-link icon="Position" @click="goRouter('/apps')" type="primary">
+                <el-link icon="Position" @click="goRouter('/apps/installed')" type="primary">
                     {{ $t('database.goInstall') }}
                 </el-link>
             </el-alert>
