@@ -1,6 +1,5 @@
 <template>
     <div>
-        <Submenu activeName="host" />
         <el-row class="row-box" style="margin-top: 20px" :gutter="20">
             <el-col :span="8">
                 <el-card class="el-card">
@@ -142,7 +141,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive } from 'vue';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { Host } from '@/api/interface/host';
@@ -153,7 +152,6 @@ import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
 import type Node from 'element-plus/es/components/tree/src/model/node';
-import Submenu from '@/views/host/terminal/index.vue';
 
 type FormInstance = InstanceType<typeof ElForm>;
 const hostInfoRef = ref<FormInstance>();
@@ -311,9 +309,12 @@ const onEdit = async (node: Node, data: Tree) => {
     }
 };
 
-onMounted(() => {
+function onInit() {
     loadHostTree();
     loadGroups();
+}
+defineExpose({
+    onInit,
 });
 </script>
 

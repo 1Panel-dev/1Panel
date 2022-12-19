@@ -12,6 +12,9 @@ type IHostRepo interface {
 	Get(opts ...DBOption) (model.Host, error)
 	GetList(opts ...DBOption) ([]model.Host, error)
 	WithByInfo(info string) DBOption
+	WithByPort(port uint) DBOption
+	WithByUser(user string) DBOption
+	WithByAddr(addr string) DBOption
 	Create(host *model.Host) error
 	ChangeGroup(oldGroup, newGroup string) error
 	Update(id uint, vars map[string]interface{}) error
@@ -49,6 +52,22 @@ func (c *HostRepo) WithByInfo(info string) DBOption {
 		}
 		infoStr := "%" + info + "%"
 		return g.Where("name LIKE ? OR addr LIKE ?", infoStr, infoStr)
+	}
+}
+
+func (u *HostRepo) WithByPort(port uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("port = ?", port)
+	}
+}
+func (u *HostRepo) WithByUser(user string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("user = ?", user)
+	}
+}
+func (u *HostRepo) WithByAddr(addr string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("addr = ?", addr)
 	}
 }
 

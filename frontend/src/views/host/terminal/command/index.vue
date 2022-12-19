@@ -1,6 +1,5 @@
 <template>
     <div>
-        <Submenu activeName="command" />
         <el-card style="margin-top: 20px">
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
                 <template #toolbar>
@@ -40,10 +39,9 @@
 
 <script setup lang="ts">
 import ComplexTable from '@/components/complex-table/index.vue';
-import Submenu from '@/views/host/terminal/index.vue';
 import { Command } from '@/api/interface/command';
 import { addCommand, editCommand, deleteCommand, getCommandPage } from '@/api/modules/command';
-import { reactive, ref, onMounted } from 'vue';
+import { reactive, ref } from 'vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
@@ -148,7 +146,10 @@ const search = async () => {
     paginationConfig.total = res.data.total;
 };
 
-onMounted(() => {
+function onInit() {
     search();
+}
+defineExpose({
+    onInit,
 });
 </script>

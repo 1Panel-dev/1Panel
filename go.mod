@@ -25,7 +25,6 @@ require (
 	github.com/gwatts/gin-adapter v1.0.0
 	github.com/jinzhu/copier v0.3.5
 	github.com/joho/godotenv v1.4.0
-	github.com/kr/pty v1.1.8
 	github.com/mholt/archiver/v4 v4.0.0-alpha.7
 	github.com/minio/minio-go/v7 v7.0.36
 	github.com/mojocn/base64Captcha v1.3.5
@@ -70,7 +69,6 @@ require (
 	github.com/containerd/cgroups v1.0.3 // indirect
 	github.com/containerd/containerd v1.6.8 // indirect
 	github.com/containerd/continuity v0.3.0 // indirect
-	github.com/creack/pty v1.1.11 // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
 	github.com/distribution/distribution/v3 v3.0.0-20220725133111-4bf3547399eb // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect

@@ -170,7 +170,7 @@ const buttons = [
             onEdit(row);
         },
         disabled: (row: any) => {
-            return row.createdBy !== 'local';
+            return row.createdBy !== 'Local';
         },
     },
     {
@@ -179,7 +179,7 @@ const buttons = [
             onDelete(row);
         },
         disabled: (row: any) => {
-            return row.createdBy === 'apps';
+            return row.createdBy === 'Apps';
         },
     },
 ];

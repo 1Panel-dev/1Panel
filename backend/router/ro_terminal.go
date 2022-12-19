@@ -17,6 +17,5 @@ func (s *TerminalRouter) InitTerminalRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		terminalRouter.GET("", baseApi.WsSsh)
-		terminalRouter.GET("/local", baseApi.LocalWsSsh)
 	}
 }

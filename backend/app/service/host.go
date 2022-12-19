@@ -57,14 +57,43 @@ func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, e
 	return datas, err
 }
 
-func (u *HostService) Create(hostDto dto.HostOperate) (*dto.HostInfo, error) {
-	host, _ := hostRepo.Get(commonRepo.WithByName(hostDto.Name))
+func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
+	host, _ := hostRepo.Get(commonRepo.WithByName(req.Name))
 	if host.ID != 0 {
 		return nil, constant.ErrRecordExist
 	}
-	if err := copier.Copy(&host, &hostDto); err != nil {
+	if err := copier.Copy(&host, &req); err != nil {
 		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
+	var sameHostID uint
+	if req.Addr == "127.0.0.1" {
+		hostSame, _ := hostRepo.Get(hostRepo.WithByAddr(req.Addr))
+		sameHostID = hostSame.ID
+	} else {
+		hostSame, _ := hostRepo.Get(hostRepo.WithByAddr(req.Addr), hostRepo.WithByUser(req.User), hostRepo.WithByPort(req.Port))
+		sameHostID = hostSame.ID
+	}
+	if sameHostID != 0 {
+		host.ID = sameHostID
+		upMap := make(map[string]interface{})
+		upMap["name"] = req.Name
+		upMap["group_belong"] = req.GroupBelong
+		upMap["addr"] = req.Addr
+		upMap["port"] = req.Port
+		upMap["user"] = req.User
+		upMap["auth_mode"] = req.AuthMode
+		upMap["password"] = req.Password
+		upMap["private_key"] = req.PrivateKey
+		if err := hostRepo.Update(sameHostID, upMap); err != nil {
+			return nil, err
+		}
+		var hostinfo dto.HostInfo
+		if err := copier.Copy(&hostinfo, &host); err != nil {
+			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		}
+		return &hostinfo, nil
+	}
+
 	if err := hostRepo.Create(&host); err != nil {
 		return nil, err
 	}
