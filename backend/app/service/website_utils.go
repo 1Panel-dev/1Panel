@@ -402,7 +402,8 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 		return err
 	}
 	nginxConfFile := fmt.Sprintf("%s/nginx/%s/conf/conf.d/%s.conf", constant.AppInstallDir, nginxInfo.Name, website.PrimaryDomain)
-	if err := copyConf(nginxConfFile, fmt.Sprintf("%s/%s.conf", tmpDir, website.PrimaryDomain)); err != nil {
+	fileOp := files.NewFileOp()
+	if err := fileOp.CopyFile(nginxConfFile, tmpDir); err != nil {
 		return err
 	}
 
