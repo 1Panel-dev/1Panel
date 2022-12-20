@@ -1,7 +1,7 @@
 {
   "formFields": [
     {
-      "type": "text",
+      "type": "password",
       "labelZh": "Root用户密码",
       "labelEn": "RootPassword",
       "required": true,

@@ -58,7 +58,7 @@ const checkLinuxName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.linuxName')));
     } else {
-        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9_.]{0,30}$/;
+        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9_.-]{0,30}$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.linuxName')));
         } else {

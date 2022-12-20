@@ -10,12 +10,12 @@
       "envKey": "PANEL_REDIS_HOST"
     },
     {
-      "type": "text",
+      "type": "password",
       "labelZh": "密码",
       "labelEn": "Password",
       "required": true,
       "default": "eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81",
-        "envKey": "PANEL_DB_ROOT_PASSWORD"
+      "envKey": "PANEL_DB_ROOT_PASSWORD"
     },
     {
       "type": "number",
