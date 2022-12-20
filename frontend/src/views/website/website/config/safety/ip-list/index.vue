@@ -53,7 +53,7 @@ const props = defineProps({
     },
     rule: {
         type: String,
-        default: 'ipWhitelist',
+        default: 'ipWhiteList',
     },
     paramKey: {
         type: String,
@@ -75,7 +75,7 @@ let data = ref([]);
 let req = ref<Website.WafReq>({
     websiteId: 0,
     key: '$ipWhiteAllow',
-    rule: 'ipWhitelist',
+    rule: 'ipWhiteList',
 });
 let fileUpdate = reactive({
     path: '',
