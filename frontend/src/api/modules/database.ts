@@ -83,5 +83,5 @@ export const recoverRedis = (param: Database.RedisRecover) => {
     return http.post(`/databases/redis/recover`, param);
 };
 export const redisBackupRedisRecords = (param: ReqPage) => {
-    return http.post<ResPage<Database.FileRecord>>(`/databases/redis/backup/records`, param);
+    return http.post<ResPage<Database.FileRecord>>(`/databases/redis/backup/search`, param);
 };

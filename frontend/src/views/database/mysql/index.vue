@@ -11,11 +11,7 @@
         <Setting ref="settingRef" style="margin-top: 20px" />
 
         <el-card width="30%" v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist" class="mask-prompt">
-            <span style="font-size: 14px">{{ $t('database.mysqlBadStatus') }}</span>
-            <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="onSetting">
-                【 {{ $t('database.setting') }} 】
-            </el-button>
-            <span style="font-size: 14px">{{ $t('database.adjust') }}</span>
+            <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['Mysql']) }}</span>
         </el-card>
         <div v-if="mysqlIsExist" :class="{ mask: mysqlStatus != 'Running' }">
             <el-card v-if="!isOnSetting" style="margin-top: 20px">

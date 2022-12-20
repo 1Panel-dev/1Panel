@@ -120,7 +120,6 @@ export namespace Database {
     export interface RedisConfUpdate {
         timeout: string;
         maxclients: string;
-        requirepass: string;
         maxmemory: string;
     }
     export interface RedisConfPersistenceUpdate {

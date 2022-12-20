@@ -10,24 +10,22 @@
             @is-exist="checkExist"
             v-model:loading="loading"
         ></AppStatus>
-
-        <el-button style="margin-top: 20px" type="primary" plain @click="goDashboard" icon="Position">
-            Redis-Commander
-        </el-button>
-
-        <Setting ref="settingRef" style="margin-top: 10px" />
-
         <el-card width="30%" v-if="redisStatus != 'Running' && !isOnSetting && redisIsExist" class="mask-prompt">
-            <span style="font-size: 14px">{{ $t('database.mysqlBadStatus') }}</span>
-            <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="onSetting">
-                【 {{ $t('database.setting') }} 】
-            </el-button>
-            <span style="font-size: 14px">{{ $t('database.adjust') }}</span>
+            <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['Redis']) }}</span>
         </el-card>
+
         <div v-show="redisIsExist" :class="{ mask: redisStatus != 'Running' }">
-            <Terminal style="margin-top: 10px" ref="terminalRef" />
+            <el-button style="margin-top: 20px" type="primary" plain @click="goDashboard" icon="Position">
+                Redis-Commander
+            </el-button>
+            <el-button style="margin-top: 20px" type="primary" plain @click="onChangePassword">
+                {{ $t('database.changePassword') }}
+            </el-button>
+            <Terminal :key="isRefresh" style="margin-top: 10px" ref="terminalRef" />
         </div>
 
+        <Setting ref="settingRef" style="margin-top: 10px" />
+        <Password ref="passwordRef" @check-exist="initTerminal" @close-terminal="closeTerminal(true)" />
         <el-dialog
             v-model="commandVisiable"
             :title="$t('app.checkTitle')"
@@ -52,6 +50,7 @@
 <script lang="ts" setup>
 import Submenu from '@/views/database/index.vue';
 import Setting from '@/views/database/redis/setting/index.vue';
+import Password from '@/views/database/redis/password/index.vue';
 import Terminal from '@/views/database/redis/terminal/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import { ref } from 'vue';
@@ -66,14 +65,17 @@ const settingRef = ref();
 const isOnSetting = ref(false);
 const redisIsExist = ref(false);
 const redisStatus = ref();
+const redisName = ref();
 
 const redisCommandPort = ref();
 const commandVisiable = ref(false);
 
+const isRefresh = ref();
+
 const onSetting = async () => {
     isOnSetting.value = true;
-    terminalRef.value.onClose();
-    settingRef.value!.acceptParams({ status: redisStatus.value });
+    terminalRef.value.onClose(false);
+    settingRef.value!.acceptParams({ status: redisStatus.value, redisName: redisName.value });
 };
 
 const goRouter = async (path: string) => {
@@ -95,8 +97,14 @@ const loadDashboardPort = async () => {
     redisCommandPort.value = res.data;
 };
 
+const passwordRef = ref();
+const onChangePassword = async () => {
+    passwordRef.value!.acceptParams();
+};
+
 const checkExist = (data: App.CheckInstalled) => {
     redisIsExist.value = data.isExist;
+    redisName.value = data.name;
     redisStatus.value = data.status;
     loading.value = false;
     if (redisStatus.value === 'Running') {
@@ -105,8 +113,18 @@ const checkExist = (data: App.CheckInstalled) => {
     }
 };
 
+const initTerminal = async () => {
+    if (redisStatus.value === 'Running') {
+        terminalRef.value.acceptParams();
+    }
+};
+const closeTerminal = async (isKeepShow: boolean) => {
+    isRefresh.value = !isRefresh.value;
+    terminalRef.value!.onClose(isKeepShow);
+};
+
 const onBefore = () => {
-    terminalRef.value!.onClose();
+    closeTerminal(true);
     loading.value = true;
 };
 </script>

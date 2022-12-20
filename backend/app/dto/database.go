@@ -128,10 +128,9 @@ type UploadRecover struct {
 
 // redis
 type RedisConfUpdate struct {
-	Timeout     string `json:"timeout"`
-	Maxclients  string `json:"maxclients"`
-	Requirepass string `json:"requirepass"`
-	Maxmemory   string `json:"maxmemory"`
+	Timeout    string `json:"timeout"`
+	Maxclients string `json:"maxclients"`
+	Maxmemory  string `json:"maxmemory"`
 }
 type RedisConfPersistenceUpdate struct {
 	Type        string `json:"type" validate:"required,oneof=aof rbd"`
