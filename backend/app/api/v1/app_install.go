@@ -2,8 +2,9 @@ package v1
 
 import (
 	"errors"
-	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"reflect"
+
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -66,6 +67,20 @@ func (b *BaseApi) LoadPort(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, port)
+}
+
+func (b *BaseApi) LoadPassword(c *gin.Context) {
+	key, ok := c.Params.Get("key")
+	if !ok {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error key in path"))
+		return
+	}
+	password, err := appInstallService.LoadPassword(key)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, password)
 }
 
 func (b *BaseApi) DeleteCheck(c *gin.Context) {

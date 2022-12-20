@@ -15,8 +15,10 @@
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="dialogVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="onSave(formRef)">
+                <el-button :disabled="loading" @click="dialogVisiable = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -31,6 +33,7 @@ import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { changeRedisPassword } from '@/api/modules/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
+import { GetAppPassword } from '@/api/modules/app';
 
 const loading = ref(false);
 
@@ -48,7 +51,13 @@ const formRef = ref<FormInstance>();
 
 const acceptParams = (): void => {
     form.password = '';
+    loadPassword();
     dialogVisiable.value = true;
+};
+
+const loadPassword = async () => {
+    const res = await GetAppPassword('redis');
+    form.password = res.data;
 };
 
 const onSubmit = async () => {

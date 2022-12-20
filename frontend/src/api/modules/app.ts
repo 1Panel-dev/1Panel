@@ -34,6 +34,10 @@ export const GetAppPort = (key: string) => {
     return http.get<number>(`apps/installed/loadport/${key}`);
 };
 
+export const GetAppPassword = (key: string) => {
+    return http.get<string>(`apps/installed/loadpassword/${key}`);
+};
+
 export const CheckAppInstalled = (key: string) => {
     return http.get<App.CheckInstalled>(`apps/installed/check/${key}`);
 };
