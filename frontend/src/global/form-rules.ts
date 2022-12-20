@@ -80,6 +80,19 @@ const checkDomain = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkDatabaseName = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.databaseName')));
+    } else {
+        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9_]{0,30}$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.databaseName')));
+        } else {
+            callback();
+        }
+    }
+};
+
 interface CommonRule {
     requiredInput: FormItemRule;
     requiredSelect: FormItemRule;
@@ -93,6 +106,7 @@ interface CommonRule {
     ip: FormItemRule;
     port: FormItemRule;
     domain: FormItemRule;
+    databaseName: FormItemRule;
 }
 
 export const Rules: CommonRule = {
@@ -127,6 +141,11 @@ export const Rules: CommonRule = {
     linuxName: {
         required: true,
         validator: checkLinuxName,
+        trigger: 'blur',
+    },
+    databaseName: {
+        required: true,
+        validator: checkDatabaseName,
         trigger: 'blur',
     },
     password: {

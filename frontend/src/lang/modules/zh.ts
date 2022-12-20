@@ -113,6 +113,7 @@ export default {
             port: '请输入正确的端口',
             selectHelper: '请选择正确的 {0} 文件',
             domain: '域名格式错误',
+            databaseName: '支持英文、数字、_,长度1-30',
         },
         res: {
             paramError: '请求失败,请稍后重试!',
