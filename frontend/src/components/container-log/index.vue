@@ -70,7 +70,9 @@ const timeOptions = ref([
 ]);
 
 const onCloseLog = async () => {
+    logSearch.isWatch = false;
     clearInterval(Number(timer));
+    timer = null;
 };
 
 const searchLogs = async () => {

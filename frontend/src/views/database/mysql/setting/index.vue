@@ -2,7 +2,7 @@
     <div class="demo-collapse" v-show="onSetting">
         <el-card style="margin-top: 5px" v-loading="loading">
             <LayoutContent :header="'Mysql ' + $t('database.setting')" :back-name="'Mysql'" :reload="true">
-                <el-collapse v-model="activeName" accordion>
+                <el-collapse v-model="activeName" @change="handleCollapse" accordion>
                     <el-collapse-item :title="$t('database.confChange')" name="1">
                         <codemirror
                             :autofocus="true"
@@ -78,7 +78,7 @@ import Status from '@/views/database/mysql/setting/status/index.vue';
 import Variables from '@/views/database/mysql/setting/variables/index.vue';
 import SlowLog from '@/views/database/mysql/setting/slow-log/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import { reactive, ref } from 'vue';
+import { onUnmounted, reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -132,6 +132,14 @@ const onClose = (): void => {
     onSetting.value = false;
 };
 
+const handleCollapse = async (val: string) => {
+    if (val !== '5') {
+        dialogContainerLogRef.value!.onCloseLog();
+    }
+    if (val !== '6') {
+        slowLogRef.value!.onCloseLog();
+    }
+};
 const onSubmitChangePort = async () => {
     let params = {
         key: 'mysql',
@@ -230,6 +238,10 @@ const loadMysqlConf = async (path: string) => {
     loading.value = false;
     mysqlConf.value = res.data;
 };
+
+onUnmounted(() => {
+    console.log('adasd');
+});
 
 defineExpose({
     acceptParams,

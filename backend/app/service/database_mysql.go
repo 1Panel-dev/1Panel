@@ -433,7 +433,11 @@ func (u *MysqlService) UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
 			}
 		}
 
-		files = updateMyCnf(files, group, info.Param, loadSizeUnit(info.Value))
+		if _, ok := info.Value.(int64); ok {
+			files = updateMyCnf(files, group, info.Param, loadSizeUnit(info.Value.(int64)))
+		} else {
+			files = updateMyCnf(files, group, info.Param, info.Value)
+		}
 	}
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0666)
 	if err != nil {

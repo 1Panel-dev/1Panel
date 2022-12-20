@@ -1,19 +1,30 @@
 <template>
-    <div>
-        <span style="float: left">{{ $t('database.isOn') }}</span>
-        <el-switch
-            style="margin-left: 20px; float: left"
-            v-model="variables.slow_query_log"
-            active-value="ON"
-            inactive-value="OFF"
-        />
-        <span style="margin-left: 30px; float: left">{{ $t('database.longQueryTime') }}</span>
+    <div v-loading="loading">
+        <span style="float: left">{{ $t('database.longQueryTime') }}</span>
         <div style="margin-left: 5px; float: left">
             <el-input type="number" v-model.number="variables.long_query_time">
                 <template #append>{{ $t('database.second') }}</template>
             </el-input>
         </div>
-        <el-button style="margin-left: 20px" @click="onSaveStart">{{ $t('commons.button.confirm') }}</el-button>
+        <span style="float: left; margin-left: 20px">{{ $t('database.isOn') }}</span>
+        <el-switch
+            style="margin-left: 5px; float: left"
+            v-model="variables.slow_query_log"
+            active-value="ON"
+            inactive-value="OFF"
+            @change="handleSlowLogs"
+        />
+        <div v-if="variables.slow_query_log === 'ON'" style="margin-left: 20px; float: left">
+            <el-checkbox border v-model="isWatch">{{ $t('commons.button.watch') }}</el-checkbox>
+        </div>
+        <el-button
+            v-if="variables.slow_query_log === 'ON'"
+            style="margin-left: 20px"
+            @click="onDownload"
+            icon="Download"
+        >
+            {{ $t('file.download') }}
+        </el-button>
         <div v-if="variables.slow_query_log === 'ON'">
             <codemirror
                 :autofocus="true"
@@ -31,7 +42,8 @@
             />
         </div>
 
-        <ConfirmDialog ref="confirmDialogRef" @confirm="onSave"></ConfirmDialog>
+        <br />
+        <ConfirmDialog @cancle="onCancle" ref="confirmDialogRef" @confirm="onSave"></ConfirmDialog>
     </div>
 </template>
 <script lang="ts" setup>
@@ -44,12 +56,17 @@ import { LoadFile } from '@/api/modules/files';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { updateMysqlVariables } from '@/api/modules/database';
 import { ElMessage } from 'element-plus';
+import { dateFromatForName } from '@/utils/util';
 import i18n from '@/lang';
 
+const loading = ref();
 const extensions = [javascript(), oneDark];
 const slowLogs = ref();
 
 const confirmDialogRef = ref();
+
+const isWatch = ref();
+let timer: NodeJS.Timer | null = null;
 
 const mysqlName = ref();
 const variables = reactive({
@@ -67,14 +84,19 @@ const acceptParams = (params: DialogProps): void => {
     variables.slow_query_log = params.variables.slow_query_log;
     variables.long_query_time = Number(params.variables.long_query_time);
 
+    let path = `/opt/1Panel/data/apps/mysql/${mysqlName.value}/data/1Panel-slow.log`;
     if (variables.slow_query_log === 'ON') {
-        let path = `/opt/1Panel/data/apps/mysql/${mysqlName.value}/data/1Panel-slow.log`;
         loadMysqlSlowlogs(path);
     }
+    timer = setInterval(() => {
+        if (variables.slow_query_log === 'ON' && isWatch.value) {
+            loadMysqlSlowlogs(path);
+        }
+    }, 1000 * 5);
     oldVariables.value = { ...variables };
 };
 
-const onSaveStart = async () => {
+const handleSlowLogs = async () => {
     let params = {
         header: i18n.global.t('database.confChange'),
         operationInfo: i18n.global.t('database.restartNowHelper'),
@@ -83,17 +105,38 @@ const onSaveStart = async () => {
     confirmDialogRef.value!.acceptParams(params);
 };
 
+const onCancle = async () => {
+    variables.slow_query_log = variables.slow_query_log === 'ON' ? 'OFF' : 'ON';
+};
+
 const onSave = async () => {
     let param = [] as Array<Database.VariablesUpdate>;
     if (variables.slow_query_log !== oldVariables.value.slow_query_log) {
         param.push({ param: 'slow_query_log', value: variables.slow_query_log });
     }
     if (variables.slow_query_log === 'ON') {
-        param.push({ param: 'long_query_time', value: variables.long_query_time });
+        param.push({ param: 'long_query_time', value: variables.long_query_time + '' });
         param.push({ param: 'slow_query_log_file', value: '/var/lib/mysql/1Panel-slow.log' });
     }
-    await updateMysqlVariables(param);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    loading.value = true;
+    await updateMysqlVariables(param)
+        .then(() => {
+            loading.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+const onDownload = async () => {
+    const downloadUrl = window.URL.createObjectURL(new Blob([slowLogs.value]));
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = downloadUrl;
+    a.download = mysqlName.value + '-slowlogs-' + dateFromatForName(new Date()) + '.log';
+    const event = new MouseEvent('click');
+    a.dispatchEvent(event);
 };
 
 const loadMysqlSlowlogs = async (path: string) => {
@@ -101,7 +144,14 @@ const loadMysqlSlowlogs = async (path: string) => {
     slowLogs.value = res.data;
 };
 
+const onCloseLog = async () => {
+    isWatch.value = false;
+    clearInterval(Number(timer));
+    timer = null;
+};
+
 defineExpose({
     acceptParams,
+    onCloseLog,
 });
 </script>
