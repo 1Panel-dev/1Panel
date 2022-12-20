@@ -16,7 +16,7 @@ import (
 
 const (
 	TimeFormat         = "2006-01-02 15:04:05"
-	FileTImeFormat     = "2006-01-02-15-04-05"
+	FileTImeFormat     = "2006-01-02"
 	RollingTimePattern = "0 0  * * *"
 )
 
@@ -28,7 +28,6 @@ func Init() {
 }
 
 func setOutput(logger *logrus.Logger, config configs.LogConfig) {
-
 	writer, err := log.NewWriterFromConfig(&log.Config{
 		LogPath:            config.Path,
 		FileName:           config.LogName,

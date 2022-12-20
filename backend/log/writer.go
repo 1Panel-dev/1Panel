@@ -120,7 +120,7 @@ func NewWriterFromConfig(c *Config) (RollingWriter, error) {
 			}
 
 			fileName := c.FileName
-			if strings.Contains(fi.Name(), fileName) && strings.Contains(fi.Name(), c.LogSuffix+".tar.gz") {
+			if strings.Contains(fi.Name(), fileName) && strings.Contains(fi.Name(), c.LogSuffix+".gz") {
 				start := strings.Index(fi.Name(), "-")
 				end := strings.Index(fi.Name(), c.LogSuffix)
 				name := fi.Name()
@@ -259,11 +259,11 @@ func (w *Writer) Reopen(file string) error {
 
 func (w *Writer) CompressFile(logFile string) error {
 	op := files.NewFileOp()
-	comFileName := path.Base(logFile) + ".tar.gz"
+	comFileName := path.Base(logFile) + ".gz"
 	filePath := path.Dir(logFile)
 
 	fmt.Println(path.Dir(logFile))
-	if err := op.Compress([]string{logFile}, filePath, comFileName, files.TarGz); err != nil {
+	if err := op.Compress([]string{logFile}, filePath, comFileName, files.Gz); err != nil {
 		return err
 	}
 	if errR := os.Remove(logFile); errR != nil {
