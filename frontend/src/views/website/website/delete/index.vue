@@ -3,18 +3,50 @@
         v-model="open"
         :close-on-click-modal="false"
         :title="$t('website.delete')"
-        width="40%"
+        width="30%"
         :before-close="handleClose"
     >
-        <div style="text-align: center" :key="key">
-            <el-checkbox v-model="deleteReq.forceDelete" :label="$t('website.forceDelete')" />
-            <el-checkbox v-if="type === 'deployment'" v-model="deleteReq.deleteApp" :label="$t('website.deleteApp')" />
-            <el-checkbox v-model="deleteReq.deleteBackup" :label="$t('website.deleteBackup')" />
+        <div :key="key">
+            <el-form ref="deleteForm" label-position="left">
+                <el-form-item>
+                    <el-checkbox v-model="deleteReq.forceDelete" :label="$t('website.forceDelete')" />
+                </el-form-item>
+                <div class="helper">
+                    <span class="input-help">
+                        {{ $t('website.forceDeleteHelper') }}
+                    </span>
+                </div>
+                <el-form-item v-if="type === 'deployment'">
+                    <el-checkbox v-model="deleteReq.deleteApp" :label="$t('website.deleteApp')" />
+                </el-form-item>
+                <div class="helper" v-if="type === 'deployment'">
+                    <span class="input-help">
+                        {{ $t('website.deleteAppHelper') }}
+                    </span>
+                </div>
+                <div class="helper">
+                    <span class="input-help">
+                        {{ $t('website.deleteBackupHelper') }}
+                    </span>
+                </div>
+                <el-form-item>
+                    <el-checkbox v-model="deleteReq.deleteBackup" :label="$t('website.deleteBackup')" />
+                </el-form-item>
+                <span v-html="deleteHelper"></span>
+                <el-form-item>
+                    <el-input v-model="deleteInfo" :placeholder="websiteName" />
+                </el-form-item>
+            </el-form>
         </div>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit()" :disabled="loading" :loading="loading">
+                <el-button
+                    type="primary"
+                    @click="submit()"
+                    :disabled="loading || deleteInfo != websiteName"
+                    :loading="loading"
+                >
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -25,7 +57,7 @@
 <script lang="ts" setup>
 import { DeleteWebsite } from '@/api/modules/website';
 import i18n from '@/lang';
-import { ElMessage } from 'element-plus';
+import { ElMessage, FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import { Website } from '@/api/interface/website';
 
@@ -40,6 +72,10 @@ let deleteReq = ref({
 });
 let type = ref('');
 const em = defineEmits(['close']);
+const deleteForm = ref<FormInstance>();
+let deleteInfo = ref('');
+let websiteName = ref('');
+let deleteHelper = ref('');
 
 const handleClose = () => {
     open.value = false;
@@ -54,6 +90,8 @@ const acceptParams = async (website: Website.Website) => {
         forceDelete: false,
     };
     deleteReq.value.id = website.id;
+    websiteName.value = website.primaryDomain;
+    deleteHelper.value = i18n.global.t('website.deleteConfirmHelper', [website.primaryDomain]);
     type.value = website.type;
     open.value = true;
 };
@@ -74,3 +112,9 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style lang="scss">
+.helper {
+    margin-top: -20px;
+}
+</style>

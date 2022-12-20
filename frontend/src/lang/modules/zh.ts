@@ -880,6 +880,10 @@ export default {
         proxyAddress: '代理地址',
         proxyHelper: '例如: http://127.0.0.1:8080',
         forceDelete: '强制删除',
+        forceDeleteHelper: '强制删除，会忽略删除过程中碰到的问题，最终删除元数据',
+        deleteAppHelper: '同时删除关联应用以及应用备份',
+        deleteBackupHelper: '同时删除网站备份',
+        deleteConfirmHelper: '删除操作无法回滚，请输入 <span style="color:red"> "{0}" </span> 删除此网站',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',
