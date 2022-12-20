@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
-	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"io/ioutil"
 	"os"
 	"path"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 
@@ -86,6 +87,14 @@ func (a AppInstallService) LoadPort(key string) (int64, error) {
 		return int64(0), nil
 	}
 	return app.Port, nil
+}
+
+func (a AppInstallService) LoadPassword(key string) (string, error) {
+	app, err := appInstallRepo.LoadBaseInfoByKey(key)
+	if err != nil {
+		return "", nil
+	}
+	return app.Password, nil
 }
 
 func (a AppInstallService) Search(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error) {

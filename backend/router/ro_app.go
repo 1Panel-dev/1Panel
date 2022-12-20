@@ -23,6 +23,7 @@ func (a *AppRouter) InitAppRouter(Router *gin.RouterGroup) {
 		appRouter.GET("/installed/:appInstallId/versions", baseApi.GetUpdateVersions)
 		appRouter.GET("/installed/check/:key", baseApi.CheckAppInstalled)
 		appRouter.GET("/installed/loadport/:key", baseApi.LoadPort)
+		appRouter.GET("/installed/loadpassword/:key", baseApi.LoadPassword)
 		appRouter.GET("/installed/delete/check/:appInstallId", baseApi.DeleteCheck)
 		appRouter.POST("/installed", baseApi.SearchAppInstalled)
 		appRouter.POST("/installed/op", baseApi.OperateInstalled)
