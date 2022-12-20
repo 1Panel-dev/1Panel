@@ -268,7 +268,19 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 			}
 		}
 	}
-	//TODO 删除备份
+	if req.DeleteBackup {
+		backups, _ := backupRepo.ListRecord(backupRepo.WithByType("website-"+website.Type), commonRepo.WithByName(website.PrimaryDomain))
+		if len(backups) > 0 {
+			fileOp := files.NewFileOp()
+			for _, b := range backups {
+				_ = fileOp.DeleteDir(b.FileDir)
+			}
+		}
+		if err := backupRepo.DeleteRecord(backupRepo.WithByType("website-"+website.Type), commonRepo.WithByName(website.PrimaryDomain)); err != nil {
+			return err
+		}
+	}
+
 	if err := websiteRepo.DeleteBy(ctx, commonRepo.WithByID(req.ID)); err != nil {
 		tx.Rollback()
 		return err

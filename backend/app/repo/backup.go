@@ -41,7 +41,7 @@ func (u *BackupRepo) ListRecord(opts ...DBOption) ([]model.BackupRecord, error) 
 	for _, opt := range opts {
 		db = opt(db)
 	}
-	err := db.Find(&users).Error
+	err := db.Debug().Find(&users).Error
 	return users, err
 }
 
@@ -57,7 +57,7 @@ func (u *BackupRepo) PageRecord(page, size int, opts ...DBOption) (int64, []mode
 	return count, users, err
 }
 
-func (c *BackupRepo) WithByDetailName(detailName string) DBOption {
+func (u *BackupRepo) WithByDetailName(detailName string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		if len(detailName) == 0 {
 			return g
@@ -66,12 +66,21 @@ func (c *BackupRepo) WithByDetailName(detailName string) DBOption {
 	}
 }
 
-func (c *BackupRepo) WithByFileName(fileName string) DBOption {
+func (u *BackupRepo) WithByFileName(fileName string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		if len(fileName) == 0 {
 			return g
 		}
 		return g.Where("file_name = ?", fileName)
+	}
+}
+
+func (u *BackupRepo) WithByType(backupType string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if len(backupType) == 0 {
+			return g
+		}
+		return g.Where("type = ?", backupType)
 	}
 }
 
