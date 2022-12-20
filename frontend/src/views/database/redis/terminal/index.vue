@@ -29,13 +29,15 @@ const acceptParams = async (): Promise<void> => {
     initTerm();
     window.addEventListener('resize', changeTerminalSize);
 };
-const onClose = async () => {
+const onClose = async (isKeepShow: boolean) => {
     window.removeEventListener('resize', changeTerminalSize);
     if (isWsOpen()) {
         terminalSocket && terminalSocket.close();
+    }
+    if (!isKeepShow) {
         term.dispose();
     }
-    terminalShow.value = false;
+    terminalShow.value = isKeepShow;
 };
 
 const onWSReceive = (message: any) => {

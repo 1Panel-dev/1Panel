@@ -132,6 +132,9 @@ export default {
             changePassword: 'Change Password',
             logout: 'Logout',
         },
+        service: {
+            serviceNotStarted: 'The {0} service is not currently started',
+        },
         status: {
             running: 'running',
             stopped: 'stopped',

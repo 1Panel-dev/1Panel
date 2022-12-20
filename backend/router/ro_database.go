@@ -40,7 +40,7 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/redis/password", baseApi.ChangeRedisPassword)
 		cmdRouter.POST("/redis/backup", baseApi.RedisBackup)
 		cmdRouter.POST("/redis/recover", baseApi.RedisRecover)
-		cmdRouter.POST("/redis/backuplist/search", baseApi.RedisBackupList)
+		cmdRouter.POST("/redis/backup/search", baseApi.RedisBackupList)
 		cmdRouter.POST("/redis/conf/update", baseApi.UpdateRedisConf)
 		cmdRouter.POST("/redis/conffile/update", baseApi.UpdateRedisConfByFile)
 		cmdRouter.POST("/redis/persistence/update", baseApi.UpdateRedisPersistenceConf)

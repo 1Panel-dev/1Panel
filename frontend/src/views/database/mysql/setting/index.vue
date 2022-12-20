@@ -78,7 +78,7 @@ import Status from '@/views/database/mysql/setting/status/index.vue';
 import Variables from '@/views/database/mysql/setting/variables/index.vue';
 import SlowLog from '@/views/database/mysql/setting/slow-log/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import { onUnmounted, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -238,10 +238,6 @@ const loadMysqlConf = async (path: string) => {
     loading.value = false;
     mysqlConf.value = res.data;
 };
-
-onUnmounted(() => {
-    console.log('adasd');
-});
 
 defineExpose({
     acceptParams,

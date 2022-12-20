@@ -134,6 +134,9 @@ export default {
             changePassword: '修改密码',
             logout: '退出登录',
         },
+        service: {
+            serviceNotStarted: '当前未启动 {0} 服务',
+        },
         status: {
             running: '已启动',
             success: '成功',
