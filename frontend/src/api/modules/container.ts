@@ -88,7 +88,7 @@ export const createImageRepo = (params: Container.RepoCreate) => {
 export const updateImageRepo = (params: Container.RepoUpdate) => {
     return http.post(`/containers/repo/update`, params);
 };
-export const deleteImageRepo = (params: { ids: number[] }) => {
+export const deleteImageRepo = (params: Container.RepoDelete) => {
     return http.post(`/containers/repo/del`, params);
 };
 

@@ -47,18 +47,19 @@
             </ComplexTable>
         </el-card>
         <OperatorDialog @search="search" ref="dialogRef" />
+        <DeleteDialog @search="search" ref="dialogDeleteRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import OperatorDialog from '@/views/container/repo/operator/index.vue';
+import DeleteDialog from '@/views/container/repo/delete/index.vue';
 import Submenu from '@/views/container/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFromat } from '@/utils/util';
 import { Container } from '@/api/interface/container';
-import { deleteImageRepo, loadDockerStatus, searchImageRepo } from '@/api/modules/container';
-import { useDeleteData } from '@/hooks/use-delete-data';
+import { loadDockerStatus, searchImageRepo } from '@/api/modules/container';
 import i18n from '@/lang';
 import router from '@/routers';
 
@@ -112,6 +113,7 @@ const onOpenDialog = async (
     dialogRef.value!.acceptParams(params);
 };
 
+const dialogDeleteRef = ref();
 const onBatchDelete = async (row: Container.RepoInfo | null) => {
     let ids: Array<number> = [];
     if (row) {
@@ -121,8 +123,7 @@ const onBatchDelete = async (row: Container.RepoInfo | null) => {
             ids.push(item.id);
         });
     }
-    await useDeleteData(deleteImageRepo, { ids: ids }, 'commons.msg.delete');
-    search();
+    dialogDeleteRef.value!.acceptParams({ ids: ids });
 };
 
 const buttons = [

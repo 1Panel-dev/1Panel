@@ -22,7 +22,7 @@
                 prop="repoID"
             >
                 <el-select style="width: 100%" filterable v-model="form.repoID">
-                    <el-option v-for="item in dialogData.repos" :key="item.id" :value="item.id" :label="item.name" />
+                    <el-option v-for="item in repos" :key="item.id" :value="item.id" :label="item.name" />
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('container.imageName')" :rules="Rules.requiredInput" prop="imageName">
@@ -75,7 +75,7 @@ import { LoadFile } from '@/api/modules/files';
 const pullVisiable = ref(false);
 const form = reactive({
     fromRepo: true,
-    repoID: 1,
+    repoID: null as number,
     imageName: '',
 });
 
@@ -89,16 +89,13 @@ let timer: NodeJS.Timer | null = null;
 interface DialogProps {
     repos: Array<Container.RepoOptions>;
 }
-const dialogData = ref<DialogProps>({
-    repos: [] as Array<Container.RepoOptions>,
-});
+const repos = ref();
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
     pullVisiable.value = true;
     form.fromRepo = true;
-    form.repoID = 1;
     form.imageName = '';
-    dialogData.value.repos = params.repos;
+    repos.value = params.repos;
     buttonDisabled.value = false;
     logInfo.value = '';
 };
@@ -138,7 +135,7 @@ const onCloseLog = async () => {
 };
 
 function loadDetailInfo(id: number) {
-    for (const item of dialogData.value.repos) {
+    for (const item of repos.value) {
         if (item.id === id) {
             return item.downloadUrl;
         }

@@ -282,6 +282,9 @@ const loadHost = async () => {
     const res = await getHostTree({});
     hostTree.value = res.data;
     for (const item of hostTree.value) {
+        if (!item.children) {
+            continue;
+        }
         for (const host of item.children) {
             if (host.label.indexOf('127.0.0.1')) {
                 localHostID.value = host.id;

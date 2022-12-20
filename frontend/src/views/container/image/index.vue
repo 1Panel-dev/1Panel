@@ -144,7 +144,7 @@ const search = async () => {
 };
 const loadRepos = async () => {
     const res = await listImageRepo();
-    repos.value = res.data;
+    repos.value = res.data || [];
 };
 
 const onOpenPull = () => {

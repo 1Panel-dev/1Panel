@@ -152,6 +152,10 @@ export namespace Container {
         password: string;
         auth: boolean;
     }
+    export interface RepoDelete {
+        ids: Array<number>;
+        deleteInsecure: boolean;
+    }
     export interface RepoInfo {
         id: number;
         createdAt: Date;

@@ -23,7 +23,7 @@ type IImageRepoService interface {
 	List() ([]dto.ImageRepoOption, error)
 	Create(req dto.ImageRepoCreate) error
 	Update(req dto.ImageRepoUpdate) error
-	BatchDelete(ids []uint) error
+	BatchDelete(req dto.ImageRepoDelete) error
 }
 
 func NewIImageRepoService() IImageRepoService {
@@ -70,6 +70,13 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 	if err := copier.Copy(&imageRepo, &req); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
+
+	cmd := exec.Command("systemctl", "restart", "docker")
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return errors.New(string(stdout))
+	}
+
 	imageRepo.Status = constant.StatusSuccess
 	if err := u.checkConn(req.DownloadUrl, req.Username, req.Password); err != nil {
 		imageRepo.Status = constant.StatusFailed
@@ -79,21 +86,22 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 		return err
 	}
 
-	cmd := exec.Command("systemctl", "restart", "docker")
-	stdout, err := cmd.CombinedOutput()
-	if err != nil {
-		return errors.New(string(stdout))
-	}
 	return nil
 }
 
-func (u *ImageRepoService) BatchDelete(ids []uint) error {
-	for _, id := range ids {
+func (u *ImageRepoService) BatchDelete(req dto.ImageRepoDelete) error {
+	for _, id := range req.Ids {
 		if id == 1 {
 			return errors.New("The default value cannot be edit !")
 		}
 	}
-	repos, err := imageRepoRepo.List(commonRepo.WithIdsIn(ids))
+	if !req.DeleteInsecure {
+		if err := imageRepoRepo.Delete(commonRepo.WithIdsIn(req.Ids)); err != nil {
+			return err
+		}
+		return nil
+	}
+	repos, err := imageRepoRepo.List(commonRepo.WithIdsIn(req.Ids))
 	if err != nil {
 		return err
 	}
@@ -106,7 +114,7 @@ func (u *ImageRepoService) BatchDelete(ids []uint) error {
 			_, _ = cmd.CombinedOutput()
 		}
 	}
-	if err := imageRepoRepo.Delete(commonRepo.WithIdsIn(ids)); err != nil {
+	if err := imageRepoRepo.Delete(commonRepo.WithIdsIn(req.Ids)); err != nil {
 		return err
 	}
 	cmd := exec.Command("systemctl", "restart", "docker")
@@ -129,8 +137,13 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 	if repo.DownloadUrl != req.DownloadUrl {
 		_ = u.handleRegistries(req.DownloadUrl, repo.DownloadUrl, "update")
 		if repo.Auth {
-			cmd := exec.Command("docker", "logout", fmt.Sprintf("%s://%s", repo.Protocol, repo.DownloadUrl))
+			cmd := exec.Command("docker", "logout", repo.DownloadUrl)
 			_, _ = cmd.CombinedOutput()
+		}
+		cmd := exec.Command("systemctl", "restart", "docker")
+		stdout, err := cmd.CombinedOutput()
+		if err != nil {
+			return errors.New(string(stdout))
 		}
 	}
 

@@ -38,3 +38,8 @@ type ImageRepoOption struct {
 	Name        string `json:"name"`
 	DownloadUrl string `json:"downloadUrl"`
 }
+
+type ImageRepoDelete struct {
+	DeleteInsecure bool   `json:"deleteInsecure"`
+	Ids            []uint `json:"ids" validate:"required"`
+}

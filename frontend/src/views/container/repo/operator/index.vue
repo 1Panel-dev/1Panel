@@ -7,7 +7,11 @@
         </template>
         <el-form ref="formRef" v-loading="loading" :model="dialogData.rowData" :rules="rules" label-width="120px">
             <el-form-item :label="$t('container.name')" prop="name">
-                <el-input :disabled="dialogData.title === 'edit'" v-model="dialogData.rowData!.name"></el-input>
+                <el-input
+                    clearable
+                    :disabled="dialogData.title === 'edit'"
+                    v-model="dialogData.rowData!.name"
+                ></el-input>
             </el-form-item>
             <el-form-item :label="$t('container.auth')" prop="auth">
                 <el-radio-group v-model="dialogData.rowData!.auth">
@@ -16,19 +20,29 @@
                 </el-radio-group>
             </el-form-item>
             <el-form-item v-if="dialogData.rowData!.auth" :label="$t('commons.login.username')" prop="username">
-                <el-input v-model="dialogData.rowData!.username"></el-input>
+                <el-input clearable v-model="dialogData.rowData!.username"></el-input>
             </el-form-item>
             <el-form-item v-if="dialogData.rowData!.auth" :label="$t('commons.login.password')" prop="password">
-                <el-input type="password" v-model="dialogData.rowData!.password"></el-input>
+                <el-input clearable type="password" show-password v-model="dialogData.rowData!.password"></el-input>
             </el-form-item>
             <el-form-item :label="$t('container.downloadUrl')" prop="downloadUrl">
-                <el-input v-model="dialogData.rowData!.downloadUrl" :placeholder="'172.16.10.10:8081'"></el-input>
+                <el-input
+                    clearable
+                    v-model="dialogData.rowData!.downloadUrl"
+                    :placeholder="'172.16.10.10:8081'"
+                ></el-input>
+                <span v-if="dialogData.rowData!.downloadUrl" class="input-help">
+                    docker pull {{ dialogData.rowData!.downloadUrl }}/nginx
+                </span>
             </el-form-item>
             <el-form-item :label="$t('container.protocol')" prop="protocol">
                 <el-radio-group v-model="dialogData.rowData!.protocol">
                     <el-radio label="http">http</el-radio>
                     <el-radio label="https">https</el-radio>
                 </el-radio-group>
+                <span v-if="dialogData.rowData!.protocol === 'http'" class="input-help">
+                    {{ $t('container.httpRepo') }}
+                </span>
             </el-form-item>
         </el-form>
         <template #footer>

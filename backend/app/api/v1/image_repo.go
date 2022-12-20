@@ -59,7 +59,7 @@ func (b *BaseApi) CreateRepo(c *gin.Context) {
 }
 
 func (b *BaseApi) DeleteRepo(c *gin.Context) {
-	var req dto.BatchDeleteReq
+	var req dto.ImageRepoDelete
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -69,7 +69,7 @@ func (b *BaseApi) DeleteRepo(c *gin.Context) {
 		return
 	}
 
-	if err := imageRepoService.BatchDelete(req.Ids); err != nil {
+	if err := imageRepoService.BatchDelete(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
