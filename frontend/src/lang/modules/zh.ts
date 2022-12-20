@@ -905,4 +905,15 @@ export default {
         manualCreate: '手动创建',
         acmeAccount: 'Acme 账号',
     },
+    firewall: {
+        ccDeny: 'CC 防护',
+        ipWhiteList: 'IP 白名单',
+        ipBlockList: 'IP 黑名单',
+        fileExtBlockList: '文件扩展名黑名单',
+        urlWhiteList: 'URL 白名单',
+        urlBlockList: 'URL 黑名单',
+        argsCheck: 'GET 参数校验',
+        postCheck: 'POST 参数校验',
+        cookieBlockList: 'Cookie 黑名单',
+    },
 };
