@@ -50,7 +50,6 @@ func (a AppInstallService) Page(req request.AppInstalledSearch) (int64, []respon
 }
 
 func (a AppInstallService) CheckExist(key string) (*response.AppInstalledCheck, error) {
-
 	res := &response.AppInstalledCheck{
 		IsExist: false,
 	}
@@ -101,7 +100,7 @@ func (a AppInstallService) Search(req request.AppInstalledSearch) ([]response.Ap
 		for _, app := range apps {
 			ids = append(ids, app.ID)
 		}
-		installs, err = appInstallRepo.GetBy(appInstallRepo.WithAppIdsIn(ids))
+		installs, err = appInstallRepo.GetBy(appInstallRepo.WithAppIdsIn(ids), appInstallRepo.WithIdNotInWebsite())
 		if err != nil {
 			return nil, err
 		}
@@ -191,7 +190,6 @@ func (a AppInstallService) PageInstallBackups(req request.AppBackupSearch) (int6
 }
 
 func (a AppInstallService) DeleteBackup(req request.AppBackupDelete) error {
-
 	backups, err := appInstallBackupRepo.GetBy(commonRepo.WithIdsIn(req.Ids))
 	if err != nil {
 		return err
