@@ -9,7 +9,7 @@
       "envKey": "MINIO_ROOT_USER"
     },
     {
-      "type": "text",
+      "type": "password",
       "labelZh": "密码",
       "labelEn": "Password",
       "required": true,
