@@ -10,7 +10,11 @@
             @is-exist="checkExist"
             v-model:loading="loading"
         ></AppStatus>
-        <el-card width="30%" v-if="redisStatus != 'Running' && !isOnSetting && redisIsExist" class="mask-prompt">
+        <el-card
+            width="30%"
+            v-if="redisStatus != 'Running' && !isOnSetting && redisIsExist && !loading"
+            class="mask-prompt"
+        >
             <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['Redis']) }}</span>
         </el-card>
 

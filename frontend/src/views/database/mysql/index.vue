@@ -10,7 +10,11 @@
         />
         <Setting ref="settingRef" style="margin-top: 20px" />
 
-        <el-card width="30%" v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist" class="mask-prompt">
+        <el-card
+            width="30%"
+            v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist && !loading"
+            class="mask-prompt"
+        >
             <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['Mysql']) }}</span>
         </el-card>
         <div v-if="mysqlIsExist" :class="{ mask: mysqlStatus != 'Running' }">
