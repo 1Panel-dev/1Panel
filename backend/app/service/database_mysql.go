@@ -169,14 +169,14 @@ func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create database if not exists %s character set=%s", mysqlDto.Name, mysqlDto.Format)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create database if not exists `%s` character set=%s", mysqlDto.Name, mysqlDto.Format)); err != nil {
 		return err
 	}
 	tmpPermission := mysqlDto.Permission
 	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create user if not exists '%s'@'%s' identified by '%s';", mysqlDto.Username, tmpPermission, mysqlDto.Password)); err != nil {
 		return err
 	}
-	grantStr := fmt.Sprintf("grant all privileges on %s.* to '%s'@'%s'", mysqlDto.Name, mysqlDto.Username, tmpPermission)
+	grantStr := fmt.Sprintf("grant all privileges on `%s`.* to '%s'@'%s'", mysqlDto.Name, mysqlDto.Username, tmpPermission)
 	if app.Version == "5.7.39" {
 		grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, mysqlDto.Password)
 	}

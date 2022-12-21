@@ -46,7 +46,7 @@ const installData = ref<InstallRrops>({
 let open = ref(false);
 let form = ref<{ [key: string]: any }>({});
 let rules = ref<FormRules>({
-    NAME: [Rules.requiredInput],
+    NAME: [Rules.simpleName],
 });
 let loading = false;
 const paramForm = ref<FormInstance>();
