@@ -37,11 +37,11 @@ type daemonJsonItem struct {
 
 func (u *DockerService) LoadDockerStatus() string {
 	status := constant.StatusRunning
-	// cmd := exec.Command("systemctl", "is-active", "docker")
-	// stdout, err := cmd.CombinedOutput()
-	// if string(stdout) != "active\n" || err != nil {
-	// 	status = constant.Stopped
-	// }
+	cmd := exec.Command("systemctl", "is-active", "docker")
+	stdout, err := cmd.CombinedOutput()
+	if string(stdout) != "active\n" || err != nil {
+		status = constant.Stopped
+	}
 
 	return status
 }

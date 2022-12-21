@@ -46,7 +46,7 @@
                                         <span class="input-help">{{ $t('database.maxmemoryHelper') }}</span>
                                     </el-form-item>
                                     <el-form-item>
-                                        <el-button type="primary" @click="submtiForm(formRef)">
+                                        <el-button type="primary" @click="onSubmtiForm(formRef)">
                                             {{ $t('commons.button.save') }}
                                         </el-button>
                                     </el-form-item>
@@ -150,6 +150,7 @@ const acceptParams = (prop: DialogProps): void => {
     if (redisStatus.value === 'Running') {
         statusRef.value!.acceptParams({ status: prop.status });
         persistenceRef.value!.acceptParams({ status: prop.status });
+        loadform();
     }
 };
 const onClose = (): void => {
@@ -201,42 +202,35 @@ const onChangePort = async (formEl: FormInstance | undefined) => {
         });
 };
 
-// const onChangePassword = async () => {
-//     loading.value = true;
-//     let param = {
-//         id: 0,
-//         value: form.requirepass,
-//     };
-//     changeRedisPassword(param)
-//         .then(() => {
-//             loading.value = false;
-//             ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-//         })
-//         .finally(() => {
-//             loading.value = false;
-//         });
-// };
-
-const submtiForm = async (formEl: FormInstance | undefined) => {
+const confirmFormRef = ref();
+const onSubmtiForm = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        let param = {
-            timeout: form.timeout + '',
-            maxclients: form.maxclients + '',
-            maxmemory: form.maxmemory + '',
+        let params = {
+            header: i18n.global.t('database.confChange'),
+            operationInfo: i18n.global.t('database.restartNowHelper'),
+            submitInputInfo: i18n.global.t('database.restartNow'),
         };
-        loading.value = true;
-        await updateRedisConf(param)
-            .then(() => {
-                loadform();
-                loading.value = false;
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-            })
-            .finally(() => {
-                loading.value = false;
-            });
+        confirmFormRef.value!.acceptParams(params);
     });
+};
+const submtiForm = async () => {
+    let param = {
+        timeout: form.timeout + '',
+        maxclients: form.maxclients + '',
+        maxmemory: form.maxmemory + '',
+    };
+    loading.value = true;
+    await updateRedisConf(param)
+        .then(() => {
+            loadform();
+            loading.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 const onSaveFile = async () => {
@@ -264,19 +258,12 @@ const submtiFile = async () => {
 };
 
 const loadform = async () => {
-    loading.value = true;
-    await loadRedisConf()
-        .then((res) => {
-            loading.value = false;
-            form.name = res.data?.name;
-            form.timeout = Number(res.data?.timeout);
-            form.maxclients = Number(res.data?.maxclients);
-            form.maxmemory = Number(res.data?.maxmemory);
-            form.port = Number(res.data?.port);
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    const res = await loadRedisConf();
+    form.name = res.data?.name;
+    form.timeout = Number(res.data?.timeout);
+    form.maxclients = Number(res.data?.maxclients);
+    form.maxmemory = Number(res.data?.maxmemory);
+    form.port = Number(res.data?.port);
 };
 
 const loadConfFile = async () => {

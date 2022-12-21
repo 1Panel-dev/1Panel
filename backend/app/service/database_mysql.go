@@ -436,9 +436,9 @@ func (u *MysqlService) UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
 	lineBytes, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
-	} else {
-		files = strings.Split(string(lineBytes), "\n")
 	}
+	files = strings.Split(string(lineBytes), "\n")
+
 	group := "[mysqld]"
 	for _, info := range updatas {
 		if app.Version != "5.7.39" {

@@ -42,23 +42,18 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 	if err != nil {
 		return err
 	}
-	if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "timeout", req.Timeout); err != nil {
+
+	var confs []redisConfig
+	confs = append(confs, redisConfig{key: "timeout", value: req.Timeout})
+	confs = append(confs, redisConfig{key: "maxclients", value: req.Maxclients})
+	confs = append(confs, redisConfig{key: "maxmemory", value: req.Maxmemory})
+	if err := confSet(redisInfo.Name, confs); err != nil {
 		return err
 	}
-	if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "maxclients", req.Maxclients); err != nil {
+	if _, err := compose.Restart(fmt.Sprintf("%s/redis/%s/docker-compose.yml", constant.AppInstallDir, redisInfo.Name)); err != nil {
 		return err
 	}
 
-	if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "maxmemory", req.Maxmemory); err != nil {
-		return err
-	}
-
-	commands := append(redisExec(redisInfo.ContainerName, redisInfo.Password), []string{"config", "rewrite"}...)
-	cmd := exec.Command("docker", commands...)
-	stdout, err := cmd.CombinedOutput()
-	if err != nil {
-		return errors.New(string(stdout))
-	}
 	return nil
 }
 
@@ -79,24 +74,20 @@ func (u *RedisService) UpdatePersistenceConf(req dto.RedisConfPersistenceUpdate)
 		return err
 	}
 
+	var confs []redisConfig
 	if req.Type == "rbd" {
-		if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "save", req.Save); err != nil {
-			return err
-		}
+		confs = append(confs, redisConfig{key: "save", value: req.Save})
 	} else {
-		if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "appendonly", req.Appendonly); err != nil {
-			return err
-		}
-		if err := configSetStr(redisInfo.ContainerName, redisInfo.Password, "appendfsync", req.Appendfsync); err != nil {
-			return err
-		}
+		confs = append(confs, redisConfig{key: "appendonly", value: req.Appendonly})
+		confs = append(confs, redisConfig{key: "appendfsync", value: req.Appendfsync})
 	}
-	commands := append(redisExec(redisInfo.ContainerName, redisInfo.Password), []string{"config", "rewrite"}...)
-	cmd := exec.Command("docker", commands...)
-	stdout, err := cmd.CombinedOutput()
-	if err != nil {
-		return errors.New(string(stdout))
+	if err := confSet(redisInfo.Name, confs); err != nil {
+		return err
 	}
+	if _, err := compose.Restart(fmt.Sprintf("%s/redis/%s/docker-compose.yml", constant.AppInstallDir, redisInfo.Name)); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -150,7 +141,6 @@ func (u *RedisService) LoadPersistenceConf() (*dto.RedisPersistence, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	var item dto.RedisPersistence
 	if item.Appendonly, err = configGetStr(redisInfo.ContainerName, redisInfo.Password, "appendonly"); err != nil {
 		return nil, err
@@ -301,12 +291,63 @@ func configGetStr(containerName, password, param string) (string, error) {
 	}
 	return "", nil
 }
-func configSetStr(containerName, password, param, value string) error {
-	commands := append(redisExec(containerName, password), []string{"config", "set", param, value}...)
-	cmd := exec.Command("docker", commands...)
-	stdout, err := cmd.CombinedOutput()
+
+type redisConfig struct {
+	key   string
+	value string
+}
+
+func confSet(redisName string, changeConf []redisConfig) error {
+	path := fmt.Sprintf("%s/redis/%s/conf/redis.conf", constant.AppInstallDir, redisName)
+	lineBytes, err := ioutil.ReadFile(path)
 	if err != nil {
-		return errors.New(string(stdout))
+		return err
+	}
+	files := strings.Split(string(lineBytes), "\n")
+
+	isStartRange := false
+	isEndRange := false
+	var newFiles []string
+	for _, line := range files {
+		if !isStartRange {
+			if line == "# Redis configuration rewrite by 1Panel" {
+				isStartRange = true
+			}
+			newFiles = append(newFiles, line)
+			continue
+		}
+		if !isEndRange {
+			isExist := false
+			for _, item := range changeConf {
+				if strings.HasPrefix(line, item.key) || strings.HasPrefix(line, "# "+item.key) {
+					if item.value == "0" || len(item.value) == 0 {
+						newFiles = append(newFiles, fmt.Sprintf("# %s %s", item.key, item.value))
+					} else {
+						newFiles = append(newFiles, fmt.Sprintf("%s %s", item.key, item.value))
+					}
+					isExist = true
+					break
+				}
+			}
+			if isExist {
+				continue
+			}
+			newFiles = append(newFiles, line)
+			if line == "# End Redis configuration rewrite by 1Panel" {
+				isEndRange = true
+			}
+			continue
+		}
+		newFiles = append(newFiles, line)
+	}
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0666)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	_, err = file.WriteString(strings.Join(newFiles, "\n"))
+	if err != nil {
+		return err
 	}
 	return nil
 }
