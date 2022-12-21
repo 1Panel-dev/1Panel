@@ -63,11 +63,8 @@
             </LayoutContent>
         </div>
         <div v-if="nginxIsExist">
-            <el-card width="30%" v-if="nginxStatus == 'Stopped'" class="mask-prompt">
-                <span style="font-size: 14px">当前未启动 OpenResty 服务</span>
-            </el-card>
-            <el-card width="30%" v-else-if="nginxStatus !== 'Running'" class="mask-prompt">
-                <span style="font-size: 14px">OpenResty 服务状态异常</span>
+            <el-card width="30%" v-if="nginxStatus != 'Running' && !loading" class="mask-prompt">
+                <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['OpenResty']) }}</span>
             </el-card>
         </div>
 
