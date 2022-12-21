@@ -108,6 +108,8 @@ export namespace App {
         operate: string;
         backupId?: number;
         detailId?: number;
+        forceDelete?: boolean;
+        deleteBackup?: boolean;
     }
 
     export interface AppInstalledSearch {

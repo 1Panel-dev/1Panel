@@ -35,10 +35,12 @@ type AppBackupDelete struct {
 }
 
 type AppInstalledOperate struct {
-	InstallId uint                `json:"installId" validate:"required"`
-	BackupId  uint                `json:"backupId"`
-	DetailId  uint                `json:"detailId"`
-	Operate   constant.AppOperate `json:"operate" validate:"required"`
+	InstallId    uint                `json:"installId" validate:"required"`
+	BackupId     uint                `json:"backupId"`
+	DetailId     uint                `json:"detailId"`
+	Operate      constant.AppOperate `json:"operate" validate:"required"`
+	ForceDelete  bool                `json:"forceDelete"`
+	DeleteBackup bool                `json:"deleteBackup"`
 }
 
 type PortUpdate struct {
