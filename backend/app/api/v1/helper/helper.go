@@ -40,9 +40,9 @@ func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 	if msgKey == constant.ErrTypeInternalServer {
 		switch {
 		case errors.Is(err, constant.ErrRecordExist):
-			res.Message = i18n.GetMsgWithMap("ErrRecordExist", map[string]interface{}{"detail": err})
+			res.Message = i18n.GetMsgWithMap("ErrRecordExist", nil)
 		case errors.Is(constant.ErrRecordNotFound, err):
-			res.Message = i18n.GetMsgWithMap("ErrRecordNotFound", map[string]interface{}{"detail": err})
+			res.Message = i18n.GetMsgWithMap("ErrRecordNotFound", nil)
 		case errors.Is(constant.ErrStructTransform, err):
 			res.Message = i18n.GetMsgWithMap("ErrStructTransform", map[string]interface{}{"detail": err})
 		case errors.Is(constant.ErrCaptchaCode, err):

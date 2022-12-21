@@ -137,7 +137,7 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 	case "website":
 		return fmt.Sprintf("%v/website/%s/website_%s_%s.tar.gz", varMap["dir"], cronjob.Website, cronjob.Website, record.StartTime.Format("20060102150405")), nil
 	case "database":
-		mysqlInfo, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+		mysqlInfo, err := appInstallRepo.LoadBaseInfo("mysql", "")
 		if err != nil {
 			return "", fmt.Errorf("load mysqlInfo failed, err: %v", err)
 		}

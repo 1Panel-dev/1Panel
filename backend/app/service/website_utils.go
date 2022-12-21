@@ -4,6 +4,13 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"io"
+	"os"
+	"os/exec"
+	"path"
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -16,12 +23,6 @@ import (
 	"github.com/1Panel-dev/1Panel/cmd/server/nginx_conf"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
-	"io"
-	"os"
-	"os/exec"
-	"path"
-	"strconv"
-	"strings"
 )
 
 func getDomain(domainStr string, websiteID uint) (model.WebsiteDomain, error) {
@@ -397,7 +398,7 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 		return err
 	}
 
-	nginxInfo, err := appInstallRepo.LoadBaseInfoByKey(constant.AppNginx)
+	nginxInfo, err := appInstallRepo.LoadBaseInfo(constant.AppNginx, "")
 	if err != nil {
 		return err
 	}
@@ -451,7 +452,7 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 }
 
 func handleWebsiteRecover(website *model.Website, fileDir string) error {
-	nginxInfo, err := appInstallRepo.LoadBaseInfoByKey(constant.AppNginx)
+	nginxInfo, err := appInstallRepo.LoadBaseInfo(constant.AppNginx, "")
 	if err != nil {
 		return err
 	}
@@ -493,7 +494,7 @@ func handleWebsiteRecover(website *model.Website, fileDir string) error {
 }
 
 func mysqlOpration(website *model.Website, operation, filePath string) error {
-	mysqlInfo, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	mysqlInfo, err := appInstallRepo.LoadBaseInfo(constant.AppNginx, "")
 	if err != nil {
 		return err
 	}

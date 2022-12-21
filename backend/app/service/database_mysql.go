@@ -67,7 +67,7 @@ func (u *MysqlService) SearchWithPage(search dto.PageInfo) (int64, interface{}, 
 }
 
 func (u *MysqlService) RecoverByUpload(req dto.UploadRecover) error {
-	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return err
 	}
@@ -157,7 +157,7 @@ func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
 	if mysqlDto.Username == "root" {
 		return errors.New("Cannot set root as user name")
 	}
-	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return err
 	}
@@ -204,7 +204,7 @@ func (u *MysqlService) Backup(db dto.BackupDB) error {
 }
 
 func (u *MysqlService) Recover(db dto.RecoverDB) error {
-	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return err
 	}
@@ -230,7 +230,7 @@ func (u *MysqlService) Recover(db dto.RecoverDB) error {
 
 func (u *MysqlService) DeleteCheck(id uint) ([]string, error) {
 	var appInUsed []string
-	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return appInUsed, err
 	}
@@ -251,7 +251,7 @@ func (u *MysqlService) DeleteCheck(id uint) ([]string, error) {
 }
 
 func (u *MysqlService) Delete(id uint) error {
-	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return err
 	}
@@ -298,7 +298,7 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 			return err
 		}
 	}
-	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return err
 	}
@@ -308,6 +308,20 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 		passwordChangeCMD = fmt.Sprintf("ALTER USER '%s'@'%s' IDENTIFIED WITH mysql_native_password BY '%s';", mysql.Username, mysql.Permission, info.Value)
 	}
 	if info.ID != 0 {
+		appRess, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(app.ID), appInstallResourceRepo.WithResourceId(mysql.ID))
+		for _, appRes := range appRess {
+			appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(appRes.AppInstallId))
+			if err != nil {
+				return err
+			}
+			appModel, err := appRepo.GetFirst(commonRepo.WithByID(appInstall.AppId))
+			if err != nil {
+				return err
+			}
+			if err := updateInstallInfoInDB(appModel.Key, appInstall.Name, "password", true, info.Value); err != nil {
+				return err
+			}
+		}
 		if err := excuteSql(app.ContainerName, app.Password, passwordChangeCMD); err != nil {
 			return err
 		}
@@ -330,10 +344,10 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 			}
 		}
 	}
-	if err := updateInstallInfoInDB("mysql", "password", false, info.Value); err != nil {
+	if err := updateInstallInfoInDB("mysql", "", "password", false, info.Value); err != nil {
 		return err
 	}
-	if err := updateInstallInfoInDB("phpmyadmin", "password", true, info.Value); err != nil {
+	if err := updateInstallInfoInDB("phpmyadmin", "", "password", true, info.Value); err != nil {
 		return err
 	}
 	return nil
@@ -350,7 +364,7 @@ func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
 			return err
 		}
 	}
-	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return err
 	}
@@ -392,7 +406,7 @@ func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
 }
 
 func (u *MysqlService) UpdateConfByFile(info dto.MysqlConfUpdateByFile) error {
-	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return err
 	}
@@ -412,7 +426,7 @@ func (u *MysqlService) UpdateConfByFile(info dto.MysqlConfUpdateByFile) error {
 }
 
 func (u *MysqlService) UpdateVariables(updatas []dto.MysqlVariablesUpdate) error {
-	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return err
 	}
@@ -458,7 +472,7 @@ func (u *MysqlService) UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
 
 func (u *MysqlService) LoadBaseInfo() (*dto.DBBaseInfo, error) {
 	var data dto.DBBaseInfo
-	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return nil, err
 	}
@@ -470,7 +484,7 @@ func (u *MysqlService) LoadBaseInfo() (*dto.DBBaseInfo, error) {
 }
 
 func (u *MysqlService) LoadRemoteAccess() (bool, error) {
-	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return false, err
 	}
@@ -488,7 +502,7 @@ func (u *MysqlService) LoadRemoteAccess() (bool, error) {
 }
 
 func (u *MysqlService) LoadVariables() (*dto.MysqlVariables, error) {
-	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return nil, err
 	}
@@ -506,7 +520,7 @@ func (u *MysqlService) LoadVariables() (*dto.MysqlVariables, error) {
 }
 
 func (u *MysqlService) LoadStatus() (*dto.MysqlStatus, error) {
-	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return nil, err
 	}
@@ -590,7 +604,7 @@ func excuteSql(containerName, password, command string) error {
 }
 
 func backupMysql(backupType, baseDir, backupDir, mysqlName, dbName, fileName string) error {
-	app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return err
 	}

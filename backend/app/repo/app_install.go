@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"gorm.io/gorm"
@@ -116,7 +117,7 @@ type RootInfo struct {
 	Version       string `json:"version"`
 }
 
-func (a *AppInstallRepo) LoadBaseInfoByKey(key string) (*RootInfo, error) {
+func (a *AppInstallRepo) LoadBaseInfo(key string, name string) (*RootInfo, error) {
 	var (
 		app        model.App
 		appInstall model.AppInstall
@@ -125,8 +126,14 @@ func (a *AppInstallRepo) LoadBaseInfoByKey(key string) (*RootInfo, error) {
 	if err := global.DB.Where("key = ?", key).First(&app).Error; err != nil {
 		return nil, err
 	}
-	if err := global.DB.Where("app_id = ?", app.ID).First(&appInstall).Error; err != nil {
-		return nil, err
+	if len(name) == 0 {
+		if err := global.DB.Where("app_id = ?", app.ID).First(&appInstall).Error; err != nil {
+			return nil, err
+		}
+	} else {
+		if err := global.DB.Where("app_id = ? AND name = ?", app.ID, name).First(&appInstall).Error; err != nil {
+			return nil, err
+		}
 	}
 	envMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(appInstall.Env), &envMap); err != nil {

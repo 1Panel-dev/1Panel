@@ -26,11 +26,11 @@
                             </el-input>
                             <span class="input-help">{{ $t('database.keyBufferSizeHelper') }}</span>
                         </el-form-item>
-                        <el-form-item label="query_cache_size" prop="query_cache_size">
-                            <el-input clearable v-model.number="mysqlVariables.query_cache_size">
-                                <template #append>MB</template>
+                        <el-form-item label="join_buffer_size" prop="join_buffer_size">
+                            <el-input clearable v-model.number="mysqlVariables.join_buffer_size">
+                                <template #append>KB</template>
                             </el-input>
-                            <span class="input-help">{{ $t('database.queryCacheSizeHelper') }}</span>
+                            <span class="input-help">{{ $t('database.joinBufferSizeHelper') }}</span>
                         </el-form-item>
                         <el-form-item label="tmp_table_size" prop="tmp_table_size">
                             <el-input clearable v-model.number="mysqlVariables.tmp_table_size">
@@ -77,11 +77,11 @@
                             </el-input>
                             <span class="input-help">{{ $t('database.readRndBufferSizeHelper') }}</span>
                         </el-form-item>
-                        <el-form-item label="join_buffer_size" prop="join_buffer_size">
-                            <el-input clearable v-model.number="mysqlVariables.join_buffer_size">
-                                <template #append>KB</template>
+                        <el-form-item v-if="mysqlVersion === '5.7.39'" label="query_cache_size" prop="query_cache_size">
+                            <el-input clearable v-model.number="mysqlVariables.query_cache_size">
+                                <template #append>MB</template>
                             </el-input>
-                            <span class="input-help">{{ $t('database.joinBufferSizeHelper') }}</span>
+                            <span class="input-help">{{ $t('database.queryCacheSizeHelper') }}</span>
                         </el-form-item>
                         <el-form-item label="thread_stack" prop="thread_stack">
                             <el-input clearable v-model.number="mysqlVariables.thread_stack">
@@ -129,6 +129,7 @@ const loading = ref(false);
 
 const plan = ref();
 const confirmDialogRef = ref();
+const mysqlVersion = ref();
 
 const variableFormRef = ref<FormInstance>();
 const oldVariables = ref<Database.MysqlVariables>();
@@ -175,10 +176,12 @@ const variablesRules = reactive({
 const mysqlName = ref();
 interface DialogProps {
     mysqlName: string;
+    mysqlVersion: string;
     variables: Database.MysqlVariables;
 }
 const acceptParams = (params: DialogProps): void => {
     mysqlName.value = params.mysqlName;
+    mysqlVersion.value = params.mysqlVersion;
     mysqlVariables.key_buffer_size = Number(params.variables.key_buffer_size) / 1024 / 1024;
     mysqlVariables.query_cache_size = Number(params.variables.query_cache_size) / 1024 / 1024;
     mysqlVariables.tmp_table_size = Number(params.variables.tmp_table_size) / 1024 / 1024;

@@ -247,6 +247,7 @@ export default {
         remoteAccess: '远程访问',
         remoteConnHelper: 'root 帐号远程连接 mysql 有安全风险，开启需谨慎！',
         changePassword: '改密',
+        changePasswordHelper: '当前数据库已经关联应用，修改密码将同步修改应用中数据库密码，修改后重启生效。',
 
         portSetting: '端口',
         portHelper: '该端口为容器对外暴露端口，修改需要单独保存并且重启容器！',

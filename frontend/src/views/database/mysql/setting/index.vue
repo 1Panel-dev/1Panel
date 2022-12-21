@@ -110,10 +110,12 @@ const slowLogRef = ref();
 const onSetting = ref<boolean>(false);
 const mysqlName = ref();
 const mysqlStatus = ref();
+const mysqlVersion = ref();
 const variables = ref();
 
 interface DialogProps {
     mysqlName: string;
+    mysqlVersion: string;
     status: string;
 }
 
@@ -121,6 +123,7 @@ const dialogContainerLogRef = ref();
 const acceptParams = (props: DialogProps): void => {
     onSetting.value = true;
     mysqlStatus.value = props.status;
+    mysqlVersion.value = props.mysqlVersion;
     loadBaseInfo();
     if (mysqlStatus.value === 'Running') {
         loadVariables();
@@ -221,7 +224,11 @@ const loadBaseInfo = async () => {
 const loadVariables = async () => {
     const res = await loadMysqlVariables();
     variables.value = res.data;
-    variablesRef.value!.acceptParams({ mysqlName: mysqlName.value, variables: res.data });
+    variablesRef.value!.acceptParams({
+        mysqlName: mysqlName.value,
+        mysqlVersion: mysqlVersion.value,
+        variables: res.data,
+    });
 };
 
 const loadSlowLogs = async () => {
