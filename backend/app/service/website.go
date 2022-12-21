@@ -92,6 +92,8 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) error {
 		Proxy:          create.Proxy,
 	}
 
+	tx, ctx := getTxAndContext()
+
 	switch create.Type {
 	case constant.Deployment:
 		if create.AppType == constant.NewApp {
@@ -99,19 +101,14 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) error {
 			req.Name = create.AppInstall.Name
 			req.AppDetailId = create.AppInstall.AppDetailId
 			req.Params = create.AppInstall.Params
-			install, err := ServiceGroupApp.Install(context.Background(), req)
+			install, err := ServiceGroupApp.Install(ctx, req)
 			if err != nil {
 				return err
 			}
 			website.AppInstallID = install.ID
 		}
-	case constant.Static:
-		if err := createStaticHtml(website); err != nil {
-			return err
-		}
 	}
 
-	tx, ctx := getTxAndContext()
 	if err := websiteRepo.Create(ctx, website); err != nil {
 		return err
 	}
