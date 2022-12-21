@@ -94,6 +94,11 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) 
 		if err := fileOp.CreateDir(path.Join(siteFolder, "ssl"), 0755); err != nil {
 			return err
 		}
+		if website.Type == constant.Static {
+			if err := createStaticHtml(website); err != nil {
+				return err
+			}
+		}
 	}
 	return fileOp.CopyDir(path.Join(nginxFolder, "www", "common", "waf", "rules"), path.Join(siteFolder, "waf"))
 }
@@ -151,9 +156,15 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain) e
 	}
 
 	if err := opNginx(nginxInstall.ContainerName, constant.NginxCheck); err != nil {
+		_ = deleteWebsiteFolder(nginxInstall, website)
 		return err
 	}
-	return opNginx(nginxInstall.ContainerName, constant.NginxReload)
+	if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
+		_ = deleteWebsiteFolder(nginxInstall, website)
+		return err
+	}
+
+	return nil
 }
 
 func delNginxConfig(website model.Website, force bool) error {
@@ -562,5 +573,19 @@ func copyConf(srcPath, dstPath string) error {
 	}
 	defer out.Close()
 	_, _ = io.Copy(out, src)
+	return nil
+}
+
+func deleteWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) error {
+	nginxFolder := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name)
+	siteFolder := path.Join(nginxFolder, "www", "sites", website.Alias)
+	fileOp := files.NewFileOp()
+	if fileOp.Stat(siteFolder) {
+		_ = fileOp.DeleteDir(siteFolder)
+	}
+	nginxFilePath := path.Join(nginxFolder, "conf", "conf.d", website.PrimaryDomain+".conf")
+	if fileOp.Stat(nginxFilePath) {
+		_ = fileOp.DeleteFile(nginxFilePath)
+	}
 	return nil
 }
