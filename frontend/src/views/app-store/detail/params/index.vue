@@ -108,7 +108,7 @@ const handleParams = () => {
                 } else {
                     rules[p.envKey] = [Rules.requiredInput];
                     if (p.envKey === 'PANEL_DB_NAME') {
-                        rules[p.envKey].push(Rules.databaseName);
+                        rules[p.envKey].push(Rules.linuxName);
                     }
                 }
             }
