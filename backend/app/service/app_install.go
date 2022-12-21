@@ -82,7 +82,7 @@ func (a AppInstallService) CheckExist(key string) (*response.AppInstalledCheck, 
 }
 
 func (a AppInstallService) LoadPort(key string) (int64, error) {
-	app, err := appInstallRepo.LoadBaseInfoByKey(key)
+	app, err := appInstallRepo.LoadBaseInfo(key, "")
 	if err != nil {
 		return int64(0), nil
 	}
@@ -90,7 +90,7 @@ func (a AppInstallService) LoadPort(key string) (int64, error) {
 }
 
 func (a AppInstallService) LoadPassword(key string) (string, error) {
-	app, err := appInstallRepo.LoadBaseInfoByKey(key)
+	app, err := appInstallRepo.LoadBaseInfo(key, "")
 	if err != nil {
 		return "", nil
 	}
@@ -272,7 +272,7 @@ func (a AppInstallService) GetUpdateVersions(installId uint) ([]dto.AppVersion, 
 }
 
 func (a AppInstallService) ChangeAppPort(req request.PortUpdate) error {
-	return updateInstallInfoInDB(req.Key, "port", true, strconv.FormatInt(req.Port, 10))
+	return updateInstallInfoInDB(req.Key, "", "port", true, strconv.FormatInt(req.Port, 10))
 }
 
 func (a AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, error) {
@@ -444,11 +444,11 @@ func syncById(installId uint) error {
 	return appInstallRepo.Save(&appInstall)
 }
 
-func updateInstallInfoInDB(appKey, param string, isRestart bool, value interface{}) error {
+func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value interface{}) error {
 	if param != "password" && param != "port" {
 		return nil
 	}
-	appInstall, err := appInstallRepo.LoadBaseInfoByKey(appKey)
+	appInstall, err := appInstallRepo.LoadBaseInfo(appKey, appName)
 	if err != nil {
 		return nil
 	}

@@ -239,6 +239,8 @@ export default {
         setting: 'Mysql Settings',
         remoteAccess: 'Remote access',
         changePassword: 'Password change',
+        changePasswordHelper:
+            'The database has been associated with an application. Changing the password will change the database password of the application at the same time. The change takes effect after the application restarts.',
 
         baseSetting: 'infrastructure',
         remoteConnHelper:

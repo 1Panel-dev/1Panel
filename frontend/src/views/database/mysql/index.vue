@@ -95,7 +95,7 @@
                 </div>
             </template>
             <el-form>
-                <el-form ref="changeFormRef" :model="changeForm" label-width="80px">
+                <el-form v-loading="loading" ref="changeFormRef" :model="changeForm" label-width="80px">
                     <div v-if="changeForm.operation === 'password'">
                         <el-form-item :label="$t('commons.login.username')" prop="userName">
                             <el-input disabled v-model="changeForm.userName"></el-input>
@@ -128,8 +128,10 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="changeVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button @click="submitChangeInfo(changeFormRef)">
+                    <el-button :disabled="loading" @click="changeVisiable = false">
+                        {{ $t('commons.button.cancel') }}
+                    </el-button>
+                    <el-button :disabled="loading" @click="submitChangeInfo(changeFormRef)">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>
@@ -162,6 +164,8 @@
         <BackupRecords ref="dialogBackupRef" />
 
         <AppResources ref="checkRef"></AppResources>
+
+        <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit"></ConfirmDialog>
     </div>
 </template>
 
@@ -171,6 +175,7 @@ import OperatrDialog from '@/views/database/mysql/create/index.vue';
 import RootPasswordDialog from '@/views/database/mysql/password/index.vue';
 import RemoteAccessDialog from '@/views/database/mysql/remote/index.vue';
 import BackupRecords from '@/views/database/mysql/backup/index.vue';
+import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import UploadDialog from '@/views/database/mysql/upload/index.vue';
 import AppResources from '@/views/database/mysql/check/index.vue';
 import Setting from '@/views/database/mysql/setting/index.vue';
@@ -216,6 +221,7 @@ const paginationConfig = reactive({
 const mysqlIsExist = ref(false);
 const mysqlContainer = ref();
 const mysqlStatus = ref();
+const mysqlVersion = ref();
 
 const dialogRef = ref();
 const onOpenDialog = async () => {
@@ -256,6 +262,7 @@ const onSetting = async () => {
     let params = {
         status: mysqlStatus.value,
         mysqlName: mysqlName.value,
+        mysqlVersion: mysqlVersion.value,
     };
     settingRef.value!.acceptParams(params);
 };
@@ -282,19 +289,43 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
             value: '',
         };
         if (changeForm.operation === 'password') {
-            param.value = changeForm.password;
-            await updateMysqlPassword(param);
-            search();
-            changeVisiable.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            const res = await deleteCheckMysqlDB(changeForm.id);
+            if (res.data && res.data.length > 0) {
+                let params = {
+                    header: i18n.global.t('database.changePassword'),
+                    operationInfo: i18n.global.t('database.changePasswordHelper'),
+                    submitInputInfo: i18n.global.t('database.restartNow'),
+                };
+                confirmDialogRef.value!.acceptParams(params);
+            } else {
+                param.value = changeForm.password;
+                loading.value = true;
+                await updateMysqlPassword(param)
+                    .then(() => {
+                        loading.value = false;
+                        search();
+                        changeVisiable.value = false;
+                        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                    })
+                    .catch(() => {
+                        loading.value = false;
+                    });
+            }
             return;
         }
         param.value = changeForm.privilege;
         changeForm.mysqlName = mysqlName.value;
-        await updateMysqlAccess(param);
-        search();
-        changeVisiable.value = false;
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        loading.value = true;
+        await updateMysqlAccess(param)
+            .then(() => {
+                loading.value = false;
+                search();
+                changeVisiable.value = false;
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     });
 };
 
@@ -331,6 +362,7 @@ const checkExist = (data: App.CheckInstalled) => {
     mysqlIsExist.value = data.isExist;
     mysqlName.value = data.name;
     mysqlStatus.value = data.status;
+    mysqlVersion.value = data.version;
     mysqlContainer.value = data.containerName;
     if (mysqlIsExist.value) {
         search();
@@ -356,6 +388,25 @@ const onDelete = async (row: Database.MysqlDBInfo) => {
         await useDeleteData(deleteMysqlDB, row.id, 'app.deleteWarn');
         search();
     }
+};
+
+const confirmDialogRef = ref();
+const onSubmit = async () => {
+    let param = {
+        id: changeForm.id,
+        value: changeForm.password,
+    };
+    loading.value = true;
+    await updateMysqlPassword(param)
+        .then(() => {
+            loading.value = false;
+            search();
+            changeVisiable.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const buttons = [

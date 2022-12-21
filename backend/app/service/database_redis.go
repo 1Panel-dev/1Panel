@@ -38,7 +38,7 @@ func NewIRedisService() IRedisService {
 }
 
 func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
-	redisInfo, err := appInstallRepo.LoadBaseInfoByKey("redis")
+	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
 	if err != nil {
 		return err
 	}
@@ -63,10 +63,10 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 }
 
 func (u *RedisService) ChangePassword(req dto.ChangeDBInfo) error {
-	if err := updateInstallInfoInDB("redis", "password", true, req.Value); err != nil {
+	if err := updateInstallInfoInDB("redis", "", "password", true, req.Value); err != nil {
 		return err
 	}
-	if err := updateInstallInfoInDB("redis-commander", "password", true, req.Value); err != nil {
+	if err := updateInstallInfoInDB("redis-commander", "", "password", true, req.Value); err != nil {
 		return err
 	}
 
@@ -74,7 +74,7 @@ func (u *RedisService) ChangePassword(req dto.ChangeDBInfo) error {
 }
 
 func (u *RedisService) UpdatePersistenceConf(req dto.RedisConfPersistenceUpdate) error {
-	redisInfo, err := appInstallRepo.LoadBaseInfoByKey("redis")
+	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func (u *RedisService) UpdatePersistenceConf(req dto.RedisConfPersistenceUpdate)
 }
 
 func (u *RedisService) LoadStatus() (*dto.RedisStatus, error) {
-	redisInfo, err := appInstallRepo.LoadBaseInfoByKey("redis")
+	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (u *RedisService) LoadStatus() (*dto.RedisStatus, error) {
 }
 
 func (u *RedisService) LoadConf() (*dto.RedisConf, error) {
-	redisInfo, err := appInstallRepo.LoadBaseInfoByKey("redis")
+	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +146,7 @@ func (u *RedisService) LoadConf() (*dto.RedisConf, error) {
 }
 
 func (u *RedisService) LoadPersistenceConf() (*dto.RedisPersistence, error) {
-	redisInfo, err := appInstallRepo.LoadBaseInfoByKey("redis")
+	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func (u *RedisService) LoadPersistenceConf() (*dto.RedisPersistence, error) {
 }
 
 func (u *RedisService) Backup() error {
-	redisInfo, err := appInstallRepo.LoadBaseInfoByKey("redis")
+	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
 	if err != nil {
 		return err
 	}
@@ -210,7 +210,7 @@ func (u *RedisService) Backup() error {
 }
 
 func (u *RedisService) Recover(req dto.RedisBackupRecover) error {
-	redisInfo, err := appInstallRepo.LoadBaseInfoByKey("redis")
+	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
 	if err != nil {
 		return err
 	}
@@ -250,7 +250,7 @@ func (u *RedisService) SearchBackupListWithPage(req dto.PageInfo) (int64, interf
 		list      []dto.DatabaseFileRecords
 		backDatas []dto.DatabaseFileRecords
 	)
-	redisInfo, err := appInstallRepo.LoadBaseInfoByKey("redis")
+	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
 	if err != nil {
 		return 0, nil, err
 	}

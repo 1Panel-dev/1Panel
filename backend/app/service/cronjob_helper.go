@@ -93,7 +93,7 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 
 	switch cronjob.Type {
 	case "database":
-		app, err := appInstallRepo.LoadBaseInfoByKey("mysql")
+		app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 		if err != nil {
 			return "", err
 		}
