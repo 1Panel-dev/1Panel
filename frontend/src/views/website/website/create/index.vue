@@ -109,6 +109,11 @@
             </el-form-item>
             <el-form-item :label="$t('website.alias')" prop="alias">
                 <el-input v-model="website.alias" :placeholder="$t('website.aliasHelper')"></el-input>
+                <div>
+                    <span class="input-help">
+                        {{ $t('website.staticPath') + staticPath + '/' + website.alias }}
+                    </span>
+                </div>
             </el-form-item>
             <el-form-item v-if="website.type === 'proxy'" :label="$t('website.proxyAddress')" prop="proxy">
                 <el-input v-model="website.proxy" :placeholder="$t('website.proxyHelper')"></el-input>
@@ -190,6 +195,7 @@ let appDetail = ref<App.AppDetail>();
 let appParams = ref<App.AppParams>();
 let paramKey = ref(1);
 let preCheckRef = ref();
+let staticPath = ref('');
 
 const em = defineEmits(['close']);
 
@@ -236,10 +242,12 @@ const getAppDetail = (version: string) => {
     });
 };
 
-const acceptParams = async () => {
+const acceptParams = async (installPath: string) => {
     if (websiteForm.value) {
         websiteForm.value.resetFields();
     }
+    console.log(installPath);
+    staticPath.value = installPath + '/www/sites';
 
     await ListGroups().then((res) => {
         groups.value = res.data;
