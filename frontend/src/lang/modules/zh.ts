@@ -895,6 +895,7 @@ export default {
         deleteAppHelper: '同时删除关联应用以及应用备份',
         deleteBackupHelper: '同时删除网站备份',
         deleteConfirmHelper: '删除操作无法回滚，请输入 <span style="color:red"> "{0}" </span> 删除此网站',
+        staticPath: '对应主目录:',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',

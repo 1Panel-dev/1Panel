@@ -106,6 +106,7 @@ let openNginxConfig = ref(false);
 let nginxIsExist = ref(false);
 let containerName = ref('');
 let nginxStatus = ref('');
+let installPath = ref('');
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -178,7 +179,7 @@ const openDelete = (website: Website.Website) => {
 };
 
 const openCreate = () => {
-    createRef.value.acceptParams();
+    createRef.value.acceptParams(installPath.value);
 };
 
 const openGroup = () => {
@@ -189,6 +190,7 @@ const checkExist = (data: App.CheckInstalled) => {
     nginxIsExist.value = data.isExist;
     containerName.value = data.containerName;
     nginxStatus.value = data.status;
+    installPath.value = data.installPath;
 };
 
 onMounted(() => {

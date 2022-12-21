@@ -74,6 +74,7 @@ func (a AppInstallService) CheckExist(key string) (*response.AppInstalledCheck, 
 	res.Status = appInstall.Status
 	res.AppInstallID = appInstall.ID
 	res.IsExist = true
+	res.InstallPath = path.Join(constant.AppInstallDir, appInstall.Name)
 	if len(appInstall.Backups) > 0 {
 		res.LastBackupAt = appInstall.Backups[0].CreatedAt.Format("2006-01-02 15:04:05")
 	}

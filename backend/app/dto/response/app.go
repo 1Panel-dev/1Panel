@@ -29,6 +29,7 @@ type AppInstalledCheck struct {
 	LastBackupAt  string    `json:"lastBackupAt"`
 	AppInstallID  uint      `json:"appInstallId"`
 	ContainerName string    `json:"containerName"`
+	InstallPath   string    `json:"installPath"`
 }
 
 type AppDetailDTO struct {

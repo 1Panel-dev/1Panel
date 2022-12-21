@@ -96,6 +96,7 @@ export namespace App {
         lastBackupAt: string;
         appInstallId: number;
         containerName: string;
+        installPath: string;
     }
 
     export interface AppInstallResource {
