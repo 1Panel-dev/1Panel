@@ -156,7 +156,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 	return nil
 }
 
-func deleteAppInstall(ctx context.Context, install model.AppInstall) error {
+func deleteAppInstall(ctx context.Context, install model.AppInstall, forceDelete bool, deleteBackup bool) error {
 	op := files.NewFileOp()
 	appDir := install.GetPath()
 	dir, _ := os.Stat(appDir)
@@ -169,19 +169,20 @@ func deleteAppInstall(ctx context.Context, install model.AppInstall) error {
 			return err
 		}
 	}
-
 	if err := appInstallRepo.Delete(ctx, install); err != nil {
 		return err
 	}
-	if err := deleteLink(ctx, &install); err != nil {
+	if err := deleteLink(ctx, &install); err != nil && !forceDelete {
 		return err
 	}
-	backups, _ := appInstallBackupRepo.GetBy(appInstallBackupRepo.WithAppInstallID(install.ID))
-	for _, backup := range backups {
-		_ = op.DeleteDir(backup.Path)
-	}
-	if err := appInstallBackupRepo.Delete(ctx, appInstallBackupRepo.WithAppInstallID(install.ID)); err != nil {
-		return err
+	if deleteBackup {
+		backups, _ := appInstallBackupRepo.GetBy(appInstallBackupRepo.WithAppInstallID(install.ID))
+		for _, backup := range backups {
+			_ = op.DeleteDir(backup.Path)
+		}
+		if err := appInstallBackupRepo.Delete(ctx, appInstallBackupRepo.WithAppInstallID(install.ID)); err != nil {
+			return err
+		}
 	}
 	return nil
 }

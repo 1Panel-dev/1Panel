@@ -789,6 +789,10 @@ export default {
         database: '数据库',
         defaultConfig: '默认配置',
         defaultConfigHelper: '已恢复为默认配置，保存后生效',
+        forceDelete: '强制删除',
+        forceDeleteHelper: '强制删除，会忽略删除过程中碰到的问题，最终删除元数据',
+        deleteBackup: '删除备份',
+        deleteBackupHelper: '同时删除应用备份',
     },
     website: {
         website: '网站',

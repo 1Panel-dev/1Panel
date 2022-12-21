@@ -109,6 +109,7 @@
         </el-dialog>
         <Backups ref="backupRef" @close="search"></Backups>
         <AppResources ref="checkRef"></AppResources>
+        <AppDelete ref="deleteRef" @close="search"></AppDelete>
     </el-card>
 </template>
 
@@ -127,8 +128,9 @@ import i18n from '@/lang';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import Backups from './backups.vue';
 import AppResources from './check/index.vue';
+import AppDelete from './delete/index.vue';
 import { App } from '@/api/interface/app';
-import { useDeleteData } from '@/hooks/use-delete-data';
+// import { useDeleteData } from '@/hooks/use-delete-data';
 import Status from '@/components/status/index.vue';
 
 let data = ref<any>();
@@ -148,6 +150,7 @@ let operateReq = reactive({
 let versions = ref<App.VersionDetail[]>();
 const backupRef = ref();
 const checkRef = ref();
+const deleteRef = ref();
 let searchName = ref('');
 
 const sync = () => {
@@ -192,8 +195,10 @@ const openOperate = (row: any, op: string) => {
             if (res.data && res.data.length > 0) {
                 checkRef.value.acceptParams({ items: items });
             } else {
-                await useDeleteData(InstalledOp, operateReq, 'app.deleteWarn');
-                search();
+                deleteRef.value.acceptParams(row);
+
+                // await useDeleteData(InstalledOp, operateReq, 'app.deleteWarn');
+                // search();
             }
         });
     } else {
