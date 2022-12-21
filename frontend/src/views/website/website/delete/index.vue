@@ -90,6 +90,7 @@ const acceptParams = async (website: Website.Website) => {
         deleteBackup: false,
         forceDelete: false,
     };
+    deleteInfo.value = '';
     deleteReq.value.id = website.id;
     websiteName.value = website.primaryDomain;
     deleteHelper.value = i18n.global.t('website.deleteConfirmHelper', [website.primaryDomain]);

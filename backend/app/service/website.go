@@ -95,7 +95,11 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) error {
 	switch create.Type {
 	case constant.Deployment:
 		if create.AppType == constant.NewApp {
-			install, err := ServiceGroupApp.Install(create.AppInstall.Name, create.AppInstall.AppDetailId, create.AppInstall.Params)
+			var req request.AppInstallCreate
+			req.Name = create.AppInstall.Name
+			req.AppDetailId = create.AppInstall.AppDetailId
+			req.Params = create.AppInstall.Params
+			install, err := ServiceGroupApp.Install(context.Background(), req)
 			if err != nil {
 				return err
 			}
@@ -275,9 +279,10 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 			for _, b := range backups {
 				_ = fileOp.DeleteDir(b.FileDir)
 			}
-		}
-		if err := backupRepo.DeleteRecord(backupRepo.WithByType("website-"+website.Type), commonRepo.WithByName(website.PrimaryDomain)); err != nil {
-			return err
+			if err := backupRepo.DeleteRecord(ctx, backupRepo.WithByType("website-"+website.Type), commonRepo.WithByName(website.PrimaryDomain)); err != nil {
+				tx.Rollback()
+				return err
+			}
 		}
 	}
 

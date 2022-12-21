@@ -75,6 +75,7 @@ const acceptParams = async (app: App.AppInstalled) => {
         deleteBackup: false,
         forceDelete: false,
     };
+    deleteInfo.value = '';
     deleteReq.value.installId = app.id;
     deleteHelper.value = i18n.global.t('website.deleteConfirmHelper', [app.name]);
     appInstallName.value = app.name;

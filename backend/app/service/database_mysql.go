@@ -31,7 +31,7 @@ type MysqlService struct{}
 type IMysqlService interface {
 	SearchWithPage(search dto.PageInfo) (int64, interface{}, error)
 	ListDBName() ([]string, error)
-	Create(mysqlDto dto.MysqlDBCreate) error
+	Create(ctx context.Context, mysqlDto dto.MysqlDBCreate) (*model.DatabaseMysql, error)
 	ChangeAccess(info dto.ChangeDBInfo) error
 	ChangePassword(info dto.ChangeDBInfo) error
 	UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
@@ -153,41 +153,41 @@ func (u *MysqlService) ListDBName() ([]string, error) {
 	return dbNames, err
 }
 
-func (u *MysqlService) Create(mysqlDto dto.MysqlDBCreate) error {
+func (u *MysqlService) Create(ctx context.Context, mysqlDto dto.MysqlDBCreate) (*model.DatabaseMysql, error) {
 	if mysqlDto.Username == "root" {
-		return errors.New("Cannot set root as user name")
+		return nil, errors.New("Cannot set root as user name")
 	}
 	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	mysql, _ := mysqlRepo.Get(commonRepo.WithByName(mysqlDto.Name))
 	if mysql.ID != 0 {
-		return constant.ErrRecordExist
+		return nil, constant.ErrRecordExist
 	}
 	if err := copier.Copy(&mysql, &mysqlDto); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
+		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 
 	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create database if not exists `%s` character set=%s", mysqlDto.Name, mysqlDto.Format)); err != nil {
-		return err
+		return nil,err
 	}
 	tmpPermission := mysqlDto.Permission
 	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create user if not exists '%s'@'%s' identified by '%s';", mysqlDto.Username, tmpPermission, mysqlDto.Password)); err != nil {
-		return err
+		return nil, err
 	}
 	grantStr := fmt.Sprintf("grant all privileges on `%s`.* to '%s'@'%s'", mysqlDto.Name, mysqlDto.Username, tmpPermission)
 	if app.Version == "5.7.39" {
 		grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, mysqlDto.Password)
 	}
 	if err := excuteSql(app.ContainerName, app.Password, grantStr); err != nil {
-		return err
+		return nil, err
 	}
 	mysql.MysqlName = app.Name
-	if err := mysqlRepo.Create(context.TODO(), &mysql); err != nil {
-		return err
+	if err := mysqlRepo.Create(ctx, &mysql); err != nil {
+		return nil, err
 	}
-	return nil
+	return &mysql, nil
 }
 
 func (u *MysqlService) Backup(db dto.BackupDB) error {
@@ -281,7 +281,7 @@ func (u *MysqlService) Delete(id uint) error {
 	if _, err := os.Stat(backupDir); err == nil {
 		_ = os.RemoveAll(backupDir)
 	}
-	_ = backupRepo.DeleteRecord(commonRepo.WithByType("database-mysql"), commonRepo.WithByName(app.Name), backupRepo.WithByDetailName(db.Name))
+	_ = backupRepo.DeleteRecord(context.Background(), commonRepo.WithByType("database-mysql"), commonRepo.WithByName(app.Name), backupRepo.WithByDetailName(db.Name))
 
 	_ = mysqlRepo.Delete(context.Background(), commonRepo.WithByID(db.ID))
 	return nil

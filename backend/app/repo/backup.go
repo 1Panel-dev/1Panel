@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"context"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"gorm.io/gorm"
@@ -17,7 +18,7 @@ type IBackupRepo interface {
 	CreateRecord(record *model.BackupRecord) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
-	DeleteRecord(opts ...DBOption) error
+	DeleteRecord(ctx context.Context, opts ...DBOption) error
 	WithByDetailName(detailName string) DBOption
 }
 
@@ -114,10 +115,6 @@ func (u *BackupRepo) Delete(opts ...DBOption) error {
 	return db.Delete(&model.BackupAccount{}).Error
 }
 
-func (u *BackupRepo) DeleteRecord(opts ...DBOption) error {
-	db := global.DB
-	for _, opt := range opts {
-		db = opt(db)
-	}
-	return db.Delete(&model.BackupRecord{}).Error
+func (u *BackupRepo) DeleteRecord(ctx context.Context, opts ...DBOption) error {
+	return getTx(ctx, opts...).Delete(&model.BackupRecord{}).Error
 }

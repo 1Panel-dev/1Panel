@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -25,7 +26,6 @@ type AppService struct {
 }
 
 func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
-
 	var opts []repo.DBOption
 	opts = append(opts, commonRepo.WithOrderBy("name"))
 	if req.Name != "" {
@@ -139,22 +139,21 @@ func (a AppService) GetAppDetail(appId uint, version string) (response.AppDetail
 	return appDetailDTO, nil
 }
 
-func (a AppService) Install(name string, appDetailId uint, params map[string]interface{}) (*model.AppInstall, error) {
-
-	if list, _ := appInstallRepo.GetBy(commonRepo.WithByName(name)); len(list) > 0 {
+func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (*model.AppInstall, error) {
+	if list, _ := appInstallRepo.GetBy(commonRepo.WithByName(req.Name)); len(list) > 0 {
 		return nil, buserr.New(constant.ErrNameIsExist)
 	}
 
-	httpPort, err := checkPort("PANEL_APP_PORT_HTTP", params)
+	httpPort, err := checkPort("PANEL_APP_PORT_HTTP", req.Params)
 	if err != nil {
 		return nil, err
 	}
-	httpsPort, err := checkPort("PANEL_APP_PORT_HTTPS", params)
+	httpsPort, err := checkPort("PANEL_APP_PORT_HTTPS", req.Params)
 	if err != nil {
 		return nil, err
 	}
 
-	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(appDetailId))
+	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(req.AppDetailId))
 	if err != nil {
 		return nil, err
 	}
@@ -166,16 +165,16 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 	if err := checkRequiredAndLimit(app); err != nil {
 		return nil, err
 	}
-	if err := copyAppData(app.Key, appDetail.Version, name, params); err != nil {
+	if err := copyAppData(app.Key, appDetail.Version, req.Name, req.Params); err != nil {
 		return nil, err
 	}
 
-	paramByte, err := json.Marshal(params)
+	paramByte, err := json.Marshal(req.Params)
 	if err != nil {
 		return nil, err
 	}
 	appInstall := model.AppInstall{
-		Name:        name,
+		Name:        req.Name,
 		AppId:       appDetail.AppId,
 		AppDetailId: appDetail.ID,
 		Version:     appDetail.Version,
@@ -216,12 +215,12 @@ func (a AppService) Install(name string, appDetailId uint, params map[string]int
 		return nil, err
 	}
 
-	tx, ctx := getTxAndContext()
+	tx, ctx := getTxByContext(ctx)
 	if err := appInstallRepo.Create(ctx, &appInstall); err != nil {
 		tx.Rollback()
 		return nil, err
 	}
-	if err := createLink(ctx, app, &appInstall, params); err != nil {
+	if err := createLink(ctx, app, &appInstall, req.Params); err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -484,20 +483,16 @@ func (a AppService) SyncAppList() error {
 			return err
 		}
 	}
-
 	if err := appTagRepo.DeleteAll(ctx); err != nil {
 		tx.Rollback()
 		return err
 	}
-
 	if len(appTags) > 0 {
 		if err := appTagRepo.BatchCreate(ctx, appTags); err != nil {
 			tx.Rollback()
 			return err
 		}
 	}
-
 	tx.Commit()
-
 	return nil
 }

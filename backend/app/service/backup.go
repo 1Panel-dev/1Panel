@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -169,7 +170,7 @@ func (u *BackupService) BatchDeleteRecord(ids []uint) error {
 			}
 		}
 	}
-	return backupRepo.DeleteRecord(commonRepo.WithIdsIn(ids))
+	return backupRepo.DeleteRecord(context.Background(), commonRepo.WithIdsIn(ids))
 }
 
 func (u *BackupService) Update(id uint, upMap map[string]interface{}) error {

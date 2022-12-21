@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
@@ -184,7 +185,7 @@ func (u *CronjobService) HandleRmExpired(backType, baseDir, backupDir string, cr
 				dbCopies++
 				if dbCopies > cronjob.RetainCopies {
 					_ = os.Remove(baseDir + "/" + backupDir + "/" + files[i].Name())
-					_ = backupRepo.DeleteRecord(backupRepo.WithByFileName(files[i].Name()))
+					_ = backupRepo.DeleteRecord(context.Background(), backupRepo.WithByFileName(files[i].Name()))
 				}
 			}
 		}

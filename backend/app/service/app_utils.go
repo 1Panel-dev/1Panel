@@ -130,29 +130,25 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 		if err != nil {
 			return err
 		}
-		var database model.DatabaseMysql
-		database.Name = dbConfig.DbName
-		database.Username = dbConfig.DbUser
-		database.Password = dbConfig.Password
-		database.MysqlName = dbInstall.Name
-		database.Format = "utf8mb4"
-		database.Permission = "127.0.0.1"
-		if err := mysqlRepo.Create(ctx, &database); err != nil {
+		var createMysql dto.MysqlDBCreate
+		createMysql.Name = dbConfig.DbName
+		createMysql.Username = dbConfig.DbUser
+		createMysql.Format = "utf8mb4"
+		createMysql.Permission = "%"
+		createMysql.Password = dbConfig.Password
+		mysqldb, err := NewIMysqlService().Create(ctx, createMysql)
+		if err != nil {
 			return err
 		}
 		var installResource model.AppInstallResource
-		installResource.ResourceId = database.ID
+		installResource.ResourceId = mysqldb.ID
 		installResource.AppInstallId = appInstall.ID
 		installResource.LinkId = dbInstall.ID
 		installResource.Key = dbInstall.App.Key
 		if err := appInstallResourceRepo.Create(ctx, &installResource); err != nil {
 			return err
 		}
-		if err := execDockerCommand(database, dbInstall, Add); err != nil {
-			return err
-		}
 	}
-
 	return nil
 }
 
