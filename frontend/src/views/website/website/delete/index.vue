@@ -24,14 +24,15 @@
                         {{ $t('website.deleteAppHelper') }}
                     </span>
                 </div>
+                <el-form-item>
+                    <el-checkbox v-model="deleteReq.deleteBackup" :label="$t('website.deleteBackup')" />
+                </el-form-item>
                 <div class="helper">
                     <span class="input-help">
                         {{ $t('website.deleteBackupHelper') }}
                     </span>
                 </div>
-                <el-form-item>
-                    <el-checkbox v-model="deleteReq.deleteBackup" :label="$t('website.deleteBackup')" />
-                </el-form-item>
+                <br />
                 <span v-html="deleteHelper"></span>
                 <el-form-item>
                     <el-input v-model="deleteInfo" :placeholder="websiteName" />
