@@ -71,7 +71,7 @@ const openCreate = () => {
 };
 
 const deleteAccount = async (id: number) => {
-    await useDeleteData(DeleteAcmeAccount, id, 'commons.msg.delete');
+    await useDeleteData(DeleteAcmeAccount, { id: id }, 'commons.msg.delete');
     search();
 };
 

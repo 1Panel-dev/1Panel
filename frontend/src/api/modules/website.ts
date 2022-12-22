@@ -103,8 +103,8 @@ export const CreateAcmeAccount = (req: Website.AcmeAccountCreate) => {
     return http.post<Website.AcmeAccount>(`/websites/acme`, req);
 };
 
-export const DeleteAcmeAccount = (id: number) => {
-    return http.delete<any>(`/websites/acme/${id}`);
+export const DeleteAcmeAccount = (req: Website.DelReq) => {
+    return http.post<any>(`/websites/acme/del`, req);
 };
 
 export const SearchSSL = (req: ReqPage) => {
