@@ -4,23 +4,23 @@ type SettingInfo struct {
 	UserName string `json:"userName"`
 	Email    string `json:"email"`
 
-	SessionTimeout int    `json:"sessionTimeout"`
+	SessionTimeout string `json:"sessionTimeout"`
 	LocalTime      string `json:"localTime"`
 
 	PanelName string `json:"panelName"`
 	Theme     string `json:"theme"`
 	Language  string `json:"language"`
 
-	ServerPort             int    `json:"serverPort"`
+	ServerPort             string `json:"serverPort"`
 	SecurityEntrance       string `json:"securityEntrance"`
-	ExpirationDays         int    `json:"expirationDays"`
+	ExpirationDays         string `json:"expirationDays"`
 	ExpirationTime         string `json:"expirationTime"`
 	ComplexityVerification string `json:"complexityVerification"`
 	MFAStatus              string `json:"mfaStatus"`
 	MFASecret              string `json:"mfaSecret"`
 
 	MonitorStatus    string `json:"monitorStatus"`
-	MonitorStoreDays int    `json:"monitorStoreDays"`
+	MonitorStoreDays string `json:"monitorStoreDays"`
 
 	MessageType string `json:"messageType"`
 	EmailVars   string `json:"emailVars"`

@@ -40,12 +40,10 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	_ = json.Unmarshal(arr, &info)
-	info.MonitorStoreDays, _ = strconv.Atoi(settingMap["MonitorStoreDays"])
-	info.ServerPort, _ = strconv.Atoi(settingMap["ServerPort"])
-	info.SessionTimeout, _ = strconv.Atoi(settingMap["SessionTimeout"])
-	info.ExpirationDays, _ = strconv.Atoi(settingMap["ExpirationDays"])
-	info.LocalTime = time.Now().Format("2006-01-02 15:04:05")
+	if err := json.Unmarshal(arr, &info); err != nil {
+		return nil, err
+	}
+	info.LocalTime = time.Now().String()
 	return &info, err
 }
 
