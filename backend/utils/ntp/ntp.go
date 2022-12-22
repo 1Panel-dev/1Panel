@@ -2,7 +2,6 @@ package ntp
 
 import (
 	"encoding/binary"
-	"flag"
 	"fmt"
 	"net"
 	"runtime"
@@ -31,29 +30,25 @@ type packet struct {
 	TxTimeFrac     uint32
 }
 
-func Getremotetime() (*time.Time, error) {
-	var host string
-	flag.StringVar(&host, "e", "ntp1.aliyun.com:123", "NTP host")
-	flag.Parse()
-
-	conn, err := net.Dial("udp", host)
+func Getremotetime() (time.Time, error) {
+	conn, err := net.Dial("udp", "ntp.aliyun.com:123")
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect: %v", err)
+		return time.Time{}, fmt.Errorf("failed to connect: %v", err)
 	}
 	defer conn.Close()
 	if err := conn.SetDeadline(time.Now().Add(15 * time.Second)); err != nil {
-		return nil, fmt.Errorf("failed to set deadline: %v", err)
+		return time.Time{}, fmt.Errorf("failed to set deadline: %v", err)
 	}
 
 	req := &packet{Settings: 0x1B}
 
 	if err := binary.Write(conn, binary.BigEndian, req); err != nil {
-		return nil, fmt.Errorf("failed to set request: %v", err)
+		return time.Time{}, fmt.Errorf("failed to set request: %v", err)
 	}
 
 	rsp := &packet{}
 	if err := binary.Read(conn, binary.BigEndian, rsp); err != nil {
-		return nil, fmt.Errorf("failed to read server response: %v", err)
+		return time.Time{}, fmt.Errorf("failed to read server response: %v", err)
 	}
 
 	secs := float64(rsp.TxTimeSec) - ntpEpochOffset
@@ -61,7 +56,7 @@ func Getremotetime() (*time.Time, error) {
 
 	showtime := time.Unix(int64(secs), nanos)
 
-	return &showtime, nil
+	return showtime, nil
 }
 
 func UpdateSystemDate(dateTime string) error {

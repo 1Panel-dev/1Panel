@@ -92,13 +92,14 @@ func (b *BaseApi) SyncTime(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
+
 	ts := ntime.Format(timeLayoutStr)
 	if err := ntp.UpdateSystemDate(ts); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 
-	helper.SuccessWithData(c, ts)
+	helper.SuccessWithData(c, ntime.String())
 }
 
 func (b *BaseApi) CleanMonitor(c *gin.Context) {

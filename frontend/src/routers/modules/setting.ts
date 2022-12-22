@@ -12,10 +12,10 @@ const settingRouter = {
     children: [
         {
             path: '/setting',
-            name: 'Setting',
-            component: () => import('@/views/setting/index.vue'),
+            name: 'Panel',
+            component: () => import('@/views/setting/panel/index.vue'),
+            hidden: true,
             meta: {
-                requiresAuth: true,
                 key: 'Setting',
             },
         },
@@ -41,15 +41,6 @@ const settingRouter = {
             path: '/setting/monitor',
             name: 'Monitor',
             component: () => import('@/views/setting/monitor/index.vue'),
-            hidden: true,
-            meta: {
-                key: 'Setting',
-            },
-        },
-        {
-            path: '/setting/panel',
-            name: 'Panel',
-            component: () => import('@/views/setting/panel/index.vue'),
             hidden: true,
             meta: {
                 key: 'Setting',
