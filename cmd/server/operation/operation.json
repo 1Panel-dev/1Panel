@@ -813,5 +813,528 @@
         "BeforeFuntions": [],
         "formatZH": "mfa 绑定",
         "formatEN": "bind mfa"
+    },
+    {
+        "api": "/api/v1/apps/sync",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "应用商店同步",
+        "formatEN": "App store synchronization"
+    },
+    {
+        "api": "/api/v1/apps/install",
+        "method": "POST",
+        "bodyKeys": [
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "name",
+                "isList": false,
+                "db": "app_installs",
+                "key": "app_id",
+                "value": "appId"
+            },
+            {
+                "info": "appId",
+                "isList": false,
+                "db": "apps",
+                "key": "key",
+                "value": "appKey"
+            }
+        ],
+        "formatZH": "安装应用 [appKey]-name",
+        "formatEN": "Install app [appKey]-name"
+    },
+    {
+        "api": "/api/v1/apps/installed/op",
+        "method": "POST",
+        "bodyKeys": [
+            "installId",
+            "operate"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "installId",
+                "isList": false,
+                "db": "app_installs",
+                "key": "app_id",
+                "value": "appId"
+            },
+            {
+                "info": "installId",
+                "isList": false,
+                "db": "app_installs",
+                "key": "name",
+                "value": "appName"
+            },
+            {
+                "info": "appId",
+                "isList": false,
+                "db": "apps",
+                "key": "key",
+                "value": "appKey"
+            }
+        ],
+        "formatZH": "应用 [appKey]-appName operate",
+        "formatEN": "App [appKey]-appName operate"
+    },
+    {
+        "api": "/api/v1/apps/installed/sync",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "已安装应用同步",
+        "formatEN": "App installed synchronization"
+    },
+    {
+        "api": "/api/v1/apps/installed/backups/del",
+        "method": "POST",
+        "bodyKeys": [
+            "ids"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "ids",
+                "isList": true,
+                "db": "app_install_backups",
+                "key": "name",
+                "value": "names"
+            }
+        ],
+        "formatZH": "删除应用备份 [names]",
+        "formatEN": "Deleting an Application Backup [names]"
+    },
+    {
+        "api": "/api/v1/apps/installed/port/change",
+        "method": "POST",
+        "bodyKeys": [
+            "key",
+            "name",
+            "port"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "应用端口修改 [key]-name => port",
+        "formatEN": "Application port update [key]-name => port"
+    },
+    {
+        "api": "/api/v1/apps/installed/port/change",
+        "method": "POST",
+        "bodyKeys": [
+            "key",
+            "name",
+            "port"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "应用端口修改 [key]-name => port",
+        "formatEN": "Application port update [key]-name => port"
+    },
+    {
+        "api": "/api/v1/apps/files",
+        "method": "POST",
+        "bodyKeys": [
+            "path"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建文件/文件夹 path",
+        "formatEN": "Create dir or file path"
+    },
+    {
+        "api": "/api/v1/apps/files/del",
+        "method": "POST",
+        "bodyKeys": [
+            "path"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "删除文件/文件夹 path",
+        "formatEN": "Delete dir or file path"
+    },
+    {
+        "api": "/api/v1/apps/files/batch/del",
+        "method": "POST",
+        "bodyKeys": [
+            "paths"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "批量删除文件/文件夹 paths",
+        "formatEN": "Batch delete dir or file paths"
+    },
+    {
+        "api": "/api/v1/apps/files/mode",
+        "method": "POST",
+        "bodyKeys": [
+            "path",
+            "mode"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "修改权限 paths => mode",
+        "formatEN": "Change mode paths => mode"
+    },
+    {
+        "api": "/api/v1/apps/files/compress",
+        "method": "POST",
+        "bodyKeys": [
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "压缩文件 name",
+        "formatEN": "Compress file name"
+    },
+    {
+        "api": "/api/v1/apps/files/decompress",
+        "method": "POST",
+        "bodyKeys": [
+            "path"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "解压 path",
+        "formatEN": "Decompress file path"
+    },
+    {
+        "api": "/api/v1/apps/files/upload",
+        "method": "POST",
+        "bodyKeys": [
+            "path"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "上传文件 path",
+        "formatEN": "Upload file path"
+    },
+    {
+        "api": "/api/v1/apps/files/rename",
+        "method": "POST",
+        "bodyKeys": [
+            "oldName",
+            "newName"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "重命名 oldName => newName",
+        "formatEN": "Rename oldName => newName"
+    },
+    {
+        "api": "/api/v1/apps/files/wget",
+        "method": "POST",
+        "bodyKeys": [
+            "url",
+            "path",
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "下载 url => path/name",
+        "formatEN": "Download url => path/name"
+    },
+    {
+        "api": "/api/v1/apps/files/move",
+        "method": "POST",
+        "bodyKeys": [
+            "oldPaths",
+            "newPath"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "移动文件 oldPaths => newPath",
+        "formatEN": "Move oldPaths => newPath"
+    },
+    {
+        "api": "/api/v1/apps/files/download",
+        "method": "POST",
+        "bodyKeys": [
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "下载文件 name",
+        "formatEN": "Download file name"
+    },
+    {
+        "api": "/api/v1/apps/nginx/update",
+        "method": "POST",
+        "bodyKeys": [
+            "websiteId"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "websiteId",
+                "isList": false,
+                "db": "websites",
+                "key": "primary_domain",
+                "value": "domain"
+            }
+        ],
+        "formatZH": "更新 nginx 配置 domain",
+        "formatEN": "Update nginx conf domain"
+    },
+    {
+        "api": "/api/v1/apps/nginx/file",
+        "method": "POST",
+        "bodyKeys": [],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "更新 nginx 配置",
+        "formatEN": "Update nginx conf"
+    },
+    {
+        "api": "/api/v1/websites/acme",
+        "method": "POST",
+        "bodyKeys": [
+            "email"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建网站 acme [email]",
+        "formatEN": "Create website acme [email]"
+    },
+    {
+        "api": "/api/v1/websites/acme/del",
+        "method": "POST",
+        "bodyKeys": [
+            "id"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "id",
+                "isList": false,
+                "db": "website_acme_accounts",
+                "key": "email",
+                "value": "email"
+            }
+        ],
+        "formatZH": "删除网站 acme [email]",
+        "formatEN": "Delete website acme [email]"
+    },
+    {
+        "api": "/api/v1/websites/dns",
+        "method": "POST",
+        "bodyKeys": [
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建网站 dns [name]",
+        "formatEN": "Create website dns [name]"
+    },
+    {
+        "api": "/api/v1/websites/dns/update",
+        "method": "POST",
+        "bodyKeys": [
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "更新网站 dns name",
+        "formatEN": "Update website dns [name]"
+    },
+    {
+        "api": "/api/v1/websites/dns/del",
+        "method": "POST",
+        "bodyKeys": [
+            "id"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "id",
+                "isList": false,
+                "db": "website_dns_accounts",
+                "key": "name",
+                "value": "name"
+            }
+        ],
+        "formatZH": "删除网站 dns name",
+        "formatEN": "Delete website dns [name]"
+    },
+    {
+        "api": "/api/v1/websites/groups",
+        "method": "POST",
+        "bodyKeys": [
+            "name"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建网站组 [name]",
+        "formatEN": "Create website groups [name]"
+    },
+    {
+        "api": "/api/v1/websites/ssl",
+        "method": "POST",
+        "bodyKeys": [
+            "primaryDomain"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建网站 ssl [primaryDomain]",
+        "formatEN": "Create website ssl [primaryDomain]"
+    },
+    {
+        "api": "/api/v1/websites/ssl/renew",
+        "method": "POST",
+        "bodyKeys": [
+            "SSLId"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "SSLId",
+                "isList": false,
+                "db": "website_ssls",
+                "key": "primary_domain",
+                "value": "domain"
+            }
+        ],
+        "formatZH": "重置 ssl [domain]",
+        "formatEN": "Renew ssl [domain]"
+    },
+    {
+        "api": "/api/v1/websites",
+        "method": "POST",
+        "bodyKeys": [
+            "primaryDomain"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建网站 [primaryDomain]",
+        "formatEN": "Create website [primaryDomain]"
+    },
+    {
+        "api": "/api/v1/websites/update",
+        "method": "POST",
+        "bodyKeys": [
+            "primaryDomain"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "更新网站 [primaryDomain]",
+        "formatEN": "Update website [primaryDomain]"
+    },
+    {
+        "api": "/api/v1/websites/del",
+        "method": "POST",
+        "bodyKeys": [
+            "id"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "id",
+                "isList": false,
+                "db": "websites",
+                "key": "primary_domain",
+                "value": "domain"
+            }
+        ],
+        "formatZH": "删除网站 [domain]",
+        "formatEN": "Delete website [domain]"
+    },
+    {
+        "api": "/api/v1/websites/recover",
+        "method": "POST",
+        "bodyKeys": [
+            "websiteName",
+            "backupName"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "[websiteName] 从备份恢复 [backupName]",
+        "formatEN": "[websiteName] recover from backups [backupName]"
+    },
+    {
+        "api": "/api/v1/websites/recover/byupload",
+        "method": "POST",
+        "bodyKeys": [
+            "websiteName",
+            "fileDir",
+            "fileName"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "[websiteName] 从上传恢复 [fileDir/fileName]",
+        "formatEN": "[websiteName] recover from uploads [fileDir/fileName]"
+    },
+    {
+        "api": "/api/v1/websites/domains/del",
+        "method": "POST",
+        "bodyKeys": [
+            "id"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "id",
+                "isList": false,
+                "db": "website_domains",
+                "key": "domain",
+                "value": "domain"
+            }
+        ],
+        "formatZH": "删除域名 [domain]",
+        "formatEN": "Delete domain [domain]"
+    },
+    {
+        "api": "/api/v1/websites/domains",
+        "method": "POST",
+        "bodyKeys": [
+            "domain"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [],
+        "formatZH": "创建域名 [domain]",
+        "formatEN": "Create domain [domain]"
+    },
+    {
+        "api": "/api/v1/websites/config/update",
+        "method": "POST",
+        "bodyKeys": [
+            "websiteId"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "websiteId",
+                "isList": false,
+                "db": "websites",
+                "key": "primary_domain",
+                "value": "domain"
+            }
+        ],
+        "formatZH": "nginx 配置修改 [domain]",
+        "formatEN": "Nginx conf update [domain]"
+    },
+    {
+        "api": "/api/v1/websites/waf/update",
+        "method": "POST",
+        "bodyKeys": [
+            "websiteId"
+        ],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "websiteId",
+                "isList": false,
+                "db": "websites",
+                "key": "primary_domain",
+                "value": "domain"
+            }
+        ],
+        "formatZH": "WAF 配置修改 [domain]",
+        "formatEN": "WAF conf update [domain]"
     }
 ]

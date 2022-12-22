@@ -12,7 +12,6 @@ type FileRouter struct {
 func (f *FileRouter) InitFileRouter(Router *gin.RouterGroup) {
 	fileRouter := Router.Group("files")
 	fileRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
-	//withRecordRouter := fileRouter.Use(middleware.OperationRecord())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		fileRouter.POST("/search", baseApi.ListFiles)
