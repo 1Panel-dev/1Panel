@@ -81,8 +81,10 @@ func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) 
 	varMap["bucket"] = backup.Bucket
 	switch backup.Type {
 	case constant.Sftp:
+		varMap["username"] = backup.AccessKey
 		varMap["password"] = backup.Credential
 	case constant.OSS, constant.S3, constant.MinIo:
+		varMap["accessKey"] = backup.AccessKey
 		varMap["secretKey"] = backup.Credential
 	}
 	backClient, err := cloud_storage.NewCloudStorageClient(varMap)
@@ -131,8 +133,10 @@ func (u *BackupService) GetBuckets(backupDto dto.ForBuckets) ([]interface{}, err
 	varMap["type"] = backupDto.Type
 	switch backupDto.Type {
 	case constant.Sftp:
+		varMap["username"] = backupDto.AccessKey
 		varMap["password"] = backupDto.Credential
 	case constant.OSS, constant.S3, constant.MinIo:
+		varMap["accessKey"] = backupDto.AccessKey
 		varMap["secretKey"] = backupDto.Credential
 	}
 	client, err := cloud_storage.NewCloudStorageClient(varMap)
@@ -189,8 +193,10 @@ func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.Cl
 	varMap["bucket"] = backup.Bucket
 	switch backup.Type {
 	case constant.Sftp:
+		varMap["username"] = backup.AccessKey
 		varMap["password"] = backup.Credential
 	case constant.OSS, constant.S3, constant.MinIo:
+		varMap["accessKey"] = backup.AccessKey
 		varMap["secretKey"] = backup.Credential
 	}
 

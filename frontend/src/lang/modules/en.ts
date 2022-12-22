@@ -676,7 +676,7 @@ export default {
         sessionTimeoutError: 'The minimum timeout is 300 seconds',
         sessionTimeoutHelper:
             'If you do not operate the panel for more than {0} seconds, the panel automatically logs out',
-        syncTime: 'Synchronization time',
+        syncTime: 'Server time',
         changePassword: 'Password change',
         oldPassword: 'Original password',
         newPassword: 'New password',

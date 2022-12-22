@@ -1,5 +1,6 @@
 <template>
     <div>
+        <Submenu activeName="safe" />
         <el-form :model="form" ref="panelFormRef" label-position="left" label-width="160px">
             <el-card style="margin-top: 20px">
                 <template #header>
@@ -12,21 +13,18 @@
                     <el-col :span="10">
                         <el-form-item
                             :label="$t('setting.expirationTime')"
-                            prop="settingInfo.expirationTime"
+                            prop="expirationTime"
                             :rules="Rules.requiredInput"
                         >
-                            <el-input disabled v-model="form.settingInfo.expirationTime">
+                            <el-input disabled v-model="form.expirationTime">
                                 <template #append>
-                                    <el-button @click="onChangeExoirationTime" icon="Setting">
+                                    <el-button @click="onChangeExpirationTime" icon="Setting">
                                         {{ $t('commons.button.set') }}
                                     </el-button>
                                 </template>
                             </el-input>
                             <div>
-                                <span
-                                    class="input-help"
-                                    v-if="form.settingInfo.expirationTime !== $t('setting.unSetting')"
-                                >
+                                <span class="input-help" v-if="form.expirationTime !== $t('setting.unSetting')">
                                     {{ $t('setting.timeoutHelper', [loadTimeOut()]) }}
                                 </span>
                                 <span class="input-help" v-else>
@@ -36,19 +34,13 @@
                         </el-form-item>
                         <el-form-item
                             :label="$t('setting.complexity')"
-                            prop="settingInfo.complexityVerification"
+                            prop="complexityVerification"
                             :rules="Rules.requiredSelect"
                         >
                             <el-radio-group
                                 style="width: 100%"
-                                @change="
-                                    onSave(
-                                        panelFormRef,
-                                        'ComplexityVerification',
-                                        form.settingInfo.complexityVerification,
-                                    )
-                                "
-                                v-model="form.settingInfo.complexityVerification"
+                                @change="onSave(panelFormRef, 'ComplexityVerification', form.complexityVerification)"
+                                v-model="form.complexityVerification"
                             >
                                 <el-radio-button label="enable">{{ $t('commons.button.enable') }}</el-radio-button>
                                 <el-radio-button label="disable">{{ $t('commons.button.disable') }}</el-radio-button>
@@ -59,12 +51,8 @@
                                 </span>
                             </div>
                         </el-form-item>
-                        <el-form-item
-                            :label="$t('setting.mfa')"
-                            prop="settingInfo.securityEntrance"
-                            :rules="Rules.requiredSelect"
-                        >
-                            <el-radio-group @change="handleMFA()" v-model="form.settingInfo.mfaStatus">
+                        <el-form-item :label="$t('setting.mfa')" prop="securityEntrance" :rules="Rules.requiredSelect">
+                            <el-radio-group @change="handleMFA()" v-model="form.mfaStatus">
                                 <el-radio-button label="enable">{{ $t('commons.button.enable') }}</el-radio-button>
                                 <el-radio-button label="disable">{{ $t('commons.button.disable') }}</el-radio-button>
                             </el-radio-group>
@@ -130,29 +118,25 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { ElMessage, ElForm } from 'element-plus';
+import Submenu from '@/views/setting/index.vue';
 import { Setting } from '@/api/interface/setting';
-import { updateSetting, getMFA, bindMFA } from '@/api/modules/setting';
+import { updateSetting, getMFA, bindMFA, getSettingInfo } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { dateFromat } from '@/utils/util';
 
 const emit = defineEmits(['on-save', 'search']);
 
-interface Props {
-    settingInfo: any;
-}
-const form = withDefaults(defineProps<Props>(), {
-    settingInfo: {
-        serverPort: '',
-        securityEntrance: '',
-        expirationDays: 0,
-        expirationTime: '',
-        complexityVerification: '',
-        mfaStatus: '',
-        mfaSecret: '',
-    },
+const form = reactive({
+    serverPort: '',
+    securityEntrance: '',
+    expirationDays: 0,
+    expirationTime: '',
+    complexityVerification: '',
+    mfaStatus: '',
+    mfaSecret: '',
 });
 type FormInstance = InstanceType<typeof ElForm>;
 const timeoutFormRef = ref<FormInstance>();
@@ -160,6 +144,16 @@ const timeoutVisiable = ref<boolean>(false);
 const timeoutForm = reactive({
     days: 0,
 });
+
+const search = async () => {
+    const res = await getSettingInfo();
+    form.securityEntrance = res.data.securityEntrance;
+    form.expirationDays = res.data.expirationDays;
+    form.expirationTime = res.data.expirationTime;
+    form.complexityVerification = res.data.complexityVerification;
+    form.mfaStatus = res.data.mfaStatus;
+    form.mfaSecret = res.data.mfaSecret;
+};
 
 const isMFAShow = ref<boolean>(false);
 const otp = reactive<Setting.MFAInfo>({
@@ -169,12 +163,33 @@ const otp = reactive<Setting.MFAInfo>({
 const mfaCode = ref();
 const panelFormRef = ref<FormInstance>();
 
-function onSave(formEl: FormInstance | undefined, key: string, val: any) {
-    emit('on-save', formEl, key, val);
+const onSave = async (formEl: FormInstance | undefined, key: string, val: any) => {
+    if (!formEl) return;
+    const result = await formEl.validateField(key.replace(key[0], key[0].toLowerCase()), callback);
+    if (!result) {
+        return;
+    }
+    if (val === '') {
+        return;
+    }
+    let param = {
+        key: key,
+        value: val + '',
+    };
+    await updateSetting(param);
+    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    search();
+};
+function callback(error: any) {
+    if (error) {
+        return error.message;
+    } else {
+        return;
+    }
 }
 
 const handleMFA = async () => {
-    if (form.settingInfo.mfaStatus === 'enable') {
+    if (form.mfaStatus === 'enable') {
         const res = await getMFA();
         otp.secret = res.data.secret;
         otp.qrImage = res.data.qrImage;
@@ -194,12 +209,12 @@ const onBind = async () => {
 };
 
 const onCancelMfaBind = async () => {
-    form.settingInfo.mfaStatus = 'disable';
+    form.mfaStatus = 'disable';
     isMFAShow.value = false;
 };
 
-const onChangeExoirationTime = async () => {
-    timeoutForm.days = form.settingInfo.expirationDays;
+const onChangeExpirationTime = async () => {
+    timeoutForm.days = form.expirationDays;
     timeoutVisiable.value = true;
 };
 
@@ -211,21 +226,25 @@ const submitTimeout = async (formEl: FormInstance | undefined) => {
         await updateSetting({ key: 'ExpirationDays', value: timeoutForm.days + '' });
         emit('search');
         loadTimeOut();
-        form.settingInfo.expirationTime = dateFromat(0, 0, time);
+        form.expirationTime = dateFromat(0, 0, time);
         timeoutVisiable.value = false;
     });
 };
 
 function loadTimeOut() {
-    if (form.settingInfo.expirationDays === 0) {
-        form.settingInfo.expirationTime = i18n.global.t('setting.unSetting');
+    if (form.expirationDays === 0) {
+        form.expirationTime = i18n.global.t('setting.unSetting');
         return i18n.global.t('setting.unSetting');
     }
-    let staytimeGap = new Date(form.settingInfo.expirationTime).getTime() - new Date().getTime();
+    let staytimeGap = new Date(form.expirationTime).getTime() - new Date().getTime();
     if (staytimeGap < 0) {
-        form.settingInfo.expirationTime = i18n.global.t('setting.unSetting');
+        form.expirationTime = i18n.global.t('setting.unSetting');
         return i18n.global.t('setting.unSetting');
     }
     return Math.floor(staytimeGap / (3600 * 1000 * 24));
 }
+
+onMounted(() => {
+    search();
+});
 </script>

@@ -6,6 +6,7 @@ type BackupOperate struct {
 	ID         uint   `json:"id"`
 	Type       string `json:"type" validate:"required"`
 	Bucket     string `json:"bucket"`
+	AccessKey  string `json:"accessKey"`
 	Credential string `json:"credential"`
 	Vars       string `json:"vars" validate:"required"`
 }
@@ -49,6 +50,7 @@ type DownloadRecord struct {
 
 type ForBuckets struct {
 	Type       string `json:"type" validate:"required"`
+	AccessKey  string `json:"accessKey"`
 	Credential string `json:"credential" validate:"required"`
 	Vars       string `json:"vars" validate:"required"`
 }

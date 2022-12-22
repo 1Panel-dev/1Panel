@@ -4,13 +4,16 @@ export namespace Backup {
     export interface BackupInfo {
         id: number;
         type: string;
+        accessKey: string;
         bucket: string;
+        credential: string;
         vars: string;
         varsJson: object;
     }
     export interface BackupOperate {
         id: number;
         type: string;
+        accessKey: string;
         bucket: string;
         credential: string;
         vars: string;
@@ -30,6 +33,7 @@ export namespace Backup {
     }
     export interface ForBucket {
         type: string;
+        accessKey: string;
         credential: string;
         vars: string;
     }

@@ -6,11 +6,11 @@ export const getSettingInfo = () => {
 };
 
 export const updateSetting = (param: Setting.SettingUpdate) => {
-    return http.post(`/settings`, param);
+    return http.post(`/settings/update`, param);
 };
 
 export const updatePassword = (param: Setting.PasswordUpdate) => {
-    return http.post(`/settings/password`, param);
+    return http.post(`/settings/password/update`, param);
 };
 
 export const handleExpired = (param: Setting.PasswordUpdate) => {
@@ -18,7 +18,7 @@ export const handleExpired = (param: Setting.PasswordUpdate) => {
 };
 
 export const syncTime = () => {
-    return http.post(`/settings/time/sync`, {});
+    return http.post<string>(`/settings/time/sync`, {});
 };
 
 export const cleanMonitors = () => {

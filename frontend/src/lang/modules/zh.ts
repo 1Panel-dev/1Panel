@@ -689,7 +689,7 @@ export default {
         sessionTimeout: '超时时间',
         sessionTimeoutError: '最小超时时间为 300 秒',
         sessionTimeoutHelper: '如果用户超过 {0} 秒未操作面板，面板将自动退出登录',
-        syncTime: '同步时间',
+        syncTime: '服务器时间',
         changePassword: '密码修改',
         oldPassword: '原密码',
         newPassword: '新密码',
