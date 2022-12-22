@@ -91,8 +91,8 @@ export const UpdateDnsAccount = (req: Website.DnsAccountUpdate) => {
     return http.post<any>(`/websites/dns/update`, req);
 };
 
-export const DeleteDnsAccount = (id: number) => {
-    return http.delete<any>(`/websites/dns/${id}`);
+export const DeleteDnsAccount = (req: Website.DelReq) => {
+    return http.post<any>(`/websites/dns/del`, req);
 };
 
 export const SearchAcmeAccount = (req: ReqPage) => {
