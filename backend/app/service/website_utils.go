@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"path"
@@ -423,20 +422,18 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 		if err := mysqlOpration(&website, "backup", tmpDir); err != nil {
 			return err
 		}
-
 		app, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 		if err != nil {
 			return err
 		}
 		websiteDir := fmt.Sprintf("%s/%s/%s", constant.AppInstallDir, app.App.Key, app.Name)
-		if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.PrimaryDomain), ""); err != nil {
+		if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.app.tar.gz", website.PrimaryDomain), ""); err != nil {
 			return err
 		}
-	} else {
-		websiteDir := fmt.Sprintf("%s/nginx/%s/www/%s", constant.AppInstallDir, nginxInfo.Name, website.PrimaryDomain)
-		if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.PrimaryDomain), ""); err != nil {
-			return err
-		}
+	}
+	websiteDir := path.Join(constant.AppInstallDir, "nginx", nginxInfo.Name, "www", "sites", website.PrimaryDomain)
+	if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.PrimaryDomain), ""); err != nil {
+		return err
 	}
 	if err := handleTar(tmpDir, fmt.Sprintf("%s/%s", baseDir, backupDir), backupName+".tar.gz", ""); err != nil {
 		return err
@@ -467,8 +464,8 @@ func handleWebsiteRecover(website *model.Website, fileDir string) error {
 	if err != nil {
 		return err
 	}
-	nginxConfFile := fmt.Sprintf("%s/nginx/%s/conf/conf.d/%s.conf", constant.AppInstallDir, nginxInfo.Name, website.PrimaryDomain)
-	if err := copyConf(fmt.Sprintf("%s/%s.conf", fileDir, website.PrimaryDomain), nginxConfFile); err != nil {
+	nginxConfPath := fmt.Sprintf("%s/nginx/%s/conf/conf.d/%s.conf", constant.AppInstallDir, nginxInfo.Name)
+	if err := files.NewFileOp().CopyFile(path.Join(fileDir, website.PrimaryDomain+".conf"), nginxConfPath); err != nil {
 		return err
 	}
 
@@ -555,24 +552,6 @@ func saveWebsiteJson(website *model.Website, tmpDir string) error {
 	write := bufio.NewWriter(file)
 	_, _ = write.WriteString(string(remarkInfo))
 	write.Flush()
-	return nil
-}
-
-func copyConf(srcPath, dstPath string) error {
-	if _, err := os.Stat(srcPath); err != nil {
-		return err
-	}
-	src, err := os.OpenFile(srcPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775)
-	if err != nil {
-		return err
-	}
-	defer src.Close()
-	out, err := os.Create(dstPath)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-	_, _ = io.Copy(out, src)
 	return nil
 }
 
