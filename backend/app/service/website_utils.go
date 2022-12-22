@@ -102,7 +102,7 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) 
 	return fileOp.CopyDir(path.Join(nginxFolder, "www", "common", "waf", "rules"), path.Join(siteFolder, "waf"))
 }
 
-func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain) error {
+func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, appInstall *model.AppInstall) error {
 	nginxInstall, err := getAppInstallByKey(constant.AppNginx)
 	if err != nil {
 		return err
@@ -136,10 +136,6 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain) e
 
 	switch website.Type {
 	case constant.Deployment:
-		appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
-		if err != nil {
-			return err
-		}
 		proxy := fmt.Sprintf("http://127.0.0.1:%d", appInstall.HttpPort)
 		server.UpdateRootProxy([]string{proxy})
 	case constant.Static:
