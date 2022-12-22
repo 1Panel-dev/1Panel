@@ -112,6 +112,7 @@
                 <div>
                     <span class="input-help">
                         {{ $t('website.staticPath') + staticPath + '/' + website.alias }}
+                        <span v-if="website.type === 'static' && website.alias != ''">{{ '/index' }}</span>
                     </span>
                 </div>
             </el-form-item>
