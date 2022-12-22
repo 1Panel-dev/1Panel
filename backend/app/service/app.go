@@ -215,16 +215,12 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		return nil, err
 	}
 
-	tx, ctx := getTxByContext(ctx)
 	if err := appInstallRepo.Create(ctx, &appInstall); err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 	if err := createLink(ctx, app, &appInstall, req.Params); err != nil {
-		tx.Rollback()
 		return nil, err
 	}
-	tx.Commit()
 	go upApp(appInstall.GetComposePath(), appInstall)
 	go updateToolApp(appInstall)
 	return &appInstall, nil

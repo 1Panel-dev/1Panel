@@ -1,7 +1,10 @@
 package helper
 
 import (
+	"context"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 
@@ -102,4 +105,10 @@ func GetIntParamByKey(c *gin.Context, key string) (uint, error) {
 	}
 	intNum, _ := strconv.Atoi(idParam)
 	return uint(intNum), nil
+}
+
+func GetTxAndContext() (tx *gorm.DB, ctx context.Context) {
+	tx = global.DB.Begin()
+	ctx = context.WithValue(context.Background(), constant.DB, tx)
+	return
 }

@@ -93,7 +93,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) error {
 	}
 
 	tx, ctx := getTxAndContext()
-
+	var appInstall *model.AppInstall
 	switch create.Type {
 	case constant.Deployment:
 		if create.AppType == constant.NewApp {
@@ -101,11 +101,12 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) error {
 			req.Name = create.AppInstall.Name
 			req.AppDetailId = create.AppInstall.AppDetailId
 			req.Params = create.AppInstall.Params
-			install, err := ServiceGroupApp.Install(ctx, req)
-			if err != nil {
-				return err
+			var installErr error
+			appInstall, installErr = ServiceGroupApp.Install(ctx, req)
+			if installErr != nil {
+				return installErr
 			}
-			website.AppInstallID = install.ID
+			website.AppInstallID = appInstall.ID
 		}
 	}
 
@@ -137,7 +138,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) error {
 		}
 	}
 
-	if err := configDefaultNginx(website, domains); err != nil {
+	if err := configDefaultNginx(website, domains, appInstall); err != nil {
 		tx.Rollback()
 		return err
 	}
