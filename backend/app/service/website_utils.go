@@ -53,7 +53,7 @@ func createStaticHtml(website *model.Website) error {
 		return err
 	}
 
-	indexFolder := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name, "www", "sites", website.Alias)
+	indexFolder := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name, "www", "sites", website.Alias, "index")
 	indexPath := path.Join(indexFolder, "index.html")
 	indexContent := string(nginx_conf.Index)
 	fileOp := files.NewFileOp()
@@ -87,7 +87,7 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) 
 		if err := fileOp.CreateFile(path.Join(siteFolder, "log", "access.log")); err != nil {
 			return err
 		}
-		if err := fileOp.CreateDir(path.Join(siteFolder, "data"), 0755); err != nil {
+		if err := fileOp.CreateDir(path.Join(siteFolder, "index"), 0755); err != nil {
 			return err
 		}
 		if err := fileOp.CreateDir(path.Join(siteFolder, "ssl"), 0755); err != nil {
@@ -139,7 +139,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		proxy := fmt.Sprintf("http://127.0.0.1:%d", appInstall.HttpPort)
 		server.UpdateRootProxy([]string{proxy})
 	case constant.Static:
-		server.UpdateRoot(path.Join("/www/sites", website.Alias))
+		server.UpdateRoot(path.Join("/www/sites", website.Alias, "index"))
 		server.UpdateRootLocation()
 	case constant.Proxy:
 		server.UpdateRootProxy([]string{website.Proxy})

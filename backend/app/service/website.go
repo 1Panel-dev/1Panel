@@ -218,7 +218,6 @@ func (w WebsiteService) Recover(req request.WebsiteRecover) error {
 	}
 	fileDir := path.Dir(req.BackupName)
 	pathName := strings.ReplaceAll(path.Base(req.BackupName), ".tar.gz", "")
-	//fileName := strings.ReplaceAll(req.BackupName[strings.LastIndex(req.BackupName, "/"):], ".tar.gz", "")
 	if err := handleUnTar(req.BackupName, fileDir); err != nil {
 		return err
 	}
