@@ -52,13 +52,13 @@ func (b *BaseApi) UpdateWebsiteDnsAccount(c *gin.Context) {
 }
 
 func (b *BaseApi) DeleteWebsiteDnsAccount(c *gin.Context) {
-	id, err := helper.GetParamID(c)
-	if err != nil {
+	var req request.WebsiteResourceReq
+	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 
-	if err := websiteDnsAccountService.Delete(id); err != nil {
+	if err := websiteDnsAccountService.Delete(req.ID); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

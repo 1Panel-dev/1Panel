@@ -18,6 +18,6 @@ func (a *WebsiteDnsAccountRouter) InitWebsiteDnsAccountRouter(Router *gin.Router
 		groupRouter.POST("/search", baseApi.PageWebsiteDnsAccount)
 		groupRouter.POST("", baseApi.CreateWebsiteDnsAccount)
 		groupRouter.POST("/update", baseApi.UpdateWebsiteDnsAccount)
-		groupRouter.DELETE("/:id", baseApi.DeleteWebsiteDnsAccount)
+		groupRouter.POST("/del", baseApi.DeleteWebsiteDnsAccount)
 	}
 }
