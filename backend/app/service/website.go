@@ -101,12 +101,18 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) error {
 			req.Name = create.AppInstall.Name
 			req.AppDetailId = create.AppInstall.AppDetailId
 			req.Params = create.AppInstall.Params
-			var installErr error
-			appInstall, installErr = ServiceGroupApp.Install(ctx, req)
-			if installErr != nil {
-				return installErr
+			install, err := ServiceGroupApp.Install(ctx, req)
+			if err != nil {
+				return err
 			}
-			website.AppInstallID = appInstall.ID
+			website.AppInstallID = install.ID
+			appInstall = install
+		} else {
+			install, err := appInstallRepo.GetFirst(commonRepo.WithByID(create.AppInstallID))
+			if err != nil {
+				return err
+			}
+			appInstall = &install
 		}
 	}
 
@@ -265,7 +271,7 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 			return err
 		}
 		if !reflect.DeepEqual(model.AppInstall{}, appInstall) {
-			if err := deleteAppInstall(ctx, appInstall, req.ForceDelete, true); err != nil {
+			if err := deleteAppInstall(ctx, appInstall, true); err != nil && !req.ForceDelete {
 				return err
 			}
 		}
