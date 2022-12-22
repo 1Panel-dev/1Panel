@@ -408,7 +408,7 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 	if err != nil {
 		return err
 	}
-	nginxConfFile := fmt.Sprintf("%s/nginx/%s/conf/conf.d/%s.conf", constant.AppInstallDir, nginxInfo.Name, website.PrimaryDomain)
+	nginxConfFile := fmt.Sprintf("%s/nginx/%s/conf/conf.d/%s.conf", constant.AppInstallDir, nginxInfo.Name, website.Alias)
 	fileOp := files.NewFileOp()
 	if err := fileOp.CopyFile(nginxConfFile, tmpDir); err != nil {
 		return err
@@ -423,12 +423,12 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 			return err
 		}
 		websiteDir := fmt.Sprintf("%s/%s/%s", constant.AppInstallDir, app.App.Key, app.Name)
-		if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.app.tar.gz", website.PrimaryDomain), ""); err != nil {
+		if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.app.tar.gz", website.Alias), ""); err != nil {
 			return err
 		}
 	}
-	websiteDir := path.Join(constant.AppInstallDir, "nginx", nginxInfo.Name, "www", "sites", website.PrimaryDomain)
-	if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.PrimaryDomain), ""); err != nil {
+	websiteDir := path.Join(constant.AppInstallDir, "nginx", nginxInfo.Name, "www", "sites", website.Alias)
+	if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.Alias), ""); err != nil {
 		return err
 	}
 	if err := handleTar(tmpDir, fmt.Sprintf("%s/%s", baseDir, backupDir), backupName+".tar.gz", ""); err != nil {
