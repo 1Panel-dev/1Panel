@@ -216,12 +216,13 @@ func (w WebsiteService) Recover(req request.WebsiteRecover) error {
 	if !strings.Contains(req.BackupName, "/") {
 		return errors.New("error path of request")
 	}
-	fileDir := req.BackupName[:strings.LastIndex(req.BackupName, "/")]
-	fileName := strings.ReplaceAll(req.BackupName[strings.LastIndex(req.BackupName, "/"):], ".tar.gz", "")
+	fileDir := path.Dir(req.BackupName)
+	pathName := strings.ReplaceAll(path.Base(req.BackupName), ".tar.gz", "")
+	//fileName := strings.ReplaceAll(req.BackupName[strings.LastIndex(req.BackupName, "/"):], ".tar.gz", "")
 	if err := handleUnTar(req.BackupName, fileDir); err != nil {
 		return err
 	}
-	fileDir = fileDir + "/" + fileName
+	fileDir = fileDir + "/" + pathName
 
 	if err := handleWebsiteRecover(&website, fileDir); err != nil {
 		return err

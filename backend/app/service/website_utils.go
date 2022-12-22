@@ -415,7 +415,7 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 	}
 
 	if website.Type == constant.Deployment {
-		if err := mysqlOpration(&website, "backup", tmpDir); err != nil {
+		if err := mysqlOperation(&website, "backup", tmpDir); err != nil {
 			return err
 		}
 		app, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
@@ -460,13 +460,13 @@ func handleWebsiteRecover(website *model.Website, fileDir string) error {
 	if err != nil {
 		return err
 	}
-	nginxConfPath := fmt.Sprintf("%s/nginx/%s/conf/conf.d/%s.conf", constant.AppInstallDir, nginxInfo.Name)
-	if err := files.NewFileOp().CopyFile(path.Join(fileDir, website.PrimaryDomain+".conf"), nginxConfPath); err != nil {
+	nginxConfPath := fmt.Sprintf("%s/nginx/%s/conf/conf.d", constant.AppInstallDir, nginxInfo.Name)
+	if err := files.NewFileOp().CopyFile(path.Join(fileDir, website.Alias+".conf"), nginxConfPath); err != nil {
 		return err
 	}
 
 	if website.Type == constant.Deployment {
-		if err := mysqlOpration(website, "recover", fileDir); err != nil {
+		if err := mysqlOperation(website, "recover", fileDir); err != nil {
 			return err
 		}
 
@@ -475,17 +475,16 @@ func handleWebsiteRecover(website *model.Website, fileDir string) error {
 			return err
 		}
 		appDir := fmt.Sprintf("%s/%s", constant.AppInstallDir, app.App.Key)
-		if err := handleUnTar(fmt.Sprintf("%s/%s.web.tar.gz", fileDir, website.PrimaryDomain), appDir); err != nil {
+		if err := handleUnTar(fmt.Sprintf("%s/%s.app.tar.gz", fileDir, website.Alias), appDir); err != nil {
 			return err
 		}
 		if _, err := compose.Restart(fmt.Sprintf("%s/%s/docker-compose.yml", appDir, app.Name)); err != nil {
 			return err
 		}
-	} else {
-		appDir := fmt.Sprintf("%s/nginx/%s/www", constant.AppInstallDir, nginxInfo.Name)
-		if err := handleUnTar(fmt.Sprintf("%s/%s.web.tar.gz", fileDir, website.PrimaryDomain), appDir); err != nil {
-			return err
-		}
+	}
+	siteDir := fmt.Sprintf("%s/nginx/%s/www/sites", constant.AppInstallDir, nginxInfo.Name)
+	if err := handleUnTar(fmt.Sprintf("%s/%s.web.tar.gz", fileDir, website.Alias), siteDir); err != nil {
+		return err
 	}
 	cmd := exec.Command("docker", "exec", "-i", nginxInfo.ContainerName, "nginx", "-s", "reload")
 	stdout, err := cmd.CombinedOutput()
@@ -497,8 +496,8 @@ func handleWebsiteRecover(website *model.Website, fileDir string) error {
 	return nil
 }
 
-func mysqlOpration(website *model.Website, operation, filePath string) error {
-	mysqlInfo, err := appInstallRepo.LoadBaseInfo(constant.AppNginx, "")
+func mysqlOperation(website *model.Website, operation, filePath string) error {
+	mysqlInfo, err := appInstallRepo.LoadBaseInfo(constant.AppMysql, "")
 	if err != nil {
 		return err
 	}
@@ -521,7 +520,7 @@ func mysqlOpration(website *model.Website, operation, filePath string) error {
 		return nil
 	}
 	cmd := exec.Command("docker", "exec", "-i", mysqlInfo.ContainerName, "mysql", "-uroot", "-p"+mysqlInfo.Password, db.Name)
-	sqlfile, err := os.Open(fmt.Sprintf("%s/%s.sql", filePath, website.PrimaryDomain))
+	sqlfile, err := os.Open(fmt.Sprintf("%s/%s.sql", filePath, website.Alias))
 	if err != nil {
 		return err
 	}
