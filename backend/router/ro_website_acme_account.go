@@ -17,6 +17,6 @@ func (a *WebsiteAcmeAccountRouter) InitWebsiteAcmeAccountRouter(Router *gin.Rout
 	{
 		groupRouter.POST("/search", baseApi.PageWebsiteAcmeAccount)
 		groupRouter.POST("", baseApi.CreateWebsiteAcmeAccount)
-		groupRouter.DELETE("/:id", baseApi.DeleteWebsiteAcmeAccount)
+		groupRouter.POST("/del", baseApi.DeleteWebsiteAcmeAccount)
 	}
 }

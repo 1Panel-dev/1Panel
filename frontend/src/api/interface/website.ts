@@ -228,4 +228,8 @@ export namespace Website {
         websiteId: number;
         key: string;
     }
+
+    export interface DelReq {
+        id: number;
+    }
 }

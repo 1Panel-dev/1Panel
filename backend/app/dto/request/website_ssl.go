@@ -39,3 +39,7 @@ type WebsiteDnsAccountUpdate struct {
 	Type          string            `json:"type" validate:"required"`
 	Authorization map[string]string `json:"authorization" validate:"required"`
 }
+
+type WebsiteResourceReq struct {
+	ID uint `json:"id" validate:"required"`
+}
