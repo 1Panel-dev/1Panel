@@ -111,7 +111,7 @@
                 <el-input v-model="website.alias" :placeholder="$t('website.aliasHelper')"></el-input>
                 <div>
                     <span class="input-help">
-                        {{ $t('website.staticPath') + staticPath + '/' + website.alias }}
+                        <span>{{ $t('website.staticPath') + staticPath + website.alias }}</span>
                         <span v-if="website.type === 'static' && website.alias != ''">{{ '/index' }}</span>
                     </span>
                 </div>
@@ -248,7 +248,7 @@ const acceptParams = async (installPath: string) => {
         websiteForm.value.resetFields();
     }
     console.log(installPath);
-    staticPath.value = installPath + '/www/sites';
+    staticPath.value = installPath + '/www/sites/';
 
     await ListGroups().then((res) => {
         groups.value = res.data;
