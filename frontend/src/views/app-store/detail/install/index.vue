@@ -2,13 +2,18 @@
     <el-dialog
         v-model="open"
         :title="$t('app.install')"
-        :destroy-on-close="true"
         :close-on-click-modal="false"
         width="40%"
         :before-close="handleClose"
-        @opened="opened"
     >
-        <el-form ref="paramForm" label-position="left" :model="form" label-width="150px" :rules="rules">
+        <el-form
+            ref="paramForm"
+            label-position="left"
+            :model="form"
+            label-width="150px"
+            :rules="rules"
+            :validate-on-rule-change="false"
+        >
             <el-form-item :label="$t('app.name')" prop="NAME">
                 <el-input v-model="form['NAME']"></el-input>
             </el-form-item>
@@ -30,7 +35,7 @@ import { App } from '@/api/interface/app';
 import { InstallApp } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import { FormInstance, FormRules } from 'element-plus';
-import { nextTick, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Params from '../params/index.vue';
 const router = useRouter();
@@ -61,22 +66,16 @@ const handleClose = () => {
     resetForm();
 };
 
-const opened = () => {
-    nextTick(() => {
-        if (paramForm.value) {
-            paramForm.value.clearValidate();
-        }
-    });
-};
-
 const resetForm = () => {
     if (paramForm.value) {
+        paramForm.value.clearValidate();
         paramForm.value.resetFields();
     }
 };
 
 const acceptParams = (props: InstallRrops): void => {
     installData.value = props;
+    resetForm();
     open.value = true;
 };
 
