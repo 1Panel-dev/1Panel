@@ -12,13 +12,3 @@ func getTxAndContext() (tx *gorm.DB, ctx context.Context) {
 	ctx = context.WithValue(context.Background(), constant.DB, tx)
 	return
 }
-
-func getTxByContext(ctx context.Context) (*gorm.DB, context.Context) {
-	tx, ok := ctx.Value(constant.DB).(*gorm.DB)
-	if ok {
-		return tx, ctx
-	}
-	tx = global.DB.Begin()
-	ctx = context.WithValue(context.Background(), constant.DB, tx)
-	return tx, ctx
-}
