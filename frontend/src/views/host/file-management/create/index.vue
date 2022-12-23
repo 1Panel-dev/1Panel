@@ -82,7 +82,7 @@ const handleClose = () => {
 };
 
 const rules = reactive<FormRules>({
-    name: [Rules.requiredInput],
+    name: [Rules.requiredInput, Rules.linuxName],
     path: [Rules.requiredInput],
     isSymlink: [Rules.requiredInput],
     linkPath: [Rules.requiredInput],

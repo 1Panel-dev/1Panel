@@ -92,7 +92,7 @@ let open = ref();
 let loading = ref(false);
 let accountForm = ref<FormInstance>();
 let rules = ref({
-    name: [Rules.requiredInput],
+    name: [Rules.requiredInput, Rules.linuxName],
     type: [Rules.requiredSelect],
     authorization: {
         accessKey: [Rules.requiredInput],

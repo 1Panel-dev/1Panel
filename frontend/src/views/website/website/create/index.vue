@@ -167,7 +167,7 @@ const website = ref({
     },
 });
 let rules = reactive({
-    primaryDomain: [Rules.linuxName],
+    primaryDomain: [Rules.domain],
     alias: [Rules.linuxName],
     type: [Rules.requiredInput],
     webSiteGroupId: [Rules.requiredSelectBusiness],

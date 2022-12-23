@@ -106,10 +106,9 @@ let acmeReq = reactive({
 });
 let dnsAccounts = ref<Website.DnsAccount[]>();
 let acmeAccounts = ref<Website.AcmeAccount[]>();
-// let domains = ref<Website.Domain[]>([]);
 let sslForm = ref<FormInstance>();
 let rules = ref({
-    primaryDomain: [Rules.requiredInput],
+    primaryDomain: [Rules.requiredInput, Rules.domain],
     acmeAccountId: [Rules.requiredSelectBusiness],
     dnsAccountId: [Rules.requiredSelectBusiness],
     provider: [Rules.requiredInput],
