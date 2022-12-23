@@ -82,24 +82,11 @@ const checkImageName = (rule: any, value: any, callback: any) => {
 
 const checkLinuxName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
-        callback(new Error(i18n.global.t('commons.rule.linuxName')));
+        callback(new Error(i18n.global.t('commons.rule.linuxName', ['/\\:*?"<>|'])));
     } else {
-        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9_.-]{0,30}$/;
+        const reg = /^((?!\\|\/|:|\*|\?|<|>|\||'|%).){1,30}$/;
         if (!reg.test(value) && value !== '') {
-            callback(new Error(i18n.global.t('commons.rule.linuxName')));
-        } else {
-            callback();
-        }
-    }
-};
-
-const checkDomain = (rule: any, value: any, callback: any) => {
-    if (value === '' || typeof value === 'undefined' || value == null) {
-        callback(new Error(i18n.global.t('commons.rule.domain')));
-    } else {
-        const reg = /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]$/;
-        if (!reg.test(value) && value !== '') {
-            callback(new Error(i18n.global.t('commons.rule.domain')));
+            callback(new Error(i18n.global.t('commons.rule.linuxName', ['/\\:*?"<>|'])));
         } else {
             callback();
         }
@@ -113,6 +100,20 @@ const checkDatabaseName = (rule: any, value: any, callback: any) => {
         const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9_]{0,30}$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.databaseName')));
+        } else {
+            callback();
+        }
+    }
+};
+
+const checkDomain = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.domain')));
+    } else {
+        const reg =
+            /^([\w\u4e00-\u9fa5\-\*]{1,100}\.){1,10}([\w\u4e00-\u9fa5\-]{1,24}|[\w\u4e00-\u9fa5\-]{1,24}\.[\w\u4e00-\u9fa5\-]{1,24})$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.domain')));
         } else {
             callback();
         }
