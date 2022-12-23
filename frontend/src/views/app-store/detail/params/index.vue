@@ -91,7 +91,6 @@ const updateParam = () => {
 
 const handleParams = () => {
     rules = props.rules;
-
     if (params.value != undefined && params.value.formFields != undefined) {
         for (const p of params.value.formFields) {
             const pObj = p;
@@ -129,7 +128,11 @@ const getServices = async (envKey: string, key: string | undefined, pObj: ParamO
             form[envKey] = res.data[0].value;
             if (res.data[0].config) {
                 Object.entries(res.data[0].config).forEach(([k, v]) => {
-                    form[k] = v;
+                    params.value.formFields.forEach((field) => {
+                        if (field.envKey === k) {
+                            form[k] = v;
+                        }
+                    });
                 });
             }
             updateParam();
@@ -141,7 +144,9 @@ const changeService = (value: string, services: App.AppService[]) => {
     services.forEach((item) => {
         if (item.value === value) {
             Object.entries(item.config).forEach(([k, v]) => {
-                form[k] = v;
+                if (form.hasOwnProperty(k)) {
+                    form[k] = v;
+                }
             });
         }
     });

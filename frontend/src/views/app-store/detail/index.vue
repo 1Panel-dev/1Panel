@@ -54,7 +54,6 @@
                                     show-icon
                                     :closable="false"
                                 />
-                                <!-- <span v-if="!appDetail.enable">{{ $t('app.limitHelper') }}</span> -->
                             </div>
                         </div>
                     </el-col>
