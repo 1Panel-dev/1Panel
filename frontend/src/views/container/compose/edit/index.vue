@@ -7,12 +7,11 @@
         </template>
         <div v-loading="loading">
             <codemirror
-                ref="mymirror"
                 :autofocus="true"
                 placeholder="None data"
                 :indent-with-tab="true"
                 :tabSize="4"
-                style="max-height: 500px"
+                style="max-height: 500px; width: 100%; min-height: 200px"
                 :lineWrapping="true"
                 :matchBrackets="true"
                 theme="cobalt"

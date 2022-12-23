@@ -2,11 +2,13 @@
     <div v-loading="loading">
         <LayoutContent :header="composeName" back-name="Compose" :reload="true">
             <div v-if="createdBy === '1Panel'">
-                <el-button icon="VideoPlay" @click="onComposeOperate('start')">{{ $t('container.start') }}</el-button>
-                <el-button icon="VideoPause" @click="onComposeOperate('stop')">{{ $t('container.stop') }}</el-button>
-                <el-button icon="Delete" @click="onComposeOperate('down')" plain type="danger">
-                    {{ $t('container.remove') }}
-                </el-button>
+                <el-button-group>
+                    <el-button @click="onComposeOperate('start')">{{ $t('container.start') }}</el-button>
+                    <el-button @click="onComposeOperate('stop')">{{ $t('container.stop') }}</el-button>
+                    <el-button @click="onComposeOperate('down')">
+                        {{ $t('container.remove') }}
+                    </el-button>
+                </el-button-group>
             </div>
             <div v-else>
                 <el-alert :closable="false" show-icon :title="$t('container.composeDetailHelper')" type="info" />
