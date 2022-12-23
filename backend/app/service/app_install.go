@@ -446,7 +446,7 @@ func syncById(installId uint) error {
 }
 
 func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value interface{}) error {
-	if param != "password" && param != "port" {
+	if param != "password" && param != "port" && param != "user-password" {
 		return nil
 	}
 	appInstall, err := appInstallRepo.LoadBaseInfo(appKey, appName)
@@ -458,9 +458,15 @@ func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value 
 	if err != nil {
 		return err
 	}
-	envKey := "PANEL_DB_ROOT_PASSWORD="
-	if param == "port" {
+
+	envKey := ""
+	switch param {
+	case "password":
+		envKey = "PANEL_DB_ROOT_PASSWORD="
+	case "port":
 		envKey = "PANEL_APP_PORT_HTTP="
+	case "user-password":
+		envKey = "PANEL_DB_USER_PASSWORD="
 	}
 	files := strings.Split(string(lineBytes), "\n")
 	var newFiles []string

@@ -19,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	_ "github.com/go-sql-driver/mysql"
@@ -170,7 +171,7 @@ func (u *MysqlService) Create(ctx context.Context, mysqlDto dto.MysqlDBCreate) (
 	}
 
 	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create database if not exists `%s` character set=%s", mysqlDto.Name, mysqlDto.Format)); err != nil {
-		return nil,err
+		return nil, err
 	}
 	tmpPermission := mysqlDto.Permission
 	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create user if not exists '%s'@'%s' identified by '%s';", mysqlDto.Username, tmpPermission, mysqlDto.Password)); err != nil {
@@ -264,7 +265,7 @@ func (u *MysqlService) Delete(id uint) error {
 	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", db.Name, db.Permission)); err != nil {
 		return err
 	}
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop database if exists %s", db.Name)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop database if exists `%s`", db.Name)); err != nil {
 		return err
 	}
 
@@ -318,7 +319,7 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 			if err != nil {
 				return err
 			}
-			if err := updateInstallInfoInDB(appModel.Key, appInstall.Name, "password", true, info.Value); err != nil {
+			if err := updateInstallInfoInDB(appModel.Key, appInstall.Name, "user-password", true, info.Value); err != nil {
 				return err
 			}
 		}
@@ -447,8 +448,8 @@ func (u *MysqlService) UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
 			}
 		}
 
-		if _, ok := info.Value.(int64); ok {
-			files = updateMyCnf(files, group, info.Param, loadSizeUnit(info.Value.(int64)))
+		if _, ok := info.Value.(float64); ok {
+			files = updateMyCnf(files, group, info.Param, common.LoadSizeUnit(info.Value.(float64)))
 		} else {
 			files = updateMyCnf(files, group, info.Param, info.Value)
 		}
@@ -684,14 +685,4 @@ func updateMyCnf(oldFiles []string, group string, param string, value interface{
 		newFiles = append(newFiles, fmt.Sprintf("%s=%v\n", param, value))
 	}
 	return newFiles
-}
-
-func loadSizeUnit(value int64) string {
-	if value > 1048576 {
-		return fmt.Sprintf("%dM", value/1048576)
-	}
-	if value > 1024 {
-		return fmt.Sprintf("%dK", value/1024)
-	}
-	return fmt.Sprintf("%d", value)
 }

@@ -124,7 +124,6 @@ func (sws *LogicSshWsSession) receiveWsMsg(exitCh chan bool) {
 		default:
 			_, wsData, err := wsConn.ReadMessage()
 			if err != nil {
-				global.LOG.Errorf("reading webSocket message failed, err: %v", err)
 				return
 			}
 			msgObj := wsMsg{}

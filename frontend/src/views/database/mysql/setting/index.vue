@@ -18,9 +18,23 @@
                             v-model="mysqlConf"
                             :readOnly="true"
                         />
+                        <el-button style="margin-top: 10px" @click="getDefaultConfig()">
+                            {{ $t('app.defaultConfig') }}
+                        </el-button>
                         <el-button type="primary" style="margin-top: 10px" @click="onSaveConf">
                             {{ $t('commons.button.save') }}
                         </el-button>
+                        <el-row>
+                            <el-col :span="8">
+                                <el-alert
+                                    v-if="useOld"
+                                    style="margin-top: 10px"
+                                    :title="$t('app.defaultConfigHelper')"
+                                    type="info"
+                                    :closable="false"
+                                ></el-alert>
+                            </el-col>
+                        </el-row>
                     </el-collapse-item>
                     <el-collapse-item
                         :disabled="mysqlStatus !== 'Running'"
@@ -84,7 +98,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { LoadFile } from '@/api/modules/files';
 import { loadMysqlBaseInfo, loadMysqlVariables, updateMysqlConfByFile } from '@/api/modules/database';
-import { ChangePort } from '@/api/modules/app';
+import { ChangePort, GetAppDefaultConfig } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 
@@ -102,6 +116,8 @@ const baseInfo = reactive({
 });
 const panelFormRef = ref<FormInstance>();
 const mysqlConf = ref();
+
+const useOld = ref(false);
 
 const statusRef = ref();
 const variablesRef = ref();
@@ -181,6 +197,14 @@ function callback(error: any) {
         return;
     }
 }
+
+const getDefaultConfig = async () => {
+    loading.value = true;
+    const res = await GetAppDefaultConfig('mysql');
+    mysqlConf.value = res.data;
+    useOld.value = true;
+    loading.value = false;
+};
 
 const onSubmitChangeConf = async () => {
     let param = {
