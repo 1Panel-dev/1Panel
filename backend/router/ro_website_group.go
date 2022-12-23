@@ -17,7 +17,7 @@ func (a *WebsiteGroupRouter) InitWebsiteGroupRouter(Router *gin.RouterGroup) {
 	{
 		groupRouter.GET("", baseApi.GetWebGroups)
 		groupRouter.POST("", baseApi.CreateWebGroup)
-		groupRouter.PUT("", baseApi.UpdateWebGroup)
-		groupRouter.DELETE("/:groupId", baseApi.DeleteWebGroup)
+		groupRouter.POST("/update", baseApi.UpdateWebGroup)
+		groupRouter.POST("/del", baseApi.DeleteWebGroup)
 	}
 }

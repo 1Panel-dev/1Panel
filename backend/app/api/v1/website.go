@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"errors"
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
@@ -51,12 +50,12 @@ func (b *BaseApi) CreateWebsite(c *gin.Context) {
 }
 
 func (b *BaseApi) BackupWebsite(c *gin.Context) {
-	domain, ok := c.Params.Get("domain")
-	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error domain in path"))
+	var req request.WebsiteResourceReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if err := websiteService.Backup(domain); err != nil {
+	if err := websiteService.Backup(req.ID); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

@@ -108,7 +108,7 @@ const onRecover = async (row: Backup.RecordInfo) => {
 
 const onBackup = async () => {
     loading.value = true;
-    await BackupWebsite(websiteName.value)
+    await BackupWebsite({ id: websiteID.value })
         .then(() => {
             loading.value = false;
             ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));

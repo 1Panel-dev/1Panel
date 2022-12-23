@@ -30,7 +30,7 @@ type IWebsiteService interface {
 	PageWebsite(req request.WebsiteSearch) (int64, []response.WebsiteDTO, error)
 	CreateWebsite(create request.WebsiteCreate) error
 	GetWebsiteOptions() ([]string, error)
-	Backup(domain string) error
+	Backup(id uint) error
 	Recover(req request.WebsiteRecover) error
 	RecoverByUpload(req request.WebsiteRecoverByFile) error
 	UpdateWebsite(req request.WebsiteUpdate) error
@@ -165,15 +165,19 @@ func (w WebsiteService) GetWebsiteOptions() ([]string, error) {
 	return datas, nil
 }
 
-func (w WebsiteService) Backup(domain string) error {
+func (w WebsiteService) Backup(id uint) error {
 	localDir, err := loadLocalDir()
 	if err != nil {
 		return err
 	}
-	fileName := fmt.Sprintf("%s_%s", domain, time.Now().Format("20060102150405"))
-	backupDir := fmt.Sprintf("website/%s", domain)
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return err
+	}
 
-	if err := handleWebsiteBackup("LOCAL", localDir, backupDir, domain, fileName); err != nil {
+	fileName := fmt.Sprintf("%s_%s", website.PrimaryDomain, time.Now().Format("20060102150405"))
+	backupDir := fmt.Sprintf("website/%s", website.PrimaryDomain)
+	if err := handleWebsiteBackup("LOCAL", localDir, backupDir, website.PrimaryDomain, fileName); err != nil {
 		return err
 	}
 	return nil
