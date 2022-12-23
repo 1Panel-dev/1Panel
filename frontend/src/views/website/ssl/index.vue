@@ -129,7 +129,7 @@ const openRenewSSL = (id: number) => {
 
 const deleteSSL = async (id: number) => {
     loading.value = true;
-    await useDeleteData(DeleteSSL, id, 'commons.msg.delete');
+    await useDeleteData(DeleteSSL, { id: id }, 'commons.msg.delete');
     loading.value = false;
     search();
 };

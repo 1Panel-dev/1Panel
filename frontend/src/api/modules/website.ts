@@ -11,8 +11,8 @@ export const CreateWebsite = (req: Website.WebSiteCreateReq) => {
     return http.post<any>(`/websites`, req);
 };
 
-export const BackupWebsite = (id: number) => {
-    return http.post(`/websites/backup/${id}`);
+export const BackupWebsite = (req: Website.BackupReq) => {
+    return http.post(`/websites/backup`, req);
 };
 
 export const RecoverWebsite = (req: Website.WebSiteRecover) => {
@@ -52,11 +52,11 @@ export const CreateGroup = (req: Website.GroupOp) => {
 };
 
 export const UpdateGroup = (req: Website.GroupOp) => {
-    return http.put<any>(`/websites/groups`, req);
+    return http.post<any>(`/websites/groups/update`, req);
 };
 
-export const DeleteGroup = (id: number) => {
-    return http.delete<any>(`/websites/groups/${id}`);
+export const DeleteGroup = (req: Website.DelReq) => {
+    return http.post<any>(`/websites/groups/del`, req);
 };
 
 export const ListDomains = (id: number) => {
@@ -119,8 +119,8 @@ export const CreateSSL = (req: Website.SSLCreate) => {
     return http.post<Website.SSLCreate>(`/websites/ssl`, req);
 };
 
-export const DeleteSSL = (id: number) => {
-    return http.delete<any>(`/websites/ssl/${id}`);
+export const DeleteSSL = (req: Website.DelReq) => {
+    return http.post<any>(`/websites/ssl/del`, req);
 };
 
 export const GetWebsiteSSL = (websiteId: number) => {

@@ -127,7 +127,7 @@ const deleteGroup = (index: number) => {
     const group = data.value[index];
 
     if (group.id > 0) {
-        DeleteGroup(group.id).then(() => {
+        DeleteGroup({ id: group.id }).then(() => {
             data.value.splice(index, 1);
             ElMessage.success(i18n.global.t('commons.msg.deleteSuccess'));
         });

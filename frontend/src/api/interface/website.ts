@@ -232,4 +232,8 @@ export namespace Website {
     export interface DelReq {
         id: number;
     }
+
+    export interface BackupReq {
+        id: number;
+    }
 }

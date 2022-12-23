@@ -19,7 +19,7 @@ func (a *WebsiteSSLRouter) InitWebsiteSSLRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/renew", baseApi.RenewWebsiteSSL)
 		groupRouter.POST("", baseApi.CreateWebsiteSSL)
 		groupRouter.POST("/resolve", baseApi.GetDNSResolve)
-		groupRouter.DELETE("/:id", baseApi.DeleteWebsiteSSL)
+		groupRouter.POST("/del", baseApi.DeleteWebsiteSSL)
 		groupRouter.GET("/:websiteId", baseApi.GetWebsiteSSL)
 	}
 }
