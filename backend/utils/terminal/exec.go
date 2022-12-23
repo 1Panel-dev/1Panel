@@ -72,7 +72,6 @@ func (sws *ExecWsSession) receiveWsMsg(ctx context.Context, exitCh chan bool) {
 	for {
 		_, wsData, err := wsConn.ReadMessage()
 		if err != nil {
-			global.LOG.Errorf("reading webSocket message failed, err: %v", err)
 			return
 		}
 		msgObj := wsMsg{}

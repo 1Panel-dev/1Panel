@@ -18,9 +18,23 @@
                             v-model="redisConf"
                             :readOnly="true"
                         />
+                        <el-button style="margin-top: 10px" @click="getDefaultConfig()">
+                            {{ $t('app.defaultConfig') }}
+                        </el-button>
                         <el-button type="primary" @click="onSaveFile" style="margin-top: 5px">
                             {{ $t('commons.button.save') }}
                         </el-button>
+                        <el-row>
+                            <el-col :span="8">
+                                <el-alert
+                                    v-if="useOld"
+                                    style="margin-top: 10px"
+                                    :title="$t('app.defaultConfigHelper')"
+                                    type="info"
+                                    :closable="false"
+                                ></el-alert>
+                            </el-col>
+                        </el-row>
                     </el-collapse-item>
                     <el-collapse-item :disabled="redisStatus !== 'Running'" :title="$t('database.status')" name="2">
                         <Status ref="statusRef" />
@@ -104,7 +118,7 @@ import Persistence from '@/views/database/redis/setting/persistence/index.vue';
 import { loadRedisConf, updateRedisConf, updateRedisConfByFile } from '@/api/modules/database';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
-import { ChangePort } from '@/api/modules/app';
+import { ChangePort, GetAppDefaultConfig } from '@/api/modules/app';
 
 const extensions = [javascript(), oneDark];
 
@@ -127,6 +141,8 @@ const rules = reactive({
 const activeName = ref('1');
 const statusRef = ref();
 const persistenceRef = ref();
+
+const useOld = ref(false);
 
 const redisStatus = ref();
 const redisName = ref();
@@ -231,6 +247,14 @@ const submtiForm = async () => {
         .finally(() => {
             loading.value = false;
         });
+};
+
+const getDefaultConfig = async () => {
+    loading.value = true;
+    const res = await GetAppDefaultConfig('redis');
+    redisConf.value = res.data;
+    useOld.value = true;
+    loading.value = false;
 };
 
 const onSaveFile = async () => {
