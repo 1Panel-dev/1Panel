@@ -2,7 +2,7 @@
     <div>
         <el-card class="topCard">
             <el-radio-group v-model="active">
-                <el-radio-button class="topButton" size="large" @click="routerTo('/setting/panel')" label="panel">
+                <el-radio-button class="topButton" size="large" @click="routerTo('/setting')" label="panel">
                     {{ $t('setting.panel') }}
                 </el-radio-button>
                 <el-radio-button class="topButton" size="large" @click="routerTo('/setting/safe')" label="safe">

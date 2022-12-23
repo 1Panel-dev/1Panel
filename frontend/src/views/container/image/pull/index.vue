@@ -44,6 +44,7 @@
             theme="cobalt"
             :styleActiveLine="true"
             :extensions="extensions"
+            @ready="handleReady"
             v-model="logInfo"
             :readOnly="true"
         />
@@ -61,7 +62,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { nextTick, reactive, ref, shallowRef } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
@@ -83,6 +84,10 @@ const buttonDisabled = ref(false);
 
 const logVisiable = ref(false);
 const logInfo = ref();
+const view = shallowRef();
+const handleReady = (payload) => {
+    view.value = payload.view;
+};
 const extensions = [javascript(), oneDark];
 let timer: NodeJS.Timer | null = null;
 
@@ -125,6 +130,13 @@ const loadLogs = async (path: string) => {
         if (logVisiable.value) {
             const res = await LoadFile({ path: path });
             logInfo.value = res.data;
+            nextTick(() => {
+                const state = view.value.state;
+                view.value.dispatch({
+                    selection: { anchor: state.doc.length, head: state.doc.length },
+                    scrollIntoView: true,
+                });
+            });
         }
     }, 1000 * 3);
 };

@@ -23,6 +23,7 @@
             theme="cobalt"
             :styleActiveLine="true"
             :extensions="extensions"
+            @ready="handleReady"
             v-model="logInfo"
             :readOnly="true"
         />
@@ -33,7 +34,7 @@
 import { logContainer } from '@/api/modules/container';
 import i18n from '@/lang';
 import { dateFromatForName } from '@/utils/util';
-import { reactive, ref } from 'vue';
+import { nextTick, reactive, ref, shallowRef } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -41,6 +42,11 @@ import { oneDark } from '@codemirror/theme-one-dark';
 const extensions = [javascript(), oneDark];
 
 const logInfo = ref();
+const view = shallowRef();
+const handleReady = (payload) => {
+    view.value = payload.view;
+};
+
 const logSearch = reactive({
     isWatch: false,
     container: '',
@@ -78,6 +84,13 @@ const onCloseLog = async () => {
 const searchLogs = async () => {
     const res = await logContainer(logSearch);
     logInfo.value = res.data;
+    nextTick(() => {
+        const state = view.value.state;
+        view.value.dispatch({
+            selection: { anchor: state.doc.length, head: state.doc.length },
+            scrollIntoView: true,
+        });
+    });
 };
 
 const onDownload = async () => {

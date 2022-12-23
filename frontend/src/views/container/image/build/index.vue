@@ -22,7 +22,20 @@
                 </el-radio-group>
             </el-form-item>
             <el-form-item v-if="form.from === 'edit'" :rules="Rules.requiredInput">
-                <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 10 }" v-model="form.dockerfile" />
+                <codemirror
+                    :autofocus="true"
+                    placeholder="None data"
+                    :indent-with-tab="true"
+                    :tabSize="4"
+                    style="max-height: 500px; width: 100%; min-height: 200px"
+                    :lineWrapping="true"
+                    :matchBrackets="true"
+                    theme="cobalt"
+                    :styleActiveLine="true"
+                    :extensions="extensions"
+                    v-model="form.dockerfile"
+                    :readOnly="true"
+                />
             </el-form-item>
             <el-form-item v-else :rules="Rules.requiredSelect" prop="dockerfile">
                 <el-input clearable v-model="form.dockerfile">
@@ -53,6 +66,7 @@
             theme="cobalt"
             :styleActiveLine="true"
             :extensions="extensions"
+            @ready="handleReady"
             v-model="logInfo"
             :readOnly="true"
         />
@@ -75,7 +89,7 @@ import FileList from '@/components/file-list/index.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { reactive, ref } from 'vue';
+import { nextTick, reactive, ref, shallowRef } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
@@ -84,6 +98,10 @@ import { LoadFile } from '@/api/modules/files';
 
 const logVisiable = ref<boolean>(false);
 const logInfo = ref();
+const view = shallowRef();
+const handleReady = (payload) => {
+    view.value = payload.view;
+};
 const extensions = [javascript(), oneDark];
 let timer: NodeJS.Timer | null = null;
 
@@ -143,6 +161,13 @@ const loadLogs = async (path: string) => {
         if (logVisiable.value) {
             const res = await LoadFile({ path: path });
             logInfo.value = res.data;
+            nextTick(() => {
+                const state = view.value.state;
+                view.value.dispatch({
+                    selection: { anchor: state.doc.length, head: state.doc.length },
+                    scrollIntoView: true,
+                });
+            });
         }
     }, 1000 * 3);
 };

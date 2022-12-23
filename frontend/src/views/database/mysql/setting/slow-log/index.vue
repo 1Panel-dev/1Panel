@@ -37,6 +37,7 @@
                 theme="cobalt"
                 :styleActiveLine="true"
                 :extensions="extensions"
+                @ready="handleReady"
                 v-model="slowLogs"
                 :readOnly="true"
             />
@@ -50,7 +51,7 @@
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { reactive, ref } from 'vue';
+import { nextTick, reactive, ref, shallowRef } from 'vue';
 import { Database } from '@/api/interface/database';
 import { LoadFile } from '@/api/modules/files';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
@@ -62,6 +63,10 @@ import i18n from '@/lang';
 const loading = ref();
 const extensions = [javascript(), oneDark];
 const slowLogs = ref();
+const view = shallowRef();
+const handleReady = (payload) => {
+    view.value = payload.view;
+};
 
 const confirmDialogRef = ref();
 
@@ -142,6 +147,13 @@ const onDownload = async () => {
 const loadMysqlSlowlogs = async (path: string) => {
     const res = await LoadFile({ path: path });
     slowLogs.value = res.data;
+    nextTick(() => {
+        const state = view.value.state;
+        view.value.dispatch({
+            selection: { anchor: state.doc.length, head: state.doc.length },
+            scrollIntoView: true,
+        });
+    });
 };
 
 const onCloseLog = async () => {

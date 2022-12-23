@@ -194,6 +194,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         if (!dialogData.value.rowData) return;
+        dialogData.value.rowData.vars = JSON.stringify(dialogData.value.rowData!.varsJson);
         if (dialogData.value.title === 'create') {
             await addBackup(dialogData.value.rowData);
         }
