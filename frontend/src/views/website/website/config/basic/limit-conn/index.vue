@@ -1,8 +1,29 @@
 <template>
     <el-row :gutter="20">
-        <el-col :span="8" :offset="2">
-            <el-checkbox v-model="enable" @change="changeEnable">{{ $t('website.limtHelper') }}</el-checkbox>
-            <el-form ref="limitForm" label-position="left" :model="form" :rules="rules" :loading="loading">
+        <el-col :span="8" :offset="1">
+            <el-form
+                ref="limitForm"
+                label-position="right"
+                :model="form"
+                :rules="rules"
+                :loading="loading"
+                label-width="100px"
+            >
+                <el-form-item>
+                    <el-checkbox v-model="enable" @change="changeEnable">
+                        {{ $t('website.limtHelper') }}
+                    </el-checkbox>
+                </el-form-item>
+                <el-form-item :label="$t('website.limit')">
+                    <el-select v-model="ruleKey" @change="changeRule(ruleKey)">
+                        <el-option
+                            v-for="(limit, index) in limitRules"
+                            :key="index"
+                            :label="limit.key"
+                            :value="limit.key"
+                        ></el-option>
+                    </el-select>
+                </el-form-item>
                 <el-form-item :label="$t('website.perserver')" prop="perserver">
                     <el-input v-model="form.perserver"></el-input>
                     <span class="input-help">{{ $t('website.perserverHelper') }}</span>
@@ -63,6 +84,18 @@ let scopeReq = reactive({
 });
 let enable = ref(false);
 let loading = ref(false);
+
+const limitRules = [
+    { key: i18n.global.t('website.blog'), values: [300, 25, 512] },
+    { key: i18n.global.t('website.imageSite'), values: [200, 10, 1024] },
+    { key: i18n.global.t('website.downloadSite'), values: [50, 3, 2048] },
+    { key: i18n.global.t('website.shopSite'), values: [500, 10, 2048] },
+    { key: i18n.global.t('website.doorSite'), values: [400, 15, 1024] },
+    { key: i18n.global.t('website.qiteSite'), values: [60, 10, 512] },
+    { key: i18n.global.t('website.videoSite'), values: [150, 4, 1024] },
+];
+
+let ruleKey = limitRules[0].key;
 
 const search = (scopeReq: Website.NginxScopeReq) => {
     loading.value = true;
@@ -129,6 +162,16 @@ const changeEnable = () => {
     } else {
         req.operate = 'add';
     }
+};
+
+const changeRule = (key: string) => {
+    limitRules.forEach((limit) => {
+        if (limit.key === key) {
+            form.perserver = limit.values[0];
+            form.perip = limit.values[1];
+            form.rate = limit.values[2];
+        }
+    });
 };
 
 onMounted(() => {

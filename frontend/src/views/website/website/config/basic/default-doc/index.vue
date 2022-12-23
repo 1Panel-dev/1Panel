@@ -1,6 +1,6 @@
 <template>
     <el-row :gutter="20">
-        <el-col :span="8" :offset="2">
+        <el-col :span="8" :offset="1">
             <el-form ref="defaultForm" label-position="top" :model="defaultModel" :rules="rules" :loading="loading">
                 <el-form-item :label="$t('website.defaultDoc')" prop="index">
                     <el-input
