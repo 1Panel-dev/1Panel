@@ -20,7 +20,7 @@ const hostRouter = {
         },
         {
             path: '/hosts/monitor',
-            name: 'Monitor',
+            name: 'Monitorx',
             component: () => import('@/views/host/monitor/index.vue'),
             meta: {
                 title: 'menu.monitor',

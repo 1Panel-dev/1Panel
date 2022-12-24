@@ -85,16 +85,19 @@ func OperationLog() gin.HandlerFunc {
 				}
 			}
 		}
-		var values []interface{}
 		for key, value := range formatMap {
-			if strings.Contains(operationDic.FormatEN, key) {
-				operationDic.FormatZH = strings.ReplaceAll(operationDic.FormatZH, key, "%v")
-				operationDic.FormatEN = strings.ReplaceAll(operationDic.FormatEN, key, "%v")
-				values = append(values, value)
+			if strings.Contains(operationDic.FormatEN, "["+key+"]") {
+				if arrys, ok := value.([]string); ok {
+					operationDic.FormatZH = strings.ReplaceAll(operationDic.FormatZH, "["+key+"]", fmt.Sprintf("[%v]", strings.Join(arrys, ",")))
+					operationDic.FormatEN = strings.ReplaceAll(operationDic.FormatEN, "["+key+"]", fmt.Sprintf("[%v]", strings.Join(arrys, ",")))
+				} else {
+					operationDic.FormatZH = strings.ReplaceAll(operationDic.FormatZH, "["+key+"]", fmt.Sprintf("[%v]", value))
+					operationDic.FormatEN = strings.ReplaceAll(operationDic.FormatEN, "["+key+"]", fmt.Sprintf("[%v]", value))
+				}
 			}
 		}
-		record.DetailZH = fmt.Sprintf(operationDic.FormatZH, values...)
-		record.DetailEN = fmt.Sprintf(operationDic.FormatEN, values...)
+		record.DetailEN = operationDic.FormatEN
+		record.DetailZH = operationDic.FormatZH
 
 		writer := responseBodyWriter{
 			ResponseWriter: c.Writer,

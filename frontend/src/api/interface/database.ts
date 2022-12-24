@@ -5,6 +5,10 @@ export namespace Database {
         mysqlName: string;
         dbName: string;
     }
+    export interface DescriptionUpdate {
+        id: number;
+        description: string;
+    }
     export interface Backup {
         mysqlName: string;
         dbName: string;

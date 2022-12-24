@@ -24,6 +24,7 @@ func (s *DatabaseRouter) InitDatabaseRouter(Router *gin.RouterGroup) {
 		cmdRouter.POST("/recover", baseApi.RecoverMysql)
 		cmdRouter.POST("/del/check", baseApi.DeleteCheckMysql)
 		cmdRouter.POST("/del", baseApi.DeleteMysql)
+		cmdRouter.POST("/description/update", baseApi.UpdateMysqlDescription)
 		cmdRouter.POST("/variables/update", baseApi.UpdateMysqlVariables)
 		cmdRouter.POST("/conffile/update", baseApi.UpdateMysqlConfByFile)
 		cmdRouter.POST("/search", baseApi.SearchMysql)

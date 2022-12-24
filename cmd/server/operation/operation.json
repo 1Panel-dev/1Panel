@@ -8,8 +8,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "创建容器 name[image]",
-        "formatEN": "create container name[image]"
+        "formatZH": "创建容器 [name][image]",
+        "formatEN": "create container [name][image]"
     },
     {
         "api": "/api/v1/containers/operate",
@@ -21,8 +21,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "容器 [name] 执行 [operation] newName",
-        "formatEN": "container [operation] [name] newName"
+        "formatZH": "容器 [name] 执行 [operation] [newName]",
+        "formatEN": "container [operation] [name] [newName]"
     },
     {
         "api": "/api/v1/containers/repo",
@@ -70,8 +70,8 @@
                 "value": "names"
             }
         ],
-        "formatZH": "删除镜像仓库 names",
-        "formatEN": "delete image repo names"
+        "formatZH": "删除镜像仓库 [names]",
+        "formatEN": "delete image repo [names]"
     },
     {
         "api": "/api/v1/containers/compose",
@@ -153,8 +153,8 @@
                 "value": "names"
             }
         ],
-        "formatZH": "删除 compose 模版 names",
-        "formatEN": "delete compose template names"
+        "formatZH": "删除 compose 模版 [names]",
+        "formatEN": "delete compose template [names]"
     },
     {
         "api": "/api/v1/containers/image/pull",
@@ -173,8 +173,8 @@
                 "value": "reponame"
             }
         ],
-        "formatZH": "镜像拉取 [reponame]imageName",
-        "formatEN": "image pull [reponame]imageName"
+        "formatZH": "镜像拉取 [reponame][imageName]",
+        "formatEN": "image pull [reponame][imageName]"
     },
     {
         "api": "/api/v1/containers/image/push",
@@ -194,8 +194,8 @@
                 "value": "reponame"
             }
         ],
-        "formatZH": "[tagName] 推送到 [reponame]name",
-        "formatEN": "push [tagName] to [reponame]name"
+        "formatZH": "[tagName] 推送到 [reponame][name]",
+        "formatEN": "push [tagName] to [reponame][name]"
     },
     {
         "api": "/api/v1/containers/image/save",
@@ -207,8 +207,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "保留 [tagName] 为 [path/name]",
-        "formatEN": "save [tagName] as [path/name]"
+        "formatZH": "保留 [tagName] 为 [path]/[name]",
+        "formatEN": "save [tagName] as [path]/[name]"
     },
     {
         "api": "/api/v1/containers/image/load",
@@ -229,8 +229,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "移除镜像 names",
-        "formatEN": "remove image names"
+        "formatZH": "移除镜像 [names]",
+        "formatEN": "remove image [names]"
     },
     {
         "api": "/api/v1/containers/image/tag",
@@ -249,8 +249,8 @@
                 "value": "reponame"
             }
         ],
-        "formatZH": "tag 镜像 [reponame]targetName",
-        "formatEN": "tag image [reponame]targetName"
+        "formatZH": "tag 镜像 [reponame][targetName]",
+        "formatEN": "tag image [reponame][targetName]"
     },
     {
         "api": "/api/v1/containers/image/build",
@@ -282,8 +282,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "删除容器网络 names",
-        "formatEN": "delete container network names"
+        "formatZH": "删除容器网络 [names]",
+        "formatEN": "delete container network [names]"
     },
     {
         "api": "/api/v1/containers/volume",
@@ -304,8 +304,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "删除容器存储卷 names",
-        "formatEN": "delete container volume names"
+        "formatZH": "删除容器存储卷 [names]",
+        "formatEN": "delete container volume [names]"
     },
     {
         "api": "/api/v1/containers/docker/operate",
@@ -316,7 +316,7 @@
         "paramKeys": [],
         "BeforeFuntions": [],
         "formatZH": "docker 服务 [operation]",
-        "formatEN": "operation docker service"
+        "formatEN": "[operation] docker service"
     },
     {
         "api": "/api/v1/containers/daemonjson/update",
@@ -352,8 +352,8 @@
                 "value": "names"
             }
         ],
-        "formatZH": "删除计划任务 names",
-        "formatEN": "delete cronjob names"
+        "formatZH": "删除计划任务 [names]",
+        "formatEN": "delete cronjob [names]"
     },
     {
         "api": "/api/v1/cronjobs/update",
@@ -433,8 +433,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "备份 mysql 数据库 mysqlName[dbName]",
-        "formatEN": "backup mysql database mysqlName[dbName]"
+        "formatZH": "备份 mysql 数据库 [mysqlName][dbName]",
+        "formatEN": "backup mysql database [mysqlName][dbName]"
     },
     {
         "api": "/api/v1/databases/recover",
@@ -446,8 +446,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "恢复 mysql 数据库 mysqlName[dbName] backupName",
-        "formatEN": "恢复 mysql 数据库 mysqlName[dbName] backupName"
+        "formatZH": "恢复 mysql 数据库 [mysqlName][dbName] [backupName]",
+        "formatEN": "恢复 mysql 数据库 [mysqlName][dbName] [backupName]"
     },
     {
         "api": "/api/v1/databases/recover/byupload",
@@ -460,8 +460,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "mysql 数据库从 [fileDir/fileName] 恢复 [mysqlName]dbName",
-        "formatEN": "mysql database recover [fileDir/fileName] from [mysqlName]dbName"
+        "formatZH": "mysql 数据库从 [fileDir]/[fileName] 恢复 [mysqlName][dbName]",
+        "formatEN": "mysql database recover [fileDir]/[fileName] from [mysqlName][dbName]"
     },
     {
         "api": "/api/v1/databases/del",
@@ -481,6 +481,23 @@
         ],
         "formatZH": "删除 mysql 数据库 [name]",
         "formatEN": "delete mysql database [name]"
+    },
+    {
+        "api": "/api/v1/databases/description/update",
+        "method": "POST",
+        "bodyKeys": ["id", "description"],
+        "paramKeys": [],
+        "BeforeFuntions": [
+            {
+                "info": "id",
+                "isList": false,
+                "db": "database_mysqls",
+                "key": "name",
+                "value": "name"
+            }
+        ],
+        "formatZH": "mysql 数据库 [name] 描述信息修改 [description]",
+        "formatEN": "The description of the mysql database [name] is modified => [description]"
     },
     {
         "api": "/api/v1/databases/variables/update",
@@ -527,8 +544,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "redis 数据库从 fileDir/fileName 恢复",
-        "formatEN": "redis database recover from fileDir/fileName"
+        "formatZH": "redis 数据库从 [fileDir]/[fileName] 恢复",
+        "formatEN": "redis database recover from [fileDir]/[fileName]"
     },
     {
         "api": "/api/v1/databases/redis/conf/update",
@@ -566,8 +583,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "创建快捷命令 name[command]",
-        "formatEN": "create quick command name[command]"
+        "formatZH": "创建快捷命令 [name][command]",
+        "formatEN": "create quick command [name][command]"
     },
     {
         "api": "/api/v1/commands/del",
@@ -585,8 +602,8 @@
                 "value": "names"
             }
         ],
-        "formatZH": "删除快捷命令 names",
-        "formatEN": "delete quick command names"
+        "formatZH": "删除快捷命令 [names]",
+        "formatEN": "delete quick command [names]"
     },
     {
         "api": "/api/v1/commands/update",
@@ -649,8 +666,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "下载备份记录 [source]fileName",
-        "formatEN": "download backup records [source]fileName"
+        "formatZH": "下载备份记录 [source][fileName]",
+        "formatEN": "download backup records [source][fileName]"
     },
     {
         "api": "/api/v1/backups/record/del",
@@ -699,8 +716,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "更新组 [name]type",
-        "formatEN": "update group [name]type"
+        "formatZH": "更新组 [name][type]",
+        "formatEN": "update group [name][type]"
     },
     {
         "api": "/api/v1/groups",
@@ -711,8 +728,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "创建组 [name]type",
-        "formatEN": "create group [name]type"
+        "formatZH": "创建组 [name][type]",
+        "formatEN": "create group [name][type]"
     },
     {
         "api": "/api/v1/hosts/del",
@@ -742,8 +759,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "更新主机信息 [name]addr",
-        "formatEN": "update host [name]addr"
+        "formatZH": "更新主机信息 [name][addr]",
+        "formatEN": "update host [name][addr]"
     },
     {
         "api": "/api/v1/hosts",
@@ -754,8 +771,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "创建主机 [name]addr",
-        "formatEN": "create host [name]addr"
+        "formatZH": "创建主机 [name][addr]",
+        "formatEN": "create host [name][addr]"
     },
     {
         "api": "/api/v1/settings/expired/handle",
@@ -846,8 +863,8 @@
                 "value": "appKey"
             }
         ],
-        "formatZH": "安装应用 [appKey]-name",
-        "formatEN": "Install app [appKey]-name"
+        "formatZH": "安装应用 [appKey]-[name]",
+        "formatEN": "Install app [appKey]-[name]"
     },
     {
         "api": "/api/v1/apps/installed/op",
@@ -880,8 +897,8 @@
                 "value": "appKey"
             }
         ],
-        "formatZH": "应用 [appKey]-appName operate",
-        "formatEN": "App [appKey]-appName operate"
+        "formatZH": "应用 [appKey]-[appName] [operate]",
+        "formatEN": "App [appKey]-[appName] [operate]"
     },
     {
         "api": "/api/v1/apps/installed/sync",
@@ -921,8 +938,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "应用端口修改 [key]-name => port",
-        "formatEN": "Application port update [key]-name => port"
+        "formatZH": "应用端口修改 [key]-[name] => [port]",
+        "formatEN": "Application port update [key]-[name] => [port]"
     },
     {
         "api": "/api/v1/apps/installed/port/change",
@@ -934,8 +951,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "应用端口修改 [key]-name => port",
-        "formatEN": "Application port update [key]-name => port"
+        "formatZH": "应用端口修改 [key]-[name] => [port]",
+        "formatEN": "Application port update [key]-[name] => [port]"
     },
     {
         "api": "/api/v1/apps/files",
@@ -945,8 +962,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "创建文件/文件夹 path",
-        "formatEN": "Create dir or file path"
+        "formatZH": "创建文件/文件夹 [path]",
+        "formatEN": "Create dir or file [path]"
     },
     {
         "api": "/api/v1/apps/files/del",
@@ -956,8 +973,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "删除文件/文件夹 path",
-        "formatEN": "Delete dir or file path"
+        "formatZH": "删除文件/文件夹 [path]",
+        "formatEN": "Delete dir or file [path]"
     },
     {
         "api": "/api/v1/apps/files/batch/del",
@@ -967,8 +984,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "批量删除文件/文件夹 paths",
-        "formatEN": "Batch delete dir or file paths"
+        "formatZH": "批量删除文件/文件夹 [paths]",
+        "formatEN": "Batch delete dir or file [paths]"
     },
     {
         "api": "/api/v1/apps/files/mode",
@@ -979,8 +996,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "修改权限 paths => mode",
-        "formatEN": "Change mode paths => mode"
+        "formatZH": "修改权限 [paths] => [mode]",
+        "formatEN": "Change mode [paths] => [mode]"
     },
     {
         "api": "/api/v1/apps/files/compress",
@@ -990,8 +1007,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "压缩文件 name",
-        "formatEN": "Compress file name"
+        "formatZH": "压缩文件 [name]",
+        "formatEN": "Compress file [name]"
     },
     {
         "api": "/api/v1/apps/files/decompress",
@@ -1001,8 +1018,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "解压 path",
-        "formatEN": "Decompress file path"
+        "formatZH": "解压 [path]",
+        "formatEN": "Decompress file [path]"
     },
     {
         "api": "/api/v1/apps/files/upload",
@@ -1012,8 +1029,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "上传文件 path",
-        "formatEN": "Upload file path"
+        "formatZH": "上传文件 [path]",
+        "formatEN": "Upload file [path]"
     },
     {
         "api": "/api/v1/apps/files/rename",
@@ -1024,8 +1041,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "重命名 oldName => newName",
-        "formatEN": "Rename oldName => newName"
+        "formatZH": "重命名 [oldName] => [newName]",
+        "formatEN": "Rename [oldName] => [newName]"
     },
     {
         "api": "/api/v1/apps/files/wget",
@@ -1037,8 +1054,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "下载 url => path/name",
-        "formatEN": "Download url => path/name"
+        "formatZH": "下载 url => [path]/[name]",
+        "formatEN": "Download url => [path]/[name]"
     },
     {
         "api": "/api/v1/apps/files/move",
@@ -1049,8 +1066,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "移动文件 oldPaths => newPath",
-        "formatEN": "Move oldPaths => newPath"
+        "formatZH": "移动文件 [oldPaths] => [newPath]",
+        "formatEN": "Move [oldPaths] => [newPath]"
     },
     {
         "api": "/api/v1/apps/files/download",
@@ -1060,8 +1077,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "下载文件 name",
-        "formatEN": "Download file name"
+        "formatZH": "下载文件 [name]",
+        "formatEN": "Download file [name]"
     },
     {
         "api": "/api/v1/apps/nginx/update",
@@ -1079,8 +1096,8 @@
                 "value": "domain"
             }
         ],
-        "formatZH": "更新 nginx 配置 domain",
-        "formatEN": "Update nginx conf domain"
+        "formatZH": "更新 nginx 配置 [domain]",
+        "formatEN": "Update nginx conf [domain]"
     },
     {
         "api": "/api/v1/apps/nginx/file",
@@ -1140,7 +1157,7 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "更新网站 dns name",
+        "formatZH": "更新网站 dns [name]",
         "formatEN": "Update website dns [name]"
     },
     {
@@ -1159,7 +1176,7 @@
                 "value": "name"
             }
         ],
-        "formatZH": "删除网站 dns name",
+        "formatZH": "删除网站 dns [name]",
         "formatEN": "Delete website dns [name]"
     },
     {
@@ -1266,8 +1283,8 @@
         ],
         "paramKeys": [],
         "BeforeFuntions": [],
-        "formatZH": "[websiteName] 从上传恢复 [fileDir/fileName]",
-        "formatEN": "[websiteName] recover from uploads [fileDir/fileName]"
+        "formatZH": "[websiteName] 从上传恢复 [fileDir]/[fileName]",
+        "formatEN": "[websiteName] recover from uploads [fileDir]/[fileName]"
     },
     {
         "api": "/api/v1/websites/domains/del",
