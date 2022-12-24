@@ -48,8 +48,8 @@
                             <el-form-item v-if="item.type === 'SFTP'" :label="$t('setting.port')">
                                 {{ item.varsJson['port'] }}
                             </el-form-item>
-                            <el-form-item v-if="item.type === 'SFTP'" :label="$t('setting.username')">
-                                {{ item.accessKey }}
+                            <el-form-item v-if="item.type === 'SFTP'" :label="$t('setting.path')">
+                                {{ item.bucket }}
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
                                 {{ dateFromat(0, 0, item.createdAt) }}

@@ -75,7 +75,13 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.description')" prop="description" />
+                    <el-table-column :label="$t('commons.table.description')" prop="description">
+                        <template #default="{ row }">
+                            <fu-read-write-switch :data="row.description" v-model="row.edit" @change="onChange(row)">
+                                <el-input v-model="row.description" @blur="row.edit = false" />
+                            </fu-read-write-switch>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         prop="createdAt"
                         :label="$t('commons.table.date')"
@@ -193,6 +199,7 @@ import {
     loadRemoteAccess,
     searchMysqlDBs,
     updateMysqlAccess,
+    updateMysqlDescription,
     updateMysqlPassword,
 } from '@/api/modules/database';
 import i18n from '@/lang';
@@ -341,6 +348,13 @@ const search = async () => {
     const res = await searchMysqlDBs(params);
     data.value = res.data.items || [];
     paginationConfig.total = res.data.total;
+};
+
+const onChange = async (info: any) => {
+    if (!info.edit) {
+        await updateMysqlDescription({ id: info.id, description: info.description });
+        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    }
 };
 
 const goRouter = async (path: string) => {

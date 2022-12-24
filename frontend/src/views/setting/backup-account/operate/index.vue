@@ -5,7 +5,7 @@
                 <span>{{ title }}{{ $t('setting.backupAccount') }}</span>
             </div>
         </template>
-        <el-form ref="formRef" :model="dialogData.rowData" label-width="120px">
+        <el-form ref="formRef" v-loading="loading" :model="dialogData.rowData" label-width="120px">
             <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
                 <el-select
                     style="width: 100%"
@@ -53,12 +53,27 @@
                 <el-input v-model="dialogData.rowData!.varsJson['region']" />
             </el-form-item>
             <el-form-item
-                v-if="hasBucket(dialogData.rowData!.type)"
+                v-if="hasBucket(dialogData.rowData!.type) && dialogData.rowData!.type !== 'MINIO'"
                 label="Endpoint"
                 prop="varsJson.endpoint"
                 :rules="Rules.requiredInput"
             >
                 <el-input v-model="dialogData.rowData!.varsJson['endpoint']" />
+            </el-form-item>
+            <el-form-item
+                v-if="dialogData.rowData!.type === 'MINIO'"
+                label="Endpoint"
+                prop="varsJson.endpointItem"
+                :rules="Rules.requiredInput"
+            >
+                <el-input v-model="dialogData.rowData!.varsJson['endpointItem']">
+                    <template #prepend>
+                        <el-select v-model="endpoints" style="width: 80px">
+                            <el-option label="http" value="http" />
+                            <el-option label="https" value="https" />
+                        </el-select>
+                    </template>
+                </el-input>
             </el-form-item>
             <el-form-item
                 v-if="dialogData.rowData!.type !== '' && hasBucket(dialogData.rowData!.type)"
@@ -110,12 +125,15 @@ import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { Backup } from '@/api/interface/backup';
 import { addBackup, editBackup, listBucket } from '@/api/modules/backup';
+import { deepCopy } from '@/utils/util';
 
 const loading = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 const typeOptions = ref();
 const buckets = ref();
+
+const endpoints = ref('http');
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
@@ -133,6 +151,13 @@ const dialogData = ref<DialogProps>({
 });
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
+    if (dialogData.value.title === 'edit' && dialogData.value.rowData!.type === 'MINIO') {
+        if (dialogData.value.rowData!.varsJson['endpoint'].indexOf('://') !== 0) {
+            endpoints.value = dialogData.value.rowData!.varsJson['endpoint'].split('://')[0];
+            dialogData.value.rowData!.varsJson['endpointItem'] =
+                dialogData.value.rowData!.varsJson['endpoint'].split('://')[1];
+        }
+    }
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     loadOption(params.types);
     dialogVisiable.value = true;
@@ -173,9 +198,14 @@ function hasBucket(val: string) {
 
 const getBuckets = async () => {
     loading.value = true;
+    let item = deepCopy(dialogData.value.rowData!.varsJson);
+    if (dialogData.value.rowData!.type === 'MINIO') {
+        item['endpoint'] = endpoints.value + '://' + dialogData.value.rowData!.varsJson['endpointItem'];
+        item['endpointItem'] = undefined;
+    }
     listBucket({
         type: dialogData.value.rowData!.type,
-        vars: JSON.stringify(dialogData.value.rowData!.varsJson),
+        vars: JSON.stringify(item),
         accessKey: dialogData.value.rowData!.accessKey,
         credential: dialogData.value.rowData!.credential,
     })
@@ -194,6 +224,11 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         if (!dialogData.value.rowData) return;
+        if (dialogData.value.rowData!.type === 'MINIO') {
+            dialogData.value.rowData!.varsJson['endpoint'] =
+                endpoints.value + '://' + dialogData.value.rowData!.varsJson['endpointItem'];
+            dialogData.value.rowData!.varsJson['endpointItem'] = undefined;
+        }
         dialogData.value.rowData.vars = JSON.stringify(dialogData.value.rowData!.varsJson);
         if (dialogData.value.title === 'create') {
             await addBackup(dialogData.value.rowData);

@@ -3,10 +3,11 @@ package helper
 import (
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/global"
-	"gorm.io/gorm"
 	"net/http"
 	"strconv"
+
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"gorm.io/gorm"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -46,6 +47,8 @@ func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 			res.Message = i18n.GetMsgWithMap("ErrRecordExist", nil)
 		case errors.Is(constant.ErrRecordNotFound, err):
 			res.Message = i18n.GetMsgWithMap("ErrRecordNotFound", nil)
+		case errors.Is(constant.ErrInvalidParams, err):
+			res.Message = i18n.GetMsgWithMap("ErrInvalidParams", nil)
 		case errors.Is(constant.ErrStructTransform, err):
 			res.Message = i18n.GetMsgWithMap("ErrStructTransform", map[string]interface{}{"detail": err})
 		case errors.Is(constant.ErrCaptchaCode, err):
