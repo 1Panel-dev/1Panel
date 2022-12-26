@@ -6,7 +6,8 @@
       "labelEn": "Http Port",
       "required": true,
       "default": 80,
-      "envKey": "PANEL_APP_PORT_HTTP"
+      "envKey": "PANEL_APP_PORT_HTTP",
+      "disabled": true,
     },
     {
       "type": "number",
@@ -14,7 +15,8 @@
       "labelEn": "Https Port",
       "required": true,
       "default": 443,
-      "envKey": "PANEL_APP_PORT_HTTPS"
+      "envKey": "PANEL_APP_PORT_HTTPS",
+      "disabled": true
     }
   ]
 }

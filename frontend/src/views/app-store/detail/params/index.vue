@@ -7,6 +7,7 @@
                 v-if="p.type == 'number'"
                 :type="p.type"
                 @change="updateParam"
+                :disabled="p.disabled"
             ></el-input>
             <el-input
                 v-model="form[p.envKey]"
@@ -41,6 +42,7 @@ import { App } from '@/api/interface/app';
 interface ParamObj extends App.FromField {
     services: App.AppService[];
     prop: string;
+    disabled: false;
 }
 
 const emit = defineEmits(['update:form', 'update:rules']);
@@ -96,6 +98,8 @@ const handleParams = () => {
         for (const p of params.value.formFields) {
             const pObj = p;
             pObj.prop = propStart.value + p.envKey;
+            pObj.disabled = p.disabled;
+            console.log(pObj);
             paramObjs.value.push(pObj);
             if (p.default == 'random') {
                 form[p.envKey] = getRandomStr(6);
