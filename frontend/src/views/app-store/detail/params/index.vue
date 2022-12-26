@@ -1,7 +1,12 @@
 <template>
     <div v-for="(p, index) in paramObjs" :key="index">
         <el-form-item :label="p.labelZh" :prop="p.prop">
-            <el-input v-model="form[p.envKey]" v-if="p.type == 'text'" :type="p.type" @change="updateParam"></el-input>
+            <el-input
+                v-model.trim="form[p.envKey]"
+                v-if="p.type == 'text'"
+                :type="p.type"
+                @change="updateParam"
+            ></el-input>
             <el-input
                 v-model.number="form[p.envKey]"
                 v-if="p.type == 'number'"
@@ -10,7 +15,7 @@
                 :disabled="p.disabled"
             ></el-input>
             <el-input
-                v-model="form[p.envKey]"
+                v-model.trim="form[p.envKey]"
                 v-if="p.type == 'password'"
                 :type="p.type"
                 show-password

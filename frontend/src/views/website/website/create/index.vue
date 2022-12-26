@@ -97,7 +97,7 @@
                 </div>
             </div>
             <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
-                <el-input v-model="website.primaryDomain" @input="changeAlias(website.primaryDomain)"></el-input>
+                <el-input v-model.trim="website.primaryDomain" @input="changeAlias(website.primaryDomain)"></el-input>
             </el-form-item>
             <el-form-item :label="$t('website.otherDomains')" prop="otherDomains">
                 <el-input
@@ -108,7 +108,7 @@
                 ></el-input>
             </el-form-item>
             <el-form-item :label="$t('website.alias')" prop="alias">
-                <el-input v-model="website.alias" :placeholder="$t('website.aliasHelper')"></el-input>
+                <el-input v-model.trim="website.alias" :placeholder="$t('website.aliasHelper')"></el-input>
                 <div>
                     <span class="input-help">
                         <span>{{ $t('website.staticPath') + staticPath + website.alias }}</span>
