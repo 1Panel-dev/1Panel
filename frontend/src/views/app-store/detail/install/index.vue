@@ -15,7 +15,7 @@
             :validate-on-rule-change="false"
         >
             <el-form-item :label="$t('app.name')" prop="NAME">
-                <el-input v-model="form['NAME']"></el-input>
+                <el-input v-model.trim="form['NAME']"></el-input>
             </el-form-item>
             <Params v-model:form="form" v-model:params="installData.params" v-model:rules="rules"></Params>
         </el-form>
