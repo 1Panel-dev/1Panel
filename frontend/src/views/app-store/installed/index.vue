@@ -50,7 +50,7 @@
                         trigger="hover"
                         :content="row.message"
                     >
-                        <template #reference>{{ row.status }}</template>
+                        <template #reference><Status :key="row.status" :status="row.status"></Status></template>
                     </el-popover>
                     <div v-else>
                         <el-icon v-if="row.status === 'Installing'" class="is-loading">
