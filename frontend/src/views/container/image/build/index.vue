@@ -13,7 +13,7 @@
         </template>
         <el-form ref="formRef" :model="form" label-width="80px" :rules="rules">
             <el-form-item :label="$t('container.name')" prop="name">
-                <el-input :placeholder="$t('container.imageNameHelper')" v-model="form.name" clearable />
+                <el-input :placeholder="$t('container.imageNameHelper')" v-model.trim="form.name" clearable />
             </el-form-item>
             <el-form-item label="Dockerfile" prop="from">
                 <el-radio-group v-model="form.from">

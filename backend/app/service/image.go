@@ -110,8 +110,8 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 			}
 		}
 
-		path := fmt.Sprintf("%s/Dockerfile", dir)
-		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+		pathItem := fmt.Sprintf("%s/Dockerfile", dir)
+		file, err := os.OpenFile(pathItem, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		if err != nil {
 			return "", err
 		}
@@ -134,8 +134,8 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 	}
 	logName := fmt.Sprintf("%s/build.log", req.Dockerfile)
 
-	path := logName
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	pathItem := logName
+	file, err := os.OpenFile(pathItem, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		return "", err
 	}
@@ -165,8 +165,10 @@ func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 			return "", err
 		}
 	}
-	path := fmt.Sprintf("%s/image_pull_%s_%s.log", dockerLogDir, strings.ReplaceAll(req.ImageName, ":", "_"), time.Now().Format("20060102150405"))
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	imageItemName := strings.ReplaceAll(req.ImageName, ":", "_")
+	imageItemName = strings.ReplaceAll(imageItemName, "/", "@")
+	pathItem := fmt.Sprintf("%s/image_pull_%s_%s.log", dockerLogDir, imageItemName, time.Now().Format("20060102150405"))
+	file, err := os.OpenFile(pathItem, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		return "", err
 	}
@@ -182,7 +184,7 @@ func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 			global.LOG.Debugf("pull image %s successful!", req.ImageName)
 			_, _ = io.Copy(file, out)
 		}()
-		return path, nil
+		return pathItem, nil
 	}
 	repo, err := imageRepoRepo.Get(commonRepo.WithByID(req.RepoID))
 	if err != nil {
@@ -213,7 +215,7 @@ func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 		global.LOG.Debugf("pull image %s successful!", req.ImageName)
 		_, _ = io.Copy(file, out)
 	}()
-	return path, nil
+	return pathItem, nil
 }
 
 func (u *ImageService) ImageLoad(req dto.ImageLoad) error {
@@ -294,14 +296,15 @@ func (u *ImageService) ImagePush(req dto.ImagePush) (string, error) {
 			return "", err
 		}
 	}
-
 	if _, err := os.Stat(dockerLogDir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dockerLogDir, os.ModePerm); err != nil {
 			return "", err
 		}
 	}
-	path := fmt.Sprintf("%s/image_push_%s_%s.log", dockerLogDir, strings.ReplaceAll(req.Name, ":", "_"), time.Now().Format("20060102150405"))
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	imageItemName := strings.ReplaceAll(req.Name, ":", "_")
+	imageItemName = strings.ReplaceAll(imageItemName, "/", "@")
+	pathItem := fmt.Sprintf("%s/image_push_%s_%s.log", dockerLogDir, imageItemName, time.Now().Format("20060102150405"))
+	file, err := os.OpenFile(pathItem, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		return "", err
 	}
@@ -317,7 +320,7 @@ func (u *ImageService) ImagePush(req dto.ImagePush) (string, error) {
 		_, _ = io.Copy(file, out)
 	}()
 
-	return path, nil
+	return pathItem, nil
 }
 
 func (u *ImageService) ImageRemove(req dto.BatchDelete) error {

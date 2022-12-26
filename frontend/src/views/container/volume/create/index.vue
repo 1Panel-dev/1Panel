@@ -7,7 +7,7 @@
         </template>
         <el-form ref="formRef" v-loading="loading" :model="form" :rules="rules" label-width="80px">
             <el-form-item :label="$t('container.volumeName')" prop="name">
-                <el-input clearable v-model="form.name" />
+                <el-input clearable v-model.trim="form.name" />
             </el-form-item>
             <el-form-item :label="$t('container.driver')" prop="driver">
                 <el-select v-model="form.driver">

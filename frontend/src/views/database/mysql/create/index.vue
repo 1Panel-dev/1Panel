@@ -7,7 +7,7 @@
         </template>
         <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
             <el-form-item :label="$t('commons.table.name')" prop="name">
-                <el-input clearable v-model="form.name">
+                <el-input clearable v-model.trim="form.name">
                     <template #append>
                         <el-select v-model="form.format" style="width: 125px">
                             <el-option label="utf8mb4" value="utf8mb4" />
@@ -19,10 +19,10 @@
                 </el-input>
             </el-form-item>
             <el-form-item :label="$t('commons.login.username')" prop="username">
-                <el-input clearable v-model="form.username" />
+                <el-input clearable v-model.trim="form.username" />
             </el-form-item>
             <el-form-item :label="$t('commons.login.password')" prop="password">
-                <el-input type="password" clearable show-password v-model="form.password" />
+                <el-input type="password" clearable show-password v-model.trim="form.password" />
             </el-form-item>
 
             <el-form-item :label="$t('database.permission')" prop="permission">

@@ -7,7 +7,7 @@
         </template>
         <el-form ref="formRef" v-loading="loading" :model="form" :rules="rules" label-width="80px">
             <el-form-item :label="$t('container.name')" prop="name">
-                <el-input clearable v-model="form.name" />
+                <el-input clearable v-model.trim="form.name" />
             </el-form-item>
             <el-form-item :label="$t('container.image')" prop="image">
                 <el-select style="width: 100%" filterable v-model="form.image">

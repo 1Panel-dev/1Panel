@@ -7,21 +7,17 @@
         </template>
         <el-form ref="formRef" :model="dialogData.rowData" label-position="left" :rules="rules" label-width="120px">
             <el-form-item :label="$t('cronjob.taskType')" prop="type">
-                <el-select
-                    @change="changeName(true, dialogData.rowData!.type)"
-                    style="width: 100%"
-                    v-model="dialogData.rowData!.type"
-                >
+                <el-select style="width: 100%" v-model="dialogData.rowData!.type">
                     <el-option value="shell" :label="$t('cronjob.shell')" />
                     <el-option value="website" :label="$t('cronjob.website')" />
                     <el-option value="database" :label="$t('cronjob.database')" />
                     <el-option value="directory" :label="$t('cronjob.directory')" />
-                    <el-option value="curl" :label="$t('cronjob.curl')" />
+                    <el-option value="curl" :label="$t('cronjob.curl') + ' URL'" />
                 </el-select>
             </el-form-item>
 
             <el-form-item :label="$t('cronjob.taskName')" prop="name">
-                <el-input style="width: 100%" clearable v-model="dialogData.rowData!.name" />
+                <el-input style="width: 100%" clearable v-model.trim="dialogData.rowData!.name" />
             </el-form-item>
 
             <el-form-item :label="$t('cronjob.cronSpec')" prop="spec">
@@ -65,11 +61,7 @@
             </el-form-item>
 
             <el-form-item v-if="dialogData.rowData!.type === 'website'" :label="$t('cronjob.website')" prop="website">
-                <el-select
-                    @change="changeName(false, dialogData.rowData!.type)"
-                    style="width: 100%"
-                    v-model="dialogData.rowData!.website"
-                >
+                <el-select style="width: 100%" v-model="dialogData.rowData!.website">
                     <el-option v-for="item in websiteOptions" :key="item" :value="item" :label="item" />
                 </el-select>
             </el-form-item>
@@ -87,12 +79,7 @@
                 :label="$t('cronjob.sourceDir')"
                 prop="sourceDir"
             >
-                <el-input
-                    @input="changeName(false, dialogData.rowData!.type)"
-                    style="width: 100%"
-                    clearable
-                    v-model="dialogData.rowData!.sourceDir"
-                >
+                <el-input style="width: 100%" disabled v-model="dialogData.rowData!.sourceDir">
                     <template #append>
                         <FileList @choose="loadDir" :dir="true"></FileList>
                     </template>
@@ -124,8 +111,8 @@
                 </el-form-item>
             </div>
 
-            <el-form-item v-if="dialogData.rowData!.type === 'curl'" :label="$t('cronjob.url') + 'URL'" prop="url">
-                <el-input style="width: 100%" clearable v-model="dialogData.rowData!.url" />
+            <el-form-item v-if="dialogData.rowData!.type === 'curl'" :label="$t('cronjob.url')" prop="url">
+                <el-input style="width: 100%" clearable v-model.trim="dialogData.rowData!.url" />
             </el-form-item>
 
             <el-form-item
@@ -343,16 +330,6 @@ function isBackup() {
 
 function hasScript() {
     return dialogData.value.rowData!.type === 'shell';
-}
-function changeName(isChangeType: boolean, type: string) {
-    if (isChangeType) {
-        if (isBackup()) {
-            if (backupOptions.value.length === 0) {
-                ElMessage.error(i18n.global.t('cronjob.missBackupAccount'));
-            }
-        }
-    }
-    dialogData.value.rowData!.name = `${type}_test`;
 }
 
 const onSubmit = async (formEl: FormInstance | undefined) => {

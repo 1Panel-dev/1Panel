@@ -9,7 +9,7 @@
             <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
         </el-card>
         <el-card style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
-            <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
+            <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
                 <template #toolbar>
                     <el-button @click="onOpenPull">
                         {{ $t('container.imagePull') }}
@@ -21,7 +21,6 @@
                         {{ $t('container.build') }}
                     </el-button>
                 </template>
-                <el-table-column type="selection" fix />
                 <el-table-column label="ID" show-overflow-tooltip prop="id" min-width="60" />
                 <el-table-column :label="$t('container.tag')" prop="tags" min-width="160" fix>
                     <template #default="{ row }">
@@ -99,7 +98,6 @@ const loading = ref(false);
 
 const data = ref();
 const repos = ref();
-const selects = ref<any>([]);
 const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 10,

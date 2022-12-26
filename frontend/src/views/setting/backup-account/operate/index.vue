@@ -22,7 +22,7 @@
                 prop="varsJson['dir']"
                 :rules="Rules.requiredInput"
             >
-                <el-input v-model="dialogData.rowData!.varsJson['dir']">
+                <el-input disabled v-model="dialogData.rowData!.varsJson['dir']">
                     <template #append>
                         <FileList @choose="loadDir" :dir="true"></FileList>
                     </template>
@@ -34,7 +34,7 @@
                 prop="accessKey"
                 :rules="Rules.requiredInput"
             >
-                <el-input v-model="dialogData.rowData!.accessKey" />
+                <el-input v-model.trim="dialogData.rowData!.accessKey" />
             </el-form-item>
             <el-form-item
                 v-if="hasBucket(dialogData.rowData!.type)"
@@ -42,7 +42,7 @@
                 prop="credential"
                 :rules="Rules.requiredInput"
             >
-                <el-input show-password clearable v-model="dialogData.rowData!.credential" />
+                <el-input show-password clearable v-model.trim="dialogData.rowData!.credential" />
             </el-form-item>
             <el-form-item
                 v-if="dialogData.rowData!.type === 'S3'"
@@ -50,7 +50,7 @@
                 prop="varsJson.region"
                 :rules="Rules.requiredInput"
             >
-                <el-input v-model="dialogData.rowData!.varsJson['region']" />
+                <el-input v-model.trim="dialogData.rowData!.varsJson['region']" />
             </el-form-item>
             <el-form-item
                 v-if="hasBucket(dialogData.rowData!.type) && dialogData.rowData!.type !== 'MINIO'"
@@ -58,7 +58,7 @@
                 prop="varsJson.endpoint"
                 :rules="Rules.requiredInput"
             >
-                <el-input v-model="dialogData.rowData!.varsJson['endpoint']" />
+                <el-input v-model.trim="dialogData.rowData!.varsJson['endpoint']" />
             </el-form-item>
             <el-form-item
                 v-if="dialogData.rowData!.type === 'MINIO'"
@@ -68,7 +68,7 @@
             >
                 <el-input v-model="dialogData.rowData!.varsJson['endpointItem']">
                     <template #prepend>
-                        <el-select v-model="endpoints" style="width: 80px">
+                        <el-select v-model.trim="endpoints" style="width: 80px">
                             <el-option label="http" value="http" />
                             <el-option label="https" value="https" />
                         </el-select>
@@ -90,7 +90,7 @@
             </el-form-item>
             <div v-if="dialogData.rowData!.type === 'SFTP'">
                 <el-form-item :label="$t('setting.address')" prop="varsJson.address" :rules="Rules.requiredInput">
-                    <el-input v-model="dialogData.rowData!.varsJson['address']" />
+                    <el-input v-model.trim="dialogData.rowData!.varsJson['address']" />
                 </el-form-item>
                 <el-form-item :label="$t('setting.port')" prop="varsJson.port" :rules="[Rules.number]">
                     <el-input-number :min="0" :max="65535" v-model.number="dialogData.rowData!.varsJson['port']" />

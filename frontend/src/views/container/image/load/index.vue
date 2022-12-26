@@ -7,7 +7,7 @@
         </template>
         <el-form v-loading="loading" ref="formRef" :model="form" label-width="80px">
             <el-form-item :label="$t('container.path')" :rules="Rules.requiredSelect" prop="path">
-                <el-input clearable v-model="form.path">
+                <el-input disabled v-model="form.path">
                     <template #append>
                         <FileList @choose="loadLoadDir" :dir="false"></FileList>
                     </template>

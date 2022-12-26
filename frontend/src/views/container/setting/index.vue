@@ -29,7 +29,7 @@
                             </div>
                         </el-form-item>
                         <el-form-item :label="$t('container.daemonJsonPath')">
-                            <el-input clearable v-model="daemonJsonPath">
+                            <el-input disabled v-model="daemonJsonPath">
                                 <template #append>
                                     <FileList @choose="loadLoadDir" :dir="false"></FileList>
                                 </template>

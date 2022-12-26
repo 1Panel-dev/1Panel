@@ -13,6 +13,7 @@
                 v-if="p.type == 'password'"
                 :type="p.type"
                 show-password
+                clearable
                 @change="updateParam"
             ></el-input>
             <el-select
