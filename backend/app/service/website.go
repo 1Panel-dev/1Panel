@@ -252,6 +252,14 @@ func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
 		return res, err
 	}
 	res.Website = website
+
+	nginxInstall, err := getAppInstallByKey(constant.AppNginx)
+	if err != nil {
+		return res, err
+	}
+	sitePath := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name, "www", "sites", website.Alias)
+	res.ErrorLogPath = path.Join(sitePath, "log", "error.log")
+	res.AccessLogPath = path.Join(sitePath, "log", "access.log")
 	return res, nil
 }
 

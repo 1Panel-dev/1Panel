@@ -109,11 +109,13 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 		if err := json.Unmarshal(paramByte, &authParam); err != nil {
 			return err
 		}
-		authByte, err := json.Marshal(authParam)
-		if err != nil {
-			return err
+		if authParam.RootPassword != "" {
+			authByte, err := json.Marshal(authParam)
+			if err != nil {
+				return err
+			}
+			appInstall.Param = string(authByte)
 		}
-		appInstall.Param = string(authByte)
 	}
 	if app.Type == "website" {
 		paramByte, err := json.Marshal(params)

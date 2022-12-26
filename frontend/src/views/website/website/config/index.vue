@@ -8,6 +8,9 @@
                 <el-tab-pane :label="$t('website.security')" name="safety">
                     <Safety :key="id" :id="id" v-if="index === 'safety'"></Safety>
                 </el-tab-pane>
+                <el-tab-pane :label="$t('website.log')" name="log">
+                    <Log :key="id" :id="id" v-if="index === 'log'"></Log>
+                </el-tab-pane>
                 <el-tab-pane :label="$t('website.source')" name="resource">
                     <Resource :key="id" :id="id" v-if="index === 'resource'"></Resource>
                 </el-tab-pane>
@@ -22,6 +25,7 @@ import { onMounted, ref } from 'vue';
 import Basic from './basic/index.vue';
 import Safety from './safety/index.vue';
 import Resource from './resource/index.vue';
+import Log from './log/index.vue';
 import router from '@/routers';
 
 const props = defineProps({

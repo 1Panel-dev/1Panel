@@ -87,6 +87,9 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) 
 		if err := fileOp.CreateFile(path.Join(siteFolder, "log", "access.log")); err != nil {
 			return err
 		}
+		if err := fileOp.CreateFile(path.Join(siteFolder, "log", "error.log")); err != nil {
+			return err
+		}
 		if err := fileOp.CreateDir(path.Join(siteFolder, "index"), 0755); err != nil {
 			return err
 		}
@@ -130,6 +133,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	siteFolder := path.Join("/www", "sites", website.Alias)
 	commonFolder := path.Join("/www", "common")
 	server.UpdateDirective("access_log", []string{path.Join(siteFolder, "log", "access.log")})
+	server.UpdateDirective("error_log", []string{path.Join(siteFolder, "log", "error.log")})
 	server.UpdateDirective("access_by_lua_file", []string{path.Join(commonFolder, "waf", "access.lua")})
 	server.UpdateDirective("set", []string{"$RulePath", path.Join(siteFolder, "waf", "rules")})
 	server.UpdateDirective("set", []string{"$logdir", path.Join(siteFolder, "log")})

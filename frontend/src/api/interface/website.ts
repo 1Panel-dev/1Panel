@@ -15,6 +15,11 @@ export namespace Website {
         webSiteSSL: SSL;
     }
 
+    export interface WebsiteDTO extends Website {
+        errorLogPath: string;
+        accessLogPath: string;
+    }
+
     export interface NewAppInstall {
         name: string;
         appDetailId: number;

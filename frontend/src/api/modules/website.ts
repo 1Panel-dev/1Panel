@@ -28,7 +28,7 @@ export const UpdateWebsite = (req: Website.WebSiteUpdateReq) => {
 };
 
 export const GetWebsite = (id: number) => {
-    return http.get<Website.Website>(`/websites/${id}`);
+    return http.get<Website.WebsiteDTO>(`/websites/${id}`);
 };
 
 export const GetWebsiteOptions = () => {
