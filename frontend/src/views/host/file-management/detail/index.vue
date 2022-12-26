@@ -39,7 +39,6 @@ const acceptParams = async (params: InfoProps): Promise<void> => {
     props.value = params;
     GetFileContent({ path: params.path, expand: false, page: 1, pageSize: 1 }).then((res) => {
         data.value = res.data;
-        console.log(data.value);
         open.value = true;
     });
 };
