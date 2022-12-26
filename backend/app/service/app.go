@@ -123,7 +123,9 @@ func (a AppService) GetAppDetail(appId uint, version string) (response.AppDetail
 		return appDetailDTO, err
 	}
 	paramMap := make(map[string]interface{})
-	_ = json.Unmarshal([]byte(detail.Params), &paramMap)
+	if err := json.Unmarshal([]byte(detail.Params), &paramMap); err != nil {
+		return appDetailDTO, err
+	}
 	appDetailDTO.AppDetail = detail
 	appDetailDTO.Params = paramMap
 	appDetailDTO.Enable = true
