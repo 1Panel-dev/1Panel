@@ -8,7 +8,7 @@
         <div v-loading="loading">
             <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
                 <el-form-item :label="$t('container.name')" prop="name">
-                    <el-input v-model="form.name"></el-input>
+                    <el-input v-model.trim="form.name"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('container.from')">
                     <el-radio-group v-model="form.from">
@@ -19,7 +19,7 @@
                 </el-form-item>
                 <el-form-item v-if="form.from === 'path'" prop="path">
                     <el-input
-                        clearable
+                        disabled
                         :placeholder="$t('commons.example') + '/tmp/docker-compose.yml'"
                         v-model="form.path"
                     >

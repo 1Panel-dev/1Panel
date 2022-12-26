@@ -18,7 +18,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('container.path')" :rules="Rules.requiredSelect" prop="path">
-                <el-input clearable v-model="form.path">
+                <el-input disabled v-model="form.path">
                     <template #append>
                         <FileList @choose="loadSaveDir" :dir="true"></FileList>
                     </template>

@@ -7,7 +7,7 @@
         </template>
         <el-form v-loading="loading" ref="formRef" :model="dialogData.rowData" :rules="rules" label-width="80px">
             <el-form-item :label="$t('container.name')" prop="name">
-                <el-input :disabled="dialogData.title === 'edit'" v-model="dialogData.rowData!.name"></el-input>
+                <el-input :disabled="dialogData.title === 'edit'" v-model.trim="dialogData.rowData!.name"></el-input>
             </el-form-item>
             <el-form-item :label="$t('container.description')">
                 <el-input v-model="dialogData.rowData!.description"></el-input>

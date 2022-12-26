@@ -7,7 +7,7 @@
         </template>
         <el-form ref="formRef" v-loading="loading" :model="form" :rules="rules" label-width="80px">
             <el-form-item :label="$t('container.networkName')" prop="name">
-                <el-input clearable v-model="form.name" />
+                <el-input clearable v-model.trim="form.name" />
             </el-form-item>
             <el-form-item :label="$t('container.driver')" prop="driver">
                 <el-select v-model="form.driver">
@@ -26,13 +26,13 @@
                 />
             </el-form-item>
             <el-form-item :label="$t('container.subnet')" prop="subnet">
-                <el-input clearable v-model="form.subnet" />
+                <el-input clearable v-model.trim="form.subnet" />
             </el-form-item>
             <el-form-item :label="$t('container.gateway')" prop="gateway">
-                <el-input clearable v-model="form.gateway" />
+                <el-input clearable v-model.trim="form.gateway" />
             </el-form-item>
             <el-form-item :label="$t('container.scope')" prop="scope">
-                <el-input clearable v-model="form.scope" />
+                <el-input clearable v-model.trim="form.scope" />
             </el-form-item>
             <el-form-item :label="$t('container.tag')" prop="labelStr">
                 <el-input

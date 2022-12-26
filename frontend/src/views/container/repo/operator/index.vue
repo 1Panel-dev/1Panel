@@ -10,7 +10,7 @@
                 <el-input
                     clearable
                     :disabled="dialogData.title === 'edit'"
-                    v-model="dialogData.rowData!.name"
+                    v-model.trim="dialogData.rowData!.name"
                 ></el-input>
             </el-form-item>
             <el-form-item :label="$t('container.auth')" prop="auth">
@@ -20,15 +20,20 @@
                 </el-radio-group>
             </el-form-item>
             <el-form-item v-if="dialogData.rowData!.auth" :label="$t('commons.login.username')" prop="username">
-                <el-input clearable v-model="dialogData.rowData!.username"></el-input>
+                <el-input clearable v-model.trim="dialogData.rowData!.username"></el-input>
             </el-form-item>
             <el-form-item v-if="dialogData.rowData!.auth" :label="$t('commons.login.password')" prop="password">
-                <el-input clearable type="password" show-password v-model="dialogData.rowData!.password"></el-input>
+                <el-input
+                    clearable
+                    type="password"
+                    show-password
+                    v-model.trim="dialogData.rowData!.password"
+                ></el-input>
             </el-form-item>
             <el-form-item :label="$t('container.downloadUrl')" prop="downloadUrl">
                 <el-input
                     clearable
-                    v-model="dialogData.rowData!.downloadUrl"
+                    v-model.trim="dialogData.rowData!.downloadUrl"
                     :placeholder="'172.16.10.10:8081'"
                 ></el-input>
                 <span v-if="dialogData.rowData!.downloadUrl" class="input-help">

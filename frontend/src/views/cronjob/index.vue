@@ -139,9 +139,9 @@ const onOpenDialog = async (
     rowData: Partial<Cronjob.CronjobInfo> = {
         specType: 'perMonth',
         week: 1,
-        day: 1,
-        hour: 2,
-        minute: 3,
+        day: 3,
+        hour: 1,
+        minute: 30,
         keepLocal: true,
         retainCopies: 7,
     },
