@@ -44,7 +44,7 @@ type IMysqlService interface {
 	Recover(db dto.RecoverDB) error
 
 	DeleteCheck(id uint) ([]string, error)
-	Delete(id uint) error
+	Delete(req dto.MysqlDBDelete) error
 	LoadStatus() (*dto.MysqlStatus, error)
 	LoadVariables() (*dto.MysqlVariables, error)
 	LoadBaseInfo() (*dto.DBBaseInfo, error)
@@ -256,36 +256,37 @@ func (u *MysqlService) DeleteCheck(id uint) ([]string, error) {
 	return appInUsed, nil
 }
 
-func (u *MysqlService) Delete(id uint) error {
+func (u *MysqlService) Delete(req dto.MysqlDBDelete) error {
 	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
-	if err != nil {
+	if err != nil && !req.ForceDelete {
 		return err
 	}
 
-	db, err := mysqlRepo.Get(commonRepo.WithByID(id))
-	if err != nil {
+	db, err := mysqlRepo.Get(commonRepo.WithByID(req.ID))
+	if err != nil && !req.ForceDelete {
 		return err
 	}
 
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", db.Name, db.Permission)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", db.Name, db.Permission)); err != nil && !req.ForceDelete {
 		return err
 	}
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop database if exists `%s`", db.Name)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop database if exists `%s`", db.Name)); err != nil && !req.ForceDelete {
 		return err
 	}
 
-	uploadDir := fmt.Sprintf("%s/uploads/%s/mysql/%s", constant.DefaultDataDir, app.Name, db.Name)
+	uploadDir := fmt.Sprintf("%s/uploads/database/mysql/%s/%s", constant.DefaultDataDir, app.Name, db.Name)
 	if _, err := os.Stat(uploadDir); err == nil {
 		_ = os.RemoveAll(uploadDir)
 	}
-
-	localDir, err := loadLocalDir()
-	if err != nil {
-		return err
-	}
-	backupDir := fmt.Sprintf("%s/database/mysql/%s/%s", localDir, db.MysqlName, db.Name)
-	if _, err := os.Stat(backupDir); err == nil {
-		_ = os.RemoveAll(backupDir)
+	if req.DeleteBackup {
+		localDir, err := loadLocalDir()
+		if err != nil && !req.ForceDelete {
+			return err
+		}
+		backupDir := fmt.Sprintf("%s/database/mysql/%s/%s", localDir, db.MysqlName, db.Name)
+		if _, err := os.Stat(backupDir); err == nil {
+			_ = os.RemoveAll(backupDir)
+		}
 	}
 	_ = backupRepo.DeleteRecord(context.Background(), commonRepo.WithByType("database-mysql"), commonRepo.WithByName(app.Name), backupRepo.WithByDetailName(db.Name))
 

@@ -75,7 +75,7 @@ import { File } from '@/api/interface/file';
 import { BatchDeleteFile, GetFilesList, UploadFileData } from '@/api/modules/files';
 
 const selects = ref<any>([]);
-const baseDir = '/opt/1Panel/data/uploads/database/';
+const baseDir = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -94,6 +94,7 @@ interface DialogProps {
 const acceptParams = (params: DialogProps): void => {
     mysqlName.value = params.mysqlName;
     dbName.value = params.dbName;
+    baseDir.value = '/opt/1Panel/data/uploads/database/mysql/' + mysqlName.value + '/' + dbName.value + '/';
     upVisiable.value = true;
     search();
 };
@@ -102,7 +103,7 @@ const search = async () => {
     let params = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
-        path: baseDir,
+        path: baseDir.value,
         expand: true,
     };
     const res = await GetFilesList(params);
@@ -114,7 +115,7 @@ const onRecover = async (row: File.File) => {
     let params = {
         mysqlName: mysqlName.value,
         dbName: dbName.value,
-        fileDir: baseDir,
+        fileDir: baseDir.value,
         fileName: row.name,
     };
     await recoverByUpload(params);
@@ -156,7 +157,7 @@ const onSubmit = () => {
     if (uploaderFiles.value[0]!.raw != undefined) {
         formData.append('file', uploaderFiles.value[0]!.raw);
     }
-    formData.append('path', baseDir);
+    formData.append('path', baseDir.value);
     UploadFileData(formData, {}).then(() => {
         ElMessage.success(i18n.global.t('file.uploadSuccess'));
         handleClose();
@@ -167,10 +168,10 @@ const onSubmit = () => {
 const onBatchDelete = async (row: File.File | null) => {
     let files: Array<string> = [];
     if (row) {
-        files.push(baseDir + row.name);
+        files.push(baseDir.value + row.name);
     } else {
         selects.value.forEach((item: File.File) => {
-            files.push(baseDir + item.name);
+            files.push(baseDir.value + item.name);
         });
     }
     await useDeleteData(BatchDeleteFile, { paths: files, isDir: false }, 'commons.msg.delete');

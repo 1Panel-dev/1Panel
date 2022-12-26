@@ -8,7 +8,7 @@
         <div v-loading="loading">
             <codemirror
                 :autofocus="true"
-                placeholder="None data"
+                placeholder="#Define or paste the content of your docker-compose file here"
                 :indent-with-tab="true"
                 :tabSize="4"
                 style="max-height: 500px; width: 100%; min-height: 200px"

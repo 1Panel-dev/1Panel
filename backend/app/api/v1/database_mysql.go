@@ -217,7 +217,7 @@ func (b *BaseApi) DeleteCheckMysql(c *gin.Context) {
 }
 
 func (b *BaseApi) DeleteMysql(c *gin.Context) {
-	var req dto.OperateByID
+	var req dto.MysqlDBDelete
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -227,7 +227,7 @@ func (b *BaseApi) DeleteMysql(c *gin.Context) {
 		return
 	}
 
-	if err := mysqlService.Delete(req.ID); err != nil {
+	if err := mysqlService.Delete(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

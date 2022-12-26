@@ -2,13 +2,20 @@
     <div v-loading="loading">
         <LayoutContent :header="composeName" back-name="Compose" :reload="true">
             <div v-if="createdBy === '1Panel'">
-                <el-button-group>
-                    <el-button @click="onComposeOperate('start')">{{ $t('container.start') }}</el-button>
-                    <el-button @click="onComposeOperate('stop')">{{ $t('container.stop') }}</el-button>
-                    <el-button @click="onComposeOperate('down')">
-                        {{ $t('container.remove') }}
-                    </el-button>
-                </el-button-group>
+                <el-card>
+                    <template #header>
+                        <div class="card-header">
+                            <span>{{ $t('container.compose') }}</span>
+                        </div>
+                    </template>
+                    <el-button-group>
+                        <el-button @click="onComposeOperate('start')">{{ $t('container.start') }}</el-button>
+                        <el-button @click="onComposeOperate('stop')">{{ $t('container.stop') }}</el-button>
+                        <el-button @click="onComposeOperate('down')">
+                            {{ $t('container.remove') }}
+                        </el-button>
+                    </el-button-group>
+                </el-card>
             </div>
             <div v-else>
                 <el-alert :closable="false" show-icon :title="$t('container.composeDetailHelper')" type="info" />

@@ -230,6 +230,8 @@ export default {
         logout: '退出登录',
     },
     database: {
+        delete: '删除操作无法回滚，请输入 "',
+        deleteHelper: '" 删除此数据库',
         create: '创建数据库',
         noMysql: '当前未检测到 {0} 数据库，请进入应用商店点击安装！',
         mysqlBadStatus: '当前 mysql 应用状态异常，请在',
@@ -603,7 +605,7 @@ export default {
         detail: {
             users: '用户',
             hosts: '主机',
-            groups: '组',
+            apps: '应用',
             containers: '容器',
             commands: '快捷命令',
             backups: '备份账号',

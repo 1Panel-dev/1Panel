@@ -54,6 +54,11 @@ export namespace Database {
         permission: string;
         description: string;
     }
+    export interface MysqlDBDelete {
+        id: number;
+        forceDelete: boolean;
+        deleteBackup: boolean;
+    }
     export interface MysqlVariables {
         mysqlName: string;
         binlog_cache_size: number;

@@ -15,11 +15,11 @@
                 <el-table-column min-width="40" :label="$t('logs.loginStatus')" prop="status">
                     <template #default="{ row }">
                         <div v-if="row.status === 'Success'">
-                            <el-tag type="success">{{ row.status }}</el-tag>
+                            <el-tag type="success">{{ $t('commons.status.success') }}</el-tag>
                         </div>
                         <div v-else>
                             <el-tooltip class="box-item" effect="dark" :content="row.message" placement="top-start">
-                                <el-tag type="danger">{{ row.status }}</el-tag>
+                                <el-tag type="danger">{{ $t('commons.status.failed') }}</el-tag>
                             </el-tooltip>
                         </div>
                     </template>

@@ -1,12 +1,11 @@
 <template>
     <el-dialog
-        v-model="open"
-        :title="$t('commons.button.delete') + ' - ' + appInstallName"
+        v-model="dialogVisiable"
+        :title="$t('commons.button.delete') + ' - ' + dbName"
         width="30%"
         :close-on-click-modal="false"
-        :before-close="handleClose"
     >
-        <el-form ref="deleteForm" label-position="left">
+        <el-form ref="deleteForm">
             <el-form-item>
                 <el-checkbox v-model="deleteReq.forceDelete" :label="$t('app.forceDelete')" />
                 <span class="input-help">
@@ -20,16 +19,20 @@
                 </span>
             </el-form-item>
             <el-form-item>
-                <span v-html="deleteHelper"></span>
-                <el-input v-model="deleteInfo" :placeholder="appInstallName" />
+                <div>
+                    <span style="font-size: 12px">{{ $t('database.delete') }}</span>
+                    <span style="font-size: 12px; color: red; font-weight: 500">{{ dbName }}</span>
+                    <span style="font-size: 12px">{{ $t('database.deleteHelper') }}</span>
+                </div>
+                <el-input v-model="deleteInfo" :placeholder="dbName"></el-input>
             </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="handleClose" :loading="loading">
+                <el-button @click="dialogVisiable = false" :loading="loading">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" @click="submit" :loading="loading" :disabled="deleteInfo != appInstallName">
+                <el-button type="primary" @click="submit" :loading="loading" :disabled="deleteInfo != dbName">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -39,52 +42,48 @@
 <script lang="ts" setup>
 import { ElMessage, FormInstance } from 'element-plus';
 import { ref } from 'vue';
-import { App } from '@/api/interface/app';
-import { InstalledOp } from '@/api/modules/app';
 import i18n from '@/lang';
+import { deleteMysqlDB } from '@/api/modules/database';
 
 let deleteReq = ref({
-    operate: 'delete',
-    installId: 0,
+    id: 0,
     deleteBackup: false,
     forceDelete: false,
 });
-let open = ref(false);
+let dialogVisiable = ref(false);
 let loading = ref(false);
-let deleteHelper = ref('');
 let deleteInfo = ref('');
-let appInstallName = ref('');
+let dbName = ref('');
 
 const deleteForm = ref<FormInstance>();
-const em = defineEmits(['close']);
 
-const handleClose = () => {
-    open.value = false;
-    em('close', open);
-};
+interface DialogProps {
+    id: number;
+    name: string;
+}
+const emit = defineEmits<{ (e: 'search'): void }>();
 
-const acceptParams = async (app: App.AppInstalled) => {
+const acceptParams = async (prop: DialogProps) => {
     deleteReq.value = {
-        operate: 'delete',
-        installId: 0,
+        id: prop.id,
         deleteBackup: false,
         forceDelete: false,
     };
+    dbName.value = prop.name;
     deleteInfo.value = '';
-    deleteReq.value.installId = app.id;
-    deleteHelper.value = i18n.global.t('website.deleteConfirmHelper', [app.name]);
-    appInstallName.value = app.name;
-    open.value = true;
+    dialogVisiable.value = true;
 };
 
 const submit = async () => {
     loading.value = true;
-    InstalledOp(deleteReq.value)
+    deleteMysqlDB(deleteReq.value)
         .then(() => {
-            handleClose();
+            loading.value = false;
+            emit('search');
             ElMessage.success(i18n.global.t('commons.msg.deleteSuccess'));
+            dialogVisiable.value = false;
         })
-        .finally(() => {
+        .catch(() => {
             loading.value = false;
         });
 };
