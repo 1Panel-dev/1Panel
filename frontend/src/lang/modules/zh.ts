@@ -930,6 +930,10 @@ export default {
         provider: '类型',
         manualCreate: '手动创建',
         acmeAccount: 'Acme 账号',
+        resolveDomain: '解析域名',
+        err: '错误',
+        value: '记录值',
+        type: '类型',
     },
     firewall: {
         ccDeny: 'CC 防护',

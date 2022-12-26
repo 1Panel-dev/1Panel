@@ -51,14 +51,16 @@
             <el-form-item v-if="dnsResolve.length > 0">
                 <div v-for="(re, index) in dnsResolve" :key="index">
                     <el-descriptions direction="vertical" :column="4" border>
-                        <el-descriptions-item label="域名">{{ re.domain }}</el-descriptions-item>
+                        <el-descriptions-item :label="$t('website.domain')">{{ re.domain }}</el-descriptions-item>
                         <div v-if="re.err != ''">
-                            <el-descriptions-item label="错误">{{ re.err }}</el-descriptions-item>
+                            <el-descriptions-item :label="$t('ssl.err')">{{ re.err }}</el-descriptions-item>
                         </div>
                         <div v-else>
-                            <el-descriptions-item label="解析域名">{{ re.resolve }}</el-descriptions-item>
-                            <el-descriptions-item label="记录值">{{ re.value }}</el-descriptions-item>
-                            <el-descriptions-item label="类型">TXT</el-descriptions-item>
+                            <el-descriptions-item :label="$t('ssl.resolveDomain')">
+                                {{ re.resolve }}
+                            </el-descriptions-item>
+                            <el-descriptions-item :label="$t('ssl.value')">{{ re.value }}</el-descriptions-item>
+                            <el-descriptions-item :label="$t('ssl.type')">TXT</el-descriptions-item>
                         </div>
                     </el-descriptions>
                 </div>
@@ -137,15 +139,14 @@ const resetForm = () => {
         otherDomains: '',
         provider: 'dnsAccount',
         websiteId: 0,
-        acmeAccountId: 0,
-        dnsAccountId: 0,
+        acmeAccountId: undefined,
+        dnsAccountId: undefined,
     };
 };
 
 const acceptParams = () => {
     resetForm();
     ssl.value.websiteId = Number(id.value);
-    // getWebsite(id.value);
     getAcmeAccounts();
     getDnsAccounts();
     open.value = true;
