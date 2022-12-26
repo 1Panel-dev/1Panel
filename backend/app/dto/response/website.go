@@ -8,6 +8,7 @@ type WebsiteDTO struct {
 	model.Website
 	ErrorLogPath  string `json:"errorLogPath"`
 	AccessLogPath string `json:"accessLogPath"`
+	SitePath      string `json:"sitePath"`
 }
 
 type WebsitePreInstallCheck struct {
