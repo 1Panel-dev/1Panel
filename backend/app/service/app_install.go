@@ -495,7 +495,14 @@ func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value 
 			"param": strings.ReplaceAll(appInstall.Param, oldVal, newVal),
 			"env":   strings.ReplaceAll(appInstall.Env, oldVal, newVal),
 		}, commonRepo.WithByID(appInstall.ID))
-
+	}
+	if param == "user-password" {
+		oldVal = fmt.Sprintf("\"PANEL_DB_USER_PASSWORD\":\"%v\"", appInstall.Password)
+		newVal = fmt.Sprintf("\"PANEL_DB_USER_PASSWORD\":\"%v\"", value)
+		_ = appInstallRepo.BatchUpdateBy(map[string]interface{}{
+			"param": strings.ReplaceAll(appInstall.Param, oldVal, newVal),
+			"env":   strings.ReplaceAll(appInstall.Env, oldVal, newVal),
+		}, commonRepo.WithByID(appInstall.ID))
 	}
 	if param == "port" {
 		oldVal = fmt.Sprintf("\"PANEL_APP_PORT_HTTP\":%v", appInstall.Port)
