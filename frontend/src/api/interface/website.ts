@@ -18,6 +18,7 @@ export namespace Website {
     export interface WebsiteDTO extends Website {
         errorLogPath: string;
         accessLogPath: string;
+        sitePath: string;
     }
 
     export interface NewAppInstall {

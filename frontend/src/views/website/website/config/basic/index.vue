@@ -3,17 +3,20 @@
         <el-tab-pane :label="$t('website.domainConfig')">
             <Doamin :id="id" v-if="index == '0'"></Doamin>
         </el-tab-pane>
+        <el-tab-pane :label="$t('website.sitePath')">
+            <SitePath :id="id" v-if="index == '1'"></SitePath>
+        </el-tab-pane>
         <el-tab-pane :label="$t('website.defaultDoc')">
-            <Default :id="id" v-if="index == '1'"></Default>
+            <Default :id="id" v-if="index == '2'"></Default>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.rate')">
-            <LimitConn :id="id" v-if="index == '2'"></LimitConn>
+            <LimitConn :id="id" v-if="index == '3'"></LimitConn>
         </el-tab-pane>
         <el-tab-pane :label="'HTTPS'">
-            <HTTPS :id="id" v-if="index == '3'"></HTTPS>
+            <HTTPS :id="id" v-if="index == '4'"></HTTPS>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.other')">
-            <Other :id="id" v-if="index == '4'"></Other>
+            <Other :id="id" v-if="index == '5'"></Other>
         </el-tab-pane>
     </el-tabs>
 </template>
@@ -26,6 +29,7 @@ import Default from './default-doc/index.vue';
 import LimitConn from './limit-conn/index.vue';
 import Other from './other/index.vue';
 import HTTPS from './https/index.vue';
+import SitePath from './site-folder/index.vue';
 
 const props = defineProps({
     id: {

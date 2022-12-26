@@ -1,6 +1,6 @@
 <template>
     <el-row :gutter="20">
-        <el-col :span="8" :offset="2">
+        <el-col :span="8" :offset="1">
             <el-form
                 ref="websiteForm"
                 label-position="right"
@@ -88,7 +88,6 @@ const search = () => {
     ListGroups().then((res) => {
         groups.value = res.data;
         GetWebsite(websiteId.value).then((res) => {
-            // form.id = res.data.id;
             form.primaryDomain = res.data.primaryDomain;
             form.remark = res.data.remark;
             form.webSiteGroupId = res.data.webSiteGroupId;

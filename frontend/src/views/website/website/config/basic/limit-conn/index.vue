@@ -95,12 +95,13 @@ const limitRules = [
     { key: i18n.global.t('website.videoSite'), values: [150, 4, 1024] },
 ];
 
-let ruleKey = limitRules[0].key;
+let ruleKey = ref('');
 
 const search = (scopeReq: Website.NginxScopeReq) => {
     loading.value = true;
     GetNginxConfig(scopeReq)
         .then((res) => {
+            ruleKey.value = limitRules[0].key;
             if (res.data) {
                 enable.value = res.data.enable;
                 if (res.data.enable == false) {
