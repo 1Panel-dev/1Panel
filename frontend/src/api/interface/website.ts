@@ -68,6 +68,11 @@ export namespace Website {
         webSiteGroupId: number;
     }
 
+    export interface WebSiteOp {
+        id: number;
+        operate: string;
+    }
+
     export interface Group extends CommonModel {
         name: string;
         default: boolean;

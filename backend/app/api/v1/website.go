@@ -49,6 +49,20 @@ func (b *BaseApi) CreateWebsite(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+func (b *BaseApi) OpWebsite(c *gin.Context) {
+	var req request.WebsiteOp
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	err := websiteService.OpWebsite(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
 func (b *BaseApi) BackupWebsite(c *gin.Context) {
 	var req request.WebsiteResourceReq
 	if err := c.ShouldBindJSON(&req); err != nil {

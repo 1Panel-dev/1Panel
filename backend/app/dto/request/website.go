@@ -45,6 +45,11 @@ type WebsiteDelete struct {
 	ForceDelete  bool `json:"forceDelete"`
 }
 
+type WebsiteOp struct {
+	ID      uint   `json:"id" validate:"required"`
+	Operate string `json:"operate"`
+}
+
 type WebsiteWafReq struct {
 	WebsiteID uint   `json:"websiteId" validate:"required"`
 	Key       string `json:"key" validate:"required"`

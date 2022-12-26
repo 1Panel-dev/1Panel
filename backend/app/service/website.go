@@ -29,6 +29,7 @@ type WebsiteService struct {
 type IWebsiteService interface {
 	PageWebsite(req request.WebsiteSearch) (int64, []response.WebsiteDTO, error)
 	CreateWebsite(create request.WebsiteCreate) error
+	OpWebsite(req request.WebsiteOp) error
 	GetWebsiteOptions() ([]string, error)
 	Backup(id uint) error
 	Recover(req request.WebsiteRecover) error
@@ -113,6 +114,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) error {
 				return err
 			}
 			appInstall = &install
+			website.AppInstallID = 0
 		}
 	}
 
@@ -151,6 +153,17 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) error {
 
 	tx.Commit()
 	return nil
+}
+
+func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	if err := opWebsite(&website, req.Operate); err != nil {
+		return err
+	}
+	return websiteRepo.Save(context.Background(), &website)
 }
 
 func (w WebsiteService) GetWebsiteOptions() ([]string, error) {

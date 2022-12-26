@@ -162,7 +162,6 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		_ = deleteWebsiteFolder(nginxInstall, website)
 		return err
 	}
-
 	return nil
 }
 
@@ -566,4 +565,48 @@ func deleteWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) 
 		_ = fileOp.DeleteFile(nginxFilePath)
 	}
 	return nil
+}
+
+func opWebsite(website *model.Website, operate string) error {
+	nginxInstall, err := getNginxFull(website)
+	if err != nil {
+		return err
+	}
+	config := nginxInstall.SiteConfig.Config
+	servers := config.FindServers()
+	if len(servers) == 0 {
+		return errors.New("nginx config is not valid")
+	}
+	server := servers[0]
+	if operate == constant.StopWeb {
+		if website.Type != constant.Static {
+			server.RemoveDirective("location", []string{"/"})
+		}
+		server.UpdateRoot("/usr/share/nginx/html/stop")
+		website.Status = constant.WebStopped
+	}
+	if operate == constant.StartWeb {
+		switch website.Type {
+		case constant.Deployment:
+			server.RemoveDirective("root", nil)
+			appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+			if err != nil {
+				return err
+			}
+			proxy := fmt.Sprintf("http://127.0.0.1:%d", appInstall.HttpPort)
+			server.UpdateRootProxy([]string{proxy})
+		case constant.Static:
+			server.UpdateRoot(path.Join("/www/sites", website.Alias, "index"))
+			server.UpdateRootLocation()
+		case constant.Proxy:
+			server.RemoveDirective("root", nil)
+			server.UpdateRootProxy([]string{website.Proxy})
+		}
+		website.Status = constant.WebRunning
+	}
+
+	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return err
+	}
+	return nginxCheckAndReload(nginxInstall.SiteConfig.OldContent, config.FilePath, nginxInstall.Install.ContainerName)
 }

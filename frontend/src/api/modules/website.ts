@@ -11,6 +11,10 @@ export const CreateWebsite = (req: Website.WebSiteCreateReq) => {
     return http.post<any>(`/websites`, req);
 };
 
+export const OpWebsite = (req: Website.WebSiteOp) => {
+    return http.post<any>(`/websites/operate`, req);
+};
+
 export const BackupWebsite = (req: Website.BackupReq) => {
     return http.post(`/websites/backup`, req);
 };

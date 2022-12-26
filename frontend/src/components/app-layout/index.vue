@@ -26,6 +26,7 @@ const { switchDark } = useTheme();
 const loadDataFromDB = async () => {
     const res = await getSettingInfo();
     i18n.locale.value = res.data.language;
+    i18n.warnHtmlMessage = false;
     globalStore.updateLanguage(res.data.language);
     globalStore.setThemeConfig({ ...themeConfig.value, theme: res.data.theme });
     globalStore.setThemeConfig({ ...themeConfig.value, panelName: res.data.panelName });
