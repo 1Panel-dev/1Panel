@@ -25,4 +25,7 @@ const (
 	DnsManual  = "dnsManual"
 	Http       = "http"
 	Manual     = "manual"
+
+	StartWeb = "start"
+	StopWeb  = "stop"
 )

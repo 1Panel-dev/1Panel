@@ -32,7 +32,17 @@
                             </el-table-column>
                             <el-table-column :label="$t('commons.table.status')" prop="status">
                                 <template #default="{ row }">
-                                    <Status :key="row.status" :status="row.status"></Status>
+                                    <el-button
+                                        v-if="row.status === 'Running'"
+                                        link
+                                        type="success"
+                                        @click="opWebsite('stop', row.id)"
+                                    >
+                                        {{ $t('commons.status.running') }}
+                                    </el-button>
+                                    <el-button v-else link type="danger" @click="opWebsite('start', row.id)">
+                                        {{ $t('commons.status.stopped') }}
+                                    </el-button>
                                 </template>
                             </el-table-column>
                             <el-table-column :label="$t('website.remark')" prop="remark"></el-table-column>
@@ -83,16 +93,16 @@ import { onMounted, reactive, ref } from '@vue/runtime-core';
 import CreateWebSite from './create/index.vue';
 import DeleteWebsite from './delete/index.vue';
 import WebSiteGroup from './group/index.vue';
-import { SearchWebsites } from '@/api/modules/website';
+import { OpWebsite, SearchWebsites } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import AppStatus from '@/components/app-status/index.vue';
 import NginxConfig from './nginx/index.vue';
 import { dateFromat } from '@/utils/util';
-import Status from '@/components/status/index.vue';
 
 import i18n from '@/lang';
 import router from '@/routers';
 import { App } from '@/api/interface/app';
+import { ElMessage, ElMessageBox } from 'element-plus';
 
 const loading = ref(false);
 
@@ -188,6 +198,17 @@ const checkExist = (data: App.CheckInstalled) => {
     containerName.value = data.containerName;
     nginxStatus.value = data.status;
     installPath.value = data.installPath;
+};
+
+const opWebsite = (op: string, id: number) => {
+    ElMessageBox.confirm(i18n.global.t('website.' + op + 'Helper'), i18n.global.t('cronjob.changeStatus'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).then(async () => {
+        await OpWebsite({ id: id, operate: op });
+        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        search();
+    });
 };
 
 onMounted(() => {

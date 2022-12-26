@@ -906,6 +906,8 @@ export default {
         videoSite: '视频',
         errLog: '错误日志',
         accessLog: '网站日志',
+        stopHelper: '停止站点后将无法正常访问，用户访问会显示当前站点停止页面，是否继续操作？',
+        startHelper: '启用站点后，用户可以正常访问网站内容，是否继续操作？',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',
