@@ -104,7 +104,7 @@ export default {
             requiredSelect: '请选择必选项',
             commonName: '支持英文、中文、数字、.-和_,长度1-30',
             simpleName: '支持英文、数字、_,长度1-30',
-            dbName: '支持英文、数字、:.-_,长度1-30',
+            dbName: '支持英文、中文、数字、.-_,长度1-16',
             imageName: '支持英文、中文、数字、:.-_,长度1-30',
             complexityPassword: '请输入 8 位以上、必须含有字母、数字、特殊符号的密码',
             commonPassword: '请输入 6 位以上长度密码',
