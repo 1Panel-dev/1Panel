@@ -21,7 +21,7 @@
                         <el-button style="margin-top: 10px" @click="getDefaultConfig()">
                             {{ $t('app.defaultConfig') }}
                         </el-button>
-                        <el-button type="primary" @click="onSaveFile" style="margin-top: 5px">
+                        <el-button type="primary" @click="onSaveFile" style="margin-top: 10px">
                             {{ $t('commons.button.save') }}
                         </el-button>
                         <el-row>
@@ -98,6 +98,7 @@
             </LayoutContent>
         </el-card>
 
+        <ConfirmDialog ref="confirmDialogRef" @confirm="submtiFile"></ConfirmDialog>
         <ConfirmDialog ref="confirmFileRef" @confirm="submtiFile"></ConfirmDialog>
         <ConfirmDialog ref="confirmFormRef" @confirm="submtiForm"></ConfirmDialog>
         <ConfirmDialog ref="confirmPortRef" @confirm="onChangePort(formRef)"></ConfirmDialog>

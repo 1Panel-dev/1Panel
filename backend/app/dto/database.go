@@ -28,6 +28,12 @@ type MysqlDBCreate struct {
 	Description string `json:"description"`
 }
 
+type MysqlDBDelete struct {
+	ID           uint `json:"id" validate:"required"`
+	ForceDelete  bool `json:"forceDelete"`
+	DeleteBackup bool `json:"deleteBackup"`
+}
+
 type MysqlStatus struct {
 	AbortedClients               string `json:"Aborted_clients"`
 	AbortedConnects              string `json:"Aborted_connects"`

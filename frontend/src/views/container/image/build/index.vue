@@ -24,7 +24,7 @@
             <el-form-item v-if="form.from === 'edit'" :rules="Rules.requiredInput">
                 <codemirror
                     :autofocus="true"
-                    placeholder="None data"
+                    placeholder="#Define or paste the content of your Dockerfile here"
                     :indent-with-tab="true"
                     :tabSize="4"
                     style="max-height: 500px; width: 100%; min-height: 200px"
@@ -57,7 +57,7 @@
         <codemirror
             v-if="logVisiable"
             :autofocus="true"
-            placeholder="Wait for build output..."
+            placeholder="Waiting for build output..."
             :indent-with-tab="true"
             :tabSize="4"
             style="max-height: 300px"

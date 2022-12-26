@@ -10,31 +10,24 @@
             <el-form ref="deleteForm" label-position="left">
                 <el-form-item>
                     <el-checkbox v-model="deleteReq.forceDelete" :label="$t('website.forceDelete')" />
-                </el-form-item>
-                <div class="helper">
                     <span class="input-help">
                         {{ $t('website.forceDeleteHelper') }}
                     </span>
-                </div>
+                </el-form-item>
                 <el-form-item v-if="type === 'deployment'">
                     <el-checkbox v-model="deleteReq.deleteApp" :label="$t('website.deleteApp')" />
-                </el-form-item>
-                <div class="helper" v-if="type === 'deployment'">
                     <span class="input-help">
                         {{ $t('website.deleteAppHelper') }}
                     </span>
-                </div>
+                </el-form-item>
                 <el-form-item>
                     <el-checkbox v-model="deleteReq.deleteBackup" :label="$t('website.deleteBackup')" />
-                </el-form-item>
-                <div class="helper">
                     <span class="input-help">
                         {{ $t('website.deleteBackupHelper') }}
                     </span>
-                </div>
-                <br />
-                <span v-html="deleteHelper"></span>
+                </el-form-item>
                 <el-form-item>
+                    <span v-html="deleteHelper"></span>
                     <el-input v-model="deleteInfo" :placeholder="websiteName" />
                 </el-form-item>
             </el-form>
@@ -114,9 +107,3 @@ defineExpose({
     acceptParams,
 });
 </script>
-
-<style lang="scss">
-.helper {
-    margin-top: -20px;
-}
-</style>

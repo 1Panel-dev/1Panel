@@ -68,18 +68,16 @@ func OperationLog() gin.HandlerFunc {
 		if len(operationDic.BeforeFuntions) != 0 {
 			for _, funcs := range operationDic.BeforeFuntions {
 				for key, value := range formatMap {
-					if funcs.Info == key {
+					if funcs.InputValue == key {
 						var names []string
 						if funcs.IsList {
-							if key == "ids" {
-								sql := fmt.Sprintf("SELECT %s FROM %s where id in (?);", funcs.Key, funcs.DB)
-								fmt.Println(value)
-								_ = global.DB.Raw(sql, value).Scan(&names)
-							}
+							sql := fmt.Sprintf("SELECT %s FROM %s where %s in (?);", funcs.OutputColume, funcs.DB, funcs.InputColume)
+							fmt.Println(value)
+							_ = global.DB.Raw(sql, value).Scan(&names)
 						} else {
-							_ = global.DB.Raw(fmt.Sprintf("select %s from %s where %s = ?;", funcs.Key, funcs.DB, key), value).Scan(&names)
+							_ = global.DB.Raw(fmt.Sprintf("select %s from %s where %s = ?;", funcs.OutputColume, funcs.DB, funcs.InputColume), value).Scan(&names)
 						}
-						formatMap[funcs.Value] = strings.Join(names, ",")
+						formatMap[funcs.OutputValue] = strings.Join(names, ",")
 						break
 					}
 				}
@@ -136,11 +134,12 @@ type operationJson struct {
 	FormatEN       string         `json:"formatEN"`
 }
 type functionInfo struct {
-	Info   string `json:"info"`
-	IsList bool   `json:"isList"`
-	DB     string `json:"db"`
-	Key    string `json:"key"`
-	Value  string `json:"value"`
+	InputColume  string `json:"input_colume"`
+	InputValue   string `json:"input_value"`
+	IsList       bool   `json:"isList"`
+	DB           string `json:"db"`
+	OutputColume string `json:"output_colume"`
+	OutputValue  string `json:"output_value"`
 }
 
 type response struct {

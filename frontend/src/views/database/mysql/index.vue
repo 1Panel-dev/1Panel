@@ -19,12 +19,7 @@
         </el-card>
         <div v-if="mysqlIsExist" :class="{ mask: mysqlStatus != 'Running' }">
             <el-card v-if="!isOnSetting" style="margin-top: 20px">
-                <ComplexTable
-                    :pagination-config="paginationConfig"
-                    v-model:selects="selects"
-                    @search="search"
-                    :data="data"
-                >
+                <ComplexTable :pagination-config="paginationConfig" @search="search" :data="data">
                     <template #toolbar>
                         <el-button type="primary" icon="Plus" @click="onOpenDialog()">
                             {{ $t('commons.button.create') }}
@@ -37,7 +32,6 @@
                         </el-button>
                         <el-button @click="goDashboard" type="primary" plain icon="Position">phpMyAdmin</el-button>
                     </template>
-                    <el-table-column type="selection" fix />
                     <el-table-column :label="$t('commons.table.name')" prop="name" />
                     <el-table-column :label="$t('commons.login.username')" prop="username" />
                     <el-table-column :label="$t('commons.login.password')" prop="password">
@@ -170,10 +164,11 @@
         <RootPasswordDialog ref="rootPasswordRef" />
         <RemoteAccessDialog ref="remoteAccessRef" />
         <UploadDialog ref="uploadRef" />
-        <OperatrDialog @search="search" ref="dialogRef" />
+        <OperateDialog @search="search" ref="dialogRef" />
         <BackupRecords ref="dialogBackupRef" />
 
         <AppResources ref="checkRef"></AppResources>
+        <DeleteDialog ref="deleteRef" @search="search" />
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit"></ConfirmDialog>
     </div>
@@ -181,7 +176,8 @@
 
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
-import OperatrDialog from '@/views/database/mysql/create/index.vue';
+import OperateDialog from '@/views/database/mysql/create/index.vue';
+import DeleteDialog from '@/views/database/mysql/delete/index.vue';
 import RootPasswordDialog from '@/views/database/mysql/password/index.vue';
 import RemoteAccessDialog from '@/views/database/mysql/remote/index.vue';
 import BackupRecords from '@/views/database/mysql/backup/index.vue';
@@ -195,7 +191,6 @@ import { dateFromat } from '@/utils/util';
 import { reactive, ref } from 'vue';
 import {
     deleteCheckMysqlDB,
-    deleteMysqlDB,
     loadRemoteAccess,
     searchMysqlDBs,
     updateMysqlAccess,
@@ -203,7 +198,6 @@ import {
     updateMysqlPassword,
 } from '@/api/modules/database';
 import i18n from '@/lang';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElForm, ElMessage } from 'element-plus';
 import { Database } from '@/api/interface/database';
 import { Rules } from '@/global/form-rules';
@@ -213,11 +207,11 @@ import router from '@/routers';
 
 const loading = ref(false);
 
-const selects = ref<any>([]);
 const mysqlName = ref();
 const isOnSetting = ref<boolean>();
 
 const checkRef = ref();
+const deleteRef = ref();
 
 const phpadminPort = ref();
 const phpVisiable = ref(false);
@@ -403,8 +397,7 @@ const onDelete = async (row: Database.MysqlDBInfo) => {
     if (res.data && res.data.length > 0) {
         checkRef.value.acceptParams({ items: res.data });
     } else {
-        await useDeleteData(deleteMysqlDB, row.id, 'app.deleteWarn');
-        search();
+        deleteRef.value.acceptParams({ id: row.id, name: row.name });
     }
 };
 
@@ -446,6 +439,7 @@ const buttons = [
             if (row.permission === '%' || row.permission === 'localhost') {
                 changeForm.privilege = row.permission;
             } else {
+                changeForm.privilegeIPs = row.permission;
                 changeForm.privilege = 'ip';
             }
             changeVisiable.value = true;

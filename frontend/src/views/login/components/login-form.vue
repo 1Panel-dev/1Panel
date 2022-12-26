@@ -19,6 +19,7 @@
                         <el-form-item prop="password">
                             <el-input
                                 type="password"
+                                clearable
                                 v-model="registerForm.password"
                                 show-password
                                 :placeholder="$t('commons.login.password')"
@@ -33,6 +34,7 @@
                         <el-form-item prop="rePassword">
                             <el-input
                                 type="password"
+                                clearable
                                 v-model="registerForm.rePassword"
                                 show-password
                                 :placeholder="$t('commons.login.rePassword')"
@@ -113,6 +115,7 @@
                             <el-form-item prop="password">
                                 <el-input
                                     type="password"
+                                    clearable
                                     v-model="loginForm.password"
                                     show-password
                                     :placeholder="$t('commons.login.password')"

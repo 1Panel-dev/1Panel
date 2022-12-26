@@ -42,7 +42,7 @@
                 prop="credential"
                 :rules="Rules.requiredInput"
             >
-                <el-input show-password v-model="dialogData.rowData!.credential" />
+                <el-input show-password clearable v-model="dialogData.rowData!.credential" />
             </el-form-item>
             <el-form-item
                 v-if="dialogData.rowData!.type === 'S3'"
@@ -99,7 +99,7 @@
                     <el-input v-model="dialogData.rowData!.accessKey" />
                 </el-form-item>
                 <el-form-item :label="$t('setting.password')" prop="credential" :rules="[Rules.requiredInput]">
-                    <el-input type="password" show-password v-model="dialogData.rowData!.credential" />
+                    <el-input type="password" clearable show-password v-model="dialogData.rowData!.credential" />
                 </el-form-item>
                 <el-form-item :label="$t('setting.path')" prop="bucket">
                     <el-input v-model="dialogData.rowData!.bucket" />

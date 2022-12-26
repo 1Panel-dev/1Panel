@@ -37,8 +37,8 @@ export const updateMysqlConfByFile = (params: Database.MysqlConfUpdateByFile) =>
 export const deleteCheckMysqlDB = (id: number) => {
     return http.post<Array<string>>(`/databases/del/check`, { id: id });
 };
-export const deleteMysqlDB = (id: number) => {
-    return http.post(`/databases/del`, { id: id });
+export const deleteMysqlDB = (params: Database.MysqlDBDelete) => {
+    return http.post(`/databases/del`, params);
 };
 
 export const loadMysqlBaseInfo = () => {

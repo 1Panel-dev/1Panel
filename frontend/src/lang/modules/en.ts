@@ -225,6 +225,8 @@ export default {
         logout: 'Logout',
     },
     database: {
+        delete: 'Delete operation cannot be rolled back, please input "',
+        deleteHelper: '" to delete this database',
         create: 'Create database',
         noMysql: 'No {0} database is detected, please go to App Store and click Install!',
         goInstall: 'Go to install',
@@ -591,7 +593,7 @@ export default {
         detail: {
             users: 'User',
             hosts: 'Host',
-            groups: 'Group',
+            apps: 'App',
             containers: 'Container',
             commands: 'Command',
             backups: 'Backup Account',

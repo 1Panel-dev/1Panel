@@ -35,7 +35,7 @@
         <codemirror
             v-if="logVisiable"
             :autofocus="true"
-            placeholder="Wait for pull output..."
+            placeholder="Waiting for pull output..."
             :indent-with-tab="true"
             :tabSize="4"
             style="max-height: 300px"
