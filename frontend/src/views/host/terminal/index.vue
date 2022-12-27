@@ -34,15 +34,21 @@
                             <el-icon style="margin-top: 1px" color="#67C23A" v-if="item.status === 'online'">
                                 <circleCheck />
                             </el-icon>
-                            <el-icon style="margin-top: 1px" color="#F56C6C" v-if="item.status === 'closed'">
-                                <circleClose />
-                            </el-icon>
+                            <el-button
+                                v-if="item.status === 'closed'"
+                                icon="Refresh"
+                                style="color: #f56c6c"
+                                size="default"
+                                link
+                                @click="onReconnect(item)"
+                            />
                             <span>&nbsp;{{ item.title }}&nbsp;&nbsp;</span>
                         </span>
                     </template>
                     <Terminal
                         style="height: calc(100vh - 178px); background-color: #000"
                         :ref="'Ref' + item.key"
+                        :key="item.Refresh"
                         :wsID="item.wsID"
                         :terminalID="item.key"
                     ></Terminal>
@@ -360,6 +366,14 @@ const onConn = (node: Node, data: Tree) => {
         status: 'online',
     });
     terminalValue.value = `${addr}-${tabIndex}`;
+};
+
+const onReconnect = async (item: any) => {
+    if (ctx) {
+        ctx.refs[`Ref${item.key}`] && ctx.refs[`Ref${item.key}`][0].onClose();
+    }
+    item.Refresh = !item.Refresh;
+    ctx.refs[`Ref${item.key}`];
 };
 
 const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {

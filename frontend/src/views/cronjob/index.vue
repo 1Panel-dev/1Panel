@@ -45,8 +45,11 @@
                     <span v-if="row.specType === 'perWeek'">
                         {{ loadWeek(row.week) }} {{ loadZero(row.hour) }} : {{ loadZero(row.minute) }}
                     </span>
+                    <span v-if="row.specType === 'perDay'">
+                        &#32;{{ loadZero(row.hour) }} : {{ loadZero(row.minute) }}
+                    </span>
                     <span v-if="row.specType === 'perNDay'">
-                        {{ row.day }}{{ $t('cronjob.day1') }}, {{ loadZero(row.hour) }} : {{ loadZero(row.minute) }}
+                        {{ row.day }} {{ $t('cronjob.day1') }}, {{ loadZero(row.hour) }} : {{ loadZero(row.minute) }}
                     </span>
                     <span v-if="row.specType === 'perNHour'">
                         {{ row.hour }}{{ $t('cronjob.hour') }}, {{ loadZero(row.minute) }}

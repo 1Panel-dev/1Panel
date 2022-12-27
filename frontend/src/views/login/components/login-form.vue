@@ -3,7 +3,7 @@
         <div v-if="isFirst">
             <div class="login-container">
                 <el-form ref="registerFormRef" :model="registerForm" size="default" :rules="registerRules">
-                    <div class="login-title">1Panel</div>
+                    <div class="login-title">{{ globalStore.themeConfig.panelName }}</div>
                     <div class="login-border"></div>
                     <div class="login-welcome">{{ $t('commons.login.firstLogin') }}</div>
                     <div class="login-form">
@@ -64,7 +64,7 @@
             <div v-if="mfaShow">
                 <div class="login-container">
                     <el-form>
-                        <div class="login-title">1Panel</div>
+                        <div class="login-title">{{ globalStore.themeConfig.panelName }}</div>
                         <div class="login-border"></div>
                         <div class="login-welcome">{{ $t('commons.login.codeInput') }}</div>
                         <div class="login-form">
@@ -99,7 +99,7 @@
             <div v-if="!mfaShow">
                 <div class="login-container">
                     <el-form ref="loginFormRef" :model="loginForm" size="default" :rules="loginRules">
-                        <div class="login-title">1Panel</div>
+                        <div class="login-title">{{ globalStore.themeConfig.panelName }}</div>
                         <div class="login-border"></div>
                         <div class="login-welcome">{{ $t('commons.login.welcome') }}</div>
                         <div class="login-form">
@@ -317,6 +317,7 @@ function checkPassword(rule: any, value: any, callback: any) {
 }
 
 onMounted(() => {
+    document.title = globalStore.themeConfig.panelName;
     checkStatus();
     document.onkeydown = (e: any) => {
         e = window.event || e;
