@@ -227,10 +227,13 @@ func (b *BaseApi) DeleteMysql(c *gin.Context) {
 		return
 	}
 
-	if err := mysqlService.Delete(req); err != nil {
+	tx, ctx := helper.GetTxAndContext()
+	if err := mysqlService.Delete(ctx, req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		tx.Rollback()
 		return
 	}
+	tx.Commit()
 	helper.SuccessWithData(c, nil)
 }
 

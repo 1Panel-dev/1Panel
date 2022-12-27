@@ -20,7 +20,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
@@ -36,56 +35,7 @@ var (
 	Delete DatabaseOp = "delete"
 )
 
-func execDockerCommand(database model.DatabaseMysql, dbInstall model.AppInstall, op DatabaseOp) error {
-	var auth dto.AuthParam
-	var dbConfig dto.AppDatabase
-	dbConfig.Password = database.Password
-	dbConfig.DbUser = database.Username
-	dbConfig.DbName = database.Name
-	_ = json.Unmarshal([]byte(dbInstall.Param), &auth)
-	execConfig := dto.ContainerExec{
-		ContainerName: dbInstall.ContainerName,
-		Auth:          auth,
-		DbParam:       dbConfig,
-	}
-	out, err := cmd.Exec(getSqlStr(dbInstall.Version, op, execConfig))
-	if err != nil {
-		return errors.New(out)
-	}
-	return nil
-}
-
-func getSqlStr(version string, operate DatabaseOp, exec dto.ContainerExec) string {
-	var str string
-	param := exec.DbParam
-
-	if strings.Contains(version, "5.7") {
-		if operate == Add {
-			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s  -e \"CREATE USER IF NOT EXISTS '%s'@'%%' IDENTIFIED BY '%s';\" -e \"create database %s;\" -e \"GRANT ALL ON %s.* TO '%s'@'%%' IDENTIFIED BY '%s';\" -e \"FLUSH PRIVILEGES;\"",
-				exec.ContainerName, exec.Auth.RootPassword, param.DbUser, param.Password, param.DbName, param.DbName, param.DbUser, param.Password)
-		}
-		if operate == Delete {
-			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s   -e \"drop database %s;\"  -e \"drop user %s;\" ",
-				exec.ContainerName, exec.Auth.RootPassword, param.DbName, param.DbUser)
-		}
-	}
-
-	if strings.Contains(version, "8.0") {
-		if operate == Add {
-			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s  -e \"CREATE USER IF NOT EXISTS '%s'@'%%' IDENTIFIED BY '%s';\" -e \"create database %s;\" -e \"GRANT ALL ON %s.* TO '%s'@'%%';\" -e \"FLUSH PRIVILEGES;\"",
-				exec.ContainerName, exec.Auth.RootPassword, param.DbUser, param.Password, param.DbName, param.DbName, param.DbUser)
-		}
-		if operate == Delete {
-			str = fmt.Sprintf("docker exec -i  %s  mysql -uroot -p%s   -e \"drop database %s;\"  -e \"drop user %s;\" ",
-				exec.ContainerName, exec.Auth.RootPassword, param.DbName, param.DbUser)
-		}
-	}
-
-	return str
-}
-
 func checkPort(key string, params map[string]interface{}) (int, error) {
-
 	port, ok := params[key]
 	if ok {
 		portN := int(math.Ceil(port.(float64)))
@@ -191,19 +141,15 @@ func deleteLink(ctx context.Context, install *model.AppInstall) error {
 		return nil
 	}
 	for _, re := range resources {
+		mysqlService := NewIMysqlService()
 		if re.Key == "mysql" {
 			database, _ := mysqlRepo.Get(commonRepo.WithByID(re.ResourceId))
 			if reflect.DeepEqual(database, model.DatabaseMysql{}) {
 				continue
 			}
-			appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByName(database.MysqlName))
-			if err != nil {
-				return err
-			}
-			if err := execDockerCommand(database, appInstall, Delete); err != nil {
-				return err
-			}
-			if err := mysqlRepo.Delete(ctx, commonRepo.WithByID(database.ID)); err != nil {
+			if err := mysqlService.Delete(ctx, dto.MysqlDBDelete{
+				ID: database.ID,
+			}); err != nil {
 				return err
 			}
 		}

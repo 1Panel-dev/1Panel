@@ -104,7 +104,6 @@ const handleParams = () => {
             const pObj = p;
             pObj.prop = propStart.value + p.envKey;
             pObj.disabled = p.disabled;
-            console.log(pObj);
             paramObjs.value.push(pObj);
             if (p.default == 'random') {
                 form[p.envKey] = getRandomStr(6);
