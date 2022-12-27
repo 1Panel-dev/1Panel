@@ -209,7 +209,9 @@ import Download from './download/index.vue';
 import { Mimetypes } from '@/global/mimetype';
 import Process from './process/index.vue';
 import Detail from './detail/index.vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const data = ref();
 let selects = ref<any>([]);
 let req = reactive({ path: '/', expand: true, showHidden: false, page: 1, pageSize: 100 });
@@ -454,7 +456,6 @@ const openWget = () => {
 };
 
 const closeWget = (submit: any) => {
-    console.log(submit);
     wgetPage.open = false;
     search();
     if (submit) {
@@ -568,6 +569,9 @@ const buttons = [
 ];
 
 onMounted(() => {
+    if (router.currentRoute.value.query.path) {
+        req.path = String(router.currentRoute.value.query.path);
+    }
     search();
 });
 </script>
