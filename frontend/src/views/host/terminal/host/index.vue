@@ -31,7 +31,7 @@
                     <el-input v-if="groupInputShow" clearable style="margin-top: 5px" v-model="groupInputValue">
                         <template #append>
                             <el-button-group>
-                                <el-button icon="Check" @click="onCreateGroup" />
+                                <el-button icon="Check" @click="onCreateGroup(groupInputValue)" />
                                 <el-button icon="Close" @click="groupInputShow = false" />
                             </el-button-group>
                         </template>
@@ -46,15 +46,17 @@
                     >
                         <template #default="{ node, data }">
                             <span class="custom-tree-node" @mouseover="hover = data.id" @mouseleave="hover = null">
-                                <span>
+                                <span v-if="node.label !== currentGroup">
                                     <a @click="onEdit(node, data)">{{ node.label }}</a>
                                 </span>
-                                <el-button-group
+                                <el-input v-else v-model="currentGroupValue" @blur="onUpdateGroup()"></el-input>
+                                <div
+                                    style="margin-left: 10px"
                                     v-if="!(node.level === 1 && data.label === 'default') && data.id === hover"
                                 >
-                                    <el-button icon="Edit" @click="onEdit(node, data)" />
-                                    <el-button icon="Delete" @click="onDelete(node, data)" />
-                                </el-button-group>
+                                    <el-button icon="Edit" link @click="onEdit(node, data)" />
+                                    <el-button icon="Delete" link @click="onDelete(node, data)" />
+                                </div>
                             </span>
                         </template>
                     </el-tree>
@@ -120,10 +122,9 @@
                             <el-button
                                 v-if="hostOperation === 'create'"
                                 type="primary"
-                                icon="Plus"
                                 @click="submitAddHost(hostInfoRef, 'create')"
                             >
-                                {{ $t('commons.button.create') }}
+                                {{ $t('commons.button.save') }}
                             </el-button>
                             <el-button
                                 v-if="hostOperation === 'edit'"
@@ -198,8 +199,11 @@ const defaultProps = {
 
 const groupList = ref<Array<Group.GroupInfo>>();
 
-let groupInputValue = ref();
-let currentGroupID = ref();
+const groupInputValue = ref();
+const currentGroup = ref();
+const currentGroupID = ref();
+const currentGroupValue = ref();
+
 let groupOperation = ref<string>('create');
 let groupInputShow = ref<boolean>(false);
 
@@ -255,19 +259,28 @@ const onGroupCreate = () => {
     groupInputValue.value = '';
     groupOperation.value = 'create';
 };
-const onCreateGroup = async () => {
+const onCreateGroup = async (name: string) => {
     if (groupOperation.value === 'create') {
-        let group = { id: 0, name: groupInputValue.value, type: 'host' };
+        let group = { id: 0, name: name, type: 'host' };
         await addGroup(group);
         groupOperation.value = '';
         groupInputShow.value = false;
-    } else {
-        let group = { id: currentGroupID.value, name: groupInputValue.value, type: 'host' };
-        await editGroup(group);
     }
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
     groupOperation.value = '';
     groupInputShow.value = false;
+    loadHostTree();
+    loadGroups();
+};
+
+const onUpdateGroup = async () => {
+    if (currentGroup.value === currentGroupValue.value) {
+        currentGroup.value = '';
+        return;
+    }
+    let group = { id: currentGroupID.value, name: currentGroupValue.value, type: 'host' };
+    await editGroup(group);
+    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
     loadHostTree();
     loadGroups();
 };
@@ -291,8 +304,8 @@ const onEdit = async (node: Node, data: Tree) => {
         return;
     }
     if (node.level === 1) {
-        groupInputShow.value = true;
-        groupInputValue.value = data.label;
+        currentGroup.value = data.label;
+        currentGroupValue.value = data.label;
         currentGroupID.value = data.id - 10000;
         groupOperation.value = 'edit';
         return;

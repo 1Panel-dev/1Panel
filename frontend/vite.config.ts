@@ -1,5 +1,4 @@
 import { defineConfig, loadEnv, ConfigEnv, UserConfig } from 'vite';
-import { createHtmlPlugin } from 'vite-plugin-html';
 import vue from '@vitejs/plugin-vue';
 import { resolve } from 'path';
 import { wrapperEnv } from './src/utils/get-env';
@@ -11,21 +10,17 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 import DefineOptions from 'unplugin-vue-define-options/vite';
 import MonacoEditorPlugin from 'vite-plugin-monaco-editor';
 
-// @see: https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     const env = loadEnv(mode, process.cwd());
     const viteEnv = wrapperEnv(env);
 
     return {
-        // base: '/kubepi',
-        // alias config
         resolve: {
             alias: {
                 '@': resolve(__dirname, './src'),
                 'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js',
             },
         },
-        // global css
         css: {
             preprocessorOptions: {
                 scss: {
@@ -36,36 +31,20 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         server: {
             port: viteEnv.VITE_PORT,
             open: viteEnv.VITE_OPEN,
-            // host: '0.0.0.0',
-            // https: false,
             proxy: {
-                // '/1panel': {
-                //     target: 'http://0.0.0.0:4004',
-                // },
                 '/api/v1': {
                     target: 'http://127.0.0.1:9999',
                     changeOrigin: true,
-                    // rewrite: (path) => path.replace(/^\/api/, ''),
                 },
             },
         },
         plugins: [
             vue(),
-            createHtmlPlugin({
-                inject: {
-                    data: {
-                        title: viteEnv.VITE_GLOB_APP_TITLE,
-                    },
-                },
-            }),
             DefineOptions(),
-            // * EsLint 报错信息显示在浏览器界面上
             eslintPlugin({
                 exclude: ['**/*.js'],
             }),
-            // * vite 可以使用 jsx/tsx 语法
             vueJsx(),
-            // * name 可以写在 script 标签上
             VueSetupExtend(),
 
             MonacoEditorPlugin({}),

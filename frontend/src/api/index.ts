@@ -43,7 +43,6 @@ class RequestHttp {
                     globalStore.setCsrfToken(response.headers['x-csrf-token']);
                 }
                 if (data.code == ResultEnum.OVERDUE || data.code == ResultEnum.FORBIDDEN) {
-                    ElMessage.error(data.message);
                     router.replace({
                         path: '/login',
                     });

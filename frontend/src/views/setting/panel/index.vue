@@ -238,6 +238,7 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
             }
         case 'PanelName':
             globalStore.setThemeConfig({ ...themeConfig.value, panelName: val });
+            document.title = val;
             break;
         case 'MonitorStoreDays':
         case 'ServerPort':
