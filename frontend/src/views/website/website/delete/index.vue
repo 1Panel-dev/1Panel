@@ -6,7 +6,7 @@
         width="30%"
         :before-close="handleClose"
     >
-        <div :key="key">
+        <div :key="key" v-loading="loading">
             <el-form ref="deleteForm" label-position="left">
                 <el-form-item>
                     <el-checkbox v-model="deleteReq.forceDelete" :label="$t('website.forceDelete')" />

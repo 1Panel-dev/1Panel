@@ -44,7 +44,7 @@ type IMysqlService interface {
 	Recover(db dto.RecoverDB) error
 
 	DeleteCheck(id uint) ([]string, error)
-	Delete(req dto.MysqlDBDelete) error
+	Delete(ctx context.Context, req dto.MysqlDBDelete) error
 	LoadStatus() (*dto.MysqlStatus, error)
 	LoadVariables() (*dto.MysqlVariables, error)
 	LoadBaseInfo() (*dto.DBBaseInfo, error)
@@ -256,7 +256,7 @@ func (u *MysqlService) DeleteCheck(id uint) ([]string, error) {
 	return appInUsed, nil
 }
 
-func (u *MysqlService) Delete(req dto.MysqlDBDelete) error {
+func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error {
 	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil && !req.ForceDelete {
 		return err
@@ -288,9 +288,9 @@ func (u *MysqlService) Delete(req dto.MysqlDBDelete) error {
 			_ = os.RemoveAll(backupDir)
 		}
 	}
-	_ = backupRepo.DeleteRecord(context.Background(), commonRepo.WithByType("database-mysql"), commonRepo.WithByName(app.Name), backupRepo.WithByDetailName(db.Name))
+	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("database-mysql"), commonRepo.WithByName(app.Name), backupRepo.WithByDetailName(db.Name))
 
-	_ = mysqlRepo.Delete(context.Background(), commonRepo.WithByID(db.ID))
+	_ = mysqlRepo.Delete(ctx, commonRepo.WithByID(db.ID))
 	return nil
 }
 
