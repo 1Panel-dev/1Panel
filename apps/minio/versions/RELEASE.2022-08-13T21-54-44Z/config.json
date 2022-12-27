@@ -2,7 +2,7 @@
   "formFields": [
     {
       "type": "text",
-      "labelZh": "Root 用户",
+      "labelZh": "用户",
       "labelEn": "User",
       "required": true,
       "default": "random",
@@ -13,7 +13,7 @@
       "labelZh": "密码",
       "labelEn": "Password",
       "required": true,
-      "default": "Password@123",
+      "default": "random",
       "envKey": "MINIO_ROOT_PASSWORD"
     },
     {
@@ -23,6 +23,14 @@
       "required": true,
       "default": 9000,
       "envKey": "PANEL_APP_PORT_HTTP"
+    },
+    {
+      "type": "number",
+      "labelZh": "API 端口",
+      "labelEn": "Port",
+      "required": true,
+      "default": 9001,
+      "envKey": "API_ROOT"
     }
   ]
 }
