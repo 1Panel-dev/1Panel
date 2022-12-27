@@ -20,8 +20,6 @@ export namespace Dashboard {
         kernelArch: string;
         kernelVersion: string;
         virtualizationSystem: string;
-        uptime: string;
-        timeSinceUptime: string;
 
         cpuCores: number;
         cpuLogicalCores: number;
@@ -30,6 +28,8 @@ export namespace Dashboard {
         currentInfo: CurrentInfo;
     }
     export interface CurrentInfo {
+        uptime: number;
+        timeSinceUptime: string;
         procs: number;
 
         load1: number;

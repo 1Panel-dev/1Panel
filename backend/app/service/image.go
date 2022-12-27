@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -165,8 +166,7 @@ func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 			return "", err
 		}
 	}
-	imageItemName := strings.ReplaceAll(req.ImageName, ":", "_")
-	imageItemName = strings.ReplaceAll(imageItemName, "/", "@")
+	imageItemName := strings.ReplaceAll(path.Base(req.ImageName), ":", "_")
 	pathItem := fmt.Sprintf("%s/image_pull_%s_%s.log", dockerLogDir, imageItemName, time.Now().Format("20060102150405"))
 	file, err := os.OpenFile(pathItem, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
@@ -301,8 +301,7 @@ func (u *ImageService) ImagePush(req dto.ImagePush) (string, error) {
 			return "", err
 		}
 	}
-	imageItemName := strings.ReplaceAll(req.Name, ":", "_")
-	imageItemName = strings.ReplaceAll(imageItemName, "/", "@")
+	imageItemName := strings.ReplaceAll(path.Base(req.Name), ":", "_")
 	pathItem := fmt.Sprintf("%s/image_push_%s_%s.log", dockerLogDir, imageItemName, time.Now().Format("20060102150405"))
 	file, err := os.OpenFile(pathItem, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {

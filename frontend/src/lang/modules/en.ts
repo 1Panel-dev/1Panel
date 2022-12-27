@@ -191,6 +191,7 @@ export default {
         Day: 'Days',
         Hour: 'Hours',
         Minute: 'Minutes',
+        Second: 'Seconds',
 
         runSmoothly: 'Run smoothly',
         runNormal: 'Run normal',
@@ -596,6 +597,7 @@ export default {
             apps: 'App',
             containers: 'Container',
             commands: 'Command',
+            groups: 'System Group',
             backups: 'Backup Account',
             settings: 'Panel Setting',
             cronjobs: 'Cronjob',

@@ -73,7 +73,6 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 
 	<-quitChan
 
-	global.LOG.Info("websocket finished")
 	if wshandleError(wsConn, err) {
 		return
 	}
