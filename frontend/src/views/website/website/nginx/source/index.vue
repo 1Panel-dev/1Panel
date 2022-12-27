@@ -11,6 +11,7 @@
             theme="cobalt"
             :styleActiveLine="true"
             :extensions="extensions"
+            :mode="'text/x-nginx-conf'"
             v-model="content"
             :readOnly="true"
         />
@@ -39,13 +40,14 @@
 import { GetNginx, UpdateNginxConfigFile } from '@/api/modules/nginx';
 import { onMounted, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
+import { StreamLanguage } from '@codemirror/language';
+import { nginx } from '@codemirror/legacy-modes/mode/nginx';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
 import { GetAppDefaultConfig } from '@/api/modules/app';
 
-const extensions = [javascript(), oneDark];
+const extensions = [StreamLanguage.define(nginx), oneDark];
 
 let data = ref();
 let content = ref('');

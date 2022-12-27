@@ -35,12 +35,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button
-                    type="primary"
-                    @click="submit()"
-                    :disabled="loading || deleteInfo != websiteName"
-                    :loading="loading"
-                >
+                <el-button type="primary" @click="submit()" :disabled="loading || deleteInfo != websiteName">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

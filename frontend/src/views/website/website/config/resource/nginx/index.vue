@@ -23,7 +23,6 @@
 </template>
 <script lang="ts" setup>
 import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { GetWebsiteNginx } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
@@ -31,8 +30,10 @@ import { File } from '@/api/interface/file';
 import { SaveFileContent } from '@/api/modules/files';
 import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
+import { StreamLanguage } from '@codemirror/language';
+import { nginx } from '@codemirror/legacy-modes/mode/nginx';
 
-const extensions = [javascript(), oneDark];
+const extensions = [StreamLanguage.define(nginx), oneDark];
 
 const props = defineProps({
     id: {

@@ -21,6 +21,8 @@
     },
     "dependencies": {
         "@codemirror/lang-javascript": "^6.1.0",
+        "@codemirror/language": "^6.3.2",
+        "@codemirror/legacy-modes": "^6.3.1",
         "@codemirror/theme-one-dark": "^6.1.0",
         "@element-plus/icons-vue": "^1.1.4",
         "@kangc/v-md-editor": "^2.3.15",
