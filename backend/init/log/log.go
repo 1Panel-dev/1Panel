@@ -53,16 +53,15 @@ func setOutput(logger *logrus.Logger, config configs.LogConfig) {
 type MineFormatter struct{}
 
 func (s *MineFormatter) Format(entry *logrus.Entry) ([]byte, error) {
-	var cstSh, _ = time.LoadLocation(global.CONF.LogConfig.TimeZone)
 	detailInfo := ""
 	if entry.Caller != nil {
 		funcion := strings.ReplaceAll(entry.Caller.Function, "github.com/1Panel-dev/1Panel/backend/", "")
 		detailInfo = fmt.Sprintf("(%s: %d)", funcion, entry.Caller.Line)
 	}
 	if len(entry.Data) == 0 {
-		msg := fmt.Sprintf("[%s] [%s] %s %s \n", time.Now().In(cstSh).Format(TimeFormat), strings.ToUpper(entry.Level.String()), entry.Message, detailInfo)
+		msg := fmt.Sprintf("[%s] [%s] %s %s \n", time.Now().Format(TimeFormat), strings.ToUpper(entry.Level.String()), entry.Message, detailInfo)
 		return []byte(msg), nil
 	}
-	msg := fmt.Sprintf("[%s] [%s] %s %s {%v} \n", time.Now().In(cstSh).Format(TimeFormat), strings.ToUpper(entry.Level.String()), entry.Message, detailInfo, entry.Data)
+	msg := fmt.Sprintf("[%s] [%s] %s %s {%v} \n", time.Now().Format(TimeFormat), strings.ToUpper(entry.Level.String()), entry.Message, detailInfo, entry.Data)
 	return []byte(msg), nil
 }
