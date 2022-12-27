@@ -1,22 +1,22 @@
 <template>
-    <el-tabs tab-position="left" type="border-card" v-model="index">
+    <el-tabs tab-position="left" type="border-card" v-model="tabIndex">
         <el-tab-pane :label="$t('website.domainConfig')">
-            <Doamin :id="id" v-if="index == '0'"></Doamin>
+            <Doamin :id="id" v-if="tabIndex == '0'"></Doamin>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.sitePath')">
-            <SitePath :id="id" v-if="index == '1'"></SitePath>
+            <SitePath :id="id" v-if="tabIndex == '1'"></SitePath>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.defaultDoc')">
-            <Default :id="id" v-if="index == '2'"></Default>
+            <Default :id="id" v-if="tabIndex == '2'"></Default>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.rate')">
-            <LimitConn :id="id" v-if="index == '3'"></LimitConn>
+            <LimitConn :id="id" v-if="tabIndex == '3'"></LimitConn>
         </el-tab-pane>
         <el-tab-pane :label="'HTTPS'">
-            <HTTPS :id="id" v-if="index == '4'"></HTTPS>
+            <HTTPS :id="id" v-if="tabIndex == '4'"></HTTPS>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.other')">
-            <Other :id="id" v-if="index == '5'"></Other>
+            <Other :id="id" v-if="tabIndex == '5'"></Other>
         </el-tab-pane>
     </el-tabs>
 </template>
@@ -42,5 +42,5 @@ const id = computed(() => {
     return props.id;
 });
 
-let index = ref('0');
+let tabIndex = ref('0');
 </script>

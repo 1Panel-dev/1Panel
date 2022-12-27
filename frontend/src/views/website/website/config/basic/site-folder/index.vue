@@ -4,7 +4,12 @@
             <br />
             <el-descriptions :column="1" border v-loading="loading">
                 <el-descriptions-item :label="$t('website.siteAlias')">{{ website.alias }}</el-descriptions-item>
-                <el-descriptions-item :label="$t('website.primaryPath')">{{ website.sitePath }}</el-descriptions-item>
+                <el-descriptions-item :label="$t('website.primaryPath')">
+                    {{ website.sitePath }}
+                    <el-button type="primary" link @click="toFolder(website.sitePath)">
+                        <el-icon><CopyDocument /></el-icon>
+                    </el-button>
+                </el-descriptions-item>
             </el-descriptions>
             <br />
 
@@ -20,6 +25,8 @@
 <script lang="ts" setup>
 import { GetWebsite } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const props = defineProps({
     id: {
@@ -42,6 +49,10 @@ const search = () => {
         .finally(() => {
             loading.value = false;
         });
+};
+
+const toFolder = (folder: string) => {
+    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 onMounted(() => {

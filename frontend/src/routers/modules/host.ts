@@ -13,6 +13,7 @@ const hostRouter = {
         {
             path: '/hosts/files',
             name: 'File',
+            props: true,
             component: () => import('@/views/host/file-management/index.vue'),
             meta: {
                 title: 'menu.files',
