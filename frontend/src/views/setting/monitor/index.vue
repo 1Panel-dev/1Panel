@@ -64,7 +64,7 @@ const panelFormRef = ref<FormInstance>();
 const search = async () => {
     const res = await getSettingInfo();
     form.monitorStatus = res.data.monitorStatus;
-    form.monitorStoreDays = res.data.monitorStoreDays;
+    form.monitorStoreDays = Number(res.data.monitorStoreDays);
 };
 
 const onSave = async (formEl: FormInstance | undefined, key: string, val: any) => {

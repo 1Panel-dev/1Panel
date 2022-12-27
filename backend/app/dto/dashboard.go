@@ -23,8 +23,6 @@ type DashboardBase struct {
 	KernelArch           string `json:"kernelArch"`
 	KernelVersion        string `json:"kernelVersion"`
 	VirtualizationSystem string `json:"virtualizationSystem"`
-	Uptime               string `json:"uptime"`
-	TimeSinceUptime      string `json:"timeSinceUptime"`
 
 	CPUCores        int    `json:"cpuCores"`
 	CPULogicalCores int    `json:"cpuLogicalCores"`
@@ -34,6 +32,9 @@ type DashboardBase struct {
 }
 
 type DashboardCurrent struct {
+	Uptime          uint64 `json:"uptime"`
+	TimeSinceUptime string `json:"timeSinceUptime"`
+
 	Procs uint64 `json:"procs"`
 
 	Load1            float64 `json:"load1"`

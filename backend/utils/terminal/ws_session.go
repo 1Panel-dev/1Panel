@@ -185,7 +185,6 @@ func (sws *LogicSshWsSession) sendComboOutput(exitCh chan bool) {
 
 func (sws *LogicSshWsSession) Wait(quitChan chan bool) {
 	if err := sws.session.Wait(); err != nil {
-		global.LOG.Errorf("ssh session wait failed, err: %v", err)
 		setQuit(quitChan)
 	}
 }

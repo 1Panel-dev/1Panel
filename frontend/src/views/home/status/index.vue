@@ -138,8 +138,6 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     databaseNumber: 0,
     cronjobNumber: 0,
     appInstalldNumber: 0,
-    uptime: '',
-    timeSinceUptime: '',
 
     hostname: '',
     os: '',
@@ -156,6 +154,8 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     currentInfo: null,
 });
 const currentInfo = ref<Dashboard.CurrentInfo>({
+    uptime: 0,
+    timeSinceUptime: '',
     procs: 0,
 
     load1: 0,

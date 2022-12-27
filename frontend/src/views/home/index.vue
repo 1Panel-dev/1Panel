@@ -100,8 +100,10 @@
                             {{ baseInfo.kernelVersion }}
                         </el-form-item>
                         <el-form-item :label="$t('home.kernelArch')">{{ baseInfo.kernelArch }}</el-form-item>
-                        <el-form-item :label="$t('home.uptime')">{{ baseInfo.uptime }}</el-form-item>
-                        <el-form-item :label="$t('home.runningTime')">{{ baseInfo.timeSinceUptime }}</el-form-item>
+                        <el-form-item :label="$t('home.uptime')">{{ currentInfo.timeSinceUptime }}</el-form-item>
+                        <el-form-item :label="$t('home.runningTime')">
+                            {{ loadUpTime(currentInfo.uptime) }}
+                        </el-form-item>
                     </el-form>
                 </el-card>
             </el-col>
@@ -227,8 +229,6 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     kernelArch: '',
     kernelVersion: '',
     virtualizationSystem: '',
-    uptime: '',
-    timeSinceUptime: '',
 
     cpuCores: 0,
     cpuLogicalCores: 0,
@@ -236,6 +236,8 @@ const baseInfo = ref<Dashboard.BaseInfo>({
     currentInfo: null,
 });
 const currentInfo = ref<Dashboard.CurrentInfo>({
+    uptime: 0,
+    timeSinceUptime: '',
     procs: 0,
 
     load1: 0,
@@ -316,11 +318,6 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
     baseInfo.value = res.data;
     currentInfo.value = baseInfo.value.currentInfo;
-    if (baseInfo.value.timeSinceUptime) {
-        baseInfo.value.timeSinceUptime.replaceAll('days', i18n.global.t('home.Day'));
-        baseInfo.value.timeSinceUptime.replaceAll('hours', i18n.global.t('home.Hour'));
-        baseInfo.value.timeSinceUptime.replaceAll('minutes', i18n.global.t('home.Minute'));
-    }
     onLoadCurrentInfo();
     statuRef.value.acceptParams(currentInfo.value, baseInfo.value);
     appRef.value.acceptParams(baseInfo.value);
@@ -334,6 +331,8 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
 
 const onLoadCurrentInfo = async () => {
     const res = await loadCurrentInfo(searchInfo.ioOption, searchInfo.netOption);
+    currentInfo.value.timeSinceUptime = res.data.timeSinceUptime;
+
     currentChartInfo.netBytesSent = Number(
         ((res.data.netBytesSent - currentInfo.value.netBytesSent) / 1024 / 3).toFixed(2),
     );
@@ -377,6 +376,47 @@ const onLoadCurrentInfo = async () => {
     currentInfo.value = res.data;
     statuRef.value.acceptParams(currentInfo.value, baseInfo.value);
 };
+
+function loadUpTime(uptime: number) {
+    if (uptime <= 0) {
+        return '-';
+    }
+    let days = Math.floor(uptime / 86400);
+    let hours = Math.floor((uptime % 86400) / 3600);
+    let minutes = Math.floor((uptime % 3600) / 60);
+    let seconds = uptime % 60;
+    if (days !== 0) {
+        return (
+            days +
+            i18n.global.t('home.Day') +
+            ' ' +
+            hours +
+            i18n.global.t('home.Hour') +
+            ' ' +
+            minutes +
+            i18n.global.t('home.Minute') +
+            ' ' +
+            seconds +
+            i18n.global.t('home.Second')
+        );
+    }
+    if (hours !== 0) {
+        return (
+            hours +
+            i18n.global.t('home.Hour') +
+            ' ' +
+            minutes +
+            i18n.global.t('home.Minute') +
+            ' ' +
+            seconds +
+            i18n.global.t('home.Second')
+        );
+    }
+    if (minutes !== 0) {
+        return minutes + i18n.global.t('home.Minute') + ' ' + seconds + i18n.global.t('home.Second');
+    }
+    return seconds + i18n.global.t('home.Second');
+}
 
 const loadData = async () => {
     if (chartOption.value === 'io') {

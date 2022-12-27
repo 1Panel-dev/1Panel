@@ -2,9 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
-	"os/exec"
-	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -41,18 +38,6 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 	baseInfo.KernelVersion = hostInfo.KernelVersion
 	ss, _ := json.Marshal(hostInfo)
 	baseInfo.VirtualizationSystem = string(ss)
-
-	cmd := exec.Command("uptime", "-s")
-	stdout, err := cmd.CombinedOutput()
-	if err == nil {
-		baseInfo.Uptime = string(stdout)
-		uptime, err := time.Parse("2006-01-02 15:04:05", strings.ReplaceAll(string(stdout), "\n", ""))
-		if err == nil {
-			hours := int(time.Since(uptime).Hours())
-			minutes := int(time.Since(uptime).Minutes())
-			baseInfo.TimeSinceUptime = fmt.Sprintf("%ddays %dhours %dmimutes", hours/24, hours%24, minutes-hours*60)
-		}
-	}
 
 	apps, err := appRepo.GetBy()
 	if err != nil {
@@ -111,6 +96,8 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *dto.DashboardCurrent {
 	var currentInfo dto.DashboardCurrent
 	hostInfo, _ := host.Info()
+	currentInfo.Uptime = hostInfo.Uptime
+	currentInfo.TimeSinceUptime = time.Now().Add(-time.Duration(hostInfo.Uptime) * time.Second).Format("2006-01-02 15:04:05")
 	currentInfo.Procs = hostInfo.Procs
 
 	currentInfo.CPUTotal, _ = cpu.Counts(true)

@@ -202,11 +202,12 @@ const search = async (param: string) => {
         searchInfo.endTime = searchTime.value[1];
     }
     const res = await loadMonitor(searchInfo);
-    if (res.data[0].value === null) {
-        return;
-    }
     monitorBase.value = res.data;
     for (const item of monitorBase.value) {
+        if (!item.value) {
+            item.value = [];
+            item.date = [];
+        }
         switch (item.param) {
             case 'base':
                 let baseDate = item.date.map(function (item: any) {
