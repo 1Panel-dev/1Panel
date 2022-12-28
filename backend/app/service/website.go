@@ -653,7 +653,7 @@ func (w WebsiteService) GetWafConfig(req request.WebsiteWafReq) (response.Websit
 func (w WebsiteService) UpdateWafConfig(req request.WebsiteWafUpdate) error {
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
 	if err != nil {
-		return nil
+		return err
 	}
 	updateValue := "on"
 	if !req.Enable {
@@ -662,4 +662,20 @@ func (w WebsiteService) UpdateWafConfig(req request.WebsiteWafUpdate) error {
 	return updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{
 		{Name: "set", Params: []string{req.Key, updateValue}},
 	}, &website)
+}
+
+func (w WebsiteService) UpdateNginxConfigFile(req request.WebsiteNginxUpdate) error {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	nginxFull, err := getNginxFull(&website)
+	if err != nil {
+		return err
+	}
+	filePath := nginxFull.SiteConfig.FilePath
+	if err := files.NewFileOp().WriteFile(filePath, strings.NewReader(req.Content), 0755); err != nil {
+		return err
+	}
+	return nginxCheckAndReload(nginxFull.SiteConfig.OldContent, filePath, nginxFull.Install.ContainerName)
 }

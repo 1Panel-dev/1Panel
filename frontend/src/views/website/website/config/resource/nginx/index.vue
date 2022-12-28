@@ -16,7 +16,7 @@
         />
         <div style="margin-top: 10px">
             <el-button type="primary" @click="submit()" :loading="loading">
-                {{ $t('commons.button.save') }}
+                {{ $t('nginx.saveAndReload') }}
             </el-button>
         </div>
     </div>
@@ -24,10 +24,9 @@
 <script lang="ts" setup>
 import { Codemirror } from 'vue-codemirror';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { GetWebsiteNginx } from '@/api/modules/website';
+import { GetWebsiteNginx, UpdateNginxFile } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import { File } from '@/api/interface/file';
-import { SaveFileContent } from '@/api/modules/files';
 import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
 import { StreamLanguage } from '@codemirror/language';
@@ -64,8 +63,8 @@ const get = () => {
 
 const submit = () => {
     loading.value = true;
-    SaveFileContent({
-        path: data.value.path,
+    UpdateNginxFile({
+        id: id.value,
         content: content.value,
     })
         .then(() => {

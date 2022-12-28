@@ -247,4 +247,9 @@ export namespace Website {
     export interface BackupReq {
         id: number;
     }
+
+    export interface NginxUpdate {
+        id: number;
+        content: string;
+    }
 }
