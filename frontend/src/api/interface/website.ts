@@ -205,12 +205,16 @@ export namespace Website {
         certificate?: string;
         privateKey?: string;
         httpConfig: string;
+        SSLProtocol: string[];
+        algorithm: string;
     }
 
     export interface HTTPSConfig {
         enable: boolean;
         SSL: SSL;
         httpConfig: string;
+        SSLProtocol: string[];
+        algorithm: string;
     }
 
     export interface CheckReq {
