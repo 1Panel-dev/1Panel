@@ -1,20 +1,15 @@
 <template>
     <div>
         <el-card class="topCard">
-            <el-radio-group v-model="active">
-                <el-radio-button class="topButton" size="large" @click="routerTo('/databases')" label="mysql">
-                    Mysql
-                </el-radio-button>
-                <el-radio-button class="topButton" size="large" @click="routerTo('/databases/redis')" label="redis">
-                    Redis
-                </el-radio-button>
+            <el-radio-group :model-value="props.activeName" @change="handleChange">
+                <el-radio-button class="topButton" size="large" label="mysql">Mysql</el-radio-button>
+                <el-radio-button class="topButton" size="large" label="redis">Redis</el-radio-button>
             </el-radio-group>
         </el-card>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 interface MenuProps {
@@ -24,16 +19,19 @@ const props = withDefaults(defineProps<MenuProps>(), {
     activeName: 'mysql',
 });
 
-const active = ref('mysql');
-
-onMounted(() => {
-    if (props.activeName) {
-        active.value = props.activeName;
-    }
-});
-
 const routerTo = (path: string) => {
     router.push({ path: path });
+};
+
+const handleChange = (val: string) => {
+    switch (val) {
+        case 'mysql':
+            routerTo('/databases');
+            break;
+        case 'redis':
+            routerTo('/databases/redis');
+            break;
+    }
 };
 </script>
 

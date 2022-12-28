@@ -1,11 +1,11 @@
 <template>
     <div>
         <el-card class="topCard">
-            <el-radio-group v-model="activeName">
-                <el-radio-button class="topButton" size="large" @click="routerTo('/apps/all')" label="all">
+            <el-radio-group v-model="activeName" @change="handleChange">
+                <el-radio-button class="topButton" size="large" label="all">
                     {{ $t('app.all') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" @click="routerTo('/apps/installed')" label="installed">
+                <el-radio-button class="topButton" size="large" label="installed">
                     {{ $t('app.installed') }}
                 </el-radio-button>
             </el-radio-group>
@@ -27,6 +27,17 @@ const activeName = ref('all');
 
 const routerTo = (path: string) => {
     router.push({ path: path });
+};
+
+const handleChange = (val: string) => {
+    switch (val) {
+        case 'all':
+            routerTo('/apps/all');
+            break;
+        case 'installed':
+            routerTo('/apps/installed');
+            break;
+    }
 };
 
 onMounted(() => {

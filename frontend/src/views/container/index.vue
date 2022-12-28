@@ -1,49 +1,29 @@
 <template>
     <div>
         <el-card class="topCard">
-            <el-radio-group v-model="active">
-                <el-radio-button class="topButton" size="large" @click="routerTo('/containers')" label="container">
+            <el-radio-group :model-value="props.activeName" @change="handleChange">
+                <el-radio-button class="topButton" size="large" label="container">
                     {{ $t('container.container') }}
                 </el-radio-button>
-                <el-radio-button
-                    class="topButton"
-                    size="large"
-                    @click="routerTo('/containers/compose')"
-                    label="compose"
-                >
+                <el-radio-button class="topButton" size="large" label="compose">
                     {{ $t('container.compose') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" @click="routerTo('/containers/image')" label="image">
+                <el-radio-button class="topButton" size="large" label="image">
                     {{ $t('container.image') }}
                 </el-radio-button>
-                <el-radio-button
-                    class="topButton"
-                    size="large"
-                    @click="routerTo('/containers/network')"
-                    label="network"
-                >
+                <el-radio-button class="topButton" size="large" label="network">
                     {{ $t('container.network') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" @click="routerTo('/containers/volume')" label="volume">
+                <el-radio-button class="topButton" size="large" label="volume">
                     {{ $t('container.volume') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" @click="routerTo('/containers/repo')" label="repo">
+                <el-radio-button class="topButton" size="large" label="repo">
                     {{ $t('container.repo') }}
                 </el-radio-button>
-                <el-radio-button
-                    class="topButton"
-                    size="large"
-                    @click="routerTo('/containers/template')"
-                    label="template"
-                >
+                <el-radio-button class="topButton" size="large" label="template">
                     {{ $t('container.composeTemplate') }}
                 </el-radio-button>
-                <el-radio-button
-                    class="topButton"
-                    size="large"
-                    @click="routerTo('/containers/setting')"
-                    label="setting"
-                >
+                <el-radio-button class="topButton" size="large" label="setting">
                     {{ $t('container.setting') }}
                 </el-radio-button>
             </el-radio-group>
@@ -52,9 +32,9 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
+
 interface MenuProps {
     activeName: string;
 }
@@ -62,16 +42,37 @@ const props = withDefaults(defineProps<MenuProps>(), {
     activeName: 'container',
 });
 
-const active = ref('container');
-
-onMounted(() => {
-    if (props.activeName) {
-        active.value = props.activeName;
-    }
-});
-
 const routerTo = (path: string) => {
     router.push({ path: path });
+};
+
+const handleChange = (val: string) => {
+    switch (val) {
+        case 'container':
+            routerTo('/containers');
+            break;
+        case 'compose':
+            routerTo('/containers/compose');
+            break;
+        case 'image':
+            routerTo('/containers/image');
+            break;
+        case 'network':
+            routerTo('/containers/network');
+            break;
+        case 'volume':
+            routerTo('/containers/volume');
+            break;
+        case 'repo':
+            routerTo('/containers/repo');
+            break;
+        case 'template':
+            routerTo('/containers/template');
+            break;
+        case 'setting':
+            routerTo('/containers/setting');
+            break;
+    }
 };
 </script>
 

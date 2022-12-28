@@ -1,14 +1,14 @@
 <template>
     <div>
         <el-card class="topCard">
-            <el-radio-group v-model="active">
-                <el-radio-button class="topButton" size="large" @click="routerTo('/logs')" label="operation">
+            <el-radio-group :model-value="props.activeName" @change="handleChange">
+                <el-radio-button class="topButton" size="large" label="operation">
                     {{ $t('logs.operation') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" @click="routerTo('/logs/login')" label="login">
+                <el-radio-button class="topButton" size="large" label="login">
                     {{ $t('logs.login') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" @click="routerTo('/logs/system')" label="system">
+                <el-radio-button class="topButton" size="large" label="system">
                     {{ $t('logs.system') }}
                 </el-radio-button>
             </el-radio-group>
@@ -17,9 +17,9 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 const router = useRouter();
+
 interface MenuProps {
     activeName: string;
 }
@@ -27,16 +27,22 @@ const props = withDefaults(defineProps<MenuProps>(), {
     activeName: 'operation',
 });
 
-const active = ref('operation');
-
-onMounted(() => {
-    if (props.activeName) {
-        active.value = props.activeName;
-    }
-});
-
 const routerTo = (path: string) => {
     router.push({ path: path });
+};
+
+const handleChange = (val: string) => {
+    switch (val) {
+        case 'operation':
+            routerTo('/logs');
+            break;
+        case 'login':
+            routerTo('/logs/login');
+            break;
+        case 'system':
+            routerTo('/logs/system');
+            break;
+    }
 };
 </script>
 

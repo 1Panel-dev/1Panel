@@ -1,25 +1,20 @@
 <template>
     <div>
         <el-card class="topCard">
-            <el-radio-group v-model="active">
-                <el-radio-button class="topButton" size="large" @click="routerTo('/setting')" label="panel">
+            <el-radio-group :model-value="props.activeName" @change="handleChange">
+                <el-radio-button class="topButton" size="large" label="panel">
                     {{ $t('setting.panel') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" @click="routerTo('/setting/safe')" label="safe">
+                <el-radio-button class="topButton" size="large" label="safe">
                     {{ $t('setting.safe') }}
                 </el-radio-button>
-                <el-radio-button
-                    class="topButton"
-                    @click="routerTo('/setting/backupaccount')"
-                    size="large"
-                    label="backupaccount"
-                >
+                <el-radio-button class="topButton" size="large" label="backupaccount">
                     {{ $t('setting.backupAccount') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" @click="routerTo('/setting/monitor')" label="monitor">
+                <el-radio-button class="topButton" size="large" label="monitor">
                     {{ $t('menu.monitor') }}
                 </el-radio-button>
-                <el-radio-button class="topButton" size="large" @click="routerTo('/setting/about')" label="about">
+                <el-radio-button class="topButton" size="large" label="about">
                     {{ $t('setting.about') }}
                 </el-radio-button>
             </el-radio-group>
@@ -28,7 +23,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
 import router from '@/routers';
 
 interface MenuProps {
@@ -38,16 +32,29 @@ const props = withDefaults(defineProps<MenuProps>(), {
     activeName: 'all',
 });
 
-const active = ref('all');
 const routerTo = (path: string) => {
     router.push({ path: path });
 };
 
-onMounted(() => {
-    if (props.activeName) {
-        active.value = props.activeName;
+const handleChange = (val: string) => {
+    switch (val) {
+        case 'panel':
+            routerTo('/setting');
+            break;
+        case 'safe':
+            routerTo('/setting/safe');
+            break;
+        case 'backupaccount':
+            routerTo('/setting/backupaccount');
+            break;
+        case 'monitor':
+            routerTo('/setting/monitor');
+            break;
+        case 'about':
+            routerTo('/setting/about');
+            break;
     }
-});
+};
 </script>
 
 <style>
