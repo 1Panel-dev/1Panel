@@ -939,6 +939,7 @@ export default {
         status: '当前状态',
         nginxConfig: 'OpenResty 设置',
         configResource: '配置修改',
+        saveAndReload: '保存并重载',
     },
     ssl: {
         provider: '类型',

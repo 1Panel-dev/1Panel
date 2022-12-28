@@ -103,3 +103,8 @@ type WebsiteHTTPSOp struct {
 	PrivateKey   string `json:"privateKey"`
 	Certificate  string `json:"certificate"`
 }
+
+type WebsiteNginxUpdate struct {
+	ID      uint   `json:"id" validate:"required"`
+	Content string `json:"content" validate:"required"`
+}
