@@ -44,7 +44,7 @@ type IWebsiteService interface {
 	UpdateNginxConfigByScope(req request.NginxConfigUpdate) error
 	GetWebsiteNginxConfig(websiteId uint) (response.FileInfo, error)
 	GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, error)
-	OpWebsiteHTTPS(req request.WebsiteHTTPSOp) (response.WebsiteHTTPS, error)
+	OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (response.WebsiteHTTPS, error)
 	PreInstallCheck(req request.WebsiteInstallCheckReq) ([]response.WebsitePreInstallCheck, error)
 	GetWafConfig(req request.WebsiteWafReq) (response.WebsiteWafConfig, error)
 	UpdateWafConfig(req request.WebsiteWafUpdate) error
@@ -472,84 +472,78 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 	}
 	res.SSL = websiteSSL
 	res.Enable = true
+	if website.HttpConfig != "" {
+		res.HttpConfig = website.HttpConfig
+	} else {
+		res.HttpConfig = constant.HTTPToHTTPS
+	}
 	return res, nil
 }
 
-func (w WebsiteService) OpWebsiteHTTPS(req request.WebsiteHTTPSOp) (response.WebsiteHTTPS, error) {
+func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (response.WebsiteHTTPS, error) {
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
 	if err != nil {
 		return response.WebsiteHTTPS{}, err
 	}
-
 	var (
 		res        response.WebsiteHTTPS
 		websiteSSL model.WebsiteSSL
 	)
 	res.Enable = req.Enable
-
-	if req.Type == constant.SSLExisted {
-		websiteSSL, err = websiteSSLRepo.GetFirst(commonRepo.WithByID(req.WebsiteSSLID))
-		if err != nil {
-			return response.WebsiteHTTPS{}, err
+	if req.Enable {
+		if req.Type == constant.SSLExisted {
+			websiteSSL, err = websiteSSLRepo.GetFirst(commonRepo.WithByID(req.WebsiteSSLID))
+			if err != nil {
+				return response.WebsiteHTTPS{}, err
+			}
+			website.WebsiteSSLID = websiteSSL.ID
+			res.SSL = websiteSSL
 		}
-		website.WebsiteSSLID = websiteSSL.ID
-		if err := websiteRepo.Save(context.TODO(), &website); err != nil {
-			return response.WebsiteHTTPS{}, err
-		}
-		res.SSL = websiteSSL
-	}
-
-	if req.Type == constant.SSLManual {
-		certBlock, _ := pem.Decode([]byte(req.Certificate))
-		cert, err := x509.ParseCertificate(certBlock.Bytes)
-		if err != nil {
-			return response.WebsiteHTTPS{}, err
-		}
-		websiteSSL.ExpireDate = cert.NotAfter
-		websiteSSL.StartDate = cert.NotBefore
-		websiteSSL.Type = cert.Issuer.CommonName
-		websiteSSL.Organization = cert.Issuer.Organization[0]
-		websiteSSL.PrimaryDomain = cert.Subject.CommonName
-		if len(cert.Subject.Names) > 0 {
-			var domains []string
-			for _, name := range cert.Subject.Names {
-				if v, ok := name.Value.(string); ok {
-					if v != cert.Subject.CommonName {
-						domains = append(domains, v)
+		if req.Type == constant.SSLManual {
+			certBlock, _ := pem.Decode([]byte(req.Certificate))
+			cert, err := x509.ParseCertificate(certBlock.Bytes)
+			if err != nil {
+				return response.WebsiteHTTPS{}, err
+			}
+			websiteSSL.ExpireDate = cert.NotAfter
+			websiteSSL.StartDate = cert.NotBefore
+			websiteSSL.Type = cert.Issuer.CommonName
+			websiteSSL.Organization = cert.Issuer.Organization[0]
+			websiteSSL.PrimaryDomain = cert.Subject.CommonName
+			if len(cert.Subject.Names) > 0 {
+				var domains []string
+				for _, name := range cert.Subject.Names {
+					if v, ok := name.Value.(string); ok {
+						if v != cert.Subject.CommonName {
+							domains = append(domains, v)
+						}
 					}
 				}
+				if len(domains) > 0 {
+					websiteSSL.Domains = strings.Join(domains, "")
+				}
 			}
-			if len(domains) > 0 {
-				websiteSSL.Domains = strings.Join(domains, "")
-			}
+			websiteSSL.Provider = constant.Manual
+			websiteSSL.PrivateKey = req.PrivateKey
+			websiteSSL.Pem = req.Certificate
+			res.SSL = websiteSSL
 		}
-
-		websiteSSL.Provider = constant.Manual
-		websiteSSL.PrivateKey = req.PrivateKey
-		websiteSSL.Pem = req.Certificate
-
-		res.SSL = websiteSSL
-	}
-
-	if req.Enable {
 		website.Protocol = constant.ProtocolHTTPS
-		if err := applySSL(website, websiteSSL); err != nil {
+		if err := applySSL(website, websiteSSL, req.HttpConfig); err != nil {
 			return response.WebsiteHTTPS{}, err
 		}
+		website.HttpConfig = req.HttpConfig
 	} else {
 		website.Protocol = constant.ProtocolHTTP
 		website.WebsiteSSLID = 0
-
 		if err := deleteListenAndServerName(website, []int{443}, []string{}); err != nil {
 			return response.WebsiteHTTPS{}, err
 		}
-
 		if err := deleteNginxConfig(constant.NginxScopeServer, getKeysFromStaticFile(dto.SSL), &website); err != nil {
 			return response.WebsiteHTTPS{}, err
 		}
 	}
 
-	tx, ctx := getTxAndContext()
 	if websiteSSL.ID == 0 {
 		if err := websiteSSLRepo.Create(ctx, &websiteSSL); err != nil {
 			return response.WebsiteHTTPS{}, err
@@ -559,8 +553,6 @@ func (w WebsiteService) OpWebsiteHTTPS(req request.WebsiteHTTPSOp) (response.Web
 	if err := websiteRepo.Save(ctx, &website); err != nil {
 		return response.WebsiteHTTPS{}, err
 	}
-
-	tx.Commit()
 	return res, nil
 }
 

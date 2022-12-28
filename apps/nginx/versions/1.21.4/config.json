@@ -7,7 +7,7 @@
       "required": true,
       "default": 80,
       "envKey": "PANEL_APP_PORT_HTTP",
-      "disabled": true,
+      "disabled": true
     },
     {
       "type": "number",

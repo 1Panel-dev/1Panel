@@ -242,13 +242,26 @@ func (s *Server) UpdateDirectiveBySecondKey(name string, key string, directive D
 }
 
 func (s *Server) RemoveListenByBind(bind string) {
-	index := 0
-	listens := s.Listens
+	var listens []*ServerListen
 	for _, listen := range s.Listens {
 		if listen.Bind != bind || len(listen.Parameters) > 0 {
-			listens[index] = listen
-			index++
+			listens = append(listens, listen)
 		}
 	}
 	s.Listens = listens
+}
+
+func (s *Server) AddHTTP2HTTPS() {
+	newDir := Directive{
+		Name:       "if",
+		Parameters: []string{"($scheme = http)"},
+		Block:      &Block{},
+	}
+	block := &Block{}
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "return",
+		Parameters: []string{"301", "https://$host$request_uri"},
+	})
+	newDir.Block = block
+	s.UpdateDirectiveBySecondKey("if", "($scheme", newDir)
 }

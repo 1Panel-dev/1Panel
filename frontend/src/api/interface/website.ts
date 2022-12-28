@@ -204,11 +204,13 @@ export namespace Website {
         type: string;
         certificate?: string;
         privateKey?: string;
+        httpConfig: string;
     }
 
     export interface HTTPSConfig {
         enable: boolean;
         SSL: SSL;
+        httpConfig: string;
     }
 
     export interface CheckReq {

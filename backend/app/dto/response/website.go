@@ -30,6 +30,7 @@ type WebsiteWafConfig struct {
 }
 
 type WebsiteHTTPS struct {
-	Enable bool             `json:"enable"`
-	SSL    model.WebsiteSSL `json:"SSL"`
+	Enable     bool             `json:"enable"`
+	HttpConfig string           `json:"httpConfig"`
+	SSL        model.WebsiteSSL `json:"SSL"`
 }
