@@ -5,7 +5,7 @@ services:
       container_name: 1panel_minio
       ports:
         - ${PANEL_APP_PORT_HTTP}:9000
-        - "9001:9001"
+        - ${API_ROOT}:9001
       restart: always
       command: server /data --console-address ":9001"
       environment:

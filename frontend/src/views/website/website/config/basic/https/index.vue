@@ -9,65 +9,70 @@
                 :rules="rules"
                 :loading="loading"
             >
-                <el-form-item prop="enable">
-                    <el-checkbox v-model="form.enable">
-                        {{ $t('website.enableHTTPS') }}
-                    </el-checkbox>
+                <el-form-item prop="enable" :label="$t('website.enableHTTPS')">
+                    <el-switch v-model="form.enable" @change="changeEnable"></el-switch>
                 </el-form-item>
-                <el-form-item :label="$t('website.HTTPConfig')" prop="httpConfig">
-                    <el-select v-model="form.httpConfig" style="width: 240px">
-                        <el-option :label="$t('website.HTTPToHTTPS')" :value="'HTTPToHTTPS'"></el-option>
-                        <el-option :label="$t('website.HTTPAlso')" :value="'HTTPAlso'"></el-option>
-                        <el-option :label="$t('website.HTTPSOnly')" :value="'HTTPSOnly'"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item :label="$t('website.ssl')" prop="type">
-                    <el-select v-model="form.type" @change="changeType(form.type)">
-                        <el-option :label="$t('website.oldSSL')" :value="'existed'"></el-option>
-                        <el-option :label="$t('website.manualSSL')" :value="'manual'"></el-option>
-                        <!-- <el-option :label="'自动生成证书'" :value="'auto'"></el-option> -->
-                    </el-select>
-                </el-form-item>
-                <el-form-item :label="$t('website.select')" prop="websiteSSLId" v-if="form.type === 'existed'">
-                    <el-select
-                        v-model="form.websiteSSLId"
-                        :placeholder="$t('website.selectSSL')"
-                        @change="changeSSl(form.websiteSSLId)"
-                    >
-                        <el-option
-                            v-for="(ssl, index) in ssls"
-                            :key="index"
-                            :label="ssl.primaryDomain"
-                            :value="ssl.id"
-                        ></el-option>
-                    </el-select>
-                </el-form-item>
-                <div v-if="form.type === 'manual'">
-                    <el-form-item :label="$t('website.privateKey')" prop="privateKey">
-                        <el-input v-model="form.privateKey" :rows="6" type="textarea" />
+                <div v-if="form.enable">
+                    <el-form-item :label="$t('website.HTTPConfig')" prop="httpConfig">
+                        <el-select v-model="form.httpConfig" style="width: 240px">
+                            <el-option :label="$t('website.HTTPToHTTPS')" :value="'HTTPToHTTPS'"></el-option>
+                            <el-option :label="$t('website.HTTPAlso')" :value="'HTTPAlso'"></el-option>
+                            <el-option :label="$t('website.HTTPSOnly')" :value="'HTTPSOnly'"></el-option>
+                        </el-select>
                     </el-form-item>
-                    <el-form-item :label="$t('website.certificate')" prop="certificate">
-                        <el-input v-model="form.certificate" :rows="6" type="textarea" />
+                    <el-form-item :label="$t('website.sslConfig')" prop="type">
+                        <el-select v-model="form.type" @change="changeType(form.type)">
+                            <el-option :label="$t('website.oldSSL')" :value="'existed'"></el-option>
+                            <el-option :label="$t('website.manualSSL')" :value="'manual'"></el-option>
+                            <!-- <el-option :label="'自动生成证书'" :value="'auto'"></el-option> -->
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item
+                        :label="$t('website.ssl')"
+                        prop="websiteSSLId"
+                        v-if="form.type === 'existed'"
+                        :hide-required-asterisk="true"
+                    >
+                        <el-select
+                            v-model="form.websiteSSLId"
+                            :placeholder="$t('website.selectSSL')"
+                            @change="changeSSl(form.websiteSSLId)"
+                        >
+                            <el-option
+                                v-for="(ssl, index) in ssls"
+                                :key="index"
+                                :label="ssl.primaryDomain"
+                                :value="ssl.id"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <div v-if="form.type === 'manual'">
+                        <el-form-item :label="$t('website.privateKey')" prop="privateKey">
+                            <el-input v-model="form.privateKey" :rows="6" type="textarea" />
+                        </el-form-item>
+                        <el-form-item :label="$t('website.certificate')" prop="certificate">
+                            <el-input v-model="form.certificate" :rows="6" type="textarea" />
+                        </el-form-item>
+                    </div>
+                    <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
+                        <el-descriptions :column="3" border direction="vertical">
+                            <el-descriptions-item :label="$t('website.primaryDomain')">
+                                {{ websiteSSL.primaryDomain }}
+                            </el-descriptions-item>
+                            <el-descriptions-item :label="$t('website.otherDomains')">
+                                {{ websiteSSL.otherDomains }}
+                            </el-descriptions-item>
+                            <el-descriptions-item :label="$t('website.expireDate')">
+                                {{ dateFromat(1, 1, websiteSSL.expireDate) }}
+                            </el-descriptions-item>
+                        </el-descriptions>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="submit(httpsForm)" :loading="loading">
+                            {{ $t('commons.button.save') }}
+                        </el-button>
                     </el-form-item>
                 </div>
-                <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
-                    <el-descriptions :column="3" border direction="vertical">
-                        <el-descriptions-item :label="$t('website.primaryDomain')">
-                            {{ websiteSSL.primaryDomain }}
-                        </el-descriptions-item>
-                        <el-descriptions-item :label="$t('website.otherDomains')">
-                            {{ websiteSSL.otherDomains }}
-                        </el-descriptions-item>
-                        <el-descriptions-item :label="$t('website.expireDate')">
-                            {{ dateFromat(1, 1, websiteSSL.expireDate) }}
-                        </el-descriptions-item>
-                    </el-descriptions>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" @click="submit(httpsForm)" :loading="loading">
-                        {{ $t('commons.button.save') }}
-                    </el-button>
-                </el-form-item>
             </el-form>
         </el-col>
     </el-row>
@@ -75,7 +80,7 @@
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
 import { GetHTTPSConfig, ListSSL, UpdateHTTPSConfig } from '@/api/modules/website';
-import { ElMessage, FormInstance } from 'element-plus';
+import { ElMessage, ElMessageBox, FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { dateFromat } from '@/utils/util';
 import i18n from '@/lang';
@@ -110,6 +115,7 @@ let rules = ref({
     websiteSSLId: [Rules.requiredSelect],
     httpConfig: [Rules.requiredSelect],
 });
+const resData = ref();
 
 const listSSL = () => {
     ListSSL({}).then((res) => {
@@ -134,10 +140,12 @@ const changeType = (type: string) => {
 
 const get = () => {
     GetHTTPSConfig(id.value).then((res) => {
-        console.log(res);
         if (res.data) {
+            resData.value = res.data;
             form.enable = res.data.enable;
-            form.httpConfig = res.data.httpConfig;
+            if (res.data.httpConfig != '') {
+                form.httpConfig = res.data.httpConfig;
+            }
         }
         if (res.data?.SSL && res.data?.SSL.id > 0) {
             form.websiteSSLId = res.data.SSL.id;
@@ -162,6 +170,33 @@ const submit = async (formEl: FormInstance | undefined) => {
                 loading.value = false;
             });
     });
+};
+
+const changeEnable = (enable: boolean) => {
+    if (resData.value.enable && !enable) {
+        ElMessageBox.confirm(i18n.global.t('website.disbaleHTTTPSHelper'), i18n.global.t('website.disbaleHTTTPS'), {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'error',
+            closeOnClickModal: false,
+            beforeClose: async (action, instance, done) => {
+                if (action !== 'confirm') {
+                    form.enable = true;
+                    done();
+                } else {
+                    instance.confirmButtonLoading = true;
+                    instance.cancelButtonLoading = true;
+                    form.enable = false;
+                    form.websiteId = id.value;
+                    UpdateHTTPSConfig(form).then(() => {
+                        done();
+                        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                        get();
+                    });
+                }
+            },
+        }).then(() => {});
+    }
 };
 
 onMounted(() => {
