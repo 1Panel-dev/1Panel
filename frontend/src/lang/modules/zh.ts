@@ -920,6 +920,7 @@ export default {
         indexFolder: '静态网站root目录',
         logFoler: '网站日志',
         sslFolder: '网站证书',
+        enableOrNot: '是否启用',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',

@@ -9,10 +9,8 @@
                 :loading="loading"
                 label-width="100px"
             >
-                <el-form-item>
-                    <el-checkbox v-model="enable" @change="changeEnable">
-                        {{ $t('website.limtHelper') }}
-                    </el-checkbox>
+                <el-form-item prop="enable" :label="$t('website.enableOrNot')">
+                    <el-switch v-model="enable" @change="changeEnable"></el-switch>
                 </el-form-item>
                 <el-form-item :label="$t('website.limit')">
                     <el-select v-model="ruleKey" @change="changeRule(ruleKey)">
@@ -38,7 +36,8 @@
                 </el-form-item>
             </el-form>
             <el-button type="primary" @click="submit(limitForm)" :loading="loading">
-                {{ $t('commons.button.save') }}
+                <span v-if="enable">{{ $t('commons.button.save') }}</span>
+                <span v-else>{{ $t('commons.button.saveAndEnable') }}</span>
             </el-button>
         </el-col>
     </el-row>
@@ -146,6 +145,9 @@ const submit = async (formEl: FormInstance | undefined) => {
             },
         ];
         req.params = params;
+        if (req.operate === 'add') {
+            enable.value = true;
+        }
         UpdateNginxConfig(req)
             .then(() => {
                 ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
@@ -163,6 +165,7 @@ const changeEnable = () => {
     } else {
         req.operate = 'add';
     }
+    submit(limitForm.value);
 };
 
 const changeRule = (key: string) => {

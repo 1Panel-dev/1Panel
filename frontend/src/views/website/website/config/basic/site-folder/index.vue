@@ -1,6 +1,6 @@
 <template>
     <el-row :gutter="20">
-        <el-col :span="8" :offset="1">
+        <el-col :span="14" :offset="1">
             <br />
             <el-descriptions :column="1" border v-loading="loading">
                 <el-descriptions-item :label="$t('website.siteAlias')">{{ website.alias }}</el-descriptions-item>
