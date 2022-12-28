@@ -102,6 +102,7 @@ type WebsiteHTTPSOp struct {
 	Type         string `json:"type"  validate:"oneof=existed auto manual"`
 	PrivateKey   string `json:"privateKey"`
 	Certificate  string `json:"certificate"`
+	HttpConfig   string `json:"HttpConfig"  validate:"oneof=HTTPSOnly HTTPAlso HTTPToHTTPS"`
 }
 
 type WebsiteNginxUpdate struct {

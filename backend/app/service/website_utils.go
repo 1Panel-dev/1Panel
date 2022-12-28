@@ -298,7 +298,7 @@ func createPemFile(website model.Website, websiteSSL model.WebsiteSSL) error {
 	return nil
 }
 
-func applySSL(website model.Website, websiteSSL model.WebsiteSSL) error {
+func applySSL(website model.Website, websiteSSL model.WebsiteSSL, httpConfig string) error {
 	nginxFull, err := getNginxFull(&website)
 	if err != nil {
 		return nil
@@ -306,10 +306,22 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL) error {
 	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
 	server.UpdateListen("443", false, "ssl")
+
+	switch httpConfig {
+	case constant.HTTPSOnly:
+		server.RemoveListenByBind("80")
+		server.RemoveDirective("if", []string{"($scheme"})
+	case constant.HTTPToHTTPS:
+		server.UpdateListen("80", false)
+		server.AddHTTP2HTTPS()
+	case constant.HTTPAlso:
+		server.UpdateListen("80", false)
+		server.RemoveDirective("if", []string{"($scheme"})
+	}
+
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
-
 	if err := createPemFile(website, websiteSSL); err != nil {
 		return err
 	}
@@ -325,7 +337,6 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL) error {
 	if err := updateNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
 		return err
 	}
-
 	return nil
 }
 

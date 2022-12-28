@@ -10,6 +10,7 @@ type Website struct {
 	Alias          string          `gorm:"type:varchar(128);not null" json:"alias"`
 	Remark         string          `gorm:"type:longtext;" json:"remark"`
 	Status         string          `gorm:"type:varchar(64);not null" json:"status"`
+	HttpConfig     string          `gorm:"type:varchar(64);not null" json:"httpConfig"`
 	ExpireDate     time.Time       `json:"expireDate"`
 	AppInstallID   uint            `gorm:"type:integer" json:"appInstallId"`
 	WebsiteGroupID uint            `gorm:"type:integer" json:"webSiteGroupId"`

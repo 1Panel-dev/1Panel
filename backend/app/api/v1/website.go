@@ -256,11 +256,14 @@ func (b *BaseApi) UpdateHTTPSConfig(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	res, err := websiteService.OpWebsiteHTTPS(req)
+	tx, ctx := helper.GetTxAndContext()
+	res, err := websiteService.OpWebsiteHTTPS(ctx, req)
 	if err != nil {
+		tx.Rollback()
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
+	tx.Commit()
 	helper.SuccessWithData(c, res)
 }
 

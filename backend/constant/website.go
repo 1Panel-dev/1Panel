@@ -28,4 +28,8 @@ const (
 
 	StartWeb = "start"
 	StopWeb  = "stop"
+
+	HTTPSOnly   = "HTTPSOnly"
+	HTTPAlso    = "HTTPAlso"
+	HTTPToHTTPS = "HTTPToHTTPS"
 )
