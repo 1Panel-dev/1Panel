@@ -5,9 +5,9 @@ services:
       container_name: 1panel_minio
       ports:
         - ${PANEL_APP_PORT_HTTP}:9000
-        - ${API_ROOT}:9001
+        - ${PORT_API}:9001
       restart: always
-      command: server /data --console-address ":9001"
+      command: server /data --console-address :9000 --address :9001
       environment:
         MINIO_ROOT_USER: ${MINIO_ROOT_USER}
         MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}

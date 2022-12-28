@@ -13,6 +13,7 @@
                     <el-switch v-model="form.enable" @change="changeEnable"></el-switch>
                 </el-form-item>
                 <div v-if="form.enable">
+                    <el-divider content-position="left">{{ $t('website.SSLConfig') }}</el-divider>
                     <el-form-item :label="$t('website.HTTPConfig')" prop="httpConfig">
                         <el-select v-model="form.httpConfig" style="width: 240px">
                             <el-option :label="$t('website.HTTPToHTTPS')" :value="'HTTPToHTTPS'"></el-option>
@@ -67,11 +68,39 @@
                             </el-descriptions-item>
                         </el-descriptions>
                     </el-form-item>
+                    <el-divider content-position="left">{{ $t('website.SSLProConfig') }}</el-divider>
+                    <el-form-item :label="$t('website.supportProtocol')" prop="SSLProtocol">
+                        <el-checkbox-group v-model="form.SSLProtocol">
+                            <el-checkbox :label="'TLSv1.2'">{{ 'TLS 1.2' }}</el-checkbox>
+                            <el-checkbox :label="'TLSv1.1'">{{ 'TLS 1.1' }}</el-checkbox>
+                            <el-checkbox :label="'TLSv1'">{{ 'TLS 1.0' }}</el-checkbox>
+                            <el-checkbox :label="'SSLv3'">
+                                {{ 'SSL V3' + $t('website.notSecurity') }}
+                            </el-checkbox>
+                            <el-checkbox :label="'SSLv2'">
+                                {{ 'SSL V2' + $t('website.notSecurity') }}
+                            </el-checkbox>
+                        </el-checkbox-group>
+                    </el-form-item>
+                    <el-form-item prop="algorithm" :label="$t('website.encryptionAlgorithm')">
+                        <el-input
+                            type="textarea"
+                            :autosize="{ minRows: 2, maxRows: 6 }"
+                            v-model.trim="form.algorithm"
+                        ></el-input>
+                    </el-form-item>
                     <el-form-item>
                         <el-button type="primary" @click="submit(httpsForm)" :loading="loading">
                             {{ $t('commons.button.save') }}
                         </el-button>
                     </el-form-item>
+                </div>
+                <div v-else>
+                    <el-alert :closable="false">
+                        <template #default>
+                            <span style="white-space: pre-line">{{ $t('website.SSLHelper') }}</span>
+                        </template>
+                    </el-alert>
                 </div>
             </el-form>
         </el-col>
@@ -104,6 +133,9 @@ let form = reactive({
     privateKey: '',
     certificate: '',
     httpConfig: 'HTTPToHTTPS',
+    algorithm:
+        'EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5',
+    SSLProtocol: ['TLSv1.2', 'TLSv1.1', 'TLSv1'],
 });
 let loading = ref(false);
 const ssls = ref();
@@ -114,6 +146,8 @@ let rules = ref({
     certificate: [Rules.requiredInput],
     websiteSSLId: [Rules.requiredSelect],
     httpConfig: [Rules.requiredSelect],
+    SSLProtocol: [Rules.requiredSelect],
+    algorithm: [Rules.requiredInput],
 });
 const resData = ref();
 
@@ -146,6 +180,12 @@ const get = () => {
             if (res.data.httpConfig != '') {
                 form.httpConfig = res.data.httpConfig;
             }
+            if (res.data.SSLProtocol.length > 0) {
+                form.SSLProtocol = res.data.SSLProtocol;
+            }
+            if (res.data.algorithm != '') {
+                form.algorithm = res.data.algorithm;
+            }
         }
         if (res.data?.SSL && res.data?.SSL.id > 0) {
             form.websiteSSLId = res.data.SSL.id;
@@ -165,6 +205,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         UpdateHTTPSConfig(form)
             .then(() => {
                 ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+                get();
             })
             .finally(() => {
                 loading.value = false;
@@ -203,3 +244,12 @@ onMounted(() => {
     get();
 });
 </script>
+<style lang="scss">
+.el-collapse,
+.el-collapse-item__wrap {
+    border: none;
+}
+.el-collapse-item__header {
+    border: none;
+}
+</style>

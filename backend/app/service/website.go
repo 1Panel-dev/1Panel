@@ -477,6 +477,18 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 	} else {
 		res.HttpConfig = constant.HTTPToHTTPS
 	}
+	params, err := getNginxParamsByKeys(constant.NginxScopeServer, []string{"ssl_protocols", "ssl_ciphers"}, &website)
+	if err != nil {
+		return res, err
+	}
+	for _, p := range params {
+		if p.Name == "ssl_protocols" {
+			res.SSLProtocol = p.Params
+		}
+		if p.Name == "ssl_ciphers" {
+			res.Algorithm = p.Params[0]
+		}
+	}
 	return res, nil
 }
 
@@ -490,7 +502,8 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 		websiteSSL model.WebsiteSSL
 	)
 	res.Enable = req.Enable
-
+	res.SSLProtocol = req.SSLProtocol
+	res.Algorithm = req.Algorithm
 	if !req.Enable {
 		website.Protocol = constant.ProtocolHTTP
 		website.WebsiteSSLID = 0
@@ -544,7 +557,7 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 		res.SSL = websiteSSL
 	}
 	website.Protocol = constant.ProtocolHTTPS
-	if err := applySSL(website, websiteSSL, req.HttpConfig); err != nil {
+	if err := applySSL(website, websiteSSL, req); err != nil {
 		return response.WebsiteHTTPS{}, err
 	}
 	website.HttpConfig = req.HttpConfig

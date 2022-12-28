@@ -96,13 +96,15 @@ type WebsiteDomainDelete struct {
 }
 
 type WebsiteHTTPSOp struct {
-	WebsiteID    uint   `json:"websiteId" validate:"required"`
-	Enable       bool   `json:"enable" validate:"required"`
-	WebsiteSSLID uint   `json:"websiteSSLId"`
-	Type         string `json:"type"  validate:"oneof=existed auto manual"`
-	PrivateKey   string `json:"privateKey"`
-	Certificate  string `json:"certificate"`
-	HttpConfig   string `json:"HttpConfig"  validate:"oneof=HTTPSOnly HTTPAlso HTTPToHTTPS"`
+	WebsiteID    uint     `json:"websiteId" validate:"required"`
+	Enable       bool     `json:"enable" validate:"required"`
+	WebsiteSSLID uint     `json:"websiteSSLId"`
+	Type         string   `json:"type"  validate:"oneof=existed auto manual"`
+	PrivateKey   string   `json:"privateKey"`
+	Certificate  string   `json:"certificate"`
+	HttpConfig   string   `json:"HttpConfig"  validate:"oneof=HTTPSOnly HTTPAlso HTTPToHTTPS"`
+	SSLProtocol  []string `json:"SSLProtocol"`
+	Algorithm    string   `json:"algorithm"`
 }
 
 type WebsiteNginxUpdate struct {

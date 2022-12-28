@@ -30,7 +30,7 @@
       "labelEn": "Port",
       "required": true,
       "default": 9001,
-      "envKey": "API_ROOT"
+      "envKey": "PORT_API"
     }
   ]
 }

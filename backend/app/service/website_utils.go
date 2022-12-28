@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"os"
 	"os/exec"
 	"path"
@@ -298,7 +299,7 @@ func createPemFile(website model.Website, websiteSSL model.WebsiteSSL) error {
 	return nil
 }
 
-func applySSL(website model.Website, websiteSSL model.WebsiteSSL, httpConfig string) error {
+func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.WebsiteHTTPSOp) error {
 	nginxFull, err := getNginxFull(&website)
 	if err != nil {
 		return nil
@@ -307,7 +308,7 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, httpConfig str
 	server := config.FindServers()[0]
 	server.UpdateListen("443", false, "ssl")
 
-	switch httpConfig {
+	switch req.HttpConfig {
 	case constant.HTTPSOnly:
 		server.RemoveListenByBind("80")
 		server.RemoveDirective("if", []string{"($scheme"})
@@ -332,6 +333,12 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, httpConfig str
 		}
 		if param.Name == "ssl_certificate_key" {
 			nginxParams[i].Params = []string{path.Join("/www", "sites", website.Alias, "ssl", "privkey.pem")}
+		}
+		if param.Name == "ssl_protocols" {
+			nginxParams[i].Params = req.SSLProtocol
+		}
+		if param.Name == "ssl_ciphers" {
+			nginxParams[i].Params = []string{req.Algorithm}
 		}
 	}
 	if err := updateNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
