@@ -92,6 +92,8 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 	if cronjob.ID == 0 {
 		return "", constant.ErrRecordNotFound
 	}
+
+	global.LOG.Infof("start to download records %s from %s", cronjob.Type, backup.Type)
 	varMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(backup.Vars), &varMap); err != nil {
 		return "", err
@@ -101,25 +103,30 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 		varMap["bucket"] = backup.Bucket
 		switch backup.Type {
 		case constant.Sftp:
+			varMap["username"] = backup.AccessKey
 			varMap["password"] = backup.Credential
 		case constant.OSS, constant.S3, constant.MinIo:
+			varMap["accessKey"] = backup.AccessKey
 			varMap["secretKey"] = backup.Credential
 		}
 		backClient, err := cloud_storage.NewCloudStorageClient(varMap)
 		if err != nil {
 			return "", fmt.Errorf("new cloud storage client failed, err: %v", err)
 		}
+		global.LOG.Info("new backup client successful")
 		commonDir := fmt.Sprintf("%s/%s/", cronjob.Type, cronjob.Name)
 		name := fmt.Sprintf("%s%s.tar.gz", commonDir, record.StartTime.Format("20060102150405"))
 		if cronjob.Type == "database" {
 			name = fmt.Sprintf("%s%s.gz", commonDir, record.StartTime.Format("20060102150405"))
 		}
-		tempPath := fmt.Sprintf("%s%s", constant.DownloadDir, commonDir)
+		tempPath := fmt.Sprintf("%s/%s", constant.DownloadDir, commonDir)
 		if _, err := os.Stat(tempPath); err != nil && os.IsNotExist(err) {
 			if err = os.MkdirAll(tempPath, os.ModePerm); err != nil {
 				fmt.Println(err)
 			}
 		}
+
+		global.LOG.Infof("download records %s from %s to %s", name, commonDir, tempPath)
 		targetPath := tempPath + strings.ReplaceAll(name, commonDir, "")
 		if _, err = os.Stat(targetPath); err != nil && os.IsNotExist(err) {
 			isOK, err := backClient.Download(name, targetPath)
@@ -132,6 +139,7 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 	if _, ok := varMap["dir"]; !ok {
 		return "", errors.New("load local backup dir failed")
 	}
+	global.LOG.Infof("record is save in local dir %s", varMap["dir"])
 
 	switch cronjob.Type {
 	case "website":
@@ -172,6 +180,7 @@ func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
 	if err := cronjobRepo.Create(&cronjob); err != nil {
 		return err
 	}
+	global.LOG.Infof("create cronjob %s successful, spec: %s", cronjob.Name, cronjob.Spec)
 	if err := u.StartJob(&cronjob); err != nil {
 		return err
 	}
@@ -180,6 +189,7 @@ func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
 
 func (u *CronjobService) StartJob(cronjob *model.Cronjob) error {
 	global.Cron.Remove(cron.EntryID(cronjob.EntryID))
+	global.LOG.Infof("stop cronjob entryID: %d", cronjob.EntryID)
 	entryID, err := u.AddCronJob(cronjob)
 	if err != nil {
 		return err
@@ -245,6 +255,7 @@ func (u *CronjobService) UpdateStatus(id uint, status string) error {
 		}
 	} else {
 		global.Cron.Remove(cron.EntryID(cronjob.EntryID))
+		global.LOG.Infof("stop cronjob entryID: %d", cronjob.EntryID)
 	}
 	return cronjobRepo.Update(cronjob.ID, map[string]interface{}{"status": status})
 }
@@ -258,6 +269,7 @@ func (u *CronjobService) AddCronJob(cronjob *model.Cronjob) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	global.LOG.Infof("start cronjob entryID: %d", entryID)
 	return int(entryID), nil
 }
 
@@ -270,6 +282,7 @@ func mkdirAndWriteFile(cronjob *model.Cronjob, startTime time.Time, msg []byte) 
 	}
 
 	path := fmt.Sprintf("%s/%s.log", dir, startTime.Format("20060102150405"))
+	global.LOG.Infof("cronjob %s has generated some logs %s", cronjob.Name, path)
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
 		return "", err

@@ -14,6 +14,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -159,11 +160,14 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
 			hostConf.Binds = append(hostConf.Binds, fmt.Sprintf("%s:%s:%s", volume.SourceDir, volume.ContainerDir, volume.Mode))
 		}
 	}
+
+	global.LOG.Infof("new container info %s has been made, now start to create", req.Name)
 	container, err := client.ContainerCreate(context.TODO(), config, hostConf, &network.NetworkingConfig{}, &v1.Platform{}, req.Name)
 	if err != nil {
 		_ = client.ContainerRemove(context.Background(), req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 		return err
 	}
+	global.LOG.Infof("create container successful! now check if the container is started and delete the container information if it is not.", req.Name)
 	if err := client.ContainerStart(context.TODO(), container.ID, types.ContainerStartOptions{}); err != nil {
 		_ = client.ContainerRemove(context.Background(), req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 		return fmt.Errorf("create successful but start failed, err: %v", err)
@@ -178,6 +182,7 @@ func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error 
 	if err != nil {
 		return err
 	}
+	global.LOG.Infof("start container %s operation %s", req.Name, req.Operation)
 	switch req.Operation {
 	case constant.ContainerOpStart:
 		err = client.ContainerStart(ctx, req.Name, types.ContainerStartOptions{})

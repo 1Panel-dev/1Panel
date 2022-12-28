@@ -13,6 +13,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -182,6 +183,8 @@ func (u *RedisService) Backup() error {
 	if err != nil {
 		return err
 	}
+
+	global.LOG.Infof("appendonly in redis conf is %s", appendonly)
 	if appendonly == "yes" {
 		redisDataDir := fmt.Sprintf("%s/%s/%s/data", constant.AppInstallDir, "redis", redisInfo.Name)
 		name := fmt.Sprintf("%s.tar.gz", time.Now().Format("20060102150405"))
@@ -208,6 +211,7 @@ func (u *RedisService) Recover(req dto.RedisBackupRecover) error {
 	if err != nil {
 		return err
 	}
+	global.LOG.Infof("appendonly in redis conf is %s", appendonly)
 
 	composeDir := fmt.Sprintf("%s/redis/%s", constant.AppInstallDir, redisInfo.Name)
 	if _, err := compose.Down(composeDir + "/docker-compose.yml"); err != nil {

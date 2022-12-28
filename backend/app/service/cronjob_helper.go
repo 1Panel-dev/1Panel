@@ -82,6 +82,8 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 	if err != nil {
 		return "", err
 	}
+
+	global.LOG.Infof("start to backup %s %s to %s", cronjob.Type, cronjob.Name, backup.Type)
 	if cronjob.KeepLocal || cronjob.Type != "LOCAL" {
 		localDir, err := loadLocalDir()
 		if err != nil {
@@ -113,6 +115,7 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 	default:
 		fileName = fmt.Sprintf("%s.tar.gz", startTime.Format("20060102150405"))
 		backupDir = fmt.Sprintf("%s/%s", cronjob.Type, cronjob.Name)
+		global.LOG.Infof("handle tar %s to %s", backupDir, fileName)
 		if err := handleTar(cronjob.SourceDir, baseDir+"/"+backupDir, fileName, cronjob.ExclusionRules); err != nil {
 			return "", err
 		}
@@ -145,6 +148,7 @@ func (u *CronjobService) HandleDelete(id uint) error {
 	}
 	commonDir := fmt.Sprintf("%s/%s/", cronjob.Type, cronjob.Name)
 	global.Cron.Remove(cron.EntryID(cronjob.EntryID))
+	global.LOG.Infof("stop cronjob entryID: %d", cronjob.EntryID)
 	_ = cronjobRepo.DeleteRecord(cronjobRepo.WithByJobID(int(id)))
 
 	dir := fmt.Sprintf("%s/%s/%s", constant.TaskDir, cronjob.Type, cronjob.Name)
@@ -157,6 +161,7 @@ func (u *CronjobService) HandleDelete(id uint) error {
 }
 
 func (u *CronjobService) HandleRmExpired(backType, baseDir, backupDir string, cronjob *model.Cronjob, backClient cloud_storage.CloudStorageClient) {
+	global.LOG.Infof("start to handle remove expired, retain copies: %d", cronjob.RetainCopies)
 	if backType != "LOCAL" {
 		currentObjs, err := backClient.ListObjects(backupDir + "/")
 		if err != nil {

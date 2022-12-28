@@ -403,9 +403,12 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 			}
 		}
 	}
+
+	global.LOG.Infof("make a tmp dir %s for website files successful", tmpDir)
 	if err := saveWebsiteJson(&website, tmpDir); err != nil {
 		return err
 	}
+	global.LOG.Info("put website into tmp dir successful")
 
 	nginxInfo, err := appInstallRepo.LoadBaseInfo(constant.AppNginx, "")
 	if err != nil {
@@ -416,6 +419,7 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 	if err := fileOp.CopyFile(nginxConfFile, tmpDir); err != nil {
 		return err
 	}
+	global.LOG.Info("put nginx conf into tmp dir successful")
 
 	if website.Type == constant.Deployment {
 		if err := mysqlOperation(&website, "backup", tmpDir); err != nil {
@@ -429,11 +433,13 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 		if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.app.tar.gz", website.Alias), ""); err != nil {
 			return err
 		}
+		global.LOG.Info("put app tar into tmp dir successful")
 	}
 	websiteDir := path.Join(constant.AppInstallDir, "nginx", nginxInfo.Name, "www", "sites", website.Alias)
 	if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.Alias), ""); err != nil {
 		return err
 	}
+	global.LOG.Info("put website tar into tmp dir successful, now start to tar tmp dir")
 	if err := handleTar(tmpDir, fmt.Sprintf("%s/%s", baseDir, backupDir), backupName+".tar.gz", ""); err != nil {
 		return err
 	}

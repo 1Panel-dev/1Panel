@@ -46,16 +46,16 @@
                     >
                         <template #default="{ node, data }">
                             <span class="custom-tree-node" @mouseover="hover = data.id" @mouseleave="hover = null">
-                                <span v-if="node.label !== currentGroup">
-                                    <a @click="onEdit(node, data)">{{ node.label }}</a>
-                                </span>
-                                <el-input v-else v-model="currentGroupValue" @blur="onUpdateGroup()"></el-input>
+                                <span v-if="node.label !== currentGroup || !data.onEdit">{{ node.label }}</span>
+                                <el-input v-else v-model="currentGroupValue"></el-input>
                                 <div
                                     style="margin-left: 10px"
                                     v-if="!(node.level === 1 && data.label === 'default') && data.id === hover"
                                 >
-                                    <el-button icon="Edit" link @click="onEdit(node, data)" />
-                                    <el-button icon="Delete" link @click="onDelete(node, data)" />
+                                    <el-button v-if="!data.onEdit" icon="Edit" link @click="onEdit(node, data)" />
+                                    <el-button v-if="!data.onEdit" icon="Delete" link @click="onDelete(node, data)" />
+                                    <el-button v-if="data.onEdit" icon="Check" link @click="onUpdateGroup()" />
+                                    <el-button v-if="data.onEdit" icon="Close" link @click="data.onEdit = false" />
                                 </div>
                             </span>
                         </template>
@@ -184,6 +184,7 @@ interface Tree {
     id: number;
     label: string;
     children?: Tree[];
+    onEdit: boolean;
 }
 
 let searcConfig = reactive<Host.ReqSearch>({
@@ -308,6 +309,7 @@ const onEdit = async (node: Node, data: Tree) => {
         currentGroupValue.value = data.label;
         currentGroupID.value = data.id - 10000;
         groupOperation.value = 'edit';
+        data.onEdit = true;
         return;
     } else {
         const res = await getHostInfo(data.id);

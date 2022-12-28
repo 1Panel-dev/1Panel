@@ -32,7 +32,7 @@ type MysqlService struct{}
 type IMysqlService interface {
 	SearchWithPage(search dto.PageInfo) (int64, interface{}, error)
 	ListDBName() ([]string, error)
-	Create(ctx context.Context, mysqlDto dto.MysqlDBCreate) (*model.DatabaseMysql, error)
+	Create(ctx context.Context, req dto.MysqlDBCreate) (*model.DatabaseMysql, error)
 	ChangeAccess(info dto.ChangeDBInfo) error
 	ChangePassword(info dto.ChangeDBInfo) error
 	UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
@@ -73,15 +73,11 @@ func (u *MysqlService) RecoverByUpload(req dto.UploadRecover) error {
 	if err != nil {
 		return err
 	}
-	localDir, err := loadLocalDir()
-	if err != nil {
-		return err
-	}
 	file := req.FileDir + "/" + req.FileName
 	if !strings.HasSuffix(req.FileName, ".sql") && !strings.HasSuffix(req.FileName, ".gz") {
 		fileOp := files.NewFileOp()
 		fileNameItem := time.Now().Format("20060102150405")
-		dstDir := fmt.Sprintf("%s/database/mysql/%s/upload/tmp/%s", localDir, req.MysqlName, fileNameItem)
+		dstDir := fmt.Sprintf("%s/%s", req.FileDir, fileNameItem)
 		if _, err := os.Stat(dstDir); err != nil && os.IsNotExist(err) {
 			if err = os.MkdirAll(dstDir, os.ModePerm); err != nil {
 				if err != nil {
@@ -100,6 +96,7 @@ func (u *MysqlService) RecoverByUpload(req dto.UploadRecover) error {
 			_ = os.RemoveAll(dstDir)
 			return err
 		}
+		global.LOG.Infof("decompress file %s successful, now start to check test.sql is exist", req.FileDir+"/"+req.FileName)
 		hasTestSql := false
 		_ = filepath.Walk(dstDir, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
@@ -120,6 +117,7 @@ func (u *MysqlService) RecoverByUpload(req dto.UploadRecover) error {
 		}()
 	}
 
+	global.LOG.Info("start to do recover from uploads")
 	fi, _ := os.Open(file)
 	defer fi.Close()
 	cmd := exec.Command("docker", "exec", "-i", app.ContainerName, "mysql", "-uroot", "-p"+app.Password, req.DBName)
@@ -143,6 +141,7 @@ func (u *MysqlService) RecoverByUpload(req dto.UploadRecover) error {
 	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
 		return errors.New(stdStr)
 	}
+	global.LOG.Info("recover from uploads successful!")
 	return nil
 }
 
@@ -155,36 +154,38 @@ func (u *MysqlService) ListDBName() ([]string, error) {
 	return dbNames, err
 }
 
-func (u *MysqlService) Create(ctx context.Context, mysqlDto dto.MysqlDBCreate) (*model.DatabaseMysql, error) {
-	if mysqlDto.Username == "root" {
+func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*model.DatabaseMysql, error) {
+	if req.Username == "root" {
 		return nil, errors.New("Cannot set root as user name")
 	}
 	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return nil, err
 	}
-	mysql, _ := mysqlRepo.Get(commonRepo.WithByName(mysqlDto.Name))
+	mysql, _ := mysqlRepo.Get(commonRepo.WithByName(req.Name))
 	if mysql.ID != 0 {
 		return nil, constant.ErrRecordExist
 	}
-	if err := copier.Copy(&mysql, &mysqlDto); err != nil {
+	if err := copier.Copy(&mysql, &req); err != nil {
 		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create database if not exists `%s` character set=%s", mysqlDto.Name, mysqlDto.Format)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create database if not exists `%s` character set=%s", req.Name, req.Format)); err != nil {
 		return nil, err
 	}
-	tmpPermission := mysqlDto.Permission
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create user if not exists '%s'@'%s' identified by '%s';", mysqlDto.Username, tmpPermission, mysqlDto.Password)); err != nil {
+	tmpPermission := req.Permission
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create user if not exists '%s'@'%s' identified by '%s';", req.Username, tmpPermission, req.Password)); err != nil {
 		return nil, err
 	}
-	grantStr := fmt.Sprintf("grant all privileges on `%s`.* to '%s'@'%s'", mysqlDto.Name, mysqlDto.Username, tmpPermission)
+	grantStr := fmt.Sprintf("grant all privileges on `%s`.* to '%s'@'%s'", req.Name, req.Username, tmpPermission)
 	if app.Version == "5.7.39" {
-		grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, mysqlDto.Password)
+		grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, req.Password)
 	}
 	if err := excuteSql(app.ContainerName, app.Password, grantStr); err != nil {
 		return nil, err
 	}
+
+	global.LOG.Infof("create database %s successful!", req.Name)
 	mysql.MysqlName = app.Name
 	if err := mysqlRepo.Create(ctx, &mysql); err != nil {
 		return nil, err
@@ -209,12 +210,14 @@ func (u *MysqlService) Backup(db dto.BackupDB) error {
 	return nil
 }
 
-func (u *MysqlService) Recover(db dto.RecoverDB) error {
+func (u *MysqlService) Recover(req dto.RecoverDB) error {
 	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return err
 	}
-	gzipFile, err := os.Open(db.BackupName)
+
+	global.LOG.Infof("recover database %s-%s from backup file %s", req.MysqlName, req.DBName, req.BackupName)
+	gzipFile, err := os.Open(req.BackupName)
 	if err != nil {
 		return err
 	}
@@ -224,7 +227,7 @@ func (u *MysqlService) Recover(db dto.RecoverDB) error {
 		return err
 	}
 	defer gzipReader.Close()
-	cmd := exec.Command("docker", "exec", "-i", app.ContainerName, "mysql", "-uroot", "-p"+app.Password, db.DBName)
+	cmd := exec.Command("docker", "exec", "-i", app.ContainerName, "mysql", "-uroot", "-p"+app.Password, req.DBName)
 	cmd.Stdin = gzipReader
 	stdout, err := cmd.CombinedOutput()
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
@@ -273,6 +276,7 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop database if exists `%s`", db.Name)); err != nil && !req.ForceDelete {
 		return err
 	}
+	global.LOG.Info("execute delete database sql successful, now start to drop uploads and records")
 
 	uploadDir := fmt.Sprintf("%s/uploads/database/mysql/%s/%s", constant.DefaultDataDir, app.Name, db.Name)
 	if _, err := os.Stat(uploadDir); err == nil {
@@ -287,6 +291,7 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
+		global.LOG.Infof("delete database %s-%s backups successful", app.Name, db.Name)
 	}
 	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("database-mysql"), commonRepo.WithByName(app.Name), backupRepo.WithByDetailName(db.Name))
 
@@ -325,6 +330,8 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 			if err != nil {
 				return err
 			}
+
+			global.LOG.Infof("start to update mysql password used by app %s-%s", appModel.Key, appInstall.Name)
 			if err := updateInstallInfoInDB(appModel.Key, appInstall.Name, "user-password", true, info.Value); err != nil {
 				return err
 			}
@@ -332,6 +339,7 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 		if err := excuteSql(app.ContainerName, app.Password, passwordChangeCMD); err != nil {
 			return err
 		}
+		global.LOG.Info("excute password change sql successful")
 		_ = mysqlRepo.Update(mysql.ID, map[string]interface{}{"password": info.Value})
 		return nil
 	}
@@ -344,7 +352,7 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 		if host == "%" || host == "localhost" {
 			passwordRootChangeCMD := fmt.Sprintf("set password for 'root'@'%s' = password('%s')", host, info.Value)
 			if app.Version != "5.7.39" {
-				passwordRootChangeCMD = fmt.Sprintf("ALTER USER 'root'@'%s' IDENTIFIED WITH mysql_native_password BY '%s';", host, info.Value)
+				passwordRootChangeCMD = fmt.Sprintf("alter user 'root'@'%s' identified with mysql_native_password BY '%s';", host, info.Value)
 			}
 			if err := excuteSql(app.ContainerName, app.Password, passwordRootChangeCMD); err != nil {
 				return err
@@ -625,6 +633,7 @@ func backupMysql(backupType, baseDir, backupDir, mysqlName, dbName, fileName str
 		}
 	}
 	outfile, _ := os.OpenFile(fullDir+"/"+fileName, os.O_RDWR|os.O_CREATE, 0755)
+	global.LOG.Infof("start to mysqldump | gzip > %s.gzip", outfile)
 	cmd := exec.Command("docker", "exec", app.ContainerName, "mysqldump", "-uroot", "-p"+app.Password, dbName)
 	gzipCmd := exec.Command("gzip", "-cf")
 	gzipCmd.Stdin, _ = cmd.StdoutPipe()

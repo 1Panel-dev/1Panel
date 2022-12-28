@@ -5,7 +5,7 @@
         width="30%"
         :close-on-click-modal="false"
     >
-        <el-form ref="deleteForm">
+        <el-form ref="deleteForm" v-loading="loading">
             <el-form-item>
                 <el-checkbox v-model="deleteReq.forceDelete" :label="$t('app.forceDelete')" />
                 <span class="input-help">
@@ -29,10 +29,10 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="dialogVisiable = false" :loading="loading">
+                <el-button @click="dialogVisiable = false" :disabled="loading">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" @click="submit" :loading="loading" :disabled="deleteInfo != dbName">
+                <el-button type="primary" @click="submit" :disabled="deleteInfo != dbName || loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

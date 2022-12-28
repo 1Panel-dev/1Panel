@@ -94,7 +94,7 @@ func (b *BaseApi) SyncTime(c *gin.Context) {
 	}
 	system := runtime.GOOS
 	if system == "linux" {
-		cmd := exec.Command("timedatectl", "set-time", ntime.Format("2006-01-02 15:04:05"))
+		cmd := exec.Command("date", "-s", ntime.Format("2006-01-02 15:04:05"))
 		stdout, err := cmd.CombinedOutput()
 		if err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, errors.New(string(stdout)))
@@ -102,7 +102,7 @@ func (b *BaseApi) SyncTime(c *gin.Context) {
 		}
 	}
 
-	helper.SuccessWithData(c, ntime.Format("2006-01-02 15:04 MST -0700"))
+	helper.SuccessWithData(c, ntime.Format("2006-01-02 15:04:05 MST -0700"))
 }
 
 func (b *BaseApi) CleanMonitor(c *gin.Context) {

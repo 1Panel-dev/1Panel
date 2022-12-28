@@ -140,10 +140,10 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 		write.Flush()
 		req.Path = path
 	}
+	global.LOG.Infof("docker-compose.yml %s create successful, start to docker-compose up", req.Name)
 	if stdout, err := compose.Up(req.Path); err != nil {
 		return errors.New(string(stdout))
 	}
-	global.LOG.Debugf("docker-compose up %s successful", req.Name)
 
 	_ = composeRepo.CreateRecord(&model.Compose{Name: req.Name})
 	return nil
@@ -156,7 +156,7 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 	if stdout, err := compose.Operate(req.Path, req.Operation); err != nil {
 		return errors.New(string(stdout))
 	}
-	global.LOG.Debugf("docker-compose %s %s successful", req.Operation, req.Name)
+	global.LOG.Infof("docker-compose %s %s successful", req.Operation, req.Name)
 	if req.Operation == "down" {
 		_ = composeRepo.DeleteRecord(commonRepo.WithByName(req.Name))
 		_ = os.RemoveAll(strings.ReplaceAll(req.Path, req.Name+"/docker-compose.yml", ""))
@@ -178,6 +178,7 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 	_, _ = write.WriteString(req.Content)
 	write.Flush()
 
+	global.LOG.Infof("docker-compose.yml %s has been replaced, now start to docker-compose restart", req.Path)
 	if stdout, err := compose.Down(req.Path); err != nil {
 		return errors.New(string(stdout))
 	}

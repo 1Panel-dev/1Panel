@@ -43,7 +43,7 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	if err := json.Unmarshal(arr, &info); err != nil {
 		return nil, err
 	}
-	info.LocalTime = time.Now().Format("2006-01-02 15:04 MST -0700")
+	info.LocalTime = time.Now().Format("2006-01-02 15:04:05 MST -0700")
 	return &info, err
 }
 
