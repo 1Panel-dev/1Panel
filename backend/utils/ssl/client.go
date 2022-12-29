@@ -65,7 +65,7 @@ type DnsType string
 const (
 	DnsPod     DnsType = "DnsPod"
 	AliYun     DnsType = "AliYun"
-	Cloudflare DnsType = "Cloudflare"
+	CloudFlare DnsType = "CloudFlare"
 )
 
 type DNSParam struct {
@@ -103,7 +103,7 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string) error {
 			return err
 		}
 	}
-	if dnsType == Cloudflare {
+	if dnsType == CloudFlare {
 		cloudflareConfig := cloudflare.NewDefaultConfig()
 		cloudflareConfig.AuthEmail = param.Email
 		cloudflareConfig.AuthKey = param.APIkey

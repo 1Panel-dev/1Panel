@@ -32,7 +32,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('website.provider')" prop="provider">
-                <el-radio-group v-model="ssl.provider">
+                <el-radio-group v-model="ssl.provider" @change="changeProvider()">
                     <el-radio label="dnsAccount">{{ $t('website.dnsAccount') }}</el-radio>
                     <el-radio label="dnsManual">{{ $t('website.dnsCommon') }}</el-radio>
                     <el-radio label="http">HTTP</el-radio>
@@ -48,7 +48,7 @@
                     ></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item v-if="dnsResolve.length > 0">
+            <el-form-item v-if="ssl.provider === 'dnsManual' && dnsResolve.length > 0">
                 <span>{{ $t('ssl.dnsResolveHelper') }}</span>
                 <div v-for="(re, index) in dnsResolve" :key="index">
                     <el-descriptions direction="vertical" :column="4" border>
@@ -135,6 +135,7 @@ const handleClose = () => {
 };
 const resetForm = () => {
     sslForm.value?.resetFields();
+    dnsResolve.value = [];
     ssl.value = {
         primaryDomain: '',
         otherDomains: '',
@@ -167,6 +168,10 @@ const getDnsAccounts = async () => {
     if (dnsAccounts.value.length > 0) {
         ssl.value.dnsAccountId = res.data.items[0].id;
     }
+};
+
+const changeProvider = () => {
+    dnsResolve.value = [];
 };
 
 const getDnsResolve = async (acmeAccountId: number, domains: string[]) => {
