@@ -1,6 +1,6 @@
 <template>
     <el-row :gutter="20">
-        <el-col :span="10" :offset="1">
+        <el-col :span="12" :offset="1">
             <el-form
                 ref="httpsForm"
                 label-position="left"
@@ -25,7 +25,6 @@
                         <el-select v-model="form.type" @change="changeType(form.type)">
                             <el-option :label="$t('website.oldSSL')" :value="'existed'"></el-option>
                             <el-option :label="$t('website.manualSSL')" :value="'manual'"></el-option>
-                            <!-- <el-option :label="'自动生成证书'" :value="'auto'"></el-option> -->
                         </el-select>
                     </el-form-item>
                     <el-form-item

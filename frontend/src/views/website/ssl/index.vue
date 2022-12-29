@@ -48,7 +48,7 @@
                     show-overflow-tooltip
                 />
                 <fu-table-operations
-                    :ellipsis="1"
+                    :ellipsis="3"
                     :buttons="buttons"
                     :label="$t('commons.table.operate')"
                     fixed="right"
@@ -59,6 +59,7 @@
             <AcmeAccount ref="acmeAccountRef"></AcmeAccount>
             <Create ref="sslCreateRef" @close="search()"></Create>
             <Renew ref="renewRef" @close="search()"></Renew>
+            <Detail ref="detailRef"></Detail>
         </LayoutContent>
     </el-card>
 </template>
@@ -72,6 +73,7 @@ import DnsAccount from './dns-account/index.vue';
 import AcmeAccount from './acme-account/index.vue';
 import Renew from './renew/index.vue';
 import Create from './create/index.vue';
+import Detail from './detail/index.vue';
 import { dateFromat } from '@/utils/util';
 import i18n from '@/lang';
 import { Website } from '@/api/interface/website';
@@ -86,19 +88,26 @@ const acmeAccountRef = ref();
 const dnsAccountRef = ref();
 const sslCreateRef = ref();
 const renewRef = ref();
+const detailRef = ref();
 let data = ref();
 let loading = ref(false);
 
 const buttons = [
     {
+        label: i18n.global.t('ssl.detail'),
+        click: function (row: Website.SSL) {
+            openDetail(row.id);
+        },
+    },
+    {
         label: i18n.global.t('website.renewSSL'),
-        click: function (row: Website.Website) {
+        click: function (row: Website.SSL) {
             openRenewSSL(row.id);
         },
     },
     {
         label: i18n.global.t('app.delete'),
-        click: function (row: Website.Website) {
+        click: function (row: Website.SSL) {
             deleteSSL(row.id);
         },
     },
@@ -131,6 +140,9 @@ const openSSL = () => {
 };
 const openRenewSSL = (id: number) => {
     renewRef.value.acceptParams(id);
+};
+const openDetail = (id: number) => {
+    detailRef.value.acceptParams(id);
 };
 
 const deleteSSL = async (id: number) => {

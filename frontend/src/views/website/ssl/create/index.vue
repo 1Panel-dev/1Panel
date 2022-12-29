@@ -49,6 +49,7 @@
                 </el-select>
             </el-form-item>
             <el-form-item v-if="dnsResolve.length > 0">
+                <span>{{ $t('ssl.dnsResolveHelper') }}</span>
                 <div v-for="(re, index) in dnsResolve" :key="index">
                     <el-descriptions direction="vertical" :column="4" border>
                         <el-descriptions-item :label="$t('website.domain')">{{ re.domain }}</el-descriptions-item>

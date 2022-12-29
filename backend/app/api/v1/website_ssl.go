@@ -89,13 +89,27 @@ func (b *BaseApi) DeleteWebsiteSSL(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-func (b *BaseApi) GetWebsiteSSL(c *gin.Context) {
+func (b *BaseApi) GetWebsiteSSLByWebsiteId(c *gin.Context) {
 	websiteId, err := helper.GetIntParamByKey(c, "websiteId")
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 	websiteSSL, err := websiteSSLService.GetWebsiteSSL(websiteId)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, websiteSSL)
+}
+
+func (b *BaseApi) GetWebsiteSSLById(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	websiteSSL, err := websiteSSLService.GetSSL(id)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

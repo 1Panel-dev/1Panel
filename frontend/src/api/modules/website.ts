@@ -128,7 +128,11 @@ export const DeleteSSL = (req: Website.DelReq) => {
 };
 
 export const GetWebsiteSSL = (websiteId: number) => {
-    return http.get<Website.SSL>(`/websites/ssl/${websiteId}`);
+    return http.get<Website.SSL>(`/websites/ssl/website/${websiteId}`);
+};
+
+export const GetSSL = (id: number) => {
+    return http.get<Website.SSL>(`/websites/ssl/${id}`);
 };
 
 export const ApplySSL = (req: Website.SSLApply) => {

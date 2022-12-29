@@ -971,6 +971,12 @@ export default {
         err: '错误',
         value: '记录值',
         type: '类型',
+        dnsResolveHelper: '请到DNS解析服务商处添加以下解析记录：',
+        detail: '详情',
+        msg: '证书信息',
+        ssl: '证书',
+        key: '私钥',
+        startDate: '生效时间',
     },
     firewall: {
         ccDeny: 'CC 防护',
