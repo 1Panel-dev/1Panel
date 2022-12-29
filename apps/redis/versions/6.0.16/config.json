@@ -5,7 +5,7 @@
       "labelZh": "密码",
       "labelEn": "Password",
       "required": true,
-      "default": "eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81",
+      "default": "random",
       "envKey": "PANEL_DB_ROOT_PASSWORD"
     },
     {
