@@ -4,26 +4,21 @@
             <el-form-item prop="enable" :label="$t('website.enable')">
                 <el-switch v-model="enableUpdate.enable" @change="updateEnable"></el-switch>
             </el-form-item>
+            <el-form-item :label="$t('website.data')">
+                <el-input
+                    type="textarea"
+                    :autosize="{ minRows: 4, maxRows: 8 }"
+                    v-model="add"
+                    :placeholder="$t('website.wafInputHelper')"
+                />
+            </el-form-item>
             <ComplexTable :data="data" v-loading="loading">
                 <template #toolbar>
                     <el-button type="primary" icon="Plus" @click="openCreate">
                         {{ $t('commons.button.add') }}
                     </el-button>
                 </template>
-                <el-table-column :label="$t('website.value')">
-                    <template #default="{ row }">
-                        <fu-read-write-switch :data="row.value" v-model="row.edit" write-trigger="onDblclick">
-                            <el-form-item :error="row.error">
-                                <el-input
-                                    type="textarea"
-                                    :autosize="{ minRows: 2, maxRows: 8 }"
-                                    v-model="row.value"
-                                    @blur="row.edit = false"
-                                />
-                            </el-form-item>
-                        </fu-read-write-switch>
-                    </template>
-                </el-table-column>
+                <el-table-column :label="$t('website.value')" prop="value"></el-table-column>
                 <el-table-column :label="$t('commons.table.operate')" width="100px">
                     <template #default="{ $index }">
                         <el-button link type="primary" @click="remove($index)">
@@ -32,12 +27,6 @@
                     </template>
                 </el-table-column>
             </ComplexTable>
-            <br />
-            <el-alert :title="$t('website.mustSave')" type="info" :closable="false"></el-alert>
-            <br />
-            <el-button type="primary" :loading="loading" @click="submit">
-                {{ $t('commons.button.save') }}
-            </el-button>
         </el-col>
     </el-row>
 </template>
@@ -90,6 +79,7 @@ let enableUpdate = ref<Website.WafUpdate>({
     key: '$UrlDeny',
     enable: false,
 });
+let add = ref();
 
 const get = async () => {
     data.value = [];
@@ -103,22 +93,31 @@ const get = async () => {
             if (value != '') {
                 data.value.push({
                     value: value,
-                    eidt: false,
-                    error: '',
                 });
             }
         });
     }
-
     fileUpdate.path = res.data.filePath;
 };
 
 const remove = (index: number) => {
     data.value.splice(index, 1);
+    const addArray = [];
+    data.value.forEach((d) => {
+        addArray.push(d.value);
+    });
+    submit(addArray);
 };
 
 const openCreate = () => {
-    data.value.unshift({ value: '', edit: true, error: '' });
+    const addArray = add.value.split('\n');
+    if (addArray.length == 0) {
+        return;
+    }
+    data.value.forEach((d) => {
+        addArray.push(d.value);
+    });
+    submit(addArray);
 };
 
 const updateEnable = async (enable: boolean) => {
@@ -128,18 +127,17 @@ const updateEnable = async (enable: boolean) => {
     loading.value = false;
 };
 
-const submit = async () => {
+const submit = async (addArray: string[]) => {
     let urlList = '';
-    data.value.forEach((row) => {
-        if (row.value != '') {
-            urlList = urlList + row.value + '\n';
-        }
+    addArray.forEach((row) => {
+        urlList = urlList + row + '\n';
     });
 
     fileUpdate.content = urlList;
     loading.value = true;
     SaveFileContent(fileUpdate)
         .then(() => {
+            add.value = '';
             ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
             get();
         })

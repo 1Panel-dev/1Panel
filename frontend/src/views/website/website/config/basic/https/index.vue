@@ -70,9 +70,11 @@
                     <el-divider content-position="left">{{ $t('website.SSLProConfig') }}</el-divider>
                     <el-form-item :label="$t('website.supportProtocol')" prop="SSLProtocol">
                         <el-checkbox-group v-model="form.SSLProtocol">
+                            <el-checkbox :label="'TLSv1.3'">{{ 'TLS 1.3' }}</el-checkbox>
                             <el-checkbox :label="'TLSv1.2'">{{ 'TLS 1.2' }}</el-checkbox>
                             <el-checkbox :label="'TLSv1.1'">{{ 'TLS 1.1' }}</el-checkbox>
                             <el-checkbox :label="'TLSv1'">{{ 'TLS 1.0' }}</el-checkbox>
+                            <br />
                             <el-checkbox :label="'SSLv3'">
                                 {{ 'SSL V3' + $t('website.notSecurity') }}
                             </el-checkbox>
@@ -134,7 +136,7 @@ let form = reactive({
     httpConfig: 'HTTPToHTTPS',
     algorithm:
         'EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5',
-    SSLProtocol: ['TLSv1.2', 'TLSv1.1', 'TLSv1'],
+    SSLProtocol: ['TLSv1.3', 'TLSv1.2', 'TLSv1.1', 'TLSv1'],
 });
 let loading = ref(false);
 const ssls = ref();

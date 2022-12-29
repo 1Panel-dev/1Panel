@@ -4,21 +4,21 @@
             <el-form-item prop="enable" :label="$t('website.enable')">
                 <el-switch v-model="enableUpdate.enable" @change="updateEnable"></el-switch>
             </el-form-item>
+            <el-form-item :label="$t('website.ext')">
+                <el-input
+                    type="textarea"
+                    :autosize="{ minRows: 4, maxRows: 8 }"
+                    v-model="exts"
+                    :placeholder="$t('website.wafInputHelper')"
+                />
+            </el-form-item>
             <ComplexTable :data="data" v-loading="loading">
                 <template #toolbar>
                     <el-button type="primary" icon="Plus" @click="openCreate">
                         {{ $t('commons.button.add') }}
                     </el-button>
                 </template>
-                <el-table-column :label="$t('website.fileExt')">
-                    <template #default="{ row }">
-                        <fu-read-write-switch :data="row.file" v-model="row.edit" write-trigger="onDblclick">
-                            <el-form-item :error="row.error">
-                                <el-input v-model="row.file" @blur="row.edit = false" />
-                            </el-form-item>
-                        </fu-read-write-switch>
-                    </template>
-                </el-table-column>
+                <el-table-column :label="$t('website.fileExt')" prop="file"></el-table-column>
                 <el-table-column :label="$t('commons.table.operate')">
                     <template #default="{ $index }">
                         <el-button link type="primary" @click="remove($index)">
@@ -27,12 +27,6 @@
                     </template>
                 </el-table-column>
             </ComplexTable>
-            <br />
-            <el-alert :title="$t('website.mustSave')" type="info" :closable="false"></el-alert>
-            <br />
-            <el-button type="primary" :loading="loading" @click="submit">
-                {{ $t('commons.button.save') }}
-            </el-button>
         </el-col>
     </el-row>
 </template>
@@ -71,6 +65,7 @@ let enableUpdate = ref<Website.WafUpdate>({
     key: '$fileExtDeny',
     enable: false,
 });
+let exts = ref();
 
 const get = async () => {
     data.value = [];
@@ -80,11 +75,9 @@ const get = async () => {
 
     if (res.data.content != '') {
         const ipList = JSON.parse(res.data.content);
-        ipList.forEach((value) => {
+        ipList.forEach((value: string) => {
             data.value.push({
                 file: value,
-                eidt: false,
-                error: '',
             });
         });
     }
@@ -95,24 +88,30 @@ const get = async () => {
 
 const remove = (index: number) => {
     data.value.splice(index, 1);
+    const extArray = [];
+    data.value.forEach((d) => {
+        extArray.push(d.file);
+    });
+    submit(extArray);
 };
 
 const openCreate = () => {
-    data.value.unshift({ file: '', edit: true, error: '' });
+    const extArray = exts.value.split('\n');
+    if (extArray.length === 0) {
+        return;
+    }
+    data.value.forEach((d) => {
+        extArray.push(d.file);
+    });
+    submit(extArray);
 };
 
-const submit = async () => {
-    let fileArray = [];
-    data.value.forEach((row) => {
-        if (row.file != '') {
-            fileArray.push(row.file);
-        }
-    });
-
-    fileUpdate.content = JSON.stringify(fileArray);
+const submit = async (extArray: string[]) => {
+    fileUpdate.content = JSON.stringify(extArray);
     loading.value = true;
     SaveFileContent(fileUpdate)
         .then(() => {
+            exts.value = '';
             ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
             get();
         })

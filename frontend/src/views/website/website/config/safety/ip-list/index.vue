@@ -4,21 +4,21 @@
             <el-form-item prop="enable" :label="$t('website.enable')">
                 <el-switch v-model="enableUpdate.enable" @change="updateEnable"></el-switch>
             </el-form-item>
+            <el-form-item :label="$t('website.ipValue')">
+                <el-input
+                    type="textarea"
+                    :autosize="{ minRows: 4, maxRows: 8 }"
+                    v-model="ips"
+                    :placeholder="$t('website.wafInputHelper')"
+                />
+            </el-form-item>
             <ComplexTable :data="data" v-loading="loading">
                 <template #toolbar>
                     <el-button type="primary" icon="Plus" @click="openCreate">
                         {{ $t('commons.button.add') }}
                     </el-button>
                 </template>
-                <el-table-column label="IP" prop="ip">
-                    <template #default="{ row }">
-                        <fu-read-write-switch :data="row.ip" v-model="row.edit" write-trigger="onDblclick">
-                            <el-form-item :error="row.error">
-                                <el-input v-model="row.ip" @blur="row.edit = false" @input="checkIpRule(row)" />
-                            </el-form-item>
-                        </fu-read-write-switch>
-                    </template>
-                </el-table-column>
+                <el-table-column label="IP" prop="ip"></el-table-column>
                 <el-table-column :label="$t('commons.table.operate')">
                     <template #default="{ $index }">
                         <el-button link type="primary" @click="removeIp($index)">
@@ -27,12 +27,6 @@
                     </template>
                 </el-table-column>
             </ComplexTable>
-            <br />
-            <el-alert :title="$t('website.mustSave')" type="info" :closable="false"></el-alert>
-            <br />
-            <el-button type="primary" :loading="loading" @click="submit">
-                {{ $t('commons.button.save') }}
-            </el-button>
         </el-col>
     </el-row>
 </template>
@@ -86,6 +80,7 @@ let enableUpdate = ref<Website.WafUpdate>({
     key: '$ipWhiteAllow',
     enable: false,
 });
+let ips = ref();
 
 const get = async () => {
     data.value = [];
@@ -95,11 +90,9 @@ const get = async () => {
 
     if (res.data.content != '') {
         const ipList = JSON.parse(res.data.content);
-        ipList.forEach((value) => {
+        ipList.forEach((ip: string) => {
             data.value.push({
-                ip: value,
-                eidt: false,
-                error: '',
+                ip: ip,
             });
         });
     }
@@ -109,32 +102,39 @@ const get = async () => {
 
 const removeIp = (index: number) => {
     data.value.splice(index, 1);
+    let ipArray = [];
+    data.value.forEach((d) => {
+        ipArray.push(d.ip);
+    });
+    submit(ipArray);
 };
 
 const openCreate = () => {
-    data.value.unshift({ ip: '', edit: true, error: '' });
-};
-
-const submit = async () => {
-    let canCommit = true;
-    for (const row of data.value) {
-        if (row.ip != '' && row.error != '') {
-            row.edit = true;
-            canCommit = false;
-        }
-    }
-    if (!canCommit) {
+    console.log(ips.value);
+    const ipArray = ips.value.split('\n');
+    if (ipArray.length == 0) {
         return;
     }
-    let ipArray = [];
-    data.value.forEach((row) => {
-        ipArray.push(row.ip);
-    });
+    for (const id in ipArray) {
+        if (checkIp(ipArray[id])) {
+            ElMessage.error(i18n.global.t('commons.rule.ipErr', [ipArray[id]]));
+            return;
+        }
+    }
 
-    fileUpdate.content = JSON.stringify(ipArray);
+    data.value.forEach((d) => {
+        ipArray.push(d.ip);
+    });
+    submit(ipArray);
+};
+
+const submit = async (ipList: string[]) => {
+    fileUpdate.content = JSON.stringify(ipList);
     loading.value = true;
     SaveFileContent(fileUpdate)
         .then(() => {
+            ips.value = '';
+            get();
             ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
         })
         .finally(() => {
@@ -147,14 +147,6 @@ const updateEnable = async (enable: boolean) => {
     loading.value = true;
     await UpdateWafEnable(enableUpdate.value);
     loading.value = false;
-};
-
-const checkIpRule = (row: any) => {
-    if (checkIp(row.ip)) {
-        row.error = i18n.global.t('commons.rule.ip');
-    } else {
-        row.error = '';
-    }
 };
 
 onMounted(() => {
