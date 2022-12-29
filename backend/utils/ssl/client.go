@@ -78,7 +78,6 @@ type DNSParam struct {
 }
 
 func (c *AcmeClient) UseDns(dnsType DnsType, params string) error {
-
 	var param DNSParam
 	if err := json.Unmarshal([]byte(params), &param); err != nil {
 		return err
@@ -148,7 +147,6 @@ func (c *AcmeClient) UseHTTP(path string) error {
 }
 
 func (c *AcmeClient) ObtainSSL(domains []string) (certificate.Resource, error) {
-
 	request := certificate.ObtainRequest{
 		Domains: domains,
 		Bundle:  true,
@@ -163,7 +161,6 @@ func (c *AcmeClient) ObtainSSL(domains []string) (certificate.Resource, error) {
 }
 
 func (c *AcmeClient) RenewSSL(certUrl string) (certificate.Resource, error) {
-
 	certificates, err := c.Client.Certificate.Get(certUrl, true)
 	if err != nil {
 		return certificate.Resource{}, err
