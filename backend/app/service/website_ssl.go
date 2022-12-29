@@ -31,6 +31,16 @@ func (w WebsiteSSLService) Page(search request.WebsiteSSLSearch) (int64, []respo
 	return total, sslDTOs, err
 }
 
+func (w WebsiteSSLService) GetSSL(id uint) (*response.WebsiteSSLDTO, error) {
+	var res response.WebsiteSSLDTO
+	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return nil, err
+	}
+	res.WebsiteSSL = websiteSSL
+	return &res, nil
+}
+
 func (w WebsiteSSLService) Search() ([]response.WebsiteSSLDTO, error) {
 	sslList, err := websiteSSLRepo.List()
 	if err != nil {
