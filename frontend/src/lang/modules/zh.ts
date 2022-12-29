@@ -940,6 +940,8 @@ export default {
         supportProtocol: '支持的协议版本',
         encryptionAlgorithm: '加密算法',
         notSecurity: ' 不安全',
+        encryptHelper:
+            "Let's Encrypt 签发证书有频率限制，但足以满足正常需求，过于频繁操作会导致签发失败。具体限制请看 <a target=“_blank” href='https://letsencrypt.org/zh-cn/docs/rate-limits/'>官方文档</a> ",
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',

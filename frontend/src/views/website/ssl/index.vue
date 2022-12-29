@@ -1,6 +1,12 @@
 <template>
     <el-card>
         <LayoutContent :header="$t('website.ssl')">
+            <el-alert type="info" :closable="false">
+                <template #default>
+                    <span><span v-html="$t('website.encryptHelper')"></span></span>
+                </template>
+            </el-alert>
+            <br />
             <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
                 <template #toolbar>
                     <el-button type="primary" icon="Plus" @click="openSSL()">
