@@ -5,7 +5,7 @@
       "labelZh": "Root用户密码",
       "labelEn": "RootPassword",
       "required": true,
-      "default": "1panel@mysql",
+      "default": "random",
       "envKey": "PANEL_DB_ROOT_PASSWORD"
     },
     {
