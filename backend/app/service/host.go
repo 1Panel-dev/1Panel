@@ -84,6 +84,7 @@ func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 		upMap["auth_mode"] = req.AuthMode
 		upMap["password"] = req.Password
 		upMap["private_key"] = req.PrivateKey
+		upMap["description"] = req.Description
 		if err := hostRepo.Update(sameHostID, upMap); err != nil {
 			return nil, err
 		}

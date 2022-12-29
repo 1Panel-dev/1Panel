@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -73,6 +74,57 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 
 	<-quitChan
 
+	if wshandleError(wsConn, err) {
+		return
+	}
+}
+
+func (b *BaseApi) RedisWsSsh(c *gin.Context) {
+	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		global.LOG.Errorf("gin context http handler failed, err: %v", err)
+		return
+	}
+	defer wsConn.Close()
+
+	redisConf, err := redisService.LoadConf()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	auth := ""
+	if len(redisConf.Requirepass) != 0 {
+		auth = fmt.Sprintf("-a %s --no-auth-warning", redisConf.Requirepass)
+	}
+	slave, err := terminal.NewCommand(redisConf.ContainerName, auth)
+	if wshandleError(wsConn, err) {
+		return
+	}
+	defer slave.Close()
+
+	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave)
+	if wshandleError(wsConn, err) {
+		return
+	}
+
+	quitChan := make(chan bool, 3)
+	tty.Start(quitChan)
+	go slave.Wait(quitChan)
+
+	<-quitChan
+
+	global.LOG.Info("websocket finished")
 	if wshandleError(wsConn, err) {
 		return
 	}

@@ -99,6 +99,6 @@ func (sws *ExecWsSession) sendWebsocketInputCommandToSshSessionStdinPipe(cmdByte
 	_, _ = sws.conn.Write(cmdBytes)
 }
 
-func (sws *ExecWsSession) ResizeTerminal(width int, height int) {
-	_, _ = sws.conn.Write([]byte(fmt.Sprintf("stty cols %d rows %d && clear \r", width, height)))
+func (sws *ExecWsSession) ResizeTerminal(rows int, cols int) {
+	_, _ = sws.conn.Write([]byte(fmt.Sprintf("stty cols %d rows %d && clear \r", cols, rows)))
 }

@@ -1,7 +1,7 @@
 <template>
     <div>
         <Submenu activeName="panel" />
-        <el-form :model="form" ref="panelFormRef" label-position="left" label-width="160px">
+        <el-form :model="form" ref="panelFormRef" label-position="left" v-loading="loading" label-width="160px">
             <el-card style="margin-top: 20px">
                 <template #header>
                     <div class="card-header">
@@ -122,7 +122,14 @@
             :title="$t('setting.changePassword')"
             width="30%"
         >
-            <el-form ref="passFormRef" label-width="80px" label-position="left" :model="passForm" :rules="passRules">
+            <el-form
+                v-loading="dialogLoading"
+                ref="passFormRef"
+                label-width="80px"
+                label-position="left"
+                :model="passForm"
+                :rules="passRules"
+            >
                 <el-form-item :label="$t('setting.oldPassword')" prop="oldPassword">
                     <el-input type="password" show-password clearable v-model="passForm.oldPassword" />
                 </el-form-item>
@@ -146,8 +153,10 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button @click="passwordVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button @click="submitChangePassword(passFormRef)">
+                    <el-button :disabled="dialogLoading" @click="passwordVisiable = false">
+                        {{ $t('commons.button.cancel') }}
+                    </el-button>
+                    <el-button :disabled="dialogLoading" @click="submitChangePassword(passFormRef)">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>
@@ -167,6 +176,8 @@ import { GlobalStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
 
+const loading = ref(false);
+const dialogLoading = ref(false);
 const i18n = useI18n();
 const globalStore = GlobalStore();
 const themeConfig = computed(() => globalStore.themeConfig);
@@ -203,7 +214,7 @@ const search = async () => {
     const res = await getSettingInfo();
     form.userName = res.data.userName;
     form.password = '******';
-    form.sessionTimeout = res.data.sessionTimeout;
+    form.sessionTimeout = Number(res.data.sessionTimeout);
     form.localTime = res.data.localTime;
     form.panelName = res.data.panelName;
     form.theme = res.data.theme;
@@ -221,6 +232,7 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
     if (val === '') {
         return;
     }
+    loading.value = true;
     switch (key) {
         case 'Language':
             i18n.locale.value = val;
@@ -249,9 +261,15 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
         key: key,
         value: val + '',
     };
-    await updateSetting(param);
-    ElMessage.success(i18n.t('commons.msg.operationSuccess'));
-    search();
+    await updateSetting(param)
+        .then(() => {
+            loading.value = false;
+            ElMessage.success(i18n.t('commons.msg.operationSuccess'));
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 function callback(error: any) {
     if (error) {
@@ -287,18 +305,32 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
             ElMessage.error(i18n.t('setting.duplicatePassword'));
             return;
         }
-        await updatePassword({ oldPassword: passForm.oldPassword, newPassword: password });
-        passwordVisiable.value = false;
-        ElMessage.success(i18n.t('commons.msg.operationSuccess'));
-        router.push({ name: 'login', params: { code: '' } });
-        globalStore.setLogStatus(false);
+        dialogLoading.value = true;
+        await updatePassword({ oldPassword: passForm.oldPassword, newPassword: password })
+            .then(() => {
+                dialogLoading.value = false;
+                passwordVisiable.value = false;
+                ElMessage.success(i18n.t('commons.msg.operationSuccess'));
+                router.push({ name: 'login', params: { code: '' } });
+                globalStore.setLogStatus(false);
+            })
+            .catch(() => {
+                dialogLoading.value = false;
+            });
     });
 };
 
 const onSyncTime = async () => {
-    const res = await syncTime();
-    form.localTime = res.data;
-    ElMessage.success(i18n.t('commons.msg.operationSuccess'));
+    loading.value = true;
+    await syncTime()
+        .then((res) => {
+            loading.value = false;
+            form.localTime = res.data;
+            ElMessage.success(i18n.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 onMounted(() => {

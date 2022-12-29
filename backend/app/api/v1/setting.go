@@ -2,15 +2,13 @@ package v1
 
 import (
 	"errors"
-	"os/exec"
-	"runtime"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/mfa"
-	"github.com/beevik/ntp"
+	"github.com/1Panel-dev/1Panel/backend/utils/ntp"
 	"github.com/gin-gonic/gin"
 )
 
@@ -87,19 +85,16 @@ func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
 }
 
 func (b *BaseApi) SyncTime(c *gin.Context) {
-	ntime, err := ntp.Time("pool.ntp.org")
+	ntime, err := ntp.Getremotetime()
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	system := runtime.GOOS
-	if system == "linux" {
-		cmd := exec.Command("date", "-s", ntime.Format("2006-01-02 15:04:05"))
-		stdout, err := cmd.CombinedOutput()
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, errors.New(string(stdout)))
-			return
-		}
+
+	ts := ntime.Format("2006-01-02 15:04:05")
+	if err := ntp.UpdateSystemDate(ts); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
 	}
 
 	helper.SuccessWithData(c, ntime.Format("2006-01-02 15:04:05 MST -0700"))

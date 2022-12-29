@@ -1,7 +1,7 @@
 <template>
     <div>
         <Submenu activeName="safe" />
-        <el-form :model="form" ref="panelFormRef" label-position="left" label-width="160px">
+        <el-form :model="form" ref="panelFormRef" v-loading="loading" label-position="left" label-width="160px">
             <el-card style="margin-top: 20px">
                 <template #header>
                     <div class="card-header">
@@ -129,6 +129,7 @@ import { dateFromat } from '@/utils/util';
 
 const emit = defineEmits(['on-save', 'search']);
 
+const loading = ref(false);
 const form = reactive({
     serverPort: '',
     securityEntrance: '',
@@ -148,7 +149,7 @@ const timeoutForm = reactive({
 const search = async () => {
     const res = await getSettingInfo();
     form.securityEntrance = res.data.securityEntrance;
-    form.expirationDays = res.data.expirationDays;
+    form.expirationDays = Number(res.data.expirationDays);
     form.expirationTime = res.data.expirationTime;
     form.complexityVerification = res.data.complexityVerification;
     form.mfaStatus = res.data.mfaStatus;
@@ -176,9 +177,16 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
         key: key,
         value: val + '',
     };
-    await updateSetting(param);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-    search();
+    loading.value = true;
+    await updateSetting(param)
+        .then(() => {
+            loading.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 function callback(error: any) {
     if (error) {
@@ -195,17 +203,31 @@ const handleMFA = async () => {
         otp.qrImage = res.data.qrImage;
         isMFAShow.value = true;
     } else {
-        await updateSetting({ key: 'MFAStatus', value: 'disable' });
-        emit('search');
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        loading.value = true;
+        await updateSetting({ key: 'MFAStatus', value: 'disable' })
+            .then(() => {
+                loading.value = false;
+                emit('search');
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     }
 };
 
 const onBind = async () => {
-    await bindMFA({ code: mfaCode.value, secret: otp.secret });
-    emit('search');
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-    isMFAShow.value = false;
+    loading.value = true;
+    await bindMFA({ code: mfaCode.value, secret: otp.secret })
+        .then(() => {
+            loading.value = false;
+            emit('search');
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            isMFAShow.value = false;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onCancelMfaBind = async () => {
@@ -223,11 +245,18 @@ const submitTimeout = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         let time = new Date(new Date().getTime() + 3600 * 1000 * 24 * timeoutForm.days);
-        await updateSetting({ key: 'ExpirationDays', value: timeoutForm.days + '' });
-        emit('search');
-        loadTimeOut();
-        form.expirationTime = dateFromat(0, 0, time);
-        timeoutVisiable.value = false;
+        loading.value = true;
+        await updateSetting({ key: 'ExpirationDays', value: timeoutForm.days + '' })
+            .then(() => {
+                loading.value = false;
+                emit('search');
+                loadTimeOut();
+                form.expirationTime = dateFromat(0, 0, time);
+                timeoutVisiable.value = false;
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     });
 };
 

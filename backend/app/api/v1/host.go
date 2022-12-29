@@ -127,6 +127,7 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 	upMap["auth_mode"] = req.AuthMode
 	upMap["password"] = req.Password
 	upMap["private_key"] = req.PrivateKey
+	upMap["description"] = req.Description
 	if err := hostService.Update(req.ID, upMap); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

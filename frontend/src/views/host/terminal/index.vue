@@ -37,7 +37,7 @@
                             <el-button
                                 v-if="item.status === 'closed'"
                                 icon="Refresh"
-                                style="color: #f56c6c"
+                                style="color: white"
                                 size="default"
                                 link
                                 @click="onReconnect(item)"
@@ -292,7 +292,7 @@ const loadHost = async () => {
             continue;
         }
         for (const host of item.children) {
-            if (host.label.indexOf('127.0.0.1')) {
+            if (host.label.indexOf('127.0.0.1') !== -1) {
                 localHostID.value = host.id;
                 if (terminalTabs.value.length === 0) {
                     onConnLocal();
@@ -374,6 +374,7 @@ const onReconnect = async (item: any) => {
     }
     item.Refresh = !item.Refresh;
     ctx.refs[`Ref${item.key}`];
+    syncTerminal();
 };
 
 const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
@@ -424,7 +425,7 @@ onMounted(() => {
     loadCommand();
     timer = setInterval(() => {
         syncTerminal();
-    }, 1000 * 8);
+    }, 1000 * 5);
 });
 onBeforeMount(() => {
     clearInterval(Number(timer));
