@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="open" :before-close="handleClose" :title="$t('ssl.detail')">
+    <el-dialog v-model="open" :before-close="handleClose" :title="$t('ssl.detail')" width="30%">
         <div>
             <el-radio-group v-model="curr">
                 <el-radio-button label="detail">{{ $t('ssl.msg') }}</el-radio-button>
@@ -15,6 +15,18 @@
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('website.otherDomains')">
                         {{ ssl.otherDomains }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('ssl.provider')">
+                        {{ getProvider(ssl.provider) }}
+                    </el-descriptions-item>
+                    <el-descriptions-item
+                        :label="$t('ssl.acmeAccount')"
+                        v-if="ssl.acmeAccount && ssl.provider !== 'manual'"
+                    >
+                        {{ ssl.acmeAccount.email }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('website.brand')">
+                        {{ ssl.type }}
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('ssl.startDate')">
                         {{ dateFromat(0, 0, ssl.startDate) }}
@@ -44,7 +56,7 @@
 <script lang="ts" setup>
 import { GetSSL } from '@/api/modules/website';
 import { ref } from 'vue';
-import { dateFromat } from '@/utils/util';
+import { dateFromat, getProvider } from '@/utils/util';
 import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
 

@@ -1,3 +1,5 @@
+import i18n from '@/lang';
+
 export function deepCopy<T>(obj: any): T {
     let newObj: any;
     try {
@@ -153,5 +155,18 @@ export function checkIp(value: string): boolean {
         return true;
     } else {
         return false;
+    }
+}
+
+export function getProvider(provider: string): string {
+    switch (provider) {
+        case 'dnsAccount':
+            return i18n.global.t('website.dnsAccount');
+        case 'dnsManual':
+            return i18n.global.t('website.dnsManual');
+        case 'http':
+            return 'HTTP';
+        default:
+            return i18n.global.t('ssl.manualCreate');
     }
 }

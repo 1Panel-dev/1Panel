@@ -74,7 +74,7 @@ import AcmeAccount from './acme-account/index.vue';
 import Renew from './renew/index.vue';
 import Create from './create/index.vue';
 import Detail from './detail/index.vue';
-import { dateFromat } from '@/utils/util';
+import { dateFromat, getProvider } from '@/utils/util';
 import i18n from '@/lang';
 import { Website } from '@/api/interface/website';
 import { useDeleteData } from '@/hooks/use-delete-data';
@@ -150,19 +150,6 @@ const deleteSSL = async (id: number) => {
     await useDeleteData(DeleteSSL, { id: id }, 'commons.msg.delete');
     loading.value = false;
     search();
-};
-
-const getProvider = (provider: string) => {
-    switch (provider) {
-        case 'dnsAccount':
-            return i18n.global.t('website.dnsAccount');
-        case 'dnsManual':
-            return i18n.global.t('website.dnsAccount');
-        case 'http':
-            return 'HTTP';
-        default:
-            return i18n.global.t('ssl.manualCreate');
-    }
 };
 
 onMounted(() => {
