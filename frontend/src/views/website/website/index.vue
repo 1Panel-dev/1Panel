@@ -8,10 +8,40 @@
                     <LayoutContent :header="$t('website.website')">
                         <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search()">
                             <template #toolbar>
-                                <el-button type="primary" icon="Plus" @click="openCreate">
-                                    {{ $t('commons.button.create') }}
-                                </el-button>
-                                <el-button type="primary" plain @click="openGroup">{{ $t('website.group') }}</el-button>
+                                <el-row>
+                                    <el-col :span="10">
+                                        <el-button type="primary" icon="Plus" @click="openCreate">
+                                            {{ $t('commons.button.create') }}
+                                        </el-button>
+                                        <el-button type="primary" plain @click="openGroup">
+                                            {{ $t('website.group') }}
+                                        </el-button>
+                                    </el-col>
+                                    <el-col :span="14">
+                                        <div style="float: right">
+                                            <div class="table-button">
+                                                <el-select v-model="req.websiteGroupId" @change="search()">
+                                                    <el-option :label="$t('website.allGroup')" :value="0"></el-option>
+                                                    <el-option
+                                                        v-for="(group, index) in groups"
+                                                        :key="index"
+                                                        :label="group.name"
+                                                        :value="group.id"
+                                                    ></el-option>
+                                                </el-select>
+                                            </div>
+                                            <el-input
+                                                class="table-button"
+                                                v-model="req.name"
+                                                clearable
+                                                @clear="search()"
+                                            ></el-input>
+                                            <el-button type="primary" icon="Search" @click="search()">
+                                                {{ $t('app.search') }}
+                                            </el-button>
+                                        </div>
+                                    </el-col>
+                                </el-row>
                             </template>
                             <el-table-column
                                 :label="$t('commons.table.name')"
@@ -113,7 +143,7 @@ import { onMounted, reactive, ref } from '@vue/runtime-core';
 import CreateWebSite from './create/index.vue';
 import DeleteWebsite from './delete/index.vue';
 import WebSiteGroup from './group/index.vue';
-import { OpWebsite, SearchWebsites, UpdateWebsite } from '@/api/modules/website';
+import { ListGroups, OpWebsite, SearchWebsites, UpdateWebsite } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import AppStatus from '@/components/app-status/index.vue';
 import NginxConfig from './nginx/index.vue';
@@ -153,24 +183,35 @@ const uploadRef = ref();
 const dialogBackupRef = ref();
 const data = ref();
 let dateRefs: Map<number, any> = new Map();
+let groups = ref<Website.Group[]>([]);
 
 const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 20,
     total: 0,
 });
+let req = reactive({
+    name: '',
+    page: paginationConfig.currentPage,
+    pageSize: paginationConfig.pageSize,
+    websiteGroupId: 0,
+});
 
 const search = async () => {
-    const req = {
-        name: '',
-        page: paginationConfig.currentPage,
-        pageSize: paginationConfig.pageSize,
-    };
+    req.page = paginationConfig.currentPage;
+    req.pageSize = paginationConfig.currentPage;
     SearchWebsites(req).then((res) => {
         data.value = res.data.items;
         paginationConfig.total = res.data.total;
     });
 };
+
+const listGroup = async () => {
+    await ListGroups().then((res) => {
+        groups.value = res.data;
+    });
+};
+
 const setting = () => {
     openNginxConfig.value = true;
 };
@@ -314,5 +355,12 @@ const opWebsite = (op: string, id: number) => {
 
 onMounted(() => {
     search();
+    listGroup();
 });
 </script>
+<style lang="scss">
+.table-button {
+    display: inline;
+    margin-right: 5px;
+}
+</style>

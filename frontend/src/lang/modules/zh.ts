@@ -949,6 +949,7 @@ export default {
         data: '数据',
         ever: '永久',
         nextYear: '一年后',
+        allGroup: '所有分组',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',

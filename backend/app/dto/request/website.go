@@ -6,6 +6,8 @@ import (
 
 type WebsiteSearch struct {
 	dto.PageInfo
+	Name           string `json:"name"`
+	WebsiteGroupID uint   `json:"websiteGroupId"`
 }
 
 type WebsiteCreate struct {
