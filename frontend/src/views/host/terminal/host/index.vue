@@ -46,7 +46,12 @@
                     >
                         <template #default="{ node, data }">
                             <span class="custom-tree-node" @mouseover="hover = data.id" @mouseleave="hover = null">
-                                <span v-if="node.label !== currentGroup || !data.onEdit">{{ node.label }}</span>
+                                <div v-if="node.label !== currentGroup || !data.onEdit">
+                                    <span v-if="node.label.length <= 35">{{ node.label }}</span>
+                                    <el-tooltip v-else :content="node.label" placement="top-start">
+                                        <span>{{ node.label.substring(0, 32) }}...</span>
+                                    </el-tooltip>
+                                </div>
                                 <el-input v-else v-model="currentGroupValue"></el-input>
                                 <div
                                     style="margin-left: 10px"
@@ -64,31 +69,9 @@
             </el-col>
             <el-col :span="16">
                 <el-card class="el-card">
-                    <el-form
-                        ref="hostInfoRef"
-                        label-width="100px"
-                        label-position="left"
-                        :model="hostInfo"
-                        :rules="rules"
-                    >
-                        <el-form-item :label="$t('commons.table.name')" prop="name">
-                            <el-input clearable v-model="hostInfo.name" />
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.table.group')" prop="groupBelong">
-                            <el-select filterable v-model="hostInfo.groupBelong" clearable style="width: 100%">
-                                <el-option
-                                    v-for="item in groupList"
-                                    :key="item.id"
-                                    :label="item.name"
-                                    :value="item.name"
-                                />
-                            </el-select>
-                        </el-form-item>
+                    <el-form ref="hostInfoRef" label-width="100px" :model="hostInfo" :rules="rules">
                         <el-form-item label="IP" prop="addr">
                             <el-input clearable v-model="hostInfo.addr" />
-                        </el-form-item>
-                        <el-form-item :label="$t('terminal.port')" prop="port">
-                            <el-input clearable v-model.number="hostInfo.port" />
                         </el-form-item>
                         <el-form-item :label="$t('terminal.user')" prop="user">
                             <el-input clearable v-model="hostInfo.user" />
@@ -108,6 +91,22 @@
                         </el-form-item>
                         <el-form-item :label="$t('terminal.key')" v-if="hostInfo.authMode === 'key'" prop="privateKey">
                             <el-input clearable type="textarea" v-model="hostInfo.privateKey" />
+                        </el-form-item>
+                        <el-form-item :label="$t('terminal.port')" prop="port">
+                            <el-input clearable v-model.number="hostInfo.port" />
+                        </el-form-item>
+                        <el-form-item :label="$t('commons.table.group')" prop="groupBelong">
+                            <el-select filterable v-model="hostInfo.groupBelong" clearable style="width: 100%">
+                                <el-option
+                                    v-for="item in groupList"
+                                    :key="item.id"
+                                    :label="item.name"
+                                    :value="item.name"
+                                />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item :label="$t('commons.table.title')" prop="name">
+                            <el-input clearable v-model="hostInfo.name" />
                         </el-form-item>
                         <el-form-item :label="$t('commons.table.description')" prop="description">
                             <el-input clearable type="textarea" v-model="hostInfo.description" />
@@ -157,8 +156,7 @@ import type Node from 'element-plus/es/components/tree/src/model/node';
 type FormInstance = InstanceType<typeof ElForm>;
 const hostInfoRef = ref<FormInstance>();
 const rules = reactive({
-    name: [Rules.requiredInput, Rules.name],
-    group: [Rules.requiredSelect],
+    groupBelong: [Rules.requiredSelect],
     addr: [Rules.requiredInput, Rules.ip],
     port: [Rules.requiredInput, Rules.port],
     user: [Rules.requiredInput],
@@ -211,6 +209,11 @@ let groupInputShow = ref<boolean>(false);
 const loadHostTree = async () => {
     const res = await getHostTree(searcConfig);
     hostTree.value = res.data;
+};
+
+const acceptParams = () => {
+    loadHostTree();
+    loadGroups();
 };
 
 const loadGroups = async () => {
@@ -324,12 +327,8 @@ const onEdit = async (node: Node, data: Tree) => {
     }
 };
 
-function onInit() {
-    loadHostTree();
-    loadGroups();
-}
 defineExpose({
-    onInit,
+    acceptParams,
 });
 </script>
 

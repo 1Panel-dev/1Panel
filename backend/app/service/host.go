@@ -48,6 +48,9 @@ func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, e
 		data.Label = group.Name
 		for _, host := range hosts {
 			label := fmt.Sprintf("%s@%s:%d", host.User, host.Addr, host.Port)
+			if len(host.Name) != 0 {
+				label = fmt.Sprintf("%s-%s@%s:%d", host.Name, host.User, host.Addr, host.Port)
+			}
 			if host.GroupBelong == group.Name {
 				data.Children = append(data.Children, dto.TreeChild{ID: host.ID, Label: label})
 			}

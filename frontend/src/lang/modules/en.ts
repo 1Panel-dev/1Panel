@@ -57,6 +57,7 @@ export default {
             message: 'Message',
             description: 'Description',
             interval: 'Interval',
+            title: 'Title',
         },
         msg: {
             delete: 'This operation cannot be rolled back. Do you want to continue',
@@ -555,6 +556,7 @@ export default {
     },
     terminal: {
         conn: 'connection',
+        connLocalErr: 'Unable to automatically authenticate, please fill in the local server login information!',
         testConn: 'Test connection',
         saveAndConn: 'Save and Connect',
         connTestOk: 'Connection information available',

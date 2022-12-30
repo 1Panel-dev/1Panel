@@ -65,6 +65,10 @@ const rules = reactive({
 });
 let operate = ref<string>('create');
 
+const acceptParams = () => {
+    search();
+};
+
 let commandInfo = reactive<Command.CommandOperate>({
     id: 0,
     name: '',
@@ -146,10 +150,7 @@ const search = async () => {
     paginationConfig.total = res.data.total;
 };
 
-function onInit() {
-    search();
-}
 defineExpose({
-    onInit,
+    acceptParams,
 });
 </script>
