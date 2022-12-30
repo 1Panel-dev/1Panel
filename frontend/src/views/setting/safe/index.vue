@@ -127,7 +127,7 @@ import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { dateFromat } from '@/utils/util';
 
-const emit = defineEmits(['on-save', 'search']);
+const emit = defineEmits(['search']);
 
 const loading = ref(false);
 const form = reactive({

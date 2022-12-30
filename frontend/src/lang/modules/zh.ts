@@ -50,7 +50,7 @@ export default {
             statusSuccess: '成功',
             statusFailed: '失败',
             records: '任务输出',
-            group: '组',
+            group: '分组',
             createdAt: '创建时间',
             date: '时间',
             updatedAt: '更新时间',
@@ -58,6 +58,7 @@ export default {
             message: '信息',
             description: '描述信息',
             interval: '耗时',
+            title: '标题',
         },
         msg: {
             delete: '删除 操作不可回滚，是否继续',
@@ -568,6 +569,7 @@ export default {
     },
     terminal: {
         conn: '连接',
+        connLocalErr: '无法自动认证，请填写本地服务器的登录信息！',
         testConn: '连接测试',
         saveAndConn: '保存并连接',
         connTestOk: '连接信息可用',
