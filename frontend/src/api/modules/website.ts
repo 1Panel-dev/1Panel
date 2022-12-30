@@ -15,6 +15,10 @@ export const OpWebsite = (req: Website.WebSiteOp) => {
     return http.post<any>(`/websites/operate`, req);
 };
 
+export const OpWebsiteLog = (req: Website.WebSiteOpLog) => {
+    return http.post<Website.WebSiteLog>(`/websites/log`, req);
+};
+
 export const BackupWebsite = (req: Website.BackupReq) => {
     return http.post(`/websites/backup`, req);
 };

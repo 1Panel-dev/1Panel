@@ -32,4 +32,11 @@ const (
 	HTTPSOnly   = "HTTPSOnly"
 	HTTPAlso    = "HTTPAlso"
 	HTTPToHTTPS = "HTTPToHTTPS"
+
+	GetLog     = "get"
+	DisableLog = "disable"
+	EnableLog  = "enable"
+
+	AccessLog = "access.log"
+	ErrorLog  = "error.log"
 )
