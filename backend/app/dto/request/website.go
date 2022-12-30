@@ -116,3 +116,9 @@ type WebsiteNginxUpdate struct {
 	ID      uint   `json:"id" validate:"required"`
 	Content string `json:"content" validate:"required"`
 }
+
+type WebsiteLogReq struct {
+	ID      uint   `json:"id" validate:"required"`
+	Operate string `json:"operate" validate:"required"`
+	LogType string `json:"logType" validate:"required"`
+}

@@ -952,6 +952,7 @@ export default {
         ever: '永久',
         nextYear: '一年后',
         allGroup: '所有分组',
+        noLog: '当前没有日志...',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',

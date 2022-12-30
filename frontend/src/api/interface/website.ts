@@ -76,6 +76,17 @@ export namespace Website {
         operate: string;
     }
 
+    export interface WebSiteOpLog {
+        id: number;
+        operate: string;
+        logType: string;
+    }
+
+    export interface WebSiteLog {
+        enable: boolean;
+        content: string;
+    }
+
     export interface Group extends CommonModel {
         name: string;
         default: boolean;

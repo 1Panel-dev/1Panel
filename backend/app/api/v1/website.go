@@ -320,3 +320,17 @@ func (b *BaseApi) UpdateWebsiteNginxConfig(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, nil)
 }
+
+func (b *BaseApi) OpWebsiteLog(c *gin.Context) {
+	var req request.WebsiteLogReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	res, err := websiteService.OpWebsiteLog(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}

@@ -96,7 +96,6 @@ func getNginxParamsByKeys(scope string, keys []string, website *model.Website) (
 }
 
 func updateNginxConfig(scope string, params []dto.NginxParam, website *model.Website) error {
-
 	nginxFull, err := getNginxFull(website)
 	if err != nil {
 		return err

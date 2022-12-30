@@ -49,6 +49,8 @@ type IWebsiteService interface {
 	PreInstallCheck(req request.WebsiteInstallCheckReq) ([]response.WebsitePreInstallCheck, error)
 	GetWafConfig(req request.WebsiteWafReq) (response.WebsiteWafConfig, error)
 	UpdateWafConfig(req request.WebsiteWafUpdate) error
+	UpdateNginxConfigFile(req request.WebsiteNginxUpdate) error
+	OpWebsiteLog(req request.WebsiteLogReq) (*response.WebsiteLog, error)
 }
 
 func NewWebsiteService() IWebsiteService {
@@ -706,4 +708,72 @@ func (w WebsiteService) UpdateNginxConfigFile(req request.WebsiteNginxUpdate) er
 		return err
 	}
 	return nginxCheckAndReload(nginxFull.SiteConfig.OldContent, filePath, nginxFull.Install.ContainerName)
+}
+
+func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.WebsiteLog, error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return nil, err
+	}
+	nginx, err := getNginxFull(&website)
+	if err != nil {
+		return nil, err
+	}
+	sitePath := path.Join(nginx.SiteDir, "sites", website.Alias)
+	res := &response.WebsiteLog{
+		Content: "",
+	}
+	switch req.Operate {
+	case constant.GetLog:
+		switch req.LogType {
+		case constant.AccessLog:
+			res.Enable = website.AccessLog
+			if !website.AccessLog {
+				return res, nil
+			}
+		case constant.ErrorLog:
+			res.Enable = website.ErrorLog
+			if !website.ErrorLog {
+				return res, nil
+			}
+		}
+		content, err := os.ReadFile(path.Join(sitePath, "log", req.LogType))
+		if err != nil {
+			return nil, err
+		}
+		res.Content = string(content)
+		return res, nil
+	case constant.DisableLog:
+		key := "access_log"
+		switch req.LogType {
+		case constant.AccessLog:
+			website.AccessLog = false
+		case constant.ErrorLog:
+			key = "error_log"
+			website.ErrorLog = false
+		}
+		if err := deleteNginxConfig(constant.NginxScopeServer, []string{key}, &website); err != nil {
+			return nil, err
+		}
+		if err := websiteRepo.Save(context.Background(), &website); err != nil {
+			return nil, err
+		}
+	case constant.EnableLog:
+		key := "access_log"
+		logPath := path.Join("/www", "sites", website.Alias, "log", req.LogType)
+		switch req.LogType {
+		case constant.AccessLog:
+			website.AccessLog = true
+		case constant.ErrorLog:
+			key = "error_log"
+			website.ErrorLog = true
+		}
+		if err := updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: key, Params: []string{logPath}}}, &website); err != nil {
+			return nil, err
+		}
+		if err := websiteRepo.Save(context.Background(), &website); err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
 }
