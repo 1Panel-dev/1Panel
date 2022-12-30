@@ -804,6 +804,7 @@ export default {
         forceDeleteHelper: '强制删除，会忽略删除过程中产生的错误并最终删除元数据',
         deleteBackup: '删除备份',
         deleteBackupHelper: '同时删除应用备份',
+        noService: '无{0}',
         toInstall: '去安装',
     },
     website: {
