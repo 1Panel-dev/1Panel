@@ -14,6 +14,7 @@ type IWebsiteRepo interface {
 	WithAlias(alias string) DBOption
 	WithWebsiteSSLID(sslId uint) DBOption
 	Page(page, size int, opts ...DBOption) (int64, []model.Website, error)
+	List(opts ...DBOption) ([]model.Website, error)
 	GetFirst(opts ...DBOption) (model.Website, error)
 	GetBy(opts ...DBOption) ([]model.Website, error)
 	Save(ctx context.Context, app *model.Website) error
@@ -59,6 +60,12 @@ func (w *WebsiteRepo) Page(page, size int, opts ...DBOption) (int64, []model.Web
 	db = db.Count(&count)
 	err := db.Debug().Limit(size).Offset(size * (page - 1)).Preload("WebsiteSSL").Find(&websites).Error
 	return count, websites, err
+}
+
+func (w *WebsiteRepo) List(opts ...DBOption) ([]model.Website, error) {
+	var websites []model.Website
+	err := getDb(opts...).Model(&model.Website{}).Preload("WebsiteSSL").Find(&websites).Error
+	return websites, err
 }
 
 func (w *WebsiteRepo) GetFirst(opts ...DBOption) (model.Website, error) {

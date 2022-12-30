@@ -10,6 +10,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -627,6 +628,11 @@ func opWebsite(website *model.Website, operate string) error {
 			server.UpdateRootProxy([]string{website.Proxy})
 		}
 		website.Status = constant.WebRunning
+		now := time.Now()
+		if website.ExpireDate.Before(now) {
+			defaultDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
+			website.ExpireDate = defaultDate
+		}
 	}
 
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
