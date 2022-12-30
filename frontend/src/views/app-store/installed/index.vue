@@ -8,17 +8,8 @@
                     </el-col>
                     <el-col :span="6">
                         <div style="float: right">
-                            <el-input
-                                style="display: inline; margin-right: 5px"
-                                v-model="searchName"
-                                clearable
-                                @clear="search()"
-                            ></el-input>
-                            <el-button
-                                style="display: inline; margin-right: 5px"
-                                v-model="searchName"
-                                @click="search()"
-                            >
+                            <el-input class="table-button" v-model="searchName" clearable @clear="search()"></el-input>
+                            <el-button class="table-button" @click="search()" icon="Search">
                                 {{ $t('app.search') }}
                             </el-button>
                         </div>
@@ -302,7 +293,7 @@ onUnmounted(() => {
 });
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .i-card {
     height: 60px;
     cursor: pointer;
@@ -317,5 +308,10 @@ onUnmounted(() => {
     border: 1px solid;
     border-color: $primary-color;
     z-index: 1;
+}
+
+.table-button {
+    display: inline;
+    margin-right: 5px;
 }
 </style>

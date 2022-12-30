@@ -200,4 +200,9 @@ onMounted(() => {
 .a-card:hover {
     transform: scale(1.1);
 }
+
+.table-button {
+    display: inline;
+    margin-right: 5px;
+}
 </style>

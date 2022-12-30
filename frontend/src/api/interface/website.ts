@@ -29,6 +29,7 @@ export namespace Website {
 
     export interface WebSiteSearch extends ReqPage {
         name: string;
+        websiteGroupId: number;
     }
 
     export interface WebSiteRecover {

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"os"
 	"path"
@@ -55,8 +56,18 @@ func NewWebsiteService() IWebsiteService {
 }
 
 func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []response.WebsiteDTO, error) {
-	var websiteDTOs []response.WebsiteDTO
-	total, websites, err := websiteRepo.Page(req.Page, req.PageSize)
+	var (
+		websiteDTOs []response.WebsiteDTO
+		opts        []repo.DBOption
+	)
+	opts = append(opts, commonRepo.WithOrderBy("created_at desc"))
+	if req.Name != "" {
+		opts = append(opts, websiteRepo.WithDomain(req.Name))
+	}
+	if req.WebsiteGroupID != 0 {
+		opts = append(opts, websiteRepo.WithGroupID(req.WebsiteGroupID))
+	}
+	total, websites, err := websiteRepo.Page(req.Page, req.PageSize, opts...)
 	if err != nil {
 		return 0, nil, err
 	}
