@@ -34,6 +34,9 @@
                     :label="service.label"
                 ></el-option>
             </el-select>
+            <span v-if="p.type === 'service' && !p.services" style="margin-left: 5px">
+                <el-link type="primary" :underline="false" @click="toPage()">{{ $t('app.toInstall') }}</el-link>
+            </span>
         </el-form-item>
     </div>
 </template>
@@ -43,6 +46,8 @@ import { getRandomStr } from '@/utils/util';
 import { GetAppService } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 interface ParamObj extends App.FromField {
     services: App.AppService[];
@@ -133,7 +138,7 @@ const handleParams = () => {
 const getServices = async (envKey: string, key: string | undefined, pObj: ParamObj) => {
     await GetAppService(key).then((res) => {
         pObj.services = res.data;
-        if (res.data.length > 0) {
+        if (res.data && res.data.length > 0) {
             form[envKey] = res.data[0].value;
             if (res.data[0].config) {
                 Object.entries(res.data[0].config).forEach(([k, v]) => {
@@ -160,6 +165,10 @@ const changeService = (value: string, services: App.AppService[]) => {
         }
     });
     updateParam();
+};
+
+const toPage = () => {
+    router.push({ name: 'App' });
 };
 
 onMounted(() => {

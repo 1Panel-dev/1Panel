@@ -12,7 +12,7 @@
                     ref="websiteForm"
                     label-position="right"
                     :model="website"
-                    label-width="68px"
+                    label-width="125px"
                     :rules="rules"
                     :validate-on-rule-change="false"
                 >
