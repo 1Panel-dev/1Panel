@@ -26,9 +26,17 @@
             </div>
             <div v-else-if="curr === 'ssl'">
                 <el-input v-model="ssl.pem" :autosize="{ minRows: 10, maxRows: 15 }" type="textarea" />
+                <div>
+                    <br />
+                    <el-button type="primary" @click="copyText(ssl.pem)">{{ $t('file.copy') }}</el-button>
+                </div>
             </div>
             <div v-else>
                 <el-input v-model="ssl.privateKey" :autosize="{ minRows: 10, maxRows: 15 }" type="textarea" />
+                <div>
+                    <br />
+                    <el-button type="primary" @click="copyText(ssl.privateKey)">{{ $t('file.copy') }}</el-button>
+                </div>
             </div>
         </div>
     </el-dialog>
@@ -37,6 +45,8 @@
 import { GetSSL } from '@/api/modules/website';
 import { ref } from 'vue';
 import { dateFromat } from '@/utils/util';
+import { ElMessage } from 'element-plus';
+import i18n from '@/lang';
 
 let open = ref(false);
 let id = ref(0);
@@ -58,6 +68,12 @@ const acceptParams = (sslId: number) => {
 const get = async () => {
     const res = await GetSSL(id.value);
     ssl.value = res.data;
+};
+
+const copyText = (val: string): void => {
+    navigator.clipboard.writeText(val).then(() => {
+        ElMessage.success(i18n.global.t('commons.msg.copySuccess'));
+    });
 };
 
 defineExpose({
