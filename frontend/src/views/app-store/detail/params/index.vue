@@ -35,7 +35,9 @@
                 ></el-option>
             </el-select>
             <span v-if="p.type === 'service' && !p.services" style="margin-left: 5px">
-                <el-link type="primary" :underline="false" @click="toPage()">{{ $t('app.toInstall') }}</el-link>
+                <el-link type="primary" :underline="false" @click="toPage()">
+                    {{ $t('app.toInstall') }}
+                </el-link>
             </span>
         </el-form-item>
     </div>
