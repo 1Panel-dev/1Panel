@@ -856,7 +856,7 @@ export default {
         provider: '验证方式',
         dnsCommon: '手动解析',
         expireDate: '过期时间',
-        brand: '品牌',
+        brand: '颁发者',
         deploySSL: '部署',
         deploySSLHelper: '确定部署证书？',
         ssl: '证书',
@@ -940,7 +940,7 @@ export default {
         SSLProConfig: 'SSL 协议设置',
         supportProtocol: '支持的协议版本',
         encryptionAlgorithm: '加密算法',
-        notSecurity: ' 不安全',
+        notSecurity: '（不安全）',
         encryptHelper:
             "Let's Encrypt 签发证书有频率限制，但足以满足正常需求，过于频繁操作会导致签发失败。具体限制请看 <a target=“_blank” href='https://letsencrypt.org/zh-cn/docs/rate-limits/'>官方文档</a> ",
         ipValue: 'IP值',
@@ -984,6 +984,7 @@ export default {
         ssl: '证书',
         key: '私钥',
         startDate: '生效时间',
+        organization: '签发机构',
     },
     firewall: {
         ccDeny: 'CC 防护',

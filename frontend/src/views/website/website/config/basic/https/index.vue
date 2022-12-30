@@ -55,12 +55,21 @@
                         </el-form-item>
                     </div>
                     <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
-                        <el-descriptions :column="3" border direction="vertical">
+                        <el-descriptions :column="5" border direction="vertical">
                             <el-descriptions-item :label="$t('website.primaryDomain')">
                                 {{ websiteSSL.primaryDomain }}
                             </el-descriptions-item>
                             <el-descriptions-item :label="$t('website.otherDomains')">
                                 {{ websiteSSL.otherDomains }}
+                            </el-descriptions-item>
+                            <el-descriptions-item :label="$t('ssl.provider')">
+                                {{ getProvider(websiteSSL.provider) }}
+                            </el-descriptions-item>
+                            <el-descriptions-item
+                                :label="$t('ssl.acmeAccount')"
+                                v-if="websiteSSL.acmeAccount && websiteSSL.provider !== 'manual'"
+                            >
+                                {{ websiteSSL.acmeAccount.email }}
                             </el-descriptions-item>
                             <el-descriptions-item :label="$t('website.expireDate')">
                                 {{ dateFromat(1, 1, websiteSSL.expireDate) }}
@@ -112,9 +121,9 @@ import { Website } from '@/api/interface/website';
 import { GetHTTPSConfig, ListSSL, UpdateHTTPSConfig } from '@/api/modules/website';
 import { ElMessage, ElMessageBox, FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
-import { dateFromat } from '@/utils/util';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
+import { dateFromat, getProvider } from '@/utils/util';
 
 const props = defineProps({
     id: {
@@ -187,10 +196,10 @@ const get = () => {
             if (res.data.algorithm != '') {
                 form.algorithm = res.data.algorithm;
             }
-        }
-        if (res.data?.SSL && res.data?.SSL.id > 0) {
-            form.websiteSSLId = res.data.SSL.id;
-            websiteSSL.value = res.data.SSL;
+            if (res.data.SSL && res.data.SSL.id > 0) {
+                form.websiteSSLId = res.data.SSL.id;
+                websiteSSL.value = res.data.SSL;
+            }
         }
         listSSL();
     });
@@ -215,6 +224,9 @@ const submit = async (formEl: FormInstance | undefined) => {
 };
 
 const changeEnable = (enable: boolean) => {
+    if (enable) {
+        listSSL();
+    }
     if (resData.value.enable && !enable) {
         ElMessageBox.confirm(i18n.global.t('website.disbaleHTTTPSHelper'), i18n.global.t('website.disbaleHTTTPS'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
