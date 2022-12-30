@@ -254,6 +254,13 @@ func (w WebsiteService) UpdateWebsite(req request.WebsiteUpdate) error {
 	website.PrimaryDomain = req.PrimaryDomain
 	website.WebsiteGroupID = req.WebsiteGroupID
 	website.Remark = req.Remark
+	if req.ExpireDate != "" {
+		expireDate, err := time.Parse(constant.DateLayout, req.ExpireDate)
+		if err != nil {
+			return err
+		}
+		website.ExpireDate = expireDate
+	}
 
 	return websiteRepo.Save(context.TODO(), &website)
 }
