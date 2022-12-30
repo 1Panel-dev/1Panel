@@ -947,6 +947,8 @@ export default {
         ext: '文件扩展名',
         wafInputHelper: '按行输入数据，一行一个',
         data: '数据',
+        ever: '永久',
+        nextYear: '一年后',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',

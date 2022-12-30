@@ -48,9 +48,29 @@
                             <el-table-column :label="$t('website.remark')" prop="remark"></el-table-column>
                             <el-table-column :label="$t('website.protocol')" prop="protocol"></el-table-column>
                             <el-table-column :label="$t('website.expireDate')">
-                                <template #default="{ row }">
-                                    <span v-if="row.protocol === 'HTTP'">{{ $t('website.neverExpire') }}</span>
-                                    <span v-else>{{ dateFromat(1, 1, row.webSiteSSL.expireDate) }}</span>
+                                <template #default="{ row, $index }">
+                                    <div v-show="row.showdate">
+                                        <el-date-picker
+                                            v-model="row.expireDate"
+                                            type="date"
+                                            :disabled-date="checkDate"
+                                            :shortcuts="shortcuts"
+                                            :clearable="false"
+                                            :default-value="setDate(row.expireDate)"
+                                            :ref="(el) => setdateRefs(el, $index)"
+                                            @change="submitDate(row)"
+                                            @visible-change="(visibility:boolean) => pickerVisibility(visibility, row)"
+                                            size="small"
+                                        ></el-date-picker>
+                                    </div>
+                                    <div v-show="!row.showdate">
+                                        <span v-if="isEver(row.expireDate)" @click="openDatePicker(row, $index)">
+                                            {{ $t('website.neverExpire') }}
+                                        </span>
+                                        <span v-else @click="openDatePicker(row, $index)">
+                                            {{ dateFromatSimple(row.expireDate) }}
+                                        </span>
+                                    </div>
                                 </template>
                             </el-table-column>
                             <fu-table-operations
@@ -93,19 +113,34 @@ import { onMounted, reactive, ref } from '@vue/runtime-core';
 import CreateWebSite from './create/index.vue';
 import DeleteWebsite from './delete/index.vue';
 import WebSiteGroup from './group/index.vue';
-import { OpWebsite, SearchWebsites } from '@/api/modules/website';
+import { OpWebsite, SearchWebsites, UpdateWebsite } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import AppStatus from '@/components/app-status/index.vue';
 import NginxConfig from './nginx/index.vue';
-import { dateFromat } from '@/utils/util';
-
 import i18n from '@/lang';
 import router from '@/routers';
 import { App } from '@/api/interface/app';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { dateFromatSimple } from '@/utils/util';
+
+const shortcuts = [
+    {
+        text: i18n.global.t('website.ever'),
+        value: () => {
+            return new Date('1970-01-01');
+        },
+    },
+    {
+        text: i18n.global.t('website.nextYear'),
+        value: () => {
+            const now = new Date();
+            now.setFullYear(now.getFullYear() + 1);
+            return now;
+        },
+    },
+];
 
 const loading = ref(false);
-
 const createRef = ref();
 const deleteRef = ref();
 const groupRef = ref();
@@ -114,6 +149,10 @@ let nginxIsExist = ref(false);
 let containerName = ref('');
 let nginxStatus = ref('');
 let installPath = ref('');
+const uploadRef = ref();
+const dialogBackupRef = ref();
+const data = ref();
+let dateRefs: Map<number, any> = new Map();
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -121,14 +160,12 @@ const paginationConfig = reactive({
     total: 0,
 });
 
-const data = ref();
 const search = async () => {
     const req = {
         name: '',
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
-
     SearchWebsites(req).then((res) => {
         data.value = res.data.items;
         paginationConfig.total = res.data.total;
@@ -142,8 +179,67 @@ const openConfig = (id: number) => {
     router.push({ name: 'WebsiteConfig', params: { id: id, tab: 'basic' } });
 };
 
-const uploadRef = ref();
-const dialogBackupRef = ref();
+const isEver = (time: string) => {
+    const expireDate = new Date(time);
+    return expireDate < new Date('1970-01-02');
+};
+
+const isBeforeNow = (time: string) => {
+    return new Date() > new Date(time);
+};
+
+const setDate = (time: string) => {
+    if (isEver(time)) {
+        return new Date().toLocaleDateString();
+    } else {
+        return new Date(time);
+    }
+};
+
+const openDatePicker = (row: any, index: number) => {
+    row.showdate = true;
+    const ref = dateRefs.get(index);
+    if (ref != undefined) {
+        if (isBeforeNow(row.expireDate)) {
+            row.oldExpireDate = row.expireDate;
+            const date = new Date().toLocaleDateString();
+            row.expireDate = date;
+        }
+        ref.handleOpen();
+    }
+};
+
+const setdateRefs = (ref: any, index: number) => {
+    dateRefs.set(index, ref);
+};
+
+const pickerVisibility = (visibility: boolean, row: any) => {
+    if (!visibility) {
+        row.showdate = false;
+        if (!row.change) {
+            if (row.oldExpireDate) {
+                row.expireDate = row.oldExpireDate;
+            }
+            row.change = false;
+        }
+    }
+};
+
+const submitDate = (row: any) => {
+    const reqDate = dateFromatSimple(row.expireDate);
+    const req = {
+        id: row.id,
+        primaryDomain: row.primaryDomain,
+        remark: row.remark,
+        webSiteGroupId: row.webSiteGroupId,
+        expireDate: reqDate,
+    };
+
+    UpdateWebsite(req).then(() => {
+        row.change = true;
+        ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+    });
+};
 
 const buttons = [
     {
@@ -198,6 +294,11 @@ const checkExist = (data: App.CheckInstalled) => {
     containerName.value = data.containerName;
     nginxStatus.value = data.status;
     installPath.value = data.installPath;
+};
+
+const checkDate = (date: Date) => {
+    const now = new Date();
+    return date < now;
 };
 
 const opWebsite = (op: string, id: number) => {

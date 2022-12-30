@@ -49,6 +49,17 @@ export function dateFromat(row: number, col: number, dataStr: any) {
     return `${String(y)}-${String(m)}-${String(d)}   ${String(h)}:${String(minute)}:${String(second)}`;
 }
 
+//2016-01-12
+export function dateFromatSimple(dataStr: any) {
+    const date = new Date(dataStr);
+    const y = date.getFullYear();
+    let m: string | number = date.getMonth() + 1;
+    m = m < 10 ? `0${String(m)}` : m;
+    let d: string | number = date.getDate();
+    d = d < 10 ? `0${String(d)}` : d;
+    return `${String(y)}-${String(m)}-${String(d)}`;
+}
+
 // 20221013151302
 export function dateFromatForName(dataStr: any) {
     const date = new Date(dataStr);

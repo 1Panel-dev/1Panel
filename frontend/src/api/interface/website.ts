@@ -67,6 +67,7 @@ export namespace Website {
         primaryDomain: string;
         remark: string;
         webSiteGroupId: number;
+        expireDate?: string;
     }
 
     export interface WebSiteOp {

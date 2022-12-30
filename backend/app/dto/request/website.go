@@ -1,6 +1,8 @@
 package request
 
-import "github.com/1Panel-dev/1Panel/backend/app/dto"
+import (
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
+)
 
 type WebsiteSearch struct {
 	dto.PageInfo
@@ -36,6 +38,7 @@ type WebsiteUpdate struct {
 	PrimaryDomain  string `json:"primaryDomain" validate:"required"`
 	Remark         string `json:"remark"`
 	WebsiteGroupID uint   `json:"webSiteGroupID" validate:"required"`
+	ExpireDate     string `json:"expireDate"`
 }
 
 type WebsiteDelete struct {
