@@ -119,6 +119,8 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) error {
 		WebsiteGroupID: create.WebsiteGroupID,
 		Protocol:       constant.ProtocolHTTP,
 		Proxy:          create.Proxy,
+		AccessLog:      true,
+		ErrorLog:       true,
 	}
 
 	tx, ctx := getTxAndContext()
@@ -545,7 +547,9 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 		if err := deleteListenAndServerName(website, []int{443}, []string{}); err != nil {
 			return response.WebsiteHTTPS{}, err
 		}
-		if err := deleteNginxConfig(constant.NginxScopeServer, getKeysFromStaticFile(dto.SSL), &website); err != nil {
+		keys := getKeysFromStaticFile(dto.SSL)
+		keys = append(keys, "if")
+		if err := deleteNginxConfig(constant.NginxScopeServer, keys, &website); err != nil {
 			return response.WebsiteHTTPS{}, err
 		}
 		if err := websiteRepo.Save(ctx, &website); err != nil {

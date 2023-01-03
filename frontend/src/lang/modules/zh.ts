@@ -998,6 +998,7 @@ export default {
         key: '私钥',
         startDate: '生效时间',
         organization: '签发机构',
+        renewConfirm: '是否确定续签？',
     },
     firewall: {
         ccDeny: 'CC 防护',
