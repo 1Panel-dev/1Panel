@@ -101,6 +101,9 @@ const buttons = [
     },
     {
         label: i18n.global.t('website.renewSSL'),
+        disabled: function (row: Website.SSL) {
+            return row.provider === 'manual';
+        },
         click: function (row: Website.SSL) {
             openRenewSSL(row.id);
         },
