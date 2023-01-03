@@ -129,9 +129,7 @@ func (a AppInstallService) Operate(req request.AppInstalledOperate) error {
 	if err != nil {
 		return err
 	}
-
 	dockerComposePath := install.GetComposePath()
-
 	switch req.Operate {
 	case constant.Up:
 		out, err := compose.Up(dockerComposePath)

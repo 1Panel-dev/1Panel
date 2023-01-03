@@ -2,21 +2,33 @@
     <el-dialog
         v-model="open"
         :title="$t('website.defaulServer')"
-        width="20%"
+        width="25%"
         @close="handleClose"
         :close-on-click-modal="false"
     >
-        <div style="text-align: center">
-            <el-select v-model="defaultId">
-                <el-option :value="0" :key="-1" :label="$t('website.noDefaulServer')"></el-option>
-                <el-option
-                    v-for="(website, key) in websites"
-                    :key="key"
-                    :value="website.id"
-                    :label="website.primaryDomain"
-                ></el-option>
-            </el-select>
-        </div>
+        <el-row>
+            <el-col :offset="5">
+                <div style="text-align: center">
+                    <el-form-item :label="$t('website.defaulServer')">
+                        <el-select v-model="defaultId">
+                            <el-option :value="0" :key="-1" :label="$t('website.noDefaulServer')"></el-option>
+                            <el-option
+                                v-for="(website, key) in websites"
+                                :key="key"
+                                :value="website.id"
+                                :label="website.primaryDomain"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+                </div>
+            </el-col>
+            <el-alert :closable="false">
+                <template #default>
+                    <span style="white-space: pre-line">{{ $t('website.defaulServerHelper') }}</span>
+                </template>
+            </el-alert>
+        </el-row>
+
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
