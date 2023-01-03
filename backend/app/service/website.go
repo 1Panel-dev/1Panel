@@ -804,13 +804,16 @@ func (w WebsiteService) ChangeDefaultServer(id uint) error {
 			return err
 		}
 	}
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
-	if err != nil {
-		return err
+	if id > 0 {
+		website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
+		if err != nil {
+			return err
+		}
+		if err := updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "listen", Params: []string{"80", "default_server"}}}, &website); err != nil {
+			return err
+		}
+		website.DefaultServer = true
+		return websiteRepo.Save(context.Background(), &website)
 	}
-	if err := updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "listen", Params: []string{"80", "default_server"}}}, &website); err != nil {
-		return err
-	}
-	website.DefaultServer = true
-	return websiteRepo.Save(context.Background(), &website)
+	return nil
 }

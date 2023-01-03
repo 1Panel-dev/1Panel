@@ -959,8 +959,9 @@ export default {
         nextYear: '一年后',
         allGroup: '所有分组',
         noLog: '当前没有日志...',
-        defaulServer: '默认网站',
-        noDefaulServer: '当前没有默认网站',
+        defaulServer: '默认站点',
+        noDefaulServer: '未设置',
+        defaulServerHelper: '设置默认站点后,所有未绑定的域名和IP都被定向到默认站点\n可有效防止恶意解析',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',
