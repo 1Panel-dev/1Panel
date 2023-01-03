@@ -44,6 +44,7 @@
         "unplugin-vue-define-options": "^0.7.3",
         "vite-plugin-monaco-editor": "^1.1.0",
         "vue": "^3.2.25",
+        "vue-clipboard3": "^2.0.0",
         "vue-codemirror": "^6.1.1",
         "vue-i18n": "^9.1.9",
         "vue-router": "^4.0.12",

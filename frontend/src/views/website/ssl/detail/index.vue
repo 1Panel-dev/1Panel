@@ -37,14 +37,19 @@
                 </el-descriptions>
             </div>
             <div v-else-if="curr === 'ssl'">
-                <el-input v-model="ssl.pem" :autosize="{ minRows: 10, maxRows: 15 }" type="textarea" />
+                <el-input v-model="ssl.pem" :autosize="{ minRows: 10, maxRows: 15 }" type="textarea" id="textArea" />
                 <div>
                     <br />
                     <el-button type="primary" @click="copyText(ssl.pem)">{{ $t('file.copy') }}</el-button>
                 </div>
             </div>
             <div v-else>
-                <el-input v-model="ssl.privateKey" :autosize="{ minRows: 10, maxRows: 15 }" type="textarea" />
+                <el-input
+                    v-model="ssl.privateKey"
+                    :autosize="{ minRows: 10, maxRows: 15 }"
+                    type="textarea"
+                    id="textArea"
+                />
                 <div>
                     <br />
                     <el-button type="primary" @click="copyText(ssl.privateKey)">{{ $t('file.copy') }}</el-button>
@@ -59,6 +64,8 @@ import { ref } from 'vue';
 import { dateFromat, getProvider } from '@/utils/util';
 import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
+import useClipboard from 'vue-clipboard3';
+const { toClipboard } = useClipboard();
 
 let open = ref(false);
 let id = ref(0);
@@ -82,11 +89,51 @@ const get = async () => {
     ssl.value = res.data;
 };
 
-const copyText = (val: string): void => {
-    navigator.clipboard.writeText(val).then(() => {
+const copyText = async (msg) => {
+    try {
+        await toClipboard(msg);
         ElMessage.success(i18n.global.t('commons.msg.copySuccess'));
-    });
+    } catch (e) {
+        ElMessage.error(i18n.global.t('commons.msg.copyfailed'));
+    }
 };
+
+// const copyText = async (text: string) => {
+//     try {
+//         try {
+//             await navigator.clipboard.writeText(text);
+//             ElMessage.success(i18n.global.t('commons.msg.copySuccess'));
+//             return await Promise.resolve();
+//         } catch (err) {
+//             return await Promise.reject(err);
+//         }
+//     } catch (e) {
+//         let input = document.createElement('input');
+//         input.style.position = 'fixed';
+//         input.style.top = '-10000px';
+//         input.style.zIndex = '-999';
+//         document.body.appendChild(input);
+//         console.log('input', input);
+//         input.value = text;
+//         input.focus();
+//         input.select();
+//         try {
+//             let result = document.execCommand('copy');
+//             document.body.removeChild(input);
+//             if (!result) {
+//                 ElMessage.error(i18n.global.t('commons.msg.copyfailed'));
+//                 return Promise.reject();
+//             } else {
+//                 ElMessage.success(i18n.global.t('commons.msg.copySuccess'));
+//                 return Promise.resolve();
+//             }
+//         } catch (e) {
+//             document.body.removeChild(input);
+//             ElMessage.error(i18n.global.t('commons.msg.copyfailed'));
+//             return Promise.reject();
+//         }
+//     }
+// };
 
 defineExpose({
     acceptParams,

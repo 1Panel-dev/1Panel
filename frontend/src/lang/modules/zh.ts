@@ -78,6 +78,7 @@ export default {
             operate: '操作',
             operateConfirm: '如果确认操作，请手动输入',
             inputOrSelect: '请选择或输入',
+            copyfailed: '复制失败',
         },
         login: {
             firstLogin: '首次登录，请创建初始管理员用户！',
