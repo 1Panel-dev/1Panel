@@ -11,7 +11,7 @@
                     <template #append>
                         <el-select v-model="form.format" style="width: 125px">
                             <el-option label="utf8mb4" value="utf8mb4" />
-                            <el-option label="utf-8" value="utf-8" />
+                            <el-option label="utf-8" value="utf8" />
                             <el-option label="gbk" value="gbk" />
                             <el-option label="big5" value="big5" />
                         </el-select>

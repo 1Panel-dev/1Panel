@@ -76,7 +76,10 @@
                 <el-card class="el-card">
                     <el-form ref="hostInfoRef" label-width="100px" :model="hostInfo" :rules="rules">
                         <el-form-item :label="$t('terminal.ip')" prop="addr">
-                            <el-input clearable v-model="hostInfo.addr" />
+                            <span v-if="hostInfo.addr === '127.0.0.1' && hostOperation === 'edit'">
+                                {{ hostInfo.addr }}
+                            </span>
+                            <el-input v-else clearable v-model="hostInfo.addr" />
                         </el-form-item>
                         <el-form-item :label="$t('terminal.user')" prop="user">
                             <el-input clearable v-model="hostInfo.user" />

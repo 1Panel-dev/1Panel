@@ -105,9 +105,10 @@
                         <el-form-item :label="$t('setting.syncTime')">
                             <el-input disabled v-model="form.localTime">
                                 <template #append>
-                                    <el-button @click="onSyncTime" icon="Refresh">
+                                    <el-button v-show="!show" @click="onSyncTime" icon="Refresh">
                                         {{ $t('commons.button.sync') }}
                                     </el-button>
+                                    <span v-show="show">{{ count }} S</span>
                                 </template>
                             </el-input>
                         </el-form-item>
@@ -210,6 +211,11 @@ const form = reactive({
     complexityVerification: '',
 });
 
+const timer = ref();
+const TIME_COUNT = ref(10);
+const count = ref();
+const show = ref();
+
 const search = async () => {
     const res = await getSettingInfo();
     form.userName = res.data.userName;
@@ -271,6 +277,21 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
             loading.value = false;
         });
 };
+
+function countdown() {
+    count.value = TIME_COUNT.value;
+    show.value = true;
+    timer.value = setInterval(() => {
+        if (count.value > 0 && count.value <= TIME_COUNT.value) {
+            count.value--;
+        } else {
+            show.value = false;
+            clearInterval(timer.value);
+            timer.value = null;
+        }
+    }, 1000);
+}
+
 function callback(error: any) {
     if (error) {
         return error.message;
@@ -326,6 +347,7 @@ const onSyncTime = async () => {
         .then((res) => {
             loading.value = false;
             form.localTime = res.data;
+            countdown();
             ElMessage.success(i18n.t('commons.msg.operationSuccess'));
         })
         .catch(() => {

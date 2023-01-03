@@ -38,32 +38,11 @@
 <script setup lang="ts" name="login">
 import LoginForm from './components/login-form.vue';
 import { ref, onMounted } from 'vue';
-// import { loginStatus, entrance } from '@/api/modules/auth';
-
-// interface Props {
-//     code: string;
-// }
-// const mySafetyCode = withDefaults(defineProps<Props>(), {
-//     code: '',
-// });
 
 const statusCode = ref<number>(0);
 
 const getStatus = async () => {
     statusCode.value = 1;
-    // const res = await loginStatus();
-    // if (res.code === 402) {
-    //     statusCode.value = -1;
-    // } else {
-    //     statusCode.value = 1;
-    //     return;
-    // }
-    // if (mySafetyCode.code) {
-    //     const res = await entrance(mySafetyCode.code);
-    //     if (res.code === 200) {
-    //         statusCode.value = 1;
-    //     }
-    // }
 };
 
 onMounted(() => {

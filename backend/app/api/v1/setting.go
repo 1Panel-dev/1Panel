@@ -2,6 +2,7 @@ package v1
 
 import (
 	"errors"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -87,7 +88,7 @@ func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
 func (b *BaseApi) SyncTime(c *gin.Context) {
 	ntime, err := ntp.Getremotetime()
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		helper.SuccessWithData(c, time.Now().Format("2006-01-02 15:04:05 MST -0700"))
 		return
 	}
 

@@ -307,6 +307,14 @@ const onReconnect = async (item: any) => {
 
 const onConnTerminal = async (title: string, wsID: number, isLocal?: boolean) => {
     const res = await testByID(wsID);
+    if (isLocal) {
+        for (const tab of terminalTabs.value) {
+            if (tab.title.indexOf('@127.0.0.1:') !== -1 || tab.title === i18n.global.t('terminal.localhost')) {
+                onReconnect(tab);
+                return;
+            }
+        }
+    }
     terminalTabs.value.push({
         index: tabIndex,
         title: title,
@@ -322,7 +330,7 @@ const onConnTerminal = async (title: string, wsID: number, isLocal?: boolean) =>
             ctx.refs[`t-${terminalValue.value}`][0].acceptParams({
                 wsID: wsID,
                 terminalID: terminalValue.value,
-                error: res.data ? '' : 'Failed to set up the connection. Please check the host information !',
+                error: res.data ? '' : 'Authentication failed.  Please check the host information !',
             });
     });
     tabIndex++;

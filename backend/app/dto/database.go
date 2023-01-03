@@ -21,7 +21,7 @@ type MysqlDBInfo struct {
 
 type MysqlDBCreate struct {
 	Name        string `json:"name" validate:"required"`
-	Format      string `json:"format" validate:"required,oneof=utf8mb4 utf-8 gbk big5"`
+	Format      string `json:"format" validate:"required,oneof=utf8mb4 utf8 gbk big5"`
 	Username    string `json:"username" validate:"required"`
 	Password    string `json:"password" validate:"required"`
 	Permission  string `json:"permission" validate:"required"`

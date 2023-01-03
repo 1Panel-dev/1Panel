@@ -3,7 +3,7 @@
         <slot></slot>
     </div>
     <div class="footer flx-center">
-        <a href="http://www.spicyboy.cn/" target="_blank">2022 © 1Panel By 飞致云.</a>
+        <a href="http://www.spicyboy.cn/" target="_blank">2023 © 1Panel By 飞致云.</a>
     </div>
 </template>
 

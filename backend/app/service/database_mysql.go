@@ -154,6 +154,13 @@ func (u *MysqlService) ListDBName() ([]string, error) {
 	return dbNames, err
 }
 
+var formatMap = map[string]string{
+	"utf8":    "utf8_general_ci",
+	"utf8mb4": "utf8mb4_general_ci",
+	"gbk":     "gbk_chinese_ci",
+	"big5":    "big5_chinese_ci",
+}
+
 func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*model.DatabaseMysql, error) {
 	if req.Username == "root" {
 		return nil, errors.New("Cannot set root as user name")
@@ -170,7 +177,8 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create database if not exists `%s` character set=%s", req.Name, req.Format)); err != nil {
+	createSql := fmt.Sprintf("create database if not exists `%s` default character set %s collate %s", req.Name, req.Format, formatMap[req.Format])
+	if err := excuteSql(app.ContainerName, app.Password, createSql); err != nil {
 		return nil, err
 	}
 	tmpPermission := req.Permission
