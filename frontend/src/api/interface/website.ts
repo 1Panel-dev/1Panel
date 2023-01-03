@@ -167,6 +167,7 @@ export namespace Website {
         issuerName: string;
         expireDate: string;
         startDate: string;
+        provider: string;
     }
 
     export interface SSLCreate {

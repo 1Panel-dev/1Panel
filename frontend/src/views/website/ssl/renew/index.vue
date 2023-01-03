@@ -8,7 +8,7 @@
         :before-close="handleClose"
     >
         <div style="text-align: center">
-            <span>是否确定续签?</span>
+            <span>{{ $t('ssl.renewConfirm') }}</span>
         </div>
         <template #footer>
             <span class="dialog-footer">
