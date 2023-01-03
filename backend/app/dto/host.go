@@ -7,7 +7,7 @@ import (
 type HostOperate struct {
 	ID          uint   `json:"id"`
 	GroupBelong string `json:"groupBelong" validate:"required"`
-	Name        string `json:"name" validate:"required"`
+	Name        string `json:"name"`
 	Addr        string `json:"addr" validate:"required,ip"`
 	Port        uint   `json:"port" validate:"required,number,max=65535,min=1"`
 	User        string `json:"user" validate:"required"`

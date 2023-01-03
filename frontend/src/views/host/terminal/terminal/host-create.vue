@@ -2,6 +2,7 @@
     <div>
         <el-dialog v-model="dialogVisiable" :title="$t('terminal.addHost')" width="30%">
             <el-alert
+                v-if="isLocal"
                 style="margin-bottom: 20px"
                 center
                 :title="$t('terminal.connLocalErr')"
@@ -9,7 +10,7 @@
                 type="warning"
             />
             <el-form ref="hostRef" label-width="100px" :model="hostInfo" :rules="rules">
-                <el-form-item label="IP" prop="addr">
+                <el-form-item :label="$t('terminal.ip')" prop="addr">
                     <el-input v-if="!isLocal" clearable v-model="hostInfo.addr" />
                     <span v-if="isLocal">{{ hostInfo.addr }}</span>
                 </el-form-item>
@@ -57,7 +58,7 @@
 import { ElForm, ElMessage } from 'element-plus';
 import { Host } from '@/api/interface/host';
 import { Rules } from '@/global/form-rules';
-import { addHost, testConn } from '@/api/modules/host';
+import { addHost, testByInfo } from '@/api/modules/host';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 
@@ -79,7 +80,7 @@ let hostInfo = reactive<Host.HostOperate>({
 });
 
 const rules = reactive({
-    addr: [Rules.requiredInput, Rules.ip],
+    addr: [Rules.requiredInput],
     port: [Rules.requiredInput, Rules.port],
     user: [Rules.requiredInput],
     authMode: [Rules.requiredSelect],
@@ -92,9 +93,10 @@ interface DialogProps {
     isLocal: boolean;
 }
 const acceptParams = (props: DialogProps) => {
+    isLocal.value = props.isLocal;
     if (props.isLocal) {
-        isLocal.value = props.isLocal;
         hostInfo.addr = '127.0.0.1';
+        hostInfo.user = 'root';
     }
     dialogVisiable.value = true;
 };
@@ -108,8 +110,13 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
         hostInfo.groupBelong = 'default';
         switch (ops) {
             case 'testConn':
-                await testConn(hostInfo);
-                ElMessage.success(i18n.global.t('terminal.connTestOk'));
+                await testByInfo(hostInfo).then((res) => {
+                    if (res.data) {
+                        ElMessage.success(i18n.global.t('terminal.connTestOk'));
+                    } else {
+                        ElMessage.success(i18n.global.t('terminal.connTestFailed'));
+                    }
+                });
                 break;
             case 'saveAndConn':
                 const res = await addHost(hostInfo);
@@ -118,7 +125,7 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
                 if (res.data.name.length !== 0) {
                     title = res.data.name + '-' + title;
                 }
-                emit('on-conn-terminal', title, res.data.id, res.data.addr);
+                emit('on-conn-terminal', title, res.data.id, res.data.addr, '');
                 emit('load-host-tree');
         }
     });

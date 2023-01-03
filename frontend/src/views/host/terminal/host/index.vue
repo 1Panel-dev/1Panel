@@ -58,7 +58,12 @@
                                     v-if="!(node.level === 1 && data.label === 'default') && data.id === hover"
                                 >
                                     <el-button v-if="!data.onEdit" icon="Edit" link @click="onEdit(node, data)" />
-                                    <el-button v-if="!data.onEdit" icon="Delete" link @click="onDelete(node, data)" />
+                                    <el-button
+                                        v-if="!data.onEdit && node.label.indexOf('@127.0.0.1:') === -1"
+                                        icon="Delete"
+                                        link
+                                        @click="onDelete(node, data)"
+                                    />
                                     <el-button v-if="data.onEdit" icon="Check" link @click="onUpdateGroup()" />
                                     <el-button v-if="data.onEdit" icon="Close" link @click="data.onEdit = false" />
                                 </div>
@@ -70,7 +75,7 @@
             <el-col :span="16">
                 <el-card class="el-card">
                     <el-form ref="hostInfoRef" label-width="100px" :model="hostInfo" :rules="rules">
-                        <el-form-item label="IP" prop="addr">
+                        <el-form-item :label="$t('terminal.ip')" prop="addr">
                             <el-input clearable v-model="hostInfo.addr" />
                         </el-form-item>
                         <el-form-item :label="$t('terminal.user')" prop="user">
@@ -146,7 +151,7 @@ import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { Host } from '@/api/interface/host';
 import { Group } from '@/api/interface/group';
-import { testConn, getHostTree, getHostInfo, addHost, editHost, deleteHost } from '@/api/modules/host';
+import { getHostTree, getHostInfo, addHost, editHost, deleteHost, testByInfo } from '@/api/modules/host';
 import { getGroupList, addGroup, editGroup, deleteGroup } from '@/api/modules/group';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElMessage } from 'element-plus';
@@ -157,7 +162,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const hostInfoRef = ref<FormInstance>();
 const rules = reactive({
     groupBelong: [Rules.requiredSelect],
-    addr: [Rules.requiredInput, Rules.ip],
+    addr: [Rules.requiredInput],
     port: [Rules.requiredInput, Rules.port],
     user: [Rules.requiredInput],
     authMode: [Rules.requiredSelect],
@@ -251,8 +256,13 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
                 loadHostTree();
                 break;
             case 'testconn':
-                await testConn(hostInfo);
-                ElMessage.success(i18n.global.t('terminal.connTestOk'));
+                await testByInfo(hostInfo).then((res) => {
+                    if (res.data) {
+                        ElMessage.success(i18n.global.t('terminal.connTestOk'));
+                    } else {
+                        ElMessage.success(i18n.global.t('terminal.connTestFailed'));
+                    }
+                });
                 break;
         }
     });

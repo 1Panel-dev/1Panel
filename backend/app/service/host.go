@@ -6,6 +6,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/ssh"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 )
@@ -13,6 +14,7 @@ import (
 type HostService struct{}
 
 type IHostService interface {
+	TestLocalConn(id uint) bool
 	GetHostInfo(id uint) (*model.Host, error)
 	SearchForTree(search dto.SearchForTree) ([]dto.HostTree, error)
 	Create(hostDto dto.HostOperate) (*dto.HostInfo, error)
@@ -22,6 +24,35 @@ type IHostService interface {
 
 func NewIHostService() IHostService {
 	return &HostService{}
+}
+
+func (u *HostService) TestLocalConn(id uint) bool {
+	var (
+		host model.Host
+		err  error
+	)
+	if id == 0 {
+		host, err = hostRepo.Get(hostRepo.WithByAddr("127.0.0.1"))
+		if err != nil {
+			return false
+		}
+	} else {
+		host, err = hostRepo.Get(commonRepo.WithByID(id))
+		if err != nil {
+			return false
+		}
+	}
+	var connInfo ssh.ConnInfo
+	if err := copier.Copy(&connInfo, &host); err != nil {
+		return false
+	}
+	client, err := connInfo.NewClient()
+	if err != nil {
+		return false
+	}
+	defer client.Close()
+
+	return true
 }
 
 func (u *HostService) GetHostInfo(id uint) (*model.Host, error) {
@@ -49,7 +80,7 @@ func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, e
 		for _, host := range hosts {
 			label := fmt.Sprintf("%s@%s:%d", host.User, host.Addr, host.Port)
 			if len(host.Name) != 0 {
-				label = fmt.Sprintf("%s-%s@%s:%d", host.Name, host.User, host.Addr, host.Port)
+				label = fmt.Sprintf("%s - %s@%s:%d", host.Name, host.User, host.Addr, host.Port)
 			}
 			if host.GroupBelong == group.Name {
 				data.Children = append(data.Children, dto.TreeChild{ID: host.ID, Label: label})
@@ -112,6 +143,9 @@ func (u *HostService) Delete(id uint) error {
 	host, _ := hostRepo.Get(commonRepo.WithByID(id))
 	if host.ID == 0 {
 		return constant.ErrRecordNotFound
+	}
+	if host.Addr == "127.0.0.1" {
+		return errors.New("the local connection information cannot be deleted!")
 	}
 	return hostRepo.Delete(commonRepo.WithByID(id))
 }

@@ -28,7 +28,7 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 	helper.SuccessWithData(c, host)
 }
 
-func (b *BaseApi) TestConn(c *gin.Context) {
+func (b *BaseApi) TestByInfo(c *gin.Context) {
 	var req dto.HostConnTest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
@@ -41,17 +41,26 @@ func (b *BaseApi) TestConn(c *gin.Context) {
 
 	var connInfo ssh.ConnInfo
 	if err := copier.Copy(&connInfo, &req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, constant.ErrStructTransform)
-		return
+		helper.SuccessWithData(c, false)
 	}
 	client, err := connInfo.NewClient()
+	if err != nil {
+		helper.SuccessWithData(c, false)
+	}
+	defer client.Close()
+
+	helper.SuccessWithData(c, true)
+}
+
+func (b *BaseApi) TestByID(c *gin.Context) {
+	id, err := helper.GetParamID(c)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	defer client.Close()
 
-	helper.SuccessWithData(c, nil)
+	connStatus := hostService.TestLocalConn(id)
+	helper.SuccessWithData(c, connStatus)
 }
 
 func (b *BaseApi) HostTree(c *gin.Context) {
