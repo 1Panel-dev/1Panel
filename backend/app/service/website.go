@@ -29,6 +29,7 @@ type WebsiteService struct {
 
 type IWebsiteService interface {
 	PageWebsite(req request.WebsiteSearch) (int64, []response.WebsiteDTO, error)
+	GetWebsites() ([]response.WebsiteDTO, error)
 	CreateWebsite(create request.WebsiteCreate) error
 	OpWebsite(req request.WebsiteOp) error
 	GetWebsiteOptions() ([]string, error)
@@ -79,6 +80,20 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 		})
 	}
 	return total, websiteDTOs, nil
+}
+
+func (w WebsiteService) GetWebsites() ([]response.WebsiteDTO, error) {
+	var websiteDTOs []response.WebsiteDTO
+	websites, err := websiteRepo.List()
+	if err != nil {
+		return nil, err
+	}
+	for _, web := range websites {
+		websiteDTOs = append(websiteDTOs, response.WebsiteDTO{
+			Website: web,
+		})
+	}
+	return websiteDTOs, nil
 }
 
 func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) error {
@@ -776,4 +791,26 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 		}
 	}
 	return res, nil
+}
+
+func (w WebsiteService) ChangeDefaultServer(id uint) error {
+	defaultWebsite, _ := websiteRepo.GetFirst(websiteRepo.WithDefaultServer())
+	if defaultWebsite.ID > 0 {
+		if err := updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "listen", Params: []string{"80"}}}, &defaultWebsite); err != nil {
+			return err
+		}
+		defaultWebsite.DefaultServer = false
+		if err := websiteRepo.Save(context.Background(), &defaultWebsite); err != nil {
+			return err
+		}
+	}
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return err
+	}
+	if err := updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "listen", Params: []string{"80", "default_server"}}}, &website); err != nil {
+		return err
+	}
+	website.DefaultServer = true
+	return websiteRepo.Save(context.Background(), &website)
 }

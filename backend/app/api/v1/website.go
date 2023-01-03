@@ -26,6 +26,15 @@ func (b *BaseApi) PageWebsite(c *gin.Context) {
 	})
 }
 
+func (b *BaseApi) GetWebsites(c *gin.Context) {
+	websites, err := websiteService.GetWebsites()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, websites)
+}
+
 func (b *BaseApi) GetWebsiteOptions(c *gin.Context) {
 	websites, err := websiteService.GetWebsiteOptions()
 	if err != nil {
@@ -333,4 +342,17 @@ func (b *BaseApi) OpWebsiteLog(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, res)
+}
+
+func (b *BaseApi) ChangeDefaultServer(c *gin.Context) {
+	var req request.WebsiteDefaultUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.ChangeDefaultServer(req.ID); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
 }

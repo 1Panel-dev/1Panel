@@ -11,6 +11,7 @@ export namespace Website {
         appInstallId?: number;
         webSiteGroupId: number;
         otherDomains: string;
+        defaultServer: boolean;
         appinstall?: NewAppInstall;
         webSiteSSL: SSL;
     }
@@ -270,5 +271,9 @@ export namespace Website {
     export interface NginxUpdate {
         id: number;
         content: string;
+    }
+
+    export interface DefaultServerUpdate {
+        id: number;
     }
 }

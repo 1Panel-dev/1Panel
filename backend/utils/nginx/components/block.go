@@ -32,23 +32,6 @@ func (b *Block) FindDirectives(directiveName string) []IDirective {
 	return directives
 }
 
-//func (b *Block) UpdateDirectives(directiveName string, directive Directive) {
-//	directives := b.GetDirectives()
-//	index := -1
-//	for i, dir := range directives {
-//		if dir.GetName() == directiveName {
-//			index = i
-//			break
-//		}
-//	}
-//	if index > -1 {
-//		directives[index] = &directive
-//	} else {
-//		directives = append(directives, &directive)
-//	}
-//	b.Directives = directives
-//}
-
 func (b *Block) UpdateDirective(key string, params []string) {
 	if key == "" || len(params) == 0 {
 		return

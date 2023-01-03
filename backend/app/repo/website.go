@@ -14,6 +14,7 @@ type IWebsiteRepo interface {
 	WithAlias(alias string) DBOption
 	WithWebsiteSSLID(sslId uint) DBOption
 	WithGroupID(groupId uint) DBOption
+	WithDefaultServer() DBOption
 	Page(page, size int, opts ...DBOption) (int64, []model.Website, error)
 	List(opts ...DBOption) ([]model.Website, error)
 	GetFirst(opts ...DBOption) (model.Website, error)
@@ -57,6 +58,12 @@ func (w *WebsiteRepo) WithWebsiteSSLID(sslId uint) DBOption {
 func (w *WebsiteRepo) WithGroupID(groupId uint) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("website_group_id = ?", groupId)
+	}
+}
+
+func (w *WebsiteRepo) WithDefaultServer() DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("default_server = 1")
 	}
 }
 

@@ -122,3 +122,7 @@ type WebsiteLogReq struct {
 	Operate string `json:"operate" validate:"required"`
 	LogType string `json:"logType" validate:"required"`
 }
+
+type WebsiteDefaultUpdate struct {
+	ID uint `json:"id" validate:"required"`
+}
