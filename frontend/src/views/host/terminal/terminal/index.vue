@@ -129,7 +129,7 @@ import { ElTree } from 'element-plus';
 import screenfull from 'screenfull';
 import i18n from '@/lang';
 import { Host } from '@/api/interface/host';
-import { getHostTree } from '@/api/modules/host';
+import { getHostTree, testByID } from '@/api/modules/host';
 import { getCommandList } from '@/api/modules/command';
 
 const dialogRef = ref();
@@ -168,33 +168,35 @@ interface Tree {
     children?: Tree[];
 }
 
-const acceptParams = () => {
-    loadHostTree();
+const acceptParams = async () => {
     loadCommand();
+    const res = await getHostTree({});
+    hostTree.value = res.data;
     timer = setInterval(() => {
         syncTerminal();
     }, 1000 * 5);
-    // for (const item of hostTree.value) {
-    //     if (!item.children) {
-    //         continue;
-    //     }
-    //     for (const host of item.children) {
-    //         if (host.label.indexOf('127.0.0.1') !== -1) {
-    //             localHostID.value = host.id;
-    //             if (terminalTabs.value.length === 0) {
-    //                 onConnTerminal(i18n.global.t('terminal.localhost'), localHostID.value, '127.0.0.1');
-    //             }
-    //             return;
-    //         }
-    //     }
-    // }
+    for (const item of hostTree.value) {
+        if (!item.children) {
+            continue;
+        }
+        for (const host of item.children) {
+            if (host.label.indexOf('127.0.0.1') !== -1) {
+                localHostID.value = host.id;
+                if (terminalTabs.value.length !== 0) {
+                    return;
+                }
+                onNewLocal();
+                return;
+            }
+        }
+    }
 };
 const cleanTimer = () => {
     clearInterval(Number(timer));
     timer = null;
     for (const terminal of terminalTabs.value) {
-        if (ctx && ctx.refs[`t-${terminal.key}`][0]) {
-            terminal.status = ctx.refs[`t-${terminal.key}`][0].onClose();
+        if (ctx && ctx.refs[`t-${terminal.index}`][0]) {
+            terminal.status = ctx.refs[`t-${terminal.index}`][0].onClose();
         }
     }
 };
@@ -239,11 +241,15 @@ const loadCommand = async () => {
 };
 
 function quickInput(val: any) {
-    if (val !== '') {
-        if (ctx) {
-            ctx.refs[`t-${terminalValue.value}`] && ctx.refs[`t-${terminalValue.value}`][0].onSendMsg(val + '\n');
-            quickCmd.value = '';
+    if (val !== '' && ctx) {
+        if (isBatch.value) {
+            for (const tab of terminalTabs.value) {
+                ctx.refs[`t-${tab.index}`] && ctx.refs[`t-${tab.index}`][0].onSendMsg(val + '\n');
+            }
+            return;
         }
+        ctx.refs[`t-${terminalValue.value}`] && ctx.refs[`t-${terminalValue.value}`][0].onSendMsg(val + '\n');
+        quickCmd.value = '';
     }
 }
 
@@ -253,7 +259,7 @@ function batchInput() {
     }
     if (isBatch.value) {
         for (const tab of terminalTabs.value) {
-            ctx.refs[`t-${tab.key}`] && ctx.refs[`t-${tab.key}`][0].onSendMsg(batchVal.value + '\n');
+            ctx.refs[`t-${tab.index}`] && ctx.refs[`t-${tab.index}`][0].onSendMsg(batchVal.value + '\n');
         }
         batchVal.value = '';
         return;
@@ -272,7 +278,7 @@ const onNewSsh = () => {
     dialogRef.value!.acceptParams({ isLocal: false });
 };
 const onNewLocal = () => {
-    onConnTerminal(i18n.global.t('terminal.localhost'), localHostID.value);
+    onConnTerminal(i18n.global.t('terminal.localhost'), localHostID.value, true);
 };
 
 const onClickConn = (node: Node, data: Tree) => {
@@ -284,26 +290,39 @@ const onClickConn = (node: Node, data: Tree) => {
 
 const onReconnect = async (item: any) => {
     if (ctx) {
-        ctx.refs[`t-${item.key}`] && ctx.refs[`t-${item.key}`][0].onClose();
+        ctx.refs[`t-${item.index}`] && ctx.refs[`t-${item.index}`][0].onClose();
     }
     item.Refresh = !item.Refresh;
-    ctx.refs[`t-${item.key}`];
+    const res = await testByID(item.wsID);
+    nextTick(() => {
+        ctx.refs[`t-${item.index}`] &&
+            ctx.refs[`t-${item.index}`][0].acceptParams({
+                wsID: item.wsID,
+                terminalID: item.index,
+                error: res.data ? '' : 'Failed to set up the connection. Please check the host information',
+            });
+    });
     syncTerminal();
 };
 
-const onConnTerminal = (title: string, wsID: number) => {
+const onConnTerminal = async (title: string, wsID: number, isLocal?: boolean) => {
+    const res = await testByID(wsID);
     terminalTabs.value.push({
         index: tabIndex,
         title: title,
         wsID: wsID,
-        status: 'online',
+        status: res.data ? 'online' : 'closed',
     });
     terminalValue.value = tabIndex;
+    if (!res.data && isLocal) {
+        dialogRef.value!.acceptParams({ isLocal: true });
+    }
     nextTick(() => {
         ctx.refs[`t-${terminalValue.value}`] &&
             ctx.refs[`t-${terminalValue.value}`][0].acceptParams({
                 wsID: wsID,
                 terminalID: terminalValue.value,
+                error: res.data ? '' : 'Failed to set up the connection. Please check the host information !',
             });
     });
     tabIndex++;
@@ -356,7 +375,7 @@ defineExpose({
 .fullScreen {
     position: absolute;
     right: 50px;
-    top: 86px;
+    top: 80px;
     font-weight: 600;
     font-size: 14px;
 }

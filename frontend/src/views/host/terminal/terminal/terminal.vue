@@ -15,13 +15,18 @@ const wsID = ref();
 interface WsProps {
     terminalID: string;
     wsID: number;
+    error: string;
 }
 const acceptParams = (props: WsProps) => {
     terminalID.value = props.terminalID;
     wsID.value = props.wsID;
     nextTick(() => {
-        initTerm();
-        window.addEventListener('resize', changeTerminalSize);
+        if (props.error.length !== 0) {
+            initErrorTerm(props.error);
+        } else {
+            initTerm();
+            window.addEventListener('resize', changeTerminalSize);
+        }
     });
 };
 
@@ -57,11 +62,32 @@ const errorRealTerminal = (ex: any) => {
     let message = ex.message;
     if (!message) message = 'disconnected';
     term.write(`\x1b[31m${message}\x1b[m\r\n`);
-    console.log('err');
 };
 
 const closeRealTerminal = (ev: CloseEvent) => {
     term.write(ev.reason);
+};
+
+const initErrorTerm = (errorInfo: string) => {
+    let ifm = document.getElementById('terminal-' + terminalID.value) as HTMLInputElement | null;
+    term = new Terminal({
+        lineHeight: 1.2,
+        fontSize: 12,
+        fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
+        theme: {
+            background: '#000000',
+        },
+        cursorBlink: true,
+        cursorStyle: 'underline',
+        scrollback: 100,
+        tabStopWidth: 4,
+    });
+    if (ifm) {
+        term.open(ifm);
+        term.write(errorInfo);
+        term.loadAddon(fitAddon);
+        fitAddon.fit();
+    }
 };
 
 const initTerm = () => {
@@ -127,8 +153,12 @@ const isWsOpen = () => {
 
 function onClose() {
     window.removeEventListener('resize', changeTerminalSize);
-    terminalSocket && terminalSocket.close();
-    term && term.dispose();
+    try {
+        terminalSocket.close();
+    } catch {}
+    try {
+        term.dispose();
+    } catch {}
 }
 
 function onSendMsg(command: string) {

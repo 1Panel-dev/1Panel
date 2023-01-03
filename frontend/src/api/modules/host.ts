@@ -13,8 +13,12 @@ export const addHost = (params: Host.HostOperate) => {
     return http.post<Host.HostOperate>(`/hosts`, params);
 };
 
-export const testConn = (params: Host.HostConnTest) => {
-    return http.post(`/hosts/testconn`, params);
+export const testByInfo = (params: Host.HostConnTest) => {
+    return http.post<boolean>(`/hosts/test/byinfo`, params);
+};
+
+export const testByID = (id: number) => {
+    return http.post<boolean>(`/hosts/test/byid/${id}`);
 };
 
 export const editHost = (params: Host.HostOperate) => {

@@ -20,7 +20,8 @@ func (s *HostRouter) InitHostRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/del", baseApi.DeleteHost)
 		hostRouter.POST("/update", baseApi.UpdateHost)
 		hostRouter.POST("/search", baseApi.HostTree)
-		hostRouter.POST("/testconn", baseApi.TestConn)
+		hostRouter.POST("/test/byinfo", baseApi.TestByInfo)
+		hostRouter.POST("/test/byid/:id", baseApi.TestByID)
 		hostRouter.GET(":id", baseApi.GetHostInfo)
 	}
 }
