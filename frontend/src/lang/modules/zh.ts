@@ -811,6 +811,7 @@ export default {
         deleteBackupHelper: '同时删除应用备份',
         noService: '无{0}',
         toInstall: '去安装',
+        param: '参数配置',
     },
     website: {
         website: '网站',

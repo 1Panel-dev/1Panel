@@ -33,5 +33,6 @@ func (a *AppRouter) InitAppRouter(Router *gin.RouterGroup) {
 		appRouter.POST("/installed/port/change", baseApi.ChangeAppPort)
 		appRouter.GET("/services/:key", baseApi.GetServices)
 		appRouter.GET("/installed/conf/:key", baseApi.GetDefaultConfig)
+		appRouter.GET("/installed/params/:appInstallId", baseApi.GetParams)
 	}
 }

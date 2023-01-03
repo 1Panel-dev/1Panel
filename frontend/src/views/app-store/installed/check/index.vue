@@ -1,11 +1,5 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('app.checkTitle')"
-        width="50%"
-        :close-on-click-modal="false"
-        :destroy-on-close="true"
-    >
+    <el-dialog v-model="open" :title="$t('app.checkTitle')" width="50%" :close-on-click-modal="false">
         <el-row>
             <el-alert
                 type="warning"

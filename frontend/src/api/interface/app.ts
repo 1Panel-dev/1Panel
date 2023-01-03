@@ -142,4 +142,9 @@ export namespace App {
         version: string;
         detailId: number;
     }
+
+    export interface InstallParams {
+        label: string;
+        value: string;
+    }
 }

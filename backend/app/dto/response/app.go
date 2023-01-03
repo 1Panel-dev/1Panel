@@ -52,3 +52,8 @@ type AppService struct {
 	Value  string      `json:"value"`
 	Config interface{} `json:"config"`
 }
+
+type AppParam struct {
+	Label string      `json:"label"`
+	Value interface{} `json:"value"`
+}
