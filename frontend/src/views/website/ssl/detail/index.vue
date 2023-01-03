@@ -98,43 +98,6 @@ const copyText = async (msg) => {
     }
 };
 
-// const copyText = async (text: string) => {
-//     try {
-//         try {
-//             await navigator.clipboard.writeText(text);
-//             ElMessage.success(i18n.global.t('commons.msg.copySuccess'));
-//             return await Promise.resolve();
-//         } catch (err) {
-//             return await Promise.reject(err);
-//         }
-//     } catch (e) {
-//         let input = document.createElement('input');
-//         input.style.position = 'fixed';
-//         input.style.top = '-10000px';
-//         input.style.zIndex = '-999';
-//         document.body.appendChild(input);
-//         console.log('input', input);
-//         input.value = text;
-//         input.focus();
-//         input.select();
-//         try {
-//             let result = document.execCommand('copy');
-//             document.body.removeChild(input);
-//             if (!result) {
-//                 ElMessage.error(i18n.global.t('commons.msg.copyfailed'));
-//                 return Promise.reject();
-//             } else {
-//                 ElMessage.success(i18n.global.t('commons.msg.copySuccess'));
-//                 return Promise.resolve();
-//             }
-//         } catch (e) {
-//             document.body.removeChild(input);
-//             ElMessage.error(i18n.global.t('commons.msg.copyfailed'));
-//             return Promise.reject();
-//         }
-//     }
-// };
-
 defineExpose({
     acceptParams,
 });

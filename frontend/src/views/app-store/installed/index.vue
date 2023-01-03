@@ -18,7 +18,9 @@
             </template>
             <el-table-column :label="$t('app.name')" prop="name" min-width="150px" show-overflow-tooltip>
                 <template #default="{ row }">
-                    {{ row.name }}
+                    <el-link :underline="false" @click="openParam(row.id)" type="primary">
+                        {{ row.name }}
+                    </el-link>
                     <el-tag round effect="dark" v-if="row.canUpdate">{{ $t('app.canUpdate') }}</el-tag>
                 </template>
             </el-table-column>
@@ -32,6 +34,7 @@
                     </el-link>
                 </template>
             </el-table-column>
+
             <el-table-column :label="$t('app.status')">
                 <template #default="{ row }">
                     <el-popover
@@ -101,6 +104,7 @@
         <Backups ref="backupRef" @close="search"></Backups>
         <AppResources ref="checkRef"></AppResources>
         <AppDelete ref="deleteRef" @close="search"></AppDelete>
+        <AppParams ref="appParamRef"></AppParams>
     </el-card>
 </template>
 
@@ -120,8 +124,8 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import Backups from './backups.vue';
 import AppResources from './check/index.vue';
 import AppDelete from './delete/index.vue';
+import AppParams from './detail/index.vue';
 import { App } from '@/api/interface/app';
-// import { useDeleteData } from '@/hooks/use-delete-data';
 import Status from '@/components/status/index.vue';
 
 let data = ref<any>();
@@ -142,6 +146,7 @@ let versions = ref<App.VersionDetail[]>();
 const backupRef = ref();
 const checkRef = ref();
 const deleteRef = ref();
+const appParamRef = ref();
 let searchName = ref('');
 
 const sync = () => {
@@ -187,9 +192,6 @@ const openOperate = (row: any, op: string) => {
                 checkRef.value.acceptParams({ items: items });
             } else {
                 deleteRef.value.acceptParams(row);
-
-                // await useDeleteData(InstalledOp, operateReq, 'app.deleteWarn');
-                // search();
             }
         });
     } else {
@@ -279,6 +281,10 @@ const openBackups = (installId: number, installName: string) => {
         appInstallName: installName,
     };
     backupRef.value.acceptParams(params);
+};
+
+const openParam = (installId: number) => {
+    appParamRef.value.acceptParams({ id: installId });
 };
 
 onMounted(() => {

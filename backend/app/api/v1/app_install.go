@@ -25,7 +25,6 @@ func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
 		}
-
 		helper.SuccessWithData(c, dto.PageResult{
 			Items: list,
 			Total: total,
@@ -36,7 +35,6 @@ func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
 		}
-
 		helper.SuccessWithData(c, list)
 	}
 }
@@ -89,7 +87,6 @@ func (b *BaseApi) DeleteCheck(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
 		return
 	}
-
 	checkData, err := appInstallService.DeleteCheck(appInstallId)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -117,7 +114,6 @@ func (b *BaseApi) SearchInstalledBackup(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-
 	helper.SuccessWithData(c, dto.PageResult{
 		Items: list,
 		Total: total,
@@ -134,7 +130,6 @@ func (b *BaseApi) OperateInstalled(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-
 	helper.SuccessWithData(c, nil)
 }
 
@@ -158,7 +153,6 @@ func (b *BaseApi) GetServices(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-
 	helper.SuccessWithData(c, services)
 }
 
@@ -168,13 +162,11 @@ func (b *BaseApi) GetUpdateVersions(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
 		return
 	}
-
 	versions, err := appInstallService.GetUpdateVersions(appInstallId)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-
 	helper.SuccessWithData(c, versions)
 }
 
@@ -188,12 +180,10 @@ func (b *BaseApi) ChangeAppPort(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-
 	if err := appInstallService.ChangeAppPort(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-
 	helper.SuccessWithData(c, nil)
 }
 
@@ -203,12 +193,25 @@ func (b *BaseApi) GetDefaultConfig(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
 		return
 	}
-
 	content, err := appInstallService.GetDefaultConfigByKey(key)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 
+	helper.SuccessWithData(c, content)
+}
+
+func (b *BaseApi) GetParams(c *gin.Context) {
+	appInstallId, err := helper.GetIntParamByKey(c, "appInstallId")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	content, err := appInstallService.GetParams(appInstallId)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
 	helper.SuccessWithData(c, content)
 }

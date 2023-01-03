@@ -350,6 +350,45 @@ func (a AppInstallService) GetDefaultConfigByKey(key string) (string, error) {
 	return string(contentByte), nil
 }
 
+func (a AppInstallService) GetParams(id uint) ([]response.AppParam, error) {
+	var (
+		res     []response.AppParam
+		appForm dto.AppForm
+		envs    = make(map[string]interface{})
+	)
+	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return nil, err
+	}
+	detail, err := appDetailRepo.GetFirst(commonRepo.WithByID(install.AppDetailId))
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal([]byte(detail.Params), &appForm); err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal([]byte(install.Env), &envs); err != nil {
+		return nil, err
+	}
+	for _, form := range appForm.FormFields {
+		if v, ok := envs[form.EnvKey]; ok {
+			if form.Type == "service" {
+				appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithServiceName(v.(string)))
+				res = append(res, response.AppParam{
+					Label: form.LabelZh,
+					Value: appInstall.Name,
+				})
+			} else {
+				res = append(res, response.AppParam{
+					Label: form.LabelZh,
+					Value: v,
+				})
+			}
+		}
+	}
+	return res, nil
+}
+
 func syncById(installId uint) error {
 	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
 	if err != nil {

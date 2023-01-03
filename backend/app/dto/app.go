@@ -62,16 +62,17 @@ type Tag struct {
 }
 
 type AppForm struct {
-	FormFields []AppFormFields `json:"form_fields"`
+	FormFields []AppFormFields `json:"formFields"`
 }
 
 type AppFormFields struct {
-	Type     string `json:"type"`
-	LabelZh  string `json:"label_zh"`
-	LabelEn  string `json:"label_en"`
-	Required string `json:"required"`
-	Default  string `json:"default"`
-	EnvKey   string `json:"env_variable"`
+	Type     string      `json:"type"`
+	LabelZh  string      `json:"labelZh"`
+	LabelEn  string      `json:"labelEn"`
+	Required bool        `json:"required"`
+	Default  interface{} `json:"default"`
+	EnvKey   string      `json:"envKey"`
+	Disabled bool        `json:"disabled"`
 }
 
 type AppResource struct {
