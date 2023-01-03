@@ -1,8 +1,24 @@
 <template>
     <div v-loading="loading">
-        <el-form-item prop="enable" :label="$t('website.enable')">
-            <el-switch v-model="data.enable" @change="updateEnable"></el-switch>
-        </el-form-item>
+        <div>
+            <el-form-item :label="$t('website.enable')">
+                <el-switch v-model="data.enable" @change="updateEnable"></el-switch>
+            </el-form-item>
+            <div style="margin-top: 10px">
+                <el-checkbox border v-model="tailLog" style="float: left" @change="changeTail">
+                    {{ $t('commons.button.watch') }}
+                </el-checkbox>
+                <el-button
+                    style="margin-left: 20px"
+                    @click="onDownload"
+                    icon="Download"
+                    :disabled="data.content === ''"
+                >
+                    {{ $t('file.download') }}
+                </el-button>
+            </div>
+        </div>
+        <br />
         <codemirror
             style="max-height: 500px; width: 100%; min-height: 200px"
             :autofocus="true"
@@ -16,6 +32,7 @@
             :extensions="extensions"
             v-model="data.content"
             :readOnly="true"
+            @ready="handleReady"
         />
     </div>
 </template>
@@ -23,8 +40,9 @@
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { computed, onMounted, ref } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef } from 'vue';
 import { OpWebsiteLog } from '@/api/modules/website';
+import { dateFromatForName } from '@/utils/util';
 
 const extensions = [javascript(), oneDark];
 const props = defineProps({
@@ -48,6 +66,13 @@ let data = ref({
     enable: false,
     content: '',
 });
+let tailLog = ref(false);
+let timer: NodeJS.Timer | null = null;
+
+const view = shallowRef();
+const handleReady = (payload) => {
+    view.value = payload.view;
+};
 
 const getContent = () => {
     const req = {
@@ -59,10 +84,27 @@ const getContent = () => {
     OpWebsiteLog(req)
         .then((res) => {
             data.value = res.data;
+            nextTick(() => {
+                const state = view.value.state;
+                view.value.dispatch({
+                    selection: { anchor: state.doc.length, head: state.doc.length },
+                    scrollIntoView: true,
+                });
+            });
         })
         .finally(() => {
             loading.value = false;
         });
+};
+
+const changeTail = () => {
+    if (tailLog.value) {
+        timer = setInterval(() => {
+            getContent();
+        }, 1000 * 5);
+    } else {
+        onCloseLog();
+    }
 };
 
 const updateEnable = () => {
@@ -82,7 +124,27 @@ const updateEnable = () => {
         });
 };
 
+const onDownload = async () => {
+    const downloadUrl = window.URL.createObjectURL(new Blob([data.value.content]));
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = downloadUrl;
+    a.download = logType.value + '-' + dateFromatForName(new Date()) + '.log';
+    const event = new MouseEvent('click');
+    a.dispatchEvent(event);
+};
+
+const onCloseLog = async () => {
+    tailLog.value = false;
+    clearInterval(Number(timer));
+    timer = null;
+};
+
 onMounted(() => {
     getContent();
+});
+
+onUnmounted(() => {
+    onCloseLog();
 });
 </script>
