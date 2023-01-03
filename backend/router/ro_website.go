@@ -16,6 +16,7 @@ func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		groupRouter.POST("/search", baseApi.PageWebsite)
+		groupRouter.GET("/list", baseApi.GetWebsites)
 		groupRouter.POST("", baseApi.CreateWebsite)
 		groupRouter.POST("/operate", baseApi.OpWebsite)
 		groupRouter.POST("/log", baseApi.OpWebsiteLog)
@@ -40,5 +41,6 @@ func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/waf/config", baseApi.GetWebsiteWafConfig)
 		groupRouter.POST("/waf/update", baseApi.UpdateWebsiteWafConfig)
 		groupRouter.POST("/nginx/update", baseApi.UpdateWebsiteNginxConfig)
+		groupRouter.POST("/default/server", baseApi.ChangeDefaultServer)
 	}
 }

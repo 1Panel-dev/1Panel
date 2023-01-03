@@ -7,6 +7,10 @@ export const SearchWebsites = (req: Website.WebSiteSearch) => {
     return http.post<ResPage<Website.Website>>(`/websites/search`, req);
 };
 
+export const ListWebsites = () => {
+    return http.get<Website.WebsiteDTO>(`/websites/list`);
+};
+
 export const CreateWebsite = (req: Website.WebSiteCreateReq) => {
     return http.post<any>(`/websites`, req);
 };
@@ -173,4 +177,8 @@ export const UpdateWafEnable = (req: Website.WafUpdate) => {
 
 export const UpdateNginxFile = (req: Website.NginxUpdate) => {
     return http.post<any>(`/websites/nginx/update`, req);
+};
+
+export const ChangeDefaultServer = (req: Website.DefaultServerUpdate) => {
+    return http.post<any>(`/websites/default/server`, req);
 };

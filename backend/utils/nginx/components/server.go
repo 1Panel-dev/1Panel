@@ -73,6 +73,19 @@ func (s *Server) UpdateDirective(key string, params []string) {
 	if key == "" || len(params) == 0 {
 		return
 	}
+	if key == "listen" {
+		defaultServer := false
+		if len(params) > 1 && params[1] == "default_server" {
+			defaultServer = true
+		}
+		if len(params) > 2 {
+			s.UpdateListen(params[0], defaultServer, params[2:]...)
+		} else {
+			s.UpdateListen(params[0], defaultServer)
+		}
+		return
+	}
+
 	directives := s.Directives
 	index := -1
 	for i, dir := range directives {

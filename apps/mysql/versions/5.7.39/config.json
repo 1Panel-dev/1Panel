@@ -2,7 +2,7 @@
   "formFields": [
     {
       "type": "password",
-      "labelZh": "Root用户密码",
+      "labelZh": "root用户密码",
       "labelEn": "RootPassword",
       "required": true,
       "default": "random",

@@ -959,6 +959,8 @@ export default {
         nextYear: '一年后',
         allGroup: '所有分组',
         noLog: '当前没有日志...',
+        defaulServer: '默认网站',
+        noDefaulServer: '当前没有默认网站',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',

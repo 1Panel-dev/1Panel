@@ -18,6 +18,7 @@ type Website struct {
 	Proxy          string          `gorm:"type:varchar(128);not null" json:"proxy"`
 	ErrorLog       bool            `json:"errorLog"`
 	AccessLog      bool            `json:"accessLog"`
+	DefaultServer  bool            `json:"defaultServer"`
 	Domains        []WebsiteDomain `json:"domains"`
 	WebsiteSSL     WebsiteSSL      `json:"webSiteSSL"`
 }

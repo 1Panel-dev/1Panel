@@ -16,6 +16,9 @@
                                         <el-button type="primary" plain @click="openGroup">
                                             {{ $t('website.group') }}
                                         </el-button>
+                                        <el-button type="primary" plain @click="openDefault">
+                                            {{ $t('website.defaulServer') }}
+                                        </el-button>
                                     </el-col>
                                     <el-col :span="14">
                                         <div style="float: right">
@@ -120,6 +123,7 @@
                 <WebSiteGroup ref="groupRef"></WebSiteGroup>
                 <UploadDialog ref="uploadRef" />
                 <BackupRecords ref="dialogBackupRef" />
+                <DefaultServer ref="defaultRef" />
             </LayoutContent>
         </div>
         <div v-if="nginxIsExist">
@@ -127,7 +131,6 @@
                 <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['OpenResty']) }}</span>
             </el-card>
         </div>
-
         <el-card v-if="openNginxConfig">
             <NginxConfig :containerName="containerName" :status="nginxStatus"></NginxConfig>
         </el-card>
@@ -138,6 +141,7 @@
 import LayoutContent from '@/layout/layout-content.vue';
 import BackupRecords from '@/views/website/website/backup/index.vue';
 import UploadDialog from '@/views/website/website/upload/index.vue';
+import DefaultServer from '@/views/website/website/default/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import CreateWebSite from './create/index.vue';
@@ -181,25 +185,26 @@ let nginxStatus = ref('');
 let installPath = ref('');
 const uploadRef = ref();
 const dialogBackupRef = ref();
+const defaultRef = ref();
 const data = ref();
 let dateRefs: Map<number, any> = new Map();
 let groups = ref<Website.Group[]>([]);
 
 const paginationConfig = reactive({
     currentPage: 1,
-    pageSize: 20,
+    pageSize: 15,
     total: 0,
 });
 let req = reactive({
     name: '',
-    page: paginationConfig.currentPage,
-    pageSize: paginationConfig.pageSize,
+    page: 1,
+    pageSize: 15,
     websiteGroupId: 0,
 });
 
 const search = async () => {
     req.page = paginationConfig.currentPage;
-    req.pageSize = paginationConfig.currentPage;
+    req.pageSize = paginationConfig.pageSize;
     SearchWebsites(req).then((res) => {
         data.value = res.data.items;
         paginationConfig.total = res.data.total;
@@ -328,6 +333,10 @@ const openCreate = () => {
 
 const openGroup = () => {
     groupRef.value.acceptParams();
+};
+
+const openDefault = () => {
+    defaultRef.value.acceptParams();
 };
 
 const checkExist = (data: App.CheckInstalled) => {

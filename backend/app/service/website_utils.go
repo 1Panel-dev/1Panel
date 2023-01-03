@@ -314,10 +314,10 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 		server.RemoveListenByBind("80")
 		server.RemoveDirective("if", []string{"($scheme"})
 	case constant.HTTPToHTTPS:
-		server.UpdateListen("80", false)
+		server.UpdateListen("80", website.DefaultServer)
 		server.AddHTTP2HTTPS()
 	case constant.HTTPAlso:
-		server.UpdateListen("80", false)
+		server.UpdateListen("80", website.DefaultServer)
 		server.RemoveDirective("if", []string{"($scheme"})
 	}
 
