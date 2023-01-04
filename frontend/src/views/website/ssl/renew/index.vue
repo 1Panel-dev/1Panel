@@ -8,6 +8,16 @@
         :before-close="handleClose"
     >
         <div style="text-align: center">
+            <span>{{ $t('ssl.renewWebsite') }}</span>
+            <div>
+                <br />
+                <span v-if="websites.length > 0">
+                    <span v-for="(website, index) in websites" :key="index">
+                        <el-tag>{{ website.primaryDomain }}</el-tag>
+                    </span>
+                </span>
+            </div>
+            <br />
             <span>{{ $t('ssl.renewConfirm') }}</span>
         </div>
         <template #footer>
@@ -22,10 +32,16 @@
 </template>
 
 <script lang="ts" setup>
+import { Website } from '@/api/interface/Website';
 import { RenewSSL } from '@/api/modules/website';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
 import { reactive, ref } from 'vue';
+
+interface RenewProps {
+    id: number;
+    websites: Website.Website[];
+}
 
 let open = ref(false);
 let loading = ref(false);
@@ -33,14 +49,15 @@ let renewReq = reactive({
     SSLId: 0,
 });
 const em = defineEmits(['close']);
-
 const handleClose = () => {
     open.value = false;
     em('close', false);
 };
+const websites = ref([]);
 
-const acceptParams = async (id: number) => {
-    renewReq.SSLId = id;
+const acceptParams = async (props: RenewProps) => {
+    renewReq.SSLId = Number(props.id);
+    websites.value = props.websites;
     open.value = true;
 };
 

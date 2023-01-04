@@ -1002,6 +1002,7 @@ export default {
         autoRenew: '自动续签',
         autoRenewHelper: '距离到期时间7天自动续签',
         renewSuccess: '续签成功',
+        renewWebsite: '该证书已经和以下网站关联，续签会同步应用到这些网站',
     },
     firewall: {
         ccDeny: 'CC 防护',
