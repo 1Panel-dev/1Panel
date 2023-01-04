@@ -8,6 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Load dashboard base info
+// @Tags Dashboard
+// @Summary Load dashboard base info
+// @Description 获取首页基础数据
+// @Accept json
+// @Param ioOption path string true "request"
+// @Param netOption path string true "request"
+// @Success 200 {object} dto.DashboardBase
+// @Security ApiKeyAuth
+// @Router /dashboard/base/:ioOption/:netOption [get]
 func (b *BaseApi) LoadDashboardBaseInfo(c *gin.Context) {
 	ioOption, ok := c.Params.Get("ioOption")
 	if !ok {
@@ -27,6 +37,16 @@ func (b *BaseApi) LoadDashboardBaseInfo(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+// Load dashboard current info
+// @Tags Dashboard
+// @Summary Load dashboard current info
+// @Description 获取首页实时数据
+// @Accept json
+// @Param ioOption path string true "request"
+// @Param netOption path string true "request"
+// @Success 200 {object} dto.DashboardCurrent
+// @Security ApiKeyAuth
+// @Router /dashboard/current/:ioOption/:netOption [get]
 func (b *BaseApi) LoadDashboardCurrentInfo(c *gin.Context) {
 	ioOption, ok := c.Params.Get("ioOption")
 	if !ok {

@@ -19,6 +19,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Load redis status info
+// @Tags Database Redis
+// @Summary Load redis status info
+// @Description 获取 redis 状态信息
+// @Success 200 {object} dto.RedisStatus
+// @Security ApiKeyAuth
+// @Router /databases/redis/status [get]
 func (b *BaseApi) LoadRedisStatus(c *gin.Context) {
 	data, err := redisService.LoadStatus()
 	if err != nil {
@@ -29,6 +36,13 @@ func (b *BaseApi) LoadRedisStatus(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+// Load redis conf
+// @Tags Database Redis
+// @Summary Load redis conf
+// @Description 获取 redis 配置信息
+// @Success 200 {object} dto.RedisConf
+// @Security ApiKeyAuth
+// @Router /databases/redis/conf [get]
 func (b *BaseApi) LoadRedisConf(c *gin.Context) {
 	data, err := redisService.LoadConf()
 	if err != nil {
@@ -39,6 +53,13 @@ func (b *BaseApi) LoadRedisConf(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+// Load redis persistence conf
+// @Tags Database Redis
+// @Summary Load redis persistence conf
+// @Description 获取 redis 持久化配置
+// @Success 200 {object} dto.RedisPersistence
+// @Security ApiKeyAuth
+// @Router /databases/redis/persistence/conf [get]
 func (b *BaseApi) LoadPersistenceConf(c *gin.Context) {
 	data, err := redisService.LoadPersistenceConf()
 	if err != nil {
@@ -49,6 +70,16 @@ func (b *BaseApi) LoadPersistenceConf(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
+// Update redis conf
+// @Tags Database Redis
+// @Summary Update redis conf
+// @Description 更新 redis 配置信息
+// @Accept json
+// @Param request body dto.RedisConfUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /databases/redis/conf/update [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新 redis 数据库配置信息","formatEN":"update the redis database configuration information"}
 func (b *BaseApi) UpdateRedisConf(c *gin.Context) {
 	var req dto.RedisConfUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -66,6 +97,16 @@ func (b *BaseApi) UpdateRedisConf(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Change redis password
+// @Tags Database Redis
+// @Summary Change redis password
+// @Description 更新 redis 密码
+// @Accept json
+// @Param request body dto.ChangeDBInfo true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /databases/redis/password [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"修改 redis 数据库密码","formatEN":"change the password of the redis database"}
 func (b *BaseApi) ChangeRedisPassword(c *gin.Context) {
 	var req dto.ChangeDBInfo
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -83,6 +124,16 @@ func (b *BaseApi) ChangeRedisPassword(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Update redis persistence conf
+// @Tags Database Redis
+// @Summary Update redis persistence conf
+// @Description 更新 redis 持久化配置
+// @Accept json
+// @Param request body dto.RedisConfPersistenceUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /databases/redis/persistence/update [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"redis 数据库持久化配置更新","formatEN":"redis database persistence configuration update"}
 func (b *BaseApi) UpdateRedisPersistenceConf(c *gin.Context) {
 	var req dto.RedisConfPersistenceUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -100,6 +151,14 @@ func (b *BaseApi) UpdateRedisPersistenceConf(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Backup redis
+// @Tags Database Redis
+// @Summary Backup redis
+// @Description 备份 redis 数据库
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /databases/redis/backup [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"备份 redis 数据库","formatEN":"backup redis database"}
 func (b *BaseApi) RedisBackup(c *gin.Context) {
 	if err := redisService.Backup(); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -108,6 +167,14 @@ func (b *BaseApi) RedisBackup(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Recover redis
+// @Tags Database Redis
+// @Summary Recover redis
+// @Description 恢复 redis 数据库
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /databases/redis/recover [post]
+// @x-panel-log {"bodyKeys":["fileDir","fileName"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"redis 数据库从 [fileDir]/[fileName] 恢复","formatEN":"redis database recover from [fileDir]/[fileName]"}
 func (b *BaseApi) RedisRecover(c *gin.Context) {
 	var req dto.RedisBackupRecover
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -126,6 +193,15 @@ func (b *BaseApi) RedisRecover(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Search redis backup list
+// @Tags Database Redis
+// @Summary Search redis backup list
+// @Description 获取 redis 备份记录分页
+// @Accept json
+// @Param request body dto.PageInfo true "request"
+// @Success 200 {object} dto.PageResult
+// @Security ApiKeyAuth
+// @Router /databases/redis/backup/search [post]
 func (b *BaseApi) RedisBackupList(c *gin.Context) {
 	var req dto.PageInfo
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -145,6 +221,16 @@ func (b *BaseApi) RedisBackupList(c *gin.Context) {
 	})
 }
 
+// Update redis conf by file
+// @Tags Database Redis
+// @Summary Update redis conf by file
+// @Description 上传更新 redis 配置信息
+// @Accept json
+// @Param request body dto.RedisConfUpdateByFile true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /databases/redis/conffile/update [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新 redis 数据库配置信息","formatEN":"update the redis database configuration information"}
 func (b *BaseApi) UpdateRedisConfByFile(c *gin.Context) {
 	var req dto.RedisConfUpdateByFile
 	if err := c.ShouldBindJSON(&req); err != nil {

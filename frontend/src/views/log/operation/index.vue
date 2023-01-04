@@ -86,7 +86,7 @@ const onClean = async () => {
 };
 
 const onSubmitClean = async () => {
-    await cleanLogs('operation');
+    await cleanLogs({ logType: 'operation' });
     search();
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };

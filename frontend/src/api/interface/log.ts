@@ -28,4 +28,7 @@ export namespace Log {
         message: string;
         createdAt: DateTimeFormats;
     }
+    export interface CleanLog {
+        logType: string;
+    }
 }

@@ -14,8 +14,8 @@ func (s *LogRouter) InitLogRouter(Router *gin.RouterGroup) {
 	operationRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		operationRouter.POST("login", baseApi.GetLoginLogs)
-		operationRouter.POST("operation", baseApi.GetOperationLogs)
-		operationRouter.POST("clean/:logtype", baseApi.CleanLogs)
+		operationRouter.POST("/login", baseApi.GetLoginLogs)
+		operationRouter.POST("/operation", baseApi.GetOperationLogs)
+		operationRouter.POST("/clean", baseApi.CleanLogs)
 	}
 }

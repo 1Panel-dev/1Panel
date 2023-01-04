@@ -10,6 +10,6 @@ export const getLoginLogs = (info: ReqPage) => {
     return http.post<ResPage<Log.OperationLog>>(`/logs/login`, info);
 };
 
-export const cleanLogs = (logtype: string) => {
-    return http.post(`/logs/clean/${logtype}`);
+export const cleanLogs = (param: Log.CleanLog) => {
+    return http.post(`/logs/clean`, param);
 };

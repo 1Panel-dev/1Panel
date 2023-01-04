@@ -31,3 +31,7 @@ type LoginLog struct {
 	Message   string    `json:"message"`
 	CreatedAt time.Time `json:"createdAt"`
 }
+
+type CleanLog struct {
+	LogType string `json:"logType" validate:"required,oneof=login operation"`
+}

@@ -15,6 +15,14 @@ import (
 
 type BaseApi struct{}
 
+// User login
+// @Tags Auth
+// @Summary User login
+// @Description 用户登录
+// @Accept json
+// @Param request body dto.Login true "request"
+// @Success 200 {object} dto.UserLoginInfo
+// @Router /auth/login [post]
 func (b *BaseApi) Login(c *gin.Context) {
 	var req dto.Login
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -39,6 +47,14 @@ func (b *BaseApi) Login(c *gin.Context) {
 	helper.SuccessWithData(c, user)
 }
 
+// User login with mfa
+// @Tags Auth
+// @Summary User login with mfa
+// @Description 用户 mfa 登录
+// @Accept json
+// @Param request body dto.MFALogin true "request"
+// @Success 200 {object} dto.UserLoginInfo
+// @Router /auth/mfalogin [post]
 func (b *BaseApi) MFALogin(c *gin.Context) {
 	var req dto.MFALogin
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -58,6 +74,13 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 	helper.SuccessWithData(c, user)
 }
 
+// User logout
+// @Tags Auth
+// @Summary User logout
+// @Description 用户登出
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /auth/logout [post]
 func (b *BaseApi) LogOut(c *gin.Context) {
 	if err := authService.LogOut(c); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -66,6 +89,12 @@ func (b *BaseApi) LogOut(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Load captcha
+// @Tags Auth
+// @Summary Load captcha
+// @Description 加载验证码
+// @Success 200 {object} dto.CaptchaResponse
+// @Router /auth/captcha [get]
 func (b *BaseApi) Captcha(c *gin.Context) {
 	captcha, err := captcha.CreateCaptcha()
 	if err != nil {
@@ -75,6 +104,13 @@ func (b *BaseApi) Captcha(c *gin.Context) {
 	helper.SuccessWithData(c, captcha)
 }
 
+// Load safety status
+// @Tags Auth
+// @Summary Load safety status
+// @Description 获取系统安全登录状态
+// @Success 200
+// @Failure 402
+// @Router /auth/status [get]
 func (b *BaseApi) GetSafetyStatus(c *gin.Context) {
 	if err := authService.SafetyStatus(c); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrUnSafety, constant.ErrTypeNotSafety, err)
@@ -110,6 +146,14 @@ func (b *BaseApi) CheckIsFirstLogin(c *gin.Context) {
 	helper.SuccessWithData(c, authService.CheckIsFirst())
 }
 
+// Init user
+// @Tags Auth
+// @Summary Init user
+// @Description 初始化用户
+// @Accept json
+// @Param request body dto.InitUser true "request"
+// @Success 200
+// @Router /auth/init [post]
 func (b *BaseApi) InitUserInfo(c *gin.Context) {
 	var req dto.InitUser
 	if err := c.ShouldBindJSON(&req); err != nil {

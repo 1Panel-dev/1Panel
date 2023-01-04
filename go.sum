@@ -929,11 +929,10 @@ github.com/stretchr/testify v1.8.0 h1:pSgiaMZlXftHpm5L7V1+rVB+AZJydKsMxsQBIJw4PK
 github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
 github.com/subosito/gotenv v1.3.0 h1:mjC+YW8QpAdXibNi+vNWgzmgBH4+5l5dCXv8cNysBLI=
 github.com/subosito/gotenv v1.3.0/go.mod h1:YzJjq/33h7nrwdY+iHMhEOEEbW0ovIz0tB6t6PwAXzs=
-github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe/go.mod h1:lKJPbtWzJ9JhsTN1k1gZgleJWY/cqq0psdoMmaThG3w=
 github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a h1:kAe4YSu0O0UFn1DowNo2MY5p6xzqtJ/wQ7LZynSvGaY=
 github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a/go.mod h1:lKJPbtWzJ9JhsTN1k1gZgleJWY/cqq0psdoMmaThG3w=
-github.com/swaggo/gin-swagger v1.5.1 h1:PFmlJU1LPn8DjrR0meVLX5gyFdgcPOkLcoFRRFx7WcY=
-github.com/swaggo/gin-swagger v1.5.1/go.mod h1:Cbj/MlHApPOjZdf4joWFXLLgmZVPyh54GPvPPyVjVZM=
+github.com/swaggo/gin-swagger v1.5.3 h1:8mWmHLolIbrhJJTflsaFoZzRBYVmEE7JZGIq08EiC0Q=
+github.com/swaggo/gin-swagger v1.5.3/go.mod h1:3XJKSfHjDMB5dBo/0rrTXidPmgLeqsX89Yp4uA50HpI=
 github.com/swaggo/swag v1.8.1/go.mod h1:ugemnJsPZm/kRwFUnzBlbHRd0JY9zE1M4F+uy2pAaPQ=
 github.com/swaggo/swag v1.8.4 h1:oGB351qH1JqUqK1tsMYEE5qTBbPk394BhsZxmUfebcI=
 github.com/swaggo/swag v1.8.4/go.mod h1:jMLeXOOmYyjk8PvHTsXBdrubsNd9gUJTTCzL5iBnseg=
