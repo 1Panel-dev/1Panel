@@ -8,16 +8,18 @@
         :before-close="handleClose"
     >
         <div style="text-align: center">
-            <span>{{ $t('ssl.renewWebsite') }}</span>
-            <div>
-                <br />
-                <span v-if="websites.length > 0">
-                    <span v-for="(website, index) in websites" :key="index">
-                        <el-tag>{{ website.primaryDomain }}</el-tag>
+            <div v-if="websites.length > 0">
+                <span>{{ $t('ssl.renewWebsite') }}</span>
+                <div>
+                    <br />
+                    <span>
+                        <span v-for="(website, index) in websites" :key="index">
+                            <el-tag>{{ website.primaryDomain }}</el-tag>
+                        </span>
                     </span>
-                </span>
+                </div>
+                <br />
             </div>
-            <br />
             <span>{{ $t('ssl.renewConfirm') }}</span>
         </div>
         <template #footer>
