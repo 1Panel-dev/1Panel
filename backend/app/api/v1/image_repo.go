@@ -8,6 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Page image repo
+// @Tags Container Image-repo
+// @Summary Search image repo list with page
+// @Description 获取镜像仓库列表分页
+// @Accept json
+// @Param request body dto.PageInfo true "request"
+// @Produce json
+// @Success 200 {object} dto.PageResult
+// @Security ApiKeyAuth
+// @Router /containers/repo/search [post]
 func (b *BaseApi) SearchRepo(c *gin.Context) {
 	var req dto.PageInfo
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -31,6 +41,14 @@ func (b *BaseApi) SearchRepo(c *gin.Context) {
 	})
 }
 
+// List image repo
+// @Tags Container Image-repo
+// @Summary Search image repo list
+// @Description 获取镜像仓库列表
+// @Produce json
+// @Success 200 {anrry} dto.ImageRepoOption
+// @Security ApiKeyAuth
+// @Router /containers/repo [get]
 func (b *BaseApi) ListRepo(c *gin.Context) {
 	list, err := imageRepoService.List()
 	if err != nil {
@@ -41,6 +59,17 @@ func (b *BaseApi) ListRepo(c *gin.Context) {
 	helper.SuccessWithData(c, list)
 }
 
+// Create image repo
+// @Tags Container Image-repo
+// @Summary Create image repo
+// @Description 创建镜像仓库
+// @Accept json
+// @Param request body dto.ImageRepoCreate true "request"
+// @Produce json
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/repo [post]
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建镜像仓库 [name]","formatEN":"create image repo [name]"}
 func (b *BaseApi) CreateRepo(c *gin.Context) {
 	var req dto.ImageRepoCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -58,6 +87,17 @@ func (b *BaseApi) CreateRepo(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Delete image repo
+// @Tags Container Image-repo
+// @Summary Delete image repo
+// @Description 删除镜像仓库
+// @Accept json
+// @Param request body dto.ImageRepoDelete true "request"
+// @Produce json
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/repo/del [post]
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"ids","isList":true,"db":"image_repos","output_colume":"name","output_value":"names"}],"formatZH":"删除镜像仓库 [names]","formatEN":"delete image repo [names]"}
 func (b *BaseApi) DeleteRepo(c *gin.Context) {
 	var req dto.ImageRepoDelete
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -76,6 +116,17 @@ func (b *BaseApi) DeleteRepo(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Update image repo
+// @Tags Container Image-repo
+// @Summary Update image repo
+// @Description 更新镜像仓库
+// @Accept json
+// @Param request body dto.ImageRepoUpdate true "request"
+// @Produce json
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/repo/update [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"image_repos","output_colume":"name","output_value":"name"}],"formatZH":"更新镜像仓库 [name]","formatEN":"update image repo information [name]"}
 func (b *BaseApi) UpdateRepo(c *gin.Context) {
 	var req dto.ImageRepoUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {

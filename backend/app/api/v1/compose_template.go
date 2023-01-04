@@ -8,6 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Create Compose template
+// @Tags Container Compose-template
+// @Summary Create Compose template
+// @Description 创建容器编排模版
+// @Accept json
+// @Param request body dto.ComposeTemplateCreate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/template [post]
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建 compose 模版 [name]","formatEN":"create compose template [name]"}
 func (b *BaseApi) CreateComposeTemplate(c *gin.Context) {
 	var req dto.ComposeTemplateCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -25,6 +35,16 @@ func (b *BaseApi) CreateComposeTemplate(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Page compose template
+// @Tags Container Compose-template
+// @Summary Search compose template list with page
+// @Description 获取容器编排模版列表分页
+// @Accept json
+// @Param request body dto.PageInfo true "request"
+// @Produce json
+// @Success 200 {object} dto.PageResult
+// @Security ApiKeyAuth
+// @Router /containers/template/search [post]
 func (b *BaseApi) SearchComposeTemplate(c *gin.Context) {
 	var req dto.PageInfo
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -44,6 +64,14 @@ func (b *BaseApi) SearchComposeTemplate(c *gin.Context) {
 	})
 }
 
+// List compose template
+// @Tags Container Compose-template
+// @Summary Search compose template list
+// @Description 获取容器编排模版列表
+// @Produce json
+// @Success 200 {anrry} dto.ComposeTemplateInfo
+// @Security ApiKeyAuth
+// @Router /containers/template [get]
 func (b *BaseApi) ListComposeTemplate(c *gin.Context) {
 	list, err := composeTemplateService.List()
 	if err != nil {
@@ -54,6 +82,16 @@ func (b *BaseApi) ListComposeTemplate(c *gin.Context) {
 	helper.SuccessWithData(c, list)
 }
 
+// Delete compose template
+// @Tags Container Compose-template
+// @Summary Delete compose template
+// @Description 删除容器编排模版
+// @Accept json
+// @Param request body dto.BatchDelete true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/template/del [post]
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"ids","isList":true,"db":"compose_templates","output_colume":"name","output_value":"names"}],"formatZH":"删除 compose 模版 [names]","formatEN":"delete compose template [names]"}
 func (b *BaseApi) DeleteComposeTemplate(c *gin.Context) {
 	var req dto.BatchDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -72,6 +110,16 @@ func (b *BaseApi) DeleteComposeTemplate(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Update compose template
+// @Tags Container Compose-template
+// @Summary Update compose template
+// @Description 更新容器编排模版
+// @Accept json
+// @Param request body dto.ComposeTemplateUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/template/update [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"compose_templates","output_colume":"name","output_value":"name"}],"formatZH":"更新 compose 模版 [name]","formatEN":"update compose template information [name]"}
 func (b *BaseApi) UpdateComposeTemplate(c *gin.Context) {
 	var req dto.ComposeTemplateUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {

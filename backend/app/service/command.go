@@ -2,7 +2,6 @@ package service
 
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
-	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -11,7 +10,7 @@ import (
 type CommandService struct{}
 
 type ICommandService interface {
-	List() ([]model.Command, error)
+	List() ([]dto.CommandInfo, error)
 	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
 	Create(commandDto dto.CommandOperate) error
 	Update(id uint, upMap map[string]interface{}) error
@@ -22,12 +21,20 @@ func NewICommandService() ICommandService {
 	return &CommandService{}
 }
 
-func (u *CommandService) List() ([]model.Command, error) {
+func (u *CommandService) List() ([]dto.CommandInfo, error) {
 	commands, err := commandRepo.GetList()
 	if err != nil {
 		return nil, constant.ErrRecordNotFound
 	}
-	return commands, err
+	var dtoCommands []dto.CommandInfo
+	for _, command := range commands {
+		var item dto.CommandInfo
+		if err := copier.Copy(&item, &command); err != nil {
+			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		}
+		dtoCommands = append(dtoCommands, item)
+	}
+	return dtoCommands, err
 }
 
 func (u *CommandService) SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error) {

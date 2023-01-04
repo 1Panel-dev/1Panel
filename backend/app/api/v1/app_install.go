@@ -13,6 +13,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// List app installed
+// @Tags App
+// @Summary Search app list installed
+// @Description 获取已安装应用列表
+// @Accept json
+// @Param request body request.AppInstalledSearch true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /apps/installed [post]
 func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 	var req request.AppInstalledSearch
 	if err := c.ShouldBindJSON(&req); err != nil {

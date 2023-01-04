@@ -60,7 +60,7 @@ func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
 		baRouter.POST("/volume", baseApi.CreateVolume)
 
 		baRouter.GET("/daemonjson", baseApi.LoadDaemonJson)
-		baRouter.GET("docker/status", baseApi.LoadDockerStatus)
+		baRouter.GET("/docker/status", baseApi.LoadDockerStatus)
 		baRouter.POST("/docker/operate", baseApi.OperateDocker)
 		baRouter.POST("/daemonjson/update", baseApi.UpdateDaemonJson)
 		baRouter.POST("/daemonjson/update/byfile", baseApi.UpdateDaemonJsonByFile)

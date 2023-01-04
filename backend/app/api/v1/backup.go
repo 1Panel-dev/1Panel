@@ -8,6 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Create backup account
+// @Tags Backup Account
+// @Summary Create backup account
+// @Description 创建备份账号
+// @Accept json
+// @Param request body dto.BackupOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /backups [post]
+// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建备份账号 [type]","formatEN":"create backup account [type]"}
 func (b *BaseApi) CreateBackup(c *gin.Context) {
 	var req dto.BackupOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -25,6 +35,15 @@ func (b *BaseApi) CreateBackup(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// List bucket
+// @Tags Backup Account
+// @Summary List bucket
+// @Description 获取 bucket 列表
+// @Accept json
+// @Param request body dto.ForBuckets true "request"
+// @Success 200 {anrry} string
+// @Security ApiKeyAuth
+// @Router /backups/search [post]
 func (b *BaseApi) ListBuckets(c *gin.Context) {
 	var req dto.ForBuckets
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -43,6 +62,16 @@ func (b *BaseApi) ListBuckets(c *gin.Context) {
 	helper.SuccessWithData(c, buckets)
 }
 
+// Delete backup account
+// @Tags Backup Account
+// @Summary Delete backup account
+// @Description 删除备份账号
+// @Accept json
+// @Param request body dto.BatchDeleteReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /backups/del [post]
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"ids","isList":true,"db":"backup_accounts","output_colume":"type","output_value":"types"}],"formatZH":"删除备份账号 [types]","formatEN":"delete backup account [types]"}
 func (b *BaseApi) DeleteBackup(c *gin.Context) {
 	var req dto.BatchDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -61,6 +90,15 @@ func (b *BaseApi) DeleteBackup(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Page backup records
+// @Tags Backup Account
+// @Summary Search backup records with page
+// @Description 获取备份记录列表分页
+// @Accept json
+// @Param request body dto.RecordSearch true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /backups/record/search [post]
 func (b *BaseApi) SearchBackupRecords(c *gin.Context) {
 	var req dto.RecordSearch
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -80,6 +118,16 @@ func (b *BaseApi) SearchBackupRecords(c *gin.Context) {
 	})
 }
 
+// Download backup record
+// @Tags Backup Account
+// @Summary Download backup record
+// @Description 下载备份记录
+// @Accept json
+// @Param request body dto.DownloadRecord true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /backups/record/download [post]
+// @x-panel-log {"bodyKeys":["source","fileName"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"下载备份记录 [source][fileName]","formatEN":"download backup records [source][fileName]"}
 func (b *BaseApi) DownloadRecord(c *gin.Context) {
 	var req dto.DownloadRecord
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -99,6 +147,16 @@ func (b *BaseApi) DownloadRecord(c *gin.Context) {
 	c.File(filePath)
 }
 
+// Delete backup record
+// @Tags Backup Account
+// @Summary Delete backup record
+// @Description 删除备份记录
+// @Accept json
+// @Param request body dto.BatchDeleteReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /backups/record/del [post]
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"ids","isList":true,"db":"backup_records","output_colume":"file_name","output_value":"files"}],"formatZH":"删除备份记录 [files]","formatEN":"delete backup records [files]"}
 func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 	var req dto.BatchDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -117,6 +175,16 @@ func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Update backup account
+// @Tags Backup Account
+// @Summary Update backup account
+// @Description 更新备份账号信息
+// @Accept json
+// @Param request body dto.BackupOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /backups/update [post]
+// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新备份账号 [types]","formatEN":"update backup account [types]"}
 func (b *BaseApi) UpdateBackup(c *gin.Context) {
 	var req dto.BackupOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -139,6 +207,13 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// List backup account
+// @Tags Backup Account
+// @Summary Search backup account
+// @Description 获取备份账号列表
+// @Success 200 {anrry} dto.BackupInfo
+// @Security ApiKeyAuth
+// @Router /backups/search [get]
 func (b *BaseApi) ListBackup(c *gin.Context) {
 	data, err := backupService.List()
 	if err != nil {

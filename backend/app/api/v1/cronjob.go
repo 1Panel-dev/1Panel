@@ -10,6 +10,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Create cronjob
+// @Tags Cronjob
+// @Summary Create cronjob
+// @Description 创建计划任务
+// @Accept json
+// @Param request body dto.CronjobCreate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /cronjobs [post]
+// @x-panel-log {"bodyKeys":["type","name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建计划任务 [type][name]","formatEN":"create cronjob [type][name]"}
 func (b *BaseApi) CreateCronjob(c *gin.Context) {
 	var req dto.CronjobCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -27,6 +37,15 @@ func (b *BaseApi) CreateCronjob(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Page cronjob
+// @Tags Cronjob
+// @Summary Search cronjob list with page
+// @Description 获取计划任务分页
+// @Accept json
+// @Param request body dto.SearchWithPage true "request"
+// @Success 200 {object} dto.PageResult
+// @Security ApiKeyAuth
+// @Router /cronjobs/search [post]
 func (b *BaseApi) SearchCronjob(c *gin.Context) {
 	var req dto.SearchWithPage
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -46,6 +65,15 @@ func (b *BaseApi) SearchCronjob(c *gin.Context) {
 	})
 }
 
+// Search job records
+// @Tags Cronjob
+// @Summary Search job records
+// @Description 获取计划任务记录
+// @Accept json
+// @Param request body dto.SearchRecord true "request"
+// @Success 200 {object} dto.PageResult
+// @Security ApiKeyAuth
+// @Router /cronjobs/search/records [post]
 func (b *BaseApi) SearchJobRecords(c *gin.Context) {
 	var req dto.SearchRecord
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -69,6 +97,16 @@ func (b *BaseApi) SearchJobRecords(c *gin.Context) {
 	})
 }
 
+// Delete cronjob
+// @Tags Cronjob
+// @Summary Delete cronjob
+// @Description 删除计划任务
+// @Accept json
+// @Param request body dto.BatchDeleteReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /cronjob/del [post]
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"ids","isList":true,"db":"cronjobs","output_colume":"name","output_value":"names"}],"formatZH":"删除计划任务 [names]","formatEN":"delete cronjob [names]"}
 func (b *BaseApi) DeleteCronjob(c *gin.Context) {
 	var req dto.BatchDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -87,6 +125,16 @@ func (b *BaseApi) DeleteCronjob(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Update cronjob
+// @Tags Cronjob
+// @Summary Update cronjob
+// @Description 更新计划任务
+// @Accept json
+// @Param request body dto.CronjobUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /cronjob/update [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"cronjobs","output_colume":"name","output_value":"name"}],"formatZH":"更新计划任务 [name]","formatEN":"update cronjob [name]"}
 func (b *BaseApi) UpdateCronjob(c *gin.Context) {
 	var req dto.CronjobUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -105,6 +153,16 @@ func (b *BaseApi) UpdateCronjob(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Update cronjob status
+// @Tags Cronjob
+// @Summary Update cronjob status
+// @Description 更新计划任务状态
+// @Accept json
+// @Param request body dto.CronjobUpdateStatus true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /cronjob/status [post]
+// @x-panel-log {"bodyKeys":["id","status"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"cronjobs","output_colume":"name","output_value":"name"}],"formatZH":"修改计划任务 [name] 状态为 [status]","formatEN":"change the status of cronjob [name] to [status]."}
 func (b *BaseApi) UpdateCronjobStatus(c *gin.Context) {
 	var req dto.CronjobUpdateStatus
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -123,6 +181,16 @@ func (b *BaseApi) UpdateCronjobStatus(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Download Cronjob records
+// @Tags Cronjob
+// @Summary Download Cronjob records
+// @Description 下载计划任务记录
+// @Accept json
+// @Param request body dto.CronjobDownload true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /cronjob/download [post]
+// @x-panel-log {"bodyKeys":["recordID"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"recordID","isList":false,"db":"job_records","output_colume":"file","output_value":"file"}],"formatZH":"下载计划任务记录 [file]","formatEN":"download the cronjob record [file]"}
 func (b *BaseApi) TargetDownload(c *gin.Context) {
 	var req dto.CronjobDownload
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -142,6 +210,16 @@ func (b *BaseApi) TargetDownload(c *gin.Context) {
 	c.File(filePath)
 }
 
+// Handle cronjob once
+// @Tags Cronjob
+// @Summary Handle cronjob once
+// @Description 手动执行计划任务
+// @Accept json
+// @Param request body dto.OperateByID true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /cronjob/handle [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"cronjobs","output_colume":"name","output_value":"name"}],"formatZH":"手动执行计划任务 [name]","formatEN":"manually execute the cronjob [name]"}
 func (b *BaseApi) HandleOnce(c *gin.Context) {
 	var req dto.OperateByID
 	if err := c.ShouldBindJSON(&req); err != nil {

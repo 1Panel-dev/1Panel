@@ -7,6 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// List app
+// @Tags App
+// @Summary Search app list
+// @Description 获取应用列表
+// @Accept json
+// @Param request body request.AppSearch true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /apps/search [post]
 func (b *BaseApi) SearchApp(c *gin.Context) {
 	var req request.AppSearch
 	if err := c.ShouldBindJSON(&req); err != nil {

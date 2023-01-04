@@ -8,6 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Page website acme account
+// @Tags Website Acme
+// @Summary Search website acme account with page
+// @Description 获取网站 acme 列表分页
+// @Accept json
+// @Param request body dto.PageInfo true "request"
+// @Success 200 {object} dto.PageResult
+// @Security ApiKeyAuth
+// @Router /websites/acme/search [post]
 func (b *BaseApi) PageWebsiteAcmeAccount(c *gin.Context) {
 	var req dto.PageInfo
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -25,6 +34,16 @@ func (b *BaseApi) PageWebsiteAcmeAccount(c *gin.Context) {
 	})
 }
 
+// Create website acme account
+// @Tags Website Acme
+// @Summary Create website acme account
+// @Description 创建网站 acme
+// @Accept json
+// @Param request body request.WebsiteAcmeAccountCreate true "request"
+// @Success 200 {object} response.WebsiteAcmeAccountDTO
+// @Security ApiKeyAuth
+// @Router /websites/acme [post]
+// @x-panel-log {"bodyKeys":["email"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建网站 acme [email]","formatEN":"Create website acme [email]"}
 func (b *BaseApi) CreateWebsiteAcmeAccount(c *gin.Context) {
 	var req request.WebsiteAcmeAccountCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -39,6 +58,16 @@ func (b *BaseApi) CreateWebsiteAcmeAccount(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
+// Delete website acme account
+// @Tags Website Acme
+// @Summary Delete website acme account
+// @Description 删除网站 acme
+// @Accept json
+// @Param request body request.WebsiteResourceReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/acme/del [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"website_acme_accounts","output_colume":"email","output_value":"email"}],"formatZH":"删除网站 acme [email]","formatEN":"Delete website acme [email]"}
 func (b *BaseApi) DeleteWebsiteAcmeAccount(c *gin.Context) {
 	var req request.WebsiteResourceReq
 	if err := c.ShouldBindJSON(&req); err != nil {

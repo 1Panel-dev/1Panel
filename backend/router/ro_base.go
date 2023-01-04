@@ -11,11 +11,11 @@ func (s *BaseRouter) InitBaseRouter(Router *gin.RouterGroup) {
 	baseRouter := Router.Group("auth")
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		baseRouter.GET("captcha", baseApi.Captcha)
-		baseRouter.POST("mfalogin", baseApi.MFALogin)
-		baseRouter.POST("login", baseApi.Login)
-		baseRouter.GET("status", baseApi.CheckIsFirstLogin)
-		baseRouter.POST("init", baseApi.InitUserInfo)
-		baseRouter.POST("logout", baseApi.LogOut)
+		baseRouter.GET("/captcha", baseApi.Captcha)
+		baseRouter.POST("/mfalogin", baseApi.MFALogin)
+		baseRouter.POST("/login", baseApi.Login)
+		baseRouter.GET("/status", baseApi.CheckIsFirstLogin)
+		baseRouter.POST("/init", baseApi.InitUserInfo)
+		baseRouter.POST("/logout", baseApi.LogOut)
 	}
 }

@@ -7,6 +7,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Load nginx conf
+// @Tags Nginx
+// @Summary Load nginx conf
+// @Description 获取 nginx 配置信息
+// @Success 200 {object} response.FileInfo
+// @Security ApiKeyAuth
+// @Router /nginx [get]
 func (b *BaseApi) GetNginx(c *gin.Context) {
 	fileInfo, err := nginxService.GetNginxConfig()
 	if err != nil {
@@ -16,6 +23,15 @@ func (b *BaseApi) GetNginx(c *gin.Context) {
 	helper.SuccessWithData(c, fileInfo)
 }
 
+// Load partial nginx conf
+// @Tags Nginx
+// @Summary Load partial nginx conf
+// @Description 获取部分 nginx 配置信息
+// @Accept json
+// @Param request body dto.NginxScopeReq true "request"
+// @Success 200 {anrry} response.NginxParam
+// @Security ApiKeyAuth
+// @Router /nginx/scope [post]
 func (b *BaseApi) GetNginxConfigByScope(c *gin.Context) {
 	var req request.NginxScopeReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -31,6 +47,16 @@ func (b *BaseApi) GetNginxConfigByScope(c *gin.Context) {
 	helper.SuccessWithData(c, params)
 }
 
+// Update nginx conf
+// @Tags Nginx
+// @Summary Update nginx conf
+// @Description 更新 nginx 配置信息
+// @Accept json
+// @Param request body dto.NginxConfigUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /nginx/update [post]
+// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"websiteId","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"更新 nginx 配置 [domain]","formatEN":"Update nginx conf [domain]"}
 func (b *BaseApi) UpdateNginxConfigByScope(c *gin.Context) {
 	var req request.NginxConfigUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -44,6 +70,13 @@ func (b *BaseApi) UpdateNginxConfigByScope(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// Load nginx status info
+// @Tags Nginx
+// @Summary Load nginx status info
+// @Description 获取 nginx 状态信息
+// @Success 200 {object} response.NginxStatus
+// @Security ApiKeyAuth
+// @Router /nginx/status [get]
 func (b *BaseApi) GetNginxStatus(c *gin.Context) {
 	res, err := nginxService.GetStatus()
 	if err != nil {
@@ -53,6 +86,16 @@ func (b *BaseApi) GetNginxStatus(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
+// Update nginx conf by upload file
+// @Tags Nginx
+// @Summary Update nginx conf by upload file
+// @Description 上传更新 nginx 配置文件
+// @Accept json
+// @Param request body dto.NginxConfigFileUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /nginx/file [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新 nginx 配置","formatEN":"Update nginx conf"}
 func (b *BaseApi) UpdateNginxFile(c *gin.Context) {
 	var req request.NginxConfigFileUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {

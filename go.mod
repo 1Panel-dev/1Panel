@@ -42,7 +42,7 @@ require (
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.12.0
 	github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a
-	github.com/swaggo/gin-swagger v1.5.1
+	github.com/swaggo/gin-swagger v1.5.3
 	github.com/swaggo/swag v1.8.4
 	github.com/xlzd/gotp v0.0.0-20220817083547-a63b9d03d72f
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
