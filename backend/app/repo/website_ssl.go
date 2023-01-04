@@ -48,7 +48,7 @@ func (w WebsiteSSLRepo) Page(page, size int, opts ...DBOption) (int64, []model.W
 	db := getDb(opts...).Model(&model.WebsiteSSL{})
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Limit(size).Offset(size * (page - 1)).Preload("AcmeAccount").Find(&sslList).Error
+	err := db.Limit(size).Offset(size * (page - 1)).Preload("AcmeAccount").Preload("Websites").Find(&sslList).Error
 	return count, sslList, err
 }
 

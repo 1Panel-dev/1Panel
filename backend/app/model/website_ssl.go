@@ -19,6 +19,7 @@ type WebsiteSSL struct {
 	StartDate     time.Time `json:"startDate"`
 
 	AcmeAccount WebsiteAcmeAccount `json:"acmeAccount"`
+	Websites    []Website          `json:"websites"`
 }
 
 func (w WebsiteSSL) TableName() string {

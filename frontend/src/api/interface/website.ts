@@ -169,6 +169,7 @@ export namespace Website {
         expireDate: string;
         startDate: string;
         provider: string;
+        websites?: Website.Website[];
     }
 
     export interface SSLCreate {

@@ -105,7 +105,7 @@ const buttons = [
             return row.provider === 'manual';
         },
         click: function (row: Website.SSL) {
-            openRenewSSL(row.id);
+            openRenewSSL(row.id, row.websites);
         },
     },
     {
@@ -141,8 +141,8 @@ const openDnsAccount = () => {
 const openSSL = () => {
     sslCreateRef.value.acceptParams();
 };
-const openRenewSSL = (id: number) => {
-    renewRef.value.acceptParams(id);
+const openRenewSSL = (id: number, websites: Website.Website[]) => {
+    renewRef.value.acceptParams({ id: id, websites: websites });
 };
 const openDetail = (id: number) => {
     detailRef.value.acceptParams(id);
