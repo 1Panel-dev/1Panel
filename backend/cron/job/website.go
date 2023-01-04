@@ -18,7 +18,7 @@ func NewWebsiteJob() *website {
 
 func (w *website) Run() {
 	websites, _ := repo.NewIWebsiteRepo().List()
-	global.LOG.Info("website cron job start....")
+	global.LOG.Info("website cron job start...")
 	now := time.Now()
 	if len(websites) > 0 {
 		neverExpireDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
@@ -36,7 +36,7 @@ func (w *website) Run() {
 		}
 		wg.Wait()
 	}
-	global.LOG.Info("website cron job end")
+	global.LOG.Info("website cron job end...")
 }
 
 func stopWebsite(websiteId uint, wg *sync.WaitGroup) {

@@ -205,7 +205,6 @@ func nginxCheckAndReload(oldContent string, filePath string, containerName strin
 		_ = files.NewFileOp().WriteFile(filePath, strings.NewReader(oldContent), 0644)
 		return err
 	}
-
 	if err := opNginx(containerName, constant.NginxReload); err != nil {
 		_ = files.NewFileOp().WriteFile(filePath, strings.NewReader(oldContent), 0644)
 		return err

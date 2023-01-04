@@ -49,7 +49,7 @@ const submit = () => {
     RenewSSL(renewReq)
         .then(() => {
             handleClose();
-            ElMessage.success(i18n.global.t('commons.msg.renewSuccess'));
+            ElMessage.success(i18n.global.t('ssl.renewSuccess'));
         })
         .finally(() => {
             loading.value = false;

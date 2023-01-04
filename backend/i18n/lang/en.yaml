@@ -35,3 +35,4 @@ ErrAppDelete: 'Other Website use this App'
 #ssl
 ErrSSLCannotDelete: "The certificate is being used by the website and cannot be removed"
 ErrAccountCannotDelete: "The certificate associated with the account cannot be deleted"
+ErrSSLApply: "The certificate continues to be signed successfully, but openresty reload fails, please check the configuration！"

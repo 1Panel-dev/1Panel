@@ -4,7 +4,7 @@
         :title="$t('commons.button.create')"
         :destroy-on-close="true"
         :close-on-click-modal="false"
-        width="60%"
+        width="50%"
         :before-close="handleClose"
     >
         <el-form
@@ -66,6 +66,9 @@
                     </el-descriptions>
                 </div>
             </el-form-item>
+            <el-form-item :label="$t('ssl.autoRenew')" prop="autoRenew" v-if="ssl.provider !== 'dnsManual'">
+                <el-checkbox v-model="ssl.autoRenew" />
+            </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -115,6 +118,7 @@ let rules = ref({
     acmeAccountId: [Rules.requiredSelectBusiness],
     dnsAccountId: [Rules.requiredSelectBusiness],
     provider: [Rules.requiredInput],
+    autoRenew: [Rules.requiredInput],
 });
 let ssl = ref({
     primaryDomain: '',
@@ -123,6 +127,7 @@ let ssl = ref({
     websiteId: 0,
     acmeAccountId: undefined,
     dnsAccountId: undefined,
+    autoRenew: false,
 });
 let dnsResolve = ref<Website.DNSResolve[]>([]);
 let hasResolve = ref(false);
@@ -143,6 +148,7 @@ const resetForm = () => {
         websiteId: 0,
         acmeAccountId: undefined,
         dnsAccountId: undefined,
+        autoRenew: false,
     };
 };
 

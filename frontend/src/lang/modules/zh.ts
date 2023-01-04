@@ -999,6 +999,9 @@ export default {
         startDate: '生效时间',
         organization: '签发机构',
         renewConfirm: '是否确定续签？',
+        autoRenew: '自动续签',
+        autoRenewHelper: '距离到期时间7天自动续签',
+        renewSuccess: '续签成功',
     },
     firewall: {
         ccDeny: 'CC 防护',

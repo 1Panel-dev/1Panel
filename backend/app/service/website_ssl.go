@@ -9,12 +9,28 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
 	"path"
 	"strings"
 )
 
 type WebsiteSSLService struct {
+}
+
+type IWebsiteSSLService interface {
+	Page(search request.WebsiteSSLSearch) (int64, []response.WebsiteSSLDTO, error)
+	GetSSL(id uint) (*response.WebsiteSSLDTO, error)
+	Search() ([]response.WebsiteSSLDTO, error)
+	Create(create request.WebsiteSSLCreate) (request.WebsiteSSLCreate, error)
+	Renew(sslId uint) error
+	GetDNSResolve(req request.WebsiteDNSReq) ([]response.WebsiteDNSRes, error)
+	GetWebsiteSSL(websiteId uint) (response.WebsiteSSLDTO, error)
+	Delete(id uint) error
+}
+
+func NewIWebsiteSSLService() IWebsiteSSLService {
+	return &WebsiteSSLService{}
 }
 
 func (w WebsiteSSLService) Page(search request.WebsiteSSLSearch) (int64, []response.WebsiteSSLDTO, error) {
@@ -151,8 +167,6 @@ func (w WebsiteSSLService) Renew(sslId uint) error {
 		if err := client.UseHTTP(path.Join(constant.AppInstallDir, constant.AppNginx, appInstall.Name, "root")); err != nil {
 			return err
 		}
-	case constant.DnsManual:
-
 	}
 
 	resource, err := client.RenewSSL(websiteSSL.CertURL)
@@ -172,7 +186,26 @@ func (w WebsiteSSLService) Renew(sslId uint) error {
 	websiteSSL.Type = cert.Issuer.CommonName
 	websiteSSL.Organization = cert.Issuer.Organization[0]
 
-	return websiteSSLRepo.Save(websiteSSL)
+	if err := websiteSSLRepo.Save(websiteSSL); err != nil {
+		return err
+	}
+
+	websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(sslId))
+	for _, website := range websites {
+		if err := createPemFile(website, websiteSSL); err != nil {
+			global.LOG.Errorf("create website [%s] ssl file failed! err:%s", website.PrimaryDomain, err.Error())
+		}
+	}
+	if len(websites) > 0 {
+		nginxInstall, err := getAppInstallByKey(constant.AppNginx)
+		if err != nil {
+			return err
+		}
+		if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
+			return buserr.New(constant.ErrSSLApply)
+		}
+	}
+	return nil
 }
 
 func (w WebsiteSSLService) GetDNSResolve(req request.WebsiteDNSReq) ([]response.WebsiteDNSRes, error) {
