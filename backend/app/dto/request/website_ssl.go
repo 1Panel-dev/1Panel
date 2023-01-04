@@ -12,6 +12,7 @@ type WebsiteSSLCreate struct {
 	Provider      string `json:"provider" validate:"required"`
 	AcmeAccountID uint   `json:"acmeAccountId" validate:"required"`
 	DnsAccountID  uint   `json:"dnsAccountId"`
+	AutoRenew     bool   `json:"autoRenew" validate:"required"`
 }
 
 type WebsiteDNSReq struct {

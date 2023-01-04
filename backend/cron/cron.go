@@ -22,6 +22,10 @@ func Run() {
 	if err != nil {
 		global.LOG.Errorf("can not add  website corn job: %s", err.Error())
 	}
+	_, err = Cron.AddJob("@daily", job.NewSSLJob())
+	if err != nil {
+		global.LOG.Errorf("can not add  ssl corn job: %s", err.Error())
+	}
 	Cron.Start()
 
 	global.Cron = Cron

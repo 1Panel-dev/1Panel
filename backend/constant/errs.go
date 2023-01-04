@@ -66,4 +66,5 @@ var (
 var (
 	ErrSSLCannotDelete     = "ErrSSLCannotDelete"
 	ErrAccountCannotDelete = "ErrAccountCannotDelete"
+	ErrSSLApply            = "ErrSSLApply"
 )

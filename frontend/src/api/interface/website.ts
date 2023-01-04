@@ -12,6 +12,7 @@ export namespace Website {
         webSiteGroupId: number;
         otherDomains: string;
         defaultServer: boolean;
+        autoRenew: boolean;
         appinstall?: NewAppInstall;
         webSiteSSL: SSL;
     }
