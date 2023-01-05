@@ -2,14 +2,17 @@ package service
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/pkg/errors"
 )
 
@@ -53,31 +56,33 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 	if string(stdout) != "active\n" || err != nil {
 		status = constant.Stopped
 	}
-	fileSetting, err := settingRepo.Get(settingRepo.WithByKey("DaemonJsonPath"))
+	version := "-"
+	client, err := docker.NewDockerClient()
+	if err == nil {
+		ctx := context.Background()
+		itemVersion, err := client.ServerVersion(ctx)
+		if err == nil {
+			version = itemVersion.Version
+		}
+	}
+	if _, err := os.Stat(constant.DaemonJsonPath); err != nil {
+		return &dto.DaemonJsonConf{Status: status, Version: version}
+	}
+	file, err := ioutil.ReadFile(constant.DaemonJsonPath)
 	if err != nil {
-		return &dto.DaemonJsonConf{Status: status}
-	}
-	if len(fileSetting.Value) == 0 {
-		return &dto.DaemonJsonConf{Status: status}
-	}
-	if _, err := os.Stat(fileSetting.Value); err != nil {
-		return &dto.DaemonJsonConf{Status: status}
-	}
-	file, err := ioutil.ReadFile(fileSetting.Value)
-	if err != nil {
-		return &dto.DaemonJsonConf{Status: status}
+		return &dto.DaemonJsonConf{Status: status, Version: version}
 	}
 	var conf daemonJsonItem
 	deamonMap := make(map[string]interface{})
 	if err := json.Unmarshal(file, &deamonMap); err != nil {
-		return &dto.DaemonJsonConf{Status: status}
+		return &dto.DaemonJsonConf{Status: status, Version: version}
 	}
 	arr, err := json.Marshal(deamonMap)
 	if err != nil {
-		return &dto.DaemonJsonConf{Status: status}
+		return &dto.DaemonJsonConf{Status: status, Version: version}
 	}
 	if err := json.Unmarshal(arr, &conf); err != nil {
-		return &dto.DaemonJsonConf{Status: status}
+		return &dto.DaemonJsonConf{Status: status, Version: version}
 	}
 	driver := "cgroupfs"
 	for _, opt := range conf.ExecOpts {
@@ -88,6 +93,7 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 	}
 	data := dto.DaemonJsonConf{
 		Status:       status,
+		Version:      version,
 		Mirrors:      conf.Mirrors,
 		Registries:   conf.Registries,
 		LiveRestore:  conf.LiveRestore,
@@ -98,22 +104,16 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 }
 
 func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
-	fileSetting, err := settingRepo.Get(settingRepo.WithByKey("DaemonJsonPath"))
-	if err != nil {
-		return err
-	}
-	if len(fileSetting.Value) == 0 {
-		return errors.New("error daemon.json path in request")
-	}
-	if _, err := os.Stat(fileSetting.Value); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(fileSetting.Value, os.ModePerm); err != nil {
+	if _, err := os.Stat(constant.DaemonJsonPath); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(path.Dir(constant.DaemonJsonPath), os.ModePerm); err != nil {
 			if err != nil {
 				return err
 			}
 		}
+		_, _ = os.Create(constant.DaemonJsonPath)
 	}
 
-	file, err := ioutil.ReadFile(fileSetting.Value)
+	file, err := ioutil.ReadFile(constant.DaemonJsonPath)
 	if err != nil {
 		return err
 	}
@@ -155,7 +155,7 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 	if err != nil {
 		return err
 	}
-	if err := ioutil.WriteFile(fileSetting.Value, newJson, 0640); err != nil {
+	if err := ioutil.WriteFile(constant.DaemonJsonPath, newJson, 0640); err != nil {
 		return err
 	}
 

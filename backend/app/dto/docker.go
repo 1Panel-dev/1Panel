@@ -7,6 +7,7 @@ type DaemonJsonUpdateByFile struct {
 
 type DaemonJsonConf struct {
 	Status       string   `json:"status"`
+	Version      string   `json:"version"`
 	Mirrors      []string `json:"registryMirrors"`
 	Registries   []string `json:"insecureRegistries"`
 	LiveRestore  bool     `json:"liveRestore"`

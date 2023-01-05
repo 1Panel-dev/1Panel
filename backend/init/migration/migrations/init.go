@@ -114,10 +114,6 @@ var AddTableSetting = &gormigrate.Migration{
 			return err
 		}
 
-		if err := tx.Create(&model.Setting{Key: "DaemonJsonPath", Value: "/opt/1Panel/docker/conf/daemon.json"}).Error; err != nil {
-			return err
-		}
-
 		if err := tx.Create(&model.Setting{Key: "MessageType", Value: "none"}).Error; err != nil {
 			return err
 		}

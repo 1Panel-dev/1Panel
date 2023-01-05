@@ -176,24 +176,17 @@ func (u *ImageRepoService) checkConn(host, user, password string) error {
 }
 
 func (u *ImageRepoService) handleRegistries(newHost, delHost, handle string) error {
-	fileSetting, err := settingRepo.Get(settingRepo.WithByKey("DaemonJsonPath"))
-	if err != nil {
-		return err
-	}
-	if len(fileSetting.Value) == 0 {
-		return errors.New("error daemon.json in settings")
-	}
-	if _, err := os.Stat(path.Dir(fileSetting.Value)); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(fileSetting.Value, os.ModePerm); err != nil {
+	if _, err := os.Stat(constant.DaemonJsonPath); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(path.Dir(constant.DaemonJsonPath), os.ModePerm); err != nil {
 			if err != nil {
 				return err
 			}
 		}
-		_, _ = os.Create(fileSetting.Value)
+		_, _ = os.Create(constant.DaemonJsonPath)
 	}
 
 	deamonMap := make(map[string]interface{})
-	file, err := ioutil.ReadFile(fileSetting.Value)
+	file, err := ioutil.ReadFile(constant.DaemonJsonPath)
 	if err != nil {
 		return err
 	}
@@ -229,7 +222,7 @@ func (u *ImageRepoService) handleRegistries(newHost, delHost, handle string) err
 	if err != nil {
 		return err
 	}
-	if err := ioutil.WriteFile(fileSetting.Value, newJson, 0640); err != nil {
+	if err := ioutil.WriteFile(constant.DaemonJsonPath, newJson, 0640); err != nil {
 		return err
 	}
 	return nil

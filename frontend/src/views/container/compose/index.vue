@@ -1,6 +1,10 @@
 <template>
     <div v-loading="loading">
         <Submenu activeName="compose" />
+
+        <div v-show="isOnDetail">
+            <ComposeDetial @back="backList" ref="composeDetailRef" />
+        </div>
         <el-card width="30%" v-if="dockerStatus != 'Running'" class="mask-prompt">
             <span style="font-size: 14px">{{ $t('container.serviceUnavailable') }}</span>
             <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="goSetting">
@@ -8,8 +12,8 @@
             </el-button>
             <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
         </el-card>
-        <el-card style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
-            <div v-if="!isOnDetail">
+        <el-card v-if="!isOnDetail" style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
+            <div>
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
@@ -53,9 +57,6 @@
                         fix
                     />
                 </ComplexTable>
-            </div>
-            <div v-show="isOnDetail">
-                <ComposeDetial @back="backList" ref="composeDetailRef" />
             </div>
         </el-card>
 

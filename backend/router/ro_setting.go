@@ -23,7 +23,6 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/time/sync", baseApi.SyncTime)
 		settingRouter.POST("/monitor/clean", baseApi.CleanMonitor)
 		settingRouter.GET("/mfa", baseApi.GetMFA)
-		settingRouter.GET("/daemonjson", baseApi.GetDaemonjson)
 		settingRouter.POST("/mfa/bind", baseApi.MFABind)
 	}
 }

@@ -372,6 +372,7 @@ export default {
         rdbInfo: '规则列表存在 0 值，请确认后重试！',
     },
     container: {
+        containerList: '容器列表',
         operatorHelper: '将对选中容器进行 {0} 操作，是否继续？',
         start: '启动',
         stop: '停止',

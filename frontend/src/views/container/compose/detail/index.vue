@@ -1,31 +1,42 @@
 <template>
     <div v-loading="loading">
-        <LayoutContent :header="composeName" back-name="Compose" :reload="true">
-            <div v-if="createdBy === '1Panel'">
-                <el-card>
-                    <template #header>
-                        <div class="card-header">
-                            <span>{{ $t('container.compose') }}</span>
+        <div class="app-content" style="margin-top: 20px">
+            <el-card class="app-card">
+                <el-row :gutter="20">
+                    <el-col :lg="3" :xl="2">
+                        <div>
+                            <el-tag effect="dark" type="success">{{ composeName }}</el-tag>
                         </div>
-                    </template>
-                    <el-button-group>
-                        <el-button @click="onComposeOperate('start')">{{ $t('container.start') }}</el-button>
-                        <el-button @click="onComposeOperate('stop')">{{ $t('container.stop') }}</el-button>
-                        <el-button @click="onComposeOperate('down')">
-                            {{ $t('container.remove') }}
-                        </el-button>
-                    </el-button-group>
-                </el-card>
-            </div>
-            <div v-else>
-                <el-alert :closable="false" show-icon :title="$t('container.composeDetailHelper')" type="info" />
-            </div>
-            <el-card style="margin-top: 20px">
-                <template #header>
-                    <div class="card-header">
-                        <span>{{ $t('container.container') }}</span>
-                    </div>
-                </template>
+                    </el-col>
+                    <el-col :lg="8" :xl="12">
+                        <div v-if="createdBy === '1Panel'">
+                            <el-button link type="primary" @click="onComposeOperate('start')">
+                                {{ $t('container.start') }}
+                            </el-button>
+                            <el-divider direction="vertical" />
+                            <el-button link type="primary" @click="onComposeOperate('stop')">
+                                {{ $t('container.stop') }}
+                            </el-button>
+                            <el-divider direction="vertical" />
+                            <el-button link type="primary" @click="onComposeOperate('down')">
+                                {{ $t('container.remove') }}
+                            </el-button>
+                        </div>
+                        <div v-else>
+                            <el-alert
+                                style="margin-top: -5px"
+                                :closable="false"
+                                show-icon
+                                :title="$t('container.composeDetailHelper')"
+                                type="info"
+                            />
+                        </div>
+                    </el-col>
+                </el-row>
+            </el-card>
+        </div>
+        <el-card style="margin-top: 20px">
+            <LayoutContent :header="$t('container.containerList')" back-name="Compose" :reload="true">
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
@@ -103,8 +114,8 @@
                 <CreateDialog @search="search" ref="dialogCreateRef" />
                 <MonitorDialog ref="dialogMonitorRef" />
                 <TerminalDialog ref="dialogTerminalRef" />
-            </el-card>
-        </LayoutContent>
+            </LayoutContent>
+        </el-card>
     </div>
 </template>
 
@@ -314,3 +325,18 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style lang="scss">
+.app-card {
+    font-size: 14px;
+    height: 60px;
+}
+
+.app-content {
+    height: 50px;
+}
+
+body {
+    margin: 0;
+}
+</style>

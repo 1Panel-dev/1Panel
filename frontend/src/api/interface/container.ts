@@ -236,7 +236,6 @@ export namespace Container {
     }
 
     export interface DaemonJsonUpdateByFile {
-        path: string;
         file: string;
     }
     export interface DockerOperate {
@@ -244,6 +243,7 @@ export namespace Container {
     }
     export interface DaemonJsonConf {
         status: string;
+        version: string;
         registryMirrors: Array<string>;
         insecureRegistries: Array<string>;
         liveRestore: boolean;

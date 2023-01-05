@@ -16,7 +16,6 @@ type SettingService struct{}
 
 type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
-	GetDaemonjson() (string, error)
 	Update(c *gin.Context, key, value string) error
 	UpdatePassword(c *gin.Context, old, new string) error
 	HandlePasswordExpired(c *gin.Context, old, new string) error
@@ -45,14 +44,6 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	}
 	info.LocalTime = time.Now().Format("2006-01-02 15:04:05 MST -0700")
 	return &info, err
-}
-
-func (u *SettingService) GetDaemonjson() (string, error) {
-	setting, err := settingRepo.Get(settingRepo.WithByKey("DaemonJsonPath"))
-	if err != nil {
-		return "", err
-	}
-	return setting.Value, nil
 }
 
 func (u *SettingService) Update(c *gin.Context, key, value string) error {

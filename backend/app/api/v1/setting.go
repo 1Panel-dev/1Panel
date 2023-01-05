@@ -28,22 +28,6 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 	helper.SuccessWithData(c, setting)
 }
 
-// Load daemon.json path
-// @Tags System Setting
-// @Summary Load daemon.json path
-// @Description 加载 docker 配置路径
-// @Success 200 {string} path
-// @Security ApiKeyAuth
-// @Router /settings/daemonjson [get]
-func (b *BaseApi) GetDaemonjson(c *gin.Context) {
-	value, err := settingService.GetDaemonjson()
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, value)
-}
-
 // @Tags System Setting
 // @Summary Update system setting
 // @Description 更新系统配置

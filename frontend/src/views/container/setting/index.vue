@@ -1,53 +1,63 @@
 <template>
     <div v-loading="loading">
         <Submenu activeName="setting" />
-        <el-form :model="form" ref="formRef" label-width="120px">
-            <el-card style="margin-top: 20px">
-                <el-row style="margin-top: 20px">
-                    <el-col :span="1"><br /></el-col>
-                    <el-col :span="10">
-                        <el-form-item :label="$t('container.dockerStatus')">
-                            <div v-if="form.status === 'Running'">
-                                <el-tag type="success">{{ $t('commons.status.running') }}</el-tag>
-                                <el-button type="primary" @click="onOperator('stop')" link style="margin-left: 20px">
-                                    {{ $t('container.stop') }}
-                                </el-button>
-                                <el-divider direction="vertical" />
-                                <el-button type="primary" @click="onOperator('restart')" link>
-                                    {{ $t('container.restart') }}
-                                </el-button>
-                            </div>
-                            <div v-if="form.status === 'Stopped'">
-                                <el-tag type="info">{{ $t('commons.status.stopped') }}</el-tag>
-                                <el-button type="primary" @click="onOperator('start')" link style="margin-left: 20px">
-                                    {{ $t('container.start') }}
-                                </el-button>
-                                <el-divider direction="vertical" />
-                                <el-button type="primary" @click="onOperator('restart')" link>
-                                    {{ $t('container.restart') }}
-                                </el-button>
-                            </div>
-                        </el-form-item>
-                        <el-form-item :label="$t('container.daemonJsonPath')">
-                            <el-input disabled v-model="daemonJsonPath">
-                                <template #append>
-                                    <FileList @choose="loadLoadDir" :dir="false"></FileList>
-                                </template>
-                            </el-input>
-                            <span class="input-help">{{ $t('container.daemonJsonPathHelper') }}</span>
-                            <el-button type="primary" @click="savePath">{{ $t('commons.button.save') }}</el-button>
-                        </el-form-item>
+        <div class="app-content" style="margin-top: 20px">
+            <el-card class="app-card">
+                <el-row :gutter="20">
+                    <el-col :lg="3" :xl="2">
+                        <div>
+                            <el-tag effect="dark" type="success">Docker</el-tag>
+                        </div>
+                    </el-col>
+                    <el-col :lg="3" :xl="2">
+                        <div>
+                            {{ $t('app.version') }}:
+                            <el-tag type="info">{{ form.version }}</el-tag>
+                        </div>
+                    </el-col>
+                    <el-col :lg="3" :xl="2">
+                        <div>
+                            {{ $t('commons.table.status') }}:
+                            <el-tag v-if="form.status === 'Running'" type="success">
+                                {{ $t('commons.status.running') }}
+                            </el-tag>
+                            <el-tag v-if="form.status === 'Stopped'" type="info">
+                                {{ $t('commons.status.stopped') }}
+                            </el-tag>
+                        </div>
+                    </el-col>
+                    <el-col :lg="4" :xl="6">
+                        <div v-if="form.status === 'Running'">
+                            <el-button type="primary" @click="onOperator('stop')" link style="margin-left: 20px">
+                                {{ $t('container.stop') }}
+                            </el-button>
+                            <el-divider direction="vertical" />
+                            <el-button type="primary" @click="onOperator('restart')" link>
+                                {{ $t('container.restart') }}
+                            </el-button>
+                        </div>
+                        <div v-if="form.status === 'Stopped'">
+                            <el-button type="primary" @click="onOperator('start')" link style="margin-left: 20px">
+                                {{ $t('container.start') }}
+                            </el-button>
+                            <el-divider direction="vertical" />
+                            <el-button type="primary" @click="onOperator('restart')" link>
+                                {{ $t('container.restart') }}
+                            </el-button>
+                        </div>
                     </el-col>
                 </el-row>
             </el-card>
-            <el-card style="margin-top: 10px">
-                <el-radio-group v-model="confShowType" @change="changeMode">
-                    <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
-                    <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
-                </el-radio-group>
-                <el-row style="margin-top: 20px" v-if="confShowType === 'base'">
-                    <el-col :span="1"><br /></el-col>
-                    <el-col :span="10">
+        </div>
+        <el-card style="margin-top: 20px">
+            <el-radio-group v-model="confShowType" @change="changeMode">
+                <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
+                <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
+            </el-radio-group>
+            <el-row style="margin-top: 20px" v-if="confShowType === 'base'">
+                <el-col :span="1"><br /></el-col>
+                <el-col :span="10">
+                    <el-form :model="form" ref="formRef" label-width="120px">
                         <el-form-item :label="$t('container.mirrors')" prop="mirrors">
                             <el-input
                                 type="textarea"
@@ -80,30 +90,30 @@
                                 {{ $t('commons.button.save') }}
                             </el-button>
                         </el-form-item>
-                    </el-col>
-                </el-row>
+                    </el-form>
+                </el-col>
+            </el-row>
 
-                <div v-if="confShowType === 'all'">
-                    <codemirror
-                        :autofocus="true"
-                        placeholder="None data"
-                        :indent-with-tab="true"
-                        :tabSize="4"
-                        style="margin-top: 10px; height: calc(100vh - 380px)"
-                        :lineWrapping="true"
-                        :matchBrackets="true"
-                        theme="cobalt"
-                        :styleActiveLine="true"
-                        :extensions="extensions"
-                        v-model="dockerConf"
-                        :readOnly="true"
-                    />
-                    <el-button :disabled="loading" type="primary" @click="onSaveFile" style="margin-top: 5px">
-                        {{ $t('commons.button.save') }}
-                    </el-button>
-                </div>
-            </el-card>
-        </el-form>
+            <div v-if="confShowType === 'all'">
+                <codemirror
+                    :autofocus="true"
+                    placeholder="None data"
+                    :indent-with-tab="true"
+                    :tabSize="4"
+                    style="margin-top: 10px; height: calc(100vh - 380px)"
+                    :lineWrapping="true"
+                    :matchBrackets="true"
+                    theme="cobalt"
+                    :styleActiveLine="true"
+                    :extensions="extensions"
+                    v-model="dockerConf"
+                    :readOnly="true"
+                />
+                <el-button :disabled="loading" type="primary" @click="onSaveFile" style="margin-top: 5px">
+                    {{ $t('commons.button.save') }}
+                </el-button>
+            </div>
+        </el-card>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmitSave"></ConfirmDialog>
     </div>
@@ -111,7 +121,6 @@
 
 <script lang="ts" setup>
 import { ElMessage, FormInstance } from 'element-plus';
-import FileList from '@/components/file-list/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import Submenu from '@/views/container/index.vue';
 import { Codemirror } from 'vue-codemirror';
@@ -121,20 +130,15 @@ import { LoadFile } from '@/api/modules/files';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import i18n from '@/lang';
 import { dockerOperate, loadDaemonJson, updateDaemonJson, updateDaemonJsonByfile } from '@/api/modules/container';
-import { loadDaemonJsonPath, updateSetting } from '@/api/modules/setting';
 
 const loading = ref(false);
 
 const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
 
-const daemonJsonPath = ref();
-const loadLoadDir = async (path: string) => {
-    daemonJsonPath.value = path;
-};
-
 const form = reactive({
     status: '',
+    version: '',
     mirrors: '',
     registries: '',
     liveRestore: false,
@@ -177,22 +181,9 @@ const onOperator = async (operation: string) => {
     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
 };
 
-const savePath = async () => {
-    let param = {
-        key: 'DaemonJsonPath',
-        value: daemonJsonPath.value,
-    };
-    await updateSetting(param);
-    changeMode();
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-};
-
 const onSubmitSave = async () => {
     if (confShowType.value === 'all') {
-        let param = {
-            file: dockerConf.value,
-            path: daemonJsonPath.value,
-        };
+        let param = { file: dockerConf.value };
         loading.value = true;
         await updateDaemonJsonByfile(param)
             .then(() => {
@@ -208,6 +199,7 @@ const onSubmitSave = async () => {
     let itemRegistries = form.registries.split('\n');
     let param = {
         status: form.status,
+        version: '',
         registryMirrors: itemMirrors.filter(function (el) {
             return el !== null && el !== '' && el !== undefined;
         }),
@@ -229,19 +221,14 @@ const onSubmitSave = async () => {
         });
 };
 
-const loadMysqlConf = async () => {
-    const res = await LoadFile({ path: daemonJsonPath.value });
+const loadDockerConf = async () => {
+    const res = await LoadFile({ path: '/etc/docker/daemon.json' });
     dockerConf.value = res.data;
-};
-
-const loadPath = async () => {
-    const res = await loadDaemonJsonPath();
-    daemonJsonPath.value = res.data;
 };
 
 const changeMode = async () => {
     if (confShowType.value === 'all') {
-        loadMysqlConf();
+        loadDockerConf();
     } else {
         search();
     }
@@ -250,6 +237,7 @@ const changeMode = async () => {
 const search = async () => {
     const res = await loadDaemonJson();
     form.status = res.data.status;
+    form.version = res.data.version;
     form.cgroupDriver = res.data.cgroupDriver;
     form.liveRestore = res.data.liveRestore;
     form.mirrors = res.data.registryMirrors ? res.data.registryMirrors.join('\n') : '';
@@ -257,7 +245,21 @@ const search = async () => {
 };
 
 onMounted(() => {
-    loadPath();
     search();
 });
 </script>
+
+<style lang="scss">
+.app-card {
+    font-size: 14px;
+    height: 60px;
+}
+
+.app-content {
+    height: 50px;
+}
+
+body {
+    margin: 0;
+}
+</style>

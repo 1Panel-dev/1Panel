@@ -16,4 +16,5 @@ const (
 
 	TmpDockerBuildDir  = "/opt/1Panel/data/docker/build"
 	TmpComposeBuildDir = "/opt/1Panel/data/docker/compose"
+	DaemonJsonPath     = "/tmp/docker/daemon.json"
 )

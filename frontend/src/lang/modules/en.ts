@@ -359,6 +359,7 @@ export default {
         rdbInfo: 'Rule list has 0 value, please confirm and try again!',
     },
     container: {
+        containerList: 'Container list',
         operatorHelper: '{0} will be performed on the selected container. Do you want to continue?',
         start: 'Start',
         stop: 'Stop',
