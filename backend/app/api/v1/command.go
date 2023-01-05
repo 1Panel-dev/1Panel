@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Create command
 // @Tags Command
 // @Summary Create command
 // @Description 创建快速命令
@@ -35,15 +34,14 @@ func (b *BaseApi) CreateCommand(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Page command
 // @Tags Command
-// @Summary Search command with page
+// @Summary Page commands
 // @Description 获取快速命令列表分页
 // @Accept json
 // @Param request body dto.SearchWithPage true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
-// @Router /commands [post]
+// @Router /commands/search [post]
 func (b *BaseApi) SearchCommand(c *gin.Context) {
 	var req dto.SearchWithPage
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -63,9 +61,8 @@ func (b *BaseApi) SearchCommand(c *gin.Context) {
 	})
 }
 
-// List command
 // @Tags Command
-// @Summary Search command
+// @Summary List commands
 // @Description 获取快速命令列表
 // @Success 200 {object} dto.CommandInfo
 // @Security ApiKeyAuth
@@ -80,7 +77,6 @@ func (b *BaseApi) ListCommand(c *gin.Context) {
 	helper.SuccessWithData(c, list)
 }
 
-// Delete command
 // @Tags Command
 // @Summary Delete command
 // @Description 删除快速命令
@@ -108,7 +104,6 @@ func (b *BaseApi) DeleteCommand(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update command
 // @Tags Command
 // @Summary Update command
 // @Description 更新快速命令

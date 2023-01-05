@@ -8,9 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Create Compose template
 // @Tags Container Compose-template
-// @Summary Create Compose template
+// @Summary Create compose template
 // @Description 创建容器编排模版
 // @Accept json
 // @Param request body dto.ComposeTemplateCreate true "request"
@@ -35,9 +34,8 @@ func (b *BaseApi) CreateComposeTemplate(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Page compose template
 // @Tags Container Compose-template
-// @Summary Search compose template list with page
+// @Summary Page compose templates
 // @Description 获取容器编排模版列表分页
 // @Accept json
 // @Param request body dto.PageInfo true "request"
@@ -64,9 +62,8 @@ func (b *BaseApi) SearchComposeTemplate(c *gin.Context) {
 	})
 }
 
-// List compose template
 // @Tags Container Compose-template
-// @Summary Search compose template list
+// @Summary List compose templates
 // @Description 获取容器编排模版列表
 // @Produce json
 // @Success 200 {anrry} dto.ComposeTemplateInfo
@@ -82,7 +79,6 @@ func (b *BaseApi) ListComposeTemplate(c *gin.Context) {
 	helper.SuccessWithData(c, list)
 }
 
-// Delete compose template
 // @Tags Container Compose-template
 // @Summary Delete compose template
 // @Description 删除容器编排模版
@@ -110,7 +106,6 @@ func (b *BaseApi) DeleteComposeTemplate(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update compose template
 // @Tags Container Compose-template
 // @Summary Update compose template
 // @Description 更新容器编排模版

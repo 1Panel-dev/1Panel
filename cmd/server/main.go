@@ -17,7 +17,7 @@ import (
 // @host localhost
 // @BasePath /api/v1
 
-//go:generate swag init -o ./docs -g main.go -d ../../backend/app -g ../../cmd/server/main.go
+//go:generate swag init -o ./docs -g main.go -d ../../backend -g ../cmd/server/main.go
 func main() {
 	if err := cmd.RootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)

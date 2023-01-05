@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Create mysql database
 // @Tags Database Mysql
 // @Summary Create mysql database
 // @Description 创建 mysql 数据库
@@ -37,7 +36,6 @@ func (b *BaseApi) CreateMysql(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update mysql database description
 // @Tags Database Mysql
 // @Summary Update mysql database description
 // @Description 更新 mysql 数据库库描述信息
@@ -64,7 +62,6 @@ func (b *BaseApi) UpdateMysqlDescription(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Change mysql password
 // @Tags Database Mysql
 // @Summary Change mysql password
 // @Description 修改 mysql 密码
@@ -91,7 +88,6 @@ func (b *BaseApi) ChangeMysqlPassword(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Change mysql access
 // @Tags Database Mysql
 // @Summary Change mysql access
 // @Description 修改 mysql 访问权限
@@ -118,7 +114,6 @@ func (b *BaseApi) ChangeMysqlAccess(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update mysql variables
 // @Tags Database Mysql
 // @Summary Update mysql variables
 // @Description mysql 性能调优
@@ -142,7 +137,6 @@ func (b *BaseApi) UpdateMysqlVariables(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update mysql conf by upload file
 // @Tags Database Mysql
 // @Summary Update mysql conf by upload file
 // @Description 上传替换 mysql 配置文件
@@ -171,9 +165,8 @@ func (b *BaseApi) UpdateMysqlConfByFile(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Page mysql database
-// @Tags Cronjob
-// @Summary Search mysql database list with page
+// @Tags Database Mysql
+// @Summary Page mysql databases
 // @Description 获取 mysql 数据库列表分页
 // @Accept json
 // @Param request body dto.PageInfo true "request"
@@ -199,9 +192,8 @@ func (b *BaseApi) SearchMysql(c *gin.Context) {
 	})
 }
 
-// List mysql database
-// @Tags Cronjob
-// @Summary Search mysql database list
+// @Tags Database Mysql
+// @Summary List mysql database names
 // @Description 获取 mysql 数据库列表
 // @Accept json
 // @Param request body dto.PageInfo true "request"
@@ -218,7 +210,6 @@ func (b *BaseApi) ListDBName(c *gin.Context) {
 	helper.SuccessWithData(c, list)
 }
 
-// Backup mysql database
 // @Tags Database Mysql
 // @Summary Backup mysql database
 // @Description 备份 mysql 数据库
@@ -247,7 +238,6 @@ func (b *BaseApi) BackupMysql(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Recover mysql database by upload file
 // @Tags Database Mysql
 // @Summary Recover mysql database by upload file
 // @Description Mysql 数据库从上传文件恢复
@@ -276,7 +266,6 @@ func (b *BaseApi) RecoverMysqlByUpload(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Recover mysql database
 // @Tags Database Mysql
 // @Summary Recover mysql database
 // @Description Mysql 数据库恢复
@@ -305,7 +294,6 @@ func (b *BaseApi) RecoverMysql(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Check before delete mysql database
 // @Tags Database Mysql
 // @Summary Check before delete mysql database
 // @Description Mysql 数据库删除前检查
@@ -333,7 +321,6 @@ func (b *BaseApi) DeleteCheckMysql(c *gin.Context) {
 	helper.SuccessWithData(c, apps)
 }
 
-// Delete mysql database
 // @Tags Database Mysql
 // @Summary Delete mysql database
 // @Description 删除 mysql 数据库
@@ -364,7 +351,6 @@ func (b *BaseApi) DeleteMysql(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Load mysql base info
 // @Tags Database Mysql
 // @Summary Load mysql base info
 // @Description 获取 mysql 基础信息
@@ -381,7 +367,6 @@ func (b *BaseApi) LoadBaseinfo(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
-// Load mysql remote access
 // @Tags Database Mysql
 // @Summary Load mysql remote access
 // @Description 获取 mysql 远程访问权限
@@ -398,7 +383,6 @@ func (b *BaseApi) LoadRemoteAccess(c *gin.Context) {
 	helper.SuccessWithData(c, isRemote)
 }
 
-// Load mysql status info
 // @Tags Database Mysql
 // @Summary Load mysql status info
 // @Description 获取 mysql 状态信息
@@ -415,7 +399,6 @@ func (b *BaseApi) LoadStatus(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
-// Load mysql variables info
 // @Tags Database Mysql
 // @Summary Load mysql variables info
 // @Description 获取 mysql 性能参数信息

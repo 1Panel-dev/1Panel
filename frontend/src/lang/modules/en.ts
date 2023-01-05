@@ -603,6 +603,7 @@ export default {
             commands: 'Command',
             groups: 'System Group',
             backups: 'Backup Account',
+            logs: 'Panel Logs',
             settings: 'Panel Setting',
             cronjobs: 'Cronjob',
             databases: 'Database',

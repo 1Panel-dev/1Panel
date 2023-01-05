@@ -46,6 +46,13 @@ definitions:
     required:
     - ids
     type: object
+  dto.CaptchaResponse:
+    properties:
+      captchaID:
+        type: string
+      imagePath:
+        type: string
+    type: object
   dto.ChangeDBInfo:
     properties:
       id:
@@ -54,6 +61,16 @@ definitions:
         type: string
     required:
     - value
+    type: object
+  dto.CleanLog:
+    properties:
+      logType:
+        enum:
+        - login
+        - operation
+        type: string
+    required:
+    - logType
     type: object
   dto.CommandInfo:
     properties:
@@ -384,6 +401,118 @@ definitions:
     required:
     - path
     type: object
+  dto.DashboardBase:
+    properties:
+      appInstalldNumber:
+        type: integer
+      cpuCores:
+        type: integer
+      cpuLogicalCores:
+        type: integer
+      cpuModelName:
+        type: string
+      cronjobNumber:
+        type: integer
+      currentInfo:
+        $ref: '#/definitions/dto.DashboardCurrent'
+      databaseNumber:
+        type: integer
+      dateeaseID:
+        type: integer
+      haloID:
+        type: integer
+      hostname:
+        type: string
+      jumpserverID:
+        type: integer
+      kernelArch:
+        type: string
+      kernelVersion:
+        type: string
+      kubeoperatorID:
+        type: integer
+      kubepiID:
+        type: integer
+      metersphereID:
+        type: integer
+      os:
+        type: string
+      platform:
+        type: string
+      platformFamily:
+        type: string
+      platformVersion:
+        type: string
+      virtualizationSystem:
+        type: string
+      websiteNumber:
+        type: integer
+    type: object
+  dto.DashboardCurrent:
+    properties:
+      MemoryUsedPercent:
+        type: number
+      cpuPercent:
+        items:
+          type: number
+        type: array
+      cpuTotal:
+        type: integer
+      cpuUsed:
+        type: number
+      cpuUsedPercent:
+        type: number
+      free:
+        type: integer
+      inodesFree:
+        type: integer
+      inodesTotal:
+        type: integer
+      inodesUsed:
+        type: integer
+      inodesUsedPercent:
+        type: number
+      ioCount:
+        type: integer
+      ioReadBytes:
+        type: integer
+      ioTime:
+        type: integer
+      ioWriteBytes:
+        type: integer
+      load1:
+        type: number
+      load5:
+        type: number
+      load15:
+        type: number
+      loadUsagePercent:
+        type: number
+      memoryAvailable:
+        type: integer
+      memoryTotal:
+        type: integer
+      memoryUsed:
+        type: integer
+      netBytesRecv:
+        type: integer
+      netBytesSent:
+        type: integer
+      procs:
+        type: integer
+      shotTime:
+        type: string
+      timeSinceUptime:
+        type: string
+      total:
+        type: integer
+      uptime:
+        type: integer
+      used:
+        type: integer
+      usedPercent:
+        type: number
+    type: object
   dto.DockerOperation:
     properties:
       operation:
@@ -414,6 +543,13 @@ definitions:
     - fileName
     - source
     type: object
+  dto.FilePath:
+    properties:
+      path:
+        type: string
+    required:
+    - path
+    type: object
   dto.ForBuckets:
     properties:
       accessKey:
@@ -428,6 +564,112 @@ definitions:
     - credential
     - type
     - vars
+    type: object
+  dto.GroupInfo:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  dto.GroupOperate:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      type:
+        type: string
+    required:
+    - name
+    - type
+    type: object
+  dto.GroupSearch:
+    properties:
+      type:
+        type: string
+    required:
+    - type
+    type: object
+  dto.HostConnTest:
+    properties:
+      addr:
+        type: string
+      authMode:
+        enum:
+        - password
+        - key
+        type: string
+      password:
+        type: string
+      port:
+        maximum: 65535
+        minimum: 1
+        type: integer
+      privateKey:
+        type: string
+      user:
+        type: string
+    required:
+    - addr
+    - port
+    - user
+    type: object
+  dto.HostInfo:
+    properties:
+      addr:
+        type: string
+      authMode:
+        type: string
+      createdAt:
+        type: string
+      description:
+        type: string
+      groupBelong:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      port:
+        type: integer
+      user:
+        type: string
+    type: object
+  dto.HostOperate:
+    properties:
+      addr:
+        type: string
+      authMode:
+        enum:
+        - password
+        - key
+        type: string
+      description:
+        type: string
+      groupBelong:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      port:
+        maximum: 65535
+        minimum: 1
+        type: integer
+      privateKey:
+        type: string
+      user:
+        type: string
+    required:
+    - addr
+    - groupBelong
+    - port
+    - user
     type: object
   dto.ImageBuild:
     properties:
@@ -543,11 +785,61 @@ definitions:
     - sourceID
     - targetName
     type: object
+  dto.InitUser:
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - name
+    - password
+    type: object
   dto.InspectReq:
     properties:
       id:
         type: string
       type:
+        type: string
+    type: object
+  dto.Login:
+    properties:
+      authMethod:
+        type: string
+      captcha:
+        type: string
+      captchaID:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - name
+    - password
+    type: object
+  dto.MFALogin:
+    properties:
+      authMethod:
+        type: string
+      code:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      secret:
+        type: string
+    required:
+    - name
+    - password
+    - secret
+    type: object
+  dto.MfaCredential:
+    properties:
+      code:
+        type: string
+      secret:
         type: string
     type: object
   dto.MysqlConfUpdateByFile:
@@ -779,6 +1071,16 @@ definitions:
       total:
         type: integer
     type: object
+  dto.PasswordUpdate:
+    properties:
+      newPassword:
+        type: string
+      oldPassword:
+        type: string
+    required:
+    - newPassword
+    - oldPassword
+    type: object
   dto.PortHelper:
     properties:
       containerPort:
@@ -904,6 +1206,11 @@ definitions:
       used_memory_rss:
         type: string
     type: object
+  dto.SearchForTree:
+    properties:
+      info:
+        type: string
+    type: object
   dto.SearchRecord:
     properties:
       cronjobID:
@@ -935,6 +1242,58 @@ definitions:
     - page
     - pageSize
     type: object
+  dto.SettingInfo:
+    properties:
+      complexityVerification:
+        type: string
+      dingVars:
+        type: string
+      email:
+        type: string
+      emailVars:
+        type: string
+      expirationDays:
+        type: string
+      expirationTime:
+        type: string
+      language:
+        type: string
+      localTime:
+        type: string
+      messageType:
+        type: string
+      mfaSecret:
+        type: string
+      mfaStatus:
+        type: string
+      monitorStatus:
+        type: string
+      monitorStoreDays:
+        type: string
+      panelName:
+        type: string
+      securityEntrance:
+        type: string
+      serverPort:
+        type: string
+      sessionTimeout:
+        type: string
+      theme:
+        type: string
+      userName:
+        type: string
+      weChatVars:
+        type: string
+    type: object
+  dto.SettingUpdate:
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+    required:
+    - key
+    type: object
   dto.UploadRecover:
     properties:
       dbName:
@@ -948,6 +1307,17 @@ definitions:
     required:
     - dbName
     - mysqlName
+    type: object
+  dto.UserLoginInfo:
+    properties:
+      mfaSecret:
+        type: string
+      mfaStatus:
+        type: string
+      name:
+        type: string
+      token:
+        type: string
     type: object
   dto.VolumeCreat:
     properties:
@@ -972,6 +1342,328 @@ definitions:
         type: string
       sourceDir:
         type: string
+    type: object
+  files.FileInfo:
+    properties:
+      content:
+        type: string
+      extension:
+        type: string
+      group:
+        type: string
+      isDir:
+        type: boolean
+      isHidden:
+        type: boolean
+      isSymlink:
+        type: boolean
+      itemTotal:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/files.FileInfo'
+        type: array
+      linkPath:
+        type: string
+      mimeType:
+        type: string
+      modTime:
+        type: string
+      mode:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      size:
+        type: integer
+      type:
+        type: string
+      updateTime:
+        type: string
+      user:
+        type: string
+    type: object
+  mfa.Otp:
+    properties:
+      qrImage:
+        type: string
+      secret:
+        type: string
+    type: object
+  model.App:
+    properties:
+      author:
+        type: string
+      createdAt:
+        type: string
+      crossVersionUpdate:
+        type: boolean
+      icon:
+        type: string
+      id:
+        type: integer
+      key:
+        type: string
+      limit:
+        type: integer
+      name:
+        type: string
+      required:
+        type: string
+      shortDesc:
+        type: string
+      source:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  model.AppInstall:
+    properties:
+      app:
+        $ref: '#/definitions/model.App'
+      appDetailId:
+        type: integer
+      appId:
+        type: integer
+      backups:
+        items:
+          $ref: '#/definitions/model.AppInstallBackup'
+        type: array
+      containerName:
+        type: string
+      createdAt:
+        type: string
+      description:
+        type: string
+      dockerCompose:
+        type: string
+      env:
+        type: string
+      httpPort:
+        type: integer
+      httpsPort:
+        type: integer
+      id:
+        type: integer
+      message:
+        type: string
+      name:
+        type: string
+      param:
+        type: string
+      serviceName:
+        type: string
+      status:
+        type: string
+      updatedAt:
+        type: string
+      version:
+        type: string
+    type: object
+  model.AppInstallBackup:
+    properties:
+      app_detail_id:
+        type: integer
+      app_install_id:
+        type: integer
+      createdAt:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      param:
+        type: string
+      path:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  model.Tag:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: integer
+      key:
+        type: string
+      name:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+  model.Website:
+    properties:
+      accessLog:
+        type: boolean
+      alias:
+        type: string
+      appInstallId:
+        type: integer
+      createdAt:
+        type: string
+      defaultServer:
+        type: boolean
+      domains:
+        items:
+          $ref: '#/definitions/model.WebsiteDomain'
+        type: array
+      errorLog:
+        type: boolean
+      expireDate:
+        type: string
+      httpConfig:
+        type: string
+      id:
+        type: integer
+      primaryDomain:
+        type: string
+      protocol:
+        type: string
+      proxy:
+        type: string
+      remark:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+      updatedAt:
+        type: string
+      webSiteGroupId:
+        type: integer
+      webSiteSSL:
+        $ref: '#/definitions/model.WebsiteSSL'
+      webSiteSSLId:
+        type: integer
+    type: object
+  model.WebsiteAcmeAccount:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      updatedAt:
+        type: string
+      url:
+        type: string
+    type: object
+  model.WebsiteDomain:
+    properties:
+      createdAt:
+        type: string
+      domain:
+        type: string
+      id:
+        type: integer
+      port:
+        type: integer
+      updatedAt:
+        type: string
+      websiteId:
+        type: integer
+    type: object
+  model.WebsiteSSL:
+    properties:
+      acmeAccount:
+        $ref: '#/definitions/model.WebsiteAcmeAccount'
+      acmeAccountId:
+        type: integer
+      autoRenew:
+        type: boolean
+      certURL:
+        type: string
+      createdAt:
+        type: string
+      dnsAccountId:
+        type: integer
+      domains:
+        type: string
+      expireDate:
+        type: string
+      id:
+        type: integer
+      organization:
+        type: string
+      pem:
+        type: string
+      primaryDomain:
+        type: string
+      privateKey:
+        type: string
+      provider:
+        type: string
+      startDate:
+        type: string
+      type:
+        type: string
+      updatedAt:
+        type: string
+      websites:
+        items:
+          $ref: '#/definitions/model.Website'
+        type: array
+    type: object
+  request.AppBackupDelete:
+    properties:
+      ids:
+        items:
+          type: integer
+        type: array
+    type: object
+  request.AppBackupSearch:
+    properties:
+      appInstallID:
+        type: integer
+      page:
+        type: integer
+      pageSize:
+        type: integer
+    required:
+    - page
+    - pageSize
+    type: object
+  request.AppInstallCreate:
+    properties:
+      appDetailId:
+        type: integer
+      name:
+        type: string
+      params:
+        additionalProperties: true
+        type: object
+      services:
+        additionalProperties:
+          type: string
+        type: object
+    required:
+    - appDetailId
+    - name
+    type: object
+  request.AppInstalledOperate:
+    properties:
+      backupId:
+        type: integer
+      deleteBackup:
+        type: boolean
+      detailId:
+        type: integer
+      forceDelete:
+        type: boolean
+      installId:
+        type: integer
+      operate:
+        type: string
+    required:
+    - installId
+    - operate
     type: object
   request.AppInstalledSearch:
     properties:
@@ -1005,6 +1697,828 @@ definitions:
     - page
     - pageSize
     type: object
+  request.DirSizeReq:
+    properties:
+      path:
+        type: string
+    required:
+    - path
+    type: object
+  request.FileBatchDelete:
+    properties:
+      isDir:
+        type: boolean
+      paths:
+        items:
+          type: string
+        type: array
+    required:
+    - paths
+    type: object
+  request.FileCompress:
+    properties:
+      dst:
+        type: string
+      files:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      replace:
+        type: boolean
+      type:
+        type: string
+    required:
+    - dst
+    - files
+    - name
+    - type
+    type: object
+  request.FileCreate:
+    properties:
+      content:
+        type: string
+      isDir:
+        type: boolean
+      isLink:
+        type: boolean
+      isSymlink:
+        type: boolean
+      linkPath:
+        type: string
+      mode:
+        type: integer
+      path:
+        type: string
+    required:
+    - mode
+    - path
+    type: object
+  request.FileDeCompress:
+    properties:
+      dst:
+        type: string
+      path:
+        type: string
+      type:
+        type: string
+    required:
+    - dst
+    - path
+    - type
+    type: object
+  request.FileDelete:
+    properties:
+      isDir:
+        type: boolean
+      path:
+        type: string
+    required:
+    - path
+    type: object
+  request.FileDownload:
+    properties:
+      name:
+        type: string
+      paths:
+        items:
+          type: string
+        type: array
+      type:
+        type: string
+    required:
+    - name
+    - paths
+    - type
+    type: object
+  request.FileEdit:
+    properties:
+      content:
+        type: string
+      path:
+        type: string
+    required:
+    - content
+    - path
+    type: object
+  request.FileMove:
+    properties:
+      newPath:
+        type: string
+      oldPaths:
+        items:
+          type: string
+        type: array
+      type:
+        type: string
+    required:
+    - newPath
+    - oldPaths
+    - type
+    type: object
+  request.FileOption:
+    properties:
+      dir:
+        type: boolean
+      expand:
+        type: boolean
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      path:
+        type: string
+      search:
+        type: string
+      showHidden:
+        type: boolean
+    type: object
+  request.FileRename:
+    properties:
+      newName:
+        type: string
+      oldName:
+        type: string
+    required:
+    - newName
+    - oldName
+    type: object
+  request.FileWget:
+    properties:
+      name:
+        type: string
+      path:
+        type: string
+      url:
+        type: string
+    required:
+    - name
+    - path
+    - url
+    type: object
+  request.NewAppInstall:
+    properties:
+      appDetailID:
+        type: integer
+      name:
+        type: string
+      params:
+        additionalProperties: true
+        type: object
+    type: object
+  request.NginxConfigFileUpdate:
+    properties:
+      backup:
+        type: boolean
+      content:
+        type: string
+      filePath:
+        type: string
+    required:
+    - backup
+    - content
+    - filePath
+    type: object
+  request.NginxConfigUpdate:
+    properties:
+      operate:
+        type: string
+      params: {}
+      scope:
+        type: string
+      websiteId:
+        type: integer
+    required:
+    - websiteId
+    type: object
+  request.NginxScopeReq:
+    properties:
+      scope:
+        type: string
+      websiteId:
+        type: integer
+    required:
+    - scope
+    type: object
+  request.PortUpdate:
+    properties:
+      key:
+        type: string
+      name:
+        type: string
+      port:
+        type: integer
+    type: object
+  request.WebsiteAcmeAccountCreate:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  request.WebsiteCreate:
+    properties:
+      alias:
+        type: string
+      appID:
+        type: integer
+      appInstall:
+        $ref: '#/definitions/request.NewAppInstall'
+      appInstallID:
+        type: integer
+      appType:
+        enum:
+        - new
+        - installed
+        type: string
+      otherDomains:
+        type: string
+      primaryDomain:
+        type: string
+      proxy:
+        type: string
+      remark:
+        type: string
+      type:
+        type: string
+      webSiteGroupID:
+        type: integer
+    required:
+    - alias
+    - primaryDomain
+    - type
+    - webSiteGroupID
+    type: object
+  request.WebsiteDNSReq:
+    properties:
+      acmeAccountId:
+        type: integer
+      domains:
+        items:
+          type: string
+        type: array
+    required:
+    - acmeAccountId
+    - domains
+    type: object
+  request.WebsiteDefaultUpdate:
+    properties:
+      id:
+        type: integer
+    required:
+    - id
+    type: object
+  request.WebsiteDelete:
+    properties:
+      deleteApp:
+        type: boolean
+      deleteBackup:
+        type: boolean
+      forceDelete:
+        type: boolean
+      id:
+        type: integer
+    required:
+    - id
+    type: object
+  request.WebsiteDnsAccountCreate:
+    properties:
+      authorization:
+        additionalProperties:
+          type: string
+        type: object
+      name:
+        type: string
+      type:
+        type: string
+    required:
+    - authorization
+    - name
+    - type
+    type: object
+  request.WebsiteDnsAccountUpdate:
+    properties:
+      authorization:
+        additionalProperties:
+          type: string
+        type: object
+      id:
+        type: integer
+      name:
+        type: string
+      type:
+        type: string
+    required:
+    - authorization
+    - id
+    - name
+    - type
+    type: object
+  request.WebsiteDomainCreate:
+    properties:
+      domain:
+        type: string
+      port:
+        type: integer
+      websiteId:
+        type: integer
+    required:
+    - domain
+    - port
+    - websiteId
+    type: object
+  request.WebsiteDomainDelete:
+    properties:
+      id:
+        type: integer
+    required:
+    - id
+    type: object
+  request.WebsiteGroupCreate:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  request.WebsiteGroupUpdate:
+    properties:
+      default:
+        type: boolean
+      id:
+        type: integer
+      name:
+        type: string
+    required:
+    - id
+    type: object
+  request.WebsiteHTTPSOp:
+    properties:
+      HttpConfig:
+        enum:
+        - HTTPSOnly
+        - HTTPAlso
+        - HTTPToHTTPS
+        type: string
+      SSLProtocol:
+        items:
+          type: string
+        type: array
+      algorithm:
+        type: string
+      certificate:
+        type: string
+      enable:
+        type: boolean
+      privateKey:
+        type: string
+      type:
+        enum:
+        - existed
+        - auto
+        - manual
+        type: string
+      websiteId:
+        type: integer
+      websiteSSLId:
+        type: integer
+    required:
+    - enable
+    - websiteId
+    type: object
+  request.WebsiteInstallCheckReq:
+    properties:
+      InstallIds:
+        items:
+          type: integer
+        type: array
+    required:
+    - InstallIds
+    type: object
+  request.WebsiteLogReq:
+    properties:
+      id:
+        type: integer
+      logType:
+        type: string
+      operate:
+        type: string
+    required:
+    - id
+    - logType
+    - operate
+    type: object
+  request.WebsiteNginxUpdate:
+    properties:
+      content:
+        type: string
+      id:
+        type: integer
+    required:
+    - content
+    - id
+    type: object
+  request.WebsiteOp:
+    properties:
+      id:
+        type: integer
+      operate:
+        type: string
+    required:
+    - id
+    type: object
+  request.WebsiteRecover:
+    properties:
+      backupName:
+        type: string
+      type:
+        type: string
+      websiteName:
+        type: string
+    required:
+    - backupName
+    - type
+    - websiteName
+    type: object
+  request.WebsiteRecoverByFile:
+    properties:
+      fileDir:
+        type: string
+      fileName:
+        type: string
+      type:
+        type: string
+      websiteName:
+        type: string
+    required:
+    - fileDir
+    - fileName
+    - type
+    - websiteName
+    type: object
+  request.WebsiteResourceReq:
+    properties:
+      id:
+        type: integer
+    required:
+    - id
+    type: object
+  request.WebsiteSSLCreate:
+    properties:
+      acmeAccountId:
+        type: integer
+      autoRenew:
+        type: boolean
+      dnsAccountId:
+        type: integer
+      otherDomains:
+        type: string
+      primaryDomain:
+        type: string
+      provider:
+        type: string
+    required:
+    - acmeAccountId
+    - autoRenew
+    - primaryDomain
+    - provider
+    type: object
+  request.WebsiteSSLRenew:
+    properties:
+      SSLId:
+        type: integer
+    required:
+    - SSLId
+    type: object
+  request.WebsiteSSLSearch:
+    properties:
+      page:
+        type: integer
+      pageSize:
+        type: integer
+    required:
+    - page
+    - pageSize
+    type: object
+  request.WebsiteSearch:
+    properties:
+      name:
+        type: string
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      websiteGroupId:
+        type: integer
+    required:
+    - page
+    - pageSize
+    type: object
+  request.WebsiteUpdate:
+    properties:
+      expireDate:
+        type: string
+      id:
+        type: integer
+      primaryDomain:
+        type: string
+      remark:
+        type: string
+      webSiteGroupID:
+        type: integer
+    required:
+    - id
+    - primaryDomain
+    - webSiteGroupID
+    type: object
+  request.WebsiteWafReq:
+    properties:
+      key:
+        type: string
+      rule:
+        type: string
+      websiteId:
+        type: integer
+    required:
+    - key
+    - rule
+    - websiteId
+    type: object
+  request.WebsiteWafUpdate:
+    properties:
+      enable:
+        type: boolean
+      key:
+        type: string
+      websiteId:
+        type: integer
+    required:
+    - enable
+    - key
+    - websiteId
+    type: object
+  response.AppDTO:
+    properties:
+      author:
+        type: string
+      createdAt:
+        type: string
+      crossVersionUpdate:
+        type: boolean
+      icon:
+        type: string
+      id:
+        type: integer
+      key:
+        type: string
+      limit:
+        type: integer
+      name:
+        type: string
+      required:
+        type: string
+      shortDesc:
+        type: string
+      source:
+        type: string
+      status:
+        type: string
+      tags:
+        items:
+          $ref: '#/definitions/model.Tag'
+        type: array
+      type:
+        type: string
+      updatedAt:
+        type: string
+      versions:
+        items:
+          type: string
+        type: array
+    type: object
+  response.AppDetailDTO:
+    properties:
+      appId:
+        type: integer
+      createdAt:
+        type: string
+      enable:
+        type: boolean
+      id:
+        type: integer
+      lastVersion:
+        type: string
+      params: {}
+      readme:
+        type: string
+      status:
+        type: string
+      updatedAt:
+        type: string
+      version:
+        type: string
+    type: object
+  response.AppInstalledCheck:
+    properties:
+      app:
+        type: string
+      appInstallId:
+        type: integer
+      containerName:
+        type: string
+      createdAt:
+        type: string
+      installPath:
+        type: string
+      isExist:
+        type: boolean
+      lastBackupAt:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      version:
+        type: string
+    type: object
+  response.AppParam:
+    properties:
+      label:
+        type: string
+      value: {}
+    type: object
+  response.FileInfo:
+    properties:
+      content:
+        type: string
+      extension:
+        type: string
+      group:
+        type: string
+      isDir:
+        type: boolean
+      isHidden:
+        type: boolean
+      isSymlink:
+        type: boolean
+      itemTotal:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/files.FileInfo'
+        type: array
+      linkPath:
+        type: string
+      mimeType:
+        type: string
+      modTime:
+        type: string
+      mode:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      size:
+        type: integer
+      type:
+        type: string
+      updateTime:
+        type: string
+      user:
+        type: string
+    type: object
+  response.NginxParam:
+    properties:
+      name:
+        type: string
+      params:
+        items:
+          type: string
+        type: array
+    type: object
+  response.NginxStatus:
+    properties:
+      accepts:
+        type: string
+      active:
+        type: string
+      handled:
+        type: string
+      reading:
+        type: string
+      requests:
+        type: string
+      waiting:
+        type: string
+      writing:
+        type: string
+    type: object
+  response.WebsiteAcmeAccountDTO:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      updatedAt:
+        type: string
+      url:
+        type: string
+    type: object
+  response.WebsiteDTO:
+    properties:
+      accessLog:
+        type: boolean
+      accessLogPath:
+        type: string
+      alias:
+        type: string
+      appInstallId:
+        type: integer
+      createdAt:
+        type: string
+      defaultServer:
+        type: boolean
+      domains:
+        items:
+          $ref: '#/definitions/model.WebsiteDomain'
+        type: array
+      errorLog:
+        type: boolean
+      errorLogPath:
+        type: string
+      expireDate:
+        type: string
+      httpConfig:
+        type: string
+      id:
+        type: integer
+      primaryDomain:
+        type: string
+      protocol:
+        type: string
+      proxy:
+        type: string
+      remark:
+        type: string
+      sitePath:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+      updatedAt:
+        type: string
+      webSiteGroupId:
+        type: integer
+      webSiteSSL:
+        $ref: '#/definitions/model.WebsiteSSL'
+      webSiteSSLId:
+        type: integer
+    type: object
+  response.WebsiteHTTPS:
+    properties:
+      SSL:
+        $ref: '#/definitions/model.WebsiteSSL'
+      SSLProtocol:
+        items:
+          type: string
+        type: array
+      algorithm:
+        type: string
+      enable:
+        type: boolean
+      httpConfig:
+        type: string
+    type: object
+  response.WebsiteLog:
+    properties:
+      content:
+        type: string
+      enable:
+        type: boolean
+    type: object
+  response.WebsiteNginxConfig:
+    properties:
+      enable:
+        type: boolean
+      params:
+        items:
+          $ref: '#/definitions/response.NginxParam'
+        type: array
+    type: object
+  response.WebsiteWafConfig:
+    properties:
+      content:
+        type: string
+      enable:
+        type: boolean
+      filePath:
+        type: string
+    type: object
 host: localhost
 info:
   contact: {}
@@ -1016,6 +2530,93 @@ info:
   title: 1Panel
   version: "1.0"
 paths:
+  /apps/:id:
+    get:
+      consumes:
+      - application/json
+      description: 通过 id 获取应用信息
+      parameters:
+      - description: app id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.AppDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Search app by id
+      tags:
+      - App
+  /apps/detail/:appId/:version:
+    get:
+      consumes:
+      - application/json
+      description: 通过 id 获取应用详情
+      parameters:
+      - description: app id
+        in: path
+        name: appId
+        required: true
+        type: integer
+      - description: app 版本
+        in: path
+        name: version
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.AppDetailDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Search app detail by id
+      tags:
+      - App
+  /apps/install:
+    post:
+      consumes:
+      - application/json
+      description: 安装应用
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.AppInstallCreate'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.AppInstall'
+      security:
+      - ApiKeyAuth: []
+      summary: Install app
+      tags:
+      - App
+      x-panel-log:
+        BeforeFuntions:
+        - db: app_installs
+          input_colume: name
+          input_value: name
+          isList: false
+          output_colume: app_id
+          output_value: appId
+        - db: apps
+          info: appId
+          isList: false
+          output_colume: key
+          output_value: appKey
+        bodyKeys:
+        - name
+        formatEN: Install app [appKey]-[name]
+        formatZH: 安装应用 [appKey]-[name]
+        paramKeys: []
   /apps/installed:
     post:
       consumes:
@@ -1033,9 +2634,303 @@ paths:
           description: ""
       security:
       - ApiKeyAuth: []
-      summary: Search app list installed
+      summary: List app installed
       tags:
       - App
+  /apps/installed/:appInstallId/versions:
+    get:
+      consumes:
+      - application/json
+      description: 通过 install id 获取应用更新版本
+      parameters:
+      - description: request
+        in: path
+        name: appInstallId
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: Search app update version by install id
+      tags:
+      - App
+  /apps/installed/backups:
+    post:
+      consumes:
+      - application/json
+      description: 查询已安装备份列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.AppBackupSearch'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page installed backups
+      tags:
+      - App
+  /apps/installed/backups/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除应用备份记录
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.AppBackupDelete'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete app backup record
+      tags:
+      - App
+      x-panel-log:
+        BeforeFuntions:
+        - db: app_install_backups
+          input_colume: id
+          input_value: ids
+          isList: true
+          output_colume: name
+          output_value: names
+        bodyKeys:
+        - ids
+        formatEN: Deleting an Application Backup [names]
+        formatZH: 删除应用备份 [names]
+        paramKeys: []
+  /apps/installed/check/:key:
+    get:
+      consumes:
+      - application/json
+      description: 检查应用安装情况
+      parameters:
+      - description: request
+        in: path
+        name: key
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.AppInstalledCheck'
+      security:
+      - ApiKeyAuth: []
+      summary: Check app installed
+      tags:
+      - App
+  /apps/installed/conf/:key:
+    get:
+      consumes:
+      - application/json
+      description: 通过 key 获取应用默认配置
+      parameters:
+      - description: request
+        in: path
+        name: key
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Search default config by key
+      tags:
+      - App
+  /apps/installed/delete/check/:appInstallId:
+    get:
+      consumes:
+      - application/json
+      description: 删除前检查
+      parameters:
+      - description: App install id
+        in: path
+        name: appInstallId
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: Check before delete
+      tags:
+      - App
+  /apps/installed/loadpassword/:key:
+    get:
+      consumes:
+      - application/json
+      description: 获取应用密码
+      parameters:
+      - description: request
+        in: path
+        name: key
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Search app password by key
+      tags:
+      - App
+  /apps/installed/loadport/:key:
+    get:
+      consumes:
+      - application/json
+      description: 获取应用端口
+      parameters:
+      - description: request
+        in: path
+        name: key
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+      security:
+      - ApiKeyAuth: []
+      summary: Search app port by key
+      tags:
+      - App
+  /apps/installed/op:
+    post:
+      consumes:
+      - application/json
+      description: 操作已安装应用
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.AppInstalledOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Operate installed app
+      tags:
+      - App
+      x-panel-log:
+        BeforeFuntions:
+        - db: app_installs
+          input_colume: id
+          input_value: installId
+          isList: false
+          output_colume: app_id
+          output_value: appId
+        - db: app_installs
+          input_colume: id
+          input_value: installId
+          isList: false
+          output_colume: name
+          output_value: appName
+        - db: apps
+          input_colume: id
+          input_value: appId
+          isList: false
+          output_colume: key
+          output_value: appKey
+        bodyKeys:
+        - installId
+        - operate
+        formatEN: '[appKey] App [appName] [operate]'
+        formatZH: '[appKey] 应用 [appName] [operate]'
+        paramKeys: []
+  /apps/installed/params/:appInstallId:
+    get:
+      consumes:
+      - application/json
+      description: 通过 install id 获取应用参数
+      parameters:
+      - description: request
+        in: path
+        name: appInstallId
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.AppParam'
+      security:
+      - ApiKeyAuth: []
+      summary: Search params by appInstallId
+      tags:
+      - App
+  /apps/installed/port/change:
+    post:
+      consumes:
+      - application/json
+      description: 修改应用端口
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.PortUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Change app port
+      tags:
+      - App
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - key
+        - name
+        - port
+        formatEN: Application port update [key]-[name] => [port]
+        formatZH: 应用端口修改 [key]-[name] => [port]
+        paramKeys: []
+  /apps/installed/sync:
+    post:
+      description: 同步已安装应用列表
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Sync app installed
+      tags:
+      - App
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys: []
+        formatEN: Sync the list of installed apps
+        formatZH: 同步已安装应用列表
+        paramKeys: []
   /apps/search:
     post:
       consumes:
@@ -1053,9 +2948,138 @@ paths:
           description: ""
       security:
       - ApiKeyAuth: []
-      summary: Search app list
+      summary: List apps
       tags:
       - App
+  /apps/services/:key:
+    get:
+      consumes:
+      - application/json
+      description: 通过 key 获取应用 service
+      parameters:
+      - description: request
+        in: path
+        name: key
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: Search app service by key
+      tags:
+      - App
+  /apps/sync:
+    post:
+      description: 同步应用列表
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Sync app list
+      tags:
+      - App
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys: []
+        formatEN: App store synchronization
+        formatZH: 应用商店同步
+        paramKeys: []
+  /auth/captcha:
+    get:
+      description: 加载验证码
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CaptchaResponse'
+      summary: Load captcha
+      tags:
+      - Auth
+  /auth/init:
+    post:
+      consumes:
+      - application/json
+      description: 初始化用户
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.InitUser'
+      responses:
+        "200":
+          description: ""
+      summary: Init user
+      tags:
+      - Auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: 用户登录
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Login'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserLoginInfo'
+      summary: User login
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      description: 用户登出
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: User logout
+      tags:
+      - Auth
+  /auth/mfalogin:
+    post:
+      consumes:
+      - application/json
+      description: 用户 mfa 登录
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.MFALogin'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserLoginInfo'
+      summary: User login with mfa
+      tags:
+      - Auth
+  /auth/status:
+    get:
+      description: 获取系统安全登录状态
+      responses:
+        "200":
+          description: ""
+        "402":
+          description: ""
+      summary: Load safety status
+      tags:
+      - Auth
   /backups:
     post:
       consumes:
@@ -1194,10 +3218,22 @@ paths:
           description: ""
       security:
       - ApiKeyAuth: []
-      summary: Search backup records with page
+      summary: Page backup records
       tags:
       - Backup Account
   /backups/search:
+    get:
+      description: 获取备份账号列表
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: List backup accounts
+      tags:
+      - Backup Account
     post:
       consumes:
       - application/json
@@ -1216,22 +3252,10 @@ paths:
             type: anrry
       security:
       - ApiKeyAuth: []
-      summary: List bucket
+      summary: List buckets
       tags:
       - Backup Account
   /backups/update:
-    get:
-      description: 获取备份账号列表
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: anrry
-      security:
-      - ApiKeyAuth: []
-      summary: Search backup account
-      tags:
-      - Backup Account
     post:
       consumes:
       - application/json
@@ -1268,30 +3292,36 @@ paths:
             $ref: '#/definitions/dto.CommandInfo'
       security:
       - ApiKeyAuth: []
-      summary: Search command
+      summary: List commands
       tags:
       - Command
     post:
       consumes:
       - application/json
-      description: 获取快速命令列表分页
+      description: 创建快速命令
       parameters:
       - description: request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.SearchWithPage'
+          $ref: '#/definitions/dto.CommandOperate'
       responses:
         "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.PageResult'
+          description: ""
       security:
       - ApiKeyAuth: []
-      summary: Search command with page
+      summary: Create command
       tags:
       - Command
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        - command
+        formatEN: create quick command [name][command]
+        formatZH: 创建快捷命令 [name][command]
+        paramKeys: []
   /commands/del:
     post:
       consumes:
@@ -1325,6 +3355,28 @@ paths:
         formatEN: delete quick command [names]
         formatZH: 删除快捷命令 [names]
         paramKeys: []
+  /commands/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取快速命令列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SearchWithPage'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page commands
+      tags:
+      - Command
   /commands/update:
     post:
       consumes:
@@ -1454,7 +3506,7 @@ paths:
             $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
-      summary: Search compose list with page
+      summary: Page composes
       tags:
       - Container Compose
   /containers/compose/update:
@@ -1605,7 +3657,7 @@ paths:
             type: anrry
       security:
       - ApiKeyAuth: []
-      summary: Search image list
+      summary: List images
       tags:
       - Container Image
   /containers/image/build:
@@ -1814,7 +3866,7 @@ paths:
             $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
-      summary: Search image list with page
+      summary: Page images
       tags:
       - Container Image
   /containers/image/tag:
@@ -1948,7 +4000,7 @@ paths:
             $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
-      summary: Search network list with page
+      summary: Page networks
       tags:
       - Container Network
   /containers/operate:
@@ -1992,7 +4044,7 @@ paths:
             type: anrry
       security:
       - ApiKeyAuth: []
-      summary: Search image repo list
+      summary: List image repos
       tags:
       - Container Image-repo
     post:
@@ -2079,7 +4131,7 @@ paths:
             $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
-      summary: Search image repo list with page
+      summary: Page image repos
       tags:
       - Container Image-repo
   /containers/repo/update:
@@ -2138,7 +4190,7 @@ paths:
             $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
-      summary: Search container list with page
+      summary: Page containers
       tags:
       - Container
   /containers/search/log:
@@ -2194,7 +4246,7 @@ paths:
             type: anrry
       security:
       - ApiKeyAuth: []
-      summary: Search compose template list
+      summary: List compose templates
       tags:
       - Container Compose-template
     post:
@@ -2213,7 +4265,7 @@ paths:
           description: ""
       security:
       - ApiKeyAuth: []
-      summary: Create Compose template
+      summary: Create compose template
       tags:
       - Container Compose-template
       x-panel-log:
@@ -2277,7 +4329,7 @@ paths:
             $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
-      summary: Search compose template list with page
+      summary: Page compose templates
       tags:
       - Container Compose-template
   /containers/template/update:
@@ -2388,7 +4440,7 @@ paths:
             $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
-      summary: Search volume list
+      summary: List volumes
       tags:
       - Container Volume
     post:
@@ -2411,10 +4463,38 @@ paths:
             $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
-      summary: Search volume list with page
+      summary: Page volumes
       tags:
       - Container Volume
-  /cronjob/del:
+  /cronjobs:
+    post:
+      consumes:
+      - application/json
+      description: 创建计划任务
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CronjobCreate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create cronjob
+      tags:
+      - Cronjob
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - type
+        - name
+        formatEN: create cronjob [type][name]
+        formatZH: 创建计划任务 [type][name]
+        paramKeys: []
+  /cronjobs/del:
     post:
       consumes:
       - application/json
@@ -2447,7 +4527,7 @@ paths:
         formatEN: delete cronjob [names]
         formatZH: 删除计划任务 [names]
         paramKeys: []
-  /cronjob/download:
+  /cronjobs/download:
     post:
       consumes:
       - application/json
@@ -2464,7 +4544,7 @@ paths:
           description: ""
       security:
       - ApiKeyAuth: []
-      summary: Download Cronjob records
+      summary: Download cronjob records
       tags:
       - Cronjob
       x-panel-log:
@@ -2480,7 +4560,7 @@ paths:
         formatEN: download the cronjob record [file]
         formatZH: 下载计划任务记录 [file]
         paramKeys: []
-  /cronjob/handle:
+  /cronjobs/handle:
     post:
       consumes:
       - application/json
@@ -2513,7 +4593,51 @@ paths:
         formatEN: manually execute the cronjob [name]
         formatZH: 手动执行计划任务 [name]
         paramKeys: []
-  /cronjob/status:
+  /cronjobs/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取计划任务分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SearchWithPage'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page cronjobs
+      tags:
+      - Cronjob
+  /cronjobs/search/records:
+    post:
+      consumes:
+      - application/json
+      description: 获取计划任务记录
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SearchRecord'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page job records
+      tags:
+      - Cronjob
+  /cronjobs/status:
     post:
       consumes:
       - application/json
@@ -2547,7 +4671,7 @@ paths:
         formatEN: change the status of cronjob [name] to [status].
         formatZH: 修改计划任务 [name] 状态为 [status]
         paramKeys: []
-  /cronjob/update:
+  /cronjobs/update:
     post:
       consumes:
       - application/json
@@ -2580,78 +4704,58 @@ paths:
         formatEN: update cronjob [name]
         formatZH: 更新计划任务 [name]
         paramKeys: []
-  /cronjobs:
-    post:
+  /dashboard/base/:ioOption/:netOption:
+    get:
       consumes:
       - application/json
-      description: 创建计划任务
+      description: 获取首页基础数据
       parameters:
       - description: request
-        in: body
-        name: request
+        in: path
+        name: ioOption
         required: true
-        schema:
-          $ref: '#/definitions/dto.CronjobCreate'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Create cronjob
-      tags:
-      - Cronjob
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - type
-        - name
-        formatEN: create cronjob [type][name]
-        formatZH: 创建计划任务 [type][name]
-        paramKeys: []
-  /cronjobs/search:
-    post:
-      consumes:
-      - application/json
-      description: 获取计划任务分页
-      parameters:
+        type: string
       - description: request
-        in: body
-        name: request
+        in: path
+        name: netOption
         required: true
-        schema:
-          $ref: '#/definitions/dto.SearchWithPage'
+        type: string
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.PageResult'
+            $ref: '#/definitions/dto.DashboardBase'
       security:
       - ApiKeyAuth: []
-      summary: Search cronjob list with page
+      summary: Load dashboard base info
       tags:
-      - Cronjob
-  /cronjobs/search/records:
-    post:
+      - Dashboard
+  /dashboard/current/:ioOption/:netOption:
+    get:
       consumes:
       - application/json
-      description: 获取计划任务记录
+      description: 获取首页实时数据
       parameters:
       - description: request
-        in: body
-        name: request
+        in: path
+        name: ioOption
         required: true
-        schema:
-          $ref: '#/definitions/dto.SearchRecord'
+        type: string
+      - description: request
+        in: path
+        name: netOption
+        required: true
+        type: string
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.PageResult'
+            $ref: '#/definitions/dto.DashboardCurrent'
       security:
       - ApiKeyAuth: []
-      summary: Search job records
+      summary: Load dashboard current info
       tags:
-      - Cronjob
+      - Dashboard
   /databases:
     post:
       consumes:
@@ -2920,9 +5024,9 @@ paths:
             type: anrry
       security:
       - ApiKeyAuth: []
-      summary: Search mysql database list
+      summary: List mysql database names
       tags:
-      - Cronjob
+      - Database Mysql
   /databases/recover:
     post:
       consumes:
@@ -3018,7 +5122,7 @@ paths:
             $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
-      summary: Search redis backup list
+      summary: Page redis backups
       tags:
       - Database Redis
   /databases/redis/conf:
@@ -3190,7 +5294,7 @@ paths:
         "200":
           description: OK
           schema:
-            type: bool
+            type: boolean
       security:
       - ApiKeyAuth: []
       summary: Load mysql remote access
@@ -3215,9 +5319,9 @@ paths:
             $ref: '#/definitions/dto.PageResult'
       security:
       - ApiKeyAuth: []
-      summary: Search mysql database list with page
+      summary: Page mysql databases
       tags:
-      - Cronjob
+      - Database Mysql
   /databases/status:
     get:
       description: 获取 mysql 状态信息
@@ -3269,5 +5373,2267 @@ paths:
         bodyKeys: []
         formatEN: adjust mysql database performance parameters
         formatZH: 调整 mysql 数据库性能参数
+        paramKeys: []
+  /files:
+    post:
+      consumes:
+      - application/json
+      description: 创建文件/文件夹
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileCreate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create file
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - path
+        formatEN: Create dir or file [path]
+        formatZH: 创建文件/文件夹 [path]
+        paramKeys: []
+  /files/batch/del:
+    post:
+      consumes:
+      - application/json
+      description: 批量删除文件/文件夹
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileBatchDelete'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Batch delete file
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - paths
+        formatEN: Batch delete dir or file [paths]
+        formatZH: 批量删除文件/文件夹 [paths]
+        paramKeys: []
+  /files/compress:
+    post:
+      consumes:
+      - application/json
+      description: 压缩文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileCompress'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Compress file
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        formatEN: Compress file [name]
+        formatZH: 压缩文件 [name]
+        paramKeys: []
+  /files/content:
+    post:
+      consumes:
+      - application/json
+      description: 获取文件内容
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileOption'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.FileInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Load file content
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - path
+        formatEN: Load file content [path]
+        formatZH: 获取文件内容 [path]
+        paramKeys: []
+  /files/decompress:
+    post:
+      consumes:
+      - application/json
+      description: 解压文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileDeCompress'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Decompress file
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - path
+        formatEN: Decompress file [path]
+        formatZH: 解压 [path]
+        paramKeys: []
+  /files/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除文件/文件夹
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileDelete'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete file
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - path
+        formatEN: Delete dir or file [path]
+        formatZH: 删除文件/文件夹 [path]
+        paramKeys: []
+  /files/download:
+    post:
+      consumes:
+      - application/json
+      description: 下载文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileDownload'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Download file
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        formatEN: Download file [name]
+        formatZH: 下载文件 [name]
+        paramKeys: []
+  /files/loadfile:
+    post:
+      consumes:
+      - application/json
+      description: 读取文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.FilePath'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Read file
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - path
+        formatEN: Read file [path]
+        formatZH: 读取文件 [path]
+        paramKeys: []
+  /files/mode:
+    post:
+      consumes:
+      - application/json
+      description: 修改文件权限
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileCreate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Change file mode
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - path
+        - mode
+        formatEN: Change mode [paths] => [mode]
+        formatZH: 修改权限 [paths] => [mode]
+        paramKeys: []
+  /files/move:
+    post:
+      consumes:
+      - application/json
+      description: 移动文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileMove'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Move file
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - oldPaths
+        - newPath
+        formatEN: Move [oldPaths] => [newPath]
+        formatZH: 移动文件 [oldPaths] => [newPath]
+        paramKeys: []
+  /files/rename:
+    post:
+      consumes:
+      - application/json
+      description: 修改文件名称
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileRename'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Change file name
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - oldName
+        - newName
+        formatEN: Rename [oldName] => [newName]
+        formatZH: 重命名 [oldName] => [newName]
+        paramKeys: []
+  /files/save:
+    post:
+      consumes:
+      - application/json
+      description: 更新文件内容
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileEdit'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update file content
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - path
+        formatEN: Update file content [path]
+        formatZH: 更新文件内容 [path]
+        paramKeys: []
+  /files/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取文件列表
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileOption'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.FileInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: List files
+      tags:
+      - File
+  /files/size:
+    post:
+      consumes:
+      - application/json
+      description: 获取文件夹大小
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.DirSizeReq'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Load file size
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - path
+        formatEN: Load file size [path]
+        formatZH: 获取文件夹大小 [path]
+        paramKeys: []
+  /files/tree:
+    post:
+      consumes:
+      - application/json
+      description: 加载文件树
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileOption'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: Load files tree
+      tags:
+      - File
+  /files/upload:
+    post:
+      description: 上传文件
+      parameters:
+      - description: request
+        in: formData
+        name: file
+        required: true
+        type: file
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Upload file
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - path
+        formatEN: Upload file [path]
+        formatZH: 上传文件 [path]
+        paramKeys: []
+  /files/wget:
+    post:
+      consumes:
+      - application/json
+      description: 下载远端文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileWget'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Wget file
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - url
+        - path
+        - name
+        formatEN: Download url => [path]/[name]
+        formatZH: 下载 url => [path]/[name]
+        paramKeys: []
+  /groups:
+    post:
+      consumes:
+      - application/json
+      description: 创建系统组
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GroupOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create group
+      tags:
+      - System Group
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        - type
+        formatEN: create group [name][type]
+        formatZH: 创建组 [name][type]
+        paramKeys: []
+  /groups/:id:
+    get:
+      consumes:
+      - application/json
+      description: 查询系统组
+      parameters:
+      - description: request
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.GroupInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Search group info by id
+      tags:
+      - System Group
+  /groups/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除系统组
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperateByID'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete group
+      tags:
+      - System Group
+      x-panel-log:
+        BeforeFuntions:
+        - db: groups
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: name
+          output_value: name
+        bodyKeys:
+        - id
+        formatEN: delete group [name]
+        formatZH: 删除组 [name]
+        paramKeys: []
+  /groups/search:
+    post:
+      consumes:
+      - application/json
+      description: 查询系统组
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GroupSearch'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: List groups
+      tags:
+      - System Group
+  /groups/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新系统组
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GroupOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update group
+      tags:
+      - System Group
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        - type
+        formatEN: update group [name][type]
+        formatZH: 更新组 [name][type]
+        paramKeys: []
+  /hosts:
+    post:
+      consumes:
+      - application/json
+      description: 创建主机
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.HostOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create host
+      tags:
+      - Host
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        - addr
+        formatEN: create host [name][addr]
+        formatZH: 创建主机 [name][addr]
+        paramKeys: []
+  /hosts/:id:
+    get:
+      consumes:
+      - application/json
+      description: 加载主机信息
+      parameters:
+      - description: request
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HostInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Load host info
+      tags:
+      - Host
+  /hosts/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除主机
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperateByID'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete host
+      tags:
+      - Host
+      x-panel-log:
+        BeforeFuntions:
+        - db: hosts
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: addr
+          output_value: addr
+        bodyKeys:
+        - id
+        formatEN: delete host [addr]
+        formatZH: 删除主机 [addr]
+        paramKeys: []
+  /hosts/search:
+    post:
+      consumes:
+      - application/json
+      description: 加载主机树
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SearchForTree'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: Load host tree
+      tags:
+      - Host
+  /hosts/test/byid/:id:
+    post:
+      consumes:
+      - application/json
+      description: 测试主机连接
+      parameters:
+      - description: request
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+      security:
+      - ApiKeyAuth: []
+      summary: Test host conn by host id
+      tags:
+      - Host
+  /hosts/test/byinfo:
+    post:
+      consumes:
+      - application/json
+      description: 测试主机连接
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.HostConnTest'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Test host conn by info
+      tags:
+      - Host
+  /hosts/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新主机
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.HostOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update host
+      tags:
+      - Host
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        - addr
+        formatEN: update host [name][addr]
+        formatZH: 更新主机信息 [name][addr]
+        paramKeys: []
+  /logs/clean:
+    post:
+      consumes:
+      - application/json
+      description: 清空操作日志
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CleanLog'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Clean operation logs
+      tags:
+      - Logs
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - logType
+        formatEN: Clean the [logType] log information
+        formatZH: 清空 [logType] 日志信息
+        paramKeys: []
+  /logs/login:
+    post:
+      consumes:
+      - application/json
+      description: 获取系统登录日志列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PageInfo'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page login logs
+      tags:
+      - Logs
+  /logs/operation:
+    post:
+      consumes:
+      - application/json
+      description: 获取系统操作日志列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PageInfo'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page operation logs
+      tags:
+      - Logs
+  /nginx:
+    get:
+      description: 获取 nginx 配置信息
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.FileInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Load nginx conf
+      tags:
+      - Nginx
+  /nginx/file:
+    post:
+      consumes:
+      - application/json
+      description: 上传更新 nginx 配置文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.NginxConfigFileUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update nginx conf by upload file
+      tags:
+      - Nginx
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys: []
+        formatEN: Update nginx conf
+        formatZH: 更新 nginx 配置
+        paramKeys: []
+  /nginx/scope:
+    post:
+      consumes:
+      - application/json
+      description: 获取部分 nginx 配置信息
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.NginxScopeReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: Load partial nginx conf
+      tags:
+      - Nginx
+  /nginx/status:
+    get:
+      description: 获取 nginx 状态信息
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.NginxStatus'
+      security:
+      - ApiKeyAuth: []
+      summary: Load nginx status info
+      tags:
+      - Nginx
+  /nginx/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新 nginx 配置信息
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.NginxConfigUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update nginx conf
+      tags:
+      - Nginx
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_colume: id
+          input_value: websiteId
+          isList: false
+          output_colume: primary_domain
+          output_value: domain
+        bodyKeys:
+        - websiteId
+        formatEN: Update nginx conf [domain]
+        formatZH: 更新 nginx 配置 [domain]
+        paramKeys: []
+  /settings/daemonjson:
+    get:
+      description: 加载 docker 配置路径
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Load daemon.json path
+      tags:
+      - System Setting
+  /settings/expired/handle:
+    post:
+      consumes:
+      - application/json
+      description: 重置过期系统登录密码
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PasswordUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Reset system password expired
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys: []
+        formatEN: reset an expired Password
+        formatZH: 重置过期密码
+        paramKeys: []
+  /settings/mfa:
+    get:
+      description: 获取 mfa 信息
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/mfa.Otp'
+      security:
+      - ApiKeyAuth: []
+      summary: Load mfa info
+      tags:
+      - System Setting
+  /settings/mfa/bind:
+    post:
+      consumes:
+      - application/json
+      description: Mfa 绑定
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.MfaCredential'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Bind mfa
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys: []
+        formatEN: bind mfa
+        formatZH: mfa 绑定
+        paramKeys: []
+  /settings/monitor/clean:
+    post:
+      description: 清空监控数据
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Clean monitor datas
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys: []
+        formatEN: clean monitor datas
+        formatZH: 清空监控数据
+        paramKeys: []
+  /settings/password/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新系统登录密码
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PasswordUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update system password
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys: []
+        formatEN: update system password
+        formatZH: 修改系统密码
+        paramKeys: []
+  /settings/search:
+    post:
+      description: 加载系统配置信息
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SettingInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Load system setting info
+      tags:
+      - System Setting
+  /settings/time/sync:
+    post:
+      description: 系统时间同步
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Sync system time
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys: []
+        formatEN: sync system time
+        formatZH: 系统时间同步
+        paramKeys: []
+  /settings/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新系统配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SettingUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update system setting
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - key
+        - value
+        formatEN: update system setting [key] => [value]
+        formatZH: 修改系统配置 [key] => [value]
+        paramKeys: []
+  /websites:
+    post:
+      consumes:
+      - application/json
+      description: 创建网站
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteCreate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create website
+      tags:
+      - Website
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - primaryDomain
+        formatEN: Create website [primaryDomain]
+        formatZH: 创建网站 [primaryDomain]
+        paramKeys: []
+  /websites/:id:
+    get:
+      consumes:
+      - application/json
+      description: 通过 id 查询网站
+      parameters:
+      - description: request
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.WebsiteDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Search website by id
+      tags:
+      - Website
+  /websites/:id/https:
+    get:
+      consumes:
+      - application/json
+      description: 获取 https 配置
+      parameters:
+      - description: request
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.WebsiteHTTPS'
+      security:
+      - ApiKeyAuth: []
+      summary: Load https conf
+      tags:
+      - Website HTTPS
+    post:
+      consumes:
+      - application/json
+      description: 更新 https 配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteHTTPSOp'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.WebsiteHTTPS'
+      security:
+      - ApiKeyAuth: []
+      summary: Update https conf
+      tags:
+      - Website HTTPS
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_colume: id
+          input_value: websiteId
+          isList: false
+          output_colume: primary_domain
+          output_value: domain
+        bodyKeys:
+        - websiteId
+        formatEN: Update website https [domain] conf
+        formatZH: 更新网站 [domain] https 配置
+        paramKeys: []
+  /websites/:id/nginx:
+    get:
+      consumes:
+      - application/json
+      description: 通过 id 查询网站 nginx
+      parameters:
+      - description: request
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.FileInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Search website nginx by id
+      tags:
+      - Website Nginx
+  /websites/acme:
+    post:
+      consumes:
+      - application/json
+      description: 创建网站 acme
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteAcmeAccountCreate'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.WebsiteAcmeAccountDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Create website acme account
+      tags:
+      - Website Acme
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - email
+        formatEN: Create website acme [email]
+        formatZH: 创建网站 acme [email]
+        paramKeys: []
+  /websites/acme/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除网站 acme
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteResourceReq'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete website acme account
+      tags:
+      - Website Acme
+      x-panel-log:
+        BeforeFuntions:
+        - db: website_acme_accounts
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: email
+          output_value: email
+        bodyKeys:
+        - id
+        formatEN: Delete website acme [email]
+        formatZH: 删除网站 acme [email]
+        paramKeys: []
+  /websites/acme/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取网站 acme 列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PageInfo'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page website acme accounts
+      tags:
+      - Website Acme
+  /websites/backup:
+    post:
+      consumes:
+      - application/json
+      description: 备份网站
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteResourceReq'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Backup website
+      tags:
+      - Website
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: primary_domain
+          output_value: domain
+        bodyKeys:
+        - id
+        formatEN: Backup website [domain]
+        formatZH: 备份网站 [domain]
+        paramKeys: []
+  /websites/check:
+    post:
+      consumes:
+      - application/json
+      description: 网站创建前检查
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteInstallCheckReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: Check before create website
+      tags:
+      - Website
+  /websites/config:
+    post:
+      consumes:
+      - application/json
+      description: 获取 nginx 配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.NginxScopeReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.WebsiteNginxConfig'
+      security:
+      - ApiKeyAuth: []
+      summary: Load nginx conf
+      tags:
+      - Website Nginx
+  /websites/config/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新 nginx 配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.NginxConfigUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update nginx conf
+      tags:
+      - Website Nginx
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_colume: id
+          input_value: websiteId
+          isList: false
+          output_colume: primary_domain
+          output_value: domain
+        bodyKeys:
+        - websiteId
+        formatEN: Nginx conf update [domain]
+        formatZH: nginx 配置修改 [domain]
+        paramKeys: []
+  /websites/default/server:
+    post:
+      consumes:
+      - application/json
+      description: 操作网站日志
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteDefaultUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Change default server
+      tags:
+      - Website
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: primary_domain
+          output_value: domain
+        bodyKeys:
+        - id
+        - operate
+        formatEN: Change default server => [domain]
+        formatZH: 修改默认 server => [domain]
+        paramKeys: []
+  /websites/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除网站
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteDelete'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete website
+      tags:
+      - Website
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: primary_domain
+          output_value: domain
+        bodyKeys:
+        - id
+        formatEN: Delete website [domain]
+        formatZH: 删除网站 [domain]
+        paramKeys: []
+  /websites/dns:
+    post:
+      consumes:
+      - application/json
+      description: 创建网站 dns
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteDnsAccountCreate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create website dns account
+      tags:
+      - Website DNS
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        formatEN: Create website dns [name]
+        formatZH: 创建网站 dns [name]
+        paramKeys: []
+  /websites/dns/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除网站 dns
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteResourceReq'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete website dns account
+      tags:
+      - Website DNS
+      x-panel-log:
+        BeforeFuntions:
+        - db: website_dns_accounts
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: name
+          output_value: name
+        bodyKeys:
+        - id
+        formatEN: Delete website dns [name]
+        formatZH: 删除网站 dns [name]
+        paramKeys: []
+  /websites/dns/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取网站 dns 列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PageInfo'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page website dns accounts
+      tags:
+      - Website DNS
+  /websites/dns/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新网站 dns
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteDnsAccountUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update website dns account
+      tags:
+      - Website DNS
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        formatEN: Update website dns [name]
+        formatZH: 更新网站 dns [name]
+        paramKeys: []
+  /websites/domains:
+    post:
+      consumes:
+      - application/json
+      description: 创建网站域名
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteDomainCreate'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WebsiteDomain'
+      security:
+      - ApiKeyAuth: []
+      summary: Create website domain
+      tags:
+      - Website Domain
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - domain
+        formatEN: Create domain [domain]
+        formatZH: 创建域名 [domain]
+        paramKeys: []
+  /websites/domains/:websiteId:
+    get:
+      consumes:
+      - application/json
+      description: 通过网站 id 查询域名
+      parameters:
+      - description: request
+        in: path
+        name: websiteId
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: Search website domains by websiteId
+      tags:
+      - Website Domain
+  /websites/domains/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除网站域名
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteDomainDelete'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete website domain
+      tags:
+      - Website Domain
+      x-panel-log:
+        BeforeFuntions:
+        - db: website_domains
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: domain
+          output_value: domain
+        bodyKeys:
+        - id
+        formatEN: Delete domain [domain]
+        formatZH: 删除域名 [domain]
+        paramKeys: []
+  /websites/groups:
+    get:
+      description: 获取网站组
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: List website groups
+      tags:
+      - Website Group
+    post:
+      consumes:
+      - application/json
+      description: 创建网站组
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteGroupCreate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create website group
+      tags:
+      - Website Group
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        formatEN: Create website groups [name]
+        formatZH: 创建网站组 [name]
+        paramKeys: []
+  /websites/groups/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除网站组
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteResourceReq'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete website group
+      tags:
+      - Website Group
+      x-panel-log:
+        BeforeFuntions:
+        - db: website_groups
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: name
+          output_value: name
+        bodyKeys:
+        - id
+        formatEN: Delete website group [name]
+        formatZH: 删除网站组 [name]
+        paramKeys: []
+  /websites/groups/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新网站组
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteGroupUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update website group
+      tags:
+      - Website Group
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        formatEN: Update website groups [name]
+        formatZH: 更新网站组 [name]
+        paramKeys: []
+  /websites/list:
+    get:
+      description: 获取网站列表
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: List websites
+      tags:
+      - Website
+  /websites/log:
+    post:
+      consumes:
+      - application/json
+      description: 操作网站日志
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteLogReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.WebsiteLog'
+      security:
+      - ApiKeyAuth: []
+      summary: Operate website log
+      tags:
+      - Website
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: primary_domain
+          output_value: domain
+        bodyKeys:
+        - id
+        - operate
+        formatEN: '[domain][operate] logs'
+        formatZH: '[domain][operate] 日志'
+        paramKeys: []
+  /websites/nginx/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新 网站 nginx 配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteNginxUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update website nginx conf
+      tags:
+      - Website Nginx
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: primary_domain
+          output_value: domain
+        bodyKeys:
+        - id
+        formatEN: '[domain] Nginx conf update'
+        formatZH: '[domain] Nginx 配置修改'
+        paramKeys: []
+  /websites/operate:
+    post:
+      consumes:
+      - application/json
+      description: 操作网站
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteOp'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Operate website
+      tags:
+      - Website
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: primary_domain
+          output_value: domain
+        bodyKeys:
+        - id
+        - operate
+        formatEN: '[operate] website [domain]'
+        formatZH: '[operate] 网站 [domain]'
+        paramKeys: []
+  /websites/options:
+    get:
+      description: 获取网站列表
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: List website names
+      tags:
+      - Website
+  /websites/recover:
+    post:
+      consumes:
+      - application/json
+      description: 从备份恢复网站
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteRecover'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Recover website
+      tags:
+      - Website
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - websiteName
+        - backupName
+        formatEN: '[websiteName] recover from backups [backupName]'
+        formatZH: '[websiteName] 从备份恢复 [backupName]'
+        paramKeys: []
+  /websites/recover/byupload:
+    post:
+      consumes:
+      - application/json
+      description: 从上传恢复网站
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteRecoverByFile'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Recover website by upload
+      tags:
+      - Website
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - websiteName
+        - fileDir
+        - fileName
+        formatEN: '[websiteName] recover from uploads [fileDir]/[fileName]'
+        formatZH: '[websiteName] 从上传恢复 [fileDir]/[fileName]'
+        paramKeys: []
+  /websites/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取网站列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteSearch'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page websites
+      tags:
+      - Website
+  /websites/ssl:
+    post:
+      consumes:
+      - application/json
+      description: 创建网站 ssl
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteSSLCreate'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/request.WebsiteSSLCreate'
+      security:
+      - ApiKeyAuth: []
+      summary: Create website ssl
+      tags:
+      - Website SSL
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - primaryDomain
+        formatEN: Create website ssl [primaryDomain]
+        formatZH: 创建网站 ssl [primaryDomain]
+        paramKeys: []
+  /websites/ssl/:id:
+    get:
+      consumes:
+      - application/json
+      description: 通过 id 查询 ssl
+      parameters:
+      - description: request
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Search website ssl by id
+      tags:
+      - Website SSL
+  /websites/ssl/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除网站 ssl
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteResourceReq'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete website ssl
+      tags:
+      - Website SSL
+      x-panel-log:
+        BeforeFuntions:
+        - db: website_ssls
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: primary_domain
+          output_value: domain
+        bodyKeys:
+        - id
+        formatEN: Delete ssl [domain]
+        formatZH: 删除 ssl [domain]
+        paramKeys: []
+  /websites/ssl/renew:
+    post:
+      consumes:
+      - application/json
+      description: 重置网站 ssl
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteSSLRenew'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Reset website ssl
+      tags:
+      - Website SSL
+      x-panel-log:
+        BeforeFuntions:
+        - db: website_ssls
+          input_colume: id
+          input_value: SSLId
+          isList: false
+          output_colume: primary_domain
+          output_value: domain
+        bodyKeys:
+        - SSLId
+        formatEN: Renew ssl [domain]
+        formatZH: 重置 ssl [domain]
+        paramKeys: []
+  /websites/ssl/resolve:
+    post:
+      consumes:
+      - application/json
+      description: 解析网站 ssl
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteDNSReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: Resolve website ssl
+      tags:
+      - Website SSL
+  /websites/ssl/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取网站 ssl 列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteSSLSearch'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Page website ssl
+      tags:
+      - Website SSL
+  /websites/ssl/website/:websiteId:
+    get:
+      consumes:
+      - application/json
+      description: 通过网站 id 查询 ssl
+      parameters:
+      - description: request
+        in: path
+        name: websiteId
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Search website ssl by website id
+      tags:
+      - Website SSL
+  /websites/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新网站
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update website
+      tags:
+      - Website
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - primaryDomain
+        formatEN: Update website [primaryDomain]
+        formatZH: 更新网站 [primaryDomain]
+        paramKeys: []
+  /websites/waf/config:
+    post:
+      consumes:
+      - application/json
+      description: 获取网站 waf 配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteWafReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.WebsiteWafConfig'
+      security:
+      - ApiKeyAuth: []
+      summary: Load websit waf conf
+      tags:
+      - Website WAF
+  /websites/waf/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新 网站 waf 配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteWafUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update website waf conf
+      tags:
+      - Website WAF
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_colume: id
+          input_value: websiteId
+          isList: false
+          output_colume: primary_domain
+          output_value: domain
+        bodyKeys:
+        - websiteId
+        formatEN: WAF conf update [domain]
+        formatZH: WAF 配置修改 [domain]
         paramKeys: []
 swagger: "2.0"

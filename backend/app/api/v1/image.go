@@ -8,9 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Page image
 // @Tags Container Image
-// @Summary Search image list with page
+// @Summary Page images
 // @Description 获取镜像列表分页
 // @Accept json
 // @Param request body dto.PageInfo true "request"
@@ -41,9 +40,8 @@ func (b *BaseApi) SearchImage(c *gin.Context) {
 	})
 }
 
-// List image
 // @Tags Container Image
-// @Summary Search image list
+// @Summary List images
 // @Description 获取镜像列表
 // @Produce json
 // @Success 200 {anrry} dto.Options
@@ -58,7 +56,6 @@ func (b *BaseApi) ListImage(c *gin.Context) {
 	helper.SuccessWithData(c, list)
 }
 
-// Build image
 // @Tags Container Image
 // @Summary Build image
 // @Description 构建镜像
@@ -88,7 +85,6 @@ func (b *BaseApi) ImageBuild(c *gin.Context) {
 	helper.SuccessWithData(c, log)
 }
 
-// Pull image
 // @Tags Container Image
 // @Summary Pull image
 // @Description 拉取镜像
@@ -118,7 +114,6 @@ func (b *BaseApi) ImagePull(c *gin.Context) {
 	helper.SuccessWithData(c, logPath)
 }
 
-// Push image
 // @Tags Container Image
 // @Summary Push image
 // @Description 推送镜像
@@ -148,7 +143,6 @@ func (b *BaseApi) ImagePush(c *gin.Context) {
 	helper.SuccessWithData(c, logPath)
 }
 
-// Delete image
 // @Tags Container Image
 // @Summary Delete image
 // @Description 删除镜像
@@ -177,7 +171,6 @@ func (b *BaseApi) ImageRemove(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Save image
 // @Tags Container Image
 // @Summary Save image
 // @Description 导出镜像
@@ -206,7 +199,6 @@ func (b *BaseApi) ImageSave(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Tag image
 // @Tags Container Image
 // @Summary Tag image
 // @Description Tag 镜像
@@ -235,7 +227,6 @@ func (b *BaseApi) ImageTag(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Load image
 // @Tags Container Image
 // @Summary Load image
 // @Description 导入镜像

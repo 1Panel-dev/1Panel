@@ -28,6 +28,7 @@ func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/backup", baseApi.BackupWebsite)
 		groupRouter.POST("/recover", baseApi.RecoverWebsite)
 		groupRouter.POST("/recover/byupload", baseApi.RecoverWebsiteByUpload)
+		groupRouter.POST("/default/server", baseApi.ChangeDefaultServer)
 
 		groupRouter.GET("/domains/:websiteId", baseApi.GetWebDomains)
 		groupRouter.POST("/domains/del", baseApi.DeleteWebDomain)
@@ -36,11 +37,12 @@ func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 		groupRouter.GET("/:id/nginx", baseApi.GetWebsiteNginx)
 		groupRouter.POST("/config", baseApi.GetNginxConfig)
 		groupRouter.POST("/config/update", baseApi.UpdateNginxConfig)
+		groupRouter.POST("/nginx/update", baseApi.UpdateWebsiteNginxConfig)
+
 		groupRouter.GET("/:id/https", baseApi.GetHTTPSConfig)
 		groupRouter.POST("/:id/https", baseApi.UpdateHTTPSConfig)
+
 		groupRouter.POST("/waf/config", baseApi.GetWebsiteWafConfig)
 		groupRouter.POST("/waf/update", baseApi.UpdateWebsiteWafConfig)
-		groupRouter.POST("/nginx/update", baseApi.UpdateWebsiteNginxConfig)
-		groupRouter.POST("/default/server", baseApi.ChangeDefaultServer)
 	}
 }

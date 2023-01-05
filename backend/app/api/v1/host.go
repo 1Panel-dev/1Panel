@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Create host
 // @Tags Host
 // @Summary Create host
 // @Description 创建主机
@@ -18,7 +17,7 @@ import (
 // @Param request body dto.HostOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /host [post]
+// @Router /hosts [post]
 // @x-panel-log {"bodyKeys":["name","addr"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建主机 [name][addr]","formatEN":"create host [name][addr]"}
 func (b *BaseApi) CreateHost(c *gin.Context) {
 	var req dto.HostOperate
@@ -38,7 +37,6 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 	helper.SuccessWithData(c, host)
 }
 
-// Test host conn by info
 // @Tags Host
 // @Summary Test host conn by info
 // @Description 测试主机连接
@@ -46,7 +44,7 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 // @Param request body dto.HostConnTest true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /host/test/byinfo [post]
+// @Router /hosts/test/byinfo [post]
 func (b *BaseApi) TestByInfo(c *gin.Context) {
 	var req dto.HostConnTest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -71,15 +69,14 @@ func (b *BaseApi) TestByInfo(c *gin.Context) {
 	helper.SuccessWithData(c, true)
 }
 
-// Test host conn by host id
 // @Tags Host
 // @Summary Test host conn by host id
 // @Description 测试主机连接
 // @Accept json
 // @Param id path integer true "request"
-// @Success 200 {boolean}
+// @Success 200 {boolean} connStatus
 // @Security ApiKeyAuth
-// @Router /host/test/byid/:id [post]
+// @Router /hosts/test/byid/:id [post]
 func (b *BaseApi) TestByID(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
@@ -91,7 +88,6 @@ func (b *BaseApi) TestByID(c *gin.Context) {
 	helper.SuccessWithData(c, connStatus)
 }
 
-// Load host tree
 // @Tags Host
 // @Summary Load host tree
 // @Description 加载主机树
@@ -99,7 +95,7 @@ func (b *BaseApi) TestByID(c *gin.Context) {
 // @Param request body dto.SearchForTree true "request"
 // @Success 200 {anrry} dto.HostTree
 // @Security ApiKeyAuth
-// @Router /host/search [post]
+// @Router /hosts/search [post]
 func (b *BaseApi) HostTree(c *gin.Context) {
 	var req dto.SearchForTree
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -116,7 +112,6 @@ func (b *BaseApi) HostTree(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
-// Load host info
 // @Tags Host
 // @Summary Load host info
 // @Description 加载主机信息
@@ -124,7 +119,7 @@ func (b *BaseApi) HostTree(c *gin.Context) {
 // @Param id path integer true "request"
 // @Success 200 {object} dto.HostInfo
 // @Security ApiKeyAuth
-// @Router /host/:id [get]
+// @Router /hosts/:id [get]
 func (b *BaseApi) GetHostInfo(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
@@ -144,7 +139,6 @@ func (b *BaseApi) GetHostInfo(c *gin.Context) {
 	helper.SuccessWithData(c, hostDto)
 }
 
-// Delete host
 // @Tags Host
 // @Summary Delete host
 // @Description 删除主机
@@ -152,7 +146,7 @@ func (b *BaseApi) GetHostInfo(c *gin.Context) {
 // @Param request body dto.OperateByID true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /host/del [post]
+// @Router /hosts/del [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"hosts","output_colume":"addr","output_value":"addr"}],"formatZH":"删除主机 [addr]","formatEN":"delete host [addr]"}
 func (b *BaseApi) DeleteHost(c *gin.Context) {
 	var req dto.OperateByID
@@ -172,7 +166,6 @@ func (b *BaseApi) DeleteHost(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update host
 // @Tags Host
 // @Summary Update host
 // @Description 更新主机
@@ -180,7 +173,7 @@ func (b *BaseApi) DeleteHost(c *gin.Context) {
 // @Param request body dto.HostOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /host/update [post]
+// @Router /hosts/update [post]
 // @x-panel-log {"bodyKeys":["name","addr"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新主机信息 [name][addr]","formatEN":"update host [name][addr]"}
 func (b *BaseApi) UpdateHost(c *gin.Context) {
 	var req dto.HostOperate

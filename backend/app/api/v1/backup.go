@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Create backup account
 // @Tags Backup Account
 // @Summary Create backup account
 // @Description 创建备份账号
@@ -35,9 +34,8 @@ func (b *BaseApi) CreateBackup(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// List bucket
 // @Tags Backup Account
-// @Summary List bucket
+// @Summary List buckets
 // @Description 获取 bucket 列表
 // @Accept json
 // @Param request body dto.ForBuckets true "request"
@@ -62,7 +60,6 @@ func (b *BaseApi) ListBuckets(c *gin.Context) {
 	helper.SuccessWithData(c, buckets)
 }
 
-// Delete backup account
 // @Tags Backup Account
 // @Summary Delete backup account
 // @Description 删除备份账号
@@ -90,9 +87,8 @@ func (b *BaseApi) DeleteBackup(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Page backup records
 // @Tags Backup Account
-// @Summary Search backup records with page
+// @Summary Page backup records
 // @Description 获取备份记录列表分页
 // @Accept json
 // @Param request body dto.RecordSearch true "request"
@@ -118,7 +114,6 @@ func (b *BaseApi) SearchBackupRecords(c *gin.Context) {
 	})
 }
 
-// Download backup record
 // @Tags Backup Account
 // @Summary Download backup record
 // @Description 下载备份记录
@@ -147,7 +142,6 @@ func (b *BaseApi) DownloadRecord(c *gin.Context) {
 	c.File(filePath)
 }
 
-// Delete backup record
 // @Tags Backup Account
 // @Summary Delete backup record
 // @Description 删除备份记录
@@ -175,7 +169,6 @@ func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update backup account
 // @Tags Backup Account
 // @Summary Update backup account
 // @Description 更新备份账号信息
@@ -207,9 +200,8 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// List backup account
 // @Tags Backup Account
-// @Summary Search backup account
+// @Summary List backup accounts
 // @Description 获取备份账号列表
 // @Success 200 {anrry} dto.BackupInfo
 // @Security ApiKeyAuth

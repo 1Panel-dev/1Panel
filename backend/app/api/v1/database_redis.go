@@ -19,7 +19,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Load redis status info
 // @Tags Database Redis
 // @Summary Load redis status info
 // @Description 获取 redis 状态信息
@@ -36,7 +35,6 @@ func (b *BaseApi) LoadRedisStatus(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
-// Load redis conf
 // @Tags Database Redis
 // @Summary Load redis conf
 // @Description 获取 redis 配置信息
@@ -53,7 +51,6 @@ func (b *BaseApi) LoadRedisConf(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
-// Load redis persistence conf
 // @Tags Database Redis
 // @Summary Load redis persistence conf
 // @Description 获取 redis 持久化配置
@@ -70,7 +67,6 @@ func (b *BaseApi) LoadPersistenceConf(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
-// Update redis conf
 // @Tags Database Redis
 // @Summary Update redis conf
 // @Description 更新 redis 配置信息
@@ -97,7 +93,6 @@ func (b *BaseApi) UpdateRedisConf(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Change redis password
 // @Tags Database Redis
 // @Summary Change redis password
 // @Description 更新 redis 密码
@@ -124,7 +119,6 @@ func (b *BaseApi) ChangeRedisPassword(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update redis persistence conf
 // @Tags Database Redis
 // @Summary Update redis persistence conf
 // @Description 更新 redis 持久化配置
@@ -151,7 +145,6 @@ func (b *BaseApi) UpdateRedisPersistenceConf(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Backup redis
 // @Tags Database Redis
 // @Summary Backup redis
 // @Description 备份 redis 数据库
@@ -167,7 +160,6 @@ func (b *BaseApi) RedisBackup(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Recover redis
 // @Tags Database Redis
 // @Summary Recover redis
 // @Description 恢复 redis 数据库
@@ -193,9 +185,8 @@ func (b *BaseApi) RedisRecover(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Search redis backup list
 // @Tags Database Redis
-// @Summary Search redis backup list
+// @Summary Page redis backups
 // @Description 获取 redis 备份记录分页
 // @Accept json
 // @Param request body dto.PageInfo true "request"
@@ -221,7 +212,6 @@ func (b *BaseApi) RedisBackupList(c *gin.Context) {
 	})
 }
 
-// Update redis conf by file
 // @Tags Database Redis
 // @Summary Update redis conf by file
 // @Description 上传更新 redis 配置信息

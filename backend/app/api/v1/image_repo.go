@@ -8,9 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Page image repo
 // @Tags Container Image-repo
-// @Summary Search image repo list with page
+// @Summary Page image repos
 // @Description 获取镜像仓库列表分页
 // @Accept json
 // @Param request body dto.PageInfo true "request"
@@ -41,9 +40,8 @@ func (b *BaseApi) SearchRepo(c *gin.Context) {
 	})
 }
 
-// List image repo
 // @Tags Container Image-repo
-// @Summary Search image repo list
+// @Summary List image repos
 // @Description 获取镜像仓库列表
 // @Produce json
 // @Success 200 {anrry} dto.ImageRepoOption
@@ -59,7 +57,6 @@ func (b *BaseApi) ListRepo(c *gin.Context) {
 	helper.SuccessWithData(c, list)
 }
 
-// Create image repo
 // @Tags Container Image-repo
 // @Summary Create image repo
 // @Description 创建镜像仓库
@@ -87,7 +84,6 @@ func (b *BaseApi) CreateRepo(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Delete image repo
 // @Tags Container Image-repo
 // @Summary Delete image repo
 // @Description 删除镜像仓库
@@ -116,7 +112,6 @@ func (b *BaseApi) DeleteRepo(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update image repo
 // @Tags Container Image-repo
 // @Summary Update image repo
 // @Description 更新镜像仓库

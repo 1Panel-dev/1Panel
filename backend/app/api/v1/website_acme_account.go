@@ -8,9 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Page website acme account
 // @Tags Website Acme
-// @Summary Search website acme account with page
+// @Summary Page website acme accounts
 // @Description 获取网站 acme 列表分页
 // @Accept json
 // @Param request body dto.PageInfo true "request"
@@ -34,7 +33,6 @@ func (b *BaseApi) PageWebsiteAcmeAccount(c *gin.Context) {
 	})
 }
 
-// Create website acme account
 // @Tags Website Acme
 // @Summary Create website acme account
 // @Description 创建网站 acme
@@ -58,7 +56,6 @@ func (b *BaseApi) CreateWebsiteAcmeAccount(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
-// Delete website acme account
 // @Tags Website Acme
 // @Summary Delete website acme account
 // @Description 删除网站 acme

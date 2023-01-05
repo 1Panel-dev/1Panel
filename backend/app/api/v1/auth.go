@@ -15,7 +15,6 @@ import (
 
 type BaseApi struct{}
 
-// User login
 // @Tags Auth
 // @Summary User login
 // @Description 用户登录
@@ -47,7 +46,6 @@ func (b *BaseApi) Login(c *gin.Context) {
 	helper.SuccessWithData(c, user)
 }
 
-// User login with mfa
 // @Tags Auth
 // @Summary User login with mfa
 // @Description 用户 mfa 登录
@@ -74,7 +72,6 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 	helper.SuccessWithData(c, user)
 }
 
-// User logout
 // @Tags Auth
 // @Summary User logout
 // @Description 用户登出
@@ -89,7 +86,6 @@ func (b *BaseApi) LogOut(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Load captcha
 // @Tags Auth
 // @Summary Load captcha
 // @Description 加载验证码
@@ -104,7 +100,6 @@ func (b *BaseApi) Captcha(c *gin.Context) {
 	helper.SuccessWithData(c, captcha)
 }
 
-// Load safety status
 // @Tags Auth
 // @Summary Load safety status
 // @Description 获取系统安全登录状态
@@ -146,7 +141,6 @@ func (b *BaseApi) CheckIsFirstLogin(c *gin.Context) {
 	helper.SuccessWithData(c, authService.CheckIsFirst())
 }
 
-// Init user
 // @Tags Auth
 // @Summary Init user
 // @Description 初始化用户
