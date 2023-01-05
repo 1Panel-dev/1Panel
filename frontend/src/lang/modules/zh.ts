@@ -617,6 +617,7 @@ export default {
             groups: '系统组',
             commands: '快捷命令',
             backups: '备份账号',
+            logs: '面板日志',
             settings: '面板设置',
             cronjobs: '计划任务',
             databases: '数据库',

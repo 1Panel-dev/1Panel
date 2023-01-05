@@ -15,9 +15,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Page container
 // @Tags Container
-// @Summary Search container list with page
+// @Summary Page containers
 // @Description 获取容器列表分页
 // @Accept json
 // @Param request body dto.PageContainer true "request"
@@ -47,9 +46,8 @@ func (b *BaseApi) SearchContainer(c *gin.Context) {
 	})
 }
 
-// Page compose
 // @Tags Container Compose
-// @Summary Search compose list with page
+// @Summary Page composes
 // @Description 获取编排列表分页
 // @Accept json
 // @Param request body dto.PageInfo true "request"
@@ -78,7 +76,6 @@ func (b *BaseApi) SearchCompose(c *gin.Context) {
 	})
 }
 
-// Create compose
 // @Tags Container Compose
 // @Summary Create compose
 // @Description 创建容器编排
@@ -106,7 +103,6 @@ func (b *BaseApi) CreateCompose(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Operate compose
 // @Tags Container Compose
 // @Summary Operate compose
 // @Description 容器编排操作
@@ -134,7 +130,6 @@ func (b *BaseApi) OperatorCompose(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Create container
 // @Tags Container
 // @Summary Create container
 // @Description 创建容器
@@ -161,7 +156,6 @@ func (b *BaseApi) ContainerCreate(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Operate Container
 // @Tags Container
 // @Summary Operate Container
 // @Description 容器操作
@@ -188,7 +182,6 @@ func (b *BaseApi) ContainerOperation(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Container stats
 // @Tags Container
 // @Summary Container stats
 // @Description 容器监控信息
@@ -211,7 +204,6 @@ func (b *BaseApi) ContainerStats(c *gin.Context) {
 	helper.SuccessWithData(c, result)
 }
 
-// Container inspect
 // @Tags Container
 // @Summary Container inspect
 // @Description 容器详情
@@ -296,7 +288,6 @@ func (b *BaseApi) ContainerExec(c *gin.Context) {
 	}
 }
 
-// Container logs
 // @Tags Container
 // @Summary Container logs
 // @Description 容器日志
@@ -323,9 +314,8 @@ func (b *BaseApi) ContainerLogs(c *gin.Context) {
 	helper.SuccessWithData(c, logs)
 }
 
-// Page network
 // @Tags Container Network
-// @Summary Search network list with page
+// @Summary Page networks
 // @Description 获取容器网络列表分页
 // @Accept json
 // @Param request body dto.PageInfo true "request"
@@ -355,7 +345,6 @@ func (b *BaseApi) SearchNetwork(c *gin.Context) {
 	})
 }
 
-// Delete network
 // @Tags Container Network
 // @Summary Delete network
 // @Description 删除容器网络
@@ -383,7 +372,6 @@ func (b *BaseApi) DeleteNetwork(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Create network
 // @Tags Container Network
 // @Summary Create network
 // @Description 创建容器网络
@@ -411,9 +399,8 @@ func (b *BaseApi) CreateNetwork(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Page volume
 // @Tags Container Volume
-// @Summary Search volume list with page
+// @Summary Page volumes
 // @Description 获取容器存储卷分页
 // @Accept json
 // @Param request body dto.PageInfo true "request"
@@ -443,9 +430,8 @@ func (b *BaseApi) SearchVolume(c *gin.Context) {
 	})
 }
 
-// List volume
 // @Tags Container Volume
-// @Summary Search volume list
+// @Summary List volumes
 // @Description 获取容器存储卷列表
 // @Accept json
 // @Param request body dto.PageInfo true "request"
@@ -462,7 +448,6 @@ func (b *BaseApi) ListVolume(c *gin.Context) {
 	helper.SuccessWithData(c, list)
 }
 
-// Delete volume
 // @Tags Container Volume
 // @Summary Delete volume
 // @Description 删除容器存储卷
@@ -490,7 +475,6 @@ func (b *BaseApi) DeleteVolume(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Create volume
 // @Tags Container Volume
 // @Summary Create volume
 // @Description 创建容器存储卷
@@ -518,7 +502,6 @@ func (b *BaseApi) CreateVolume(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update compose
 // @Tags Container Compose
 // @Summary Update compose
 // @Description 更新容器编排

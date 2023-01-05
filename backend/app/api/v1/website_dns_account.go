@@ -8,9 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Page website dns account
 // @Tags Website DNS
-// @Summary Search website dns account with page
+// @Summary Page website dns accounts
 // @Description 获取网站 dns 列表分页
 // @Accept json
 // @Param request body dto.PageInfo true "request"
@@ -34,7 +33,6 @@ func (b *BaseApi) PageWebsiteDnsAccount(c *gin.Context) {
 	})
 }
 
-// Create website dns account
 // @Tags Website DNS
 // @Summary Create website dns account
 // @Description 创建网站 dns
@@ -57,7 +55,6 @@ func (b *BaseApi) CreateWebsiteDnsAccount(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update website dns account
 // @Tags Website DNS
 // @Summary Update website dns account
 // @Description 更新网站 dns
@@ -80,7 +77,6 @@ func (b *BaseApi) UpdateWebsiteDnsAccount(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Delete website dns account
 // @Tags Website DNS
 // @Summary Delete website dns account
 // @Description 删除网站 dns

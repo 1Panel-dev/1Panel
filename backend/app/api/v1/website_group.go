@@ -7,9 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// List website group
 // @Tags Website Group
-// @Summary List website group
+// @Summary List website groups
 // @Description 获取网站组
 // @Success 200 {anrry} model.WebsiteGroup
 // @Security ApiKeyAuth
@@ -23,7 +22,6 @@ func (b *BaseApi) GetWebGroups(c *gin.Context) {
 	helper.SuccessWithData(c, list)
 }
 
-// Create website group
 // @Tags Website Group
 // @Summary Create website group
 // @Description 创建网站组
@@ -46,7 +44,6 @@ func (b *BaseApi) CreateWebGroup(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update website group
 // @Tags Website Group
 // @Summary Update website group
 // @Description 更新网站组
@@ -69,7 +66,6 @@ func (b *BaseApi) UpdateWebGroup(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Delete website group
 // @Tags Website Group
 // @Summary Delete website group
 // @Description 删除网站组

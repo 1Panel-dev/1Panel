@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Load status
 // @Tags Container Docker
 // @Summary Load docker status
 // @Description 获取 docker 服务状态
@@ -21,7 +20,6 @@ func (b *BaseApi) LoadDockerStatus(c *gin.Context) {
 	helper.SuccessWithData(c, status)
 }
 
-// Load daemon.json
 // @Tags Container Docker
 // @Summary Load docker daemon.json
 // @Description 获取 docker 配置信息
@@ -34,7 +32,6 @@ func (b *BaseApi) LoadDaemonJson(c *gin.Context) {
 	helper.SuccessWithData(c, conf)
 }
 
-// Update daemon.json
 // @Tags Container Docker
 // @Summary Update docker daemon.json
 // @Description 修改 docker 配置信息
@@ -59,7 +56,6 @@ func (b *BaseApi) UpdateDaemonJson(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update daemon.json by upload file
 // @Tags Container Docker
 // @Summary Update docker daemon.json by upload file
 // @Description 上传替换 docker 配置文件
@@ -88,7 +84,6 @@ func (b *BaseApi) UpdateDaemonJsonByFile(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Operate docker
 // @Tags Container Docker
 // @Summary Operate docker
 // @Description Docker 操作

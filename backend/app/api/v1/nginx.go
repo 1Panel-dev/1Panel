@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Load nginx conf
 // @Tags Nginx
 // @Summary Load nginx conf
 // @Description 获取 nginx 配置信息
@@ -23,12 +22,11 @@ func (b *BaseApi) GetNginx(c *gin.Context) {
 	helper.SuccessWithData(c, fileInfo)
 }
 
-// Load partial nginx conf
 // @Tags Nginx
 // @Summary Load partial nginx conf
 // @Description 获取部分 nginx 配置信息
 // @Accept json
-// @Param request body dto.NginxScopeReq true "request"
+// @Param request body request.NginxScopeReq true "request"
 // @Success 200 {anrry} response.NginxParam
 // @Security ApiKeyAuth
 // @Router /nginx/scope [post]
@@ -47,12 +45,11 @@ func (b *BaseApi) GetNginxConfigByScope(c *gin.Context) {
 	helper.SuccessWithData(c, params)
 }
 
-// Update nginx conf
 // @Tags Nginx
 // @Summary Update nginx conf
 // @Description 更新 nginx 配置信息
 // @Accept json
-// @Param request body dto.NginxConfigUpdate true "request"
+// @Param request body request.NginxConfigUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /nginx/update [post]
@@ -70,7 +67,6 @@ func (b *BaseApi) UpdateNginxConfigByScope(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Load nginx status info
 // @Tags Nginx
 // @Summary Load nginx status info
 // @Description 获取 nginx 状态信息
@@ -86,12 +82,11 @@ func (b *BaseApi) GetNginxStatus(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
-// Update nginx conf by upload file
 // @Tags Nginx
 // @Summary Update nginx conf by upload file
 // @Description 上传更新 nginx 配置文件
 // @Accept json
-// @Param request body dto.NginxConfigFileUpdate true "request"
+// @Param request body request.NginxConfigFileUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /nginx/file [post]

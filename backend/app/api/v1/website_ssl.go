@@ -10,9 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Page website ssl
 // @Tags Website SSL
-// @Summary Search website ssl with page
+// @Summary Page website ssl
 // @Description 获取网站 ssl 列表分页
 // @Accept json
 // @Param request body request.WebsiteSSLSearch true "request"
@@ -45,7 +44,6 @@ func (b *BaseApi) PageWebsiteSSL(c *gin.Context) {
 	}
 }
 
-// Create website ssl
 // @Tags Website SSL
 // @Summary Create website ssl
 // @Description 创建网站 ssl
@@ -69,7 +67,6 @@ func (b *BaseApi) CreateWebsiteSSL(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
-// Reset website ssl
 // @Tags Website SSL
 // @Summary Reset website ssl
 // @Description 重置网站 ssl
@@ -92,7 +89,6 @@ func (b *BaseApi) RenewWebsiteSSL(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Resolve website ssl
 // @Tags Website SSL
 // @Summary Resolve website ssl
 // @Description 解析网站 ssl
@@ -115,7 +111,6 @@ func (b *BaseApi) GetDNSResolve(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
-// Delete website ssl
 // @Tags Website SSL
 // @Summary Delete website ssl
 // @Description 删除网站 ssl
@@ -138,7 +133,6 @@ func (b *BaseApi) DeleteWebsiteSSL(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Search website ssl by website id
 // @Tags Website SSL
 // @Summary Search website ssl by website id
 // @Description 通过网站 id 查询 ssl
@@ -161,7 +155,6 @@ func (b *BaseApi) GetWebsiteSSLByWebsiteId(c *gin.Context) {
 	helper.SuccessWithData(c, websiteSSL)
 }
 
-// Search website ssl by id
 // @Tags Website SSL
 // @Summary Search website ssl by id
 // @Description 通过 id 查询 ssl

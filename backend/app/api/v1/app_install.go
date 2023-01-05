@@ -13,9 +13,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// List app installed
 // @Tags App
-// @Summary Search app list installed
+// @Summary List app installed
 // @Description 获取已安装应用列表
 // @Accept json
 // @Param request body request.AppInstalledSearch true "request"
@@ -48,6 +47,14 @@ func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 	}
 }
 
+// @Tags App
+// @Summary Check app installed
+// @Description 检查应用安装情况
+// @Accept json
+// @Param key path string true "request"
+// @Success 200 {object} response.AppInstalledCheck
+// @Security ApiKeyAuth
+// @Router /apps/installed/check/:key [get]
 func (b *BaseApi) CheckAppInstalled(c *gin.Context) {
 	key, ok := c.Params.Get("key")
 	if !ok {
@@ -62,6 +69,14 @@ func (b *BaseApi) CheckAppInstalled(c *gin.Context) {
 	helper.SuccessWithData(c, checkData)
 }
 
+// @Tags App
+// @Summary Search app port by key
+// @Description 获取应用端口
+// @Accept json
+// @Param key path string true "request"
+// @Success 200 {integer} port
+// @Security ApiKeyAuth
+// @Router /apps/installed/loadport/:key [get]
 func (b *BaseApi) LoadPort(c *gin.Context) {
 	key, ok := c.Params.Get("key")
 	if !ok {
@@ -76,6 +91,14 @@ func (b *BaseApi) LoadPort(c *gin.Context) {
 	helper.SuccessWithData(c, port)
 }
 
+// @Tags App
+// @Summary Search app password by key
+// @Description 获取应用密码
+// @Accept json
+// @Param key path string true "request"
+// @Success 200 {string} password
+// @Security ApiKeyAuth
+// @Router /apps/installed/loadpassword/:key [get]
 func (b *BaseApi) LoadPassword(c *gin.Context) {
 	key, ok := c.Params.Get("key")
 	if !ok {
@@ -90,6 +113,14 @@ func (b *BaseApi) LoadPassword(c *gin.Context) {
 	helper.SuccessWithData(c, password)
 }
 
+// @Tags App
+// @Summary Check before delete
+// @Description 删除前检查
+// @Accept json
+// @Param appInstallId path integer true "App install id"
+// @Success 200 {anrry} dto.AppResource
+// @Security ApiKeyAuth
+// @Router /apps/installed/delete/check/:appInstallId [get]
 func (b *BaseApi) DeleteCheck(c *gin.Context) {
 	appInstallId, err := helper.GetIntParamByKey(c, "appInstallId")
 	if err != nil {
@@ -104,6 +135,14 @@ func (b *BaseApi) DeleteCheck(c *gin.Context) {
 	helper.SuccessWithData(c, checkData)
 }
 
+// Sync app installed
+// @Tags App
+// @Summary Sync app installed
+// @Description 同步已安装应用列表
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /apps/installed/sync [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"同步已安装应用列表","formatEN":"Sync the list of installed apps"}
 func (b *BaseApi) SyncInstalled(c *gin.Context) {
 	if err := appInstallService.SyncAll(); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -112,6 +151,14 @@ func (b *BaseApi) SyncInstalled(c *gin.Context) {
 	helper.SuccessWithData(c, "")
 }
 
+// @Tags App
+// @Summary Page installed backups
+// @Description 查询已安装备份列表分页
+// @Accept json
+// @Param request body request.AppBackupSearch true "request"
+// @Success 200 {object} dto.PageResult
+// @Security ApiKeyAuth
+// @Router /apps/installed/backups [post]
 func (b *BaseApi) SearchInstalledBackup(c *gin.Context) {
 	var req request.AppBackupSearch
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -129,6 +176,15 @@ func (b *BaseApi) SearchInstalledBackup(c *gin.Context) {
 	})
 }
 
+// @Tags App
+// @Summary Operate installed app
+// @Description 操作已安装应用
+// @Accept json
+// @Param request body request.AppInstalledOperate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /apps/installed/op [post]
+// @x-panel-log {"bodyKeys":["installId","operate"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"installId","isList":false,"db":"app_installs","output_colume":"app_id","output_value":"appId"},{"input_colume":"id","input_value":"installId","isList":false,"db":"app_installs","output_colume":"name","output_value":"appName"},{"input_colume":"id","input_value":"appId","isList":false,"db":"apps","output_colume":"key","output_value":"appKey"}],"formatZH":"[appKey] 应用 [appName] [operate]","formatEN":"[appKey] App [appName] [operate]"}
 func (b *BaseApi) OperateInstalled(c *gin.Context) {
 	var req request.AppInstalledOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -142,6 +198,15 @@ func (b *BaseApi) OperateInstalled(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// @Tags App
+// @Summary Delete app backup record
+// @Description 删除应用备份记录
+// @Accept json
+// @Param request body request.AppBackupDelete true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /apps/installed/backups/del [post]
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"ids","isList":true,"db":"app_install_backups","output_colume":"name","output_value":"names"}],"formatZH":"删除应用备份 [names]","formatEN":"Deleting an Application Backup [names]"}
 func (b *BaseApi) DeleteAppBackup(c *gin.Context) {
 	var req request.AppBackupDelete
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -155,6 +220,14 @@ func (b *BaseApi) DeleteAppBackup(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// @Tags App
+// @Summary Search app service by key
+// @Description 通过 key 获取应用 service
+// @Accept json
+// @Param key path string true "request"
+// @Success 200 {anrry} response.AppService
+// @Security ApiKeyAuth
+// @Router /apps/services/:key [get]
 func (b *BaseApi) GetServices(c *gin.Context) {
 	key := c.Param("key")
 	services, err := appInstallService.GetServices(key)
@@ -165,6 +238,14 @@ func (b *BaseApi) GetServices(c *gin.Context) {
 	helper.SuccessWithData(c, services)
 }
 
+// @Tags App
+// @Summary Search app update version by install id
+// @Description 通过 install id 获取应用更新版本
+// @Accept json
+// @Param appInstallId path integer true "request"
+// @Success 200 {anrry} dto.AppVersion
+// @Security ApiKeyAuth
+// @Router /apps/installed/:appInstallId/versions [get]
 func (b *BaseApi) GetUpdateVersions(c *gin.Context) {
 	appInstallId, err := helper.GetIntParamByKey(c, "appInstallId")
 	if err != nil {
@@ -179,6 +260,15 @@ func (b *BaseApi) GetUpdateVersions(c *gin.Context) {
 	helper.SuccessWithData(c, versions)
 }
 
+// @Tags App
+// @Summary Change app port
+// @Description 修改应用端口
+// @Accept json
+// @Param request body request.PortUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /apps/installed/port/change [post]
+// @x-panel-log {"bodyKeys":["key","name","port"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"应用端口修改 [key]-[name] => [port]","formatEN":"Application port update [key]-[name] => [port]"}
 func (b *BaseApi) ChangeAppPort(c *gin.Context) {
 	var req request.PortUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -196,6 +286,14 @@ func (b *BaseApi) ChangeAppPort(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// @Tags App
+// @Summary Search default config by key
+// @Description 通过 key 获取应用默认配置
+// @Accept json
+// @Param key path string true "request"
+// @Success 200 {string} content
+// @Security ApiKeyAuth
+// @Router /apps/installed/conf/:key [get]
 func (b *BaseApi) GetDefaultConfig(c *gin.Context) {
 	key := c.Param("key")
 	if key == "" {
@@ -211,6 +309,14 @@ func (b *BaseApi) GetDefaultConfig(c *gin.Context) {
 	helper.SuccessWithData(c, content)
 }
 
+// @Tags App
+// @Summary Search params by appInstallId
+// @Description 通过 install id 获取应用参数
+// @Accept json
+// @Param appInstallId path string true "request"
+// @Success 200 {object} response.AppParam
+// @Security ApiKeyAuth
+// @Router /apps/installed/params/:appInstallId [get]
 func (b *BaseApi) GetParams(c *gin.Context) {
 	appInstallId, err := helper.GetIntParamByKey(c, "appInstallId")
 	if err != nil {

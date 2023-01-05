@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Create group
 // @Tags System Group
 // @Summary Create group
 // @Description 创建系统组
@@ -35,7 +34,6 @@ func (b *BaseApi) CreateGroup(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Delete group
 // @Tags System Group
 // @Summary Delete group
 // @Description 删除系统组
@@ -63,7 +61,6 @@ func (b *BaseApi) DeleteGroup(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update group
 // @Tags System Group
 // @Summary Update group
 // @Description 更新系统组
@@ -91,9 +88,8 @@ func (b *BaseApi) UpdateGroup(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Search group info
 // @Tags System Group
-// @Summary Search group info
+// @Summary Search group info by id
 // @Description 查询系统组
 // @Accept json
 // @Param id path integer true "request"
@@ -114,9 +110,8 @@ func (b *BaseApi) GetGroupInfo(c *gin.Context) {
 	helper.SuccessWithData(c, group)
 }
 
-// List group
 // @Tags System Group
-// @Summary Search group list
+// @Summary List groups
 // @Description 查询系统组
 // @Accept json
 // @Param request body dto.GroupSearch true "request"

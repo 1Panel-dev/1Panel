@@ -13,7 +13,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Load system setting info
 // @Tags System Setting
 // @Summary Load system setting info
 // @Description 加载系统配置信息
@@ -45,7 +44,6 @@ func (b *BaseApi) GetDaemonjson(c *gin.Context) {
 	helper.SuccessWithData(c, value)
 }
 
-// Update system setting
 // @Tags System Setting
 // @Summary Update system setting
 // @Description 更新系统配置
@@ -73,7 +71,6 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update system password
 // @Tags System Setting
 // @Summary Update system password
 // @Description 更新系统登录密码
@@ -101,7 +98,6 @@ func (b *BaseApi) UpdatePassword(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Reset system password expired
 // @Tags System Setting
 // @Summary Reset system password expired
 // @Description 重置过期系统登录密码
@@ -129,7 +125,6 @@ func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Sync system time
 // @Tags System Setting
 // @Summary Sync system time
 // @Description 系统时间同步
@@ -153,7 +148,6 @@ func (b *BaseApi) SyncTime(c *gin.Context) {
 	helper.SuccessWithData(c, ntime.Format("2006-01-02 15:04:05 MST -0700"))
 }
 
-// Clean monitor datas
 // @Tags System Setting
 // @Summary Clean monitor datas
 // @Description 清空监控数据
@@ -178,7 +172,6 @@ func (b *BaseApi) CleanMonitor(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Load mfa info
 // @Tags System Setting
 // @Summary Load mfa info
 // @Description 获取 mfa 信息
@@ -195,7 +188,6 @@ func (b *BaseApi) GetMFA(c *gin.Context) {
 	helper.SuccessWithData(c, otp)
 }
 
-// Bind mfa
 // @Tags System Setting
 // @Summary Bind mfa
 // @Description Mfa 绑定

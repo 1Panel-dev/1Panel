@@ -13,7 +13,8 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/service"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/cmd/server/operation"
+	"github.com/1Panel-dev/1Panel/backend/utils/copier"
+	"github.com/1Panel-dev/1Panel/cmd/server/docs"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,25 +29,48 @@ func OperationLog() gin.HandlerFunc {
 		record := model.OperationLog{
 			Group:     group,
 			IP:        c.ClientIP(),
-			Method:    c.Request.Method,
-			Path:      c.Request.URL.Path,
+			Method:    strings.ToLower(c.Request.Method),
+			Path:      strings.ReplaceAll(c.Request.URL.Path, "/api/v1", ""),
 			UserAgent: c.Request.UserAgent(),
 		}
 		var (
-			operationDics []operationJson
-			operationDic  operationJson
+			swagger      swaggerJson
+			operationDic operationJson
 		)
-		if err := json.Unmarshal(operation.OperationJosn, &operationDics); err != nil {
+		if err := json.Unmarshal(docs.SwaggerJson, &swagger); err != nil {
 			c.Next()
 			return
 		}
-		for _, dic := range operationDics {
-			if dic.API == record.Path && dic.Method == record.Method {
-				operationDic = dic
-				break
-			}
+		path, hasPath := swagger.Paths[record.Path]
+		if !hasPath {
+			c.Next()
+			return
 		}
-		if len(operationDic.API) == 0 {
+		methodMap, isMethodMap := path.(map[string]interface{})
+		if !isMethodMap {
+			c.Next()
+			return
+		}
+		dataMap, hasPost := methodMap["post"]
+		if !hasPost {
+			c.Next()
+			return
+		}
+		data, isDataMap := dataMap.(map[string]interface{})
+		if !isDataMap {
+			c.Next()
+			return
+		}
+		xlog, hasXlog := data["x-panel-log"]
+		if !hasXlog {
+			c.Next()
+			return
+		}
+		if err := copier.Copy(&operationDic, xlog); err != nil {
+			c.Next()
+			return
+		}
+		if len(operationDic.FormatZH) == 0 {
 			c.Next()
 			return
 		}
@@ -122,6 +146,10 @@ func OperationLog() gin.HandlerFunc {
 			global.LOG.Errorf("create operation record failed, err: %v", err)
 		}
 	}
+}
+
+type swaggerJson struct {
+	Paths map[string]interface{} `json:"paths"`
 }
 
 type operationJson struct {

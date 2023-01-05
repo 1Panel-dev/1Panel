@@ -8,12 +8,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Page login logs
 // @Tags Logs
 // @Summary Page login logs
 // @Description 获取系统登录日志列表分页
 // @Accept json
-// @Param request body request.PageInfo true "request"
+// @Param request body dto.PageInfo true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /logs/login [post]
@@ -36,12 +35,11 @@ func (b *BaseApi) GetLoginLogs(c *gin.Context) {
 	})
 }
 
-// Page operation logs
 // @Tags Logs
 // @Summary Page operation logs
 // @Description 获取系统操作日志列表分页
 // @Accept json
-// @Param request body request.PageInfo true "request"
+// @Param request body dto.PageInfo true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /logs/operation [post]
@@ -64,7 +62,6 @@ func (b *BaseApi) GetOperationLogs(c *gin.Context) {
 	})
 }
 
-// Clean operation logs
 // @Tags Logs
 // @Summary Clean operation logs
 // @Description 清空操作日志

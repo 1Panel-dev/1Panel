@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Load dashboard base info
 // @Tags Dashboard
 // @Summary Load dashboard base info
 // @Description 获取首页基础数据
@@ -37,7 +36,6 @@ func (b *BaseApi) LoadDashboardBaseInfo(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
-// Load dashboard current info
 // @Tags Dashboard
 // @Summary Load dashboard current info
 // @Description 获取首页实时数据

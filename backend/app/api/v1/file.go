@@ -22,9 +22,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// List files
 // @Tags File
-// @Summary Search file list
+// @Summary List files
 // @Description 获取文件列表
 // @Accept json
 // @Param request body request.FileOption true "request"
@@ -45,7 +44,6 @@ func (b *BaseApi) ListFiles(c *gin.Context) {
 	helper.SuccessWithData(c, files)
 }
 
-// Load files tree
 // @Tags File
 // @Summary Load files tree
 // @Description 加载文件树
@@ -68,7 +66,6 @@ func (b *BaseApi) GetFileTree(c *gin.Context) {
 	helper.SuccessWithData(c, tree)
 }
 
-// Create file
 // @Tags File
 // @Summary Create file
 // @Description 创建文件/文件夹
@@ -92,7 +89,6 @@ func (b *BaseApi) CreateFile(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Delete file
 // @Tags File
 // @Summary Delete file
 // @Description 删除文件/文件夹
@@ -116,7 +112,6 @@ func (b *BaseApi) DeleteFile(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Batch delete file
 // @Tags File
 // @Summary Batch delete file
 // @Description 批量删除文件/文件夹
@@ -140,7 +135,6 @@ func (b *BaseApi) BatchDeleteFile(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Change file mode
 // @Tags File
 // @Summary Change file mode
 // @Description 修改文件权限
@@ -164,7 +158,6 @@ func (b *BaseApi) ChangeFileMode(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Compress file
 // @Tags File
 // @Summary Compress file
 // @Description 压缩文件
@@ -188,7 +181,6 @@ func (b *BaseApi) CompressFile(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Decompress file
 // @Tags File
 // @Summary Decompress file
 // @Description 解压文件
@@ -212,7 +204,6 @@ func (b *BaseApi) DeCompressFile(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Load file content
 // @Tags File
 // @Summary Load file content
 // @Description 获取文件内容
@@ -236,7 +227,6 @@ func (b *BaseApi) GetContent(c *gin.Context) {
 	helper.SuccessWithData(c, info)
 }
 
-// Update file content
 // @Tags File
 // @Summary Update file content
 // @Description 更新文件内容
@@ -259,7 +249,6 @@ func (b *BaseApi) SaveContent(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Upload file
 // @Tags File
 // @Summary Upload file
 // @Description 上传文件
@@ -307,7 +296,6 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 	}
 }
 
-// Change file name
 // @Tags File
 // @Summary Change file name
 // @Description 修改文件名称
@@ -330,7 +318,6 @@ func (b *BaseApi) ChangeFileName(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Wget file
 // @Tags File
 // @Summary Wget file
 // @Description 下载远端文件
@@ -356,7 +343,6 @@ func (b *BaseApi) WgetFile(c *gin.Context) {
 	})
 }
 
-// Move file
 // @Tags File
 // @Summary Move file
 // @Description 移动文件
@@ -379,7 +365,6 @@ func (b *BaseApi) MoveFile(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Download file
 // @Tags File
 // @Summary Download file
 // @Description 下载文件
@@ -403,7 +388,6 @@ func (b *BaseApi) Download(c *gin.Context) {
 	c.File(filePath)
 }
 
-// Load file size
 // @Tags File
 // @Summary Load file size
 // @Description 获取文件夹大小
@@ -427,13 +411,12 @@ func (b *BaseApi) Size(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
-// Read file
 // @Tags File
 // @Summary Read file
 // @Description 读取文件
 // @Accept json
 // @Param request body dto.FilePath true "request"
-// @Success 200 <anrry> byte
+// @Success 200 {string} content
 // @Security ApiKeyAuth
 // @Router /files/loadfile [post]
 // @x-panel-log {"bodyKeys":["path"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"读取文件 [path]","formatEN":"Read file [path]"}

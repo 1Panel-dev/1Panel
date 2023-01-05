@@ -9,9 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Page website
 // @Tags Website
-// @Summary Search website with page
+// @Summary Page websites
 // @Description 获取网站列表分页
 // @Accept json
 // @Param request body request.WebsiteSearch true "request"
@@ -35,9 +34,8 @@ func (b *BaseApi) PageWebsite(c *gin.Context) {
 	})
 }
 
-// List website
 // @Tags Website
-// @Summary Search website
+// @Summary List websites
 // @Description 获取网站列表
 // @Success 200 {anrry} response.WebsiteDTO
 // @Security ApiKeyAuth
@@ -51,9 +49,8 @@ func (b *BaseApi) GetWebsites(c *gin.Context) {
 	helper.SuccessWithData(c, websites)
 }
 
-// List website name
 // @Tags Website
-// @Summary Search website names
+// @Summary List website names
 // @Description 获取网站列表
 // @Success 200 {anrry} string
 // @Security ApiKeyAuth
@@ -67,7 +64,6 @@ func (b *BaseApi) GetWebsiteOptions(c *gin.Context) {
 	helper.SuccessWithData(c, websites)
 }
 
-// Create website
 // @Tags Website
 // @Summary Create website
 // @Description 创建网站
@@ -91,7 +87,6 @@ func (b *BaseApi) CreateWebsite(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Operate website
 // @Tags Website
 // @Summary Operate website
 // @Description 操作网站
@@ -115,7 +110,6 @@ func (b *BaseApi) OpWebsite(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Backup website
 // @Tags Website
 // @Summary Backup website
 // @Description 备份网站
@@ -138,7 +132,6 @@ func (b *BaseApi) BackupWebsite(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Recover website by upload
 // @Tags Website
 // @Summary Recover website by upload
 // @Description 从上传恢复网站
@@ -166,7 +159,6 @@ func (b *BaseApi) RecoverWebsiteByUpload(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Recover website
 // @Tags Website
 // @Summary Recover website
 // @Description 从备份恢复网站
@@ -194,7 +186,6 @@ func (b *BaseApi) RecoverWebsite(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Delete website
 // @Tags Website
 // @Summary Delete website
 // @Description 删除网站
@@ -202,7 +193,7 @@ func (b *BaseApi) RecoverWebsite(c *gin.Context) {
 // @Param request body request.WebsiteDelete true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /websites/recover [post]
+// @Router /websites/del [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"删除网站 [domain]","formatEN":"Delete website [domain]"}
 func (b *BaseApi) DeleteWebsite(c *gin.Context) {
 	var req request.WebsiteDelete
@@ -218,7 +209,6 @@ func (b *BaseApi) DeleteWebsite(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update website
 // @Tags Website
 // @Summary Update website
 // @Description 更新网站
@@ -241,7 +231,6 @@ func (b *BaseApi) UpdateWebsite(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Search website by id
 // @Tags Website
 // @Summary Search website by id
 // @Description 通过 id 查询网站
@@ -264,7 +253,6 @@ func (b *BaseApi) GetWebsite(c *gin.Context) {
 	helper.SuccessWithData(c, website)
 }
 
-// Search website nginx by id
 // @Tags Website Nginx
 // @Summary Search website nginx by id
 // @Description 通过 id 查询网站 nginx
@@ -287,7 +275,6 @@ func (b *BaseApi) GetWebsiteNginx(c *gin.Context) {
 	helper.SuccessWithData(c, fileInfo)
 }
 
-// Search website domains by websiteId
 // @Tags Website Domain
 // @Summary Search website domains by websiteId
 // @Description 通过网站 id 查询域名
@@ -310,7 +297,6 @@ func (b *BaseApi) GetWebDomains(c *gin.Context) {
 	helper.SuccessWithData(c, list)
 }
 
-// Delete website domain
 // @Tags Website Domain
 // @Summary Delete website domain
 // @Description 删除网站域名
@@ -334,7 +320,6 @@ func (b *BaseApi) DeleteWebDomain(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Create website domain
 // @Tags Website Domain
 // @Summary Create website domain
 // @Description 创建网站域名
@@ -358,7 +343,6 @@ func (b *BaseApi) CreateWebDomain(c *gin.Context) {
 	helper.SuccessWithData(c, domain)
 }
 
-// Load nginx conf
 // @Tags Website Nginx
 // @Summary Load nginx conf
 // @Description 获取 nginx 配置
@@ -366,7 +350,7 @@ func (b *BaseApi) CreateWebDomain(c *gin.Context) {
 // @Param request body request.NginxScopeReq true "request"
 // @Success 200 {object} response.WebsiteNginxConfig
 // @Security ApiKeyAuth
-// @Router /websites/config [get]
+// @Router /websites/config [post]
 func (b *BaseApi) GetNginxConfig(c *gin.Context) {
 	var req request.NginxScopeReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -381,7 +365,6 @@ func (b *BaseApi) GetNginxConfig(c *gin.Context) {
 	helper.SuccessWithData(c, config)
 }
 
-// Update nginx conf
 // @Tags Website Nginx
 // @Summary Update nginx conf
 // @Description 更新 nginx 配置
@@ -404,7 +387,6 @@ func (b *BaseApi) UpdateNginxConfig(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Load https conf
 // @Tags Website HTTPS
 // @Summary Load https conf
 // @Description 获取 https 配置
@@ -412,7 +394,7 @@ func (b *BaseApi) UpdateNginxConfig(c *gin.Context) {
 // @Param id path integer true "request"
 // @Success 200 {object} response.WebsiteHTTPS
 // @Security ApiKeyAuth
-// @Router /websites/:id/https [post]
+// @Router /websites/:id/https [get]
 func (b *BaseApi) GetHTTPSConfig(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
@@ -427,13 +409,12 @@ func (b *BaseApi) GetHTTPSConfig(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
-// Update https conf
 // @Tags Website HTTPS
 // @Summary Update https conf
 // @Description 更新 https 配置
 // @Accept json
 // @Param request body request.WebsiteHTTPSOp true "request"
-// @Success 200 {object} request.WebsiteHTTPS
+// @Success 200 {object} response.WebsiteHTTPS
 // @Security ApiKeyAuth
 // @Router /websites/:id/https [post]
 // @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"websiteId","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"更新网站 [domain] https 配置","formatEN":"Update website https [domain] conf"}
@@ -454,7 +435,6 @@ func (b *BaseApi) UpdateHTTPSConfig(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
-// Check before create website
 // @Tags Website
 // @Summary Check before create website
 // @Description 网站创建前检查
@@ -477,13 +457,12 @@ func (b *BaseApi) CreateWebsiteCheck(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
-// Load websit waf conf
 // @Tags Website WAF
 // @Summary Load websit waf conf
 // @Description 获取网站 waf 配置
 // @Accept json
 // @Param request body request.WebsiteWafReq true "request"
-// @Success 200 {object} request.WebsiteWafConfig
+// @Success 200 {object} response.WebsiteWafConfig
 // @Security ApiKeyAuth
 // @Router /websites/waf/config [post]
 func (b *BaseApi) GetWebsiteWafConfig(c *gin.Context) {
@@ -500,7 +479,6 @@ func (b *BaseApi) GetWebsiteWafConfig(c *gin.Context) {
 	helper.SuccessWithData(c, data)
 }
 
-// Update website waf conf
 // @Tags Website WAF
 // @Summary Update website waf conf
 // @Description 更新 网站 waf 配置
@@ -523,7 +501,6 @@ func (b *BaseApi) UpdateWebsiteWafConfig(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Update website nginx conf
 // @Tags Website Nginx
 // @Summary Update website nginx conf
 // @Description 更新 网站 nginx 配置
@@ -546,7 +523,6 @@ func (b *BaseApi) UpdateWebsiteNginxConfig(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
-// Operate website log
 // @Tags Website
 // @Summary Operate website log
 // @Description 操作网站日志
@@ -570,7 +546,6 @@ func (b *BaseApi) OpWebsiteLog(c *gin.Context) {
 	helper.SuccessWithData(c, res)
 }
 
-// Change default server
 // @Tags Website
 // @Summary Change default server
 // @Description 操作网站日志
