@@ -43,5 +43,6 @@ var (
 
 	nginxService = service.ServiceGroupApp.NginxService
 
-	logService = service.ServiceGroupApp.LogService
+	logService      = service.ServiceGroupApp.LogService
+	snapshotService = service.ServiceGroupApp.SnapshotService
 )

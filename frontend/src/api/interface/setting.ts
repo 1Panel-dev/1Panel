@@ -1,3 +1,5 @@
+import { DateTimeFormats } from '@intlify/core-base';
+
 export namespace Setting {
     export interface SettingInfo {
         userName: string;
@@ -42,5 +44,18 @@ export namespace Setting {
     export interface MFABind {
         secret: string;
         code: string;
+    }
+    export interface SnapshotCreate {
+        description: string;
+        backupType: string;
+    }
+    export interface SnapshotInfo {
+        id: number;
+        name: string;
+        description: string;
+        backupType: string;
+        status: string;
+        message: string;
+        createdAt: DateTimeFormats;
     }
 }

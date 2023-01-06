@@ -641,7 +641,7 @@ func backupMysql(backupType, baseDir, backupDir, mysqlName, dbName, fileName str
 		}
 	}
 	outfile, _ := os.OpenFile(fullDir+"/"+fileName, os.O_RDWR|os.O_CREATE, 0755)
-	global.LOG.Infof("start to mysqldump | gzip > %s.gzip", outfile)
+	global.LOG.Infof("start to mysqldump | gzip > %s.gzip", fullDir+"/"+fileName)
 	cmd := exec.Command("docker", "exec", app.ContainerName, "mysqldump", "-uroot", "-p"+app.Password, dbName)
 	gzipCmd := exec.Command("gzip", "-cf")
 	gzipCmd.Stdin, _ = cmd.StdoutPipe()

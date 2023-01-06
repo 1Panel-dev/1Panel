@@ -603,6 +603,7 @@ export default {
             containers: 'Container',
             commands: 'Command',
             groups: 'System Group',
+            files: 'File Manage',
             backups: 'Backup Account',
             logs: 'Panel Logs',
             settings: 'Panel Setting',
@@ -734,6 +735,8 @@ export default {
         mfaHelper1: 'Download a MFA verification mobile app such as:',
         mfaHelper2: 'Scan the following QR code using the mobile app to obtain the 6-digit verification code',
         mfaHelper3: 'Enter six digits from the app',
+
+        snapshot: 'Snapshot',
 
         enableMonitor: 'Enable',
         storeDays: 'Expiration time (day)',

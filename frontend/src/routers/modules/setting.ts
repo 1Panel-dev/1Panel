@@ -16,6 +16,7 @@ const settingRouter = {
             component: () => import('@/views/setting/panel/index.vue'),
             hidden: true,
             meta: {
+                requiresAuth: true,
                 key: 'Setting',
             },
         },
@@ -25,6 +26,7 @@ const settingRouter = {
             component: () => import('@/views/setting/backup-account/index.vue'),
             hidden: true,
             meta: {
+                requiresAuth: true,
                 key: 'Setting',
             },
         },
@@ -34,6 +36,7 @@ const settingRouter = {
             component: () => import('@/views/setting/about/index.vue'),
             hidden: true,
             meta: {
+                requiresAuth: true,
                 key: 'Setting',
             },
         },
@@ -43,6 +46,7 @@ const settingRouter = {
             component: () => import('@/views/setting/monitor/index.vue'),
             hidden: true,
             meta: {
+                requiresAuth: true,
                 key: 'Setting',
             },
         },
@@ -52,6 +56,17 @@ const settingRouter = {
             component: () => import('@/views/setting/safe/index.vue'),
             hidden: true,
             meta: {
+                requiresAuth: true,
+                key: 'Setting',
+            },
+        },
+        {
+            path: '/setting/snapshot',
+            name: 'Snapshot',
+            hidden: true,
+            component: () => import('@/views/setting/snapshot/index.vue'),
+            meta: {
+                requiresAuth: true,
                 key: 'Setting',
             },
         },

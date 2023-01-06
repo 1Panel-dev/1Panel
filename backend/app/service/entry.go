@@ -37,6 +37,7 @@ type ServiceGroup struct {
 	NginxService
 
 	LogService
+	SnapshotService
 }
 
 var ServiceGroupApp = new(ServiceGroup)
@@ -73,5 +74,6 @@ var (
 	websiteSSLRepo    = repo.NewISSLRepo()
 	websiteAcmeRepo   = repo.NewIAcmeAccountRepo()
 
-	logRepo = repo.RepoGroupApp.LogRepo
+	logRepo      = repo.RepoGroupApp.LogRepo
+	snapshotRepo = repo.NewISnapshotRepo()
 )

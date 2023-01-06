@@ -202,3 +202,13 @@ var AddTableWebsite = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddTableSnapshot = &gormigrate.Migration{
+	ID: "20230106-add-table-snapshot",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Snapshot{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
