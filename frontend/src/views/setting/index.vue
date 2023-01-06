@@ -11,6 +11,9 @@
                 <el-radio-button class="topRouterButton" size="default" label="backupaccount">
                     {{ $t('setting.backupAccount') }}
                 </el-radio-button>
+                <el-radio-button class="topRouterButton" size="default" label="snapshot">
+                    {{ $t('setting.snapshot') }}
+                </el-radio-button>
                 <el-radio-button class="topRouterButton" size="default" label="monitor">
                     {{ $t('menu.monitor') }}
                 </el-radio-button>
@@ -53,6 +56,8 @@ const handleChange = (val: string) => {
         case 'about':
             routerTo('/setting/about');
             break;
+        case 'snapshot':
+            routerTo('/setting/snapshot');
     }
 };
 </script>

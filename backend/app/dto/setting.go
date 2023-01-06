@@ -1,5 +1,7 @@
 package dto
 
+import "time"
+
 type SettingInfo struct {
 	UserName string `json:"userName"`
 	Email    string `json:"email"`
@@ -36,4 +38,18 @@ type SettingUpdate struct {
 type PasswordUpdate struct {
 	OldPassword string `json:"oldPassword" validate:"required"`
 	NewPassword string `json:"newPassword" validate:"required"`
+}
+
+type SnapshotCreate struct {
+	BackupType  string `json:"backupType" validate:"required,oneof=OSS S3 SFTP MINIO"`
+	Description string `json:"description"`
+}
+type SnapshotInfo struct {
+	ID          uint      `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	BackupType  string    `json:"backupType"`
+	Status      string    `json:"status"`
+	Message     string    `json:"message"`
+	CreatedAt   time.Time `json:"createdAt"`
 }

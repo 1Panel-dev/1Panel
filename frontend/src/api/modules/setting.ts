@@ -1,4 +1,5 @@
 import http from '@/api';
+import { ReqPage, ResPage } from '../interface';
 import { Setting } from '../interface/setting';
 
 export const getSettingInfo = () => {
@@ -35,4 +36,12 @@ export const loadDaemonJsonPath = () => {
 
 export const bindMFA = (param: Setting.MFABind) => {
     return http.post(`/settings/mfa/bind`, param);
+};
+
+// snapshot
+export const snapshotCreate = (param: Setting.SnapshotCreate) => {
+    return http.post(`/settings/snapshot`, param);
+};
+export const searchSnapshotPage = (param: ReqPage) => {
+    return http.post<ResPage<Setting.SnapshotInfo>>(`/settings/snapshot/search`, param);
 };

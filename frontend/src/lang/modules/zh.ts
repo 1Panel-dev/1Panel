@@ -617,6 +617,7 @@ export default {
             containers: '容器',
             groups: '系统组',
             commands: '快捷命令',
+            files: '文件管理',
             backups: '备份账号',
             logs: '面板日志',
             settings: '面板设置',
@@ -723,6 +724,8 @@ export default {
         username: '用户名',
         password: '密码',
         path: '路径',
+
+        snapshot: '快照',
 
         safe: '安全',
         panelPort: '面板端口',

@@ -24,5 +24,7 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/monitor/clean", baseApi.CleanMonitor)
 		settingRouter.GET("/mfa", baseApi.GetMFA)
 		settingRouter.POST("/mfa/bind", baseApi.MFABind)
+		settingRouter.POST("/snapshot", baseApi.CreateSnapshot)
+		settingRouter.POST("/snapshot/search", baseApi.SearchSnapshot)
 	}
 }

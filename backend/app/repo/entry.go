@@ -25,6 +25,7 @@ type RepoGroup struct {
 	WebsiteSSLRepo
 	WebsiteAcmeAccountRepo
 	LogRepo
+	SnapshotRepo
 }
 
 var RepoGroupApp = new(RepoGroup)

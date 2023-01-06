@@ -2,6 +2,8 @@ package viper
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/backend/configs"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/fsnotify/fsnotify"
@@ -23,6 +25,13 @@ func Init() {
 			panic(err)
 		}
 	})
+	for _, k := range v.AllKeys() {
+		value := v.GetString(k)
+		if strings.HasPrefix(value, "${") && strings.Contains(value, "}") {
+			itemKey := strings.ReplaceAll(value[strings.Index(value, "${"):strings.Index(value, "}")], "${", "")
+			v.Set(k, strings.ReplaceAll(value, fmt.Sprintf("${%s}", itemKey), v.GetString(itemKey)))
+		}
+	}
 	serverConfig := configs.ServerConfig{}
 	if err := v.Unmarshal(&serverConfig); err != nil {
 		panic(err)

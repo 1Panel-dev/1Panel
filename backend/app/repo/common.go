@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"gorm.io/gorm"
@@ -12,6 +13,7 @@ type DBOption func(*gorm.DB) *gorm.DB
 type ICommonRepo interface {
 	WithByID(id uint) DBOption
 	WithByName(name string) DBOption
+	WithByType(tp string) DBOption
 	WithOrderBy(orderStr string) DBOption
 	WithLikeName(name string) DBOption
 	WithIdsIn(ids []uint) DBOption
@@ -31,9 +33,9 @@ func (c *CommonRepo) WithByName(name string) DBOption {
 	}
 }
 
-func (c *CommonRepo) WithByType(name string) DBOption {
+func (c *CommonRepo) WithByType(tp string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("type = ?", name)
+		return g.Where("type = ?", tp)
 	}
 }
 

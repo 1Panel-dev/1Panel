@@ -167,7 +167,7 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
 		_ = client.ContainerRemove(context.Background(), req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 		return err
 	}
-	global.LOG.Infof("create container successful! now check if the container is started and delete the container information if it is not.", req.Name)
+	global.LOG.Infof("create container %s successful! now check if the container is started and delete the container information if it is not.", req.Name)
 	if err := client.ContainerStart(context.TODO(), container.ID, types.ContainerStartOptions{}); err != nil {
 		_ = client.ContainerRemove(context.Background(), req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 		return fmt.Errorf("create successful but start failed, err: %v", err)
