@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-row :gutter="10">
-            <el-col :span="12" align="center">
+            <el-col :span="6" align="center">
                 <el-popover placement="bottom" :width="300" trigger="hover">
                     <div style="margin-bottom: 10px">
                         <el-tag>{{ baseInfo.cpuModelName }}</el-tag>
@@ -18,7 +18,8 @@
                     <template #reference>
                         <el-progress
                             type="dashboard"
-                            :width="80"
+                            :width="100"
+                            :stroke-width="10"
                             :percentage="formatNumber(currentInfo.cpuUsedPercent)"
                         >
                             <template #default="{ percentage }">
@@ -33,8 +34,13 @@
                     ( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} ) Core
                 </span>
             </el-col>
-            <el-col :span="12" align="center">
-                <el-progress type="dashboard" :width="80" :percentage="formatNumber(currentInfo.MemoryUsedPercent)">
+            <el-col :span="6" align="center">
+                <el-progress
+                    type="dashboard"
+                    :width="100"
+                    :stroke-width="10"
+                    :percentage="formatNumber(currentInfo.MemoryUsedPercent)"
+                >
                     <template #default="{ percentage }">
                         <span class="percentage-value">{{ percentage }}%</span>
                         <span class="percentage-label">{{ $t('monitor.memory') }}</span>
@@ -46,9 +52,7 @@
                     {{ formatNumber(currentInfo.memoryTotal / 1024 / 1024) }} ) MB
                 </span>
             </el-col>
-        </el-row>
-        <el-row :gutter="10" style="margin-top: 30px">
-            <el-col :span="12" align="center">
+            <el-col :span="6" align="center">
                 <el-popover placement="bottom" :width="200" trigger="hover">
                     <el-tag style="margin-top: 5px">
                         {{ $t('home.loadAverage', [1]) }}: {{ formatNumber(currentInfo.load1) }}
@@ -62,7 +66,8 @@
                     <template #reference>
                         <el-progress
                             type="dashboard"
-                            :width="80"
+                            :width="100"
+                            :stroke-width="10"
                             :percentage="formatNumber(currentInfo.loadUsagePercent)"
                         >
                             <template #default="{ percentage }">
@@ -75,7 +80,7 @@
                 <br />
                 <span class="input-help">{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
             </el-col>
-            <el-col :span="12" align="center">
+            <el-col :span="6" align="center">
                 <el-popover placement="bottom" :width="160" trigger="hover">
                     <el-tag>{{ $t('home.mount') }}: /</el-tag>
                     <div><el-tag style="margin-top: 10px">iNode</el-tag></div>
@@ -102,7 +107,12 @@
                         {{ $t('home.percent') }}: {{ formatNumber(currentInfo.usedPercent) }}%
                     </el-tag>
                     <template #reference>
-                        <el-progress type="dashboard" :width="80" :percentage="formatNumber(currentInfo.usedPercent)">
+                        <el-progress
+                            type="dashboard"
+                            :width="100"
+                            :stroke-width="10"
+                            :percentage="formatNumber(currentInfo.usedPercent)"
+                        >
                             <template #default="{ percentage }">
                                 <span class="percentage-value">{{ percentage }}%</span>
                                 <span class="percentage-label">{{ $t('monitor.disk') }}</span>

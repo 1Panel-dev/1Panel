@@ -1,174 +1,149 @@
 <template>
     <div>
-        <el-row :gutter="20" class="row-box">
-            <el-col :span="8">
-                <el-card class="el-card">
-                    <template #header>
-                        <div class="card-header">
-                            <span>{{ $t('home.overview') }}</span>
-                        </div>
+        <el-card class="topRouterCard">
+            <el-radio-group v-model="active">
+                <el-radio-button class="topRouterButton" size="default" label="home">
+                    {{ $t('home.overview') }}
+                </el-radio-button>
+            </el-radio-group>
+        </el-card>
+        <el-row :gutter="20" style="margin-top: 20px">
+            <el-col :span="18">
+                <CardWithHeader :header="$t('home.overview')">
+                    <template #body>
+                        <el-form label-position="top" label-width="100px">
+                            <el-row :gutter="20">
+                                <el-col :span="6" align="center">
+                                    <span style="font-size: 16px">{{ $t('menu.website') }}</span>
+                                    <div>
+                                        <el-link style="font-size: 24px" @click="goRouter('/websites')" type="primary">
+                                            {{ baseInfo?.websiteNumber }}
+                                        </el-link>
+                                    </div>
+                                </el-col>
+                                <el-col :span="6" align="center">
+                                    <span style="font-size: 16px">{{ $t('menu.database') }}</span>
+                                    <div>
+                                        <el-link style="font-size: 24px" @click="goRouter('/databases')" type="primary">
+                                            {{ baseInfo?.databaseNumber }}
+                                        </el-link>
+                                    </div>
+                                </el-col>
+                                <el-col :span="6" align="center">
+                                    <span style="font-size: 16px">{{ $t('menu.cronjob') }}</span>
+                                    <div>
+                                        <el-link style="font-size: 24px" @click="goRouter('/cronjobs')" type="primary">
+                                            {{ baseInfo?.cronjobNumber }}
+                                        </el-link>
+                                    </div>
+                                </el-col>
+                                <el-col :span="6" align="center">
+                                    <span style="font-size: 16px">{{ $t('home.appInstalled') }}</span>
+                                    <div>
+                                        <el-link style="font-size: 24px" @click="goRouter('/apps')" type="primary">
+                                            {{ baseInfo?.appInstalldNumber }}
+                                        </el-link>
+                                    </div>
+                                </el-col>
+                            </el-row>
+                        </el-form>
                     </template>
-                    <el-row :gutter="20">
-                        <el-col :span="12">
-                            <el-card style="font-size: 12px; height: 80px; border-radius: 10px">
-                                <svg-icon style="float: left; margin-left: 5px" iconName="p-website"></svg-icon>
-                                <span style="float: left; margin-left: 5px; margin-top: 10px">
-                                    {{ $t('menu.website') }}
-                                </span>
-                                <el-link
-                                    style="float: right; font-size: 24px; margin-right: 5px"
-                                    @click="goRouter('/websites')"
-                                    type="primary"
-                                >
-                                    {{ baseInfo?.websiteNumber }}
-                                </el-link>
-                            </el-card>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-card style="font-size: 12px; height: 80px; border-radius: 10px">
-                                <svg-icon style="float: left; margin-left: 5px" iconName="p-database"></svg-icon>
-                                <span style="float: left; margin-left: 5px; margin-top: 10px">
-                                    {{ $t('menu.database') }}
-                                </span>
-                                <el-link
-                                    style="float: right; font-size: 24px; margin-right: 5px"
-                                    @click="goRouter('/databases')"
-                                    type="primary"
-                                >
-                                    {{ baseInfo?.databaseNumber }}
-                                </el-link>
-                            </el-card>
-                        </el-col>
-                    </el-row>
-                    <el-row :gutter="20" style="margin-top: 20px; margin-top: 30px">
-                        <el-col :span="12">
-                            <el-card style="font-size: 12px; height: 80px; border-radius: 10px">
-                                <svg-icon style="float: left; margin-left: 5px" iconName="p-plan"></svg-icon>
-                                <span style="float: left; margin-left: 5px; margin-top: 10px">
-                                    {{ $t('menu.cronjob') }}
-                                </span>
-                                <el-link
-                                    style="float: right; font-size: 24px; margin-right: 5px"
-                                    @click="goRouter('/cronjobs')"
-                                    type="primary"
-                                >
-                                    {{ baseInfo?.cronjobNumber }}
-                                </el-link>
-                            </el-card>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-card style="font-size: 12px; height: 80px; border-radius: 10px">
-                                <svg-icon style="float: left; margin-left: 5px" iconName="p-appstore"></svg-icon>
-                                <span style="float: left; margin-left: 5px; margin-top: 10px">
-                                    {{ $t('home.appInstalled') }}
-                                </span>
-                                <el-link
-                                    style="float: right; font-size: 24px; margin-right: 5px"
-                                    @click="goRouter('/apps')"
-                                    type="primary"
-                                >
-                                    {{ baseInfo?.appInstalldNumber }}
-                                </el-link>
-                            </el-card>
-                        </el-col>
-                    </el-row>
-                </el-card>
-            </el-col>
-            <el-col :span="8">
-                <el-card class="el-card">
-                    <template #header>
-                        <div class="card-header">
-                            <span>{{ $t('commons.table.status') }}</span>
-                        </div>
+                </CardWithHeader>
+                <CardWithHeader :header="$t('commons.table.status')" style="margin-top: 20px">
+                    <template #body>
+                        <Status ref="statuRef" />
                     </template>
-                    <Status ref="statuRef" />
-                </el-card>
-            </el-col>
-            <el-col :span="8">
-                <el-card class="el-card">
-                    <template #header>
-                        <div class="card-header">
-                            <span>{{ $t('home.systemInfo') }}</span>
+                </CardWithHeader>
+                <CardWithHeader :header="$t('menu.monitor')" style="margin-top: 20px">
+                    <template #body>
+                        <el-radio-group
+                            style="float: right; margin-left: 5px"
+                            v-model="chartOption"
+                            @change="changeOption"
+                        >
+                            <el-radio-button label="network">{{ $t('home.network') }}</el-radio-button>
+                            <el-radio-button label="io">{{ $t('home.io') }}</el-radio-button>
+                        </el-radio-group>
+                        <el-select
+                            v-if="chartOption === 'network'"
+                            @change="onLoadBaseInfo(false, 'network')"
+                            v-model="searchInfo.netOption"
+                            style="float: right"
+                        >
+                            <el-option v-for="item in netOptions" :key="item" :label="item" :value="item" />
+                        </el-select>
+                        <el-select
+                            v-if="chartOption === 'io'"
+                            v-model="searchInfo.ioOption"
+                            @change="onLoadBaseInfo(false, 'io')"
+                            style="float: right"
+                        >
+                            <el-option v-for="item in ioOptions" :key="item" :label="item" :value="item" />
+                        </el-select>
+                        <div style="margin-top: 20px; margin-left: 8px" v-if="chartOption === 'network'">
+                            <el-tag>{{ $t('monitor.up') }}: {{ currentChartInfo.netBytesSent }} KB/s</el-tag>
+                            <el-tag style="margin-left: 20px">
+                                {{ $t('monitor.down') }}: {{ currentChartInfo.netBytesRecv }} KB/s
+                            </el-tag>
+                            <el-tag style="margin-left: 20px">
+                                {{ $t('home.totalSend') }}: {{ computeSize(currentInfo.netBytesSent) }}
+                            </el-tag>
+                            <el-tag style="margin-left: 20px">
+                                {{ $t('home.totalRecv') }}: {{ computeSize(currentInfo.netBytesRecv) }}
+                            </el-tag>
                         </div>
+                        <div style="margin-top: 20px" v-if="chartOption === 'io'">
+                            <el-tag>{{ $t('monitor.read') }}: {{ currentChartInfo.ioReadBytes }} MB</el-tag>
+                            <el-tag style="margin-left: 20px">
+                                {{ $t('monitor.write') }}: {{ currentChartInfo.ioWriteBytes }} MB
+                            </el-tag>
+                            <el-tag style="margin-left: 20px">
+                                {{ $t('home.rwPerSecond') }}: {{ currentChartInfo.ioCount }} {{ $t('home.time') }}
+                            </el-tag>
+                            <el-tag style="margin-left: 20px">
+                                {{ $t('home.rwPerSecond') }}: {{ currentInfo.ioTime }} ms
+                            </el-tag>
+                        </div>
+                        <div
+                            v-if="chartOption === 'io'"
+                            id="ioChart"
+                            style="margin-top: 20px; width: 100%; height: 320px"
+                        ></div>
+                        <div
+                            v-if="chartOption === 'network'"
+                            id="networkChart"
+                            style="margin-top: 20px; width: 100%; height: 320px"
+                        ></div>
                     </template>
-                    <el-form>
-                        <el-form-item :label="$t('home.hostname')">{{ baseInfo.hostname }}</el-form-item>
-                        <el-form-item :label="$t('home.platformVersion')">
-                            {{ baseInfo.platform }}-{{ baseInfo.platformVersion }}
-                        </el-form-item>
-                        <el-form-item :label="$t('home.kernelVersion')">
-                            {{ baseInfo.kernelVersion }}
-                        </el-form-item>
-                        <el-form-item :label="$t('home.kernelArch')">{{ baseInfo.kernelArch }}</el-form-item>
-                        <el-form-item :label="$t('home.uptime')">{{ currentInfo.timeSinceUptime }}</el-form-item>
-                        <el-form-item :label="$t('home.runningTime')">
-                            {{ loadUpTime(currentInfo.uptime) }}
-                        </el-form-item>
-                    </el-form>
-                </el-card>
+                </CardWithHeader>
             </el-col>
-        </el-row>
-        <el-row :gutter="20" style="margin-top: 20px" class="row-box">
-            <el-col :span="12">
-                <App ref="appRef" />
-            </el-col>
-            <el-col :span="12">
-                <el-card class="el-card">
-                    <el-radio-group v-model="chartOption" @change="changeOption">
-                        <el-radio-button label="network">{{ $t('home.network') }}</el-radio-button>
-                        <el-radio-button label="io">{{ $t('home.io') }}</el-radio-button>
-                    </el-radio-group>
-                    <el-select
-                        v-if="chartOption === 'network'"
-                        @change="onLoadBaseInfo(false, 'network')"
-                        v-model="searchInfo.netOption"
-                        style="float: right"
-                    >
-                        <el-option v-for="item in netOptions" :key="item" :label="item" :value="item" />
-                    </el-select>
-                    <el-select
-                        v-if="chartOption === 'io'"
-                        v-model="searchInfo.ioOption"
-                        @change="onLoadBaseInfo(false, 'io')"
-                        style="float: right"
-                    >
-                        <el-option v-for="item in ioOptions" :key="item" :label="item" :value="item" />
-                    </el-select>
-                    <div style="margin-top: 20px" v-if="chartOption === 'network'">
-                        <el-tag>{{ $t('monitor.up') }}: {{ currentChartInfo.netBytesSent }} KB/s</el-tag>
-                        <el-tag style="margin-left: 20px">
-                            {{ $t('monitor.down') }}: {{ currentChartInfo.netBytesRecv }} KB/s
-                        </el-tag>
-                        <el-tag style="margin-left: 20px">
-                            {{ $t('home.totalSend') }}: {{ computeSize(currentInfo.netBytesSent) }}
-                        </el-tag>
-                        <el-tag style="margin-left: 20px">
-                            {{ $t('home.totalRecv') }}: {{ computeSize(currentInfo.netBytesRecv) }}
-                        </el-tag>
-                    </div>
-                    <div style="margin-top: 20px" v-if="chartOption === 'io'">
-                        <el-tag>{{ $t('monitor.read') }}: {{ currentChartInfo.ioReadBytes }} MB</el-tag>
-                        <el-tag style="margin-left: 20px">
-                            {{ $t('monitor.write') }}: {{ currentChartInfo.ioWriteBytes }} MB
-                        </el-tag>
-                        <el-tag style="margin-left: 20px">
-                            {{ $t('home.rwPerSecond') }}: {{ currentChartInfo.ioCount }} {{ $t('home.time') }}
-                        </el-tag>
-                        <el-tag style="margin-left: 20px">
-                            {{ $t('home.rwPerSecond') }}: {{ currentInfo.ioTime }} ms
-                        </el-tag>
-                    </div>
-                    <div
-                        v-if="chartOption === 'io'"
-                        id="ioChart"
-                        style="margin-top: 20px; width: 100%; height: 320px"
-                    ></div>
-                    <div
-                        v-if="chartOption === 'network'"
-                        id="networkChart"
-                        style="margin-top: 20px; width: 100%; height: 320px"
-                    ></div>
-                </el-card>
+            <el-col :span="6">
+                <CardWithHeader :header="$t('home.systemInfo')">
+                    <template #body>
+                        <el-form style="margin-left: 10px">
+                            <el-form-item style="margin-top: 15px" :label="$t('home.hostname')">
+                                {{ baseInfo.hostname }}
+                            </el-form-item>
+                            <el-form-item :label="$t('home.platformVersion')">
+                                {{ baseInfo.platform }}-{{ baseInfo.platformVersion }}
+                            </el-form-item>
+                            <el-form-item :label="$t('home.kernelVersion')">
+                                {{ baseInfo.kernelVersion }}
+                            </el-form-item>
+                            <el-form-item :label="$t('home.kernelArch')">{{ baseInfo.kernelArch }}</el-form-item>
+                            <el-form-item :label="$t('home.uptime')">{{ currentInfo.timeSinceUptime }}</el-form-item>
+                            <el-form-item :label="$t('home.runningTime')">
+                                {{ loadUpTime(currentInfo.uptime) }}
+                            </el-form-item>
+                        </el-form>
+                    </template>
+                </CardWithHeader>
+
+                <CardWithHeader :header="$t('home.app')" style="margin-top: 20px">
+                    <template #body>
+                        <App ref="appRef" />
+                    </template>
+                </CardWithHeader>
             </el-col>
         </el-row>
     </div>
@@ -179,6 +154,7 @@ import { onMounted, onBeforeUnmount, ref, reactive } from 'vue';
 import * as echarts from 'echarts';
 import Status from '@/views/home/status/index.vue';
 import App from '@/views/home/app/index.vue';
+import CardWithHeader from '@/components/card-with-header/index.vue';
 import i18n from '@/lang';
 import { Dashboard } from '@/api/interface/dashboard';
 import { dateFromatForSecond, computeSize } from '@/utils/util';
@@ -187,6 +163,7 @@ import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
 const router = useRouter();
 
+const active = ref('home');
 const statuRef = ref();
 const appRef = ref();
 
@@ -535,10 +512,10 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style scoped>
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+<style scoped lang="scss">
+.el-form-item--small {
+    --font-size: 14px;
+    --el-form-label-font-size: var(--font-size);
+    margin-bottom: 8px;
 }
 </style>
