@@ -391,6 +391,8 @@ definitions:
         type: array
       status:
         type: string
+      version:
+        type: string
     type: object
   dto.DaemonJsonUpdateByFile:
     properties:
@@ -1278,6 +1280,8 @@ definitions:
         type: string
       sessionTimeout:
         type: string
+      systemVersion:
+        type: string
       theme:
         type: string
       userName:
@@ -1293,6 +1297,44 @@ definitions:
         type: string
     required:
     - key
+    type: object
+  dto.SnapshotCreate:
+    properties:
+      description:
+        type: string
+      from:
+        enum:
+        - OSS
+        - S3
+        - SFTP
+        - MINIO
+        type: string
+    required:
+    - from
+    type: object
+  dto.SnapshotRecover:
+    properties:
+      id:
+        type: integer
+      isNew:
+        type: boolean
+      reDownload:
+        type: boolean
+    required:
+    - id
+    type: object
+  dto.UpgradeInfo:
+    properties:
+      createdAt:
+        type: string
+      newVersion:
+        type: string
+      publishedAt:
+        type: string
+      releaseNote:
+        type: string
+      tag:
+        type: string
     type: object
   dto.UploadRecover:
     properties:
@@ -6314,19 +6356,6 @@ paths:
         formatEN: Update nginx conf [domain]
         formatZH: 更新 nginx 配置 [domain]
         paramKeys: []
-  /settings/daemonjson:
-    get:
-      description: 加载 docker 配置路径
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: Load daemon.json path
-      tags:
-      - System Setting
   /settings/expired/handle:
     post:
       consumes:
@@ -6448,6 +6477,155 @@ paths:
       summary: Load system setting info
       tags:
       - System Setting
+  /settings/snapshot:
+    post:
+      consumes:
+      - application/json
+      description: 创建系统快照
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SnapshotCreate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create system backup
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        - description
+        formatEN: Create system backup [name][description]
+        formatZH: 创建系统快照 [name][description]
+        paramKeys: []
+  /settings/snapshot/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除系统快照
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BatchDeleteReq'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete system backup
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions:
+        - db: snapshots
+          input_colume: id
+          input_value: ids
+          isList: true
+          output_colume: name
+          output_value: name
+        bodyKeys:
+        - ids
+        formatEN: Delete system backup [name]
+        formatZH: 删除系统快照 [name]
+        paramKeys: []
+  /settings/snapshot/recover:
+    post:
+      consumes:
+      - application/json
+      description: 从系统快照恢复
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SnapshotRecover'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Recover system backup
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions:
+        - db: snapshots
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: name
+          output_value: name
+        bodyKeys:
+        - id
+        formatEN: Recover from system backup [name]
+        formatZH: 从系统快照 [name] 恢复
+        paramKeys: []
+  /settings/snapshot/rollback:
+    post:
+      consumes:
+      - application/json
+      description: 从系统快照回滚
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SnapshotRecover'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Rollback system backup
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions:
+        - db: snapshots
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: name
+          output_value: name
+        bodyKeys:
+        - id
+        formatEN: Rollback from system backup [name]
+        formatZH: 从系统快照 [name] 回滚
+        paramKeys: []
+  /settings/snapshot/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取系统快照列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PageInfo'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page system snapshot
+      tags:
+      - System Setting
   /settings/time/sync:
     post:
       description: 系统时间同步
@@ -6495,6 +6673,19 @@ paths:
         formatEN: update system setting [key] => [value]
         formatZH: 修改系统配置 [key] => [value]
         paramKeys: []
+  /settings/upgrade:
+    get:
+      description: 加载系统更新信息
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UpgradeInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Load upgrade info
+      tags:
+      - System Setting
   /websites:
     post:
       consumes:

@@ -1,18 +1,19 @@
 package cache
 
 import (
+	"time"
+
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/init/cache/badger_db"
 	"github.com/dgraph-io/badger/v3"
-	"time"
 )
 
 func Init() {
-	c := global.CONF.Cache
+	c := global.CONF.System.Cache
 
 	options := badger.Options{
-		Dir:                c.Path,
-		ValueDir:           c.Path,
+		Dir:                c,
+		ValueDir:           c,
 		ValueLogFileSize:   102400000,
 		ValueLogMaxEntries: 100000,
 		VLogPercentile:     0.1,

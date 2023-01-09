@@ -127,8 +127,6 @@ import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { dateFromat } from '@/utils/util';
 
-const emit = defineEmits(['search']);
-
 const loading = ref(false);
 const form = reactive({
     serverPort: '',
@@ -207,7 +205,7 @@ const handleMFA = async () => {
         await updateSetting({ key: 'MFAStatus', value: 'disable' })
             .then(() => {
                 loading.value = false;
-                emit('search');
+                search();
                 ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {
@@ -221,7 +219,7 @@ const onBind = async () => {
     await bindMFA({ code: mfaCode.value, secret: otp.secret })
         .then(() => {
             loading.value = false;
-            emit('search');
+            search();
             ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
             isMFAShow.value = false;
         })
@@ -249,7 +247,7 @@ const submitTimeout = async (formEl: FormInstance | undefined) => {
         await updateSetting({ key: 'ExpirationDays', value: timeoutForm.days + '' })
             .then(() => {
                 loading.value = false;
-                emit('search');
+                search();
                 loadTimeOut();
                 form.expirationTime = dateFromat(0, 0, time);
                 timeoutVisiable.value = false;

@@ -42,6 +42,20 @@ export const bindMFA = (param: Setting.MFABind) => {
 export const snapshotCreate = (param: Setting.SnapshotCreate) => {
     return http.post(`/settings/snapshot`, param);
 };
+export const snapshotDelete = (param: { ids: number[] }) => {
+    return http.post(`/settings/snapshot/del`, param);
+};
+export const snapshotRecover = (param: Setting.SnapshotRecover) => {
+    return http.post(`/settings/snapshot/recover`, param);
+};
+export const snapshotRollback = (param: Setting.SnapshotRecover) => {
+    return http.post(`/settings/snapshot/rollback`, param);
+};
 export const searchSnapshotPage = (param: ReqPage) => {
     return http.post<ResPage<Setting.SnapshotInfo>>(`/settings/snapshot/search`, param);
+};
+
+// upgrade
+export const loadUpgradeInfo = () => {
+    return http.get<Setting.UpgradeInfo>(`/settings/upgrade`);
 };

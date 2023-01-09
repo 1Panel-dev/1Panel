@@ -33,7 +33,7 @@ type Cronjob struct {
 type JobRecords struct {
 	BaseModel
 
-	CronjobID uint      `gorm:"type:varchar(64);not null" json:"cronjobID"`
+	CronjobID uint      `gorm:"type:decimal" json:"cronjobID"`
 	StartTime time.Time `gorm:"type:datetime" json:"startTime"`
 	Interval  float64   `gorm:"type:float" json:"interval"`
 	Records   string    `gorm:"longtext" json:"records"`

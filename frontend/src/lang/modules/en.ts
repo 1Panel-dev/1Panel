@@ -27,6 +27,7 @@ export default {
             log: 'Log',
             back: 'Back',
             recover: 'Recover',
+            retry: 'Retry',
             upload: 'Upload',
             download: 'Download',
             init: 'Init',
@@ -51,6 +52,7 @@ export default {
             records: 'Records',
             group: 'Group',
             createdAt: 'Creation Time',
+            publishedAt: 'Publish Time',
             date: 'Date',
             updatedAt: 'Update Time',
             operate: 'Operations',
@@ -737,6 +739,27 @@ export default {
         mfaHelper3: 'Enter six digits from the app',
 
         snapshot: 'Snapshot',
+        recoverDetail: 'Recover detail',
+        createSnapshot: 'Create snapshot',
+        recover: 'Recover',
+        noRecoverRecord: 'No recovery record has been recorded',
+        lastRecoverAt: 'Last recovery time',
+        lastRollbackAt: 'Last rollback time',
+        noRollbackRecord: 'No rollback record has been recorded',
+        reDownload: 'Download the backup file again',
+        recoverRecord: 'Recover record',
+        recoverHelper:
+            'The recovery is about to start from snapshot {0}, and the recovery needs to restart docker and 1panel service, do you want to continue?',
+        rollback: 'Rollback',
+        rollbackHelper:
+            'This recovery is about to be rolled back, which will replace all the files recovered this time. In the process, docker and 1panel services may need to be restarted. Do you want to continue?',
+
+        upgrade: 'Upgrade',
+        newVersion: 'NewVersion',
+        upgradeCheck: 'Check for updates',
+        tag: 'Tag',
+        upgradeNotes: 'Release note',
+        upgradeNow: 'Upgrade now',
 
         enableMonitor: 'Enable',
         storeDays: 'Expiration time (day)',

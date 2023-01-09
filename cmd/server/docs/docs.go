@@ -5976,28 +5976,6 @@ var doc = `{
                 }
             }
         },
-        "/settings/daemonjson": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "加载 docker 配置路径",
-                "tags": [
-                    "System Setting"
-                ],
-                "summary": "Load daemon.json path",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/settings/expired/handle": {
             "post": {
                 "security": [
@@ -6188,6 +6166,238 @@ var doc = `{
                 }
             }
         },
+        "/settings/snapshot": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建系统快照",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Create system backup",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SnapshotCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name",
+                        "description"
+                    ],
+                    "formatEN": "Create system backup [name][description]",
+                    "formatZH": "创建系统快照 [name][description]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/settings/snapshot/del": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "删除系统快照",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Delete system backup",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BatchDeleteReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "snapshots",
+                            "input_colume": "id",
+                            "input_value": "ids",
+                            "isList": true,
+                            "output_colume": "name",
+                            "output_value": "name"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "ids"
+                    ],
+                    "formatEN": "Delete system backup [name]",
+                    "formatZH": "删除系统快照 [name]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/settings/snapshot/recover": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "从系统快照恢复",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Recover system backup",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SnapshotRecover"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "snapshots",
+                            "input_colume": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_colume": "name",
+                            "output_value": "name"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "id"
+                    ],
+                    "formatEN": "Recover from system backup [name]",
+                    "formatZH": "从系统快照 [name] 恢复",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/settings/snapshot/rollback": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "从系统快照回滚",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Rollback system backup",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SnapshotRecover"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "snapshots",
+                            "input_colume": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_colume": "name",
+                            "output_value": "name"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "id"
+                    ],
+                    "formatEN": "Rollback from system backup [name]",
+                    "formatZH": "从系统快照 [name] 回滚",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/settings/snapshot/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取系统快照列表分页",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Page system snapshot",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
+                    }
+                }
+            }
+        },
         "/settings/time/sync": {
             "post": {
                 "security": [
@@ -6257,6 +6467,28 @@ var doc = `{
                     "formatEN": "update system setting [key] =\u003e [value]",
                     "formatZH": "修改系统配置 [key] =\u003e [value]",
                     "paramKeys": []
+                }
+            }
+        },
+        "/settings/upgrade": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "加载系统更新信息",
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Load upgrade info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpgradeInfo"
+                        }
+                    }
                 }
             }
         },
@@ -8629,6 +8861,9 @@ var doc = `{
                 },
                 "status": {
                     "type": "string"
+                },
+                "version": {
+                    "type": "string"
                 }
             }
         },
@@ -9960,6 +10195,9 @@ var doc = `{
                 "sessionTimeout": {
                     "type": "string"
                 },
+                "systemVersion": {
+                    "type": "string"
+                },
                 "theme": {
                     "type": "string"
                 },
@@ -9981,6 +10219,63 @@ var doc = `{
                     "type": "string"
                 },
                 "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SnapshotCreate": {
+            "type": "object",
+            "required": [
+                "from"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string",
+                    "enum": [
+                        "OSS",
+                        "S3",
+                        "SFTP",
+                        "MINIO"
+                    ]
+                }
+            }
+        },
+        "dto.SnapshotRecover": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "isNew": {
+                    "type": "boolean"
+                },
+                "reDownload": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "dto.UpgradeInfo": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "newVersion": {
+                    "type": "string"
+                },
+                "publishedAt": {
+                    "type": "string"
+                },
+                "releaseNote": {
+                    "type": "string"
+                },
+                "tag": {
                     "type": "string"
                 }
             }

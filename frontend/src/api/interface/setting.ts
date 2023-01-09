@@ -5,6 +5,7 @@ export namespace Setting {
         userName: string;
         password: string;
         email: string;
+        systemVersion: string;
 
         sessionTimeout: number;
         localTime: string;
@@ -46,16 +47,36 @@ export namespace Setting {
         code: string;
     }
     export interface SnapshotCreate {
+        from: string;
         description: string;
-        backupType: string;
+    }
+    export interface SnapshotRecover {
+        id: number;
+        isNew: boolean;
+        reDownload: boolean;
     }
     export interface SnapshotInfo {
         id: number;
         name: string;
+        from: string;
         description: string;
-        backupType: string;
         status: string;
         message: string;
         createdAt: DateTimeFormats;
+        version: string;
+        interruptStep: string;
+        recoverStatus: string;
+        recoverMessage: string;
+        lastRecoveredAt: string;
+        rollbackStatus: string;
+        rollbackMessage: string;
+        lastRollbackedAt: string;
+    }
+    export interface UpgradeInfo {
+        newVersion: string;
+        tag: string;
+        releaseNote: string;
+        createdAt: string;
+        publishedAt: string;
     }
 }

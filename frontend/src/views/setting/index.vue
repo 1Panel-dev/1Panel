@@ -58,6 +58,7 @@ const handleChange = (val: string) => {
             break;
         case 'snapshot':
             routerTo('/setting/snapshot');
+            break;
     }
 };
 </script>

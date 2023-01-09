@@ -1,11 +1,10 @@
 package configs
 
 type ServerConfig struct {
-	Sqlite    Sqlite    `mapstructure:"sqlite"`
+	BaseDir   string    `mapstructure:"base_dir"`
 	System    System    `mapstructure:"system"`
+	Sqlite    Sqlite    `mapstructure:"sqlite"`
 	LogConfig LogConfig `mapstructure:"log"`
 	CORS      CORS      `mapstructure:"cors"`
 	Encrypt   Encrypt   `mapstructure:"encrypt"`
-	Csrf      Csrf      `mapstructure:"csrf"`
-	Cache     Cache     `mapstructure:"cache"`
 }

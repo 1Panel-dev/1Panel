@@ -21,9 +21,8 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gogf/gf v1.16.9
 	github.com/golang-jwt/jwt/v4 v4.4.2
-	github.com/gorilla/csrf v1.7.1
+	github.com/google/go-github v17.0.0+incompatible
 	github.com/gorilla/websocket v1.5.0
-	github.com/gwatts/gin-adapter v1.0.0
 	github.com/jinzhu/copier v0.3.5
 	github.com/joho/godotenv v1.4.0
 	github.com/mholt/archiver/v4 v4.0.0-alpha.7
@@ -95,7 +94,6 @@ require (
 	github.com/google/flatbuffers v1.12.1 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect

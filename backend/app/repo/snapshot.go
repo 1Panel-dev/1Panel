@@ -7,9 +7,10 @@ import (
 
 type ISnapshotRepo interface {
 	Get(opts ...DBOption) (model.Snapshot, error)
-	Page(limit, offset int, opts ...DBOption) (int64, []model.Snapshot, error)
-	Create(snapshot *model.Snapshot) error
+	GetList(opts ...DBOption) ([]model.Snapshot, error)
+	Create(snap *model.Snapshot) error
 	Update(id uint, vars map[string]interface{}) error
+	Page(limit, offset int, opts ...DBOption) (int64, []model.Snapshot, error)
 	Delete(opts ...DBOption) error
 }
 
@@ -20,13 +21,23 @@ func NewISnapshotRepo() ISnapshotRepo {
 type SnapshotRepo struct{}
 
 func (u *SnapshotRepo) Get(opts ...DBOption) (model.Snapshot, error) {
-	var snapshot model.Snapshot
+	var Snapshot model.Snapshot
 	db := global.DB
 	for _, opt := range opts {
 		db = opt(db)
 	}
-	err := db.First(&snapshot).Error
-	return snapshot, err
+	err := db.First(&Snapshot).Error
+	return Snapshot, err
+}
+
+func (u *SnapshotRepo) GetList(opts ...DBOption) ([]model.Snapshot, error) {
+	var snaps []model.Snapshot
+	db := global.DB.Model(&model.Snapshot{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	err := db.Find(&snaps).Error
+	return snaps, err
 }
 
 func (u *SnapshotRepo) Page(page, size int, opts ...DBOption) (int64, []model.Snapshot, error) {
@@ -41,8 +52,8 @@ func (u *SnapshotRepo) Page(page, size int, opts ...DBOption) (int64, []model.Sn
 	return count, users, err
 }
 
-func (u *SnapshotRepo) Create(snapshot *model.Snapshot) error {
-	return global.DB.Create(snapshot).Error
+func (u *SnapshotRepo) Create(Snapshot *model.Snapshot) error {
+	return global.DB.Create(Snapshot).Error
 }
 
 func (u *SnapshotRepo) Update(id uint, vars map[string]interface{}) error {

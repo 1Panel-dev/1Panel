@@ -9,16 +9,15 @@ import (
 type SettingRouter struct{}
 
 func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
-	baseRouter := Router.Group("settings")
 	settingRouter := Router.Group("settings").
 		Use(middleware.JwtAuth()).
 		Use(middleware.SessionAuth()).
 		Use(middleware.PasswordExpired())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		baseRouter.POST("/search", baseApi.GetSettingInfo)
-		baseRouter.POST("/expired/handle", baseApi.HandlePasswordExpired)
-		baseRouter.POST("/update", baseApi.UpdateSetting)
+		settingRouter.POST("/search", baseApi.GetSettingInfo)
+		settingRouter.POST("/expired/handle", baseApi.HandlePasswordExpired)
+		settingRouter.POST("/update", baseApi.UpdateSetting)
 		settingRouter.POST("/password/update", baseApi.UpdatePassword)
 		settingRouter.POST("/time/sync", baseApi.SyncTime)
 		settingRouter.POST("/monitor/clean", baseApi.CleanMonitor)
@@ -26,5 +25,9 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/mfa/bind", baseApi.MFABind)
 		settingRouter.POST("/snapshot", baseApi.CreateSnapshot)
 		settingRouter.POST("/snapshot/search", baseApi.SearchSnapshot)
+		settingRouter.POST("/snapshot/del", baseApi.DeleteSnapshot)
+		settingRouter.POST("/snapshot/recover", baseApi.RecoverSnapshot)
+		settingRouter.POST("/snapshot/rollback", baseApi.RollbackSnapshot)
+		settingRouter.GET("/upgrade", baseApi.GetUpgradeInfo)
 	}
 }
