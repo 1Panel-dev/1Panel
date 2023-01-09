@@ -32,7 +32,14 @@
                         <el-divider direction="vertical" />
                         <el-button type="primary" link @click="onOperate('restart')">{{ $t('app.restart') }}</el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" link @click="setting">{{ $t('commons.button.set') }}</el-button>
+                        <el-button
+                            type="primary"
+                            link
+                            @click="setting"
+                            :disabled="data.status !== 'Running' && data.app === 'OpenResty'"
+                        >
+                            {{ $t('commons.button.set') }}
+                        </el-button>
                     </el-col>
                 </el-row>
             </el-card>

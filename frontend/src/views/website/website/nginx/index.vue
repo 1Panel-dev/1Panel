@@ -1,26 +1,32 @@
 <template>
-    <LayoutContent :header="$t('nginx.nginxConfig')" :reload="true">
-        <el-collapse v-model="activeName" accordion>
-            <el-collapse-item :title="$t('nginx.configResource')" name="1">
-                <Source v-if="activeName === '1'"></Source>
-            </el-collapse-item>
-            <el-collapse-item :title="$t('nginx.status')" name="2">
-                <Status v-if="activeName === '2'" :status="status" />
-            </el-collapse-item>
-            <el-collapse-item :title="$t('website.nginxPer')" name="3">
-                <NginxPer v-if="activeName === '3'" />
-            </el-collapse-item>
-            <el-collapse-item :title="$t('website.log')" name="4">
-                <ContainerLog ref="dialogContainerLogRef" />
-            </el-collapse-item>
-        </el-collapse>
+    <LayoutContent :title="$t('nginx.nginxConfig')" :reload="true">
+        <template #buttons>
+            <el-button type="primary" :plain="activeName !== '1'" @click="changeTab('1')">
+                {{ $t('nginx.configResource') }}
+            </el-button>
+            <el-button type="primary" :plain="activeName !== '2'" @click="changeTab('2')">
+                {{ $t('nginx.status') }}
+            </el-button>
+            <el-button type="primary" :plain="activeName !== '3'" @click="changeTab('3')">
+                {{ $t('website.nginxPer') }}
+            </el-button>
+            <el-button type="primary" :plain="activeName !== '4'" @click="changeTab('4')">
+                {{ $t('website.log') }}
+            </el-button>
+        </template>
+        <template #main>
+            <Source v-if="activeName === '1'"></Source>
+            <Status v-if="activeName === '2'" :status="status" />
+            <NginxPer v-if="activeName === '3'" />
+            <ContainerLog v-if="activeName === '4'" ref="dialogContainerLogRef" />
+        </template>
     </LayoutContent>
 </template>
 
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
 import Source from './source/index.vue';
-import { ref, watch } from 'vue';
+import { nextTick, ref } from 'vue';
 import ContainerLog from '@/components/container-log/index.vue';
 import NginxPer from './performance/index.vue';
 import Status from './status/index.vue';
@@ -38,17 +44,16 @@ const props = defineProps({
         default: 'Running',
     },
 });
+const changeTab = (index: string) => {
+    activeName.value = index;
 
-watch(
-    activeName,
-    (newvalue) => {
-        if (newvalue === '4') {
+    if (index === '4') {
+        nextTick(() => {
             dialogContainerLogRef.value!.acceptParams({
                 containerID: props.containerName,
                 container: props.containerName,
             });
-        }
-    },
-    { immediate: true },
-);
+        });
+    }
+};
 </script>

@@ -17,7 +17,7 @@
             placeholder="None data"
             :indent-with-tab="true"
             :tabSize="4"
-            style="margin-top: 10px; max-height: 500px"
+            style="margin-top: 10px; max-height: 700px"
             :lineWrapping="true"
             :matchBrackets="true"
             theme="cobalt"

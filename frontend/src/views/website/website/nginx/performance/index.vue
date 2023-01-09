@@ -1,57 +1,55 @@
 <template>
     <div>
-        <el-card>
-            <el-form :model="form" :rules="variablesRules" ref="nginxFormRef" label-width="160px">
-                <el-row>
-                    <el-col :span="1"><br /></el-col>
-                    <el-col :span="9">
-                        <el-form-item label="server_names_hash_bucket_size" prop="server_names_hash_bucket_size">
-                            <el-input clearable v-model.number="form.server_names_hash_bucket_size"></el-input>
-                            <span class="input-help">{{ $t('nginx.serverNamesHashBucketSizeHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="client_header_buffer_size" prop="client_header_buffer_size">
-                            <el-input clearable v-model.number="form.client_header_buffer_size">
-                                <template #append>K</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('nginx.clientHeaderBufferSizeHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="client_max_body_size" prop="client_max_body_size">
-                            <el-input clearable v-model.number="form.client_max_body_size">
-                                <template #append>MB</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('nginx.clientMaxBodySizeHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="keepalive_timeout" prop="keepalive_timeout">
-                            <el-input clearable v-model.number="form.keepalive_timeout"></el-input>
-                            <span class="input-help">{{ $t('nginx.keepaliveTimeoutHelper') }}</span>
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span="1"><br /></el-col>
-                    <el-col :span="9">
-                        <el-form-item label="gzip" prop="gzip">
-                            <el-select v-model="form.gzip">
-                                <el-option :label="'on'" :value="'on'"></el-option>
-                                <el-option :label="'off'" :value="'off'"></el-option>
-                            </el-select>
-                            <span class="input-help">{{ $t('nginx.gzipHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="gzip_min_length" prop="gzip_min_length">
-                            <el-input clearable v-model.number="form.gzip_min_length">
-                                <template #append>KB</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('nginx.gzipMinLengthHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="gzip_comp_level" prop="gzip_comp_level">
-                            <el-input clearable v-model.number="form.gzip_comp_level"></el-input>
-                            <span class="input-help">{{ $t('nginx.gzipCompLevelHelper') }}</span>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <el-button type="primary" @click="submit(nginxFormRef)" :loading="loading">
-                {{ $t('commons.button.save') }}
-            </el-button>
-        </el-card>
+        <el-form :model="form" :rules="variablesRules" ref="nginxFormRef" label-width="160px">
+            <el-row>
+                <el-col :span="1"><br /></el-col>
+                <el-col :span="9">
+                    <el-form-item label="server_names_hash_bucket_size" prop="server_names_hash_bucket_size">
+                        <el-input clearable v-model.number="form.server_names_hash_bucket_size"></el-input>
+                        <span class="input-help">{{ $t('nginx.serverNamesHashBucketSizeHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="client_header_buffer_size" prop="client_header_buffer_size">
+                        <el-input clearable v-model.number="form.client_header_buffer_size">
+                            <template #append>K</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('nginx.clientHeaderBufferSizeHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="client_max_body_size" prop="client_max_body_size">
+                        <el-input clearable v-model.number="form.client_max_body_size">
+                            <template #append>MB</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('nginx.clientMaxBodySizeHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="keepalive_timeout" prop="keepalive_timeout">
+                        <el-input clearable v-model.number="form.keepalive_timeout"></el-input>
+                        <span class="input-help">{{ $t('nginx.keepaliveTimeoutHelper') }}</span>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="1"><br /></el-col>
+                <el-col :span="9">
+                    <el-form-item label="gzip" prop="gzip">
+                        <el-select v-model="form.gzip">
+                            <el-option :label="'on'" :value="'on'"></el-option>
+                            <el-option :label="'off'" :value="'off'"></el-option>
+                        </el-select>
+                        <span class="input-help">{{ $t('nginx.gzipHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="gzip_min_length" prop="gzip_min_length">
+                        <el-input clearable v-model.number="form.gzip_min_length">
+                            <template #append>KB</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('nginx.gzipMinLengthHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="gzip_comp_level" prop="gzip_comp_level">
+                        <el-input clearable v-model.number="form.gzip_comp_level"></el-input>
+                        <span class="input-help">{{ $t('nginx.gzipCompLevelHelper') }}</span>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </el-form>
+        <el-button type="primary" @click="submit(nginxFormRef)" :loading="loading">
+            {{ $t('commons.button.save') }}
+        </el-button>
     </div>
 </template>
 <script lang="ts" setup>

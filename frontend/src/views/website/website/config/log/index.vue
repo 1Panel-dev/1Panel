@@ -1,5 +1,5 @@
 <template>
-    <el-tabs tab-position="left" type="border-card" v-model="index">
+    <el-tabs tab-position="left" v-model="index">
         <el-tab-pane :label="$t('website.accessLog')" name="0">
             <LogFile :id="id" :log-type="'access.log'" v-if="index == '0'"></LogFile>
         </el-tab-pane>

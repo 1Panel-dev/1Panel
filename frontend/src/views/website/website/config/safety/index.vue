@@ -1,5 +1,5 @@
 <template>
-    <el-tabs tab-position="left" type="border-card" v-model="index">
+    <el-tabs tab-position="left" v-model="index">
         <el-tab-pane :label="$t('firewall.ccDeny')" name="cc">
             <CCDeny :id="id" v-if="index == 'cc'"></CCDeny>
         </el-tab-pane>

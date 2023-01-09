@@ -35,6 +35,7 @@ export default {
             verify: '验证',
             saveAndEnable: '保存并启用',
             import: '导入',
+            search: '搜索',
         },
         search: {
             timeStart: '开始时间',
@@ -1003,6 +1004,10 @@ export default {
         defaulServer: '默认站点',
         noDefaulServer: '未设置',
         defaulServerHelper: '设置默认站点后,所有未绑定的域名和IP都被定向到默认站点\n可有效防止恶意解析',
+        websiteDeploymentHelper: '使用从 1Panel 部署的应用创建网站',
+        websiteStatictHelper: '在主机上创建网站目录',
+        websiteProxyHelper:
+            '代理已有服务,例如本机已安装使用 8080 端口的 halo 服务，那么代理地址为 http://127.0.0.1:8080',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',

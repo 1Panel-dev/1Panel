@@ -1,4 +1,3 @@
-/* 常用 flex */
 .flx-center {
     display: flex;
     align-items: center;
@@ -14,7 +13,6 @@
     align-items: center;
 }
 
-/* 清除浮动 */
 .clearfix::after {
     display: block;
     height: 0;
@@ -23,14 +21,12 @@
     content: '';
 }
 
-/* 文字单行省略号 */
 .sle {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-/* 文字多行省略号 */
 .mle {
     display: -webkit-box;
     overflow: hidden;
@@ -38,13 +34,11 @@
     -webkit-line-clamp: 2;
 }
 
-/* 文字多了自動換行 */
 .break-word {
     word-break: break-all;
     word-wrap: break-word;
 }
 
-/* fade-transform */
 .fade-transform-leave-active,
 .fade-transform-enter-active {
     transition: all 0.2s;
@@ -75,7 +69,6 @@
     z-index: -1;
 }
 
-/* scroll bar */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -99,7 +92,6 @@
     }
 }
 
-/* nprogress样式 */
 #nprogress .bar {
     background: $primary-color !important;
 }
@@ -190,6 +182,10 @@
 .table-button {
     display: inline;
     margin-right: 5px;
+}
+
+.button-left {
+    float: left;
 }
 
 .topRouterCard {
