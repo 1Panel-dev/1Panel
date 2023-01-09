@@ -8,16 +8,13 @@
             </el-col>
             <el-col :lg="4" :xl="2">
                 <div class="span-font">
-                    {{ $t('commons.table.status') }}:
-                    <el-tag type="info">
-                        <Status class="span-font" :key="props.status" :status="props.status"></Status>
-                    </el-tag>
+                    <Status class="span-font" :key="props.status" :status="props.status"></Status>
                 </div>
             </el-col>
             <el-col :lg="4" :xl="4">
                 <div class="span-font">
-                    {{ $t('website.expireDate') }}:
                     <el-tag type="info">
+                        {{ $t('website.expireDate') }}:
                         <span v-if="isEver(props.expireDate)">
                             {{ $t('website.neverExpire') }}
                         </span>

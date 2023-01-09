@@ -1,7 +1,7 @@
 <template>
     <el-drawer v-model="backupVisiable" size="50%" :show-close="false">
         <template #header>
-            <Header :header="$t('database.backup') + ' - ' + websiteName" :back="handleClose"></Header>
+            <Header :header="$t('database.backup')" :resource="websiteName" :back="handleClose"></Header>
         </template>
         <ComplexTable
             v-loading="loading"

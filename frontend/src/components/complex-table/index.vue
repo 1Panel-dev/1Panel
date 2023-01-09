@@ -41,7 +41,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
-defineOptions({ name: 'ComplexTable' }); // 组件名
+defineOptions({ name: 'ComplexTable' });
 defineProps({
     header: String,
     searchConfig: Object,

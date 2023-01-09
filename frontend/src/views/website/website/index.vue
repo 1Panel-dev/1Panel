@@ -8,7 +8,7 @@
                 @is-exist="checkExist"
             ></AppStatus>
         </template>
-        <template v-if="!openNginxConfig" #toolbar>
+        <template v-if="nginxIsExist && !openNginxConfig" #toolbar>
             <el-row :class="{ mask: nginxStatus != 'Running' }">
                 <el-col :span="10">
                     <el-button type="primary" icon="Plus" @click="openCreate">
@@ -37,7 +37,7 @@
                 </el-col>
             </el-row>
         </template>
-        <template v-if="!openNginxConfig" #search>
+        <template v-if="nginxIsExist && !openNginxConfig" #search>
             <div :class="{ mask: nginxStatus != 'Running' }">
                 <el-select v-model="req.websiteGroupId" @change="search()">
                     <el-option :label="$t('website.allGroup')" :value="0"></el-option>
