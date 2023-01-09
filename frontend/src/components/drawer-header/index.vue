@@ -1,9 +1,13 @@
 <template>
-    <el-page-header :content="header" @back="props.back">
-        <template v-if="slots.buttons" #content>
+    <el-page-header @back="props.back">
+        <template #content>
             <span>{{ header }}</span>
-            <el-divider direction="vertical" />
-            <slot name="buttons"></slot>
+            <span v-if="resource">
+                -
+                <el-tag effect="dark" type="success">{{ resource }}</el-tag>
+            </span>
+            <el-divider v-if="slots.buttons" direction="vertical" />
+            <slot v-if="slots.buttons" name="buttons"></slot>
         </template>
     </el-page-header>
 </template>
@@ -15,5 +19,6 @@ const slots = useSlots();
 const props = defineProps({
     header: String,
     back: Function,
+    resource: String,
 });
 </script>

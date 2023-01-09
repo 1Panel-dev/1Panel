@@ -1,7 +1,7 @@
 <template>
     <el-drawer v-model="upVisiable" size="50%" :show-close="false">
         <template #header>
-            <Header :header="$t('commons.button.import') + ' - ' + websiteName" :back="handleClose"></Header>
+            <Header :header="$t('commons.button.import')" :resource="websiteName" :back="handleClose"></Header>
         </template>
         <div v-loading="loading">
             <el-upload

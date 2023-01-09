@@ -1,6 +1,6 @@
 <template>
     <el-row :gutter="20">
-        <el-col :span="10" :offset="2">
+        <el-col :span="10" :offset="1">
             <el-form
                 ref="wafForm"
                 label-position="left"

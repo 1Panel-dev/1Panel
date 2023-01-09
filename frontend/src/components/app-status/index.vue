@@ -3,26 +3,14 @@
         <div class="app-content" v-if="data.isExist">
             <el-card class="app-card">
                 <el-row :gutter="20">
-                    <el-col :lg="3" :xl="2">
-                        <div>
-                            <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
-                        </div>
+                    <el-col :xs="10" :sm="10" :md="10" :lg="10" :xl="6">
+                        <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
+                        <Status class="status-content" :key="refresh" :status="data.status"></Status>
+                        <el-tag class="status-content" type="primary">
+                            {{ $t('app.version') }}:{{ data.version }}
+                        </el-tag>
                     </el-col>
-                    <el-col :lg="3" :xl="2">
-                        <div>
-                            {{ $t('app.version') }}:
-                            <el-tag type="info">{{ data.version }}</el-tag>
-                        </div>
-                    </el-col>
-                    <el-col :lg="3" :xl="2">
-                        <div>
-                            {{ $t('commons.table.status') }}:
-                            <el-tag type="info">
-                                <Status :key="refresh" :status="data.status"></Status>
-                            </el-tag>
-                        </div>
-                    </el-col>
-                    <el-col :lg="4" :xl="6">
+                    <el-col :xs="8" :sm="8" :md="8" :lg="6" :xl="4">
                         <el-button type="primary" v-if="data.status != 'Running'" link @click="onOperate('up')">
                             {{ $t('app.up') }}
                         </el-button>
@@ -30,12 +18,14 @@
                             {{ $t('app.down') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" link @click="onOperate('restart')">{{ $t('app.restart') }}</el-button>
+                        <el-button type="primary" link @click="onOperate('restart')">
+                            {{ $t('app.restart') }}
+                        </el-button>
                         <el-divider direction="vertical" />
                         <el-button
                             type="primary"
-                            link
                             @click="setting"
+                            link
                             :disabled="data.status !== 'Running' && data.app === 'OpenResty'"
                         >
                             {{ $t('commons.button.set') }}
@@ -144,5 +134,9 @@ onMounted(() => {
 
 body {
     margin: 0;
+}
+
+.status-content {
+    margin-left: 50px;
 }
 </style>

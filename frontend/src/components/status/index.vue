@@ -1,7 +1,9 @@
 <template>
-    <span :style="{ color: getColor(status) }">
+    <el-tag :type="getType(status)" round effect="light">
+        <!-- <span :style="{ color: getColor(status) }"> -->
         {{ $t('commons.status.' + status) }}
-    </span>
+        <!-- </span> -->
+    </el-tag>
 </template>
 
 <script lang="ts" setup>
@@ -15,12 +17,25 @@ const props = defineProps({
 });
 let status = ref('running');
 
-const getColor = (status: string) => {
+// const getColor = (status: string) => {
+//     switch (status) {
+//         case 'running':
+//             return '#00c957';
+//         case 'error':
+//             return '#ff0000';
+//         default:
+//             return '';
+//     }
+// };
+
+const getType = (status: string) => {
     switch (status) {
         case 'running':
-            return '#00c957';
+            return 'success';
         case 'error':
-            return '#ff0000';
+            return 'danger';
+        case 'stopped':
+            return 'warning';
         default:
             return '';
     }
