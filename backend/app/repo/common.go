@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -17,6 +18,8 @@ type ICommonRepo interface {
 	WithOrderBy(orderStr string) DBOption
 	WithLikeName(name string) DBOption
 	WithIdsIn(ids []uint) DBOption
+	WithByDate(startTime, endTime time.Time) DBOption
+	WithByStartDate(startTime time.Time) DBOption
 }
 
 type CommonRepo struct{}
@@ -30,6 +33,18 @@ func (c *CommonRepo) WithByID(id uint) DBOption {
 func (c *CommonRepo) WithByName(name string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("name = ?", name)
+	}
+}
+
+func (c *CommonRepo) WithByDate(startTime, endTime time.Time) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("start_time > ? AND start_time < ?", startTime, endTime)
+	}
+}
+
+func (c *CommonRepo) WithByStartDate(startTime time.Time) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("start_time < ?", startTime)
 	}
 }
 

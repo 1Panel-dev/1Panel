@@ -126,6 +126,9 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "DingVars", Value: ""}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: "SystemVersion", Value: "v1.0.0"}).Error; err != nil {
+			return err
+		}
 		return nil
 	},
 }
@@ -203,8 +206,8 @@ var AddTableWebsite = &gormigrate.Migration{
 	},
 }
 
-var AddTableSnapshot = &gormigrate.Migration{
-	ID: "20230106-add-table-snapshot",
+var AddTableSnap = &gormigrate.Migration{
+	ID: "20230106-add-table-snap",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.Snapshot{}); err != nil {
 			return err

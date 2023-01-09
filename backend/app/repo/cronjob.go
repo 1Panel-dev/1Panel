@@ -19,7 +19,6 @@ type ICronjobRepo interface {
 	List(opts ...DBOption) ([]model.Cronjob, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.Cronjob, error)
 	Create(cronjob *model.Cronjob) error
-	WithByDate(startTime, endTime time.Time) DBOption
 	WithByJobID(id int) DBOption
 	Save(id uint, cronjob model.Cronjob) error
 	Update(id uint, vars map[string]interface{}) error
@@ -107,16 +106,6 @@ func (u *CronjobRepo) Create(cronjob *model.Cronjob) error {
 	return global.DB.Create(cronjob).Error
 }
 
-func (c *CronjobRepo) WithByDate(startTime, endTime time.Time) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("start_time > ? AND start_time < ?", startTime, endTime)
-	}
-}
-func (c *CronjobRepo) WithByStartDate(startTime time.Time) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("start_time < ?", startTime)
-	}
-}
 func (c *CronjobRepo) WithByJobID(id int) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("cronjob_id = ?", id)

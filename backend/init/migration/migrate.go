@@ -19,7 +19,7 @@ func Init() {
 		migrations.AddTableImageRepo,
 		migrations.AddTableWebsite,
 		migrations.AddTableDatabaseMysql,
-		migrations.AddTableSnapshot,
+		migrations.AddTableSnap,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

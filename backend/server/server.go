@@ -3,9 +3,10 @@ package server
 import (
 	"encoding/gob"
 	"fmt"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/backend/init/app"
 	"github.com/1Panel-dev/1Panel/backend/init/business"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/cron"
 	"github.com/1Panel-dev/1Panel/backend/init/cache"
@@ -34,7 +35,7 @@ func Start() {
 	gob.Register(psession.SessionUser{})
 	cache.Init()
 	session.Init()
-	gin.SetMode(global.CONF.System.Level)
+	gin.SetMode("debug")
 	cron.Run()
 	business.Init()
 

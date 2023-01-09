@@ -235,6 +235,7 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 	}
 	cmd := exec.Command("tar", exStr...)
 	stdout, err := cmd.CombinedOutput()
+	fmt.Println(string(stdout))
 	if err != nil {
 		return errors.New(string(stdout))
 	}

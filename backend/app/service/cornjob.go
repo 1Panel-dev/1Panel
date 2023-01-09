@@ -67,7 +67,7 @@ func (u *CronjobService) SearchRecords(search dto.SearchRecord) (int64, interfac
 		search.PageSize,
 		commonRepo.WithByStatus(search.Status),
 		cronjobRepo.WithByJobID(search.CronjobID),
-		cronjobRepo.WithByDate(search.StartTime, search.EndTime))
+		commonRepo.WithByDate(search.StartTime, search.EndTime))
 	var dtoCronjobs []dto.Record
 	for _, record := range records {
 		var item dto.Record
