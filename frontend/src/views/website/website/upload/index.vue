@@ -1,68 +1,64 @@
 <template>
-    <div :v-loading="loading">
-        <el-dialog v-model="upVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="70%">
-            <template #header>
-                <div class="card-header">
-                    <span>{{ $t('commons.button.import') }}</span>
-                </div>
-            </template>
-            <div v-loading="loading">
-                <el-upload
-                    ref="uploadRef"
-                    :on-change="fileOnChange"
-                    :before-upload="beforeAvatarUpload"
-                    class="upload-demo"
-                    :auto-upload="false"
-                >
-                    <template #trigger>
-                        <el-button type="primary" plain>{{ $t('database.selectFile') }}</el-button>
-                    </template>
-                    <el-button style="margin-left: 10px" icon="Upload" @click="onSubmit">
-                        {{ $t('commons.button.upload') }}
-                    </el-button>
-                </el-upload>
-                <div style="margin-left: 10px">
-                    <span class="input-help">{{ $t('website.supportUpType') }}</span>
-                    <span class="input-help">
-                        {{ $t('website.zipFormat') }}
-                    </span>
-                </div>
-                <el-divider />
-                <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data">
-                    <template #toolbar>
-                        <el-button
-                            style="margin-left: 10px"
-                            type="danger"
-                            plain
-                            :disabled="selects.length === 0"
-                            @click="onBatchDelete(null)"
-                        >
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                    </template>
-                    <el-table-column type="selection" fix />
-                    <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name" />
-                    <el-table-column :label="$t('file.size')" prop="size">
-                        <template #default="{ row }">
-                            {{ computeSize(row.size) }}
-                        </template>
-                    </el-table-column>
-                    <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
-                        <template #default="{ row }">
-                            {{ dateFromat(0, 0, row.modTime) }}
-                        </template>
-                    </el-table-column>
-                    <fu-table-operations
-                        width="300px"
-                        :buttons="buttons"
-                        :ellipsis="10"
-                        :label="$t('commons.table.operate')"
-                        fix
-                    />
-                </ComplexTable>
+    <el-drawer v-model="upVisiable" size="50%" :show-close="false">
+        <template #header>
+            <Header :header="$t('commons.button.import') + ' - ' + websiteName" :back="handleClose"></Header>
+        </template>
+        <div v-loading="loading">
+            <el-upload
+                ref="uploadRef"
+                :on-change="fileOnChange"
+                :before-upload="beforeAvatarUpload"
+                class="upload-demo"
+                :auto-upload="false"
+            >
+                <template #trigger>
+                    <el-button type="primary" plain>{{ $t('database.selectFile') }}</el-button>
+                </template>
+                <el-button style="margin-left: 10px" icon="Upload" @click="onSubmit">
+                    {{ $t('commons.button.upload') }}
+                </el-button>
+            </el-upload>
+            <div style="margin-left: 10px">
+                <span class="input-help">{{ $t('website.supportUpType') }}</span>
+                <span class="input-help">
+                    {{ $t('website.zipFormat') }}
+                </span>
             </div>
-        </el-dialog>
-    </div>
+            <el-divider />
+            <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data">
+                <template #toolbar>
+                    <el-button
+                        style="margin-left: 10px"
+                        type="danger"
+                        plain
+                        :disabled="selects.length === 0"
+                        @click="onBatchDelete(null)"
+                    >
+                        {{ $t('commons.button.delete') }}
+                    </el-button>
+                </template>
+                <el-table-column type="selection" fix />
+                <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name" />
+                <el-table-column :label="$t('file.size')" prop="size">
+                    <template #default="{ row }">
+                        {{ computeSize(row.size) }}
+                    </template>
+                </el-table-column>
+                <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
+                    <template #default="{ row }">
+                        {{ dateFromat(0, 0, row.modTime) }}
+                    </template>
+                </el-table-column>
+                <fu-table-operations
+                    width="300px"
+                    :buttons="buttons"
+                    :ellipsis="10"
+                    :label="$t('commons.table.operate')"
+                    fix
+                />
+            </ComplexTable>
+        </div>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>
@@ -76,6 +72,7 @@ import { File } from '@/api/interface/file';
 import { BatchDeleteFile, GetFilesList, UploadFileData } from '@/api/modules/files';
 import { RecoverWebsiteByUpload } from '@/api/modules/website';
 import { loadBaseDir } from '@/api/modules/setting';
+import Header from '@/components/drawer-header/index.vue';
 
 const selects = ref<any>([]);
 const baseDir = ref();
@@ -152,6 +149,7 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
 
 const handleClose = () => {
     uploadRef.value!.clearFiles();
+    upVisiable.value = false;
 };
 
 const onSubmit = () => {

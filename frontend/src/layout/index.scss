@@ -14,11 +14,10 @@
     }
     .el-main {
         box-sizing: border-box;
-        padding: 10px 13px;
+        padding: 20px 33px;
 
-        /* 防止切换出现横向滚动条 */
         overflow-x: hidden;
-        // background-color: #f0f2f5;
+        background-color: #f4f4f4;
         // background: #f0f2f5;
         .main-box {
             box-sizing: border-box;

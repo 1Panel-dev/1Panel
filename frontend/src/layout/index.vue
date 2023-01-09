@@ -12,15 +12,17 @@
                 </Header>
             </el-header>
             <el-main>
-                <Content>
+                <!-- <Content> -->
+                <div>
                     <View></View>
-                </Content>
+                </div>
+                <!-- </Content> -->
             </el-main>
-            <!-- <el-footer v-if="themeConfig.footer">
+            <el-footer>
                 <Footer>
                     <slot name="footer"></slot>
                 </Footer>
-            </el-footer> -->
+            </el-footer>
         </el-container>
     </el-container>
 </template>
@@ -29,9 +31,9 @@
 // import { computed } from 'vue';
 import Menu from './layout-menu.vue';
 import Header from './layout-header.vue';
-// import Footer from './layout-footer.vue';
+import Footer from './layout-footer.vue';
 import View from './layout-view.vue';
-import Content from './layout-content.vue';
+// import Content from './layout-content.vue';
 // import { GlobalStore } from '@/store';
 // const globalStore = GlobalStore();
 // const themeConfig = computed(() => globalStore.themeConfig);

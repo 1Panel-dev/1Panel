@@ -1,19 +1,10 @@
 <template>
     <div class="main-box">
-        <div class="content-container__header" v-if="slots.header || header">
-            <slot name="header">
-                <back-button
-                    :path="backPath"
-                    :name="backName"
-                    :to="backTo"
-                    :header="header"
-                    :reload="reload"
-                    v-if="showBack"
-                ></back-button>
-                <!-- <el-page-header @back="reload" v-if="showBack" :content="header"></el-page-header> -->
-                <span v-else>{{ header }}</span>
-                <el-divider />
-            </slot>
+        <div class="content-container__header" v-if="slots.header">
+            <slot name="header"></slot>
+        </div>
+        <div class="content-container__app" v-if="slots.app">
+            <slot name="app"></slot>
         </div>
         <div class="content-container__toolbar" v-if="slots.toolbar">
             <slot name="toolbar"></slot>
@@ -24,6 +15,36 @@
                     <slot name="button"></slot>
                 </form-button>
             </slot>
+        </div>
+        <div class="content-container__main" v-if="slots.main">
+            <el-card>
+                <div class="content-container__title" v-if="slots.title || title">
+                    <slot name="title">
+                        <back-button
+                            :path="backPath"
+                            :name="backName"
+                            :to="backTo"
+                            :header="title"
+                            :reload="reload"
+                            v-if="showBack"
+                        >
+                            <template v-if="slots.buttons" #buttons>
+                                <slot name="buttons"></slot>
+                            </template>
+                        </back-button>
+
+                        <span v-else>
+                            {{ title }}
+                            <el-divider v-if="slots.buttons" direction="vertical" />
+                            <slot v-if="slots.buttons" name="buttons"></slot>
+                        </span>
+                    </slot>
+                </div>
+                <div v-if="slots.prompt">
+                    <slot name="prompt"></slot>
+                </div>
+                <slot name="main"></slot>
+            </el-card>
         </div>
         <slot></slot>
     </div>
@@ -36,7 +57,7 @@ import FormButton from './form-button.vue';
 defineOptions({ name: 'LayoutContent' }); // 组件名
 const slots = useSlots();
 const prop = defineProps({
-    header: String,
+    title: String,
     backPath: String,
     backName: String,
     backTo: Object,
@@ -53,13 +74,23 @@ const showBack = computed(() => {
 @use '@/styles/mixins.scss' as *;
 
 .content-container__header {
+}
+
+.content-container__app {
+}
+
+.content-container__search {
+    margin-top: 20px;
+}
+
+.content-container__title {
     font-weight: 700;
     font-size: 18px;
 }
 
 .content-container__toolbar {
-    @include flex-row(space-between, center);
-    margin-bottom: 10px;
+    // @include flex-row(space-between, center);
+    margin-top: 30px;
 }
 
 .content-container_form {
@@ -69,6 +100,10 @@ const showBack = computed(() => {
     .form-button {
         float: right;
     }
+}
+
+.content-container__main {
+    margin-top: 20px;
 }
 
 .el-divider--horizontal {

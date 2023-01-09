@@ -1,5 +1,6 @@
 <template>
-    <el-tabs tab-position="left" type="border-card" v-model="tabIndex">
+    <!-- <div style="border: 1px solid #6495ed"> -->
+    <el-tabs tab-position="left" v-model="tabIndex">
         <el-tab-pane :label="$t('website.domainConfig')">
             <Doamin :id="id" v-if="tabIndex == '0'"></Doamin>
         </el-tab-pane>
@@ -19,6 +20,7 @@
             <Other :id="id" v-if="tabIndex == '5'"></Other>
         </el-tab-pane>
     </el-tabs>
+    <!-- </div> -->
 </template>
 
 <script lang="ts" setup name="Basic">

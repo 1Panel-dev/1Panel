@@ -20,7 +20,7 @@
         </div>
         <br />
         <codemirror
-            style="max-height: 500px; width: 100%; min-height: 200px"
+            style="max-height: 800px; width: 100%"
             :autofocus="true"
             :placeholder="$t('website.noLog')"
             :indent-with-tab="true"

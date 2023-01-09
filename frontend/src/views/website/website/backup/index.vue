@@ -1,40 +1,35 @@
 <template>
-    <div>
-        <el-dialog v-model="backupVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="50%">
-            <template #header>
-                <div class="card-header">
-                    <span>{{ $t('database.backup') }} - {{ websiteName }}</span>
-                </div>
+    <el-drawer v-model="backupVisiable" size="50%" :show-close="false">
+        <template #header>
+            <Header :header="$t('database.backup') + ' - ' + websiteName" :back="handleClose"></Header>
+        </template>
+        <ComplexTable
+            v-loading="loading"
+            :pagination-config="paginationConfig"
+            v-model:selects="selects"
+            @search="search"
+            :data="data"
+        >
+            <template #toolbar>
+                <el-button type="primary" @click="onBackup()">
+                    {{ $t('database.backup') }}
+                </el-button>
+                <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
             </template>
-            <ComplexTable
-                v-loading="loading"
-                :pagination-config="paginationConfig"
-                v-model:selects="selects"
-                @search="search"
-                :data="data"
-            >
-                <template #toolbar>
-                    <el-button type="primary" @click="onBackup()">
-                        {{ $t('database.backup') }}
-                    </el-button>
-                    <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
-                        {{ $t('commons.button.delete') }}
-                    </el-button>
-                </template>
-                <el-table-column type="selection" fix />
-                <el-table-column :label="$t('commons.table.name')" prop="fileName" show-overflow-tooltip />
-                <el-table-column :label="$t('database.source')" prop="backupType" />
-                <el-table-column
-                    prop="createdAt"
-                    :label="$t('commons.table.date')"
-                    :formatter="dateFromat"
-                    show-overflow-tooltip
-                />
-
-                <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
-            </ComplexTable>
-        </el-dialog>
-    </div>
+            <el-table-column type="selection" fix />
+            <el-table-column :label="$t('commons.table.name')" prop="fileName" show-overflow-tooltip />
+            <el-table-column :label="$t('database.source')" prop="backupType" />
+            <el-table-column
+                prop="createdAt"
+                :label="$t('commons.table.date')"
+                :formatter="dateFromat"
+                show-overflow-tooltip
+            />
+            <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
+        </ComplexTable>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>
@@ -47,6 +42,7 @@ import { ElMessage } from 'element-plus';
 import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords } from '@/api/modules/backup';
 import { Backup } from '@/api/interface/backup';
 import { BackupWebsite, RecoverWebsite } from '@/api/modules/website';
+import Header from '@/components/drawer-header/index.vue';
 
 const selects = ref<any>([]);
 const loading = ref(false);
@@ -74,6 +70,10 @@ const acceptParams = (params: DialogProps): void => {
     websiteType.value = params.type;
     backupVisiable.value = true;
     search();
+};
+
+const handleClose = () => {
+    backupVisiable.value = false;
 };
 
 const search = async () => {

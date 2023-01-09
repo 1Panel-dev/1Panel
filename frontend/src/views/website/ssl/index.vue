@@ -1,11 +1,13 @@
 <template>
-    <el-card>
-        <LayoutContent :header="$t('website.ssl')">
+    <LayoutContent :title="$t('website.ssl')">
+        <template #prompt>
             <el-alert type="info" :closable="false">
                 <template #default>
                     <span><span v-html="$t('website.encryptHelper')"></span></span>
                 </template>
             </el-alert>
+        </template>
+        <template #main>
             <br />
             <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
                 <template #toolbar>
@@ -55,13 +57,13 @@
                     fix
                 />
             </ComplexTable>
-            <DnsAccount ref="dnsAccountRef"></DnsAccount>
-            <AcmeAccount ref="acmeAccountRef"></AcmeAccount>
-            <Create ref="sslCreateRef" @close="search()"></Create>
-            <Renew ref="renewRef" @close="search()"></Renew>
-            <Detail ref="detailRef"></Detail>
-        </LayoutContent>
-    </el-card>
+        </template>
+        <DnsAccount ref="dnsAccountRef"></DnsAccount>
+        <AcmeAccount ref="acmeAccountRef"></AcmeAccount>
+        <Create ref="sslCreateRef" @close="search()"></Create>
+        <Renew ref="renewRef" @close="search()"></Renew>
+        <Detail ref="detailRef"></Detail>
+    </LayoutContent>
 </template>
 
 <script lang="ts" setup>

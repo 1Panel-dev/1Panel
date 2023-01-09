@@ -1,12 +1,9 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :title="$t('website.groupSetting')"
-        width="40%"
-        :before-close="handleClose"
-    >
+    <el-drawer v-model="open" size="50%" :show-close="false" :before-close="handleClose">
+        <template #header>
+            <Header :header="$t('website.groupSetting')" :back="handleClose"></Header>
+        </template>
+
         <ComplexTable :data="data" @search="search()">
             <template #toolbar>
                 <el-button type="primary" icon="Plus" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
@@ -48,7 +45,7 @@
                 </template>
             </el-table-column>
         </ComplexTable>
-    </el-dialog>
+    </el-drawer>
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';
@@ -56,6 +53,7 @@ import i18n from '@/lang';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { ListGroups, CreateGroup, DeleteGroup, UpdateGroup } from '@/api/modules/website';
 import { ElMessage } from 'element-plus';
+import Header from '@/components/drawer-header/index.vue';
 
 interface groupData {
     id: number;

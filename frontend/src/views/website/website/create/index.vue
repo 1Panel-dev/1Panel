@@ -1,28 +1,53 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :close-on-click-modal="false"
-        :title="$t('website.create')"
-        width="40%"
-        :before-close="handleClose"
-    >
+    <el-drawer v-model="open" :size="'50%'" :show-close="false">
+        <template #header>
+            <Header :header="$t('website.create')" :back="handleClose">
+                <template #buttons>
+                    <el-button
+                        type="primary"
+                        :plain="website.type !== 'deployment'"
+                        @click="website.type = 'deployment'"
+                    >
+                        {{ $t('website.deployment') }}
+                    </el-button>
+                    <el-button type="primary" :plain="website.type !== 'static'" @click="website.type = 'static'">
+                        {{ $t('website.static') }}
+                    </el-button>
+                    <el-button type="primary" :plain="website.type !== 'proxy'" @click="website.type = 'proxy'">
+                        {{ $t('website.proxy') }}
+                    </el-button>
+                </template>
+            </Header>
+        </template>
         <el-row>
             <el-col :span="22" :offset="1">
+                <el-alert
+                    v-if="website.type == 'deployment'"
+                    :title="$t('website.websiteDeploymentHelper')"
+                    type="info"
+                    :closable="false"
+                />
+                <el-alert
+                    v-if="website.type == 'static'"
+                    :title="$t('website.websiteStatictHelper')"
+                    type="info"
+                    :closable="false"
+                />
+                <el-alert
+                    v-if="website.type == 'proxy'"
+                    :title="$t('website.websiteProxyHelper')"
+                    type="info"
+                    :closable="false"
+                />
+                <br />
                 <el-form
                     ref="websiteForm"
-                    label-position="right"
+                    label-position="top"
                     :model="website"
                     label-width="125px"
                     :rules="rules"
                     :validate-on-rule-change="false"
                 >
-                    <el-form-item :label="$t('website.type')" prop="type">
-                        <el-select v-model="website.type">
-                            <el-option :label="$t('website.deployment')" value="deployment"></el-option>
-                            <el-option :label="$t('website.static')" value="static"></el-option>
-                            <el-option :label="$t('website.proxy')" value="proxy"></el-option>
-                        </el-select>
-                    </el-form-item>
                     <el-form-item :label="$t('website.group')" prop="webSiteGroupId">
                         <el-select v-model="website.webSiteGroupId">
                             <el-option
@@ -131,7 +156,7 @@
             </el-col>
         </el-row>
         <template #footer>
-            <span class="dialog-footer">
+            <span>
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button type="primary" @click="submit(websiteForm)" :loading="loading">
                     {{ $t('commons.button.confirm') }}
@@ -139,7 +164,7 @@
             </span>
         </template>
         <Check ref="preCheckRef"></Check>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup name="CreateWebSite">
@@ -149,10 +174,11 @@ import { GetApp, GetAppDetail, SearchApp, GetAppInstalled } from '@/api/modules/
 import { CreateWebsite, ListGroups, PreCheck } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElDialog, ElForm, FormInstance, ElMessage } from 'element-plus';
+import { ElForm, FormInstance, ElMessage } from 'element-plus';
 import { reactive, ref } from 'vue';
 import Params from '@/views/app-store/detail/params/index.vue';
 import Check from '../check/index.vue';
+import Header from '@/components/drawer-header/index.vue';
 
 const websiteForm = ref<FormInstance>();
 const website = ref({
