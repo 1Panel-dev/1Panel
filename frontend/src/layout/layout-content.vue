@@ -73,12 +73,6 @@ const showBack = computed(() => {
 <style lang="scss">
 @use '@/styles/mixins.scss' as *;
 
-.content-container__header {
-}
-
-.content-container__app {
-}
-
 .content-container__search {
     margin-top: 20px;
 }
