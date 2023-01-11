@@ -1,4 +1,3 @@
-// * Menu
 declare namespace Menu {
     interface MenuOptions {
         path: string;
@@ -10,7 +9,6 @@ declare namespace Menu {
     }
 }
 
-// * Vite
 declare type Recordable<T = any> = Record<string, T>;
 
 declare interface ViteEnv {
@@ -22,4 +20,10 @@ declare interface ViteEnv {
     VITE_PROXY_URL: string;
     VITE_BUILD_GZIP: boolean;
     VITE_REPORT: boolean;
+}
+
+declare interface RouterButton {
+    label: string;
+    path?: string;
+    name?: string;
 }
