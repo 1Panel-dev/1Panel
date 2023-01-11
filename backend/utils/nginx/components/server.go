@@ -277,4 +277,5 @@ func (s *Server) AddHTTP2HTTPS() {
 	})
 	newDir.Block = block
 	s.UpdateDirectiveBySecondKey("if", "($scheme", newDir)
+
 }

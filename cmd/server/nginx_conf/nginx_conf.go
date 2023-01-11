@@ -7,9 +7,6 @@ import (
 //go:embed ssl.conf
 var SSL []byte
 
-//go:embed  http2https.conf
-var HTTPS []byte
-
 //go:embed  website_default.conf
 var WebsiteDefault []byte
 
@@ -18,6 +15,3 @@ var Limit []byte
 
 //go:embed index.html
 var Index []byte
-
-//go:embed http_per.conf
-var HttpPer []byte

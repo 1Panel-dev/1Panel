@@ -9,7 +9,7 @@ export const GlobalStore = defineStore({
     state: (): GlobalState => ({
         isLogin: false,
         csrfToken: '',
-        assemblySize: 'small',
+        assemblySize: 'default',
         language: '',
         themeConfig: {
             panelName: '',

@@ -455,7 +455,13 @@ func (w WebsiteService) UpdateNginxConfigByScope(req request.NginxConfigUpdate) 
 		return err
 	}
 	if req.Operate == constant.ConfigDel {
-		return deleteNginxConfig(constant.NginxScopeServer, keys, &website)
+		var nginxParams []dto.NginxParam
+		for _, key := range keys {
+			nginxParams = append(nginxParams, dto.NginxParam{
+				Name: key,
+			})
+		}
+		return deleteNginxConfig(constant.NginxScopeServer, nginxParams, &website)
 	}
 	params := getNginxParams(req.Params, keys)
 	if req.Operate == constant.ConfigNew {
@@ -547,9 +553,12 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 		if err := deleteListenAndServerName(website, []int{443}, []string{}); err != nil {
 			return response.WebsiteHTTPS{}, err
 		}
-		keys := getKeysFromStaticFile(dto.SSL)
-		keys = append(keys, "if")
-		if err := deleteNginxConfig(constant.NginxScopeServer, keys, &website); err != nil {
+		nginxParams := getNginxParamsFromStaticFile(dto.SSL, nil)
+		nginxParams = append(nginxParams, dto.NginxParam{
+			Name:   "if",
+			Params: []string{"($scheme", "=", "http)"},
+		})
+		if err := deleteNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
 			return response.WebsiteHTTPS{}, err
 		}
 		if err := websiteRepo.Save(ctx, &website); err != nil {
@@ -771,7 +780,12 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 			key = "error_log"
 			website.ErrorLog = false
 		}
-		if err := deleteNginxConfig(constant.NginxScopeServer, []string{key}, &website); err != nil {
+		var nginxParams []dto.NginxParam
+		nginxParams = append(nginxParams, dto.NginxParam{
+			Name: key,
+		})
+
+		if err := deleteNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
 			return nil, err
 		}
 		if err := websiteRepo.Save(context.Background(), &website); err != nil {

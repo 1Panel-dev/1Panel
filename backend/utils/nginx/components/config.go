@@ -39,9 +39,11 @@ func (c *Config) FindHttp() *Http {
 
 var repeatKeys = map[string]struct {
 }{
-	"limit_conn":      {},
-	"limit_conn_zone": {},
-	"set":             {},
+	"limit_conn":       {},
+	"limit_conn_zone":  {},
+	"set":              {},
+	"if":               {},
+	"proxy_set_header": {},
 }
 
 func IsRepeatKey(key string) bool {
