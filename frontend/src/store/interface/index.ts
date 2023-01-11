@@ -1,6 +1,5 @@
 import { RouteRecordRaw } from 'vue-router';
 
-/* themeConfigProp */
 export interface ThemeConfigProp {
     panelName: string;
     primary: string;
@@ -8,7 +7,6 @@ export interface ThemeConfigProp {
     footer: boolean;
 }
 
-/* GlobalState */
 export interface GlobalState {
     isLogin: boolean;
     csrfToken: string;
@@ -22,7 +20,6 @@ export interface MenuState {
     menuList: RouteRecordRaw[];
 }
 
-/* AuthState */
 export interface AuthState {
     authRouter: string[];
 }

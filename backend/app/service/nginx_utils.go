@@ -126,7 +126,7 @@ func updateNginxConfig(scope string, params []dto.NginxParam, website *model.Web
 	return nginxCheckAndReload(config.OldContent, config.FilePath, nginxFull.Install.ContainerName)
 }
 
-func deleteNginxConfig(scope string, keys []string, website *model.Website) error {
+func deleteNginxConfig(scope string, params []dto.NginxParam, website *model.Website) error {
 	nginxFull, err := getNginxFull(website)
 	if err != nil {
 		return err
@@ -144,8 +144,8 @@ func deleteNginxConfig(scope string, keys []string, website *model.Website) erro
 		block = config.Config.Block
 	}
 
-	for _, key := range keys {
-		block.RemoveDirective(key, []string{})
+	for _, param := range params {
+		block.RemoveDirective(param.Name, param.Params)
 	}
 
 	if err := nginx.WriteConfig(config.Config, nginx.IndentedStyle); err != nil {
