@@ -1,24 +1,27 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('app.install')"
-        :close-on-click-modal="false"
-        width="40%"
-        :before-close="handleClose"
-    >
-        <el-form
-            ref="paramForm"
-            label-position="left"
-            :model="form"
-            label-width="150px"
-            :rules="rules"
-            :validate-on-rule-change="false"
-        >
-            <el-form-item :label="$t('app.name')" prop="NAME">
-                <el-input v-model.trim="form['NAME']"></el-input>
-            </el-form-item>
-            <Params v-model:form="form" v-model:params="installData.params" v-model:rules="rules"></Params>
-        </el-form>
+    <el-drawer v-model="open" :title="$t('app.install')" size="50%" :before-close="handleClose" :show-close="false">
+        <template #header>
+            <Header :header="$t('app.install')" :back="handleClose" />
+        </template>
+
+        <el-row>
+            <el-col :span="22" :offset="1">
+                <el-form
+                    ref="paramForm"
+                    label-position="top"
+                    :model="form"
+                    label-width="150px"
+                    :rules="rules"
+                    :validate-on-rule-change="false"
+                >
+                    <el-form-item :label="$t('app.name')" prop="NAME">
+                        <el-input v-model.trim="form['NAME']"></el-input>
+                    </el-form-item>
+                    <Params v-model:form="form" v-model:params="installData.params" v-model:rules="rules"></Params>
+                </el-form>
+            </el-col>
+        </el-row>
+
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -27,7 +30,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup name="appInstall">
@@ -38,6 +41,8 @@ import { FormInstance, FormRules } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Params from '../params/index.vue';
+import Header from '@/components/drawer-header/index.vue';
+
 const router = useRouter();
 
 interface InstallRrops {

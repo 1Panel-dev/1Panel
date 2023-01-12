@@ -35,8 +35,13 @@
 
                         <span v-else>
                             {{ title }}
-                            <el-divider v-if="slots.buttons" direction="vertical" />
-                            <slot v-if="slots.buttons" name="buttons"></slot>
+                            <span v-if="slots.buttons">
+                                <el-divider direction="vertical" />
+                                <slot name="buttons"></slot>
+                            </span>
+                            <span style="float: right">
+                                <slot v-if="slots.rightButton" name="rightButton"></slot>
+                            </span>
                         </span>
                     </slot>
                 </div>

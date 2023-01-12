@@ -1,6 +1,6 @@
 <template>
-    <el-card>
-        <LayoutContent :header="$t('app.detail')" :back-name="'App'" :v-loading="loadingDetail">
+    <LayoutContent :title="$t('app.detail')" :reload="true" :v-loading="loadingDetail">
+        <template #main>
             <div class="brief">
                 <el-row :gutter="20">
                     <el-col :span="4">
@@ -63,9 +63,9 @@
             <div class="detail" v-loading="loadingDetail">
                 <v-md-preview :text="appDetail.readme"></v-md-preview>
             </div>
-            <Install ref="installRef"></Install>
-        </LayoutContent>
-    </el-card>
+        </template>
+    </LayoutContent>
+    <Install ref="installRef"></Install>
 </template>
 
 <script lang="ts" setup>
