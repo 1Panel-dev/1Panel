@@ -1,7 +1,6 @@
 <template>
     <div>
         <RouterButton :buttons="buttons" />
-        <br />
         <LayoutContent>
             <router-view></router-view>
         </LayoutContent>

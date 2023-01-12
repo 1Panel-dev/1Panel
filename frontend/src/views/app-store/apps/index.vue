@@ -1,89 +1,84 @@
 <template>
-    <div>
-        <el-card v-loading="loading" v-if="!showDetail">
+    <LayoutContent v-loading="loading" v-if="!showDetail" :title="$t('website.website')">
+        <template #toolbar>
             <el-row :gutter="5">
-                <el-col :span="2">
-                    <el-button @click="sync" type="primary" :plain="true">{{ $t('app.sync') }}</el-button>
+                <el-col :span="20">
+                    <div>
+                        <el-button @click="changeTag('all')" type="primary" :plain="activeTag !== 'all'">
+                            {{ $t('app.all') }}
+                        </el-button>
+                        <div v-for="item in tags" :key="item.key" style="display: inline">
+                            <el-button
+                                class="tag-button"
+                                @click="changeTag(item.key)"
+                                type="primary"
+                                :plain="activeTag !== item.key"
+                            >
+                                {{ item.name }}
+                            </el-button>
+                        </div>
+                    </div>
                 </el-col>
-                <el-col :span="22">
+                <el-col :span="4">
                     <div style="float: right">
                         <el-input
-                            style="display: inline; margin-right: 5px"
+                            class="table-button"
                             v-model="req.name"
                             clearable
                             @clear="searchByName('')"
+                            suffix-icon="Search"
+                            @keyup.enter="searchByName(req.name)"
+                            @blur="searchByName(req.name)"
+                            :placeholder="$t('commons.button.search')"
                         ></el-input>
-                        <el-button
-                            style="display: inline; margin-right: 5px"
-                            v-model="req.name"
-                            @click="searchByName(req.name)"
-                        >
-                            {{ $t('app.search') }}
-                        </el-button>
                     </div>
                 </el-col>
             </el-row>
-            <br />
-            <el-row>
-                <el-button
-                    style="margin-right: 5px"
-                    @click="changeTag('all')"
-                    type="primary"
-                    :plain="activeTag !== 'all'"
-                >
-                    {{ $t('app.all') }}
-                </el-button>
-                <div style="margin-right: 5px" :span="1" v-for="item in tags" :key="item.key">
-                    <el-button @click="changeTag(item.key)" type="primary" :plain="activeTag !== item.key">
-                        {{ item.name }}
-                    </el-button>
-                </div>
-            </el-row>
+        </template>
+        <template #rightButton>
+            <el-button @click="sync" type="text" :plain="true">{{ $t('app.syncAppList') }}</el-button>
+        </template>
+        <template #main>
+            <div class="divider"></div>
             <el-row :gutter="5">
-                <el-col v-for="(app, index) in apps" :key="index" :span="6">
-                    <div @click="getAppDetail(app.id)">
-                        <el-card :body-style="{ padding: '0px' }" class="a-card">
-                            <el-row :gutter="24">
-                                <el-col :span="8">
-                                    <div class="icon">
-                                        <el-image class="image" :src="'data:image/png;base64,' + app.icon"></el-image>
+                <el-col v-for="(app, index) in apps" :key="index" :span="8">
+                    <div class="a-card">
+                        <el-row :gutter="24">
+                            <el-col :span="5">
+                                <div class="icon">
+                                    <el-avatar shape="square" :size="60" :src="'data:image/png;base64,' + app.icon" />
+                                </div>
+                            </el-col>
+                            <el-col :span="19">
+                                <div class="a-detail">
+                                    <div class="d-name">
+                                        <span class="name">{{ app.name }}</span>
+                                        <el-button class="h-button" round @click="getAppDetail(app.id)">安装</el-button>
                                     </div>
-                                </el-col>
-                                <el-col :span="16">
-                                    <div class="a-detail">
-                                        <div class="d-name">
-                                            <span style="font-weight: 500; font-size: 16px">
-                                                {{ app.name }}
-                                            </span>
-                                        </div>
-                                        <div class="d-description">
-                                            <span>
-                                                {{ app.shortDesc }}
-                                            </span>
-                                        </div>
-                                        <div class="d-tag" style="margin-top: 5px">
-                                            <el-tag
-                                                v-for="(tag, ind) in app.tags"
-                                                :key="ind"
-                                                round
-                                                :colr="getColor(ind)"
-                                            >
-                                                {{ tag.name }}
-                                            </el-tag>
-                                        </div>
+                                    <div class="d-description">
+                                        <span class="description">
+                                            {{ app.shortDesc }}
+                                        </span>
                                     </div>
-                                </el-col>
-                            </el-row>
-                        </el-card>
+                                    <div class="d-tag" style="margin-top: 5px">
+                                        <el-tag v-for="(tag, ind) in app.tags" :key="ind" :colr="getColor(ind)">
+                                            {{ tag.name }}
+                                        </el-tag>
+                                    </div>
+                                    <div class="divider"></div>
+                                </div>
+                            </el-col>
+                        </el-row>
                     </div>
                 </el-col>
             </el-row>
-        </el-card>
-        <Detail v-if="showDetail" :id="appId"></Detail>
-    </div>
+        </template>
+    </LayoutContent>
+    <Detail v-if="showDetail" :id="appId"></Detail>
 </template>
 
 <script lang="ts" setup>
+import LayoutContent from '@/layout/layout-content.vue';
 import { App } from '@/api/interface/app';
 import { onMounted, reactive, ref } from 'vue';
 import { SearchApp, SyncApp } from '@/api/modules/app';
@@ -159,14 +154,15 @@ onMounted(() => {
 }
 
 .a-card {
-    height: 100px;
+    height: 120px;
     margin-top: 10px;
     cursor: pointer;
     padding: 5px;
 
     .icon {
+        margin-left: 10px;
         width: 80px;
-        height: 100%;
+        height: 80%;
         padding: 5px;
         display: flex;
         align-items: center;
@@ -185,24 +181,46 @@ onMounted(() => {
 
         .d-name {
             height: 20%;
+            .name {
+                font-weight: 500;
+                font-size: 16px;
+                color: #1f2329;
+            }
+            .h-button {
+                float: right;
+            }
         }
 
         .d-description {
-            margin-top: 5px;
+            margin-top: 10px;
             overflow: hidden;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
+            .description {
+                font-size: 14px;
+                color: #646a73;
+            }
         }
     }
 }
 
 .a-card:hover {
-    transform: scale(1.1);
+    background-color: rgba(0, 94, 235, 0.03);
 }
 
 .table-button {
     display: inline;
     margin-right: 5px;
+}
+
+.tag-button {
+    margin-left: 10px;
+}
+
+.divider {
+    margin-top: 5px;
+    border: 0;
+    border-top: 1px solid #ccc;
 }
 </style>
