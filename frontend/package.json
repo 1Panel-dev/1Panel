@@ -31,7 +31,7 @@
         "echarts": "^5.3.0",
         "echarts-liquidfill": "^3.1.0",
         "element-plus": "^2.2.13",
-        "fit2cloud-ui-plus": "^0.0.1-beta.15",
+        "fit2cloud-ui-plus": "^1.0.4",
         "js-base64": "^3.7.2",
         "js-md5": "^0.7.3",
         "md-editor-v3": "^2.7.2",

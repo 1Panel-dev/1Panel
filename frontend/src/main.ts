@@ -1,27 +1,31 @@
 import { createApp } from 'vue';
 import App from './App.vue';
+// import 'element-plus/dist/index.css';
+// import 'element-plus/theme-chalk/dark/css-vars.css';
+
+import '@/styles/index.scss';
 import '@/styles/reset.scss';
 import '@/styles/common.scss';
 import '@/assets/iconfont/iconfont.css';
 import '@/assets/iconfont/iconfont.js';
-import ElementPlus from 'element-plus';
-import Fit2CloudPlus from 'fit2cloud-ui-plus';
-import * as Icons from '@element-plus/icons-vue';
 import '@/styles/element-dark.scss';
 import '@/styles/element.scss';
-import 'element-plus/dist/index.css';
-import 'element-plus/theme-chalk/dark/css-vars.css';
-import 'fit2cloud-ui-plus/src/styles/index.scss';
+
+import VMdPreview from '@kangc/v-md-editor/lib/preview';
+import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
+import '@kangc/v-md-editor/lib/theme/style/github.css';
+import '@kangc/v-md-editor/lib/style/preview.css';
+import hljs from 'highlight.js';
+
 import directives from '@/directives/index';
 import router from '@/routers/index';
 import I18n from '@/lang/index';
 import pinia from '@/store/index';
 import SvgIcon from './components/svg-icon/svg-icon.vue';
-import VMdPreview from '@kangc/v-md-editor/lib/preview';
-import '@kangc/v-md-editor/lib/style/preview.css';
-import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
-import '@kangc/v-md-editor/lib/theme/style/github.css';
-import hljs from 'highlight.js';
+
+import ElementPlus from 'element-plus';
+import Fit2CloudPlus from 'fit2cloud-ui-plus';
+import * as Icons from '@element-plus/icons-vue';
 
 VMdPreview.use(githubTheme, {
     hljs,

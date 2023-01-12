@@ -1,20 +1,16 @@
-// * 设置 notification 层级在 loading 之上
 .el-notification {
     z-index: 99999 !important;
 }
 
-// * 设置 message 层级在 loading 之上
 .el-message {
     z-index: 99999 !important;
 }
 
-// * el-table 样式
 .table-box {
     display: flex;
     flex-direction: column;
     height: 100%;
 
-    // 表格 search 样式
     .table-search {
         display: flex;
         margin-bottom: 10px;
@@ -32,12 +28,10 @@
                     width: 400px;
                 }
 
-                // 去除时间选择器上下 padding
                 .el-range-editor.el-input__wrapper {
                     padding: 0 10px;
                 }
 
-                // el-select 为多选时不换行显示
                 .el-select__tags {
                     overflow: hidden;
                     white-space: nowrap;
@@ -56,7 +50,6 @@
         }
     }
 
-    // 表格 header 样式
     .table-header {
         .header-button-lf {
             float: left;
@@ -72,9 +65,7 @@
         }
     }
 
-    // el-table 表格样式
     .el-table {
-        // 表格自适应撑满整个页面(设置了 flex:1,页面上表格必须添加 height 属性)
         flex: 1;
         .el-table__header th,
         .el-table__body td {
@@ -88,14 +79,12 @@
             background: #fafafa;
         }
 
-        // table 中 image 图片样式
         .table-image {
             width: 50px;
             height: 50px;
             border-radius: 50%;
         }
 
-        // 解决 el-table 中 header 文字换行问题
         .el-table__header .el-table__cell > .cell {
             white-space: nowrap;
         }
@@ -103,7 +92,6 @@
             height: 52px;
         }
 
-        // 解决表格数据为空时样式不居中问题(仅在element-plus中)
         .el-table__empty-block {
             position: absolute;
             top: 50%;
@@ -113,18 +101,8 @@
         .table-empty {
             line-height: 30px;
         }
-
-        // 解决 keep-alive || 浏览器窗口大小变化 导致 el-table 样式错乱问题（2.1.4会出现问题，升级之后问题已解决）
-        // .el-table__body-wrapper {
-        // 	height: calc(100% - 50px) !important;
-        // }
-        // .el-table__inner-wrapper,
-        // .el-scrollbar__wrap {
-        // 	height: 100% !important;
-        // }
     }
 
-    // 表格 pagination 样式
     .el-pagination {
         display: flex;
         justify-content: flex-end;
@@ -132,9 +110,7 @@
     }
 }
 
-// * el-drawer 样式
 .el-drawer {
-    // drawer header 样式
     .el-drawer__header {
         padding: 15px 20px 14px;
         margin-bottom: 0;
@@ -145,7 +121,6 @@
         }
     }
 
-    // drawer header 样式
     .el-drawer__footer {
         border-top: 1px solid #ebeef5;
     }
@@ -153,7 +128,6 @@
         width: 100%;
     }
 
-    // drawer-form 多列 form-item
     .drawer-multiColumn-form {
         display: flex;
         flex-wrap: wrap;
@@ -166,7 +140,6 @@
     }
 }
 
-// * el-dialog 样式
 .el-dialog {
     .el-dialog__header {
         padding: 15px 20px;
@@ -188,5 +161,4 @@
     height: 100%;
     margin-right: 20px;
     border: 0;
-    // box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
 }

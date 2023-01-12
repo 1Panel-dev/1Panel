@@ -4,7 +4,7 @@ const appStoreRouter = {
     sort: 2,
     path: '/apps',
     component: Layout,
-    redirect: '/apps',
+    redirect: '/apps/all',
     meta: {
         icon: 'p-appstore',
         title: 'menu.apps',
@@ -13,6 +13,7 @@ const appStoreRouter = {
         {
             path: '/apps',
             name: 'App',
+            redirect: '/apps/all',
             component: () => import('@/views/app-store/index.vue'),
             meta: {},
             children: [

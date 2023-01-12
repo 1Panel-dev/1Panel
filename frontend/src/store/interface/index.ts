@@ -11,7 +11,7 @@ export interface GlobalState {
     isLogin: boolean;
     csrfToken: string;
     language: string; // zh | en
-    assemblySize: string; // small | default | large
+    // assemblySize: string; // small | default | large
     themeConfig: ThemeConfigProp;
 }
 

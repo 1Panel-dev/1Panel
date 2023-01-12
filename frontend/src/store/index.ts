@@ -9,11 +9,10 @@ export const GlobalStore = defineStore({
     state: (): GlobalState => ({
         isLogin: false,
         csrfToken: '',
-        assemblySize: 'default',
         language: '',
         themeConfig: {
             panelName: '',
-            primary: '#409EFF',
+            primary: '#005EEB',
             theme: 'bright',
             footer: true,
         },
@@ -25,9 +24,6 @@ export const GlobalStore = defineStore({
         },
         setCsrfToken(token: string) {
             this.csrfToken = token;
-        },
-        setAssemblySize(assemblySize: string) {
-            this.assemblySize = assemblySize;
         },
         updateLanguage(language: string) {
             this.language = language;
