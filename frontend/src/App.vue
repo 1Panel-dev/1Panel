@@ -1,5 +1,5 @@
 <template>
-    <el-config-provider :locale="i18nLocale" :button="config" :size="assemblySize">
+    <el-config-provider :locale="i18nLocale" :button="config" size="default">
         <router-view v-if="isRouterAlive"></router-view>
     </el-config-provider>
 </template>
@@ -23,7 +23,7 @@ const i18nLocale = computed((): any => {
     return '';
 });
 
-const assemblySize = computed((): string => globalStore.assemblySize);
+// const assemblySize = computed((): string => globalStore.assemblySize);
 
 let isRouterAlive = ref(true);
 

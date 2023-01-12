@@ -10,6 +10,10 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 import DefineOptions from 'unplugin-vue-define-options/vite';
 import MonacoEditorPlugin from 'vite-plugin-monaco-editor';
 
+import AutoImport from 'unplugin-auto-import/vite';
+import Components from 'unplugin-vue-components/vite';
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
+
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     const env = loadEnv(mode, process.cwd());
     const viteEnv = wrapperEnv(env);
@@ -49,7 +53,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 
             MonacoEditorPlugin({}),
             viteEnv.VITE_REPORT && visualizer(),
-            // * gzip compress
             viteEnv.VITE_BUILD_GZIP &&
                 viteCompression({
                     verbose: true,
@@ -58,6 +61,20 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
                     algorithm: 'gzip',
                     ext: '.gz',
                 }),
+            AutoImport({
+                resolvers: [
+                    ElementPlusResolver({
+                        importStyle: 'sass',
+                    }),
+                ],
+            }),
+            Components({
+                resolvers: [
+                    ElementPlusResolver({
+                        importStyle: 'sass',
+                    }),
+                ],
+            }),
         ],
         esbuild: {
             pure: viteEnv.VITE_DROP_CONSOLE ? ['console.log', 'debugger'] : [],
@@ -67,7 +84,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             minify: 'esbuild',
             rollupOptions: {
                 output: {
-                    // Static resource classification and packaging
                     chunkFileNames: 'assets/js/[name]-[hash].js',
                     entryFileNames: 'assets/js/[name]-[hash].js',
                     assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
