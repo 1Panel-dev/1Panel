@@ -1,0 +1,75 @@
+.app-card {
+    height: 140px;
+    margin-top: 10px;
+    cursor: pointer;
+    padding: 5px;
+
+    .icon {
+        margin-top: 10px;
+        margin-left: 20px;
+    }
+
+    .a-detail {
+        margin-top: 10px;
+        height: 100%;
+        width: 100%;
+
+        .d-name {
+            height: 20%;
+            .name {
+                font-weight: 500;
+                font-size: 18px;
+                color: #1f2329;
+            }
+            .status {
+                margin-left: 10px;
+            }
+            .h-button {
+                float: right;
+                margin-right: 10px;
+            }
+        }
+
+        .d-description {
+            margin-top: 10px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            .el-tag {
+                margin-right: 5px;
+            }
+            .description {
+                margin-top: 10px;
+                font-size: 14px;
+                color: #646a73;
+            }
+        }
+        .d-button {
+            margin-top: 10px;
+        }
+    }
+}
+
+.app-card:hover {
+    background-color: rgba(0, 94, 235, 0.03);
+}
+
+.table-button {
+    display: inline;
+    margin-right: 5px;
+}
+
+.tag-button {
+    margin-left: 10px;
+}
+
+.divider {
+    margin-top: 5px;
+    border: 0;
+    border-top: 1px solid #f2f2f2;
+}
+
+.el-avatar {
+    --el-avatar-bg-color: #eaeaea;
+}
