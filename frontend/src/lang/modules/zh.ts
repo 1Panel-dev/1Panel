@@ -855,6 +855,7 @@ export default {
         toInstall: '去安装',
         param: '参数配置',
         syncAppList: '更新应用列表',
+        syncAppListSuccess: '更新成功',
     },
     website: {
         website: '网站',
