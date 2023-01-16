@@ -49,7 +49,7 @@
 <script lang="ts" setup>
 import { logContainer } from '@/api/modules/container';
 import i18n from '@/lang';
-import { dateFromatForName } from '@/utils/util';
+import { dateFormatForName } from '@/utils/util';
 import { nextTick, reactive, ref, shallowRef } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
@@ -114,7 +114,7 @@ const onDownload = async () => {
     const a = document.createElement('a');
     a.style.display = 'none';
     a.href = downloadUrl;
-    a.download = logSearch.container + '-' + dateFromatForName(new Date()) + '.log';
+    a.download = logSearch.container + '-' + dateFormatForName(new Date()) + '.log';
     const event = new MouseEvent('click');
     a.dispatchEvent(event);
 };

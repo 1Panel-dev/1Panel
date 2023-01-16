@@ -46,7 +46,7 @@
                 <el-table-column
                     prop="expireDate"
                     :label="$t('website.expireDate')"
-                    :formatter="dateFromat"
+                    :formatter="dateFormat"
                     show-overflow-tooltip
                 />
                 <fu-table-operations
@@ -76,7 +76,7 @@ import AcmeAccount from './acme-account/index.vue';
 import Renew from './renew/index.vue';
 import Create from './create/index.vue';
 import Detail from './detail/index.vue';
-import { dateFromat, getProvider } from '@/utils/util';
+import { dateFormat, getProvider } from '@/utils/util';
 import i18n from '@/lang';
 import { Website } from '@/api/interface/website';
 import { useDeleteData } from '@/hooks/use-delete-data';

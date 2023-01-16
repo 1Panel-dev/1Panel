@@ -71,7 +71,7 @@
                     <el-table-column
                         prop="createTime"
                         :label="$t('commons.table.date')"
-                        :formatter="dateFromat"
+                        :formatter="dateFormat"
                         show-overflow-tooltip
                     />
                     <fu-table-operations
@@ -107,7 +107,7 @@ import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
 import Status from '@/components/status/index.vue';
 import Submenu from '@/views/container/index.vue';
 import { reactive, onMounted, ref } from 'vue';
-import { dateFromat } from '@/utils/util';
+import { dateFormat } from '@/utils/util';
 import { ContainerOperator, inspect, loadDockerStatus, searchContainer } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { ElMessage, ElMessageBox } from 'element-plus';

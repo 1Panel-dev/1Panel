@@ -50,7 +50,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { ContainerStats } from '@/api/modules/container';
-import { dateFromatForSecond } from '@/utils/util';
+import { dateFormatForSecond } from '@/utils/util';
 import * as echarts from 'echarts';
 import i18n from '@/lang';
 
@@ -142,7 +142,7 @@ const loadData = async () => {
     if (netRxDatas.value.length > 20) {
         netRxDatas.value.splice(0, 1);
     }
-    timeDatas.value.push(dateFromatForSecond(res.data.shotTime));
+    timeDatas.value.push(dateFormatForSecond(res.data.shotTime));
     if (timeDatas.value.length > 20) {
         timeDatas.value.splice(0, 1);
     }

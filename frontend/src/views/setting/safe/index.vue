@@ -186,7 +186,9 @@ import LayoutContent from '@/layout/layout-content.vue';
 import { updatePassword, updateSetting, getMFA, bindMFA, getSettingInfo } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
-import { dateFromat } from '@/utils/util';
+import { dateFormatSimple } from '@/utils/util';
+
+const emit = defineEmits(['search']);
 import { GlobalStore } from '@/store';
 import router from '@/routers';
 
@@ -377,7 +379,7 @@ const submitTimeout = async (formEl: FormInstance | undefined) => {
                 loading.value = false;
                 search();
                 loadTimeOut();
-                form.expirationTime = dateFromat(0, 0, time);
+                form.expirationTime = dateFormatSimple(time);
                 timeoutVisiable.value = false;
             })
             .catch(() => {

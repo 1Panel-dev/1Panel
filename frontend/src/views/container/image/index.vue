@@ -33,7 +33,7 @@
                     <el-table-column :label="$t('container.size')" prop="size" min-width="70" fix />
                     <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
                         <template #default="{ row }">
-                            {{ dateFromat(0, 0, row.createdAt) }}
+													{{ dateFormatSimple(row.createdAt) }}
                         </template>
                     </el-table-column>
                     <fu-table-operations
@@ -81,7 +81,7 @@
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import { reactive, onMounted, ref } from 'vue';
-import { dateFromat } from '@/utils/util';
+import { dateFormatSimple } from '@/utils/util';
 import Submenu from '@/views/container/index.vue';
 import { Container } from '@/api/interface/container';
 import LayoutContent from '@/layout/layout-content.vue';

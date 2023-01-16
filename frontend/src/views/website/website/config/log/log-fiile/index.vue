@@ -42,7 +42,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef } from 'vue';
 import { OpWebsiteLog } from '@/api/modules/website';
-import { dateFromatForName } from '@/utils/util';
+import { dateFormatForName } from '@/utils/util';
 
 const extensions = [javascript(), oneDark];
 const props = defineProps({
@@ -129,7 +129,7 @@ const onDownload = async () => {
     const a = document.createElement('a');
     a.style.display = 'none';
     a.href = downloadUrl;
-    a.download = logType.value + '-' + dateFromatForName(new Date()) + '.log';
+    a.download = logType.value + '-' + dateFormatForName(new Date()) + '.log';
     const event = new MouseEvent('click');
     a.dispatchEvent(event);
 };

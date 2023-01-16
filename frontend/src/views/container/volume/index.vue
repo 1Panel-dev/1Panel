@@ -52,7 +52,7 @@
                         prop="createdAt"
                         min-width="90"
                         :label="$t('commons.table.date')"
-                        :formatter="dateFromat"
+                        :formatter="dateFormat"
                     />
                     <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
                 </ComplexTable>
@@ -71,7 +71,7 @@ import CreateDialog from '@/views/container/volume/create/index.vue';
 import Submenu from '@/views/container/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
 import { reactive, onMounted, ref } from 'vue';
-import { dateFromat } from '@/utils/util';
+import { dateFormat } from '@/utils/util';
 import { deleteVolume, searchVolume, inspect, loadDockerStatus } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import i18n from '@/lang';

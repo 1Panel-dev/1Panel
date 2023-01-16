@@ -29,10 +29,10 @@
                         {{ ssl.type }}
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('ssl.startDate')">
-                        {{ dateFromat(0, 0, ssl.startDate) }}
+                        {{ dateFormatSimple(ssl.startDate) }}
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('website.expireDate')">
-                        {{ dateFromat(0, 0, ssl.expireDate) }}
+                        {{ dateFormatSimple(ssl.expireDate) }}
                     </el-descriptions-item>
                 </el-descriptions>
             </div>
@@ -61,7 +61,7 @@
 <script lang="ts" setup>
 import { GetSSL } from '@/api/modules/website';
 import { ref } from 'vue';
-import { dateFromat, getProvider } from '@/utils/util';
+import { dateFormatSimple, getProvider } from '@/utils/util';
 import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
 import useClipboard from 'vue-clipboard3';

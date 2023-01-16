@@ -18,7 +18,7 @@
                         <span v-if="isEver(props.expireDate)">
                             {{ $t('website.neverExpire') }}
                         </span>
-                        <span v-else>{{ dateFromatSimple(props.expireDate) }}</span>
+                        <span v-else>{{ dateFormatSimple(props.expireDate) }}</span>
                     </el-tag>
                 </div>
             </el-col>
@@ -27,7 +27,7 @@
 </template>
 <script lang="ts" setup>
 import Status from '@/components/status/index.vue';
-import { dateFromatSimple } from '@/utils/util';
+import { dateFormatSimple } from '@/utils/util';
 const props = defineProps({
     primaryDomain: {
         type: String,

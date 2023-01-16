@@ -11,7 +11,7 @@
                     <el-descriptions-item :label="$t('file.user')">{{ data.user }}</el-descriptions-item>
                     <el-descriptions-item :label="$t('file.group')">{{ data.group }}</el-descriptions-item>
                     <el-descriptions-item :label="$t('commons.table.updatedAt')">
-                        {{ dateFromat(0, 0, data.modTime) }}
+                        {{ dateFormatSimple(data.modTime) }}
                     </el-descriptions-item>
                 </el-descriptions>
             </el-col>
@@ -23,7 +23,7 @@
 import { GetFileContent } from '@/api/modules/files';
 import { computeSize } from '@/utils/util';
 import { ref } from 'vue';
-import { dateFromat } from '@/utils/util';
+import { dateFormatSimple } from '@/utils/util';
 
 interface InfoProps {
     path: string;

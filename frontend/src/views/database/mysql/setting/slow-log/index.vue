@@ -57,7 +57,7 @@ import { LoadFile } from '@/api/modules/files';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { updateMysqlVariables } from '@/api/modules/database';
 import { ElMessage } from 'element-plus';
-import { dateFromatForName } from '@/utils/util';
+import { dateFormatForName } from '@/utils/util';
 import i18n from '@/lang';
 import { loadBaseDir } from '@/api/modules/setting';
 
@@ -141,7 +141,7 @@ const onDownload = async () => {
     const a = document.createElement('a');
     a.style.display = 'none';
     a.href = downloadUrl;
-    a.download = mysqlName.value + '-slowlogs-' + dateFromatForName(new Date()) + '.log';
+    a.download = mysqlName.value + '-slowlogs-' + dateFormatForName(new Date()) + '.log';
     const event = new MouseEvent('click');
     a.dispatchEvent(event);
 };

@@ -24,7 +24,7 @@
             <el-table-column
                 prop="createdAt"
                 :label="$t('commons.table.date')"
-                :formatter="dateFromat"
+                :formatter="dateFormat"
                 show-overflow-tooltip
             />
             <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
@@ -35,7 +35,7 @@
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import { reactive, ref } from 'vue';
-import { dateFromat } from '@/utils/util';
+import { dateFormat } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';

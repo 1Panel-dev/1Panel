@@ -114,7 +114,7 @@ import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
 import * as echarts from 'echarts';
 import { loadMonitor, getNetworkOptions } from '@/api/modules/monitor';
 import { Monitor } from '@/api/interface/monitor';
-import { dateFromatWithoutYear } from '@/utils/util';
+import { dateFormatWithoutYear } from '@/utils/util';
 import i18n from '@/lang';
 
 const zoomStart = ref();
@@ -211,7 +211,7 @@ const search = async (param: string) => {
         switch (item.param) {
             case 'base':
                 let baseDate = item.date.map(function (item: any) {
-                    return dateFromatWithoutYear(item);
+                    return dateFormatWithoutYear(item);
                 });
                 if (param === 'cpu' || param === 'all') {
                     let cpuData = item.value.map(function (item: any) {
@@ -241,7 +241,7 @@ const search = async (param: string) => {
                 break;
             case 'network':
                 let networkDate = item.date.map(function (item: any) {
-                    return dateFromatWithoutYear(item);
+                    return dateFormatWithoutYear(item);
                 });
                 let networkUp = item.value.map(function (item: any) {
                     return item.up.toFixed(2);
@@ -327,7 +327,7 @@ function initLoadCharts(item: Monitor.MonitorData) {
         grid: { left: '7%', right: '7%', bottom: '20%' },
         xAxis: {
             data: item.date.map(function (item: any) {
-                return dateFromatWithoutYear(item);
+                return dateFormatWithoutYear(item);
             }),
         },
         yAxis: [
@@ -425,7 +425,7 @@ function initIOCharts(item: Monitor.MonitorData) {
         grid: { left: '7%', right: '7%', bottom: '20%' },
         xAxis: {
             data: item.date.map(function (item: any) {
-                return dateFromatWithoutYear(item);
+                return dateFormatWithoutYear(item);
             }),
         },
         yAxis: [
@@ -482,7 +482,7 @@ function changeChartSize() {
 }
 
 onMounted(() => {
-    zoomStart.value = dateFromatWithoutYear(new Date(new Date().setHours(0, 0, 0, 0)));
+    zoomStart.value = dateFormatWithoutYear(new Date(new Date().setHours(0, 0, 0, 0)));
     loadNetworkOptions();
     window.addEventListener('resize', changeChartSize);
 });

@@ -157,7 +157,7 @@ import App from '@/views/home/app/index.vue';
 import CardWithHeader from '@/components/card-with-header/index.vue';
 import i18n from '@/lang';
 import { Dashboard } from '@/api/interface/dashboard';
-import { dateFromatForSecond, computeSize } from '@/utils/util';
+import { dateFormatForSecond, computeSize } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
@@ -341,11 +341,11 @@ const onLoadCurrentInfo = async () => {
     }
     currentChartInfo.ioCount = Number(((res.data.ioCount - currentInfo.value.ioCount) / 3).toFixed(2));
 
-    timeIODatas.value.push(dateFromatForSecond(res.data.shotTime));
+    timeIODatas.value.push(dateFormatForSecond(res.data.shotTime));
     if (timeIODatas.value.length > 20) {
         timeIODatas.value.splice(0, 1);
     }
-    timeNetDatas.value.push(dateFromatForSecond(res.data.shotTime));
+    timeNetDatas.value.push(dateFormatForSecond(res.data.shotTime));
     if (timeNetDatas.value.length > 20) {
         timeNetDatas.value.splice(0, 1);
     }
