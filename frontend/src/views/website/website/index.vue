@@ -106,7 +106,7 @@
                                 {{ $t('website.neverExpire') }}
                             </span>
                             <span v-else @click="openDatePicker(row, $index)">
-                                {{ dateFromatSimple(row.expireDate) }}
+                                {{ dateFormatSimple(row.expireDate) }}
                             </span>
                         </div>
                     </template>
@@ -152,7 +152,7 @@ import i18n from '@/lang';
 import router from '@/routers';
 import { App } from '@/api/interface/app';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { dateFromatSimple } from '@/utils/util';
+import { dateFormatSimple } from '@/utils/util';
 
 const shortcuts = [
     {
@@ -269,7 +269,7 @@ const pickerVisibility = (visibility: boolean, row: any) => {
 };
 
 const submitDate = (row: any) => {
-    const reqDate = dateFromatSimple(row.expireDate);
+    const reqDate = dateFormatSimple(row.expireDate);
     const req = {
         id: row.id,
         primaryDomain: row.primaryDomain,

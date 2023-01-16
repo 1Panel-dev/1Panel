@@ -72,7 +72,7 @@
                                 {{ websiteSSL.acmeAccount.email }}
                             </el-descriptions-item>
                             <el-descriptions-item :label="$t('website.expireDate')">
-                                {{ dateFromat(1, 1, websiteSSL.expireDate) }}
+                                {{ dateFormatSimple(websiteSSL.expireDate) }}
                             </el-descriptions-item>
                         </el-descriptions>
                     </el-form-item>
@@ -123,7 +123,7 @@ import { ElMessage, ElMessageBox, FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
-import { dateFromat, getProvider } from '@/utils/util';
+import { dateFormatSimple, getProvider } from '@/utils/util';
 
 const props = defineProps({
     id: {

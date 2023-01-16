@@ -116,7 +116,7 @@
                     <el-table-column
                         :label="$t('file.updateTime')"
                         prop="modTime"
-                        :formatter="dateFromat"
+                        :formatter="dateFormat"
                         min-width="150"
                         show-overflow-tooltip
                     ></el-table-column>
@@ -187,7 +187,7 @@ import {
     SaveFileContent,
     ComputeDirSize,
 } from '@/api/modules/files';
-import { computeSize, dateFromat, getIcon, getRandomStr } from '@/utils/util';
+import { computeSize, dateFormat, getIcon, getRandomStr } from '@/utils/util';
 import { File } from '@/api/interface/file';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElMessage } from 'element-plus';

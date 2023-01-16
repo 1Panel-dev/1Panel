@@ -33,7 +33,7 @@
             <el-table-column
                 prop="createdAt"
                 :label="$t('app.backupdate')"
-                :formatter="dateFromat"
+                :formatter="dateFormat"
                 show-overflow-tooltip
             />
             <fu-table-operations
@@ -73,7 +73,7 @@ import { DelAppBackups, GetAppBackups, InstalledOp } from '@/api/modules/app';
 import { reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import Header from '@/components/drawer-header/index.vue';
-import { dateFromat } from '@/utils/util';
+import { dateFormat } from '@/utils/util';
 import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';

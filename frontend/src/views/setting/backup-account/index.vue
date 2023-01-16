@@ -191,7 +191,7 @@
                                     {{ sftpData.bucket }}
                                 </el-form-item>
                                 <el-form-item :label="$t('commons.table.createdAt')">
-                                    {{ dateFromat(0, 0, sftpData.createdAt) }}
+																	{{ dateFormatSimple(sftpData.createdAt) }}
                                 </el-form-item>
                             </div>
                             <el-alert v-else center style="height: 167px; background-color: #e2e4ec" :closable="false">
@@ -214,7 +214,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { dateFromat } from '@/utils/util';
+import { dateFormatSimple } from '@/utils/util';
 import { onMounted, ref } from 'vue';
 import LayoutContent from '@/layout/layout-content.vue';
 import { getBackupList, deleteBackup } from '@/api/modules/backup';

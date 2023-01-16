@@ -46,7 +46,7 @@
                 </el-table-column>
                 <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
                     <template #default="{ row }">
-                        {{ dateFromat(0, 0, row.modTime) }}
+                        {{ dateFormatSimple(row.modTime) }}
                     </template>
                 </el-table-column>
                 <fu-table-operations
@@ -64,7 +64,7 @@
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import { reactive, ref } from 'vue';
-import { computeSize, dateFromat } from '@/utils/util';
+import { computeSize, dateFormatSimple } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import i18n from '@/lang';
 import { ElMessage, UploadFile, UploadFiles, UploadInstance, UploadProps } from 'element-plus';

@@ -29,7 +29,7 @@
                         >
                             <el-icon v-if="item.status === 'Success'"><Select /></el-icon>
                             <el-icon v-if="item.status === 'Failed'"><CloseBold /></el-icon>
-                            {{ dateFromat(0, 0, item.startTime) }}
+                            {{ dateFormatSimple(item.startTime) }}
                         </li>
                     </ul>
                     <div style="margin-top: 10px; margin-bottom: 5px; font-size: 12px; float: right">
@@ -164,7 +164,7 @@
                         <el-row>
                             <el-col :span="8">
                                 <el-form-item :label="$t('commons.search.timeStart')">
-                                    {{ dateFromat(0, 0, currentRecord?.startTime) }}
+                                    {{ dateFormatSimple(currentRecord?.startTime) }}
                                 </el-form-item>
                             </el-col>
                             <el-col :span="8">
@@ -232,7 +232,7 @@ import { Cronjob } from '@/api/interface/cronjob';
 import { loadZero } from '@/utils/util';
 import { loadBackupName } from '@/views/setting/helper';
 import { searchRecords, download } from '@/api/modules/cronjob';
-import { dateFromat, dateFromatForName } from '@/utils/util';
+import { dateFormatSimple, dateFormatForName } from '@/utils/util';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
 import { LoadFile } from '@/api/modules/files';
@@ -362,9 +362,9 @@ const onDownload = async (recordID: number, backupID: number) => {
     a.style.display = 'none';
     a.href = downloadUrl;
     if (dialogData.value.rowData!.type === 'database') {
-        a.download = dateFromatForName(currentRecord.value?.startTime) + '.sql.gz';
+        a.download = dateFormatForName(currentRecord.value?.startTime) + '.sql.gz';
     } else {
-        a.download = dateFromatForName(currentRecord.value?.startTime) + '.tar.gz';
+        a.download = dateFormatForName(currentRecord.value?.startTime) + '.tar.gz';
     }
     const event = new MouseEvent('click');
     a.dispatchEvent(event);

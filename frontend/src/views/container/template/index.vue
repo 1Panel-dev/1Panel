@@ -39,7 +39,7 @@
                     <el-table-column :label="$t('container.description')" prop="description" min-width="200" fix />
                     <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
                         <template #default="{ row }">
-                            {{ dateFromat(0, 0, row.createdAt) }}
+													{{ dateFormatSimple(row.createdAt) }}
                         </template>
                     </el-table-column>
                     <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" />
@@ -86,7 +86,7 @@ import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { reactive, onMounted, ref } from 'vue';
-import { dateFromat } from '@/utils/util';
+import { dateFormatSimple } from '@/utils/util';
 import { Container } from '@/api/interface/container';
 import OperatorDialog from '@/views/container/template/operator/index.vue';
 import { deleteComposeTemplate, loadDockerStatus, searchComposeTemplate } from '@/api/modules/container';

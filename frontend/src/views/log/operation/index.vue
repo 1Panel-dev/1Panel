@@ -39,7 +39,7 @@
                     <el-table-column
                         prop="createdAt"
                         :label="$t('commons.table.date')"
-                        :formatter="dateFromat"
+                        :formatter="dateFormat"
                         show-overflow-tooltip
                     />
                 </ComplexTable>
@@ -53,7 +53,7 @@
 <script setup lang="ts">
 import ComplexTable from '@/components/complex-table/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import { dateFromat } from '@/utils/util';
+import { dateFormat } from '@/utils/util';
 import LayoutContent from '@/layout/layout-content.vue';
 import { cleanLogs, getOperationLogs } from '@/api/modules/log';
 import Submenu from '@/views/log/index.vue';

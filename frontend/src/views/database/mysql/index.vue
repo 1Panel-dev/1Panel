@@ -86,7 +86,7 @@
                         <el-table-column
                             prop="createdAt"
                             :label="$t('commons.table.date')"
-                            :formatter="dateFromat"
+                            :formatter="dateFormat"
                             show-overflow-tooltip
                         />
                         <fu-table-operations
@@ -196,7 +196,7 @@ import AppResources from '@/views/database/mysql/check/index.vue';
 import Setting from '@/views/database/mysql/setting/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import Submenu from '@/views/database/index.vue';
-import { dateFromat } from '@/utils/util';
+import { dateFormat } from '@/utils/util';
 import { reactive, ref } from 'vue';
 import {
     deleteCheckMysqlDB,

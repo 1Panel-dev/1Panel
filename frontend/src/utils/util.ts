@@ -35,7 +35,7 @@ export function getBrowserLang() {
     }
     return defaultBrowserLang;
 }
-export function dateFromat(row: number, col: number, dataStr: any) {
+export function dateFormat(row: any, col: any, dataStr: any) {
     const date = new Date(dataStr);
     const y = date.getFullYear();
     let m: string | number = date.getMonth() + 1;
@@ -52,7 +52,7 @@ export function dateFromat(row: number, col: number, dataStr: any) {
 }
 
 //2016-01-12
-export function dateFromatSimple(dataStr: any) {
+export function dateFormatSimple(dataStr: any) {
     const date = new Date(dataStr);
     const y = date.getFullYear();
     let m: string | number = date.getMonth() + 1;
@@ -63,7 +63,7 @@ export function dateFromatSimple(dataStr: any) {
 }
 
 // 20221013151302
-export function dateFromatForName(dataStr: any) {
+export function dateFormatForName(dataStr: any) {
     const date = new Date(dataStr);
     const y = date.getFullYear();
     let m: string | number = date.getMonth() + 1;
@@ -80,7 +80,7 @@ export function dateFromatForName(dataStr: any) {
 }
 
 // 10-13 \n 15:13
-export function dateFromatWithoutYear(dataStr: any) {
+export function dateFormatWithoutYear(dataStr: any) {
     const date = new Date(dataStr);
     let m: string | number = date.getMonth() + 1;
     m = m < 10 ? `0${String(m)}` : m;
@@ -94,7 +94,7 @@ export function dateFromatWithoutYear(dataStr: any) {
 }
 
 // 20221013151302
-export function dateFromatForSecond(dataStr: any) {
+export function dateFormatForSecond(dataStr: any) {
     const date = new Date(dataStr);
     let h: string | number = date.getHours();
     h = h < 10 ? `0${String(h)}` : h;
