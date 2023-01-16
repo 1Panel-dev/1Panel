@@ -504,7 +504,7 @@ func getAppFromOss() error {
 		return err
 	}
 	appDir := constant.AppResourceDir
-	content, _ := os.ReadFile(path.Join(appDir, "apps.json"))
+	content, _ := os.ReadFile(path.Join(appDir, "list.json"))
 
 	if content != nil {
 		oldConfig := &dto.AppOssConfig{}
