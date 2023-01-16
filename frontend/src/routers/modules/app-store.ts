@@ -37,18 +37,18 @@ const appStoreRouter = {
                         activeMenu: '/apps',
                     },
                 },
+                {
+                    path: 'update',
+                    name: 'AppUpdate',
+                    component: () => import('@/views/app-store/installed/index.vue'),
+                    props: true,
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/apps',
+                    },
+                },
             ],
         },
-        // {
-        //     path: '/apps/detail/:id',
-        //     name: 'AppDetail',
-        //     props: true,
-        //     hidden: true,
-        //     component: () => import('@/views/app-store/detail/index.vue'),
-        //     meta: {
-        //         activeMenu: '/apps',
-        //     },
-        // },
     ],
 };
 

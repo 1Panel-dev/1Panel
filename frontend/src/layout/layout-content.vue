@@ -59,7 +59,7 @@
 import { computed, useSlots } from 'vue';
 import BackButton from '@/components/back-button/index.vue';
 import FormButton from './form-button.vue';
-defineOptions({ name: 'LayoutContent' }); // 组件名
+defineOptions({ name: 'LayoutContent' });
 const slots = useSlots();
 const prop = defineProps({
     title: String,

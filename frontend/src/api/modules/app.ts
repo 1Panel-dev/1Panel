@@ -14,6 +14,10 @@ export const GetApp = (id: number) => {
     return http.get<App.AppDTO>('apps/' + id);
 };
 
+export const GetAppTags = () => {
+    return http.get<App.Tag[]>('apps/tags');
+};
+
 export const GetAppDetail = (id: number, version: string) => {
     return http.get<App.AppDetail>(`apps/detail/${id}/${version}`);
 };

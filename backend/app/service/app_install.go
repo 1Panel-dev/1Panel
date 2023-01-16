@@ -36,13 +36,33 @@ func (a AppInstallService) Page(req request.AppInstalledSearch) (int64, []respon
 	if req.Name != "" {
 		opts = append(opts, commonRepo.WithLikeName(req.Name))
 	}
+	if len(req.Tags) != 0 {
+		tags, err := tagRepo.GetByKeys(req.Tags)
+		if err != nil {
+			return 0, nil, err
+		}
+		var tagIds []uint
+		for _, t := range tags {
+			tagIds = append(tagIds, t.ID)
+		}
+		appTags, err := appTagRepo.GetByTagIds(tagIds)
+		if err != nil {
+			return 0, nil, err
+		}
+		var appIds []uint
+		for _, t := range appTags {
+			appIds = append(appIds, t.AppId)
+		}
+
+		opts = append(opts, appInstallRepo.WithAppIdsIn(appIds))
+	}
 
 	total, installs, err := appInstallRepo.Page(req.Page, req.PageSize, opts...)
 	if err != nil {
 		return 0, nil, err
 	}
 
-	installDTOs, err := handleInstalled(installs)
+	installDTOs, err := handleInstalled(installs, req.Update)
 	if err != nil {
 		return 0, nil, err
 	}
@@ -98,9 +118,12 @@ func (a AppInstallService) LoadPassword(key string) (string, error) {
 	return app.Password, nil
 }
 
-func (a AppInstallService) Search(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error) {
-	var installs []model.AppInstall
-	var err error
+func (a AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error) {
+	var (
+		installs []model.AppInstall
+		err      error
+		opts     []repo.DBOption
+	)
 	if req.Type != "" {
 		apps, err := appRepo.GetBy(appRepo.WithType(req.Type))
 		if err != nil {
@@ -110,7 +133,11 @@ func (a AppInstallService) Search(req request.AppInstalledSearch) ([]response.Ap
 		for _, app := range apps {
 			ids = append(ids, app.ID)
 		}
-		installs, err = appInstallRepo.GetBy(appInstallRepo.WithAppIdsIn(ids), appInstallRepo.WithIdNotInWebsite())
+		if req.Unused {
+			opts = append(opts, appInstallRepo.WithIdNotInWebsite())
+		}
+		opts = append(opts, appInstallRepo.WithAppIdsIn(ids))
+		installs, err = appInstallRepo.GetBy(opts...)
 		if err != nil {
 			return nil, err
 		}
@@ -121,7 +148,7 @@ func (a AppInstallService) Search(req request.AppInstalledSearch) ([]response.Ap
 		}
 	}
 
-	return handleInstalled(installs)
+	return handleInstalled(installs, false)
 }
 
 func (a AppInstallService) Operate(req request.AppInstalledOperate) error {

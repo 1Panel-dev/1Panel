@@ -10,7 +10,7 @@
         </template>
         <template v-if="nginxIsExist && !openNginxConfig" #toolbar>
             <el-row :class="{ mask: nginxStatus != 'Running' }">
-                <el-col :span="10">
+                <el-col :span="20">
                     <el-button type="primary" icon="Plus" @click="openCreate">
                         {{ $t('commons.button.create') }}
                     </el-button>
@@ -21,10 +21,9 @@
                         {{ $t('website.defaulServer') }}
                     </el-button>
                 </el-col>
-                <el-col :span="14">
-                    <div style="float: right">
+                <el-col :span="4">
+                    <div class="search-button">
                         <el-input
-                            class="table-button"
                             v-model="req.name"
                             clearable
                             @clear="search()"
@@ -366,9 +365,8 @@ onMounted(() => {
 });
 </script>
 <style lang="scss">
-.table-button {
-    border-radius: 20px;
+.search-button {
+    float: right;
     display: inline;
-    margin-right: 5px;
 }
 </style>

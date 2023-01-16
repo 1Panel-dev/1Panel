@@ -1,12 +1,8 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('app.backup') + ' - ' + installData.appInstallName"
-        width="70%"
-        :destroy-on-close="true"
-        :before-close="handleClose"
-        :close-on-click-modal="false"
-    >
+    <el-drawer v-model="open" size="50%" :destroy-on-close="true" :before-close="handleClose" :show-close="false">
+        <template #header>
+            <Header :header="$t('app.backup')" :resource="installData.appInstallName" :back="handleClose"></Header>
+        </template>
         <ComplexTable
             :pagination-config="paginationConfig"
             :data="data"
@@ -69,13 +65,14 @@
                 </span>
             </template>
         </el-dialog>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup name="installBackup">
 import { DelAppBackups, GetAppBackups, InstalledOp } from '@/api/modules/app';
 import { reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
+import Header from '@/components/drawer-header/index.vue';
 import { dateFromat } from '@/utils/util';
 import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
@@ -138,7 +135,7 @@ const backup = async () => {
     loading.value = true;
     await InstalledOp(req)
         .then(() => {
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            ElMessage.success(i18n.global.t('commons.msg.backupSuccess'));
             search();
         })
         .finally(() => {
@@ -157,7 +154,7 @@ const restore = async () => {
     loading.value = true;
     await InstalledOp(req)
         .then(() => {
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            ElMessage.success(i18n.global.t('commons.msg.restoreSuccess'));
             openRestorePage.value = false;
             search();
         })

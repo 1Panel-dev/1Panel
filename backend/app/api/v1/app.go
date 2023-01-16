@@ -115,3 +115,12 @@ func (b *BaseApi) InstallApp(c *gin.Context) {
 	tx.Commit()
 	helper.SuccessWithData(c, install)
 }
+
+func (b *BaseApi) GetAppTags(c *gin.Context) {
+	tags, err := appService.GetAppTags()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, tags)
+}

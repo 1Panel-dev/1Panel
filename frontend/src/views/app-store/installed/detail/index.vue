@@ -1,16 +1,20 @@
 <template>
-    <el-dialog v-model="open" :title="$t('app.param')" width="30%" :close-on-click-modal="false">
+    <el-drawer v-model="open" size="40%" :show-close="false">
+        <template #header>
+            <Header :header="$t('app.param')" :back="handleClose"></Header>
+        </template>
         <el-descriptions border :column="1">
             <el-descriptions-item v-for="(param, key) in params" :label="param.label" :key="key">
                 {{ param.value }}
             </el-descriptions-item>
         </el-descriptions>
-    </el-dialog>
+    </el-drawer>
 </template>
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { GetAppInstallParams } from '@/api/modules/app';
 import { ref } from 'vue';
+import Header from '@/components/drawer-header/index.vue';
 
 interface ParamProps {
     id: Number;
@@ -28,6 +32,10 @@ const acceptParams = (props: ParamProps) => {
     paramData.value.id = props.id;
     get();
     open.value = true;
+};
+
+const handleClose = () => {
+    open.value = false;
 };
 
 const get = async () => {

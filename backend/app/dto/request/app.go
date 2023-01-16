@@ -21,8 +21,11 @@ type AppInstallCreate struct {
 
 type AppInstalledSearch struct {
 	dto.PageInfo
-	Type string `json:"type"`
-	Name string `json:"name"`
+	Type   string   `json:"type"`
+	Name   string   `json:"name"`
+	Tags   []string `json:"tags"`
+	Update bool     `json:"update"`
+	Unused bool     `json:"unused"`
 }
 
 type AppBackupSearch struct {

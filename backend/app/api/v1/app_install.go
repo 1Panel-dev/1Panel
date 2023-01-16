@@ -38,7 +38,7 @@ func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 			Total: total,
 		})
 	} else {
-		list, err := appInstallService.Search(req)
+		list, err := appInstallService.SearchForWebsite(req)
 		if err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
