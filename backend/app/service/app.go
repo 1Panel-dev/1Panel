@@ -90,25 +90,38 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	return res, nil
 }
 
-func (a AppService) GetApp(id uint) (response.AppDTO, error) {
+func (a AppService) GetAppTags() ([]response.TagDTO, error) {
+	tags, err := tagRepo.All()
+	if err != nil {
+		return nil, err
+	}
+	var res []response.TagDTO
+	for _, tag := range tags {
+		res = append(res, response.TagDTO{
+			Tag: tag,
+		})
+	}
+	return res, nil
+}
+
+func (a AppService) GetApp(id uint) (*response.AppDTO, error) {
 	var appDTO response.AppDTO
 	app, err := appRepo.GetFirst(commonRepo.WithByID(id))
 	if err != nil {
-		return appDTO, err
+		return nil, err
 	}
 	appDTO.App = app
 	details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))
 	if err != nil {
-		return appDTO, err
+		return nil, err
 	}
 	var versionsRaw []string
 	for _, detail := range details {
 		versionsRaw = append(versionsRaw, detail.Version)
 	}
-
 	appDTO.Versions = common.GetSortedVersions(versionsRaw)
 
-	return appDTO, nil
+	return &appDTO, nil
 }
 
 func (a AppService) GetAppDetail(appId uint, version string) (response.AppDetailDTO, error) {

@@ -83,6 +83,8 @@ export default {
             operateConfirm: '如果确认操作，请手动输入',
             inputOrSelect: '请选择或输入',
             copyfailed: '复制失败',
+            backupSuccess: '备份成功',
+            restoreSuccess: '备份成功',
         },
         login: {
             firstLogin: '首次登录，请创建初始管理员用户！',
@@ -856,6 +858,12 @@ export default {
         param: '参数配置',
         syncAppList: '更新应用列表',
         syncAppListSuccess: '更新成功',
+        port: '端口',
+        areadyRun: '已安装',
+        day: '天',
+        hour: '小时',
+        minute: '分钟',
+        less1Minute: '小于1分钟',
     },
     website: {
         website: '网站',

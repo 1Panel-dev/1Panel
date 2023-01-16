@@ -21,5 +21,9 @@ const buttons = [
         label: i18n.global.t('app.installed'),
         path: '/apps/installed',
     },
+    {
+        label: i18n.global.t('app.canUpdate'),
+        path: '/apps/update',
+    },
 ];
 </script>

@@ -19,6 +19,10 @@ type AppDTO struct {
 	Tags     []model.Tag `json:"tags"`
 }
 
+type TagDTO struct {
+	model.Tag
+}
+
 type AppInstalledCheck struct {
 	IsExist       bool      `json:"isExist"`
 	Name          string    `json:"name"`

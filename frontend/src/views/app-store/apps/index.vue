@@ -18,15 +18,17 @@
                     </div>
                 </el-col>
                 <el-col :span="4">
-                    <el-input
-                        v-model="req.name"
-                        clearable
-                        @clear="searchByName('')"
-                        suffix-icon="Search"
-                        @keyup.enter="searchByName(req.name)"
-                        @blur="searchByName(req.name)"
-                        :placeholder="$t('commons.button.search')"
-                    ></el-input>
+                    <div class="search-button">
+                        <el-input
+                            v-model="req.name"
+                            clearable
+                            @clear="searchByName('')"
+                            suffix-icon="Search"
+                            @keyup.enter="searchByName(req.name)"
+                            @blur="searchByName(req.name)"
+                            :placeholder="$t('commons.button.search')"
+                        ></el-input>
+                    </div>
                 </el-col>
             </el-row>
         </template>
@@ -53,9 +55,10 @@
                                             type="primary"
                                             plain
                                             round
+                                            size="small"
                                             @click="getAppDetail(app.id)"
                                         >
-                                            安装
+                                            {{ $t('app.install') }}
                                         </el-button>
                                     </div>
                                     <div class="app-desc">
@@ -84,7 +87,7 @@
 import LayoutContent from '@/layout/layout-content.vue';
 import { App } from '@/api/interface/app';
 import { onMounted, reactive, ref } from 'vue';
-import { SearchApp, SyncApp } from '@/api/modules/app';
+import { GetAppTags, SearchApp, SyncApp } from '@/api/modules/app';
 import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
 import Detail from '../detail/index.vue';
@@ -109,9 +112,16 @@ const getColor = (index: number) => {
 };
 
 const search = async (req: App.AppReq) => {
-    await SearchApp(req).then((res) => {
-        apps.value = res.data.items;
-        tags.value = res.data.tags;
+    loading.value = true;
+    await SearchApp(req)
+        .then((res) => {
+            apps.value = res.data.items;
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+    GetAppTags().then((res) => {
+        tags.value = res.data;
     });
 };
 
@@ -218,5 +228,9 @@ onMounted(() => {
     margin-top: 5px;
     border: 0;
     border-top: 1px solid #f2f2f2;
+}
+
+.el-avatar {
+    --el-avatar-bg-color: #ffffff;
 }
 </style>

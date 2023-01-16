@@ -170,3 +170,31 @@ export function getProvider(provider: string): string {
             return i18n.global.t('ssl.manualCreate');
     }
 }
+
+export function getAge(d1: string): string {
+    const dateBegin = new Date(d1);
+    const dateEnd = new Date();
+    const dateDiff = dateEnd.getTime() - dateBegin.getTime();
+    const dayDiff = Math.floor(dateDiff / (24 * 3600 * 1000));
+    const leave1 = dateDiff % (24 * 3600 * 1000);
+    const hours = Math.floor(leave1 / (3600 * 1000));
+    const leave2 = leave1 % (3600 * 1000);
+    const minutes = Math.floor(leave2 / (60 * 1000));
+
+    let res = '';
+    if (dayDiff > 0) {
+        res += String(dayDiff) + i18n.global.t('app.day');
+        if (hours <= 0) {
+            return res;
+        }
+    }
+    if (hours > 0) {
+        res += String(hours) + i18n.global.t('app.hour');
+        return res;
+    }
+    if (minutes > 0) {
+        res += String(minutes) + i18n.global.t('app.minute');
+        return res;
+    }
+    return i18n.global.t('app.less1Minute');
+}

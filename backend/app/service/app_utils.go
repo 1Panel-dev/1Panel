@@ -536,15 +536,12 @@ func getAppFromOss() error {
 	return nil
 }
 
-func handleInstalled(installed []model.AppInstall) ([]response.AppInstalledDTO, error) {
+func handleInstalled(appInstallList []model.AppInstall, updated bool) ([]response.AppInstalledDTO, error) {
 	var res []response.AppInstalledDTO
-
-	for _, installed := range installed {
-
+	for _, installed := range appInstallList {
 		installDTO := response.AppInstalledDTO{
 			AppInstall: installed,
 		}
-
 		app, err := appRepo.GetFirst(commonRepo.WithByID(installed.AppId))
 		if err != nil {
 			return nil, err
@@ -559,15 +556,19 @@ func handleInstalled(installed []model.AppInstall) ([]response.AppInstalledDTO, 
 		}
 		versions = common.GetSortedVersions(versions)
 		lastVersion := versions[0]
-
 		if common.IsCrossVersion(installed.Version, lastVersion) {
 			installDTO.CanUpdate = app.CrossVersionUpdate
 		} else {
 			installDTO.CanUpdate = common.CompareVersion(lastVersion, installed.Version)
 		}
-		res = append(res, installDTO)
+		if updated {
+			if installDTO.CanUpdate {
+				res = append(res, installDTO)
+			}
+		} else {
+			res = append(res, installDTO)
+		}
 	}
-
 	return res, nil
 }
 

@@ -1,6 +1,9 @@
 <template>
     <el-tag :type="getType(status)" round effect="light">
         {{ $t('commons.status.' + status) }}
+        <el-icon v-if="status === 'installing'" class="is-loading">
+            <Loading />
+        </el-icon>
     </el-tag>
 </template>
 

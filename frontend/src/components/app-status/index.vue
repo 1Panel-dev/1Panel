@@ -1,14 +1,12 @@
 <template>
     <div>
-        <div class="app-content" v-if="data.isExist">
-            <el-card class="app-card">
+        <div class="a-content" v-if="data.isExist">
+            <el-card class="a-card">
                 <el-row :gutter="20">
                     <el-col :xs="10" :sm="10" :md="10" :lg="10" :xl="6">
                         <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
                         <Status class="status-content" :key="refresh" :status="data.status"></Status>
-                        <el-tag class="status-content" type="primary">
-                            {{ $t('app.version') }}:{{ data.version }}
-                        </el-tag>
+                        <el-tag class="status-content">{{ $t('app.version') }}:{{ data.version }}</el-tag>
                     </el-col>
                     <el-col :xs="8" :sm="8" :md="8" :lg="6" :xl="4">
                         <el-button type="primary" v-if="data.status != 'Running'" link @click="onOperate('up')">
@@ -122,13 +120,13 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss">
-.app-card {
+<style lang="scss" scoped>
+.a-card {
     font-size: 14px;
     height: 60px;
 }
 
-.app-content {
+.a-content {
     height: 50px;
 }
 

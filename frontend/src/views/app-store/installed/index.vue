@@ -1,9 +1,9 @@
 <template>
-    <LayoutContent v-loading="loading" :title="$t('app.installed')">
+    <LayoutContent v-loading="loading" :title="activeName">
         <template #toolbar>
             <el-row :gutter="5">
                 <el-col :span="20">
-                    <!-- <div>
+                    <div>
                         <el-button @click="changeTag('all')" type="primary" :plain="activeTag !== 'all'">
                             {{ $t('app.all') }}
                         </el-button>
@@ -17,13 +17,13 @@
                                 {{ item.name }}
                             </el-button>
                         </div>
-                    </div> -->
+                    </div>
                 </el-col>
                 <el-col :span="4">
                     <div style="float: right">
                         <el-input
                             class="table-button"
-                            v-model="searchName"
+                            v-model="searchReq.name"
                             clearable
                             @clear="search()"
                             suffix-icon="Search"
@@ -36,7 +36,7 @@
             </el-row>
         </template>
         <template #rightButton>
-            <el-button @click="sync" type="primary" link>{{ $t('app.sync') }}</el-button>
+            <el-button @click="sync" type="primary" link v-if="mode === 'installed'">{{ $t('app.sync') }}</el-button>
         </template>
         <template #main>
             <div class="divider"></div>
@@ -70,9 +70,6 @@
                                                 </template>
                                             </el-popover>
                                             <span v-else>
-                                                <el-icon v-if="installed.status === 'Installing'" class="is-loading">
-                                                    <Loading />
-                                                </el-icon>
                                                 <Status :key="installed.status" :status="installed.status"></Status>
                                             </span>
                                         </span>
@@ -80,24 +77,38 @@
                                         <el-button
                                             class="h-button"
                                             type="primary"
-                                            link
+                                            plain
+                                            round
+                                            size="small"
                                             @click="openBackups(installed.id, installed.name)"
+                                            v-if="mode === 'installed'"
                                         >
-                                            备份
+                                            {{ $t('app.backup') }}
+                                        </el-button>
+                                        <el-button
+                                            class="h-button"
+                                            type="primary"
+                                            plain
+                                            round
+                                            size="small"
+                                            @click="openOperate(installed, 'update')"
+                                            v-if="mode === 'update'"
+                                        >
+                                            {{ $t('app.update') }}
                                         </el-button>
                                     </div>
                                     <div class="d-description">
-                                        <el-tag>版本：{{ installed.version }}</el-tag>
-                                        <el-tag>HTTP端口：{{ installed.httpPort }}</el-tag>
-                                        <!-- <span class="description">
-                                            {{ app.shortDesc }}
-                                        </span> -->
+                                        <el-tag>{{ $t('app.version') }}：{{ installed.version }}</el-tag>
+                                        <el-tag>HTTP{{ $t('app.port') }}：{{ installed.httpPort }}</el-tag>
+                                        <el-tag v-if="installed.httpsPort > 0">
+                                            HTTPS{{ $t('app.port') }}：{{ installed.httpsPort }}
+                                        </el-tag>
                                         <div class="description">
-                                            <span>已运行：12天</span>
+                                            <span>{{ $t('app.areadyRun') }}： {{ getAge(installed.createdAt) }}</span>
                                         </div>
                                     </div>
                                     <div class="divider"></div>
-                                    <div class="d-button">
+                                    <div class="d-button" v-if="mode === 'installed'">
                                         <el-button
                                             v-for="(button, key) in buttons"
                                             :key="key"
@@ -110,9 +121,6 @@
                                         >
                                             {{ button.label }}
                                         </el-button>
-                                        <!-- <el-tag v-for="(tag, ind) in app.tags" :key="ind" :colr="getColor(ind)">
-                                            {{ tag.name }}
-                                        </el-tag> -->
                                     </div>
                                 </div>
                             </el-col>
@@ -120,99 +128,13 @@
                     </div>
                 </el-col>
             </el-row>
-
-            <!-- <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" v-loading="loading">
-                <el-table-column :label="$t('app.name')" prop="name" min-width="150px" show-overflow-tooltip>
-                    <template #default="{ row }">
-                        <el-link :underline="false" @click="openParam(row.id)" type="primary">
-                            {{ row.name }}
-                        </el-link>
-                        <el-tag round effect="dark" v-if="row.canUpdate">{{ $t('app.canUpdate') }}</el-tag>
-                    </template>
-                </el-table-column>
-                <el-table-column :label="$t('app.app')" prop="app.name" show-overflow-tooltip></el-table-column>
-                <el-table-column :label="$t('app.version')" prop="version" show-overflow-tooltip></el-table-column>
-                <el-table-column :label="$t('website.port')" prop="httpPort"></el-table-column>
-                <el-table-column :label="$t('app.backup')">
-                    <template #default="{ row }">
-                        <el-link :underline="false" @click="openBackups(row.id, row.name)" type="primary">
-                            {{ $t('app.backup') }} ({{ row.backups.length }})
-                        </el-link>
-                    </template>
-                </el-table-column>
-
-                <el-table-column :label="$t('app.status')">
-                    <template #default="{ row }">
-                        <el-popover
-                            v-if="row.status === 'Error'"
-                            placement="bottom"
-                            :width="400"
-                            trigger="hover"
-                            :content="row.message"
-                        >
-                            <template #reference><Status :key="row.status" :status="row.status"></Status></template>
-                        </el-popover>
-                        <div v-else>
-                            <el-icon v-if="row.status === 'Installing'" class="is-loading">
-                                <Loading />
-                            </el-icon>
-                            <Status :key="row.status" :status="row.status"></Status>
-                        </div>
-                    </template>
-                </el-table-column>
-                <el-table-column
-                    prop="createdAt"
-                    :label="$t('commons.table.date')"
-                    :formatter="dateFromat"
-                    show-overflow-tooltip
-                />
-                <fu-table-operations
-                    width="300px"
-                    :ellipsis="10"
-                    :buttons="buttons"
-                    :label="$t('commons.table.operate')"
-                    fixed="right"
-                    fix
-                />
-            </ComplexTable> -->
         </template>
     </LayoutContent>
-    <el-dialog
-        v-model="open"
-        :title="$t('commons.msg.operate')"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :before-close="handleClose"
-        width="30%"
-    >
-        <div style="text-align: center">
-            <p>{{ $t('app.versioneSelect') }}</p>
-            <el-select v-model="operateReq.detailId">
-                <el-option
-                    v-for="(version, index) in versions"
-                    :key="index"
-                    :value="version.detailId"
-                    :label="version.version"
-                ></el-option>
-            </el-select>
-        </div>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button
-                    type="primary"
-                    @click="operate"
-                    :disabled="operateReq.operate == 'update' && versions == null"
-                >
-                    {{ $t('commons.button.confirm') }}
-                </el-button>
-            </span>
-        </template>
-    </el-dialog>
-    <Backups ref="backupRef" @close="search"></Backups>
-    <AppResources ref="checkRef"></AppResources>
-    <AppDelete ref="deleteRef" @close="search"></AppDelete>
-    <AppParams ref="appParamRef"></AppParams>
+    <Backups ref="backupRef" @close="search" />
+    <AppResources ref="checkRef" />
+    <AppDelete ref="deleteRef" @close="search" />
+    <AppParams ref="appParamRef" />
+    <AppUpdate ref="updateRef" @close="search" />
 </template>
 
 <script lang="ts" setup>
@@ -220,21 +142,22 @@ import {
     SearchAppInstalled,
     InstalledOp,
     SyncInstalledApp,
-    GetAppUpdateVersions,
     AppInstalledDeleteCheck,
+    GetAppTags,
 } from '@/api/modules/app';
 import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
-// import ComplexTable from '@/components/complex-table/index.vue';
-// import { dateFromat } from '@/utils/util';
 import i18n from '@/lang';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import Backups from './backups.vue';
+import Backups from './backup/index.vue';
 import AppResources from './check/index.vue';
 import AppDelete from './delete/index.vue';
 import AppParams from './detail/index.vue';
+import AppUpdate from './update/index.vue';
 import { App } from '@/api/interface/app';
 import Status from '@/components/status/index.vue';
+import { getAge } from '@/utils/util';
+import { useRouter } from 'vue-router';
 
 let data = ref<any>();
 let loading = ref(false);
@@ -250,12 +173,23 @@ let operateReq = reactive({
     operate: '',
     detailId: 0,
 });
-let versions = ref<App.VersionDetail[]>();
 const backupRef = ref();
 const checkRef = ref();
 const deleteRef = ref();
 const appParamRef = ref();
-let searchName = ref('');
+const updateRef = ref();
+let tags = ref<App.Tag[]>([]);
+let activeTag = ref('all');
+let searchReq = reactive({
+    page: 1,
+    pageSize: 15,
+    name: '',
+    tags: [],
+    updated: false,
+});
+const router = useRouter();
+let activeName = ref(i18n.global.t('app.installed'));
+let mode = ref('installed');
 
 const sync = () => {
     loading.value = true;
@@ -269,16 +203,24 @@ const sync = () => {
         });
 };
 
-const search = () => {
-    const req = {
-        page: paginationConfig.currentPage,
-        pageSize: paginationConfig.pageSize,
-        name: searchName.value,
-    };
+const changeTag = (key: string) => {
+    searchReq.tags = [];
+    activeTag.value = key;
+    if (key !== 'all') {
+        searchReq.tags = [key];
+    }
+    search();
+};
 
-    SearchAppInstalled(req).then((res) => {
+const search = () => {
+    searchReq.page = paginationConfig.currentPage;
+    searchReq.pageSize = paginationConfig.pageSize;
+    SearchAppInstalled(searchReq).then((res) => {
         data.value = res.data.items;
         paginationConfig.total = res.data.total;
+    });
+    GetAppTags().then((res) => {
+        tags.value = res.data;
     });
 };
 
@@ -286,13 +228,7 @@ const openOperate = (row: any, op: string) => {
     operateReq.installId = row.id;
     operateReq.operate = op;
     if (op == 'update') {
-        GetAppUpdateVersions(row.id).then((res) => {
-            versions.value = res.data;
-            if (res.data != null && res.data.length > 0) {
-                operateReq.detailId = res.data[0].detailId;
-            }
-            open.value = true;
-        });
+        updateRef.value.acceptParams(row.id, row.name);
     } else if (op == 'delete') {
         AppInstalledDeleteCheck(row.id).then(async (res) => {
             const items = res.data;
@@ -318,10 +254,6 @@ const operate = async () => {
         .finally(() => {
             loading.value = false;
         });
-};
-
-const handleClose = () => {
-    open.value = false;
 };
 
 const onOperate = async (operation: string) => {
@@ -402,6 +334,12 @@ const openParam = (installId: number) => {
 };
 
 onMounted(() => {
+    const path = router.currentRoute.value.path;
+    if (path == '/apps/update') {
+        activeName.value = i18n.global.t('app.canUpdate');
+        mode.value = 'update';
+        searchReq.updated = true;
+    }
     search();
     timer = setInterval(() => {
         search();
