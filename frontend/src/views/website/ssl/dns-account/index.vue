@@ -1,13 +1,13 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :title="$t('website.dnsAccountManage')"
-    >
+    <el-drawer v-model="open" :size="'50%'" :show-close="false">
+        <template #header>
+            <DrawerHeader :header="$t('website.dnsAccountManage')" :back="handleClose" />
+        </template>
         <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
             <template #toolbar>
-                <el-button type="primary" icon="Plus" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                <el-button type="primary" icon="Plus" @click="openCreate">
+                    {{ $t('commons.button.create') }}
+                </el-button>
             </template>
             <el-table-column :label="$t('commons.table.name')" fix show-overflow-tooltip prop="name"></el-table-column>
             <el-table-column :label="$t('commons.table.type')" prop="type">
@@ -30,7 +30,7 @@
             />
         </ComplexTable>
         <Create ref="createRef" @close="search()"></Create>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>
@@ -64,6 +64,10 @@ const buttons = [
 const acceptParams = () => {
     search();
     open.value = true;
+};
+
+const handleClose = () => {
+    open.value = false;
 };
 
 const search = () => {

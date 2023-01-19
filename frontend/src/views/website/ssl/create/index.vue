@@ -1,75 +1,85 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('commons.button.create')"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        width="50%"
-        :before-close="handleClose"
-    >
-        <el-form
-            ref="sslForm"
-            label-position="right"
-            :model="ssl"
-            label-width="100px"
-            :rules="rules"
-            v-loading="loading"
-        >
-            <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
-                <el-input v-model="ssl.primaryDomain"></el-input>
-            </el-form-item>
-            <el-form-item :label="$t('website.otherDomains')" prop="otherDomains">
-                <el-input type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" v-model="ssl.otherDomains"></el-input>
-            </el-form-item>
-            <el-form-item :label="$t('website.acmeAccount')" prop="acmeAccountId">
-                <el-select v-model="ssl.acmeAccountId">
-                    <el-option
-                        v-for="(acme, index) in acmeAccounts"
-                        :key="index"
-                        :label="acme.email"
-                        :value="acme.id"
-                    ></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('website.provider')" prop="provider">
-                <el-radio-group v-model="ssl.provider" @change="changeProvider()">
-                    <el-radio label="dnsAccount">{{ $t('website.dnsAccount') }}</el-radio>
-                    <el-radio label="dnsManual">{{ $t('website.dnsCommon') }}</el-radio>
-                    <el-radio label="http">HTTP</el-radio>
-                </el-radio-group>
-            </el-form-item>
-            <el-form-item :label="$t('website.dnsAccount')" prop="dnsAccountId" v-if="ssl.provider === 'dnsAccount'">
-                <el-select v-model="ssl.dnsAccountId">
-                    <el-option
-                        v-for="(dns, index) in dnsAccounts"
-                        :key="index"
-                        :label="dns.name + ' ( ' + dns.type + ' )'"
-                        :value="dns.id"
-                    ></el-option>
-                </el-select>
-            </el-form-item>
-            <el-form-item v-if="ssl.provider === 'dnsManual' && dnsResolve.length > 0">
-                <span>{{ $t('ssl.dnsResolveHelper') }}</span>
-                <div v-for="(re, index) in dnsResolve" :key="index">
-                    <el-descriptions direction="vertical" :column="4" border>
-                        <el-descriptions-item :label="$t('website.domain')">{{ re.domain }}</el-descriptions-item>
-                        <div v-if="re.err != ''">
-                            <el-descriptions-item :label="$t('ssl.err')">{{ re.err }}</el-descriptions-item>
+    <el-drawer v-model="open" size="50%" :show-close="false">
+        <template #header>
+            <DrawerHeader :header="$t('commons.button.create')" :back="handleClose" />
+        </template>
+        <el-row>
+            <el-col :span="22" :offset="1">
+                <el-form
+                    ref="sslForm"
+                    label-position="top"
+                    :model="ssl"
+                    label-width="100px"
+                    :rules="rules"
+                    v-loading="loading"
+                >
+                    <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
+                        <el-input v-model="ssl.primaryDomain"></el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('website.otherDomains')" prop="otherDomains">
+                        <el-input
+                            type="textarea"
+                            :autosize="{ minRows: 2, maxRows: 6 }"
+                            v-model="ssl.otherDomains"
+                        ></el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('website.acmeAccount')" prop="acmeAccountId">
+                        <el-select v-model="ssl.acmeAccountId">
+                            <el-option
+                                v-for="(acme, index) in acmeAccounts"
+                                :key="index"
+                                :label="acme.email"
+                                :value="acme.id"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item :label="$t('website.provider')" prop="provider">
+                        <el-radio-group v-model="ssl.provider" @change="changeProvider()">
+                            <el-radio label="dnsAccount">{{ $t('website.dnsAccount') }}</el-radio>
+                            <el-radio label="dnsManual">{{ $t('website.dnsCommon') }}</el-radio>
+                            <el-radio label="http">HTTP</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item
+                        :label="$t('website.dnsAccount')"
+                        prop="dnsAccountId"
+                        v-if="ssl.provider === 'dnsAccount'"
+                    >
+                        <el-select v-model="ssl.dnsAccountId">
+                            <el-option
+                                v-for="(dns, index) in dnsAccounts"
+                                :key="index"
+                                :label="dns.name + ' ( ' + dns.type + ' )'"
+                                :value="dns.id"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item v-if="ssl.provider === 'dnsManual' && dnsResolve.length > 0">
+                        <span>{{ $t('ssl.dnsResolveHelper') }}</span>
+                        <div v-for="(re, index) in dnsResolve" :key="index">
+                            <el-descriptions direction="vertical" :column="4" border>
+                                <el-descriptions-item :label="$t('website.domain')">
+                                    {{ re.domain }}
+                                </el-descriptions-item>
+                                <div v-if="re.err != ''">
+                                    <el-descriptions-item :label="$t('ssl.err')">{{ re.err }}</el-descriptions-item>
+                                </div>
+                                <div v-else>
+                                    <el-descriptions-item :label="$t('ssl.resolveDomain')">
+                                        {{ re.resolve }}
+                                    </el-descriptions-item>
+                                    <el-descriptions-item :label="$t('ssl.value')">{{ re.value }}</el-descriptions-item>
+                                    <el-descriptions-item :label="$t('ssl.type')">TXT</el-descriptions-item>
+                                </div>
+                            </el-descriptions>
                         </div>
-                        <div v-else>
-                            <el-descriptions-item :label="$t('ssl.resolveDomain')">
-                                {{ re.resolve }}
-                            </el-descriptions-item>
-                            <el-descriptions-item :label="$t('ssl.value')">{{ re.value }}</el-descriptions-item>
-                            <el-descriptions-item :label="$t('ssl.type')">TXT</el-descriptions-item>
-                        </div>
-                    </el-descriptions>
-                </div>
-            </el-form-item>
-            <el-form-item :label="$t('ssl.autoRenew')" prop="autoRenew" v-if="ssl.provider !== 'dnsManual'">
-                <el-checkbox v-model="ssl.autoRenew" />
-            </el-form-item>
-        </el-form>
+                    </el-form-item>
+                    <el-form-item :label="''" prop="autoRenew" v-if="ssl.provider !== 'dnsManual'">
+                        <el-checkbox v-model="ssl.autoRenew" :label="$t('ssl.autoRenew')" />
+                    </el-form-item>
+                </el-form>
+            </el-col>
+        </el-row>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -78,7 +88,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>

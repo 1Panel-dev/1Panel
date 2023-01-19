@@ -1,7 +1,7 @@
 <template>
-    <el-drawer v-model="open" :size="'50%'" :show-close="false">
+    <el-drawer v-model="open" size="50%" :show-close="false">
         <template #header>
-            <Header :header="$t('website.create')" :back="handleClose">
+            <DrawerHeader :header="$t('website.create')" :back="handleClose">
                 <template #buttons>
                     <el-button
                         type="primary"
@@ -17,7 +17,7 @@
                         {{ $t('website.proxy') }}
                     </el-button>
                 </template>
-            </Header>
+            </DrawerHeader>
         </template>
         <el-row>
             <el-col :span="22" :offset="1">
@@ -178,7 +178,6 @@ import { ElForm, FormInstance, ElMessage } from 'element-plus';
 import { reactive, ref } from 'vue';
 import Params from '@/views/app-store/detail/params/index.vue';
 import Check from '../check/index.vue';
-import Header from '@/components/drawer-header/index.vue';
 
 const websiteForm = ref<FormInstance>();
 const website = ref({

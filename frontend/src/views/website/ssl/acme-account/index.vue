@@ -1,10 +1,8 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('website.acmeAccountManage')"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-    >
+    <el-drawer v-model="open" :size="'50%'" :show-close="false">
+        <template #header>
+            <DrawerHeader :header="$t('website.acmeAccountManage')" :back="handleClose" />
+        </template>
         <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
             <template #toolbar>
                 <el-button type="primary" icon="Plus" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
@@ -20,7 +18,7 @@
             />
         </ComplexTable>
         <Create ref="createRef" @close="search()"></Create>
-    </el-dialog>
+    </el-drawer>
 </template>
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
@@ -68,6 +66,10 @@ const search = async () => {
 
 const openCreate = () => {
     createRef.value.acceptParams();
+};
+
+const handleClose = () => {
+    open.value = false;
 };
 
 const deleteAccount = async (id: number) => {
