@@ -2,15 +2,15 @@
     <el-dialog
         v-model="open"
         :title="$t('website.defaulServer')"
-        width="25%"
+        width="35%"
         @close="handleClose"
         :close-on-click-modal="false"
     >
         <el-row>
-            <el-col :offset="5">
-                <div style="text-align: center">
+            <el-col :span="22" :offset="1">
+                <el-form label-position="top">
                     <el-form-item :label="$t('website.defaulServer')">
-                        <el-select v-model="defaultId">
+                        <el-select v-model="defaultId" style="width: 100%">
                             <el-option :value="0" :key="-1" :label="$t('website.noDefaulServer')"></el-option>
                             <el-option
                                 v-for="(website, key) in websites"
@@ -20,13 +20,13 @@
                             ></el-option>
                         </el-select>
                     </el-form-item>
-                </div>
+                </el-form>
+                <el-alert :closable="false">
+                    <template #default>
+                        <span style="white-space: pre-line">{{ $t('website.defaulServerHelper') }}</span>
+                    </template>
+                </el-alert>
             </el-col>
-            <el-alert :closable="false">
-                <template #default>
-                    <span style="white-space: pre-line">{{ $t('website.defaulServerHelper') }}</span>
-                </template>
-            </el-alert>
         </el-row>
 
         <template #footer>

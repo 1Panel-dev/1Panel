@@ -1,4 +1,5 @@
 <template>
+    <RouterButton :buttons="routerButton" />
     <LayoutContent :title="$t('website.ssl')">
         <template #prompt>
             <el-alert type="info" :closable="false">
@@ -7,20 +8,20 @@
                 </template>
             </el-alert>
         </template>
+        <template #toolbar>
+            <el-button type="primary" icon="Plus" @click="openSSL()">
+                {{ $t('commons.button.create') }}
+            </el-button>
+            <el-button type="primary" plain @click="openAcmeAccount()">
+                {{ $t('website.acmeAccountManage') }}
+            </el-button>
+            <el-button type="primary" plain @click="openDnsAccount()">
+                {{ $t('website.dnsAccountManage') }}
+            </el-button>
+        </template>
         <template #main>
             <br />
             <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
-                <template #toolbar>
-                    <el-button type="primary" icon="Plus" @click="openSSL()">
-                        {{ $t('commons.button.create') }}
-                    </el-button>
-                    <el-button type="primary" plain @click="openAcmeAccount()">
-                        {{ $t('website.acmeAccountManage') }}
-                    </el-button>
-                    <el-button type="primary" plain @click="openDnsAccount()">
-                        {{ $t('website.dnsAccountManage') }}
-                    </el-button>
-                </template>
                 <el-table-column
                     :label="$t('website.domain')"
                     fix
@@ -93,6 +94,13 @@ const renewRef = ref();
 const detailRef = ref();
 let data = ref();
 let loading = ref(false);
+
+const routerButton = [
+    {
+        label: i18n.global.t('website.ssl'),
+        path: '/websites/ssl',
+    },
+];
 
 const buttons = [
     {

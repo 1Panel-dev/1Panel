@@ -7,45 +7,49 @@
         width="40%"
         :before-close="handleClose"
     >
-        <el-form ref="accountForm" label-position="right" :model="account" label-width="100px" :rules="rules">
-            <el-form-item :label="$t('commons.table.name')" prop="name">
-                <el-input v-model="account.name"></el-input>
-            </el-form-item>
-            <el-form-item :label="$t('website.type')" prop="type">
-                <el-select v-model="account.type" :disabled="accountData.mode === 'edit'">
-                    <el-option
-                        v-for="(type, index) in types"
-                        :key="index"
-                        :label="type.label"
-                        :value="type.value"
-                    ></el-option>
-                </el-select>
-            </el-form-item>
-            <div v-if="account.type === 'AliYun'">
-                <el-form-item label="AccessKey" prop="authorization.accessKey">
-                    <el-input v-model="account.authorization['accessKey']"></el-input>
-                </el-form-item>
-                <el-form-item label="SecretKey" prop="authorization.secretKey">
-                    <el-input v-model="account.authorization['secretKey']"></el-input>
-                </el-form-item>
-            </div>
-            <div v-if="account.type === 'DnsPod'">
-                <el-form-item label="ID" prop="authorization.id">
-                    <el-input v-model="account.authorization['id']"></el-input>
-                </el-form-item>
-                <el-form-item label="Token" prop="authorization.token">
-                    <el-input v-model="account.authorization['token']"></el-input>
-                </el-form-item>
-            </div>
-            <div v-if="account.type === 'CloudFlare'">
-                <el-form-item label="EMAIL" prop="authorization.email">
-                    <el-input v-model="account.authorization['email']"></el-input>
-                </el-form-item>
-                <el-form-item label="API Key" prop="authorization.apiKey">
-                    <el-input v-model="account.authorization['apiKey']"></el-input>
-                </el-form-item>
-            </div>
-        </el-form>
+        <el-row>
+            <el-col :span="22" :offset="1">
+                <el-form ref="accountForm" label-position="top" :model="account" :rules="rules">
+                    <el-form-item :label="$t('commons.table.name')" prop="name">
+                        <el-input v-model="account.name"></el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('website.type')" prop="type">
+                        <el-select v-model="account.type" :disabled="accountData.mode === 'edit'">
+                            <el-option
+                                v-for="(type, index) in types"
+                                :key="index"
+                                :label="type.label"
+                                :value="type.value"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <div v-if="account.type === 'AliYun'">
+                        <el-form-item label="AccessKey" prop="authorization.accessKey">
+                            <el-input v-model="account.authorization['accessKey']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="SecretKey" prop="authorization.secretKey">
+                            <el-input v-model="account.authorization['secretKey']"></el-input>
+                        </el-form-item>
+                    </div>
+                    <div v-if="account.type === 'DnsPod'">
+                        <el-form-item label="ID" prop="authorization.id">
+                            <el-input v-model="account.authorization['id']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="Token" prop="authorization.token">
+                            <el-input v-model="account.authorization['token']"></el-input>
+                        </el-form-item>
+                    </div>
+                    <div v-if="account.type === 'CloudFlare'">
+                        <el-form-item label="EMAIL" prop="authorization.email">
+                            <el-input v-model="account.authorization['email']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="API Key" prop="authorization.apiKey">
+                            <el-input v-model="account.authorization['apiKey']"></el-input>
+                        </el-form-item>
+                    </div>
+                </el-form>
+            </el-col>
+        </el-row>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>

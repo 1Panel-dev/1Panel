@@ -1,5 +1,8 @@
 <template>
-    <el-dialog v-model="open" :before-close="handleClose" :title="$t('ssl.detail')" width="30%">
+    <el-drawer v-model="open" size="50%" :show-close="false">
+        <template #header>
+            <DrawerHeader :header="$t('ssl.detail')" :back="handleClose" />
+        </template>
         <div>
             <el-radio-group v-model="curr">
                 <el-radio-button label="detail">{{ $t('ssl.msg') }}</el-radio-button>
@@ -56,7 +59,7 @@
                 </div>
             </div>
         </div>
-    </el-dialog>
+    </el-drawer>
 </template>
 <script lang="ts" setup>
 import { GetSSL } from '@/api/modules/website';

@@ -16,6 +16,8 @@
 import { useSlots } from 'vue';
 const slots = useSlots();
 
+defineOptions({ name: 'DrawerHeader' });
+
 const props = defineProps({
     header: String,
     back: Function,

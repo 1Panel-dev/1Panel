@@ -7,18 +7,15 @@
         width="30%"
         :before-close="handleClose"
     >
-        <el-form
-            ref="accountForm"
-            label-position="right"
-            :model="account"
-            label-width="100px"
-            :rules="rules"
-            v-loading="loading"
-        >
-            <el-form-item :label="$t('website.email')" prop="email">
-                <el-input v-model="account.email"></el-input>
-            </el-form-item>
-        </el-form>
+        <el-row>
+            <el-col :span="22" :offset="1">
+                <el-form ref="accountForm" label-position="top" :model="account" :rules="rules" v-loading="loading">
+                    <el-form-item :label="$t('website.email')" prop="email">
+                        <el-input v-model="account.email"></el-input>
+                    </el-form-item>
+                </el-form>
+            </el-col>
+        </el-row>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
