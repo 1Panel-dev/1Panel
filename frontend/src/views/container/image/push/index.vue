@@ -1,10 +1,10 @@
 <template>
-    <el-dialog
+    <el-drawer
         v-model="pushVisiable"
         @close="onCloseLog"
         :destroy-on-close="true"
         :close-on-click-modal="false"
-        width="50%"
+        size="50%"
     >
         <template #header>
             <div class="card-header">
@@ -35,7 +35,7 @@
             placeholder="Waiting for push output..."
             :indent-with-tab="true"
             :tabSize="4"
-            style="max-height: 300px"
+            style="height: calc(100vh - 301px)"
             :lineWrapping="true"
             :matchBrackets="true"
             theme="cobalt"
@@ -55,7 +55,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>

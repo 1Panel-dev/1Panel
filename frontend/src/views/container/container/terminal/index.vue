@@ -17,7 +17,7 @@
                 <span class="input-help">{{ $t('container.emptyUser') }}</span>
             </el-form-item>
             <el-form-item :label="$t('container.custom')" prop="custom">
-                <el-switch v-model="form.isCustom" @change="form.command = ''" />
+                <el-switch v-model="form.isCustom" @change="onChangeCommand" />
             </el-form-item>
             <el-form-item v-if="form.isCustom" label="Command" prop="command" :rules="Rules.requiredInput">
                 <el-input style="width: 30%" clearable v-model="form.command" />
@@ -82,6 +82,11 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     form.command = '/bin/bash';
     terminalOpen.value = false;
     window.addEventListener('resize', changeTerminalSize);
+};
+
+const onChangeCommand = async () => {
+    console.log('addqwd');
+    form.command = '';
 };
 
 const onWSReceive = (message: any) => {

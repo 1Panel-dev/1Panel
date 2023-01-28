@@ -239,7 +239,7 @@ export default {
     database: {
         delete: '删除操作无法回滚，请输入 "',
         deleteHelper: '" 删除此数据库',
-        create: '创建数据库',
+        create: '新建数据库',
         noMysql: '当前未检测到 {0} 数据库，请进入应用商店点击安装！',
         mysqlBadStatus: '当前 mysql 应用状态异常，请在',
         adjust: '中查看原因或修改配置',
@@ -713,6 +713,7 @@ export default {
         duplicatePassword: '新密码不能与原始密码一致，请重新输入！',
 
         backup: '备份',
+        createBackupAccount: '添加 {0} 备份账号',
         noTypeForCreate: '当前无可创建备份类型',
         serverDisk: '服务器磁盘',
         currentPath: '当前路径',
@@ -767,8 +768,9 @@ export default {
         expiredHelper: '当前密码已过期，请重新修改密码：',
         timeoutHelper: '【 {0} 天后 】面板密码即将过期，过期后需要重新设置密码',
         complexity: '密码复杂度验证',
-        complexityHelper: '密码必须满足密码长度大于 8 位且包含字母、数字及特殊字符',
+        complexityHelper: '开启后密码必须满足密码长度大于 8 位且包含字母、数字及特殊字符',
         mfa: '两步验证',
+        mfaHelper: '开启后会验证手机应用验证码',
         mfaHelper1: '下载两步验证手机应用 如:',
         mfaHelper2: '使用手机应用扫描以下二维码，获取 6 位验证码',
         mfaHelper3: '输入手机应用上的 6 位数字',

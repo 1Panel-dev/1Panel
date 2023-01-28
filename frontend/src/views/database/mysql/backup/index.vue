@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-dialog v-model="backupVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="50%">
+        <el-drawer v-model="backupVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
                 <div class="card-header">
                     <span>{{ $t('database.backup') }} - {{ dbName }}</span>
@@ -27,7 +27,7 @@
 
                 <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
             </ComplexTable>
-        </el-dialog>
+        </el-drawer>
     </div>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="templateVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="50%">
+    <el-drawer v-model="templateVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
             <div class="card-header">
                 <span>{{ title }}{{ $t('container.composeTemplate') }}</span>
@@ -18,7 +18,7 @@
                     placeholder="#Define or paste the content of your docker-compose file here"
                     :indent-with-tab="true"
                     :tabSize="4"
-                    style="max-height: 500px; width: 100%; min-height: 200px"
+                    style="width: 100%; height: calc(100vh - 251px)"
                     :lineWrapping="true"
                     :matchBrackets="true"
                     theme="cobalt"
@@ -39,7 +39,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>
