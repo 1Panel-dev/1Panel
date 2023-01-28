@@ -36,12 +36,35 @@ func NewIBackupService() IBackupService {
 func (u *BackupService) List() ([]dto.BackupInfo, error) {
 	ops, err := backupRepo.List(commonRepo.WithOrderBy("created_at desc"))
 	var dtobas []dto.BackupInfo
+	ossExist, s3Exist, sftpExist, minioExist := false, false, false, false
 	for _, group := range ops {
+		switch group.Type {
+		case "OSS":
+			ossExist = true
+		case "S3":
+			s3Exist = true
+		case "SFTP":
+			sftpExist = true
+		case "MINIO":
+			minioExist = true
+		}
 		var item dto.BackupInfo
 		if err := copier.Copy(&item, &group); err != nil {
 			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
 		dtobas = append(dtobas, item)
+	}
+	if !ossExist {
+		dtobas = append(dtobas, dto.BackupInfo{Type: "OSS"})
+	}
+	if !s3Exist {
+		dtobas = append(dtobas, dto.BackupInfo{Type: "S3"})
+	}
+	if !sftpExist {
+		dtobas = append(dtobas, dto.BackupInfo{Type: "SFTP"})
+	}
+	if !minioExist {
+		dtobas = append(dtobas, dto.BackupInfo{Type: "MINIO"})
 	}
 	return dtobas, err
 }

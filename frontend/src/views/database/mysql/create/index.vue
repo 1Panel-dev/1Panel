@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="createVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
+    <el-drawer v-model="createVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
             <div class="card-header">
                 <span>{{ $t('database.create') }}</span>
@@ -9,7 +9,7 @@
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input clearable v-model.trim="form.name">
                     <template #append>
-                        <el-select v-model="form.format" style="width: 125px">
+                        <el-select v-model="form.format" style="width: 80px">
                             <el-option label="utf8mb4" value="utf8mb4" />
                             <el-option label="utf-8" value="utf8" />
                             <el-option label="gbk" value="gbk" />
@@ -26,7 +26,7 @@
             </el-form-item>
 
             <el-form-item :label="$t('database.permission')" prop="permission">
-                <el-select style="width: 100%" v-model="form.permission">
+                <el-select v-model="form.permission">
                     <el-option value="localhost" :label="$t('database.permissionLocal')" />
                     <el-option value="%" :label="$t('database.permissionAll')" />
                     <el-option value="ip" :label="$t('database.permissionForIP')" />
@@ -47,7 +47,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>

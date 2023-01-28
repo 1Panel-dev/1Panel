@@ -1,10 +1,10 @@
 <template>
-    <el-dialog
+    <el-drawer
         v-model="pullVisiable"
         @close="onCloseLog"
         :destroy-on-close="true"
         :close-on-click-modal="false"
-        width="50%"
+        size="50%"
     >
         <template #header>
             <div class="card-header">
@@ -58,7 +58,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>

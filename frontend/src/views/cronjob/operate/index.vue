@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="cronjobVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="50%">
+    <el-drawer v-model="cronjobVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
             <div class="card-header">
                 <span>{{ title }}{{ $t('cronjob.cronTask') }}</span>
@@ -138,7 +138,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>

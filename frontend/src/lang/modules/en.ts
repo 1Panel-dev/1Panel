@@ -699,6 +699,7 @@ export default {
         duplicatePassword: 'The new password cannot be the same as the original password, please re-enter!',
 
         backup: 'Backup',
+        createBackupAccount: 'Create {0} backup account',
         noTypeForCreate: 'No backup type is currently created',
         serverDisk: 'Server disks',
         currentPath: 'Current path',
@@ -734,6 +735,7 @@ export default {
         complexityHelper:
             'The password must contain at least eight characters and contain at least three uppercase letters, lowercase letters, digits, and special characters',
         mfa: 'MFA',
+        mfaHelper: 'After this function is enabled, the mobile application verification code will be verified',
         mfaHelper1: 'Download a MFA verification mobile app such as:',
         mfaHelper2: 'Scan the following QR code using the mobile app to obtain the 6-digit verification code',
         mfaHelper3: 'Enter six digits from the app',

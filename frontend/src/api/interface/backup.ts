@@ -9,6 +9,7 @@ export namespace Backup {
         credential: string;
         vars: string;
         varsJson: object;
+        createdAt: Date;
     }
     export interface BackupOperate {
         id: number;

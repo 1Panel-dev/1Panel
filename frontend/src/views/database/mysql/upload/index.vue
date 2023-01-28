@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-dialog v-model="upVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="70%">
+        <el-drawer v-model="upVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
                 <div class="card-header">
                     <span>{{ $t('commons.button.import') }}</span>
@@ -59,7 +59,7 @@
                     fix
                 />
             </ComplexTable>
-        </el-dialog>
+        </el-drawer>
     </div>
 </template>
 

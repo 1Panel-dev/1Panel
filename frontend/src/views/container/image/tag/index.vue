@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="tagVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
+    <el-drawer v-model="tagVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
             <div class="card-header">
                 <span>Tag {{ $t('container.image') }}</span>
@@ -35,7 +35,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>
