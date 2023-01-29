@@ -101,6 +101,7 @@ import { loadMysqlBaseInfo, loadMysqlVariables, updateMysqlConfByFile } from '@/
 import { ChangePort, GetAppDefaultConfig } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
+import { loadBaseDir } from '@/api/modules/setting';
 
 const loading = ref(false);
 
@@ -241,7 +242,8 @@ const loadBaseInfo = async () => {
     mysqlName.value = res.data?.name;
     baseInfo.port = res.data?.port;
     baseInfo.containerID = res.data?.containerName;
-    loadMysqlConf(`/opt/1Panel/data/apps/mysql/${mysqlName.value}/conf/my.cnf`);
+    const pathRes = await loadBaseDir();
+    loadMysqlConf(`${pathRes.data}/apps/mysql/${mysqlName.value}/conf/my.cnf`);
     loadContainerLog(baseInfo.containerID);
 };
 

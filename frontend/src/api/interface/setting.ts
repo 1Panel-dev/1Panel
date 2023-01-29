@@ -38,6 +38,9 @@ export namespace Setting {
         oldPassword: string;
         newPassword: string;
     }
+    export interface PortUpdate {
+        serverPort: number;
+    }
     export interface MFAInfo {
         secret: string;
         qrImage: string;

@@ -122,7 +122,7 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 		req.File = template.Content
 	}
 	if req.From == "edit" {
-		dir := fmt.Sprintf("%s/%s", constant.TmpComposeBuildDir, req.Name)
+		dir := fmt.Sprintf("%s/docker/compose/%s", constant.DataDir, req.Name)
 		if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 			if err = os.MkdirAll(dir, os.ModePerm); err != nil {
 				return err

@@ -1090,6 +1090,15 @@ definitions:
       hostPort:
         type: integer
     type: object
+  dto.PortUpdate:
+    properties:
+      serverPort:
+        maximum: 65535
+        minimum: 1
+        type: integer
+    required:
+    - serverPort
+    type: object
   dto.RecordSearch:
     properties:
       detailName:
@@ -1273,6 +1282,8 @@ definitions:
       monitorStoreDays:
         type: string
       panelName:
+        type: string
+      port:
         type: string
       securityEntrance:
         type: string
@@ -6464,6 +6475,33 @@ paths:
         formatEN: update system password
         formatZH: 修改系统密码
         paramKeys: []
+  /settings/port/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新系统端口
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PortUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update system port
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - serverPort
+        formatEN: update system port => [serverPort]
+        formatZH: 修改系统端口 => [serverPort]
+        paramKeys: []
   /settings/search:
     post:
       description: 加载系统配置信息
@@ -6500,10 +6538,10 @@ paths:
       x-panel-log:
         BeforeFuntions: []
         bodyKeys:
-        - name
+        - from
         - description
-        formatEN: Create system backup [name][description]
-        formatZH: 创建系统快照 [name][description]
+        formatEN: Create system backup [description] to [from]
+        formatZH: 创建系统快照 [description] 到 [from]
         paramKeys: []
   /settings/snapshot/del:
     post:

@@ -2,7 +2,7 @@ package viper
 
 import (
 	"fmt"
-	"strings"
+	"path"
 
 	"github.com/1Panel-dev/1Panel/backend/configs"
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -11,10 +11,11 @@ import (
 )
 
 func Init() {
+	baseDir := "/opt"
 	v := viper.NewWithOptions()
 	v.SetConfigName("app")
-	v.SetConfigType("yml")
-	v.AddConfigPath("/opt/1Panel/conf")
+	v.SetConfigType("yaml")
+	v.AddConfigPath(path.Dir(baseDir + "/1Panel/conf/app.yaml"))
 	if err := v.ReadInConfig(); err != nil {
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
@@ -25,16 +26,16 @@ func Init() {
 			panic(err)
 		}
 	})
-	for _, k := range v.AllKeys() {
-		value := v.GetString(k)
-		if strings.HasPrefix(value, "${") && strings.Contains(value, "}") {
-			itemKey := strings.ReplaceAll(value[strings.Index(value, "${"):strings.Index(value, "}")], "${", "")
-			v.Set(k, strings.ReplaceAll(value, fmt.Sprintf("${%s}", itemKey), v.GetString(itemKey)))
-		}
-	}
 	serverConfig := configs.ServerConfig{}
 	if err := v.Unmarshal(&serverConfig); err != nil {
 		panic(err)
 	}
 	global.CONF = serverConfig
+	global.CONF.BaseDir = baseDir
+	global.CONF.System.DataDir = global.CONF.BaseDir + "/1Panel/data"
+	global.CONF.System.Cache = global.CONF.BaseDir + "/1Panel/data/cache"
+	global.CONF.System.Backup = global.CONF.BaseDir + "/1Panel/data/backup"
+	global.CONF.System.DbPath = global.CONF.BaseDir + "/1Panel/data/db"
+	global.CONF.System.LogPath = global.CONF.BaseDir + "/1Panel/log"
+	global.Viper = v
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
 
@@ -17,6 +18,7 @@ var (
 	VALID   *validator.Validate
 	SESSION *psession.PSession
 	CACHE   *badger_db.Cache
+	Viper   *viper.Viper
 
 	Cron *cron.Cron
 )

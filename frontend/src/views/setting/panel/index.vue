@@ -7,11 +7,7 @@
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :span="10">
-                            <el-form-item
-                                :label="$t('commons.login.username')"
-                                :rules="Rules.requiredInput"
-                                prop="userName"
-                            >
+                            <el-form-item :label="$t('setting.user')" :rules="Rules.requiredInput" prop="userName">
                                 <el-input clearable v-model="form.userName">
                                     <template #append>
                                         <el-button
@@ -37,18 +33,31 @@
                                 </el-input>
                             </el-form-item>
 
+                            <!-- <el-form-item :label="$t('setting.panelPort')" :rules="Rules.port" prop="serverPort">
+                                <el-input clearable v-model.number="form.serverPort">
+                                    <template #append>
+                                        <el-button
+                                            @click="onSavePort(panelFormRef, 'ServerPort', form.serverPort)"
+                                            icon="Collection"
+                                        >
+                                            {{ $t('commons.button.save') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item> -->
+
                             <el-form-item :label="$t('setting.theme')" :rules="Rules.requiredSelect" prop="theme">
                                 <el-radio-group
                                     @change="onSave(panelFormRef, 'Theme', form.theme)"
                                     v-model="form.theme"
                                 >
-                                    <el-radio-button label="dark">
-                                        <el-icon><Moon /></el-icon>
-                                        {{ $t('setting.dark') }}
-                                    </el-radio-button>
                                     <el-radio-button label="light">
                                         <el-icon><Sunny /></el-icon>
                                         {{ $t('setting.light') }}
+                                    </el-radio-button>
+                                    <el-radio-button label="dark">
+                                        <el-icon><Moon /></el-icon>
+                                        {{ $t('setting.dark') }}
                                     </el-radio-button>
                                 </el-radio-group>
                             </el-form-item>
@@ -131,6 +140,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const form = reactive({
     userName: '',
     email: '',
+    serverPort: 9999,
     sessionTimeout: 0,
     localTime: '',
     panelName: '',
@@ -149,6 +159,7 @@ const search = async () => {
     form.userName = res.data.userName;
     form.sessionTimeout = Number(res.data.sessionTimeout);
     form.localTime = res.data.localTime;
+    form.serverPort = Number(res.data.serverPort);
     form.panelName = res.data.panelName;
     form.theme = res.data.theme;
     form.language = res.data.language;
@@ -204,6 +215,33 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
             loading.value = false;
         });
 };
+
+// const onSavePort = async (formEl: FormInstance | undefined, key: string, val: any) => {
+//     if (!formEl) return;
+//     const result = await formEl.validateField(key.replace(key[0], key[0].toLowerCase()), callback);
+//     if (!result) {
+//         return;
+//     }
+//     ElMessageBox.confirm(i18n.t('setting.portChangeHelper'), i18n.t('setting.portChange'), {
+//         confirmButtonText: i18n.t('commons.button.confirm'),
+//         cancelButtonText: i18n.t('commons.button.cancel'),
+//         type: 'info',
+//     }).then(async () => {
+//         loading.value = true;
+//         let param = {
+//             serverPort: val,
+//         };
+//         await updatePort(param)
+//             .then(() => {
+//                 loading.value = false;
+//                 ElMessage.success(i18n.t('commons.msg.operationSuccess'));
+//                 search();
+//             })
+//             .catch(() => {
+//                 loading.value = false;
+//             });
+//     });
+// };
 
 function countdown() {
     count.value = TIME_COUNT.value;

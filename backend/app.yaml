@@ -1,21 +1,11 @@
-base_dir: /opt
-
 system:
   port: 9999
-  db_type: sqlite
-  data_dir: ${base_dir}/1Panel/data
-  cache: ${base_dir}/1Panel/data/cache
-  backup: ${base_dir}/1Panel/data/backup
-  app_oss: "https://1panel.oss-cn-hangzhou.aliyuncs.com/apps/list.json"
-
-sqlite:
-  path: ${base_dir}/1Panel/data/db
   db_file: 1Panel.db
+  app_oss: "https://1panel.oss-cn-hangzhou.aliyuncs.com/apps/list.json"
 
 log:
   level: debug
   time_zone: Asia/Shanghai
-  path: ${base_dir}/1Panel/log
   log_name: 1Panel
   log_suffix: .log
   log_backup: 10

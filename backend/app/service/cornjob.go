@@ -119,7 +119,7 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 		if cronjob.Type == "database" {
 			name = fmt.Sprintf("%s%s.gz", commonDir, record.StartTime.Format("20060102150405"))
 		}
-		tempPath := fmt.Sprintf("%s/%s", constant.DownloadDir, commonDir)
+		tempPath := fmt.Sprintf("%s/download/%s", constant.DataDir, commonDir)
 		if _, err := os.Stat(tempPath); err != nil && os.IsNotExist(err) {
 			if err = os.MkdirAll(tempPath, os.ModePerm); err != nil {
 				fmt.Println(err)
@@ -274,7 +274,7 @@ func (u *CronjobService) AddCronJob(cronjob *model.Cronjob) (int, error) {
 }
 
 func mkdirAndWriteFile(cronjob *model.Cronjob, startTime time.Time, msg []byte) (string, error) {
-	dir := fmt.Sprintf("%s/%s/%s", constant.TaskDir, cronjob.Type, cronjob.Name)
+	dir := fmt.Sprintf("%s/task/%s/%s", constant.DataDir, cronjob.Type, cronjob.Name)
 	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
 			return "", err

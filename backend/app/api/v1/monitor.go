@@ -23,10 +23,8 @@ func (b *BaseApi) LoadMonitor(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if global.CONF.System.DbType == "sqlite" {
-		req.StartTime = req.StartTime.Add(8 * time.Hour)
-		req.EndTime = req.EndTime.Add(8 * time.Hour)
-	}
+	req.StartTime = req.StartTime.Add(8 * time.Hour)
+	req.EndTime = req.EndTime.Add(8 * time.Hour)
 
 	var backdatas []dto.MonitorData
 	if req.Param == "all" || req.Param == "cpu" || req.Param == "memory" || req.Param == "load" {

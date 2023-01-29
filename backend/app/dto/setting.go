@@ -10,6 +10,7 @@ type SettingInfo struct {
 	SessionTimeout string `json:"sessionTimeout"`
 	LocalTime      string `json:"localTime"`
 
+	Port      string `json:"port"`
 	PanelName string `json:"panelName"`
 	Theme     string `json:"theme"`
 	Language  string `json:"language"`
@@ -39,6 +40,10 @@ type SettingUpdate struct {
 type PasswordUpdate struct {
 	OldPassword string `json:"oldPassword" validate:"required"`
 	NewPassword string `json:"newPassword" validate:"required"`
+}
+
+type PortUpdate struct {
+	ServerPort uint `json:"serverPort" validate:"required,number,max=65535,min=1"`
 }
 
 type SnapshotCreate struct {

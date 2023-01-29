@@ -2,7 +2,9 @@ package configs
 
 type System struct {
 	Port    int    `mapstructure:"port"`
-	DbType  string `mapstructure:"db_type"`
+	DbFile  string `mapstructure:"db_file"`
+	DbPath  string `mapstructure:"db_path"`
+	LogPath string `mapstructure:"log_path"`
 	DataDir string `mapstructure:"data_dir"`
 	Cache   string `mapstructure:"cache"`
 	Backup  string `mapstructure:"backup"`

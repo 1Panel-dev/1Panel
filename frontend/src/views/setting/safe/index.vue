@@ -7,11 +7,7 @@
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :span="10">
-                            <el-form-item
-                                :label="$t('commons.login.password')"
-                                :rules="Rules.requiredInput"
-                                prop="password"
-                            >
+                            <el-form-item :label="$t('setting.passwd')" :rules="Rules.requiredInput" prop="password">
                                 <el-input type="password" clearable disabled v-model="form.password">
                                     <template #append>
                                         <el-button icon="Setting" @click="onChangePassword">

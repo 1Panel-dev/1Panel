@@ -679,8 +679,15 @@ export default {
     setting: {
         all: 'All',
         panel: 'Panel',
+        user: 'UserName',
+        passwd: 'Password',
         emailHelper: 'For password retrieval',
         title: 'Panel alias',
+        panelPort: 'Panel port',
+        portHelper:
+            'The recommended port range is 8888 to 65535. Note: If the server has a security group, permit the new port from the security group in advance',
+        portChange: 'Port change',
+        portChangeHelper: 'Modify the service port and restart the service. Do you want to continue?',
         theme: 'Theme',
         dark: 'Dark',
         light: 'Light',
@@ -699,6 +706,7 @@ export default {
         duplicatePassword: 'The new password cannot be the same as the original password, please re-enter!',
 
         backup: 'Backup',
+        thirdParty: 'Third-party',
         createBackupAccount: 'Create {0} backup account',
         noTypeForCreate: 'No backup type is currently created',
         serverDisk: 'Server disks',
@@ -716,9 +724,6 @@ export default {
         path: 'Path',
 
         safe: 'Safe',
-        panelPort: 'Panel port',
-        portHelper:
-            'The recommended port range is 8888 to 65535. Note: If the server has a security group, permit the new port from the security group in advance',
         safeEntrance: 'Security entrance',
         safeEntranceHelper:
             'Panel management portal. You can log in to the panel only through a specified security portal, for example: onepanel',

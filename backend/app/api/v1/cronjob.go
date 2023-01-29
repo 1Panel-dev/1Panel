@@ -77,10 +77,8 @@ func (b *BaseApi) SearchJobRecords(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if global.CONF.System.DbType == "sqlite" {
-		req.StartTime = req.StartTime.Add(8 * time.Hour)
-		req.EndTime = req.EndTime.Add(8 * time.Hour)
-	}
+	req.StartTime = req.StartTime.Add(8 * time.Hour)
+	req.EndTime = req.EndTime.Add(8 * time.Hour)
 
 	total, list, err := cronjobService.SearchRecords(req)
 	if err != nil {

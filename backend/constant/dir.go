@@ -2,18 +2,14 @@ package constant
 
 import (
 	"path"
+
+	"github.com/1Panel-dev/1Panel/backend/global"
 )
 
 var (
-	DefaultDataDir = "/opt/1Panel/data"
-	ResourceDir    = path.Join(DefaultDataDir, "resource")
+	DataDir        = global.CONF.System.DataDir
+	ResourceDir    = path.Join(DataDir, "resource")
 	AppResourceDir = path.Join(ResourceDir, "apps")
-	AppInstallDir  = path.Join(DefaultDataDir, "apps")
-)
-
-const (
-	TmpDir      = "/opt/1Panel/data/tmp"
-	TaskDir     = "/opt/1Panel/data/task"
-	DownloadDir = "/opt/1Panel/data/download"
-	UploadDir   = "/opt/1Panel/data/uploads"
+	AppInstallDir  = path.Join(DataDir, "apps")
+	TmpDir         = path.Join(DataDir, "tmp")
 )

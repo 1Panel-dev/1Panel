@@ -14,6 +14,10 @@ export const updatePassword = (param: Setting.PasswordUpdate) => {
     return http.post(`/settings/password/update`, param);
 };
 
+export const updatePort = (param: Setting.PortUpdate) => {
+    return http.post(`/settings/port/update`, param);
+};
+
 export const handleExpired = (param: Setting.PasswordUpdate) => {
     return http.post(`/settings/expired/handle`, param);
 };
@@ -36,6 +40,10 @@ export const loadDaemonJsonPath = () => {
 
 export const bindMFA = (param: Setting.MFABind) => {
     return http.post(`/settings/mfa/bind`, param);
+};
+
+export const loadBaseDir = () => {
+    return http.get<string>(`/settings/basedir`);
 };
 
 // snapshot

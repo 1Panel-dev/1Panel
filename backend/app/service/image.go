@@ -20,7 +20,7 @@ import (
 	"github.com/docker/docker/pkg/archive"
 )
 
-const dockerLogDir = constant.TmpDir + "/docker_logs"
+var dockerLogDir = constant.TmpDir + "/docker_logs"
 
 type ImageService struct{}
 
@@ -104,7 +104,7 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 		return "", err
 	}
 	if req.From == "edit" {
-		dir := fmt.Sprintf("%s/%s", constant.TmpDockerBuildDir, req.Name)
+		dir := fmt.Sprintf("%s/docker/build/%s", constant.DataDir, req.Name)
 		if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 			if err = os.MkdirAll(dir, os.ModePerm); err != nil {
 				return "", err

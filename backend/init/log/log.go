@@ -2,11 +2,12 @@ package log
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/log"
 	"io"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/log"
 
 	"github.com/1Panel-dev/1Panel/backend/configs"
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -29,7 +30,7 @@ func Init() {
 
 func setOutput(logger *logrus.Logger, config configs.LogConfig) {
 	writer, err := log.NewWriterFromConfig(&log.Config{
-		LogPath:            config.Path,
+		LogPath:            global.CONF.System.LogPath,
 		FileName:           config.LogName,
 		TimeTagFormat:      FileTImeFormat,
 		MaxRemain:          config.LogBackup,
