@@ -73,6 +73,7 @@ import i18n from '@/lang';
 import { ElMessage, UploadFile, UploadFiles, UploadInstance, UploadProps } from 'element-plus';
 import { File } from '@/api/interface/file';
 import { BatchDeleteFile, GetFilesList, UploadFileData } from '@/api/modules/files';
+import { loadBaseDir } from '@/api/modules/setting';
 
 const selects = ref<any>([]);
 const baseDir = ref();
@@ -91,10 +92,12 @@ interface DialogProps {
     mysqlName: string;
     dbName: string;
 }
-const acceptParams = (params: DialogProps): void => {
+const acceptParams = async (params: DialogProps): Promise<void> => {
     mysqlName.value = params.mysqlName;
     dbName.value = params.dbName;
-    baseDir.value = '/opt/1Panel/data/uploads/database/mysql/' + mysqlName.value + '/' + dbName.value + '/';
+
+    const pathRes = await loadBaseDir();
+    baseDir.value = `${pathRes.data}/uploads/database/mysql/${mysqlName.value}/${dbName.value}/`;
     upVisiable.value = true;
     search();
 };

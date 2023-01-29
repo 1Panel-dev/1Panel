@@ -1,10 +1,12 @@
 package migrations
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
@@ -85,7 +87,7 @@ var AddTableSetting = &gormigrate.Migration{
 			return err
 		}
 
-		if err := tx.Create(&model.Setting{Key: "ServerPort", Value: "4004"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "ServerPort", Value: "9999"}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "SecurityEntrance", Value: "onepanel"}).Error; err != nil {
@@ -139,9 +141,10 @@ var AddTableBackupAccount = &gormigrate.Migration{
 		if err := tx.AutoMigrate(&model.BackupAccount{}, &model.BackupRecord{}); err != nil {
 			return err
 		}
+
 		item := &model.BackupAccount{
 			Type: "LOCAL",
-			Vars: "{\"dir\":\"/opt/1Panel/data/backup\"}",
+			Vars: fmt.Sprintf("{\"dir\":\"%s\"}", global.CONF.System.Backup),
 		}
 		if err := tx.Create(item).Error; err != nil {
 			return err

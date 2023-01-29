@@ -151,10 +151,10 @@ func (u *CronjobService) HandleDelete(id uint) error {
 	global.LOG.Infof("stop cronjob entryID: %d", cronjob.EntryID)
 	_ = cronjobRepo.DeleteRecord(cronjobRepo.WithByJobID(int(id)))
 
-	dir := fmt.Sprintf("%s/%s/%s", constant.TaskDir, cronjob.Type, cronjob.Name)
+	dir := fmt.Sprintf("%s/task/%s/%s", constant.DataDir, cronjob.Type, cronjob.Name)
 	if _, err := os.Stat(dir); err == nil {
 		if err := os.RemoveAll(dir); err != nil {
-			global.LOG.Errorf("rm file %s/%s failed, err: %v", constant.TaskDir, commonDir, err)
+			global.LOG.Errorf("rm file %s/task/%s failed, err: %v", constant.DataDir, commonDir, err)
 		}
 	}
 	return nil

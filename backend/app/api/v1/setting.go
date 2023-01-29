@@ -83,6 +83,33 @@ func (b *BaseApi) UpdatePassword(c *gin.Context) {
 }
 
 // @Tags System Setting
+// @Summary Update system port
+// @Description 更新系统端口
+// @Accept json
+// @Param request body dto.PortUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/port/update [post]
+// @x-panel-log {"bodyKeys":["serverPort"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"修改系统端口 => [serverPort]","formatEN":"update system port => [serverPort]"}
+func (b *BaseApi) UpdatePort(c *gin.Context) {
+	var req dto.PortUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := settingService.UpdatePort(req.ServerPort); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags System Setting
 // @Summary Reset system password expired
 // @Description 重置过期系统登录密码
 // @Accept json
@@ -130,6 +157,16 @@ func (b *BaseApi) SyncTime(c *gin.Context) {
 	}
 
 	helper.SuccessWithData(c, ntime.Format("2006-01-02 15:04:05 MST -0700"))
+}
+
+// @Tags System Setting
+// @Summary Load local backup dir
+// @Description 获取安装根目录
+// @Success 200 {string} path
+// @Security ApiKeyAuth
+// @Router /settings/basedir [get]
+func (b *BaseApi) LoadBaseDir(c *gin.Context) {
+	helper.SuccessWithData(c, global.CONF.System.DataDir)
 }
 
 // @Tags System Setting

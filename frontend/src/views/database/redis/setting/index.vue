@@ -120,6 +120,7 @@ import { loadRedisConf, updateRedisConf, updateRedisConfByFile } from '@/api/mod
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { ChangePort, GetAppDefaultConfig } from '@/api/modules/app';
+import { loadBaseDir } from '@/api/modules/setting';
 
 const extensions = [javascript(), oneDark];
 
@@ -292,7 +293,8 @@ const loadform = async () => {
 };
 
 const loadConfFile = async () => {
-    let path = `/opt/1Panel/data/apps/redis/${redisName.value}/conf/redis.conf`;
+    const pathRes = await loadBaseDir();
+    let path = `${pathRes.data}/apps/redis/${redisName.value}/conf/redis.conf`;
     const res = await LoadFile({ path: path });
     redisConf.value = res.data;
 };

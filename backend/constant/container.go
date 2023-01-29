@@ -14,7 +14,5 @@ const (
 	ComposeOpRestart = "restart"
 	ComposeOpRemove  = "remove"
 
-	TmpDockerBuildDir  = "/opt/1Panel/data/docker/build"
-	TmpComposeBuildDir = "/opt/1Panel/data/docker/compose"
-	DaemonJsonPath     = "/etc/docker/daemon.json"
+	DaemonJsonPath = "/etc/docker/daemon.json"
 )

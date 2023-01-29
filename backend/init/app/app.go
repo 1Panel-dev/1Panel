@@ -2,19 +2,22 @@ package app
 
 import (
 	"fmt"
+	"path"
+
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"path"
 )
 
 func Init() {
-	constant.DefaultDataDir = "/opt/1Panel/data"
-	constant.ResourceDir = path.Join(constant.DefaultDataDir, "resource")
+	constant.DataDir = global.CONF.System.DataDir
+	constant.ResourceDir = path.Join(constant.DataDir, "resource")
 	constant.AppResourceDir = path.Join(constant.ResourceDir, "apps")
-	constant.AppInstallDir = path.Join(constant.DefaultDataDir, "apps")
+	constant.AppInstallDir = path.Join(constant.DataDir, "apps")
+	constant.TmpDir = path.Join(constant.DataDir, "tmp")
 
-	dirs := []string{constant.DefaultDataDir, constant.ResourceDir, constant.AppResourceDir, constant.AppInstallDir}
+	dirs := []string{constant.DataDir, constant.ResourceDir, constant.AppResourceDir, constant.AppInstallDir}
 
 	fileOp := files.NewFileOp()
 	for _, dir := range dirs {

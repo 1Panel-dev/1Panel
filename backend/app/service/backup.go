@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cloud_storage"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 )
@@ -23,7 +25,7 @@ type IBackupService interface {
 	DownloadRecord(info dto.DownloadRecord) (string, error)
 	Create(backupDto dto.BackupOperate) error
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
-	Update(id uint, upMap map[string]interface{}) error
+	Update(ireq dto.BackupOperate) error
 	BatchDelete(ids []uint) error
 	BatchDeleteRecord(ids []uint) error
 	NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error)
@@ -114,7 +116,7 @@ func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) 
 	if err != nil {
 		return "", fmt.Errorf("new cloud storage client failed, err: %v", err)
 	}
-	tempPath := fmt.Sprintf("%s%s", constant.DownloadDir, info.FileDir)
+	tempPath := fmt.Sprintf("%sdownload%s", constant.DataDir, info.FileDir)
 	if _, err := os.Stat(tempPath); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(tempPath, os.ModePerm); err != nil {
 			fmt.Println(err)
@@ -140,10 +142,6 @@ func (u *BackupService) Create(backupDto dto.BackupOperate) error {
 	}
 	if err := backupRepo.Create(&backup); err != nil {
 		return err
-	}
-	var backupinfo dto.BackupInfo
-	if err := copier.Copy(&backupinfo, &backup); err != nil {
-		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 	return nil
 }
@@ -200,8 +198,32 @@ func (u *BackupService) BatchDeleteRecord(ids []uint) error {
 	return backupRepo.DeleteRecord(context.Background(), commonRepo.WithIdsIn(ids))
 }
 
-func (u *BackupService) Update(id uint, upMap map[string]interface{}) error {
-	return backupRepo.Update(id, upMap)
+func (u *BackupService) Update(req dto.BackupOperate) error {
+	backup, err := backupRepo.Get(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return constant.ErrRecordNotFound
+	}
+	varMap := make(map[string]string)
+	if err := json.Unmarshal([]byte(req.Vars), &varMap); err != nil {
+		return err
+	}
+	upMap := make(map[string]interface{})
+	upMap["bucket"] = req.Bucket
+	upMap["credential"] = req.Credential
+	upMap["vars"] = req.Vars
+	if err := backupRepo.Update(req.ID, upMap); err != nil {
+		return err
+	}
+	if backup.Type == "LOCAL" {
+		if dir, ok := varMap["dir"]; ok {
+			if err := updateBackupDir(dir); err != nil {
+				upMap["vars"] = backup.Vars
+				_ = backupRepo.Update(req.ID, upMap)
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error) {
@@ -255,4 +277,24 @@ func loadLocalDir() (string, error) {
 		return baseDir, nil
 	}
 	return "", fmt.Errorf("error type dir: %T", varMap["dir"])
+}
+
+func updateBackupDir(dir string) error {
+	oldDir := global.CONF.System.Backup
+	fileOp := files.NewFileOp()
+	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
+			return err
+		}
+	}
+	global.Viper.Set("system.backup", path.Join(dir, "backup"))
+	if err := global.Viper.WriteConfig(); err != nil {
+		return err
+	}
+	if err := fileOp.CopyDir(oldDir, dir); err != nil {
+		global.Viper.Set("system.backup", oldDir)
+		_ = global.Viper.WriteConfig()
+		return err
+	}
+	return nil
 }

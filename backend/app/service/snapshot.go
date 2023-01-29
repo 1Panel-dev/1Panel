@@ -779,7 +779,7 @@ func (u *SnapshotService) updateLiveRestore(enabled bool) error {
 	if err != nil {
 		return errors.New(stdout)
 	}
-	time.Sleep(10 * time.Second)
+	time.Sleep(5 * time.Second)
 	return nil
 }
 

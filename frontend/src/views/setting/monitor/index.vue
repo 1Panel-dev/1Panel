@@ -16,13 +16,12 @@
                             :rules="Rules.requiredInput"
                             prop="monitorStatus"
                         >
-                            <el-radio-group
+                            <el-switch
                                 @change="onSave(panelFormRef, 'MonitorStatus', form.monitorStatus)"
                                 v-model="form.monitorStatus"
-                            >
-                                <el-radio-button label="enable">{{ $t('commons.button.enable') }}</el-radio-button>
-                                <el-radio-button label="disable">{{ $t('commons.button.disable') }}</el-radio-button>
-                            </el-radio-group>
+                                active-value="enable"
+                                inactive-value="disable"
+                            />
                         </el-form-item>
                         <el-form-item :label="$t('setting.storeDays')" :rules="Rules.number" prop="monitorStoreDays">
                             <el-input clearable v-model.number="form.monitorStoreDays">
@@ -56,7 +55,7 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 
 const form = reactive({
-    monitorStatus: '',
+    monitorStatus: 'disable',
     monitorStoreDays: 30,
 });
 const panelFormRef = ref<FormInstance>();
@@ -78,7 +77,6 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
     }
     switch (key) {
         case 'MonitorStoreDays':
-        case 'ServerPort':
             val = val + '';
             break;
     }

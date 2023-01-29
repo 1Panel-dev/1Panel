@@ -6144,6 +6144,48 @@ var doc = `{
                 }
             }
         },
+        "/settings/port/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新系统端口",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Update system port",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PortUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "serverPort"
+                    ],
+                    "formatEN": "update system port =\u003e [serverPort]",
+                    "formatZH": "修改系统端口 =\u003e [serverPort]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/settings/search": {
             "post": {
                 "security": [
@@ -6200,11 +6242,11 @@ var doc = `{
                 "x-panel-log": {
                     "BeforeFuntions": [],
                     "bodyKeys": [
-                        "name",
+                        "from",
                         "description"
                     ],
-                    "formatEN": "Create system backup [name][description]",
-                    "formatZH": "创建系统快照 [name][description]",
+                    "formatEN": "Create system backup [description] to [from]",
+                    "formatZH": "创建系统快照 [description] 到 [from]",
                     "paramKeys": []
                 }
             }
@@ -9909,6 +9951,19 @@ var doc = `{
                 }
             }
         },
+        "dto.PortUpdate": {
+            "type": "object",
+            "required": [
+                "serverPort"
+            ],
+            "properties": {
+                "serverPort": {
+                    "type": "integer",
+                    "maximum": 65535,
+                    "minimum": 1
+                }
+            }
+        },
         "dto.RecordSearch": {
             "type": "object",
             "required": [
@@ -10184,6 +10239,9 @@ var doc = `{
                     "type": "string"
                 },
                 "panelName": {
+                    "type": "string"
+                },
+                "port": {
                     "type": "string"
                 },
                 "securityEntrance": {

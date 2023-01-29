@@ -59,6 +59,7 @@ import { updateMysqlVariables } from '@/api/modules/database';
 import { ElMessage } from 'element-plus';
 import { dateFromatForName } from '@/utils/util';
 import i18n from '@/lang';
+import { loadBaseDir } from '@/api/modules/setting';
 
 const loading = ref();
 const extensions = [javascript(), oneDark];
@@ -84,12 +85,13 @@ interface DialogProps {
     mysqlName: string;
     variables: Database.MysqlVariables;
 }
-const acceptParams = (params: DialogProps): void => {
+const acceptParams = async (params: DialogProps): Promise<void> => {
     mysqlName.value = params.mysqlName;
     variables.slow_query_log = params.variables.slow_query_log;
     variables.long_query_time = Number(params.variables.long_query_time);
 
-    let path = `/opt/1Panel/data/apps/mysql/${mysqlName.value}/data/1Panel-slow.log`;
+    const pathRes = await loadBaseDir();
+    let path = `${pathRes.data}/apps/mysql/${mysqlName.value}/data/1Panel-slow.log`;
     if (variables.slow_query_log === 'ON') {
         loadMysqlSlowlogs(path);
     }

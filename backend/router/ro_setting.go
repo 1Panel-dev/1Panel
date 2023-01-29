@@ -18,6 +18,7 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/search", baseApi.GetSettingInfo)
 		settingRouter.POST("/expired/handle", baseApi.HandlePasswordExpired)
 		settingRouter.POST("/update", baseApi.UpdateSetting)
+		settingRouter.POST("/port/update", baseApi.UpdatePort)
 		settingRouter.POST("/password/update", baseApi.UpdatePassword)
 		settingRouter.POST("/time/sync", baseApi.SyncTime)
 		settingRouter.POST("/monitor/clean", baseApi.CleanMonitor)
@@ -29,5 +30,6 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/snapshot/recover", baseApi.RecoverSnapshot)
 		settingRouter.POST("/snapshot/rollback", baseApi.RollbackSnapshot)
 		settingRouter.GET("/upgrade", baseApi.GetUpgradeInfo)
+		settingRouter.GET("/basedir", baseApi.LoadBaseDir)
 	}
 }

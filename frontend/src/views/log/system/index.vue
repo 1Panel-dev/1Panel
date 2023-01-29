@@ -28,6 +28,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { nextTick, onMounted, ref, shallowRef } from 'vue';
 import Submenu from '@/views/log/index.vue';
 import { LoadFile } from '@/api/modules/files';
+import { loadBaseDir } from '@/api/modules/setting';
 
 const extensions = [javascript(), oneDark];
 const logs = ref();
@@ -37,7 +38,9 @@ const handleReady = (payload) => {
 };
 
 const loadSystemlogs = async () => {
-    const res = await LoadFile({ path: '/opt/1Panel/log/1Panel.log' });
+    const pathRes = await loadBaseDir();
+    let logPath = pathRes.data.replaceAll('/data', '/log');
+    const res = await LoadFile({ path: `${logPath}/1Panel.log` });
     logs.value = res.data;
     nextTick(() => {
         const state = view.value.state;

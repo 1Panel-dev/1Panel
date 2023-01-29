@@ -7,25 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/1Panel-dev/1Panel/backend/init/db"
-	"github.com/1Panel-dev/1Panel/backend/init/viper"
 	"github.com/google/go-github/github"
 )
-
-func TestDw(t *testing.T) {
-	viper.Init()
-	db.Init()
-
-	backup, err := backupRepo.Get(commonRepo.WithByType("OSS"))
-	if err != nil {
-		fmt.Println(err)
-	}
-	client, err := NewIBackupService().NewClient(&backup)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(client.Download("system_snapshot/1panel_snapshot_20230112135640.tar.gz", "/opt/1Panel/data/backup/system/test.tar.gz"))
-}
 
 func TestDi(t *testing.T) {
 	docker := "var/lib/docker"

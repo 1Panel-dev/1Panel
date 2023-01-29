@@ -75,6 +75,7 @@ import { ElMessage, UploadFile, UploadFiles, UploadInstance, UploadProps } from 
 import { File } from '@/api/interface/file';
 import { BatchDeleteFile, GetFilesList, UploadFileData } from '@/api/modules/files';
 import { RecoverWebsiteByUpload } from '@/api/modules/website';
+import { loadBaseDir } from '@/api/modules/setting';
 
 const selects = ref<any>([]);
 const baseDir = ref();
@@ -95,11 +96,12 @@ interface DialogProps {
     websiteName: string;
     websiteType: string;
 }
-const acceptParams = (params: DialogProps): void => {
+const acceptParams = async (params: DialogProps): Promise<void> => {
     websiteName.value = params.websiteName;
     websiteType.value = params.websiteType;
     upVisiable.value = true;
-    baseDir.value = '/opt/1Panel/data/uploads/website/' + websiteName.value;
+    const pathRes = await loadBaseDir();
+    baseDir.value = `${pathRes.data}/uploads/website/${websiteName.value}`;
     search();
 };
 

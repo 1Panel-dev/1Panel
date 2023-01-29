@@ -2,12 +2,14 @@ package service
 
 import (
 	"encoding/json"
+	"errors"
 	"strconv"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/gin-gonic/gin"
 )
@@ -18,6 +20,7 @@ type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
 	Update(c *gin.Context, key, value string) error
 	UpdatePassword(c *gin.Context, old, new string) error
+	UpdatePort(port uint) error
 	HandlePasswordExpired(c *gin.Context, old, new string) error
 }
 
@@ -55,6 +58,19 @@ func (u *SettingService) Update(c *gin.Context, key, value string) error {
 	}
 	if err := settingRepo.Update(key, value); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (u *SettingService) UpdatePort(port uint) error {
+	global.Viper.Set("system.port", port)
+	if err := global.Viper.WriteConfig(); err != nil {
+		return err
+	}
+	_ = settingRepo.Update("ServerPort", strconv.Itoa(int(port)))
+	stdout, err := cmd.Exec("systemctl restart 1panel.service")
+	if err != nil {
+		return errors.New(stdout)
 	}
 	return nil
 }

@@ -2,7 +2,8 @@
     <div>
         <Submenu activeName="backupaccount" />
         <el-form label-position="left" label-width="130px" :v-key="reflash">
-            <el-row :gutter="20" style="margin-top: 20px">
+            <div style="margin-top: 20px"><span style="font-size: 16px; font-weight: 500">Local</span></div>
+            <el-row :gutter="20" style="margin-top: 10px">
                 <el-col :span="24">
                     <el-card>
                         <template #header>
@@ -23,11 +24,14 @@
                     </el-card>
                 </el-col>
             </el-row>
-            <el-row :gutter="20" style="margin-top: 20px">
+            <div style="margin-top: 20px">
+                <span style="font-size: 16px; font-weight: 500">{{ $t('setting.thirdParty') }}</span>
+            </div>
+            <el-row :gutter="20" style="margin-top: 10px">
                 <el-col :span="12">
                     <el-card>
                         <template #header>
-                            <svg-icon style="font-size: 7px" iconName="p-MINIO"></svg-icon>
+                            <svg-icon style="font-size: 7px" iconName="p-minio"></svg-icon>
                             <span style="font-size: 16px; font-weight: 500">&nbsp;MIMIO</span>
                             <div style="float: right">
                                 <el-button :disabled="minioData.id === 0" round @click="onBatchDelete(minioData)">
@@ -63,7 +67,7 @@
                 <el-col :span="12">
                     <el-card>
                         <template #header>
-                            <svg-icon style="font-size: 7px" iconName="p-OSS"></svg-icon>
+                            <svg-icon style="font-size: 7px" iconName="p-oss"></svg-icon>
                             <span style="font-size: 16px; font-weight: 500">&nbsp;OSS</span>
                             <div style="float: right">
                                 <el-button round :disabled="ossData.id === 0" @click="onBatchDelete(ossData)">
@@ -241,7 +245,7 @@ const sftpData = ref<Backup.BackupInfo>({
     vars: '',
     varsJson: {
         address: '',
-        port: 0,
+        port: 22,
     },
     createdAt: new Date(),
 });
@@ -303,7 +307,6 @@ const onOpenDialog = async (
         varsJson: {},
     },
 ) => {
-    console.log(rowData);
     let params = {
         title,
         rowData: { ...rowData },
