@@ -9,8 +9,8 @@
             </el-alert>
         </template>
         <template #toolbar>
-            <el-button type="primary" icon="Plus" @click="openSSL()">
-                {{ $t('commons.button.create') }}
+            <el-button type="primary" @click="openSSL()">
+                {{ $t('ssl.create') }}
             </el-button>
             <el-button type="primary" plain @click="openAcmeAccount()">
                 {{ $t('website.acmeAccountManage') }}

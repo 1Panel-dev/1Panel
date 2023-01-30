@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="open" size="50%" :show-close="false">
+    <el-drawer :close-on-click-modal="false" v-model="open" size="50%">
         <template #header>
             <DrawerHeader :header="$t('website.create')" :back="handleClose">
                 <template #buttons>

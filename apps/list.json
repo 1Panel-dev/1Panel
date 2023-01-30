@@ -24,104 +24,112 @@
       "name": "MySQL",
       "tags": ["Database"],
       "versions": ["5.7.39","8.0.30"],
-      "short_desc": "开源关系型数据库管理系统",
-      "author": "Oracle",
+      "shortDesc": "开源关系型数据库管理系统",
       "type": "runtime",
       "required": [],
       "crossVersionUpdate": false,
       "limit": 1,
-      "source": "https://www.mysql.com"
+      "website": "https://www.mysql.com",
+      "github": "https://github.com/mysql/mysql-server",
+      "document": "https://dev.mysql.com/doc/"
     },
     {
       "key": "nginx",
       "name": "OpenResty",
       "tags": ["Server"],
       "versions": ["1.21.4"],
-      "short_desc": "基于 Nginx 和 LuaJIT 的高性能 Web 平台",
-      "author": "OpenResty",
+      "shortDesc": "基于 Nginx 和 LuaJIT 的高性能 Web 平台",
       "type": "runtime",
       "required": [],
       "limit": 1,
       "crossVersionUpdate": true,
-      "source": "https://openresty.org/"
+      "website": "https://openresty.org",
+      "github": "https://github.com/openresty/openresty",
+      "document": "http://openresty.org/cn/getting-started.html"
     },
     {
       "key": "wordpress",
       "name": "WordPress",
       "tags": ["WebSite"],
       "versions": ["6.0.1","6.0.2"],
-      "short_desc": "开源博客软件和内容管理系统",
-      "author": "Wordpress",
+      "shortDesc": "开源博客软件和内容管理系统",
       "type": "website",
       "required": ["mysql"],
       "limit": 0,
       "crossVersionUpdate": true,
-      "source": "http://wordpress.org/"
+      "website": "https://wordpress.org/",
+      "github": "https://github.com/WordPress/WordPress",
+      "document": "https://cn.wordpress.org/support/"
     },
     {
       "key": "redis",
       "name": "Redis",
       "tags": ["Database"],
       "versions": ["7.0.5","6.0.16"],
-      "short_desc": "高性能的 key-value 数据库",
-      "author": "Salvatore Sanfilippo",
+      "shortDesc": "高性能的 key-value 数据库",
       "type": "runtime",
       "required": [],
       "limit": 1,
       "crossVersionUpdate": true,
-      "source": "https://redis.io/"
+      "website": "https://redis.io/",
+      "github": "https://github.com/redis/redis",
+      "document": "https://redis.io/docs/"
     },
     {
       "key": "halo",
       "name": "Halo",
       "tags": ["WebSite"],
       "versions": ["1.6.0"],
-      "short_desc": "好用又强大的开源建站工具",
-      "author": "Halo",
+      "shortDesc": "好用又强大的开源建站工具",
       "type": "website",
       "required": ["mysql"],
       "limit": 0,
       "crossVersionUpdate": true,
-      "source": "https://halo.run/"
+      "website": "https://halo.run/",
+      "github": "https://github.com/halo-dev/halo",
+      "document": "https://docs.halo.run/"
     },
     {
       "key": "phpmyadmin",
       "name": "phpMyAdmin",
       "tags": ["Tool"],
       "versions": ["5.2.0"],
-      "short_desc": "MySQL 数据库管理工具",
-      "author": "phpmyadmin",
+      "shortDesc": "MySQL 数据库管理工具",
       "type": "tool",
       "required": ["mysql"],
       "limit": 1,
       "crossVersionUpdate": true,
-      "source": "https://www.phpmyadmin.net/"
+      "website": "https://www.phpmyadmin.net/",
+      "github": "https://github.com/phpmyadmin/phpmyadmin",
+      "document": "https://www.phpmyadmin.net/docs/"
     },
     {
       "key": "redis-commander",
       "name": "Redis-Commander",
       "tags": ["Tool"],
       "versions": ["0.8.0"],
-      "short_desc": "Redis web 管理工具",
-      "author": "redis-commander",
+      "shortDesc": "Redis web 管理工具",
       "type": "tool",
       "required": ["redis"],
       "limit": 1,
       "crossVersionUpdate": true,
-      "source": "https://github.com/joeferner/redis-commander"
+      "website": "http://joeferner.github.io/redis-commander/",
+      "github": "https://github.com/joeferner/redis-commander",
+      "document": "https://github.com/joeferner/redis-commander/blob/master/docs/configuration.md"
     },
     {
       "key": "minio",
       "name": "MinIO",
       "tags": ["Tool"],
       "versions": ["RELEASE.2022-08-13T21-54-44Z"],
-      "short_desc": "开源的对象存储服务器",
-      "author": "minio",
+      "shortDesc": "开源的对象存储服务器",
       "type": "tool",
       "required": [],
       "limit": 1,
       "crossVersionUpdate": true,
-      "source": "https://github.com/minio/minio"
+      "website": "https://min.io/download",
+      "github": "https://github.com/minio/minio",
+      "document": "https://min.io/docs/minio/kubernetes/upstream"
     }
   ]
 }

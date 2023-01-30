@@ -42,13 +42,14 @@ type AppDefine struct {
 	Name               string   `json:"name"`
 	Tags               []string `json:"tags"`
 	Versions           []string `json:"versions"`
-	Author             string   `json:"author"`
-	Source             string   `json:"source"`
-	ShortDesc          string   `json:"short_desc"`
+	ShortDesc          string   `json:"shortDesc"`
 	Type               string   `json:"type"`
 	Required           []string `json:"Required"`
 	CrossVersionUpdate bool     `json:"crossVersionUpdate"`
 	Limit              int      `json:"limit"`
+	Website            string   `json:"website"`
+	Github             string   `json:"github"`
+	Document           string   `json:"document"`
 }
 
 func (define AppDefine) GetRequired() string {

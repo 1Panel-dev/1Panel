@@ -1,12 +1,12 @@
 <template>
-    <el-drawer v-model="open" size="50%" :show-close="false" :before-close="handleClose">
+    <el-drawer :close-on-click-modal="false" v-model="open" size="50%" :before-close="handleClose">
         <template #header>
-            <Header :header="$t('website.groupSetting')" :back="handleClose"></Header>
+            <Header :header="$t('website.group')" :back="handleClose"></Header>
         </template>
 
         <ComplexTable :data="data" @search="search()">
             <template #toolbar>
-                <el-button type="primary" icon="Plus" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                <el-button type="primary" @click="openCreate">{{ $t('website.createGroup') }}</el-button>
             </template>
             <el-table-column :label="$t('commons.table.name')" prop="name">
                 <template #default="{ row }">

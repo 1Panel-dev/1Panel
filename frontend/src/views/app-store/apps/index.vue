@@ -1,5 +1,5 @@
 <template>
-    <LayoutContent v-loading="loading" v-if="!showDetail" :title="$t('app.app')">
+    <LayoutContent v-loading="loading" v-if="!showDetail" :title="$t('app.app')" :divider="true">
         <template #toolbar>
             <el-row :gutter="5">
                 <el-col :span="20">
@@ -36,7 +36,6 @@
             <el-button @click="sync" type="text" :plain="true">{{ $t('app.syncAppList') }}</el-button>
         </template>
         <template #main>
-            <div class="divider"></div>
             <el-row :gutter="5">
                 <el-col v-for="(app, index) in apps" :key="index" :span="8">
                     <div class="app-card">
@@ -222,15 +221,5 @@ onMounted(() => {
 
 .tag-button {
     margin-left: 10px;
-}
-
-.divider {
-    margin-top: 5px;
-    border: 0;
-    border-top: 1px solid #f2f2f2;
-}
-
-.el-avatar {
-    --el-avatar-bg-color: #ffffff;
 }
 </style>

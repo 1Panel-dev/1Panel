@@ -1,7 +1,7 @@
 <template>
-    <el-drawer v-model="open" size="50%" :show-close="false">
+    <el-drawer :close-on-click-modal="false" v-model="open" size="50%">
         <template #header>
-            <DrawerHeader :header="$t('commons.button.create')" :back="handleClose" />
+            <DrawerHeader :header="$t('ssl.create')" :back="handleClose" />
         </template>
         <el-row>
             <el-col :span="22" :offset="1">
