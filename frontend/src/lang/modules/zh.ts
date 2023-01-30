@@ -756,9 +756,11 @@ export default {
             '即将回滚本次恢复，回滚将替换所有本次恢复的文件，过程中可能需要重启 docker 以及 1panel 服务，是否继续？',
 
         upgrade: '升级',
+        upgrading: '正在升级中，请稍候...',
+        upgradeHelper: '升级操作需要重启服务，是否继续？',
+        noUpgrade: '当前已是最新版本，无需更新',
         newVersion: '新版本',
         upgradeCheck: '检查更新',
-        tag: '标签',
         upgradeNotes: '更新内容',
         upgradeNow: '立即更新',
 

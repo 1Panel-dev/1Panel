@@ -762,9 +762,11 @@ export default {
             'This recovery is about to be rolled back, which will replace all the files recovered this time. In the process, docker and 1panel services may need to be restarted. Do you want to continue?',
 
         upgrade: 'Upgrade',
+        upgrading: 'Please wait while the upgrade is underway...',
+        upgradeHelper: 'The upgrade requires a service restart. Do you want to continue?',
+        noUpgrade: 'This is the latest version. You do not need to update it',
         newVersion: 'NewVersion',
         upgradeCheck: 'Check for updates',
-        tag: 'Tag',
         upgradeNotes: 'Release note',
         upgradeNow: 'Upgrade now',
 

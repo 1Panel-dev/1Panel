@@ -29,7 +29,9 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/snapshot/del", baseApi.DeleteSnapshot)
 		settingRouter.POST("/snapshot/recover", baseApi.RecoverSnapshot)
 		settingRouter.POST("/snapshot/rollback", baseApi.RollbackSnapshot)
+		settingRouter.POST("/upgrade", baseApi.Upgrade)
 		settingRouter.GET("/upgrade", baseApi.GetUpgradeInfo)
+		settingRouter.GET("/upgrade/byoss", baseApi.GetUpgradeInfoByOSS)
 		settingRouter.GET("/basedir", baseApi.LoadBaseDir)
 	}
 }

@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -15,6 +13,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -490,7 +491,7 @@ func handleErr(install model.AppInstall, err error, out string) error {
 }
 
 func getAppFromOss() error {
-	res, err := http.Get(global.CONF.System.AppOss)
+	res, err := http.Get(global.CONF.System.AppOss + "/apps/apps.json")
 	if err != nil {
 		return err
 	}

@@ -67,3 +67,9 @@ export const searchSnapshotPage = (param: ReqPage) => {
 export const loadUpgradeInfo = () => {
     return http.get<Setting.UpgradeInfo>(`/settings/upgrade`);
 };
+export const loadUpgradeInfoByOSS = () => {
+    return http.get<Setting.UpgradeInfo>(`/settings/upgrade/byoss`);
+};
+export const upgrade = (version: string) => {
+    return http.post(`/settings/upgrade`, { version: version });
+};

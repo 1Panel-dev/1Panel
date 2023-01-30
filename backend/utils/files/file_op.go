@@ -4,10 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/mholt/archiver/v4"
-	"github.com/pkg/errors"
-	"github.com/spf13/afero"
 	"io"
 	"io/fs"
 	"net/http"
@@ -17,6 +13,11 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/mholt/archiver/v4"
+	"github.com/pkg/errors"
+	"github.com/spf13/afero"
 )
 
 type FileOp struct {
@@ -170,16 +171,18 @@ func (f FileOp) DownloadFileWithProcess(url, dst, key string) error {
 func (f FileOp) DownloadFile(url, dst string) error {
 	resp, err := http.Get(url)
 	if err != nil {
-		global.LOG.Errorf("get download file [%s] error, err %s", dst, err.Error())
+		return fmt.Errorf("get download file [%s] error, err %s", dst, err.Error())
 	}
+	defer resp.Body.Close()
 
 	out, err := os.Create(dst)
 	if err != nil {
-		global.LOG.Errorf("create download file [%s] error, err %s", dst, err.Error())
+		return fmt.Errorf("create download file [%s] error, err %s", dst, err.Error())
 	}
+	defer out.Close()
 
 	if _, err = io.Copy(out, resp.Body); err != nil {
-		global.LOG.Errorf("save download file [%s] error, err %s", dst, err.Error())
+		return fmt.Errorf("save download file [%s] error, err %s", dst, err.Error())
 	}
 	out.Close()
 	resp.Body.Close()

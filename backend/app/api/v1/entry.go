@@ -45,4 +45,5 @@ var (
 
 	logService      = service.ServiceGroupApp.LogService
 	snapshotService = service.ServiceGroupApp.SnapshotService
+	upgradeService  = service.ServiceGroupApp.UpgradeService
 )
