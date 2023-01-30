@@ -137,6 +137,16 @@ let icons = new Map([
     ['.tar', 'p-file-zip'],
     ['.tar.gz', 'p-file-zip'],
     ['.tar.xz', 'p-file-zip'],
+    ['.mp3', 'p-file-mp3'],
+    ['.svg', 'p-file-svg'],
+    ['.txt', 'p-file-txt'],
+    ['.html', 'p-file-html'],
+    ['.word', 'p-file-word'],
+    ['.ppt', 'p-file-ppt'],
+    ['.jpg', 'p-file-jpg'],
+    ['.xlsx', 'p-file-excel'],
+    ['.doc', 'p-file-word'],
+    ['.pdf', 'p-file-pdf'],
 ]);
 
 export function getIcon(extention: string): string {

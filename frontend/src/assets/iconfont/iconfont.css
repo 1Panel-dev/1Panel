@@ -1,9 +1,9 @@
 @font-face {
   font-family: "panel"; /* Project id 3575356 */
-  src: url('iconfont.woff2?t=1664421291278') format('woff2'),
-       url('iconfont.woff?t=1664421291278') format('woff'),
-       url('iconfont.ttf?t=1664421291278') format('truetype'),
-       url('iconfont.svg?t=1664421291278#panel') format('svg');
+  src: url('iconfont.woff2?t=1673865903517') format('woff2'),
+       url('iconfont.woff?t=1673865903517') format('woff'),
+       url('iconfont.ttf?t=1673865903517') format('truetype'),
+       url('iconfont.svg?t=1673865903517#panel') format('svg');
 }
 
 .panel {
@@ -12,6 +12,42 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.p-file-ppt:before {
+  content: "\e6e2";
+}
+
+.p-file-html:before {
+  content: "\d123";
+}
+
+.p-file-word:before {
+  content: "\e6e4";
+}
+
+.p-file-excel:before {
+  content: "\e6e6";
+}
+
+.p-file-pdf:before {
+  content: "\e6e7";
+}
+
+.p-file-mp3:before {
+  content: "\e6e8";
+}
+
+.p-file-svg:before {
+  content: "\e6e9";
+}
+
+.p-file-jpg:before {
+  content: "\e6ea";
+}
+
+.p-file-video:before {
+  content: "\e6eb";
 }
 
 .p-star:before {
@@ -144,6 +180,10 @@
 
 .p-file-normal:before {
   content: "\e7ac";
+}
+
+.p-txt:before {
+  content: "\e6e3";
 }
 
 .p-file-zip:before {
