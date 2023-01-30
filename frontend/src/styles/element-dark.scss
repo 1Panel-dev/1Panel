@@ -152,7 +152,7 @@ html.dark {
         }
     }
 
-    // el-drawer
+    // el-drawer :close-on-click-modal="false"
     .el-drawer {
         .el-drawer__header {
             border-bottom: var(--panel-border-light) !important;

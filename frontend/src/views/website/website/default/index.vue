@@ -1,11 +1,8 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :title="$t('website.defaulServer')"
-        width="35%"
-        @close="handleClose"
-        :close-on-click-modal="false"
-    >
+    <el-drawer :close-on-click-modal="false" v-model="open" size="30%">
+        <template #header>
+            <DrawerHeader :header="$t('website.defaulServer')" :back="handleClose"></DrawerHeader>
+        </template>
         <el-row>
             <el-col :span="22" :offset="1">
                 <el-form label-position="top">
@@ -37,7 +34,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 <script lang="ts" setup>
 import { Website } from '@/api/interface/Website';

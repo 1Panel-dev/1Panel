@@ -1,26 +1,23 @@
 <template>
-    <LayoutContent :title="$t('app.detail')" :reload="true" :v-loading="loadingDetail">
+    <LayoutContent :title="$t('app.detail')" :reload="true" :v-loading="loadingDetail" :divider="true">
         <template #main>
             <div class="brief">
                 <el-row :gutter="20">
-                    <el-col :span="4">
-                        <div class="icon">
-                            <el-image class="image" :src="'data:image/png;base64,' + app.icon"></el-image>
-                        </div>
+                    <el-col :span="3">
+                        <el-avatar shape="square" :size="180" :src="'data:image/png;base64,' + app.icon" />
                     </el-col>
                     <el-col :span="20">
-                        <div class="a-detail">
-                            <div class="a-name">
-                                <span style="font-weight: 500; font-size: 18px">{{ app.name }}</span>
+                        <div class="detail">
+                            <div class="name">
+                                <span>{{ app.name }}</span>
                             </div>
-                            <div class="a-description">
+                            <div class="description">
                                 <span>
                                     {{ app.shortDesc }}
                                 </span>
                             </div>
-                            <br />
-                            <el-descriptions :column="1">
-                                <el-descriptions-item :label="$t('app.version')">
+                            <div class="version">
+                                <el-form-item :label="$t('app.version')">
                                     <el-select v-model="version" @change="getDetail(version)">
                                         <el-option
                                             v-for="(v, index) in app.versions"
@@ -31,19 +28,9 @@
                                             {{ v }}
                                         </el-option>
                                     </el-select>
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('app.source')">
-                                    <el-link @click="toLink(app.source)">
-                                        <el-icon><Link /></el-icon>
-                                    </el-link>
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('app.author')">{{ app.author }}</el-descriptions-item>
-                            </el-descriptions>
-                            <div>
-                                <el-button v-if="appDetail.enable" @click="openInstall" type="primary">
-                                    {{ $t('app.install') }}
-                                </el-button>
+                                </el-form-item>
                             </div>
+
                             <br />
                             <div>
                                 <el-alert
@@ -55,12 +42,43 @@
                                     :closable="false"
                                 />
                             </div>
+                            <div>
+                                <el-button round v-if="appDetail.enable" @click="openInstall" type="primary">
+                                    {{ $t('app.install') }}
+                                </el-button>
+                            </div>
+                        </div>
+                    </el-col>
+                </el-row>
+                <div class="divider"></div>
+                <el-row>
+                    <el-col :span="12">
+                        <div class="descriptions">
+                            <el-descriptions direction="vertical">
+                                <el-descriptions-item :label="$t('app.appWebsite')">
+                                    <el-link @click="toLink(app.website)">
+                                        <el-icon><OfficeBuilding /></el-icon>
+                                        <span>{{ $t('app.appOfficeWebsite') }}</span>
+                                    </el-link>
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('app.doc')">
+                                    <el-link @click="toLink(app.document)">
+                                        <el-icon><Document /></el-icon>
+                                        <span>{{ $t('app.document') }}</span>
+                                    </el-link>
+                                </el-descriptions-item>
+                                <el-descriptions-item label="Github">
+                                    <el-link @click="toLink(app.github)">
+                                        <el-icon><Link /></el-icon>
+                                        <span>{{ $t('app.github') }}</span>
+                                    </el-link>
+                                </el-descriptions-item>
+                            </el-descriptions>
                         </div>
                     </el-col>
                 </el-row>
             </div>
-            <el-divider border-style="double" />
-            <div class="detail" v-loading="loadingDetail">
+            <div v-loading="loadingDetail">
                 <v-md-preview :text="appDetail.readme"></v-md-preview>
             </div>
         </template>
@@ -125,11 +143,31 @@ onMounted(() => {
 <style lang="scss">
 .brief {
     height: 30vh;
-    .icon {
-        .image {
-            width: auto;
-            height: 20vh;
+
+    .name {
+        span {
+            font-weight: 500;
+            font-size: 18px;
         }
     }
+
+    .description {
+        margin-top: 10px;
+        span {
+            font-size: 14px;
+            color: #646a73;
+        }
+    }
+
+    .version {
+        margin-top: 10px;
+    }
+
+    .descriptions {
+        margin-top: 5px;
+    }
+}
+.el-avatar {
+    --el-avatar-bg-color: #ffffff;
 }
 </style>

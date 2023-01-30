@@ -468,8 +468,9 @@ func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
 		app.Limit = item.Limit
 		app.Key = item.Key
 		app.ShortDesc = item.ShortDesc
-		app.Author = item.Author
-		app.Source = item.Source
+		app.Website = item.Website
+		app.Document = item.Document
+		app.Github = item.Github
 		app.Type = item.Type
 		app.CrossVersionUpdate = item.CrossVersionUpdate
 		app.Required = item.GetRequired()

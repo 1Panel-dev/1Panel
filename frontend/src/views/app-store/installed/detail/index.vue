@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="open" size="40%" :show-close="false">
+    <el-drawer :close-on-click-modal="false" v-model="open" size="40%">
         <template #header>
             <Header :header="$t('app.param')" :back="handleClose"></Header>
         </template>

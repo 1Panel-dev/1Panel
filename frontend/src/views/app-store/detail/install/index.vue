@@ -1,5 +1,11 @@
 <template>
-    <el-drawer v-model="open" :title="$t('app.install')" size="50%" :before-close="handleClose" :show-close="false">
+    <el-drawer
+        :close-on-click-modal="false"
+        v-model="open"
+        :title="$t('app.install')"
+        size="50%"
+        :before-close="handleClose"
+    >
         <template #header>
             <Header :header="$t('app.install')" :back="handleClose" />
         </template>

@@ -1,5 +1,11 @@
 <template>
-    <el-drawer v-model="open" size="50%" :destroy-on-close="true" :before-close="handleClose" :show-close="false">
+    <el-drawer
+        :close-on-click-modal="false"
+        v-model="open"
+        size="50%"
+        :destroy-on-close="true"
+        :before-close="handleClose"
+    >
         <template #header>
             <Header :header="$t('app.backup')" :resource="installData.appInstallName" :back="handleClose"></Header>
         </template>
@@ -51,7 +57,6 @@
             :close-on-click-modal="false"
             :title="$t('commons.msg.operate')"
             width="30%"
-            :show-close="false"
         >
             <el-alert :title="$t('app.restoreWarn')" type="warning" :closable="false" show-icon />
             <template #footer>

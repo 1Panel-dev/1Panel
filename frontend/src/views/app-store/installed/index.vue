@@ -1,5 +1,5 @@
 <template>
-    <LayoutContent v-loading="loading" :title="activeName">
+    <LayoutContent v-loading="loading" :title="activeName" :divider="true">
         <template #toolbar>
             <el-row :gutter="5">
                 <el-col :span="20">
@@ -39,7 +39,6 @@
             <el-button @click="sync" type="primary" link v-if="mode === 'installed'">{{ $t('app.sync') }}</el-button>
         </template>
         <template #main>
-            <div class="divider"></div>
             <el-row :gutter="5">
                 <el-col v-for="(installed, index) in data" :key="index" :span="12">
                     <div class="app-card">
@@ -107,7 +106,7 @@
                                             <span>{{ $t('app.areadyRun') }}： {{ getAge(installed.createdAt) }}</span>
                                         </div>
                                     </div>
-                                    <div class="divider"></div>
+                                    <div class="app-divider" />
                                     <div class="d-button" v-if="mode === 'installed'">
                                         <el-button
                                             v-for="(button, key) in buttons"

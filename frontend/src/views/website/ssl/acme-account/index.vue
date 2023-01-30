@@ -1,11 +1,11 @@
 <template>
-    <el-drawer v-model="open" :size="'50%'" :show-close="false">
+    <el-drawer :close-on-click-modal="false" v-model="open" :size="'50%'">
         <template #header>
             <DrawerHeader :header="$t('website.acmeAccountManage')" :back="handleClose" />
         </template>
         <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
             <template #toolbar>
-                <el-button type="primary" icon="Plus" @click="openCreate">{{ $t('commons.button.create') }}</el-button>
+                <el-button type="primary" @click="openCreate">{{ $t('website.addAccount') }}</el-button>
             </template>
             <el-table-column :label="$t('website.email')" fix show-overflow-tooltip prop="email"></el-table-column>
             <el-table-column label="URL" show-overflow-tooltip prop="url"></el-table-column>

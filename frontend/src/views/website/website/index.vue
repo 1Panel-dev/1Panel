@@ -1,4 +1,13 @@
 <template>
+    <RouterButton
+        :buttons="[
+            {
+                label: i18n.global.t('website.website'),
+                path: '/websites',
+            },
+        ]"
+    />
+    <br />
     <LayoutContent :title="$t('website.website')" v-loading="loading">
         <template #app>
             <AppStatus
@@ -11,8 +20,8 @@
         <template v-if="nginxIsExist && !openNginxConfig" #toolbar>
             <el-row :class="{ mask: nginxStatus != 'Running' }">
                 <el-col :span="20">
-                    <el-button type="primary" icon="Plus" @click="openCreate">
-                        {{ $t('commons.button.create') }}
+                    <el-button type="primary" @click="openCreate">
+                        {{ $t('website.create') }}
                     </el-button>
                     <el-button type="primary" plain @click="openGroup">
                         {{ $t('website.group') }}

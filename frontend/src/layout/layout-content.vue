@@ -9,6 +9,12 @@
         <div class="content-container__toolbar" v-if="slots.toolbar">
             <slot name="toolbar"></slot>
         </div>
+        <div class="content-container__search" v-if="slots.search">
+            <el-card>
+                <slot name="search"></slot>
+            </el-card>
+        </div>
+
         <div class="content-container_form">
             <slot name="form">
                 <form-button>
@@ -43,11 +49,15 @@
                                 <slot v-if="slots.rightButton" name="rightButton"></slot>
                             </span>
                         </span>
+                        <div v-if="prop.divider">
+                            <div class="divider"></div>
+                        </div>
                     </slot>
                 </div>
                 <div v-if="slots.prompt">
                     <slot name="prompt"></slot>
                 </div>
+
                 <slot name="main"></slot>
             </el-card>
         </div>
@@ -67,6 +77,7 @@ const prop = defineProps({
     backName: String,
     backTo: Object,
     reload: Boolean,
+    divider: Boolean,
 });
 
 const showBack = computed(() => {
@@ -105,11 +116,9 @@ const showBack = computed(() => {
     margin-top: 20px;
 }
 
-.el-divider--horizontal {
-    display: block;
-    height: 1px;
-    width: 100%;
-    margin: 10px 0;
-    border-top: 1px var(--el-border-color) var(--el-border-style);
+.divider {
+    margin-top: 20px;
+    border: 0;
+    border-top: 1px solid #f2f2f2;
 }
 </style>

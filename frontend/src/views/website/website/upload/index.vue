@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="upVisiable" size="50%" :show-close="false">
+    <el-drawer :close-on-click-modal="false" v-model="upVisiable" size="50%">
         <template #header>
             <Header :header="$t('commons.button.import')" :resource="websiteName" :back="handleClose"></Header>
         </template>

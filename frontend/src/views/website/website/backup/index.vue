@@ -1,7 +1,7 @@
 <template>
-    <el-drawer v-model="backupVisiable" size="50%" :show-close="false">
+    <el-drawer :close-on-click-modal="false" v-model="backupVisiable" size="50%">
         <template #header>
-            <Header :header="$t('database.backup')" :resource="websiteName" :back="handleClose"></Header>
+            <DrawerHeader :header="$t('database.backup')" :resource="websiteName" :back="handleClose"></DrawerHeader>
         </template>
         <ComplexTable
             v-loading="loading"
@@ -42,7 +42,6 @@ import { ElMessage } from 'element-plus';
 import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords } from '@/api/modules/backup';
 import { Backup } from '@/api/interface/backup';
 import { BackupWebsite, RecoverWebsite } from '@/api/modules/website';
-import Header from '@/components/drawer-header/index.vue';
 
 const selects = ref<any>([]);
 const loading = ref(false);

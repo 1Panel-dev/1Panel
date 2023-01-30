@@ -1,12 +1,12 @@
 <template>
-    <el-drawer v-model="open" :size="'50%'" :show-close="false">
+    <el-drawer :close-on-click-modal="false" v-model="open" :size="'50%'">
         <template #header>
             <DrawerHeader :header="$t('website.dnsAccountManage')" :back="handleClose" />
         </template>
         <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
             <template #toolbar>
-                <el-button type="primary" icon="Plus" @click="openCreate">
-                    {{ $t('commons.button.create') }}
+                <el-button type="primary" @click="openCreate">
+                    {{ $t('website.addAccount') }}
                 </el-button>
             </template>
             <el-table-column :label="$t('commons.table.name')" fix show-overflow-tooltip prop="name"></el-table-column>
