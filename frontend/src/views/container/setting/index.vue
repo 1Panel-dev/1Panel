@@ -50,69 +50,71 @@
             </el-card>
         </div>
         <el-card style="margin-top: 20px">
-            <el-radio-group v-model="confShowType" @change="changeMode">
-                <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
-                <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
-            </el-radio-group>
-            <el-row style="margin-top: 20px" v-if="confShowType === 'base'">
-                <el-col :span="1"><br /></el-col>
-                <el-col :span="10">
-                    <el-form :model="form" ref="formRef" label-width="120px">
-                        <el-form-item :label="$t('container.mirrors')" prop="mirrors">
-                            <el-input
-                                type="textarea"
-                                :placeholder="$t('container.mirrorHelper')"
-                                :autosize="{ minRows: 3, maxRows: 10 }"
-                                v-model="form.mirrors"
-                            />
-                            <span class="input-help">{{ $t('container.mirrorsHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item :label="$t('container.registries')" prop="registries">
-                            <el-input
-                                type="textarea"
-                                :placeholder="$t('container.registrieHelper')"
-                                :autosize="{ minRows: 3, maxRows: 10 }"
-                                v-model="form.registries"
-                            />
-                        </el-form-item>
-                        <el-form-item label="live-restore" prop="liveRestore">
-                            <el-switch v-model="form.liveRestore"></el-switch>
-                            <span class="input-help">{{ $t('container.liveHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="cgroup-driver" prop="cgroupDriver">
-                            <el-radio-group v-model="form.cgroupDriver">
-                                <el-radio label="cgroupfs">cgroupfs</el-radio>
-                                <el-radio label="systemd">systemd</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
-                                {{ $t('commons.button.save') }}
-                            </el-button>
-                        </el-form-item>
-                    </el-form>
-                </el-col>
-            </el-row>
+            <LayoutContent :header="$t('container.setting')">
+                <el-radio-group v-model="confShowType" @change="changeMode">
+                    <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
+                    <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
+                </el-radio-group>
+                <el-row style="margin-top: 20px" v-if="confShowType === 'base'">
+                    <el-col :span="1"><br /></el-col>
+                    <el-col :span="10">
+                        <el-form :model="form" ref="formRef" label-width="120px">
+                            <el-form-item :label="$t('container.mirrors')" prop="mirrors">
+                                <el-input
+                                    type="textarea"
+                                    :placeholder="$t('container.mirrorHelper')"
+                                    :autosize="{ minRows: 3, maxRows: 10 }"
+                                    v-model="form.mirrors"
+                                />
+                                <span class="input-help">{{ $t('container.mirrorsHelper') }}</span>
+                            </el-form-item>
+                            <el-form-item :label="$t('container.registries')" prop="registries">
+                                <el-input
+                                    type="textarea"
+                                    :placeholder="$t('container.registrieHelper')"
+                                    :autosize="{ minRows: 3, maxRows: 10 }"
+                                    v-model="form.registries"
+                                />
+                            </el-form-item>
+                            <el-form-item label="live-restore" prop="liveRestore">
+                                <el-switch v-model="form.liveRestore"></el-switch>
+                                <span class="input-help">{{ $t('container.liveHelper') }}</span>
+                            </el-form-item>
+                            <el-form-item label="cgroup-driver" prop="cgroupDriver">
+                                <el-radio-group v-model="form.cgroupDriver">
+                                    <el-radio label="cgroupfs">cgroupfs</el-radio>
+                                    <el-radio label="systemd">systemd</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
+                                    {{ $t('commons.button.save') }}
+                                </el-button>
+                            </el-form-item>
+                        </el-form>
+                    </el-col>
+                </el-row>
 
-            <div v-if="confShowType === 'all'">
-                <codemirror
-                    :autofocus="true"
-                    placeholder="None data"
-                    :indent-with-tab="true"
-                    :tabSize="4"
-                    style="margin-top: 10px; height: calc(100vh - 380px)"
-                    :lineWrapping="true"
-                    :matchBrackets="true"
-                    theme="cobalt"
-                    :styleActiveLine="true"
-                    :extensions="extensions"
-                    v-model="dockerConf"
-                    :readOnly="true"
-                />
-                <el-button :disabled="loading" type="primary" @click="onSaveFile" style="margin-top: 5px">
-                    {{ $t('commons.button.save') }}
-                </el-button>
-            </div>
+                <div v-if="confShowType === 'all'">
+                    <codemirror
+                        :autofocus="true"
+                        placeholder="None data"
+                        :indent-with-tab="true"
+                        :tabSize="4"
+                        style="margin-top: 10px; height: calc(100vh - 380px)"
+                        :lineWrapping="true"
+                        :matchBrackets="true"
+                        theme="cobalt"
+                        :styleActiveLine="true"
+                        :extensions="extensions"
+                        v-model="dockerConf"
+                        :readOnly="true"
+                    />
+                    <el-button :disabled="loading" type="primary" @click="onSaveFile" style="margin-top: 5px">
+                        {{ $t('commons.button.save') }}
+                    </el-button>
+                </div>
+            </LayoutContent>
         </el-card>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmitSave"></ConfirmDialog>
@@ -124,6 +126,7 @@ import { ElMessage, FormInstance } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
 import Submenu from '@/views/container/index.vue';
 import { Codemirror } from 'vue-codemirror';
+import LayoutContent from '@/layout/layout-content.vue';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { LoadFile } from '@/api/modules/files';

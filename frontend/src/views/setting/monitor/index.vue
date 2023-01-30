@@ -3,43 +3,44 @@
         <Submenu activeName="monitor" />
         <el-form :model="form" ref="panelFormRef" label-position="left" label-width="160px">
             <el-card style="margin-top: 20px">
-                <template #header>
-                    <div class="card-header">
-                        <span>{{ $t('menu.monitor') }}</span>
-                    </div>
-                </template>
-                <el-row>
-                    <el-col :span="1"><br /></el-col>
-                    <el-col :span="10">
-                        <el-form-item
-                            :label="$t('setting.enableMonitor')"
-                            :rules="Rules.requiredInput"
-                            prop="monitorStatus"
-                        >
-                            <el-switch
-                                @change="onSave(panelFormRef, 'MonitorStatus', form.monitorStatus)"
-                                v-model="form.monitorStatus"
-                                active-value="enable"
-                                inactive-value="disable"
-                            />
-                        </el-form-item>
-                        <el-form-item :label="$t('setting.storeDays')" :rules="Rules.number" prop="monitorStoreDays">
-                            <el-input clearable v-model.number="form.monitorStoreDays">
-                                <template #append>
-                                    <el-button
-                                        @click="onSave(panelFormRef, 'MonitorStoreDays', form.monitorStoreDays)"
-                                        icon="Collection"
-                                    >
-                                        {{ $t('commons.button.save') }}
-                                    </el-button>
-                                </template>
-                            </el-input>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button @click="onClean()" icon="Delete">{{ $t('setting.cleanMonitor') }}</el-button>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
+                <LayoutContent :header="$t('menu.monitor')">
+                    <el-row>
+                        <el-col :span="1"><br /></el-col>
+                        <el-col :span="10">
+                            <el-form-item
+                                :label="$t('setting.enableMonitor')"
+                                :rules="Rules.requiredInput"
+                                prop="monitorStatus"
+                            >
+                                <el-switch
+                                    @change="onSave(panelFormRef, 'MonitorStatus', form.monitorStatus)"
+                                    v-model="form.monitorStatus"
+                                    active-value="enable"
+                                    inactive-value="disable"
+                                />
+                            </el-form-item>
+                            <el-form-item
+                                :label="$t('setting.storeDays')"
+                                :rules="Rules.number"
+                                prop="monitorStoreDays"
+                            >
+                                <el-input clearable v-model.number="form.monitorStoreDays">
+                                    <template #append>
+                                        <el-button
+                                            @click="onSave(panelFormRef, 'MonitorStoreDays', form.monitorStoreDays)"
+                                            icon="Collection"
+                                        >
+                                            {{ $t('commons.button.save') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button @click="onClean()" icon="Delete">{{ $t('setting.cleanMonitor') }}</el-button>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </LayoutContent>
             </el-card>
         </el-form>
     </div>
@@ -48,6 +49,7 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
 import { ElMessage, FormInstance } from 'element-plus';
+import LayoutContent from '@/layout/layout-content.vue';
 import { cleanMonitors, getSettingInfo, updateSetting } from '@/api/modules/setting';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import Submenu from '@/views/setting/index.vue';

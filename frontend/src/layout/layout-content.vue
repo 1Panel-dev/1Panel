@@ -12,6 +12,7 @@
                 ></back-button>
                 <!-- <el-page-header @back="reload" v-if="showBack" :content="header"></el-page-header> -->
                 <span v-else>{{ header }}</span>
+                <el-divider />
             </slot>
         </div>
         <div class="content-container__toolbar" v-if="slots.toolbar">
@@ -53,7 +54,6 @@ const showBack = computed(() => {
 
 .content-container__header {
     font-weight: 700;
-    padding: 5px 0 25px;
     font-size: 18px;
 }
 
@@ -69,5 +69,13 @@ const showBack = computed(() => {
     .form-button {
         float: right;
     }
+}
+
+.el-divider--horizontal {
+    display: block;
+    height: 1px;
+    width: 100%;
+    margin: 10px 0;
+    border-top: 1px var(--el-border-color) var(--el-border-style);
 }
 </style>

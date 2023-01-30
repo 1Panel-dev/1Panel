@@ -9,42 +9,49 @@
             <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
         </el-card>
         <el-card style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
-            <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
-                <template #toolbar>
-                    <el-button icon="Plus" type="primary" @click="onOpenDialog('create')">
-                        {{ $t('commons.button.create') }}
-                    </el-button>
-                    <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
-                        {{ $t('commons.button.delete') }}
-                    </el-button>
-                </template>
-                <el-table-column type="selection" :selectable="selectable" fix />
-                <el-table-column :label="$t('commons.table.name')" prop="name" min-width="60" />
-                <el-table-column
-                    :label="$t('container.downloadUrl')"
-                    show-overflow-tooltip
-                    prop="downloadUrl"
-                    min-width="100"
-                    fix
-                />
-                <el-table-column :label="$t('container.protocol')" prop="protocol" min-width="60" fix />
-                <el-table-column :label="$t('commons.table.status')" prop="status" min-width="60" fix>
-                    <template #default="{ row }">
-                        <el-tag v-if="row.status === 'Success'" type="success">
-                            {{ $t('commons.status.success') }}
-                        </el-tag>
-                        <el-tooltip v-else effect="dark" :content="row.message" placement="bottom">
-                            <el-tag type="danger">{{ $t('commons.status.failed') }}</el-tag>
-                        </el-tooltip>
+            <LayoutContent :header="$t('container.repo')">
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    v-model:selects="selects"
+                    :data="data"
+                    @search="search"
+                >
+                    <template #toolbar>
+                        <el-button icon="Plus" type="primary" @click="onOpenDialog('create')">
+                            {{ $t('commons.button.create') }}
+                        </el-button>
+                        <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
                     </template>
-                </el-table-column>
-                <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
-                    <template #default="{ row }">
-                        {{ dateFromat(0, 0, row.createdAt) }}
-                    </template>
-                </el-table-column>
-                <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" />
-            </ComplexTable>
+                    <el-table-column type="selection" :selectable="selectable" fix />
+                    <el-table-column :label="$t('commons.table.name')" prop="name" min-width="60" />
+                    <el-table-column
+                        :label="$t('container.downloadUrl')"
+                        show-overflow-tooltip
+                        prop="downloadUrl"
+                        min-width="100"
+                        fix
+                    />
+                    <el-table-column :label="$t('container.protocol')" prop="protocol" min-width="60" fix />
+                    <el-table-column :label="$t('commons.table.status')" prop="status" min-width="60" fix>
+                        <template #default="{ row }">
+                            <el-tag v-if="row.status === 'Success'" type="success">
+                                {{ $t('commons.status.success') }}
+                            </el-tag>
+                            <el-tooltip v-else effect="dark" :content="row.message" placement="bottom">
+                                <el-tag type="danger">{{ $t('commons.status.failed') }}</el-tag>
+                            </el-tooltip>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
+                        <template #default="{ row }">
+                            {{ dateFromat(0, 0, row.createdAt) }}
+                        </template>
+                    </el-table-column>
+                    <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" />
+                </ComplexTable>
+            </LayoutContent>
         </el-card>
         <OperatorDialog @search="search" ref="dialogRef" />
         <DeleteDialog @search="search" ref="dialogDeleteRef" />
@@ -52,6 +59,7 @@
 </template>
 
 <script lang="ts" setup>
+import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import OperatorDialog from '@/views/container/repo/operator/index.vue';
 import DeleteDialog from '@/views/container/repo/delete/index.vue';

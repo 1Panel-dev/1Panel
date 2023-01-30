@@ -9,35 +9,42 @@
             <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
         </el-card>
         <el-card style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
-            <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
-                <template #toolbar>
-                    <el-button icon="Plus" type="primary" @click="onOpenDialog('create')">
-                        {{ $t('commons.button.create') }}
-                    </el-button>
-                    <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
-                        {{ $t('commons.button.delete') }}
-                    </el-button>
-                </template>
-                <el-table-column type="selection" fix />
-                <el-table-column
-                    :label="$t('commons.table.name')"
-                    show-overflow-tooltip
-                    min-width="100"
-                    prop="name"
-                    fix
+            <LayoutContent :header="$t('container.composeTemplate')">
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    v-model:selects="selects"
+                    :data="data"
+                    @search="search"
                 >
-                    <template #default="{ row }">
-                        <el-link @click="onOpenDetail(row)" type="primary">{{ row.name }}</el-link>
+                    <template #toolbar>
+                        <el-button icon="Plus" type="primary" @click="onOpenDialog('create')">
+                            {{ $t('commons.button.create') }}
+                        </el-button>
+                        <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
                     </template>
-                </el-table-column>
-                <el-table-column :label="$t('container.description')" prop="description" min-width="200" fix />
-                <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
-                    <template #default="{ row }">
-                        {{ dateFromat(0, 0, row.createdAt) }}
-                    </template>
-                </el-table-column>
-                <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" />
-            </ComplexTable>
+                    <el-table-column type="selection" fix />
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        show-overflow-tooltip
+                        min-width="100"
+                        prop="name"
+                        fix
+                    >
+                        <template #default="{ row }">
+                            <el-link @click="onOpenDetail(row)" type="primary">{{ row.name }}</el-link>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('container.description')" prop="description" min-width="200" fix />
+                    <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
+                        <template #default="{ row }">
+                            {{ dateFromat(0, 0, row.createdAt) }}
+                        </template>
+                    </el-table-column>
+                    <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" />
+                </ComplexTable>
+            </LayoutContent>
         </el-card>
 
         <el-dialog v-model="detailVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="70%">
@@ -72,6 +79,7 @@
 </template>
 
 <script lang="ts" setup>
+import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import Submenu from '@/views/container/index.vue';
 import { Codemirror } from 'vue-codemirror';

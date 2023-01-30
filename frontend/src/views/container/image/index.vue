@@ -9,39 +9,41 @@
             <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
         </el-card>
         <el-card style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
-            <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
-                <template #toolbar>
-                    <el-button @click="onOpenPull">
-                        {{ $t('container.imagePull') }}
-                    </el-button>
-                    <el-button @click="onOpenload">
-                        {{ $t('container.importImage') }}
-                    </el-button>
-                    <el-button @click="onOpenBuild">
-                        {{ $t('container.build') }}
-                    </el-button>
-                </template>
-                <el-table-column label="ID" show-overflow-tooltip prop="id" min-width="60" />
-                <el-table-column :label="$t('container.tag')" prop="tags" min-width="160" fix>
-                    <template #default="{ row }">
-                        <el-tag style="margin-left: 5px" v-for="(item, index) of row.tags" :key="index">
-                            {{ item }}
-                        </el-tag>
+            <LayoutContent :header="$t('container.image')">
+                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
+                    <template #toolbar>
+                        <el-button @click="onOpenPull">
+                            {{ $t('container.imagePull') }}
+                        </el-button>
+                        <el-button @click="onOpenload">
+                            {{ $t('container.importImage') }}
+                        </el-button>
+                        <el-button @click="onOpenBuild">
+                            {{ $t('container.build') }}
+                        </el-button>
                     </template>
-                </el-table-column>
-                <el-table-column :label="$t('container.size')" prop="size" min-width="70" fix />
-                <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
-                    <template #default="{ row }">
-                        {{ dateFromat(0, 0, row.createdAt) }}
-                    </template>
-                </el-table-column>
-                <fu-table-operations
-                    width="200px"
-                    :ellipsis="10"
-                    :buttons="buttons"
-                    :label="$t('commons.table.operate')"
-                />
-            </ComplexTable>
+                    <el-table-column label="ID" show-overflow-tooltip prop="id" min-width="60" />
+                    <el-table-column :label="$t('container.tag')" prop="tags" min-width="160" fix>
+                        <template #default="{ row }">
+                            <el-tag style="margin-left: 5px" v-for="(item, index) of row.tags" :key="index">
+                                {{ item }}
+                            </el-tag>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('container.size')" prop="size" min-width="70" fix />
+                    <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
+                        <template #default="{ row }">
+                            {{ dateFromat(0, 0, row.createdAt) }}
+                        </template>
+                    </el-table-column>
+                    <fu-table-operations
+                        width="200px"
+                        :ellipsis="10"
+                        :buttons="buttons"
+                        :label="$t('commons.table.operate')"
+                    />
+                </ComplexTable>
+            </LayoutContent>
         </el-card>
 
         <Pull ref="dialogPullRef" @search="search" />
@@ -82,6 +84,7 @@ import { reactive, onMounted, ref } from 'vue';
 import { dateFromat } from '@/utils/util';
 import Submenu from '@/views/container/index.vue';
 import { Container } from '@/api/interface/container';
+import LayoutContent from '@/layout/layout-content.vue';
 import Pull from '@/views/container/image/pull/index.vue';
 import Tag from '@/views/container/image/tag/index.vue';
 import Push from '@/views/container/image/push/index.vue';

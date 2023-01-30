@@ -9,36 +9,54 @@
             <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
         </el-card>
         <el-card style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
-            <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
-                <template #toolbar>
-                    <el-button icon="Plus" type="primary" @click="onCreate()">
-                        {{ $t('commons.button.create') }}
-                    </el-button>
-                    <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete(null)">
-                        {{ $t('commons.button.delete') }}
-                    </el-button>
-                </template>
-                <el-table-column type="selection" fix />
-                <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip min-width="80" prop="name" fix>
-                    <template #default="{ row }">
-                        <el-link @click="onInspect(row.name)" type="primary">{{ row.name }}</el-link>
+            <LayoutContent :header="$t('container.volume')">
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    v-model:selects="selects"
+                    :data="data"
+                    @search="search"
+                >
+                    <template #toolbar>
+                        <el-button icon="Plus" type="primary" @click="onCreate()">
+                            {{ $t('commons.button.create') }}
+                        </el-button>
+                        <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete(null)">
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
                     </template>
-                </el-table-column>
-                <el-table-column
-                    :label="$t('container.mountpoint')"
-                    show-overflow-tooltip
-                    min-width="120"
-                    prop="mountpoint"
-                />
-                <el-table-column :label="$t('container.driver')" show-overflow-tooltip min-width="80" prop="driver" />
-                <el-table-column
-                    prop="createdAt"
-                    min-width="90"
-                    :label="$t('commons.table.date')"
-                    :formatter="dateFromat"
-                />
-                <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
-            </ComplexTable>
+                    <el-table-column type="selection" fix />
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        show-overflow-tooltip
+                        min-width="80"
+                        prop="name"
+                        fix
+                    >
+                        <template #default="{ row }">
+                            <el-link @click="onInspect(row.name)" type="primary">{{ row.name }}</el-link>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        :label="$t('container.mountpoint')"
+                        show-overflow-tooltip
+                        min-width="120"
+                        prop="mountpoint"
+                    />
+                    <el-table-column
+                        :label="$t('container.driver')"
+                        show-overflow-tooltip
+                        min-width="80"
+                        prop="driver"
+                    />
+                    <el-table-column
+                        prop="createdAt"
+                        min-width="90"
+                        :label="$t('commons.table.date')"
+                        :formatter="dateFromat"
+                    />
+                    <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
+                </ComplexTable>
+            </LayoutContent>
         </el-card>
 
         <CodemirrorDialog ref="codemirror" />
@@ -47,6 +65,7 @@
 </template>
 
 <script lang="ts" setup>
+import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import CreateDialog from '@/views/container/volume/create/index.vue';
 import Submenu from '@/views/container/index.vue';

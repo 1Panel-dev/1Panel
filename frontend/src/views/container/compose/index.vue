@@ -13,7 +13,7 @@
             <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
         </el-card>
         <el-card v-if="!isOnDetail" style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
-            <div>
+            <LayoutContent :header="$t('container.compose')">
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
@@ -57,7 +57,7 @@
                         fix
                     />
                 </ComplexTable>
-            </div>
+            </LayoutContent>
         </el-card>
 
         <EditDialog ref="dialogEditRef" />
@@ -68,6 +68,7 @@
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import { reactive, onMounted, ref } from 'vue';
+import LayoutContent from '@/layout/layout-content.vue';
 import EditDialog from '@/views/container/compose/edit/index.vue';
 import CreateDialog from '@/views/container/compose/create/index.vue';
 import ComposeDetial from '@/views/container/compose/detail/index.vue';
