@@ -76,8 +76,9 @@ type SnapshotInfo struct {
 
 type UpgradeInfo struct {
 	NewVersion  string `json:"newVersion"`
-	Tag         string `json:"tag"`
 	ReleaseNote string `json:"releaseNote"`
 	CreatedAt   string `json:"createdAt"`
-	PublishedAt string `json:"publishedAt"`
+}
+type Upgrade struct {
+	Version string `json:"version"`
 }

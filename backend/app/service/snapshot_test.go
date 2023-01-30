@@ -4,16 +4,26 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"strings"
 	"testing"
+	"time"
 
+	"github.com/1Panel-dev/1Panel/backend/init/log"
+	"github.com/1Panel-dev/1Panel/backend/init/viper"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/google/go-github/github"
 )
 
 func TestDi(t *testing.T) {
-	docker := "var/lib/docker"
-	fmt.Println(docker[strings.LastIndex(docker, "/"):])
-	fmt.Println(docker[:strings.LastIndex(docker, "/")])
+	viper.Init()
+	log.Init()
+	ti := time.Now().Format("20060102150405")
+	oss := "https://1panel.oss-cn-hangzhou.aliyuncs.com"
+	tmpPath := fmt.Sprintf("/opt/1Panel/data/tmp/%s_upgrade.tar.gz", ti)
+	fileOp := files.NewFileOp()
+	downloadPath := fmt.Sprintf("%s/releases/v1.0.1/v1.0.1.tar.gz", oss)
+	if err := fileOp.DownloadFile(downloadPath, tmpPath); err != nil {
+		fmt.Println(err)
+	}
 }
 
 func TestGit(t *testing.T) {

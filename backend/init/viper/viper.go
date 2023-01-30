@@ -1,11 +1,12 @@
 package viper
 
 import (
+	"bytes"
 	"fmt"
-	"path"
 
 	"github.com/1Panel-dev/1Panel/backend/configs"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/cmd/server/conf"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
@@ -13,15 +14,12 @@ import (
 func Init() {
 	baseDir := "/opt"
 	v := viper.NewWithOptions()
-	v.SetConfigName("app")
 	v.SetConfigType("yaml")
-	v.AddConfigPath(path.Dir(baseDir + "/1Panel/conf/app.yaml"))
-	if err := v.ReadInConfig(); err != nil {
+	reader := bytes.NewReader(conf.AppYaml)
+	if err := v.ReadConfig(reader); err != nil {
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
-	v.WatchConfig()
 	v.OnConfigChange(func(e fsnotify.Event) {
-		fmt.Println("config file changed:", e.Name)
 		if err := v.Unmarshal(&global.CONF); err != nil {
 			panic(err)
 		}

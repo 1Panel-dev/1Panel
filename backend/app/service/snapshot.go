@@ -95,7 +95,6 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 	_ = snapshotRepo.Create(&snap)
 	go func() {
 		defer func() {
-			global.LOG.Info("zhengque zoudao le zheli")
 			_ = os.RemoveAll(rootDir)
 		}()
 		fileOp := files.NewFileOp()
@@ -157,10 +156,8 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 			return
 		}
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusSuccess})
-		_ = os.RemoveAll(rootDir)
 		_ = os.RemoveAll(fmt.Sprintf("%s/system/1panel_snapshot_%s.tar.gz", localDir, timeNow))
 
-		updateSnapshotStatus(snap.ID, constant.StatusSuccess, "")
 		global.LOG.Infof("upload snapshot to %s success", backup.Type)
 	}()
 	return nil
@@ -313,17 +310,11 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 			}
 			isReTry = false
 		}
-		fmt.Println(000)
 		_ = os.RemoveAll(rootDir)
-		fmt.Println(111)
 		global.LOG.Info("recover successful")
-		fmt.Println(222)
 		_, _ = cmd.Exec("systemctl daemon-reload")
-		fmt.Println(333)
 		_, _ = cmd.Exec("systemctl restart 1panel.service")
-		fmt.Println(444)
 		updateRecoverStatus(snap.ID, "", constant.StatusSuccess, "")
-		fmt.Println(555)
 	}()
 	return nil
 }
@@ -435,17 +426,11 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 		return nil
 	}
 
-	fmt.Println(000)
 	_ = os.RemoveAll(rootDir)
-	fmt.Println(111)
 	global.LOG.Info("rollback successful")
-	fmt.Println(222)
 	_, _ = cmd.Exec("systemctl daemon-reload")
-	fmt.Println(333)
 	_, _ = cmd.Exec("systemctl restart 1panel.service")
-	fmt.Println(444)
 	updateRollbackStatus(snap.ID, constant.StatusSuccess, "")
-	fmt.Println(555)
 	return nil
 }
 

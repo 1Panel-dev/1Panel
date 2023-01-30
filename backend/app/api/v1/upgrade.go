@@ -25,10 +25,45 @@ func (b *BaseApi) GetUpgradeInfo(c *gin.Context) {
 	}
 	info := dto.UpgradeInfo{
 		NewVersion:  string(*stats.Name),
-		Tag:         string(*stats.TagName),
 		ReleaseNote: string(*stats.Body),
 		CreatedAt:   github.Timestamp(*stats.CreatedAt).Format("2006-01-02 15:04:05"),
-		PublishedAt: github.Timestamp(*stats.PublishedAt).Format("2006-01-02 15:04:05"),
 	}
 	helper.SuccessWithData(c, info)
+}
+
+// @Tags System Setting
+// @Summary Load upgrade info
+// @Description 从 OSS 加载系统更新信息
+// @Success 200 {object} dto.UpgradeInfo
+// @Security ApiKeyAuth
+// @Router /settings/upgrade [get]
+func (b *BaseApi) GetUpgradeInfoByOSS(c *gin.Context) {
+	info, err := upgradeService.SearchUpgrade()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, info)
+}
+
+// @Tags System Setting
+// @Summary Upgrade
+// @Description 系统更新
+// @Accept json
+// @Param request body dto.Upgrade true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/upgrade [post]
+// @x-panel-log {"bodyKeys":["version"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新系统 => [version]","formatEN":"upgrade service => [version]"}
+func (b *BaseApi) Upgrade(c *gin.Context) {
+	var req dto.Upgrade
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := upgradeService.Upgrade(req.Version); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
 }

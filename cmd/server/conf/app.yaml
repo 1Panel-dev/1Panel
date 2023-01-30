@@ -1,7 +1,7 @@
 system:
   port: 9999
   db_file: 1Panel.db
-  app_oss: "https://1panel.oss-cn-hangzhou.aliyuncs.com/apps/list.json"
+  app_oss: "https://1panel.oss-cn-hangzhou.aliyuncs.com"
 
 log:
   level: debug

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <Submenu activeName="about" />
         <el-card style="margin-top: 20px">
             <LayoutContent :header="$t('setting.about')">
@@ -10,9 +10,10 @@
                     <h3>{{ $t('setting.description') }}</h3>
                     <h3>
                         {{ version }}
-                        <el-button type="primary" link @click="onLoadUpgradeInfo">
+                        <el-button v-if="version !== 'Waiting'" type="primary" link @click="onLoadUpgradeInfo">
                             {{ $t('setting.upgradeCheck') }}
                         </el-button>
+                        <el-tag v-else round style="margin-left: 10px">{{ $t('setting.upgrading') }}</el-tag>
                     </h3>
                     <div style="margin-top: 10px">
                         <el-link @click="toGithub">
@@ -40,20 +41,14 @@
                 <el-form-item :label="$t('setting.newVersion')">
                     <el-tag>{{ upgradeInfo.newVersion }}</el-tag>
                 </el-form-item>
-                <el-form-item :label="$t('setting.tag')">
-                    <el-tag>{{ upgradeInfo.tag }}</el-tag>
-                </el-form-item>
-                <el-form-item :label="$t('setting.upgradeNotes')">
-                    <MdEditor style="height: 450px" v-model="upgradeInfo.releaseNote" previewOnly />
-                </el-form-item>
                 <el-form-item :label="$t('commons.table.createdAt')">
                     <el-tag>{{ upgradeInfo.createdAt }}</el-tag>
                 </el-form-item>
-                <el-form-item :label="$t('commons.table.publishedAt')">
-                    <el-tag>{{ upgradeInfo.publishedAt }}</el-tag>
+                <el-form-item :label="$t('setting.upgradeNotes')">
+                    <MdEditor style="height: calc(100vh - 260px)" v-model="upgradeInfo.releaseNote" previewOnly />
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary">{{ $t('setting.upgradeNow') }}</el-button>
+                    <el-button type="primary" @click="onUpgrade">{{ $t('setting.upgradeNow') }}</el-button>
                 </el-form-item>
             </el-form>
         </el-drawer>
@@ -62,17 +57,20 @@
 
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
-import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
+import { getSettingInfo, loadUpgradeInfoByOSS, upgrade } from '@/api/modules/setting';
 import Submenu from '@/views/setting/index.vue';
 import { onMounted, ref } from 'vue';
 import MdEditor from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import i18n from '@/lang';
 
 const version = ref();
 const upgradeInfo = ref();
 const drawerShow = ref();
 const refresh = ref();
 
+const loading = ref();
 const search = async () => {
     const res = await getSettingInfo();
     version.value = res.data.systemVersion;
@@ -92,9 +90,32 @@ const toGithubStar = () => {
 };
 
 const onLoadUpgradeInfo = async () => {
-    const res = await loadUpgradeInfo();
+    const res = await loadUpgradeInfoByOSS();
+    if (!res.data) {
+        ElMessage.success(i18n.global.t('setting.noUpgrade'));
+        return;
+    }
     upgradeInfo.value = res.data;
     drawerShow.value = true;
+};
+const onUpgrade = async () => {
+    ElMessageBox.confirm(i18n.global.t('setting.upgradeHelper', i18n.global.t('setting.upgrade')), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(() => {
+        loading.value = true;
+        upgrade(upgradeInfo.value.newVersion)
+            .then(() => {
+                loading.value = false;
+                drawerShow.value = false;
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 onMounted(() => {

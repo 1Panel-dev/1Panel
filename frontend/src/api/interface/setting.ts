@@ -77,9 +77,7 @@ export namespace Setting {
     }
     export interface UpgradeInfo {
         newVersion: string;
-        tag: string;
         releaseNote: string;
         createdAt: string;
-        publishedAt: string;
     }
 }

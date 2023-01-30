@@ -5976,6 +5976,28 @@ var doc = `{
                 }
             }
         },
+        "/settings/basedir": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取安装根目录",
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Load local backup dir",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/settings/expired/handle": {
             "post": {
                 "security": [
@@ -6519,7 +6541,7 @@ var doc = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "加载系统更新信息",
+                "description": "从 OSS 加载系统更新信息",
                 "tags": [
                     "System Setting"
                 ],
@@ -6531,6 +6553,46 @@ var doc = `{
                             "$ref": "#/definitions/dto.UpgradeInfo"
                         }
                     }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "系统更新",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Upgrade",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Upgrade"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "version"
+                    ],
+                    "formatEN": "upgrade service =\u003e [version]",
+                    "formatZH": "更新系统 =\u003e [version]",
+                    "paramKeys": []
                 }
             }
         },
@@ -10318,6 +10380,14 @@ var doc = `{
                 }
             }
         },
+        "dto.Upgrade": {
+            "type": "object",
+            "properties": {
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.UpgradeInfo": {
             "type": "object",
             "properties": {
@@ -10327,13 +10397,7 @@ var doc = `{
                 "newVersion": {
                     "type": "string"
                 },
-                "publishedAt": {
-                    "type": "string"
-                },
                 "releaseNote": {
-                    "type": "string"
-                },
-                "tag": {
                     "type": "string"
                 }
             }

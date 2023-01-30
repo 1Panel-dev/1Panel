@@ -1334,17 +1334,18 @@ definitions:
     required:
     - id
     type: object
+  dto.Upgrade:
+    properties:
+      version:
+        type: string
+    type: object
   dto.UpgradeInfo:
     properties:
       createdAt:
         type: string
       newVersion:
         type: string
-      publishedAt:
-        type: string
       releaseNote:
-        type: string
-      tag:
         type: string
     type: object
   dto.UploadRecover:
@@ -6367,6 +6368,19 @@ paths:
         formatEN: Update nginx conf [domain]
         formatZH: 更新 nginx 配置 [domain]
         paramKeys: []
+  /settings/basedir:
+    get:
+      description: 获取安装根目录
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Load local backup dir
+      tags:
+      - System Setting
   /settings/expired/handle:
     post:
       consumes:
@@ -6713,7 +6727,7 @@ paths:
         paramKeys: []
   /settings/upgrade:
     get:
-      description: 加载系统更新信息
+      description: 从 OSS 加载系统更新信息
       responses:
         "200":
           description: OK
@@ -6724,6 +6738,32 @@ paths:
       summary: Load upgrade info
       tags:
       - System Setting
+    post:
+      consumes:
+      - application/json
+      description: 系统更新
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Upgrade'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Upgrade
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - version
+        formatEN: upgrade service => [version]
+        formatZH: 更新系统 => [version]
+        paramKeys: []
   /websites:
     post:
       consumes:

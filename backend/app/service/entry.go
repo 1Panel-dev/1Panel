@@ -38,6 +38,7 @@ type ServiceGroup struct {
 
 	LogService
 	SnapshotService
+	UpgradeService
 }
 
 var ServiceGroupApp = new(ServiceGroup)
