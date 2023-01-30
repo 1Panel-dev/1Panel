@@ -2,41 +2,38 @@
     <div>
         <Submenu activeName="about" />
         <el-card style="margin-top: 20px">
-            <template #header>
-                <div class="card-header">
-                    <span>{{ $t('setting.about') }}</span>
+            <LayoutContent :header="$t('setting.about')">
+                <div style="text-align: center">
+                    <div style="justify-self: center">
+                        <img style="width: 80px" src="@/assets/images/ko_image.png" />
+                    </div>
+                    <h3>{{ $t('setting.description') }}</h3>
+                    <h3>
+                        {{ version }}
+                        <el-button type="primary" link @click="onLoadUpgradeInfo">
+                            {{ $t('setting.upgradeCheck') }}
+                        </el-button>
+                    </h3>
+                    <div style="margin-top: 10px">
+                        <el-link @click="toGithub">
+                            <svg-icon style="font-size: 7px; margin-bottom: 3px" iconName="p-huaban88"></svg-icon>
+                            <span style="line-height: 20px">{{ $t('setting.project') }}</span>
+                        </el-link>
+                        <el-link @click="toIssue" style="margin-left: 15px">
+                            <svg-icon style="font-size: 7px; margin-bottom: 3px" iconName="p-bug"></svg-icon>
+                            <span>{{ $t('setting.issue') }}</span>
+                        </el-link>
+                        <el-link @click="toTalk" style="margin-left: 15px">
+                            <svg-icon style="font-size: 7px; margin-bottom: 3px" iconName="p-taolun"></svg-icon>
+                            <span>{{ $t('setting.chat') }}</span>
+                        </el-link>
+                        <el-link @click="toGithubStar" style="margin-left: 15px">
+                            <svg-icon style="font-size: 7px; margin-bottom: 3px" iconName="p-star"></svg-icon>
+                            <span>{{ $t('setting.star') }}</span>
+                        </el-link>
+                    </div>
                 </div>
-            </template>
-            <div style="text-align: center">
-                <div style="justify-self: center">
-                    <img style="width: 80px" src="@/assets/images/ko_image.png" />
-                </div>
-                <h3>{{ $t('setting.description') }}</h3>
-                <h3>
-                    {{ version }}
-                    <el-button type="primary" link @click="onLoadUpgradeInfo">
-                        {{ $t('setting.upgradeCheck') }}
-                    </el-button>
-                </h3>
-                <div style="margin-top: 10px">
-                    <el-link @click="toGithub">
-                        <svg-icon style="font-size: 7px; margin-bottom: 3px" iconName="p-huaban88"></svg-icon>
-                        <span style="line-height: 20px">{{ $t('setting.project') }}</span>
-                    </el-link>
-                    <el-link @click="toIssue" style="margin-left: 15px">
-                        <svg-icon style="font-size: 7px; margin-bottom: 3px" iconName="p-bug"></svg-icon>
-                        <span>{{ $t('setting.issue') }}</span>
-                    </el-link>
-                    <el-link @click="toTalk" style="margin-left: 15px">
-                        <svg-icon style="font-size: 7px; margin-bottom: 3px" iconName="p-taolun"></svg-icon>
-                        <span>{{ $t('setting.chat') }}</span>
-                    </el-link>
-                    <el-link @click="toGithubStar" style="margin-left: 15px">
-                        <svg-icon style="font-size: 7px; margin-bottom: 3px" iconName="p-star"></svg-icon>
-                        <span>{{ $t('setting.star') }}</span>
-                    </el-link>
-                </div>
-            </div>
+            </LayoutContent>
         </el-card>
         <el-drawer :key="refresh" v-model="drawerShow" size="50%">
             <el-form label-width="120px">
@@ -64,6 +61,7 @@
 </template>
 
 <script lang="ts" setup>
+import LayoutContent from '@/layout/layout-content.vue';
 import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
 import Submenu from '@/views/setting/index.vue';
 import { onMounted, ref } from 'vue';

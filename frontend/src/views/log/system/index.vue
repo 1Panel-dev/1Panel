@@ -2,27 +2,30 @@
     <div>
         <Submenu activeName="system" />
         <el-card style="margin-top: 20px">
-            <codemirror
-                :autofocus="true"
-                placeholder="None data"
-                :indent-with-tab="true"
-                :tabSize="4"
-                style="height: calc(100vh - 150px)"
-                :lineWrapping="true"
-                :matchBrackets="true"
-                theme="cobalt"
-                :styleActiveLine="true"
-                :extensions="extensions"
-                @ready="handleReady"
-                v-model="logs"
-                :readOnly="true"
-            />
+            <LayoutContent :header="$t('logs.system')">
+                <codemirror
+                    :autofocus="true"
+                    placeholder="None data"
+                    :indent-with-tab="true"
+                    :tabSize="4"
+                    style="height: calc(100vh - 180px)"
+                    :lineWrapping="true"
+                    :matchBrackets="true"
+                    theme="cobalt"
+                    :styleActiveLine="true"
+                    :extensions="extensions"
+                    @ready="handleReady"
+                    v-model="logs"
+                    :readOnly="true"
+                />
+            </LayoutContent>
         </el-card>
     </div>
 </template>
 
 <script setup lang="ts">
 import { Codemirror } from 'vue-codemirror';
+import LayoutContent from '@/layout/layout-content.vue';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { nextTick, onMounted, ref, shallowRef } from 'vue';

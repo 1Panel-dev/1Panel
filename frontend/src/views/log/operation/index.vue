@@ -2,46 +2,48 @@
     <div>
         <Submenu activeName="operation" />
         <el-card style="margin-top: 20px">
-            <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
-                <template #toolbar>
-                    <el-button type="primary" @click="onClean()">
-                        {{ $t('logs.deleteLogs') }}
-                    </el-button>
-                </template>
+            <LayoutContent :header="$t('logs.operation')">
+                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
+                    <template #toolbar>
+                        <el-button type="primary" @click="onClean()">
+                            {{ $t('logs.deleteLogs') }}
+                        </el-button>
+                    </template>
 
-                <el-table-column :label="$t('logs.resource')" prop="group" fix>
-                    <template #default="{ row }">
-                        {{ $t('logs.detail.' + row.group) }}
-                    </template>
-                </el-table-column>
-                <el-table-column :label="$t('logs.operate')" min-width="150px" prop="detailZH" />
-                <el-table-column :label="$t('logs.status')" prop="status">
-                    <template #default="{ row }">
-                        <el-tag v-if="row.status === 'Success'" class="ml-2" type="success">
-                            {{ $t('commons.status.success') }}
-                        </el-tag>
-                        <div v-else>
-                            <el-popover
-                                placement="top-start"
-                                :title="$t('commons.table.message')"
-                                :width="400"
-                                trigger="hover"
-                                :content="row.message"
-                            >
-                                <template #reference>
-                                    <el-tag class="ml-2" type="danger">{{ $t('commons.status.failed') }}</el-tag>
-                                </template>
-                            </el-popover>
-                        </div>
-                    </template>
-                </el-table-column>
-                <el-table-column
-                    prop="createdAt"
-                    :label="$t('commons.table.date')"
-                    :formatter="dateFromat"
-                    show-overflow-tooltip
-                />
-            </ComplexTable>
+                    <el-table-column :label="$t('logs.resource')" prop="group" fix>
+                        <template #default="{ row }">
+                            {{ $t('logs.detail.' + row.group) }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('logs.operate')" min-width="150px" prop="detailZH" />
+                    <el-table-column :label="$t('logs.status')" prop="status">
+                        <template #default="{ row }">
+                            <el-tag v-if="row.status === 'Success'" class="ml-2" type="success">
+                                {{ $t('commons.status.success') }}
+                            </el-tag>
+                            <div v-else>
+                                <el-popover
+                                    placement="top-start"
+                                    :title="$t('commons.table.message')"
+                                    :width="400"
+                                    trigger="hover"
+                                    :content="row.message"
+                                >
+                                    <template #reference>
+                                        <el-tag class="ml-2" type="danger">{{ $t('commons.status.failed') }}</el-tag>
+                                    </template>
+                                </el-popover>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="createdAt"
+                        :label="$t('commons.table.date')"
+                        :formatter="dateFromat"
+                        show-overflow-tooltip
+                    />
+                </ComplexTable>
+            </LayoutContent>
         </el-card>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmitClean"></ConfirmDialog>
@@ -52,6 +54,7 @@
 import ComplexTable from '@/components/complex-table/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { dateFromat } from '@/utils/util';
+import LayoutContent from '@/layout/layout-content.vue';
 import { cleanLogs, getOperationLogs } from '@/api/modules/log';
 import Submenu from '@/views/log/index.vue';
 import { onMounted, reactive, ref } from '@vue/runtime-core';

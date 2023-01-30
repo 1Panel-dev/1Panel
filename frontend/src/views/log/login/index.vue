@@ -2,35 +2,37 @@
     <div>
         <Submenu activeName="login" />
         <el-card style="margin-top: 20px">
-            <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
-                <template #toolbar>
-                    <el-button type="primary" @click="onClean()">
-                        {{ $t('logs.deleteLogs') }}
-                    </el-button>
-                </template>
-
-                <el-table-column min-width="40" :label="$t('logs.loginIP')" prop="ip" />
-                <el-table-column min-width="40" :label="$t('logs.loginAddress')" prop="address" />
-                <el-table-column :label="$t('logs.loginAgent')" show-overflow-tooltip prop="agent" />
-                <el-table-column min-width="40" :label="$t('logs.loginStatus')" prop="status">
-                    <template #default="{ row }">
-                        <div v-if="row.status === 'Success'">
-                            <el-tag type="success">{{ $t('commons.status.success') }}</el-tag>
-                        </div>
-                        <div v-else>
-                            <el-tooltip class="box-item" effect="dark" :content="row.message" placement="top-start">
-                                <el-tag type="danger">{{ $t('commons.status.failed') }}</el-tag>
-                            </el-tooltip>
-                        </div>
+            <LayoutContent :header="$t('logs.login')">
+                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
+                    <template #toolbar>
+                        <el-button type="primary" @click="onClean()">
+                            {{ $t('logs.deleteLogs') }}
+                        </el-button>
                     </template>
-                </el-table-column>
-                <el-table-column
-                    prop="createdAt"
-                    :label="$t('commons.table.date')"
-                    :formatter="dateFromat"
-                    show-overflow-tooltip
-                />
-            </ComplexTable>
+
+                    <el-table-column min-width="40" :label="$t('logs.loginIP')" prop="ip" />
+                    <el-table-column min-width="40" :label="$t('logs.loginAddress')" prop="address" />
+                    <el-table-column :label="$t('logs.loginAgent')" show-overflow-tooltip prop="agent" />
+                    <el-table-column min-width="40" :label="$t('logs.loginStatus')" prop="status">
+                        <template #default="{ row }">
+                            <div v-if="row.status === 'Success'">
+                                <el-tag type="success">{{ $t('commons.status.success') }}</el-tag>
+                            </div>
+                            <div v-else>
+                                <el-tooltip class="box-item" effect="dark" :content="row.message" placement="top-start">
+                                    <el-tag type="danger">{{ $t('commons.status.failed') }}</el-tag>
+                                </el-tooltip>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="createdAt"
+                        :label="$t('commons.table.date')"
+                        :formatter="dateFromat"
+                        show-overflow-tooltip
+                    />
+                </ComplexTable>
+            </LayoutContent>
         </el-card>
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmitClean"></ConfirmDialog>
     </div>
@@ -40,6 +42,7 @@
 import ComplexTable from '@/components/complex-table/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { dateFromat } from '@/utils/util';
+import LayoutContent from '@/layout/layout-content.vue';
 import { cleanLogs, getLoginLogs } from '@/api/modules/log';
 import Submenu from '@/views/log/index.vue';
 import { onMounted, reactive, ref } from '@vue/runtime-core';

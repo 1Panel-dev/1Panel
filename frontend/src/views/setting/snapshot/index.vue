@@ -2,66 +2,73 @@
     <div v-loading="loading">
         <Submenu activeName="snapshot" />
         <el-card v-if="!isRecordShow" style="margin-top: 20px">
-            <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
-                <template #toolbar>
-                    <el-button type="primary" icon="Plus" @click="onCreate()">
-                        {{ $t('setting.createSnapshot') }}
-                    </el-button>
-                    <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete(null)">
-                        {{ $t('commons.button.delete') }}
-                    </el-button>
-                </template>
-                <el-table-column type="selection" fix />
-                <el-table-column
-                    show-overflow-tooltip
-                    :label="$t('commons.table.name')"
-                    min-width="100"
-                    prop="name"
-                    fix
-                />
-                <el-table-column
-                    :label="$t('commons.table.description')"
-                    min-width="150"
-                    show-overflow-tooltip
-                    prop="description"
-                />
-                <el-table-column :label="$t('setting.backupAccount')" min-width="150" prop="from" />
-                <el-table-column :label="$t('setting.backup')" min-width="80" prop="status">
-                    <template #default="{ row }">
-                        <el-tag v-if="row.status === 'Success'" type="success">
-                            {{ $t('commons.table.statusSuccess') }}
-                        </el-tag>
-                        <el-tag v-if="row.status === 'Waiting'" type="info">
-                            {{ $t('commons.table.statusWaiting') }}
-                        </el-tag>
-                        <el-tooltip
-                            v-if="row.status === 'Failed'"
-                            class="box-item"
-                            effect="dark"
-                            :content="row.message"
-                            placement="top-start"
-                        >
-                            <el-tag type="danger">{{ $t('commons.table.statusFailed') }}</el-tag>
-                        </el-tooltip>
+            <LayoutContent :header="$t('setting.snapshot')">
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    v-model:selects="selects"
+                    :data="data"
+                    @search="search"
+                >
+                    <template #toolbar>
+                        <el-button type="primary" icon="Plus" @click="onCreate()">
+                            {{ $t('setting.createSnapshot') }}
+                        </el-button>
+                        <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete(null)">
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
                     </template>
-                </el-table-column>
-                <el-table-column
-                    prop="createdAt"
-                    :label="$t('commons.table.date')"
-                    :formatter="dateFromat"
-                    show-overflow-tooltip
-                />
-                <fu-table-operations
-                    width="200px"
-                    :ellipsis="10"
-                    :buttons="buttons"
-                    :label="$t('commons.table.operate')"
-                    fix
-                />
-            </ComplexTable>
+                    <el-table-column type="selection" fix />
+                    <el-table-column
+                        show-overflow-tooltip
+                        :label="$t('commons.table.name')"
+                        min-width="100"
+                        prop="name"
+                        fix
+                    />
+                    <el-table-column
+                        :label="$t('commons.table.description')"
+                        min-width="150"
+                        show-overflow-tooltip
+                        prop="description"
+                    />
+                    <el-table-column :label="$t('setting.backupAccount')" min-width="150" prop="from" />
+                    <el-table-column :label="$t('setting.backup')" min-width="80" prop="status">
+                        <template #default="{ row }">
+                            <el-tag v-if="row.status === 'Success'" type="success">
+                                {{ $t('commons.table.statusSuccess') }}
+                            </el-tag>
+                            <el-tag v-if="row.status === 'Waiting'" type="info">
+                                {{ $t('commons.table.statusWaiting') }}
+                            </el-tag>
+                            <el-tooltip
+                                v-if="row.status === 'Failed'"
+                                class="box-item"
+                                effect="dark"
+                                :content="row.message"
+                                placement="top-start"
+                            >
+                                <el-tag type="danger">{{ $t('commons.table.statusFailed') }}</el-tag>
+                            </el-tooltip>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="createdAt"
+                        :label="$t('commons.table.date')"
+                        :formatter="dateFromat"
+                        show-overflow-tooltip
+                    />
+                    <fu-table-operations
+                        width="200px"
+                        :ellipsis="10"
+                        :buttons="buttons"
+                        :label="$t('commons.table.operate')"
+                        fix
+                    />
+                </ComplexTable>
+            </LayoutContent>
         </el-card>
         <RecoverStatus ref="recoverStatusRef"></RecoverStatus>
-        <el-dialog v-model="dialogVisiable" :title="$t('setting.createSnapshot')" width="30%">
+        <el-drawer v-model="dialogVisiable" :title="$t('setting.createSnapshot')" size="50%">
             <el-form v-loading="loading" ref="snapRef" label-width="100px" :model="snapInfo" :rules="rules">
                 <el-form-item :label="$t('cronjob.target')" prop="from">
                     <el-select v-model="snapInfo.from" clearable>
@@ -87,7 +94,7 @@
                     </el-button>
                 </span>
             </template>
-        </el-dialog>
+        </el-drawer>
     </div>
 </template>
 
@@ -103,6 +110,7 @@ import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
 import Submenu from '@/views/setting/index.vue';
+import LayoutContent from '@/layout/layout-content.vue';
 import RecoverStatus from '@/views/setting/snapshot/status/index.vue';
 import { getBackupList } from '@/api/modules/backup';
 import { loadBackupName } from '../helper';
