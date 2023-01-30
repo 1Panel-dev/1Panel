@@ -1,192 +1,168 @@
 <template>
-    <LayoutContent>
-        <el-row :gutter="20">
-            <el-col :span="5">
-                <br />
-                <el-scrollbar height="85vh">
-                    <el-tree
-                        :data="fileTree"
-                        :props="defaultProps"
-                        :load="loadNode"
-                        lazy
-                        v-loading="treeLoading"
-                        node-key="id"
-                        :default-expanded-keys="expandKeys"
-                        @node-click="clickNode"
+    <el-row>
+        <el-col :span="2">
+            <el-button :icon="Back" @click="jump(paths.length - 2)" circle :disabled="paths.length == 0" />
+            <el-button :icon="Refresh" circle @click="search" />
+        </el-col>
+        <el-col :span="22">
+            <div style="background-color: #ffffff">
+                <BreadCrumbs>
+                    <BreadCrumbItem @click="jump(-1)" :right="paths.length == 0">/</BreadCrumbItem>
+                    <BreadCrumbItem
+                        v-for="(item, key) in paths"
+                        :key="key"
+                        @click="jump(key)"
+                        :right="key == paths.length - 1"
                     >
-                        <template #default="{ node }">
-                            <el-icon v-if="node.expanded"><FolderOpened /></el-icon>
-                            <el-icon v-else><Folder /></el-icon>
-                            <span class="custom-tree-node">
-                                <span>{{ node.data.name }}</span>
-                            </span>
-                        </template>
-                    </el-tree>
-                </el-scrollbar>
-            </el-col>
-
-            <el-col :span="19">
-                <br />
-                <div class="path">
-                    <BreadCrumbs>
-                        <BreadCrumbItem @click="jump(-1)" :right="paths.length == 0">/</BreadCrumbItem>
-                        <BreadCrumbItem
-                            v-for="(item, key) in paths"
-                            :key="key"
-                            @click="jump(key)"
-                            :right="key == paths.length - 1"
-                        >
-                            {{ item }}
-                        </BreadCrumbItem>
-                    </BreadCrumbs>
-                </div>
-                <ComplexTable
-                    :pagination-config="paginationConfig"
-                    v-model:selects="selects"
-                    :data="data"
-                    v-loading="loading"
-                    @search="search"
-                >
-                    <template #toolbar>
-                        <el-dropdown @command="handleCreate">
-                            <el-button type="primary" icon="Plus">
-                                {{ $t('commons.button.create') }}
-                                <el-icon class="el-icon--right"><arrow-down /></el-icon>
-                            </el-button>
-                            <template #dropdown>
-                                <el-dropdown-menu>
-                                    <el-dropdown-item command="dir">
-                                        <svg-icon iconName="p-file-folder"></svg-icon>
-                                        {{ $t('file.dir') }}
-                                    </el-dropdown-item>
-                                    <el-dropdown-item command="file">
-                                        <svg-icon iconName="p-file-normal"></svg-icon>
-                                        {{ $t('file.file') }}
-                                    </el-dropdown-item>
-                                </el-dropdown-menu>
-                            </template>
-                        </el-dropdown>
-                        <el-button-group style="margin-left: 5px">
-                            <el-button plain @click="openUpload">{{ $t('file.upload') }}</el-button>
-                            <!-- <el-button type="primary" plain> {{ $t('file.search') }}</el-button> -->
-                            <el-button plain @click="openWget">{{ $t('file.remoteFile') }}</el-button>
-                            <el-button plain @click="openMove('copy')" :disabled="selects.length === 0">
-                                {{ $t('file.copy') }}
-                            </el-button>
-                            <el-button plain @click="openMove('cut')" :disabled="selects.length === 0">
-                                {{ $t('file.move') }}
-                            </el-button>
-                            <el-button plain @click="openCompress(selects)" :disabled="selects.length === 0">
-                                {{ $t('file.compress') }}
-                            </el-button>
-                            <el-button plain @click="openDownload" :disabled="selects.length === 0">
-                                {{ $t('file.download') }}
-                            </el-button>
-                        </el-button-group>
+                        {{ item }}
+                    </BreadCrumbItem>
+                </BreadCrumbs>
+            </div>
+        </el-col>
+    </el-row>
+    <LayoutContent :title="$t('file.file')" v-loading="loading">
+        <template #toolbar>
+            <el-dropdown @command="handleCreate">
+                <el-button type="primary" icon="Plus">
+                    {{ $t('commons.button.create') }}
+                    <el-icon class="el-icon--right"><arrow-down /></el-icon>
+                </el-button>
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item command="dir">
+                            <svg-icon iconName="p-file-folder"></svg-icon>
+                            {{ $t('file.dir') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item command="file">
+                            <svg-icon iconName="p-file-normal"></svg-icon>
+                            {{ $t('file.file') }}
+                        </el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+            <el-button plain @click="openUpload" style="margin-left: 10px">{{ $t('file.upload') }}</el-button>
+            <el-button plain @click="openWget">{{ $t('file.remoteFile') }}</el-button>
+            <el-button plain @click="openMove('copy')" :disabled="selects.length === 0">
+                {{ $t('file.copy') }}
+            </el-button>
+            <el-button plain @click="openMove('cut')" :disabled="selects.length === 0">
+                {{ $t('file.move') }}
+            </el-button>
+            <el-button plain @click="openCompress(selects)" :disabled="selects.length === 0">
+                {{ $t('file.compress') }}
+            </el-button>
+            <el-button plain @click="openDownload" :disabled="selects.length === 0">
+                {{ $t('file.download') }}
+            </el-button>
+            <div class="search-button">
+                <el-input
+                    clearable
+                    @clear="search()"
+                    suffix-icon="Search"
+                    @keyup.enter="search()"
+                    @blur="search()"
+                    :placeholder="$t('commons.button.search')"
+                ></el-input>
+            </div>
+        </template>
+        <template #main>
+            <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
+                <el-table-column type="selection" width="55" />
+                <el-table-column :label="$t('commons.table.name')" min-width="250" fix show-overflow-tooltip>
+                    <template #default="{ row }">
+                        <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
+                        <svg-icon v-else className="table-icon" :iconName="getIconName(row.extension)"></svg-icon>
+                        <el-link :underline="false" @click="open(row)">{{ row.name }}</el-link>
+                        <span v-if="row.isSymlink">-> {{ row.linkPath }}</span>
                     </template>
-                    <el-table-column type="selection" width="55" />
-                    <el-table-column :label="$t('commons.table.name')" min-width="250" fix show-overflow-tooltip>
-                        <template #default="{ row }">
-                            <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
-                            <svg-icon v-else className="table-icon" :iconName="getIconName(row.extension)"></svg-icon>
-                            <el-link :underline="false" @click="open(row)">{{ row.name }}</el-link>
-                            <span v-if="row.isSymlink">-> {{ row.linkPath }}</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column :label="$t('file.mode')" prop="mode">
-                        <template #default="{ row }">
-                            <el-link :underline="false" @click="openMode(row)">{{ row.mode }}</el-link>
-                        </template>
-                    </el-table-column>
-                    <el-table-column :label="$t('file.user')" prop="user" show-overflow-tooltip></el-table-column>
-                    <el-table-column :label="$t('file.group')" prop="group"></el-table-column>
-                    <el-table-column :label="$t('file.size')" prop="size">
-                        <template #default="{ row }">
-                            <span v-if="row.isDir">
-                                <el-button type="primary" link small @click="getDirSize(row)">
-                                    <span v-if="row.dirSize == undefined">
-                                        {{ $t('file.calculate') }}
-                                    </span>
-                                    <span v-else>{{ getFileSize(row.dirSize) }}</span>
-                                </el-button>
-                            </span>
-                            <span v-else>{{ getFileSize(row.size) }}</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column
-                        :label="$t('file.updateTime')"
-                        prop="modTime"
-                        :formatter="dateFormat"
-                        min-width="150"
-                        show-overflow-tooltip
-                    ></el-table-column>
+                </el-table-column>
+                <el-table-column :label="$t('file.mode')" prop="mode">
+                    <template #default="{ row }">
+                        <el-link :underline="false" @click="openMode(row)">{{ row.mode }}</el-link>
+                    </template>
+                </el-table-column>
+                <el-table-column :label="$t('file.user')" prop="user" show-overflow-tooltip></el-table-column>
+                <el-table-column :label="$t('file.group')" prop="group"></el-table-column>
+                <el-table-column :label="$t('file.size')" prop="size">
+                    <template #default="{ row }">
+                        <span v-if="row.isDir">
+                            <el-button type="primary" link small @click="getDirSize(row)">
+                                <span v-if="row.dirSize == undefined">
+                                    {{ $t('file.calculate') }}
+                                </span>
+                                <span v-else>{{ getFileSize(row.dirSize) }}</span>
+                            </el-button>
+                        </span>
+                        <span v-else>{{ getFileSize(row.size) }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column
+                    :label="$t('file.updateTime')"
+                    prop="modTime"
+                    :formatter="dateFormat"
+                    min-width="150"
+                    show-overflow-tooltip
+                ></el-table-column>
 
-                    <fu-table-operations
-                        :ellipsis="1"
-                        :buttons="buttons"
-                        :label="$t('commons.table.operate')"
-                        fixed="right"
-                        fix
-                    />
-                </ComplexTable>
-            </el-col>
-            <CreateFile :open="filePage.open" :file="filePage.createForm" @close="closeCreate"></CreateFile>
-            <ChangeRole :open="modePage.open" :file="modePage.modeForm" @close="closeMode"></ChangeRole>
-            <Compress
-                :open="compressPage.open"
-                :files="compressPage.files"
-                :dst="compressPage.dst"
-                :name="compressPage.name"
-                @close="closeCompress"
-            ></Compress>
-            <Decompress
-                :open="deCompressPage.open"
-                :dst="deCompressPage.dst"
-                :path="deCompressPage.path"
-                :name="deCompressPage.name"
-                :mimeType="deCompressPage.mimeType"
-                @close="closeDeCompress"
-            ></Decompress>
-            <CodeEditor
-                :open="editorPage.open"
-                :language="'json'"
-                :content="editorPage.content"
-                :loading="editorPage.loading"
-                @close="closeCodeEditor"
-                @qsave="quickSave"
-                @save="saveContent"
-            ></CodeEditor>
-            <FileRename
-                :open="renamePage.open"
-                :path="renamePage.path"
-                :oldName="renamePage.oldName"
-                @close="closeRename"
-            ></FileRename>
-            <Upload :open="uploadPage.open" :path="uploadPage.path" @close="closeUpload"></Upload>
-            <Wget :open="wgetPage.open" :path="wgetPage.path" @close="closeWget"></Wget>
-            <Move :open="movePage.open" :oldPaths="movePage.oldPaths" :type="movePage.type" @close="clodeMove"></Move>
-            <Download
-                :open="downloadPage.open"
-                :paths="downloadPage.paths"
-                :name="downloadPage.name"
-                @close="closeDownload"
-            ></Download>
-            <Process :open="processPage.open" @close="closeProcess"></Process>
-            <Detail ref="detailRef"></Detail>
-        </el-row>
+                <fu-table-operations
+                    :ellipsis="1"
+                    :buttons="buttons"
+                    :label="$t('commons.table.operate')"
+                    fixed="right"
+                    fix
+                />
+            </ComplexTable>
+        </template>
+
+        <CreateFile :open="filePage.open" :file="filePage.createForm" @close="closeCreate"></CreateFile>
+        <ChangeRole :open="modePage.open" :file="modePage.modeForm" @close="closeMode"></ChangeRole>
+        <Compress
+            :open="compressPage.open"
+            :files="compressPage.files"
+            :dst="compressPage.dst"
+            :name="compressPage.name"
+            @close="closeCompress"
+        ></Compress>
+        <Decompress
+            :open="deCompressPage.open"
+            :dst="deCompressPage.dst"
+            :path="deCompressPage.path"
+            :name="deCompressPage.name"
+            :mimeType="deCompressPage.mimeType"
+            @close="closeDeCompress"
+        ></Decompress>
+        <CodeEditor
+            :open="editorPage.open"
+            :language="'json'"
+            :content="editorPage.content"
+            :loading="editorPage.loading"
+            @close="closeCodeEditor"
+            @qsave="quickSave"
+            @save="saveContent"
+        ></CodeEditor>
+        <FileRename
+            :open="renamePage.open"
+            :path="renamePage.path"
+            :oldName="renamePage.oldName"
+            @close="closeRename"
+        ></FileRename>
+        <Upload :open="uploadPage.open" :path="uploadPage.path" @close="closeUpload"></Upload>
+        <Wget :open="wgetPage.open" :path="wgetPage.path" @close="closeWget"></Wget>
+        <Move :open="movePage.open" :oldPaths="movePage.oldPaths" :type="movePage.type" @close="clodeMove"></Move>
+        <Download
+            :open="downloadPage.open"
+            :paths="downloadPage.paths"
+            :name="downloadPage.name"
+            @close="closeDownload"
+        ></Download>
+        <Process :open="processPage.open" @close="closeProcess"></Process>
+        <Detail ref="detailRef"></Detail>
     </LayoutContent>
 </template>
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from '@vue/runtime-core';
-import {
-    GetFilesList,
-    GetFilesTree,
-    DeleteFile,
-    GetFileContent,
-    SaveFileContent,
-    ComputeDirSize,
-} from '@/api/modules/files';
+import { GetFilesList, DeleteFile, GetFileContent, SaveFileContent, ComputeDirSize } from '@/api/modules/files';
 import { computeSize, dateFormat, getIcon, getRandomStr } from '@/utils/util';
 import { File } from '@/api/interface/file';
 import { useDeleteData } from '@/hooks/use-delete-data';
@@ -210,16 +186,14 @@ import { Mimetypes } from '@/global/mimetype';
 import Process from './process/index.vue';
 import Detail from './detail/index.vue';
 import { useRouter } from 'vue-router';
+import { Back, Refresh } from '@element-plus/icons-vue';
 
 const router = useRouter();
 const data = ref();
 let selects = ref<any>([]);
 let req = reactive({ path: '/', expand: true, showHidden: false, page: 1, pageSize: 100 });
 let loading = ref(false);
-let treeLoading = ref(false);
 const paths = ref<string[]>([]);
-const fileTree = ref<File.FileTree[]>([]);
-const expandKeys = ref<string[]>([]);
 
 const filePage = reactive({ open: false, createForm: { path: '/', isDir: false, mode: 0o755 } });
 const modePage = reactive({ open: false, modeForm: { path: '/', isDir: false, mode: 0o755 } });
@@ -234,12 +208,6 @@ const movePage = reactive({ open: false, oldPaths: [''], type: '' });
 const downloadPage = reactive({ open: false, paths: [''], name: '' });
 const processPage = reactive({ open: false });
 const detailRef = ref();
-
-const defaultProps = {
-    children: 'children',
-    label: 'name',
-    id: 'id',
-};
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -298,44 +266,6 @@ const jump = async (index: number) => {
     }
     req.path = path;
     search();
-};
-
-const getTree = async (req: File.ReqFile, node: File.FileTree | null) => {
-    treeLoading.value = true;
-    await GetFilesTree(req)
-        .then((res) => {
-            if (node) {
-                if (res.data.length > 0) {
-                    node.children = res.data[0].children;
-                }
-            } else {
-                fileTree.value = res.data;
-                expandKeys.value = [];
-                expandKeys.value.push(fileTree.value[0].id);
-            }
-        })
-        .finally(() => {
-            treeLoading.value = false;
-        });
-};
-
-const clickNode = async (node: any) => {
-    if (node.path) {
-        req.path = node.path;
-        search();
-    }
-};
-
-const loadNode = (node: any, resolve: (data: File.FileTree[]) => void) => {
-    if (!node.hasChildNodes) {
-        if (node.data.path) {
-            req.path = node.data.path;
-            getTree(req, node.data);
-        } else {
-            getTree(req, null);
-        }
-    }
-    resolve([]);
 };
 
 const handleCreate = (commnad: string) => {
@@ -580,5 +510,10 @@ onMounted(() => {
 .path {
     height: 30px;
     margin-bottom: 5px;
+}
+
+.search-button {
+    float: right;
+    display: inline;
 }
 </style>

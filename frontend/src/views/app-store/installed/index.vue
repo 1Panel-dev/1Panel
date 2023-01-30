@@ -185,7 +185,7 @@ let searchReq = reactive({
     pageSize: 15,
     name: '',
     tags: [],
-    updated: false,
+    update: false,
 });
 const router = useRouter();
 let activeName = ref(i18n.global.t('app.installed'));
@@ -338,7 +338,7 @@ onMounted(() => {
     if (path == '/apps/update') {
         activeName.value = i18n.global.t('app.canUpdate');
         mode.value = 'update';
-        searchReq.updated = true;
+        searchReq.update = true;
     }
     search();
     timer = setInterval(() => {

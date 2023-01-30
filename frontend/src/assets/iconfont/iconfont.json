@@ -6,6 +6,69 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "26815641",
+      "name": "PPT",
+      "font_class": "file-ppt",
+      "unicode": "e6e2",
+      "unicode_decimal": 59106
+    },
+    {
+      "icon_id": "26815643",
+      "name": "HTML",
+      "font_class": "file-html",
+      "unicode": "d123",
+      "unicode_decimal": 53539
+    },
+    {
+      "icon_id": "26815644",
+      "name": "word",
+      "font_class": "file-word",
+      "unicode": "e6e4",
+      "unicode_decimal": 59108
+    },
+    {
+      "icon_id": "26815647",
+      "name": "excel",
+      "font_class": "file-excel",
+      "unicode": "e6e6",
+      "unicode_decimal": 59110
+    },
+    {
+      "icon_id": "26815651",
+      "name": "PDF",
+      "font_class": "file-pdf",
+      "unicode": "e6e7",
+      "unicode_decimal": 59111
+    },
+    {
+      "icon_id": "26815652",
+      "name": "音频",
+      "font_class": "file-mp3",
+      "unicode": "e6e8",
+      "unicode_decimal": 59112
+    },
+    {
+      "icon_id": "26815654",
+      "name": "SVG",
+      "font_class": "file-svg",
+      "unicode": "e6e9",
+      "unicode_decimal": 59113
+    },
+    {
+      "icon_id": "26815655",
+      "name": "JPG",
+      "font_class": "file-jpg",
+      "unicode": "e6ea",
+      "unicode_decimal": 59114
+    },
+    {
+      "icon_id": "26815656",
+      "name": "视频",
+      "font_class": "file-video",
+      "unicode": "e6eb",
+      "unicode_decimal": 59115
+    },
+    {
       "icon_id": "974125",
       "name": "star",
       "font_class": "star",
@@ -235,6 +298,13 @@
       "font_class": "file-normal",
       "unicode": "e7ac",
       "unicode_decimal": 59308
+    },
+    {
+      "icon_id": "26815646",
+      "name": "txt",
+      "font_class": "txt",
+      "unicode": "e6e3",
+      "unicode_decimal": 59107
     },
     {
       "icon_id": "22761832",
