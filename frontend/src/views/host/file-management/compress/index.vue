@@ -1,52 +1,55 @@
 <template>
-    <el-dialog
+    <el-drawer
         v-model="open"
         :title="title"
         :destroy-on-close="true"
         :close-on-click-modal="false"
         :before-close="handleClose"
-        width="30%"
-        @open="onOpen"
+        size="50%"
     >
-        <el-form
-            ref="fileForm"
-            label-position="left"
-            :model="form"
-            label-width="100px"
-            :rules="rules"
-            v-loading="loading"
-        >
-            <el-form-item :label="$t('file.compressType')" prop="type">
-                <el-select v-model="form.type">
-                    <el-option v-for="item in options" :key="item" :label="item" :value="item" />
-                </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('file.name')" prop="name">
-                <el-input v-model="form.name">
-                    <template #append>{{ extension }}</template>
-                </el-input>
-            </el-form-item>
-            <el-form-item :label="$t('file.compressDst')" prop="dst">
-                <el-input v-model="form.dst" disabled>
-                    <template #append><FileList :path="props.dst" @choose="getLinkPath"></FileList></template>
-                </el-input>
-            </el-form-item>
-            <el-form-item>
-                <el-checkbox v-model="form.replace" :label="$t('file.replace')"></el-checkbox>
-            </el-form-item>
-        </el-form>
+        <el-row>
+            <el-col :span="22" :offset="1">
+                <el-form
+                    ref="fileForm"
+                    label-position="top"
+                    :model="form"
+                    label-width="100px"
+                    :rules="rules"
+                    v-loading="loading"
+                >
+                    <el-form-item :label="$t('file.compressType')" prop="type">
+                        <el-select v-model="form.type">
+                            <el-option v-for="item in options" :key="item" :label="item" :value="item" />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item :label="$t('file.name')" prop="name">
+                        <el-input v-model="form.name">
+                            <template #append>{{ extension }}</template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('file.compressDst')" prop="dst">
+                        <el-input v-model="form.dst" disabled>
+                            <template #append><FileList :path="form.dst" @choose="getLinkPath"></FileList></template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-checkbox v-model="form.replace" :label="$t('file.replace')"></el-checkbox>
+                    </el-form-item>
+                </el-form>
+            </el-col>
+        </el-row>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button type="primary" @click="submit(fileForm)">{{ $t('commons.button.confirm') }}</el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script setup lang="ts">
 import i18n from '@/lang';
-import { computed, reactive, ref, toRefs } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { File } from '@/api/interface/file';
 import { ElMessage, FormInstance, FormRules } from 'element-plus';
 import { Rules } from '@/global/form-rules';
@@ -54,30 +57,12 @@ import { CompressExtention, CompressType } from '@/enums/files';
 import { CompressFile } from '@/api/modules/files';
 import FileList from '@/components/file-list/index.vue';
 
-const props = defineProps({
-    open: {
-        type: Boolean,
-        default: false,
-    },
-    files: {
-        type: Array,
-        default: function () {
-            return [];
-        },
-    },
-    type: {
-        type: String,
-        default: 'compress',
-    },
-    dst: {
-        type: String,
-        default: '',
-    },
-    name: {
-        type: String,
-        default: '',
-    },
-});
+interface CompressProps {
+    files: Array<any>;
+    dst: string;
+    name: string;
+    operate: string;
+}
 
 const rules = reactive<FormRules>({
     type: [Rules.requiredSelect],
@@ -85,17 +70,15 @@ const rules = reactive<FormRules>({
     name: [Rules.requiredInput],
 });
 
-const { open, files, type, dst, name } = toRefs(props);
 const fileForm = ref<FormInstance>();
 let loading = ref(false);
 let form = ref<File.FileCompress>({ files: [], type: 'zip', dst: '', name: '', replace: false });
 let options = ref<string[]>([]);
+let open = ref(false);
+let title = ref('');
+let operate = ref('compress');
 
 const em = defineEmits(['close']);
-
-const title = computed(() => {
-    return i18n.global.t('file.' + type.value);
-});
 
 const extension = computed(() => {
     return CompressExtention[form.value.type];
@@ -106,24 +89,11 @@ const handleClose = () => {
         fileForm.value.resetFields();
     }
     em('close', open);
+    open.value = false;
 };
 
 const getLinkPath = (path: string) => {
     form.value.dst = path;
-};
-
-const onOpen = () => {
-    form.value = {
-        dst: dst.value,
-        type: 'zip',
-        files: files.value as string[],
-        name: name.value,
-        replace: false,
-    };
-    options.value = [];
-    for (const t in CompressType) {
-        options.value.push(CompressType[t]);
-    }
 };
 
 const submit = async (formEl: FormInstance | undefined) => {
@@ -146,4 +116,21 @@ const submit = async (formEl: FormInstance | undefined) => {
             });
     });
 };
+
+const acceptParams = (props: CompressProps) => {
+    form.value.files = props.files;
+    form.value.dst = props.dst;
+    form.value.name = props.name;
+
+    operate.value = props.operate;
+    options.value = [];
+    for (const t in CompressType) {
+        options.value.push(CompressType[t]);
+    }
+    open.value = true;
+
+    title.value = i18n.global.t('file.' + props.operate);
+};
+
+defineExpose({ acceptParams });
 </script>

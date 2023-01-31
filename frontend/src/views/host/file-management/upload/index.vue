@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="open" :title="$t('file.upload')" :before-close="handleClose" width="30%" :file-list="files">
+    <el-drawer v-model="open" :title="$t('file.upload')" :before-close="handleClose" size="40%" :file-list="files">
         <el-upload
             action="#"
             :auto-upload="false"
@@ -21,7 +21,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script setup lang="ts">
@@ -30,24 +30,20 @@ import { ElMessage, UploadFile, UploadFiles, UploadInstance } from 'element-plus
 import { UploadFileData } from '@/api/modules/files';
 import i18n from '@/lang';
 
-const props = defineProps({
-    open: {
-        type: Boolean,
-        default: false,
-    },
-    path: {
-        type: String,
-        default: '',
-    },
-});
+interface UploadProps {
+    path: string;
+}
 
 const uploadRef = ref<UploadInstance>();
 const files = ref();
 const loading = ref(false);
 let uploadPrecent = ref(0);
+let open = ref(false);
+let path = ref();
 
 const em = defineEmits(['close']);
 const handleClose = () => {
+    open.value = false;
     uploadRef.value!.clearFiles();
     em('close', false);
 };
@@ -70,7 +66,7 @@ const submit = () => {
             formData.append('file', file.raw);
         }
     }
-    formData.append('path', props.path);
+    formData.append('path', path.value);
     loading.value = true;
     UploadFileData(formData, { onUploadProgress: onProcess })
         .then(() => {
@@ -81,4 +77,11 @@ const submit = () => {
             loading.value = false;
         });
 };
+
+const acceptParams = (props: UploadProps) => {
+    path.value = props.path;
+    open.value = true;
+};
+
+defineExpose({ acceptParams });
 </script>

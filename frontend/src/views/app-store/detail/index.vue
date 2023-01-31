@@ -6,7 +6,7 @@
                     <el-col :span="3">
                         <el-avatar shape="square" :size="180" :src="'data:image/png;base64,' + app.icon" />
                     </el-col>
-                    <el-col :span="20">
+                    <el-col :span="18">
                         <div class="detail">
                             <div class="name">
                                 <span>{{ app.name }}</span>
@@ -78,7 +78,7 @@
                     </el-col>
                 </el-row>
             </div>
-            <div v-loading="loadingDetail">
+            <div v-loading="loadingDetail" style="margin-left: -32px">
                 <v-md-preview :text="appDetail.readme"></v-md-preview>
             </div>
         </template>

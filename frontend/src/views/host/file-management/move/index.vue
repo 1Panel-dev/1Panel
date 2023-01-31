@@ -1,12 +1,11 @@
 <template>
-    <el-dialog
+    <el-drawer
         v-model="open"
         :title="title"
         :destroy-on-close="true"
         :close-on-click-modal="false"
         :before-close="handleClose"
-        width="30%"
-        @open="onOpen"
+        size="30%"
     >
         <el-form
             ref="fileForm"
@@ -30,7 +29,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>
@@ -38,32 +37,21 @@ import { MoveFile } from '@/api/modules/files';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElMessage, FormInstance, FormRules } from 'element-plus';
-import { toRefs, ref, reactive, PropType, computed } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import FileList from '@/components/file-list/index.vue';
 
-const props = defineProps({
-    open: {
-        type: Boolean,
-        default: false,
-    },
-    oldPaths: {
-        type: Array as PropType<string[]>,
-        default: () => {
-            return [];
-        },
-    },
-    type: {
-        type: String,
-        default: '',
-    },
-});
+interface MoveProps {
+    oldPaths: Array<string>;
+    type: string;
+}
 
-const { open } = toRefs(props);
 const fileForm = ref<FormInstance>();
 const loading = ref(false);
+let open = ref(false);
+let type = ref('cut');
 
 const title = computed(() => {
-    if (props.type === 'cut') {
+    if (type.value === 'cut') {
         return i18n.global.t('file.move');
     } else {
         return i18n.global.t('file.copy');
@@ -83,6 +71,7 @@ const rules = reactive<FormRules>({
 const em = defineEmits(['close']);
 
 const handleClose = () => {
+    open.value = false;
     if (fileForm.value) {
         fileForm.value.resetFields();
     }
@@ -111,8 +100,12 @@ const submit = async (formEl: FormInstance | undefined) => {
     });
 };
 
-const onOpen = () => {
+const acceptParams = (props: MoveProps) => {
     addForm.oldPaths = props.oldPaths;
     addForm.type = props.type;
+    type.value = props.type;
+    open.value = true;
 };
+
+defineExpose({ acceptParams });
 </script>
