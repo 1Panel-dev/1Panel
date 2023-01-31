@@ -72,6 +72,7 @@ let settingForm = reactive<Setting.SettingInfo>({
     language: '',
     serverPort: 8888,
     securityEntrance: '',
+    systemVersion: '',
     expirationDays: 0,
     expirationTime: '',
     complexityVerification: 'enable',

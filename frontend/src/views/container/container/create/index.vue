@@ -2,7 +2,7 @@
     <el-drawer v-model="createVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
             <div class="card-header">
-                <span>{{ $t('container.containerCreate') }}</span>
+                <span>{{ $t('container.createContainer') }}</span>
             </div>
         </template>
         <el-form ref="formRef" v-loading="loading" :model="form" :rules="rules" label-width="80px">

@@ -1,6 +1,5 @@
 <template>
     <div>
-        <Submenu activeName="template" />
         <el-card width="30%" v-if="dockerStatus != 'Running'" class="mask-prompt">
             <span style="font-size: 14px">{{ $t('container.serviceUnavailable') }}</span>
             <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="goSetting">
@@ -8,22 +7,27 @@
             </el-button>
             <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
         </el-card>
-        <el-card style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
-            <LayoutContent :header="$t('container.composeTemplate')">
+
+        <LayoutContent
+            v-loading="loading"
+            :title="$t('container.composeTemplate')"
+            :class="{ mask: dockerStatus != 'Running' }"
+        >
+            <template #toolbar>
+                <el-button type="primary" @click="onOpenDialog('create')">
+                    {{ $t('container.createComposeTemplate') }}
+                </el-button>
+                <el-button plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
+            </template>
+            <template #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
                     @search="search"
                 >
-                    <template #toolbar>
-                        <el-button icon="Plus" type="primary" @click="onOpenDialog('create')">
-                            {{ $t('commons.button.create') }}
-                        </el-button>
-                        <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                    </template>
                     <el-table-column type="selection" fix />
                     <el-table-column
                         :label="$t('commons.table.name')"
@@ -39,13 +43,13 @@
                     <el-table-column :label="$t('container.description')" prop="description" min-width="200" fix />
                     <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
                         <template #default="{ row }">
-													{{ dateFormatSimple(row.createdAt) }}
+                            {{ dateFormatSimple(row.createdAt) }}
                         </template>
                     </el-table-column>
                     <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" />
                 </ComplexTable>
-            </LayoutContent>
-        </el-card>
+            </template>
+        </LayoutContent>
 
         <el-dialog v-model="detailVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="70%">
             <template #header>
@@ -81,7 +85,6 @@
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
-import Submenu from '@/views/container/index.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -94,6 +97,7 @@ import { useDeleteData } from '@/hooks/use-delete-data';
 import i18n from '@/lang';
 import router from '@/routers';
 
+const loading = ref();
 const data = ref();
 const selects = ref<any>([]);
 const detailVisiable = ref(false);
@@ -123,10 +127,16 @@ const search = async () => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
-    await searchComposeTemplate(params).then((res) => {
-        data.value = res.data.items || [];
-        paginationConfig.total = res.data.total;
-    });
+    loading.value = true;
+    await searchComposeTemplate(params)
+        .then((res) => {
+            loading.value = false;
+            data.value = res.data.items || [];
+            paginationConfig.total = res.data.total;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onOpenDetail = async (row: Container.TemplateInfo) => {

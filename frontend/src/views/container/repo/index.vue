@@ -1,6 +1,5 @@
 <template>
     <div>
-        <Submenu activeName="repo" />
         <el-card width="30%" v-if="dockerStatus != 'Running'" class="mask-prompt">
             <span style="font-size: 14px">{{ $t('container.serviceUnavailable') }}</span>
             <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="goSetting">
@@ -8,22 +7,23 @@
             </el-button>
             <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
         </el-card>
-        <el-card style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
-            <LayoutContent :header="$t('container.repo')">
+
+        <LayoutContent v-loading="loading" :title="$t('container.repo')" :class="{ mask: dockerStatus != 'Running' }">
+            <template #toolbar>
+                <el-button type="primary" @click="onOpenDialog('create')">
+                    {{ $t('container.createRepo') }}
+                </el-button>
+                <el-button plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
+            </template>
+            <template #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
                     @search="search"
                 >
-                    <template #toolbar>
-                        <el-button icon="Plus" type="primary" @click="onOpenDialog('create')">
-                            {{ $t('commons.button.create') }}
-                        </el-button>
-                        <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                    </template>
                     <el-table-column type="selection" :selectable="selectable" fix />
                     <el-table-column :label="$t('commons.table.name')" prop="name" min-width="60" />
                     <el-table-column
@@ -46,13 +46,13 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
                         <template #default="{ row }">
-													{{ dateFormatSimple(row.createdAt) }}
+                            {{ dateFormatSimple(row.createdAt) }}
                         </template>
                     </el-table-column>
                     <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" />
                 </ComplexTable>
-            </LayoutContent>
-        </el-card>
+            </template>
+        </LayoutContent>
         <OperatorDialog @search="search" ref="dialogRef" />
         <DeleteDialog @search="search" ref="dialogDeleteRef" />
     </div>
@@ -63,7 +63,6 @@ import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import OperatorDialog from '@/views/container/repo/operator/index.vue';
 import DeleteDialog from '@/views/container/repo/delete/index.vue';
-import Submenu from '@/views/container/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFormatSimple } from '@/utils/util';
 import { Container } from '@/api/interface/container';
@@ -71,6 +70,7 @@ import { loadDockerStatus, searchImageRepo } from '@/api/modules/container';
 import i18n from '@/lang';
 import router from '@/routers';
 
+const loading = ref();
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
@@ -96,10 +96,16 @@ const search = async () => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
-    await searchImageRepo(params).then((res) => {
-        data.value = res.data.items || [];
-        paginationConfig.total = res.data.total;
-    });
+    loading.value = true;
+    await searchImageRepo(params)
+        .then((res) => {
+            loading.value = false;
+            data.value = res.data.items || [];
+            paginationConfig.total = res.data.total;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 function selectable(row) {

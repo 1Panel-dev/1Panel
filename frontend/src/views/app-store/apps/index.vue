@@ -33,7 +33,7 @@
             </el-row>
         </template>
         <template #rightButton>
-            <el-button @click="sync" type="text" :plain="true">{{ $t('app.syncAppList') }}</el-button>
+            <el-button @click="sync" link :plain="true">{{ $t('app.syncAppList') }}</el-button>
         </template>
         <template #main>
             <el-row :gutter="5">

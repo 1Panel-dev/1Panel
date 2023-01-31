@@ -11,7 +11,6 @@
 import LayoutContent from '@/layout/layout-content.vue';
 import RouterButton from '@/components/router-button/index.vue';
 import i18n from '@/lang';
-
 const buttons = [
     {
         label: i18n.global.t('app.all'),

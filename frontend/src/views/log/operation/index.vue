@@ -1,15 +1,13 @@
 <template>
     <div>
-        <Submenu activeName="operation" />
-        <el-card style="margin-top: 20px">
-            <LayoutContent :header="$t('logs.operation')">
+        <LayoutContent v-loading="loading" :title="$t('logs.operation')">
+            <template #toolbar>
+                <el-button type="primary" plain @click="onClean()">
+                    {{ $t('logs.deleteLogs') }}
+                </el-button>
+            </template>
+            <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
-                    <template #toolbar>
-                        <el-button type="primary" @click="onClean()">
-                            {{ $t('logs.deleteLogs') }}
-                        </el-button>
-                    </template>
-
                     <el-table-column :label="$t('logs.resource')" prop="group" fix>
                         <template #default="{ row }">
                             {{ $t('logs.detail.' + row.group) }}
@@ -43,8 +41,8 @@
                         show-overflow-tooltip
                     />
                 </ComplexTable>
-            </LayoutContent>
-        </el-card>
+            </template>
+        </LayoutContent>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmitClean"></ConfirmDialog>
     </div>
@@ -56,11 +54,11 @@ import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { dateFormat } from '@/utils/util';
 import LayoutContent from '@/layout/layout-content.vue';
 import { cleanLogs, getOperationLogs } from '@/api/modules/log';
-import Submenu from '@/views/log/index.vue';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
 
+const loading = ref();
 const data = ref();
 const confirmDialogRef = ref();
 const paginationConfig = reactive({
@@ -74,9 +72,16 @@ const search = async () => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
-    const res = await getOperationLogs(params);
-    data.value = res.data.items;
-    paginationConfig.total = res.data.total;
+    loading.value = true;
+    await getOperationLogs(params)
+        .then((res) => {
+            loading.value = false;
+            data.value = res.data.items;
+            paginationConfig.total = res.data.total;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onClean = async () => {

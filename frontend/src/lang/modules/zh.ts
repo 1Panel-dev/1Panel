@@ -4,7 +4,7 @@ export default {
         false: '否',
         example: '例如：',
         button: {
-            create: '新建',
+            create: '创建',
             add: '添加',
             save: '保存',
             set: '设置',
@@ -381,6 +381,7 @@ export default {
         rdbInfo: '规则列表存在 0 值，请确认后重试！',
     },
     container: {
+        createContainer: '创建容器',
         containerList: '容器列表',
         operatorHelper: '将对选中容器进行 {0} 操作，是否继续？',
         start: '启动',
@@ -404,7 +405,6 @@ export default {
         containerTerminal: '容器终端',
         emptyUser: '为空时，将使用容器默认的用户登录',
 
-        containerCreate: '容器创建',
         port: '端口',
         exposePort: '暴露端口',
         exposeAll: '暴露所有',
@@ -462,7 +462,7 @@ export default {
         imageNameHelper: '镜像名称及 Tag，例：nginx:latest',
 
         network: '网络',
-        createNetwork: '添加网络',
+        createNetwork: '创建网络',
         networkName: '网络名',
         driver: '模式',
         option: '参数',
@@ -477,6 +477,7 @@ export default {
         createVolume: '创建存储卷',
 
         repo: '仓库',
+        createRepo: '创建仓库',
         name: '名称',
         protocol: '协议',
         downloadUrl: '下载地址',
@@ -487,7 +488,9 @@ export default {
         registrieHelper: '一行一个，例：\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: '编排',
+        createCompose: '创建编排',
         composeTemplate: '编排模版',
+        createComposeTemplate: '创建编排模版',
         description: '描述',
         content: '内容',
         containerNumber: '容器数量',
@@ -788,6 +791,7 @@ export default {
         mfaHelper2: '使用手机应用扫描以下二维码，获取 6 位验证码',
         mfaHelper3: '输入手机应用上的 6 位数字',
 
+        monitor: '监控',
         enableMonitor: '监控状态',
         storeDays: '过期时间 (天)',
         cleanMonitor: '清空监控记录',

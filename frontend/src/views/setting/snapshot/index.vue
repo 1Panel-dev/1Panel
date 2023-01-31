@@ -1,12 +1,12 @@
 <template>
-    <div v-loading="loading">
-        <Submenu activeName="snapshot" />
-        <el-card v-if="!isRecordShow" style="margin-top: 20px">
-            <LayoutContent :header="$t('setting.snapshot')">
+    <div>
+        <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('setting.snapshot')" :divider="true">
+            <template #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
+                    style="margin-top: 20px"
                     @search="search"
                 >
                     <template #toolbar>
@@ -65,8 +65,8 @@
                         fix
                     />
                 </ComplexTable>
-            </LayoutContent>
-        </el-card>
+            </template>
+        </LayoutContent>
         <RecoverStatus ref="recoverStatusRef"></RecoverStatus>
         <el-drawer v-model="dialogVisiable" :title="$t('setting.createSnapshot')" size="50%">
             <el-form v-loading="loading" ref="snapRef" label-width="100px" :model="snapInfo" :rules="rules">
@@ -109,7 +109,6 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
-import Submenu from '@/views/setting/index.vue';
 import LayoutContent from '@/layout/layout-content.vue';
 import RecoverStatus from '@/views/setting/snapshot/status/index.vue';
 import { getBackupList } from '@/api/modules/backup';

@@ -1,47 +1,29 @@
 <template>
     <div>
-        <el-card class="topRouterCard">
-            <el-radio-group :model-value="props.activeName" @change="handleChange">
-                <el-radio-button class="topRouterButton" size="default" label="operation">
-                    {{ $t('logs.operation') }}
-                </el-radio-button>
-                <el-radio-button class="topRouterButton" size="default" label="login">
-                    {{ $t('logs.login') }}
-                </el-radio-button>
-                <el-radio-button class="topRouterButton" size="default" label="system">
-                    {{ $t('logs.system') }}
-                </el-radio-button>
-            </el-radio-group>
-        </el-card>
+        <RouterButton :buttons="buttons" />
+        <LayoutContent>
+            <router-view></router-view>
+        </LayoutContent>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { useRouter } from 'vue-router';
-const router = useRouter();
+import i18n from '@/lang';
+import LayoutContent from '@/layout/layout-content.vue';
+import RouterButton from '@/components/router-button/index.vue';
 
-interface MenuProps {
-    activeName: string;
-}
-const props = withDefaults(defineProps<MenuProps>(), {
-    activeName: 'operation',
-});
-
-const routerTo = (path: string) => {
-    router.push({ path: path });
-};
-
-const handleChange = (val: string) => {
-    switch (val) {
-        case 'operation':
-            routerTo('/logs');
-            break;
-        case 'login':
-            routerTo('/logs/login');
-            break;
-        case 'system':
-            routerTo('/logs/system');
-            break;
-    }
-};
+const buttons = [
+    {
+        label: i18n.global.t('logs.operation'),
+        path: '/logs/operation',
+    },
+    {
+        label: i18n.global.t('logs.login'),
+        path: '/logs/login',
+    },
+    {
+        label: i18n.global.t('logs.system'),
+        path: '/logs/system',
+    },
+];
 </script>

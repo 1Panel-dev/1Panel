@@ -1,6 +1,5 @@
 <template>
-    <div v-loading="loading">
-        <Submenu activeName="setting" />
+    <div>
         <div class="app-content" style="margin-top: 20px">
             <el-card class="app-card">
                 <el-row :gutter="20">
@@ -49,8 +48,9 @@
                 </el-row>
             </el-card>
         </div>
-        <el-card style="margin-top: 20px">
-            <LayoutContent :header="$t('container.setting')">
+
+        <LayoutContent v-loading="loading" :title="$t('container.setting')" :divider="true">
+            <template #main>
                 <el-radio-group v-model="confShowType" @change="changeMode">
                     <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
                     <el-radio-button label="all">{{ $t('database.allConf') }}</el-radio-button>
@@ -114,8 +114,8 @@
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </div>
-            </LayoutContent>
-        </el-card>
+            </template>
+        </LayoutContent>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmitSave"></ConfirmDialog>
     </div>
@@ -124,7 +124,6 @@
 <script lang="ts" setup>
 import { ElMessage, FormInstance } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
-import Submenu from '@/views/container/index.vue';
 import { Codemirror } from 'vue-codemirror';
 import LayoutContent from '@/layout/layout-content.vue';
 import { javascript } from '@codemirror/lang-javascript';

@@ -364,6 +364,7 @@ export default {
         rdbInfo: 'Rule list has 0 value, please confirm and try again!',
     },
     container: {
+        createContainer: 'Create container',
         containerList: 'Container list',
         operatorHelper: '{0} will be performed on the selected container. Do you want to continue?',
         start: 'Start',
@@ -387,7 +388,6 @@ export default {
         emptyUser: 'When empty, you will log in with the  default user of container',
         containerTerminal: 'Container terminal',
 
-        containerCreate: 'Container create',
         port: 'Port',
         exposePort: 'Expose port',
         exposeAll: 'Expose all',
@@ -454,6 +454,7 @@ export default {
         createVolume: 'Create volume',
 
         repo: 'Repo',
+        createRepo: 'Create repo',
         name: 'Name',
         protocol: 'protocol',
         httpRepo: 'The http repository needs to restart the docker service to add credit',
@@ -467,7 +468,9 @@ export default {
         registrieHelper: 'One in a row, for example:\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: 'Compose',
+        createCompose: 'Create compose',
         composeTemplate: 'Compose template',
+        createComposeTemplate: 'Create compose template',
         description: 'Description',
         content: 'Content',
         containerNumber: 'Container number',
@@ -773,6 +776,7 @@ export default {
         upgradeNotes: 'Release note',
         upgradeNow: 'Upgrade now',
 
+        monitor: 'Monitor',
         enableMonitor: 'Enable',
         storeDays: 'Expiration time (day)',
         cleanMonitor: 'Clearing monitoring records',

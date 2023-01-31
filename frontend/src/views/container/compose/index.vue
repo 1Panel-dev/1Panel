@@ -1,7 +1,5 @@
 <template>
     <div v-loading="loading">
-        <Submenu activeName="compose" />
-
         <div v-show="isOnDetail">
             <ComposeDetial @back="backList" ref="composeDetailRef" />
         </div>
@@ -12,19 +10,25 @@
             </el-button>
             <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
         </el-card>
-        <el-card v-if="!isOnDetail" style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
-            <LayoutContent :header="$t('container.compose')">
+
+        <LayoutContent
+            v-loading="loading"
+            v-if="!isOnDetail"
+            :title="$t('container.compose')"
+            :class="{ mask: dockerStatus != 'Running' }"
+        >
+            <template #toolbar>
+                <el-button type="primary" @click="onOpenDialog()">
+                    {{ $t('container.createCompose') }}
+                </el-button>
+            </template>
+            <template #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
                     @search="search"
                 >
-                    <template #toolbar>
-                        <el-button icon="Plus" type="primary" @click="onOpenDialog()">
-                            {{ $t('commons.button.create') }}
-                        </el-button>
-                    </template>
                     <el-table-column
                         :label="$t('commons.table.name')"
                         show-overflow-tooltip
@@ -57,8 +61,8 @@
                         fix
                     />
                 </ComplexTable>
-            </LayoutContent>
-        </el-card>
+            </template>
+        </LayoutContent>
 
         <EditDialog ref="dialogEditRef" />
         <CreateDialog @search="search" ref="dialogRef" />
@@ -72,7 +76,6 @@ import LayoutContent from '@/layout/layout-content.vue';
 import EditDialog from '@/views/container/compose/edit/index.vue';
 import CreateDialog from '@/views/container/compose/create/index.vue';
 import ComposeDetial from '@/views/container/compose/detail/index.vue';
-import Submenu from '@/views/container/index.vue';
 import { composeOperator, loadDockerStatus, searchCompose } from '@/api/modules/container';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';

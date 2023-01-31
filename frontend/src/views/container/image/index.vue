@@ -1,6 +1,5 @@
 <template>
     <div v-loading="loading">
-        <Submenu activeName="image" />
         <el-card width="30%" v-if="dockerStatus != 'Running'" class="mask-prompt">
             <span style="font-size: 14px">{{ $t('container.serviceUnavailable') }}</span>
             <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="goSetting">
@@ -8,20 +7,21 @@
             </el-button>
             <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
         </el-card>
-        <el-card style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
-            <LayoutContent :header="$t('container.image')">
+
+        <LayoutContent v-loading="loading" :title="$t('container.image')" :class="{ mask: dockerStatus != 'Running' }">
+            <template #toolbar>
+                <el-button @click="onOpenPull">
+                    {{ $t('container.imagePull') }}
+                </el-button>
+                <el-button @click="onOpenload">
+                    {{ $t('container.importImage') }}
+                </el-button>
+                <el-button @click="onOpenBuild">
+                    {{ $t('container.build') }}
+                </el-button>
+            </template>
+            <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
-                    <template #toolbar>
-                        <el-button @click="onOpenPull">
-                            {{ $t('container.imagePull') }}
-                        </el-button>
-                        <el-button @click="onOpenload">
-                            {{ $t('container.importImage') }}
-                        </el-button>
-                        <el-button @click="onOpenBuild">
-                            {{ $t('container.build') }}
-                        </el-button>
-                    </template>
                     <el-table-column label="ID" show-overflow-tooltip prop="id" min-width="60" />
                     <el-table-column :label="$t('container.tag')" prop="tags" min-width="160" fix>
                         <template #default="{ row }">
@@ -33,7 +33,7 @@
                     <el-table-column :label="$t('container.size')" prop="size" min-width="70" fix />
                     <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
                         <template #default="{ row }">
-													{{ dateFormatSimple(row.createdAt) }}
+                            {{ dateFormatSimple(row.createdAt) }}
                         </template>
                     </el-table-column>
                     <fu-table-operations
@@ -43,8 +43,8 @@
                         :label="$t('commons.table.operate')"
                     />
                 </ComplexTable>
-            </LayoutContent>
-        </el-card>
+            </template>
+        </LayoutContent>
 
         <Pull ref="dialogPullRef" @search="search" />
         <Tag ref="dialogTagRef" @search="search" />
@@ -82,7 +82,6 @@
 import ComplexTable from '@/components/complex-table/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFormatSimple } from '@/utils/util';
-import Submenu from '@/views/container/index.vue';
 import { Container } from '@/api/interface/container';
 import LayoutContent from '@/layout/layout-content.vue';
 import Pull from '@/views/container/image/pull/index.vue';

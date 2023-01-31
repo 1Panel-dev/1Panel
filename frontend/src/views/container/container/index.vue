@@ -1,6 +1,5 @@
 <template>
     <div>
-        <Submenu activeName="container" />
         <el-card width="30%" v-if="dockerStatus != 'Running'" class="mask-prompt">
             <span style="font-size: 14px">{{ $t('container.serviceUnavailable') }}</span>
             <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="goSetting">
@@ -8,47 +7,51 @@
             </el-button>
             <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
         </el-card>
-        <el-card style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
-            <LayoutContent :header="$t('container.container')">
+        <LayoutContent
+            v-loading="loading"
+            :title="$t('container.container')"
+            :class="{ mask: dockerStatus != 'Running' }"
+        >
+            <template #toolbar>
+                <el-button type="primary" @click="onCreate()">
+                    {{ $t('container.createContainer') }}
+                </el-button>
+                <el-button-group style="margin-left: 10px">
+                    <el-button :disabled="checkStatus('start')" @click="onOperate('start')">
+                        {{ $t('container.start') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('stop')" @click="onOperate('stop')">
+                        {{ $t('container.stop') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('restart')" @click="onOperate('restart')">
+                        {{ $t('container.restart') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('kill')" @click="onOperate('kill')">
+                        {{ $t('container.kill') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('pause')" @click="onOperate('pause')">
+                        {{ $t('container.pause') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('unpause')" @click="onOperate('unpause')">
+                        {{ $t('container.unpause') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('remove')" @click="onOperate('remove')">
+                        {{ $t('container.remove') }}
+                    </el-button>
+                </el-button-group>
+            </template>
+            <template #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
                     @search="search"
                 >
-                    <template #toolbar>
-                        <el-button icon="Plus" type="primary" @click="onCreate()">
-                            {{ $t('commons.button.create') }}
-                        </el-button>
-                        <el-button-group style="margin-left: 10px">
-                            <el-button :disabled="checkStatus('start')" @click="onOperate('start')">
-                                {{ $t('container.start') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('stop')" @click="onOperate('stop')">
-                                {{ $t('container.stop') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('restart')" @click="onOperate('restart')">
-                                {{ $t('container.restart') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('kill')" @click="onOperate('kill')">
-                                {{ $t('container.kill') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('pause')" @click="onOperate('pause')">
-                                {{ $t('container.pause') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('unpause')" @click="onOperate('unpause')">
-                                {{ $t('container.unpause') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('remove')" @click="onOperate('remove')">
-                                {{ $t('container.remove') }}
-                            </el-button>
-                        </el-button-group>
-                    </template>
                     <el-table-column type="selection" fix />
                     <el-table-column
                         :label="$t('commons.table.name')"
                         show-overflow-tooltip
-                        min-width="100"
+                        min-width="80"
                         prop="name"
                         fix
                     >
@@ -59,7 +62,7 @@
                     <el-table-column
                         :label="$t('container.image')"
                         show-overflow-tooltip
-                        min-width="100"
+                        min-width="80"
                         prop="imageName"
                     />
                     <el-table-column :label="$t('commons.table.status')" min-width="50" prop="state" fix>
@@ -67,7 +70,7 @@
                             <Status :key="row.state" :status="row.state"></Status>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.upTime')" min-width="100" prop="runTime" fix />
+                    <el-table-column :label="$t('container.upTime')" min-width="80" prop="runTime" fix />
                     <el-table-column
                         prop="createTime"
                         :label="$t('commons.table.date')"
@@ -75,15 +78,15 @@
                         show-overflow-tooltip
                     />
                     <fu-table-operations
-                        width="200px"
+                        width="220px"
                         :ellipsis="10"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fix
                     />
                 </ComplexTable>
-            </LayoutContent>
-        </el-card>
+            </template>
+        </LayoutContent>
 
         <CodemirrorDialog ref="mydetail" />
 
@@ -105,7 +108,6 @@ import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
 import Status from '@/components/status/index.vue';
-import Submenu from '@/views/container/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
 import { ContainerOperator, inspect, loadDockerStatus, searchContainer } from '@/api/modules/container';
@@ -114,6 +116,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import router from '@/routers';
 
+const loading = ref();
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
@@ -154,10 +157,16 @@ const search = async () => {
         pageSize: paginationConfig.pageSize,
         filters: filterItem,
     };
-    await searchContainer(params).then((res) => {
-        data.value = res.data.items || [];
-        paginationConfig.total = res.data.total;
-    });
+    loading.value = true;
+    await searchContainer(params)
+        .then((res) => {
+            loading.value = false;
+            data.value = res.data.items || [];
+            paginationConfig.total = res.data.total;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const dialogCreateRef = ref();
@@ -239,12 +248,15 @@ const onOperate = async (operation: string) => {
             };
             ps.push(ContainerOperator(param));
         }
+        loading.value = true;
         Promise.all(ps)
             .then(() => {
+                loading.value = false;
                 search();
                 ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {
+                loading.value = false;
                 search();
             });
     });

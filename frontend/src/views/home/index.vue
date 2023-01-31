@@ -1,12 +1,13 @@
 <template>
     <div>
-        <el-card class="topRouterCard">
-            <el-radio-group v-model="active">
-                <el-radio-button class="topRouterButton" size="default" label="home">
-                    {{ $t('home.overview') }}
-                </el-radio-button>
-            </el-radio-group>
-        </el-card>
+        <RouterButton
+            :buttons="[
+                {
+                    label: i18n.global.t('menu.monitor'),
+                    path: '/home/index',
+                },
+            ]"
+        />
         <el-row :gutter="20" style="margin-top: 20px">
             <el-col :span="18">
                 <CardWithHeader :header="$t('home.overview')">
@@ -163,7 +164,6 @@ import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
 const router = useRouter();
 
-const active = ref('home');
 const statuRef = ref();
 const appRef = ref();
 

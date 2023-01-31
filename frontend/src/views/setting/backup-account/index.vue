@@ -1,35 +1,35 @@
 <template>
     <div>
-        <Submenu activeName="backupaccount" />
-        <el-form label-position="left" label-width="130px" :v-key="reflash">
-            <LayoutContent header="Local" style="margin-top: 20px">
-                <el-row :gutter="20">
-                    <el-col :span="24">
-                        <el-card>
-                            <template #header>
-                                <svg-icon style="font-size: 7px" iconName="p-file-folder"></svg-icon>
-                                <span style="font-size: 16px; font-weight: 500">
-                                    &nbsp;{{ $t('setting.serverDisk') }}
-                                </span>
-                                <div style="float: right">
-                                    <el-button round @click="onOpenDialog('edit', 'local', localData)">
-                                        {{ $t('commons.button.edit') }}
-                                    </el-button>
-                                </div>
-                            </template>
-                            <el-form-item :label="$t('setting.currentPath')">
-                                {{ localData.varsJson['dir'] }}
-                            </el-form-item>
-                            <el-form-item :label="$t('commons.table.createdAt')">
-                                {{ dateFormat(0, 0, localData.createdAt) }}
-                            </el-form-item>
-                        </el-card>
-                    </el-col>
-                </el-row>
-            </LayoutContent>
+        <LayoutContent :title="$t('setting.backup')" :divider="true">
+            <template #main>
+                <el-form label-position="left" label-width="130px" :v-key="reflash">
+                    <el-row :gutter="20">
+                        <el-col :span="24">
+                            <el-card>
+                                <template #header>
+                                    <svg-icon style="font-size: 7px" iconName="p-file-folder"></svg-icon>
+                                    <span style="font-size: 16px; font-weight: 500">
+                                        &nbsp;{{ $t('setting.serverDisk') }}
+                                    </span>
+                                    <div style="float: right">
+                                        <el-button round @click="onOpenDialog('edit', 'local', localData)">
+                                            {{ $t('commons.button.edit') }}
+                                        </el-button>
+                                    </div>
+                                </template>
+                                <el-form-item :label="$t('setting.currentPath')">
+                                    {{ localData.varsJson['dir'] }}
+                                </el-form-item>
+                                <el-form-item :label="$t('commons.table.createdAt')">
+                                    {{ dateFormat(0, 0, localData.createdAt) }}
+                                </el-form-item>
+                            </el-card>
+                        </el-col>
+                    </el-row>
+                </el-form>
 
-            <LayoutContent :header="$t('setting.thirdParty')" style="margin-top: 20px">
-                <el-row :gutter="20">
+                <div style="margin-top: 20px"><span style="font-size: 14px; font-weight: 500">第三方账号</span></div>
+                <el-row :gutter="20" style="margin-top: 5px">
                     <el-col :span="12">
                         <el-card style="height: 265px">
                             <template #header>
@@ -208,8 +208,8 @@
                         </el-card>
                     </el-col>
                 </el-row>
-            </LayoutContent>
-        </el-form>
+            </template>
+        </LayoutContent>
         <DialogOperate ref="dialogRef" @search="search" />
     </div>
 </template>
@@ -219,7 +219,6 @@ import { onMounted, ref } from 'vue';
 import LayoutContent from '@/layout/layout-content.vue';
 import { getBackupList, deleteBackup } from '@/api/modules/backup';
 import DialogOperate from '@/views/setting/backup-account/operate/index.vue';
-import Submenu from '@/views/setting/index.vue';
 import { Backup } from '@/api/interface/backup';
 import { ElForm } from 'element-plus';
 import { useDeleteData } from '@/hooks/use-delete-data';

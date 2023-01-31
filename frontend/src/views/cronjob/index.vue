@@ -1,28 +1,29 @@
 <template>
     <div>
-        <el-card class="topRouterCard">
-            <el-radio-group v-model="active">
-                <el-radio-button class="topRouterButton" size="default" label="cronjob">
-                    {{ $t('cronjob.cronTask') }}
-                </el-radio-button>
-            </el-radio-group>
-        </el-card>
-        <el-card style="margin-top: 20px">
-            <LayoutContent :header="$t('cronjob.cronTask')">
+        <RouterButton
+            :buttons="[
+                {
+                    label: i18n.global.t('cronjob.cronTask'),
+                    path: '/cronjobs',
+                },
+            ]"
+        />
+        <LayoutContent v-loading="loading" :title="$t('cronjob.cronTask')">
+            <template #toolbar>
+                <el-button type="primary" @click="onOpenDialog('create')">
+                    {{ $t('commons.button.create') }}{{ $t('cronjob.cronTask') }}
+                </el-button>
+                <el-button plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
+            </template>
+            <template #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     @search="search"
                     :data="data"
                 >
-                    <template #toolbar>
-                        <el-button type="primary" icon="Plus" @click="onOpenDialog('create')">
-                            {{ $t('commons.button.create') }}
-                        </el-button>
-                        <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                    </template>
                     <el-table-column type="selection" fix />
                     <el-table-column :label="$t('cronjob.taskName')" prop="name" />
                     <el-table-column :label="$t('commons.table.status')" prop="status">
@@ -87,8 +88,8 @@
                         fix
                     />
                 </ComplexTable>
-            </LayoutContent>
-        </el-card>
+            </template>
+        </LayoutContent>
 
         <OperatrDialog @search="search" ref="dialogRef" />
         <RecordDialog ref="dialogRecordRef" />
@@ -109,9 +110,9 @@ import { Cronjob } from '@/api/interface/cronjob';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
+const loading = ref();
 const selects = ref<any>([]);
 
-const active = ref('cronjob');
 const data = ref();
 const paginationConfig = reactive({
     currentPage: 1,
@@ -134,14 +135,21 @@ const search = async () => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
-    const res = await getCronjobPage(params);
-    data.value = res.data.items || [];
-    for (const item of data.value) {
-        if (item.targetDir !== '-') {
-            item.targetDir = loadBackupName(item.targetDir);
-        }
-    }
-    paginationConfig.total = res.data.total;
+    loading.value = true;
+    await getCronjobPage(params)
+        .then((res) => {
+            loading.value = false;
+            data.value = res.data.items || [];
+            for (const item of data.value) {
+                if (item.targetDir !== '-') {
+                    item.targetDir = loadBackupName(item.targetDir);
+                }
+            }
+            paginationConfig.total = res.data.total;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const dialogRecordRef = ref<DialogExpose>();

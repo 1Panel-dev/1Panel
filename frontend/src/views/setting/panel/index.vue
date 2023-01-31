@@ -1,9 +1,8 @@
 <template>
     <div>
-        <Submenu activeName="panel" />
-        <el-form :model="form" ref="panelFormRef" label-position="left" v-loading="loading" label-width="160px">
-            <el-card style="margin-top: 20px">
-                <LayoutContent :header="$t('setting.panel')">
+        <LayoutContent v-loading="loading" :title="$t('setting.panel')" :divider="true">
+            <template #main>
+                <el-form :model="form" ref="panelFormRef" label-position="left" v-loading="loading" label-width="160px">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :span="10">
@@ -112,9 +111,9 @@
                             </el-form-item>
                         </el-col>
                     </el-row>
-                </LayoutContent>
-            </el-card>
-        </el-form>
+                </el-form>
+            </template>
+        </LayoutContent>
     </div>
 </template>
 
@@ -123,7 +122,6 @@ import { ref, reactive, onMounted, computed } from 'vue';
 import { ElMessage, ElForm } from 'element-plus';
 import LayoutContent from '@/layout/layout-content.vue';
 import { syncTime, getSettingInfo, updateSetting } from '@/api/modules/setting';
-import Submenu from '@/views/setting/index.vue';
 import { Rules } from '@/global/form-rules';
 import { GlobalStore } from '@/store';
 import { useI18n } from 'vue-i18n';

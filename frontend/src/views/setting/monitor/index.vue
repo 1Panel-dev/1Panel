@@ -1,9 +1,8 @@
 <template>
     <div>
-        <Submenu activeName="monitor" />
-        <el-form :model="form" ref="panelFormRef" label-position="left" label-width="160px">
-            <el-card style="margin-top: 20px">
-                <LayoutContent :header="$t('menu.monitor')">
+        <LayoutContent v-loading="loading" :title="$t('setting.monitor')" :divider="true">
+            <template #main>
+                <el-form :model="form" ref="panelFormRef" label-position="left" label-width="160px">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :span="10">
@@ -40,9 +39,9 @@
                             </el-form-item>
                         </el-col>
                     </el-row>
-                </LayoutContent>
-            </el-card>
-        </el-form>
+                </el-form>
+            </template>
+        </LayoutContent>
     </div>
 </template>
 
@@ -52,10 +51,10 @@ import { ElMessage, FormInstance } from 'element-plus';
 import LayoutContent from '@/layout/layout-content.vue';
 import { cleanMonitors, getSettingInfo, updateSetting } from '@/api/modules/setting';
 import { useDeleteData } from '@/hooks/use-delete-data';
-import Submenu from '@/views/setting/index.vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 
+const loading = ref();
 const form = reactive({
     monitorStatus: 'disable',
     monitorStoreDays: 30,
@@ -86,8 +85,15 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
         key: key,
         value: val + '',
     };
-    await updateSetting(param);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    loading.value = true;
+    await updateSetting(param)
+        .then(() => {
+            loading.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 function callback(error: any) {
     if (error) {

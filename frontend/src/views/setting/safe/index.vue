@@ -1,9 +1,8 @@
 <template>
     <div>
-        <Submenu activeName="safe" />
-        <el-form :model="form" ref="panelFormRef" v-loading="loading" label-position="left" label-width="160px">
-            <el-card style="margin-top: 20px">
-                <LayoutContent :header="$t('setting.safe')">
+        <LayoutContent v-loading="loading" :title="$t('setting.safe')" :divider="true">
+            <template #main>
+                <el-form :model="form" ref="panelFormRef" v-loading="loading" label-position="left" label-width="160px">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :span="10">
@@ -102,9 +101,9 @@
                             </el-form-item>
                         </el-col>
                     </el-row>
-                </LayoutContent>
-            </el-card>
-        </el-form>
+                </el-form>
+            </template>
+        </LayoutContent>
         <el-dialog
             v-model="timeoutVisiable"
             :destroy-on-close="true"
@@ -180,7 +179,6 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage, ElForm } from 'element-plus';
-import Submenu from '@/views/setting/index.vue';
 import { Setting } from '@/api/interface/setting';
 import LayoutContent from '@/layout/layout-content.vue';
 import { updatePassword, updateSetting, getMFA, bindMFA, getSettingInfo } from '@/api/modules/setting';

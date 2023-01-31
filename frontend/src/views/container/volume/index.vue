@@ -1,6 +1,5 @@
 <template>
     <div>
-        <Submenu activeName="volume" />
         <el-card width="30%" v-if="dockerStatus != 'Running'" class="mask-prompt">
             <span style="font-size: 14px">{{ $t('container.serviceUnavailable') }}</span>
             <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="goSetting">
@@ -8,22 +7,23 @@
             </el-button>
             <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
         </el-card>
-        <el-card style="margin-top: 20px" :class="{ mask: dockerStatus != 'Running' }">
-            <LayoutContent :header="$t('container.volume')">
+
+        <LayoutContent v-loading="loading" :title="$t('container.volume')" :class="{ mask: dockerStatus != 'Running' }">
+            <template #toolbar>
+                <el-button type="primary" @click="onCreate()">
+                    {{ $t('container.createVolume') }}
+                </el-button>
+                <el-button plain :disabled="selects.length === 0" @click="batchDelete(null)">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
+            </template>
+            <template #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
                     @search="search"
                 >
-                    <template #toolbar>
-                        <el-button icon="Plus" type="primary" @click="onCreate()">
-                            {{ $t('commons.button.create') }}
-                        </el-button>
-                        <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete(null)">
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                    </template>
                     <el-table-column type="selection" fix />
                     <el-table-column
                         :label="$t('commons.table.name')"
@@ -56,8 +56,8 @@
                     />
                     <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
                 </ComplexTable>
-            </LayoutContent>
-        </el-card>
+            </template>
+        </LayoutContent>
 
         <CodemirrorDialog ref="codemirror" />
         <CreateDialog @search="search" ref="dialogCreateRef" />
@@ -68,7 +68,6 @@
 import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import CreateDialog from '@/views/container/volume/create/index.vue';
-import Submenu from '@/views/container/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
@@ -78,6 +77,7 @@ import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import router from '@/routers';
 
+const loading = ref();
 const detailInfo = ref();
 const codemirror = ref();
 
@@ -115,10 +115,16 @@ const search = async () => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
-    await searchVolume(params).then((res) => {
-        data.value = res.data.items || [];
-        paginationConfig.total = res.data.total;
-    });
+    loading.value = true;
+    await searchVolume(params)
+        .then((res) => {
+            loading.value = false;
+            data.value = res.data.items || [];
+            paginationConfig.total = res.data.total;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onInspect = async (id: string) => {

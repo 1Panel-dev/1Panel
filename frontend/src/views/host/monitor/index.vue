@@ -1,12 +1,13 @@
 <template>
     <div>
-        <el-card class="topRouterCard">
-            <el-radio-group v-model="active">
-                <el-radio-button class="topRouterButton" size="default" label="monitor">
-                    {{ $t('menu.monitor') }}
-                </el-radio-button>
-            </el-radio-group>
-        </el-card>
+        <RouterButton
+            :buttons="[
+                {
+                    label: i18n.global.t('menu.monitor'),
+                    path: '/hosts/monitor',
+                },
+            ]"
+        />
         <el-row :gutter="20" style="margin-top: 20px">
             <el-col :span="24">
                 <el-card style="overflow: inherit">
@@ -124,7 +125,6 @@ import { Monitor } from '@/api/interface/monitor';
 import { dateFormatWithoutYear } from '@/utils/util';
 import i18n from '@/lang';
 
-const active = ref('monitor');
 const zoomStart = ref();
 const monitorBase = ref();
 const timeRangeLoad = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);

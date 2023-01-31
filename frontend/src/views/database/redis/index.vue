@@ -1,34 +1,26 @@
 <template>
     <div v-loading="loading">
-        <Submenu activeName="redis" />
-
         <AppStatus
             :app-key="'redis'"
             style="margin-top: 20px"
             @before="onBefore"
             @setting="onSetting"
             @is-exist="checkExist"
-            v-model:loading="loading"
         ></AppStatus>
-        <el-card
-            width="30%"
-            v-if="redisStatus != 'Running' && !isOnSetting && redisIsExist && !loading"
-            class="mask-prompt"
-        >
-            <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['Redis']) }}</span>
-        </el-card>
 
-        <div v-show="redisIsExist" :class="{ mask: redisStatus != 'Running' }">
-            <el-button style="margin-top: 20px" type="primary" plain @click="goDashboard" icon="Position">
-                Redis-Commander
-            </el-button>
-            <el-button style="margin-top: 20px" type="primary" plain @click="onChangePassword">
-                {{ $t('database.changePassword') }}
-            </el-button>
-            <Terminal :key="isRefresh" style="margin-top: 10px" ref="terminalRef" />
-        </div>
+        <LayoutContent v-show="!isOnSetting && redisIsExist" :title="'Redis ' + $t('menu.database')">
+            <template #toolbar v-if="!isOnSetting && redisIsExist">
+                <el-button type="primary" plain @click="goDashboard" icon="Position">Redis-Commander</el-button>
+                <el-button plain @click="onChangePassword">
+                    {{ $t('database.changePassword') }}
+                </el-button>
+            </template>
+            <template #main>
+                <Terminal :key="isRefresh" style="margin-top: 10px" ref="terminalRef" />
+            </template>
+        </LayoutContent>
 
-        <Setting ref="settingRef" style="margin-top: 10px" />
+        <Setting ref="settingRef" style="margin-top: 30px" />
         <Password ref="passwordRef" @check-exist="initTerminal" @close-terminal="closeTerminal(true)" />
         <el-dialog
             v-model="commandVisiable"
@@ -52,7 +44,7 @@
 </template>
 
 <script lang="ts" setup>
-import Submenu from '@/views/database/index.vue';
+import LayoutContent from '@/layout/layout-content.vue';
 import Setting from '@/views/database/redis/setting/index.vue';
 import Password from '@/views/database/redis/password/index.vue';
 import Terminal from '@/views/database/redis/terminal/index.vue';

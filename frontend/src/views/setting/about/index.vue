@@ -1,9 +1,8 @@
 <template>
-    <div v-loading="loading">
-        <Submenu activeName="about" />
-        <el-card style="margin-top: 20px">
-            <LayoutContent :header="$t('setting.about')">
-                <div style="text-align: center">
+    <div>
+        <LayoutContent v-loading="loading" :title="$t('setting.about')" :divider="true">
+            <template #main>
+                <div style="text-align: center; margin-top: 20px">
                     <div style="justify-self: center">
                         <img style="width: 80px" src="@/assets/images/ko_image.png" />
                     </div>
@@ -34,8 +33,8 @@
                         </el-link>
                     </div>
                 </div>
-            </LayoutContent>
-        </el-card>
+            </template>
+        </LayoutContent>
         <el-drawer :key="refresh" v-model="drawerShow" size="50%">
             <el-form label-width="120px">
                 <el-form-item :label="$t('setting.newVersion')">
@@ -58,7 +57,6 @@
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
 import { getSettingInfo, loadUpgradeInfoByOSS, upgrade } from '@/api/modules/setting';
-import Submenu from '@/views/setting/index.vue';
 import { onMounted, ref } from 'vue';
 import MdEditor from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';

@@ -4,94 +4,103 @@ const containerRouter = {
     sort: 5,
     path: '/containers',
     component: Layout,
-    redirect: '/containers',
+    redirect: '/containers/container',
     meta: {
         icon: 'p-docker',
         title: 'menu.container',
     },
     children: [
         {
-            path: '',
-            name: 'Container',
-            component: () => import('@/views/container/container/index.vue'),
-            props: true,
-            hidden: true,
-            meta: {
-                activeMenu: '/containers',
-            },
-        },
-        {
-            path: 'composeDetail/:filters?',
-            name: 'ComposeDetail',
-            component: () => import('@/views/container/compose/detail/index.vue'),
-            props: true,
-            hidden: true,
-            meta: {
-                activeMenu: '/containers',
-            },
-        },
-        {
-            path: 'image',
-            name: 'Image',
-            component: () => import('@/views/container/image/index.vue'),
-            hidden: true,
-            meta: {
-                activeMenu: '/containers',
-            },
-        },
-        {
-            path: 'network',
-            name: 'Network',
-            component: () => import('@/views/container/network/index.vue'),
-            hidden: true,
-            meta: {
-                activeMenu: '/containers',
-            },
-        },
-        {
-            path: 'volume',
-            name: 'Volume',
-            component: () => import('@/views/container/volume/index.vue'),
-            hidden: true,
-            meta: {
-                activeMenu: '/containers',
-            },
-        },
-        {
-            path: 'repo',
-            name: 'Repo',
-            component: () => import('@/views/container/repo/index.vue'),
-            hidden: true,
-            meta: {
-                activeMenu: '/containers',
-            },
-        },
-        {
-            path: 'compose',
-            name: 'Compose',
-            component: () => import('@/views/container/compose/index.vue'),
-            hidden: true,
-            meta: {
-                activeMenu: '/containers',
-            },
-        },
-        {
-            path: 'template',
-            name: 'ComposeTemplate',
-            component: () => import('@/views/container/template/index.vue'),
-            hidden: true,
-            meta: {
-                activeMenu: '/containers',
-            },
-        },
-        {
-            path: 'setting',
-            name: 'ContainerSetting',
-            component: () => import('@/views/container/setting/index.vue'),
-            hidden: true,
-            meta: {
-                activeMenu: '/containers',
-            },
+            path: '/containers',
+            name: 'Containers',
+            redirect: '/containers/container',
+            component: () => import('@/views/container/index.vue'),
+            meta: {},
+            children: [
+                {
+                    path: 'container',
+                    name: 'Container',
+                    component: () => import('@/views/container/container/index.vue'),
+                    props: true,
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/containers',
+                    },
+                },
+                {
+                    path: 'composeDetail/:filters?',
+                    name: 'ComposeDetail',
+                    component: () => import('@/views/container/compose/detail/index.vue'),
+                    props: true,
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/containers',
+                    },
+                },
+                {
+                    path: 'image',
+                    name: 'Image',
+                    component: () => import('@/views/container/image/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/containers',
+                    },
+                },
+                {
+                    path: 'network',
+                    name: 'Network',
+                    component: () => import('@/views/container/network/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/containers',
+                    },
+                },
+                {
+                    path: 'volume',
+                    name: 'Volume',
+                    component: () => import('@/views/container/volume/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/containers',
+                    },
+                },
+                {
+                    path: 'repo',
+                    name: 'Repo',
+                    component: () => import('@/views/container/repo/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/containers',
+                    },
+                },
+                {
+                    path: 'compose',
+                    name: 'Compose',
+                    component: () => import('@/views/container/compose/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/containers',
+                    },
+                },
+                {
+                    path: 'template',
+                    name: 'ComposeTemplate',
+                    component: () => import('@/views/container/template/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/containers',
+                    },
+                },
+                {
+                    path: 'setting',
+                    name: 'ContainerSetting',
+                    component: () => import('@/views/container/setting/index.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/containers',
+                    },
+                },
+            ],
         },
     ],
 };

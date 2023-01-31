@@ -1,105 +1,97 @@
 <template>
     <div v-loading="loading">
-        <Submenu activeName="mysql" />
-        <AppStatus
-            :app-key="'mysql'"
-            style="margin-top: 20px"
-            v-model:loading="loading"
-            @setting="onSetting"
-            @is-exist="checkExist"
-        />
-        <Setting ref="settingRef" style="margin-top: 20px" />
+        <LayoutContent :title="'Mysql ' + $t('menu.database')">
+            <template #app>
+                <AppStatus
+                    :app-key="'mysql'"
+                    style="margin-top: 20px"
+                    @setting="onSetting"
+                    @is-exist="checkExist"
+                ></AppStatus>
+            </template>
 
-        <el-card
-            width="30%"
-            v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist && !loading"
-            class="mask-prompt"
-        >
-            <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['Mysql']) }}</span>
-        </el-card>
-        <div style="margin-top: 20px" v-if="mysqlIsExist && !isOnSetting">
-            <el-button type="primary" @click="onOpenDialog()">
-                {{ $t('database.create') }}
-            </el-button>
-            <el-button @click="onChangeRootPassword" type="primary" plain>
-                {{ $t('database.rootPassword') }}
-            </el-button>
-            <el-button @click="onChangeAccess" type="primary" plain>
-                {{ $t('database.remoteAccess') }}
-            </el-button>
-            <el-button @click="goDashboard" type="primary" plain>phpMyAdmin</el-button>
-        </div>
-        <div v-if="mysqlIsExist" :class="{ mask: mysqlStatus != 'Running' }">
-            <el-card v-if="!isOnSetting" style="margin-top: 10px">
-                <LayoutContent :header="'Mysql ' + $t('menu.database')">
-                    <ComplexTable :pagination-config="paginationConfig" @search="search" :data="data">
-                        <el-table-column :label="$t('commons.table.name')" prop="name" />
-                        <el-table-column :label="$t('commons.login.username')" prop="username" />
-                        <el-table-column :label="$t('commons.login.password')" prop="password">
-                            <template #default="{ row }">
-                                <div>
-                                    <span style="float: left; line-height: 25px" v-if="!row.showPassword">
-                                        ***********
-                                    </span>
-                                    <div style="cursor: pointer; float: left" v-if="!row.showPassword">
-                                        <el-icon
-                                            style="margin-left: 5px; margin-top: 3px"
-                                            @click="row.showPassword = true"
-                                            :size="16"
-                                        >
-                                            <View />
-                                        </el-icon>
-                                    </div>
-                                    <span style="float: left" v-if="row.showPassword">{{ row.password }}</span>
-                                    <div style="cursor: pointer; float: left" v-if="row.showPassword">
-                                        <el-icon
-                                            style="margin-left: 5px; margin-top: 3px"
-                                            @click="row.showPassword = false"
-                                            :size="16"
-                                        >
-                                            <Hide />
-                                        </el-icon>
-                                    </div>
-                                    <div style="cursor: pointer; float: left">
-                                        <el-icon
-                                            style="margin-left: 5px; margin-top: 3px"
-                                            :size="16"
-                                            @click="onCopyPassword(row)"
-                                        >
-                                            <DocumentCopy />
-                                        </el-icon>
-                                    </div>
+            <template #toolbar v-if="mysqlIsExist && !isOnSetting">
+                <el-button type="primary" @click="onOpenDialog()">
+                    {{ $t('database.create') }}
+                </el-button>
+                <el-button @click="onChangeRootPassword" type="primary" plain>
+                    {{ $t('database.rootPassword') }}
+                </el-button>
+                <el-button @click="onChangeAccess" type="primary" plain>
+                    {{ $t('database.remoteAccess') }}
+                </el-button>
+                <el-button @click="goDashboard" type="primary" plain>phpMyAdmin</el-button>
+            </template>
+            <template #main v-if="mysqlIsExist && !isOnSetting">
+                <ComplexTable :pagination-config="paginationConfig" @search="search" :data="data">
+                    <el-table-column :label="$t('commons.table.name')" prop="name" />
+                    <el-table-column :label="$t('commons.login.username')" prop="username" />
+                    <el-table-column :label="$t('commons.login.password')" prop="password">
+                        <template #default="{ row }">
+                            <div>
+                                <span style="float: left; line-height: 25px" v-if="!row.showPassword">***********</span>
+                                <div style="cursor: pointer; float: left" v-if="!row.showPassword">
+                                    <el-icon
+                                        style="margin-left: 5px; margin-top: 3px"
+                                        @click="row.showPassword = true"
+                                        :size="16"
+                                    >
+                                        <View />
+                                    </el-icon>
                                 </div>
-                            </template>
-                        </el-table-column>
-                        <el-table-column :label="$t('commons.table.description')" prop="description">
-                            <template #default="{ row }">
-                                <fu-read-write-switch
-                                    :data="row.description"
-                                    v-model="row.edit"
-                                    @change="onChange(row)"
-                                >
-                                    <el-input v-model="row.description" @blur="row.edit = false" />
-                                </fu-read-write-switch>
-                            </template>
-                        </el-table-column>
-                        <el-table-column
-                            prop="createdAt"
-                            :label="$t('commons.table.date')"
-                            :formatter="dateFormat"
-                            show-overflow-tooltip
-                        />
-                        <fu-table-operations
-                            width="300px"
-                            :buttons="buttons"
-                            :ellipsis="10"
-                            :label="$t('commons.table.operate')"
-                            fix
-                        />
-                    </ComplexTable>
-                </LayoutContent>
-            </el-card>
-        </div>
+                                <span style="float: left" v-if="row.showPassword">{{ row.password }}</span>
+                                <div style="cursor: pointer; float: left" v-if="row.showPassword">
+                                    <el-icon
+                                        style="margin-left: 5px; margin-top: 3px"
+                                        @click="row.showPassword = false"
+                                        :size="16"
+                                    >
+                                        <Hide />
+                                    </el-icon>
+                                </div>
+                                <div style="cursor: pointer; float: left">
+                                    <el-icon
+                                        style="margin-left: 5px; margin-top: 3px"
+                                        :size="16"
+                                        @click="onCopyPassword(row)"
+                                    >
+                                        <DocumentCopy />
+                                    </el-icon>
+                                </div>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('commons.table.description')" prop="description">
+                        <template #default="{ row }">
+                            <fu-read-write-switch :data="row.description" v-model="row.edit" @change="onChange(row)">
+                                <el-input v-model="row.description" @blur="row.edit = false" />
+                            </fu-read-write-switch>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="createdAt"
+                        :label="$t('commons.table.date')"
+                        :formatter="dateFormat"
+                        show-overflow-tooltip
+                    />
+                    <fu-table-operations
+                        width="300px"
+                        :buttons="buttons"
+                        :ellipsis="10"
+                        :label="$t('commons.table.operate')"
+                        fix
+                    />
+                </ComplexTable>
+                <el-card
+                    width="30%"
+                    v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist && !loading"
+                    class="mask-prompt"
+                >
+                    <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['Mysql']) }}</span>
+                </el-card>
+            </template>
+        </LayoutContent>
+        <Setting ref="settingRef" style="margin-top: 20px" />
         <el-dialog v-model="changeVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
             <template #header>
                 <div class="card-header">
@@ -195,7 +187,6 @@ import UploadDialog from '@/views/database/mysql/upload/index.vue';
 import AppResources from '@/views/database/mysql/check/index.vue';
 import Setting from '@/views/database/mysql/setting/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
-import Submenu from '@/views/database/index.vue';
 import { dateFormat } from '@/utils/util';
 import { reactive, ref } from 'vue';
 import {
