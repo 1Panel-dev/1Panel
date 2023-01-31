@@ -5,7 +5,7 @@
             <el-button :icon="Refresh" circle @click="search" />
         </el-col>
         <el-col :span="22">
-            <div style="background-color: #ffffff">
+            <div class="path">
                 <BreadCrumbs>
                     <BreadCrumbItem @click="jump(-1)" :right="paths.length == 0">/</BreadCrumbItem>
                     <BreadCrumbItem
@@ -23,7 +23,7 @@
     <LayoutContent :title="$t('file.file')" v-loading="loading">
         <template #toolbar>
             <el-dropdown @command="handleCreate">
-                <el-button type="primary" icon="Plus">
+                <el-button type="primary">
                     {{ $t('commons.button.create') }}
                     <el-icon class="el-icon--right"><arrow-down /></el-icon>
                 </el-button>
@@ -114,55 +114,24 @@
             </ComplexTable>
         </template>
 
-        <CreateFile :open="filePage.open" :file="filePage.createForm" @close="closeCreate"></CreateFile>
-        <ChangeRole :open="modePage.open" :file="modePage.modeForm" @close="closeMode"></ChangeRole>
-        <Compress
-            :open="compressPage.open"
-            :files="compressPage.files"
-            :dst="compressPage.dst"
-            :name="compressPage.name"
-            @close="closeCompress"
-        ></Compress>
-        <Decompress
-            :open="deCompressPage.open"
-            :dst="deCompressPage.dst"
-            :path="deCompressPage.path"
-            :name="deCompressPage.name"
-            :mimeType="deCompressPage.mimeType"
-            @close="closeDeCompress"
-        ></Decompress>
-        <CodeEditor
-            :open="editorPage.open"
-            :language="'json'"
-            :content="editorPage.content"
-            :loading="editorPage.loading"
-            @close="closeCodeEditor"
-            @qsave="quickSave"
-            @save="saveContent"
-        ></CodeEditor>
-        <FileRename
-            :open="renamePage.open"
-            :path="renamePage.path"
-            :oldName="renamePage.oldName"
-            @close="closeRename"
-        ></FileRename>
-        <Upload :open="uploadPage.open" :path="uploadPage.path" @close="closeUpload"></Upload>
-        <Wget :open="wgetPage.open" :path="wgetPage.path" @close="closeWget"></Wget>
-        <Move :open="movePage.open" :oldPaths="movePage.oldPaths" :type="movePage.type" @close="clodeMove"></Move>
-        <Download
-            :open="downloadPage.open"
-            :paths="downloadPage.paths"
-            :name="downloadPage.name"
-            @close="closeDownload"
-        ></Download>
-        <Process :open="processPage.open" @close="closeProcess"></Process>
-        <Detail ref="detailRef"></Detail>
+        <CreateFile ref="createRef" @close="search" />
+        <ChangeRole ref="roleRef" @close="search" />
+        <Compress ref="compressRef" @close="search" />
+        <Decompress ref="deCompressRef" @close="search" />
+        <CodeEditor ref="codeEditorRef" @close="search" />
+        <FileRename ref="renameRef" @close="search" />
+        <Upload ref="uploadRef" @close="search" />
+        <Wget ref="wgetRef" @close="closeWget" />
+        <Move ref="moveRef" @close="search" />
+        <Download ref="downloadRef" @close="search" />
+        <Process :open="processPage.open" @close="closeProcess" />
+        <Detail ref="detailRef" />
     </LayoutContent>
 </template>
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from '@vue/runtime-core';
-import { GetFilesList, DeleteFile, GetFileContent, SaveFileContent, ComputeDirSize } from '@/api/modules/files';
+import { GetFilesList, DeleteFile, GetFileContent, ComputeDirSize } from '@/api/modules/files';
 import { computeSize, dateFormat, getIcon, getRandomStr } from '@/utils/util';
 import { File } from '@/api/interface/file';
 import { useDeleteData } from '@/hooks/use-delete-data';
@@ -195,19 +164,29 @@ let req = reactive({ path: '/', expand: true, showHidden: false, page: 1, pageSi
 let loading = ref(false);
 const paths = ref<string[]>([]);
 
-const filePage = reactive({ open: false, createForm: { path: '/', isDir: false, mode: 0o755 } });
-const modePage = reactive({ open: false, modeForm: { path: '/', isDir: false, mode: 0o755 } });
-const compressPage = reactive({ open: false, files: [''], name: '', dst: '' });
-const deCompressPage = reactive({ open: false, path: '', name: '', dst: '', mimeType: '' });
-const editorPage = reactive({ open: false, content: '', loading: false });
+const fileCreate = reactive({ path: '/', isDir: false, mode: 0o755 });
+const fileCompress = reactive({ files: [''], name: '', dst: '', operate: 'compress' });
+const fileDeCompress = reactive({ path: '', name: '', dst: '', mimeType: '' });
+const fileEdit = reactive({ content: '', path: '', name: '' });
 const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100 });
-const uploadPage = reactive({ open: false, path: '' });
-const renamePage = reactive({ open: false, path: '', oldName: '' });
-const wgetPage = reactive({ open: false, path: '' });
-const movePage = reactive({ open: false, oldPaths: [''], type: '' });
-const downloadPage = reactive({ open: false, paths: [''], name: '' });
+const fileUpload = reactive({ path: '' });
+const fileRename = reactive({ path: '', oldName: '' });
+const fileWget = reactive({ path: '' });
+const fileMove = reactive({ oldPaths: [''], type: '' });
+const fileDownload = reactive({ paths: [''], name: '' });
 const processPage = reactive({ open: false });
+
+const createRef = ref();
+const roleRef = ref();
 const detailRef = ref();
+const compressRef = ref();
+const deCompressRef = ref();
+const codeEditorRef = ref();
+const renameRef = ref();
+const uploadRef = ref();
+const wgetRef = ref();
+const moveRef = ref();
+const downloadRef = ref();
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -269,12 +248,12 @@ const jump = async (index: number) => {
 };
 
 const handleCreate = (commnad: string) => {
-    filePage.createForm.path = req.path;
-    filePage.createForm.isDir = false;
+    fileCreate.path = req.path;
+    fileCreate.isDir = false;
     if (commnad === 'dir') {
-        filePage.createForm.isDir = true;
+        fileCreate.isDir = true;
     }
-    filePage.open = true;
+    createRef.value.acceptParams(fileCreate);
 };
 
 const delFile = async (row: File.File | null) => {
@@ -304,39 +283,24 @@ const getIconName = (extension: string) => {
     return getIcon(extension);
 };
 
-const closeCreate = () => {
-    filePage.open = false;
-    search();
-};
-
 const openMode = (item: File.File) => {
-    modePage.modeForm = item;
-    modePage.open = true;
-};
-
-const closeMode = () => {
-    modePage.open = false;
-    search();
+    roleRef.value.acceptParams(item);
 };
 
 const openCompress = (items: File.File[]) => {
-    compressPage.open = true;
     const paths = [];
     for (const item of items) {
         paths.push(item.path);
     }
-    compressPage.files = paths;
+    fileCompress.files = paths;
     if (paths.length === 1) {
-        compressPage.name = items[0].name;
+        fileCompress.name = items[0].name;
     } else {
-        compressPage.name = getRandomStr(6);
+        fileCompress.name = getRandomStr(6);
     }
-    compressPage.dst = req.path;
-};
+    fileCompress.dst = req.path;
 
-const closeCompress = () => {
-    compressPage.open = false;
-    search();
+    compressRef.value.acceptParams(fileCompress);
 };
 
 const openDeCompress = (item: File.File) => {
@@ -345,48 +309,36 @@ const openDeCompress = (item: File.File) => {
         return;
     }
 
-    deCompressPage.open = true;
-    deCompressPage.name = item.name;
-    deCompressPage.path = item.path;
-    deCompressPage.dst = req.path;
-    deCompressPage.mimeType = item.mimeType;
-};
+    fileDeCompress.name = item.name;
+    fileDeCompress.path = item.path;
+    fileDeCompress.dst = req.path;
+    fileDeCompress.mimeType = item.mimeType;
 
-const closeDeCompress = () => {
-    deCompressPage.open = false;
-    search();
+    deCompressRef.value.acceptParams(fileDeCompress);
 };
 
 const openCodeEditor = (row: File.File) => {
     codeReq.path = row.path;
     codeReq.expand = true;
     GetFileContent(codeReq).then((res) => {
-        editorPage.content = res.data.content;
-        editorPage.open = true;
+        fileEdit.content = res.data.content;
+        fileEdit.path = res.data.path;
+        fileEdit.name = res.data.name;
+        codeEditorRef.value.acceptParams(fileEdit);
     });
 };
 
-const closeCodeEditor = () => {
-    editorPage.open = false;
-};
-
 const openUpload = () => {
-    uploadPage.open = true;
-    uploadPage.path = req.path;
-};
-
-const closeUpload = () => {
-    uploadPage.open = false;
-    search();
+    fileUpload.path = req.path;
+    uploadRef.value.acceptParams(fileUpload);
 };
 
 const openWget = () => {
-    wgetPage.open = true;
-    wgetPage.path = req.path;
+    fileWget.path = req.path;
+    wgetRef.value.acceptParams(fileWget);
 };
 
 const closeWget = (submit: any) => {
-    wgetPage.open = false;
     search();
     if (submit) {
         openProcess();
@@ -402,29 +354,19 @@ const closeProcess = () => {
 };
 
 const openRename = (item: File.File) => {
-    renamePage.open = true;
-    renamePage.path = req.path;
-    renamePage.oldName = item.name;
-};
-
-const closeRename = () => {
-    renamePage.open = false;
-    search();
+    fileRename.path = req.path;
+    fileRename.oldName = item.name;
+    renameRef.value.acceptParams(fileRename);
 };
 
 const openMove = (type: string) => {
-    movePage.type = type;
+    fileMove.type = type;
     const oldpaths = [];
     for (const s of selects.value) {
         oldpaths.push(s['path']);
     }
-    movePage.oldPaths = oldpaths;
-    movePage.open = true;
-};
-
-const clodeMove = () => {
-    movePage.open = false;
-    search();
+    fileMove.oldPaths = oldpaths;
+    moveRef.value.acceptParams(fileMove);
 };
 
 const openDownload = () => {
@@ -432,31 +374,31 @@ const openDownload = () => {
     for (const s of selects.value) {
         paths.push(s['path']);
     }
-    downloadPage.paths = paths;
-    downloadPage.name = getRandomStr(6);
-    downloadPage.open = true;
+    fileDownload.paths = paths;
+    fileDownload.name = getRandomStr(6);
+    downloadRef.value.acceptParams(fileDownload);
 };
 
-const closeDownload = () => {
-    downloadPage.open = false;
-    search();
-};
-const saveContent = (content: string) => {
-    editorPage.loading = true;
-    SaveFileContent({ path: codeReq.path, content: content }).finally(() => {
-        editorPage.loading = false;
-        editorPage.open = false;
-        ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
-    });
-};
+// const closeDownload = () => {
+//     downloadPage.open = false;
+//     search();
+// };
+// const saveContent = (content: string) => {
+//     editorPage.loading = true;
+//     SaveFileContent({ path: codeReq.path, content: content }).finally(() => {
+//         editorPage.loading = false;
+//         editorPage.open = false;
+//         ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+//     });
+// };
 
-const quickSave = (content: string) => {
-    editorPage.loading = true;
-    SaveFileContent({ path: codeReq.path, content: content }).finally(() => {
-        editorPage.loading = false;
-        ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
-    });
-};
+// const quickSave = (content: string) => {
+//     editorPage.loading = true;
+//     SaveFileContent({ path: codeReq.path, content: content }).finally(() => {
+//         editorPage.loading = false;
+//         ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+//     });
+// };
 
 const openDetail = (row: File.File) => {
     detailRef.value.acceptParams({ path: row.path });
@@ -508,8 +450,7 @@ onMounted(() => {
 
 <style>
 .path {
-    height: 30px;
-    margin-bottom: 5px;
+    background-color: #ffffff;
 }
 
 .search-button {

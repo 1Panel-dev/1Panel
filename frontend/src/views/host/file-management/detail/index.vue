@@ -1,5 +1,5 @@
 <template>
-    <el-dialog v-model="open" :title="$t('file.info')" :column="1" width="30%">
+    <el-drawer v-model="open" :title="$t('file.info')" :column="1" width="30%">
         <el-row>
             <el-col>
                 <el-descriptions :column="1" border>
@@ -16,7 +16,7 @@
                 </el-descriptions>
             </el-col>
         </el-row>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>

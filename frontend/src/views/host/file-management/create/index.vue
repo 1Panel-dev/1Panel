@@ -1,46 +1,54 @@
 <template>
-    <el-dialog
+    <el-drawer
         v-model="open"
         :before-close="handleClose"
         :destroy-on-close="true"
         :close-on-click-modal="false"
-        :title="$t('commons.button.create')"
-        width="50%"
-        @open="onOpen"
+        size="40%"
     >
-        <el-form
-            ref="fileForm"
-            label-position="left"
-            :model="addForm"
-            label-width="100px"
-            :rules="rules"
-            v-loading="loading"
-        >
-            <el-form-item :label="$t('file.path')" prop="path"><el-input v-model="getPath" disabled /></el-form-item>
-            <el-form-item :label="$t('file.name')" prop="name"><el-input v-model="addForm.name" /></el-form-item>
-            <el-form-item v-if="!addForm.isDir">
-                <el-checkbox v-model="addForm.isLink" :label="$t('file.link')"></el-checkbox>
-            </el-form-item>
-            <el-form-item :label="$t('file.linkType')" v-if="addForm.isLink" prop="linkType">
-                <el-radio-group v-model="addForm.isSymlink">
-                    <el-radio :label="true">{{ $t('file.softLink') }}</el-radio>
-                    <el-radio :label="false">{{ $t('file.hardLink') }}</el-radio>
-                </el-radio-group>
-            </el-form-item>
-            <el-form-item v-if="addForm.isLink" :label="$t('file.linkPath')" prop="linkPath">
-                <el-input v-model="addForm.linkPath">
-                    <template #append>
-                        <FileList @choose="getLinkPath"></FileList>
-                    </template>
-                </el-input>
-            </el-form-item>
-            <el-form-item>
-                <el-checkbox v-if="addForm.isDir" v-model="setRole" :label="$t('file.setRole')"></el-checkbox>
-            </el-form-item>
-            <el-form-item>
+        <template #header>
+            <DrawerHeader :header="$t('commons.button.create')" :back="handleClose" />
+        </template>
+
+        <el-row>
+            <el-col :span="22" :offset="1">
+                <el-form
+                    ref="fileForm"
+                    label-position="top"
+                    :model="addForm"
+                    label-width="100px"
+                    :rules="rules"
+                    v-loading="loading"
+                >
+                    <el-form-item :label="$t('file.path')" prop="path">
+                        <el-input v-model="getPath" disabled />
+                    </el-form-item>
+                    <el-form-item :label="$t('file.name')" prop="name">
+                        <el-input v-model="addForm.name" />
+                    </el-form-item>
+                    <el-form-item v-if="!addForm.isDir">
+                        <el-checkbox v-model="addForm.isLink" :label="$t('file.link')"></el-checkbox>
+                    </el-form-item>
+                    <el-form-item :label="$t('file.linkType')" v-if="addForm.isLink" prop="linkType">
+                        <el-radio-group v-model="addForm.isSymlink">
+                            <el-radio :label="true">{{ $t('file.softLink') }}</el-radio>
+                            <el-radio :label="false">{{ $t('file.hardLink') }}</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item v-if="addForm.isLink" :label="$t('file.linkPath')" prop="linkPath">
+                        <el-input v-model="addForm.linkPath">
+                            <template #append>
+                                <FileList @choose="getLinkPath"></FileList>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-checkbox v-if="addForm.isDir" v-model="setRole" :label="$t('file.setRole')"></el-checkbox>
+                    </el-form-item>
+                </el-form>
                 <FileRole v-if="setRole" :mode="'0755'" @get-mode="getMode"></FileRole>
-            </el-form-item>
-        </el-form>
+            </el-col>
+        </el-row>
 
         <template #footer>
             <span class="dialog-footer">
@@ -48,11 +56,11 @@
                 <el-button type="primary" @click="submit(fileForm)">{{ $t('commons.button.confirm') }}</el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script setup lang="ts">
-import { toRefs, ref, reactive, computed } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { File } from '@/api/interface/file';
 import { ElMessage, FormInstance, FormRules } from 'element-plus';
 import { CreateFile } from '@/api/modules/files';
@@ -65,16 +73,18 @@ const fileForm = ref<FormInstance>();
 let loading = ref(false);
 let setRole = ref(false);
 
-const props = defineProps({
-    open: Boolean,
-    file: Object,
+interface CreateProps {
+    file: Object;
+}
+const propData = ref<CreateProps>({
+    file: {},
 });
-const { open, file } = toRefs(props);
 
 let addForm = reactive({ path: '', name: '', isDir: false, mode: 0o755, isLink: false, isSymlink: true, linkPath: '' });
-
+let open = ref(false);
 const em = defineEmits(['close']);
 const handleClose = () => {
+    open.value = false;
     if (fileForm.value) {
         fileForm.value.resetFields();
     }
@@ -126,16 +136,20 @@ const submit = async (formEl: FormInstance | undefined) => {
     });
 };
 
-const onOpen = () => {
-    const f = file?.value as File.FileCreate;
-    addForm.isDir = f.isDir;
-    addForm.path = f.path;
+const acceptParams = (create: File.FileCreate) => {
+    propData.value.file = create;
+    open.value = true;
+    addForm.isDir = create.isDir;
+    addForm.path = create.path;
     addForm.name = '';
     addForm.isLink = false;
+
     init();
 };
 
 const init = () => {
     setRole.value = false;
 };
+
+defineExpose({ acceptParams });
 </script>

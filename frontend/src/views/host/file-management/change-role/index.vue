@@ -1,21 +1,21 @@
 <template>
-    <el-dialog
-        v-model="open"
-        :before-close="handleClose"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :title="$t('file.setRole')"
-        width="50%"
-        @open="onOpen"
-    >
-        <FileRole v-loading="loading" :mode="mode" @get-mode="getMode"></FileRole>
+    <el-drawer v-model="open" :before-close="handleClose" :close-on-click-modal="false" width="50%">
+        <template #header>
+            <DrawerHeader :header="$t('file.setRole')" :back="handleClose" />
+        </template>
+
+        <el-row>
+            <el-col :span="22" :offset="1">
+                <FileRole v-loading="loading" :mode="mode" @get-mode="getMode"></FileRole>
+            </el-col>
+        </el-row>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button type="primary" @click="submit()">{{ $t('commons.button.confirm') }}</el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script setup lang="ts">
@@ -26,33 +26,24 @@ import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
 import FileRole from '@/components/file-role/index.vue';
 
-const props = defineProps({
-    open: {
-        type: Boolean,
-        default: false,
-    },
-    file: {
-        type: Object,
-        default: function () {
-            return {};
-        },
-    },
-});
-
+let open = ref(false);
 let form = ref<File.FileCreate>({ path: '', isDir: false, mode: 0o755 });
 let loading = ref<Boolean>(false);
 let mode = ref('0755');
 
 const em = defineEmits(['close']);
 const handleClose = () => {
+    open.value = false;
     em('close', false);
 };
 
-const onOpen = () => {
-    const f = props.file as File.FileCreate;
-    form.value.isDir = f.isDir;
-    form.value.path = f.path;
-    mode.value = String(f.mode);
+const acceptParams = (create: File.FileCreate) => {
+    open.value = true;
+    form.value.isDir = create.isDir;
+    form.value.path = create.path;
+    form.value.isLink = false;
+
+    mode.value = String(create.mode);
 };
 
 const getMode = (val: number) => {
@@ -70,4 +61,6 @@ const submit = async () => {
             loading.value = false;
         });
 };
+
+defineExpose({ acceptParams });
 </script>

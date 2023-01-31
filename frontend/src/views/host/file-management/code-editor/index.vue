@@ -2,11 +2,11 @@
     <el-dialog
         v-model="open"
         :title="$t('commons.button.edit')"
-        @opened="onOpen"
         :before-close="handleClose"
         destroy-on-close
         width="70%"
         draggable
+        @opened="onOpen"
     >
         <div>
             <div v-loading="loading">
@@ -16,57 +16,44 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="save()">{{ $t('commons.button.confirm') }}</el-button>
+                <el-button type="primary" @click="saveContent(true)">{{ $t('commons.button.confirm') }}</el-button>
             </span>
         </template>
     </el-dialog>
 </template>
 
 <script lang="ts" setup>
+import { SaveFileContent } from '@/api/modules/files';
+import i18n from '@/lang';
+import { ElMessage } from 'element-plus';
 import * as monaco from 'monaco-editor';
-import { reactive } from 'vue';
+import { ref } from 'vue';
 
 let editor: monaco.editor.IStandaloneCodeEditor | undefined;
 
-const props = defineProps({
-    open: {
-        type: Boolean,
-        default: false,
-    },
-    language: {
-        type: String,
-        default: 'json',
-    },
-    content: {
-        type: String,
-        default: '',
-    },
-    loading: {
-        type: Boolean,
-        default: false,
-    },
-});
+interface EditProps {
+    language: string;
+    content: string;
+    path: string;
+    name: string;
+}
 
-let data = reactive({
+let open = ref(false);
+let loading = ref(false);
+let language = ref('json');
+
+let form = ref({
     content: '',
-    language: '',
+    path: '',
 });
 
-const em = defineEmits(['close', 'qsave', 'save']);
+const em = defineEmits(['close']);
 
 const handleClose = () => {
     if (editor) {
         editor.dispose();
     }
     em('close', false);
-};
-
-const save = () => {
-    em('save', data.content);
-};
-
-const saveNotClose = () => {
-    em('qsave', data.content);
 };
 
 const initEditor = () => {
@@ -76,26 +63,45 @@ const initEditor = () => {
     const codeBox = document.getElementById('codeBox');
     editor = monaco.editor.create(codeBox as HTMLElement, {
         theme: 'vs-dark', //官方自带三种主题vs, hc-black, or vs-dark
-        value: data.content,
+        value: form.value.content,
         readOnly: false,
         automaticLayout: true,
-        language: data.language,
+        language: language.value,
         folding: true, //代码折叠
         roundedSelection: false, // 右侧不显示编辑器预览框
     });
 
     editor.onDidChangeModelContent(() => {
         if (editor) {
-            data.content = editor.getValue();
+            form.value.content = editor.getValue();
         }
     });
 
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, saveNotClose);
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, quickSave);
+};
+
+const quickSave = () => {
+    saveContent(false);
+};
+
+const saveContent = (closePage: boolean) => {
+    loading.value = true;
+    SaveFileContent(form.value).finally(() => {
+        loading.value = false;
+        open.value = !closePage;
+        ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+    });
+};
+
+const acceptParams = (props: EditProps) => {
+    form.value.content = props.content;
+    form.value.path = props.path;
+    open.value = true;
 };
 
 const onOpen = () => {
-    data.content = props.content;
-    data.language = props.language;
     initEditor();
 };
+
+defineExpose({ acceptParams });
 </script>
