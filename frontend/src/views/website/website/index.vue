@@ -1,150 +1,153 @@
 <template>
-    <RouterButton
-        :buttons="[
-            {
-                label: i18n.global.t('website.website'),
-                path: '/websites',
-            },
-        ]"
-    />
-    <br />
-    <LayoutContent :title="$t('website.website')" v-loading="loading">
-        <template #app>
-            <AppStatus
-                :app-key="'nginx'"
-                @setting="setting"
-                v-model:loading="loading"
-                @is-exist="checkExist"
-            ></AppStatus>
-        </template>
-        <template v-if="nginxIsExist && !openNginxConfig" #toolbar>
-            <el-row :class="{ mask: nginxStatus != 'Running' }">
-                <el-col :span="20">
-                    <el-button type="primary" @click="openCreate">
-                        {{ $t('website.create') }}
-                    </el-button>
-                    <el-button type="primary" plain @click="openGroup">
-                        {{ $t('website.group') }}
-                    </el-button>
-                    <el-button type="primary" plain @click="openDefault">
-                        {{ $t('website.defaulServer') }}
-                    </el-button>
-                </el-col>
-                <el-col :span="4">
-                    <div class="search-button">
-                        <el-input
-                            v-model="req.name"
-                            clearable
-                            @clear="search()"
-                            suffix-icon="Search"
-                            @keyup.enter="search()"
-                            @blur="search()"
-                            :placeholder="$t('commons.button.search')"
-                        ></el-input>
-                    </div>
-                </el-col>
-            </el-row>
-        </template>
-        <template v-if="nginxIsExist && !openNginxConfig" #search>
-            <div :class="{ mask: nginxStatus != 'Running' }">
-                <el-select v-model="req.websiteGroupId" @change="search()">
-                    <el-option :label="$t('website.allGroup')" :value="0"></el-option>
-                    <el-option
-                        v-for="(group, index) in groups"
-                        :key="index"
-                        :label="group.name"
-                        :value="group.id"
-                    ></el-option>
-                </el-select>
-            </div>
-        </template>
-        <template v-if="nginxIsExist && !openNginxConfig" #main>
-            <ComplexTable
-                :pagination-config="paginationConfig"
-                :data="data"
-                @search="search()"
-                :class="{ mask: nginxStatus != 'Running' }"
-            >
-                <el-table-column :label="$t('commons.table.name')" fix show-overflow-tooltip prop="primaryDomain">
-                    <template #default="{ row }">
-                        <el-link type="primary" @click="openConfig(row.id)">
-                            {{ row.primaryDomain }}
-                        </el-link>
-                    </template>
-                </el-table-column>
-                <el-table-column :label="$t('commons.table.type')" fix prop="type">
-                    <template #default="{ row }">
-                        {{ $t('website.' + row.type) }}
-                    </template>
-                </el-table-column>
-                <el-table-column :label="$t('commons.table.status')" prop="status">
-                    <template #default="{ row }">
-                        <el-button
-                            v-if="row.status === 'Running'"
-                            link
-                            type="success"
-                            @click="opWebsite('stop', row.id)"
-                        >
-                            {{ $t('commons.status.running') }}
+    <div>
+        <RouterButton
+            :buttons="[
+                {
+                    label: i18n.global.t('website.website'),
+                    path: '/websites',
+                },
+            ]"
+        />
+        <br />
+        <LayoutContent :title="$t('website.website')" v-loading="loading">
+            <template #app>
+                <AppStatus
+                    :app-key="'nginx'"
+                    @setting="setting"
+                    v-model:loading="loading"
+                    @is-exist="checkExist"
+                ></AppStatus>
+            </template>
+            <template v-if="nginxIsExist && !openNginxConfig" #toolbar>
+                <el-row :class="{ mask: nginxStatus != 'Running' }">
+                    <el-col :span="20">
+                        <el-button type="primary" @click="openCreate">
+                            {{ $t('website.create') }}
                         </el-button>
-                        <el-button v-else link type="danger" @click="opWebsite('start', row.id)">
-                            {{ $t('commons.status.stopped') }}
+                        <el-button type="primary" plain @click="openGroup">
+                            {{ $t('website.group') }}
                         </el-button>
-                    </template>
-                </el-table-column>
-                <el-table-column :label="$t('website.remark')" prop="remark"></el-table-column>
-                <el-table-column :label="$t('website.protocol')" prop="protocol"></el-table-column>
-                <el-table-column :label="$t('website.expireDate')">
-                    <template #default="{ row, $index }">
-                        <div v-show="row.showdate">
-                            <el-date-picker
-                                v-model="row.expireDate"
-                                type="date"
-                                :disabled-date="checkDate"
-                                :shortcuts="shortcuts"
-                                :clearable="false"
-                                :default-value="setDate(row.expireDate)"
-                                :ref="(el) => setdateRefs(el, $index)"
-                                @change="submitDate(row)"
-                                @visible-change="(visibility:boolean) => pickerVisibility(visibility, row)"
-                                size="small"
-                            ></el-date-picker>
+                        <el-button type="primary" plain @click="openDefault">
+                            {{ $t('website.defaulServer') }}
+                        </el-button>
+                    </el-col>
+                    <el-col :span="4">
+                        <div class="search-button">
+                            <el-input
+                                v-model="req.name"
+                                clearable
+                                @clear="search()"
+                                suffix-icon="Search"
+                                @keyup.enter="search()"
+                                @blur="search()"
+                                :placeholder="$t('commons.button.search')"
+                            ></el-input>
                         </div>
-                        <div v-show="!row.showdate">
-                            <span v-if="isEver(row.expireDate)" @click="openDatePicker(row, $index)">
-                                {{ $t('website.neverExpire') }}
-                            </span>
-                            <span v-else @click="openDatePicker(row, $index)">
-                                {{ dateFormatSimple(row.expireDate) }}
-                            </span>
-                        </div>
-                    </template>
-                </el-table-column>
-                <fu-table-operations
-                    :ellipsis="10"
-                    width="260px"
-                    :buttons="buttons"
-                    :label="$t('commons.table.operate')"
-                    fixed="right"
-                    fix
-                />
-            </ComplexTable>
-            <el-card width="30%" v-if="nginxStatus != 'Running'" class="mask-prompt">
-                <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['OpenResty']) }}</span>
-            </el-card>
-        </template>
-    </LayoutContent>
-    <NginxConfig v-if="openNginxConfig" v-loading="loading" :containerName="containerName" :status="nginxStatus" />
-    <CreateWebSite ref="createRef" @close="search" />
-    <DeleteWebsite ref="deleteRef" @close="search" />
-    <WebSiteGroup ref="groupRef" />
-    <UploadDialog ref="uploadRef" />
-    <BackupRecords ref="dialogBackupRef" />
-    <DefaultServer ref="defaultRef" />
+                    </el-col>
+                </el-row>
+            </template>
+            <template v-if="nginxIsExist && !openNginxConfig" #search>
+                <div :class="{ mask: nginxStatus != 'Running' }">
+                    <el-select v-model="req.websiteGroupId" @change="search()">
+                        <el-option :label="$t('website.allGroup')" :value="0"></el-option>
+                        <el-option
+                            v-for="(group, index) in groups"
+                            :key="index"
+                            :label="group.name"
+                            :value="group.id"
+                        ></el-option>
+                    </el-select>
+                </div>
+            </template>
+            <template v-if="nginxIsExist && !openNginxConfig" #main>
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    :data="data"
+                    @search="search()"
+                    :class="{ mask: nginxStatus != 'Running' }"
+                >
+                    <el-table-column :label="$t('commons.table.name')" fix show-overflow-tooltip prop="primaryDomain">
+                        <template #default="{ row }">
+                            <el-link type="primary" @click="openConfig(row.id)">
+                                {{ row.primaryDomain }}
+                            </el-link>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('commons.table.type')" fix prop="type">
+                        <template #default="{ row }">
+                            {{ $t('website.' + row.type) }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('commons.table.status')" prop="status">
+                        <template #default="{ row }">
+                            <el-button
+                                v-if="row.status === 'Running'"
+                                link
+                                type="success"
+                                @click="opWebsite('stop', row.id)"
+                            >
+                                {{ $t('commons.status.running') }}
+                            </el-button>
+                            <el-button v-else link type="danger" @click="opWebsite('start', row.id)">
+                                {{ $t('commons.status.stopped') }}
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('website.remark')" prop="remark"></el-table-column>
+                    <el-table-column :label="$t('website.protocol')" prop="protocol"></el-table-column>
+                    <el-table-column :label="$t('website.expireDate')">
+                        <template #default="{ row, $index }">
+                            <div v-show="row.showdate">
+                                <el-date-picker
+                                    v-model="row.expireDate"
+                                    type="date"
+                                    :disabled-date="checkDate"
+                                    :shortcuts="shortcuts"
+                                    :clearable="false"
+                                    :default-value="setDate(row.expireDate)"
+                                    :ref="(el) => setdateRefs(el, $index)"
+                                    @change="submitDate(row)"
+                                    @visible-change="(visibility:boolean) => pickerVisibility(visibility, row)"
+                                    size="small"
+                                ></el-date-picker>
+                            </div>
+                            <div v-show="!row.showdate">
+                                <span v-if="isEver(row.expireDate)" @click="openDatePicker(row, $index)">
+                                    {{ $t('website.neverExpire') }}
+                                </span>
+                                <span v-else @click="openDatePicker(row, $index)">
+                                    {{ dateFormatSimple(row.expireDate) }}
+                                </span>
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <fu-table-operations
+                        :ellipsis="10"
+                        width="260px"
+                        :buttons="buttons"
+                        :label="$t('commons.table.operate')"
+                        fixed="right"
+                        fix
+                    />
+                </ComplexTable>
+                <el-card width="30%" v-if="nginxStatus != 'Running'" class="mask-prompt">
+                    <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['OpenResty']) }}</span>
+                </el-card>
+            </template>
+        </LayoutContent>
+        <NginxConfig v-if="openNginxConfig" v-loading="loading" :containerName="containerName" :status="nginxStatus" />
+        <CreateWebSite ref="createRef" @close="search" />
+        <DeleteWebsite ref="deleteRef" @close="search" />
+        <WebSiteGroup ref="groupRef" />
+        <UploadDialog ref="uploadRef" />
+        <BackupRecords ref="dialogBackupRef" />
+        <DefaultServer ref="defaultRef" />
+    </div>
 </template>
 
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
+import RouterButton from '@/components/router-button/index.vue';
 import BackupRecords from '@/views/website/website/backup/index.vue';
 import UploadDialog from '@/views/website/website/upload/index.vue';
 import DefaultServer from '@/views/website/website/default/index.vue';

@@ -62,6 +62,7 @@
     </el-drawer>
 </template>
 <script lang="ts" setup>
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import { GetSSL } from '@/api/modules/website';
 import { ref } from 'vue';
 import { dateFormatSimple, getProvider } from '@/utils/util';

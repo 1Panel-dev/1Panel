@@ -48,10 +48,9 @@ import { GlobalStore } from '@/store';
 const route = useRoute();
 const menuStore = MenuStore();
 const globalStore = GlobalStore();
-// const activeMenu = computed((): string => route.path);
-const activeMenu = computed(() => {
+const activeMenu = computed((): string => {
     const { meta, path } = route;
-    if (meta.activeMenu) {
+    if (typeof meta.activeMenu === 'string') {
         return meta.activeMenu;
     }
     return path;

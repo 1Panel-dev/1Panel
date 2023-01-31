@@ -1,74 +1,82 @@
 <template>
-    <RouterButton :buttons="routerButton" />
-    <LayoutContent :title="$t('website.ssl')">
-        <template #prompt>
-            <el-alert type="info" :closable="false">
-                <template #default>
-                    <span><span v-html="$t('website.encryptHelper')"></span></span>
-                </template>
-            </el-alert>
-        </template>
-        <template #toolbar>
-            <el-button type="primary" @click="openSSL()">
-                {{ $t('ssl.create') }}
-            </el-button>
-            <el-button type="primary" plain @click="openAcmeAccount()">
-                {{ $t('website.acmeAccountManage') }}
-            </el-button>
-            <el-button type="primary" plain @click="openDnsAccount()">
-                {{ $t('website.dnsAccountManage') }}
-            </el-button>
-        </template>
-        <template #main>
-            <br />
-            <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
-                <el-table-column
-                    :label="$t('website.domain')"
-                    fix
-                    show-overflow-tooltip
-                    prop="primaryDomain"
-                ></el-table-column>
-                <el-table-column
-                    :label="$t('website.otherDomains')"
-                    fix
-                    show-overflow-tooltip
-                    prop="domains"
-                ></el-table-column>
-                <el-table-column :label="$t('ssl.provider')" fix show-overflow-tooltip prop="provider">
-                    <template #default="{ row }">{{ getProvider(row.provider) }}</template>
-                </el-table-column>
-                <el-table-column
-                    :label="$t('ssl.acmeAccount')"
-                    fix
-                    show-overflow-tooltip
-                    prop="acmeAccount.email"
-                ></el-table-column>
-                <el-table-column :label="$t('website.brand')" fix show-overflow-tooltip prop="type"></el-table-column>
-                <el-table-column
-                    prop="expireDate"
-                    :label="$t('website.expireDate')"
-                    :formatter="dateFormat"
-                    show-overflow-tooltip
-                />
-                <fu-table-operations
-                    :ellipsis="3"
-                    :buttons="buttons"
-                    :label="$t('commons.table.operate')"
-                    fixed="right"
-                    fix
-                />
-            </ComplexTable>
-        </template>
-        <DnsAccount ref="dnsAccountRef"></DnsAccount>
-        <AcmeAccount ref="acmeAccountRef"></AcmeAccount>
-        <Create ref="sslCreateRef" @close="search()"></Create>
-        <Renew ref="renewRef" @close="search()"></Renew>
-        <Detail ref="detailRef"></Detail>
-    </LayoutContent>
+    <div>
+        <RouterButton :buttons="routerButton" />
+        <LayoutContent :title="$t('website.ssl')">
+            <template #prompt>
+                <el-alert type="info" :closable="false">
+                    <template #default>
+                        <span><span v-html="$t('website.encryptHelper')"></span></span>
+                    </template>
+                </el-alert>
+            </template>
+            <template #toolbar>
+                <el-button type="primary" @click="openSSL()">
+                    {{ $t('ssl.create') }}
+                </el-button>
+                <el-button type="primary" plain @click="openAcmeAccount()">
+                    {{ $t('website.acmeAccountManage') }}
+                </el-button>
+                <el-button type="primary" plain @click="openDnsAccount()">
+                    {{ $t('website.dnsAccountManage') }}
+                </el-button>
+            </template>
+            <template #main>
+                <br />
+                <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
+                    <el-table-column
+                        :label="$t('website.domain')"
+                        fix
+                        show-overflow-tooltip
+                        prop="primaryDomain"
+                    ></el-table-column>
+                    <el-table-column
+                        :label="$t('website.otherDomains')"
+                        fix
+                        show-overflow-tooltip
+                        prop="domains"
+                    ></el-table-column>
+                    <el-table-column :label="$t('ssl.provider')" fix show-overflow-tooltip prop="provider">
+                        <template #default="{ row }">{{ getProvider(row.provider) }}</template>
+                    </el-table-column>
+                    <el-table-column
+                        :label="$t('ssl.acmeAccount')"
+                        fix
+                        show-overflow-tooltip
+                        prop="acmeAccount.email"
+                    ></el-table-column>
+                    <el-table-column
+                        :label="$t('website.brand')"
+                        fix
+                        show-overflow-tooltip
+                        prop="type"
+                    ></el-table-column>
+                    <el-table-column
+                        prop="expireDate"
+                        :label="$t('website.expireDate')"
+                        :formatter="dateFormat"
+                        show-overflow-tooltip
+                    />
+                    <fu-table-operations
+                        :ellipsis="3"
+                        :buttons="buttons"
+                        :label="$t('commons.table.operate')"
+                        fixed="right"
+                        fix
+                    />
+                </ComplexTable>
+            </template>
+            <DnsAccount ref="dnsAccountRef"></DnsAccount>
+            <AcmeAccount ref="acmeAccountRef"></AcmeAccount>
+            <Create ref="sslCreateRef" @close="search()"></Create>
+            <Renew ref="renewRef" @close="search()"></Renew>
+            <Detail ref="detailRef"></Detail>
+        </LayoutContent>
+    </div>
 </template>
 
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
+import RouterButton from '@/components/router-button/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { DeleteSSL, SearchSSL } from '@/api/modules/website';

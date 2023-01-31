@@ -33,6 +33,7 @@
 </template>
 
 <script lang="ts" setup>
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
