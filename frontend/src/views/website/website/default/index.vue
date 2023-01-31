@@ -37,6 +37,7 @@
     </el-drawer>
 </template>
 <script lang="ts" setup>
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import { Website } from '@/api/interface/Website';
 import { ChangeDefaultServer, ListWebsites } from '@/api/modules/website';
 import i18n from '@/lang';

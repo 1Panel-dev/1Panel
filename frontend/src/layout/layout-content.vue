@@ -57,8 +57,9 @@
                 <div v-if="slots.prompt">
                     <slot name="prompt"></slot>
                 </div>
-
-                <slot name="main"></slot>
+                <div class="main">
+                    <slot name="main"></slot>
+                </div>
             </el-card>
         </div>
         <slot></slot>
@@ -99,7 +100,6 @@ const showBack = computed(() => {
 }
 
 .content-container__toolbar {
-    // @include flex-row(space-between, center);
     margin-top: 30px;
 }
 
@@ -113,6 +113,10 @@ const showBack = computed(() => {
 }
 
 .content-container__main {
+    margin-top: 20px;
+}
+
+.main {
     margin-top: 20px;
 }
 

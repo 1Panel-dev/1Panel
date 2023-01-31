@@ -19,6 +19,7 @@
 </template>
 
 <script setup lang="ts">
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import { ref } from 'vue';
 import { File } from '@/api/interface/file';
 import { ChangeFileMode } from '@/api/modules/files';

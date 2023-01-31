@@ -92,6 +92,7 @@
 </template>
 
 <script lang="ts" setup>
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import { Website } from '@/api/interface/website';
 import { CreateSSL, GetDnsResolve, SearchAcmeAccount, SearchDnsAccount } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';

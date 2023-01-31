@@ -34,6 +34,7 @@
 </template>
 
 <script lang="ts" setup>
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import Create from './create/index.vue';
 import { Website } from '@/api/interface/website';

@@ -1,19 +1,27 @@
 <template>
-    <el-dialog
+    <el-drawer
         v-model="open"
         :close-on-click-modal="false"
-        :title="$t('website.create')"
-        width="40%"
+        :title="$t('website.addDomain')"
+        size="40%"
         :before-close="handleClose"
     >
-        <el-form ref="domainForm" label-position="right" :model="domain" label-width="130px" :rules="rules">
-            <el-form-item :label="$t('website.domain')" prop="domain">
-                <el-input v-model="domain.domain"></el-input>
-            </el-form-item>
-            <el-form-item :label="$t('website.port')" prop="port">
-                <el-input v-model.number="domain.port"></el-input>
-            </el-form-item>
-        </el-form>
+        <template #header>
+            <DrawerHeader :header="$t('website.addDomain')" :back="handleClose" />
+        </template>
+
+        <el-row>
+            <el-col :span="22" :offset="1">
+                <el-form ref="domainForm" label-position="top" :model="domain" :rules="rules">
+                    <el-form-item :label="$t('website.domain')" prop="domain">
+                        <el-input v-model="domain.domain"></el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('website.port')" prop="port">
+                        <el-input v-model.number="domain.port"></el-input>
+                    </el-form-item>
+                </el-form>
+            </el-col>
+        </el-row>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -22,10 +30,11 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import { CreateDomain } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';

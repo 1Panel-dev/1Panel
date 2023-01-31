@@ -60,6 +60,7 @@
 </template>
 
 <script setup lang="ts">
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import { ref, reactive, computed } from 'vue';
 import { File } from '@/api/interface/file';
 import { ElMessage, FormInstance, FormRules } from 'element-plus';

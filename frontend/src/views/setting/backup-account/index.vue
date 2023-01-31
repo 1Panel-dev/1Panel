@@ -59,7 +59,7 @@
                                     {{ s3Data.bucket }}
                                 </el-form-item>
                                 <el-form-item :label="$t('commons.table.createdAt')">
-                                    {{ dateFormat(0, 0, s3Data.createdAt) }}
+                                    {{ dateFormatSimple(s3Data.createdAt) }}
                                 </el-form-item>
                             </div>
                             <el-alert v-else center style="height: 167px; background-color: #e2e4ec" :closable="false">
@@ -101,7 +101,7 @@
                                     {{ ossData.bucket }}
                                 </el-form-item>
                                 <el-form-item :label="$t('commons.table.createdAt')">
-                                    {{ dateFormat(0, 0, ossData.createdAt) }}
+                                    {{ dateFormatSimple(ossData.createdAt) }}
                                 </el-form-item>
                             </div>
                             <el-alert v-else center style="height: 167px; background-color: #e2e4ec" :closable="false">
@@ -145,7 +145,7 @@
                                     {{ minioData.bucket }}
                                 </el-form-item>
                                 <el-form-item :label="$t('commons.table.createdAt')">
-                                    {{ dateFormat(0, 0, minioData.createdAt) }}
+                                    {{ dateFormatSimple(minioData.createdAt) }}
                                 </el-form-item>
                             </div>
                             <el-alert v-else center style="height: 167px; background-color: #e2e4ec" :closable="false">
