@@ -294,6 +294,9 @@ const loadBackups = async () => {
     const res = await getBackupList();
     backupOptions.value = [];
     for (const item of res.data) {
+        if (item.id === 0) {
+            continue;
+        }
         if (item.type === 'LOCAL') {
             localDirID.value = item.id;
             if (!dialogData.value.rowData!.targetDirID) {

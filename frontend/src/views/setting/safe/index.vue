@@ -187,8 +187,6 @@ import { updatePassword, updateSetting, getMFA, bindMFA, getSettingInfo } from '
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { dateFormatSimple } from '@/utils/util';
-
-const emit = defineEmits(['search']);
 import { GlobalStore } from '@/store';
 import router from '@/routers';
 

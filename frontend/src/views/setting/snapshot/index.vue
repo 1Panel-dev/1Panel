@@ -54,7 +54,7 @@
                     <el-table-column
                         prop="createdAt"
                         :label="$t('commons.table.date')"
-                        :formatter="dateFromat"
+                        :formatter="dateFormat"
                         show-overflow-tooltip
                     />
                     <fu-table-operations
@@ -102,7 +102,7 @@
 import ComplexTable from '@/components/complex-table/index.vue';
 import { snapshotCreate, searchSnapshotPage, snapshotDelete } from '@/api/modules/setting';
 import { onMounted, reactive, ref } from 'vue';
-import { dateFromat } from '@/utils/util';
+import { dateFormat } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
@@ -167,7 +167,7 @@ const loadBackups = async () => {
     const res = await getBackupList();
     backupOptions.value = [];
     for (const item of res.data) {
-        if (item.type !== 'LOCAL') {
+        if (item.type !== 'LOCAL' && item.id !== 0) {
             backupOptions.value.push({ label: loadBackupName(item.type), value: item.type });
         }
     }

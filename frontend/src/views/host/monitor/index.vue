@@ -1,6 +1,13 @@
 <template>
     <div>
-        <el-row :gutter="20">
+        <el-card class="topRouterCard">
+            <el-radio-group v-model="active">
+                <el-radio-button class="topRouterButton" size="default" label="monitor">
+                    {{ $t('menu.monitor') }}
+                </el-radio-button>
+            </el-radio-group>
+        </el-card>
+        <el-row :gutter="20" style="margin-top: 20px">
             <el-col :span="24">
                 <el-card style="overflow: inherit">
                     <template #header>
@@ -117,13 +124,14 @@ import { Monitor } from '@/api/interface/monitor';
 import { dateFormatWithoutYear } from '@/utils/util';
 import i18n from '@/lang';
 
+const active = ref('monitor');
 const zoomStart = ref();
 const monitorBase = ref();
-const timeRangeLoad = ref<Array<any>>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
-const timeRangeCpu = ref<Array<any>>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
-const timeRangeMemory = ref<Array<any>>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
-const timeRangeIO = ref<Array<any>>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
-const timeRangeNetwork = ref<Array<any>>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
+const timeRangeLoad = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
+const timeRangeCpu = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
+const timeRangeMemory = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
+const timeRangeIO = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
+const timeRangeNetwork = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
 const networkChoose = ref();
 const netOptions = ref();
 const shortcuts = [

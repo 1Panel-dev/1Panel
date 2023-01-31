@@ -8,6 +8,8 @@ export interface ThemeConfigProp {
 }
 
 export interface GlobalState {
+    isLoading: boolean;
+    loadingText: string;
     isLogin: boolean;
     csrfToken: string;
     language: string; // zh | en

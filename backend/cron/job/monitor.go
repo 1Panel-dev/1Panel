@@ -43,7 +43,7 @@ func (m *monitor) Run() {
 	itemModel.Memory = memoryInfo.UsedPercent
 
 	if err := global.DB.Create(&itemModel).Error; err != nil {
-		global.LOG.Debug("create monitor base failed, err: %v", err)
+		global.LOG.Debugf("Insert basic monitoring data failed, err: %v", err)
 	}
 
 	ioStat, _ := disk.IOCounters()
@@ -77,7 +77,7 @@ func (m *monitor) Run() {
 			itemIO.Time = writeTime
 		}
 		if err := global.DB.Create(&itemIO).Error; err != nil {
-			global.LOG.Debug("create monitor io failed, err: %v", err)
+			global.LOG.Debugf("Insert io monitoring data failed, err: %v", err)
 		}
 	}
 
@@ -96,7 +96,7 @@ func (m *monitor) Run() {
 		itemNet.Up = float64(v.BytesSent-aheadData.BytesSent) / 1024 / stime
 		itemNet.Down = float64(v.BytesRecv-aheadData.BytesRecv) / 1024 / stime
 		if err := global.DB.Create(&itemNet).Error; err != nil {
-			global.LOG.Debug("create monitor network failed, err: %v", err)
+			global.LOG.Debugf("Insert network monitoring data failed, err: %v", err)
 		}
 	}
 	netStatAll, _ := net.IOCounters(false)
@@ -114,7 +114,7 @@ func (m *monitor) Run() {
 		itemNet.Up = float64(netStatAll[0].BytesSent-aheadData.BytesSent) / 1024 / stime
 		itemNet.Down = float64(netStatAll[0].BytesRecv-aheadData.BytesRecv) / 1024 / stime
 		if err := global.DB.Create(&itemNet).Error; err != nil {
-			global.LOG.Debug("create monitor network all failed, err: %v", err)
+			global.LOG.Debugf("Insert network all monitoring data failed, err: %v", err)
 		}
 	}
 

@@ -58,6 +58,15 @@ class RequestHttp {
                     router.push({ name: 'Expired' });
                     return data;
                 }
+                if (data.code == ResultEnum.ERRGLOBALLOADDING) {
+                    globalStore.setGlobalLoading(true);
+                    globalStore.setLoadingText(data.message);
+                    return;
+                } else {
+                    if (globalStore.isLoading) {
+                        globalStore.setGlobalLoading(false);
+                    }
+                }
                 if (data.code == ResultEnum.ERRAUTH) {
                     return data;
                 }

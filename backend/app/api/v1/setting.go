@@ -29,6 +29,16 @@ func (b *BaseApi) GetSettingInfo(c *gin.Context) {
 }
 
 // @Tags System Setting
+// @Summary Load system available status
+// @Description 获取系统可用状态
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/search/available [get]
+func (b *BaseApi) GetSystemAvailable(c *gin.Context) {
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags System Setting
 // @Summary Update system setting
 // @Description 更新系统配置
 // @Accept json

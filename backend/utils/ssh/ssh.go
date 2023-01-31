@@ -74,7 +74,7 @@ func (c *ConnInfo) Run(shell string) (string, error) {
 
 func (c *ConnInfo) Close() {
 	if err := c.Client.Close(); err != nil {
-		global.LOG.Error("close ssh client failed, err: %v", err)
+		global.LOG.Errorf("close ssh client failed, err: %v", err)
 	}
 }
 

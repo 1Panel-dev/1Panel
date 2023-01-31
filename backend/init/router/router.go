@@ -67,6 +67,7 @@ func Routers() *gin.Engine {
 	}
 
 	PrivateGroup := Router.Group("/api/v1")
+	PrivateGroup.Use(middleware.GlobalLoading())
 	//PrivateGroup.Use(middleware.SafetyAuth())
 	{
 		systemRouter.InitBaseRouter(PrivateGroup)

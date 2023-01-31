@@ -3,10 +3,13 @@ import { GlobalState, ThemeConfigProp } from './interface';
 import { createPinia } from 'pinia';
 import piniaPersistConfig from '@/config/pinia-persist';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
+import i18n from '@/lang';
 
 export const GlobalStore = defineStore({
     id: 'GlobalState',
     state: (): GlobalState => ({
+        isLoading: false,
+        loadingText: '',
         isLogin: false,
         csrfToken: '',
         language: '',
@@ -21,6 +24,12 @@ export const GlobalStore = defineStore({
     actions: {
         setLogStatus(login: boolean) {
             this.isLogin = login;
+        },
+        setGlobalLoading(loading: boolean) {
+            this.isLoading = loading;
+        },
+        setLoadingText(text: string) {
+            this.loadingText = i18n.global.t('commons.loadingText.' + text);
         },
         setCsrfToken(token: string) {
             this.csrfToken = token;

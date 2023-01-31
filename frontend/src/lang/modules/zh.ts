@@ -64,6 +64,9 @@ export default {
             interval: '耗时',
             title: '标题',
         },
+        loadingText: {
+            Upgrading: '系统升级中，请稍候...',
+        },
         msg: {
             delete: '删除 操作不可回滚，是否继续',
             deleteTitle: '删除',
@@ -722,7 +725,7 @@ export default {
         duplicatePassword: '新密码不能与原始密码一致，请重新输入！',
 
         backup: '备份',
-        thirdParty: '第三方',
+        thirdParty: '第三方账号',
         createBackupAccount: '添加 {0} 备份账号',
         noTypeForCreate: '当前无可创建备份类型',
         serverDisk: '服务器磁盘',
@@ -762,7 +765,7 @@ export default {
         upgrading: '正在升级中，请稍候...',
         upgradeHelper: '升级操作需要重启服务，是否继续？',
         noUpgrade: '当前已是最新版本，无需更新',
-        newVersion: '新版本',
+        newVersion: '最新版本',
         upgradeCheck: '检查更新',
         upgradeNotes: '更新内容',
         upgradeNow: '立即更新',

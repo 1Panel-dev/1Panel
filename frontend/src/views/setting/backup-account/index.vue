@@ -21,7 +21,7 @@
                                 {{ localData.varsJson['dir'] }}
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
-                                {{ dateFromat(0, 0, localData.createdAt) }}
+                                {{ dateFormat(0, 0, localData.createdAt) }}
                             </el-form-item>
                         </el-card>
                     </el-col>
@@ -31,93 +31,7 @@
             <LayoutContent :header="$t('setting.thirdParty')" style="margin-top: 20px">
                 <el-row :gutter="20">
                     <el-col :span="12">
-                        <el-card>
-                            <template #header>
-                                <svg-icon style="font-size: 7px" iconName="p-minio"></svg-icon>
-                                <span style="font-size: 16px; font-weight: 500">&nbsp;MIMIO</span>
-                                <div style="float: right">
-                                    <el-button :disabled="minioData.id === 0" round @click="onBatchDelete(minioData)">
-                                        {{ $t('commons.button.delete') }}
-                                    </el-button>
-                                    <el-button
-                                        round
-                                        :disabled="minioData.id === 0"
-                                        @click="onOpenDialog('edit', 'MINIO', minioData)"
-                                    >
-                                        {{ $t('commons.button.edit') }}
-                                    </el-button>
-                                </div>
-                            </template>
-                            <div v-if="minioData.id !== 0">
-                                <el-form-item label="Endpoint">
-                                    {{ minioData.varsJson['endpoint'] }}
-                                </el-form-item>
-                                <el-form-item label="Bucket">
-                                    {{ minioData.bucket }}
-                                </el-form-item>
-                                <el-form-item :label="$t('commons.table.createdAt')">
-                                    {{ dateFromat(0, 0, minioData.createdAt) }}
-                                </el-form-item>
-                            </div>
-                            <el-alert v-else center style="height: 127px; background-color: #e2e4ec" :closable="false">
-                                <el-button
-                                    size="large"
-                                    round
-                                    plain
-                                    type="primary"
-                                    @click="onOpenDialog('create', 'MINIO')"
-                                >
-                                    {{ $t('setting.createBackupAccount', ['MINIO']) }}
-                                </el-button>
-                            </el-alert>
-                        </el-card>
-                    </el-col>
-                    <el-col :span="12">
-                        <el-card>
-                            <template #header>
-                                <svg-icon style="font-size: 7px" iconName="p-oss"></svg-icon>
-                                <span style="font-size: 16px; font-weight: 500">&nbsp;OSS</span>
-                                <div style="float: right">
-                                    <el-button round :disabled="ossData.id === 0" @click="onBatchDelete(ossData)">
-                                        {{ $t('commons.button.delete') }}
-                                    </el-button>
-                                    <el-button
-                                        round
-                                        :disabled="ossData.id === 0"
-                                        @click="onOpenDialog('edit', 'OSS', ossData)"
-                                    >
-                                        {{ $t('commons.button.edit') }}
-                                    </el-button>
-                                </div>
-                            </template>
-                            <div v-if="ossData.id !== 0">
-                                <el-form-item label="Endpoint">
-                                    {{ ossData.varsJson['endpoint'] }}
-                                </el-form-item>
-                                <el-form-item label="Bucket">
-                                    {{ ossData.bucket }}
-                                </el-form-item>
-                                <el-form-item :label="$t('commons.table.createdAt')">
-                                    {{ dateFromat(0, 0, ossData.createdAt) }}
-                                </el-form-item>
-                            </div>
-                            <el-alert v-else center style="height: 127px; background-color: #e2e4ec" :closable="false">
-                                <el-button
-                                    size="large"
-                                    round
-                                    plain
-                                    type="primary"
-                                    @click="onOpenDialog('create', 'OSS')"
-                                >
-                                    {{ $t('setting.createBackupAccount', ['OSS']) }}
-                                </el-button>
-                            </el-alert>
-                        </el-card>
-                    </el-col>
-                </el-row>
-                <el-row :gutter="20" style="margin-top: 20px">
-                    <el-col :span="12">
-                        <el-card>
+                        <el-card style="height: 265px">
                             <template #header>
                                 <svg-icon style="font-size: 7px" iconName="p-aws"></svg-icon>
                                 <span style="font-size: 16px; font-weight: 500">&nbsp;{{ $t('setting.S3') }}</span>
@@ -145,7 +59,7 @@
                                     {{ s3Data.bucket }}
                                 </el-form-item>
                                 <el-form-item :label="$t('commons.table.createdAt')">
-                                    {{ dateFromat(0, 0, s3Data.createdAt) }}
+                                    {{ dateFormat(0, 0, s3Data.createdAt) }}
                                 </el-form-item>
                             </div>
                             <el-alert v-else center style="height: 167px; background-color: #e2e4ec" :closable="false">
@@ -162,7 +76,93 @@
                         </el-card>
                     </el-col>
                     <el-col :span="12">
-                        <el-card>
+                        <el-card style="height: 265px">
+                            <template #header>
+                                <svg-icon style="font-size: 7px" iconName="p-oss"></svg-icon>
+                                <span style="font-size: 16px; font-weight: 500">&nbsp;OSS</span>
+                                <div style="float: right">
+                                    <el-button round :disabled="ossData.id === 0" @click="onBatchDelete(ossData)">
+                                        {{ $t('commons.button.delete') }}
+                                    </el-button>
+                                    <el-button
+                                        round
+                                        :disabled="ossData.id === 0"
+                                        @click="onOpenDialog('edit', 'OSS', ossData)"
+                                    >
+                                        {{ $t('commons.button.edit') }}
+                                    </el-button>
+                                </div>
+                            </template>
+                            <div v-if="ossData.id !== 0">
+                                <el-form-item label="Endpoint">
+                                    {{ ossData.varsJson['endpoint'] }}
+                                </el-form-item>
+                                <el-form-item label="Bucket">
+                                    {{ ossData.bucket }}
+                                </el-form-item>
+                                <el-form-item :label="$t('commons.table.createdAt')">
+                                    {{ dateFormat(0, 0, ossData.createdAt) }}
+                                </el-form-item>
+                            </div>
+                            <el-alert v-else center style="height: 167px; background-color: #e2e4ec" :closable="false">
+                                <el-button
+                                    size="large"
+                                    round
+                                    plain
+                                    type="primary"
+                                    @click="onOpenDialog('create', 'OSS')"
+                                >
+                                    {{ $t('setting.createBackupAccount', ['OSS']) }}
+                                </el-button>
+                            </el-alert>
+                        </el-card>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" style="margin-top: 20px">
+                    <el-col :span="12">
+                        <el-card style="height: 265px">
+                            <template #header>
+                                <svg-icon style="font-size: 7px" iconName="p-minio"></svg-icon>
+                                <span style="font-size: 16px; font-weight: 500">&nbsp;MIMIO</span>
+                                <div style="float: right">
+                                    <el-button :disabled="minioData.id === 0" round @click="onBatchDelete(minioData)">
+                                        {{ $t('commons.button.delete') }}
+                                    </el-button>
+                                    <el-button
+                                        round
+                                        :disabled="minioData.id === 0"
+                                        @click="onOpenDialog('edit', 'MINIO', minioData)"
+                                    >
+                                        {{ $t('commons.button.edit') }}
+                                    </el-button>
+                                </div>
+                            </template>
+                            <div v-if="minioData.id !== 0">
+                                <el-form-item label="Endpoint">
+                                    {{ minioData.varsJson['endpoint'] }}
+                                </el-form-item>
+                                <el-form-item label="Bucket">
+                                    {{ minioData.bucket }}
+                                </el-form-item>
+                                <el-form-item :label="$t('commons.table.createdAt')">
+                                    {{ dateFormat(0, 0, minioData.createdAt) }}
+                                </el-form-item>
+                            </div>
+                            <el-alert v-else center style="height: 167px; background-color: #e2e4ec" :closable="false">
+                                <el-button
+                                    size="large"
+                                    round
+                                    plain
+                                    type="primary"
+                                    @click="onOpenDialog('create', 'MINIO')"
+                                >
+                                    {{ $t('setting.createBackupAccount', ['MINIO']) }}
+                                </el-button>
+                            </el-alert>
+                        </el-card>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-card style="height: 265px">
                             <template #header>
                                 <svg-icon style="font-size: 7px" iconName="p-SFTP"></svg-icon>
                                 <span style="font-size: 16px; font-weight: 500">&nbsp;SFTP</span>
@@ -191,7 +191,7 @@
                                     {{ sftpData.bucket }}
                                 </el-form-item>
                                 <el-form-item :label="$t('commons.table.createdAt')">
-																	{{ dateFormatSimple(sftpData.createdAt) }}
+                                    {{ dateFormatSimple(sftpData.createdAt) }}
                                 </el-form-item>
                             </div>
                             <el-alert v-else center style="height: 167px; background-color: #e2e4ec" :closable="false">
@@ -214,7 +214,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { dateFormatSimple } from '@/utils/util';
+import { dateFormatSimple, dateFormat } from '@/utils/util';
 import { onMounted, ref } from 'vue';
 import LayoutContent from '@/layout/layout-content.vue';
 import { getBackupList, deleteBackup } from '@/api/modules/backup';

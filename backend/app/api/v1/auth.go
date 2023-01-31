@@ -137,6 +137,11 @@ func (b *BaseApi) SafeEntrance(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// @Tags Auth
+// @Summary Check is First login
+// @Description 判断是否为首次登录
+// @Success 200
+// @Router /auth/status [get]
 func (b *BaseApi) CheckIsFirstLogin(c *gin.Context) {
 	helper.SuccessWithData(c, authService.CheckIsFirst())
 }

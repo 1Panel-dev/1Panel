@@ -6,6 +6,7 @@ export enum ResultEnum {
     FORBIDDEN = 403,
     EXPIRED = 405,
     ERRAUTH = 406,
+    ERRGLOBALLOADDING = 407,
     TIMEOUT = 100000,
     TYPE = 'success',
 }

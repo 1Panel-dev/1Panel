@@ -5,6 +5,9 @@ import { Setting } from '../interface/setting';
 export const getSettingInfo = () => {
     return http.post<Setting.SettingInfo>(`/settings/search`);
 };
+export const getSystemAvailable = () => {
+    return http.get(`/settings/search/available`);
+};
 
 export const updateSetting = (param: Setting.SettingUpdate) => {
     return http.post(`/settings/update`, param);

@@ -61,6 +61,9 @@ export default {
             interval: 'Interval',
             title: 'Title',
         },
+        loadingText: {
+            Upgrading: 'System upgrade, please wait...',
+        },
         msg: {
             delete: 'This operation cannot be rolled back. Do you want to continue',
             deleteTitle: 'Delete',
@@ -706,7 +709,7 @@ export default {
         duplicatePassword: 'The new password cannot be the same as the original password, please re-enter!',
 
         backup: 'Backup',
-        thirdParty: 'Third-party',
+        thirdParty: 'Third-party account',
         createBackupAccount: 'Create {0} backup account',
         noTypeForCreate: 'No backup type is currently created',
         serverDisk: 'Server disks',
@@ -765,7 +768,7 @@ export default {
         upgrading: 'Please wait while the upgrade is underway...',
         upgradeHelper: 'The upgrade requires a service restart. Do you want to continue?',
         noUpgrade: 'This is the latest version. You do not need to update it',
-        newVersion: 'NewVersion',
+        newVersion: 'Latest version',
         upgradeCheck: 'Check for updates',
         upgradeNotes: 'Release note',
         upgradeNow: 'Upgrade now',
