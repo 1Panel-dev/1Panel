@@ -2,6 +2,7 @@ package job
 
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/app/service"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -29,9 +30,9 @@ func (w *website) Run() {
 			}
 			if site.ExpireDate.Before(now) {
 				wg.Add(1)
-				go func() {
-					stopWebsite(site.ID, &wg)
-				}()
+				go func(ws model.Website) {
+					stopWebsite(ws.ID, &wg)
+				}(site)
 			}
 		}
 		wg.Wait()
