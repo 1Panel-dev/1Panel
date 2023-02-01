@@ -8,7 +8,6 @@
                 },
             ]"
         />
-        <br />
         <LayoutContent :title="$t('website.website')" v-loading="loading">
             <template #app>
                 <AppStatus

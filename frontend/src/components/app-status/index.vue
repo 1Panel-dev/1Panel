@@ -1,14 +1,13 @@
 <template>
     <div>
-        <div class="a-content" v-if="data.isExist">
-            <el-card class="a-card">
-                <el-row :gutter="20">
-                    <el-col :xs="10" :sm="10" :md="10" :lg="10" :xl="6">
-                        <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
-                        <Status class="status-content" :key="refresh" :status="data.status"></Status>
-                        <el-tag class="status-content">{{ $t('app.version') }}:{{ data.version }}</el-tag>
-                    </el-col>
-                    <el-col :xs="8" :sm="8" :md="8" :lg="6" :xl="4">
+        <div class="a-card" v-if="data.isExist">
+            <el-card>
+                <div>
+                    <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
+                    <Status class="status-content" :key="refresh" :status="data.status"></Status>
+                    <el-tag class="status-content">{{ $t('app.version') }}:{{ data.version }}</el-tag>
+
+                    <span class="buttons">
                         <el-button type="primary" v-if="data.status != 'Running'" link @click="onOperate('up')">
                             {{ $t('app.up') }}
                         </el-button>
@@ -28,16 +27,19 @@
                         >
                             {{ $t('commons.button.set') }}
                         </el-button>
-                    </el-col>
-                </el-row>
+                    </span>
+                </div>
             </el-card>
         </div>
         <div v-else>
-            <el-alert :closable="false" :title="$t('app.checkInstalledWarn', [data.app])" type="info">
+            <div class="app-warn">
+                <div>
+                    <span>{{ $t('app.checkInstalledWarn', [data.app]) }}</span>
+                </div>
                 <el-link icon="Position" @click="goRouter('/apps')" type="primary">
                     {{ $t('database.goInstall') }}
                 </el-link>
-            </el-alert>
+            </div>
         </div>
     </div>
 </template>
@@ -122,12 +124,15 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .a-card {
-    font-size: 14px;
-    height: 60px;
-}
+    font-size: 12px;
 
-.a-content {
-    height: 50px;
+    .el-card {
+        --el-card-padding: 12px;
+
+        .buttons {
+            margin-left: 100px;
+        }
+    }
 }
 
 body {
@@ -136,5 +141,15 @@ body {
 
 .status-content {
     margin-left: 50px;
+}
+
+.app-warn {
+    text-align: center;
+    margin-top: 200px;
+    span {
+        font-weight: 500;
+        font-size: 16px;
+        color: #bbbfc4;
+    }
 }
 </style>
