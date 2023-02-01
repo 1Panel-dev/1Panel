@@ -1,9 +1,7 @@
 <template>
-    <el-drawer v-model="cronjobVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <div class="card-header">
-                <span>{{ title }}{{ $t('cronjob.cronTask') }}</span>
-            </div>
+            <DrawerHeader :header="$t('cronjob.cronTask')" :back="handleClose" />
         </template>
         <el-form ref="formRef" :model="dialogData.rowData" label-position="left" :rules="rules" label-width="120px">
             <el-form-item :label="$t('cronjob.taskType')" prop="type">
@@ -132,7 +130,7 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="cronjobVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button type="primary" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
@@ -161,25 +159,28 @@ interface DialogProps {
     getTableList?: () => Promise<any>;
 }
 const title = ref<string>('');
-const cronjobVisiable = ref(false);
+const drawerVisiable = ref(false);
 const dialogData = ref<DialogProps>({
     title: '',
 });
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
-    cronjobVisiable.value = true;
+    drawerVisiable.value = true;
     checkMysqlInstalled();
     loadBackups();
     loadWebsites();
+};
+const emit = defineEmits<{ (e: 'search'): void }>();
+
+const handleClose = () => {
+    drawerVisiable.value = false;
 };
 
 const localDirID = ref();
 
 const websiteOptions = ref();
 const backupOptions = ref();
-
-const emit = defineEmits<{ (e: 'search'): void }>();
 
 const mysqlInfo = reactive({
     isExist: false,
@@ -349,7 +350,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
 
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         emit('search');
-        cronjobVisiable.value = false;
+        drawerVisiable.value = false;
     });
 };
 

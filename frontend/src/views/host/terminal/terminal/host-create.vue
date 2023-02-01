@@ -1,6 +1,9 @@
 <template>
     <div>
-        <el-dialog v-model="dialogVisiable" :title="$t('terminal.addHost')" width="30%">
+        <el-drawer v-model="dialogVisiable" size="50%">
+            <template #header>
+                <DrawerHeader :header="$t('terminal.addHost')" :back="handleClose" />
+            </template>
             <el-alert
                 v-if="isLocal"
                 style="margin-bottom: 20px"
@@ -9,35 +12,45 @@
                 :closable="false"
                 type="warning"
             />
-            <el-form ref="hostRef" label-width="100px" :model="hostInfo" :rules="rules">
-                <el-form-item :label="$t('terminal.ip')" prop="addr">
-                    <el-input v-if="!isLocal" clearable v-model="hostInfo.addr" />
-                    <span v-if="isLocal">{{ hostInfo.addr }}</span>
-                </el-form-item>
-                <el-form-item :label="$t('terminal.user')" prop="user">
-                    <el-input clearable v-model="hostInfo.user" />
-                </el-form-item>
-                <el-form-item :label="$t('terminal.authMode')" prop="authMode">
-                    <el-radio-group v-model="hostInfo.authMode">
-                        <el-radio label="password">{{ $t('terminal.passwordMode') }}</el-radio>
-                        <el-radio label="key">{{ $t('terminal.keyMode') }}</el-radio>
-                    </el-radio-group>
-                </el-form-item>
-                <el-form-item :label="$t('terminal.password')" v-if="hostInfo.authMode === 'password'" prop="password">
-                    <el-input clearable show-password type="password" v-model="hostInfo.password" />
-                </el-form-item>
-                <el-form-item :label="$t('terminal.key')" v-if="hostInfo.authMode === 'key'" prop="privateKey">
-                    <el-input clearable type="textarea" v-model="hostInfo.privateKey" />
-                </el-form-item>
-                <el-form-item :label="$t('terminal.port')" prop="port">
-                    <el-input clearable v-model.number="hostInfo.port" />
-                </el-form-item>
-                <el-form-item :label="$t('commons.table.title')" prop="name">
-                    <el-input clearable v-model="hostInfo.name" />
-                </el-form-item>
-                <el-form-item :label="$t('commons.table.description')" prop="description">
-                    <el-input clearable v-model="hostInfo.description" />
-                </el-form-item>
+            <el-form ref="hostRef" label-width="100px" label-position="top" :model="hostInfo" :rules="rules">
+                <el-row type="flex" justify="center">
+                    <el-col :span="22">
+                        <el-form-item :label="$t('terminal.ip')" prop="addr">
+                            <el-input v-if="!isLocal" clearable v-model="hostInfo.addr" />
+                            <div style="margin-left: 12px">
+                                <span v-if="isLocal">{{ hostInfo.addr }}</span>
+                            </div>
+                        </el-form-item>
+                        <el-form-item :label="$t('terminal.user')" prop="user">
+                            <el-input clearable v-model="hostInfo.user" />
+                        </el-form-item>
+                        <el-form-item :label="$t('terminal.authMode')" prop="authMode">
+                            <el-radio-group v-model="hostInfo.authMode">
+                                <el-radio label="password">{{ $t('terminal.passwordMode') }}</el-radio>
+                                <el-radio label="key">{{ $t('terminal.keyMode') }}</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                        <el-form-item
+                            :label="$t('terminal.password')"
+                            v-if="hostInfo.authMode === 'password'"
+                            prop="password"
+                        >
+                            <el-input clearable show-password type="password" v-model="hostInfo.password" />
+                        </el-form-item>
+                        <el-form-item :label="$t('terminal.key')" v-if="hostInfo.authMode === 'key'" prop="privateKey">
+                            <el-input clearable type="textarea" v-model="hostInfo.privateKey" />
+                        </el-form-item>
+                        <el-form-item :label="$t('terminal.port')" prop="port">
+                            <el-input clearable v-model.number="hostInfo.port" />
+                        </el-form-item>
+                        <el-form-item :label="$t('commons.table.title')" prop="name">
+                            <el-input clearable v-model="hostInfo.name" />
+                        </el-form-item>
+                        <el-form-item :label="$t('commons.table.description')" prop="description">
+                            <el-input clearable v-model="hostInfo.description" />
+                        </el-form-item>
+                    </el-col>
+                </el-row>
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
@@ -50,7 +63,7 @@
                     </el-button>
                 </span>
             </template>
-        </el-dialog>
+        </el-drawer>
     </div>
 </template>
 
@@ -99,6 +112,10 @@ const acceptParams = (props: DialogProps) => {
         hostInfo.user = 'root';
     }
     dialogVisiable.value = true;
+};
+
+const handleClose = () => {
+    dialogVisiable.value = false;
 };
 
 const emit = defineEmits(['on-conn-terminal', 'load-host-tree']);

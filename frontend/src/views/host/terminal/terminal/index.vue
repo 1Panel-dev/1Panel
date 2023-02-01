@@ -35,7 +35,7 @@
                     </span>
                 </template>
                 <Terminal
-                    style="height: calc(100vh - 178px); background-color: #000"
+                    style="height: calc(100vh - 227px); background-color: #000"
                     :ref="'t-' + item.index"
                     :key="item.Refresh"
                 ></Terminal>
@@ -109,7 +109,7 @@
             </el-tab-pane>
             <div v-if="terminalTabs.length === 0">
                 <el-empty
-                    style="background-color: #000; height: calc(100vh - 150px)"
+                    style="background-color: #000; height: calc(100vh - 200px)"
                     :description="$t('terminal.emptyTerminal')"
                 ></el-empty>
             </div>
@@ -383,7 +383,7 @@ defineExpose({
 .fullScreen {
     position: absolute;
     right: 50px;
-    top: 80px;
+    top: 90px;
     font-weight: 600;
     font-size: 14px;
 }

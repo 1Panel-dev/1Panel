@@ -1,186 +1,195 @@
 <template>
-    <el-drawer v-model="createVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <div class="card-header">
-                <span>{{ $t('container.createContainer') }}</span>
-            </div>
+            <DrawerHeader :header="$t('container.createContainer')" :back="handleClose" />
         </template>
-        <el-form ref="formRef" v-loading="loading" :model="form" :rules="rules" label-width="80px">
-            <el-form-item :label="$t('container.name')" prop="name">
-                <el-input clearable v-model.trim="form.name" />
-            </el-form-item>
-            <el-form-item :label="$t('container.image')" prop="image">
-                <el-select style="width: 100%" filterable v-model="form.image">
-                    <el-option v-for="(item, index) of images" :key="index" :value="item.option" :label="item.option" />
-                </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('container.port')">
-                <el-radio-group v-model="form.publishAllPorts" class="ml-4">
-                    <el-radio :label="false">{{ $t('container.exposePort') }}</el-radio>
-                    <el-radio :label="true">{{ $t('container.exposeAll') }}</el-radio>
-                </el-radio-group>
-            </el-form-item>
-            <el-form-item v-if="!form.publishAllPorts">
-                <el-card style="width: 100%">
-                    <table style="width: 100%" class="tab-table">
-                        <tr v-if="form.exposedPorts.length !== 0">
-                            <th scope="col" width="48%" align="left">
-                                <label>{{ $t('container.serverPort') }}</label>
-                            </th>
-                            <th scope="col" width="48%" align="left">
-                                <label>{{ $t('container.containerPort') }}</label>
-                            </th>
-                            <th align="left"></th>
-                        </tr>
-                        <tr v-for="(row, index) in form.exposedPorts" :key="index">
-                            <td width="48%">
-                                <el-input-number
-                                    :min="0"
-                                    :max="65535"
-                                    style="width: 100%"
-                                    controls-position="right"
-                                    v-model.number="row.hostPort"
-                                />
-                            </td>
-                            <td width="48%">
-                                <el-input-number
-                                    :min="0"
-                                    :max="65535"
-                                    style="width: 100%"
-                                    controls-position="right"
-                                    v-model.number="row.containerPort"
-                                />
-                            </td>
-                            <td>
-                                <el-button link style="font-size: 10px" @click="handlePortsDelete(index)">
-                                    {{ $t('commons.button.delete') }}
-                                </el-button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="left">
-                                <el-button @click="handlePortsAdd()">{{ $t('commons.button.add') }}</el-button>
-                            </td>
-                        </tr>
-                    </table>
-                </el-card>
-            </el-form-item>
-            <el-form-item :label="$t('container.cmd')" prop="cmdStr">
-                <el-input
-                    type="textarea"
-                    :placeholder="$t('container.cmdHelper')"
-                    :autosize="{ minRows: 2, maxRows: 4 }"
-                    v-model="form.cmdStr"
-                />
-            </el-form-item>
-            <el-form-item prop="autoRemove">
-                <el-checkbox v-model="form.autoRemove">{{ $t('container.autoRemove') }}</el-checkbox>
-            </el-form-item>
-            <el-form-item :label="$t('container.cpuQuota')" prop="nanoCPUs">
-                <el-input type="number" style="width: 40%" v-model.number="form.nanoCPUs">
-                    <template #append>
-                        <el-select v-model="form.cpuUnit" disabled style="width: 65px">
-                            <el-option label="Core" value="Core" />
+        <el-form ref="formRef" label-position="top" v-loading="loading" :model="form" :rules="rules" label-width="80px">
+            <el-row type="flex" justify="center">
+                <el-col :span="22">
+                    <el-form-item :label="$t('container.name')" prop="name">
+                        <el-input clearable v-model.trim="form.name" />
+                    </el-form-item>
+                    <el-form-item :label="$t('container.image')" prop="image">
+                        <el-select style="width: 100%" filterable v-model="form.image">
+                            <el-option
+                                v-for="(item, index) of images"
+                                :key="index"
+                                :value="item.option"
+                                :label="item.option"
+                            />
                         </el-select>
-                    </template>
-                </el-input>
-                <span class="input-help">{{ $t('container.limitHelper') }}</span>
-            </el-form-item>
-            <el-form-item :label="$t('container.memoryLimit')" prop="memoryItem">
-                <el-input style="width: 40%" v-model.number="form.memoryItem">
-                    <template #append>
-                        <el-select v-model="form.memoryUnit" placeholder="Select" style="width: 65px">
-                            <el-option label="KB" value="KB" />
-                            <el-option label="MB" value="MB" />
-                            <el-option label="GB" value="GB" />
-                        </el-select>
-                    </template>
-                </el-input>
-                <span class="input-help">{{ $t('container.limitHelper') }}</span>
-            </el-form-item>
-            <el-form-item :label="$t('container.mount')">
-                <el-card style="width: 100%">
-                    <table style="width: 100%" class="tab-table">
-                        <tr v-if="form.volumes.length !== 0">
-                            <th scope="col" width="42%" align="left">
-                                <label>{{ $t('container.serverPath') }}</label>
-                            </th>
-                            <th scope="col" width="12%" align="left">
-                                <label>{{ $t('container.mode') }}</label>
-                            </th>
-                            <th scope="col" width="42%" align="left">
-                                <label>{{ $t('container.containerDir') }}</label>
-                            </th>
-                            <th align="left"></th>
-                        </tr>
-                        <tr v-for="(row, index) in form.volumes" :key="index">
-                            <td width="42%">
-                                <el-select
-                                    style="width: 100%"
-                                    allow-create
-                                    clearable
-                                    :placeholder="$t('commons.msg.inputOrSelect')"
-                                    filterable
-                                    v-model="row.sourceDir"
-                                >
-                                    <el-option
-                                        v-for="(item, indexV) of volumes"
-                                        :key="indexV"
-                                        :value="item.option"
-                                        :label="item.option"
-                                    />
+                    </el-form-item>
+                    <el-form-item :label="$t('container.port')">
+                        <el-radio-group v-model="form.publishAllPorts" class="ml-4">
+                            <el-radio :label="false">{{ $t('container.exposePort') }}</el-radio>
+                            <el-radio :label="true">{{ $t('container.exposeAll') }}</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item v-if="!form.publishAllPorts">
+                        <el-card style="width: 100%">
+                            <table style="width: 100%" class="tab-table">
+                                <tr v-if="form.exposedPorts.length !== 0">
+                                    <th scope="col" width="48%" align="left">
+                                        <label>{{ $t('container.serverPort') }}</label>
+                                    </th>
+                                    <th scope="col" width="48%" align="left">
+                                        <label>{{ $t('container.containerPort') }}</label>
+                                    </th>
+                                    <th align="left"></th>
+                                </tr>
+                                <tr v-for="(row, index) in form.exposedPorts" :key="index">
+                                    <td width="48%">
+                                        <el-input-number
+                                            :min="0"
+                                            :max="65535"
+                                            style="width: 100%"
+                                            controls-position="right"
+                                            v-model.number="row.hostPort"
+                                        />
+                                    </td>
+                                    <td width="48%">
+                                        <el-input-number
+                                            :min="0"
+                                            :max="65535"
+                                            style="width: 100%"
+                                            controls-position="right"
+                                            v-model.number="row.containerPort"
+                                        />
+                                    </td>
+                                    <td>
+                                        <el-button link style="font-size: 10px" @click="handlePortsDelete(index)">
+                                            {{ $t('commons.button.delete') }}
+                                        </el-button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="left">
+                                        <el-button @click="handlePortsAdd()">{{ $t('commons.button.add') }}</el-button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </el-card>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.cmd')" prop="cmdStr">
+                        <el-input
+                            type="textarea"
+                            :placeholder="$t('container.cmdHelper')"
+                            :autosize="{ minRows: 2, maxRows: 4 }"
+                            v-model="form.cmdStr"
+                        />
+                    </el-form-item>
+                    <el-form-item prop="autoRemove">
+                        <el-checkbox v-model="form.autoRemove">{{ $t('container.autoRemove') }}</el-checkbox>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.cpuQuota')" prop="nanoCPUs">
+                        <el-input type="number" style="width: 40%" v-model.number="form.nanoCPUs">
+                            <template #append>
+                                <el-select v-model="form.cpuUnit" disabled style="width: 65px">
+                                    <el-option label="Core" value="Core" />
                                 </el-select>
-                            </td>
-                            <td width="12%">
-                                <el-select style="width: 100%" filterable v-model="row.mode">
-                                    <el-option value="rw" :label="$t('container.modeRW')" />
-                                    <el-option value="ro" :label="$t('container.modeR')" />
+                            </template>
+                        </el-input>
+                        <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.memoryLimit')" prop="memoryItem">
+                        <el-input style="width: 40%" v-model.number="form.memoryItem">
+                            <template #append>
+                                <el-select v-model="form.memoryUnit" placeholder="Select" style="width: 65px">
+                                    <el-option label="KB" value="KB" />
+                                    <el-option label="MB" value="MB" />
+                                    <el-option label="GB" value="GB" />
                                 </el-select>
-                            </td>
-                            <td width="42%">
-                                <el-input v-model="row.containerDir" />
-                            </td>
-                            <td>
-                                <el-button link style="font-size: 10px" @click="handleVolumesDelete(index)">
-                                    {{ $t('commons.button.delete') }}
-                                </el-button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="left">
-                                <el-button @click="handleVolumesAdd()">{{ $t('commons.button.add') }}</el-button>
-                            </td>
-                        </tr>
-                    </table>
-                </el-card>
-            </el-form-item>
-            <el-form-item :label="$t('container.tag')" prop="labelsStr">
-                <el-input
-                    type="textarea"
-                    :placeholder="$t('container.tagHelper')"
-                    :autosize="{ minRows: 2, maxRows: 4 }"
-                    v-model="form.labelsStr"
-                />
-            </el-form-item>
-            <el-form-item :label="$t('container.env')" prop="envStr">
-                <el-input
-                    type="textarea"
-                    :placeholder="$t('container.tagHelper')"
-                    :autosize="{ minRows: 2, maxRows: 4 }"
-                    v-model="form.envStr"
-                />
-            </el-form-item>
-            <el-form-item :label="$t('container.restartPolicy')" prop="restartPolicy">
-                <el-radio-group v-model="form.restartPolicy">
-                    <el-radio label="unless-stopped">{{ $t('container.unlessStopped') }}</el-radio>
-                    <el-radio label="on-failure">{{ $t('container.onFailure') }}</el-radio>
-                    <el-radio label="no">{{ $t('container.no') }}</el-radio>
-                </el-radio-group>
-            </el-form-item>
+                            </template>
+                        </el-input>
+                        <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.mount')">
+                        <el-card style="width: 100%">
+                            <table style="width: 100%" class="tab-table">
+                                <tr v-if="form.volumes.length !== 0">
+                                    <th scope="col" width="42%" align="left">
+                                        <label>{{ $t('container.serverPath') }}</label>
+                                    </th>
+                                    <th scope="col" width="12%" align="left">
+                                        <label>{{ $t('container.mode') }}</label>
+                                    </th>
+                                    <th scope="col" width="42%" align="left">
+                                        <label>{{ $t('container.containerDir') }}</label>
+                                    </th>
+                                    <th align="left"></th>
+                                </tr>
+                                <tr v-for="(row, index) in form.volumes" :key="index">
+                                    <td width="42%">
+                                        <el-select
+                                            style="width: 100%"
+                                            allow-create
+                                            clearable
+                                            :placeholder="$t('commons.msg.inputOrSelect')"
+                                            filterable
+                                            v-model="row.sourceDir"
+                                        >
+                                            <el-option
+                                                v-for="(item, indexV) of volumes"
+                                                :key="indexV"
+                                                :value="item.option"
+                                                :label="item.option"
+                                            />
+                                        </el-select>
+                                    </td>
+                                    <td width="12%">
+                                        <el-select style="width: 100%" filterable v-model="row.mode">
+                                            <el-option value="rw" :label="$t('container.modeRW')" />
+                                            <el-option value="ro" :label="$t('container.modeR')" />
+                                        </el-select>
+                                    </td>
+                                    <td width="42%">
+                                        <el-input v-model="row.containerDir" />
+                                    </td>
+                                    <td>
+                                        <el-button link style="font-size: 10px" @click="handleVolumesDelete(index)">
+                                            {{ $t('commons.button.delete') }}
+                                        </el-button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="left">
+                                        <el-button @click="handleVolumesAdd()">
+                                            {{ $t('commons.button.add') }}
+                                        </el-button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </el-card>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.tag')" prop="labelsStr">
+                        <el-input
+                            type="textarea"
+                            :placeholder="$t('container.tagHelper')"
+                            :autosize="{ minRows: 2, maxRows: 4 }"
+                            v-model="form.labelsStr"
+                        />
+                    </el-form-item>
+                    <el-form-item :label="$t('container.env')" prop="envStr">
+                        <el-input
+                            type="textarea"
+                            :placeholder="$t('container.tagHelper')"
+                            :autosize="{ minRows: 2, maxRows: 4 }"
+                            v-model="form.envStr"
+                        />
+                    </el-form-item>
+                    <el-form-item :label="$t('container.restartPolicy')" prop="restartPolicy">
+                        <el-radio-group v-model="form.restartPolicy">
+                            <el-radio label="unless-stopped">{{ $t('container.unlessStopped') }}</el-radio>
+                            <el-radio label="on-failure">{{ $t('container.onFailure') }}</el-radio>
+                            <el-radio label="no">{{ $t('container.no') }}</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                </el-col>
+            </el-row>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="loading" @click="createVisiable = false">
+                <el-button :disabled="loading" @click="drawerVisiable = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
@@ -201,7 +210,7 @@ import { Container } from '@/api/interface/container';
 
 const loading = ref(false);
 
-const createVisiable = ref(false);
+const drawerVisiable = ref(false);
 const form = reactive({
     name: '',
     image: '',
@@ -226,11 +235,15 @@ const images = ref();
 const volumes = ref();
 
 const acceptParams = (): void => {
-    createVisiable.value = true;
+    drawerVisiable.value = true;
     form.restartPolicy = 'no';
     form.memoryUnit = 'MB';
     loadImageOptions();
     loadVolumeOptions();
+};
+
+const handleClose = () => {
+    drawerVisiable.value = false;
 };
 
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -306,7 +319,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 loading.value = false;
                 ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
                 emit('search');
-                createVisiable.value = false;
+                drawerVisiable.value = false;
             })
             .catch(() => {
                 loading.value = false;

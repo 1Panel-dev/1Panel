@@ -1,79 +1,77 @@
 <template>
     <div v-if="statusShow">
-        <el-card style="margin-top: 5px">
-            <el-row>
-                <el-col :span="1"><br /></el-col>
-                <el-col :span="12">
-                    <table style="margin-top: 20px; width: 100%" class="myTable">
-                        <tr>
-                            <td>uptime_in_days</td>
-                            <td>{{ redisStatus!.uptime_in_days }}</td>
-                            <td>{{ $t('database.uptimeInDays') }}</td>
-                        </tr>
-                        <tr>
-                            <td>tcp_port</td>
-                            <td>{{ redisStatus!.tcp_port }}</td>
-                            <td>{{ $t('database.tcpPort') }}</td>
-                        </tr>
-                        <tr>
-                            <td>connected_clients</td>
-                            <td>{{ redisStatus!.connected_clients }}</td>
-                            <td>{{ $t('database.connectedClients') }}</td>
-                        </tr>
-                        <tr>
-                            <td>used_memory_rss</td>
-                            <td>{{ redisStatus!.used_memory_rss }}</td>
-                            <td>{{ $t('database.usedMemoryRss') }}</td>
-                        </tr>
-                        <tr>
-                            <td>used_memory</td>
-                            <td>{{ redisStatus!.used_memory }}</td>
-                            <td>{{ $t('database.usedMemory') }}</td>
-                        </tr>
-                        <tr>
-                            <td>mem_fragmentation_ratio</td>
-                            <td>{{ redisStatus!.mem_fragmentation_ratio }}</td>
-                            <td>{{ $t('database.tmpTableToDBHelper') }}</td>
-                        </tr>
-                        <tr>
-                            <td>total_connections_received</td>
-                            <td>{{ redisStatus!.total_connections_received }}</td>
-                            <td>{{ $t('database.totalConnectionsReceived') }}</td>
-                        </tr>
-                        <tr>
-                            <td>total_commands_processed</td>
-                            <td>{{ redisStatus!.total_commands_processed }}</td>
-                            <td>{{ $t('database.totalCommandsProcessed') }}</td>
-                        </tr>
-                        <tr>
-                            <td>instantaneous_ops_per_sec</td>
-                            <td>{{ redisStatus!.instantaneous_ops_per_sec }}</td>
-                            <td>{{ $t('database.instantaneousOpsPerSec') }}</td>
-                        </tr>
-                        <tr>
-                            <td>keyspace_hits</td>
-                            <td>{{ redisStatus!.keyspace_hits }}</td>
-                            <td>{{ $t('database.keyspaceHits') }}</td>
-                        </tr>
-                        <tr>
-                            <td>keyspace_misses</td>
-                            <td>{{ redisStatus!.keyspace_misses }}</td>
-                            <td>{{ $t('database.keyspaceMisses') }}</td>
-                        </tr>
-                        <tr>
-                            <td>hit</td>
-                            <td>{{ redisStatus!.hit }}</td>
-                            <td>{{ $t('database.hit') }}</td>
-                        </tr>
-                        <tr>
-                            <td>latest_fork_usec</td>
-                            <td>{{ redisStatus!.latest_fork_usec }}</td>
-                            <td>{{ $t('database.latestForkUsec') }}</td>
-                        </tr>
-                    </table>
-                </el-col>
-            </el-row>
-        </el-card>
+        <el-row>
+            <el-col :span="1"><br /></el-col>
+            <el-col :span="12">
+                <table style="margin-top: 20px; width: 100%" class="myTable">
+                    <tr>
+                        <td>uptime_in_days</td>
+                        <td>{{ redisStatus!.uptime_in_days }}</td>
+                        <td>{{ $t('database.uptimeInDays') }}</td>
+                    </tr>
+                    <tr>
+                        <td>tcp_port</td>
+                        <td>{{ redisStatus!.tcp_port }}</td>
+                        <td>{{ $t('database.tcpPort') }}</td>
+                    </tr>
+                    <tr>
+                        <td>connected_clients</td>
+                        <td>{{ redisStatus!.connected_clients }}</td>
+                        <td>{{ $t('database.connectedClients') }}</td>
+                    </tr>
+                    <tr>
+                        <td>used_memory_rss</td>
+                        <td>{{ redisStatus!.used_memory_rss }}</td>
+                        <td>{{ $t('database.usedMemoryRss') }}</td>
+                    </tr>
+                    <tr>
+                        <td>used_memory</td>
+                        <td>{{ redisStatus!.used_memory }}</td>
+                        <td>{{ $t('database.usedMemory') }}</td>
+                    </tr>
+                    <tr>
+                        <td>mem_fragmentation_ratio</td>
+                        <td>{{ redisStatus!.mem_fragmentation_ratio }}</td>
+                        <td>{{ $t('database.tmpTableToDBHelper') }}</td>
+                    </tr>
+                    <tr>
+                        <td>total_connections_received</td>
+                        <td>{{ redisStatus!.total_connections_received }}</td>
+                        <td>{{ $t('database.totalConnectionsReceived') }}</td>
+                    </tr>
+                    <tr>
+                        <td>total_commands_processed</td>
+                        <td>{{ redisStatus!.total_commands_processed }}</td>
+                        <td>{{ $t('database.totalCommandsProcessed') }}</td>
+                    </tr>
+                    <tr>
+                        <td>instantaneous_ops_per_sec</td>
+                        <td>{{ redisStatus!.instantaneous_ops_per_sec }}</td>
+                        <td>{{ $t('database.instantaneousOpsPerSec') }}</td>
+                    </tr>
+                    <tr>
+                        <td>keyspace_hits</td>
+                        <td>{{ redisStatus!.keyspace_hits }}</td>
+                        <td>{{ $t('database.keyspaceHits') }}</td>
+                    </tr>
+                    <tr>
+                        <td>keyspace_misses</td>
+                        <td>{{ redisStatus!.keyspace_misses }}</td>
+                        <td>{{ $t('database.keyspaceMisses') }}</td>
+                    </tr>
+                    <tr>
+                        <td>hit</td>
+                        <td>{{ redisStatus!.hit }}</td>
+                        <td>{{ $t('database.hit') }}</td>
+                    </tr>
+                    <tr>
+                        <td>latest_fork_usec</td>
+                        <td>{{ redisStatus!.latest_fork_usec }}</td>
+                        <td>{{ $t('database.latestForkUsec') }}</td>
+                    </tr>
+                </table>
+            </el-col>
+        </el-row>
     </div>
 </template>
 

@@ -1,6 +1,9 @@
 <template>
     <div v-loading="loading">
-        <el-drawer v-model="drawerVisiable" :title="$t('setting.recoverDetail')">
+        <el-drawer v-model="drawerVisiable">
+            <template #header>
+                <DrawerHeader :header="$t('setting.recoverDetail')" :back="handleClose" />
+            </template>
             <el-form label-width="120px">
                 <el-card>
                     <template #header>
@@ -193,6 +196,10 @@ interface DialogProps {
 const acceptParams = (params: DialogProps): void => {
     snapInfo.value = params.snapInfo;
     drawerVisiable.value = true;
+};
+
+const handleClose = () => {
+    drawerVisiable.value = false;
 };
 
 const doRecover = async (isNew: boolean) => {

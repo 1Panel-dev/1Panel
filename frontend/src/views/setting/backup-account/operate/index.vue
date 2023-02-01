@@ -1,9 +1,7 @@
 <template>
-    <el-drawer v-model="dialogVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <div class="card-header">
-                <span>{{ title }}{{ $t('setting.backupAccount') }}</span>
-            </div>
+            <DrawerHeader :header="title + $t('setting.backupAccount')" :back="handleClose" />
         </template>
         <el-form ref="formRef" v-loading="loading" :model="dialogData.rowData" label-width="120px">
             <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
@@ -101,7 +99,7 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="loading" @click="dialogVisiable = false">
+                <el-button :disabled="loading" @click="drawerVisiable = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
@@ -137,7 +135,7 @@ interface DialogProps {
     getTableList?: () => Promise<any>;
 }
 const title = ref<string>('');
-const dialogVisiable = ref(false);
+const drawerVisiable = ref(false);
 const dialogData = ref<DialogProps>({
     title: '',
 });
@@ -151,7 +149,11 @@ const acceptParams = (params: DialogProps): void => {
         }
     }
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
-    dialogVisiable.value = true;
+    drawerVisiable.value = true;
+};
+
+const handleClose = () => {
+    drawerVisiable.value = false;
 };
 
 const loadDir = async (path: string) => {
@@ -204,7 +206,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
 
         ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
         emit('search');
-        dialogVisiable.value = false;
+        drawerVisiable.value = false;
     });
 };
 

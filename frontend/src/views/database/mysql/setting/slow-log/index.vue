@@ -14,34 +14,27 @@
             inactive-value="OFF"
             @change="handleSlowLogs"
         />
-        <div v-if="variables.slow_query_log === 'ON'" style="margin-left: 20px; float: left">
+        <div style="margin-left: 20px; float: left">
             <el-checkbox border v-model="isWatch">{{ $t('commons.button.watch') }}</el-checkbox>
         </div>
-        <el-button
-            v-if="variables.slow_query_log === 'ON'"
-            style="margin-left: 20px"
-            @click="onDownload"
-            icon="Download"
-        >
+        <el-button style="margin-left: 20px" @click="onDownload" icon="Download">
             {{ $t('file.download') }}
         </el-button>
-        <div v-if="variables.slow_query_log === 'ON'">
-            <codemirror
-                :autofocus="true"
-                placeholder="None data"
-                :indent-with-tab="true"
-                :tabSize="4"
-                style="margin-top: 10px; max-height: 500px"
-                :lineWrapping="true"
-                :matchBrackets="true"
-                theme="cobalt"
-                :styleActiveLine="true"
-                :extensions="extensions"
-                @ready="handleReady"
-                v-model="slowLogs"
-                :readOnly="true"
-            />
-        </div>
+        <codemirror
+            :autofocus="true"
+            placeholder="None data"
+            :indent-with-tab="true"
+            :tabSize="4"
+            style="margin-top: 10px; height: calc(100vh - 370px)"
+            :lineWrapping="true"
+            :matchBrackets="true"
+            theme="cobalt"
+            :styleActiveLine="true"
+            :extensions="extensions"
+            @ready="handleReady"
+            v-model="slowLogs"
+            :readOnly="true"
+        />
 
         <br />
         <ConfirmDialog @cancle="onCancle" ref="confirmDialogRef" @confirm="onSave"></ConfirmDialog>

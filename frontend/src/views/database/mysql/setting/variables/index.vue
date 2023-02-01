@@ -1,116 +1,114 @@
 <template>
     <div>
-        <el-card v-loading="loading">
-            <el-form :model="mysqlVariables" :rules="variablesRules" ref="variableFormRef" label-width="160px">
-                <el-row>
-                    <el-col :span="1"><br /></el-col>
-                    <el-col :span="9">
-                        <el-form-item :label="$t('database.optimizationScheme')">
-                            <el-select @change="changePlan" clearable v-model="plan">
-                                <el-option
-                                    v-for="item in planOptions"
-                                    :key="item.id"
-                                    :label="item.title"
-                                    :value="item.id"
-                                />
-                            </el-select>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-                <el-row>
-                    <el-col :span="1"><br /></el-col>
-                    <el-col :span="9">
-                        <el-form-item label="key_buffer_size" prop="key_buffer_size">
-                            <el-input clearable v-model.number="mysqlVariables.key_buffer_size">
-                                <template #append>MB</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('database.keyBufferSizeHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="join_buffer_size" prop="join_buffer_size">
-                            <el-input clearable v-model.number="mysqlVariables.join_buffer_size">
-                                <template #append>KB</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('database.joinBufferSizeHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="tmp_table_size" prop="tmp_table_size">
-                            <el-input clearable v-model.number="mysqlVariables.tmp_table_size">
-                                <template #append>MB</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('database.tmpTableSizeHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="innodb_buffer_pool_size" prop="innodb_buffer_pool_size">
-                            <el-input clearable v-model.number="mysqlVariables.innodb_buffer_pool_size">
-                                <template #append>MB</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('database.innodbBufferPoolSizeHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="innodb_log_buffer_size" prop="innodb_log_buffer_size">
-                            <el-input clearable v-model.number="mysqlVariables.innodb_log_buffer_size">
-                                <template #append>MB</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('database.innodbLogBufferSizeHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="sort_buffer_size" prop="sort_buffer_size">
-                            <el-input clearable v-model.number="mysqlVariables.sort_buffer_size">
-                                <template #append>KB</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('database.sortBufferSizeHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="read_buffer_size" prop="read_buffer_size">
-                            <el-input clearable v-model.number="mysqlVariables.read_buffer_size">
-                                <template #append>KB</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('database.readBufferSizeHelper') }}</span>
-                        </el-form-item>
+        <el-form :model="mysqlVariables" :rules="variablesRules" ref="variableFormRef" label-width="160px">
+            <el-row>
+                <el-col :span="1"><br /></el-col>
+                <el-col :span="9">
+                    <el-form-item :label="$t('database.optimizationScheme')">
+                        <el-select @change="changePlan" clearable v-model="plan">
+                            <el-option
+                                v-for="item in planOptions"
+                                :key="item.id"
+                                :label="item.title"
+                                :value="item.id"
+                            />
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="1"><br /></el-col>
+                <el-col :span="9">
+                    <el-form-item label="key_buffer_size" prop="key_buffer_size">
+                        <el-input clearable v-model.number="mysqlVariables.key_buffer_size">
+                            <template #append>MB</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('database.keyBufferSizeHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="join_buffer_size" prop="join_buffer_size">
+                        <el-input clearable v-model.number="mysqlVariables.join_buffer_size">
+                            <template #append>KB</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('database.joinBufferSizeHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="tmp_table_size" prop="tmp_table_size">
+                        <el-input clearable v-model.number="mysqlVariables.tmp_table_size">
+                            <template #append>MB</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('database.tmpTableSizeHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="innodb_buffer_pool_size" prop="innodb_buffer_pool_size">
+                        <el-input clearable v-model.number="mysqlVariables.innodb_buffer_pool_size">
+                            <template #append>MB</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('database.innodbBufferPoolSizeHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="innodb_log_buffer_size" prop="innodb_log_buffer_size">
+                        <el-input clearable v-model.number="mysqlVariables.innodb_log_buffer_size">
+                            <template #append>MB</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('database.innodbLogBufferSizeHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="sort_buffer_size" prop="sort_buffer_size">
+                        <el-input clearable v-model.number="mysqlVariables.sort_buffer_size">
+                            <template #append>KB</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('database.sortBufferSizeHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="read_buffer_size" prop="read_buffer_size">
+                        <el-input clearable v-model.number="mysqlVariables.read_buffer_size">
+                            <template #append>KB</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('database.readBufferSizeHelper') }}</span>
+                    </el-form-item>
 
-                        <el-form-item>
-                            <el-button :disabled="loading" @click="onSaveStart(variableFormRef)" type="primary">
-                                {{ $t('commons.button.save') }}
-                            </el-button>
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span="2"><br /></el-col>
-                    <el-col :span="9">
-                        <el-form-item label="read_rnd_buffer_size" prop="read_rnd_buffer_size">
-                            <el-input clearable v-model.number="mysqlVariables.read_rnd_buffer_size">
-                                <template #append>KB</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('database.readRndBufferSizeHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item v-if="mysqlVersion === '5.7.39'" label="query_cache_size" prop="query_cache_size">
-                            <el-input clearable v-model.number="mysqlVariables.query_cache_size">
-                                <template #append>MB</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('database.queryCacheSizeHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="thread_stack" prop="thread_stack">
-                            <el-input clearable v-model.number="mysqlVariables.thread_stack">
-                                <template #append>KB</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('database.threadStackelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="binlog_cache_size" prop="binlog_cache_size">
-                            <el-input clearable v-model.number="mysqlVariables.binlog_cache_size">
-                                <template #append>KB</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('database.binlogCacheSizeHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="thread_cache_size" prop="thread_cache_size">
-                            <el-input clearable v-model.number="mysqlVariables.thread_cache_size" />
-                            <span class="input-help">{{ $t('database.threadCacheSizeHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="table_open_cache" prop="table_open_cache">
-                            <el-input clearable v-model.number="mysqlVariables.table_open_cache" />
-                            <span class="input-help">{{ $t('database.tableOpenCacheHelper') }}</span>
-                        </el-form-item>
-                        <el-form-item label="max_connections" prop="max_connections">
-                            <el-input clearable v-model.number="mysqlVariables.max_connections" />
-                            <span class="input-help">{{ $t('database.maxConnectionsHelper') }}</span>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-        </el-card>
+                    <el-form-item>
+                        <el-button :disabled="loading" @click="onSaveStart(variableFormRef)" type="primary">
+                            {{ $t('commons.button.save') }}
+                        </el-button>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="2"><br /></el-col>
+                <el-col :span="9">
+                    <el-form-item label="read_rnd_buffer_size" prop="read_rnd_buffer_size">
+                        <el-input clearable v-model.number="mysqlVariables.read_rnd_buffer_size">
+                            <template #append>KB</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('database.readRndBufferSizeHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item v-if="mysqlVersion === '5.7.39'" label="query_cache_size" prop="query_cache_size">
+                        <el-input clearable v-model.number="mysqlVariables.query_cache_size">
+                            <template #append>MB</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('database.queryCacheSizeHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="thread_stack" prop="thread_stack">
+                        <el-input clearable v-model.number="mysqlVariables.thread_stack">
+                            <template #append>KB</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('database.threadStackelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="binlog_cache_size" prop="binlog_cache_size">
+                        <el-input clearable v-model.number="mysqlVariables.binlog_cache_size">
+                            <template #append>KB</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('database.binlogCacheSizeHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="thread_cache_size" prop="thread_cache_size">
+                        <el-input clearable v-model.number="mysqlVariables.thread_cache_size" />
+                        <span class="input-help">{{ $t('database.threadCacheSizeHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="table_open_cache" prop="table_open_cache">
+                        <el-input clearable v-model.number="mysqlVariables.table_open_cache" />
+                        <span class="input-help">{{ $t('database.tableOpenCacheHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="max_connections" prop="max_connections">
+                        <el-input clearable v-model.number="mysqlVariables.max_connections" />
+                        <span class="input-help">{{ $t('database.maxConnectionsHelper') }}</span>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+        </el-form>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSaveVariables"></ConfirmDialog>
     </div>

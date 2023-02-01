@@ -1,83 +1,89 @@
 <template>
-    <div class="demo-collapse" v-show="onSetting">
-        <el-card style="margin-top: 5px" v-loading="loading">
-            <LayoutContent :header="'Mysql ' + $t('database.setting')" :back-name="'Mysql'" :reload="true">
-                <el-collapse v-model="activeName" @change="handleCollapse" accordion>
-                    <el-collapse-item :title="$t('database.confChange')" name="1">
-                        <codemirror
-                            :autofocus="true"
-                            placeholder="None data"
-                            :indent-with-tab="true"
-                            :tabSize="4"
-                            style="margin-top: 10px; max-height: 500px"
-                            :lineWrapping="true"
-                            :matchBrackets="true"
-                            theme="cobalt"
-                            :styleActiveLine="true"
-                            :extensions="extensions"
-                            v-model="mysqlConf"
-                            :readOnly="true"
-                        />
-                        <el-button style="margin-top: 10px" @click="getDefaultConfig()">
-                            {{ $t('app.defaultConfig') }}
-                        </el-button>
-                        <el-button type="primary" style="margin-top: 10px" @click="onSaveConf">
-                            {{ $t('commons.button.save') }}
-                        </el-button>
+    <div v-show="onSetting">
+        <LayoutContent :title="$t('nginx.nginxConfig')" :reload="true">
+            <template #buttons>
+                <el-button type="primary" :plain="activeName !== 'conf'" @click="changeTab('conf')">
+                    {{ $t('database.confChange') }}
+                </el-button>
+                <el-button type="primary" :plain="activeName !== 'status'" @click="changeTab('status')">
+                    {{ $t('database.currentStatus') }}
+                </el-button>
+                <el-button type="primary" :plain="activeName !== 'tuning'" @click="changeTab('tuning')">
+                    {{ $t('database.performanceTuning') }}
+                </el-button>
+                <el-button type="primary" :plain="activeName !== 'port'" @click="changeTab('port')">
+                    {{ $t('database.portSetting') }}
+                </el-button>
+                <el-button type="primary" :plain="activeName !== 'log'" @click="changeTab('log')">
+                    {{ $t('database.log') }}
+                </el-button>
+                <el-button
+                    type="primary"
+                    :disabled="mysqlStatus !== 'Running'"
+                    :plain="activeName !== 'slowLog'"
+                    @click="changeTab('slowLog')"
+                >
+                    {{ $t('database.slowLog') }}
+                </el-button>
+            </template>
+            <template #main>
+                <div v-if="activeName === 'conf'">
+                    <codemirror
+                        :autofocus="true"
+                        placeholder="None data"
+                        :indent-with-tab="true"
+                        :tabSize="4"
+                        style="margin-top: 10px; height: calc(100vh - 360px)"
+                        :lineWrapping="true"
+                        :matchBrackets="true"
+                        theme="cobalt"
+                        :styleActiveLine="true"
+                        :extensions="extensions"
+                        v-model="mysqlConf"
+                        :readOnly="true"
+                    />
+                    <el-button style="margin-top: 10px" @click="getDefaultConfig()">
+                        {{ $t('app.defaultConfig') }}
+                    </el-button>
+                    <el-button type="primary" style="margin-top: 10px" @click="onSaveConf">
+                        {{ $t('commons.button.save') }}
+                    </el-button>
+                    <el-row>
+                        <el-col :span="8">
+                            <el-alert
+                                v-if="useOld"
+                                style="margin-top: 10px"
+                                :title="$t('app.defaultConfigHelper')"
+                                type="info"
+                                :closable="false"
+                            ></el-alert>
+                        </el-col>
+                    </el-row>
+                </div>
+                <Status v-if="activeName === 'status'" ref="statusRef" />
+                <Variables v-if="activeName === 'tuning'" ref="variablesRef" />
+                <div v-if="activeName === 'port'">
+                    <el-form :model="baseInfo" ref="panelFormRef" label-width="120px">
                         <el-row>
-                            <el-col :span="8">
-                                <el-alert
-                                    v-if="useOld"
-                                    style="margin-top: 10px"
-                                    :title="$t('app.defaultConfigHelper')"
-                                    type="info"
-                                    :closable="false"
-                                ></el-alert>
+                            <el-col :span="1"><br /></el-col>
+                            <el-col :span="10">
+                                <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
+                                    <el-input clearable type="number" v-model.number="baseInfo.port">
+                                        <template #append>
+                                            <el-button @click="onSavePort(panelFormRef)" icon="Collection">
+                                                {{ $t('commons.button.save') }}
+                                            </el-button>
+                                        </template>
+                                    </el-input>
+                                </el-form-item>
                             </el-col>
                         </el-row>
-                    </el-collapse-item>
-                    <el-collapse-item
-                        :disabled="mysqlStatus !== 'Running'"
-                        :title="$t('database.currentStatus')"
-                        name="2"
-                    >
-                        <Status ref="statusRef" />
-                    </el-collapse-item>
-                    <el-collapse-item
-                        :disabled="mysqlStatus !== 'Running'"
-                        :title="$t('database.performanceTuning')"
-                        name="3"
-                    >
-                        <Variables ref="variablesRef" />
-                    </el-collapse-item>
-                    <el-collapse-item :title="$t('database.portSetting')" name="4">
-                        <el-form :model="baseInfo" ref="panelFormRef" label-width="120px">
-                            <el-row>
-                                <el-col :span="1"><br /></el-col>
-                                <el-col :span="10">
-                                    <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
-                                        <el-input clearable type="number" v-model.number="baseInfo.port">
-                                            <template #append>
-                                                <el-button @click="onSavePort(panelFormRef)" icon="Collection">
-                                                    {{ $t('commons.button.save') }}
-                                                </el-button>
-                                            </template>
-                                        </el-input>
-                                    </el-form-item>
-                                </el-col>
-                            </el-row>
-                        </el-form>
-                    </el-collapse-item>
-                    <el-collapse-item :title="$t('database.log')" name="5">
-                        <ContainerLog ref="dialogContainerLogRef" />
-                    </el-collapse-item>
-
-                    <el-collapse-item :disabled="mysqlStatus !== 'Running'" :title="$t('database.slowLog')" name="6">
-                        <SlowLog ref="slowLogRef" />
-                    </el-collapse-item>
-                </el-collapse>
-            </LayoutContent>
-        </el-card>
+                    </el-form>
+                </div>
+                <ContainerLog v-if="activeName === 'log'" ref="dialogContainerLogRef" />
+                <SlowLog v-if="activeName === 'slowLog'" ref="slowLogRef" />
+            </template>
+        </LayoutContent>
 
         <ConfirmDialog ref="confirmPortRef" @confirm="onSubmitChangePort"></ConfirmDialog>
         <ConfirmDialog ref="confirmConfRef" @confirm="onSubmitChangeConf"></ConfirmDialog>
@@ -106,7 +112,7 @@ import { loadBaseDir } from '@/api/modules/setting';
 const loading = ref(false);
 
 const extensions = [javascript(), oneDark];
-const activeName = ref('1');
+const activeName = ref('conf');
 
 const baseInfo = reactive({
     name: '',
@@ -152,7 +158,8 @@ const onClose = (): void => {
     onSetting.value = false;
 };
 
-const handleCollapse = async (val: string) => {
+const changeTab = (val: string) => {
+    activeName.value = val;
     if (val !== '5') {
         dialogContainerLogRef.value!.onCloseLog();
     }
@@ -160,6 +167,7 @@ const handleCollapse = async (val: string) => {
         slowLogRef.value!.onCloseLog();
     }
 };
+
 const onSubmitChangePort = async () => {
     let params = {
         key: 'mysql',
