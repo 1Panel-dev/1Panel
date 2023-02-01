@@ -10,6 +10,7 @@ declare module 'vue' {
     AppLayout: typeof import('./src/components/app-layout/index.vue')['default']
     AppStatus: typeof import('./src/components/app-status/index.vue')['default']
     BackButton: typeof import('./src/components/back-button/index.vue')['default']
+    Bread: typeof import('./src/components/bread-crumbs/bread.vue')['default']
     BreadCrumbs: typeof import('./src/components/bread-crumbs/index.vue')['default']
     BreadCrumbsItem: typeof import('./src/components/bread-crumbs/bread-crumbs-item.vue')['default']
     CardWithHeader: typeof import('./src/components/card-with-header/index.vue')['default']
