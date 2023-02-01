@@ -79,7 +79,7 @@ export default {
             infoTitle: '提示',
             notRecords: '当前任务未产生执行记录',
             sureLogOut: '您是否确认退出登录?',
-            createSuccess: '新建成功',
+            createSuccess: '创建成功',
             updateSuccess: '更新成功',
             uploadSuccess: '上传成功',
             operate: '操作',
@@ -245,7 +245,7 @@ export default {
     database: {
         delete: '删除操作无法回滚，请输入 "',
         deleteHelper: '" 删除此数据库',
-        create: '新建数据库',
+        create: '创建数据库',
         noMysql: '当前未检测到 {0} 数据库，请进入应用商店点击安装！',
         mysqlBadStatus: '当前 mysql 应用状态异常，请在',
         adjust: '中查看原因或修改配置',
@@ -269,7 +269,6 @@ export default {
         portSetting: '端口',
         portHelper: '该端口为容器对外暴露端口，修改需要单独保存并且重启容器！',
 
-        baseSetting: '基础设置',
         confChange: '配置修改',
 
         unSupportType: '不支持当前文件类型！',
@@ -746,7 +745,7 @@ export default {
 
         snapshot: '快照',
         recoverDetail: '恢复详情',
-        createSnapshot: '新建快照',
+        createSnapshot: '创建快照',
         recover: '恢复',
         noRecoverRecord: '暂无恢复记录',
         lastRecoverAt: '上次恢复时间',
@@ -890,7 +889,7 @@ export default {
         remark: '备注',
         group: '分组',
         groupSetting: '分组管理',
-        createGroup: '新建分组',
+        createGroup: '创建分组',
         app: '应用',
         appNew: '新装应用',
         appInstalled: '已装应用',
@@ -923,7 +922,7 @@ export default {
         check: '查看',
         acmeAccountManage: 'Acme 账户',
         email: '邮箱',
-        addAccount: '新建账户',
+        addAccount: '创建账户',
         acmeAccount: 'Acme 账户',
         provider: '验证方式',
         dnsCommon: '手动解析',
@@ -1052,7 +1051,7 @@ export default {
         saveAndReload: '保存并重载',
     },
     ssl: {
-        create: '新建证书',
+        create: '创建证书',
         provider: '类型',
         manualCreate: '手动创建',
         acmeAccount: 'Acme 账号',
@@ -1072,7 +1071,7 @@ export default {
         autoRenewHelper: '距离到期时间7天自动续签',
         renewSuccess: '续签成功',
         renewWebsite: '该证书已经和以下网站关联，续签会同步应用到这些网站',
-        createAcme: '新建账户',
+        createAcme: '创建账户',
     },
     firewall: {
         ccDeny: 'CC 防护',

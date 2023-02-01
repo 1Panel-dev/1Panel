@@ -1,6 +1,14 @@
 <template>
     <div>
-        <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('setting.snapshot')" :divider="true">
+        <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('setting.snapshot')">
+            <template #toolbar>
+                <el-button type="primary" @click="onCreate()">
+                    {{ $t('setting.createSnapshot') }}
+                </el-button>
+                <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
+            </template>
             <template #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
@@ -9,14 +17,6 @@
                     style="margin-top: 20px"
                     @search="search"
                 >
-                    <template #toolbar>
-                        <el-button type="primary" icon="Plus" @click="onCreate()">
-                            {{ $t('setting.createSnapshot') }}
-                        </el-button>
-                        <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete(null)">
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
-                    </template>
                     <el-table-column type="selection" fix />
                     <el-table-column
                         show-overflow-tooltip
@@ -72,20 +72,31 @@
             <template #header>
                 <DrawerHeader :header="$t('setting.createSnapshot')" :back="handleClose" />
             </template>
-            <el-form v-loading="loading" ref="snapRef" label-width="100px" :model="snapInfo" :rules="rules">
-                <el-form-item :label="$t('cronjob.target')" prop="from">
-                    <el-select v-model="snapInfo.from" clearable>
-                        <el-option
-                            v-for="item in backupOptions"
-                            :key="item.label"
-                            :value="item.value"
-                            :label="item.label"
-                        />
-                    </el-select>
-                </el-form-item>
-                <el-form-item :label="$t('commons.table.description')" prop="description">
-                    <el-input type="textarea" clearable v-model="snapInfo.description" />
-                </el-form-item>
+            <el-form
+                v-loading="loading"
+                label-position="top"
+                ref="snapRef"
+                label-width="100px"
+                :model="snapInfo"
+                :rules="rules"
+            >
+                <el-row type="flex" justify="center">
+                    <el-col :span="22">
+                        <el-form-item :label="$t('cronjob.target')" prop="from">
+                            <el-select v-model="snapInfo.from" clearable>
+                                <el-option
+                                    v-for="item in backupOptions"
+                                    :key="item.label"
+                                    :value="item.value"
+                                    :label="item.label"
+                                />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item :label="$t('commons.table.description')" prop="description">
+                            <el-input type="textarea" clearable v-model="snapInfo.description" />
+                        </el-form-item>
+                    </el-col>
+                </el-row>
             </el-form>
             <template #footer>
                 <span class="dialog-footer">

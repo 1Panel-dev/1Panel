@@ -1,6 +1,6 @@
 <template>
     <div v-show="onSetting">
-        <LayoutContent :title="$t('nginx.nginxConfig')" :reload="true">
+        <LayoutContent :title="'Mysql ' + $t('database.setting')" :reload="true">
             <template #buttons>
                 <el-button type="primary" :plain="activeName !== 'conf'" @click="changeTab('conf')">
                     {{ $t('database.confChange') }}
@@ -33,7 +33,7 @@
                         placeholder="None data"
                         :indent-with-tab="true"
                         :tabSize="4"
-                        style="margin-top: 10px; height: calc(100vh - 360px)"
+                        style="margin-top: 10px; height: calc(100vh - 375px)"
                         :lineWrapping="true"
                         :matchBrackets="true"
                         theme="cobalt"

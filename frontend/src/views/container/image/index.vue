@@ -10,13 +10,13 @@
 
         <LayoutContent v-loading="loading" :title="$t('container.image')" :class="{ mask: dockerStatus != 'Running' }">
             <template #toolbar>
-                <el-button @click="onOpenPull">
+                <el-button type="primary" plain @click="onOpenPull">
                     {{ $t('container.imagePull') }}
                 </el-button>
-                <el-button @click="onOpenload">
+                <el-button type="primary" plain @click="onOpenload">
                     {{ $t('container.importImage') }}
                 </el-button>
-                <el-button @click="onOpenBuild">
+                <el-button type="primary" plain @click="onOpenBuild">
                     {{ $t('container.build') }}
                 </el-button>
             </template>

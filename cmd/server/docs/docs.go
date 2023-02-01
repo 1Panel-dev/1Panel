@@ -881,16 +881,13 @@ var doc = `{
         },
         "/auth/status": {
             "get": {
-                "description": "获取系统安全登录状态",
+                "description": "判断是否为首次登录",
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Load safety status",
+                "summary": "Check is First login",
                 "responses": {
                     "200": {
-                        "description": ""
-                    },
-                    "402": {
                         "description": ""
                     }
                 }
@@ -1632,6 +1629,31 @@ var doc = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/dto.DaemonJsonConf"
+                        }
+                    }
+                }
+            }
+        },
+        "/containers/daemonjson/file": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 docker 配置信息(表单)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container Docker"
+                ],
+                "summary": "Load docker daemon.json",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -6230,6 +6252,25 @@ var doc = `{
                 }
             }
         },
+        "/settings/search/available": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取系统可用状态",
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Load system available status",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/settings/snapshot": {
             "post": {
                 "security": [
@@ -10553,14 +10594,17 @@ var doc = `{
         "model.App": {
             "type": "object",
             "properties": {
-                "author": {
-                    "type": "string"
-                },
                 "createdAt": {
                     "type": "string"
                 },
                 "crossVersionUpdate": {
                     "type": "boolean"
+                },
+                "document": {
+                    "type": "string"
+                },
+                "github": {
+                    "type": "string"
                 },
                 "icon": {
                     "type": "string"
@@ -10583,9 +10627,6 @@ var doc = `{
                 "shortDesc": {
                     "type": "string"
                 },
-                "source": {
-                    "type": "string"
-                },
                 "status": {
                     "type": "string"
                 },
@@ -10593,6 +10634,9 @@ var doc = `{
                     "type": "string"
                 },
                 "updatedAt": {
+                    "type": "string"
+                },
+                "website": {
                     "type": "string"
                 }
             }
@@ -10981,8 +11025,20 @@ var doc = `{
                 "pageSize": {
                     "type": "integer"
                 },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "type": {
                     "type": "string"
+                },
+                "unused": {
+                    "type": "boolean"
+                },
+                "update": {
+                    "type": "boolean"
                 }
             }
         },
@@ -11852,14 +11908,17 @@ var doc = `{
         "response.AppDTO": {
             "type": "object",
             "properties": {
-                "author": {
-                    "type": "string"
-                },
                 "createdAt": {
                     "type": "string"
                 },
                 "crossVersionUpdate": {
                     "type": "boolean"
+                },
+                "document": {
+                    "type": "string"
+                },
+                "github": {
+                    "type": "string"
                 },
                 "icon": {
                     "type": "string"
@@ -11882,9 +11941,6 @@ var doc = `{
                 "shortDesc": {
                     "type": "string"
                 },
-                "source": {
-                    "type": "string"
-                },
                 "status": {
                     "type": "string"
                 },
@@ -11905,6 +11961,9 @@ var doc = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "website": {
+                    "type": "string"
                 }
             }
         },

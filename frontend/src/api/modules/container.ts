@@ -130,6 +130,9 @@ export const dockerOperate = (params: Container.DockerOperate) => {
 export const loadDaemonJson = () => {
     return http.get<Container.DaemonJsonConf>(`/containers/daemonjson`);
 };
+export const loadDaemonJsonFile = () => {
+    return http.get<string>(`/containers/daemonjson/file`);
+};
 export const loadDockerStatus = () => {
     return http.get<string>(`/containers/docker/status`);
 };

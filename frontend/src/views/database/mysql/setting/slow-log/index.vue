@@ -1,12 +1,12 @@
 <template>
     <div v-loading="loading">
-        <span style="float: left">{{ $t('database.longQueryTime') }}</span>
+        <span style="float: left; line-height: 30px">{{ $t('database.longQueryTime') }}</span>
         <div style="margin-left: 5px; float: left">
             <el-input type="number" v-model.number="variables.long_query_time">
                 <template #append>{{ $t('database.second') }}</template>
             </el-input>
         </div>
-        <span style="float: left; margin-left: 20px">{{ $t('database.isOn') }}</span>
+        <span style="float: left; margin-left: 20px; line-height: 30px">{{ $t('database.isOn') }}</span>
         <el-switch
             style="margin-left: 5px; float: left"
             v-model="variables.slow_query_log"
@@ -25,7 +25,7 @@
             placeholder="None data"
             :indent-with-tab="true"
             :tabSize="4"
-            style="margin-top: 10px; height: calc(100vh - 370px)"
+            style="margin-top: 10px; height: calc(100vh - 392px)"
             :lineWrapping="true"
             :matchBrackets="true"
             theme="cobalt"

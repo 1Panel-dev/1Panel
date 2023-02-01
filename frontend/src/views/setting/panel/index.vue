@@ -31,36 +31,6 @@
                                     </template>
                                 </el-input>
                             </el-form-item>
-
-                            <!-- <el-form-item :label="$t('setting.panelPort')" :rules="Rules.port" prop="serverPort">
-                                <el-input clearable v-model.number="form.serverPort">
-                                    <template #append>
-                                        <el-button
-                                            @click="onSavePort(panelFormRef, 'ServerPort', form.serverPort)"
-                                            icon="Collection"
-                                        >
-                                            {{ $t('commons.button.save') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item> -->
-
-                            <el-form-item :label="$t('setting.theme')" :rules="Rules.requiredSelect" prop="theme">
-                                <el-radio-group
-                                    @change="onSave(panelFormRef, 'Theme', form.theme)"
-                                    v-model="form.theme"
-                                >
-                                    <el-radio-button label="light">
-                                        <el-icon><Sunny /></el-icon>
-                                        {{ $t('setting.light') }}
-                                    </el-radio-button>
-                                    <el-radio-button label="dark">
-                                        <el-icon><Moon /></el-icon>
-                                        {{ $t('setting.dark') }}
-                                    </el-radio-button>
-                                </el-radio-group>
-                            </el-form-item>
-
                             <el-form-item :label="$t('setting.language')" :rules="Rules.requiredSelect" prop="language">
                                 <el-radio-group
                                     style="width: 100%"
@@ -70,11 +40,6 @@
                                     <el-radio label="zh">中文</el-radio>
                                     <el-radio label="en">English</el-radio>
                                 </el-radio-group>
-                                <div>
-                                    <span class="input-help">
-                                        {{ $t('setting.languageHelper') }}
-                                    </span>
-                                </div>
                             </el-form-item>
 
                             <el-form-item

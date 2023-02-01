@@ -2,9 +2,7 @@
     <div>
         <el-drawer v-model="upVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
-                <div class="card-header">
-                    <span>{{ $t('commons.button.import') }}</span>
-                </div>
+                <DrawerHeader :header="$t('commons.button.import')" :back="handleClose" />
             </template>
             <el-upload
                 ref="uploadRef"
@@ -31,7 +29,6 @@
                 <template #toolbar>
                     <el-button
                         style="margin-left: 10px"
-                        type="danger"
                         plain
                         :disabled="selects.length === 0"
                         @click="onBatchDelete(null)"

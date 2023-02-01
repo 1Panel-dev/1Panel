@@ -2,16 +2,14 @@
     <div>
         <el-drawer v-model="backupVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
-                <div class="card-header">
-                    <span>{{ $t('database.backup') }} - {{ dbName }}</span>
-                </div>
+                <DrawerHeader :header="$t('database.backup')" :resource="dbName" :back="handleClose" />
             </template>
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" @search="search" :data="data">
                 <template #toolbar>
                     <el-button type="primary" @click="onBackup()">
                         {{ $t('database.backup') }}
                     </el-button>
-                    <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                    <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </template>
@@ -63,6 +61,9 @@ const acceptParams = (params: DialogProps): void => {
     dbName.value = params.dbName;
     backupVisiable.value = true;
     search();
+};
+const handleClose = () => {
+    backupVisiable.value = false;
 };
 
 const search = async () => {

@@ -1,13 +1,13 @@
 <template>
     <el-drawer
         v-model="drawerVisiable"
-        @close="onCloseLog"
         :destroy-on-close="true"
+        @close="onCloseLog"
         :close-on-click-modal="false"
         size="50%"
     >
         <template #header>
-            <DrawerHeader :header="$t('container.imagePush')" :back="handleClose" />
+            <DrawerHeader :header="$t('container.imagePush')" :back="onCloseLog" />
         </template>
         <el-row type="flex" justify="center">
             <el-col :span="22">
@@ -116,10 +116,6 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
-const handleClose = () => {
-    drawerVisiable.value = false;
-};
-
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
@@ -154,6 +150,7 @@ const onCloseLog = async () => {
     emit('search');
     clearInterval(Number(timer));
     timer = null;
+    drawerVisiable.value = false;
 };
 
 function loadDetailInfo(id: number) {

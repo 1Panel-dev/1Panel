@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <LayoutContent :title="'Mysql ' + $t('menu.database')">
+        <LayoutContent :title="'Mysql ' + $t('menu.database')" :class="{ mask: mysqlStatus != 'Running' }">
             <template #app>
                 <AppStatus
                     :app-key="'mysql'"
@@ -82,15 +82,17 @@
                         fix
                     />
                 </ComplexTable>
-                <el-card
-                    width="30%"
-                    v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist && !loading"
-                    class="mask-prompt"
-                >
-                    <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['Mysql']) }}</span>
-                </el-card>
             </template>
         </LayoutContent>
+
+        <el-card
+            width="30%"
+            v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist && !loading"
+            class="mask-prompt"
+        >
+            <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['Mysql']) }}</span>
+        </el-card>
+
         <Setting ref="settingRef" style="margin-top: 20px" />
         <el-dialog v-model="changeVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
             <template #header>

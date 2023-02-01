@@ -3,130 +3,148 @@
         <template #header>
             <DrawerHeader :header="$t('cronjob.cronTask')" :back="handleClose" />
         </template>
-        <el-form ref="formRef" :model="dialogData.rowData" label-position="left" :rules="rules" label-width="120px">
-            <el-form-item :label="$t('cronjob.taskType')" prop="type">
-                <el-select style="width: 100%" v-model="dialogData.rowData!.type">
-                    <el-option value="shell" :label="$t('cronjob.shell')" />
-                    <el-option value="website" :label="$t('cronjob.website')" />
-                    <el-option value="database" :label="$t('cronjob.database')" />
-                    <el-option value="directory" :label="$t('cronjob.directory')" />
-                    <el-option value="curl" :label="$t('cronjob.curl') + ' URL'" />
-                </el-select>
-            </el-form-item>
+        <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules" label-width="120px">
+            <el-row type="flex" justify="center">
+                <el-col :span="22">
+                    <el-form-item :label="$t('cronjob.taskType')" prop="type">
+                        <el-select style="width: 100%" v-model="dialogData.rowData!.type">
+                            <el-option value="shell" :label="$t('cronjob.shell')" />
+                            <el-option value="website" :label="$t('cronjob.website')" />
+                            <el-option value="database" :label="$t('cronjob.database')" />
+                            <el-option value="directory" :label="$t('cronjob.directory')" />
+                            <el-option value="curl" :label="$t('cronjob.curl') + ' URL'" />
+                        </el-select>
+                    </el-form-item>
 
-            <el-form-item :label="$t('cronjob.taskName')" prop="name">
-                <el-input style="width: 100%" clearable v-model.trim="dialogData.rowData!.name" />
-            </el-form-item>
+                    <el-form-item :label="$t('cronjob.taskName')" prop="name">
+                        <el-input style="width: 100%" clearable v-model.trim="dialogData.rowData!.name" />
+                    </el-form-item>
 
-            <el-form-item :label="$t('cronjob.cronSpec')" prop="spec">
-                <el-select style="width: 20%" v-model="dialogData.rowData!.specType">
-                    <el-option v-for="item in specOptions" :key="item.label" :value="item.value" :label="item.label" />
-                </el-select>
-                <el-select
-                    v-if="dialogData.rowData!.specType === 'perWeek'"
-                    style="width: 12%; margin-left: 20px"
-                    v-model="dialogData.rowData!.week"
-                >
-                    <el-option v-for="item in weekOptions" :key="item.label" :value="item.value" :label="item.label" />
-                </el-select>
-                <el-input
-                    v-if="dialogData.rowData!.specType === 'perMonth' || dialogData.rowData!.specType === 'perNDay'"
-                    style="width: 20%; margin-left: 20px"
-                    v-model.number="dialogData.rowData!.day"
-                >
-                    <template #append>{{ $t('cronjob.day') }}</template>
-                </el-input>
-                <el-input
-                    v-if="dialogData.rowData!.specType !== 'perHour' && dialogData.rowData!.specType !== 'perNMinute'"
-                    style="width: 20%; margin-left: 20px"
-                    v-model.number="dialogData.rowData!.hour"
-                >
-                    <template #append>{{ $t('cronjob.hour') }}</template>
-                </el-input>
-                <el-input style="width: 20%; margin-left: 20px" v-model.number="dialogData.rowData!.minute">
-                    <template #append>{{ $t('cronjob.minute') }}</template>
-                </el-input>
-            </el-form-item>
+                    <el-form-item :label="$t('cronjob.cronSpec')" prop="spec">
+                        <el-select style="width: 20%" v-model="dialogData.rowData!.specType">
+                            <el-option
+                                v-for="item in specOptions"
+                                :key="item.label"
+                                :value="item.value"
+                                :label="item.label"
+                            />
+                        </el-select>
+                        <el-select
+                            v-if="dialogData.rowData!.specType === 'perWeek'"
+                            style="width: 12%; margin-left: 20px"
+                            v-model="dialogData.rowData!.week"
+                        >
+                            <el-option
+                                v-for="item in weekOptions"
+                                :key="item.label"
+                                :value="item.value"
+                                :label="item.label"
+                            />
+                        </el-select>
+                        <el-input
+                            v-if="dialogData.rowData!.specType === 'perMonth' || dialogData.rowData!.specType === 'perNDay'"
+                            style="width: 20%; margin-left: 20px"
+                            v-model.number="dialogData.rowData!.day"
+                        >
+                            <template #append>{{ $t('cronjob.day') }}</template>
+                        </el-input>
+                        <el-input
+                            v-if="dialogData.rowData!.specType !== 'perHour' && dialogData.rowData!.specType !== 'perNMinute'"
+                            style="width: 20%; margin-left: 20px"
+                            v-model.number="dialogData.rowData!.hour"
+                        >
+                            <template #append>{{ $t('cronjob.hour') }}</template>
+                        </el-input>
+                        <el-input style="width: 20%; margin-left: 20px" v-model.number="dialogData.rowData!.minute">
+                            <template #append>{{ $t('cronjob.minute') }}</template>
+                        </el-input>
+                    </el-form-item>
 
-            <el-form-item v-if="hasScript()" :label="$t('cronjob.shellContent')" prop="script">
-                <el-input
-                    style="width: 100%"
-                    clearable
-                    type="textarea"
-                    :autosize="{ minRows: 3, maxRows: 6 }"
-                    v-model="dialogData.rowData!.script"
-                />
-            </el-form-item>
-
-            <el-form-item v-if="dialogData.rowData!.type === 'website'" :label="$t('cronjob.website')" prop="website">
-                <el-select style="width: 100%" v-model="dialogData.rowData!.website">
-                    <el-option v-for="item in websiteOptions" :key="item" :value="item" :label="item" />
-                </el-select>
-            </el-form-item>
-
-            <div v-if="dialogData.rowData!.type === 'database'">
-                <el-form-item :label="$t('cronjob.database')" prop="dbName">
-                    <el-select style="width: 100%" clearable v-model="dialogData.rowData!.dbName">
-                        <el-option v-for="item in mysqlInfo.dbNames" :key="item" :label="item" :value="item" />
-                    </el-select>
-                </el-form-item>
-            </div>
-
-            <el-form-item
-                v-if="dialogData.rowData!.type === 'directory'"
-                :label="$t('cronjob.sourceDir')"
-                prop="sourceDir"
-            >
-                <el-input style="width: 100%" disabled v-model="dialogData.rowData!.sourceDir">
-                    <template #append>
-                        <FileList @choose="loadDir" :dir="true"></FileList>
-                    </template>
-                </el-input>
-            </el-form-item>
-
-            <div v-if="isBackup()">
-                <el-form-item :label="$t('cronjob.target')" prop="targetDirID">
-                    <el-select style="width: 100%" v-model="dialogData.rowData!.targetDirID">
-                        <el-option
-                            v-for="item in backupOptions"
-                            :key="item.label"
-                            :value="item.value"
-                            :label="item.label"
+                    <el-form-item v-if="hasScript()" :label="$t('cronjob.shellContent')" prop="script">
+                        <el-input
+                            style="width: 100%"
+                            clearable
+                            type="textarea"
+                            :autosize="{ minRows: 3, maxRows: 6 }"
+                            v-model="dialogData.rowData!.script"
                         />
-                    </el-select>
-                </el-form-item>
-                <el-form-item v-if="dialogData.rowData!.targetDirID !== localDirID">
-                    <el-checkbox v-model="dialogData.rowData!.keepLocal">
-                        {{ $t('cronjob.saveLocal') }}
-                    </el-checkbox>
-                </el-form-item>
-                <el-form-item :label="$t('cronjob.retainCopies')" prop="retainCopies">
-                    <el-input-number
-                        :min="1"
-                        :max="30"
-                        v-model.number="dialogData.rowData!.retainCopies"
-                    ></el-input-number>
-                </el-form-item>
-            </div>
+                    </el-form-item>
 
-            <el-form-item v-if="dialogData.rowData!.type === 'curl'" :label="$t('cronjob.url')" prop="url">
-                <el-input style="width: 100%" clearable v-model.trim="dialogData.rowData!.url" />
-            </el-form-item>
+                    <el-form-item
+                        v-if="dialogData.rowData!.type === 'website'"
+                        :label="$t('cronjob.website')"
+                        prop="website"
+                    >
+                        <el-select style="width: 100%" v-model="dialogData.rowData!.website">
+                            <el-option v-for="item in websiteOptions" :key="item" :value="item" :label="item" />
+                        </el-select>
+                    </el-form-item>
 
-            <el-form-item
-                v-if="dialogData.rowData!.type === 'website' || dialogData.rowData!.type === 'directory'"
-                :label="$t('cronjob.exclusionRules')"
-                prop="exclusionRules"
-            >
-                <el-input
-                    style="width: 100%"
-                    type="textarea"
-                    :placeholder="$t('cronjob.rulesHelper')"
-                    :autosize="{ minRows: 3, maxRows: 6 }"
-                    clearable
-                    v-model="dialogData.rowData!.exclusionRules"
-                />
-            </el-form-item>
+                    <div v-if="dialogData.rowData!.type === 'database'">
+                        <el-form-item :label="$t('cronjob.database')" prop="dbName">
+                            <el-select style="width: 100%" clearable v-model="dialogData.rowData!.dbName">
+                                <el-option v-for="item in mysqlInfo.dbNames" :key="item" :label="item" :value="item" />
+                            </el-select>
+                        </el-form-item>
+                    </div>
+
+                    <el-form-item
+                        v-if="dialogData.rowData!.type === 'directory'"
+                        :label="$t('cronjob.sourceDir')"
+                        prop="sourceDir"
+                    >
+                        <el-input style="width: 100%" disabled v-model="dialogData.rowData!.sourceDir">
+                            <template #append>
+                                <FileList @choose="loadDir" :dir="true"></FileList>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+
+                    <div v-if="isBackup()">
+                        <el-form-item :label="$t('cronjob.target')" prop="targetDirID">
+                            <el-select style="width: 100%" v-model="dialogData.rowData!.targetDirID">
+                                <el-option
+                                    v-for="item in backupOptions"
+                                    :key="item.label"
+                                    :value="item.value"
+                                    :label="item.label"
+                                />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item v-if="dialogData.rowData!.targetDirID !== localDirID">
+                            <el-checkbox v-model="dialogData.rowData!.keepLocal">
+                                {{ $t('cronjob.saveLocal') }}
+                            </el-checkbox>
+                        </el-form-item>
+                        <el-form-item :label="$t('cronjob.retainCopies')" prop="retainCopies">
+                            <el-input-number
+                                :min="1"
+                                :max="30"
+                                v-model.number="dialogData.rowData!.retainCopies"
+                            ></el-input-number>
+                        </el-form-item>
+                    </div>
+
+                    <el-form-item v-if="dialogData.rowData!.type === 'curl'" :label="$t('cronjob.url')" prop="url">
+                        <el-input style="width: 100%" clearable v-model.trim="dialogData.rowData!.url" />
+                    </el-form-item>
+
+                    <el-form-item
+                        v-if="dialogData.rowData!.type === 'website' || dialogData.rowData!.type === 'directory'"
+                        :label="$t('cronjob.exclusionRules')"
+                        prop="exclusionRules"
+                    >
+                        <el-input
+                            style="width: 100%"
+                            type="textarea"
+                            :placeholder="$t('cronjob.rulesHelper')"
+                            :autosize="{ minRows: 3, maxRows: 6 }"
+                            clearable
+                            v-model="dialogData.rowData!.exclusionRules"
+                        />
+                    </el-form-item>
+                </el-col>
+            </el-row>
         </el-form>
         <template #footer>
             <span class="dialog-footer">

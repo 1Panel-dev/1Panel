@@ -1,6 +1,7 @@
 <template>
     <div v-loading="loading">
         <AppStatus
+            :class="{ mask: redisStatus != 'Running' }"
             :app-key="'redis'"
             style="margin-top: 20px"
             @before="onBefore"
@@ -8,17 +9,25 @@
             @is-exist="checkExist"
         ></AppStatus>
 
-        <LayoutContent v-show="!isOnSetting && redisIsExist" :title="'Redis ' + $t('menu.database')">
+        <LayoutContent
+            v-show="!isOnSetting && redisIsExist"
+            :title="'Redis ' + $t('menu.database')"
+            :class="{ mask: redisStatus != 'Running' }"
+        >
             <template #toolbar v-if="!isOnSetting && redisIsExist">
                 <el-button type="primary" plain @click="goDashboard" icon="Position">Redis-Commander</el-button>
-                <el-button plain @click="onChangePassword">
+                <el-button type="primary" plain @click="onChangePassword">
                     {{ $t('database.changePassword') }}
                 </el-button>
             </template>
             <template #main>
-                <Terminal :key="isRefresh" style="margin-top: 10px" ref="terminalRef" />
+                <Terminal :key="isRefresh" ref="terminalRef" />
             </template>
         </LayoutContent>
+
+        <el-card width="30%" v-if="redisStatus != 'Running' && !isOnSetting && redisIsExist" class="mask-prompt">
+            <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['Redis']) }}</span>
+        </el-card>
 
         <Setting ref="settingRef" style="margin-top: 30px" />
         <Password ref="passwordRef" @check-exist="initTerminal" @close-terminal="closeTerminal(true)" />
