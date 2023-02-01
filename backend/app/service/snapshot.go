@@ -133,12 +133,12 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 			return
 		}
 
-		if err := u.handlePanelDatas(fileOp, "snapshot", global.CONF.BaseDir+"/1Panel", backupPanelDir, localDir, dockerDataDir); err != nil {
+		if err := u.handlePanelDatas(fileOp, "snapshot", global.CONF.BaseDir+"/1panel", backupPanelDir, localDir, dockerDataDir); err != nil {
 			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
 			return
 		}
 
-		snapJson := SnapshotJson{DockerDataDir: dockerDataDir, BackupDataDir: localDir, PanelDataDir: global.CONF.BaseDir + "/1Panel", LiveRestoreEnabled: liveRestoreStatus}
+		snapJson := SnapshotJson{DockerDataDir: dockerDataDir, BackupDataDir: localDir, PanelDataDir: global.CONF.BaseDir + "/1panel", LiveRestoreEnabled: liveRestoreStatus}
 		if err := u.saveJson(snapJson, rootDir); err != nil {
 			updateSnapshotStatus(snap.ID, constant.StatusFailed, fmt.Sprintf("save snapshot json failed, err: %v", err))
 			return
@@ -235,7 +235,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 			isReTry = false
 		}
 
-		snapJson.OldPanelDataDir = global.CONF.BaseDir + "/1Panel"
+		snapJson.OldPanelDataDir = global.CONF.BaseDir + "/1panel"
 		snapJson.OldBackupDataDir = localDir
 		recoverPanelDir := fmt.Sprintf("%s/%s/1panel", baseDir, snap.Name)
 		liveRestore := false

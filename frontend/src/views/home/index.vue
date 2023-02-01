@@ -9,7 +9,7 @@
             ]"
         />
         <el-row :gutter="20" style="margin-top: 20px">
-            <el-col :span="18">
+            <el-col :span="16">
                 <CardWithHeader :header="$t('home.overview')">
                     <template #body>
                         <el-form label-position="top" label-width="100px">
@@ -108,17 +108,17 @@
                         <div
                             v-if="chartOption === 'io'"
                             id="ioChart"
-                            style="margin-top: 20px; width: 100%; height: 320px"
+                            style="margin-top: 20px; width: 100%; height: 324px"
                         ></div>
                         <div
                             v-if="chartOption === 'network'"
                             id="networkChart"
-                            style="margin-top: 20px; width: 100%; height: 320px"
+                            style="margin-top: 20px; width: 100%; height: 324px"
                         ></div>
                     </template>
                 </CardWithHeader>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="8">
                 <CardWithHeader :header="$t('home.systemInfo')">
                     <template #body>
                         <el-form style="margin-left: 10px">

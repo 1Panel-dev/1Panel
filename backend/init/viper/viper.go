@@ -3,16 +3,22 @@ package viper
 import (
 	"bytes"
 	"fmt"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/configs"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/cmd/server/conf"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
 
 func Init() {
-	baseDir := "/opt"
+	stdout, err := cmd.Exec("grep '^BASE_DIR=' /Users/slooop/Downloads/1pctl | cut -d'=' -f2")
+	if err != nil {
+		panic(err)
+	}
+	baseDir := strings.ReplaceAll(stdout, "\n", "")
 	v := viper.NewWithOptions()
 	v.SetConfigType("yaml")
 	reader := bytes.NewReader(conf.AppYaml)
@@ -30,10 +36,10 @@ func Init() {
 	}
 	global.CONF = serverConfig
 	global.CONF.BaseDir = baseDir
-	global.CONF.System.DataDir = global.CONF.BaseDir + "/1Panel/data"
-	global.CONF.System.Cache = global.CONF.BaseDir + "/1Panel/data/cache"
-	global.CONF.System.Backup = global.CONF.BaseDir + "/1Panel/data/backup"
-	global.CONF.System.DbPath = global.CONF.BaseDir + "/1Panel/data/db"
-	global.CONF.System.LogPath = global.CONF.BaseDir + "/1Panel/log"
+	global.CONF.System.DataDir = global.CONF.BaseDir + "/1panel/data"
+	global.CONF.System.Cache = global.CONF.BaseDir + "/1panel/data/cache"
+	global.CONF.System.Backup = global.CONF.BaseDir + "/1panel/data/backup"
+	global.CONF.System.DbPath = global.CONF.BaseDir + "/1panel/data/db"
+	global.CONF.System.LogPath = global.CONF.BaseDir + "/1panel/log"
 	global.Viper = v
 }

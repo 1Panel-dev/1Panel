@@ -1,140 +1,100 @@
 <template>
-    <div>
-        <el-row :gutter="10">
-            <el-col :span="6" align="center">
-                <el-popover placement="bottom" :width="300" trigger="hover">
-                    <div style="margin-bottom: 10px">
-                        <el-tag>{{ baseInfo.cpuModelName }}</el-tag>
-                    </div>
-                    <el-tag>
-                        {{ $t('home.core') }} *{{ baseInfo.cpuCores }}； {{ $t('home.logicCore') }} *{{
-                            baseInfo.cpuLogicalCores
-                        }}
-                    </el-tag>
-                    <br />
-                    <el-tag style="margin-top: 5px" v-for="(item, index) of currentInfo.cpuPercent" :key="index">
-                        CPU-{{ index }}: {{ formatNumber(item) }}%
-                    </el-tag>
-                    <template #reference>
-                        <el-progress
-                            type="dashboard"
-                            :width="100"
-                            :stroke-width="10"
-                            :percentage="formatNumber(currentInfo.cpuUsedPercent)"
-                        >
-                            <template #default="{ percentage }">
-                                <span class="percentage-value">{{ percentage }}%</span>
-                                <span class="percentage-label">CPU</span>
-                            </template>
-                        </el-progress>
-                    </template>
-                </el-popover>
+    <el-row :gutter="10">
+        <el-col :span="6" align="center">
+            <el-popover placement="bottom" :width="300" trigger="hover">
+                <div style="margin-bottom: 10px">
+                    <el-tag>{{ baseInfo.cpuModelName }}</el-tag>
+                </div>
+                <el-tag>
+                    {{ $t('home.core') }} *{{ baseInfo.cpuCores }}； {{ $t('home.logicCore') }} *{{
+                        baseInfo.cpuLogicalCores
+                    }}
+                </el-tag>
                 <br />
-                <span class="input-help">
-                    ( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} ) Core
-                </span>
-            </el-col>
-            <el-col :span="6" align="center">
-                <el-progress
-                    type="dashboard"
-                    :width="100"
-                    :stroke-width="10"
-                    :percentage="formatNumber(currentInfo.MemoryUsedPercent)"
-                >
-                    <template #default="{ percentage }">
-                        <span class="percentage-value">{{ percentage }}%</span>
-                        <span class="percentage-label">{{ $t('monitor.memory') }}</span>
-                    </template>
-                </el-progress>
-                <br />
-                <span class="input-help">
-                    ( {{ formatNumber(currentInfo.memoryUsed / 1024 / 1024) }} /
-                    {{ formatNumber(currentInfo.memoryTotal / 1024 / 1024) }} ) MB
-                </span>
-            </el-col>
-            <el-col :span="6" align="center">
-                <el-popover placement="bottom" :width="200" trigger="hover">
-                    <el-tag style="margin-top: 5px">
-                        {{ $t('home.loadAverage', [1]) }}: {{ formatNumber(currentInfo.load1) }}
-                    </el-tag>
-                    <el-tag style="margin-top: 5px">
-                        {{ $t('home.loadAverage', [5]) }}: {{ formatNumber(currentInfo.load5) }}
-                    </el-tag>
-                    <el-tag style="margin-top: 5px">
-                        {{ $t('home.loadAverage', [15]) }}: {{ formatNumber(currentInfo.load15) }}
-                    </el-tag>
-                    <template #reference>
-                        <el-progress
-                            type="dashboard"
-                            :width="100"
-                            :stroke-width="10"
-                            :percentage="formatNumber(currentInfo.loadUsagePercent)"
-                        >
-                            <template #default="{ percentage }">
-                                <span class="percentage-value">{{ percentage }}%</span>
-                                <span class="percentage-label">{{ $t('home.load') }}</span>
-                            </template>
-                        </el-progress>
-                    </template>
-                </el-popover>
-                <br />
-                <span class="input-help">{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
-            </el-col>
-            <el-col :span="6" align="center">
-                <el-popover placement="bottom" :width="160" trigger="hover">
-                    <el-tag>{{ $t('home.mount') }}: /</el-tag>
-                    <div><el-tag style="margin-top: 10px">iNode</el-tag></div>
-                    <el-tag style="margin-top: 5px">{{ $t('home.total') }}: {{ currentInfo.inodesTotal }}</el-tag>
-                    <el-tag style="margin-top: 3px">{{ $t('home.used') }}: {{ currentInfo.inodesUsed }}</el-tag>
-                    <el-tag style="margin-top: 3px">{{ $t('home.free') }}: {{ currentInfo.inodesFree }}</el-tag>
-                    <el-tag style="margin-top: 3px">
-                        {{ $t('home.percent') }}: {{ formatNumber(currentInfo.inodesUsedPercent) }}%
-                    </el-tag>
+                <el-tag style="margin-top: 5px" v-for="(item, index) of currentInfo.cpuPercent" :key="index">
+                    CPU-{{ index }}: {{ formatNumber(item) }}%
+                </el-tag>
+                <template #reference>
+                    <div id="cpu" style="width: 100%; height: 200px"></div>
+                </template>
+            </el-popover>
+            <span class="input-help" style="margin-top: -10px">
+                ( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} ) Core
+            </span>
+        </el-col>
+        <el-col :span="6" align="center">
+            <div id="memory" style="width: 100%; height: 200px"></div>
+            <span class="input-help">
+                ( {{ formatNumber(currentInfo.memoryUsed / 1024 / 1024) }} /
+                {{ formatNumber(currentInfo.memoryTotal / 1024 / 1024) }} ) MB
+            </span>
+        </el-col>
+        <el-col :span="6" align="center">
+            <el-popover placement="bottom" :width="200" trigger="hover">
+                <el-tag style="margin-top: 5px">
+                    {{ $t('home.loadAverage', [1]) }}: {{ formatNumber(currentInfo.load1) }}
+                </el-tag>
+                <el-tag style="margin-top: 5px">
+                    {{ $t('home.loadAverage', [5]) }}: {{ formatNumber(currentInfo.load5) }}
+                </el-tag>
+                <el-tag style="margin-top: 5px">
+                    {{ $t('home.loadAverage', [15]) }}: {{ formatNumber(currentInfo.load15) }}
+                </el-tag>
+                <template #reference>
+                    <div id="load" style="width: 100%; height: 200px"></div>
+                </template>
+            </el-popover>
+            <span class="input-help">{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
+        </el-col>
+        <el-col :span="6" align="center">
+            <el-popover placement="bottom" :width="260" trigger="hover">
+                <el-row :gutter="5">
+                    <el-col :span="12">
+                        <el-tag>{{ $t('home.mount') }}: /</el-tag>
+                        <div><el-tag style="margin-top: 10px">iNode</el-tag></div>
+                        <el-tag style="margin-top: 5px">{{ $t('home.total') }}: {{ currentInfo.inodesTotal }}</el-tag>
+                        <el-tag style="margin-top: 3px">{{ $t('home.used') }}: {{ currentInfo.inodesUsed }}</el-tag>
+                        <el-tag style="margin-top: 3px">{{ $t('home.free') }}: {{ currentInfo.inodesFree }}</el-tag>
+                        <el-tag style="margin-top: 3px">
+                            {{ $t('home.percent') }}: {{ formatNumber(currentInfo.inodesUsedPercent) }}%
+                        </el-tag>
+                    </el-col>
 
-                    <div>
-                        <el-tag style="margin-top: 10px">{{ $t('monitor.disk') }}</el-tag>
-                    </div>
-                    <el-tag style="margin-top: 5px">
-                        {{ $t('home.total') }}: {{ formatNumber(currentInfo.total / 1024 / 1024 / 1024) }} GB
-                    </el-tag>
-                    <el-tag style="margin-top: 3px">
-                        {{ $t('home.used') }}: {{ formatNumber(currentInfo.used / 1024 / 1024 / 1024) }} GB
-                    </el-tag>
-                    <el-tag style="margin-top: 3px">
-                        {{ $t('home.free') }}: {{ formatNumber(currentInfo.free / 1024 / 1024 / 1024) }} GB
-                    </el-tag>
-                    <el-tag style="margin-top: 3px">
-                        {{ $t('home.percent') }}: {{ formatNumber(currentInfo.usedPercent) }}%
-                    </el-tag>
-                    <template #reference>
-                        <el-progress
-                            type="dashboard"
-                            :width="100"
-                            :stroke-width="10"
-                            :percentage="formatNumber(currentInfo.usedPercent)"
-                        >
-                            <template #default="{ percentage }">
-                                <span class="percentage-value">{{ percentage }}%</span>
-                                <span class="percentage-label">{{ $t('monitor.disk') }}</span>
-                            </template>
-                        </el-progress>
-                    </template>
-                </el-popover>
-
-                <br />
-                <span class="input-help">
-                    ( {{ formatNumber(currentInfo.used / 1024 / 1024 / 1024) }} /
-                    {{ formatNumber(currentInfo.total / 1024 / 1024 / 1024) }} ) GB
-                </span>
-            </el-col>
-        </el-row>
-    </div>
+                    <el-col :span="12">
+                        <div>
+                            <el-tag style="margin-top: 35px">{{ $t('monitor.disk') }}</el-tag>
+                        </div>
+                        <el-tag style="margin-top: 5px">
+                            {{ $t('home.total') }}: {{ formatNumber(currentInfo.total / 1024 / 1024 / 1024) }} GB
+                        </el-tag>
+                        <el-tag style="margin-top: 3px">
+                            {{ $t('home.used') }}: {{ formatNumber(currentInfo.used / 1024 / 1024 / 1024) }} GB
+                        </el-tag>
+                        <el-tag style="margin-top: 3px">
+                            {{ $t('home.free') }}: {{ formatNumber(currentInfo.free / 1024 / 1024 / 1024) }} GB
+                        </el-tag>
+                        <el-tag style="margin-top: 3px">
+                            {{ $t('home.percent') }}: {{ formatNumber(currentInfo.usedPercent) }}%
+                        </el-tag>
+                    </el-col>
+                </el-row>
+                <template #reference>
+                    <div id="disk" style="width: 100%; height: 200px"></div>
+                </template>
+            </el-popover>
+            <span class="input-help">
+                ( {{ formatNumber(currentInfo.used / 1024 / 1024 / 1024) }} /
+                {{ formatNumber(currentInfo.total / 1024 / 1024 / 1024) }} ) GB
+            </span>
+        </el-col>
+    </el-row>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
 import { Dashboard } from '@/api/interface/dashboard';
 import i18n from '@/lang';
-import { ref } from 'vue';
+import * as echarts from 'echarts';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 
 const baseInfo = ref<Dashboard.BaseInfo>({
     haloID: 0,
@@ -206,11 +166,90 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
 const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo): void => {
     currentInfo.value = current;
     baseInfo.value = base;
+    freshChart('cpu', 'CPU', formatNumber(currentInfo.value.cpuUsedPercent));
+    freshChart('memory', i18n.global.t('monitor.memory'), formatNumber(currentInfo.value.MemoryUsedPercent));
+    freshChart('load', i18n.global.t('home.load'), formatNumber(currentInfo.value.loadUsagePercent));
+    freshChart('disk', i18n.global.t('monitor.disk'), formatNumber(currentInfo.value.usedPercent));
 };
 
-function formatNumber(val: number) {
-    return Number(val.toFixed(2));
-}
+const freshChart = (chartName: string, Title: string, Data: number) => {
+    let myChart = echarts.getInstanceByDom(document.getElementById(chartName) as HTMLElement);
+    if (myChart === null || myChart === undefined) {
+        myChart = echarts.init(document.getElementById(chartName) as HTMLElement);
+    }
+    const option = {
+        title: [
+            {
+                text: Data + '%',
+                x: 'center',
+                top: '55%',
+                textStyle: { fontSize: 16, fontWeight: '100' },
+            },
+            {
+                text: Title,
+                x: 'center',
+                y: 'center',
+                textStyle: {
+                    fontSize: '20',
+                    fontFamily: 'DINAlternate-Bold, DINAlternate',
+                    foontWeight: '600',
+                },
+            },
+        ],
+        backgroundColor: '#FFFFFF',
+        polar: { radius: ['42%', '52%'], center: ['50%', '50%'] },
+        angleAxis: { max: 100, show: false },
+        radiusAxis: {
+            type: 'category',
+            show: true,
+            axisLabel: { show: false },
+            axisLine: { show: false },
+            axisTick: { show: false },
+        },
+        series: [
+            {
+                name: '',
+                type: 'bar',
+                roundCap: true,
+                barWidth: 30,
+                showBackground: true,
+                backgroundStyle: { color: 'rgba(66, 66, 66, .3)' },
+                data: [Data],
+                coordinateSystem: 'polar',
+                itemStyle: {
+                    normal: {
+                        color: new echarts.graphic.LinearGradient(0, 1, 0, 0, [
+                            {
+                                offset: 0,
+                                color: '#16CEB9',
+                            },
+                            { offset: 1, color: '#6648FF' },
+                        ]),
+                    },
+                },
+            },
+            {
+                name: '',
+                type: 'pie',
+                startAngle: 80,
+                radius: ['56%'],
+                center: ['50%', '50%'],
+                itemStyle: { color: 'rgba(66, 66, 66, .1)', borderWidth: 1, borderColor: '#5269EE' },
+                data: [100],
+            },
+            {
+                name: '',
+                type: 'pie',
+                startAngle: 80,
+                radius: ['38%'],
+                center: ['50%', '50%'],
+                itemStyle: { color: 'rgba(66, 66, 66, .1)', borderWidth: 1, borderColor: '#5269EE' },
+                data: [100],
+            },
+        ],
+    };
+    myChart.setOption(option, true);
+};
 
 function loadStatus(val: number) {
     if (val < 30) {
@@ -224,19 +263,27 @@ function loadStatus(val: number) {
     }
     return i18n.global.t('home.runJam');
 }
+
+function formatNumber(val: number) {
+    return Number(val.toFixed(2));
+}
+
+function changeChartSize() {
+    echarts.getInstanceByDom(document.getElementById('cpu') as HTMLElement)?.resize();
+    echarts.getInstanceByDom(document.getElementById('memory') as HTMLElement)?.resize();
+    echarts.getInstanceByDom(document.getElementById('load') as HTMLElement)?.resize();
+    echarts.getInstanceByDom(document.getElementById('disk') as HTMLElement)?.resize();
+}
+
+onMounted(() => {
+    window.addEventListener('resize', changeChartSize);
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', changeChartSize);
+});
+
 defineExpose({
     acceptParams,
 });
 </script>
-
-<style scoped>
-.percentage-value {
-    display: block;
-    font-size: 16px;
-}
-.percentage-label {
-    display: block;
-    margin-top: 10px;
-    font-size: 12px;
-}
-</style>
