@@ -25,4 +25,9 @@ const isCollapse = computed((): boolean => menuStore.isCollapse);
     margin-top: 10px;
     margin-left: 25px;
 }
+
+.collapse-icon:hover {
+    color: $primary-color;
+    cursor: pointer;
+}
 </style>

@@ -51,6 +51,7 @@
         span {
             color: rgba(31, 35, 41, 1);
         }
+
         .el-icon {
             color: rgba(31, 35, 41, 1);
         }
@@ -121,10 +122,28 @@
             height: 44px;
         }
     }
+
+    .el-menu-item:hover {
+        .el-icon {
+            color: $primary-color;
+        }
+
+        span {
+            color: $primary-color;
+        }
+    }
+
+    .el-sub-menu:hover {
+        .sub-icon {
+            color: $primary-color;
+        }
+
+        .sub-span {
+            color: $primary-color;
+        }
+    }
 }
 
 .el-menu--collapse {
     width: 85px;
-
-    // margin-right: 10px;
 }

@@ -1,11 +1,15 @@
 <template>
     <template v-for="subItem in menuList" :key="subItem.path">
-        <el-sub-menu v-if="subItem.children && subItem.children.length > 1" :index="subItem.path">
+        <el-sub-menu
+            v-if="subItem.children && subItem.children.length > 1"
+            :index="subItem.path"
+            popper-class="menu-popper"
+        >
             <template #title>
-                <el-icon>
+                <el-icon class="sub-icon">
                     <SvgIcon :iconName="(subItem.meta?.icon as string)" :className="'svg-icon'"></SvgIcon>
                 </el-icon>
-                <span>{{ $t(subItem.meta?.title as string) }}</span>
+                <span class="sub-span">{{ $t(subItem.meta?.title as string) }}</span>
             </template>
             <SubItem :menuList="subItem.children" />
         </el-sub-menu>
