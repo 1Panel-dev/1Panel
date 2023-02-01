@@ -175,6 +175,7 @@ var AddTableImageRepo = &gormigrate.Migration{
 		}
 		item := &model.ImageRepo{
 			Name:        "Docker Hub",
+			Protocol:    "https",
 			DownloadUrl: "docker.io",
 			Status:      constant.StatusSuccess,
 		}
