@@ -3,7 +3,7 @@
         <RouterButton
             :buttons="[
                 {
-                    label: i18n.global.t('menu.monitor'),
+                    label: i18n.global.t('menu.home'),
                     path: '/home/index',
                 },
             ]"

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="app-content" style="margin-top: 20px">
+        <div class="app-content" style="margin-top: 30px">
             <el-card class="app-card">
                 <el-row :gutter="20">
                     <el-col :lg="3" :xl="2">
@@ -49,7 +49,7 @@
             </el-card>
         </div>
 
-        <LayoutContent v-loading="loading" :title="$t('container.setting')" :divider="true">
+        <LayoutContent v-loading="loading" style="margin-top: 30px" :title="$t('container.setting')" :divider="true">
             <template #main>
                 <el-radio-group v-model="confShowType" @change="changeMode">
                     <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
@@ -58,7 +58,7 @@
                 <el-row style="margin-top: 20px" v-if="confShowType === 'base'">
                     <el-col :span="1"><br /></el-col>
                     <el-col :span="10">
-                        <el-form :model="form" ref="formRef" label-width="120px">
+                        <el-form :model="form" label-position="left" ref="formRef" label-width="120px">
                             <el-form-item :label="$t('container.mirrors')" prop="mirrors">
                                 <el-input
                                     type="textarea"
@@ -98,10 +98,10 @@
                 <div v-if="confShowType === 'all'">
                     <codemirror
                         :autofocus="true"
-                        placeholder="None data"
+                        placeholder="# The Docker configuration file does not exist or is empty (/etc/docker/daemon.json)"
                         :indent-with-tab="true"
                         :tabSize="4"
-                        style="margin-top: 10px; height: calc(100vh - 380px)"
+                        style="margin-top: 10px; height: calc(100vh - 430px)"
                         :lineWrapping="true"
                         :matchBrackets="true"
                         theme="cobalt"
@@ -128,13 +128,18 @@ import { Codemirror } from 'vue-codemirror';
 import LayoutContent from '@/layout/layout-content.vue';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { LoadFile } from '@/api/modules/files';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import i18n from '@/lang';
-import { dockerOperate, loadDaemonJson, updateDaemonJson, updateDaemonJsonByfile } from '@/api/modules/container';
+import {
+    dockerOperate,
+    loadDaemonJson,
+    loadDaemonJsonFile,
+    updateDaemonJson,
+    updateDaemonJsonByfile,
+} from '@/api/modules/container';
 
 const loading = ref(false);
-
+const showDaemonJsonAlert = ref(false);
 const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
 
@@ -224,14 +229,20 @@ const onSubmitSave = async () => {
 };
 
 const loadDockerConf = async () => {
-    const res = await LoadFile({ path: '/etc/docker/daemon.json' });
-    dockerConf.value = res.data;
+    const res = await loadDaemonJsonFile();
+    if (res.data === 'daemon.json is not find in path') {
+        console.log(res.data);
+        showDaemonJsonAlert.value = true;
+    } else {
+        dockerConf.value = res.data;
+    }
 };
 
 const changeMode = async () => {
     if (confShowType.value === 'all') {
         loadDockerConf();
     } else {
+        showDaemonJsonAlert.value = false;
         search();
     }
 };

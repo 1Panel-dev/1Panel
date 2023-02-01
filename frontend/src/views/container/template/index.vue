@@ -17,7 +17,7 @@
                 <el-button type="primary" @click="onOpenDialog('create')">
                     {{ $t('container.createComposeTemplate') }}
                 </el-button>
-                <el-button plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>

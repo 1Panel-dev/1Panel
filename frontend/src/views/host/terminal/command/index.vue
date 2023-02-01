@@ -5,7 +5,7 @@
                 <el-button type="primary" @click="onCreate()">
                     {{ $t('commons.button.create') }}{{ $t('terminal.quickCommand') }}
                 </el-button>
-                <el-button plain :disabled="selects.length === 0" @click="batchDelete(null)">
+                <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -28,7 +28,7 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
-        <el-drawer v-model="cmdVisiable" size="50%">
+        <el-drawer v-model="cmdVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
                 <DrawerHeader
                     :header="$t('commons.button.' + operate) + $t('terminal.quickCommand')"

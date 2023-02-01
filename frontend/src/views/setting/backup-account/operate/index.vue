@@ -3,99 +3,118 @@
         <template #header>
             <DrawerHeader :header="title + $t('setting.backupAccount')" :back="handleClose" />
         </template>
-        <el-form ref="formRef" v-loading="loading" :model="dialogData.rowData" label-width="120px">
-            <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
-                <span>{{ dialogData.rowData!.type }}</span>
-            </el-form-item>
-            <el-form-item
-                v-if="dialogData.rowData!.type === 'LOCAL'"
-                :label="$t('setting.currentPath')"
-                prop="varsJson['dir']"
-                :rules="Rules.requiredInput"
-            >
-                <el-input disabled v-model="dialogData.rowData!.varsJson['dir']">
-                    <template #append>
-                        <FileList @choose="loadDir" :dir="true"></FileList>
-                    </template>
-                </el-input>
-            </el-form-item>
-            <el-form-item
-                v-if="hasBucket(dialogData.rowData!.type)"
-                label="Access Key ID"
-                prop="accessKey"
-                :rules="Rules.requiredInput"
-            >
-                <el-input v-model.trim="dialogData.rowData!.accessKey" />
-            </el-form-item>
-            <el-form-item
-                v-if="hasBucket(dialogData.rowData!.type)"
-                label="Secret Key"
-                prop="credential"
-                :rules="Rules.requiredInput"
-            >
-                <el-input show-password clearable v-model.trim="dialogData.rowData!.credential" />
-            </el-form-item>
-            <el-form-item
-                v-if="dialogData.rowData!.type === 'S3'"
-                label="Region"
-                prop="varsJson.region"
-                :rules="Rules.requiredInput"
-            >
-                <el-input v-model.trim="dialogData.rowData!.varsJson['region']" />
-            </el-form-item>
-            <el-form-item
-                v-if="hasBucket(dialogData.rowData!.type) && dialogData.rowData!.type !== 'MINIO'"
-                label="Endpoint"
-                prop="varsJson.endpoint"
-                :rules="Rules.requiredInput"
-            >
-                <el-input v-model.trim="dialogData.rowData!.varsJson['endpoint']" />
-            </el-form-item>
-            <el-form-item
-                v-if="dialogData.rowData!.type === 'MINIO'"
-                label="Endpoint"
-                prop="varsJson.endpointItem"
-                :rules="Rules.requiredInput"
-            >
-                <el-input v-model="dialogData.rowData!.varsJson['endpointItem']">
-                    <template #prepend>
-                        <el-select v-model.trim="endpoints" style="width: 80px">
-                            <el-option label="http" value="http" />
-                            <el-option label="https" value="https" />
+        <el-form ref="formRef" v-loading="loading" label-position="top" :model="dialogData.rowData" label-width="120px">
+            <el-row type="flex" justify="center">
+                <el-col :span="22">
+                    <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
+                        <div style="margin-left: 10px">
+                            <el-tag>{{ dialogData.rowData!.type }}</el-tag>
+                        </div>
+                    </el-form-item>
+                    <el-form-item
+                        v-if="dialogData.rowData!.type === 'LOCAL'"
+                        :label="$t('setting.currentPath')"
+                        prop="varsJson['dir']"
+                        :rules="Rules.requiredInput"
+                    >
+                        <el-input disabled v-model="dialogData.rowData!.varsJson['dir']">
+                            <template #append>
+                                <FileList @choose="loadDir" :dir="true"></FileList>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item
+                        v-if="hasBucket(dialogData.rowData!.type)"
+                        label="Access Key ID"
+                        prop="accessKey"
+                        :rules="Rules.requiredInput"
+                    >
+                        <el-input v-model.trim="dialogData.rowData!.accessKey" />
+                    </el-form-item>
+                    <el-form-item
+                        v-if="hasBucket(dialogData.rowData!.type)"
+                        label="Secret Key"
+                        prop="credential"
+                        :rules="Rules.requiredInput"
+                    >
+                        <el-input show-password clearable v-model.trim="dialogData.rowData!.credential" />
+                    </el-form-item>
+                    <el-form-item
+                        v-if="dialogData.rowData!.type === 'S3'"
+                        label="Region"
+                        prop="varsJson.region"
+                        :rules="Rules.requiredInput"
+                    >
+                        <el-input v-model.trim="dialogData.rowData!.varsJson['region']" />
+                    </el-form-item>
+                    <el-form-item
+                        v-if="hasBucket(dialogData.rowData!.type) && dialogData.rowData!.type !== 'MINIO'"
+                        label="Endpoint"
+                        prop="varsJson.endpoint"
+                        :rules="Rules.requiredInput"
+                    >
+                        <el-input v-model.trim="dialogData.rowData!.varsJson['endpoint']" />
+                    </el-form-item>
+                    <el-form-item
+                        v-if="dialogData.rowData!.type === 'MINIO'"
+                        label="Endpoint"
+                        prop="varsJson.endpointItem"
+                        :rules="Rules.requiredInput"
+                    >
+                        <el-input v-model="dialogData.rowData!.varsJson['endpointItem']">
+                            <template #prepend>
+                                <el-select v-model.trim="endpoints" style="width: 80px">
+                                    <el-option label="http" value="http" />
+                                    <el-option label="https" value="https" />
+                                </el-select>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item
+                        v-if="dialogData.rowData!.type !== '' && hasBucket(dialogData.rowData!.type)"
+                        label="Bucket"
+                        prop="bucket"
+                        :rules="Rules.requiredSelect"
+                    >
+                        <el-select style="width: 80%" v-model="dialogData.rowData!.bucket">
+                            <el-option v-for="item in buckets" :key="item" :value="item" />
                         </el-select>
-                    </template>
-                </el-input>
-            </el-form-item>
-            <el-form-item
-                v-if="dialogData.rowData!.type !== '' && hasBucket(dialogData.rowData!.type)"
-                label="Bucket"
-                prop="bucket"
-                :rules="Rules.requiredSelect"
-            >
-                <el-select style="width: 80%" v-model="dialogData.rowData!.bucket">
-                    <el-option v-for="item in buckets" :key="item" :value="item" />
-                </el-select>
-                <el-button style="width: 20%" plain @click="getBuckets">
-                    {{ $t('setting.loadBucket') }}
-                </el-button>
-            </el-form-item>
-            <div v-if="dialogData.rowData!.type === 'SFTP'">
-                <el-form-item :label="$t('setting.address')" prop="varsJson.address" :rules="Rules.requiredInput">
-                    <el-input v-model.trim="dialogData.rowData!.varsJson['address']" />
-                </el-form-item>
-                <el-form-item :label="$t('setting.port')" prop="varsJson.port" :rules="[Rules.number]">
-                    <el-input-number :min="0" :max="65535" v-model.number="dialogData.rowData!.varsJson['port']" />
-                </el-form-item>
-                <el-form-item :label="$t('setting.username')" prop="accessKey" :rules="[Rules.requiredInput]">
-                    <el-input v-model="dialogData.rowData!.accessKey" />
-                </el-form-item>
-                <el-form-item :label="$t('setting.password')" prop="credential" :rules="[Rules.requiredInput]">
-                    <el-input type="password" clearable show-password v-model="dialogData.rowData!.credential" />
-                </el-form-item>
-                <el-form-item :label="$t('setting.path')" prop="bucket">
-                    <el-input v-model="dialogData.rowData!.bucket" />
-                </el-form-item>
-            </div>
+                        <el-button style="width: 20%" plain @click="getBuckets">
+                            {{ $t('setting.loadBucket') }}
+                        </el-button>
+                    </el-form-item>
+                    <div v-if="dialogData.rowData!.type === 'SFTP'">
+                        <el-form-item
+                            :label="$t('setting.address')"
+                            prop="varsJson.address"
+                            :rules="Rules.requiredInput"
+                        >
+                            <el-input v-model.trim="dialogData.rowData!.varsJson['address']" />
+                        </el-form-item>
+                        <el-form-item :label="$t('setting.port')" prop="varsJson.port" :rules="[Rules.number]">
+                            <el-input-number
+                                :min="0"
+                                :max="65535"
+                                v-model.number="dialogData.rowData!.varsJson['port']"
+                            />
+                        </el-form-item>
+                        <el-form-item :label="$t('setting.username')" prop="accessKey" :rules="[Rules.requiredInput]">
+                            <el-input v-model="dialogData.rowData!.accessKey" />
+                        </el-form-item>
+                        <el-form-item :label="$t('setting.password')" prop="credential" :rules="[Rules.requiredInput]">
+                            <el-input
+                                type="password"
+                                clearable
+                                show-password
+                                v-model="dialogData.rowData!.credential"
+                            />
+                        </el-form-item>
+                        <el-form-item :label="$t('setting.path')" prop="bucket">
+                            <el-input v-model="dialogData.rowData!.bucket" />
+                        </el-form-item>
+                    </div>
+                </el-col>
+            </el-row>
         </el-form>
         <template #footer>
             <span class="dialog-footer">

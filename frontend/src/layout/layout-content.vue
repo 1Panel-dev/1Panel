@@ -100,7 +100,7 @@ const showBack = computed(() => {
 }
 
 .content-container__toolbar {
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
 .content-container_form {

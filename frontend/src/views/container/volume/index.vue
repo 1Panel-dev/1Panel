@@ -13,7 +13,7 @@
                 <el-button type="primary" @click="onCreate()">
                     {{ $t('container.createVolume') }}
                 </el-button>
-                <el-button plain :disabled="selects.length === 0" @click="batchDelete(null)">
+                <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>

@@ -1,6 +1,9 @@
 package v1
 
 import (
+	"io/ioutil"
+	"os"
+
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -18,6 +21,26 @@ import (
 func (b *BaseApi) LoadDockerStatus(c *gin.Context) {
 	status := dockerService.LoadDockerStatus()
 	helper.SuccessWithData(c, status)
+}
+
+// @Tags Container Docker
+// @Summary Load docker daemon.json
+// @Description 获取 docker 配置信息(表单)
+// @Produce json
+// @Success 200 {object} string
+// @Security ApiKeyAuth
+// @Router /containers/daemonjson/file [get]
+func (b *BaseApi) LoadDaemonJsonFile(c *gin.Context) {
+	if _, err := os.Stat(constant.DaemonJsonPath); err != nil {
+		helper.SuccessWithData(c, "daemon.json is not find in path")
+		return
+	}
+	content, err := ioutil.ReadFile(constant.DaemonJsonPath)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, string(content))
 }
 
 // @Tags Container Docker

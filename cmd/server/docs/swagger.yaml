@@ -1447,12 +1447,14 @@ definitions:
     type: object
   model.App:
     properties:
-      author:
-        type: string
       createdAt:
         type: string
       crossVersionUpdate:
         type: boolean
+      document:
+        type: string
+      github:
+        type: string
       icon:
         type: string
       id:
@@ -1467,13 +1469,13 @@ definitions:
         type: string
       shortDesc:
         type: string
-      source:
-        type: string
       status:
         type: string
       type:
         type: string
       updatedAt:
+        type: string
+      website:
         type: string
     type: object
   model.AppInstall:
@@ -1727,8 +1729,16 @@ definitions:
         type: integer
       pageSize:
         type: integer
+      tags:
+        items:
+          type: string
+        type: array
       type:
         type: string
+      unused:
+        type: boolean
+      update:
+        type: boolean
     required:
     - page
     - pageSize
@@ -2314,12 +2324,14 @@ definitions:
     type: object
   response.AppDTO:
     properties:
-      author:
-        type: string
       createdAt:
         type: string
       crossVersionUpdate:
         type: boolean
+      document:
+        type: string
+      github:
+        type: string
       icon:
         type: string
       id:
@@ -2333,8 +2345,6 @@ definitions:
       required:
         type: string
       shortDesc:
-        type: string
-      source:
         type: string
       status:
         type: string
@@ -2350,6 +2360,8 @@ definitions:
         items:
           type: string
         type: array
+      website:
+        type: string
     type: object
   response.AppDetailDTO:
     properties:
@@ -3125,13 +3137,11 @@ paths:
       - Auth
   /auth/status:
     get:
-      description: 获取系统安全登录状态
+      description: 判断是否为首次登录
       responses:
         "200":
           description: ""
-        "402":
-          description: ""
-      summary: Load safety status
+      summary: Check is First login
       tags:
       - Auth
   /backups:
@@ -3600,6 +3610,21 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/dto.DaemonJsonConf'
+      security:
+      - ApiKeyAuth: []
+      summary: Load docker daemon.json
+      tags:
+      - Container Docker
+  /containers/daemonjson/file:
+    get:
+      description: 获取 docker 配置信息(表单)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
       security:
       - ApiKeyAuth: []
       summary: Load docker daemon.json
@@ -6527,6 +6552,17 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Load system setting info
+      tags:
+      - System Setting
+  /settings/search/available:
+    get:
+      description: 获取系统可用状态
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Load system available status
       tags:
       - System Setting
   /settings/snapshot:

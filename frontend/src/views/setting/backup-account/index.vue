@@ -1,6 +1,6 @@
 <template>
     <div>
-        <LayoutContent :title="$t('setting.backup')" :divider="true">
+        <LayoutContent :title="$t('setting.backup')">
             <template #main>
                 <el-form label-position="left" label-width="130px" :v-key="reflash">
                     <el-row :gutter="20">

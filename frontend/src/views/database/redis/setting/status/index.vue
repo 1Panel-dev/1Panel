@@ -3,7 +3,7 @@
         <el-row>
             <el-col :span="1"><br /></el-col>
             <el-col :span="12">
-                <table style="margin-top: 20px; width: 100%" class="myTable">
+                <table style="width: 100%" class="myTable">
                     <tr>
                         <td>uptime_in_days</td>
                         <td>{{ redisStatus!.uptime_in_days }}</td>

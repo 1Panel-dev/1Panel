@@ -1,6 +1,6 @@
 <template>
     <div v-show="settingShow">
-        <LayoutContent :title="$t('nginx.nginxConfig')" :reload="true">
+        <LayoutContent :title="'Redis' + $t('database.setting')" :reload="true">
             <template #buttons>
                 <el-button type="primary" :plain="activeName !== 'conf'" @click="changeTab('conf')">
                     {{ $t('database.confChange') }}
@@ -40,7 +40,7 @@
                         placeholder="None data"
                         :indent-with-tab="true"
                         :tabSize="4"
-                        style="margin-top: 10px; height: calc(100vh - 370px)"
+                        style="margin-top: 10px; height: calc(100vh - 380px)"
                         :lineWrapping="true"
                         :matchBrackets="true"
                         theme="cobalt"

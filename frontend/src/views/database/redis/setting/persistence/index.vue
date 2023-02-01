@@ -87,7 +87,7 @@
             >
                 <template #toolbar>
                     <el-button type="primary" @click="onBackup">{{ $t('setting.backup') }}</el-button>
-                    <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                    <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </template>

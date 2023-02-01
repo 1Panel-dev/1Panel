@@ -35,7 +35,7 @@
                 </el-row>
             </el-card>
         </div>
-        <el-card style="margin-top: 20px">
+        <el-card style="margin-top: 40px">
             <LayoutContent :header="$t('container.containerList')" back-name="Compose" :reload="true">
                 <ComplexTable
                     :pagination-config="paginationConfig"
@@ -99,7 +99,7 @@
                         show-overflow-tooltip
                     />
                     <fu-table-operations
-                        width="200px"
+                        width="220"
                         :ellipsis="10"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
