@@ -1,8 +1,10 @@
 <template>
     <el-row>
         <el-col :span="2">
-            <el-button :icon="Back" @click="jump(paths.length - 2)" circle :disabled="paths.length == 0" />
-            <el-button :icon="Refresh" circle @click="search" />
+            <div>
+                <el-button :icon="Back" @click="jump(paths.length - 2)" circle :disabled="paths.length == 0" />
+                <el-button :icon="Refresh" circle @click="search" />
+            </div>
         </el-col>
         <el-col :span="22">
             <div class="path">
@@ -54,7 +56,7 @@
             <el-button plain @click="openDownload" :disabled="selects.length === 0">
                 {{ $t('file.download') }}
             </el-button>
-            <div class="search-button">
+            <!-- <div class="search-button">
                 <el-input
                     clearable
                     @clear="search()"
@@ -63,7 +65,7 @@
                     @blur="search()"
                     :placeholder="$t('commons.button.search')"
                 ></el-input>
-            </div>
+            </div> -->
         </template>
         <template #main>
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
@@ -378,27 +380,6 @@ const openDownload = () => {
     fileDownload.name = getRandomStr(6);
     downloadRef.value.acceptParams(fileDownload);
 };
-
-// const closeDownload = () => {
-//     downloadPage.open = false;
-//     search();
-// };
-// const saveContent = (content: string) => {
-//     editorPage.loading = true;
-//     SaveFileContent({ path: codeReq.path, content: content }).finally(() => {
-//         editorPage.loading = false;
-//         editorPage.open = false;
-//         ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
-//     });
-// };
-
-// const quickSave = (content: string) => {
-//     editorPage.loading = true;
-//     SaveFileContent({ path: codeReq.path, content: content }).finally(() => {
-//         editorPage.loading = false;
-//         ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
-//     });
-// };
 
 const openDetail = (row: File.File) => {
     detailRef.value.acceptParams({ path: row.path });

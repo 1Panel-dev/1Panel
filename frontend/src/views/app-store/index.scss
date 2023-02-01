@@ -73,3 +73,12 @@
 .el-avatar {
     --el-avatar-bg-color: #ffffff;
 }
+
+.update-prompt {
+    text-align: center;
+    span {
+        font-weight: 500;
+        font-size: 16px;
+        color: #bbbfc4;
+    }
+}

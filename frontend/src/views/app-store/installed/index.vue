@@ -39,6 +39,9 @@
             <el-button @click="sync" type="primary" link v-if="mode === 'installed'">{{ $t('app.sync') }}</el-button>
         </template>
         <template #main>
+            <div class="update-prompt">
+                <span v-if="mode === 'update'">{{ $t('app.updatePrompt') }}</span>
+            </div>
             <el-row :gutter="5">
                 <el-col v-for="(installed, index) in data" :key="index" :span="12">
                     <div class="app-card">

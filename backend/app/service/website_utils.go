@@ -19,7 +19,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
-	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/parser"
 	"github.com/1Panel-dev/1Panel/cmd/server/nginx_conf"
 	"github.com/pkg/errors"
@@ -243,19 +242,6 @@ func deleteListenAndServerName(website model.Website, ports []int, domains []str
 		return err
 	}
 	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxFull.Install.ContainerName)
-}
-
-func getKeysFromStaticFile(scope dto.NginxKey) []string {
-	var res []string
-	newConfig := &components.Config{}
-	switch scope {
-	case dto.SSL:
-		newConfig = parser.NewStringParser(string(nginx_conf.SSL)).Parse()
-	}
-	for _, dir := range newConfig.GetDirectives() {
-		res = append(res, dir.GetName())
-	}
-	return res
 }
 
 func createPemFile(website model.Website, websiteSSL model.WebsiteSSL) error {

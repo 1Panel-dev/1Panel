@@ -8,13 +8,12 @@ import (
 )
 
 type manager struct {
-	thresholdSize int64
-	startAt       time.Time
-	fire          chan string
-	cr            *cron.Cron
-	context       chan int
-	wg            sync.WaitGroup
-	lock          sync.Mutex
+	startAt time.Time
+	fire    chan string
+	cr      *cron.Cron
+	context chan int
+	wg      sync.WaitGroup
+	lock    sync.Mutex
 }
 
 func (m *manager) Fire() chan string {
