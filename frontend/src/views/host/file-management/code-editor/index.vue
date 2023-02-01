@@ -50,6 +50,7 @@ let form = ref({
 const em = defineEmits(['close']);
 
 const handleClose = () => {
+    open.value = false;
     if (editor) {
         editor.dispose();
     }

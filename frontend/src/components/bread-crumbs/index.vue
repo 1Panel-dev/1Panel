@@ -1,6 +1,12 @@
 <template>
-    <div class="bread-crumbs"><slot></slot></div>
+    <span class="bread-crumbs" ref="bread"><slot></slot></span>
 </template>
+<script lang="ts" setup>
+import { ref } from 'vue';
+
+const bread = ref();
+defineExpose({ bread });
+</script>
 <style lang="scss">
 .bread-crumbs {
     display: flex;

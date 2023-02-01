@@ -697,6 +697,7 @@ export default {
         downloading: '正在下载...',
         infoDetail: '文件属性',
         type: '类型',
+        root: '根目录',
     },
     setting: {
         all: '全部',
