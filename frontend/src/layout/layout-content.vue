@@ -1,8 +1,5 @@
 <template>
     <div class="main-box">
-        <div class="content-container__header" v-if="slots.header">
-            <slot name="header"></slot>
-        </div>
         <div class="content-container__app" v-if="slots.app">
             <slot name="app"></slot>
         </div>
@@ -90,8 +87,15 @@ const showBack = computed(() => {
 <style lang="scss">
 @use '@/styles/mixins.scss' as *;
 
+.content-container__app {
+    margin-top: 20px;
+}
+
 .content-container__search {
     margin-top: 20px;
+    .el-card {
+        --el-card-padding: 12px;
+    }
 }
 
 .content-container__title {

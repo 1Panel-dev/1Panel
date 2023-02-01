@@ -3,9 +3,11 @@
         <template #main>
             <div class="brief">
                 <el-row :gutter="20">
-                    <el-col :span="3">
-                        <el-avatar shape="square" :size="180" :src="'data:image/png;base64,' + app.icon" />
-                    </el-col>
+                    <div>
+                        <el-col :span="3">
+                            <el-avatar shape="square" :size="180" :src="'data:image/png;base64,' + app.icon" />
+                        </el-col>
+                    </div>
                     <el-col :span="18">
                         <div class="detail">
                             <div class="name">
@@ -51,32 +53,34 @@
                     </el-col>
                 </el-row>
                 <div class="divider"></div>
-                <el-row>
-                    <el-col :span="12">
-                        <div class="descriptions">
-                            <el-descriptions direction="vertical">
-                                <el-descriptions-item :label="$t('app.appWebsite')">
-                                    <el-link @click="toLink(app.website)">
-                                        <el-icon><OfficeBuilding /></el-icon>
-                                        <span>{{ $t('app.appOfficeWebsite') }}</span>
-                                    </el-link>
-                                </el-descriptions-item>
-                                <el-descriptions-item :label="$t('app.doc')">
-                                    <el-link @click="toLink(app.document)">
-                                        <el-icon><Document /></el-icon>
-                                        <span>{{ $t('app.document') }}</span>
-                                    </el-link>
-                                </el-descriptions-item>
-                                <el-descriptions-item label="Github">
-                                    <el-link @click="toLink(app.github)">
-                                        <el-icon><Link /></el-icon>
-                                        <span>{{ $t('app.github') }}</span>
-                                    </el-link>
-                                </el-descriptions-item>
-                            </el-descriptions>
-                        </div>
-                    </el-col>
-                </el-row>
+                <div>
+                    <el-row>
+                        <el-col :span="12">
+                            <div class="descriptions">
+                                <el-descriptions direction="vertical">
+                                    <el-descriptions-item>
+                                        <el-link @click="toLink(app.website)">
+                                            <el-icon><OfficeBuilding /></el-icon>
+                                            <span>{{ $t('app.appOfficeWebsite') }}</span>
+                                        </el-link>
+                                    </el-descriptions-item>
+                                    <el-descriptions-item>
+                                        <el-link @click="toLink(app.document)">
+                                            <el-icon><Document /></el-icon>
+                                            <span>{{ $t('app.document') }}</span>
+                                        </el-link>
+                                    </el-descriptions-item>
+                                    <el-descriptions-item>
+                                        <el-link @click="toLink(app.github)">
+                                            <el-icon><Link /></el-icon>
+                                            <span>{{ $t('app.github') }}</span>
+                                        </el-link>
+                                    </el-descriptions-item>
+                                </el-descriptions>
+                            </div>
+                        </el-col>
+                    </el-row>
+                </div>
             </div>
             <div v-loading="loadingDetail" style="margin-left: -32px">
                 <v-md-preview :text="appDetail.readme"></v-md-preview>
@@ -142,7 +146,7 @@ onMounted(() => {
 
 <style lang="scss">
 .brief {
-    height: 30vh;
+    // height: 30vh;
 
     .name {
         span {

@@ -6,17 +6,10 @@
             </Menu>
         </el-aside>
         <el-container>
-            <el-header>
-                <Header>
-                    <slot name="header"></slot>
-                </Header>
-            </el-header>
             <el-main>
-                <!-- <Content> -->
                 <div>
                     <View></View>
                 </div>
-                <!-- </Content> -->
             </el-main>
             <el-footer>
                 <Footer>
@@ -28,15 +21,9 @@
 </template>
 
 <script setup lang="ts">
-// import { computed } from 'vue';
 import Menu from './layout-menu.vue';
-import Header from './layout-header.vue';
 import Footer from './layout-footer.vue';
 import View from './layout-view.vue';
-// import Content from './layout-content.vue';
-// import { GlobalStore } from '@/store';
-// const globalStore = GlobalStore();
-// const themeConfig = computed(() => globalStore.themeConfig);
 </script>
 
 <style scoped lang="scss">

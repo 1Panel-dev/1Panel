@@ -21,7 +21,7 @@
             >
                 <SubItem :menuList="routerMenus"></SubItem>
                 <el-menu-item>
-                    <el-icon>
+                    <el-icon @click="logout">
                         <SvgIcon :iconName="'p-logout'" :className="'svg-icon'"></SvgIcon>
                     </el-icon>
                     <template #title>
