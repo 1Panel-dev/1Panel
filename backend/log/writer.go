@@ -2,6 +2,7 @@ package log
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"io/ioutil"
 	"log"
@@ -41,6 +42,7 @@ func (w *AsynchronousWriter) Close() error {
 		func() {
 			defer func() {
 				if r := recover(); r != nil {
+					global.LOG.Error(r)
 				}
 			}()
 			w.m.Close()
@@ -59,11 +61,11 @@ func (w *AsynchronousWriter) onClose() {
 				select {
 				case w.errChan <- err:
 				default:
-					_asyncBufferPool.Put(b)
+					_asyncBufferPool.Put(&b)
 					return
 				}
 			}
-			_asyncBufferPool.Put(b)
+			_asyncBufferPool.Put(&b)
 		default:
 			return
 		}
@@ -183,7 +185,7 @@ func (w *AsynchronousWriter) writer() {
 			if _, err = w.file.Write(b); err != nil && len(w.errChan) < cap(w.errChan) {
 				w.errChan <- err
 			}
-			_asyncBufferPool.Put(b)
+			_asyncBufferPool.Put(&b)
 		case <-w.ctx:
 			return
 		}
@@ -191,11 +193,9 @@ func (w *AsynchronousWriter) writer() {
 }
 
 func (w *Writer) DoRemove() {
-	select {
-	case file := <-w.rollingfilech:
-		if err := os.Remove(file); err != nil {
-			log.Println("error in remove log file", file, err)
-		}
+	file := <-w.rollingfilech
+	if err := os.Remove(file); err != nil {
+		log.Println("error in remove log file", file, err)
 	}
 }
 

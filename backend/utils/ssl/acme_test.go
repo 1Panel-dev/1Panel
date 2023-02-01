@@ -3,16 +3,13 @@ package ssl
 import (
 	"crypto/rand"
 	"crypto/rsa"
-	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strings"
 	"testing"
 
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/go-acme/lego/v4/acme/api"
 	"github.com/go-acme/lego/v4/certcrypto"
 	"github.com/go-acme/lego/v4/certificate"
@@ -21,22 +18,6 @@ import (
 	"github.com/go-acme/lego/v4/lego"
 	"github.com/go-acme/lego/v4/registration"
 )
-
-type plainDnsProvider struct {
-	Resolve
-}
-
-func (p *plainDnsProvider) Present(domain, token, keyAuth string) error {
-	fqdn, value := dns01.GetRecord(domain, keyAuth)
-	p.Key = fqdn
-	p.Value = value
-	return nil
-}
-
-func (p *plainDnsProvider) CleanUp(domain, token, keyAuth string) error {
-	fmt.Printf("%s,%s,%s", domain, token, keyAuth)
-	return nil
-}
 
 func TestCreatePrivate(t *testing.T) {
 	priKey, err := rsa.GenerateKey(rand.Reader, 2048)
@@ -260,28 +241,4 @@ func TestSSL(t *testing.T) {
 	}
 	fmt.Println(cert2)
 
-}
-
-func TestDaoqi(t *testing.T) {
-	conn, err := tls.Dial("tcp", "1panel.xyz:443", nil)
-	if err != nil {
-		panic(err)
-	}
-
-	conn2 := conn.ConnectionState()
-
-	fmt.Println(conn2.PeerCertificates[0].NotBefore)
-
-	fmt.Println(conn.ConnectionState().PeerCertificates[0].AuthorityKeyId)
-	fmt.Println(string(conn.ConnectionState().PeerCertificates[0].SubjectKeyId))
-}
-
-func Test111(t *testing.T) {
-	out, err := cmd.Exec("docker exec -i 1Panel-nginx1.23.1-AiCt curl http://127.0.0.1/nginx_status")
-	if err != nil {
-		panic(err)
-	}
-	outArray := strings.Split(out, " ")
-	fmt.Println(outArray)
-	fmt.Println(outArray[8])
 }

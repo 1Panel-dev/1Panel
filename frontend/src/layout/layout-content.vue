@@ -54,7 +54,7 @@
                         </div>
                     </slot>
                 </div>
-                <div v-if="slots.prompt">
+                <div v-if="slots.prompt" class="prompt">
                     <slot name="prompt"></slot>
                 </div>
                 <div class="main">
@@ -118,6 +118,10 @@ const showBack = computed(() => {
 
 .main {
     margin-top: 20px;
+}
+
+.prompt {
+    margin-top: 10px;
 }
 
 .divider {

@@ -48,13 +48,11 @@ func (c *Client) Write() {
 	}()
 
 	for {
-		select {
-		case message, ok := <-c.Msg:
-			if !ok {
-				return
-			}
-			_ = c.Socket.WriteMessage(websocket.TextMessage, message)
+		message, ok := <-c.Msg
+		if !ok {
+			return
 		}
+		_ = c.Socket.WriteMessage(websocket.TextMessage, message)
 	}
 }
 
