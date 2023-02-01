@@ -1,37 +1,49 @@
 <template>
-    <el-drawer v-model="templateVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <div class="card-header">
-                <span>{{ title }}{{ $t('container.composeTemplate') }}</span>
-            </div>
+            <DrawerHeader :header="title + $t('container.composeTemplate')" :back="handleClose" />
         </template>
-        <el-form v-loading="loading" ref="formRef" :model="dialogData.rowData" :rules="rules" label-width="80px">
-            <el-form-item :label="$t('container.name')" prop="name">
-                <el-input :disabled="dialogData.title === 'edit'" v-model.trim="dialogData.rowData!.name"></el-input>
-            </el-form-item>
-            <el-form-item :label="$t('container.description')">
-                <el-input v-model="dialogData.rowData!.description"></el-input>
-            </el-form-item>
-            <el-form-item>
-                <codemirror
-                    :autofocus="true"
-                    placeholder="#Define or paste the content of your docker-compose file here"
-                    :indent-with-tab="true"
-                    :tabSize="4"
-                    style="width: 100%; height: calc(100vh - 251px)"
-                    :lineWrapping="true"
-                    :matchBrackets="true"
-                    theme="cobalt"
-                    :styleActiveLine="true"
-                    :extensions="extensions"
-                    v-model="dialogData.rowData!.content"
-                    :readOnly="true"
-                />
-            </el-form-item>
+        <el-form
+            v-loading="loading"
+            label-position="top"
+            ref="formRef"
+            :model="dialogData.rowData"
+            :rules="rules"
+            label-width="80px"
+        >
+            <el-row type="flex" justify="center">
+                <el-col :span="22">
+                    <el-form-item :label="$t('container.name')" prop="name">
+                        <el-input
+                            :disabled="dialogData.title === 'edit'"
+                            v-model.trim="dialogData.rowData!.name"
+                        ></el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.description')">
+                        <el-input v-model="dialogData.rowData!.description"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <codemirror
+                            :autofocus="true"
+                            placeholder="#Define or paste the content of your docker-compose file here"
+                            :indent-with-tab="true"
+                            :tabSize="4"
+                            style="width: 100%; height: calc(100vh - 351px)"
+                            :lineWrapping="true"
+                            :matchBrackets="true"
+                            theme="cobalt"
+                            :styleActiveLine="true"
+                            :extensions="extensions"
+                            v-model="dialogData.rowData!.content"
+                            :readOnly="true"
+                        />
+                    </el-form-item>
+                </el-col>
+            </el-row>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="loading" @click="templateVisiable = false">
+                <el-button :disabled="loading" @click="drawerVisiable = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
@@ -62,16 +74,20 @@ interface DialogProps {
 }
 const extensions = [javascript(), oneDark];
 const title = ref<string>('');
-const templateVisiable = ref(false);
+const drawerVisiable = ref(false);
 const dialogData = ref<DialogProps>({
     title: '',
 });
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
-    templateVisiable.value = true;
+    drawerVisiable.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
+
+const handleClose = () => {
+    drawerVisiable.value = false;
+};
 
 const rules = reactive({
     name: [Rules.requiredInput, Rules.name],
@@ -92,7 +108,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                     loading.value = false;
                     ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
                     emit('search');
-                    templateVisiable.value = false;
+                    drawerVisiable.value = false;
                 })
                 .catch(() => {
                     loading.value = false;
@@ -104,7 +120,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 loading.value = false;
                 ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
                 emit('search');
-                templateVisiable.value = false;
+                drawerVisiable.value = false;
             })
             .catch(() => {
                 loading.value = false;

@@ -596,7 +596,6 @@ export default {
         batchInput: '批量输入',
         quickCommand: '快速命令',
         groupDeleteHelper: '移除组后，组内所有连接将迁移到 default 组内，是否确认',
-        quickCmd: '快捷命令',
         command: '命令',
         addHost: '添加主机',
         localhost: '本地服务器',

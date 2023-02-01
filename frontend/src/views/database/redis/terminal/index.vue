@@ -1,6 +1,6 @@
 <template>
     <div v-show="terminalShow" style="height: 100%">
-        <div style="height: calc(100vh - 230px)" :id="'terminal-exec'"></div>
+        <div style="height: calc(100vh - 360px)" :id="'terminal-exec'"></div>
     </div>
 </template>
 

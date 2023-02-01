@@ -1,51 +1,49 @@
 <template>
     <div>
         <el-row :gutter="20">
-            <el-col :span="1"><br /></el-col>
-            <el-col :span="6">
-                <table style="width: 100%" class="myTable">
-                    <tr>
-                        <td>{{ $t('database.runTime') }}</td>
-                        <td>{{ mysqlStatus.run }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ $t('database.connections') }}</td>
-                        <td>{{ mysqlStatus.connections }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ $t('database.bytesSent') }}</td>
-                        <td>{{ mysqlStatus!.bytesSent }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ $t('database.bytesReceived') }}</td>
-                        <td>{{ mysqlStatus!.bytesReceived }}</td>
-                    </tr>
-                </table>
+            <el-col :span="8">
+                <el-row style="margin-top: 20px">
+                    <table style="width: 100%" class="myTable">
+                        <tr>
+                            <td>{{ $t('database.runTime') }}</td>
+                            <td>{{ mysqlStatus.run }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ $t('database.connections') }}</td>
+                            <td>{{ mysqlStatus.connections }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ $t('database.bytesSent') }}</td>
+                            <td>{{ mysqlStatus!.bytesSent }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ $t('database.bytesReceived') }}</td>
+                            <td>{{ mysqlStatus!.bytesReceived }}</td>
+                        </tr>
+                    </table>
+                </el-row>
+                <el-row style="margin-top: 20px">
+                    <table style="width: 100%" class="myTable">
+                        <tr>
+                            <td>{{ $t('database.queryPerSecond') }}</td>
+                            <td>{{ mysqlStatus!.queryPerSecond }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ $t('database.queryPerSecond') }}</td>
+                            <td>{{ mysqlStatus!.txPerSecond }}</td>
+                        </tr>
+                        <tr>
+                            <td>File</td>
+                            <td>{{ mysqlStatus!.file }}</td>
+                        </tr>
+                        <tr>
+                            <td>Position</td>
+                            <td>{{ mysqlStatus!.position }}</td>
+                        </tr>
+                    </table>
+                </el-row>
             </el-col>
-            <el-col :span="6">
-                <table style="width: 100%" class="myTable">
-                    <tr>
-                        <td>{{ $t('database.queryPerSecond') }}</td>
-                        <td>{{ mysqlStatus!.queryPerSecond }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ $t('database.queryPerSecond') }}</td>
-                        <td>{{ mysqlStatus!.txPerSecond }}</td>
-                    </tr>
-                    <tr>
-                        <td>File</td>
-                        <td>{{ mysqlStatus!.file }}</td>
-                    </tr>
-                    <tr>
-                        <td>Position</td>
-                        <td>{{ mysqlStatus!.position }}</td>
-                    </tr>
-                </table>
-            </el-col>
-        </el-row>
-        <el-row>
-            <el-col :span="1"><br /></el-col>
-            <el-col :span="12">
+            <el-col :span="16">
                 <table style="margin-top: 20px; width: 100%" class="myTable">
                     <tr>
                         <td>{{ $t('database.queryPerSecond') }}</td>

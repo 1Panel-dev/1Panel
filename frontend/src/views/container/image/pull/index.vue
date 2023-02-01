@@ -1,56 +1,58 @@
 <template>
     <el-drawer
-        v-model="pullVisiable"
+        v-model="drawerVisiable"
         @close="onCloseLog"
         :destroy-on-close="true"
         :close-on-click-modal="false"
         size="50%"
     >
         <template #header>
-            <div class="card-header">
-                <span>{{ $t('container.imagePull') }}</span>
-            </div>
+            <DrawerHeader :header="$t('container.imagePull')" :back="handleClose" />
         </template>
-        <el-form ref="formRef" :model="form" label-width="80px">
-            <el-form-item :label="$t('container.from')">
-                <el-checkbox v-model="form.fromRepo">{{ $t('container.imageRepo') }}</el-checkbox>
-            </el-form-item>
-            <el-form-item
-                v-if="form.fromRepo"
-                :label="$t('container.repoName')"
-                :rules="Rules.requiredSelect"
-                prop="repoID"
-            >
-                <el-select style="width: 100%" filterable v-model="form.repoID">
-                    <el-option v-for="item in repos" :key="item.id" :value="item.id" :label="item.name" />
-                </el-select>
-            </el-form-item>
-            <el-form-item :label="$t('container.imageName')" :rules="Rules.requiredInput" prop="imageName">
-                <el-input v-model.trim="form.imageName">
-                    <template v-if="form.fromRepo" #prepend>{{ loadDetailInfo(form.repoID) }}/</template>
-                </el-input>
-            </el-form-item>
-        </el-form>
+        <el-row type="flex" justify="center">
+            <el-col :span="22">
+                <el-form ref="formRef" label-position="top" :model="form" label-width="80px">
+                    <el-form-item :label="$t('container.from')">
+                        <el-checkbox v-model="form.fromRepo">{{ $t('container.imageRepo') }}</el-checkbox>
+                    </el-form-item>
+                    <el-form-item
+                        v-if="form.fromRepo"
+                        :label="$t('container.repoName')"
+                        :rules="Rules.requiredSelect"
+                        prop="repoID"
+                    >
+                        <el-select style="width: 100%" filterable v-model="form.repoID">
+                            <el-option v-for="item in repos" :key="item.id" :value="item.id" :label="item.name" />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.imageName')" :rules="Rules.requiredInput" prop="imageName">
+                        <el-input v-model.trim="form.imageName">
+                            <template v-if="form.fromRepo" #prepend>{{ loadDetailInfo(form.repoID) }}/</template>
+                        </el-input>
+                    </el-form-item>
+                </el-form>
 
-        <codemirror
-            v-if="logVisiable"
-            :autofocus="true"
-            placeholder="Waiting for pull output..."
-            :indent-with-tab="true"
-            :tabSize="4"
-            style="max-height: 300px"
-            :lineWrapping="true"
-            :matchBrackets="true"
-            theme="cobalt"
-            :styleActiveLine="true"
-            :extensions="extensions"
-            @ready="handleReady"
-            v-model="logInfo"
-            :readOnly="true"
-        />
+                <codemirror
+                    v-if="logVisiable"
+                    :autofocus="true"
+                    placeholder="Waiting for pull output..."
+                    :indent-with-tab="true"
+                    :tabSize="4"
+                    style="height: calc(100vh - 415px)"
+                    :lineWrapping="true"
+                    :matchBrackets="true"
+                    theme="cobalt"
+                    :styleActiveLine="true"
+                    :extensions="extensions"
+                    @ready="handleReady"
+                    v-model="logInfo"
+                    :readOnly="true"
+                />
+            </el-col>
+        </el-row>
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="buttonDisabled" @click="pullVisiable = false">
+                <el-button :disabled="buttonDisabled" @click="drawerVisiable = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="buttonDisabled" type="primary" @click="onSubmit(formRef)">
@@ -73,7 +75,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { LoadFile } from '@/api/modules/files';
 
-const pullVisiable = ref(false);
+const drawerVisiable = ref(false);
 const form = reactive({
     fromRepo: true,
     repoID: null as number,
@@ -97,7 +99,7 @@ interface DialogProps {
 const repos = ref();
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
-    pullVisiable.value = true;
+    drawerVisiable.value = true;
     form.fromRepo = true;
     form.imageName = '';
     repos.value = params.repos;
@@ -106,6 +108,10 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 };
 
 const emit = defineEmits<{ (e: 'search'): void }>();
+
+const handleClose = () => {
+    drawerVisiable.value = false;
+};
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();

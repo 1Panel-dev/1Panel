@@ -68,7 +68,10 @@
             </template>
         </LayoutContent>
         <RecoverStatus ref="recoverStatusRef"></RecoverStatus>
-        <el-drawer v-model="dialogVisiable" :title="$t('setting.createSnapshot')" size="50%">
+        <el-drawer v-model="drawerVisiable" size="50%">
+            <template #header>
+                <DrawerHeader :header="$t('setting.createSnapshot')" :back="handleClose" />
+            </template>
             <el-form v-loading="loading" ref="snapRef" label-width="100px" :model="snapInfo" :rules="rules">
                 <el-form-item :label="$t('cronjob.target')" prop="from">
                     <el-select v-model="snapInfo.from" clearable>
@@ -86,7 +89,7 @@
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="dialogVisiable = false">
+                    <el-button :disabled="loading" @click="drawerVisiable = false">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button :disabled="loading" type="primary" @click="submitAddSnapshot(snapRef)">
@@ -137,11 +140,15 @@ let snapInfo = reactive<Setting.SnapshotCreate>({
     description: '',
 });
 
-const dialogVisiable = ref<boolean>(false);
+const drawerVisiable = ref<boolean>(false);
 
 const onCreate = async () => {
     restForm();
-    dialogVisiable.value = true;
+    drawerVisiable.value = true;
+};
+
+const handleClose = () => {
+    drawerVisiable.value = false;
 };
 
 const submitAddSnapshot = (formEl: FormInstance | undefined) => {
@@ -152,7 +159,7 @@ const submitAddSnapshot = (formEl: FormInstance | undefined) => {
         await snapshotCreate(snapInfo)
             .then(() => {
                 loading.value = false;
-                dialogVisiable.value = false;
+                drawerVisiable.value = false;
                 search();
                 ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
             })

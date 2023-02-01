@@ -35,7 +35,10 @@
                 </div>
             </template>
         </LayoutContent>
-        <el-drawer :key="refresh" v-model="drawerShow" size="50%">
+        <el-drawer :key="refresh" v-model="drawerVisiable" size="50%">
+            <template #header>
+                <DrawerHeader :header="$t('setting.upgrade')" :back="handleClose" />
+            </template>
             <el-form label-width="120px">
                 <el-form-item :label="$t('setting.newVersion')">
                     <el-tag>{{ upgradeInfo.newVersion }}</el-tag>
@@ -65,7 +68,7 @@ import i18n from '@/lang';
 
 const version = ref();
 const upgradeInfo = ref();
-const drawerShow = ref();
+const drawerVisiable = ref();
 const refresh = ref();
 
 const loading = ref();
@@ -87,6 +90,10 @@ const toGithubStar = () => {
     window.open('https://github.com/1Panel-dev/1Panel', '_blank');
 };
 
+const handleClose = () => {
+    drawerVisiable.value = false;
+};
+
 const onLoadUpgradeInfo = async () => {
     const res = await loadUpgradeInfoByOSS();
     if (!res.data) {
@@ -94,7 +101,7 @@ const onLoadUpgradeInfo = async () => {
         return;
     }
     upgradeInfo.value = res.data;
-    drawerShow.value = true;
+    drawerVisiable.value = true;
 };
 const onUpgrade = async () => {
     ElMessageBox.confirm(i18n.global.t('setting.upgradeHelper', i18n.global.t('setting.upgrade')), {
@@ -106,7 +113,7 @@ const onUpgrade = async () => {
         upgrade(upgradeInfo.value.newVersion)
             .then(() => {
                 loading.value = false;
-                drawerShow.value = false;
+                drawerVisiable.value = false;
                 ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
                 search();
             })

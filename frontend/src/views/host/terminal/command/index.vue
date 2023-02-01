@@ -1,30 +1,58 @@
 <template>
     <div>
-        <el-card style="margin-top: 20px">
-            <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data" @search="search">
-                <template #toolbar>
-                    <el-button type="primary" icon="Plus" @click="onCreate()">
-                        {{ $t('commons.button.create') }}
-                    </el-button>
-                    <el-button type="danger" plain :disabled="selects.length === 0" @click="batchDelete(null)">
-                        {{ $t('commons.button.delete') }}
-                    </el-button>
-                </template>
-                <el-table-column type="selection" fix />
-                <el-table-column :label="$t('commons.table.name')" min-width="100" prop="name" fix />
-                <el-table-column :label="$t('terminal.command')" min-width="300" show-overflow-tooltip prop="command" />
-                <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
-            </ComplexTable>
-        </el-card>
-        <el-dialog v-model="cmdVisiable" :title="$t('commons.button.' + operate)" width="30%">
-            <el-form ref="commandInfoRef" label-width="100px" label-position="left" :model="commandInfo" :rules="rules">
-                <el-form-item :label="$t('commons.table.name')" prop="name">
-                    <el-input clearable v-model="commandInfo.name" />
-                </el-form-item>
-                <el-form-item :label="$t('terminal.command')" prop="command">
-                    <el-input type="textarea" clearable v-model="commandInfo.command" />
-                </el-form-item>
-            </el-form>
+        <LayoutContent v-loading="loading" :title="$t('terminal.quickCommand')">
+            <template #toolbar>
+                <el-button type="primary" @click="onCreate()">
+                    {{ $t('commons.button.create') }}{{ $t('terminal.quickCommand') }}
+                </el-button>
+                <el-button plain :disabled="selects.length === 0" @click="batchDelete(null)">
+                    {{ $t('commons.button.delete') }}
+                </el-button>
+            </template>
+            <template #main>
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    v-model:selects="selects"
+                    :data="data"
+                    @search="search"
+                >
+                    <el-table-column type="selection" fix />
+                    <el-table-column :label="$t('commons.table.name')" min-width="100" prop="name" fix />
+                    <el-table-column
+                        :label="$t('terminal.command')"
+                        min-width="300"
+                        show-overflow-tooltip
+                        prop="command"
+                    />
+                    <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fix />
+                </ComplexTable>
+            </template>
+        </LayoutContent>
+        <el-drawer v-model="cmdVisiable" size="50%">
+            <template #header>
+                <DrawerHeader
+                    :header="$t('commons.button.' + operate) + $t('terminal.quickCommand')"
+                    :back="handleClose"
+                />
+            </template>
+            <el-row type="flex" justify="center">
+                <el-col :span="22">
+                    <el-form
+                        ref="commandInfoRef"
+                        label-width="100px"
+                        label-position="top"
+                        :model="commandInfo"
+                        :rules="rules"
+                    >
+                        <el-form-item :label="$t('commons.table.name')" prop="name">
+                            <el-input clearable v-model="commandInfo.name" />
+                        </el-form-item>
+                        <el-form-item :label="$t('terminal.command')" prop="command">
+                            <el-input type="textarea" clearable v-model="commandInfo.command" />
+                        </el-form-item>
+                    </el-form>
+                </el-col>
+            </el-row>
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="cmdVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
@@ -33,11 +61,12 @@
                     </el-button>
                 </span>
             </template>
-        </el-dialog>
+        </el-drawer>
     </div>
 </template>
 
 <script setup lang="ts">
+import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { Command } from '@/api/interface/command';
 import { addCommand, editCommand, deleteCommand, getCommandPage } from '@/api/modules/command';
@@ -48,6 +77,7 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
 
+const loading = ref();
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
@@ -81,6 +111,10 @@ const onCreate = async () => {
     restcommandForm();
     operate.value = 'create';
     cmdVisiable.value = true;
+};
+
+const handleClose = () => {
+    cmdVisiable.value = false;
 };
 
 const submitAddCommand = (formEl: FormInstance | undefined) => {
@@ -145,9 +179,16 @@ const search = async () => {
         pageSize: paginationConfig.pageSize,
         info: info.value,
     };
-    const res = await getCommandPage(params);
-    data.value = res.data.items || [];
-    paginationConfig.total = res.data.total;
+    loading.value = true;
+    await getCommandPage(params)
+        .then((res) => {
+            loading.value = false;
+            data.value = res.data.items || [];
+            paginationConfig.total = res.data.total;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 defineExpose({

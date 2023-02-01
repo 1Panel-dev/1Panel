@@ -1,102 +1,119 @@
 <template>
-    <div class="demo-collapse" v-show="settingShow">
-        <el-card style="margin-top: 5px" v-loading="loading">
-            <LayoutContent :header="'Redis ' + $t('database.setting')" back-name="Redis" :reload="true">
-                <el-collapse v-model="activeName" accordion>
-                    <el-collapse-item :title="$t('database.confChange')" name="1">
-                        <codemirror
-                            :autofocus="true"
-                            placeholder="None data"
-                            :indent-with-tab="true"
-                            :tabSize="4"
-                            style="margin-top: 10px; height: calc(100vh - 280px)"
-                            :lineWrapping="true"
-                            :matchBrackets="true"
-                            theme="cobalt"
-                            :styleActiveLine="true"
-                            :extensions="extensions"
-                            v-model="redisConf"
-                            :readOnly="true"
-                        />
-                        <el-button style="margin-top: 10px" @click="getDefaultConfig()">
-                            {{ $t('app.defaultConfig') }}
-                        </el-button>
-                        <el-button type="primary" @click="onSaveFile" style="margin-top: 10px">
-                            {{ $t('commons.button.save') }}
-                        </el-button>
-                        <el-row>
-                            <el-col :span="8">
-                                <el-alert
-                                    v-if="useOld"
-                                    style="margin-top: 10px"
-                                    :title="$t('app.defaultConfigHelper')"
-                                    type="info"
-                                    :closable="false"
-                                ></el-alert>
+    <div v-show="settingShow">
+        <LayoutContent :title="$t('nginx.nginxConfig')" :reload="true">
+            <template #buttons>
+                <el-button type="primary" :plain="activeName !== 'conf'" @click="changeTab('conf')">
+                    {{ $t('database.confChange') }}
+                </el-button>
+                <el-button
+                    type="primary"
+                    :disabled="redisStatus !== 'Running'"
+                    :plain="activeName !== 'status'"
+                    @click="changeTab('status')"
+                >
+                    {{ $t('database.status') }}
+                </el-button>
+                <el-button
+                    type="primary"
+                    :disabled="redisStatus !== 'Running'"
+                    :plain="activeName !== 'tuning'"
+                    @click="changeTab('tuning')"
+                >
+                    {{ $t('database.performanceTuning') }}
+                </el-button>
+                <el-button type="primary" :plain="activeName !== 'port'" @click="changeTab('port')">
+                    {{ $t('database.portSetting') }}
+                </el-button>
+                <el-button
+                    type="primary"
+                    :disabled="redisStatus !== 'Running'"
+                    :plain="activeName !== 'persistence'"
+                    @click="changeTab('persistence')"
+                >
+                    {{ $t('database.persistence') }}
+                </el-button>
+            </template>
+            <template #main>
+                <div v-if="activeName === 'conf'">
+                    <codemirror
+                        :autofocus="true"
+                        placeholder="None data"
+                        :indent-with-tab="true"
+                        :tabSize="4"
+                        style="margin-top: 10px; height: calc(100vh - 370px)"
+                        :lineWrapping="true"
+                        :matchBrackets="true"
+                        theme="cobalt"
+                        :styleActiveLine="true"
+                        :extensions="extensions"
+                        v-model="redisConf"
+                        :readOnly="true"
+                    />
+                    <el-button style="margin-top: 10px" @click="getDefaultConfig()">
+                        {{ $t('app.defaultConfig') }}
+                    </el-button>
+                    <el-button type="primary" @click="onSaveFile" style="margin-top: 10px">
+                        {{ $t('commons.button.save') }}
+                    </el-button>
+                    <el-row>
+                        <el-col :span="8">
+                            <el-alert
+                                v-if="useOld"
+                                style="margin-top: 10px"
+                                :title="$t('app.defaultConfigHelper')"
+                                type="info"
+                                :closable="false"
+                            ></el-alert>
+                        </el-col>
+                    </el-row>
+                </div>
+                <Status v-show="activeName === 'status'" ref="statusRef" />
+                <div v-if="activeName === 'tuning'">
+                    <el-form :model="form" ref="formRef" :rules="rules" label-width="120px">
+                        <el-row style="margin-top: 20px">
+                            <el-col :span="1"><br /></el-col>
+                            <el-col :span="10">
+                                <el-form-item :label="$t('database.timeout')" prop="timeout">
+                                    <el-input clearable type="number" v-model.number="form.timeout" />
+                                    <span class="input-help">{{ $t('database.timeoutHelper') }}</span>
+                                </el-form-item>
+                                <el-form-item :label="$t('database.maxclients')" prop="maxclients">
+                                    <el-input clearable type="number" v-model.number="form.maxclients" />
+                                </el-form-item>
+                                <el-form-item :label="$t('database.maxmemory')" prop="maxmemory">
+                                    <el-input clearable type="number" v-model.number="form.maxmemory" />
+                                    <span class="input-help">{{ $t('database.maxmemoryHelper') }}</span>
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button type="primary" @click="onSubmtiForm(formRef)">
+                                        {{ $t('commons.button.save') }}
+                                    </el-button>
+                                </el-form-item>
                             </el-col>
                         </el-row>
-                    </el-collapse-item>
-                    <el-collapse-item :disabled="redisStatus !== 'Running'" :title="$t('database.status')" name="2">
-                        <Status ref="statusRef" />
-                    </el-collapse-item>
-                    <el-collapse-item
-                        :disabled="redisStatus !== 'Running'"
-                        :title="$t('database.performanceTuning')"
-                        name="3"
-                    >
-                        <el-form :model="form" ref="formRef" :rules="rules" label-width="120px">
-                            <el-row style="margin-top: 20px">
-                                <el-col :span="1"><br /></el-col>
-                                <el-col :span="10">
-                                    <el-form-item :label="$t('database.timeout')" prop="timeout">
-                                        <el-input clearable type="number" v-model.number="form.timeout" />
-                                        <span class="input-help">{{ $t('database.timeoutHelper') }}</span>
-                                    </el-form-item>
-                                    <el-form-item :label="$t('database.maxclients')" prop="maxclients">
-                                        <el-input clearable type="number" v-model.number="form.maxclients" />
-                                    </el-form-item>
-                                    <el-form-item :label="$t('database.maxmemory')" prop="maxmemory">
-                                        <el-input clearable type="number" v-model.number="form.maxmemory" />
-                                        <span class="input-help">{{ $t('database.maxmemoryHelper') }}</span>
-                                    </el-form-item>
-                                    <el-form-item>
-                                        <el-button type="primary" @click="onSubmtiForm(formRef)">
-                                            {{ $t('commons.button.save') }}
-                                        </el-button>
-                                    </el-form-item>
-                                </el-col>
-                            </el-row>
-                        </el-form>
-                    </el-collapse-item>
-
-                    <el-collapse-item :title="$t('database.portSetting')" name="4">
-                        <el-form :model="form" ref="portRef" label-width="120px">
-                            <el-row>
-                                <el-col :span="1"><br /></el-col>
-                                <el-col :span="10">
-                                    <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
-                                        <el-input clearable type="number" v-model.number="form.port">
-                                            <template #append>
-                                                <el-button @click="onSavePort(portRef)" icon="Collection">
-                                                    {{ $t('commons.button.save') }}
-                                                </el-button>
-                                            </template>
-                                        </el-input>
-                                    </el-form-item>
-                                </el-col>
-                            </el-row>
-                        </el-form>
-                    </el-collapse-item>
-                    <el-collapse-item
-                        :disabled="redisStatus !== 'Running'"
-                        :title="$t('database.persistence')"
-                        name="5"
-                    >
-                        <Persistence ref="persistenceRef" />
-                    </el-collapse-item>
-                </el-collapse>
-            </LayoutContent>
-        </el-card>
+                    </el-form>
+                </div>
+                <div v-if="activeName === 'port'">
+                    <el-form :model="form" ref="portRef" label-width="120px">
+                        <el-row>
+                            <el-col :span="1"><br /></el-col>
+                            <el-col :span="10">
+                                <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
+                                    <el-input clearable type="number" v-model.number="form.port">
+                                        <template #append>
+                                            <el-button @click="onSavePort(portRef)" icon="Collection">
+                                                {{ $t('commons.button.save') }}
+                                            </el-button>
+                                        </template>
+                                    </el-input>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                    </el-form>
+                </div>
+                <Persistence v-show="activeName === 'persistence'" ref="persistenceRef" />
+            </template>
+        </LayoutContent>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="submtiFile"></ConfirmDialog>
         <ConfirmDialog ref="confirmFileRef" @confirm="submtiFile"></ConfirmDialog>
@@ -140,7 +157,7 @@ const rules = reactive({
     maxmemory: [Rules.number],
 });
 
-const activeName = ref('1');
+const activeName = ref('conf');
 const statusRef = ref();
 const persistenceRef = ref();
 
@@ -159,6 +176,11 @@ interface DialogProps {
     redisName: string;
     status: string;
 }
+
+const changeTab = (val: string) => {
+    activeName.value = val;
+    console.log(activeName.value);
+};
 
 const acceptParams = (prop: DialogProps): void => {
     redisStatus.value = prop.status;

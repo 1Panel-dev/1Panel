@@ -1,79 +1,81 @@
 <template>
     <el-drawer
-        v-model="buildVisiable"
+        v-model="drawerVisiable"
         :destroy-on-close="true"
         @close="onCloseLog"
         :close-on-click-modal="false"
         size="50%"
     >
         <template #header>
-            <div class="card-header">
-                <span>{{ $t('container.imageBuild') }}</span>
-            </div>
+            <DrawerHeader :header="$t('container.imageBuild')" :back="handleClose" />
         </template>
-        <el-form ref="formRef" :model="form" label-width="80px" :rules="rules">
-            <el-form-item :label="$t('container.name')" prop="name">
-                <el-input :placeholder="$t('container.imageNameHelper')" v-model.trim="form.name" clearable />
-            </el-form-item>
-            <el-form-item label="Dockerfile" prop="from">
-                <el-radio-group v-model="form.from">
-                    <el-radio label="edit">{{ $t('container.edit') }}</el-radio>
-                    <el-radio label="path">{{ $t('container.pathSelect') }}</el-radio>
-                </el-radio-group>
-            </el-form-item>
-            <el-form-item v-if="form.from === 'edit'" :rules="Rules.requiredInput">
+        <el-row type="flex" justify="center">
+            <el-col :span="22">
+                <el-form ref="formRef" label-position="top" :model="form" label-width="80px" :rules="rules">
+                    <el-form-item :label="$t('container.name')" prop="name">
+                        <el-input :placeholder="$t('container.imageNameHelper')" v-model.trim="form.name" clearable />
+                    </el-form-item>
+                    <el-form-item label="Dockerfile" prop="from">
+                        <el-radio-group v-model="form.from">
+                            <el-radio label="edit">{{ $t('container.edit') }}</el-radio>
+                            <el-radio label="path">{{ $t('container.pathSelect') }}</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item v-if="form.from === 'edit'" :rules="Rules.requiredInput">
+                        <codemirror
+                            :autofocus="true"
+                            placeholder="#Define or paste the content of your Dockerfile here"
+                            :indent-with-tab="true"
+                            :tabSize="4"
+                            style="width: 100%; height: calc(100vh - 520px)"
+                            :lineWrapping="true"
+                            :matchBrackets="true"
+                            theme="cobalt"
+                            :styleActiveLine="true"
+                            :extensions="extensions"
+                            v-model="form.dockerfile"
+                            :readOnly="true"
+                        />
+                    </el-form-item>
+                    <el-form-item v-else :rules="Rules.requiredSelect" prop="dockerfile">
+                        <el-input clearable v-model="form.dockerfile">
+                            <template #append>
+                                <FileList @choose="loadBuildDir" :dir="true"></FileList>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.tag')">
+                        <el-input
+                            :placeholder="$t('container.tagHelper')"
+                            type="textarea"
+                            :autosize="{ minRows: 2, maxRows: 4 }"
+                            v-model="form.tagStr"
+                        />
+                    </el-form-item>
+                </el-form>
+
                 <codemirror
+                    v-if="logVisiable"
                     :autofocus="true"
-                    placeholder="#Define or paste the content of your Dockerfile here"
+                    placeholder="Waiting for build output..."
                     :indent-with-tab="true"
                     :tabSize="4"
-                    style="width: 100%; height: calc(100vh - 350px)"
+                    style="max-height: 300px"
                     :lineWrapping="true"
                     :matchBrackets="true"
                     theme="cobalt"
                     :styleActiveLine="true"
                     :extensions="extensions"
-                    v-model="form.dockerfile"
+                    @ready="handleReady"
+                    v-model="logInfo"
                     :readOnly="true"
                 />
-            </el-form-item>
-            <el-form-item v-else :rules="Rules.requiredSelect" prop="dockerfile">
-                <el-input clearable v-model="form.dockerfile">
-                    <template #append>
-                        <FileList @choose="loadBuildDir" :dir="true"></FileList>
-                    </template>
-                </el-input>
-            </el-form-item>
-            <el-form-item :label="$t('container.tag')">
-                <el-input
-                    :placeholder="$t('container.tagHelper')"
-                    type="textarea"
-                    :autosize="{ minRows: 2, maxRows: 4 }"
-                    v-model="form.tagStr"
-                />
-            </el-form-item>
-        </el-form>
-
-        <codemirror
-            v-if="logVisiable"
-            :autofocus="true"
-            placeholder="Waiting for build output..."
-            :indent-with-tab="true"
-            :tabSize="4"
-            style="max-height: 300px"
-            :lineWrapping="true"
-            :matchBrackets="true"
-            theme="cobalt"
-            :styleActiveLine="true"
-            :extensions="extensions"
-            @ready="handleReady"
-            v-model="logInfo"
-            :readOnly="true"
-        />
+            </el-col>
+        </el-row>
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="buttonDisabled" @click="buildVisiable = false">
+                <el-button :disabled="buttonDisabled" @click="drawerVisiable = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="buttonDisabled" type="primary" @click="onSubmit(formRef)">
@@ -107,7 +109,7 @@ let timer: NodeJS.Timer | null = null;
 
 const buttonDisabled = ref(false);
 
-const buildVisiable = ref(false);
+const drawerVisiable = ref(false);
 const form = reactive({
     from: 'path',
     dockerfile: '',
@@ -127,7 +129,7 @@ const rules = reactive({
     dockerfile: [Rules.requiredInput, { validator: varifyPath, trigger: 'change', required: true }],
 });
 const acceptParams = async () => {
-    buildVisiable.value = true;
+    drawerVisiable.value = true;
     form.from = 'path';
     form.dockerfile = '';
     form.tagStr = '';
@@ -135,8 +137,11 @@ const acceptParams = async () => {
     logInfo.value = '';
     buttonDisabled.value = false;
 };
-
 const emit = defineEmits<{ (e: 'search'): void }>();
+
+const handleClose = () => {
+    drawerVisiable.value = false;
+};
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
