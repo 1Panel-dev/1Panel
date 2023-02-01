@@ -14,6 +14,7 @@ declare module 'vue' {
     BreadCrumbsItem: typeof import('./src/components/bread-crumbs/bread-crumbs-item.vue')['default']
     CardWithHeader: typeof import('./src/components/card-with-header/index.vue')['default']
     Codemirror: typeof import('./src/components/codemirror-dialog/codemirror.vue')['default']
+    Collapse: typeof import('./src/components/app-layout/menu/components/Collapse.vue')['default']
     ComplexTable: typeof import('./src/components/complex-table/index.vue')['default']
     ConfirmDialog: typeof import('./src/components/confirm-dialog/index.vue')['default']
     ContainerLog: typeof import('./src/components/container-log/index.vue')['default']
