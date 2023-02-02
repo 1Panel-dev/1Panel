@@ -9,16 +9,17 @@
     .logo {
         box-sizing: border-box;
         height: 55px;
-        span {
-            font-size: 22px;
-            font-weight: bold;
-            color: $primary-color;
-            white-space: nowrap;
-        }
-        img {
-            width: 30px;
+        img:first-child {
+            width: 120px;
             object-fit: contain;
             margin-right: 8px;
+            margin-top: 10px;
+        }
+        img:nth-child(2) {
+            width: 50px;
+            object-fit: contain;
+            margin-top: 10px;
+            margin-left: 5px;
         }
     }
     .el-scrollbar {

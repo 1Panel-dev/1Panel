@@ -7,7 +7,7 @@
         element-loading-svg-view-box="-10, -10, 50, 50"
         element-loading-background="rgba(122, 122, 122, 0.01)"
     >
-        <Logo :panelName="panelName" :isCollapse="isCollapse"></Logo>
+        <Logo :isCollapse="isCollapse"></Logo>
         <el-scrollbar>
             <el-menu
                 :default-active="activeMenu"
@@ -39,7 +39,7 @@ import { ref, computed, onMounted } from 'vue';
 import { RouteRecordRaw, useRoute } from 'vue-router';
 import { MenuStore } from '@/store/modules/menu';
 import { loadingSvg } from '@/utils/svg';
-import Logo from './components/logo.vue';
+import Logo from './components/Logo.vue';
 import Collapse from './components/Collapse.vue';
 import SubItem from './components/sub-item.vue';
 import router, { menuList } from '@/routers/router';
@@ -58,9 +58,7 @@ const activeMenu = computed((): string => {
     return path;
 });
 const isCollapse = computed((): boolean => menuStore.isCollapse);
-const panelName = computed(() => {
-    return globalStore.themeConfig.panelName;
-});
+
 const routerMenus = computed((): RouteRecordRaw[] => menuStore.menuList);
 
 const screenWidth = ref<number>(0);
