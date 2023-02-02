@@ -1,55 +1,41 @@
 <template>
     <div>
-        <div class="app-content" style="margin-top: 30px">
-            <el-card class="app-card">
-                <el-row :gutter="20">
-                    <el-col :lg="3" :xl="2">
-                        <div>
-                            <el-tag effect="dark" type="success">Docker</el-tag>
-                        </div>
-                    </el-col>
-                    <el-col :lg="3" :xl="2">
-                        <div>
-                            {{ $t('app.version') }}:
-                            <el-tag type="info">{{ form.version }}</el-tag>
-                        </div>
-                    </el-col>
-                    <el-col :lg="3" :xl="2">
-                        <div>
-                            {{ $t('commons.table.status') }}:
-                            <el-tag v-if="form.status === 'Running'" type="success">
-                                {{ $t('commons.status.running') }}
-                            </el-tag>
-                            <el-tag v-if="form.status === 'Stopped'" type="info">
-                                {{ $t('commons.status.stopped') }}
-                            </el-tag>
-                        </div>
-                    </el-col>
-                    <el-col :lg="4" :xl="6">
-                        <div v-if="form.status === 'Running'">
-                            <el-button type="primary" @click="onOperator('stop')" link style="margin-left: 20px">
-                                {{ $t('container.stop') }}
-                            </el-button>
-                            <el-divider direction="vertical" />
-                            <el-button type="primary" @click="onOperator('restart')" link>
-                                {{ $t('container.restart') }}
-                            </el-button>
-                        </div>
-                        <div v-if="form.status === 'Stopped'">
-                            <el-button type="primary" @click="onOperator('start')" link style="margin-left: 20px">
-                                {{ $t('container.start') }}
-                            </el-button>
-                            <el-divider direction="vertical" />
-                            <el-button type="primary" @click="onOperator('restart')" link>
-                                {{ $t('container.restart') }}
-                            </el-button>
-                        </div>
-                    </el-col>
-                </el-row>
+        <div class="a-card" style="margin-top: 20px">
+            <el-card>
+                <div>
+                    <el-tag style="float: left" effect="dark" type="success">Docker</el-tag>
+                    <el-tag round class="status-content" v-if="form.status === 'Running'" type="success">
+                        {{ $t('commons.status.running') }}
+                    </el-tag>
+                    <el-tag round class="status-content" v-if="form.status === 'Stopped'" type="info">
+                        {{ $t('commons.status.stopped') }}
+                    </el-tag>
+                    <el-tag class="status-content" type="info">{{ $t('app.version') }}: {{ form.version }}</el-tag>
+
+                    <span v-if="form.status === 'Running'" class="buttons">
+                        <el-button type="primary" @click="onOperator('stop')" link>
+                            {{ $t('container.stop') }}
+                        </el-button>
+                        <el-divider direction="vertical" />
+                        <el-button type="primary" @click="onOperator('restart')" link>
+                            {{ $t('container.restart') }}
+                        </el-button>
+                    </span>
+
+                    <span v-if="form.status === 'Stopped'" class="buttons">
+                        <el-button type="primary" @click="onOperator('start')" link>
+                            {{ $t('container.start') }}
+                        </el-button>
+                        <el-divider direction="vertical" />
+                        <el-button type="primary" @click="onOperator('restart')" link>
+                            {{ $t('container.restart') }}
+                        </el-button>
+                    </span>
+                </div>
             </el-card>
         </div>
 
-        <LayoutContent v-loading="loading" style="margin-top: 30px" :title="$t('container.setting')" :divider="true">
+        <LayoutContent v-loading="loading" style="margin-top: 20px" :title="$t('container.setting')" :divider="true">
             <template #main>
                 <el-radio-group v-model="confShowType" @change="changeMode">
                     <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
@@ -262,16 +248,20 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss">
-.app-card {
-    font-size: 14px;
-    height: 60px;
+<style lang="scss" scoped>
+.a-card {
+    font-size: 17px;
+    .el-card {
+        --el-card-padding: 12px;
+        .buttons {
+            margin-left: 100px;
+        }
+    }
 }
-
-.app-content {
-    height: 50px;
+.status-content {
+    float: left;
+    margin-left: 50px;
 }
-
 body {
     margin: 0;
 }

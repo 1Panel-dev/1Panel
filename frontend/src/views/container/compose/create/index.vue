@@ -78,6 +78,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import { listComposeTemplate, upCompose } from '@/api/modules/container';
 
 const extensions = [javascript(), oneDark];

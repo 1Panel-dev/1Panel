@@ -181,6 +181,7 @@ import { ref } from 'vue';
 import { Setting } from '@/api/interface/setting';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import { snapshotRecover, snapshotRollback } from '@/api/modules/setting';
 
 const drawerVisiable = ref(false);

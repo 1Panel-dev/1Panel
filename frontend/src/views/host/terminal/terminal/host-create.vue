@@ -4,17 +4,17 @@
             <template #header>
                 <DrawerHeader :header="$t('terminal.addHost')" :back="handleClose" />
             </template>
-            <el-alert
-                v-if="isLocal"
-                style="margin-bottom: 20px"
-                center
-                :title="$t('terminal.connLocalErr')"
-                :closable="false"
-                type="warning"
-            />
             <el-form ref="hostRef" label-width="100px" label-position="top" :model="hostInfo" :rules="rules">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
+                        <el-alert
+                            v-if="isLocal"
+                            style="margin-bottom: 20px"
+                            center
+                            :title="$t('terminal.connLocalErr')"
+                            :closable="false"
+                            type="warning"
+                        />
                         <el-form-item :label="$t('terminal.ip')" prop="addr">
                             <el-input v-if="!isLocal" clearable v-model="hostInfo.addr" />
                             <div style="margin-left: 12px">
@@ -72,6 +72,7 @@ import { ElForm, ElMessage } from 'element-plus';
 import { Host } from '@/api/interface/host';
 import { Rules } from '@/global/form-rules';
 import { addHost, testByInfo } from '@/api/modules/host';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 

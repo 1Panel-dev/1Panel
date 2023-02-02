@@ -76,6 +76,7 @@ import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const loading = ref();
 const data = ref();

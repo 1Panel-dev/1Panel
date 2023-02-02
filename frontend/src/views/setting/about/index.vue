@@ -65,6 +65,7 @@ import MdEditor from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const version = ref();
 const upgradeInfo = ref();
