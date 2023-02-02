@@ -70,7 +70,7 @@ const closeRealTerminal = (ev: CloseEvent) => {
 const initTerm = () => {
     let ifm = document.getElementById('terminal-exec') as HTMLInputElement | null;
     let href = window.location.href;
-    let ipLocal = href.split('//')[1].split(':')[0];
+    let ipLocal = href.split('//')[1].split('/')[0];
     term = new Terminal({
         lineHeight: 1.2,
         fontSize: 12,
@@ -86,7 +86,7 @@ const initTerm = () => {
     if (ifm) {
         term.open(ifm);
         terminalSocket = new WebSocket(
-            `ws://${ipLocal}:9999/api/v1/databases/redis/exec?cols=${term.cols}&rows=${term.rows}`,
+            `ws://${ipLocal}/api/v1/databases/redis/exec?cols=${term.cols}&rows=${term.rows}`,
         );
         terminalSocket.onopen = runRealTerminal;
         terminalSocket.onmessage = onWSReceive;

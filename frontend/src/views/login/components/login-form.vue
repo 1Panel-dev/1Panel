@@ -166,7 +166,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import type { ElForm } from 'element-plus';
 import { ElMessage } from 'element-plus';
@@ -175,6 +175,8 @@ import { GlobalStore } from '@/store';
 import { MenuStore } from '@/store/modules/menu';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
+
+let timer: NodeJS.Timer | null = null;
 
 const globalStore = GlobalStore();
 const menuStore = MenuStore();
@@ -318,6 +320,11 @@ function checkPassword(rule: any, value: any, callback: any) {
 
 onMounted(() => {
     document.title = globalStore.themeConfig.panelName;
+    timer = setInterval(() => {
+        if (loginForm.captcha === '') {
+            loginVerify();
+        }
+    }, 1000 * 8);
     checkStatus();
     document.onkeydown = (e: any) => {
         e = window.event || e;
@@ -326,6 +333,11 @@ onMounted(() => {
             login(loginFormRef.value);
         }
     };
+});
+
+onUnmounted(() => {
+    clearInterval(Number(timer));
+    timer = null;
 });
 </script>
 

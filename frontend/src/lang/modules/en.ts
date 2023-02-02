@@ -63,6 +63,7 @@ export default {
         },
         loadingText: {
             Upgrading: 'System upgrade, please wait...',
+            Restarting: 'System restart, please wait...',
         },
         msg: {
             delete: 'This operation cannot be rolled back. Do you want to continue',

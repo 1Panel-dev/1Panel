@@ -15,6 +15,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/init/db"
+	"github.com/1Panel-dev/1Panel/backend/init/hook"
 	"github.com/1Panel-dev/1Panel/backend/init/log"
 	"github.com/1Panel-dev/1Panel/backend/init/migration"
 	"github.com/1Panel-dev/1Panel/backend/init/router"
@@ -38,11 +39,12 @@ func Start() {
 	gin.SetMode("debug")
 	cron.Run()
 	business.Init()
+	hook.Init()
 
 	rootRouter := router.Routers()
-	address := fmt.Sprintf(":%d", global.CONF.System.Port)
+	address := fmt.Sprintf(":%s", global.CONF.System.Port)
 	s := initServer(address, rootRouter)
-	global.LOG.Infof("server run success on %d", global.CONF.System.Port)
+	global.LOG.Infof("server run success on %s", global.CONF.System.Port)
 	if err := s.ListenAndServe(); err != nil {
 		global.LOG.Error(err)
 		panic(err)

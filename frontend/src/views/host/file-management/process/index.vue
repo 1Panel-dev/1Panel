@@ -56,8 +56,8 @@ const onClose = () => {};
 
 const initProcess = () => {
     let href = window.location.href;
-    let ipLocal = href.split('//')[1].split(':')[0];
-    processSocket = new WebSocket(`ws://${ipLocal}:9999/api/v1/files/ws`);
+    let ipLocal = href.split('//')[1].split('/')[0];
+    processSocket = new WebSocket(`ws://${ipLocal}/api/v1/files/ws`);
     processSocket.onopen = onOpenProcess;
     processSocket.onmessage = onMessage;
     processSocket.onerror = onerror;
