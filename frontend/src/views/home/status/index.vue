@@ -184,39 +184,82 @@ const freshChart = (chartName: string, Title: string, Data: number) => {
                 textStyle: {
                     color: '#0f0f0f',
                     lineHeight: 30,
-                    fontSize: 24,
-                    fontWeight: '500',
+                    fontSize: 20,
+                    fontWeight: '400',
                 },
                 left: '50%',
                 top: '32%',
                 subtext: Title,
                 subtextStyle: {
                     color: '#000000',
-                    fontSize: 18,
+                    fontSize: 14,
                 },
                 textAlign: 'center',
             },
         ],
+        polar: {
+            radius: ['72%', '92%'],
+            center: ['50%', '50%'],
+        },
+        angleAxis: {
+            max: 100,
+            show: false,
+        },
+        radiusAxis: {
+            type: 'category',
+            show: true,
+            axisLabel: {
+                show: false,
+            },
+            axisLine: {
+                show: false,
+            },
+            axisTick: {
+                show: false,
+            },
+        },
         series: [
             {
-                name: Title,
-                type: 'pie',
-                radius: ['75%', '96%'],
-                center: ['50%', '50%'],
-                color: ['#08a3f0', '#efefef'],
+                type: 'bar',
+                roundCap: true,
+                barWidth: 30,
+                showBackground: true,
+                coordinateSystem: 'polar',
+                color: [
+                    new echarts.graphic.LinearGradient(0, 1, 0, 0, [
+                        {
+                            offset: 0,
+                            color: 'rgba(81, 192, 255, .1)',
+                        },
+                        {
+                            offset: 1,
+                            color: '#4261F6',
+                        },
+                    ]),
+                    '#f2f2f2',
+                ],
                 label: {
-                    position: 'center',
-                    normal: {
-                        show: false,
-                    },
+                    show: false,
                 },
-                data: [{ value: Data }, { value: 100 - Data }],
+                data: [Data],
             },
             {
                 type: 'pie',
-                radius: ['0%', '65%'],
+                radius: ['0%', '55%'],
                 center: ['50%', '50%'],
-                hoverAnimation: false,
+                label: {
+                    show: false,
+                },
+                color: '#fff',
+                data: [
+                    {
+                        value: 0,
+                        itemStyle: {
+                            shadowColor: '#e3e3e3',
+                            shadowBlur: 20,
+                        },
+                    },
+                ],
             },
         ],
     };
