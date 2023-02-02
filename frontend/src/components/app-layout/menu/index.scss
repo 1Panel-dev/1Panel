@@ -84,7 +84,7 @@
         }
     }
 
-    :deep .el-sub-menu {
+    :deep(.el-sub-menu) {
         margin: 10px;
 
         span {

@@ -20,7 +20,7 @@
                     </div>
                 </el-col>
                 <el-col :span="4">
-                    <div style="float: right">
+                    <div style="float: right" class="search-button">
                         <el-input
                             class="table-button"
                             v-model="searchReq.name"

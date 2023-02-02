@@ -3,19 +3,34 @@
         <template #header>
             <DrawerHeader :header="$t('website.create')" :back="handleClose">
                 <template #buttons>
-                    <el-button
-                        type="primary"
-                        :plain="website.type !== 'deployment'"
-                        @click="website.type = 'deployment'"
-                    >
-                        {{ $t('website.deployment') }}
-                    </el-button>
-                    <el-button type="primary" :plain="website.type !== 'static'" @click="website.type = 'static'">
-                        {{ $t('website.static') }}
-                    </el-button>
-                    <el-button type="primary" :plain="website.type !== 'proxy'" @click="website.type = 'proxy'">
-                        {{ $t('website.proxy') }}
-                    </el-button>
+                    <span class="drawer-header-button">
+                        <template v-for="item in buttonList" :key="item.value">
+                            <el-button
+                                :class="website.type === item.value ? 'active-button' : ''"
+                                @click="website.type = item.value"
+                                :type="website.type === item.value ? '' : 'info'"
+                                :plain="website.type === item.value"
+                                :text="website.type !== item.value"
+                                :bg="website.type !== item.value"
+                            >
+                                {{ item.label }}
+                            </el-button>
+                        </template>
+
+                        <!-- <el-button
+                            type="primary"
+                            :plain="website.type !== 'deployment'"
+                            @click="website.type = 'deployment'"
+                        >
+                            {{ $t('website.deployment') }}
+                        </el-button>
+                        <el-button type="primary" :plain="website.type !== 'static'" @click="website.type = 'static'">
+                            {{ $t('website.static') }}
+                        </el-button>
+                        <el-button type="primary" :plain="website.type !== 'proxy'" @click="website.type = 'proxy'">
+                            {{ $t('website.proxy') }}
+                        </el-button> -->
+                    </span>
                 </template>
             </DrawerHeader>
         </template>
@@ -179,6 +194,21 @@ import { ElForm, FormInstance, ElMessage } from 'element-plus';
 import { reactive, ref } from 'vue';
 import Params from '@/views/app-store/detail/params/index.vue';
 import Check from '../check/index.vue';
+
+const buttonList = [
+    {
+        label: i18n.global.t('website.deployment'),
+        value: 'deployment',
+    },
+    {
+        label: i18n.global.t('website.static'),
+        value: 'static',
+    },
+    {
+        label: i18n.global.t('website.proxy'),
+        value: 'proxy',
+    },
+];
 
 const websiteForm = ref<FormInstance>();
 const website = ref({
