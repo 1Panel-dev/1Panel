@@ -75,18 +75,14 @@ func (u *UpgradeService) Upgrade(version string) error {
 	originalDir := fmt.Sprintf("%s/%s/original", constant.TmpDir, timeStr)
 	downloadPath := fmt.Sprintf("%s/releases/%s/%s.tar.gz", global.CONF.System.AppOss, version, version)
 
-	setting, err := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
-	if err != nil {
-		return err
-	}
-	u.changeStatus(constant.StatusWaiting, nil)
+	_ = settingRepo.Update("SystemStatus", "Upgrading")
 	go func() {
 		if err := os.MkdirAll(originalDir, os.ModePerm); err != nil {
-			u.changeStatus(setting.Value, err)
+			global.LOG.Error(err.Error())
 			return
 		}
 		if err := fileOp.DownloadFile(downloadPath, filePath); err != nil {
-			u.changeStatus(setting.Value, fmt.Errorf("download file failed, err: %v", err))
+			global.LOG.Errorf("download file failed, err: %v", err)
 			return
 		}
 		global.LOG.Info("download file from oss successful!")
@@ -94,34 +90,35 @@ func (u *UpgradeService) Upgrade(version string) error {
 			_ = os.Remove(filePath)
 		}()
 		if err := fileOp.Decompress(filePath, rootDir, files.TarGz); err != nil {
-			u.changeStatus(setting.Value, fmt.Errorf("decompress file failed, err: %v", err))
+			global.LOG.Errorf("decompress file failed, err: %v", err)
 			return
 		}
 
 		if err := u.handleBackup(fileOp, originalDir); err != nil {
-			u.changeStatus(setting.Value, fmt.Errorf("handle backup original file failed, err: %v", err))
+			global.LOG.Errorf("handle backup original file failed, err: %v", err)
 			return
 		}
 		global.LOG.Info("backup original data successful, now start to upgrade!")
 
 		if err := cpBinary(rootDir+"/1panel", "/usr/local/bin/1panel"); err != nil {
 			u.handleRollback(fileOp, originalDir, 1)
-			u.changeStatus(setting.Value, fmt.Errorf("upgrade 1panel failed, err: %v", err))
+			global.LOG.Errorf("upgrade 1panel failed, err: %v", err)
 			return
 		}
 		if err := cpBinary(rootDir+"/1pctl", "/usr/local/bin/1pctl"); err != nil {
 			u.handleRollback(fileOp, originalDir, 2)
-			u.changeStatus(setting.Value, fmt.Errorf("upgrade 1pctl failed, err: %v", err))
+			global.LOG.Errorf("upgrade 1pctl failed, err: %v", err)
 			return
 		}
 		if err := cpBinary(rootDir+"/1panel.service", "/etc/systemd/system/1panel.service"); err != nil {
 			u.handleRollback(fileOp, originalDir, 3)
-			u.changeStatus(setting.Value, fmt.Errorf("upgrade 1panel.service failed, err: %v", err))
+			global.LOG.Errorf("upgrade 1panel.service failed, err: %v", err)
 			return
 		}
 
 		global.LOG.Info("upgrade successful!")
-		u.changeStatus(version, nil)
+		_ = settingRepo.Update("SystemStatus", "Upgrade")
+		_ = settingRepo.Update("SystemVersion", version)
 		_, _ = cmd.Exec("systemctl restart 1panel.service")
 	}()
 	return nil
@@ -163,14 +160,5 @@ func (u *UpgradeService) handleRollback(fileOp files.FileOp, originalDir string,
 	}
 	if err := cpBinary(originalDir+"/1panel.service", "/etc/systemd/system/1panel.service"); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
-	}
-}
-
-func (u *UpgradeService) changeStatus(status string, err error) {
-	if err != nil {
-		global.LOG.Error(err.Error())
-	}
-	if err := settingRepo.Update("SystemVersion", status); err != nil {
-		global.LOG.Errorf("update system version failed, err: %v", err)
 	}
 }

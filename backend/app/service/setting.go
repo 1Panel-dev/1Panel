@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"errors"
 	"strconv"
 	"time"
 
@@ -63,15 +62,16 @@ func (u *SettingService) Update(c *gin.Context, key, value string) error {
 }
 
 func (u *SettingService) UpdatePort(port uint) error {
-	global.Viper.Set("system.port", port)
-	if err := global.Viper.WriteConfig(); err != nil {
+	if err := settingRepo.Update("ServerPort", strconv.Itoa(int(port))); err != nil {
 		return err
 	}
-	_ = settingRepo.Update("ServerPort", strconv.Itoa(int(port)))
-	stdout, err := cmd.Exec("systemctl restart 1panel.service")
-	if err != nil {
-		return errors.New(stdout)
-	}
+	_ = settingRepo.Update("SystemStatus", "Restarting")
+	go func() {
+		_, err := cmd.Exec("systemctl restart 1panel.service")
+		if err != nil {
+			global.LOG.Errorf("restart system port failed, err: %v")
+		}
+	}()
 	return nil
 }
 
