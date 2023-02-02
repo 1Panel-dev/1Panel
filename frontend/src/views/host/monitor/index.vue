@@ -124,6 +124,7 @@ import { loadMonitor, getNetworkOptions } from '@/api/modules/monitor';
 import { Monitor } from '@/api/interface/monitor';
 import { dateFormatWithoutYear } from '@/utils/util';
 import i18n from '@/lang';
+import RouterButton from '@/components/router-button/index.vue';
 
 const zoomStart = ref();
 const monitorBase = ref();

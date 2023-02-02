@@ -160,6 +160,7 @@ import i18n from '@/lang';
 import { Dashboard } from '@/api/interface/dashboard';
 import { dateFormatForSecond, computeSize } from '@/utils/util';
 import { useRouter } from 'vue-router';
+import RouterButton from '@/components/router-button/index.vue';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
 const router = useRouter();
@@ -422,7 +423,7 @@ const loadData = async () => {
             [i18n.global.t('monitor.read'), i18n.global.t('monitor.write')],
             timeIODatas.value,
             [ioReadYDatas, ioWriteYDatas],
-            i18n.global.t('monitor.network'),
+            i18n.global.t('home.io'),
             'MB',
         );
     } else {
@@ -451,7 +452,7 @@ const loadData = async () => {
             [i18n.global.t('monitor.up'), i18n.global.t('monitor.down')],
             timeNetDatas.value,
             [netTxYDatas, netRxYDatas],
-            i18n.global.t('monitor.network'),
+            i18n.global.t('home.network'),
             'KB/s',
         );
     }

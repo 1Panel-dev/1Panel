@@ -74,6 +74,7 @@ import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { LoadFile } from '@/api/modules/files';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const drawerVisiable = ref(false);
 const form = reactive({

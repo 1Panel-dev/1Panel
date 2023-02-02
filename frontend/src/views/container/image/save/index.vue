@@ -54,6 +54,7 @@ import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { imageSave } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const loading = ref(false);
 

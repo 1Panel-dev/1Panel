@@ -79,6 +79,7 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { Container } from '@/api/interface/container';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import { createImageRepo, updateImageRepo } from '@/api/modules/container';
 
 const loading = ref(false);

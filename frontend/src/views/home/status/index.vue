@@ -15,7 +15,7 @@
                     CPU-{{ index }}: {{ formatNumber(item) }}%
                 </el-tag>
                 <template #reference>
-                    <div id="cpu" style="width: 100%; height: 200px"></div>
+                    <div id="cpu" style="width: 100%; height: 160px"></div>
                 </template>
             </el-popover>
             <span class="input-help" style="margin-top: -10px">
@@ -23,7 +23,7 @@
             </span>
         </el-col>
         <el-col :span="6" align="center">
-            <div id="memory" style="width: 100%; height: 200px"></div>
+            <div id="memory" style="width: 100%; height: 160px"></div>
             <span class="input-help">
                 ( {{ formatNumber(currentInfo.memoryUsed / 1024 / 1024) }} /
                 {{ formatNumber(currentInfo.memoryTotal / 1024 / 1024) }} ) MB
@@ -41,7 +41,7 @@
                     {{ $t('home.loadAverage', [15]) }}: {{ formatNumber(currentInfo.load15) }}
                 </el-tag>
                 <template #reference>
-                    <div id="load" style="width: 100%; height: 200px"></div>
+                    <div id="load" style="width: 100%; height: 160px"></div>
                 </template>
             </el-popover>
             <span class="input-help">{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
@@ -79,7 +79,7 @@
                     </el-col>
                 </el-row>
                 <template #reference>
-                    <div id="disk" style="width: 100%; height: 200px"></div>
+                    <div id="disk" style="width: 100%; height: 160px"></div>
                 </template>
             </el-popover>
             <span class="input-help">
@@ -181,70 +181,42 @@ const freshChart = (chartName: string, Title: string, Data: number) => {
         title: [
             {
                 text: Data + '%',
-                x: 'center',
-                top: '55%',
-                textStyle: { fontSize: 16, fontWeight: '100' },
-            },
-            {
-                text: Title,
-                x: 'center',
-                y: 'center',
                 textStyle: {
-                    fontSize: '20',
-                    fontFamily: 'DINAlternate-Bold, DINAlternate',
-                    foontWeight: '600',
+                    color: '#0f0f0f',
+                    lineHeight: 30,
+                    fontSize: 24,
+                    fontWeight: '500',
                 },
+                left: '50%',
+                top: '32%',
+                subtext: Title,
+                subtextStyle: {
+                    color: '#000000',
+                    fontSize: 18,
+                },
+                textAlign: 'center',
             },
         ],
-        backgroundColor: '#FFFFFF',
-        polar: { radius: ['42%', '52%'], center: ['50%', '50%'] },
-        angleAxis: { max: 100, show: false },
-        radiusAxis: {
-            type: 'category',
-            show: true,
-            axisLabel: { show: false },
-            axisLine: { show: false },
-            axisTick: { show: false },
-        },
         series: [
             {
-                name: '',
-                type: 'bar',
-                roundCap: true,
-                barWidth: 30,
-                showBackground: true,
-                backgroundStyle: { color: 'rgba(66, 66, 66, .3)' },
-                data: [Data],
-                coordinateSystem: 'polar',
-                itemStyle: {
+                name: Title,
+                type: 'pie',
+                radius: ['75%', '96%'],
+                center: ['50%', '50%'],
+                color: ['#08a3f0', '#efefef'],
+                label: {
+                    position: 'center',
                     normal: {
-                        color: new echarts.graphic.LinearGradient(0, 1, 0, 0, [
-                            {
-                                offset: 0,
-                                color: '#16CEB9',
-                            },
-                            { offset: 1, color: '#6648FF' },
-                        ]),
+                        show: false,
                     },
                 },
+                data: [{ value: Data }, { value: 100 - Data }],
             },
             {
-                name: '',
                 type: 'pie',
-                startAngle: 80,
-                radius: ['56%'],
+                radius: ['0%', '65%'],
                 center: ['50%', '50%'],
-                itemStyle: { color: 'rgba(66, 66, 66, .1)', borderWidth: 1, borderColor: '#5269EE' },
-                data: [100],
-            },
-            {
-                name: '',
-                type: 'pie',
-                startAngle: 80,
-                radius: ['38%'],
-                center: ['50%', '50%'],
-                itemStyle: { color: 'rgba(66, 66, 66, .1)', borderWidth: 1, borderColor: '#5269EE' },
-                data: [100],
+                hoverAnimation: false,
             },
         ],
     };

@@ -69,6 +69,7 @@ import { recoverByUpload } from '@/api/modules/database';
 import i18n from '@/lang';
 import { ElMessage, UploadFile, UploadFiles, UploadInstance, UploadProps } from 'element-plus';
 import { File } from '@/api/interface/file';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import { BatchDeleteFile, GetFilesList, UploadFileData } from '@/api/modules/files';
 import { loadBaseDir } from '@/api/modules/setting';
 
