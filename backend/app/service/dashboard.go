@@ -82,10 +82,10 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 	baseInfo.CronjobNumber = len(cornjobs)
 
 	cpuInfo, err := cpu.Info()
-	if err != nil {
-		return nil, err
+	if err == nil {
+		baseInfo.CPUModelName = cpuInfo[0].ModelName
 	}
-	baseInfo.CPUModelName = cpuInfo[0].ModelName
+
 	baseInfo.CPUCores, _ = cpu.Counts(false)
 	baseInfo.CPULogicalCores, _ = cpu.Counts(true)
 
