@@ -1,7 +1,7 @@
 <template>
     <Layout v-loading="loading" :element-loading-text="loadinText" fullscreen>
         <template #menu>
-            <Menu :panelName="themeConfig.panelName"></Menu>
+            <Menu></Menu>
         </template>
         <template #footer>
             <Footer></Footer>

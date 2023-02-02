@@ -81,6 +81,7 @@ declare module 'vue' {
     InfiniteScroll: typeof import('element-plus/es')['ElInfiniteScroll']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
     Logo: typeof import('./src/components/app-layout/menu/components/Logo.vue')['default']
+    LogoNew: typeof import('./src/components/app-layout/menu/components/logo-new.vue')['default']
     Menu: typeof import('./src/components/app-layout/menu/index.vue')['default']
     Popover: typeof import('element-plus/es')['ElPopoverDirective']
     RouterButton: typeof import('./src/components/router-button/index.vue')['default']

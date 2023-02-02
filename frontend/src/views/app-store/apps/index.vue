@@ -3,7 +3,7 @@
         <template #toolbar>
             <el-row :gutter="5">
                 <el-col :span="20">
-                    <el-button @click="changeTag('all')" type="primary" :plain="activeTag !== 'all'">
+                    <el-button @click="changeTag('all')" type="primary" :link="activeTag !== 'all'">
                         {{ $t('app.all') }}
                     </el-button>
                     <div v-for="item in tags" :key="item.key" style="display: inline">
@@ -11,7 +11,7 @@
                             class="tag-button"
                             @click="changeTag(item.key)"
                             type="primary"
-                            :plain="activeTag !== item.key"
+                            :link="activeTag !== item.key"
                         >
                             {{ item.name }}
                         </el-button>
@@ -220,6 +220,6 @@ onMounted(() => {
 }
 
 .tag-button {
-    margin-left: 10px;
+    margin-left: 30px;
 }
 </style>

@@ -6,7 +6,7 @@
             <h4>抱歉，您访问的页面不存在~🤷‍♂️🤷‍♀️</h4>
             <!-- <el-button type="primary" @click="tabStore.goHome()"
                 >返回首页</el-button -->
-            >
+            <!-- > -->
         </div>
     </div>
 </template>
