@@ -4,13 +4,12 @@ import App from './App.vue';
 // import 'element-plus/theme-chalk/dark/css-vars.css';
 
 import '@/styles/index.scss';
-import '@/styles/reset.scss';
+// import '@/styles/reset.scss';
+import '@/styles/common-dark.scss';
 import '@/styles/common.scss';
 import '@/assets/fonts/font.scss';
 import '@/assets/iconfont/iconfont.css';
 import '@/assets/iconfont/iconfont.js';
-import '@/styles/element-dark.scss';
-import '@/styles/element.scss';
 
 import VMdPreview from '@kangc/v-md-editor/lib/preview';
 import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';

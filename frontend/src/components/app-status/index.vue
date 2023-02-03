@@ -135,9 +135,9 @@ onMounted(() => {
     }
 }
 
-body {
-    margin: 0;
-}
+// body {
+//     margin: 0;
+// }
 
 .status-content {
     margin-left: 50px;

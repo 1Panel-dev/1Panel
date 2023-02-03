@@ -92,15 +92,17 @@
     }
 }
 
-#nprogress .bar {
-    background: $primary-color !important;
-}
-#nprogress .spinner-icon {
-    border-top-color: $primary-color !important;
-    border-left-color: $primary-color !important;
-}
-#nprogress .peg {
-    box-shadow: 0 0 10px $primary-color, 0 0 5px $primary-color !important;
+#nprogress {
+    .bar {
+        background: $primary-color !important;
+    }
+    .spinner-icon {
+        border-top-color: $primary-color !important;
+        border-left-color: $primary-color !important;
+    }
+    .peg {
+        box-shadow: 0 0 10px $primary-color, 0 0 5px $primary-color !important;
+    }
 }
 
 .form-button {
@@ -131,35 +133,31 @@
     border-collapse: collapse;
     font-size: 12px;
     table-layout: fixed;
-}
-
-.myTable td {
-    width: 35%;
-    padding: 8px;
-    height: 23px;
-    border: 1px solid #383c42;
-    word-wrap: break-word;
-}
-
-.myTable td div {
-    margin-top: 2px;
-}
-
-.myTable th {
-    border: 0;
-    height: 30px;
-}
-
-.myTable tr:hover {
-    background-color: #d9dde2;
-}
-
-.myTable tr:first-child:hover {
-    background-color: transparent !important;
-}
-
-.myTable tr td:nth-child(even) {
-    color: #85888e;
+    td {
+        width: 35%;
+        padding: 8px;
+        height: 23px;
+        border: 1px solid #383c42;
+        word-wrap: break-word;
+        div {
+            margin-top: 2px;
+        }
+        th {
+            border: 0;
+            height: 30px;
+        }
+        tr {
+            &:hover {
+                background-color: #d9dde2;
+            }
+            &:first-child:hover {
+                background-color: transparent !important;
+            }
+            td:nth-child(even) {
+                color: #85888e;
+            }
+        }
+    }
 }
 
 .mask {
@@ -225,5 +223,24 @@
 .menu-popper {
     .el-menu--popup-right-start {
         background-color: rgba(0, 94, 235, 0.1);
+    }
+}
+
+// search条圆角
+.search-button {
+    .el-input__wrapper {
+        border-radius: 50px;
+    }
+}
+
+// drawer头部增加按钮
+.drawer-header-button {
+    span {
+        color: currentColor !important;
+        font-size: var(--el-font-size-base) !important;
+    }
+    .active-button {
+        color: var(--el-button-hover-text-color);
+        border-color: var(--el-button-hover-border-color);
     }
 }
