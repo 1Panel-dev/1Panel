@@ -67,7 +67,13 @@
                             v-model="searchInfo.netOption"
                             style="float: right"
                         >
-                            <el-option v-for="item in netOptions" :key="item" :label="item" :value="item" />
+                            <template #prefix>{{ $t('home.networkCard') }}</template>
+                            <el-option
+                                v-for="item in netOptions"
+                                :key="item"
+                                :label="item == 'all' ? $t('home.allNetworkCard') : item"
+                                :value="item"
+                            />
                         </el-select>
                         <el-select
                             v-if="chartOption === 'io'"
@@ -75,7 +81,13 @@
                             @change="onLoadBaseInfo(false, 'io')"
                             style="float: right"
                         >
-                            <el-option v-for="item in ioOptions" :key="item" :label="item" :value="item" />
+                            <template #prefix>{{ $t('home.disk') }}</template>
+                            <el-option
+                                v-for="item in ioOptions"
+                                :key="item"
+                                :label="item == 'all' ? $t('home.allDisk') : item"
+                                :value="item"
+                            />
                         </el-select>
                         <div class="monitor-tags" v-if="chartOption === 'network'">
                             <el-tag>{{ $t('monitor.up') }}: {{ currentChartInfo.netBytesSent }} KB/s</el-tag>
