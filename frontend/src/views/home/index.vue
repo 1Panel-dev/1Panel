@@ -10,52 +10,48 @@
         />
         <el-row :gutter="20" style="margin-top: 20px">
             <el-col :span="16">
-                <CardWithHeader :header="$t('home.overview')" height="150px">
+                <CardWithHeader :header="$t('home.overview')" height="160px">
                     <template #body>
-                        <el-form label-position="top" label-width="100px">
-                            <el-row :gutter="20">
-                                <el-col :span="6" align="center">
-                                    <span style="font-size: 16px">{{ $t('menu.website') }}</span>
-                                    <div>
-                                        <el-link style="font-size: 24px" @click="goRouter('/websites')" type="primary">
-                                            {{ baseInfo?.websiteNumber }}
-                                        </el-link>
+                        <div class="h-overview">
+                            <el-row>
+                                <el-col :span="6">
+                                    <span>{{ $t('menu.website') }}</span>
+                                    <div class="count">
+                                        <span @click="goRouter('/websites')">{{ baseInfo?.websiteNumber }}</span>
                                     </div>
                                 </el-col>
-                                <el-col :span="6" align="center">
-                                    <span style="font-size: 16px">{{ $t('menu.database') }}</span>
-                                    <div>
-                                        <el-link style="font-size: 24px" @click="goRouter('/databases')" type="primary">
-                                            {{ baseInfo?.databaseNumber }}
-                                        </el-link>
+                                <el-col :span="6">
+                                    <span>{{ $t('menu.database') }}</span>
+                                    <div class="count">
+                                        <span @click="goRouter('/databases')">{{ baseInfo?.databaseNumber }}</span>
                                     </div>
                                 </el-col>
-                                <el-col :span="6" align="center">
-                                    <span style="font-size: 16px">{{ $t('menu.cronjob') }}</span>
-                                    <div>
-                                        <el-link style="font-size: 24px" @click="goRouter('/cronjobs')" type="primary">
+                                <el-col :span="6">
+                                    <span>{{ $t('menu.cronjob') }}</span>
+                                    <div class="count">
+                                        <span @click="goRouter('/cronjobs')">
                                             {{ baseInfo?.cronjobNumber }}
-                                        </el-link>
+                                        </span>
                                     </div>
                                 </el-col>
-                                <el-col :span="6" align="center">
-                                    <span style="font-size: 16px">{{ $t('home.appInstalled') }}</span>
-                                    <div>
-                                        <el-link style="font-size: 24px" @click="goRouter('/apps')" type="primary">
+                                <el-col :span="6">
+                                    <span>{{ $t('home.appInstalled') }}</span>
+                                    <div class="count">
+                                        <span @click="goRouter('/apps')">
                                             {{ baseInfo?.appInstalldNumber }}
-                                        </el-link>
+                                        </span>
                                     </div>
                                 </el-col>
                             </el-row>
-                        </el-form>
+                        </div>
                     </template>
                 </CardWithHeader>
-                <CardWithHeader :header="$t('commons.table.status')" style="margin-top: 20px" height="280px">
+                <CardWithHeader :header="$t('commons.table.status')" style="margin-top: 20px" height="265px">
                     <template #body>
                         <Status ref="statuRef" />
                     </template>
                 </CardWithHeader>
-                <CardWithHeader :header="$t('menu.monitor')" style="margin-top: 20px" height="450px">
+                <CardWithHeader :header="$t('menu.monitor')" style="margin-top: 20px" height="465px">
                     <template #body>
                         <el-radio-group
                             style="float: right; margin-left: 5px"
@@ -81,29 +77,19 @@
                         >
                             <el-option v-for="item in ioOptions" :key="item" :label="item" :value="item" />
                         </el-select>
-                        <div style="margin-top: 20px; margin-left: 8px" v-if="chartOption === 'network'">
+                        <div class="monitor-tags" v-if="chartOption === 'network'">
                             <el-tag>{{ $t('monitor.up') }}: {{ currentChartInfo.netBytesSent }} KB/s</el-tag>
-                            <el-tag style="margin-left: 20px">
-                                {{ $t('monitor.down') }}: {{ currentChartInfo.netBytesRecv }} KB/s
-                            </el-tag>
-                            <el-tag style="margin-left: 20px">
-                                {{ $t('home.totalSend') }}: {{ computeSize(currentInfo.netBytesSent) }}
-                            </el-tag>
-                            <el-tag style="margin-left: 20px">
-                                {{ $t('home.totalRecv') }}: {{ computeSize(currentInfo.netBytesRecv) }}
-                            </el-tag>
+                            <el-tag>{{ $t('monitor.down') }}: {{ currentChartInfo.netBytesRecv }} KB/s</el-tag>
+                            <el-tag>{{ $t('home.totalSend') }}: {{ computeSize(currentInfo.netBytesSent) }}</el-tag>
+                            <el-tag>{{ $t('home.totalRecv') }}: {{ computeSize(currentInfo.netBytesRecv) }}</el-tag>
                         </div>
-                        <div style="margin-top: 20px" v-if="chartOption === 'io'">
+                        <div class="monitor-tags" v-if="chartOption === 'io'">
                             <el-tag>{{ $t('monitor.read') }}: {{ currentChartInfo.ioReadBytes }} MB</el-tag>
-                            <el-tag style="margin-left: 20px">
-                                {{ $t('monitor.write') }}: {{ currentChartInfo.ioWriteBytes }} MB
-                            </el-tag>
-                            <el-tag style="margin-left: 20px">
+                            <el-tag>{{ $t('monitor.write') }}: {{ currentChartInfo.ioWriteBytes }} MB</el-tag>
+                            <el-tag>
                                 {{ $t('home.rwPerSecond') }}: {{ currentChartInfo.ioCount }} {{ $t('home.time') }}
                             </el-tag>
-                            <el-tag style="margin-left: 20px">
-                                {{ $t('home.rwPerSecond') }}: {{ currentInfo.ioTime }} ms
-                            </el-tag>
+                            <el-tag>{{ $t('home.rwPerSecond') }}: {{ currentInfo.ioTime }} ms</el-tag>
                         </div>
                         <div
                             v-if="chartOption === 'io'"
@@ -119,28 +105,62 @@
                 </CardWithHeader>
             </el-col>
             <el-col :span="8">
-                <CardWithHeader :header="$t('home.systemInfo')" height="370px">
+                <CardWithHeader :header="$t('home.systemInfo')" height="330px">
                     <template #body>
-                        <el-form style="margin-left: 10px">
-                            <el-form-item style="margin-top: 15px" :label="$t('home.hostname')">
+                        <el-descriptions :column="1" class="h-systemInfo">
+                            <el-descriptions-item class-name="system-content">
+                                <template #label>
+                                    <span class="system-label">
+                                        {{ $t('home.hostname') }}
+                                    </span>
+                                </template>
                                 {{ baseInfo.hostname }}
-                            </el-form-item>
-                            <el-form-item :label="$t('home.platformVersion')">
+                            </el-descriptions-item>
+                            <el-descriptions-item class-name="system-content">
+                                <template #label>
+                                    <span class="system-label">
+                                        {{ $t('home.platformVersion') }}
+                                    </span>
+                                </template>
                                 {{ baseInfo.platform }}-{{ baseInfo.platformVersion }}
-                            </el-form-item>
-                            <el-form-item :label="$t('home.kernelVersion')">
+                            </el-descriptions-item>
+                            <el-descriptions-item class-name="system-content">
+                                <template #label>
+                                    <span class="system-label">
+                                        {{ $t('home.kernelVersion') }}
+                                    </span>
+                                </template>
                                 {{ baseInfo.kernelVersion }}
-                            </el-form-item>
-                            <el-form-item :label="$t('home.kernelArch')">{{ baseInfo.kernelArch }}</el-form-item>
-                            <el-form-item :label="$t('home.uptime')">{{ currentInfo.timeSinceUptime }}</el-form-item>
-                            <el-form-item :label="$t('home.runningTime')">
+                            </el-descriptions-item>
+                            <el-descriptions-item class-name="system-content">
+                                <template #label>
+                                    <span class="system-label">
+                                        {{ $t('home.kernelArch') }}
+                                    </span>
+                                </template>
+                                {{ baseInfo.kernelArch }}
+                            </el-descriptions-item>
+                            <el-descriptions-item class-name="system-content">
+                                <template #label>
+                                    <span class="system-label">
+                                        {{ $t('home.uptime') }}
+                                    </span>
+                                </template>
+                                {{ currentInfo.timeSinceUptime }}
+                            </el-descriptions-item>
+                            <el-descriptions-item class-name="system-content">
+                                <template #label>
+                                    <span class="system-label">
+                                        {{ $t('home.runningTime') }}
+                                    </span>
+                                </template>
                                 {{ loadUpTime(currentInfo.uptime) }}
-                            </el-form-item>
-                        </el-form>
+                            </el-descriptions-item>
+                        </el-descriptions>
                     </template>
                 </CardWithHeader>
 
-                <CardWithHeader :header="$t('home.app')" style="margin-top: 20px" height="532px">
+                <CardWithHeader :header="$t('home.app')" style="margin-top: 20px" height="581px">
                     <template #body>
                         <App ref="appRef" />
                     </template>
@@ -546,10 +566,54 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 .el-form-item--small {
     --font-size: 14px;
     --el-form-label-font-size: var(--font-size);
     margin-bottom: 8px;
+}
+
+.h-overview {
+    text-align: center;
+
+    span:first-child {
+        font-size: 18px;
+        color: #646a73;
+    }
+
+    .count {
+        margin-top: 10px;
+        span {
+            font-size: 28px;
+            color: $primary-color;
+            font-weight: 500;
+            line-height: 32px;
+            cursor: pointer;
+        }
+    }
+}
+
+.h-systemInfo {
+    margin-left: 18px;
+}
+
+.system-label {
+    font-weight: 400 !important;
+    font-size: 16px !important;
+    color: #1f2329;
+}
+
+.system-content {
+    font-size: 15px !important;
+}
+
+.monitor-tags {
+    margin-top: 20px;
+    margin-left: 8px;
+
+    .el-tag {
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
 }
 </style>
