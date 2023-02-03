@@ -76,9 +76,14 @@
 
 .update-prompt {
     text-align: center;
+    margin-top: 100px;
+
     span {
-        font-weight: 500;
-        font-size: 16px;
         color: #bbbfc4;
+    }
+
+    img {
+        width: 300px;
+        height: 300px;
     }
 }
