@@ -107,6 +107,7 @@ export default {
             solutionHelper: '在 SSH 终端输入以下一种命令来解决 1.查看面板入口：/etc/init.d/bt default',
             warnning: '注意：【关闭安全入口】将使您的面板登录地址被直接暴露在互联网上，非常危险，请谨慎操作',
             codeInput: '请输入 MFA 验证器的 6 位验证码',
+            mfaTitle: 'MFA认证',
         },
         rule: {
             username: '请输入用户名',

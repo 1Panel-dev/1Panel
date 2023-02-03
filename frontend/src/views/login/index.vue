@@ -1,17 +1,11 @@
 <template>
     <div>
-        <div v-if="statusCode == 1">
-            <div class="login-background">
-                <div class="login-container">
-                    <el-row type="flex">
-                        <el-col :span="12">
-                            <LoginForm ref="loginRef"></LoginForm>
-                        </el-col>
-                        <el-col :span="12">
-                            <img class="login-image" src="@/assets/images/1Panel-login.jpg" alt="login" />
-                        </el-col>
-                    </el-row>
-                </div>
+        <div class="login-backgroud" v-if="statusCode == 1">
+            <div class="login-title">
+                <span>1Panel 现代化的 Linux 面板</span>
+            </div>
+            <div class="login-container">
+                <LoginForm ref="loginRef"></LoginForm>
             </div>
         </div>
         <div style="margin-left: 50px" v-if="statusCode == -1">
@@ -56,30 +50,40 @@ onMounted(() => {
     justify-content: center;
     align-items: center;
 }
-.login-background {
-    height: 100%;
+.login-backgroud {
+    height: 100vh;
     display: flex;
-    @include login-center;
+    // @include login-center;
+    background-image: url(@/assets/images/1Panel-login.png);
+    background-color: $menu-backgroup-color;
+    background-position: 0% 40%;
+    background-size: 70%;
+    background-repeat: no-repeat;
+
+    .login-title {
+        margin-top: 10%;
+        text-align: center;
+        margin-left: 15%;
+        span:first-child {
+            color: $primary-color;
+            font-size: 48px;
+            font-family: pingFangSC-Regular;
+        }
+    }
 }
 
 .login-container {
-    margin-top: 150px;
-    min-width: 640px;
-    width: 960px;
-    height: 480px;
-    background-color: #ffffff;
-    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14),
-        0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    margin-top: 19%;
+    margin-left: 15%;
+    width: 394px;
+    height: 422px;
+    background-color: rgba(255, 255, 255, 0.55);
+    border-radius: 4px;
+
+    box-shadow: 2px 4px 22px rgba(0, 94, 235, 0.2);
     @media only screen and (max-width: 1280px) {
         width: 900px;
         height: 380px;
-    }
-    .login-image {
-        width: 480px;
-        height: 480px;
-        @media only screen and (max-width: 1280px) {
-            height: 380px;
-        }
     }
 }
 </style>

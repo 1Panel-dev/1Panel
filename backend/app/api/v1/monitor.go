@@ -9,8 +9,8 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/gin-gonic/gin"
-	"github.com/shirou/gopsutil/disk"
-	"github.com/shirou/gopsutil/net"
+	"github.com/shirou/gopsutil/v3/disk"
+	"github.com/shirou/gopsutil/v3/net"
 )
 
 func (b *BaseApi) LoadMonitor(c *gin.Context) {
