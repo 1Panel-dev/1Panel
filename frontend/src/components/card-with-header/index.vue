@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-card>
+        <el-card :style="{ height: height }">
             <el-divider direction="vertical" />
             <span style="font-size: 16px; font-weight: 700">{{ header }}</span>
             <div style="margin-top: 20px"><slot name="body" /></div>
@@ -12,6 +12,7 @@
 defineOptions({ name: 'CardWithHeader' });
 defineProps({
     header: String,
+    height: String,
 });
 </script>
 

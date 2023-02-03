@@ -4,7 +4,7 @@ import { Layout } from '@/routers/constant';
 const modules = import.meta.globEager('./modules/*.ts');
 
 const homeRouter: RouteRecordRaw = {
-    path: '/home',
+    path: '/',
     component: Layout,
     redirect: '/home/index',
     meta: {

@@ -59,7 +59,7 @@
 
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
-import { getSettingInfo, loadUpgradeInfoByOSS, upgrade } from '@/api/modules/setting';
+import { getSettingInfo, loadUpgradeInfo, upgrade } from '@/api/modules/setting';
 import { onMounted, ref } from 'vue';
 import MdEditor from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
@@ -96,7 +96,7 @@ const handleClose = () => {
 };
 
 const onLoadUpgradeInfo = async () => {
-    const res = await loadUpgradeInfoByOSS();
+    const res = await loadUpgradeInfo();
     if (!res.data) {
         ElMessage.success(i18n.global.t('setting.noUpgrade'));
         return;

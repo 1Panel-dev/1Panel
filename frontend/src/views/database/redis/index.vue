@@ -1,7 +1,6 @@
 <template>
     <div v-loading="loading">
         <AppStatus
-            :class="{ mask: redisStatus != 'Running' }"
             :app-key="'redis'"
             style="margin-top: 20px"
             @before="onBefore"

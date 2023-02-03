@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <LayoutContent :title="'Mysql ' + $t('menu.database')" :class="{ mask: mysqlStatus != 'Running' }">
+        <LayoutContent :title="'Mysql ' + $t('menu.database')">
             <template #app>
                 <AppStatus
                     :app-key="'mysql'"

@@ -10,7 +10,7 @@
         />
         <el-row :gutter="20" style="margin-top: 20px">
             <el-col :span="16">
-                <CardWithHeader :header="$t('home.overview')">
+                <CardWithHeader :header="$t('home.overview')" height="150px">
                     <template #body>
                         <el-form label-position="top" label-width="100px">
                             <el-row :gutter="20">
@@ -50,12 +50,12 @@
                         </el-form>
                     </template>
                 </CardWithHeader>
-                <CardWithHeader :header="$t('commons.table.status')" style="margin-top: 20px">
+                <CardWithHeader :header="$t('commons.table.status')" style="margin-top: 20px" height="280px">
                     <template #body>
                         <Status ref="statuRef" />
                     </template>
                 </CardWithHeader>
-                <CardWithHeader :header="$t('menu.monitor')" style="margin-top: 20px">
+                <CardWithHeader :header="$t('menu.monitor')" style="margin-top: 20px" height="450px">
                     <template #body>
                         <el-radio-group
                             style="float: right; margin-left: 5px"
@@ -119,7 +119,7 @@
                 </CardWithHeader>
             </el-col>
             <el-col :span="8">
-                <CardWithHeader :header="$t('home.systemInfo')">
+                <CardWithHeader :header="$t('home.systemInfo')" height="370px">
                     <template #body>
                         <el-form style="margin-left: 10px">
                             <el-form-item style="margin-top: 15px" :label="$t('home.hostname')">
@@ -140,7 +140,7 @@
                     </template>
                 </CardWithHeader>
 
-                <CardWithHeader :header="$t('home.app')" style="margin-top: 20px">
+                <CardWithHeader :header="$t('home.app')" style="margin-top: 20px" height="532px">
                     <template #body>
                         <App ref="appRef" />
                     </template>
@@ -401,9 +401,17 @@ const loadData = async () => {
         let ioReadYDatas = {
             name: i18n.global.t('monitor.read'),
             type: 'line',
-            smooth: true,
             areaStyle: {
-                color: '#ebdee3',
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    {
+                        offset: 0,
+                        color: 'rgba(27, 143, 60, 1)',
+                    },
+                    {
+                        offset: 1,
+                        color: 'rgba(27, 143, 60, 0)',
+                    },
+                ]),
             },
             data: ioReadBytes.value,
             showSymbol: false,
@@ -411,9 +419,17 @@ const loadData = async () => {
         let ioWriteYDatas = {
             name: i18n.global.t('monitor.write'),
             type: 'line',
-            smooth: true,
             areaStyle: {
-                color: '#ebdee3',
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    {
+                        offset: 0,
+                        color: 'rgba(0, 94, 235, 1)',
+                    },
+                    {
+                        offset: 1,
+                        color: 'rgba(0, 94, 235, 0)',
+                    },
+                ]),
             },
             data: ioWriteBytes.value,
             showSymbol: false,
@@ -430,9 +446,17 @@ const loadData = async () => {
         let netTxYDatas = {
             name: i18n.global.t('monitor.up'),
             type: 'line',
-            smooth: true,
             areaStyle: {
-                color: '#ebdee3',
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    {
+                        offset: 0,
+                        color: 'rgba(0, 94, 235, .5)',
+                    },
+                    {
+                        offset: 1,
+                        color: 'rgba(0, 94, 235, 0)',
+                    },
+                ]),
             },
             data: netBytesRecvs.value,
             showSymbol: false,
@@ -440,9 +464,17 @@ const loadData = async () => {
         let netRxYDatas = {
             name: i18n.global.t('monitor.down'),
             type: 'line',
-            smooth: true,
             areaStyle: {
-                color: '#ebdee3',
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    {
+                        offset: 0,
+                        color: 'rgba(27, 143, 60, .5)',
+                    },
+                    {
+                        offset: 1,
+                        color: 'rgba(27, 143, 60, 0)',
+                    },
+                ]),
             },
             data: netBytesSents.value,
             showSymbol: false,
@@ -491,6 +523,7 @@ function freshChart(chartName: string, legendDatas: any, xDatas: any, yDatas: an
         xAxis: { data: xDatas, boundaryGap: false },
         yAxis: { name: '( ' + formatStr + ' )' },
         series: yDatas,
+        dataZoom: [{ startValue: xDatas[0] }],
     };
     itemChart?.setOption(option, true);
 }
