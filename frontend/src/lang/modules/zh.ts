@@ -235,6 +235,11 @@ export default {
         koInfo: '开源的轻量级 Kubernetes 发行版',
         kubepiInfo: '现代化的开源 Kubernetes 面板',
         goInstall: '去安装',
+
+        networkCard: '网卡',
+        disk: '磁盘',
+        allNetworkCard: '所有网卡',
+        allDisk: '所有磁盘',
     },
     tabs: {
         more: '更多',
