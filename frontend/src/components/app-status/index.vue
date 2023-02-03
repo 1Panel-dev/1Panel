@@ -32,14 +32,22 @@
             </el-card>
         </div>
         <div v-else>
-            <div class="app-warn">
-                <div>
-                    <span>{{ $t('app.checkInstalledWarn', [data.app]) }}</span>
-                </div>
-                <el-link icon="Position" @click="goRouter('/apps')" type="primary">
-                    {{ $t('database.goInstall') }}
-                </el-link>
-            </div>
+            <LayoutContent :title="getTitle(key)" :divider="true">
+                <template #main>
+                    <div class="app-warn">
+                        <div>
+                            <span>{{ $t('app.checkInstalledWarn', [data.app]) }}</span>
+                            <span @click="goRouter('/apps')">
+                                <el-icon><Position /></el-icon>
+                                {{ $t('database.goInstall') }}
+                            </span>
+                            <div>
+                                <img src="@/assets/images/no_app.svg" />
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </LayoutContent>
         </div>
     </div>
 </template>
@@ -50,6 +58,7 @@ import { onMounted, reactive, ref } from 'vue';
 import Status from '@/components/status/index.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
+import LayoutContent from '@/layout/layout-content.vue';
 
 const props = defineProps({
     appKey: {
@@ -116,6 +125,17 @@ const onOperate = async (operation: string) => {
     });
 };
 
+const getTitle = (key: string) => {
+    switch (key) {
+        case 'nginx':
+            return i18n.global.t('website.website');
+        case 'mysql':
+            return 'Mysql ' + i18n.global.t('menu.database');
+        case 'redis':
+            return 'Redis ' + i18n.global.t('menu.database');
+    }
+};
+
 onMounted(() => {
     key.value = props.appKey;
     onCheck();
@@ -145,11 +165,25 @@ onMounted(() => {
 
 .app-warn {
     text-align: center;
-    margin-top: 200px;
-    span {
-        font-weight: 500;
-        font-size: 16px;
+    margin-top: 100px;
+    span:first-child {
+        // font-weight: 500;
+        // font-size: 16px;
         color: #bbbfc4;
+    }
+
+    span:nth-child(2) {
+        color: $primary-color;
+        cursor: pointer;
+    }
+
+    span:nth-child(2):hover {
+        color: #74a4f3;
+    }
+
+    img {
+        width: 300px;
+        height: 300px;
     }
 }
 </style>

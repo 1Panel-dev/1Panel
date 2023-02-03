@@ -3,20 +3,25 @@
         <template #toolbar>
             <el-row :gutter="5">
                 <el-col :span="20">
-                    <div>
-                        <el-button @click="changeTag('all')" type="primary" :plain="activeTag !== 'all'">
-                            {{ $t('app.all') }}
+                    <el-button
+                        class="tag-button"
+                        :class="activeTag === 'all' ? '' : 'no-active'"
+                        @click="changeTag('all')"
+                        :type="activeTag === 'all' ? 'primary' : ''"
+                        :plain="activeTag !== 'all'"
+                    >
+                        {{ $t('app.all') }}
+                    </el-button>
+                    <div v-for="item in tags" :key="item.key" style="display: inline">
+                        <el-button
+                            class="tag-button"
+                            :class="activeTag === item.key ? '' : 'no-active'"
+                            @click="changeTag(item.key)"
+                            :type="activeTag === item.key ? 'primary' : ''"
+                            :plain="activeTag !== item.key"
+                        >
+                            {{ item.name }}
                         </el-button>
-                        <div v-for="item in tags" :key="item.key" style="display: inline">
-                            <el-button
-                                class="tag-button"
-                                @click="changeTag(item.key)"
-                                type="primary"
-                                :plain="activeTag !== item.key"
-                            >
-                                {{ item.name }}
-                            </el-button>
-                        </div>
                     </div>
                 </el-col>
                 <el-col :span="4">
@@ -39,8 +44,11 @@
             <el-button @click="sync" type="primary" link v-if="mode === 'installed'">{{ $t('app.sync') }}</el-button>
         </template>
         <template #main>
-            <div class="update-prompt">
-                <span v-if="mode === 'update'">{{ $t('app.updatePrompt') }}</span>
+            <div class="update-prompt" v-if="mode === 'update'">
+                <span>{{ $t('app.updatePrompt') }}</span>
+                <div>
+                    <img src="@/assets/images/no_update_app.svg" />
+                </div>
             </div>
             <el-row :gutter="5">
                 <el-col v-for="(installed, index) in data" :key="index" :span="12">

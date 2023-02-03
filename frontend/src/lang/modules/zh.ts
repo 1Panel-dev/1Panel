@@ -252,7 +252,7 @@ export default {
         noMysql: '当前未检测到 {0} 数据库，请进入应用商店点击安装！',
         mysqlBadStatus: '当前 mysql 应用状态异常，请在',
         adjust: '中查看原因或修改配置',
-        goInstall: '去安装',
+        goInstall: '去应用商店安装',
         source: '来源',
         backup: '备份',
         permission: '权限',
