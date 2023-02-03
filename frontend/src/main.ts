@@ -6,6 +6,7 @@ import App from './App.vue';
 import '@/styles/index.scss';
 import '@/styles/reset.scss';
 import '@/styles/common.scss';
+import '@/assets/fonts/font.scss';
 import '@/assets/iconfont/iconfont.css';
 import '@/assets/iconfont/iconfont.js';
 import '@/styles/element-dark.scss';

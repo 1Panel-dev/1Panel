@@ -3,12 +3,17 @@
         <div v-if="isFirst">
             <div class="login-container">
                 <el-form ref="registerFormRef" :model="registerForm" size="default" :rules="registerRules">
-                    <div class="login-title">{{ globalStore.themeConfig.panelName }}</div>
-                    <div class="login-border"></div>
-                    <div class="login-welcome">{{ $t('commons.login.firstLogin') }}</div>
+                    <div class="login-title">{{ $t('commons.button.init') }}</div>
                     <div class="login-form">
+                        <input type="text" class="hide" id="name" />
+                        <input type="password" class="hide" id="password" />
                         <el-form-item prop="name">
-                            <el-input v-model="registerForm.name" :placeholder="$t('commons.login.username')">
+                            <el-input
+                                v-model="registerForm.name"
+                                :placeholder="$t('commons.login.username')"
+                                autocomplete="off"
+                                type="text"
+                            >
                                 <template #prefix>
                                     <el-icon class="el-input__icon">
                                         <user />
@@ -23,6 +28,8 @@
                                 v-model="registerForm.password"
                                 show-password
                                 :placeholder="$t('commons.login.password')"
+                                name="passwod"
+                                autocomplete="new-password"
                             >
                                 <template #prefix>
                                     <el-icon class="el-input__icon">
@@ -49,9 +56,10 @@
                         <el-form-item>
                             <el-button
                                 @click="register(registerFormRef)"
-                                style="width: 100%"
+                                class="login-button"
                                 type="primary"
                                 size="default"
+                                round
                             >
                                 {{ $t('commons.button.init') }}
                             </el-button>
@@ -64,9 +72,7 @@
             <div v-if="mfaShow">
                 <div class="login-container">
                     <el-form>
-                        <div class="login-title">{{ globalStore.themeConfig.panelName }}</div>
-                        <div class="login-border"></div>
-                        <div class="login-welcome">{{ $t('commons.login.codeInput') }}</div>
+                        <div class="login-title">{{ $t('commons.login.mfaTitle') }}</div>
                         <div class="login-form">
                             <el-form-item>
                                 <el-input
@@ -82,13 +88,7 @@
                                 </el-input>
                             </el-form-item>
                             <el-form-item>
-                                <el-button
-                                    class="login-btn"
-                                    style="width: 100%"
-                                    size="default"
-                                    type="primary"
-                                    @click="mfaLogin()"
-                                >
+                                <el-button class="login-button" type="primary" size="default" round @click="mfaLogin()">
                                     {{ $t('commons.button.verify') }}
                                 </el-button>
                             </el-form-item>
@@ -99,12 +99,14 @@
             <div v-if="!mfaShow">
                 <div class="login-container">
                     <el-form ref="loginFormRef" :model="loginForm" size="default" :rules="loginRules">
-                        <div class="login-title">{{ globalStore.themeConfig.panelName }}</div>
-                        <div class="login-border"></div>
-                        <div class="login-welcome">{{ $t('commons.login.welcome') }}</div>
+                        <div class="login-title">{{ $t('commons.button.login') }}</div>
                         <div class="login-form">
-                            <el-form-item prop="username">
-                                <el-input v-model="loginForm.name" :placeholder="$t('commons.login.username')">
+                            <el-form-item prop="name">
+                                <el-input
+                                    v-model="loginForm.name"
+                                    :placeholder="$t('commons.login.username')"
+                                    class="form-input"
+                                >
                                     <template #prefix>
                                         <el-icon class="el-input__icon">
                                             <user />
@@ -130,16 +132,14 @@
                                     {{ $t('commons.login.errorAuthInfo') }}
                                 </span>
                             </el-form-item>
-                            <el-form-item prop="captcha">
+                            <el-form-item prop="captcha" class="login-captcha">
                                 <el-input
                                     v-model="loginForm.captcha"
                                     :placeholder="$t('commons.login.captchaHelper')"
-                                    style="width: 70%"
                                 />
                                 <img
                                     v-if="captcha.imagePath"
                                     :src="captcha.imagePath"
-                                    style="width: 30%; height: 32px"
                                     :alt="$t('commons.login.captchaHelper')"
                                     @click="loginVerify()"
                                 />
@@ -150,9 +150,10 @@
                             <el-form-item>
                                 <el-button
                                     @click="login(loginFormRef)"
-                                    style="width: 100%"
+                                    class="login-button"
                                     type="primary"
                                     size="default"
+                                    round
                                 >
                                     {{ $t('commons.button.login') }}
                                 </el-button>
@@ -343,16 +344,10 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .login-container {
-    .login-logo {
-        margin-top: 30px;
-        margin-left: 30px;
-        @media only screen and (max-width: 1280px) {
-            margin-top: 20px;
-        }
-
-        img {
-            height: 45px;
-        }
+    .hide {
+        width: 0;
+        border: 0;
+        position: absolute;
     }
 
     .login-title {
@@ -360,30 +355,8 @@ onUnmounted(() => {
         font-size: 32px;
         letter-spacing: 0;
         text-align: center;
-        color: #999999;
+        color: #646a73;
 
-        @media only screen and (max-width: 1280px) {
-            margin-top: 20px;
-        }
-    }
-
-    .login-border {
-        height: 2px;
-        margin: 20px auto 20px;
-        position: relative;
-        width: 80px;
-        @media only screen and (max-width: 1280px) {
-            margin: 10px auto 10px;
-        }
-    }
-
-    .login-welcome {
-        margin-top: 10px;
-        font-size: 14px;
-        color: #999999;
-        letter-spacing: 0;
-        line-height: 18px;
-        text-align: center;
         @media only screen and (max-width: 1280px) {
             margin-top: 20px;
         }
@@ -393,12 +366,33 @@ onUnmounted(() => {
         margin-top: 30px;
         padding: 0 40px;
 
-        @media only screen and (max-width: 1280px) {
-            margin-top: 10px;
+        .el-input {
+            height: 44px;
         }
 
-        &:deep(.el-input__inner) {
-            border-radius: 0;
+        :deep(.el-input) {
+            --el-input-focus-border: $menu-backgroup-color;
+            --el-input-transparent-border: 0 0 0 0px;
+            --el-input-border-color: $menu-backgroup-color;
+            --el-input-hover-border: 0px !important;
+            --el-input-hover-border-color: $menu-backgroup-color;
+            --el-input-focus-border-color: $menu-backgroup-color;
+            --el-input-clear-hover-color: $menu-backgroup-color;
+            box-shadow: 0 0 0 0px !important;
+            --el-input-border: 0px;
+        }
+    }
+
+    .login-captcha {
+        .el-input {
+            width: 50%;
+            height: 44px;
+        }
+
+        img {
+            width: 45%;
+            height: 44px;
+            margin-left: 5%;
         }
     }
 
@@ -428,6 +422,11 @@ onUnmounted(() => {
         @media only screen and (max-width: 1280px) {
             margin-top: 20px;
         }
+    }
+
+    .login-button {
+        width: 100%;
+        height: 45px;
     }
 }
 </style>
