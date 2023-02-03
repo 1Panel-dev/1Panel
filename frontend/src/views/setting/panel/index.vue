@@ -19,6 +19,22 @@
                                 </el-input>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.theme')" :rules="Rules.requiredSelect" prop="theme">
+                                <el-radio-group
+                                    @change="onSave(panelFormRef, 'Theme', form.theme)"
+                                    v-model="form.theme"
+                                >
+                                    <el-radio-button label="light">
+                                        <el-icon><Sunny /></el-icon>
+                                        {{ $t('setting.light') }}
+                                    </el-radio-button>
+                                    <el-radio-button label="dark">
+                                        <el-icon><Moon /></el-icon>
+                                        {{ $t('setting.dark') }}
+                                    </el-radio-button>
+                                </el-radio-group>
+                            </el-form-item>
+
                             <el-form-item :label="$t('setting.title')" :rules="Rules.requiredInput" prop="panelName">
                                 <el-input clearable v-model="form.panelName">
                                     <template #append>
