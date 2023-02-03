@@ -4,7 +4,7 @@
             <template #main>
                 <div style="text-align: center; margin-top: 20px">
                     <div style="justify-self: center">
-                        <img style="width: 80px" src="@/assets/images/ko_image.png" />
+                        <img style="width: 80px" src="@/assets/images/1panel-small.png" />
                     </div>
                     <h3>{{ $t('setting.description') }}</h3>
                     <h3>
