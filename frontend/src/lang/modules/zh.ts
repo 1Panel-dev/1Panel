@@ -89,6 +89,7 @@ export default {
             copyfailed: '复制失败',
             backupSuccess: '备份成功',
             restoreSuccess: '备份成功',
+            notFound: '抱歉，您访问的页面不存在',
         },
         login: {
             firstLogin: '首次登录，请创建初始管理员用户！',
