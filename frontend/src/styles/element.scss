@@ -155,10 +155,11 @@
 .row-box {
     display: flex;
     flex-flow: wrap;
+		.el-card {
+			min-width: 100%;
+			height: 100%;
+			margin-right: 20px;
+			border: 0;
+	}
 }
-.row-box .el-card {
-    min-width: 100%;
-    height: 100%;
-    margin-right: 20px;
-    border: 0;
-}
+

@@ -13,14 +13,29 @@
 </template>
 
 <style scoped lang="scss">
-@import './index.scss';
+.footer {
+    height: 45px;
+    background: #ffffff;
+    border-top: 1px solid #e4e7ed;
+    a {
+        font-size: 14px;
+        color: #858585;
+        text-decoration: none;
+        letter-spacing: 0.5px;
+    }
+    span {
+        font-size: 14px;
+        color: #858585;
+        text-decoration: none;
+        letter-spacing: 0.5px;
+    }
+    .footer-left {
+        margin-left: 20px;
+    }
 
-.footer-left {
-    margin-left: 20px;
-}
-
-.footer-right {
-    float: right;
-    margin-right: 20px;
+    .footer-right {
+        float: right;
+        margin-right: 20px;
+    }
 }
 </style>
