@@ -1,9 +1,14 @@
 <template>
     <div>
-        <el-card :style="{ height: height }">
-            <el-divider direction="vertical" />
-            <span style="font-size: 16px; font-weight: 700">{{ header }}</span>
-            <div style="margin-top: 20px"><slot name="body" /></div>
+        <el-card :style="{ height: height }" class="home-card">
+            <div class="header">
+                <span></span>
+                <span>{{ header }}</span>
+            </div>
+
+            <div>
+                <slot name="body" />
+            </div>
         </el-card>
     </div>
 </template>
@@ -17,13 +22,26 @@ defineProps({
 </script>
 
 <style scoped lang="scss">
-.el-divider--vertical {
-    display: inline-block;
-    width: 1px;
-    height: 2.5em;
-    margin: 0px 8px;
-    vertical-align: middle;
-    position: relative;
-    border-left: 5px #0054e1 var(--el-border-style);
+.home-card {
+    .header {
+        span:first-child {
+            background: $primary-color;
+            border-radius: 7px;
+            flex: none;
+            order: 0;
+            flex-grow: 0;
+            padding: 3px;
+        }
+
+        span:nth-child(2) {
+            font-size: 18px;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+    }
+
+    div:nth-child(2) {
+        margin-top: 20px;
+    }
 }
 </style>
