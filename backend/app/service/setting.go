@@ -65,11 +65,10 @@ func (u *SettingService) UpdatePort(port uint) error {
 	if err := settingRepo.Update("ServerPort", strconv.Itoa(int(port))); err != nil {
 		return err
 	}
-	_ = settingRepo.Update("SystemStatus", "Restarting")
 	go func() {
 		_, err := cmd.Exec("systemctl restart 1panel.service")
 		if err != nil {
-			global.LOG.Errorf("restart system port failed, err: %v")
+			global.LOG.Errorf("restart system port failed, err: %v", err)
 		}
 	}()
 	return nil

@@ -226,7 +226,24 @@ const search = async (param: string) => {
                     let cpuData = item.value.map(function (item: any) {
                         return item.cpu.toFixed(2);
                     });
-                    let yDatasOfCpu = { name: 'CPU', type: 'line', data: cpuData, showSymbol: false };
+                    let yDatasOfCpu = {
+                        name: 'CPU',
+                        type: 'line',
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                {
+                                    offset: 0,
+                                    color: 'rgba(0, 94, 235, .5)',
+                                },
+                                {
+                                    offset: 1,
+                                    color: 'rgba(0, 94, 235, 0)',
+                                },
+                            ]),
+                        },
+                        data: cpuData,
+                        showSymbol: false,
+                    };
                     initCharts('loadCPUChart', baseDate, yDatasOfCpu, 'CPU', '%');
                 }
                 if (param === 'memory' || param === 'all') {
@@ -236,6 +253,18 @@ const search = async (param: string) => {
                     let yDatasOfMem = {
                         name: i18n.global.t('monitor.memory'),
                         type: 'line',
+                        areaStyle: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                {
+                                    offset: 0,
+                                    color: 'rgba(0, 94, 235, .5)',
+                                },
+                                {
+                                    offset: 1,
+                                    color: 'rgba(0, 94, 235, 0)',
+                                },
+                            ]),
+                        },
                         data: memoryData,
                         showSymbol: false,
                     };
@@ -258,6 +287,18 @@ const search = async (param: string) => {
                 let yDatasOfUp = {
                     name: i18n.global.t('monitor.up'),
                     type: 'line',
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            {
+                                offset: 0,
+                                color: 'rgba(0, 94, 235, .5)',
+                            },
+                            {
+                                offset: 1,
+                                color: 'rgba(0, 94, 235, 0)',
+                            },
+                        ]),
+                    },
                     data: networkUp,
                     showSymbol: false,
                 };
@@ -267,6 +308,18 @@ const search = async (param: string) => {
                 let yDatasOfDown = {
                     name: i18n.global.t('monitor.down'),
                     type: 'line',
+                    areaStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            {
+                                offset: 0,
+                                color: 'rgba(27, 143, 60, .5)',
+                            },
+                            {
+                                offset: 1,
+                                color: 'rgba(27, 143, 60, 0)',
+                            },
+                        ]),
+                    },
                     data: networkOut,
                     showSymbol: false,
                 };
@@ -353,6 +406,18 @@ function initLoadCharts(item: Monitor.MonitorData) {
             {
                 name: '1 ' + i18n.global.t('monitor.min'),
                 type: 'line',
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        {
+                            offset: 0,
+                            color: 'rgba(0, 94, 235, .5)',
+                        },
+                        {
+                            offset: 1,
+                            color: 'rgba(0, 94, 235, 0)',
+                        },
+                    ]),
+                },
                 showSymbol: false,
                 data: item.value.map(function (item: any) {
                     return item.cpuLoad1.toFixed(2);
@@ -361,6 +426,18 @@ function initLoadCharts(item: Monitor.MonitorData) {
             {
                 name: '5 ' + i18n.global.t('monitor.min'),
                 type: 'line',
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        {
+                            offset: 0,
+                            color: 'rgba(27, 143, 60, .5)',
+                        },
+                        {
+                            offset: 1,
+                            color: 'rgba(27, 143, 60, 0)',
+                        },
+                    ]),
+                },
                 showSymbol: false,
                 data: item.value.map(function (item: any) {
                     return item.cpuLoad5.toFixed(2);
@@ -369,6 +446,18 @@ function initLoadCharts(item: Monitor.MonitorData) {
             {
                 name: '15 ' + i18n.global.t('monitor.min'),
                 type: 'line',
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        {
+                            offset: 0,
+                            color: 'rgba(249, 199, 79, .5)',
+                        },
+                        {
+                            offset: 1,
+                            color: 'rgba(249, 199, 79, 0)',
+                        },
+                    ]),
+                },
                 showSymbol: false,
                 data: item.value.map(function (item: any) {
                     return item.cpuLoad15.toFixed(2);
@@ -377,6 +466,18 @@ function initLoadCharts(item: Monitor.MonitorData) {
             {
                 name: i18n.global.t('monitor.resourceUsage'),
                 type: 'line',
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        {
+                            offset: 0,
+                            color: 'rgba(255, 173, 177, 0.5)',
+                        },
+                        {
+                            offset: 1,
+                            color: 'rgba(255, 173, 177, 0)',
+                        },
+                    ]),
+                },
                 showSymbol: false,
                 data: item.value.map(function (item: any) {
                     return item.loadUsage.toFixed(2);
@@ -446,6 +547,18 @@ function initIOCharts(item: Monitor.MonitorData) {
             {
                 name: i18n.global.t('monitor.read'),
                 type: 'line',
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        {
+                            offset: 0,
+                            color: 'rgba(0, 94, 235, .5)',
+                        },
+                        {
+                            offset: 1,
+                            color: 'rgba(0, 94, 235, 0)',
+                        },
+                    ]),
+                },
                 showSymbol: false,
                 data: item.value.map(function (item: any) {
                     return (item.read / 1024).toFixed(2);
@@ -454,6 +567,18 @@ function initIOCharts(item: Monitor.MonitorData) {
             {
                 name: i18n.global.t('monitor.write'),
                 type: 'line',
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        {
+                            offset: 0,
+                            color: 'rgba(27, 143, 60, .5)',
+                        },
+                        {
+                            offset: 1,
+                            color: 'rgba(27, 143, 60, 0)',
+                        },
+                    ]),
+                },
                 showSymbol: false,
                 data: item.value.map(function (item: any) {
                     return (item.write / 1024).toFixed(2);
@@ -462,6 +587,18 @@ function initIOCharts(item: Monitor.MonitorData) {
             {
                 name: i18n.global.t('monitor.readWriteCount'),
                 type: 'line',
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        {
+                            offset: 0,
+                            color: 'rgba(249, 199, 79, .5)',
+                        },
+                        {
+                            offset: 1,
+                            color: 'rgba(249, 199, 79, 0)',
+                        },
+                    ]),
+                },
                 showSymbol: false,
                 data: item.value.map(function (item: any) {
                     return item.count;
@@ -471,6 +608,18 @@ function initIOCharts(item: Monitor.MonitorData) {
             {
                 name: i18n.global.t('monitor.readWriteTime'),
                 type: 'line',
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        {
+                            offset: 0,
+                            color: 'rgba(255, 173, 177, 0.5)',
+                        },
+                        {
+                            offset: 1,
+                            color: 'rgba(255, 173, 177, 0)',
+                        },
+                    ]),
+                },
                 showSymbol: false,
                 data: item.value.map(function (item: any) {
                     return item.time;

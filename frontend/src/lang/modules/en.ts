@@ -753,6 +753,7 @@ export default {
         mfaHelper3: 'Enter six digits from the app',
 
         snapshot: 'Snapshot',
+        thirdPartySupport: 'Only third-party accounts are supported',
         recoverDetail: 'Recover detail',
         createSnapshot: 'Create snapshot',
         recover: 'Recover',
@@ -776,6 +777,7 @@ export default {
         upgradeCheck: 'Check for updates',
         upgradeNotes: 'Release note',
         upgradeNow: 'Upgrade now',
+        source: 'Download source',
 
         monitor: 'Monitor',
         enableMonitor: 'Enable',

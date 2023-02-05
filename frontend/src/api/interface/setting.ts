@@ -80,4 +80,8 @@ export namespace Setting {
         releaseNote: string;
         createdAt: string;
     }
+    export interface Upgrade {
+        source: string;
+        version: string;
+    }
 }

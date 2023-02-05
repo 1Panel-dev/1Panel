@@ -747,6 +747,7 @@ export default {
         path: '路径',
 
         snapshot: '快照',
+        thirdPartySupport: '仅支持第三方账号',
         recoverDetail: '恢复详情',
         createSnapshot: '创建快照',
         recover: '恢复',
@@ -773,6 +774,7 @@ export default {
         upgradeCheck: '检查更新',
         upgradeNotes: '更新内容',
         upgradeNow: '立即更新',
+        source: '下载源',
 
         safe: '安全',
         safeEntrance: '安全入口',

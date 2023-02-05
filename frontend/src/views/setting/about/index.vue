@@ -47,7 +47,13 @@
                     <el-tag>{{ upgradeInfo.createdAt }}</el-tag>
                 </el-form-item>
                 <el-form-item :label="$t('setting.upgradeNotes')">
-                    <MdEditor style="height: calc(100vh - 260px)" v-model="upgradeInfo.releaseNote" previewOnly />
+                    <MdEditor style="height: calc(100vh - 330px)" v-model="upgradeInfo.releaseNote" previewOnly />
+                </el-form-item>
+                <el-form-item :label="$t('setting.source')">
+                    <el-radio-group v-model="Source">
+                        <el-radio label="gitee">Gitee</el-radio>
+                        <el-radio label="github">GitHub</el-radio>
+                    </el-radio-group>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="onUpgrade">{{ $t('setting.upgradeNow') }}</el-button>
@@ -69,6 +75,7 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const version = ref();
 const upgradeInfo = ref();
+const Source = ref('gitee');
 const drawerVisiable = ref();
 const refresh = ref();
 
@@ -98,7 +105,7 @@ const handleClose = () => {
 const onLoadUpgradeInfo = async () => {
     const res = await loadUpgradeInfo();
     if (!res.data) {
-        ElMessage.success(i18n.global.t('setting.noUpgrade'));
+        ElMessage.info(i18n.global.t('setting.noUpgrade'));
         return;
     }
     upgradeInfo.value = res.data;
@@ -111,7 +118,11 @@ const onUpgrade = async () => {
         type: 'info',
     }).then(() => {
         loading.value = true;
-        upgrade(upgradeInfo.value.newVersion)
+        let param = {
+            version: upgradeInfo.value.newVersion,
+            source: Source.value,
+        };
+        upgrade(param)
             .then(() => {
                 loading.value = false;
                 drawerVisiable.value = false;

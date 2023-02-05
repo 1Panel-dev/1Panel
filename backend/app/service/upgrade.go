@@ -1,29 +1,27 @@
 package service
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
+	"runtime"
+	"strconv"
+	"strings"
 	"time"
 
+	"gitee.com/openeuler/go-gitee/gitee"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"github.com/google/go-github/github"
 )
-
-type latestVersion struct {
-	Version    string `json:"version"`
-	UpdateTime string `json:"update_time"`
-}
 
 type UpgradeService struct{}
 
 type IUpgradeService interface {
-	Upgrade(version string) error
+	Upgrade(req dto.Upgrade) error
 	SearchUpgrade() (*dto.UpgradeInfo, error)
 }
 
@@ -32,64 +30,67 @@ func NewIUpgradeService() IUpgradeService {
 }
 
 func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
-	res, err := http.Get(global.CONF.System.AppOss + "/releases/latest.json")
+	currentVerion, err := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
 	if err != nil {
 		return nil, err
 	}
-	resByte, err := ioutil.ReadAll(res.Body)
+	infoFromGithub, err := u.loadLatestFromGithub()
 	if err != nil {
-		return nil, err
-	}
-	var latest latestVersion
-	if err := json.Unmarshal(resByte, &latest); err != nil {
-		return nil, err
-	}
-	setting, err := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
-	if err != nil {
-		return nil, err
-	}
-	if latest.Version != setting.Value {
-		notes, err := http.Get(global.CONF.System.AppOss + fmt.Sprintf("/releases/%s/release_notes.md", latest.Version))
-		if err != nil {
+		global.LOG.Error(err)
+	} else {
+		isNew, err := compareVersion(currentVerion.Value, infoFromGithub.NewVersion)
+		if !isNew || err != nil {
 			return nil, err
 		}
-		noteBytes, err := ioutil.ReadAll(notes.Body)
-		if err != nil {
-			return nil, err
-		}
-		return &dto.UpgradeInfo{
-			NewVersion:  latest.Version,
-			CreatedAt:   latest.UpdateTime,
-			ReleaseNote: string(noteBytes),
-		}, nil
+		return infoFromGithub, nil
 	}
-	return nil, nil
+
+	infoFromGitee, err := u.loadLatestFromGitee()
+	if err != nil {
+		global.LOG.Error(err)
+		return nil, err
+	}
+	isNew, err := compareVersion(currentVerion.Value, infoFromGitee.NewVersion)
+	if !isNew && err != nil {
+		return nil, err
+	}
+	return infoFromGitee, nil
 }
 
-func (u *UpgradeService) Upgrade(version string) error {
+func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	global.LOG.Info("start to upgrade now...")
 	fileOp := files.NewFileOp()
 	timeStr := time.Now().Format("20060102150405")
-	filePath := fmt.Sprintf("%s/%s.tar.gz", constant.TmpDir, timeStr)
-	rootDir := constant.TmpDir + "/" + timeStr
-	originalDir := fmt.Sprintf("%s/%s/original", constant.TmpDir, timeStr)
-	downloadPath := fmt.Sprintf("%s/releases/%s/%s.tar.gz", global.CONF.System.AppOss, version, version)
+	rootDir := fmt.Sprintf("%s/upgrade_%s/downloads", constant.TmpDir, timeStr)
+	originalDir := fmt.Sprintf("%s/upgrade_%s/original", constant.TmpDir, timeStr)
+	if err := os.MkdirAll(rootDir, os.ModePerm); err != nil {
+		return err
+	}
+	if err := os.MkdirAll(originalDir, os.ModePerm); err != nil {
+		return err
+	}
 
+	downloadPath := fmt.Sprintf("https://gitee.com/%s/%s/releases/download/%s/", "wanghe-fit2cloud", "1Panel", req.Version)
+	if req.Source == "github" {
+		downloadPath = fmt.Sprintf("https://github.com/%s/%s/releases/download/%s/", "wanghe-fit2cloud", "1Panel", req.Version)
+	}
+	panelName := fmt.Sprintf("1panel-%s-%s", "linux", runtime.GOARCH)
+	fileName := fmt.Sprintf("1panel-online-installer-%s.tar.gz", req.Version)
 	_ = settingRepo.Update("SystemStatus", "Upgrading")
 	go func() {
-		if err := os.MkdirAll(originalDir, os.ModePerm); err != nil {
-			global.LOG.Error(err.Error())
+		if err := fileOp.DownloadFile(downloadPath+panelName, rootDir+"/1panel"); err != nil {
+			global.LOG.Errorf("download panel file failed, err: %v", err)
 			return
 		}
-		if err := fileOp.DownloadFile(downloadPath, filePath); err != nil {
-			global.LOG.Errorf("download file failed, err: %v", err)
+		if err := fileOp.DownloadFile(downloadPath+fileName, rootDir+"/service.tar.gz"); err != nil {
+			global.LOG.Errorf("download service file failed, err: %v", err)
 			return
 		}
-		global.LOG.Info("download file from oss successful!")
+		global.LOG.Info("download all file successful!")
 		defer func() {
-			_ = os.Remove(filePath)
+			_ = os.Remove(rootDir)
 		}()
-		if err := fileOp.Decompress(filePath, rootDir, files.TarGz); err != nil {
+		if err := fileOp.Decompress(rootDir+"/service.tar.gz", rootDir, files.TarGz); err != nil {
 			global.LOG.Errorf("decompress file failed, err: %v", err)
 			return
 		}
@@ -105,21 +106,31 @@ func (u *UpgradeService) Upgrade(version string) error {
 			global.LOG.Errorf("upgrade 1panel failed, err: %v", err)
 			return
 		}
-		if err := cpBinary(rootDir+"/1pctl", "/usr/local/bin/1pctl"); err != nil {
+		if err := fileOp.Chmod("/usr/local/bin/1panel", 0755); err != nil {
+			u.handleRollback(fileOp, originalDir, 1)
+			global.LOG.Errorf("chmod 1panel failed, err: %v", err)
+			return
+		}
+		if err := cpBinary(fmt.Sprintf("%s/1panel-online-installer-%s/1pctl", rootDir, req.Version), "/usr/local/bin/1pctl"); err != nil {
 			u.handleRollback(fileOp, originalDir, 2)
 			global.LOG.Errorf("upgrade 1pctl failed, err: %v", err)
 			return
 		}
-		if err := cpBinary(rootDir+"/1panel.service", "/etc/systemd/system/1panel.service"); err != nil {
+		if err := fileOp.Chmod("/usr/local/bin/1pctl", 0755); err != nil {
+			u.handleRollback(fileOp, originalDir, 1)
+			global.LOG.Errorf("chmod 1pctl failed, err: %v", err)
+			return
+		}
+		if err := cpBinary(fmt.Sprintf("%s/1panel-online-installer-%s/1panel/conf/1panel.service", rootDir, req.Version), "/etc/systemd/system/1panel.service"); err != nil {
 			u.handleRollback(fileOp, originalDir, 3)
 			global.LOG.Errorf("upgrade 1panel.service failed, err: %v", err)
 			return
 		}
 
 		global.LOG.Info("upgrade successful!")
-		_ = settingRepo.Update("SystemStatus", "Upgrade")
-		_ = settingRepo.Update("SystemVersion", version)
-		_, _ = cmd.Exec("systemctl restart 1panel.service")
+		_ = settingRepo.Update("SystemVersion", req.Version)
+		_ = settingRepo.Update("SystemStatus", "Free")
+		_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
 	}()
 	return nil
 }
@@ -160,5 +171,77 @@ func (u *UpgradeService) handleRollback(fileOp files.FileOp, originalDir string,
 	}
 	if err := cpBinary(originalDir+"/1panel.service", "/etc/systemd/system/1panel.service"); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
+	}
+}
+
+func (u *UpgradeService) loadLatestFromGithub() (*dto.UpgradeInfo, error) {
+	client := github.NewClient(nil)
+	ctx, cancle := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancle()
+	stats, res, err := client.Repositories.GetLatestRelease(ctx, "wanghe-fit2cloud", "1Panel")
+	if res.StatusCode != 200 || err != nil {
+		return nil, fmt.Errorf("load upgrade info from github failed, err: %v", err)
+	}
+	info := dto.UpgradeInfo{
+		NewVersion:  string(*stats.Name),
+		ReleaseNote: string(*stats.Body),
+		CreatedAt:   github.Timestamp(*stats.CreatedAt).Format("2006-01-02 15:04:05"),
+	}
+	return &info, nil
+}
+
+func (u *UpgradeService) loadLatestFromGitee() (*dto.UpgradeInfo, error) {
+	client := gitee.NewAPIClient(gitee.NewConfiguration())
+	ctx, cancle := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancle()
+	stats, res, err := client.RepositoriesApi.GetV5ReposOwnerRepoReleasesLatest(ctx, "wanghe-fit2cloud", "1Panel", &gitee.GetV5ReposOwnerRepoReleasesLatestOpts{})
+	if res.StatusCode != 200 || err != nil {
+		return nil, fmt.Errorf("load upgrade info from gitee failed, err: %v", err)
+	}
+	info := dto.UpgradeInfo{
+		NewVersion:  string(stats.Name),
+		ReleaseNote: string(stats.Body),
+		CreatedAt:   stats.CreatedAt.Format("2006-01-02 15:04:05"),
+	}
+	return &info, nil
+}
+
+func compareVersion(version, newVersion string) (bool, error) {
+	if version == newVersion {
+		return false, nil
+	}
+	if len(version) == 0 || len(newVersion) == 0 {
+		return false, fmt.Errorf("incorrect version or new version entered %v -- %v", version, newVersion)
+	}
+	versions := strings.Split(strings.ReplaceAll(version, "v", ""), ".")
+	if len(versions) != 3 {
+		return false, fmt.Errorf("incorrect version input %v", version)
+	}
+	newVersions := strings.Split(strings.ReplaceAll(newVersion, "v", ""), ".")
+	if len(newVersions) != 3 {
+		return false, fmt.Errorf("incorrect newVersions input %v", version)
+	}
+	version1, _ := strconv.Atoi(versions[0])
+	newVersion1, _ := strconv.Atoi(newVersions[0])
+	if newVersion1 > version1 {
+		return true, nil
+	} else if newVersion1 == version1 {
+		version2, _ := strconv.Atoi(versions[1])
+		newVersion2, _ := strconv.Atoi(newVersions[1])
+		if newVersion2 > version2 {
+			return true, nil
+		} else if newVersion2 == version2 {
+			version3, _ := strconv.Atoi(versions[2])
+			newVersion3, _ := strconv.Atoi(newVersions[2])
+			if newVersion3 > version3 {
+				return true, nil
+			} else {
+				return false, nil
+			}
+		} else {
+			return false, nil
+		}
+	} else {
+		return false, nil
 	}
 }

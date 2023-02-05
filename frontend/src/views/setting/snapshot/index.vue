@@ -82,7 +82,10 @@
             >
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('cronjob.target')" prop="from">
+                        <el-form-item
+                            :label="$t('cronjob.target') + ' ( ' + $t('setting.thirdPartySupport') + ' )'"
+                            prop="from"
+                        >
                             <el-select v-model="snapInfo.from" clearable>
                                 <el-option
                                     v-for="item in backupOptions"

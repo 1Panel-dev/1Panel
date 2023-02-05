@@ -55,6 +55,8 @@
                         </el-form-item>
                         <el-form-item>
                             <el-button
+                                @focus="registerButtonFocused = true"
+                                @blur="registerButtonFocused = false"
                                 @click="register(registerFormRef)"
                                 class="login-button"
                                 type="primary"
@@ -150,6 +152,8 @@
                             <el-form-item>
                                 <el-button
                                     @click="login(loginFormRef)"
+                                    @focus="loginButtonFocused = true"
+                                    @blur="loginButtonFocused = false"
                                     class="login-button"
                                     type="primary"
                                     size="default"
@@ -167,7 +171,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import type { ElForm } from 'element-plus';
 import { ElMessage } from 'element-plus';
@@ -176,8 +180,6 @@ import { GlobalStore } from '@/store';
 import { MenuStore } from '@/store/modules/menu';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
-
-let timer: NodeJS.Timer | null = null;
 
 const globalStore = GlobalStore();
 const menuStore = MenuStore();
@@ -189,6 +191,7 @@ const isFirst = ref();
 
 type FormInstance = InstanceType<typeof ElForm>;
 
+const registerButtonFocused = ref(false);
 const registerFormRef = ref<FormInstance>();
 const registerForm = reactive({
     name: '',
@@ -201,6 +204,7 @@ const registerRules = reactive({
     rePassword: [Rules.requiredInput, { validator: checkPassword, trigger: 'blur' }],
 });
 
+const loginButtonFocused = ref();
 const loginFormRef = ref<FormInstance>();
 const loginForm = reactive({
     name: '',
@@ -321,24 +325,19 @@ function checkPassword(rule: any, value: any, callback: any) {
 
 onMounted(() => {
     document.title = globalStore.themeConfig.panelName;
-    timer = setInterval(() => {
-        if (loginForm.captcha === '') {
-            loginVerify();
-        }
-    }, 1000 * 8);
     checkStatus();
     document.onkeydown = (e: any) => {
         e = window.event || e;
-        if (e.code === 'Enter' || e.code === 'enter' || e.code === 'NumpadEnter') {
+        if (e.keyCode === 13) {
             if (loading.value) return;
-            login(loginFormRef.value);
+            if (isFirst.value && !registerButtonFocused.value) {
+                register(registerFormRef.value);
+            }
+            if (!isFirst.value && !loginButtonFocused.value) {
+                login(loginFormRef.value);
+            }
         }
     };
-});
-
-onUnmounted(() => {
-    clearInterval(Number(timer));
-    timer = null;
 });
 </script>
 
