@@ -7,6 +7,9 @@
         :before-close="handleClose"
         size="30%"
     >
+        <template #header>
+            <DrawerHeader :header="$t('file.download')" :back="handleClose" />
+        </template>
         <el-row>
             <el-col :span="11" :offset="1">
                 <el-form
@@ -46,6 +49,7 @@ import { computed, reactive, ref } from 'vue';
 import { DownloadFile } from '@/api/modules/files';
 import { File } from '@/api/interface/file';
 import { Rules } from '@/global/form-rules';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 interface DownloadProps {
     paths: Array<string>;

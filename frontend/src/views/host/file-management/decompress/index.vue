@@ -1,12 +1,14 @@
 <template>
     <el-drawer
         v-model="open"
-        :title="$t('file.deCompress')"
         :destroy-on-close="true"
         :close-on-click-modal="false"
         :before-close="handleClose"
         size="30%"
     >
+        <template #header>
+            <DrawerHeader :header="$t('file.deCompress')" :back="handleClose" />
+        </template>
         <el-form
             ref="fileForm"
             label-position="left"
@@ -42,6 +44,7 @@ import { Rules } from '@/global/form-rules';
 import { DeCompressFile } from '@/api/modules/files';
 import { Mimetypes } from '@/global/mimetype';
 import FileList from '@/components/file-list/index.vue';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 interface CompressProps {
     files: Array<any>;

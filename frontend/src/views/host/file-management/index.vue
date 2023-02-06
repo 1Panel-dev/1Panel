@@ -375,7 +375,7 @@ const openWget = () => {
     wgetRef.value.acceptParams(fileWget);
 };
 
-const closeWget = (submit: any) => {
+const closeWget = (submit: Boolean) => {
     search();
     if (submit) {
         openProcess();

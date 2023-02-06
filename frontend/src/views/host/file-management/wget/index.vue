@@ -1,5 +1,8 @@
 <template>
-    <el-drawer v-model="open" :before-close="handleClose" :title="$t('file.download')" size="50%">
+    <el-drawer v-model="open" :before-close="handleClose" size="50%">
+        <template #header>
+            <DrawerHeader :header="$t('file.download')" :back="handleClose" />
+        </template>
         <el-row>
             <el-col :span="22" :offset="1">
                 <el-form
@@ -42,6 +45,7 @@ import i18n from '@/lang';
 import { ElMessage, FormInstance, FormRules } from 'element-plus';
 import { reactive, ref } from 'vue';
 import FileList from '@/components/file-list/index.vue';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 interface WgetProps {
     path: string;
@@ -71,7 +75,7 @@ const handleClose = () => {
         fileForm.value.resetFields();
     }
     open.value = false;
-    em('close', submitData);
+    em('close', submitData.value);
 };
 
 const getPath = (path: string) => {

@@ -1,12 +1,17 @@
 <template>
-    <el-drawer v-model="open" :title="$t('file.info')" :column="1" width="30%">
+    <el-drawer v-model="open" width="30%">
+        <template #header>
+            <DrawerHeader :header="$t('file.info')" :back="handleClose" />
+        </template>
         <el-row>
             <el-col>
                 <el-descriptions :column="1" border>
                     <el-descriptions-item :label="$t('file.fileName')">{{ data.name }}</el-descriptions-item>
                     <!-- <el-descriptions-item :label="$t('file.type')">{{ data.type }}</el-descriptions-item> -->
                     <el-descriptions-item :label="$t('file.path')">{{ data.path }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('file.size')">{{ computeSize(data.size) }}</el-descriptions-item>
+                    <el-descriptions-item :label="$t('file.size')">
+                        {{ computeSize(data.size) }}
+                    </el-descriptions-item>
                     <el-descriptions-item :label="$t('file.role')">{{ data.mode }}</el-descriptions-item>
                     <el-descriptions-item :label="$t('file.user')">{{ data.user }}</el-descriptions-item>
                     <el-descriptions-item :label="$t('file.group')">{{ data.group }}</el-descriptions-item>
@@ -24,6 +29,7 @@ import { GetFileContent } from '@/api/modules/files';
 import { computeSize } from '@/utils/util';
 import { ref } from 'vue';
 import { dateFormatSimple } from '@/utils/util';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 interface InfoProps {
     path: string;
@@ -34,6 +40,10 @@ const props = ref<InfoProps>({
 
 let open = ref(false);
 let data = ref();
+
+const handleClose = () => {
+    open.value = false;
+};
 
 const acceptParams = async (params: InfoProps): Promise<void> => {
     props.value = params;

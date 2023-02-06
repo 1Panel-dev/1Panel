@@ -1,11 +1,8 @@
 <template>
-    <el-dialog
-        width="30%"
-        :title="$t('file.downloadProcess')"
-        v-model="open"
-        @open="onOpen"
-        :before-close="handleClose"
-    >
+    <el-dialog width="30%" v-model="open" @open="onOpen" :before-close="handleClose">
+        <template #header>
+            <DrawerHeader :header="$t('file.downloadProcess')" :back="handleClose" />
+        </template>
         <div v-for="(value, index) in res" :key="index">
             <span>{{ $t('file.downloading') }} {{ value['name'] }}</span>
             <el-progress :text-inside="true" :stroke-width="15" :percentage="value['percent']"></el-progress>
@@ -18,6 +15,7 @@
 import { FileKeys } from '@/api/modules/files';
 import { computeSize } from '@/utils/util';
 import { onBeforeUnmount, ref, toRefs } from 'vue';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const props = defineProps({
     open: {

@@ -1,12 +1,14 @@
 <template>
     <el-drawer
         v-model="open"
-        :title="title"
         :destroy-on-close="true"
         :close-on-click-modal="false"
         :before-close="handleClose"
         size="30%"
     >
+        <template #header>
+            <DrawerHeader :header="title" :back="handleClose" />
+        </template>
         <el-form
             ref="fileForm"
             label-position="left"
@@ -39,6 +41,7 @@ import i18n from '@/lang';
 import { ElMessage, FormInstance, FormRules } from 'element-plus';
 import { ref, reactive, computed } from 'vue';
 import FileList from '@/components/file-list/index.vue';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 interface MoveProps {
     oldPaths: Array<string>;
