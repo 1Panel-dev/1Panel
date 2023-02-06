@@ -60,10 +60,6 @@
     margin-right: 5px;
 }
 
-.tag-button {
-    margin-left: 10px;
-}
-
 .app-divider {
     margin-top: 5px;
     border: 0;
@@ -85,5 +81,13 @@
     img {
         width: 300px;
         height: 300px;
+    }
+}
+
+.tag-button {
+    margin-right: 10px;
+    &.no-active {
+        background: none;
+        border: none;
     }
 }

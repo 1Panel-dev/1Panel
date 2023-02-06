@@ -43,13 +43,16 @@
         <template #rightButton>
             <el-button @click="sync" type="primary" link v-if="mode === 'installed'">{{ $t('app.sync') }}</el-button>
         </template>
+
         <template #main>
-            <div class="update-prompt" v-if="mode === 'update'">
-                <span>{{ $t('app.updatePrompt') }}</span>
-                <div>
-                    <img src="@/assets/images/no_update_app.svg" />
-                </div>
+            <div class="update-prompt" v-if="mode === 'update' && data == null">
+                <el-empty
+                    :description="$t('app.updatePrompt')"
+                    image="/src/assets/images/no_update_app.svg"
+                    :image-size="200"
+                ></el-empty>
             </div>
+
             <el-row :gutter="5">
                 <el-col v-for="(installed, index) in data" :key="index" :span="12">
                     <div class="app-card">
@@ -169,7 +172,7 @@ import Status from '@/components/status/index.vue';
 import { getAge } from '@/utils/util';
 import { useRouter } from 'vue-router';
 
-let data = ref<any>();
+let data = ref<any>([]);
 let loading = ref(false);
 let timer: NodeJS.Timer | null = null;
 const paginationConfig = reactive({
