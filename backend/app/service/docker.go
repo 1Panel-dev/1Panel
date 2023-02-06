@@ -12,6 +12,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/pkg/errors"
 )
@@ -40,11 +41,10 @@ type daemonJsonItem struct {
 
 func (u *DockerService) LoadDockerStatus() string {
 	status := constant.StatusRunning
-	// cmd := exec.Command("systemctl", "is-active", "docker")
-	// stdout, err := cmd.CombinedOutput()
-	// if string(stdout) != "active\n" || err != nil {
-	// 	status = constant.Stopped
-	// }
+	stdout, err := cmd.Exec("systemctl is-active docker")
+	if string(stdout) != "active\n" || err != nil {
+		status = constant.Stopped
+	}
 
 	return status
 }

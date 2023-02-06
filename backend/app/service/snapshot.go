@@ -312,8 +312,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 		}
 		_ = os.RemoveAll(rootDir)
 		global.LOG.Info("recover successful")
-		_, _ = cmd.Exec("systemctl daemon-reload")
-		_, _ = cmd.Exec("systemctl restart 1panel.service")
+		_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
 		updateRecoverStatus(snap.ID, "", constant.StatusSuccess, "")
 	}()
 	return nil
@@ -371,8 +370,7 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 		}
 	}
 	if snap.InterruptStep == "UpdateLiveRestore" {
-		_, _ = cmd.Exec("systemctl daemon-reload")
-		_, _ = cmd.Exec("systemctl restart 1panel.service")
+		_, _ = cmd.Exec("systemctl restart dockere")
 		return nil
 	}
 
@@ -381,8 +379,6 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 		return err
 	}
 	if snap.InterruptStep == "1PanelBinary" {
-		_, _ = cmd.Exec("systemctl daemon-reload")
-		_, _ = cmd.Exec("systemctl restart 1panel.service")
 		return nil
 	}
 
@@ -391,8 +387,6 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 		return err
 	}
 	if snap.InterruptStep == "1PctlBinary" {
-		_, _ = cmd.Exec("systemctl daemon-reload")
-		_, _ = cmd.Exec("systemctl restart 1panel.service")
 		return nil
 	}
 
@@ -401,8 +395,7 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 		return err
 	}
 	if snap.InterruptStep == "1PanelService" {
-		_, _ = cmd.Exec("systemctl daemon-reload")
-		_, _ = cmd.Exec("systemctl restart 1panel.service")
+		_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
 		return nil
 	}
 
@@ -411,8 +404,7 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 		return err
 	}
 	if snap.InterruptStep == "1PanelBackups" {
-		_, _ = cmd.Exec("systemctl daemon-reload")
-		_, _ = cmd.Exec("systemctl restart 1panel.service")
+		_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
 		return nil
 	}
 
@@ -421,15 +413,13 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 		return err
 	}
 	if snap.InterruptStep == "1PanelData" {
-		_, _ = cmd.Exec("systemctl daemon-reload")
-		_, _ = cmd.Exec("systemctl restart 1panel.service")
+		_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
 		return nil
 	}
 
 	_ = os.RemoveAll(rootDir)
 	global.LOG.Info("rollback successful")
-	_, _ = cmd.Exec("systemctl daemon-reload")
-	_, _ = cmd.Exec("systemctl restart 1panel.service")
+	_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
 	updateRollbackStatus(snap.ID, constant.StatusSuccess, "")
 	return nil
 }
@@ -764,7 +754,22 @@ func (u *SnapshotService) updateLiveRestore(enabled bool) error {
 	if err != nil {
 		return errors.New(stdout)
 	}
-	time.Sleep(5 * time.Second)
+
+	ticker := time.NewTicker(3 * time.Second)
+	ctx, cancle := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancle()
+	for range ticker.C {
+		select {
+		case <-ctx.Done():
+			return errors.New("the docker service cannot be restarted")
+		default:
+			stdout, err := cmd.Exec("systemctl is-active docker")
+			if string(stdout) == "active\n" && err == nil {
+				global.LOG.Info("docker restart with new live-restore successful!")
+				return nil
+			}
+		}
+	}
 	return nil
 }
 
