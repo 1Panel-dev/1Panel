@@ -14,8 +14,6 @@ const isCollapse = computed((): boolean => menuStore.isCollapse);
 </script>
 
 <style scoped lang="scss">
-@import '../index.scss';
-
 .collapse {
     height: 47px;
     border-top: 1px solid #e4e7ed;
@@ -24,10 +22,9 @@ const isCollapse = computed((): boolean => menuStore.isCollapse);
 .collapse-icon {
     margin-top: 10px;
     margin-left: 25px;
-}
-
-.collapse-icon:hover {
-    color: $primary-color;
-    cursor: pointer;
+    &:hover {
+        color: $primary-color;
+        cursor: pointer;
+    }
 }
 </style>
