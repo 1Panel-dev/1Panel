@@ -1,5 +1,8 @@
 <template>
-    <el-drawer v-model="open" :title="$t('file.upload')" :before-close="handleClose" size="40%" :file-list="files">
+    <el-drawer v-model="open" :before-close="handleClose" size="40%">
+        <template #header>
+            <DrawerHeader :header="$t('file.upload')" :back="handleClose" />
+        </template>
         <el-upload
             action="#"
             :auto-upload="false"
@@ -29,13 +32,13 @@ import { ref } from 'vue';
 import { ElMessage, UploadFile, UploadFiles, UploadInstance } from 'element-plus';
 import { UploadFileData } from '@/api/modules/files';
 import i18n from '@/lang';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 interface UploadProps {
     path: string;
 }
 
 const uploadRef = ref<UploadInstance>();
-const files = ref();
 const loading = ref(false);
 let uploadPrecent = ref(0);
 let open = ref(false);

@@ -1,12 +1,14 @@
 <template>
     <el-drawer
         v-model="open"
-        :title="title"
         :destroy-on-close="true"
         :close-on-click-modal="false"
         :before-close="handleClose"
         size="50%"
     >
+        <template #header>
+            <DrawerHeader :header="title" :back="handleClose" />
+        </template>
         <el-row>
             <el-col :span="22" :offset="1">
                 <el-form
@@ -56,6 +58,7 @@ import { Rules } from '@/global/form-rules';
 import { CompressExtention, CompressType } from '@/enums/files';
 import { CompressFile } from '@/api/modules/files';
 import FileList from '@/components/file-list/index.vue';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 interface CompressProps {
     files: Array<any>;

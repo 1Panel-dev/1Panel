@@ -3,18 +3,19 @@ package viper
 import (
 	"bytes"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/configs"
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/cmd/server/conf"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
 
 func Init() {
-	stdout, err := cmd.Exec("grep '^BASE_DIR=' /usr/bin/1pctl | cut -d'=' -f2")
+	//stdout, err := cmd.Exec("grep '^BASE_DIR=' /usr/bin/1pctl | cut -d'=' -f2")
+	stdout, err := cmd.Exec("grep '^BASE_DIR=' /Users/wangzhengkun/Downloads/1pctl | cut -d'=' -f2")
 	if err != nil {
 		panic(err)
 	}
