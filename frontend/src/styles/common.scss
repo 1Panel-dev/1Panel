@@ -231,6 +231,10 @@
     .el-input__wrapper {
         border-radius: 50px;
     }
+    .el-input-group__prepend {
+        border-top-left-radius: 50px;
+        border-bottom-left-radius: 50px;
+    }
 }
 
 // drawer头部增加按钮

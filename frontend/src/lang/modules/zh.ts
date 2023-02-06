@@ -652,7 +652,7 @@ export default {
         upload: '上传',
         download: '下载',
         fileName: '文件名',
-        search: '查找',
+        search: '在当前目录下查找',
         mode: '权限',
         owner: '所有者',
         file: '文件',
