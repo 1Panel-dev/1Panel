@@ -115,6 +115,9 @@ func (f *FileInfo) search(dir, showHidden bool, af afero.Afero, search string, c
 					Path:     path,
 					FileInfo: info,
 				})
+				if len(files) > count {
+					return nil
+				}
 			}
 		}
 		return nil

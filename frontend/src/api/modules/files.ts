@@ -3,7 +3,7 @@ import http from '@/api';
 import { AxiosRequestConfig } from 'axios';
 
 export const GetFilesList = (params: File.ReqFile) => {
-    return http.post<File.File>('files/search', params);
+    return http.post<File.File>('files/search', params, 200000);
 };
 
 export const GetFilesTree = (params: File.ReqFile) => {
