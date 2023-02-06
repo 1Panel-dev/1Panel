@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -614,10 +613,10 @@ func (u *SnapshotService) handlePanelDatas(fileOp files.FileOp, operation string
 	case "recover":
 		exclusionRules := ""
 		if strings.Contains(backupDir, target) {
-			exclusionRules += ("1Panel" + strings.ReplaceAll(backupDir, target, "") + ";")
+			exclusionRules += ("1panel" + strings.ReplaceAll(backupDir, target, "") + ";")
 		}
 		if strings.Contains(dockerDir, target) {
-			exclusionRules += ("1Panel" + strings.ReplaceAll(dockerDir, target, "") + ";")
+			exclusionRules += ("1panel" + strings.ReplaceAll(dockerDir, target, "") + ";")
 		}
 		if err := u.handleTar(target, fmt.Sprintf("%s/original", filepath.Join(source, "../")), "1panel_data.tar.gz", exclusionRules); err != nil {
 			return fmt.Errorf("restore original panel data failed, err: %v", err)
@@ -779,24 +778,22 @@ func (u *SnapshotService) handleTar(sourceDir, targetDir, name, exclusionRules s
 			return err
 		}
 	}
-	exStr := []string{"--warning=no-file-changed"}
-	exStr = append(exStr, "-zcf")
-	exStr = append(exStr, targetDir+"/"+name)
+
+	exStr := ""
 	excludes := strings.Split(exclusionRules, ";")
 	for _, exclude := range excludes {
 		if len(exclude) == 0 {
 			continue
 		}
-		exStr = append(exStr, "--exclude")
-		exStr = append(exStr, exclude)
+		exStr += " --exclude "
+		exStr += exclude
 	}
-	exStr = append(exStr, "-C")
-	exStr = append(exStr, sourceDir)
-	exStr = append(exStr, ".")
-	cmd := exec.Command("tar", exStr...)
-	stdout, err := cmd.CombinedOutput()
+
+	ss := fmt.Sprintf("tar zcf %s %s -C %s .", targetDir+"/"+name, exStr, sourceDir)
+	fmt.Println(ss)
+	stdout, err := cmd.Exec(ss)
 	if err != nil {
-		return errors.New(string(stdout))
+		return errors.New(stdout)
 	}
 	return nil
 }
@@ -807,14 +804,7 @@ func (u *SnapshotService) handleUnTar(sourceDir, targetDir string) error {
 			return err
 		}
 	}
-	exStr := []string{}
-	exStr = append(exStr, "zxf")
-	exStr = append(exStr, sourceDir)
-	exStr = append(exStr, "-C")
-	exStr = append(exStr, targetDir)
-	exStr = append(exStr, ".")
-	cmd := exec.Command("tar", exStr...)
-	stdout, err := cmd.CombinedOutput()
+	stdout, err := cmd.Exec(fmt.Sprintf("tar zxf %s -C %s .", sourceDir, targetDir))
 	if err != nil {
 		return errors.New(string(stdout))
 	}
