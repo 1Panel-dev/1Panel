@@ -10,7 +10,7 @@
         />
         <el-row :gutter="20" style="margin-top: 20px">
             <el-col :span="16">
-                <CardWithHeader :header="$t('home.overview')" height="160px">
+                <CardWithHeader :header="$t('home.overview')" height="180px">
                     <template #body>
                         <div class="h-overview">
                             <el-row>
@@ -46,12 +46,12 @@
                         </div>
                     </template>
                 </CardWithHeader>
-                <CardWithHeader :header="$t('commons.table.status')" style="margin-top: 20px" height="265px">
+                <CardWithHeader :header="$t('commons.table.status')" style="margin-top: 20px" height="285px">
                     <template #body>
                         <Status ref="statuRef" />
                     </template>
                 </CardWithHeader>
-                <CardWithHeader :header="$t('menu.monitor')" style="margin-top: 20px" height="465px">
+                <CardWithHeader :header="$t('menu.monitor')" style="margin-top: 20px" height="485px">
                     <template #body>
                         <el-radio-group
                             style="float: right; margin-left: 5px"
@@ -117,7 +117,7 @@
                 </CardWithHeader>
             </el-col>
             <el-col :span="8">
-                <CardWithHeader :header="$t('home.systemInfo')" height="330px">
+                <CardWithHeader :header="$t('home.systemInfo')" height="350px">
                     <template #body>
                         <el-descriptions :column="1" class="h-systemInfo">
                             <el-descriptions-item class-name="system-content">
@@ -172,7 +172,7 @@
                     </template>
                 </CardWithHeader>
 
-                <CardWithHeader :header="$t('home.app')" style="margin-top: 20px" height="581px">
+                <CardWithHeader :header="$t('home.app')" style="margin-top: 20px" height="621px">
                     <template #body>
                         <App ref="appRef" />
                     </template>
