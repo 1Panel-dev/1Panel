@@ -14,8 +14,7 @@ import (
 )
 
 func Init() {
-	//stdout, err := cmd.Exec("grep '^BASE_DIR=' /usr/bin/1pctl | cut -d'=' -f2")
-	stdout, err := cmd.Exec("grep '^BASE_DIR=' /Users/wangzhengkun/Downloads/1pctl | cut -d'=' -f2")
+	stdout, err := cmd.Exec("grep '^BASE_DIR=' /usr/bin/1pctl | cut -d'=' -f2")
 	if err != nil {
 		panic(err)
 	}
