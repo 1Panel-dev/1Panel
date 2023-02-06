@@ -15,9 +15,7 @@
                 :collapse="isCollapse"
                 :collapse-transition="false"
                 :unique-opened="true"
-                background-color="#191a20"
-                text-color="#bdbdc0"
-                active-text-color="#fff"
+                popper-class="menu-popper"
             >
                 <SubItem :menuList="routerMenus"></SubItem>
                 <el-menu-item>
@@ -97,6 +95,29 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
 @import './index.scss';
+.menu {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: $menu-backgroup-color;
+    transition: all 0.3s ease;
+
+    .el-scrollbar {
+        height: calc(100% - 55px);
+        .el-menu {
+            flex: 1;
+            overflow: auto;
+            overflow-x: hidden;
+            border-right: none;
+        }
+    }
+    .menu-footer {
+        height: 30px;
+        background-color: #c0c0c0;
+        text-align: center;
+    }
+}
 </style>

@@ -1,79 +1,50 @@
-.menu {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    background-color: $menu-backgroup-color;
-
-    transition: all 0.3s ease;
-    .logo {
-        box-sizing: border-box;
-        height: 55px;
-        img:first-child {
-            width: 120px;
-            object-fit: contain;
-            margin-right: 8px;
-            margin-top: 10px;
-        }
-        img:nth-child(2) {
-            width: 50px;
-            object-fit: contain;
-            margin-top: 10px;
-            margin-left: 5px;
-        }
-    }
-    .el-scrollbar {
-        height: calc(100% - 55px);
-        .el-menu {
-            flex: 1;
-            overflow: auto;
-            overflow-x: hidden;
-            border-right: none;
-        }
-    }
-    .menu-footer {
-        height: 30px;
-        background-color: #c0c0c0;
-        text-align: center;
-    }
-}
-
-.el-menu,
-.el-menu--popup {
-    padding: 4px;
+.el-menu {
     background: none !important;
-
+    width: 100%;
+    padding: 0 7px;
     .el-menu-item {
         border-radius: 4px !important;
         background-color: $menu-item-backgroup-color;
-        margin: 10px;
-        height: 44px !important;
+        margin: 6px 0;
+        height: 46px !important;
+        box-shadow: 0px 0px 4px rgba(0, 94, 235, 0.1);
+        box-sizing: border-box;
+        min-width: auto;
+        padding-left: 22px;
 
-        span {
-            color: rgba(31, 35, 41, 1);
+        // span {
+        //     color: rgba(31, 35, 41, 1);
+        // }
+
+        // .el-icon {
+        //     color: rgba(31, 35, 41, 1);
+        // }
+        &:hover {
+            .el-icon {
+                color: $primary-color;
+            }
+
+            span {
+                color: $primary-color;
+            }
         }
-
-        .el-icon {
-            color: rgba(31, 35, 41, 1);
-        }
-
         &.is-active {
             background-color: #ffffff;
 
             border: 2px solid $primary-color;
 
-            span {
-                color: $primary-color;
-            }
+            // span {
+            //     color: $primary-color;
+            // }
 
-            .el-icon {
-                color: $primary-color;
-            }
+            // .el-icon {
+            //     color: $primary-color;
+            // }
 
             &::before {
                 position: absolute;
                 border-radius: 4px;
-                top: 13px;
+                top: 14px;
                 bottom: 15px;
                 left: 12px;
                 width: 4px;
@@ -83,24 +54,7 @@
             }
         }
     }
-
-    :deep(.el-sub-menu) {
-        margin: 10px;
-
-        span {
-            color: rgba(31, 35, 41, 1);
-        }
-        .el-icon {
-            color: rgba(31, 35, 41, 1);
-        }
-
-        .el-sub-menu__title {
-            background-color: $menu-item-backgroup-color !important;
-            height: 44px;
-            border-radius: 4px !important;
-        }
-
-        &.is-opened,
+    .el-sub-menu {
         &.is-active {
             .el-sub-menu__title {
                 span {
@@ -112,39 +66,103 @@
                 }
             }
         }
-
-        .el-menu {
+        .el-sub-menu__title {
             background-color: $menu-item-backgroup-color;
-        }
-        .el-menu-item {
-            border-radius: 4px !important;
-            margin-left: 0px !important;
-            min-width: 100% !important;
+            box-shadow: 0px 0px 4px rgba(0, 94, 235, 0.1);
             height: 44px;
-        }
-    }
+            border-radius: 4px !important;
+            &:hover {
+                .el-icon {
+                    color: $primary-color;
+                }
 
-    .el-menu-item:hover {
-        .el-icon {
-            color: $primary-color;
+                span {
+                    color: $primary-color;
+                }
+            }
         }
-
-        span {
-            color: $primary-color;
-        }
-    }
-
-    .el-sub-menu:hover {
-        .sub-icon {
-            color: $primary-color;
-        }
-
-        .sub-span {
-            color: $primary-color;
+        .el-menu {
+            padding: 0;
+            .el-menu-item {
+                box-shadow: none;
+                padding-left: 35px !important;
+            }
         }
     }
 }
 
-.el-menu--collapse {
-    width: 85px;
+.menu-popper {
+    .el-menu {
+        background-color: $menu-backgroup-color !important;
+        padding: 4px 8px;
+    }
 }
+
+// .el-menu--popup {
+// padding: 4px;
+// background: none !important;
+
+// :deep(.el-sub-menu) {
+//     margin: 10px;
+
+//     span {
+//         color: rgba(31, 35, 41, 1);
+//     }
+//     .el-icon {
+//         color: rgba(31, 35, 41, 1);
+//     }
+
+//     .el-sub-menu__title {
+//         background-color: $menu-item-backgroup-color !important;
+//         height: 44px;
+//         border-radius: 4px !important;
+//     }
+
+//     &.is-opened,
+//     &.is-active {
+//         .el-sub-menu__title {
+//             span {
+//                 color: $primary-color;
+//             }
+
+//             .el-icon {
+//                 color: $primary-color;
+//             }
+//         }
+//     }
+
+//     .el-menu {
+//         background-color: $menu-item-backgroup-color;
+//     }
+//     .el-menu-item {
+//         border-radius: 4px !important;
+//         margin-left: 0px !important;
+//         min-width: 100% !important;
+//         height: 44px;
+//     }
+// }
+
+// .el-menu-item:hover {
+//     .el-icon {
+//         color: $primary-color;
+//     }
+
+//     span {
+//         color: $primary-color;
+//     }
+// }
+
+// .el-sub-menu:hover {
+//     .sub-icon {
+//         color: $primary-color;
+//     }
+
+//     .sub-span {
+//         color: $primary-color;
+//     }
+// }
+// }
+
+// .el-menu--collapse {
+//     width: 85px;
+// }
