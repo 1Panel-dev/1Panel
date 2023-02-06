@@ -1,1 +1,0 @@
-ngx.log(ngx.INFO,"init success")
