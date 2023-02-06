@@ -60,16 +60,18 @@
                 <el-button plain @click="openDownload" :disabled="selects.length === 0">
                     {{ $t('file.download') }}
                 </el-button>
-                <!-- <div class="search-button">
-                <el-input
-                    clearable
-                    @clear="search()"
-                    suffix-icon="Search"
-                    @keyup.enter="search()"
-                    @blur="search()"
-                    :placeholder="$t('commons.button.search')"
-                ></el-input>
-            </div> -->
+                <div class="search search-button">
+                    <el-input
+                        v-model="req.search"
+                        clearable
+                        @clear="search()"
+                        suffix-icon="Search"
+                        @blur="search()"
+                        :placeholder="$t('file.search')"
+                    >
+                        <template #prepend><el-checkbox v-model="req.containSub">包含子目录</el-checkbox></template>
+                    </el-input>
+                </div>
             </template>
             <template #main>
                 <ComplexTable
@@ -175,7 +177,15 @@ interface FilePaths {
 const router = useRouter();
 const data = ref();
 let selects = ref<any>([]);
-let req = reactive({ path: '/', expand: true, showHidden: false, page: 1, pageSize: 100 });
+let req = reactive({
+    path: '/',
+    expand: true,
+    showHidden: false,
+    page: 1,
+    pageSize: 100,
+    search: '',
+    containSub: false,
+});
 let loading = ref(false);
 const paths = ref<FilePaths[]>([]);
 let pathWidth = ref(0);
@@ -258,6 +268,8 @@ const handlePath = () => {
 
 const jump = async (url: string) => {
     req.path = url;
+    req.containSub = false;
+    req.search = '';
     await search();
     getPaths(req.path);
     nextTick(function () {
@@ -482,8 +494,9 @@ onMounted(() => {
     }
 }
 
-.search-button {
+.search {
     float: right;
     display: inline;
+    width: 20%;
 }
 </style>

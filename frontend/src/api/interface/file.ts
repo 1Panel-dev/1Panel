@@ -27,6 +27,7 @@ export namespace File {
         expand: boolean;
         dir?: boolean;
         showHidden?: boolean;
+        containSub?: boolean;
     }
 
     export interface FileTree {

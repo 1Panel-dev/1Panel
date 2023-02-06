@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
@@ -39,11 +41,17 @@ type FileInfo struct {
 type FileOption struct {
 	Path       string `json:"path"`
 	Search     string `json:"search"`
+	ContainSub bool   `json:"containSub"`
 	Expand     bool   `json:"expand"`
 	Dir        bool   `json:"dir"`
 	ShowHidden bool   `json:"showHidden"`
 	Page       int    `json:"page"`
 	PageSize   int    `json:"pageSize"`
+}
+
+type FileSearchInfo struct {
+	Path string `json:"path"`
+	fs.FileInfo
 }
 
 func NewFileInfo(op FileOption) (*FileInfo, error) {
@@ -75,7 +83,7 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 	}
 	if op.Expand {
 		if file.IsDir {
-			if err := file.listChildren(op.Dir, op.ShowHidden, op.Page, op.PageSize); err != nil {
+			if err := file.listChildren(op.Dir, op.ShowHidden, op.ContainSub, op.Search, op.Page, op.PageSize); err != nil {
 				return nil, err
 			}
 			return file, nil
@@ -88,12 +96,59 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 	return file, nil
 }
 
-func (f *FileInfo) listChildren(dir, showHidden bool, page, pageSize int) error {
-	afs := &afero.Afero{Fs: f.Fs}
-	files, err := afs.ReadDir(f.Path)
-	if err != nil {
-		return err
+func (f *FileInfo) search(dir, showHidden bool, af afero.Afero, search string, count int) ([]FileSearchInfo, error) {
+	var files []FileSearchInfo
+	if err := afero.Walk(af, f.Path, func(path string, info fs.FileInfo, err error) error {
+		if info != nil {
+
+			if dir && !info.IsDir() {
+				return nil
+			}
+			if !showHidden && IsHidden(info.Name()) {
+				return nil
+			}
+
+			lowerName := strings.ToLower(info.Name())
+			lowerSearch := strings.ToLower(search)
+			if strings.Contains(lowerName, lowerSearch) {
+				files = append(files, FileSearchInfo{
+					Path:     path,
+					FileInfo: info,
+				})
+			}
+		}
+		return nil
+	}); err != nil {
+		return nil, err
 	}
+	return files, nil
+}
+
+func (f *FileInfo) listChildren(dir, showHidden, containSub bool, search string, page, pageSize int) error {
+	afs := &afero.Afero{Fs: f.Fs}
+	var (
+		files []FileSearchInfo
+		err   error
+	)
+
+	if search != "" && containSub {
+		files, err = f.search(dir, showHidden, *afs, search, page*pageSize)
+		if err != nil {
+			return err
+		}
+	} else {
+		dirFiles, err := afs.ReadDir(f.Path)
+		if err != nil {
+			return err
+		}
+		for _, file := range dirFiles {
+			files = append(files, FileSearchInfo{
+				Path:     f.Path,
+				FileInfo: file,
+			})
+		}
+	}
+
 	f.ItemTotal = 0
 
 	var items []*FileInfo
@@ -103,7 +158,20 @@ func (f *FileInfo) listChildren(dir, showHidden bool, page, pageSize int) error 
 		}
 
 		name := df.Name()
-		fPath := path.Join(f.Path, df.Name())
+		fPath := path.Join(df.Path, df.Name())
+
+		if search != "" {
+			if containSub {
+				fPath = df.Path
+				name = strings.TrimPrefix(strings.TrimPrefix(fPath, f.Path), "/")
+			} else {
+				lowerName := strings.ToLower(name)
+				lowerSearch := strings.ToLower(search)
+				if !strings.Contains(lowerName, lowerSearch) {
+					continue
+				}
+			}
+		}
 
 		if !showHidden && IsHidden(name) {
 			continue
@@ -115,7 +183,7 @@ func (f *FileInfo) listChildren(dir, showHidden bool, page, pageSize int) error 
 			isSymlink = true
 			info, err := f.Fs.Stat(fPath)
 			if err == nil {
-				df = info
+				df.FileInfo = info
 			} else {
 				isInvalidLink = true
 			}
@@ -137,6 +205,7 @@ func (f *FileInfo) listChildren(dir, showHidden bool, page, pageSize int) error 
 			Group:     GetGroup(df.Sys().(*syscall.Stat_t).Gid),
 			MimeType:  GetMimeType(fPath),
 		}
+
 		if isSymlink {
 			file.LinkPath = GetSymlink(fPath)
 		}
