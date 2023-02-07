@@ -1,17 +1,9 @@
 <template>
-    <el-dialog
-        @close="onClose()"
-        v-model="newNameVisiable"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        width="30%"
-    >
+    <el-drawer v-model="newNameVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
-            <div class="card-header">
-                <span>{{ $t('container.rename') }}</span>
-            </div>
+            <DrawerHeader :header="$t('container.rename')" :back="handleClose" />
         </template>
-        <el-form ref="newNameRef" v-loading="loading" :model="renameForm">
+        <el-form ref="newNameRef" v-loading="loading" :model="renameForm" label-position="top">
             <el-form-item :label="$t('container.newName')" :rules="Rules.requiredInput" prop="newName">
                 <el-input v-model="renameForm.newName"></el-input>
             </el-form-item>
@@ -26,7 +18,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>
@@ -80,7 +72,8 @@ const acceptParams = (props: DialogProps): void => {
     newNameVisiable.value = true;
 };
 
-const onClose = async () => {
+const handleClose = async () => {
+    newNameVisiable.value = false;
     emit('search');
 };
 

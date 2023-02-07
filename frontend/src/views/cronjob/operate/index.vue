@@ -12,7 +12,7 @@
                             <el-option value="website" :label="$t('cronjob.website')" />
                             <el-option value="database" :label="$t('cronjob.database')" />
                             <el-option value="directory" :label="$t('cronjob.directory')" />
-                            <el-option value="curl" :label="$t('cronjob.curl') + ' URL'" />
+                            <el-option value="curl" :label="$t('cronjob.curl')" />
                         </el-select>
                     </el-form-item>
 

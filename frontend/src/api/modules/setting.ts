@@ -70,6 +70,6 @@ export const searchSnapshotPage = (param: ReqPage) => {
 export const loadUpgradeInfo = () => {
     return http.get<Setting.UpgradeInfo>(`/settings/upgrade`);
 };
-export const upgrade = (param: Setting.Upgrade) => {
-    return http.post(`/settings/upgrade`, param);
+export const upgrade = (version: string) => {
+    return http.post(`/settings/upgrade`, { version: version });
 };

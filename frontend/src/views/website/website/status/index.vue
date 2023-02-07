@@ -13,7 +13,7 @@
             </el-col>
             <el-col :lg="4" :xl="4">
                 <div class="span-font">
-                    <el-tag type="info">
+                    <el-tag>
                         {{ $t('website.expireDate') }}:
                         <span v-if="isEver(props.expireDate)">
                             {{ $t('website.neverExpire') }}

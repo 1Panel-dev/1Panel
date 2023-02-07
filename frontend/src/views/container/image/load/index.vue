@@ -1,11 +1,9 @@
 <template>
-    <el-dialog v-model="loadVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
+    <el-drawer v-model="loadVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
-            <div class="card-header">
-                <span>{{ $t('container.importImage') }}</span>
-            </div>
+            <DrawerHeader :header="$t('container.importImage')" :back="handleClose" />
         </template>
-        <el-form v-loading="loading" ref="formRef" :model="form" label-width="80px">
+        <el-form v-loading="loading" ref="formRef" :model="form" label-position="top">
             <el-form-item :label="$t('container.path')" :rules="Rules.requiredSelect" prop="path">
                 <el-input disabled v-model="form.path">
                     <template #append>
@@ -24,7 +22,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>
@@ -45,6 +43,9 @@ const form = reactive({
 const acceptParams = () => {
     loadVisiable.value = true;
     form.path = '';
+};
+const handleClose = () => {
+    loadVisiable.value = false;
 };
 
 const emit = defineEmits<{ (e: 'search'): void }>();

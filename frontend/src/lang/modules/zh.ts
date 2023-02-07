@@ -535,7 +535,7 @@ export default {
         missBackupAccount: '未能找到备份账号',
         syncDate: '同步时间 ',
         releaseMemory: '释放内存',
-        curl: '访问',
+        curl: '访问 URL',
         taskName: '任务名称',
         cronSpec: '执行周期',
         directory: '备份目录',

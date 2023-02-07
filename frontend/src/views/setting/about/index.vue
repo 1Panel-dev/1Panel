@@ -35,7 +35,7 @@
                 </div>
             </template>
         </LayoutContent>
-        <el-drawer :key="refresh" v-model="drawerVisiable" size="50%">
+        <el-drawer :close-on-click-modal="false" :key="refresh" v-model="drawerVisiable" size="50%">
             <template #header>
                 <DrawerHeader :header="$t('setting.upgrade')" :back="handleClose" />
             </template>
@@ -49,16 +49,13 @@
                 <el-form-item :label="$t('setting.upgradeNotes')">
                     <MdEditor style="height: calc(100vh - 330px)" v-model="upgradeInfo.releaseNote" previewOnly />
                 </el-form-item>
-                <el-form-item :label="$t('setting.source')">
-                    <el-radio-group v-model="Source">
-                        <el-radio label="gitee">Gitee</el-radio>
-                        <el-radio label="github">GitHub</el-radio>
-                    </el-radio-group>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" @click="onUpgrade">{{ $t('setting.upgradeNow') }}</el-button>
-                </el-form-item>
             </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button type="primary" @click="onUpgrade">{{ $t('setting.upgradeNow') }}</el-button>
+                </span>
+            </template>
         </el-drawer>
     </div>
 </template>
@@ -75,7 +72,6 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const version = ref();
 const upgradeInfo = ref();
-const Source = ref('gitee');
 const drawerVisiable = ref();
 const refresh = ref();
 
@@ -103,13 +99,20 @@ const handleClose = () => {
 };
 
 const onLoadUpgradeInfo = async () => {
-    const res = await loadUpgradeInfo();
-    if (!res.data) {
-        ElMessage.info(i18n.global.t('setting.noUpgrade'));
-        return;
-    }
-    upgradeInfo.value = res.data;
-    drawerVisiable.value = true;
+    loading.value = true;
+    await loadUpgradeInfo()
+        .then((res) => {
+            loading.value = false;
+            if (!res.data) {
+                ElMessage.info(i18n.global.t('setting.noUpgrade'));
+                return;
+            }
+            upgradeInfo.value = res.data;
+            drawerVisiable.value = true;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 const onUpgrade = async () => {
     ElMessageBox.confirm(i18n.global.t('setting.upgradeHelper', i18n.global.t('setting.upgrade')), {
@@ -118,11 +121,7 @@ const onUpgrade = async () => {
         type: 'info',
     }).then(() => {
         loading.value = true;
-        let param = {
-            version: upgradeInfo.value.newVersion,
-            source: Source.value,
-        };
-        upgrade(param)
+        upgrade(upgradeInfo.value.newVersion)
             .then(() => {
                 loading.value = false;
                 drawerVisiable.value = false;

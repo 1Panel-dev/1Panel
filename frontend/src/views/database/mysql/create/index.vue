@@ -3,7 +3,7 @@
         <template #header>
             <DrawerHeader :header="$t('database.create')" :back="handleClose" />
         </template>
-        <el-form ref="formRef" label-position="top" :model="form" :rules="rules" label-width="80px">
+        <el-form ref="formRef" label-position="top" :model="form" :rules="rules">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('commons.table.name')" prop="name">

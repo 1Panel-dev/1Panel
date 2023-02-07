@@ -23,3 +23,4 @@ build
 /pkg/
 backend/__debug_bin
 cmd/server/__debug_bin
+cmd/server/web

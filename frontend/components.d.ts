@@ -4,9 +4,7 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
-    403: typeof import('./src/components/error-message/403.vue')['default']
     404: typeof import('./src/components/error-message/404.vue')['default']
-    500: typeof import('./src/components/error-message/500.vue')['default']
     AppLayout: typeof import('./src/components/app-layout/index.vue')['default']
     AppStatus: typeof import('./src/components/app-status/index.vue')['default']
     BackButton: typeof import('./src/components/back-button/index.vue')['default']
