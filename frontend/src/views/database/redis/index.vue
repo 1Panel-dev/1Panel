@@ -1,25 +1,24 @@
 <template>
     <div v-loading="loading">
-        <AppStatus
-            :app-key="'redis'"
-            style="margin-top: 20px"
-            @before="onBefore"
-            @setting="onSetting"
-            @is-exist="checkExist"
-        ></AppStatus>
-
-        <LayoutContent
-            v-show="!isOnSetting && redisIsExist"
-            :title="'Redis ' + $t('menu.database')"
-            :class="{ mask: redisStatus != 'Running' }"
-        >
-            <template #toolbar v-if="!isOnSetting && redisIsExist">
-                <el-button type="primary" plain @click="goDashboard" icon="Position">Redis-Commander</el-button>
-                <el-button type="primary" plain @click="onChangePassword">
-                    {{ $t('database.changePassword') }}
-                </el-button>
+        <LayoutContent :title="'Redis ' + $t('menu.database')">
+            <template #app>
+                <AppStatus
+                    :app-key="'redis'"
+                    style="margin-top: 20px"
+                    @before="onBefore"
+                    @setting="onSetting"
+                    @is-exist="checkExist"
+                ></AppStatus>
             </template>
-            <template #main>
+            <template #toolbar v-if="!isOnSetting && redisIsExist">
+                <div :class="{ mask: redisStatus != 'Running' }">
+                    <el-button type="primary" plain @click="goDashboard" icon="Position">Redis-Commander</el-button>
+                    <el-button type="primary" plain @click="onChangePassword">
+                        {{ $t('database.changePassword') }}
+                    </el-button>
+                </div>
+            </template>
+            <template #main v-if="redisIsExist && !isOnSetting">
                 <Terminal :key="isRefresh" ref="terminalRef" />
             </template>
         </LayoutContent>
@@ -57,7 +56,7 @@ import Setting from '@/views/database/redis/setting/index.vue';
 import Password from '@/views/database/redis/password/index.vue';
 import Terminal from '@/views/database/redis/terminal/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import { App } from '@/api/interface/app';
 import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
@@ -113,7 +112,9 @@ const checkExist = (data: App.CheckInstalled) => {
     loading.value = false;
     if (redisStatus.value === 'Running') {
         loadDashboardPort();
-        terminalRef.value.acceptParams();
+        nextTick(() => {
+            terminalRef.value.acceptParams();
+        });
     }
 };
 
