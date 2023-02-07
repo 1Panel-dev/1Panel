@@ -19,6 +19,9 @@ func Init() {
 		panic(err)
 	}
 	baseDir := strings.ReplaceAll(stdout, "\n", "")
+	if len(baseDir) == 0 {
+		panic("error `BASE_DIR` find in /usr/bin/1pctl")
+	}
 	v := viper.NewWithOptions()
 	v.SetConfigType("yaml")
 	reader := bytes.NewReader(conf.AppYaml)

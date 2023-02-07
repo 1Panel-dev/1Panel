@@ -2,10 +2,8 @@ package service
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"os/exec"
 	"strings"
@@ -15,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cloud_storage"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/pkg/errors"
 	"github.com/robfig/cron/v3"
 )
@@ -28,12 +27,14 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 	record.FromLocal = cronjob.KeepLocal
 	switch cronjob.Type {
 	case "shell":
-		cmd := exec.Command(cronjob.Script)
-		stdout, errExec := cmd.CombinedOutput()
-		if errExec != nil {
-			err = errors.New(string(stdout))
+		if len(cronjob.Script) == 0 {
+			return
 		}
-		message = stdout
+		stdout, errExec := cmd.Exec(cronjob.Script)
+		if errExec != nil {
+			err = errExec
+		}
+		message = []byte(stdout)
 	case "website":
 		record.File, err = u.HandleBackup(cronjob, record.StartTime)
 	case "database":
@@ -47,17 +48,11 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 		if len(cronjob.URL) == 0 {
 			return
 		}
-		tr := &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-		client := &http.Client{Timeout: 1 * time.Second, Transport: tr}
-		request, _ := http.NewRequest("GET", cronjob.URL, nil)
-		response, err := client.Do(request)
+		stdout, errCurl := cmd.Exec("curl " + cronjob.URL)
 		if err != nil {
-			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), string(message))
+			err = errCurl
 		}
-		defer response.Body.Close()
-		message, _ = ioutil.ReadAll(response.Body)
+		message = []byte(stdout)
 	}
 	if err != nil {
 		cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), string(message))
