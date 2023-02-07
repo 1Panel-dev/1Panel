@@ -21,6 +21,7 @@ ErrPortInUsed: "{{ .detail }} port already in use"
 ErrAppLimit: "App exceeds install limit"
 ErrAppRequired: "{{ .detail }} app is required"
 ErrNotInstall: "App not installed"
+ErrPortInOtherApp: "{{ .port }} port  already in use by  {{ .apps }}"
 
 
 #file

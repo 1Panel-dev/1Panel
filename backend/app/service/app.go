@@ -155,7 +155,7 @@ func (a AppService) GetAppDetail(appId uint, version string) (response.AppDetail
 }
 
 func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (*model.AppInstall, error) {
-	if list, _ := appInstallRepo.GetBy(commonRepo.WithByName(req.Name)); len(list) > 0 {
+	if list, _ := appInstallRepo.ListBy(commonRepo.WithByName(req.Name)); len(list) > 0 {
 		return nil, buserr.New(constant.ErrNameIsExist)
 	}
 

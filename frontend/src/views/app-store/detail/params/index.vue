@@ -1,6 +1,6 @@
 <template>
     <div v-for="(p, index) in paramObjs" :key="index">
-        <el-form-item :label="p.labelZh" :prop="p.prop">
+        <el-form-item :label="getLabel(p)" :prop="p.prop">
             <el-input
                 v-model.trim="form[p.envKey]"
                 v-if="p.type == 'text'"
@@ -43,12 +43,13 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, inject, onMounted, reactive, ref } from 'vue';
 import { getRandomStr } from '@/utils/util';
 import { GetAppService } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 const router = useRouter();
 
 interface ParamObj extends App.FromField {
@@ -169,8 +170,23 @@ const changeService = (value: string, services: App.AppService[]) => {
     updateParam();
 };
 
+const getLabel = (row: ParamObj): string => {
+    const language = useI18n().locale.value;
+    if (language == 'zh') {
+        return row.labelZh;
+    } else {
+        return row.labelEn;
+    }
+};
+
+let reloadPage: Function = inject('reload');
+
 const toPage = () => {
     router.push({ name: 'App' });
+    const nowPath = router.currentRoute.value.path;
+    if (nowPath && nowPath == '/apps/all') {
+        reloadPage();
+    }
 };
 
 onMounted(() => {

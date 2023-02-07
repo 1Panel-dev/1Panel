@@ -334,7 +334,7 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 			return err
 		}
 		if !reflect.DeepEqual(model.AppInstall{}, appInstall) {
-			if err := deleteAppInstall(ctx, appInstall, true); err != nil && !req.ForceDelete {
+			if err := deleteAppInstall(ctx, appInstall, true, req.ForceDelete); err != nil && !req.ForceDelete {
 				return err
 			}
 		}
@@ -638,7 +638,7 @@ func (w WebsiteService) PreInstallCheck(req request.WebsiteInstallCheckReq) ([]r
 		res = append(res, response.WebsitePreInstallCheck{
 			Name:    appInstall.Name,
 			AppName: app.Name,
-			Status:  buserr.WithMessage(constant.ErrNotInstall, app.Name, nil).Error(),
+			Status:  buserr.WithDetail(constant.ErrNotInstall, app.Name, nil).Error(),
 			Version: appInstall.Version,
 		})
 		showErr = true
@@ -651,7 +651,7 @@ func (w WebsiteService) PreInstallCheck(req request.WebsiteInstallCheckReq) ([]r
 		}
 	}
 	if len(checkIds) > 0 {
-		installList, _ := appInstallRepo.GetBy(commonRepo.WithIdsIn(checkIds))
+		installList, _ := appInstallRepo.ListBy(commonRepo.WithIdsIn(checkIds))
 		for _, install := range installList {
 			res = append(res, response.WebsitePreInstallCheck{
 				Name:    install.Name,

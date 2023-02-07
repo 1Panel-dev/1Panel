@@ -54,6 +54,7 @@ var (
 	ErrFileCanNotRead = "ErrFileCanNotRead"
 	ErrFileToLarge    = "ErrFileToLarge"
 	ErrNotInstall     = "ErrNotInstall"
+	ErrPortInOtherApp = "ErrPortInOtherApp"
 )
 
 //website

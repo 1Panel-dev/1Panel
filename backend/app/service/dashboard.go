@@ -60,7 +60,7 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 		}
 	}
 
-	appInstall, err := appInstallRepo.GetBy()
+	appInstall, err := appInstallRepo.ListBy()
 	if err != nil {
 		return nil, err
 	}
