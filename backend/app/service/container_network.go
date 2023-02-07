@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
@@ -11,7 +12,7 @@ import (
 	"github.com/docker/docker/api/types/network"
 )
 
-func (u *ContainerService) PageNetwork(req dto.PageInfo) (int64, interface{}, error) {
+func (u *ContainerService) PageNetwork(req dto.SearchWithPage) (int64, interface{}, error) {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return 0, nil, err
@@ -19,6 +20,17 @@ func (u *ContainerService) PageNetwork(req dto.PageInfo) (int64, interface{}, er
 	list, err := client.NetworkList(context.TODO(), types.NetworkListOptions{})
 	if err != nil {
 		return 0, nil, err
+	}
+	if len(req.Info) != 0 {
+		lenth, count := len(list), 0
+		for count < lenth {
+			if !strings.Contains(list[count].Name, req.Info) {
+				list = append(list[:count], list[(count+1):]...)
+				lenth--
+			} else {
+				count++
+			}
+		}
 	}
 	var (
 		data    []dto.Network

@@ -29,10 +29,10 @@ type ContainerService struct{}
 
 type IContainerService interface {
 	Page(req dto.PageContainer) (int64, interface{}, error)
-	PageNetwork(req dto.PageInfo) (int64, interface{}, error)
-	PageVolume(req dto.PageInfo) (int64, interface{}, error)
+	PageNetwork(req dto.SearchWithPage) (int64, interface{}, error)
+	PageVolume(req dto.SearchWithPage) (int64, interface{}, error)
 	ListVolume() ([]dto.Options, error)
-	PageCompose(req dto.PageInfo) (int64, interface{}, error)
+	PageCompose(req dto.SearchWithPage) (int64, interface{}, error)
 	CreateCompose(req dto.ComposeCreate) error
 	ComposeOperation(req dto.ComposeOperation) error
 	ContainerCreate(req dto.ContainerCreate) error
@@ -68,6 +68,17 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 	list, err = client.ContainerList(context.Background(), options)
 	if err != nil {
 		return 0, nil, err
+	}
+	if len(req.Name) != 0 {
+		lenth, count := len(list), 0
+		for count < lenth {
+			if !strings.Contains(list[count].Names[0][1:], req.Name) {
+				list = append(list[:count], list[(count+1):]...)
+				lenth--
+			} else {
+				count++
+			}
+		}
 	}
 	sort.Slice(list, func(i, j int) bool {
 		return list[i].Created > list[j].Created

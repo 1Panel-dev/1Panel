@@ -11,7 +11,7 @@ type ComposeTemplateService struct{}
 
 type IComposeTemplateService interface {
 	List() ([]dto.ComposeTemplateInfo, error)
-	SearchWithPage(search dto.PageInfo) (int64, interface{}, error)
+	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
 	Create(composeDto dto.ComposeTemplateCreate) error
 	Update(id uint, upMap map[string]interface{}) error
 	Delete(ids []uint) error
@@ -37,8 +37,8 @@ func (u *ComposeTemplateService) List() ([]dto.ComposeTemplateInfo, error) {
 	return dtoLists, err
 }
 
-func (u *ComposeTemplateService) SearchWithPage(search dto.PageInfo) (int64, interface{}, error) {
-	total, composes, err := composeRepo.Page(search.Page, search.PageSize)
+func (u *ComposeTemplateService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
+	total, composes, err := composeRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info))
 	var dtoComposeTemplates []dto.ComposeTemplateInfo
 	for _, compose := range composes {
 		var item dto.ComposeTemplateInfo

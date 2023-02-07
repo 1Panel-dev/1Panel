@@ -1,8 +1,8 @@
 import http from '@/api';
-import { ReqPage, ResPage } from '../interface';
+import { SearchWithPage, ReqPage, ResPage } from '../interface';
 import { Database } from '../interface/database';
 
-export const searchMysqlDBs = (params: ReqPage) => {
+export const searchMysqlDBs = (params: SearchWithPage) => {
     return http.post<ResPage<Database.MysqlDBInfo>>(`/databases/search`, params);
 };
 

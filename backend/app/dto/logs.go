@@ -5,8 +5,8 @@ import (
 )
 
 type OperationLog struct {
-	ID    uint   `json:"id"`
-	Group string `json:"group"`
+	ID     uint   `json:"id"`
+	Source string `json:"source"`
 
 	IP        string `json:"ip"`
 	Path      string `json:"path"`
@@ -20,6 +20,19 @@ type OperationLog struct {
 	DetailZH  string    `json:"detailZH"`
 	DetailEN  string    `json:"detailEN"`
 	CreatedAt time.Time `json:"createdAt"`
+}
+
+type SearchOpLogWithPage struct {
+	PageInfo
+	Source    string `json:"source"`
+	Status    string `json:"status"`
+	Operation string `json:"operation"`
+}
+
+type SearchLgLogWithPage struct {
+	PageInfo
+	IP     string `json:"ip"`
+	Status string `json:"status"`
 }
 
 type LoginLog struct {

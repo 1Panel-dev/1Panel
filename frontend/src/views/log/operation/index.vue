@@ -2,15 +2,56 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('logs.operation')">
             <template #toolbar>
-                <el-button type="primary" plain @click="onClean()">
-                    {{ $t('logs.deleteLogs') }}
-                </el-button>
+                <el-row>
+                    <el-col :span="20">
+                        <el-button type="primary" plain @click="onClean()">
+                            {{ $t('logs.deleteLogs') }}
+                        </el-button>
+                    </el-col>
+                    <el-col :span="4">
+                        <div class="search-button">
+                            <el-input
+                                v-model="searchName"
+                                clearable
+                                @clear="search()"
+                                suffix-icon="Search"
+                                @keyup.enter="search()"
+                                @blur="search()"
+                                :placeholder="$t('commons.button.search')"
+                            ></el-input>
+                        </div>
+                    </el-col>
+                </el-row>
+            </template>
+            <template #search>
+                <el-select v-model="searchGroup" @change="search()" clearable>
+                    <template #prefix>{{ $t('logs.resource') }}</template>
+                    <el-option :label="$t('commons.table.all')" value=""></el-option>
+                    <el-option :label="$t('logs.detail.apps')" value="apps"></el-option>
+                    <el-option :label="$t('logs.detail.websites')" value="websites"></el-option>
+                    <el-option :label="$t('logs.detail.databases')" value="databases"></el-option>
+                    <el-option :label="$t('logs.detail.containers')" value="containers"></el-option>
+                    <el-option :label="$t('logs.detail.cronjobs')" value="cronjobs"></el-option>
+                    <el-option :label="$t('logs.detail.files')" value="files"></el-option>
+                    <el-option :label="$t('logs.detail.hosts')" value="hosts"></el-option>
+                    <el-option :label="$t('logs.detail.commands')" value="commands"></el-option>
+                    <el-option :label="$t('logs.detail.logs')" value="logs"></el-option>
+                    <el-option :label="$t('logs.detail.settings')" value="settings"></el-option>
+                    <el-option :label="$t('logs.detail.backups')" value="backups"></el-option>
+                    <el-option :label="$t('logs.detail.groups')" value="groups"></el-option>
+                </el-select>
+                <el-select v-model="searchStatus" @change="search()" clearable style="margin-left: 10px">
+                    <template #prefix>{{ $t('commons.table.status') }}</template>
+                    <el-option :label="$t('commons.table.all')" value=""></el-option>
+                    <el-option :label="$t('commons.status.success')" value="Success"></el-option>
+                    <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
+                </el-select>
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
                     <el-table-column :label="$t('logs.resource')" prop="group" fix>
                         <template #default="{ row }">
-                            {{ $t('logs.detail.' + row.group) }}
+                            {{ $t('logs.detail.' + row.source) }}
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('logs.operate')" min-width="150px" prop="detailZH" />
@@ -63,14 +104,20 @@ const data = ref();
 const confirmDialogRef = ref();
 const paginationConfig = reactive({
     currentPage: 1,
-    pageSize: 15,
+    pageSize: 10,
     total: 0,
 });
+const searchName = ref();
+const searchGroup = ref();
+const searchStatus = ref();
 
 const search = async () => {
     let params = {
+        operation: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
+        status: searchStatus.value,
+        source: searchGroup.value,
     };
     loading.value = true;
     await getOperationLogs(params)

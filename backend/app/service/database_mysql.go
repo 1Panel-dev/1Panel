@@ -30,7 +30,7 @@ import (
 type MysqlService struct{}
 
 type IMysqlService interface {
-	SearchWithPage(search dto.PageInfo) (int64, interface{}, error)
+	SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error)
 	ListDBName() ([]string, error)
 	Create(ctx context.Context, req dto.MysqlDBCreate) (*model.DatabaseMysql, error)
 	ChangeAccess(info dto.ChangeDBInfo) error
@@ -55,8 +55,8 @@ func NewIMysqlService() IMysqlService {
 	return &MysqlService{}
 }
 
-func (u *MysqlService) SearchWithPage(search dto.PageInfo) (int64, interface{}, error) {
-	total, mysqls, err := mysqlRepo.Page(search.Page, search.PageSize)
+func (u *MysqlService) SearchWithPage(search dto.SearchWithPage) (int64, interface{}, error) {
+	total, mysqls, err := mysqlRepo.Page(search.Page, search.PageSize, commonRepo.WithLikeName(search.Info))
 	var dtoMysqls []dto.MysqlDBInfo
 	for _, mysql := range mysqls {
 		var item dto.MysqlDBInfo

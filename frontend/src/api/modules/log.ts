@@ -1,12 +1,12 @@
 import http from '@/api';
-import { ResPage, ReqPage } from '../interface';
+import { ResPage } from '../interface';
 import { Log } from '../interface/log';
 
-export const getOperationLogs = (info: ReqPage) => {
+export const getOperationLogs = (info: Log.SearchOpLog) => {
     return http.post<ResPage<Log.OperationLog>>(`/logs/operation`, info);
 };
 
-export const getLoginLogs = (info: ReqPage) => {
+export const getLoginLogs = (info: Log.SearchLgLog) => {
     return http.post<ResPage<Log.OperationLog>>(`/logs/login`, info);
 };
 

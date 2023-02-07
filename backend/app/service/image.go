@@ -25,7 +25,7 @@ var dockerLogDir = constant.TmpDir + "/docker_logs"
 type ImageService struct{}
 
 type IImageService interface {
-	Page(req dto.PageInfo) (int64, interface{}, error)
+	Page(req dto.SearchWithPage) (int64, interface{}, error)
 	List() ([]dto.Options, error)
 	ImageBuild(req dto.ImageBuild) (string, error)
 	ImagePull(req dto.ImagePull) (string, error)
@@ -38,7 +38,7 @@ type IImageService interface {
 func NewIImageService() IImageService {
 	return &ImageService{}
 }
-func (u *ImageService) Page(req dto.PageInfo) (int64, interface{}, error) {
+func (u *ImageService) Page(req dto.SearchWithPage) (int64, interface{}, error) {
 	var (
 		list      []types.ImageSummary
 		records   []dto.ImageInfo
@@ -51,6 +51,24 @@ func (u *ImageService) Page(req dto.PageInfo) (int64, interface{}, error) {
 	list, err = client.ImageList(context.Background(), types.ImageListOptions{})
 	if err != nil {
 		return 0, nil, err
+	}
+	if len(req.Info) != 0 {
+		lenth, count := len(list), 0
+		for count < lenth {
+			hasTag := false
+			for _, tag := range list[count].RepoTags {
+				if strings.Contains(tag, req.Info) {
+					hasTag = true
+					break
+				}
+			}
+			if !hasTag {
+				list = append(list[:count], list[(count+1):]...)
+				lenth--
+			} else {
+				count++
+			}
+		}
 	}
 
 	for _, image := range list {

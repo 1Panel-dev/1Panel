@@ -13,32 +13,49 @@
             :class="{ mask: dockerStatus != 'Running' }"
         >
             <template #toolbar>
-                <el-button type="primary" @click="onCreate()">
-                    {{ $t('container.createContainer') }}
-                </el-button>
-                <el-button-group style="margin-left: 10px">
-                    <el-button :disabled="checkStatus('start')" @click="onOperate('start')">
-                        {{ $t('container.start') }}
-                    </el-button>
-                    <el-button :disabled="checkStatus('stop')" @click="onOperate('stop')">
-                        {{ $t('container.stop') }}
-                    </el-button>
-                    <el-button :disabled="checkStatus('restart')" @click="onOperate('restart')">
-                        {{ $t('container.restart') }}
-                    </el-button>
-                    <el-button :disabled="checkStatus('kill')" @click="onOperate('kill')">
-                        {{ $t('container.kill') }}
-                    </el-button>
-                    <el-button :disabled="checkStatus('pause')" @click="onOperate('pause')">
-                        {{ $t('container.pause') }}
-                    </el-button>
-                    <el-button :disabled="checkStatus('unpause')" @click="onOperate('unpause')">
-                        {{ $t('container.unpause') }}
-                    </el-button>
-                    <el-button :disabled="checkStatus('remove')" @click="onOperate('remove')">
-                        {{ $t('container.remove') }}
-                    </el-button>
-                </el-button-group>
+                <el-row>
+                    <el-col :span="20">
+                        <el-button type="primary" @click="onCreate()">
+                            {{ $t('container.createContainer') }}
+                        </el-button>
+                        <el-button-group style="margin-left: 10px">
+                            <el-button :disabled="checkStatus('start')" @click="onOperate('start')">
+                                {{ $t('container.start') }}
+                            </el-button>
+                            <el-button :disabled="checkStatus('stop')" @click="onOperate('stop')">
+                                {{ $t('container.stop') }}
+                            </el-button>
+                            <el-button :disabled="checkStatus('restart')" @click="onOperate('restart')">
+                                {{ $t('container.restart') }}
+                            </el-button>
+                            <el-button :disabled="checkStatus('kill')" @click="onOperate('kill')">
+                                {{ $t('container.kill') }}
+                            </el-button>
+                            <el-button :disabled="checkStatus('pause')" @click="onOperate('pause')">
+                                {{ $t('container.pause') }}
+                            </el-button>
+                            <el-button :disabled="checkStatus('unpause')" @click="onOperate('unpause')">
+                                {{ $t('container.unpause') }}
+                            </el-button>
+                            <el-button :disabled="checkStatus('remove')" @click="onOperate('remove')">
+                                {{ $t('container.remove') }}
+                            </el-button>
+                        </el-button-group>
+                    </el-col>
+                    <el-col :span="4">
+                        <div class="search-button">
+                            <el-input
+                                v-model="searchName"
+                                clearable
+                                @clear="search()"
+                                suffix-icon="Search"
+                                @keyup.enter="search()"
+                                @blur="search()"
+                                :placeholder="$t('commons.button.search')"
+                            ></el-input>
+                        </div>
+                    </el-col>
+                </el-row>
             </template>
             <template #main>
                 <ComplexTable
@@ -124,6 +141,7 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
+const searchName = ref();
 
 const dockerStatus = ref();
 const loadStatus = async () => {
@@ -153,6 +171,7 @@ const dialogReNameRef = ref();
 const search = async () => {
     let filterItem = props.filters ? props.filters : '';
     let params = {
+        name: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         filters: filterItem,

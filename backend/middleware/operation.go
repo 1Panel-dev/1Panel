@@ -25,9 +25,9 @@ func OperationLog() gin.HandlerFunc {
 			return
 		}
 
-		group := loadLogInfo(c.Request.URL.Path)
+		source := loadLogInfo(c.Request.URL.Path)
 		record := model.OperationLog{
-			Group:     group,
+			Source:    source,
 			IP:        c.ClientIP(),
 			Method:    strings.ToLower(c.Request.Method),
 			Path:      strings.ReplaceAll(c.Request.URL.Path, "/api/v1", ""),

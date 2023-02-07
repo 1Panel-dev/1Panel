@@ -14,12 +14,29 @@
             :class="{ mask: dockerStatus != 'Running' }"
         >
             <template #toolbar>
-                <el-button type="primary" @click="onCreate()">
-                    {{ $t('container.createNetwork') }}
-                </el-button>
-                <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
-                    {{ $t('commons.button.delete') }}
-                </el-button>
+                <el-row>
+                    <el-col :span="20">
+                        <el-button type="primary" @click="onCreate()">
+                            {{ $t('container.createNetwork') }}
+                        </el-button>
+                        <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
+                    </el-col>
+                    <el-col :span="4">
+                        <div class="search-button">
+                            <el-input
+                                v-model="searchName"
+                                clearable
+                                @clear="search()"
+                                suffix-icon="Search"
+                                @keyup.enter="search()"
+                                @blur="search()"
+                                :placeholder="$t('commons.button.search')"
+                            ></el-input>
+                        </div>
+                    </el-col>
+                </el-row>
             </template>
             <template #main>
                 <ComplexTable
@@ -104,6 +121,7 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
+const searchName = ref();
 
 const dockerStatus = ref();
 const loadStatus = async () => {
@@ -132,6 +150,7 @@ function selectable(row) {
 
 const search = async () => {
     const params = {
+        info: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };

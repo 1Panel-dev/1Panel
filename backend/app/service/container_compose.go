@@ -25,7 +25,7 @@ const composeConfigLabel = "com.docker.compose.project.config_files"
 const composeWorkdirLabel = "com.docker.compose.project.working_dir"
 const composeCreatedBy = "createdBy"
 
-func (u *ContainerService) PageCompose(req dto.PageInfo) (int64, interface{}, error) {
+func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface{}, error) {
 	var (
 		records   []dto.ComposeInfo
 		BackDatas []dto.ComposeInfo
@@ -90,12 +90,23 @@ func (u *ContainerService) PageCompose(req dto.PageInfo) (int64, interface{}, er
 	}
 	for _, item := range composeCreatedByLocal {
 		if err := composeRepo.DeleteRecord(commonRepo.WithByName(item.Name)); err != nil {
-			fmt.Println(err)
+			global.LOG.Error(err)
 		}
 	}
 	for key, value := range composeMap {
 		value.Name = key
 		records = append(records, value)
+	}
+	if len(req.Info) != 0 {
+		lenth, count := len(records), 0
+		for count < lenth {
+			if !strings.Contains(records[count].Name, req.Info) {
+				records = append(records[:count], records[(count+1):]...)
+				lenth--
+			} else {
+				count++
+			}
+		}
 	}
 	sort.Slice(records, func(i, j int) bool {
 		return records[i].CreatedAt > records[j].CreatedAt

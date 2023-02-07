@@ -1,8 +1,8 @@
 import http from '@/api';
-import { ResPage, ReqPage } from '../interface';
+import { ResPage, SearchWithPage } from '../interface';
 import { Cronjob } from '../interface/cronjob';
 
-export const getCronjobPage = (params: ReqPage) => {
+export const getCronjobPage = (params: SearchWithPage) => {
     return http.post<ResPage<Cronjob.CronjobInfo>>(`/cronjobs/search`, params);
 };
 

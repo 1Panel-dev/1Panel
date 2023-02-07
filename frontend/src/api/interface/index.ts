@@ -18,6 +18,11 @@ export interface ReqPage {
     page: number;
     pageSize: number;
 }
+export interface SearchWithPage {
+    info: string;
+    page: number;
+    pageSize: number;
+}
 export interface CommonModel {
     id: number;
     CreatedAt?: string;
