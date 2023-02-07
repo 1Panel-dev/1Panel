@@ -8,7 +8,7 @@
                 },
             ]"
         />
-        <LayoutContent v-loading="loading" :title="$t('cronjob.cronTask')">
+        <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('cronjob.cronTask')">
             <template #toolbar>
                 <el-button type="primary" @click="onOpenDialog('create')">
                     {{ $t('commons.button.create') }}{{ $t('cronjob.cronTask') }}
@@ -69,13 +69,18 @@
                             {{ $t('cronjob.handle') }}
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('cronjob.retainCopies')" prop="retainCopies" />
+                    <el-table-column :label="$t('cronjob.retainCopies')" :width="90" prop="retainCopies">
+                        <template #default="{ row }">
+                            {{ loadCopies(row) }}
+                        </template>
+                    </el-table-column>
+
                     <el-table-column :label="$t('cronjob.lastRecrodTime')" prop="lastRecrodTime">
                         <template #default="{ row }">
                             {{ row.lastRecrodTime }}
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('cronjob.target')" prop="targetDir">
+                    <el-table-column :width="80" :label="$t('cronjob.target')" prop="targetDir">
                         <template #default="{ row }">
                             {{ loadBackupName(row.targetDir) }}
                         </template>
@@ -92,14 +97,14 @@
         </LayoutContent>
 
         <OperatrDialog @search="search" ref="dialogRef" />
-        <RecordDialog ref="dialogRecordRef" />
+        <Records ref="dialogRecordRef" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import OperatrDialog from '@/views/cronjob/operate/index.vue';
-import RecordDialog from '@/views/cronjob/record/index.vue';
+import Records from '@/views/cronjob/record/index.vue';
 import LayoutContent from '@/layout/layout-content.vue';
 import { loadZero } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
@@ -113,6 +118,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 
 const loading = ref();
 const selects = ref<any>([]);
+const isRecordShow = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -153,12 +159,9 @@ const search = async () => {
         });
 };
 
-const dialogRecordRef = ref<DialogExpose>();
+const dialogRecordRef = ref();
 
-interface DialogExpose {
-    acceptParams: (params: any) => void;
-}
-const dialogRef = ref<DialogExpose>();
+const dialogRef = ref();
 const onOpenDialog = async (
     title: string,
     rowData: Partial<Cronjob.CronjobInfo> = {
@@ -204,9 +207,24 @@ const onChangeStatus = async (id: number, status: string) => {
 };
 
 const onHandle = async (row: Cronjob.CronjobInfo) => {
-    await handleOnce(row.id);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-    search();
+    loading.value = true;
+    await handleOnce(row.id)
+        .then(() => {
+            loading.value = false;
+            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+const loadCopies = (item) => {
+    if (item.type === 'shell' || item.type === 'curl') {
+        return '-';
+    } else {
+        return item.retainCopies + '';
+    }
 };
 
 const buttons = [
@@ -232,20 +250,17 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('commons.button.view'),
+        label: i18n.global.t('cronjob.record'),
         icon: 'Clock',
         click: (row: Cronjob.CronjobInfo) => {
-            onOpenRecordDialog(row);
+            isRecordShow.value = true;
+            let params = {
+                rowData: { ...row },
+            };
+            dialogRecordRef.value!.acceptParams(params);
         },
     },
 ];
-const onOpenRecordDialog = async (rowData: Partial<Cronjob.CronjobInfo> = {}) => {
-    let params = {
-        rowData: { ...rowData },
-    };
-    dialogRecordRef.value!.acceptParams(params);
-};
-
 function loadWeek(i: number) {
     for (const week of weekOptions) {
         if (week.value === i) {
