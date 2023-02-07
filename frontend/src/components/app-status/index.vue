@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="a-card" v-if="data.isExist">
+        <div class="app-status" v-if="data.isExist">
             <el-card>
                 <div>
                     <el-tag effect="dark" type="success">{{ data.app }}</el-tag>
@@ -142,33 +142,11 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss" scoped>
-.a-card {
-    font-size: 12px;
-
-    .el-card {
-        --el-card-padding: 12px;
-
-        .buttons {
-            margin-left: 100px;
-        }
-    }
-}
-
-// body {
-//     margin: 0;
-// }
-
-.status-content {
-    margin-left: 50px;
-}
-
+<style lang="scss">
 .app-warn {
     text-align: center;
     margin-top: 100px;
     span:first-child {
-        // font-weight: 500;
-        // font-size: 16px;
         color: #bbbfc4;
     }
 
