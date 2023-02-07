@@ -15,6 +15,20 @@
                                     </template>
                                 </el-input>
                             </el-form-item>
+
+                            <el-form-item :label="$t('setting.panelPort')" :rules="Rules.port" prop="serverPort">
+                                <el-input clearable v-model.number="form.serverPort">
+                                    <template #append>
+                                        <el-button
+                                            @click="onSavePort(panelFormRef, 'ServerPort', form.serverPort)"
+                                            icon="Collection"
+                                        >
+                                            {{ $t('commons.button.save') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+
                             <el-form-item
                                 :label="$t('setting.expirationTime')"
                                 prop="expirationTime"
@@ -178,10 +192,10 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue';
-import { ElMessage, ElForm } from 'element-plus';
+import { ElMessage, ElForm, ElMessageBox } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
 import LayoutContent from '@/layout/layout-content.vue';
-import { updatePassword, updateSetting, getMFA, bindMFA, getSettingInfo } from '@/api/modules/setting';
+import { updatePassword, updateSetting, getMFA, bindMFA, getSettingInfo, updatePort } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { dateFormatSimple } from '@/utils/util';
@@ -211,7 +225,7 @@ const passForm = reactive({
 
 const form = reactive({
     password: '',
-    serverPort: '',
+    serverPort: 9999,
     securityEntrance: '',
     expirationDays: 0,
     expirationTime: '',
@@ -229,6 +243,7 @@ const timeoutForm = reactive({
 const search = async () => {
     const res = await getSettingInfo();
     form.password = '******';
+    form.serverPort = Number(res.data.serverPort);
     form.securityEntrance = res.data.securityEntrance;
     form.expirationDays = Number(res.data.expirationDays);
     form.expirationTime = res.data.expirationTime;
@@ -284,6 +299,34 @@ function checkPassword(rule: any, value: any, callback: any) {
     }
     callback();
 }
+const onSavePort = async (formEl: FormInstance | undefined, key: string, val: any) => {
+    if (!formEl) return;
+    const result = await formEl.validateField(key.replace(key[0], key[0].toLowerCase()), callback);
+    if (!result) {
+        return;
+    }
+    ElMessageBox.confirm(i18n.global.t('setting.portChangeHelper'), i18n.global.t('setting.portChange'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        loading.value = true;
+        let param = {
+            serverPort: val,
+        };
+        await updatePort(param)
+            .then(() => {
+                loading.value = false;
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                let href = window.location.href;
+                let ip = href.split('//')[1].split(':')[0];
+                window.open(`${href.split('//')[0]}//${ip}:${val}/1panel/login`, '_self');
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
+};
 
 const onChangePassword = async () => {
     passForm.oldPassword = '';

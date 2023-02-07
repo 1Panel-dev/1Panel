@@ -35,39 +35,45 @@
                 </el-row>
             </el-card>
         </div>
-        <el-card style="margin-top: 40px">
-            <LayoutContent :header="$t('container.containerList')" back-name="Compose" :reload="true">
+        <LayoutContent
+            v-loading="loading"
+            style="margin-top: 30px"
+            back-name="Compose"
+            :title="$t('container.containerList')"
+            :reload="true"
+        >
+            <template #toolbar>
+                <el-button-group>
+                    <el-button :disabled="checkStatus('start')" @click="onOperate('start')">
+                        {{ $t('container.start') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('stop')" @click="onOperate('stop')">
+                        {{ $t('container.stop') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('restart')" @click="onOperate('restart')">
+                        {{ $t('container.restart') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('kill')" @click="onOperate('kill')">
+                        {{ $t('container.kill') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('pause')" @click="onOperate('pause')">
+                        {{ $t('container.pause') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('unpause')" @click="onOperate('unpause')">
+                        {{ $t('container.unpause') }}
+                    </el-button>
+                    <el-button :disabled="checkStatus('remove')" @click="onOperate('remove')">
+                        {{ $t('container.remove') }}
+                    </el-button>
+                </el-button-group>
+            </template>
+            <template #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
                     @search="search"
                 >
-                    <template #toolbar>
-                        <el-button-group>
-                            <el-button :disabled="checkStatus('start')" @click="onOperate('start')">
-                                {{ $t('container.start') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('stop')" @click="onOperate('stop')">
-                                {{ $t('container.stop') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('restart')" @click="onOperate('restart')">
-                                {{ $t('container.restart') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('kill')" @click="onOperate('kill')">
-                                {{ $t('container.kill') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('pause')" @click="onOperate('pause')">
-                                {{ $t('container.pause') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('unpause')" @click="onOperate('unpause')">
-                                {{ $t('container.unpause') }}
-                            </el-button>
-                            <el-button :disabled="checkStatus('remove')" @click="onOperate('remove')">
-                                {{ $t('container.remove') }}
-                            </el-button>
-                        </el-button-group>
-                    </template>
                     <el-table-column type="selection" fix />
                     <el-table-column
                         :label="$t('commons.table.name')"
@@ -114,8 +120,8 @@
                 <CreateDialog @search="search" ref="dialogCreateRef" />
                 <MonitorDialog ref="dialogMonitorRef" />
                 <TerminalDialog ref="dialogTerminalRef" />
-            </LayoutContent>
-        </el-card>
+            </template>
+        </LayoutContent>
     </div>
 </template>
 

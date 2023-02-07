@@ -11,19 +11,26 @@
             </template>
 
             <template #toolbar v-if="mysqlIsExist && !isOnSetting">
-                <el-button type="primary" @click="onOpenDialog()">
-                    {{ $t('database.create') }}
-                </el-button>
-                <el-button @click="onChangeRootPassword" type="primary" plain>
-                    {{ $t('database.rootPassword') }}
-                </el-button>
-                <el-button @click="onChangeAccess" type="primary" plain>
-                    {{ $t('database.remoteAccess') }}
-                </el-button>
-                <el-button @click="goDashboard" type="primary" plain>phpMyAdmin</el-button>
+                <div :class="{ mask: mysqlStatus != 'Running' }">
+                    <el-button type="primary" @click="onOpenDialog()">
+                        {{ $t('database.create') }}
+                    </el-button>
+                    <el-button @click="onChangeRootPassword" type="primary" plain>
+                        {{ $t('database.rootPassword') }}
+                    </el-button>
+                    <el-button @click="onChangeAccess" type="primary" plain>
+                        {{ $t('database.remoteAccess') }}
+                    </el-button>
+                    <el-button @click="goDashboard" type="primary" plain>phpMyAdmin</el-button>
+                </div>
             </template>
             <template #main v-if="mysqlIsExist && !isOnSetting">
-                <ComplexTable :pagination-config="paginationConfig" @search="search" :data="data">
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    @search="search"
+                    :data="data"
+                    :class="{ mask: mysqlStatus != 'Running' }"
+                >
                     <el-table-column :label="$t('commons.table.name')" prop="name" />
                     <el-table-column :label="$t('commons.login.username')" prop="username" />
                     <el-table-column :label="$t('commons.login.password')" prop="password">
@@ -375,7 +382,7 @@ const loadDashboardPort = async () => {
 const checkExist = (data: App.CheckInstalled) => {
     mysqlIsExist.value = data.isExist;
     mysqlName.value = data.name;
-    mysqlStatus.value = data.status;
+    mysqlStatus.value = 'Failed';
     mysqlVersion.value = data.version;
     mysqlContainer.value = data.containerName;
     if (mysqlIsExist.value) {
