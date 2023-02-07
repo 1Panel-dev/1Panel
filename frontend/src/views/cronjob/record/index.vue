@@ -3,9 +3,14 @@
         <div class="a-card" style="margin-top: 20px">
             <el-card>
                 <div>
-                    <el-tag style="float: left" effect="dark" type="success">{{ dialogData.rowData.name }}</el-tag>
-                    <el-tag round class="status-content" type="success">
-                        {{ $t('cronjob.' + dialogData.rowData.type) }}
+                    <el-tag style="float: left" effect="dark" type="success">
+                        {{ dialogData.rowData.name }}-{{ $t('cronjob.' + dialogData.rowData.type) }}
+                    </el-tag>
+                    <el-tag v-if="dialogData.rowData.status === 'Enable'" round class="status-content" type="success">
+                        {{ $t('commons.status.running') }}
+                    </el-tag>
+                    <el-tag v-if="dialogData.rowData.status === 'Disable'" round class="status-content" type="info">
+                        {{ $t('commons.status.stopped') }}
                     </el-tag>
                     <el-tag class="status-content">
                         <span
@@ -47,13 +52,30 @@
                         <el-button type="primary" @click="onHandle(dialogData.rowData)" link>
                             {{ $t('commons.button.handle') }}
                         </el-button>
+                        <el-divider direction="vertical" />
+                        <el-button
+                            type="primary"
+                            v-if="dialogData.rowData.status === 'Enable'"
+                            @click="onChangeStatus(dialogData.rowData.id, 'disable')"
+                            link
+                        >
+                            {{ $t('commons.button.disable') }}
+                        </el-button>
+                        <el-button
+                            type="primary"
+                            v-if="dialogData.rowData.status === 'Disable'"
+                            @click="onChangeStatus(dialogData.rowData.id, 'enable')"
+                            link
+                        >
+                            {{ $t('commons.button.enable') }}
+                        </el-button>
                     </span>
                 </div>
             </el-card>
         </div>
 
         <LayoutContent :title="$t('cronjob.record')" :reload="true">
-            <template #search>
+            <template #search v-if="hasRecords">
                 <el-row :gutter="20">
                     <el-col :span="6">
                         <el-date-picker
@@ -69,15 +91,16 @@
                     </el-col>
                     <el-col :span="18">
                         <el-select @change="search()" v-model="searchInfo.status">
-                            <el-option :label="$t('cronjob.all')" value="" />
-                            <el-option :label="$t('cronjob.failedRecord')" value="Failed" />
-                            <el-option :label="$t('cronjob.successRecord')" value="Success" />
+                            <template #prefix>{{ $t('commons.table.status') }}</template>
+                            <el-option :label="$t('commons.table.all')" value="" />
+                            <el-option :label="$t('commons.status.success')" value="Success" />
+                            <el-option :label="$t('commons.status.failed')" value="Failed" />
                         </el-select>
                     </el-col>
                 </el-row>
             </template>
             <template #main>
-                <el-row :gutter="20">
+                <el-row :gutter="20" v-if="hasRecords">
                     <el-col :span="6">
                         <el-card>
                             <ul v-infinite-scroll="nextPage" class="infinite-list" style="overflow: auto">
@@ -233,6 +256,14 @@
                         </el-card>
                     </el-col>
                 </el-row>
+                <div class="app-warn" v-if="!hasRecords">
+                    <div>
+                        <span>{{ $t('cronjob.noRecord') }}</span>
+                        <div>
+                            <img src="@/assets/images/no_app.svg" />
+                        </div>
+                    </div>
+                </div>
             </template>
         </LayoutContent>
     </div>
@@ -243,10 +274,10 @@ import { reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import { loadZero } from '@/utils/util';
 import { loadBackupName } from '@/views/setting/helper';
-import { searchRecords, download, handleOnce } from '@/api/modules/cronjob';
+import { searchRecords, download, handleOnce, updateStatus } from '@/api/modules/cronjob';
 import { dateFormat, dateFormatForName } from '@/utils/util';
 import i18n from '@/lang';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { LoadFile } from '@/api/modules/files';
 import LayoutContent from '@/layout/layout-content.vue';
 import { Codemirror } from 'vue-codemirror';
@@ -254,6 +285,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 
 const loading = ref();
+const hasRecords = ref();
 
 const mymirror = ref();
 const extensions = [javascript(), oneDark];
@@ -281,9 +313,11 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     const res = await searchRecords(itemSearch);
     records.value = res.data.items || [];
     if (records.value.length === 0) {
-        ElMessage.info(i18n.global.t('commons.msg.notRecords'));
+        hasRecords.value = false;
+        recordShow.value = true;
         return;
     }
+    hasRecords.value = true;
     currentRecord.value = records.value[0];
     currentRecordIndex.value = 0;
     loadRecord(currentRecord.value.records);
@@ -365,6 +399,18 @@ const onHandle = async (row: Cronjob.CronjobInfo) => {
         .catch(() => {
             loading.value = false;
         });
+};
+
+const onChangeStatus = async (id: number, status: string) => {
+    ElMessageBox.confirm(i18n.global.t('cronjob.' + status + 'Msg'), i18n.global.t('cronjob.changeStatus'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).then(async () => {
+        let itemStatus = status === 'enable' ? 'Enable' : 'Disable';
+        await updateStatus({ id: id, status: itemStatus });
+        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        dialogData.value.rowData.status = itemStatus;
+    });
 };
 
 const search = async () => {
@@ -488,5 +534,27 @@ defineExpose({
 .status-content {
     float: left;
     margin-left: 50px;
+}
+
+.app-warn {
+    text-align: center;
+    margin-top: 100px;
+    span:first-child {
+        color: #bbbfc4;
+    }
+
+    span:nth-child(2) {
+        color: $primary-color;
+        cursor: pointer;
+    }
+
+    span:nth-child(2):hover {
+        color: #74a4f3;
+    }
+
+    img {
+        width: 300px;
+        height: 300px;
+    }
 }
 </style>

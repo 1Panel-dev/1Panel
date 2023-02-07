@@ -2,9 +2,35 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('logs.login')">
             <template #toolbar>
-                <el-button type="primary" plain @click="onClean()">
-                    {{ $t('logs.deleteLogs') }}
-                </el-button>
+                <el-row>
+                    <el-col :span="20">
+                        <el-button type="primary" plain @click="onClean()">
+                            {{ $t('logs.deleteLogs') }}
+                        </el-button>
+                    </el-col>
+                    <el-col :span="4">
+                        <div class="search-button">
+                            <el-input
+                                v-model="searchIP"
+                                clearable
+                                @clear="search()"
+                                suffix-icon="Search"
+                                @keyup.enter="search()"
+                                @blur="search()"
+                                :placeholder="$t('commons.button.search') + ' ip'"
+                            ></el-input>
+                        </div>
+                    </el-col>
+                </el-row>
+            </template>
+
+            <template #search>
+                <el-select v-model="searchStatus" @change="search()" clearable>
+                    <template #prefix>{{ $t('commons.table.status') }}</template>
+                    <el-option :label="$t('commons.table.all')" value=""></el-option>
+                    <el-option :label="$t('commons.status.success')" value="Success"></el-option>
+                    <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
+                </el-select>
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
@@ -51,12 +77,16 @@ const data = ref();
 const confirmDialogRef = ref();
 const paginationConfig = reactive({
     currentPage: 1,
-    pageSize: 15,
+    pageSize: 10,
     total: 0,
 });
+const searchIP = ref();
+const searchStatus = ref();
 
 const search = async () => {
     let params = {
+        ip: searchIP.value,
+        status: searchStatus.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };

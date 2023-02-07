@@ -50,12 +50,12 @@ func (b *BaseApi) SearchContainer(c *gin.Context) {
 // @Summary Page composes
 // @Description 获取编排列表分页
 // @Accept json
-// @Param request body dto.PageInfo true "request"
+// @Param request body dto.SearchWithPage true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /containers/compose/search [post]
 func (b *BaseApi) SearchCompose(c *gin.Context) {
-	var req dto.PageInfo
+	var req dto.SearchWithPage
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -318,13 +318,13 @@ func (b *BaseApi) ContainerLogs(c *gin.Context) {
 // @Summary Page networks
 // @Description 获取容器网络列表分页
 // @Accept json
-// @Param request body dto.PageInfo true "request"
+// @Param request body dto.SearchWithPage true "request"
 // @Produce json
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /containers/network/search [post]
 func (b *BaseApi) SearchNetwork(c *gin.Context) {
-	var req dto.PageInfo
+	var req dto.SearchWithPage
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -403,13 +403,13 @@ func (b *BaseApi) CreateNetwork(c *gin.Context) {
 // @Summary Page volumes
 // @Description 获取容器存储卷分页
 // @Accept json
-// @Param request body dto.PageInfo true "request"
+// @Param request body dto.SearchWithPage true "request"
 // @Produce json
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /containers/volume/search [post]
 func (b *BaseApi) SearchVolume(c *gin.Context) {
-	var req dto.PageInfo
+	var req dto.SearchWithPage
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

@@ -43,6 +43,7 @@ export default {
             dateEnd: 'Date end',
         },
         table: {
+            all: 'All',
             total: 'Total {0}',
             name: 'Name',
             type: 'Type',
@@ -611,6 +612,7 @@ export default {
             users: 'User',
             hosts: 'Host',
             apps: 'App',
+            websites: 'Website',
             containers: 'Container',
             commands: 'Command',
             groups: 'System Group',

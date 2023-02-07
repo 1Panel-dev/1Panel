@@ -12,10 +12,10 @@ type LogService struct{}
 
 type ILogService interface {
 	CreateLoginLog(operation model.LoginLog) error
-	PageLoginLog(search dto.PageInfo) (int64, interface{}, error)
+	PageLoginLog(search dto.SearchLgLogWithPage) (int64, interface{}, error)
 
 	CreateOperationLog(operation model.OperationLog) error
-	PageOperationLog(search dto.PageInfo) (int64, interface{}, error)
+	PageOperationLog(search dto.SearchOpLogWithPage) (int64, interface{}, error)
 
 	CleanLogs(logtype string) error
 }
@@ -28,8 +28,14 @@ func (u *LogService) CreateLoginLog(operation model.LoginLog) error {
 	return logRepo.CreateLoginLog(&operation)
 }
 
-func (u *LogService) PageLoginLog(search dto.PageInfo) (int64, interface{}, error) {
-	total, ops, err := logRepo.PageLoginLog(search.Page, search.PageSize, commonRepo.WithOrderBy("created_at desc"))
+func (u *LogService) PageLoginLog(req dto.SearchLgLogWithPage) (int64, interface{}, error) {
+	total, ops, err := logRepo.PageLoginLog(
+		req.Page,
+		req.PageSize,
+		logRepo.WithByIP(req.IP),
+		logRepo.WithByStatus(req.Status),
+		commonRepo.WithOrderBy("created_at desc"),
+	)
 	var dtoOps []dto.LoginLog
 	for _, op := range ops {
 		var item dto.LoginLog
@@ -45,8 +51,15 @@ func (u *LogService) CreateOperationLog(operation model.OperationLog) error {
 	return logRepo.CreateOperationLog(&operation)
 }
 
-func (u *LogService) PageOperationLog(search dto.PageInfo) (int64, interface{}, error) {
-	total, ops, err := logRepo.PageOperationLog(search.Page, search.PageSize, commonRepo.WithOrderBy("created_at desc"))
+func (u *LogService) PageOperationLog(req dto.SearchOpLogWithPage) (int64, interface{}, error) {
+	total, ops, err := logRepo.PageOperationLog(
+		req.Page,
+		req.PageSize,
+		logRepo.WithByGroup(req.Source),
+		logRepo.WithByLikeOperation(req.Operation),
+		logRepo.WithByStatus(req.Status),
+		commonRepo.WithOrderBy("created_at desc"),
+	)
 	var dtoOps []dto.OperationLog
 	for _, op := range ops {
 		var item dto.OperationLog

@@ -4,6 +4,7 @@ import "time"
 
 type PageContainer struct {
 	PageInfo
+	Name    string `json:"name"`
 	Filters string `json:"filters"`
 }
 

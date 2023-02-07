@@ -6,7 +6,7 @@ import (
 
 type OperationLog struct {
 	BaseModel
-	Group string `gorm:"type:varchar(64)" json:"group"`
+	Source string `gorm:"type:varchar(64)" json:"source"`
 
 	IP        string `gorm:"type:varchar(64)" json:"ip"`
 	Path      string `gorm:"type:varchar(64)" json:"path"`

@@ -7,6 +7,7 @@ export namespace Container {
         newName: string;
     }
     export interface ContainerSearch extends ReqPage {
+        name: string;
         filters: string;
     }
     export interface ContainerCreate {

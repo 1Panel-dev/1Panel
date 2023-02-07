@@ -1553,7 +1553,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.PageInfo"
+                            "$ref": "#/definitions/dto.SearchWithPage"
                         }
                     }
                 ],
@@ -2140,7 +2140,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.PageInfo"
+                            "$ref": "#/definitions/dto.SearchWithPage"
                         }
                     }
                 ],
@@ -2351,7 +2351,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.PageInfo"
+                            "$ref": "#/definitions/dto.SearchWithPage"
                         }
                     }
                 ],
@@ -2556,7 +2556,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.PageInfo"
+                            "$ref": "#/definitions/dto.SearchWithPage"
                         }
                     }
                 ],
@@ -2871,7 +2871,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.PageInfo"
+                            "$ref": "#/definitions/dto.SearchWithPage"
                         }
                     }
                 ],
@@ -3082,7 +3082,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.PageInfo"
+                            "$ref": "#/definitions/dto.SearchWithPage"
                         }
                     }
                 ],
@@ -4423,7 +4423,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.PageInfo"
+                            "$ref": "#/definitions/dto.SearchWithPage"
                         }
                     }
                 ],
@@ -5777,7 +5777,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.PageInfo"
+                            "$ref": "#/definitions/dto.SearchLgLogWithPage"
                         }
                     }
                 ],
@@ -5813,7 +5813,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.PageInfo"
+                            "$ref": "#/definitions/dto.SearchOpLogWithPage"
                         }
                     }
                 ],
@@ -6582,7 +6582,7 @@ var doc = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "从 OSS 加载系统更新信息",
+                "description": "系统更新信息",
                 "tags": [
                     "System Setting"
                 ],
@@ -9996,6 +9996,9 @@ var doc = `{
                 "filters": {
                     "type": "string"
                 },
+                "name": {
+                    "type": "string"
+                },
                 "page": {
                     "type": "integer"
                 },
@@ -10253,6 +10256,51 @@ var doc = `{
                 }
             }
         },
+        "dto.SearchLgLogWithPage": {
+            "type": "object",
+            "required": [
+                "page",
+                "pageSize"
+            ],
+            "properties": {
+                "ip": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SearchOpLogWithPage": {
+            "type": "object",
+            "required": [
+                "page",
+                "pageSize"
+            ],
+            "properties": {
+                "operation": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.SearchRecord": {
             "type": "object",
             "required": [
@@ -10283,7 +10331,6 @@ var doc = `{
         "dto.SearchWithPage": {
             "type": "object",
             "required": [
-                "info",
                 "page",
                 "pageSize"
             ],
@@ -11251,6 +11298,9 @@ var doc = `{
         "request.FileOption": {
             "type": "object",
             "properties": {
+                "containSub": {
+                    "type": "boolean"
+                },
                 "dir": {
                     "type": "boolean"
                 },

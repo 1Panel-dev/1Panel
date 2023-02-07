@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -12,7 +13,7 @@ import (
 	"github.com/docker/docker/api/types/volume"
 )
 
-func (u *ContainerService) PageVolume(req dto.PageInfo) (int64, interface{}, error) {
+func (u *ContainerService) PageVolume(req dto.SearchWithPage) (int64, interface{}, error) {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return 0, nil, err
@@ -20,6 +21,17 @@ func (u *ContainerService) PageVolume(req dto.PageInfo) (int64, interface{}, err
 	list, err := client.VolumeList(context.TODO(), filters.NewArgs())
 	if err != nil {
 		return 0, nil, err
+	}
+	if len(req.Info) != 0 {
+		lenth, count := len(list.Volumes), 0
+		for count < lenth {
+			if !strings.Contains(list.Volumes[count].Name, req.Info) {
+				list.Volumes = append(list.Volumes[:count], list.Volumes[(count+1):]...)
+				lenth--
+			} else {
+				count++
+			}
+		}
 	}
 	var (
 		data    []dto.Volume

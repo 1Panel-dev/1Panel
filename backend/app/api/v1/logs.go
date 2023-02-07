@@ -12,12 +12,12 @@ import (
 // @Summary Page login logs
 // @Description 获取系统登录日志列表分页
 // @Accept json
-// @Param request body dto.PageInfo true "request"
+// @Param request body dto.SearchLgLogWithPage true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /logs/login [post]
 func (b *BaseApi) GetLoginLogs(c *gin.Context) {
-	var req dto.PageInfo
+	var req dto.SearchLgLogWithPage
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -39,12 +39,12 @@ func (b *BaseApi) GetLoginLogs(c *gin.Context) {
 // @Summary Page operation logs
 // @Description 获取系统操作日志列表分页
 // @Accept json
-// @Param request body dto.PageInfo true "request"
+// @Param request body dto.SearchOpLogWithPage true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /logs/operation [post]
 func (b *BaseApi) GetOperationLogs(c *gin.Context) {
-	var req dto.PageInfo
+	var req dto.SearchOpLogWithPage
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

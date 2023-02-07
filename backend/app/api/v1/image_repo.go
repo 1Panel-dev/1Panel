@@ -12,13 +12,13 @@ import (
 // @Summary Page image repos
 // @Description 获取镜像仓库列表分页
 // @Accept json
-// @Param request body dto.PageInfo true "request"
+// @Param request body dto.SearchWithPage true "request"
 // @Produce json
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /containers/repo/search [post]
 func (b *BaseApi) SearchRepo(c *gin.Context) {
-	var req dto.PageInfo
+	var req dto.SearchWithPage
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

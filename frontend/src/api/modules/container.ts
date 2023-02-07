@@ -1,5 +1,5 @@
 import http from '@/api';
-import { ResPage, ReqPage } from '../interface';
+import { ResPage, SearchWithPage } from '../interface';
 import { Container } from '../interface/container';
 
 export const searchContainer = (params: Container.ContainerSearch) => {
@@ -22,7 +22,7 @@ export const inspect = (params: Container.ContainerInspect) => {
 };
 
 // image
-export const searchImage = (params: ReqPage) => {
+export const searchImage = (params: SearchWithPage) => {
     return http.post<ResPage<Container.ImageInfo>>(`/containers/image/search`, params);
 };
 export const listImage = () => {
@@ -51,7 +51,7 @@ export const imageRemove = (params: Container.BatchDelete) => {
 };
 
 // network
-export const searchNetwork = (params: ReqPage) => {
+export const searchNetwork = (params: SearchWithPage) => {
     return http.post<ResPage<Container.NetworkInfo>>(`/containers/network/search`, params);
 };
 export const deleteNetwork = (params: Container.BatchDelete) => {
@@ -62,7 +62,7 @@ export const createNetwork = (params: Container.NetworkCreate) => {
 };
 
 // volume
-export const searchVolume = (params: ReqPage) => {
+export const searchVolume = (params: SearchWithPage) => {
     return http.post<ResPage<Container.VolumeInfo>>(`/containers/volume/search`, params);
 };
 export const listVolume = () => {
@@ -76,7 +76,7 @@ export const createVolume = (params: Container.VolumeCreate) => {
 };
 
 // repo
-export const searchImageRepo = (params: ReqPage) => {
+export const searchImageRepo = (params: SearchWithPage) => {
     return http.post<ResPage<Container.RepoInfo>>(`/containers/repo/search`, params);
 };
 export const listImageRepo = () => {
@@ -93,7 +93,7 @@ export const deleteImageRepo = (params: Container.RepoDelete) => {
 };
 
 // composeTemplate
-export const searchComposeTemplate = (params: ReqPage) => {
+export const searchComposeTemplate = (params: SearchWithPage) => {
     return http.post<ResPage<Container.TemplateInfo>>(`/containers/template/search`, params);
 };
 export const listComposeTemplate = () => {
@@ -110,7 +110,7 @@ export const updateComposeTemplate = (params: Container.TemplateUpdate) => {
 };
 
 // compose
-export const searchCompose = (params: ReqPage) => {
+export const searchCompose = (params: SearchWithPage) => {
     return http.post<ResPage<Container.ComposeInfo>>(`/containers/compose/search`, params);
 };
 export const upCompose = (params: Container.ComposeCreate) => {

@@ -19,7 +19,7 @@ import (
 type ImageRepoService struct{}
 
 type IImageRepoService interface {
-	Page(search dto.PageInfo) (int64, interface{}, error)
+	Page(search dto.SearchWithPage) (int64, interface{}, error)
 	List() ([]dto.ImageRepoOption, error)
 	Create(req dto.ImageRepoCreate) error
 	Update(req dto.ImageRepoUpdate) error
@@ -30,8 +30,8 @@ func NewIImageRepoService() IImageRepoService {
 	return &ImageRepoService{}
 }
 
-func (u *ImageRepoService) Page(search dto.PageInfo) (int64, interface{}, error) {
-	total, ops, err := imageRepoRepo.Page(search.Page, search.PageSize, commonRepo.WithOrderBy("created_at desc"))
+func (u *ImageRepoService) Page(req dto.SearchWithPage) (int64, interface{}, error) {
+	total, ops, err := imageRepoRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info), commonRepo.WithOrderBy("created_at desc"))
 	var dtoOps []dto.ImageRepoInfo
 	for _, op := range ops {
 		var item dto.ImageRepoInfo

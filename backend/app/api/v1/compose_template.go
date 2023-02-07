@@ -38,13 +38,13 @@ func (b *BaseApi) CreateComposeTemplate(c *gin.Context) {
 // @Summary Page compose templates
 // @Description 获取容器编排模版列表分页
 // @Accept json
-// @Param request body dto.PageInfo true "request"
+// @Param request body dto.SearchWithPage true "request"
 // @Produce json
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /containers/template/search [post]
 func (b *BaseApi) SearchComposeTemplate(c *gin.Context) {
-	var req dto.PageInfo
+	var req dto.SearchWithPage
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

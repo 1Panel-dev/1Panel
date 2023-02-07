@@ -11,18 +11,33 @@
             </template>
 
             <template #toolbar v-if="mysqlIsExist && !isOnSetting">
-                <div :class="{ mask: mysqlStatus != 'Running' }">
-                    <el-button type="primary" @click="onOpenDialog()">
-                        {{ $t('database.create') }}
-                    </el-button>
-                    <el-button @click="onChangeRootPassword" type="primary" plain>
-                        {{ $t('database.rootPassword') }}
-                    </el-button>
-                    <el-button @click="onChangeAccess" type="primary" plain>
-                        {{ $t('database.remoteAccess') }}
-                    </el-button>
-                    <el-button @click="goDashboard" type="primary" plain>phpMyAdmin</el-button>
-                </div>
+                <el-row :class="{ mask: mysqlStatus != 'Running' }">
+                    <el-col :span="20">
+                        <el-button type="primary" @click="onOpenDialog()">
+                            {{ $t('database.create') }}
+                        </el-button>
+                        <el-button @click="onChangeRootPassword" type="primary" plain>
+                            {{ $t('database.rootPassword') }}
+                        </el-button>
+                        <el-button @click="onChangeAccess" type="primary" plain>
+                            {{ $t('database.remoteAccess') }}
+                        </el-button>
+                        <el-button @click="goDashboard" type="primary" plain>phpMyAdmin</el-button>
+                    </el-col>
+                    <el-col :span="4">
+                        <div class="search-button">
+                            <el-input
+                                v-model="searchName"
+                                clearable
+                                @clear="search()"
+                                suffix-icon="Search"
+                                @keyup.enter="search()"
+                                @blur="search()"
+                                :placeholder="$t('commons.button.search')"
+                            ></el-input>
+                        </div>
+                    </el-col>
+                </el-row>
             </template>
             <template #main v-if="mysqlIsExist && !isOnSetting">
                 <ComplexTable
@@ -172,6 +187,7 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
+const searchName = ref();
 
 const mysqlIsExist = ref(false);
 const mysqlContainer = ref();
@@ -228,6 +244,7 @@ const search = async () => {
     let params = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
+        info: searchName.value,
     };
     const res = await searchMysqlDBs(params);
     data.value = res.data.items || [];

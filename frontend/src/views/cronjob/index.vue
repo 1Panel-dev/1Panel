@@ -10,12 +10,29 @@
         />
         <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('cronjob.cronTask')">
             <template #toolbar>
-                <el-button type="primary" @click="onOpenDialog('create')">
-                    {{ $t('commons.button.create') }}{{ $t('cronjob.cronTask') }}
-                </el-button>
-                <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
-                    {{ $t('commons.button.delete') }}
-                </el-button>
+                <el-row>
+                    <el-col :span="20">
+                        <el-button type="primary" @click="onOpenDialog('create')">
+                            {{ $t('commons.button.create') }}{{ $t('cronjob.cronTask') }}
+                        </el-button>
+                        <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
+                    </el-col>
+                    <el-col :span="4">
+                        <div class="search-button">
+                            <el-input
+                                v-model="searchName"
+                                clearable
+                                @clear="search()"
+                                suffix-icon="Search"
+                                @keyup.enter="search()"
+                                @blur="search()"
+                                :placeholder="$t('commons.button.search')"
+                            ></el-input>
+                        </div>
+                    </el-col>
+                </el-row>
             </template>
             <template #main>
                 <ComplexTable
@@ -25,12 +42,12 @@
                     :data="data"
                 >
                     <el-table-column type="selection" fix />
-                    <el-table-column :label="$t('cronjob.taskName')" prop="name">
+                    <el-table-column :label="$t('cronjob.taskName')" :min-width="120" prop="name">
                         <template #default="{ row }">
                             <el-link @click="loadDetail(row)" type="primary">{{ row.name }}</el-link>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" prop="status">
+                    <el-table-column :label="$t('commons.table.status')" :min-width="80" prop="status">
                         <template #default="{ row }">
                             <el-button
                                 v-if="row.status === 'Enable'"
@@ -45,7 +62,7 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('cronjob.cronSpec')">
+                    <el-table-column :label="$t('cronjob.cronSpec')" :min-width="120">
                         <template #default="{ row }">
                             <span v-if="row.specType.indexOf('N') === -1 || row.specType === 'perWeek'">
                                 {{ $t('cronjob.' + row.specType) }}
@@ -73,18 +90,18 @@
                             {{ $t('cronjob.handle') }}
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('cronjob.retainCopies')" :width="90" prop="retainCopies">
+                    <el-table-column :label="$t('cronjob.retainCopies')" :min-width="90" prop="retainCopies">
                         <template #default="{ row }">
                             {{ loadCopies(row) }}
                         </template>
                     </el-table-column>
 
-                    <el-table-column :label="$t('cronjob.lastRecrodTime')" prop="lastRecrodTime">
+                    <el-table-column :label="$t('cronjob.lastRecrodTime')" :min-width="120" prop="lastRecrodTime">
                         <template #default="{ row }">
                             {{ row.lastRecrodTime }}
                         </template>
                     </el-table-column>
-                    <el-table-column :width="80" :label="$t('cronjob.target')" prop="targetDir">
+                    <el-table-column :min-width="80" :label="$t('cronjob.target')" prop="targetDir">
                         <template #default="{ row }">
                             {{ loadBackupName(row.targetDir) }}
                         </template>
@@ -101,7 +118,7 @@
         </LayoutContent>
 
         <OperatrDialog @search="search" ref="dialogRef" />
-        <Records ref="dialogRecordRef" />
+        <Records @search="search()" ref="dialogRecordRef" />
     </div>
 </template>
 
@@ -130,6 +147,7 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
+const searchName = ref();
 
 const weekOptions = [
     { label: i18n.global.t('cronjob.monday'), value: 1 },
@@ -143,6 +161,7 @@ const weekOptions = [
 
 const search = async () => {
     let params = {
+        info: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
@@ -259,13 +278,6 @@ const buttons = [
         icon: 'Delete',
         click: (row: Cronjob.CronjobInfo) => {
             onBatchDelete(row);
-        },
-    },
-    {
-        label: i18n.global.t('cronjob.record'),
-        icon: 'Clock',
-        click: (row: Cronjob.CronjobInfo) => {
-            loadDetail(row);
         },
     },
 ];
