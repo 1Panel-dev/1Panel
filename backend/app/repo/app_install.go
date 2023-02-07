@@ -47,13 +47,19 @@ func (a *AppInstallRepo) WithServiceName(serviceName string) DBOption {
 	}
 }
 
+func (a *AppInstallRepo) WithPort(port int) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("https_port = ? or  http_port = ?", port, port)
+	}
+}
+
 func (a *AppInstallRepo) WithIdNotInWebsite() DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("id not in (select app_install_id from websites)")
 	}
 }
 
-func (a *AppInstallRepo) GetBy(opts ...DBOption) ([]model.AppInstall, error) {
+func (a *AppInstallRepo) ListBy(opts ...DBOption) ([]model.AppInstall, error) {
 	var install []model.AppInstall
 	db := getDb(opts...).Model(&model.AppInstall{})
 	err := db.Preload("App").Preload("Backups").Find(&install).Error

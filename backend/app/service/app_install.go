@@ -137,12 +137,12 @@ func (a AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]r
 			opts = append(opts, appInstallRepo.WithIdNotInWebsite())
 		}
 		opts = append(opts, appInstallRepo.WithAppIdsIn(ids))
-		installs, err = appInstallRepo.GetBy(opts...)
+		installs, err = appInstallRepo.ListBy(opts...)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		installs, err = appInstallRepo.GetBy()
+		installs, err = appInstallRepo.ListBy()
 		if err != nil {
 			return nil, err
 		}
@@ -178,7 +178,7 @@ func (a AppInstallService) Operate(req request.AppInstalledOperate) error {
 		install.Status = constant.Running
 	case constant.Delete:
 		tx, ctx := getTxAndContext()
-		if err := deleteAppInstall(ctx, install, req.DeleteBackup); err != nil && !req.ForceDelete {
+		if err := deleteAppInstall(ctx, install, req.DeleteBackup, req.ForceDelete); err != nil && !req.ForceDelete {
 			tx.Rollback()
 			return err
 		}
@@ -206,7 +206,7 @@ func (a AppInstallService) Operate(req request.AppInstalledOperate) error {
 }
 
 func (a AppInstallService) SyncAll() error {
-	allList, err := appInstallRepo.GetBy()
+	allList, err := appInstallRepo.ListBy()
 	if err != nil {
 		return err
 	}
@@ -253,7 +253,7 @@ func (a AppInstallService) GetServices(key string) ([]response.AppService, error
 	if err != nil {
 		return nil, err
 	}
-	installs, err := appInstallRepo.GetBy(appInstallRepo.WithAppId(app.ID), appInstallRepo.WithStatus(constant.Running))
+	installs, err := appInstallRepo.ListBy(appInstallRepo.WithAppId(app.ID), appInstallRepo.WithStatus(constant.Running))
 	if err != nil {
 		return nil, err
 	}

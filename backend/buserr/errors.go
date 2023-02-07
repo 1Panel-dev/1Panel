@@ -8,6 +8,7 @@ import (
 type BusinessError struct {
 	Msg    string
 	Detail interface{}
+	Map    map[string]interface{}
 	Err    error
 }
 
@@ -15,6 +16,8 @@ func (e BusinessError) Error() string {
 	content := ""
 	if e.Detail != nil {
 		content = i18n.GetErrMsg(e.Msg, map[string]interface{}{"detail": e.Detail})
+	} else if e.Map != nil {
+		content = i18n.GetErrMsg(e.Msg, e.Map)
 	} else {
 		content = i18n.GetErrMsg(e.Msg, nil)
 	}
@@ -35,10 +38,18 @@ func New(Key string) BusinessError {
 	}
 }
 
-func WithMessage(Key string, detail interface{}, err error) BusinessError {
+func WithDetail(Key string, detail interface{}, err error) BusinessError {
 	return BusinessError{
 		Msg:    Key,
 		Detail: detail,
 		Err:    err,
+	}
+}
+
+func WithMap(Key string, maps map[string]interface{}, err error) BusinessError {
+	return BusinessError{
+		Msg: Key,
+		Map: maps,
+		Err: err,
 	}
 }

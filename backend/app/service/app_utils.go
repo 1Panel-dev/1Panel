@@ -40,8 +40,17 @@ func checkPort(key string, params map[string]interface{}) (int, error) {
 	port, ok := params[key]
 	if ok {
 		portN := int(math.Ceil(port.(float64)))
+
+		oldInstalled, _ := appInstallRepo.ListBy(appInstallRepo.WithPort(portN))
+		if len(oldInstalled) > 0 {
+			var apps []string
+			for _, install := range oldInstalled {
+				apps = append(apps, install.App.Name)
+			}
+			return portN, buserr.WithMap(constant.ErrPortInOtherApp, map[string]interface{}{"port": portN, "apps": apps}, nil)
+		}
 		if common.ScanPort(portN) {
-			return portN, buserr.WithMessage(constant.ErrPortInUsed, portN, nil)
+			return portN, buserr.WithDetail(constant.ErrPortInUsed, portN, nil)
 		} else {
 			return portN, nil
 		}
@@ -105,23 +114,23 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 	return nil
 }
 
-func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBackup bool) error {
+func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBackup bool, forceDelete bool) error {
 	op := files.NewFileOp()
 	appDir := install.GetPath()
 	dir, _ := os.Stat(appDir)
 	if dir != nil {
 		out, err := compose.Down(install.GetComposePath())
-		if err != nil {
+		if err != nil && !forceDelete {
 			return handleErr(install, err, out)
 		}
-		if err := op.DeleteDir(appDir); err != nil {
+		if err := op.DeleteDir(appDir); err != nil && !forceDelete {
 			return err
 		}
 	}
-	if err := appInstallRepo.Delete(ctx, install); err != nil {
+	if err := appInstallRepo.Delete(ctx, install); err != nil && !forceDelete {
 		return err
 	}
-	if err := deleteLink(ctx, &install); err != nil {
+	if err := deleteLink(ctx, &install); err != nil && !forceDelete {
 		return err
 	}
 	if deleteBackup {
@@ -129,7 +138,7 @@ func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBacku
 		for _, backup := range backups {
 			_ = op.DeleteDir(backup.Path)
 		}
-		if err := appInstallBackupRepo.Delete(ctx, appInstallBackupRepo.WithAppInstallID(install.ID)); err != nil {
+		if err := appInstallBackupRepo.Delete(ctx, appInstallBackupRepo.WithAppInstallID(install.ID)); err != nil && !forceDelete {
 			return err
 		}
 	}
@@ -320,7 +329,7 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 
 func checkLimit(app model.App) error {
 	if app.Limit > 0 {
-		installs, err := appInstallRepo.GetBy(appInstallRepo.WithAppId(app.ID))
+		installs, err := appInstallRepo.ListBy(appInstallRepo.WithAppId(app.ID))
 		if err != nil {
 			return err
 		}
@@ -361,7 +370,7 @@ func checkRequiredAndLimit(app model.App) error {
 
 			_, err = appInstallRepo.GetFirst(appInstallRepo.WithDetailIdsIn(detailIds))
 			if err != nil {
-				return buserr.WithMessage(constant.ErrAppRequired, requireApp.Name, nil)
+				return buserr.WithDetail(constant.ErrAppRequired, requireApp.Name, nil)
 			}
 		}
 	}
