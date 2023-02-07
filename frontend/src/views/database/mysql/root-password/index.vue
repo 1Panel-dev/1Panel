@@ -1,25 +1,22 @@
 <template>
     <el-drawer v-model="dialogVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
-            <DrawerHeader :header="$t('database.remoteAccess')" :back="handleClose" />
+            <DrawerHeader :header="$t('database.rootPassword')" :back="handleClose" />
         </template>
         <el-form v-loading="loading" ref="formRef" :model="form" label-position="top">
-            <el-row type="flex" justify="center">
-                <el-col :span="22">
-                    <el-form-item :label="$t('database.remoteAccess')" :rules="Rules.requiredInput" prop="privilege">
-                        <el-switch v-model="form.privilege" />
-                        <span class="input-help">{{ $t('database.remoteConnHelper') }}</span>
-                    </el-form-item>
-                </el-col>
-            </el-row>
+            <el-form-item :label="$t('database.rootPassword')" :rules="Rules.requiredInput" prop="password">
+                <el-input type="password" show-password clearable v-model="form.password" />
+            </el-form-item>
         </el-form>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit"></ConfirmDialog>
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="dialogVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="onSave(formRef)">
+                <el-button :disabled="loading" @click="dialogVisiable = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -32,15 +29,16 @@ import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
-import { updateMysqlAccess } from '@/api/modules/database';
+import { updateMysqlPassword } from '@/api/modules/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
+import { GetAppPassword } from '@/api/modules/app';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const loading = ref(false);
 
 const dialogVisiable = ref(false);
 const form = reactive({
-    privilege: false,
+    password: '',
 });
 
 const confirmDialogRef = ref();
@@ -48,12 +46,9 @@ const confirmDialogRef = ref();
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
-interface DialogProps {
-    privilege: boolean;
-}
-
-const acceptParams = (prop: DialogProps): void => {
-    form.privilege = prop.privilege;
+const acceptParams = (): void => {
+    form.password = '';
+    loadPassword();
     dialogVisiable.value = true;
 };
 
@@ -61,13 +56,18 @@ const handleClose = () => {
     dialogVisiable.value = false;
 };
 
+const loadPassword = async () => {
+    const res = await GetAppPassword('mysql');
+    form.password = res.data;
+};
+
 const onSubmit = async () => {
     let param = {
         id: 0,
-        value: form.privilege ? '%' : 'localhost',
+        value: form.password,
     };
     loading.value = true;
-    await updateMysqlAccess(param)
+    await updateMysqlPassword(param)
         .then(() => {
             loading.value = false;
             ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));

@@ -1,91 +1,172 @@
 <template>
-    <el-dialog v-model="dialogVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
-        <template #header>
-            <div class="card-header">
-                <span>{{ $t('database.rootPassword') }}</span>
-            </div>
-        </template>
-        <el-form v-loading="loading" ref="formRef" :model="form" label-width="80px">
-            <el-form-item :label="$t('database.rootPassword')" :rules="Rules.requiredInput" prop="password">
-                <el-input type="password" show-password clearable v-model="form.password" />
-            </el-form-item>
-        </el-form>
+    <div>
+        <el-drawer v-model="changeVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
+            <template #header>
+                <DrawerHeader :header="$t('database.changePassword')" :back="handleClose" />
+            </template>
+            <el-form>
+                <el-form v-loading="loading" ref="changeFormRef" :model="changeForm" label-width="80px">
+                    <div v-if="changeForm.operation === 'password'">
+                        <el-form-item :label="$t('commons.login.username')" prop="userName">
+                            <el-input disabled v-model="changeForm.userName"></el-input>
+                        </el-form-item>
+                        <el-form-item
+                            :label="$t('commons.login.password')"
+                            prop="password"
+                            :rules="Rules.requiredInput"
+                        >
+                            <el-input type="password" clearable show-password v-model="changeForm.password"></el-input>
+                        </el-form-item>
+                    </div>
+                    <div v-if="changeForm.operation === 'privilege'">
+                        <el-form-item :label="$t('database.permission')" prop="privilege">
+                            <el-select style="width: 100%" v-model="changeForm.privilege">
+                                <el-option value="localhost" :label="$t('database.permissionLocal')" />
+                                <el-option value="%" :label="$t('database.permissionAll')" />
+                                <el-option value="ip" :label="$t('database.permissionForIP')" />
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item
+                            v-if="changeForm.privilege === 'ip'"
+                            prop="privilegeIPs"
+                            :rules="Rules.requiredInput"
+                        >
+                            <el-input clearable v-model="changeForm.privilegeIPs" />
+                        </el-form-item>
+                    </div>
+                </el-form>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button :disabled="loading" @click="changeVisiable = false">
+                        {{ $t('commons.button.cancel') }}
+                    </el-button>
+                    <el-button :disabled="loading" type="primary" @click="submitChangeInfo(changeFormRef)">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </span>
+            </template>
+        </el-drawer>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit"></ConfirmDialog>
-
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button :disabled="loading" @click="dialogVisiable = false">
-                    {{ $t('commons.button.cancel') }}
-                </el-button>
-                <el-button :disabled="loading" type="primary" @click="onSave(formRef)">
-                    {{ $t('commons.button.confirm') }}
-                </el-button>
-            </span>
-        </template>
-    </el-dialog>
+    </div>
 </template>
-
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
-import { updateMysqlPassword } from '@/api/modules/database';
-import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import { GetAppPassword } from '@/api/modules/app';
+import { deleteCheckMysqlDB, updateMysqlAccess, updateMysqlPassword } from '@/api/modules/database';
+import DrawerHeader from '@/components/drawer-header/index.vue';
+import { Rules } from '@/global/form-rules';
 
-const loading = ref(false);
-
-const dialogVisiable = ref(false);
-const form = reactive({
+const loading = ref();
+const changeVisiable = ref(false);
+type FormInstance = InstanceType<typeof ElForm>;
+const changeFormRef = ref<FormInstance>();
+const changeForm = reactive({
+    id: 0,
+    mysqlName: '',
+    userName: '',
     password: '',
+    operation: '',
+    privilege: '',
+    privilegeIPs: '',
+    value: '',
 });
-
 const confirmDialogRef = ref();
 
-type FormInstance = InstanceType<typeof ElForm>;
-const formRef = ref<FormInstance>();
+interface DialogProps {
+    id: number;
+    mysqlName: string;
+    username: string;
+    password: string;
+    operation: string;
+    privilege: string;
+    privilegeIPs: string;
+    value: string;
+}
+const acceptParams = (params: DialogProps): void => {
+    changeForm.id = params.id;
+    changeForm.mysqlName = params.mysqlName;
+    changeForm.userName = params.username;
+    changeForm.password = params.password;
+    changeForm.operation = params.operation;
+    changeForm.privilege = params.privilege;
+    changeForm.privilegeIPs = params.privilegeIPs;
+    changeForm.value = params.value;
+    console.log(changeForm.password);
+    changeVisiable.value = true;
+};
+const emit = defineEmits<{ (e: 'search'): void }>();
 
-const acceptParams = (): void => {
-    form.password = '';
-    loadPassword();
-    dialogVisiable.value = true;
+const handleClose = () => {
+    changeVisiable.value = false;
 };
 
-const loadPassword = async () => {
-    const res = await GetAppPassword('mysql');
-    form.password = res.data;
+const submitChangeInfo = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    formEl.validate(async (valid) => {
+        if (!valid) return;
+        let param = {
+            id: changeForm.id,
+            value: '',
+        };
+        if (changeForm.operation === 'password') {
+            const res = await deleteCheckMysqlDB(changeForm.id);
+            if (res.data && res.data.length > 0) {
+                let params = {
+                    header: i18n.global.t('database.changePassword'),
+                    operationInfo: i18n.global.t('database.changePasswordHelper'),
+                    submitInputInfo: i18n.global.t('database.restartNow'),
+                };
+                confirmDialogRef.value!.acceptParams(params);
+            } else {
+                param.value = changeForm.password;
+                loading.value = true;
+                await updateMysqlPassword(param)
+                    .then(() => {
+                        loading.value = false;
+                        emit('search');
+                        changeVisiable.value = false;
+                        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                    })
+                    .catch(() => {
+                        loading.value = false;
+                    });
+            }
+            return;
+        }
+        param.value = changeForm.privilege;
+        loading.value = true;
+        await updateMysqlAccess(param)
+            .then(() => {
+                loading.value = false;
+                emit('search');
+                changeVisiable.value = false;
+                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const onSubmit = async () => {
     let param = {
-        id: 0,
-        value: form.password,
+        id: changeForm.id,
+        value: changeForm.password,
     };
     loading.value = true;
     await updateMysqlPassword(param)
         .then(() => {
             loading.value = false;
+            emit('search');
+            changeVisiable.value = false;
             ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-            dialogVisiable.value = false;
         })
         .catch(() => {
             loading.value = false;
         });
-};
-
-const onSave = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        let params = {
-            header: i18n.global.t('database.confChange'),
-            operationInfo: i18n.global.t('database.restartNowHelper'),
-            submitInputInfo: i18n.global.t('database.restartNow'),
-        };
-        confirmDialogRef.value!.acceptParams(params);
-    });
 };
 
 defineExpose({

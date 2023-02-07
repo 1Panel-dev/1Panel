@@ -75,12 +75,10 @@ type SnapshotInfo struct {
 }
 
 type UpgradeInfo struct {
-	ID          int64  `json:"id"`
 	NewVersion  string `json:"newVersion"`
 	ReleaseNote string `json:"releaseNote"`
 	CreatedAt   string `json:"createdAt"`
 }
 type Upgrade struct {
-	Source  string `json:"source" validate:"required,oneof=github gitee"`
 	Version string `json:"version"`
 }

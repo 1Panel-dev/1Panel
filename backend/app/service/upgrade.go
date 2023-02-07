@@ -2,7 +2,10 @@ package service
 
 import (
 	"context"
+	"crypto/tls"
+	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"runtime"
 	"strconv"
@@ -34,27 +37,34 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	infoFromGithub, err := u.loadLatestFromGithub()
-	if err != nil {
-		global.LOG.Error(err)
-	} else {
-		isNew, err := compareVersion(currentVerion.Value, infoFromGithub.NewVersion)
-		if !isNew || err != nil {
+
+	var releaseInfo dto.UpgradeInfo
+	isGiteeOK := checkValid("https://gitee.com/wanghe-fit2cloud/1Panel")
+	if isGiteeOK {
+		releaseInfo, err = u.loadLatestFromGitee()
+		if err != nil {
+			global.LOG.Error(err)
+		}
+	}
+	if len(releaseInfo.NewVersion) == 0 {
+		isGithubOK := checkValid("https://gitee.com/1Panel-dev/1Panel")
+		if isGithubOK {
+			releaseInfo, err = u.loadLatestFromGithub()
+			if err != nil {
+				global.LOG.Error(err)
+				return nil, err
+			}
+		}
+	}
+	if len(releaseInfo.NewVersion) != 0 {
+		isNew, err := compareVersion(currentVerion.Value, releaseInfo.NewVersion)
+		if !isNew && err != nil {
 			return nil, err
 		}
-		return infoFromGithub, nil
+		return &releaseInfo, nil
 	}
 
-	infoFromGitee, err := u.loadLatestFromGitee()
-	if err != nil {
-		global.LOG.Error(err)
-		return nil, err
-	}
-	isNew, err := compareVersion(currentVerion.Value, infoFromGitee.NewVersion)
-	if !isNew && err != nil {
-		return nil, err
-	}
-	return infoFromGitee, nil
+	return nil, errors.New("both gitee and github were unavailable")
 }
 
 func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
@@ -71,9 +81,15 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	}
 
 	downloadPath := fmt.Sprintf("https://gitee.com/%s/%s/releases/download/%s/", "wanghe-fit2cloud", "1Panel", req.Version)
-	if req.Source == "github" {
+	isGiteeOK := checkValid(downloadPath)
+	if !isGiteeOK {
 		downloadPath = fmt.Sprintf("https://github.com/%s/%s/releases/download/%s/", "wanghe-fit2cloud", "1Panel", req.Version)
+		isGithubOK := checkValid(downloadPath)
+		if !isGithubOK {
+			return errors.New("both gitee and github were unavailabl")
+		}
 	}
+
 	panelName := fmt.Sprintf("1panel-%s-%s", "linux", runtime.GOARCH)
 	fileName := fmt.Sprintf("1panel-online-installer-%s.tar.gz", req.Version)
 	_ = settingRepo.Update("SystemStatus", "Upgrading")
@@ -174,36 +190,34 @@ func (u *UpgradeService) handleRollback(fileOp files.FileOp, originalDir string,
 	}
 }
 
-func (u *UpgradeService) loadLatestFromGithub() (*dto.UpgradeInfo, error) {
+func (u *UpgradeService) loadLatestFromGithub() (dto.UpgradeInfo, error) {
+	var info dto.UpgradeInfo
 	client := github.NewClient(nil)
 	ctx, cancle := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancle()
 	stats, res, err := client.Repositories.GetLatestRelease(ctx, "wanghe-fit2cloud", "1Panel")
 	if res.StatusCode != 200 || err != nil {
-		return nil, fmt.Errorf("load upgrade info from github failed, err: %v", err)
+		return info, fmt.Errorf("load upgrade info from github failed, err: %v", err)
 	}
-	info := dto.UpgradeInfo{
-		NewVersion:  string(*stats.Name),
-		ReleaseNote: string(*stats.Body),
-		CreatedAt:   github.Timestamp(*stats.CreatedAt).Format("2006-01-02 15:04:05"),
-	}
-	return &info, nil
+	info.NewVersion = string(*stats.Name)
+	info.ReleaseNote = string(*stats.Body)
+	info.CreatedAt = stats.PublishedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05")
+	return info, nil
 }
 
-func (u *UpgradeService) loadLatestFromGitee() (*dto.UpgradeInfo, error) {
+func (u *UpgradeService) loadLatestFromGitee() (dto.UpgradeInfo, error) {
+	var info dto.UpgradeInfo
 	client := gitee.NewAPIClient(gitee.NewConfiguration())
 	ctx, cancle := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancle()
 	stats, res, err := client.RepositoriesApi.GetV5ReposOwnerRepoReleasesLatest(ctx, "wanghe-fit2cloud", "1Panel", &gitee.GetV5ReposOwnerRepoReleasesLatestOpts{})
 	if res.StatusCode != 200 || err != nil {
-		return nil, fmt.Errorf("load upgrade info from gitee failed, err: %v", err)
+		return info, fmt.Errorf("load upgrade info from gitee failed, err: %v", err)
 	}
-	info := dto.UpgradeInfo{
-		NewVersion:  string(stats.Name),
-		ReleaseNote: string(stats.Body),
-		CreatedAt:   stats.CreatedAt.Format("2006-01-02 15:04:05"),
-	}
-	return &info, nil
+	info.NewVersion = string(stats.Name)
+	info.ReleaseNote = string(stats.Body)
+	info.CreatedAt = stats.CreatedAt.Format("2006-01-02 15:04:05")
+	return info, nil
 }
 
 func compareVersion(version, newVersion string) (bool, error) {
@@ -244,4 +258,19 @@ func compareVersion(version, newVersion string) (bool, error) {
 	} else {
 		return false, nil
 	}
+}
+
+func checkValid(addr string) bool {
+	timeout := time.Duration(2 * time.Second)
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := http.Client{
+		Transport: tr,
+		Timeout:   timeout,
+	}
+	if _, err := client.Get(addr); err != nil {
+		return false
+	}
+	return true
 }

@@ -25,7 +25,11 @@
                     :data="data"
                 >
                     <el-table-column type="selection" fix />
-                    <el-table-column :label="$t('cronjob.taskName')" prop="name" />
+                    <el-table-column :label="$t('cronjob.taskName')" prop="name">
+                        <template #default="{ row }">
+                            <el-link @click="loadDetail(row)" type="primary">{{ row.name }}</el-link>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status">
                         <template #default="{ row }">
                             <el-button
@@ -227,6 +231,14 @@ const loadCopies = (item) => {
     }
 };
 
+const loadDetail = (row: any) => {
+    isRecordShow.value = true;
+    let params = {
+        rowData: { ...row },
+    };
+    dialogRecordRef.value!.acceptParams(params);
+};
+
 const buttons = [
     {
         label: i18n.global.t('commons.button.handle'),
@@ -253,11 +265,7 @@ const buttons = [
         label: i18n.global.t('cronjob.record'),
         icon: 'Clock',
         click: (row: Cronjob.CronjobInfo) => {
-            isRecordShow.value = true;
-            let params = {
-                rowData: { ...row },
-            };
-            dialogRecordRef.value!.acceptParams(params);
+            loadDetail(row);
         },
     },
 ];

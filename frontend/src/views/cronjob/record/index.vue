@@ -7,7 +7,7 @@
                     <el-tag round class="status-content" type="success">
                         {{ $t('cronjob.' + dialogData.rowData.type) }}
                     </el-tag>
-                    <el-tag class="status-content" type="info">
+                    <el-tag class="status-content">
                         <span
                             v-if="
                                 dialogData.rowData?.specType.indexOf('N') === -1 ||
@@ -53,7 +53,7 @@
         </div>
 
         <LayoutContent :title="$t('cronjob.record')" :reload="true">
-            <template #main>
+            <template #search>
                 <el-row :gutter="20">
                     <el-col :span="6">
                         <el-date-picker
@@ -66,7 +66,20 @@
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
                         ></el-date-picker>
-                        <el-card style="margin-top: 20px">
+                    </el-col>
+                    <el-col :span="18">
+                        <el-select @change="search()" v-model="searchInfo.status">
+                            <el-option :label="$t('cronjob.all')" value="" />
+                            <el-option :label="$t('cronjob.failedRecord')" value="Failed" />
+                            <el-option :label="$t('cronjob.successRecord')" value="Success" />
+                        </el-select>
+                    </el-col>
+                </el-row>
+            </template>
+            <template #main>
+                <el-row :gutter="20">
+                    <el-col :span="6">
+                        <el-card>
                             <ul v-infinite-scroll="nextPage" class="infinite-list" style="overflow: auto">
                                 <li
                                     v-for="(item, index) in records"
@@ -88,12 +101,7 @@
                         </el-card>
                     </el-col>
                     <el-col :span="18">
-                        <el-select @change="search()" v-model="searchInfo.status">
-                            <el-option :label="$t('cronjob.all')" value="" />
-                            <el-option :label="$t('cronjob.failedRecord')" value="Failed" />
-                            <el-option :label="$t('cronjob.successRecord')" value="Success" />
-                        </el-select>
-                        <el-card style="height: 382px; margin-top: 20px">
+                        <el-card style="height: 362px">
                             <el-form>
                                 <el-row v-if="hasScript()">
                                     <span>{{ $t('cronjob.shellContent') }}</span>
@@ -103,7 +111,7 @@
                                         placeholder="None data"
                                         :indent-with-tab="true"
                                         :tabSize="4"
-                                        style="height: 120px; width: 100%; margin-top: 5px"
+                                        style="height: 100px; width: 100%; margin-top: 5px"
                                         :lineWrapping="true"
                                         :matchBrackets="true"
                                         theme="cobalt"
@@ -442,7 +450,7 @@ defineExpose({
 
 <style lang="scss" scoped>
 .infinite-list {
-    height: 330px;
+    height: 310px;
     padding: 0;
     margin: 0;
     list-style: none;

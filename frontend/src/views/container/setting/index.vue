@@ -10,7 +10,7 @@
                     <el-tag round class="status-content" v-if="form.status === 'Stopped'" type="info">
                         {{ $t('commons.status.stopped') }}
                     </el-tag>
-                    <el-tag class="status-content" type="info">{{ $t('app.version') }}: {{ form.version }}</el-tag>
+                    <el-tag class="status-content">{{ $t('app.version') }}: {{ form.version }}</el-tag>
 
                     <span v-if="form.status === 'Running'" class="buttons">
                         <el-button type="primary" @click="onOperator('stop')" link>

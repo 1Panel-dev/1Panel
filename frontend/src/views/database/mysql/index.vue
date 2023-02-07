@@ -101,56 +101,6 @@
         </el-card>
 
         <Setting ref="settingRef" style="margin-top: 20px" />
-        <el-dialog v-model="changeVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
-            <template #header>
-                <div class="card-header">
-                    <span>{{ $t('database.changePassword') }}</span>
-                </div>
-            </template>
-            <el-form>
-                <el-form v-loading="loading" ref="changeFormRef" :model="changeForm" label-width="80px">
-                    <div v-if="changeForm.operation === 'password'">
-                        <el-form-item :label="$t('commons.login.username')" prop="userName">
-                            <el-input disabled v-model="changeForm.userName"></el-input>
-                        </el-form-item>
-                        <el-form-item
-                            :label="$t('commons.login.password')"
-                            prop="password"
-                            :rules="Rules.requiredInput"
-                        >
-                            <el-input type="password" clearable show-password v-model="changeForm.password"></el-input>
-                        </el-form-item>
-                    </div>
-                    <div v-if="changeForm.operation === 'privilege'">
-                        <el-form-item :label="$t('database.permission')" prop="privilege">
-                            <el-select style="width: 100%" v-model="changeForm.privilege">
-                                <el-option value="localhost" :label="$t('database.permissionLocal')" />
-                                <el-option value="%" :label="$t('database.permissionAll')" />
-                                <el-option value="ip" :label="$t('database.permissionForIP')" />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item
-                            v-if="changeForm.privilege === 'ip'"
-                            prop="privilegeIPs"
-                            :rules="Rules.requiredInput"
-                        >
-                            <el-input clearable v-model="changeForm.privilegeIPs" />
-                        </el-form-item>
-                    </div>
-                </el-form>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button :disabled="loading" @click="changeVisiable = false">
-                        {{ $t('commons.button.cancel') }}
-                    </el-button>
-                    <el-button :disabled="loading" @click="submitChangeInfo(changeFormRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-dialog>
-
         <el-dialog
             v-model="phpVisiable"
             :title="$t('app.checkTitle')"
@@ -170,6 +120,7 @@
             </template>
         </el-dialog>
 
+        <PasswordDialog ref="passwordRef" />
         <RootPasswordDialog ref="rootPasswordRef" />
         <RemoteAccessDialog ref="remoteAccessRef" />
         <UploadDialog ref="uploadRef" />
@@ -178,8 +129,6 @@
 
         <AppResources ref="checkRef"></AppResources>
         <DeleteDialog ref="deleteRef" @search="search" />
-
-        <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit"></ConfirmDialog>
     </div>
 </template>
 
@@ -188,28 +137,20 @@ import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import OperateDialog from '@/views/database/mysql/create/index.vue';
 import DeleteDialog from '@/views/database/mysql/delete/index.vue';
-import RootPasswordDialog from '@/views/database/mysql/password/index.vue';
+import PasswordDialog from '@/views/database/mysql/password/index.vue';
+import RootPasswordDialog from '@/views/database/mysql/root-password/index.vue';
 import RemoteAccessDialog from '@/views/database/mysql/remote/index.vue';
 import BackupRecords from '@/views/database/mysql/backup/index.vue';
-import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import UploadDialog from '@/views/database/mysql/upload/index.vue';
 import AppResources from '@/views/database/mysql/check/index.vue';
 import Setting from '@/views/database/mysql/setting/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import { dateFormat } from '@/utils/util';
 import { reactive, ref } from 'vue';
-import {
-    deleteCheckMysqlDB,
-    loadRemoteAccess,
-    searchMysqlDBs,
-    updateMysqlAccess,
-    updateMysqlDescription,
-    updateMysqlPassword,
-} from '@/api/modules/database';
+import { deleteCheckMysqlDB, loadRemoteAccess, searchMysqlDBs, updateMysqlDescription } from '@/api/modules/database';
 import i18n from '@/lang';
-import { ElForm, ElMessage } from 'element-plus';
+import { ElMessage } from 'element-plus';
 import { Database } from '@/api/interface/database';
-import { Rules } from '@/global/form-rules';
 import { App } from '@/api/interface/app';
 import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
@@ -270,6 +211,8 @@ const onChangeAccess = async () => {
     remoteAccessRef.value!.acceptParams(param);
 };
 
+const passwordRef = ref();
+
 const settingRef = ref();
 const onSetting = async () => {
     isOnSetting.value = true;
@@ -279,68 +222,6 @@ const onSetting = async () => {
         mysqlVersion: mysqlVersion.value,
     };
     settingRef.value!.acceptParams(params);
-};
-
-const changeVisiable = ref(false);
-type FormInstance = InstanceType<typeof ElForm>;
-const changeFormRef = ref<FormInstance>();
-const changeForm = reactive({
-    id: 0,
-    mysqlName: '',
-    userName: '',
-    password: '',
-    operation: '',
-    privilege: '',
-    privilegeIPs: '',
-    value: '',
-});
-const submitChangeInfo = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        let param = {
-            id: changeForm.id,
-            value: '',
-        };
-        if (changeForm.operation === 'password') {
-            const res = await deleteCheckMysqlDB(changeForm.id);
-            if (res.data && res.data.length > 0) {
-                let params = {
-                    header: i18n.global.t('database.changePassword'),
-                    operationInfo: i18n.global.t('database.changePasswordHelper'),
-                    submitInputInfo: i18n.global.t('database.restartNow'),
-                };
-                confirmDialogRef.value!.acceptParams(params);
-            } else {
-                param.value = changeForm.password;
-                loading.value = true;
-                await updateMysqlPassword(param)
-                    .then(() => {
-                        loading.value = false;
-                        search();
-                        changeVisiable.value = false;
-                        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-                    })
-                    .catch(() => {
-                        loading.value = false;
-                    });
-            }
-            return;
-        }
-        param.value = changeForm.privilege;
-        changeForm.mysqlName = mysqlName.value;
-        loading.value = true;
-        await updateMysqlAccess(param)
-            .then(() => {
-                loading.value = false;
-                search();
-                changeVisiable.value = false;
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    });
 };
 
 const search = async () => {
@@ -382,7 +263,7 @@ const loadDashboardPort = async () => {
 const checkExist = (data: App.CheckInstalled) => {
     mysqlIsExist.value = data.isExist;
     mysqlName.value = data.name;
-    mysqlStatus.value = 'Failed';
+    mysqlStatus.value = data.status;
     mysqlVersion.value = data.version;
     mysqlContainer.value = data.containerName;
     if (mysqlIsExist.value) {
@@ -410,48 +291,36 @@ const onDelete = async (row: Database.MysqlDBInfo) => {
     }
 };
 
-const confirmDialogRef = ref();
-const onSubmit = async () => {
-    let param = {
-        id: changeForm.id,
-        value: changeForm.password,
-    };
-    loading.value = true;
-    await updateMysqlPassword(param)
-        .then(() => {
-            loading.value = false;
-            search();
-            changeVisiable.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
-        })
-        .catch(() => {
-            loading.value = false;
-        });
-};
-
 const buttons = [
     {
         label: i18n.global.t('database.changePassword'),
         click: (row: Database.MysqlDBInfo) => {
-            changeForm.id = row.id;
-            changeForm.operation = 'password';
-            changeForm.userName = row.username;
-            changeForm.password = row.password;
-            changeVisiable.value = true;
+            let param = {
+                id: row.id,
+                operation: 'password',
+                username: row.username,
+                password: row.password,
+            };
+            passwordRef.value.acceptParams(param);
         },
     },
     {
         label: i18n.global.t('database.permission'),
         click: (row: Database.MysqlDBInfo) => {
-            changeForm.id = row.id;
-            changeForm.operation = 'privilege';
+            let param = {
+                id: row.id,
+                operation: 'privilege',
+                privilege: '',
+                privilegeIPs: '',
+                password: '',
+            };
             if (row.permission === '%' || row.permission === 'localhost') {
-                changeForm.privilege = row.permission;
+                param.privilege = row.permission;
             } else {
-                changeForm.privilegeIPs = row.permission;
-                changeForm.privilege = 'ip';
+                param.privilegeIPs = row.permission;
+                param.privilege = 'ip';
             }
-            changeVisiable.value = true;
+            passwordRef.value.acceptParams(param);
         },
     },
     {
