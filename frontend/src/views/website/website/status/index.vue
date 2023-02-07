@@ -1,29 +1,23 @@
 <template>
-    <el-card>
-        <el-row :gutter="20">
-            <el-col :lg="3" :xl="2">
-                <div>
-                    <el-tag effect="dark" type="success">{{ props.primaryDomain }}</el-tag>
-                </div>
-            </el-col>
-            <el-col :lg="4" :xl="2">
-                <div class="span-font">
+    <div class="app-status">
+        <el-card>
+            <div>
+                <el-tag effect="dark" type="success">{{ props.primaryDomain }}</el-tag>
+                <span class="status-content">
                     <Status class="span-font" :key="props.status" :status="props.status"></Status>
-                </div>
-            </el-col>
-            <el-col :lg="4" :xl="4">
-                <div class="span-font">
-                    <el-tag>
+                </span>
+                <span class="status-content">
+                    <el-tag type="info">
                         {{ $t('website.expireDate') }}:
                         <span v-if="isEver(props.expireDate)">
                             {{ $t('website.neverExpire') }}
                         </span>
                         <span v-else>{{ dateFormatSimple(props.expireDate) }}</span>
                     </el-tag>
-                </div>
-            </el-col>
-        </el-row>
-    </el-card>
+                </span>
+            </div>
+        </el-card>
+    </div>
 </template>
 <script lang="ts" setup>
 import Status from '@/components/status/index.vue';
@@ -49,8 +43,4 @@ const isEver = (time: string) => {
 };
 </script>
 
-<style lang="scss">
-.span-font {
-    font-size: 14px;
-}
-</style>
+<style lang="scss"></style>

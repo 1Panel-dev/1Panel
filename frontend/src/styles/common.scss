@@ -248,3 +248,19 @@
         border-color: var(--el-button-hover-border-color);
     }
 }
+
+.app-status {
+    font-size: 12px;
+
+    .el-card {
+        --el-card-padding: 12px;
+
+        .buttons {
+            margin-left: 100px;
+        }
+
+        .status-content {
+            margin-left: 50px;
+        }
+    }
+}

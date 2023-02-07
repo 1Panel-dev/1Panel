@@ -1,34 +1,44 @@
 <template>
-    <LayoutContent :title="$t('website.websiteConfig')" :back-name="'Website'" v-loading="loading">
-        <template #app>
-            <WebsiteStatus
-                v-if="website.id > 0"
-                :primary-domain="website.primaryDomain"
-                :status="website.status"
-                :expire-date="website.expireDate"
-            />
-        </template>
-        <template #buttons>
-            <el-button type="primary" :plain="index !== 'basic'" @click="changeTab('basic')">
-                {{ $t('website.basic') }}
-            </el-button>
-            <el-button type="primary" :plain="index !== 'safety'" @click="changeTab('safety')">
-                {{ $t('website.security') }}
-            </el-button>
-            <el-button type="primary" :plain="index !== 'log'" @click="changeTab('log')">
-                {{ $t('website.log') }}
-            </el-button>
-            <el-button type="primary" :plain="index !== 'resource'" @click="changeTab('resource')">
-                {{ $t('website.source') }}
-            </el-button>
-        </template>
-        <template #main>
-            <Basic :id="id" v-if="index === 'basic'"></Basic>
-            <Safety :id="id" v-if="index === 'safety'"></Safety>
-            <Log :id="id" v-if="index === 'log'"></Log>
-            <Resource :id="id" v-if="index === 'resource'"></Resource>
-        </template>
-    </LayoutContent>
+    <div>
+        <RouterButton
+            :buttons="[
+                {
+                    label: $t('website.website'),
+                    path: '/websites',
+                },
+            ]"
+        />
+        <LayoutContent :title="$t('website.websiteConfig')" :back-name="'Website'" v-loading="loading">
+            <template #app>
+                <WebsiteStatus
+                    v-if="website.id > 0"
+                    :primary-domain="website.primaryDomain"
+                    :status="website.status"
+                    :expire-date="website.expireDate"
+                />
+            </template>
+            <template #buttons>
+                <el-button type="primary" :plain="index !== 'basic'" @click="changeTab('basic')">
+                    {{ $t('website.basic') }}
+                </el-button>
+                <el-button type="primary" :plain="index !== 'safety'" @click="changeTab('safety')">
+                    {{ $t('website.security') }}
+                </el-button>
+                <el-button type="primary" :plain="index !== 'log'" @click="changeTab('log')">
+                    {{ $t('website.log') }}
+                </el-button>
+                <el-button type="primary" :plain="index !== 'resource'" @click="changeTab('resource')">
+                    {{ $t('website.source') }}
+                </el-button>
+            </template>
+            <template #main>
+                <Basic :id="id" v-if="index === 'basic'"></Basic>
+                <Safety :id="id" v-if="index === 'safety'"></Safety>
+                <Log :id="id" v-if="index === 'log'"></Log>
+                <Resource :id="id" v-if="index === 'resource'"></Resource>
+            </template>
+        </LayoutContent>
+    </div>
 </template>
 
 <script setup lang="ts">
