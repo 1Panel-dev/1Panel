@@ -111,6 +111,14 @@ func GetIntParamByKey(c *gin.Context, key string) (uint, error) {
 	return uint(intNum), nil
 }
 
+func GetStrParamByKey(c *gin.Context, key string) (string, error) {
+	idParam, ok := c.Params.Get(key)
+	if !ok {
+		return "", fmt.Errorf("error %s in path", key)
+	}
+	return idParam, nil
+}
+
 func GetTxAndContext() (tx *gorm.DB, ctx context.Context) {
 	tx = global.DB.Begin()
 	ctx = context.WithValue(context.Background(), constant.DB, tx)

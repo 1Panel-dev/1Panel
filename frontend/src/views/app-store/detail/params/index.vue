@@ -36,7 +36,7 @@
                 ></el-option>
             </el-select>
             <span v-if="p.type === 'service' && !p.services" style="margin-left: 5px">
-                <el-link type="primary" :underline="false" @click="toPage()">
+                <el-link type="primary" :underline="false" @click="toPage(p.key)">
                     {{ $t('app.toInstall') }}
                 </el-link>
             </span>
@@ -44,7 +44,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { computed, inject, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { getRandomStr } from '@/utils/util';
 import { GetAppService } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
@@ -180,14 +180,8 @@ const getLabel = (row: ParamObj): string => {
     }
 };
 
-let reloadPage: Function = inject('reload');
-
-const toPage = () => {
-    router.push({ name: 'App' });
-    const nowPath = router.currentRoute.value.path;
-    if (nowPath && nowPath == '/apps/all') {
-        reloadPage();
-    }
+const toPage = (appKey: string) => {
+    router.push({ name: 'AppDetail', params: { appKey: appKey } });
 };
 
 onMounted(() => {

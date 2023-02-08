@@ -28,6 +28,16 @@ const appStoreRouter = {
                     },
                 },
                 {
+                    path: 'detail/:appKey',
+                    name: 'AppDetail',
+                    component: () => import('@/views/app-store/detail/index.vue'),
+                    props: true,
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/apps',
+                    },
+                },
+                {
                     path: 'installed',
                     name: 'AppInstalled',
                     component: () => import('@/views/app-store/installed/index.vue'),

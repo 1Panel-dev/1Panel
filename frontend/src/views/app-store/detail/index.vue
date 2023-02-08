@@ -1,5 +1,5 @@
 <template>
-    <LayoutContent :title="$t('app.detail')" :reload="true" :v-loading="loadingDetail" :divider="true">
+    <LayoutContent :title="$t('app.detail')" :back-name="'App'" :v-loading="loadingDetail" :divider="true">
         <template #main>
             <div class="brief">
                 <el-row :gutter="20">
@@ -20,7 +20,7 @@
                             </div>
                             <div class="version">
                                 <el-form-item :label="$t('app.version')">
-                                    <el-select v-model="version" @change="getDetail(version)">
+                                    <el-select v-model="version" @change="getDetail(app.id, version)">
                                         <el-option
                                             v-for="(v, index) in app.versions"
                                             :key="index"
@@ -97,28 +97,32 @@ import { onMounted, ref } from 'vue';
 import Install from './install/index.vue';
 
 interface OperateProps {
-    id: number;
+    // id: number;
+    appKey: string;
 }
+
 const props = withDefaults(defineProps<OperateProps>(), {
-    id: 0,
+    // id: 0,
+    appKey: '',
 });
 let app = ref<any>({});
 let appDetail = ref<any>({});
 let version = ref('');
 let loadingDetail = ref(false);
+// let appKey = ref();
 const installRef = ref();
 
 const getApp = () => {
-    GetApp(props.id).then((res) => {
+    GetApp(props.appKey).then((res) => {
         app.value = res.data;
         version.value = app.value.versions[0];
-        getDetail(version.value);
+        getDetail(app.value.id, version.value);
     });
 };
 
-const getDetail = (version: string) => {
+const getDetail = (id: number, version: string) => {
     loadingDetail.value = true;
-    GetAppDetail(props.id, version)
+    GetAppDetail(id, version)
         .then((res) => {
             appDetail.value = res.data;
         })
@@ -146,8 +150,6 @@ onMounted(() => {
 
 <style lang="scss">
 .brief {
-    // height: 30vh;
-
     .name {
         span {
             font-weight: 500;

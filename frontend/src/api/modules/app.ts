@@ -10,8 +10,8 @@ export const SearchApp = (req: App.AppReq) => {
     return http.post<App.AppResPage>('apps/search', req);
 };
 
-export const GetApp = (id: number) => {
-    return http.get<App.AppDTO>('apps/' + id);
+export const GetApp = (key: string) => {
+    return http.get<App.AppDTO>('apps/' + key);
 };
 
 export const GetAppTags = () => {

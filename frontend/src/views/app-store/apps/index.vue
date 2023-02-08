@@ -62,7 +62,7 @@
                                             plain
                                             round
                                             size="small"
-                                            @click="getAppDetail(app.id)"
+                                            @click="getAppDetail(app.key)"
                                         >
                                             {{ $t('app.install') }}
                                         </el-button>
@@ -97,6 +97,7 @@ import { GetAppTags, SearchApp, SyncApp } from '@/api/modules/app';
 import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
 import Detail from '../detail/index.vue';
+import router from '@/routers';
 
 let req = reactive({
     name: '',
@@ -131,9 +132,8 @@ const search = async (req: App.AppReq) => {
     });
 };
 
-const getAppDetail = (id: number) => {
-    showDetail.value = true;
-    appId.value = id;
+const getAppDetail = (key: string) => {
+    router.push({ name: 'AppDetail', params: { appKey: key } });
 };
 
 const sync = () => {
