@@ -30,7 +30,7 @@ type WebsiteService struct {
 type IWebsiteService interface {
 	PageWebsite(req request.WebsiteSearch) (int64, []response.WebsiteDTO, error)
 	GetWebsites() ([]response.WebsiteDTO, error)
-	CreateWebsite(create request.WebsiteCreate) error
+	CreateWebsite(ctx context.Context, create request.WebsiteCreate) error
 	OpWebsite(req request.WebsiteOp) error
 	GetWebsiteOptions() ([]string, error)
 	Backup(id uint) error
@@ -96,7 +96,7 @@ func (w WebsiteService) GetWebsites() ([]response.WebsiteDTO, error) {
 	return websiteDTOs, nil
 }
 
-func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) error {
+func (w WebsiteService) CreateWebsite(ctx context.Context, create request.WebsiteCreate) error {
 	if exist, _ := websiteRepo.GetBy(websiteRepo.WithDomain(create.PrimaryDomain)); len(exist) > 0 {
 		return buserr.New(constant.ErrNameIsExist)
 	}
@@ -123,7 +123,6 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) error {
 		ErrorLog:       true,
 	}
 
-	tx, ctx := getTxAndContext()
 	var appInstall *model.AppInstall
 	switch create.Type {
 	case constant.Deployment:
@@ -161,7 +160,6 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) error {
 		}
 		domainModel, err := getDomain(domain, website.ID)
 		if err != nil {
-			tx.Rollback()
 			return err
 		}
 		if reflect.DeepEqual(domainModel, model.WebsiteDomain{}) {
@@ -171,18 +169,10 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) error {
 	}
 	if len(domains) > 0 {
 		if err := websiteDomainRepo.BatchCreate(ctx, domains); err != nil {
-			tx.Rollback()
 			return err
 		}
 	}
-
-	if err := configDefaultNginx(website, domains, appInstall); err != nil {
-		tx.Rollback()
-		return err
-	}
-
-	tx.Commit()
-	return nil
+	return configDefaultNginx(website, domains, appInstall)
 }
 
 func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {
