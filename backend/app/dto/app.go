@@ -47,6 +47,7 @@ type AppDefine struct {
 	Required           []string `json:"Required"`
 	CrossVersionUpdate bool     `json:"crossVersionUpdate"`
 	Limit              int      `json:"limit"`
+	Recommend          int      `json:"recommend"`
 	Website            string   `json:"website"`
 	Github             string   `json:"github"`
 	Document           string   `json:"document"`

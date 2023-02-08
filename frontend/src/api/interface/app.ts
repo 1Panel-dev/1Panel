@@ -43,6 +43,7 @@ export namespace App {
         name?: string;
         tags?: string[];
         type?: string;
+        recommend?: boolean;
     }
 
     export interface AppParams {

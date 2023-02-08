@@ -22,6 +22,18 @@ func (a AppRepo) WithType(typeStr string) DBOption {
 	}
 }
 
+func (a AppRepo) OrderByRecommend() DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Order("recommend asc")
+	}
+}
+
+func (a AppRepo) GetRecommend() DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("recommend < 9999")
+	}
+}
+
 func (a AppRepo) Page(page, size int, opts ...DBOption) (int64, []model.App, error) {
 	var apps []model.App
 	db := getDb(opts...).Model(&model.App{})
