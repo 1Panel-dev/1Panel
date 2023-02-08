@@ -3,29 +3,31 @@
         <template #toolbar>
             <el-row :gutter="5">
                 <el-col :span="20">
-                    <el-button
-                        class="tag-button"
-                        :class="activeTag === 'all' ? '' : 'no-active'"
-                        @click="changeTag('all')"
-                        :type="activeTag === 'all' ? 'primary' : ''"
-                        :plain="activeTag !== 'all'"
-                    >
-                        {{ $t('app.all') }}
-                    </el-button>
-                    <div v-for="item in tags" :key="item.key" style="display: inline">
+                    <div v-if="data != null">
                         <el-button
                             class="tag-button"
-                            :class="activeTag === item.key ? '' : 'no-active'"
-                            @click="changeTag(item.key)"
-                            :type="activeTag === item.key ? 'primary' : ''"
-                            :plain="activeTag !== item.key"
+                            :class="activeTag === 'all' ? '' : 'no-active'"
+                            @click="changeTag('all')"
+                            :type="activeTag === 'all' ? 'primary' : ''"
+                            :plain="activeTag !== 'all'"
                         >
-                            {{ item.name }}
+                            {{ $t('app.all') }}
                         </el-button>
+                        <div v-for="item in tags" :key="item.key" style="display: inline">
+                            <el-button
+                                class="tag-button"
+                                :class="activeTag === item.key ? '' : 'no-active'"
+                                @click="changeTag(item.key)"
+                                :type="activeTag === item.key ? 'primary' : ''"
+                                :plain="activeTag !== item.key"
+                            >
+                                {{ item.name }}
+                            </el-button>
+                        </div>
                     </div>
                 </el-col>
                 <el-col :span="4">
-                    <div style="float: right" class="search-button">
+                    <div class="search-button">
                         <el-input
                             class="table-button"
                             v-model="searchReq.name"
@@ -41,13 +43,15 @@
             </el-row>
         </template>
         <template #rightButton>
-            <el-button @click="sync" type="primary" link v-if="mode === 'installed'">{{ $t('app.sync') }}</el-button>
+            <el-button @click="sync" type="primary" link v-if="mode === 'installed' && data != null">
+                {{ $t('app.sync') }}
+            </el-button>
         </template>
 
         <template #main>
-            <div class="update-prompt" v-if="mode === 'update' && data == null">
+            <div class="update-prompt" v-if="data == null">
                 <el-empty
-                    :description="$t('app.updatePrompt')"
+                    :description="mode === 'update' ? $t('app.updatePrompt') : $t('app.installPrompt')"
                     image="/src/assets/images/no_update_app.svg"
                     :image-size="200"
                 ></el-empty>
@@ -172,7 +176,7 @@ import Status from '@/components/status/index.vue';
 import { getAge } from '@/utils/util';
 import { useRouter } from 'vue-router';
 
-let data = ref<any>([]);
+let data = ref<any>();
 let loading = ref(false);
 let timer: NodeJS.Timer | null = null;
 const paginationConfig = reactive({

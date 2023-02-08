@@ -887,6 +887,7 @@ export default {
         doc: '文档',
         document: '文档说明',
         updatePrompt: '当前应用均为最新版本',
+        installPrompt: '尚未安装任何应用',
     },
     website: {
         website: '网站',
