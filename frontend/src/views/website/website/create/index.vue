@@ -216,7 +216,7 @@ const website = ref({
         appkey: '',
     },
 });
-let rules = reactive({
+let rules = ref<any>({
     primaryDomain: [Rules.domain],
     alias: [Rules.linuxName],
     type: [Rules.requiredInput],
