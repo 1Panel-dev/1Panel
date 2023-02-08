@@ -21,7 +21,14 @@
                         </div>
                     </el-col>
                     <el-col :span="2">
-                        <el-button class="h-app-button" type="primary" plain round size="small" @click="goInstall">
+                        <el-button
+                            class="h-app-button"
+                            type="primary"
+                            plain
+                            round
+                            size="small"
+                            @click="goInstall(app.key)"
+                        >
                             {{ $t('app.install') }}
                         </el-button>
                     </el-col>
@@ -71,8 +78,8 @@ const acceptParams = (base: Dashboard.BaseInfo): void => {
     search(req);
 };
 
-const goInstall = () => {
-    router.push({ name: 'App' });
+const goInstall = (key: string) => {
+    router.push({ name: 'AppDetail', params: { appKey: key } });
 };
 
 const search = async (req: App.AppReq) => {
