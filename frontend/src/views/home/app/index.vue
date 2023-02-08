@@ -45,6 +45,7 @@ let req = reactive({
     tags: [],
     page: 1,
     pageSize: 50,
+    recommend: true,
 });
 
 const baseInfo = ref({

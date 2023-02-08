@@ -77,7 +77,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 			appInstall.Param = string(authByte)
 		}
 	}
-	if app.Type == "website" {
+	if app.Type == "website" || app.Type == "tool" {
 		paramByte, err := json.Marshal(params)
 		if err != nil {
 			return err

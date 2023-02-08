@@ -27,12 +27,15 @@ type AppService struct {
 
 func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	var opts []repo.DBOption
-	opts = append(opts, commonRepo.WithOrderBy("name"))
+	opts = append(opts, appRepo.OrderByRecommend())
 	if req.Name != "" {
 		opts = append(opts, commonRepo.WithLikeName(req.Name))
 	}
 	if req.Type != "" {
 		opts = append(opts, appRepo.WithType(req.Type))
+	}
+	if req.Recommend {
+		opts = append(opts, appRepo.GetRecommend())
 	}
 	if len(req.Tags) != 0 {
 		tags, err := tagRepo.GetByKeys(req.Tags)
@@ -51,7 +54,6 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 		for _, t := range appTags {
 			appIds = append(appIds, t.AppId)
 		}
-
 		opts = append(opts, commonRepo.WithIdsIn(appIds))
 	}
 	var res response.AppRes
@@ -377,6 +379,11 @@ func (a AppService) SyncAppList() error {
 		iconStr := base64.StdEncoding.EncodeToString(icon)
 		app.Icon = iconStr
 		app.TagsKey = l.Tags
+		if l.Recommend > 0 {
+			app.Recommend = l.Recommend
+		} else {
+			app.Recommend = 9999
+		}
 
 		versions := l.Versions
 		detailsMap := getAppDetails(app.Details, versions)

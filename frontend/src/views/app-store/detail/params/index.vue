@@ -6,6 +6,7 @@
                 v-if="p.type == 'text'"
                 :type="p.type"
                 @change="updateParam"
+                :disabled="p.disabled"
             ></el-input>
             <el-input
                 v-model.number="form[p.envKey]"
