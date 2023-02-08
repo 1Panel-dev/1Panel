@@ -48,7 +48,7 @@
             <template v-if="nginxIsExist && !openNginxConfig" #search>
                 <div :class="{ mask: nginxStatus != 'Running' }">
                     <el-select v-model="req.websiteGroupId" @change="search()">
-                        <template #prefix>分组</template>
+                        <template #prefix>{{ $t('website.group') }}</template>
                         <el-option :label="$t('website.allGroup')" :value="0"></el-option>
                         <el-option
                             v-for="(group, index) in groups"
