@@ -45,20 +45,20 @@ func (b *BaseApi) SyncApp(c *gin.Context) {
 }
 
 // @Tags App
-// @Summary Search app by id
-// @Description 通过 id 获取应用信息
+// @Summary Search app by key
+// @Description 通过 key 获取应用信息
 // @Accept json
-// @Param id path integer true "app id"
+// @Param key path string true "app key"
 // @Success 200 {object} response.AppDTO
 // @Security ApiKeyAuth
-// @Router /apps/:id [get]
+// @Router /apps/:key [get]
 func (b *BaseApi) GetApp(c *gin.Context) {
-	id, err := helper.GetParamID(c)
+	appKey, err := helper.GetStrParamByKey(c, "key")
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	appDTO, err := appService.GetApp(id)
+	appDTO, err := appService.GetApp(appKey)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

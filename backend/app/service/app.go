@@ -106,9 +106,9 @@ func (a AppService) GetAppTags() ([]response.TagDTO, error) {
 	return res, nil
 }
 
-func (a AppService) GetApp(id uint) (*response.AppDTO, error) {
+func (a AppService) GetApp(key string) (*response.AppDTO, error) {
 	var appDTO response.AppDTO
-	app, err := appRepo.GetFirst(commonRepo.WithByID(id))
+	app, err := appRepo.GetFirst(appRepo.WithKey(key))
 	if err != nil {
 		return nil, err
 	}

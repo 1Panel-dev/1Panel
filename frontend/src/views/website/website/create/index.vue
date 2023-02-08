@@ -16,20 +16,6 @@
                                 {{ item.label }}
                             </el-button>
                         </template>
-
-                        <!-- <el-button
-                            type="primary"
-                            :plain="website.type !== 'deployment'"
-                            @click="website.type = 'deployment'"
-                        >
-                            {{ $t('website.deployment') }}
-                        </el-button>
-                        <el-button type="primary" :plain="website.type !== 'static'" @click="website.type = 'static'">
-                            {{ $t('website.static') }}
-                        </el-button>
-                        <el-button type="primary" :plain="website.type !== 'proxy'" @click="website.type = 'proxy'">
-                            {{ $t('website.proxy') }}
-                        </el-button> -->
                     </span>
                 </template>
             </DrawerHeader>
@@ -227,6 +213,7 @@ const website = ref({
         appDetailId: 0,
         params: {},
         version: '',
+        appkey: '',
     },
 });
 let rules = reactive({
@@ -282,13 +269,14 @@ const searchApp = () => {
         apps.value = res.data.items;
         if (res.data.items.length > 0) {
             website.value.appinstall.appId = res.data.items[0].id;
+            website.value.appinstall.appkey = res.data.items[0].key;
             getApp();
         }
     });
 };
 
 const getApp = () => {
-    GetApp(website.value.appinstall.appId).then((res) => {
+    GetApp(website.value.appinstall.appkey).then((res) => {
         appVersions.value = res.data.versions;
         if (res.data.versions.length > 0) {
             website.value.appinstall.version = res.data.versions[0];

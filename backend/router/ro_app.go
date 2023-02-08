@@ -17,7 +17,7 @@ func (a *AppRouter) InitAppRouter(Router *gin.RouterGroup) {
 	{
 		appRouter.POST("/sync", baseApi.SyncApp)
 		appRouter.POST("/search", baseApi.SearchApp)
-		appRouter.GET("/:id", baseApi.GetApp)
+		appRouter.GET("/:key", baseApi.GetApp)
 		appRouter.GET("/detail/:appId/:version", baseApi.GetAppDetail)
 		appRouter.POST("/install", baseApi.InstallApp)
 		appRouter.GET("/tags", baseApi.GetAppTags)
