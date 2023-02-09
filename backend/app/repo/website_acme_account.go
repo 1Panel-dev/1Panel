@@ -22,7 +22,7 @@ func (w *WebsiteAcmeAccountRepo) Page(page, size int, opts ...DBOption) (int64, 
 	db := getDb(opts...).Model(&model.WebsiteAcmeAccount{})
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Debug().Limit(size).Offset(size * (page - 1)).Find(&accounts).Error
+	err := db.Limit(size).Offset(size * (page - 1)).Find(&accounts).Error
 	return count, accounts, err
 }
 

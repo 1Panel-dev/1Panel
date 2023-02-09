@@ -31,7 +31,7 @@ func (w WebsiteDomainRepo) Page(page, size int, opts ...DBOption) (int64, []mode
 	db := getDb(opts...).Model(&model.WebsiteDomain{})
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Debug().Limit(size).Offset(size * (page - 1)).Find(&domains).Error
+	err := db.Limit(size).Offset(size * (page - 1)).Find(&domains).Error
 	return count, domains, err
 }
 
