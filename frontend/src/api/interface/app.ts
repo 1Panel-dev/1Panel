@@ -68,7 +68,7 @@ export namespace App {
     export interface AppInstallSearch extends ReqPage {
         name?: string;
         tags?: string[];
-        updated?: boolean;
+        update?: boolean;
         unused?: boolean;
     }
     export interface ChangePort {
