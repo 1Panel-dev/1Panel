@@ -69,29 +69,7 @@
         <Save ref="dialogSaveRef" @search="search" />
         <Load ref="dialogLoadRef" @search="search" />
         <Build ref="dialogBuildRef" @search="search" />
-
-        <el-dialog v-model="deleteVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
-            <template #header>
-                <div class="card-header">
-                    <span>{{ $t('container.imageDelete') }}</span>
-                </div>
-            </template>
-            <el-form :model="deleteForm" label-width="80px">
-                <el-form-item label="Tag" prop="tagName">
-                    <el-checkbox-group v-model="deleteForm.deleteTags">
-                        <el-checkbox v-for="item in deleteForm.tags" :key="item" :value="item" :label="item" />
-                    </el-checkbox-group>
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="deleteVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button type="primary" :disabled="deleteForm.deleteTags.length === 0" @click="batchDelete()">
-                        {{ $t('commons.button.delete') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-dialog>
+        <Delete ref="dialogDeleteRef" @search="search" />
     </div>
 </template>
 
@@ -107,10 +85,9 @@ import Push from '@/views/container/image/push/index.vue';
 import Save from '@/views/container/image/save/index.vue';
 import Load from '@/views/container/image/load/index.vue';
 import Build from '@/views/container/image/build/index.vue';
-import { searchImage, listImageRepo, imageRemove, loadDockerStatus } from '@/api/modules/container';
+import Delete from '@/views/container/image/delete/index.vue';
+import { searchImage, listImageRepo, loadDockerStatus } from '@/api/modules/container';
 import i18n from '@/lang';
-import { ElForm } from 'element-plus';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import router from '@/routers';
 
 const loading = ref(false);
@@ -143,12 +120,7 @@ const dialogPushRef = ref();
 const dialogLoadRef = ref();
 const dialogSaveRef = ref();
 const dialogBuildRef = ref();
-
-const deleteVisiable = ref(false);
-const deleteForm = reactive({
-    deleteTags: [] as Array<string>,
-    tags: [] as Array<string>,
-});
+const dialogDeleteRef = ref();
 
 const search = async () => {
     const repoSearch = {
@@ -179,16 +151,6 @@ const onOpenBuild = () => {
 
 const onOpenload = () => {
     dialogLoadRef.value!.acceptParams();
-};
-
-const batchDelete = async () => {
-    let names: Array<string> = [];
-    for (const item of deleteForm.deleteTags) {
-        names.push(item);
-    }
-    await useDeleteData(imageRemove, { names: names }, 'commons.msg.delete');
-    deleteVisiable.value = false;
-    search();
 };
 
 const buttons = [
@@ -225,9 +187,11 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         click: (row: Container.ImageInfo) => {
-            deleteForm.tags = row.tags;
-            deleteForm.deleteTags = [];
-            deleteVisiable.value = true;
+            let params = {
+                id: row.id,
+                tags: row.tags,
+            };
+            dialogDeleteRef.value!.acceptParams(params);
         },
     },
 ];
