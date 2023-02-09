@@ -15,6 +15,7 @@ export interface GlobalState {
     language: string; // zh | en
     // assemblySize: string; // small | default | large
     themeConfig: ThemeConfigProp;
+    isFullScreen: boolean;
 }
 
 export interface MenuState {
