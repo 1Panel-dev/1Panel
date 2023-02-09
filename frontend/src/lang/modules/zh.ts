@@ -707,6 +707,7 @@ export default {
         infoDetail: '文件属性',
         type: '类型',
         root: '根目录',
+        list: '文件列表',
     },
     setting: {
         all: '全部',

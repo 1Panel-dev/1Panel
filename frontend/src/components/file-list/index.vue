@@ -1,5 +1,5 @@
 <template>
-    <el-popover placement="right" :width="400" trigger="click" :title="'文件列表'">
+    <el-popover placement="right" :width="400" trigger="click" :title="$t('file.list')">
         <template #reference>
             <el-button :icon="Folder"></el-button>
         </template>
@@ -17,7 +17,6 @@
             </BreadCrumbs>
         </div>
         <div>
-            <!-- <el-input :prefix-icon="Search"></el-input> -->
             <el-table :data="data" highlight-current-row height="40vh">
                 <el-table-column width="40" fix>
                     <template #default="{ row }">
