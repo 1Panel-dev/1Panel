@@ -1,20 +1,44 @@
 <template>
-    <el-popover placement="right" :width="400" trigger="click" :title="$t('file.list')">
+    <el-popover placement="right" :width="400" trigger="click" :title="$t('file.list')" :visible="popoverVisible">
         <template #reference>
-            <el-button :icon="Folder"></el-button>
+            <el-button :icon="Folder" @click="popoverVisible = true"></el-button>
         </template>
         <div>
             <BreadCrumbs>
-                <BreadCrumbItem @click="jump(-1)" :right="paths.length == 0">/</BreadCrumbItem>
-                <BreadCrumbItem
-                    v-for="(item, key) in paths"
-                    :key="key"
-                    @click="jump(key)"
-                    :right="key == paths.length - 1"
-                >
-                    <!-- <span class="sle">{{ item }}</span> -->
-                    {{ item }}
+                <BreadCrumbItem @click="jump(-1)" :right="paths.length == 0">
+                    <el-icon><HomeFilled /></el-icon>
                 </BreadCrumbItem>
+                <template v-if="paths.length > 2">
+                    <BreadCrumbItem>
+                        <el-dropdown ref="dropdown1" trigger="click" @command="jump($event)">
+                            <span class="el-dropdown-link">...</span>
+                            <template #dropdown>
+                                <el-dropdown-menu>
+                                    <el-dropdown-item
+                                        v-for="(item, key) in paths.slice(0, -1)"
+                                        :key="key"
+                                        :command="key"
+                                    >
+                                        {{ item }}
+                                    </el-dropdown-item>
+                                </el-dropdown-menu>
+                            </template>
+                        </el-dropdown>
+                    </BreadCrumbItem>
+                    <BreadCrumbItem @click="jump(paths.length - 1)" :right="true">
+                        <span class="sle" style="max-width: 200px">{{ paths[paths.length - 1] }}</span>
+                    </BreadCrumbItem>
+                </template>
+                <template v-else>
+                    <BreadCrumbItem
+                        v-for="(item, key) in paths"
+                        :key="key"
+                        @click="jump(key)"
+                        :right="key == paths.length - 1"
+                    >
+                        <span class="sle" style="max-width: 200px">{{ item }}</span>
+                    </BreadCrumbItem>
+                </template>
             </BreadCrumbs>
         </div>
         <div>
@@ -50,6 +74,8 @@ let loading = ref(false);
 let paths = ref<string[]>([]);
 let req = reactive({ path: '/', expand: true, page: 1, pageSize: 300 });
 
+const popoverVisible = ref(false);
+
 const props = defineProps({
     path: {
         type: String,
@@ -66,6 +92,7 @@ const em = defineEmits(['choose']);
 const checkFile = (row: any) => {
     rowName.value = row.name;
     em('choose', row.path);
+    popoverVisible.value = false;
 };
 
 const open = async (row: File.File) => {
@@ -91,6 +118,7 @@ const jump = async (index: number) => {
     }
     req.path = path;
     search(req);
+    popoverVisible.value = true;
 };
 
 const search = async (req: File.ReqFile) => {
