@@ -43,80 +43,11 @@ func (m *monitor) Run() {
 	itemModel.Memory = memoryInfo.UsedPercent
 
 	if err := global.DB.Create(&itemModel).Error; err != nil {
-		global.LOG.Debugf("Insert basic monitoring data failed, err: %v", err)
+		global.LOG.Errorf("Insert basic monitoring data failed, err: %v", err)
 	}
 
-	ioStat, _ := disk.IOCounters()
-	for _, v := range ioStat {
-		var itemIO model.MonitorIO
-		itemIO.Name = v.Name
-		itemIO.ReadCount = v.ReadCount
-		itemIO.WriteCount = v.WriteCount
-		itemIO.ReadByte = v.ReadBytes
-		itemIO.WriteByte = v.WriteBytes
-		itemIO.ReadTime = v.ReadTime
-		itemIO.WriteTime = v.WriteTime
-		var aheadData model.MonitorIO
-		if err := global.DB.Where("name = ?", v.Name).Order("created_at").Find(&aheadData).Error; err != nil {
-			_ = global.DB.Create(&itemIO)
-			continue
-		}
-		stime := time.Since(aheadData.CreatedAt).Seconds()
-		itemIO.Read = uint64(float64(v.ReadBytes-aheadData.ReadByte) / stime)
-		itemIO.Write = uint64(float64(v.WriteBytes-aheadData.WriteByte) / stime)
-
-		itemIO.Count = uint64(float64(v.ReadCount-aheadData.ReadCount) / stime)
-		writeCount := uint64(float64(v.WriteCount-aheadData.WriteCount) / stime)
-		if writeCount > itemIO.Count {
-			itemIO.Count = writeCount
-		}
-
-		itemIO.Time = uint64(float64(v.ReadTime-aheadData.ReadTime) / stime)
-		writeTime := uint64(float64(v.WriteTime-aheadData.WriteTime) / stime)
-		if writeTime > itemIO.Time {
-			itemIO.Time = writeTime
-		}
-		if err := global.DB.Create(&itemIO).Error; err != nil {
-			global.LOG.Debugf("Insert io monitoring data failed, err: %v", err)
-		}
-	}
-
-	netStat, _ := net.IOCounters(true)
-	for _, v := range netStat {
-		var itemNet model.MonitorNetwork
-		var aheadData model.MonitorNetwork
-		itemNet.Name = v.Name
-		itemNet.BytesSent = v.BytesSent
-		itemNet.BytesRecv = v.BytesRecv
-		if err := global.DB.Where("name = ?", v.Name).Order("created_at").Find(&aheadData).Error; err != nil {
-			_ = global.DB.Create(&itemNet)
-			continue
-		}
-		stime := time.Since(aheadData.CreatedAt).Seconds()
-		itemNet.Up = float64(v.BytesSent-aheadData.BytesSent) / 1024 / stime
-		itemNet.Down = float64(v.BytesRecv-aheadData.BytesRecv) / 1024 / stime
-		if err := global.DB.Create(&itemNet).Error; err != nil {
-			global.LOG.Debugf("Insert network monitoring data failed, err: %v", err)
-		}
-	}
-	netStatAll, _ := net.IOCounters(false)
-	if len(netStatAll) != 0 {
-		var itemNet model.MonitorNetwork
-		var aheadData model.MonitorNetwork
-		itemNet.Name = netStatAll[0].Name
-		itemNet.BytesSent = netStatAll[0].BytesSent
-		itemNet.BytesRecv = netStatAll[0].BytesRecv
-		if err := global.DB.Where("name = ?", netStatAll[0].Name).Order("created_at").Find(&aheadData).Error; err != nil {
-			_ = global.DB.Create(&itemNet)
-			return
-		}
-		stime := time.Since(aheadData.CreatedAt).Seconds()
-		itemNet.Up = float64(netStatAll[0].BytesSent-aheadData.BytesSent) / 1024 / stime
-		itemNet.Down = float64(netStatAll[0].BytesRecv-aheadData.BytesRecv) / 1024 / stime
-		if err := global.DB.Create(&itemNet).Error; err != nil {
-			global.LOG.Debugf("Insert network all monitoring data failed, err: %v", err)
-		}
-	}
+	go loadDiskIO()
+	go loadNetIO()
 
 	MonitorStoreDays, err := settingRepo.Get(settingRepo.WithByKey("MonitorStoreDays"))
 	if err != nil {
@@ -127,4 +58,76 @@ func (m *monitor) Run() {
 	_ = global.DB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorBase{}).Error
 	_ = global.DB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorIO{}).Error
 	_ = global.DB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorNetwork{}).Error
+}
+
+func loadDiskIO() {
+	ioStat, _ := disk.IOCounters()
+
+	time.Sleep(60 * time.Second)
+
+	ioStat2, _ := disk.IOCounters()
+	for _, io2 := range ioStat2 {
+		for _, io1 := range ioStat {
+			if io2.Name == io1.Name {
+				var itemIO model.MonitorIO
+				itemIO.Name = io1.Name
+				itemIO.Read = uint64(float64(io2.ReadBytes-io1.ReadBytes) / 60)
+				itemIO.Write = uint64(float64(io2.WriteBytes-io1.WriteBytes) / 60)
+
+				itemIO.Count = uint64(float64(io2.ReadCount-io1.ReadCount) / 60)
+				writeCount := uint64(float64(io2.WriteCount-io1.WriteCount) / 60)
+				if writeCount > itemIO.Count {
+					itemIO.Count = writeCount
+				}
+
+				itemIO.Time = uint64(float64(io2.ReadTime-io1.ReadTime) / 60)
+				writeTime := uint64(float64(io2.WriteTime-io1.WriteTime) / 60)
+				if writeTime > itemIO.Time {
+					itemIO.Time = writeTime
+				}
+				if err := global.DB.Create(&itemIO).Error; err != nil {
+					global.LOG.Errorf("Insert io monitoring data failed, err: %v", err)
+				}
+				break
+			}
+		}
+	}
+}
+
+func loadNetIO() {
+	netStat, _ := net.IOCounters(true)
+	netStatAll, _ := net.IOCounters(false)
+
+	time.Sleep(60 * time.Second)
+
+	netStat2, _ := net.IOCounters(true)
+	for _, net2 := range netStat2 {
+		for _, net1 := range netStat {
+			if net2.Name == net1.Name {
+				var itemNet model.MonitorNetwork
+				itemNet.Name = net1.Name
+				itemNet.Up = float64(net2.BytesSent-net1.BytesSent) / 1024 / 60
+				itemNet.Down = float64(net2.BytesRecv-net1.BytesRecv) / 1024 / 60
+				if err := global.DB.Create(&itemNet).Error; err != nil {
+					global.LOG.Errorf("Insert network monitoring data failed, err: %v", err)
+				}
+				break
+			}
+		}
+	}
+	netStatAll2, _ := net.IOCounters(false)
+	for _, net2 := range netStatAll2 {
+		for _, net1 := range netStatAll {
+			if net2.Name == net1.Name {
+				var itemNet model.MonitorNetwork
+				itemNet.Name = net1.Name
+				itemNet.Up = float64(net2.BytesSent-net1.BytesSent) / 1024 / 60
+				itemNet.Down = float64(net2.BytesRecv-net1.BytesRecv) / 1024 / 60
+				if err := global.DB.Create(&itemNet).Error; err != nil {
+					global.LOG.Errorf("Insert network all monitoring data failed, err: %v", err)
+				}
+				break
+			}
+		}
+	}
 }

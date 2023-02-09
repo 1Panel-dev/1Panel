@@ -67,7 +67,7 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
-        <RecoverStatus ref="recoverStatusRef"></RecoverStatus>
+        <RecoverStatus @search="search()" ref="recoverStatusRef"></RecoverStatus>
         <el-drawer v-model="drawerVisiable" size="50%">
             <template #header>
                 <DrawerHeader :header="$t('setting.createSnapshot')" :back="handleClose" />
