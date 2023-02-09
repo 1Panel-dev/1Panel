@@ -37,7 +37,7 @@
                     <div class="app-warn">
                         <div>
                             <span>{{ $t('app.checkInstalledWarn', [data.app]) }}</span>
-                            <span @click="goRouter('/apps')">
+                            <span @click="goRouter(key)">
                                 <el-icon><Position /></el-icon>
                                 {{ $t('database.goInstall') }}
                             </span>
@@ -88,8 +88,8 @@ const setting = () => {
     em('setting', false);
 };
 
-const goRouter = async (path: string) => {
-    router.push({ path: path });
+const goRouter = async (key: string) => {
+    router.push({ name: 'AppDetail', params: { appKey: key } });
 };
 
 const onCheck = async () => {
