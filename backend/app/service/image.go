@@ -167,7 +167,7 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 			return
 		}
 		defer res.Body.Close()
-		global.LOG.Debugf("build image %s successful!", req.Name)
+		global.LOG.Infof("build image %s successful!", req.Name)
 		_, _ = io.Copy(file, res.Body)
 	}()
 
@@ -199,7 +199,7 @@ func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 				return
 			}
 			defer out.Close()
-			global.LOG.Debugf("pull image %s successful!", req.ImageName)
+			global.LOG.Infof("pull image %s successful!", req.ImageName)
 			_, _ = io.Copy(file, out)
 		}()
 		return pathItem, nil
@@ -230,7 +230,7 @@ func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 			return
 		}
 		defer out.Close()
-		global.LOG.Debugf("pull image %s successful!", req.ImageName)
+		global.LOG.Infof("pull image %s successful!", req.ImageName)
 		_, _ = io.Copy(file, out)
 	}()
 	return pathItem, nil
@@ -333,7 +333,7 @@ func (u *ImageService) ImagePush(req dto.ImagePush) (string, error) {
 			return
 		}
 		defer out.Close()
-		global.LOG.Debugf("push image %s successful!", req.Name)
+		global.LOG.Infof("push image %s successful!", req.Name)
 		_, _ = io.Copy(file, out)
 	}()
 

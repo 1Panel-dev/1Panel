@@ -198,6 +198,7 @@ const acceptParams = (params: DialogProps): void => {
     snapInfo.value = params.snapInfo;
     drawerVisiable.value = true;
 };
+const emit = defineEmits<{ (e: 'search'): void }>();
 
 const handleClose = () => {
     drawerVisiable.value = false;
@@ -207,6 +208,7 @@ const doRecover = async (isNew: boolean) => {
     loading.value = true;
     await snapshotRecover({ id: snapInfo.value.id, isNew: isNew, reDownload: reDownload.value })
         .then(() => {
+            emit('search');
             loading.value = false;
             dialogVisiable.value = false;
             ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
@@ -235,7 +237,9 @@ const rollbackSnapshot = async () => {
         loading.value = true;
         await snapshotRollback({ id: snapInfo.value.id, isNew: false, reDownload: false })
             .then(() => {
+                emit('search');
                 loading.value = false;
+                dialogVisiable.value = false;
                 ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {

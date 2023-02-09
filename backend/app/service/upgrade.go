@@ -90,16 +90,12 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		}
 	}
 
-	panelName := fmt.Sprintf("1panel-%s-%s", "linux", runtime.GOARCH)
-	fileName := fmt.Sprintf("1panel-online-installer-%s.tar.gz", req.Version)
+	fileName := fmt.Sprintf("1panel-%s-%s-%s.tar.gz", req.Version, "linux", runtime.GOARCH)
 	_ = settingRepo.Update("SystemStatus", "Upgrading")
 	go func() {
-		if err := fileOp.DownloadFile(downloadPath+panelName, rootDir+"/1panel"); err != nil {
-			global.LOG.Errorf("download panel file failed, err: %v", err)
-			return
-		}
 		if err := fileOp.DownloadFile(downloadPath+fileName, rootDir+"/service.tar.gz"); err != nil {
 			global.LOG.Errorf("download service file failed, err: %v", err)
+			_ = settingRepo.Update("SystemStatus", "Free")
 			return
 		}
 		global.LOG.Info("download all file successful!")
@@ -108,11 +104,13 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		}()
 		if err := fileOp.Decompress(rootDir+"/service.tar.gz", rootDir, files.TarGz); err != nil {
 			global.LOG.Errorf("decompress file failed, err: %v", err)
+			_ = settingRepo.Update("SystemStatus", "Free")
 			return
 		}
 
 		if err := u.handleBackup(fileOp, originalDir); err != nil {
 			global.LOG.Errorf("handle backup original file failed, err: %v", err)
+			_ = settingRepo.Update("SystemStatus", "Free")
 			return
 		}
 		global.LOG.Info("backup original data successful, now start to upgrade!")
@@ -122,19 +120,9 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 			global.LOG.Errorf("upgrade 1panel failed, err: %v", err)
 			return
 		}
-		if err := fileOp.Chmod("/usr/local/bin/1panel", 0755); err != nil {
-			u.handleRollback(fileOp, originalDir, 1)
-			global.LOG.Errorf("chmod 1panel failed, err: %v", err)
-			return
-		}
 		if err := cpBinary(fmt.Sprintf("%s/1panel-online-installer-%s/1pctl", rootDir, req.Version), "/usr/local/bin/1pctl"); err != nil {
 			u.handleRollback(fileOp, originalDir, 2)
 			global.LOG.Errorf("upgrade 1pctl failed, err: %v", err)
-			return
-		}
-		if err := fileOp.Chmod("/usr/local/bin/1pctl", 0755); err != nil {
-			u.handleRollback(fileOp, originalDir, 1)
-			global.LOG.Errorf("chmod 1pctl failed, err: %v", err)
 			return
 		}
 		if err := cpBinary(fmt.Sprintf("%s/1panel-online-installer-%s/1panel/conf/1panel.service", rootDir, req.Version), "/etc/systemd/system/1panel.service"); err != nil {
@@ -170,6 +158,7 @@ func (u *UpgradeService) handleBackup(fileOp files.FileOp, originalDir string) e
 
 func (u *UpgradeService) handleRollback(fileOp files.FileOp, originalDir string, errStep int) {
 	dbPath := global.CONF.System.DbPath + "/1Panel.db"
+	_ = settingRepo.Update("SystemStatus", "Free")
 	if err := cpBinary(originalDir+"/1Panel.db", dbPath); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
@@ -188,6 +177,7 @@ func (u *UpgradeService) handleRollback(fileOp files.FileOp, originalDir string,
 	if err := cpBinary(originalDir+"/1panel.service", "/etc/systemd/system/1panel.service"); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
+
 }
 
 func (u *UpgradeService) loadLatestFromGithub() (dto.UpgradeInfo, error) {

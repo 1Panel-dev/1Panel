@@ -67,7 +67,6 @@ func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 	} else {
 		res.Message = i18n.GetMsgWithMap(msgKey, map[string]interface{}{"detail": err})
 	}
-	global.LOG.Errorf("request: %s, error: %s", ctx.Request.URL.Path, res.Message)
 	ctx.JSON(http.StatusOK, res)
 	ctx.Abort()
 }
