@@ -70,3 +70,8 @@ var (
 	ErrAccountCannotDelete = "ErrAccountCannotDelete"
 	ErrSSLApply            = "ErrSSLApply"
 )
+
+//file
+var (
+	ErrPathNotFound = "ErrPathNotFound"
+)

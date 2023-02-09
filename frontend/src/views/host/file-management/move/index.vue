@@ -4,25 +4,29 @@
         :destroy-on-close="true"
         :close-on-click-modal="false"
         :before-close="handleClose"
-        size="30%"
+        size="40%"
     >
         <template #header>
             <DrawerHeader :header="title" :back="handleClose" />
         </template>
-        <el-form
-            ref="fileForm"
-            label-position="left"
-            :model="addForm"
-            label-width="100px"
-            :rules="rules"
-            v-loading="loading"
-        >
-            <el-form-item :label="$t('file.path')" prop="newPath">
-                <el-input v-model="addForm.newPath" disabled>
-                    <template #append><FileList @choose="getPath" :dir="true"></FileList></template>
-                </el-input>
-            </el-form-item>
-        </el-form>
+        <el-row>
+            <el-col :span="22" :offset="1">
+                <el-form
+                    ref="fileForm"
+                    label-position="top"
+                    :model="addForm"
+                    label-width="100px"
+                    :rules="rules"
+                    v-loading="loading"
+                >
+                    <el-form-item :label="$t('file.path')" prop="newPath">
+                        <el-input v-model="addForm.newPath">
+                            <template #prepend><FileList @choose="getPath" :dir="true"></FileList></template>
+                        </el-input>
+                    </el-form-item>
+                </el-form>
+            </el-col>
+        </el-row>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>

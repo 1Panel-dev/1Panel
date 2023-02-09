@@ -1,12 +1,12 @@
 <template>
-    <el-drawer v-model="loadVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+    <el-drawer v-model="loadVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="40%">
         <template #header>
             <DrawerHeader :header="$t('container.importImage')" :back="handleClose" />
         </template>
         <el-form v-loading="loading" ref="formRef" :model="form" label-position="top">
             <el-form-item :label="$t('container.path')" :rules="Rules.requiredSelect" prop="path">
-                <el-input disabled v-model="form.path">
-                    <template #append>
+                <el-input v-model="form.path">
+                    <template #prepend>
                         <FileList @choose="loadLoadDir" :dir="false"></FileList>
                     </template>
                 </el-input>

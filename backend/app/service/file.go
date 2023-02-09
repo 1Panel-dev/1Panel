@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -57,7 +59,6 @@ func (f FileService) GetFileTree(op request.FileOption) ([]response.FileTree, er
 }
 
 func (f FileService) Create(op request.FileCreate) error {
-
 	fo := files.NewFileOp()
 	if fo.Stat(op.Path) {
 		return errors.New("file is exist")
@@ -154,6 +155,10 @@ func (f FileService) Wget(w request.FileWget) (string, error) {
 
 func (f FileService) MvFile(m request.FileMove) error {
 	fo := files.NewFileOp()
+	if !fo.Stat(m.NewPath) {
+		return buserr.New(constant.ErrPathNotFound)
+	}
+
 	if m.Type == "cut" {
 		return fo.Cut(m.OldPaths, m.NewPath)
 	}

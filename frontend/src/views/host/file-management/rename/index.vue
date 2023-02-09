@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="open" :before-close="handleClose" :title="$t('file.rename')" size="30%">
+    <el-drawer v-model="open" :before-close="handleClose" :title="$t('file.rename')" size="40%">
         <el-row>
             <el-col :span="22" :offset="1">
                 <el-form

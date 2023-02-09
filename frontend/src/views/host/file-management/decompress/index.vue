@@ -4,28 +4,32 @@
         :destroy-on-close="true"
         :close-on-click-modal="false"
         :before-close="handleClose"
-        size="30%"
+        size="40%"
     >
         <template #header>
             <DrawerHeader :header="$t('file.deCompress')" :back="handleClose" />
         </template>
-        <el-form
-            ref="fileForm"
-            label-position="left"
-            :model="form"
-            label-width="100px"
-            :rules="rules"
-            v-loading="loading"
-        >
-            <el-form-item :label="$t('file.name')">
-                <el-input v-model="name" disabled></el-input>
-            </el-form-item>
-            <el-form-item :label="$t('file.deCompressDst')" prop="dst">
-                <el-input v-model="form.dst" disabled>
-                    <template #append><FileList :path="form.dst" @choose="getLinkPath"></FileList></template>
-                </el-input>
-            </el-form-item>
-        </el-form>
+        <el-row>
+            <el-col :span="22" :offset="1">
+                <el-form
+                    ref="fileForm"
+                    label-position="top"
+                    :model="form"
+                    label-width="100px"
+                    :rules="rules"
+                    v-loading="loading"
+                >
+                    <el-form-item :label="$t('file.name')">
+                        <el-input v-model="name" disabled></el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('file.deCompressDst')" prop="dst">
+                        <el-input v-model="form.dst">
+                            <template #prepend><FileList :path="form.dst" @choose="getLinkPath"></FileList></template>
+                        </el-input>
+                    </el-form-item>
+                </el-form>
+            </el-col>
+        </el-row>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>

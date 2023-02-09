@@ -93,8 +93,8 @@
                         :label="$t('cronjob.sourceDir')"
                         prop="sourceDir"
                     >
-                        <el-input style="width: 100%" disabled v-model="dialogData.rowData!.sourceDir">
-                            <template #append>
+                        <el-input style="width: 100%" v-model="dialogData.rowData!.sourceDir">
+                            <template #prepend>
                                 <FileList @choose="loadDir" :dir="true"></FileList>
                             </template>
                         </el-input>

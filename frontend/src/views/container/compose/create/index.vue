@@ -19,11 +19,10 @@
                         </el-form-item>
                         <el-form-item v-if="form.from === 'path'" prop="path">
                             <el-input
-                                disabled
                                 :placeholder="$t('commons.example') + '/tmp/docker-compose.yml'"
                                 v-model="form.path"
                             >
-                                <template #append>
+                                <template #prepend>
                                     <FileList @choose="loadDir" :dir="false"></FileList>
                                 </template>
                             </el-input>

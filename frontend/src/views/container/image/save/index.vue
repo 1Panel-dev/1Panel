@@ -18,8 +18,8 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item :label="$t('container.path')" :rules="Rules.requiredSelect" prop="path">
-                        <el-input disabled v-model="form.path">
-                            <template #append>
+                        <el-input v-model="form.path">
+                            <template #prepend>
                                 <FileList @choose="loadSaveDir" :dir="true"></FileList>
                             </template>
                         </el-input>

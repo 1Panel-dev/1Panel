@@ -17,7 +17,7 @@
                         prop="varsJson['dir']"
                         :rules="Rules.requiredInput"
                     >
-                        <el-input disabled v-model="dialogData.rowData!.varsJson['dir']">
+                        <el-input v-model="dialogData.rowData!.varsJson['dir']">
                             <template #append>
                                 <FileList @choose="loadDir" :dir="true"></FileList>
                             </template>

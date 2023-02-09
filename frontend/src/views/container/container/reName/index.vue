@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="newNameVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+    <el-drawer v-model="newNameVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="40%">
         <template #header>
             <DrawerHeader :header="$t('container.rename')" :back="handleClose" />
         </template>
