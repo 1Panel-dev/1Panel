@@ -220,10 +220,9 @@ onMounted(() => {
             margin-top: 5px;
         }
     }
-}
-
-.app-card:hover {
-    background-color: rgba(0, 94, 235, 0.03);
+    &:hover {
+        background-color: rgba(0, 94, 235, 0.03);
+    }
 }
 
 .tag-button {

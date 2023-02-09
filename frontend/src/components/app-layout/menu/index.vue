@@ -102,7 +102,7 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     height: 100%;
-    background-color: $menu-backgroup-color;
+    background: url(@/assets/images/menu-bg.png) $menu-backgroup-color no-repeat top;
     transition: all 0.3s ease;
 
     .el-scrollbar {
