@@ -607,7 +607,7 @@ func (u *SnapshotService) handleBackupDatas(fileOp files.FileOp, operation strin
 func (u *SnapshotService) handlePanelDatas(fileOp files.FileOp, operation string, source, target, backupDir, dockerDir string) error {
 	switch operation {
 	case "snapshot":
-		exclusionRules := "./data/tmp;./data/cache;"
+		exclusionRules := "./tmp;./cache;"
 		if strings.Contains(backupDir, source) {
 			exclusionRules += ("." + strings.ReplaceAll(backupDir, source, "") + ";")
 		}
@@ -618,7 +618,7 @@ func (u *SnapshotService) handlePanelDatas(fileOp files.FileOp, operation string
 			return fmt.Errorf("backup panel data failed, err: %v", err)
 		}
 	case "recover":
-		exclusionRules := "./data/tmp/;./data/cache;"
+		exclusionRules := "./tmp/;./cache;"
 		if strings.Contains(backupDir, target) {
 			exclusionRules += ("." + strings.ReplaceAll(backupDir, target, "") + ";")
 		}

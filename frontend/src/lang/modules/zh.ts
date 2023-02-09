@@ -576,6 +576,7 @@ export default {
         avgLoad: '平均负载',
         loadDetail: '负载详情',
         resourceUsage: '资源使用率',
+        networkCard: '网卡',
         min: '分钟',
         read: '读取',
         write: '写入',

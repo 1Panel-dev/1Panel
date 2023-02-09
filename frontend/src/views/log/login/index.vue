@@ -80,8 +80,8 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
-const searchIP = ref();
-const searchStatus = ref();
+const searchIP = ref<string>('');
+const searchStatus = ref<string>('');
 
 const search = async () => {
     let params = {
