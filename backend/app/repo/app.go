@@ -39,7 +39,7 @@ func (a AppRepo) Page(page, size int, opts ...DBOption) (int64, []model.App, err
 	db := getDb(opts...).Model(&model.App{})
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Debug().Limit(size).Offset(size * (page - 1)).Preload("AppTags").Find(&apps).Error
+	err := db.Limit(size).Offset(size * (page - 1)).Preload("AppTags").Find(&apps).Error
 	return count, apps, err
 }
 

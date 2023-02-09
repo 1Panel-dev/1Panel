@@ -15,7 +15,7 @@
                                 <el-icon :size="20"><HomeFilled /></el-icon>
                             </el-link>
                         </span>
-                        <span v-for="item in paths" :key="item.url">
+                        <span v-for="item in paths" :key="item.url" class="other">
                             <span class="split">></span>
                             <el-link @click="jump(item.url)">{{ item.name }}</el-link>
                         </span>
@@ -497,7 +497,11 @@ onMounted(() => {
     border-radius: 2px !important;
 
     .root {
+        vertical-align: middle;
         margin-left: 10px;
+    }
+    .other {
+        vertical-align: middle;
     }
     .split {
         margin-left: 5px;

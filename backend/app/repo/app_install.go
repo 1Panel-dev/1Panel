@@ -99,7 +99,7 @@ func (a *AppInstallRepo) Page(page, size int, opts ...DBOption) (int64, []model.
 	db := getDb(opts...).Model(&model.AppInstall{})
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Debug().Limit(size).Offset(size * (page - 1)).Preload("App").Preload("Backups").Find(&apps).Error
+	err := db.Limit(size).Offset(size * (page - 1)).Preload("App").Preload("Backups").Find(&apps).Error
 	return count, apps, err
 }
 
@@ -108,7 +108,7 @@ func (a *AppInstallRepo) BatchUpdateBy(maps map[string]interface{}, opts ...DBOp
 	if len(opts) == 0 {
 		db = db.Where("1=1")
 	}
-	return db.Debug().Updates(&maps).Error
+	return db.Updates(&maps).Error
 }
 
 type RootInfo struct {

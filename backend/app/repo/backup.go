@@ -42,7 +42,7 @@ func (u *BackupRepo) ListRecord(opts ...DBOption) ([]model.BackupRecord, error) 
 	for _, opt := range opts {
 		db = opt(db)
 	}
-	err := db.Debug().Find(&users).Error
+	err := db.Find(&users).Error
 	return users, err
 }
 
