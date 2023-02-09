@@ -1,5 +1,5 @@
 <template>
-    <el-drawer :close-on-click-modal="false" v-model="open" size="30%">
+    <el-drawer :close-on-click-modal="false" v-model="open" size="40%">
         <template #header>
             <Header :header="$t('commons.msg.operate')" :resource="resourceName" :back="handleClose"></Header>
         </template>

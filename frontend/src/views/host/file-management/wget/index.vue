@@ -17,8 +17,8 @@
                         <el-input v-model="addForm.url" @input="getFileName" />
                     </el-form-item>
                     <el-form-item :label="$t('file.path')" prop="path">
-                        <el-input v-model="addForm.path" disabled>
-                            <template #append><FileList :path="addForm.path" @choose="getPath"></FileList></template>
+                        <el-input v-model="addForm.path">
+                            <template #prepend><FileList :path="addForm.path" @choose="getPath"></FileList></template>
                         </el-input>
                     </el-form-item>
                     <el-form-item :label="$t('file.name')" prop="name">

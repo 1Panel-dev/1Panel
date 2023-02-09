@@ -26,6 +26,7 @@ ErrPortInOtherApp: "{{ .port }} 端口已被 {{ .apps }}占用！"
 #file
 ErrFileCanNotRead: "此文件不支持预览"
 ErrFileToLarge: "文件超过10M,无法打开"
+ErrPathNotFound: "目录不存在"
 
 #website
 ErrDomainIsExist: "域名已存在"

@@ -37,7 +37,7 @@
                     </el-form-item>
                     <el-form-item v-if="addForm.isLink" :label="$t('file.linkPath')" prop="linkPath">
                         <el-input v-model="addForm.linkPath">
-                            <template #append>
+                            <template #prepend>
                                 <FileList @choose="getLinkPath"></FileList>
                             </template>
                         </el-input>

@@ -23,10 +23,10 @@ ErrAppRequired: "{{ .detail }} app is required"
 ErrNotInstall: "App not installed"
 ErrPortInOtherApp: "{{ .port }} port  already in use by  {{ .apps }}"
 
-
 #file
 ErrFileCanNotRead: "File can not read"
 ErrFileToLarge: "file is too large"
+ErrPathNotFound: "Path is not found"
 
 #website
 ErrDomainIsExist: "Domain is already exist"
