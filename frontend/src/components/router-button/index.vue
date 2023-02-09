@@ -7,7 +7,11 @@
                 v-for="(button, index) in buttonArray"
                 size="large"
                 :key="index"
-            ></el-radio-button>
+            >
+                <el-badge :value="button.count" class="item" v-if="button.count > 0">
+                    <span>{{ button.label }}</span>
+                </el-badge>
+            </el-radio-button>
         </el-radio-group>
     </el-card>
 </template>
@@ -22,6 +26,7 @@ const props = defineProps({
     buttons: {
         type: Array,
         required: true,
+        count: Number,
     },
 });
 
