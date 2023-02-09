@@ -129,6 +129,7 @@ const rules = reactive({
     dockerfile: [Rules.requiredInput, { validator: varifyPath, trigger: 'change', required: true }],
 });
 const acceptParams = async () => {
+    logVisiable.value = false;
     drawerVisiable.value = true;
     form.from = 'path';
     form.dockerfile = '';

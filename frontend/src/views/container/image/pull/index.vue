@@ -11,7 +11,7 @@
         </template>
         <el-row type="flex" justify="center">
             <el-col :span="22">
-                <el-form ref="formRef" label-position="top" :model="form" label-width="80px">
+                <el-form ref="formRef" label-position="top" :model="form">
                     <el-form-item :label="$t('container.from')">
                         <el-checkbox v-model="form.fromRepo">{{ $t('container.imageRepo') }}</el-checkbox>
                     </el-form-item>
@@ -100,6 +100,7 @@ interface DialogProps {
 const repos = ref();
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
+    logVisiable.value = false;
     drawerVisiable.value = true;
     form.fromRepo = true;
     form.imageName = '';

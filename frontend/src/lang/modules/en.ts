@@ -418,6 +418,8 @@ export default {
         image: 'Image',
         imagePull: 'Image pull',
         imagePush: 'Image push',
+        imageDelete: 'Image delete',
+        imageDeleteTag: 'Image tag delete',
         repoName: 'Repo Name',
         imageName: 'Image name',
         pull: 'Pull',
