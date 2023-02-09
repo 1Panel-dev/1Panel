@@ -3,12 +3,7 @@
         <el-row>
             <el-col :span="2">
                 <div>
-                    <el-button
-                        :icon="Back"
-                        @click="jump(paths[paths.length - 2].url)"
-                        circle
-                        :disabled="paths.length == 0"
-                    />
+                    <el-button :icon="Back" @click="back" circle :disabled="paths.length == 0" />
                     <el-button :icon="Refresh" circle @click="search" />
                 </div>
             </el-col>
@@ -16,7 +11,9 @@
                 <div class="path" ref="pathRef">
                     <span ref="breadCrumbRef">
                         <span class="root">
-                            <el-link @click="jump('/')">{{ $t('file.root') }}</el-link>
+                            <el-link @click="jump('/')">
+                                <el-icon :size="20"><HomeFilled /></el-icon>
+                            </el-link>
                         </span>
                         <span v-for="item in paths" :key="item.url">
                             <span class="split">></span>
@@ -69,7 +66,11 @@
                         @blur="search()"
                         :placeholder="$t('file.search')"
                     >
-                        <template #prepend><el-checkbox v-model="req.containSub">包含子目录</el-checkbox></template>
+                        <template #prepend>
+                            <el-checkbox :disabled="req.path == '/'" v-model="req.containSub">
+                                {{ $t('file.sub') }}
+                            </el-checkbox>
+                        </template>
                     </el-input>
                 </div>
             </template>
@@ -263,6 +264,16 @@ const handlePath = () => {
         nextTick(function () {
             handlePath();
         });
+    }
+};
+
+const back = () => {
+    if (paths.value.length > 0) {
+        let url = '/';
+        if (paths.value.length >= 2) {
+            url = paths.value[paths.value.length - 2].url;
+        }
+        jump(url);
     }
 };
 

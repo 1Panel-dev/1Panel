@@ -20,9 +20,6 @@
                     :rules="rules"
                     v-loading="loading"
                 >
-                    <el-form-item :label="$t('file.path')" prop="path">
-                        <el-input v-model="getPath" disabled />
-                    </el-form-item>
                     <el-form-item :label="$t('file.name')" prop="name">
                         <el-input v-model="addForm.name" />
                     </el-form-item>

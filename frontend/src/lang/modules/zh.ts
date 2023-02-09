@@ -710,6 +710,7 @@ export default {
         type: '类型',
         root: '根目录',
         list: '文件列表',
+        sub: '包含子目录',
     },
     setting: {
         all: '全部',
