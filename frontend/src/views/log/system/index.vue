@@ -41,7 +41,7 @@ const handleReady = (payload) => {
 
 const loadSystemlogs = async () => {
     const pathRes = await loadBaseDir();
-    let logPath = pathRes.data.replaceAll('/data', '/log');
+    let logPath = pathRes.data + '/log';
     await LoadFile({ path: `${logPath}/1Panel.log` })
         .then((res) => {
             loading.value = false;

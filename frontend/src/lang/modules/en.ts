@@ -556,6 +556,7 @@ export default {
         avgLoad: 'Average load',
         loadDetail: 'Load detail',
         resourceUsage: 'Resource utilization rate',
+        networkCard: 'Net card',
         min: 'Minutes',
         read: 'Read',
         write: 'Write',

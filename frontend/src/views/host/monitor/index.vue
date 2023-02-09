@@ -97,6 +97,7 @@
                             style="margin-left: 20px"
                             placeholder="Select"
                         >
+                            <template #prefix>{{ $t('monitor.networkCard') }}</template>
                             <el-option v-for="item in netOptions" :key="item" :label="item" :value="item" />
                         </el-select>
                         <el-date-picker

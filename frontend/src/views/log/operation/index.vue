@@ -107,9 +107,9 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
-const searchName = ref();
-const searchGroup = ref();
-const searchStatus = ref();
+const searchName = ref<string>('');
+const searchGroup = ref<string>('');
+const searchStatus = ref<string>('');
 
 const search = async () => {
     let params = {
