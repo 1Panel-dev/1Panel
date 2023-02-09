@@ -3,8 +3,9 @@ package viper
 import (
 	"bytes"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 
 	"github.com/1Panel-dev/1Panel/backend/configs"
 	"github.com/1Panel-dev/1Panel/backend/global"

@@ -68,6 +68,8 @@ export default {
         loadingText: {
             Upgrading: '系统升级中，请稍候...',
             Restarting: '系统重启中，请稍候...',
+            Snapshoting: '制作快照中，请稍候...',
+            Recovering: '从快照恢复中，请稍候...',
         },
         msg: {
             delete: '删除 操作不可回滚，是否继续',
