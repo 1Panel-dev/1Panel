@@ -7,9 +7,7 @@
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
-                        <div style="margin-left: 10px">
-                            <el-tag>{{ dialogData.rowData!.type }}</el-tag>
-                        </div>
+                        <el-tag>{{ dialogData.rowData!.type }}</el-tag>
                     </el-form-item>
                     <el-form-item
                         v-if="dialogData.rowData!.type === 'LOCAL'"
@@ -18,7 +16,7 @@
                         :rules="Rules.requiredInput"
                     >
                         <el-input v-model="dialogData.rowData!.varsJson['dir']">
-                            <template #append>
+                            <template #prepend>
                                 <FileList @choose="loadDir" :dir="true"></FileList>
                             </template>
                         </el-input>
