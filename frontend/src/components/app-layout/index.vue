@@ -1,9 +1,9 @@
 <template>
     <Layout v-loading="loading" :element-loading-text="loadinText" fullscreen>
-        <template #menu>
+        <template #menu v-if="!globalStore.isFullScreen">
             <Menu></Menu>
         </template>
-        <template #footer>
+        <template #footer v-if="!globalStore.isFullScreen">
             <Footer></Footer>
         </template>
     </Layout>

@@ -19,9 +19,13 @@ export const GlobalStore = defineStore({
             theme: 'bright',
             footer: true,
         },
+        isFullScreen: false,
     }),
     getters: {},
     actions: {
+        setScreenFull() {
+            this.isFullScreen = !this.isFullScreen;
+        },
         setLogStatus(login: boolean) {
             this.isLogin = login;
         },

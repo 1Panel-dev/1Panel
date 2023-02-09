@@ -12,6 +12,7 @@
                     @click="jump(key)"
                     :right="key == paths.length - 1"
                 >
+                    <!-- <span class="sle">{{ item }}</span> -->
                     {{ item }}
                 </BreadCrumbItem>
             </BreadCrumbs>
