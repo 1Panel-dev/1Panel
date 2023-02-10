@@ -579,12 +579,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss">
-.el-form-item--small {
-    --font-size: 14px;
-    --el-form-label-font-size: var(--font-size);
-    margin-bottom: 8px;
-}
-
 .h-overview {
     text-align: center;
 

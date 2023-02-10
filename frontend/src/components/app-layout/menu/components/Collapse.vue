@@ -15,8 +15,9 @@ const isCollapse = computed((): boolean => menuStore.isCollapse);
 
 <style scoped lang="scss">
 .collapse {
-    height: 47px;
+    height: 48px;
     border-top: 1px solid #e4e7ed;
+    box-sizing: border-box;
 }
 
 .collapse-icon {

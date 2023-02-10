@@ -173,7 +173,4 @@ onMounted(() => {
         margin-top: 5px;
     }
 }
-.el-avatar {
-    --el-avatar-bg-color: #ffffff;
-}
 </style>

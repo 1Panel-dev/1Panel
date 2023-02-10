@@ -193,7 +193,7 @@ onMounted(() => {
             .app-title {
                 font-weight: 500;
                 font-size: 16px;
-                color: #1f2329;
+                color: var(--el-text-color-regular);
             }
             .app-button {
                 float: right;

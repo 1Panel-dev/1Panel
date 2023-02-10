@@ -357,17 +357,7 @@ onMounted(() => {
             background: none !important;
             box-shadow: none !important;
             border-radius: 0 !important;
-            border-bottom: 1px solid $menu-backgroup-color;
-
-            // --el-input-focus-border: $menu-backgroup-color;
-            // --el-input-transparent-border: 0 0 0 0px;
-            // --el-input-border-color: $menu-backgroup-color;
-            // --el-input-hover-border: 0px !important;
-            // --el-input-hover-border-color: $menu-backgroup-color;
-            // --el-input-focus-border-color: $menu-backgroup-color;
-            // --el-input-clear-hover-color: $menu-backgroup-color;
-            // box-shadow: 0 0 0 0px !important;
-            // --el-input-border: 0px;
+            border-top: 1px solid #f2f2f2;
         }
     }
 

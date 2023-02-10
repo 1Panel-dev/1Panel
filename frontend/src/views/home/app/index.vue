@@ -120,19 +120,14 @@ defineExpose({
     .h-app-button {
         margin-top: 10px;
     }
+    &:hover {
+        background-color: rgba(0, 94, 235, 0.03);
+    }
 }
 
 .h-app-divider {
     margin-top: 5px;
     border: 0;
-    border-top: 1px solid #f2f2f2;
-}
-
-.h-app-card:hover {
-    background-color: rgba(0, 94, 235, 0.03);
-}
-
-.el-avatar {
-    --el-avatar-bg-color: #ffffff;
+    border-top: var(--panel-border);
 }
 </style>

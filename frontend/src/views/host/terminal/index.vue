@@ -76,14 +76,14 @@ onUnmounted(() => {
     .el-radio-button__original-radio:checked + .el-radio-button__inner {
         border-radius: 3px;
         color: $primary-color;
-        background-color: #ffffff;
+        background-color: var(--panel-button-active);
         box-shadow: 0 0 0 2px $primary-color !important;
     }
 
     .el-radio-button:first-child .el-radio-button__inner {
         border-radius: 3px;
         color: $primary-color;
-        background-color: #ffffff;
+        background-color: var(--panel-button-active);
         box-shadow: 0 0 0 2px $primary-color !important;
     }
 }

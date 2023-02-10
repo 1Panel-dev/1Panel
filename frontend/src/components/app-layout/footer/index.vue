@@ -17,6 +17,7 @@
     height: 45px;
     background: #ffffff;
     border-top: 1px solid #e4e7ed;
+    box-sizing: border-box;
     a {
         font-size: 14px;
         color: #858585;
