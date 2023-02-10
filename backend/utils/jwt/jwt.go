@@ -3,6 +3,7 @@ package jwt
 import (
 	"time"
 
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -30,8 +31,10 @@ type BaseClaims struct {
 }
 
 func NewJWT() *JWT {
+	settingRepo := repo.NewISettingRepo()
+	jwtSign, _ := settingRepo.Get(settingRepo.WithByKey("JWTSigningKey"))
 	return &JWT{
-		[]byte(constant.JWTSigningKey),
+		[]byte(jwtSign.Value),
 	}
 }
 
