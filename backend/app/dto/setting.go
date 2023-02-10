@@ -30,6 +30,8 @@ type SettingInfo struct {
 	EmailVars   string `json:"emailVars"`
 	WeChatVars  string `json:"weChatVars"`
 	DingVars    string `json:"dingVars"`
+
+	AppStoreVersion string `json:"appStoreVersion"`
 }
 
 type SettingUpdate struct {
