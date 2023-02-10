@@ -65,7 +65,7 @@ const loadStatus = async () => {
                     clearInterval(Number(timer));
                     timer = null;
                 });
-        }, 1000 * 5);
+        }, 1000 * 20);
     }
 };
 

@@ -47,6 +47,7 @@ interface DialogProps {
     tags: Array<string>;
 }
 const acceptParams = (params: DialogProps) => {
+    isByID.value = false;
     deleteVisiable.value = true;
     deleteForm.id = params.id.replaceAll('sha256:', '').substring(0, 12);
     deleteForm.deleteTags = [];

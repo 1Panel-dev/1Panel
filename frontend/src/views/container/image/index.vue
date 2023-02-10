@@ -11,7 +11,7 @@
         <LayoutContent v-loading="loading" :title="$t('container.image')" :class="{ mask: dockerStatus != 'Running' }">
             <template #toolbar>
                 <el-row>
-                    <el-col :span="20">
+                    <el-col :span="16">
                         <el-button type="primary" plain @click="onOpenPull">
                             {{ $t('container.imagePull') }}
                         </el-button>
@@ -22,7 +22,8 @@
                             {{ $t('container.build') }}
                         </el-button>
                     </el-col>
-                    <el-col :span="4">
+                    <el-col :span="8">
+                        <TableSetting @search="search()" />
                         <div class="search-button">
                             <el-input
                                 v-model="searchName"
@@ -75,6 +76,7 @@
 
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
+import TableSetting from '@/components/table-setting/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFormatSimple } from '@/utils/util';
 import { Container } from '@/api/interface/container';

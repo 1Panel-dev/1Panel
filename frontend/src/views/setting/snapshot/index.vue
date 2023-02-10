@@ -2,12 +2,30 @@
     <div>
         <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('setting.snapshot')">
             <template #toolbar>
-                <el-button type="primary" @click="onCreate()">
-                    {{ $t('setting.createSnapshot') }}
-                </el-button>
-                <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
-                    {{ $t('commons.button.delete') }}
-                </el-button>
+                <el-row>
+                    <el-col :span="16">
+                        <el-button type="primary" @click="onCreate()">
+                            {{ $t('setting.createSnapshot') }}
+                        </el-button>
+                        <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
+                    </el-col>
+                    <el-col :span="8">
+                        <TableSetting ref="timerRef" @search="search()" />
+                        <div class="search-button">
+                            <el-input
+                                v-model="searchName"
+                                clearable
+                                @clear="search()"
+                                suffix-icon="Search"
+                                @keyup.enter="search()"
+                                @blur="search()"
+                                :placeholder="$t('commons.button.search')"
+                            ></el-input>
+                        </div>
+                    </el-col>
+                </el-row>
             </template>
             <template #main>
                 <ComplexTable
@@ -40,6 +58,9 @@
                             <el-tag v-if="row.status === 'Waiting'" type="info">
                                 {{ $t('commons.table.statusWaiting') }}
                             </el-tag>
+                            <el-tag v-if="row.status === 'Uploading'" type="info">
+                                {{ $t('commons.status.uploading') }}...
+                            </el-tag>
                             <el-tooltip
                                 v-if="row.status === 'Failed'"
                                 class="box-item"
@@ -67,7 +88,7 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
-        <RecoverStatus @search="search()" ref="recoverStatusRef"></RecoverStatus>
+        <RecoverStatus ref="recoverStatusRef" @search="search()"></RecoverStatus>
         <el-drawer v-model="drawerVisiable" size="50%">
             <template #header>
                 <DrawerHeader :header="$t('setting.createSnapshot')" :back="handleClose" />
@@ -117,6 +138,7 @@
 
 <script setup lang="ts">
 import ComplexTable from '@/components/complex-table/index.vue';
+import TableSetting from '@/components/table-setting/index.vue';
 import { snapshotCreate, searchSnapshotPage, snapshotDelete } from '@/api/modules/setting';
 import { onMounted, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
@@ -139,6 +161,7 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
+const searchName = ref();
 
 const recoverStatusRef = ref();
 const isRecordShow = ref();
@@ -231,6 +254,7 @@ const buttons = [
 
 const search = async () => {
     let params = {
+        info: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };

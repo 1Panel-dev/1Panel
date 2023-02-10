@@ -1,5 +1,5 @@
 import http from '@/api';
-import { ReqPage, ResPage } from '../interface';
+import { ResPage, SearchWithPage } from '../interface';
 import { Setting } from '../interface/setting';
 
 export const getSettingInfo = () => {
@@ -62,7 +62,7 @@ export const snapshotRecover = (param: Setting.SnapshotRecover) => {
 export const snapshotRollback = (param: Setting.SnapshotRecover) => {
     return http.post(`/settings/snapshot/rollback`, param);
 };
-export const searchSnapshotPage = (param: ReqPage) => {
+export const searchSnapshotPage = (param: SearchWithPage) => {
     return http.post<ResPage<Setting.SnapshotInfo>>(`/settings/snapshot/search`, param);
 };
 
