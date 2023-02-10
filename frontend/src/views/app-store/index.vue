@@ -33,7 +33,9 @@ const buttons = [
 ];
 onMounted(() => {
     SearchAppInstalled({ update: true, page: 1, pageSize: 100 }).then((res) => {
-        buttons[2].count = res.data.items.length;
+        if (res.data.items) {
+            buttons[2].count = res.data.items.length;
+        }
         showButton.value = true;
     });
 });

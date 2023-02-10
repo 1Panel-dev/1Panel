@@ -40,10 +40,10 @@ func Init() {
 	}
 	global.CONF = serverConfig
 	global.CONF.BaseDir = baseDir
-	global.CONF.System.DataDir = global.CONF.BaseDir + "/1panel/data"
-	global.CONF.System.Cache = global.CONF.BaseDir + "/1panel/data/cache"
-	global.CONF.System.Backup = global.CONF.BaseDir + "/1panel/data/backup"
-	global.CONF.System.DbPath = global.CONF.BaseDir + "/1panel/data/db"
-	global.CONF.System.LogPath = global.CONF.BaseDir + "/1panel/log"
+	global.CONF.System.DataDir = global.CONF.BaseDir + "/1panel"
+	global.CONF.System.Cache = global.CONF.System.DataDir + "/cache"
+	global.CONF.System.Backup = global.CONF.System.DataDir + "/backup"
+	global.CONF.System.DbPath = global.CONF.System.DataDir + "/db"
+	global.CONF.System.LogPath = global.CONF.System.DataDir + "/log"
 	global.Viper = v
 }
