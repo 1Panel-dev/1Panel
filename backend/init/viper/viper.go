@@ -3,6 +3,8 @@ package viper
 import (
 	"bytes"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"path"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
@@ -15,19 +17,29 @@ import (
 )
 
 func Init() {
-	stdout, err := cmd.Exec("grep '^BASE_DIR=' /usr/bin/1pctl | cut -d'=' -f2")
-	if err != nil {
-		panic(err)
-	}
-	baseDir := strings.ReplaceAll(stdout, "\n", "")
-	if len(baseDir) == 0 {
-		panic("error `BASE_DIR` find in /usr/bin/1pctl")
-	}
+	baseDir := "/opt"
+	fileOp := files.NewFileOp()
 	v := viper.NewWithOptions()
 	v.SetConfigType("yaml")
-	reader := bytes.NewReader(conf.AppYaml)
-	if err := v.ReadConfig(reader); err != nil {
-		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+	if fileOp.Stat("/opt/1panel/conf/app.yaml") {
+		v.SetConfigName("app")
+		v.AddConfigPath(path.Join("/opt/1pane/conf"))
+		if err := v.ReadInConfig(); err != nil {
+			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		}
+	} else {
+		stdout, err := cmd.Exec("grep '^BASE_DIR=' /usr/bin/1pctl | cut -d'=' -f2")
+		if err != nil {
+			panic(err)
+		}
+		baseDir = strings.ReplaceAll(stdout, "\n", "")
+		if len(baseDir) == 0 {
+			panic("error `BASE_DIR` find in /usr/bin/1pctl")
+		}
+		reader := bytes.NewReader(conf.AppYaml)
+		if err := v.ReadConfig(reader); err != nil {
+			panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		}
 	}
 	v.OnConfigChange(func(e fsnotify.Event) {
 		if err := v.Unmarshal(&global.CONF); err != nil {
