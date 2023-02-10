@@ -11,7 +11,7 @@
         <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('cronjob.cronTask')">
             <template #toolbar>
                 <el-row>
-                    <el-col :span="20">
+                    <el-col :span="16">
                         <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('commons.button.create') }}{{ $t('cronjob.cronTask') }}
                         </el-button>
@@ -19,7 +19,8 @@
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </el-col>
-                    <el-col :span="4">
+                    <el-col :span="8">
+                        <TableSetting @search="search()" />
                         <div class="search-button">
                             <el-input
                                 v-model="searchName"
@@ -124,6 +125,7 @@
 
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
+import TableSetting from '@/components/table-setting/index.vue';
 import OperatrDialog from '@/views/cronjob/operate/index.vue';
 import Records from '@/views/cronjob/record/index.vue';
 import LayoutContent from '@/layout/layout-content.vue';

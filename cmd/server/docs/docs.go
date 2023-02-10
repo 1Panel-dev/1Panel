@@ -28,26 +28,26 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/apps/:id": {
+        "/apps/:key": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "通过 id 获取应用信息",
+                "description": "通过 key 获取应用信息",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "App"
                 ],
-                "summary": "Search app by id",
+                "summary": "Search app by key",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "app id",
-                        "name": "id",
+                        "type": "string",
+                        "description": "app key",
+                        "name": "key",
                         "in": "path",
                         "required": true
                     }
@@ -6489,7 +6489,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.PageInfo"
+                            "$ref": "#/definitions/dto.SearchWithPage"
                         }
                     }
                 ],
@@ -10668,6 +10668,9 @@ var doc = `{
                 "name": {
                     "type": "string"
                 },
+                "recommend": {
+                    "type": "integer"
+                },
                 "required": {
                     "type": "string"
                 },
@@ -11104,6 +11107,9 @@ var doc = `{
                 },
                 "pageSize": {
                     "type": "integer"
+                },
+                "recommend": {
+                    "type": "boolean"
                 },
                 "tags": {
                     "type": "array",
@@ -11984,6 +11990,9 @@ var doc = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "recommend": {
+                    "type": "integer"
                 },
                 "required": {
                     "type": "string"

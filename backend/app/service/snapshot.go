@@ -25,7 +25,7 @@ type SnapshotService struct {
 }
 
 type ISnapshotService interface {
-	SearchWithPage(req dto.PageInfo) (int64, interface{}, error)
+	SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error)
 	SnapshotCreate(req dto.SnapshotCreate) error
 	SnapshotRecover(req dto.SnapshotRecover) error
 	SnapshotRollback(req dto.SnapshotRecover) error
@@ -38,8 +38,8 @@ func NewISnapshotService() ISnapshotService {
 	return &SnapshotService{}
 }
 
-func (u *SnapshotService) SearchWithPage(req dto.PageInfo) (int64, interface{}, error) {
-	total, systemBackups, err := snapshotRepo.Page(req.Page, req.PageSize)
+func (u *SnapshotService) SearchWithPage(req dto.SearchWithPage) (int64, interface{}, error) {
+	total, systemBackups, err := snapshotRepo.Page(req.Page, req.PageSize, commonRepo.WithLikeName(req.Info))
 	var dtoSnap []dto.SnapshotInfo
 	for _, systemBackup := range systemBackups {
 		var item dto.SnapshotInfo
@@ -90,7 +90,7 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 		Description: req.Description,
 		From:        req.From,
 		Version:     versionItem.Value,
-		Status:      constant.StatusSuccess,
+		Status:      constant.StatusWaiting,
 	}
 	_ = snapshotRepo.Create(&snap)
 	_ = settingRepo.Update("SystemStatus", "Snapshoting")
@@ -134,11 +134,10 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 			return
 		}
 
-		if err := u.handlePanelDatas(fileOp, "snapshot", global.CONF.BaseDir+"/1panel", backupPanelDir, localDir, dockerDataDir); err != nil {
+		if err := u.handlePanelDatas(snap.ID, fileOp, "snapshot", global.CONF.BaseDir+"/1panel", backupPanelDir, localDir, dockerDataDir); err != nil {
 			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
 			return
 		}
-		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusWaiting})
 
 		snapJson := SnapshotJson{DockerDataDir: dockerDataDir, BackupDataDir: localDir, PanelDataDir: global.CONF.BaseDir + "/1panel", LiveRestoreEnabled: liveRestoreStatus}
 		if err := u.saveJson(snapJson, rootDir); err != nil {
@@ -154,6 +153,7 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 		_ = settingRepo.Update("SystemStatus", "Free")
 
 		global.LOG.Infof("start to upload snapshot to %s, please wait", backup.Type)
+		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusUploading})
 		localPath := fmt.Sprintf("%s/system/1panel_snapshot_%s.tar.gz", localDir, timeNow)
 		if ok, err := backupAccont.Upload(localPath, fmt.Sprintf("system_snapshot/1panel_snapshot_%s.tar.gz", timeNow)); err != nil || !ok {
 			_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
@@ -311,7 +311,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 		}
 
 		if !isReTry || snap.InterruptStep == "1PanelData" {
-			if err := u.handlePanelDatas(fileOp, operation, rootDir, snapJson.PanelDataDir, localDir, snapJson.OldDockerDataDir); err != nil {
+			if err := u.handlePanelDatas(snap.ID, fileOp, operation, rootDir, snapJson.PanelDataDir, localDir, snapJson.OldDockerDataDir); err != nil {
 				updateRecoverStatus(snap.ID, "1PanelData", constant.StatusFailed, err.Error())
 				return
 			}
@@ -344,89 +344,92 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 	if _, err := os.Stat(u.OriginalPath); err != nil && os.IsNotExist(err) {
 		return fmt.Errorf("load original dir failed, err: %s", err)
 	}
+
+	_ = settingRepo.Update("SystemStatus", "Rollbacking")
 	_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"rollback_status": constant.StatusWaiting})
-	snapJson, err := u.readFromJson(fmt.Sprintf("%s/snapshot.json", rootDir))
-	if err != nil {
-		updateRollbackStatus(snap.ID, constant.StatusFailed, fmt.Sprintf("decompress file failed, err: %v", err))
-		return err
-	}
-
-	_, _ = cmd.Exec("systemctl stop docker")
-	if err := u.handleDockerDatas(fileOp, "rollback", u.OriginalPath, snapJson.OldDockerDataDir); err != nil {
-		updateRollbackStatus(snap.ID, constant.StatusFailed, err.Error())
-		return err
-	}
-	if snap.InterruptStep == "DockerDir" {
-		_, _ = cmd.Exec("systemctl restart docker")
-		return nil
-	}
-
-	if err := u.handleDaemonJson(fileOp, "rollback", u.OriginalPath+"/daemon.json", ""); err != nil {
-		updateRollbackStatus(snap.ID, constant.StatusFailed, err.Error())
-		return err
-	}
-	if snap.InterruptStep == "DaemonJson" {
-		_, _ = cmd.Exec("systemctl restart docker")
-		return nil
-	}
-	if snapJson.LiveRestoreEnabled {
-		if err := u.updateLiveRestore(true); err != nil {
-			updateRollbackStatus(snap.ID, constant.StatusFailed, err.Error())
-			return err
+	go func() {
+		snapJson, err := u.readFromJson(fmt.Sprintf("%s/snapshot.json", rootDir))
+		if err != nil {
+			updateRollbackStatus(snap.ID, constant.StatusFailed, fmt.Sprintf("decompress file failed, err: %v", err))
+			return
 		}
-	}
-	if snap.InterruptStep == "UpdateLiveRestore" {
-		_, _ = cmd.Exec("systemctl restart dockere")
-		return nil
-	}
 
-	if err := u.handlePanelBinary(fileOp, "rollback", u.OriginalPath+"/1panel", ""); err != nil {
-		updateRollbackStatus(snap.ID, constant.StatusFailed, err.Error())
-		return err
-	}
-	if snap.InterruptStep == "1PanelBinary" {
-		return nil
-	}
+		_, _ = cmd.Exec("systemctl stop docker")
+		if err := u.handleDockerDatas(fileOp, "rollback", u.OriginalPath, snapJson.OldDockerDataDir); err != nil {
+			updateRollbackStatus(snap.ID, constant.StatusFailed, err.Error())
+			return
+		}
+		if snap.InterruptStep == "DockerDir" {
+			_, _ = cmd.Exec("systemctl restart docker")
+			return
+		}
 
-	if err := u.handlePanelctlBinary(fileOp, "rollback", u.OriginalPath+"/1pctl", ""); err != nil {
-		updateRollbackStatus(snap.ID, constant.StatusFailed, err.Error())
-		return err
-	}
-	if snap.InterruptStep == "1PctlBinary" {
-		return nil
-	}
+		if err := u.handleDaemonJson(fileOp, "rollback", u.OriginalPath+"/daemon.json", ""); err != nil {
+			updateRollbackStatus(snap.ID, constant.StatusFailed, err.Error())
+			return
+		}
+		if snap.InterruptStep == "DaemonJson" {
+			_, _ = cmd.Exec("systemctl restart docker")
+			return
+		}
+		if snapJson.LiveRestoreEnabled {
+			if err := u.updateLiveRestore(true); err != nil {
+				updateRollbackStatus(snap.ID, constant.StatusFailed, err.Error())
+				return
+			}
+		}
+		if snap.InterruptStep == "UpdateLiveRestore" {
+			_, _ = cmd.Exec("systemctl restart dockere")
+			return
+		}
 
-	if err := u.handlePanelService(fileOp, "rollback", u.OriginalPath+"/1panel.service", ""); err != nil {
-		updateRollbackStatus(snap.ID, constant.StatusFailed, err.Error())
-		return err
-	}
-	if snap.InterruptStep == "1PanelService" {
+		if err := u.handlePanelBinary(fileOp, "rollback", u.OriginalPath+"/1panel", ""); err != nil {
+			updateRollbackStatus(snap.ID, constant.StatusFailed, err.Error())
+			return
+		}
+		if snap.InterruptStep == "1PanelBinary" {
+			return
+		}
+
+		if err := u.handlePanelctlBinary(fileOp, "rollback", u.OriginalPath+"/1pctl", ""); err != nil {
+			updateRollbackStatus(snap.ID, constant.StatusFailed, err.Error())
+			return
+		}
+		if snap.InterruptStep == "1PctlBinary" {
+			return
+		}
+
+		if err := u.handlePanelService(fileOp, "rollback", u.OriginalPath+"/1panel.service", ""); err != nil {
+			updateRollbackStatus(snap.ID, constant.StatusFailed, err.Error())
+			return
+		}
+		if snap.InterruptStep == "1PanelService" {
+			_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
+			return
+		}
+
+		if err := u.handleBackupDatas(fileOp, "rollback", u.OriginalPath, snapJson.OldBackupDataDir); err != nil {
+			updateRollbackStatus(snap.ID, constant.StatusFailed, err.Error())
+			return
+		}
+		if snap.InterruptStep == "1PanelBackups" {
+			_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
+			return
+		}
+
+		if err := u.handlePanelDatas(snap.ID, fileOp, "rollback", u.OriginalPath, snapJson.OldPanelDataDir, "", ""); err != nil {
+			updateRollbackStatus(snap.ID, constant.StatusFailed, err.Error())
+			return
+		}
+		if snap.InterruptStep == "1PanelData" {
+			_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
+			return
+		}
+
+		_ = os.RemoveAll(rootDir)
+		global.LOG.Info("rollback successful")
 		_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
-		return nil
-	}
-
-	if err := u.handleBackupDatas(fileOp, "rollback", u.OriginalPath, snapJson.OldBackupDataDir); err != nil {
-		updateRollbackStatus(snap.ID, constant.StatusFailed, err.Error())
-		return err
-	}
-	if snap.InterruptStep == "1PanelBackups" {
-		_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
-		return nil
-	}
-
-	if err := u.handlePanelDatas(fileOp, "rollback", u.OriginalPath, snapJson.OldPanelDataDir, "", ""); err != nil {
-		updateRollbackStatus(snap.ID, constant.StatusFailed, err.Error())
-		return err
-	}
-	if snap.InterruptStep == "1PanelData" {
-		_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
-		return nil
-	}
-
-	_ = os.RemoveAll(rootDir)
-	global.LOG.Info("rollback successful")
-	_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
-	updateRollbackStatus(snap.ID, constant.StatusSuccess, "")
+	}()
 	return nil
 }
 
@@ -604,7 +607,7 @@ func (u *SnapshotService) handleBackupDatas(fileOp files.FileOp, operation strin
 	return nil
 }
 
-func (u *SnapshotService) handlePanelDatas(fileOp files.FileOp, operation string, source, target, backupDir, dockerDir string) error {
+func (u *SnapshotService) handlePanelDatas(snapID uint, fileOp files.FileOp, operation string, source, target, backupDir, dockerDir string) error {
 	switch operation {
 	case "snapshot":
 		exclusionRules := "./tmp;./cache;"
@@ -614,9 +617,12 @@ func (u *SnapshotService) handlePanelDatas(fileOp files.FileOp, operation string
 		if strings.Contains(dockerDir, source) {
 			exclusionRules += ("." + strings.ReplaceAll(dockerDir, source, "") + ";")
 		}
+
+		_ = snapshotRepo.Update(snapID, map[string]interface{}{"status": constant.StatusSuccess})
 		if err := u.handleTar(source, target, "1panel_data.tar.gz", exclusionRules); err != nil {
 			return fmt.Errorf("backup panel data failed, err: %v", err)
 		}
+		_ = snapshotRepo.Update(snapID, map[string]interface{}{"status": constant.StatusWaiting})
 	case "recover":
 		exclusionRules := "./tmp/;./cache;"
 		if strings.Contains(backupDir, target) {
@@ -625,9 +631,12 @@ func (u *SnapshotService) handlePanelDatas(fileOp files.FileOp, operation string
 		if strings.Contains(dockerDir, target) {
 			exclusionRules += ("." + strings.ReplaceAll(dockerDir, target, "") + ";")
 		}
+
+		_ = snapshotRepo.Update(snapID, map[string]interface{}{"recover_status": ""})
 		if err := u.handleTar(target, u.OriginalPath, "1panel_data.tar.gz", exclusionRules); err != nil {
 			return fmt.Errorf("restore original panel data failed, err: %v", err)
 		}
+		_ = snapshotRepo.Update(snapID, map[string]interface{}{"recover_status": constant.StatusWaiting})
 
 		if err := u.handleUnTar(source+"/1panel/1panel_data.tar.gz", target); err != nil {
 			return fmt.Errorf("recover panel data failed, err: %v", err)
@@ -701,6 +710,7 @@ func updateRecoverStatus(id uint, interruptStep, status string, message string) 
 	_ = settingRepo.Update("SystemStatus", "Free")
 }
 func updateRollbackStatus(id uint, status string, message string) {
+	_ = settingRepo.Update("SystemStatus", "Free")
 	if status == constant.StatusSuccess {
 		if err := snapshotRepo.Update(id, map[string]interface{}{
 			"recover_status":     "",

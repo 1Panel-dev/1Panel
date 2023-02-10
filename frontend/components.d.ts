@@ -60,7 +60,6 @@ declare module 'vue' {
     ElRow: typeof import('element-plus/es')['ElRow']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
     ElSelect: typeof import('element-plus/es')['ElSelect']
-    ElSpan: typeof import('element-plus/es')['ElSpan']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     ElSwitch: typeof import('element-plus/es')['ElSwitch']
     ElTable: typeof import('element-plus/es')['ElTable']
@@ -83,6 +82,7 @@ declare module 'vue' {
     Status: typeof import('./src/components/status/index.vue')['default']
     SubItem: typeof import('./src/components/app-layout/menu/components/sub-item.vue')['default']
     SvgIcon: typeof import('./src/components/svg-icon/svg-icon.vue')['default']
+    TableSetting: typeof import('./src/components/table-setting/index.vue')['default']
   }
 }
 

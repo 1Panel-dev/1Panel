@@ -3,12 +3,13 @@
         <LayoutContent v-loading="loading" :title="$t('logs.login')">
             <template #toolbar>
                 <el-row>
-                    <el-col :span="20">
+                    <el-col :span="16">
                         <el-button type="primary" plain @click="onClean()">
                             {{ $t('logs.deleteLogs') }}
                         </el-button>
                     </el-col>
-                    <el-col :span="4">
+                    <el-col :span="8">
+                        <TableSetting @search="search()" />
                         <div class="search-button">
                             <el-input
                                 v-model="searchIP"
@@ -64,6 +65,7 @@
 
 <script setup lang="ts">
 import ComplexTable from '@/components/complex-table/index.vue';
+import TableSetting from '@/components/table-setting/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import LayoutContent from '@/layout/layout-content.vue';
 import { dateFormat } from '@/utils/util';

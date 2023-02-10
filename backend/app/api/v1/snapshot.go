@@ -38,12 +38,12 @@ func (b *BaseApi) CreateSnapshot(c *gin.Context) {
 // @Summary Page system snapshot
 // @Description 获取系统快照列表分页
 // @Accept json
-// @Param request body dto.PageInfo true "request"
+// @Param request body dto.SearchWithPage true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
 // @Router /settings/snapshot/search [post]
 func (b *BaseApi) SearchSnapshot(c *gin.Context) {
-	var req dto.PageInfo
+	var req dto.SearchWithPage
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

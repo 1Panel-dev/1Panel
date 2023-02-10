@@ -15,7 +15,7 @@
         >
             <template #toolbar>
                 <el-row>
-                    <el-col :span="20">
+                    <el-col :span="16">
                         <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('container.createComposeTemplate') }}
                         </el-button>
@@ -23,7 +23,8 @@
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </el-col>
-                    <el-col :span="4">
+                    <el-col :span="8">
+                        <TableSetting @search="search()" />
                         <div class="search-button">
                             <el-input
                                 v-model="searchName"
@@ -102,6 +103,7 @@
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
+import TableSetting from '@/components/table-setting/index.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';

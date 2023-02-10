@@ -1496,6 +1496,8 @@ definitions:
         type: integer
       name:
         type: string
+      recommend:
+        type: integer
       required:
         type: string
       shortDesc:
@@ -1782,6 +1784,8 @@ definitions:
         type: integer
       pageSize:
         type: integer
+      recommend:
+        type: boolean
       tags:
         items:
           type: string
@@ -2375,6 +2379,8 @@ definitions:
         type: integer
       name:
         type: string
+      recommend:
+        type: integer
       required:
         type: string
       shortDesc:
@@ -2629,17 +2635,17 @@ info:
   title: 1Panel
   version: "1.0"
 paths:
-  /apps/:id:
+  /apps/:key:
     get:
       consumes:
       - application/json
-      description: 通过 id 获取应用信息
+      description: 通过 key 获取应用信息
       parameters:
-      - description: app id
+      - description: app key
         in: path
-        name: id
+        name: key
         required: true
-        type: integer
+        type: string
       responses:
         "200":
           description: OK
@@ -2647,7 +2653,7 @@ paths:
             $ref: '#/definitions/response.AppDTO'
       security:
       - ApiKeyAuth: []
-      summary: Search app by id
+      summary: Search app by key
       tags:
       - App
   /apps/detail/:appId/:version:
@@ -6736,7 +6742,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.PageInfo'
+          $ref: '#/definitions/dto.SearchWithPage'
       responses:
         "200":
           description: OK

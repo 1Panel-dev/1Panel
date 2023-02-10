@@ -11,7 +11,7 @@
         <LayoutContent v-loading="loading" :title="$t('container.repo')" :class="{ mask: dockerStatus != 'Running' }">
             <template #toolbar>
                 <el-row>
-                    <el-col :span="20">
+                    <el-col :span="16">
                         <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('container.createRepo') }}
                         </el-button>
@@ -19,7 +19,8 @@
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </el-col>
-                    <el-col :span="4">
+                    <el-col :span="8">
+                        <TableSetting @search="search()" />
                         <div class="search-button">
                             <el-input
                                 v-model="searchName"
@@ -78,6 +79,7 @@
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
+import TableSetting from '@/components/table-setting/index.vue';
 import OperatorDialog from '@/views/container/repo/operator/index.vue';
 import DeleteDialog from '@/views/container/repo/delete/index.vue';
 import { reactive, onMounted, ref } from 'vue';
