@@ -7,6 +7,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
@@ -93,6 +94,10 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "SecurityEntrance", Value: "onepanel"}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: "JWTSigningKey", Value: common.RandStr(16)}).Error; err != nil {
+			return err
+		}
+
 		if err := tx.Create(&model.Setting{Key: "ExpirationTime", Value: time.Now().AddDate(0, 0, 10).Format("2006-01-02 15:04:05")}).Error; err != nil {
 			return err
 		}
