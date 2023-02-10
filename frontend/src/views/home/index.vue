@@ -37,7 +37,7 @@
                                 <el-col :span="6">
                                     <span>{{ $t('home.appInstalled') }}</span>
                                     <div class="count">
-                                        <span @click="goRouter('/apps')">
+                                        <span @click="goRouter('/apps/installed')">
                                             {{ baseInfo?.appInstalldNumber }}
                                         </span>
                                     </div>
