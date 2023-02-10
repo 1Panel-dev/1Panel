@@ -58,7 +58,7 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 		return
 	}
 
-	if err := settingService.Update(c, req.Key, req.Value); err != nil {
+	if err := settingService.Update(req.Key, req.Value); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -240,12 +240,12 @@ func (b *BaseApi) MFABind(c *gin.Context) {
 		return
 	}
 
-	if err := settingService.Update(c, "MFAStatus", "enable"); err != nil {
+	if err := settingService.Update("MFAStatus", "enable"); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 
-	if err := settingService.Update(c, "MFASecret", req.Secret); err != nil {
+	if err := settingService.Update("MFASecret", req.Secret); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

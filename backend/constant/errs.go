@@ -32,6 +32,7 @@ var (
 	ErrTokenParse = errors.New("ErrTokenParse")
 
 	ErrPageGenerate = errors.New("generate page info failed")
+	ErrRepoNotValid = "ErrRepoNotValid"
 )
 
 // api

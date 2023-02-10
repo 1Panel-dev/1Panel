@@ -333,14 +333,12 @@ func (a AppService) SyncInstalled(installId uint) error {
 }
 
 func (a AppService) SyncAppList() error {
-	if err := getAppFromOss(); err != nil {
+	if err := getAppFromRepo(); err != nil {
 		global.LOG.Errorf("get app from oss  error: %s", err.Error())
 		return err
 	}
-
 	appDir := constant.AppResourceDir
 	listFile := path.Join(appDir, "list.json")
-
 	content, err := os.ReadFile(listFile)
 	if err != nil {
 		return err
@@ -354,22 +352,18 @@ func (a AppService) SyncAppList() error {
 		tags    []*model.Tag
 		appTags []*model.AppTag
 	)
-
 	for _, t := range list.Tags {
 		tags = append(tags, &model.Tag{
 			Key:  t.Key,
 			Name: t.Name,
 		})
 	}
-
 	oldApps, err := appRepo.GetBy()
 	if err != nil {
 		return err
 	}
 	appsMap := getApps(oldApps, list.Items)
-
 	for _, l := range list.Items {
-
 		app := appsMap[l.Key]
 		icon, err := os.ReadFile(path.Join(appDir, l.Key, "metadata", "logo.png"))
 		if err != nil {
@@ -433,9 +427,7 @@ func (a AppService) SyncAppList() error {
 			updateArray = append(updateArray, v)
 		}
 	}
-
 	tx, ctx := getTxAndContext()
-
 	if len(addAppArray) > 0 {
 		if err := appRepo.BatchCreate(ctx, addAppArray); err != nil {
 			tx.Rollback()
@@ -461,7 +453,6 @@ func (a AppService) SyncAppList() error {
 			return err
 		}
 	}
-
 	apps := append(addAppArray, updateArray...)
 
 	var (
@@ -478,7 +469,6 @@ func (a AppService) SyncAppList() error {
 				})
 			}
 		}
-
 		for _, d := range a.Details {
 			d.AppId = a.ID
 			if d.ID == 0 {
@@ -488,7 +478,6 @@ func (a AppService) SyncAppList() error {
 			}
 		}
 	}
-
 	if len(addDetails) > 0 {
 		if err := appDetailRepo.BatchCreate(ctx, addDetails); err != nil {
 			tx.Rollback()

@@ -139,6 +139,9 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "SystemStatus", Value: "Free"}).Error; err != nil {
 			return err
 		}
+		if err := tx.Create(&model.Setting{Key: "AppStoreVersion", Value: "0"}).Error; err != nil {
+			return err
+		}
 		return nil
 	},
 }

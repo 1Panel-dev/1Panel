@@ -23,7 +23,7 @@ func Init() {
 	v.SetConfigType("yaml")
 	if fileOp.Stat("/opt/1panel/conf/app.yaml") {
 		v.SetConfigName("app")
-		v.AddConfigPath(path.Join("/opt/1pane/conf"))
+		v.AddConfigPath(path.Join("/opt/1panel/conf"))
 		if err := v.ReadInConfig(); err != nil {
 			panic(fmt.Errorf("Fatal error config file: %s \n", err))
 		}

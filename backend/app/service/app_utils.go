@@ -4,9 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"github.com/1Panel-dev/1Panel/backend/utils/git"
 	"math"
-	"net/http"
 	"os"
 	"path"
 	"reflect"
@@ -500,46 +499,32 @@ func handleErr(install model.AppInstall, err error, out string) error {
 	return reErr
 }
 
-func getAppFromOss() error {
-	res, err := http.Get(global.CONF.System.AppOss + "/apps/apps.json")
+func getAppFromRepo() error {
+	repoInfo, err := git.CheckAndGetInfo(global.CONF.System.AppRepoOwner, global.CONF.System.AppRepoName)
 	if err != nil {
-		return err
-	}
-	appByte, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return err
-	}
-	var ossConfig dto.AppOssConfig
-	if err := json.Unmarshal(appByte, &ossConfig); err != nil {
 		return err
 	}
 	appDir := constant.AppResourceDir
-	content, _ := os.ReadFile(path.Join(appDir, "list.json"))
-
-	if content != nil {
-		oldConfig := &dto.AppOssConfig{}
-		if err := json.Unmarshal(content, oldConfig); err != nil {
-			return err
-		}
-		if oldConfig.Version == ossConfig.Version {
-			return nil
-		}
+	setting, err := NewISettingService().GetSettingInfo()
+	if err != nil {
+		return err
 	}
-
+	if !common.CompareVersion(repoInfo.Version, setting.AppStoreVersion) {
+		return nil
+	}
+	downloadUrl := fmt.Sprintf("%sapps-%s.tar.gz", repoInfo.DownloadPath, repoInfo.Version)
 	fileOp := files.NewFileOp()
-
 	if _, err := fileOp.CopyAndBackup(appDir); err != nil {
 		return err
 	}
-
-	packagePath := path.Join(constant.ResourceDir, path.Base(ossConfig.Package))
-	if err := fileOp.DownloadFile(ossConfig.Package, packagePath); err != nil {
+	packagePath := path.Join(constant.ResourceDir, path.Base(downloadUrl))
+	if err := fileOp.DownloadFile(downloadUrl, packagePath); err != nil {
 		return err
 	}
-	if err := fileOp.Decompress(packagePath, constant.ResourceDir, files.Zip); err != nil {
+	if err := fileOp.Decompress(packagePath, constant.ResourceDir, files.TarGz); err != nil {
 		return err
 	}
-
+	_ = NewISettingService().Update("AppStoreVersion", repoInfo.Version)
 	defer func() {
 		_ = fileOp.DeleteFile(packagePath)
 	}()

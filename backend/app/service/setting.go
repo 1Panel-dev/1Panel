@@ -17,7 +17,7 @@ type SettingService struct{}
 
 type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
-	Update(c *gin.Context, key, value string) error
+	Update(key, value string) error
 	UpdatePassword(c *gin.Context, old, new string) error
 	UpdatePort(port uint) error
 	HandlePasswordExpired(c *gin.Context, old, new string) error
@@ -48,7 +48,7 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	return &info, err
 }
 
-func (u *SettingService) Update(c *gin.Context, key, value string) error {
+func (u *SettingService) Update(key, value string) error {
 	if key == "ExpirationDays" {
 		timeout, _ := strconv.Atoi(value)
 		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006-01-02 15:04:05")); err != nil {

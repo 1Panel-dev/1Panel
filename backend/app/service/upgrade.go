@@ -33,7 +33,7 @@ func NewIUpgradeService() IUpgradeService {
 }
 
 func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
-	currentVerion, err := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
+	currentVersion, err := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 		}
 	}
 	if len(releaseInfo.NewVersion) != 0 {
-		isNew, err := compareVersion(currentVerion.Value, releaseInfo.NewVersion)
+		isNew, err := compareVersion(currentVersion.Value, releaseInfo.NewVersion)
 		if !isNew && err != nil {
 			return nil, err
 		}
@@ -183,8 +183,8 @@ func (u *UpgradeService) handleRollback(fileOp files.FileOp, originalDir string,
 func (u *UpgradeService) loadLatestFromGithub() (dto.UpgradeInfo, error) {
 	var info dto.UpgradeInfo
 	client := github.NewClient(nil)
-	ctx, cancle := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancle()
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
 	stats, res, err := client.Repositories.GetLatestRelease(ctx, "wanghe-fit2cloud", "1Panel")
 	if res.StatusCode != 200 || err != nil {
 		return info, fmt.Errorf("load upgrade info from github failed, err: %v", err)
@@ -198,8 +198,8 @@ func (u *UpgradeService) loadLatestFromGithub() (dto.UpgradeInfo, error) {
 func (u *UpgradeService) loadLatestFromGitee() (dto.UpgradeInfo, error) {
 	var info dto.UpgradeInfo
 	client := gitee.NewAPIClient(gitee.NewConfiguration())
-	ctx, cancle := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancle()
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
 	stats, res, err := client.RepositoriesApi.GetV5ReposOwnerRepoReleasesLatest(ctx, "wanghe-fit2cloud", "1Panel", &gitee.GetV5ReposOwnerRepoReleasesLatestOpts{})
 	if res.StatusCode != 200 || err != nil {
 		return info, fmt.Errorf("load upgrade info from gitee failed, err: %v", err)
