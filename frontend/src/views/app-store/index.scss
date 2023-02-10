@@ -49,10 +49,9 @@
             margin-top: 10px;
         }
     }
-}
-
-.app-card:hover {
-    background-color: rgba(0, 94, 235, 0.03);
+    &:hover {
+        background-color: rgba(0, 94, 235, 0.03);
+    }
 }
 
 .table-button {
@@ -63,11 +62,7 @@
 .app-divider {
     margin-top: 5px;
     border: 0;
-    border-top: 1px solid #f2f2f2;
-}
-
-.el-avatar {
-    --el-avatar-bg-color: #ffffff;
+    border-top: var(--panel-border);
 }
 
 .update-prompt {
