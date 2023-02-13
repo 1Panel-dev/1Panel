@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"gitee.com/openeuler/go-gitee/gitee"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/google/go-github/github"
 	"net/http"
 	"time"
@@ -28,10 +29,14 @@ func CheckAndGetInfo(owner, repoName string) (*RepoInfo, error) {
 			res, err := getLatestRepoInfo(repoType, owner, repoName)
 			if err == nil {
 				return res, nil
+			} else {
+				global.LOG.Errorf("get %s last release version  failed %s", repoType, err.Error())
 			}
+		} else {
+			global.LOG.Errorf("get %s remote repo [%s] failed", repoType, url)
 		}
 	}
-	return nil, errors.New("remote repo get failed")
+	return nil, errors.New("all remote repo get failed")
 }
 
 func checkValid(addr string) bool {

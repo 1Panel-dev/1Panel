@@ -8,8 +8,8 @@ type System struct {
 	DataDir      string `mapstructure:"data_dir"`
 	Cache        string `mapstructure:"cache"`
 	Backup       string `mapstructure:"backup"`
-	AppOss       string `mapstructure:"app_oss"`
 	AppRepoOwner string `mapstructure:"app_repo_owner"`
 	AppRepoName  string `mapstructure:"app_repo_name"`
 	EncryptKey   string `mapstructure:"encrypt_key"`
+	BaseDir      string `mapstructure:"base_dir"`
 }
