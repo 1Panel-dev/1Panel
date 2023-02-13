@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/utils/git"
 	"os"
 	"path"
 	"strings"
@@ -103,6 +104,17 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	}
 	res.Tags = tags
 
+	setting, err := NewISettingService().GetSettingInfo()
+	if err != nil {
+		return nil, err
+	}
+	repoInfo, err := git.CheckAndGetInfo(global.CONF.System.AppRepoOwner, global.CONF.System.AppRepoName)
+	if err != nil {
+		return nil, err
+	}
+	if common.CompareVersion(repoInfo.Version, setting.AppStoreVersion) {
+		res.CanUpdate = true
+	}
 	return res, nil
 }
 

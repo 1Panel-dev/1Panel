@@ -12,7 +12,7 @@ var (
 	authService      = service.ServiceGroupApp.AuthService
 	dashboardService = service.ServiceGroupApp.DashboardService
 
-	appService        = service.ServiceGroupApp.AppService
+	appService        = service.NewIAppService()
 	appInstallService = service.ServiceGroupApp.AppInstallService
 
 	containerService       = service.ServiceGroupApp.ContainerService

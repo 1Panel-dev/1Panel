@@ -14,8 +14,7 @@ func Init() {
 	if common.CompareVersion(setting.AppStoreVersion, "0.0") {
 		return
 	}
-	appService := service.AppService{}
-	if err := appService.SyncAppList(); err != nil {
+	if err := service.NewIAppService().SyncAppList(); err != nil {
 		global.LOG.Errorf("sync app error: %s", err.Error())
 	}
 }
