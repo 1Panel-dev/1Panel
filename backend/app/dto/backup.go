@@ -26,6 +26,10 @@ type BackupSearch struct {
 	DetailName string `json:"detailName"`
 }
 
+type BackupSearchFile struct {
+	Type string `json:"type" validate:"required"`
+}
+
 type RecordSearch struct {
 	PageInfo
 	Type       string `json:"type" validate:"required"`

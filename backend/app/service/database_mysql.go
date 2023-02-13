@@ -37,7 +37,7 @@ type IMysqlService interface {
 	ChangePassword(info dto.ChangeDBInfo) error
 	UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
 	UpdateConfByFile(info dto.MysqlConfUpdateByFile) error
-	UpdateDescription(req dto.MysqlDescription) error
+	UpdateDescription(req dto.UpdateDescription) error
 
 	RecoverByUpload(req dto.UploadRecover) error
 	Backup(db dto.BackupDB) error
@@ -201,7 +201,7 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 	return &mysql, nil
 }
 
-func (u *MysqlService) UpdateDescription(req dto.MysqlDescription) error {
+func (u *MysqlService) UpdateDescription(req dto.UpdateDescription) error {
 	return mysqlRepo.Update(req.ID, map[string]interface{}{"description": req.Description})
 }
 

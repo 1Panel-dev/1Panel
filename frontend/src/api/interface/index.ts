@@ -28,6 +28,10 @@ export interface CommonModel {
     CreatedAt?: string;
     UpdatedAt?: string;
 }
+export interface DescriptionUpdate {
+    id: number;
+    description: string;
+}
 
 // * 文件上传模块
 export namespace Upload {

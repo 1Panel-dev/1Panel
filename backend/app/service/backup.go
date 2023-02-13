@@ -29,6 +29,8 @@ type IBackupService interface {
 	BatchDelete(ids []uint) error
 	BatchDeleteRecord(ids []uint) error
 	NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error)
+
+	ListFiles(req dto.BackupSearchFile) ([]interface{}, error)
 }
 
 func NewIBackupService() IBackupService {
@@ -224,6 +226,18 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 		}
 	}
 	return nil
+}
+
+func (u *BackupService) ListFiles(req dto.BackupSearchFile) ([]interface{}, error) {
+	backup, err := backupRepo.Get(backupRepo.WithByType(req.Type))
+	if err != nil {
+		return nil, err
+	}
+	client, err := u.NewClient(&backup)
+	if err != nil {
+		return nil, err
+	}
+	return client.ListObjects("system_snapshot/")
 }
 
 func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error) {

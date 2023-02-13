@@ -6,6 +6,10 @@ export const getBackupList = () => {
     return http.get<Array<Backup.BackupInfo>>(`/backups/search`);
 };
 
+export const getFilesFromBackup = (type: string) => {
+    return http.post<Array<any>>(`/backups/search/files`, { type: type });
+};
+
 export const addBackup = (params: Backup.BackupOperate) => {
     return http.post<Backup.BackupOperate>(`/backups`, params);
 };

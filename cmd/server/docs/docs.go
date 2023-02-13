@@ -1169,6 +1169,42 @@ var doc = `{
                 }
             }
         },
+        "/backups/search/files": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取备份账号内文件列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "List files from backup accounts",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BackupSearchFile"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "anrry"
+                        }
+                    }
+                }
+            }
+        },
         "/backups/update": {
             "post": {
                 "security": [
@@ -3907,7 +3943,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.MysqlDescription"
+                            "$ref": "#/definitions/dto.UpdateDescription"
                         }
                     }
                 ],
@@ -6285,7 +6321,7 @@ var doc = `{
                 "tags": [
                     "System Setting"
                 ],
-                "summary": "Create system backup",
+                "summary": "Create system snapshot",
                 "parameters": [
                     {
                         "description": "request",
@@ -6361,6 +6397,101 @@ var doc = `{
                     ],
                     "formatEN": "Delete system backup [name]",
                     "formatZH": "删除系统快照 [name]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/settings/snapshot/description/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新快照描述信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Update snapshot description",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateDescription"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "snapshots",
+                            "input_colume": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_colume": "name",
+                            "output_value": "name"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "id",
+                        "description"
+                    ],
+                    "formatEN": "The description of the snapshot [name] is modified =\u003e [description]",
+                    "formatZH": "快照 [name] 描述信息修改 [description]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/settings/snapshot/import": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "导入已有快照",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Import system snapshot",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SnapshotImport"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "from",
+                        "names"
+                    ],
+                    "formatEN": "Sync system snapshots [names] from [from]",
+                    "formatZH": "从 [from] 同步系统快照 [names]",
                     "paramKeys": []
                 }
             }
@@ -8474,6 +8605,17 @@ var doc = `{
                 }
             }
         },
+        "dto.BackupSearchFile": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.BatchDelete": {
             "type": "object",
             "required": [
@@ -9751,20 +9893,6 @@ var doc = `{
                 }
             }
         },
-        "dto.MysqlDescription": {
-            "type": "object",
-            "required": [
-                "id"
-            ],
-            "properties": {
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                }
-            }
-        },
         "dto.MysqlStatus": {
             "type": "object",
             "properties": {
@@ -10451,6 +10579,23 @@ var doc = `{
                 }
             }
         },
+        "dto.SnapshotImport": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string"
+                },
+                "names": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "dto.SnapshotRecover": {
             "type": "object",
             "required": [
@@ -10465,6 +10610,20 @@ var doc = `{
                 },
                 "reDownload": {
                     "type": "boolean"
+                }
+            }
+        },
+        "dto.UpdateDescription": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
                 }
             }
         },

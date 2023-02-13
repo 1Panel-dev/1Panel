@@ -53,6 +53,11 @@ export namespace Setting {
         from: string;
         description: string;
     }
+    export interface SnapshotImport {
+        from: string;
+        names: Array<string>;
+        description: string;
+    }
     export interface SnapshotRecover {
         id: number;
         isNew: boolean;

@@ -768,6 +768,7 @@ export default {
         thirdPartySupport: '仅支持第三方账号',
         recoverDetail: '恢复详情',
         createSnapshot: '创建快照',
+        importSnapshot: '同步快照',
         recover: '恢复',
         noRecoverRecord: '暂无恢复记录',
         lastRecoverAt: '上次恢复时间',

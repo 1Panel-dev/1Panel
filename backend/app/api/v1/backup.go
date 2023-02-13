@@ -210,3 +210,30 @@ func (b *BaseApi) ListBackup(c *gin.Context) {
 
 	helper.SuccessWithData(c, data)
 }
+
+// @Tags Backup Account
+// @Summary List files from backup accounts
+// @Description 获取备份账号内文件列表
+// @Accept json
+// @Param request body dto.BackupSearchFile true "request"
+// @Success 200 {anrry} string
+// @Security ApiKeyAuth
+// @Router /backups/search/files [post]
+func (b *BaseApi) LoadFilesFromBackup(c *gin.Context) {
+	var req dto.BackupSearchFile
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	data, err := backupService.ListFiles(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, data)
+}

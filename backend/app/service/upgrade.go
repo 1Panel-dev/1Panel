@@ -58,7 +58,7 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 	}
 	if len(releaseInfo.NewVersion) != 0 {
 		isNew, err := compareVersion(currentVersion.Value, releaseInfo.NewVersion)
-		if !isNew && err != nil {
+		if !isNew || err != nil {
 			return nil, err
 		}
 		return &releaseInfo, nil

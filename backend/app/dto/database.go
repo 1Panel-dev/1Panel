@@ -2,11 +2,6 @@ package dto
 
 import "time"
 
-type MysqlDescription struct {
-	ID          uint   `json:"id" validate:"required"`
-	Description string `json:"description"`
-}
-
 type MysqlDBInfo struct {
 	ID          uint      `json:"id"`
 	CreatedAt   time.Time `json:"createdAt"`

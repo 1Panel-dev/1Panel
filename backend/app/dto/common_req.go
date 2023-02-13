@@ -10,6 +10,11 @@ type PageInfo struct {
 	PageSize int `json:"pageSize" validate:"required,number"`
 }
 
+type UpdateDescription struct {
+	ID          uint   `json:"id" validate:"required"`
+	Description string `json:"description"`
+}
+
 type OperationWithName struct {
 	Name string `json:"name" validate:"required"`
 }

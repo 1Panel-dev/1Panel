@@ -15,7 +15,7 @@ func init() {
 }
 
 var userinfoCmd = &cobra.Command{
-	Use:   "userinfo",
+	Use:   "user-info",
 	Short: "获取用户信息",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		fullPath := "/opt/1panel/db/1Panel.db"

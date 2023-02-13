@@ -1,5 +1,5 @@
 import http from '@/api';
-import { SearchWithPage, ReqPage, ResPage } from '../interface';
+import { SearchWithPage, ReqPage, ResPage, DescriptionUpdate } from '../interface';
 import { Database } from '../interface/database';
 
 export const searchMysqlDBs = (params: SearchWithPage) => {
@@ -25,7 +25,7 @@ export const updateMysqlAccess = (params: Database.ChangeInfo) => {
 export const updateMysqlPassword = (params: Database.ChangeInfo) => {
     return http.post(`/databases/change/password`, params);
 };
-export const updateMysqlDescription = (params: Database.DescriptionUpdate) => {
+export const updateMysqlDescription = (params: DescriptionUpdate) => {
     return http.post(`/databases/description/update`, params);
 };
 export const updateMysqlVariables = (params: Array<Database.VariablesUpdate>) => {
