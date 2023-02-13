@@ -40,7 +40,9 @@
             </el-row>
         </template>
         <template #rightButton>
-            <el-button @click="sync" type="primary" link :plain="true">{{ $t('app.syncAppList') }}</el-button>
+            <el-badge is-dot class="item" :hidden="!canUpdate">
+                <el-button @click="sync" type="primary" link :plain="true">{{ $t('app.syncAppList') }}</el-button>
+            </el-badge>
         </template>
         <template #main>
             <el-row :gutter="5">
@@ -113,6 +115,7 @@ let loading = ref(false);
 let activeTag = ref('all');
 let showDetail = ref(false);
 let appId = ref(0);
+let canUpdate = ref(false);
 
 const getColor = (index: number) => {
     return colorArr[index];
@@ -123,6 +126,7 @@ const search = async (req: App.AppReq) => {
     await SearchApp(req)
         .then((res) => {
             apps.value = res.data.items;
+            canUpdate.value = res.data.canUpdate;
         })
         .finally(() => {
             loading.value = false;
