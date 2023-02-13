@@ -28,6 +28,13 @@ definitions:
     - type
     - vars
     type: object
+  dto.BackupSearchFile:
+    properties:
+      type:
+        type: string
+    required:
+    - type
+    type: object
   dto.BatchDelete:
     properties:
       names:
@@ -890,15 +897,6 @@ definitions:
     required:
     - id
     type: object
-  dto.MysqlDescription:
-    properties:
-      description:
-        type: string
-      id:
-        type: integer
-    required:
-    - id
-    type: object
   dto.MysqlStatus:
     properties:
       Aborted_clients:
@@ -1354,6 +1352,17 @@ definitions:
     required:
     - from
     type: object
+  dto.SnapshotImport:
+    properties:
+      description:
+        type: string
+      from:
+        type: string
+      names:
+        items:
+          type: string
+        type: array
+    type: object
   dto.SnapshotRecover:
     properties:
       id:
@@ -1362,6 +1371,15 @@ definitions:
         type: boolean
       reDownload:
         type: boolean
+    required:
+    - id
+    type: object
+  dto.UpdateDescription:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
     required:
     - id
     type: object
@@ -3358,6 +3376,28 @@ paths:
       summary: List buckets
       tags:
       - Backup Account
+  /backups/search/files:
+    post:
+      consumes:
+      - application/json
+      description: 获取备份账号内文件列表
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BackupSearchFile'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: List files from backup accounts
+      tags:
+      - Backup Account
   /backups/update:
     post:
       consumes:
@@ -5100,7 +5140,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.MysqlDescription'
+          $ref: '#/definitions/dto.UpdateDescription'
       responses:
         "200":
           description: ""
@@ -6621,7 +6661,7 @@ paths:
           description: ""
       security:
       - ApiKeyAuth: []
-      summary: Create system backup
+      summary: Create system snapshot
       tags:
       - System Setting
       x-panel-log:
@@ -6664,6 +6704,68 @@ paths:
         - ids
         formatEN: Delete system backup [name]
         formatZH: 删除系统快照 [name]
+        paramKeys: []
+  /settings/snapshot/description/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新快照描述信息
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateDescription'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update snapshot description
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions:
+        - db: snapshots
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: name
+          output_value: name
+        bodyKeys:
+        - id
+        - description
+        formatEN: The description of the snapshot [name] is modified => [description]
+        formatZH: 快照 [name] 描述信息修改 [description]
+        paramKeys: []
+  /settings/snapshot/import:
+    post:
+      consumes:
+      - application/json
+      description: 导入已有快照
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SnapshotImport'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Import system snapshot
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - from
+        - names
+        formatEN: Sync system snapshots [names] from [from]
+        formatZH: 从 [from] 同步系统快照 [names]
         paramKeys: []
   /settings/snapshot/recover:
     post:

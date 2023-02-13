@@ -57,6 +57,11 @@ type SnapshotRecover struct {
 	ReDownload bool `json:"reDownload"`
 	ID         uint `json:"id" validate:"required"`
 }
+type SnapshotImport struct {
+	From        string   `json:"from"`
+	Names       []string `json:"names"`
+	Description string   `json:"description"`
+}
 type SnapshotInfo struct {
 	ID          uint      `json:"id"`
 	Name        string    `json:"name"`

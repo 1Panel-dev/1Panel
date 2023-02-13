@@ -7,6 +7,9 @@
                         <el-button type="primary" @click="onCreate()">
                             {{ $t('setting.createSnapshot') }}
                         </el-button>
+                        <el-button @click="onImport()">
+                            {{ $t('setting.importSnapshot') }}
+                        </el-button>
                         <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
                             {{ $t('commons.button.delete') }}
                         </el-button>
@@ -43,14 +46,9 @@
                         prop="name"
                         fix
                     />
-                    <el-table-column
-                        :label="$t('commons.table.description')"
-                        min-width="150"
-                        show-overflow-tooltip
-                        prop="description"
-                    />
-                    <el-table-column :label="$t('setting.backupAccount')" min-width="150" prop="from" />
-                    <el-table-column :label="$t('setting.backup')" min-width="80" prop="status">
+                    <el-table-column prop="version" :label="$t('app.version')" />
+                    <el-table-column :label="$t('setting.backupAccount')" min-width="80" prop="from" />
+                    <el-table-column :label="$t('commons.table.status')" min-width="80" prop="status">
                         <template #default="{ row }">
                             <el-tag v-if="row.status === 'Success'" type="success">
                                 {{ $t('commons.table.statusSuccess') }}
@@ -72,6 +70,13 @@
                             </el-tooltip>
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('commons.table.description')" prop="description">
+                        <template #default="{ row }">
+                            <fu-read-write-switch :data="row.description" v-model="row.edit" @change="onChange(row)">
+                                <el-input v-model="row.description" @blur="row.edit = false" />
+                            </fu-read-write-switch>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         prop="createdAt"
                         :label="$t('commons.table.date')"
@@ -89,6 +94,7 @@
             </template>
         </LayoutContent>
         <RecoverStatus ref="recoverStatusRef" @search="search()"></RecoverStatus>
+        <SnapshotImport ref="importRef" @search="search()" />
         <el-drawer v-model="drawerVisiable" size="50%">
             <template #header>
                 <DrawerHeader :header="$t('setting.createSnapshot')" :back="handleClose" />
@@ -139,7 +145,7 @@
 <script setup lang="ts">
 import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
-import { snapshotCreate, searchSnapshotPage, snapshotDelete } from '@/api/modules/setting';
+import { snapshotCreate, searchSnapshotPage, snapshotDelete, updateSnapshotDescription } from '@/api/modules/setting';
 import { onMounted, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
@@ -150,6 +156,7 @@ import { ElMessage } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
 import LayoutContent from '@/layout/layout-content.vue';
 import RecoverStatus from '@/views/setting/snapshot/status/index.vue';
+import SnapshotImport from '@/views/setting/snapshot/import/index.vue';
 import { getBackupList } from '@/api/modules/backup';
 import { loadBackupName } from '../helper';
 
@@ -164,6 +171,7 @@ const paginationConfig = reactive({
 const searchName = ref();
 
 const recoverStatusRef = ref();
+const importRef = ref();
 const isRecordShow = ref();
 const backupOptions = ref();
 type FormInstance = InstanceType<typeof ElForm>;
@@ -184,8 +192,19 @@ const onCreate = async () => {
     drawerVisiable.value = true;
 };
 
+const onImport = () => {
+    importRef.value.acceptParams();
+};
+
 const handleClose = () => {
     drawerVisiable.value = false;
+};
+
+const onChange = async (info: any) => {
+    if (!info.edit) {
+        await updateSnapshotDescription({ id: info.id, description: info.description });
+        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    }
 };
 
 const submitAddSnapshot = (formEl: FormInstance | undefined) => {

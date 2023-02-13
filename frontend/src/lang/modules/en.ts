@@ -770,6 +770,7 @@ export default {
         thirdPartySupport: 'Only third-party accounts are supported',
         recoverDetail: 'Recover detail',
         createSnapshot: 'Create snapshot',
+        importSnapshot: 'Sync snapshot',
         recover: 'Recover',
         noRecoverRecord: 'No recovery record has been recorded',
         lastRecoverAt: 'Last recovery time',

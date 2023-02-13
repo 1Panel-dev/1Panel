@@ -1,5 +1,5 @@
 import http from '@/api';
-import { ResPage, SearchWithPage } from '../interface';
+import { ResPage, SearchWithPage, DescriptionUpdate } from '../interface';
 import { Setting } from '../interface/setting';
 
 export const getSettingInfo = () => {
@@ -52,6 +52,12 @@ export const loadBaseDir = () => {
 // snapshot
 export const snapshotCreate = (param: Setting.SnapshotCreate) => {
     return http.post(`/settings/snapshot`, param);
+};
+export const snapshotImport = (param: Setting.SnapshotImport) => {
+    return http.post(`/settings/snapshot/import`, param);
+};
+export const updateSnapshotDescription = (param: DescriptionUpdate) => {
+    return http.post(`/settings/snapshot/description/update`, param);
 };
 export const snapshotDelete = (param: { ids: number[] }) => {
     return http.post(`/settings/snapshot/del`, param);

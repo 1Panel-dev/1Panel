@@ -17,6 +17,7 @@ func (s *BackupRouter) InitBackupRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		baRouter.GET("/search", baseApi.ListBackup)
+		baRouter.POST("/search/files", baseApi.LoadFilesFromBackup)
 		baRouter.POST("/buckets", baseApi.ListBuckets)
 		baRouter.POST("", baseApi.CreateBackup)
 		baRouter.POST("/del", baseApi.DeleteBackup)

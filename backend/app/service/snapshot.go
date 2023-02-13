@@ -29,8 +29,10 @@ type ISnapshotService interface {
 	SnapshotCreate(req dto.SnapshotCreate) error
 	SnapshotRecover(req dto.SnapshotRecover) error
 	SnapshotRollback(req dto.SnapshotRecover) error
+	SnapshotImport(req dto.SnapshotImport) error
 	Delete(req dto.BatchDeleteReq) error
 
+	UpdateDescription(req dto.UpdateDescription) error
 	readFromJson(path string) (SnapshotJson, error)
 }
 
@@ -51,11 +53,48 @@ func (u *SnapshotService) SearchWithPage(req dto.SearchWithPage) (int64, interfa
 	return total, dtoSnap, err
 }
 
+func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {
+	if len(req.Names) == 0 {
+		return fmt.Errorf("incorrect snapshot request body: %v", req.Names)
+	}
+	for _, snap := range req.Names {
+		nameItems := strings.Split(snap, "_")
+		if !strings.HasPrefix(snap, "1panel_v") || !strings.HasSuffix(snap, ".tar.gz") || len(nameItems) != 3 {
+			return fmt.Errorf("incorrect snapshot name format of %s", snap)
+		}
+		formatTime, err := time.Parse("20060102150405", strings.ReplaceAll(nameItems[2], ".tar.gz", ""))
+		if err != nil {
+			return fmt.Errorf("incorrect snapshot name format of %s", snap)
+		}
+		itemSnap := model.Snapshot{
+			Name:        snap,
+			From:        req.From,
+			Version:     nameItems[1],
+			Description: req.Description,
+			Status:      constant.StatusSuccess,
+			BaseModel: model.BaseModel{
+				CreatedAt: formatTime,
+				UpdatedAt: formatTime,
+			},
+		}
+		if err := snapshotRepo.Create(&itemSnap); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (u *SnapshotService) UpdateDescription(req dto.UpdateDescription) error {
+	return snapshotRepo.Update(req.ID, map[string]interface{}{"description": req.Description})
+}
+
 type SnapshotJson struct {
+	OldBaseDir       string `json:"oldBaseDir"`
 	OldDockerDataDir string `json:"oldDockerDataDir"`
 	OldBackupDataDir string `json:"oldDackupDataDir"`
 	OldPanelDataDir  string `json:"oldPanelDataDir"`
 
+	BaseDir            string `json:"baseDir"`
 	DockerDataDir      string `json:"dockerDataDir"`
 	BackupDataDir      string `json:"backupDataDir"`
 	PanelDataDir       string `json:"panelDataDir"`
@@ -78,15 +117,15 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 	}
 
 	timeNow := time.Now().Format("20060102150405")
-	rootDir := fmt.Sprintf("%s/system/1panel_snapshot_%s", localDir, timeNow)
+	versionItem, _ := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
+	rootDir := fmt.Sprintf("%s/system/1panel_%s_%s", localDir, versionItem.Value, timeNow)
 	backupPanelDir := fmt.Sprintf("%s/1panel", rootDir)
 	_ = os.MkdirAll(backupPanelDir, os.ModePerm)
 	backupDockerDir := fmt.Sprintf("%s/docker", rootDir)
 	_ = os.MkdirAll(backupDockerDir, os.ModePerm)
 
-	versionItem, _ := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
 	snap := model.Snapshot{
-		Name:        "1panel_snapshot_" + timeNow,
+		Name:        fmt.Sprintf("1panel_%s_%s", versionItem.Value, timeNow),
 		Description: req.Description,
 		From:        req.From,
 		Version:     versionItem.Value,
@@ -139,13 +178,19 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 			return
 		}
 
-		snapJson := SnapshotJson{DockerDataDir: dockerDataDir, BackupDataDir: localDir, PanelDataDir: global.CONF.BaseDir + "/1panel", LiveRestoreEnabled: liveRestoreStatus}
+		snapJson := SnapshotJson{
+			BaseDir:            global.CONF.BaseDir,
+			DockerDataDir:      dockerDataDir,
+			BackupDataDir:      localDir,
+			PanelDataDir:       global.CONF.BaseDir + "/1panel",
+			LiveRestoreEnabled: liveRestoreStatus,
+		}
 		if err := u.saveJson(snapJson, rootDir); err != nil {
 			updateSnapshotStatus(snap.ID, constant.StatusFailed, fmt.Sprintf("save snapshot json failed, err: %v", err))
 			return
 		}
 
-		if err := fileOp.Compress([]string{rootDir}, fmt.Sprintf("%s/system", localDir), fmt.Sprintf("1panel_snapshot_%s.tar.gz", timeNow), files.TarGz); err != nil {
+		if err := fileOp.Compress([]string{rootDir}, fmt.Sprintf("%s/system", localDir), fmt.Sprintf("1panel_%s_%s.tar.gz", versionItem.Value, timeNow), files.TarGz); err != nil {
 			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
 			return
 		}
@@ -154,14 +199,14 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 
 		global.LOG.Infof("start to upload snapshot to %s, please wait", backup.Type)
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusUploading})
-		localPath := fmt.Sprintf("%s/system/1panel_snapshot_%s.tar.gz", localDir, timeNow)
-		if ok, err := backupAccont.Upload(localPath, fmt.Sprintf("system_snapshot/1panel_snapshot_%s.tar.gz", timeNow)); err != nil || !ok {
+		localPath := fmt.Sprintf("%s/system/1panel_%s_%s.tar.gz", localDir, versionItem.Value, timeNow)
+		if ok, err := backupAccont.Upload(localPath, fmt.Sprintf("system_snapshot/1panel_%s_%s.tar.gz", versionItem.Value, timeNow)); err != nil || !ok {
 			_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
 			global.LOG.Errorf("upload snapshot to %s failed, err: %v", backup.Type, err)
 			return
 		}
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusSuccess})
-		_ = os.RemoveAll(fmt.Sprintf("%s/system/1panel_snapshot_%s.tar.gz", localDir, timeNow))
+		_ = os.RemoveAll(fmt.Sprintf("%s/system/1panel_%s_%s.tar.gz", localDir, versionItem.Value, timeNow))
 
 		global.LOG.Infof("upload snapshot to %s success", backup.Type)
 	}()
@@ -230,8 +275,6 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 			isReTry = false
 		}
 		rootDir := fmt.Sprintf("%s/%s", baseDir, snap.Name)
-		u.OriginalPath = fmt.Sprintf("%s/original_%s", global.CONF.BaseDir, snap.Name)
-		_ = os.MkdirAll(u.OriginalPath, os.ModePerm)
 
 		snapJson, err := u.readFromJson(fmt.Sprintf("%s/snapshot.json", rootDir))
 		if err != nil {
@@ -241,7 +284,10 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 		if snap.InterruptStep == "Readjson" {
 			isReTry = false
 		}
+		u.OriginalPath = fmt.Sprintf("%s/original_%s", snapJson.BaseDir, snap.Name)
+		_ = os.MkdirAll(u.OriginalPath, os.ModePerm)
 
+		snapJson.OldBaseDir = global.CONF.BaseDir
 		snapJson.OldPanelDataDir = global.CONF.BaseDir + "/1panel"
 		snapJson.OldBackupDataDir = localDir
 		recoverPanelDir := fmt.Sprintf("%s/%s/1panel", baseDir, snap.Name)
@@ -340,10 +386,6 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 	fileOp := files.NewFileOp()
 
 	rootDir := fmt.Sprintf("%s/system/%s/%s", localDir, snap.Name, snap.Name)
-	u.OriginalPath = fmt.Sprintf("%s/original_%s", global.CONF.BaseDir, snap.Name)
-	if _, err := os.Stat(u.OriginalPath); err != nil && os.IsNotExist(err) {
-		return fmt.Errorf("load original dir failed, err: %s", err)
-	}
 
 	_ = settingRepo.Update("SystemStatus", "Rollbacking")
 	_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"rollback_status": constant.StatusWaiting})
@@ -351,6 +393,10 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 		snapJson, err := u.readFromJson(fmt.Sprintf("%s/snapshot.json", rootDir))
 		if err != nil {
 			updateRollbackStatus(snap.ID, constant.StatusFailed, fmt.Sprintf("decompress file failed, err: %v", err))
+			return
+		}
+		u.OriginalPath = fmt.Sprintf("%s/original_%s", snapJson.OldBaseDir, snap.Name)
+		if _, err := os.Stat(u.OriginalPath); err != nil && os.IsNotExist(err) {
 			return
 		}
 

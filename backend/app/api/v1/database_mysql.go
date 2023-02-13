@@ -40,13 +40,13 @@ func (b *BaseApi) CreateMysql(c *gin.Context) {
 // @Summary Update mysql database description
 // @Description 更新 mysql 数据库库描述信息
 // @Accept json
-// @Param request body dto.MysqlDescription true "request"
+// @Param request body dto.UpdateDescription true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /databases/description/update [post]
 // @x-panel-log {"bodyKeys":["id","description"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"database_mysqls","output_colume":"name","output_value":"name"}],"formatZH":"mysql 数据库 [name] 描述信息修改 [description]","formatEN":"The description of the mysql database [name] is modified => [description]"}
 func (b *BaseApi) UpdateMysqlDescription(c *gin.Context) {
-	var req dto.MysqlDescription
+	var req dto.UpdateDescription
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

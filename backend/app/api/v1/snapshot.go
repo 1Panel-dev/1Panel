@@ -9,7 +9,7 @@ import (
 )
 
 // @Tags System Setting
-// @Summary Create system backup
+// @Summary Create system snapshot
 // @Description 创建系统快照
 // @Accept json
 // @Param request body dto.SnapshotCreate true "request"
@@ -28,6 +28,58 @@ func (b *BaseApi) CreateSnapshot(c *gin.Context) {
 		return
 	}
 	if err := snapshotService.SnapshotCreate(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags System Setting
+// @Summary Import system snapshot
+// @Description 导入已有快照
+// @Accept json
+// @Param request body dto.SnapshotImport true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/snapshot/import [post]
+// @x-panel-log {"bodyKeys":["from", "names"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"从 [from] 同步系统快照 [names]","formatEN":"Sync system snapshots [names] from [from]"}
+func (b *BaseApi) ImportSnapshot(c *gin.Context) {
+	var req dto.SnapshotImport
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := snapshotService.SnapshotImport(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags System Setting
+// @Summary Update snapshot description
+// @Description 更新快照描述信息
+// @Accept json
+// @Param request body dto.UpdateDescription true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/snapshot/description/update [post]
+// @x-panel-log {"bodyKeys":["id","description"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"snapshots","output_colume":"name","output_value":"name"}],"formatZH":"快照 [name] 描述信息修改 [description]","formatEN":"The description of the snapshot [name] is modified => [description]"}
+func (b *BaseApi) UpdateSnapDescription(c *gin.Context) {
+	var req dto.UpdateDescription
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := snapshotService.UpdateDescription(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
