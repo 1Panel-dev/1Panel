@@ -39,8 +39,8 @@ func createDefaultDockerNetwork() {
 		fmt.Println("init docker client error", err.Error())
 		return
 	}
-	if !cli.NetworkExist("1panel") {
-		if err := cli.CreateNetwork("1panel"); err != nil {
+	if !cli.NetworkExist("1panel-network") {
+		if err := cli.CreateNetwork("1panel-network"); err != nil {
 			fmt.Println("init docker client error", err.Error())
 			return
 		}
