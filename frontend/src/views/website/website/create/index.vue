@@ -88,7 +88,7 @@
                             <el-form-item :label="$t('app.app')" prop="appinstall.appId">
                                 <el-row :gutter="20">
                                     <el-col :span="12">
-                                        <el-select v-model="website.appinstall.appId" @change="getApp()">
+                                        <el-select v-model="website.appinstall.appId" @change="changeApp()">
                                             <el-option
                                                 v-for="(app, index) in apps"
                                                 :key="index"
@@ -275,6 +275,15 @@ const searchApp = () => {
     });
 };
 
+const changeApp = () => {
+    apps.value.forEach((app) => {
+        if (app.id === website.value.appinstall.appId) {
+            website.value.appinstall.appkey = app.key;
+            getApp();
+        }
+    });
+};
+
 const getApp = () => {
     GetApp(website.value.appinstall.appkey).then((res) => {
         appVersions.value = res.data.versions;
@@ -298,9 +307,7 @@ const acceptParams = async (installPath: string) => {
     if (websiteForm.value) {
         websiteForm.value.resetFields();
     }
-    console.log(installPath);
     staticPath.value = installPath + '/www/sites/';
-
     await ListGroups().then((res) => {
         groups.value = res.data;
         website.value.webSiteGroupId = res.data[0].id;
