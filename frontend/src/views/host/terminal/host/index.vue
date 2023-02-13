@@ -156,8 +156,18 @@ import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { Host } from '@/api/interface/host';
 import { Group } from '@/api/interface/group';
-import { getHostTree, getHostInfo, addHost, editHost, deleteHost, testByInfo } from '@/api/modules/host';
-import { getGroupList, addGroup, editGroup, deleteGroup } from '@/api/modules/group';
+import {
+    getHostTree,
+    getHostInfo,
+    addHost,
+    editHost,
+    deleteHost,
+    testByInfo,
+    getGroupList,
+    addGroup,
+    editGroup,
+    deleteGroup,
+} from '@/api/modules/host';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
@@ -309,7 +319,7 @@ const onDelete = async (node: Node, data: Tree) => {
         return;
     }
     if (node.level === 1) {
-        await useDeleteData(deleteGroup, data.id - 10000, i18n.global.t('terminal.groupDeleteHelper'));
+        await useDeleteData(deleteGroup, data.id - 10000, 'terminal.groupDeleteHelper');
         loadGroups();
     } else {
         await useDeleteData(deleteHost, data.id, 'commons.msg.delete');

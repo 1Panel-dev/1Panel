@@ -69,7 +69,7 @@
 import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { Command } from '@/api/interface/command';
-import { addCommand, editCommand, deleteCommand, getCommandPage } from '@/api/modules/command';
+import { addCommand, editCommand, deleteCommand, getCommandPage } from '@/api/modules/host';
 import { reactive, ref } from 'vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import type { ElForm } from 'element-plus';

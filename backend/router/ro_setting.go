@@ -25,6 +25,7 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/monitor/clean", baseApi.CleanMonitor)
 		settingRouter.GET("/mfa", baseApi.GetMFA)
 		settingRouter.POST("/mfa/bind", baseApi.MFABind)
+
 		settingRouter.POST("/snapshot", baseApi.CreateSnapshot)
 		settingRouter.POST("/snapshot/search", baseApi.SearchSnapshot)
 		settingRouter.POST("/snapshot/import", baseApi.ImportSnapshot)
@@ -32,6 +33,17 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/snapshot/recover", baseApi.RecoverSnapshot)
 		settingRouter.POST("/snapshot/rollback", baseApi.RollbackSnapshot)
 		settingRouter.POST("/snapshot/description/update", baseApi.UpdateSnapDescription)
+
+		settingRouter.GET("/backup/search", baseApi.ListBackup)
+		settingRouter.POST("/backup/search/files", baseApi.LoadFilesFromBackup)
+		settingRouter.POST("/backup/buckets", baseApi.ListBuckets)
+		settingRouter.POST("/backup", baseApi.CreateBackup)
+		settingRouter.POST("/backup/del", baseApi.DeleteBackup)
+		settingRouter.POST("/backup/update", baseApi.UpdateBackup)
+		settingRouter.POST("/backup/record/search", baseApi.SearchBackupRecords)
+		settingRouter.POST("/backup/record/download", baseApi.DownloadRecord)
+		settingRouter.POST("/backup/record/del", baseApi.DeleteBackupRecord)
+
 		settingRouter.POST("/upgrade", baseApi.Upgrade)
 		settingRouter.GET("/upgrade", baseApi.GetUpgradeInfo)
 		settingRouter.GET("/basedir", baseApi.LoadBaseDir)

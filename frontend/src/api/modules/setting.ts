@@ -1,5 +1,6 @@
 import http from '@/api';
 import { ResPage, SearchWithPage, DescriptionUpdate } from '../interface';
+import { Backup } from '../interface/backup';
 import { Setting } from '../interface/setting';
 
 export const getSettingInfo = () => {
@@ -47,6 +48,35 @@ export const bindMFA = (param: Setting.MFABind) => {
 
 export const loadBaseDir = () => {
     return http.get<string>(`/settings/basedir`);
+};
+
+// backup
+export const getBackupList = () => {
+    return http.get<Array<Backup.BackupInfo>>(`/settings/backup/search`);
+};
+export const getFilesFromBackup = (type: string) => {
+    return http.post<Array<any>>(`/settings/backup/search/files`, { type: type });
+};
+export const addBackup = (params: Backup.BackupOperate) => {
+    return http.post<Backup.BackupOperate>(`/settings/backup`, params);
+};
+export const editBackup = (params: Backup.BackupOperate) => {
+    return http.post(`/settings/backup/update`, params);
+};
+export const deleteBackup = (params: { ids: number[] }) => {
+    return http.post(`/settings/backup/del`, params);
+};
+export const downloadBackupRecord = (params: Backup.RecordDownload) => {
+    return http.download<BlobPart>(`/settings/backup/record/download`, params, { responseType: 'blob' });
+};
+export const deleteBackupRecord = (params: { ids: number[] }) => {
+    return http.post(`/settings/backup/record/del`, params);
+};
+export const searchBackupRecords = (params: Backup.SearchBackupRecord) => {
+    return http.post<ResPage<Backup.RecordInfo>>(`/settings/backup/record/search`, params);
+};
+export const listBucket = (params: Backup.ForBucket) => {
+    return http.post(`/settings/backup/buckets`, params);
 };
 
 // snapshot

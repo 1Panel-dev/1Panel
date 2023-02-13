@@ -879,552 +879,6 @@
                 }
             }
         },
-        "/backups": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "创建备份账号",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Backup Account"
-                ],
-                "summary": "Create backup account",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.BackupOperate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "type"
-                    ],
-                    "formatEN": "create backup account [type]",
-                    "formatZH": "创建备份账号 [type]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/backups/del": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "删除备份账号",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Backup Account"
-                ],
-                "summary": "Delete backup account",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.BatchDeleteReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [
-                        {
-                            "db": "backup_accounts",
-                            "input_colume": "id",
-                            "input_value": "ids",
-                            "isList": true,
-                            "output_colume": "type",
-                            "output_value": "types"
-                        }
-                    ],
-                    "bodyKeys": [
-                        "ids"
-                    ],
-                    "formatEN": "delete backup account [types]",
-                    "formatZH": "删除备份账号 [types]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/backups/record/del": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "删除备份记录",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Backup Account"
-                ],
-                "summary": "Delete backup record",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.BatchDeleteReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [
-                        {
-                            "db": "backup_records",
-                            "input_colume": "id",
-                            "input_value": "ids",
-                            "isList": true,
-                            "output_colume": "file_name",
-                            "output_value": "files"
-                        }
-                    ],
-                    "bodyKeys": [
-                        "ids"
-                    ],
-                    "formatEN": "delete backup records [files]",
-                    "formatZH": "删除备份记录 [files]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/backups/record/download": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "下载备份记录",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Backup Account"
-                ],
-                "summary": "Download backup record",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.DownloadRecord"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "source",
-                        "fileName"
-                    ],
-                    "formatEN": "download backup records [source][fileName]",
-                    "formatZH": "下载备份记录 [source][fileName]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/backups/record/search": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取备份记录列表分页",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Backup Account"
-                ],
-                "summary": "Page backup records",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.RecordSearch"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/backups/search": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取备份账号列表",
-                "tags": [
-                    "Backup Account"
-                ],
-                "summary": "List backup accounts",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "anrry"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取 bucket 列表",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Backup Account"
-                ],
-                "summary": "List buckets",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.ForBuckets"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "anrry"
-                        }
-                    }
-                }
-            }
-        },
-        "/backups/search/files": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取备份账号内文件列表",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Backup Account"
-                ],
-                "summary": "List files from backup accounts",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.BackupSearchFile"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "anrry"
-                        }
-                    }
-                }
-            }
-        },
-        "/backups/update": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "更新备份账号信息",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Backup Account"
-                ],
-                "summary": "Update backup account",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.BackupOperate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "type"
-                    ],
-                    "formatEN": "update backup account [types]",
-                    "formatZH": "更新备份账号 [types]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/commands": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取快速命令列表",
-                "tags": [
-                    "Command"
-                ],
-                "summary": "List commands",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.CommandInfo"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "创建快速命令",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Command"
-                ],
-                "summary": "Create command",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.CommandOperate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "name",
-                        "command"
-                    ],
-                    "formatEN": "create quick command [name][command]",
-                    "formatZH": "创建快捷命令 [name][command]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/commands/del": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "删除快速命令",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Command"
-                ],
-                "summary": "Delete command",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.BatchDeleteReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [
-                        {
-                            "db": "commands",
-                            "input_colume": "id",
-                            "input_value": "ids",
-                            "isList": true,
-                            "output_colume": "name",
-                            "output_value": "names"
-                        }
-                    ],
-                    "bodyKeys": [
-                        "ids"
-                    ],
-                    "formatEN": "delete quick command [names]",
-                    "formatZH": "删除快捷命令 [names]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/commands/search": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取快速命令列表分页",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Command"
-                ],
-                "summary": "Page commands",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.SearchWithPage"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.PageResult"
-                        }
-                    }
-                }
-            }
-        },
-        "/commands/update": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "更新快速命令",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Command"
-                ],
-                "summary": "Update command",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.CommandOperate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "name"
-                    ],
-                    "formatEN": "update quick command [name]",
-                    "formatZH": "更新快捷命令 [name]",
-                    "paramKeys": []
-                }
-            }
-        },
         "/containers": {
             "post": {
                 "security": [
@@ -5251,213 +4705,6 @@
                 }
             }
         },
-        "/groups": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "创建系统组",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "System Group"
-                ],
-                "summary": "Create group",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GroupOperate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "name",
-                        "type"
-                    ],
-                    "formatEN": "create group [name][type]",
-                    "formatZH": "创建组 [name][type]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/groups/:id": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "查询系统组",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "System Group"
-                ],
-                "summary": "Search group info by id",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "request",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.GroupInfo"
-                        }
-                    }
-                }
-            }
-        },
-        "/groups/del": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "删除系统组",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "System Group"
-                ],
-                "summary": "Delete group",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.OperateByID"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [
-                        {
-                            "db": "groups",
-                            "input_colume": "id",
-                            "input_value": "id",
-                            "isList": false,
-                            "output_colume": "name",
-                            "output_value": "name"
-                        }
-                    ],
-                    "bodyKeys": [
-                        "id"
-                    ],
-                    "formatEN": "delete group [name]",
-                    "formatZH": "删除组 [name]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/groups/search": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "查询系统组",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "System Group"
-                ],
-                "summary": "List groups",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GroupSearch"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "anrry"
-                        }
-                    }
-                }
-            }
-        },
-        "/groups/update": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "更新系统组",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "System Group"
-                ],
-                "summary": "Update group",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GroupOperate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "name",
-                        "type"
-                    ],
-                    "formatEN": "update group [name][type]",
-                    "formatZH": "更新组 [name][type]",
-                    "paramKeys": []
-                }
-            }
-        },
         "/hosts": {
             "post": {
                 "security": [
@@ -5535,6 +4782,198 @@
                 }
             }
         },
+        "/hosts/command": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取快速命令列表",
+                "tags": [
+                    "Command"
+                ],
+                "summary": "List commands",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.CommandInfo"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建快速命令",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Command"
+                ],
+                "summary": "Create command",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CommandOperate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name",
+                        "command"
+                    ],
+                    "formatEN": "create quick command [name][command]",
+                    "formatZH": "创建快捷命令 [name][command]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/command/del": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "删除快速命令",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Command"
+                ],
+                "summary": "Delete command",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BatchDeleteReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "commands",
+                            "input_colume": "id",
+                            "input_value": "ids",
+                            "isList": true,
+                            "output_colume": "name",
+                            "output_value": "names"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "ids"
+                    ],
+                    "formatEN": "delete quick command [names]",
+                    "formatZH": "删除快捷命令 [names]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/command/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取快速命令列表分页",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Command"
+                ],
+                "summary": "Page commands",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SearchWithPage"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/hosts/command/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新快速命令",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Command"
+                ],
+                "summary": "Update command",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CommandOperate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name"
+                    ],
+                    "formatEN": "update quick command [name]",
+                    "formatZH": "更新快捷命令 [name]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/hosts/del": {
             "post": {
                 "security": [
@@ -5582,6 +5021,179 @@
                     ],
                     "formatEN": "delete host [addr]",
                     "formatZH": "删除主机 [addr]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/group": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建系统组",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Group"
+                ],
+                "summary": "Create group",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GroupOperate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name",
+                        "type"
+                    ],
+                    "formatEN": "create group [name][type]",
+                    "formatZH": "创建组 [name][type]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/group/del": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "删除系统组",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Group"
+                ],
+                "summary": "Delete group",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperateByID"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "groups",
+                            "input_colume": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_colume": "name",
+                            "output_value": "name"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "id"
+                    ],
+                    "formatEN": "delete group [name]",
+                    "formatZH": "删除组 [name]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/group/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "查询系统组",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Group"
+                ],
+                "summary": "List groups",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GroupSearch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "anrry"
+                        }
+                    }
+                }
+            }
+        },
+        "/hosts/group/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新系统组",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Group"
+                ],
+                "summary": "Update group",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GroupOperate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name",
+                        "type"
+                    ],
+                    "formatEN": "update group [name][type]",
+                    "formatZH": "更新组 [name][type]",
                     "paramKeys": []
                 }
             }
@@ -6016,6 +5628,360 @@
                     ],
                     "formatEN": "Update nginx conf [domain]",
                     "formatZH": "更新 nginx 配置 [domain]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/settings/backup": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建备份账号",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "Create backup account",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BackupOperate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "type"
+                    ],
+                    "formatEN": "create backup account [type]",
+                    "formatZH": "创建备份账号 [type]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/settings/backup/del": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "删除备份账号",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "Delete backup account",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BatchDeleteReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "backup_accounts",
+                            "input_colume": "id",
+                            "input_value": "ids",
+                            "isList": true,
+                            "output_colume": "type",
+                            "output_value": "types"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "ids"
+                    ],
+                    "formatEN": "delete backup account [types]",
+                    "formatZH": "删除备份账号 [types]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/settings/backup/record/del": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "删除备份记录",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "Delete backup record",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BatchDeleteReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "backup_records",
+                            "input_colume": "id",
+                            "input_value": "ids",
+                            "isList": true,
+                            "output_colume": "file_name",
+                            "output_value": "files"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "ids"
+                    ],
+                    "formatEN": "delete backup records [files]",
+                    "formatZH": "删除备份记录 [files]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/settings/backup/record/download": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "下载备份记录",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "Download backup record",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.DownloadRecord"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "source",
+                        "fileName"
+                    ],
+                    "formatEN": "download backup records [source][fileName]",
+                    "formatZH": "下载备份记录 [source][fileName]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/settings/backup/record/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取备份记录列表分页",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "Page backup records",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.RecordSearch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/settings/backup/search": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取备份账号列表",
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "List backup accounts",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "anrry"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 bucket 列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "List buckets",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ForBuckets"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "anrry"
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/backup/search/files": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取备份账号内文件列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "List files from backup accounts",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BackupSearchFile"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "anrry"
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/backup/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新备份账号信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "Update backup account",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BackupOperate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "type"
+                    ],
+                    "formatEN": "update backup account [types]",
+                    "formatZH": "更新备份账号 [types]",
                     "paramKeys": []
                 }
             }
@@ -9398,20 +9364,6 @@
                 }
             }
         },
-        "dto.GroupInfo": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.GroupOperate": {
             "type": "object",
             "required": [
@@ -10463,6 +10415,9 @@
         "dto.SettingInfo": {
             "type": "object",
             "properties": {
+                "appStoreVersion": {
+                    "type": "string"
+                },
                 "complexityVerification": {
                     "type": "string"
                 },

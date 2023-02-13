@@ -135,7 +135,7 @@ import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { Backup } from '@/api/interface/backup';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { addBackup, editBackup, listBucket } from '@/api/modules/backup';
+import { addBackup, editBackup, listBucket } from '@/api/modules/setting';
 import { deepCopy } from '@/utils/util';
 
 const loading = ref(false);

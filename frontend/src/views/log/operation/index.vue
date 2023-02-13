@@ -35,11 +35,8 @@
                     <el-option :label="$t('logs.detail.cronjobs')" value="cronjobs"></el-option>
                     <el-option :label="$t('logs.detail.files')" value="files"></el-option>
                     <el-option :label="$t('logs.detail.hosts')" value="hosts"></el-option>
-                    <el-option :label="$t('logs.detail.commands')" value="commands"></el-option>
                     <el-option :label="$t('logs.detail.logs')" value="logs"></el-option>
                     <el-option :label="$t('logs.detail.settings')" value="settings"></el-option>
-                    <el-option :label="$t('logs.detail.backups')" value="backups"></el-option>
-                    <el-option :label="$t('logs.detail.groups')" value="groups"></el-option>
                 </el-select>
                 <el-select v-model="searchStatus" @change="search()" clearable style="margin-left: 10px">
                     <template #prefix>{{ $t('commons.table.status') }}</template>
