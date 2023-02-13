@@ -492,7 +492,7 @@ onMounted(() => {
 <style scoped lang="scss">
 .path {
     border: 1px solid #ebeef5;
-    background-color: #ffffff;
+    background-color: var(--panel-path-bg);
     height: 30px;
     border-radius: 2px !important;
 
