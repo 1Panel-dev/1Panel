@@ -1,8 +1,8 @@
 system:
   db_file: 1Panel.db
-  app_oss: "https://1panel.oss-cn-hangzhou.aliyuncs.com"
-  app_repo_owner: "1Panel-dev"
-  app_repo_name: 'appstore'
+  app_repo_owner: 1Panel-dev
+  app_repo_name: appstore
+  base_dir: /opt
 
 log:
   level: debug

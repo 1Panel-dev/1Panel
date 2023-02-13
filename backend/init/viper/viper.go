@@ -18,6 +18,7 @@ import (
 
 func Init() {
 	baseDir := "/opt"
+	mode := "local"
 	fileOp := files.NewFileOp()
 	v := viper.NewWithOptions()
 	v.SetConfigType("yaml")
@@ -28,6 +29,7 @@ func Init() {
 			panic(fmt.Errorf("Fatal error config file: %s \n", err))
 		}
 	} else {
+		mode = "release"
 		stdout, err := cmd.Exec("grep '^BASE_DIR=' /usr/bin/1pctl | cut -d'=' -f2")
 		if err != nil {
 			panic(err)
@@ -49,6 +51,9 @@ func Init() {
 	serverConfig := configs.ServerConfig{}
 	if err := v.Unmarshal(&serverConfig); err != nil {
 		panic(err)
+	}
+	if mode == "local" && serverConfig.System.BaseDir != "" {
+		baseDir = serverConfig.System.BaseDir
 	}
 	global.CONF = serverConfig
 	global.CONF.BaseDir = baseDir
