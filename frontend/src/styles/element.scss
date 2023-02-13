@@ -5,7 +5,11 @@ html {
     --el-menu-item-bg-color-active: #ffffff;
     --panel-border: 1px solid #f2f2f2;
     --panel-button-active: #ffffff;
+
+    --panel-alert-bg: #e2e4ec;
+    --panel-path-bg: #ffffff;
 }
+
 .el-notification {
     z-index: 99999 !important;
 }
@@ -172,5 +176,5 @@ html {
 }
 
 .el-avatar {
-    --el-avatar-bg-color: #ffffff;
+    --el-avatar-bg-color: #ffffff !important;
 }

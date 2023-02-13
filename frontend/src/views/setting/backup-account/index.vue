@@ -62,7 +62,12 @@
                                     {{ dateFormatSimple(s3Data.createdAt) }}
                                 </el-form-item>
                             </div>
-                            <el-alert v-else center style="height: 167px; background-color: #e2e4ec" :closable="false">
+                            <el-alert
+                                v-else
+                                center
+                                style="height: 167px; background-color: var(--panel-alert-bg)"
+                                :closable="false"
+                            >
                                 <el-button
                                     size="large"
                                     round
@@ -104,7 +109,12 @@
                                     {{ dateFormatSimple(ossData.createdAt) }}
                                 </el-form-item>
                             </div>
-                            <el-alert v-else center style="height: 167px; background-color: #e2e4ec" :closable="false">
+                            <el-alert
+                                v-else
+                                center
+                                style="height: 167px; background-color: var(--panel-alert-bg)"
+                                :closable="false"
+                            >
                                 <el-button
                                     size="large"
                                     round
@@ -148,7 +158,12 @@
                                     {{ dateFormatSimple(minioData.createdAt) }}
                                 </el-form-item>
                             </div>
-                            <el-alert v-else center style="height: 167px; background-color: #e2e4ec" :closable="false">
+                            <el-alert
+                                v-else
+                                center
+                                style="height: 167px; background-color: var(--panel-alert-bg)"
+                                :closable="false"
+                            >
                                 <el-button
                                     size="large"
                                     round
@@ -194,7 +209,12 @@
                                     {{ dateFormatSimple(sftpData.createdAt) }}
                                 </el-form-item>
                             </div>
-                            <el-alert v-else center style="height: 167px; background-color: #e2e4ec" :closable="false">
+                            <el-alert
+                                v-else
+                                center
+                                style="height: 167px; background-color: var(--panel-alert-bg)"
+                                :closable="false"
+                            >
                                 <el-button
                                     size="large"
                                     round

@@ -1,74 +1,11 @@
 html.dark {
-    // --el-color-primary: #409eff;
-    // --el-color-primary-light-3: #3375b9;
-    // --el-color-primary-light-5: #2a598a;
-    // --el-color-primary-light-7: #213d5b;
-    // --el-color-primary-light-8: #1d3043;
-    // --el-color-primary-light-9: #18222c;
-    // --el-color-primary-dark-2: #66b1ff;
-    // --el-color-success: #67c23a;
-    // --el-color-success-light-3: #4e8e2f;
-    // --el-color-success-light-5: #3e6b27;
-    // --el-color-success-light-7: #2d481f;
-    // --el-color-success-light-8: #25371c;
-    // --el-color-success-light-9: #1c2518;
-    // --el-color-success-dark-2: #85ce61;
-    // --el-color-warning: #e6a23c;
-    // --el-color-warning-light-3: #a77730;
-    // --el-color-warning-light-5: #7d5b28;
-    // --el-color-warning-light-7: #533f20;
-    // --el-color-warning-light-8: #3e301c;
-    // --el-color-warning-light-9: #292218;
-    // --el-color-warning-dark-2: #ebb563;
-    // --el-color-danger: #f56c6c;
-    // --el-color-danger-light-3: #b25252;
-    // --el-color-danger-light-5: #854040;
-    // --el-color-danger-light-7: #582e2e;
-    // --el-color-danger-light-8: #412626;
-    // --el-color-danger-light-9: #2b1d1d;
-    // --el-color-danger-dark-2: #f78989;
-    // --el-color-error: #f56c6c;
-    // --el-color-error-light-3: #b25252;
-    // --el-color-error-light-5: #854040;
-    // --el-color-error-light-7: #582e2e;
-    // --el-color-error-light-8: #412626;
-    // --el-color-error-light-9: #2b1d1d;
-    // --el-color-error-dark-2: #f78989;
-    // --el-color-info: #909399;
-    // --el-color-info-light-3: #6b6d71;
-    // --el-color-info-light-5: #525457;
-    // --el-color-info-light-7: #393a3c;
-    // --el-color-info-light-8: #2d2d2f;
-    // --el-color-info-light-9: #202121;
-    // --el-color-info-dark-2: #a6a9ad;
-    // --el-box-shadow: 0 12px 32px 4px rgb(0 0 0 / 36%), 0 8px 20px rgb(0 0 0 / 72%);
-    // --el-box-shadow-light: 0 0 12px rgb(0 0 0 / 72%);
-    // --el-box-shadow-lighter: 0 0 6px rgb(0 0 0 / 72%);
-    // --el-box-shadow-dark: 0 16px 48px 16px rgb(0 0 0 / 72%), 0 12px 32px #000000, 0 8px 16px -8px #000000;
-    // --el-bg-color-page: #0a0a0a;
+    --el-fill-color-blank: rgb(49, 51, 51);
     --el-bg-color: rgb(36, 37, 37);
-    // --el-bg-color-overlay: #1d1e1f;
-    // --el-text-color-primary: #e5eaf3;
     --el-text-color-regular: #cfd3dc;
-    // --el-text-color-secondary: #a3a6ad;
-    // --el-text-color-placeholder: #8d9095;
-    // --el-text-color-disabled: #6c6e72;
-    // --el-border-color-darker: #636466;
-    // --el-border-color-dark: #58585b;
-    // --el-border-color: #4c4d4f;
-    // --el-border-color-light: #414243;
-    // --el-border-color-lighter: #363637;
-    // --el-border-color-extra-light: #2b2b2c;
-    // --el-fill-color-darker: #424243;
-    // --el-fill-color-dark: #39393a;
-    // --el-fill-color: #303030;
-    // --el-fill-color-light: #262727;
-    // --el-fill-color-lighter: #1d1d1d;
-    // --el-fill-color-extra-light: #191919;
-    // --el-fill-color-blank: transparent;
-    // --el-mask-color: rgb(0 0 0 / 80%);
-    // --el-mask-color-extra-light: rgb(0 0 0 / 30%);
-
+    --el-fill-color-light: rgb(49, 51, 51);
+    --el-border-color: rgb(64, 67, 67);
+    --el-bg-color-overlay: rgb(36, 37, 37);
+    --el-border-color-light: rgb(64, 67, 67);
     // * menu
     --el-menu-bg-color: rgb(36, 37, 37) !important;
     --el-menu-item-bg-color: rgb(36, 37, 37);
@@ -83,7 +20,8 @@ html.dark {
     --panel-login-shadow-light: 5px 5px 15px rgb(255 255 255 / 20%);
     --panel-box-shadow-light: 0 0 10px rgb(255 255 255 / 10%);
     --panel-popup-color: #060708;
-
+    --panel-alert-bg: #2f3030;
+    --panel-path-bg: #2f3030;
     .el-card {
         --el-card-border-color: rgb(64, 67, 67);
         --el-card-bg-color: rgb(36, 37, 37);
@@ -187,5 +125,29 @@ html.dark {
     }
     span {
         color: var(--el-menu-text-color);
+    }
+    .el-input.is-disabled .el-input__wrapper {
+        box-shadow: 0 0 0 1px var(--el-input-border-color, var(--el-border-color)) inset;
+    }
+    .el-radio-button__inner {
+        background: rgb(49, 51, 51);
+    }
+    .el-button--primary.is-plain.is-disabled {
+        background: rgb(49, 51, 51);
+        border-color: rgb(64, 67, 67);
+    }
+    .el-button.is-disabled {
+        border-color: rgb(64, 67, 67);
+    }
+    .el-popper.is-dark {
+        color: rgb(171 173 173);
+    }
+    .path {
+        border: var(--panel-border);
+    }
+    input:-webkit-autofill {
+        box-shadow: 0 0 0 1000px #323232 inset;
+        -webkit-text-fill-color: #cfd3dc;
+        transition: background-color 1000s ease-out 0.5s;
     }
 }
