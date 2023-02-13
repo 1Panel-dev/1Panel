@@ -48,7 +48,7 @@ import { ElMessage, FormInstance } from 'element-plus';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { snapshotImport } from '@/api/modules/setting';
-import { getBackupList, getFilesFromBackup } from '@/api/modules/backup';
+import { getBackupList, getFilesFromBackup } from '@/api/modules/setting';
 import { loadBackupName } from '../../helper';
 import { Rules } from '@/global/form-rules';
 
