@@ -25,6 +25,20 @@ import (
 type AppService struct {
 }
 
+type IAppService interface {
+	PageApp(req request.AppSearch) (interface{}, error)
+	GetAppTags() ([]response.TagDTO, error)
+	GetApp(key string) (*response.AppDTO, error)
+	GetAppDetail(appId uint, version string) (response.AppDetailDTO, error)
+	Install(ctx context.Context, req request.AppInstallCreate) (*model.AppInstall, error)
+	SyncInstalled(installId uint) error
+	SyncAppList() error
+}
+
+func NewIAppService() IAppService {
+	return &AppService{}
+}
+
 func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	var opts []repo.DBOption
 	opts = append(opts, appRepo.OrderByRecommend())
@@ -131,7 +145,6 @@ func (a AppService) GetAppDetail(appId uint, version string) (response.AppDetail
 		appDetailDTO response.AppDetailDTO
 		opts         []repo.DBOption
 	)
-
 	opts = append(opts, appDetailRepo.WithAppId(appId), appDetailRepo.WithVersion(version))
 	detail, err := appDetailRepo.GetFirst(opts...)
 	if err != nil {
@@ -152,7 +165,6 @@ func (a AppService) GetAppDetail(appId uint, version string) (response.AppDetail
 	if err := checkLimit(app); err != nil {
 		appDetailDTO.Enable = false
 	}
-
 	return appDetailDTO, nil
 }
 
@@ -160,7 +172,6 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	if list, _ := appInstallRepo.ListBy(commonRepo.WithByName(req.Name)); len(list) > 0 {
 		return nil, buserr.New(constant.ErrNameIsExist)
 	}
-
 	httpPort, err := checkPort("PANEL_APP_PORT_HTTP", req.Params)
 	if err != nil {
 		return nil, err
@@ -169,7 +180,6 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	if err != nil {
 		return nil, err
 	}
-
 	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(req.AppDetailId))
 	if err != nil {
 		return nil, err
@@ -178,14 +188,12 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	if err != nil {
 		return nil, err
 	}
-
 	if err := checkRequiredAndLimit(app); err != nil {
 		return nil, err
 	}
 	if err := copyAppData(app.Key, appDetail.Version, req.Name, req.Params); err != nil {
 		return nil, err
 	}
-
 	paramByte, err := json.Marshal(req.Params)
 	if err != nil {
 		return nil, err
@@ -201,7 +209,6 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		HttpsPort:   httpsPort,
 		App:         app,
 	}
-
 	composeMap := make(map[string]interface{})
 	if err := yaml.Unmarshal([]byte(appDetail.DockerCompose), &composeMap); err != nil {
 		return nil, err
