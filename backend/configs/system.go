@@ -11,4 +11,5 @@ type System struct {
 	AppOss       string `mapstructure:"app_oss"`
 	AppRepoOwner string `mapstructure:"app_repo_owner"`
 	AppRepoName  string `mapstructure:"app_repo_name"`
+	EncryptKey   string `mapstructure:"encrypt_key"`
 }

@@ -15,7 +15,7 @@ import (
 )
 
 func StringEncrypt(text string) (string, error) {
-	key := global.CONF.Encrypt.Key
+	key := global.CONF.System.EncryptKey
 	pass := []byte(text)
 	xpass, err := aesEncryptWithSalt([]byte(key), pass)
 	if err == nil {
@@ -26,7 +26,7 @@ func StringEncrypt(text string) (string, error) {
 }
 
 func StringDecrypt(text string) (string, error) {
-	key := global.CONF.Encrypt.Key
+	key := global.CONF.System.EncryptKey
 	bytesPass, err := base64.StdEncoding.DecodeString(text)
 	if err != nil {
 		return "", err
