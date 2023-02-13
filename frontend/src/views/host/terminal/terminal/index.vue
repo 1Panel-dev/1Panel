@@ -119,7 +119,7 @@ import screenfull from 'screenfull';
 import i18n from '@/lang';
 import { Host } from '@/api/interface/host';
 import { getHostTree, testByID } from '@/api/modules/host';
-import { getCommandList } from '@/api/modules/command';
+import { getCommandList } from '@/api/modules/host';
 import { GlobalStore } from '@/store';
 
 const dialogRef = ref();

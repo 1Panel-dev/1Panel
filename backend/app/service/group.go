@@ -10,7 +10,6 @@ import (
 type GroupService struct{}
 
 type IGroupService interface {
-	GetGroupInfo(id uint) (*dto.GroupInfo, error)
 	List(req dto.GroupSearch) ([]dto.GroupInfo, error)
 	Create(groupDto dto.GroupOperate) error
 	Update(id uint, name string) error
@@ -19,18 +18,6 @@ type IGroupService interface {
 
 func NewIGroupService() IGroupService {
 	return &GroupService{}
-}
-
-func (u *GroupService) GetGroupInfo(id uint) (*dto.GroupInfo, error) {
-	group, err := groupRepo.Get(commonRepo.WithByID(id))
-	if err != nil {
-		return nil, constant.ErrRecordNotFound
-	}
-	var dtoGroup dto.GroupInfo
-	if err := copier.Copy(&dtoGroup, &group); err != nil {
-		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
-	}
-	return &dtoGroup, err
 }
 
 func (u *GroupService) List(req dto.GroupSearch) ([]dto.GroupInfo, error) {

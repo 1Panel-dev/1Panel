@@ -574,15 +574,6 @@ definitions:
     - type
     - vars
     type: object
-  dto.GroupInfo:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-      type:
-        type: string
-    type: object
   dto.GroupOperate:
     properties:
       id:
@@ -1284,6 +1275,8 @@ definitions:
     type: object
   dto.SettingInfo:
     properties:
+      appStoreVersion:
+        type: string
       complexityVerification:
         type: string
       dingVars:
@@ -3201,352 +3194,6 @@ paths:
       summary: Check is First login
       tags:
       - Auth
-  /backups:
-    post:
-      consumes:
-      - application/json
-      description: 创建备份账号
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.BackupOperate'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Create backup account
-      tags:
-      - Backup Account
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - type
-        formatEN: create backup account [type]
-        formatZH: 创建备份账号 [type]
-        paramKeys: []
-  /backups/del:
-    post:
-      consumes:
-      - application/json
-      description: 删除备份账号
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.BatchDeleteReq'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Delete backup account
-      tags:
-      - Backup Account
-      x-panel-log:
-        BeforeFuntions:
-        - db: backup_accounts
-          input_colume: id
-          input_value: ids
-          isList: true
-          output_colume: type
-          output_value: types
-        bodyKeys:
-        - ids
-        formatEN: delete backup account [types]
-        formatZH: 删除备份账号 [types]
-        paramKeys: []
-  /backups/record/del:
-    post:
-      consumes:
-      - application/json
-      description: 删除备份记录
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.BatchDeleteReq'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Delete backup record
-      tags:
-      - Backup Account
-      x-panel-log:
-        BeforeFuntions:
-        - db: backup_records
-          input_colume: id
-          input_value: ids
-          isList: true
-          output_colume: file_name
-          output_value: files
-        bodyKeys:
-        - ids
-        formatEN: delete backup records [files]
-        formatZH: 删除备份记录 [files]
-        paramKeys: []
-  /backups/record/download:
-    post:
-      consumes:
-      - application/json
-      description: 下载备份记录
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.DownloadRecord'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Download backup record
-      tags:
-      - Backup Account
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - source
-        - fileName
-        formatEN: download backup records [source][fileName]
-        formatZH: 下载备份记录 [source][fileName]
-        paramKeys: []
-  /backups/record/search:
-    post:
-      consumes:
-      - application/json
-      description: 获取备份记录列表分页
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.RecordSearch'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Page backup records
-      tags:
-      - Backup Account
-  /backups/search:
-    get:
-      description: 获取备份账号列表
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: anrry
-      security:
-      - ApiKeyAuth: []
-      summary: List backup accounts
-      tags:
-      - Backup Account
-    post:
-      consumes:
-      - application/json
-      description: 获取 bucket 列表
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.ForBuckets'
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: anrry
-      security:
-      - ApiKeyAuth: []
-      summary: List buckets
-      tags:
-      - Backup Account
-  /backups/search/files:
-    post:
-      consumes:
-      - application/json
-      description: 获取备份账号内文件列表
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.BackupSearchFile'
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: anrry
-      security:
-      - ApiKeyAuth: []
-      summary: List files from backup accounts
-      tags:
-      - Backup Account
-  /backups/update:
-    post:
-      consumes:
-      - application/json
-      description: 更新备份账号信息
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.BackupOperate'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Update backup account
-      tags:
-      - Backup Account
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - type
-        formatEN: update backup account [types]
-        formatZH: 更新备份账号 [types]
-        paramKeys: []
-  /commands:
-    get:
-      description: 获取快速命令列表
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.CommandInfo'
-      security:
-      - ApiKeyAuth: []
-      summary: List commands
-      tags:
-      - Command
-    post:
-      consumes:
-      - application/json
-      description: 创建快速命令
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CommandOperate'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Create command
-      tags:
-      - Command
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - name
-        - command
-        formatEN: create quick command [name][command]
-        formatZH: 创建快捷命令 [name][command]
-        paramKeys: []
-  /commands/del:
-    post:
-      consumes:
-      - application/json
-      description: 删除快速命令
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.BatchDeleteReq'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Delete command
-      tags:
-      - Command
-      x-panel-log:
-        BeforeFuntions:
-        - db: commands
-          input_colume: id
-          input_value: ids
-          isList: true
-          output_colume: name
-          output_value: names
-        bodyKeys:
-        - ids
-        formatEN: delete quick command [names]
-        formatZH: 删除快捷命令 [names]
-        paramKeys: []
-  /commands/search:
-    post:
-      consumes:
-      - application/json
-      description: 获取快速命令列表分页
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.SearchWithPage'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.PageResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Page commands
-      tags:
-      - Command
-  /commands/update:
-    post:
-      consumes:
-      - application/json
-      description: 更新快速命令
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.CommandOperate'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Update command
-      tags:
-      - Command
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - name
-        formatEN: update quick command [name]
-        formatZH: 更新快捷命令 [name]
-        paramKeys: []
   /containers:
     post:
       consumes:
@@ -5987,138 +5634,6 @@ paths:
         formatEN: Download url => [path]/[name]
         formatZH: 下载 url => [path]/[name]
         paramKeys: []
-  /groups:
-    post:
-      consumes:
-      - application/json
-      description: 创建系统组
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.GroupOperate'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Create group
-      tags:
-      - System Group
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - name
-        - type
-        formatEN: create group [name][type]
-        formatZH: 创建组 [name][type]
-        paramKeys: []
-  /groups/:id:
-    get:
-      consumes:
-      - application/json
-      description: 查询系统组
-      parameters:
-      - description: request
-        in: path
-        name: id
-        required: true
-        type: integer
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.GroupInfo'
-      security:
-      - ApiKeyAuth: []
-      summary: Search group info by id
-      tags:
-      - System Group
-  /groups/del:
-    post:
-      consumes:
-      - application/json
-      description: 删除系统组
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.OperateByID'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Delete group
-      tags:
-      - System Group
-      x-panel-log:
-        BeforeFuntions:
-        - db: groups
-          input_colume: id
-          input_value: id
-          isList: false
-          output_colume: name
-          output_value: name
-        bodyKeys:
-        - id
-        formatEN: delete group [name]
-        formatZH: 删除组 [name]
-        paramKeys: []
-  /groups/search:
-    post:
-      consumes:
-      - application/json
-      description: 查询系统组
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.GroupSearch'
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: anrry
-      security:
-      - ApiKeyAuth: []
-      summary: List groups
-      tags:
-      - System Group
-  /groups/update:
-    post:
-      consumes:
-      - application/json
-      description: 更新系统组
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.GroupOperate'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Update group
-      tags:
-      - System Group
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - name
-        - type
-        formatEN: update group [name][type]
-        formatZH: 更新组 [name][type]
-        paramKeys: []
   /hosts:
     post:
       consumes:
@@ -6168,6 +5683,128 @@ paths:
       summary: Load host info
       tags:
       - Host
+  /hosts/command:
+    get:
+      description: 获取快速命令列表
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CommandInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: List commands
+      tags:
+      - Command
+    post:
+      consumes:
+      - application/json
+      description: 创建快速命令
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CommandOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create command
+      tags:
+      - Command
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        - command
+        formatEN: create quick command [name][command]
+        formatZH: 创建快捷命令 [name][command]
+        paramKeys: []
+  /hosts/command/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除快速命令
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BatchDeleteReq'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete command
+      tags:
+      - Command
+      x-panel-log:
+        BeforeFuntions:
+        - db: commands
+          input_colume: id
+          input_value: ids
+          isList: true
+          output_colume: name
+          output_value: names
+        bodyKeys:
+        - ids
+        formatEN: delete quick command [names]
+        formatZH: 删除快捷命令 [names]
+        paramKeys: []
+  /hosts/command/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取快速命令列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SearchWithPage'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page commands
+      tags:
+      - Command
+  /hosts/command/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新快速命令
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CommandOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update command
+      tags:
+      - Command
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        formatEN: update quick command [name]
+        formatZH: 更新快捷命令 [name]
+        paramKeys: []
   /hosts/del:
     post:
       consumes:
@@ -6200,6 +5837,117 @@ paths:
         - id
         formatEN: delete host [addr]
         formatZH: 删除主机 [addr]
+        paramKeys: []
+  /hosts/group:
+    post:
+      consumes:
+      - application/json
+      description: 创建系统组
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GroupOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create group
+      tags:
+      - System Group
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        - type
+        formatEN: create group [name][type]
+        formatZH: 创建组 [name][type]
+        paramKeys: []
+  /hosts/group/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除系统组
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperateByID'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete group
+      tags:
+      - System Group
+      x-panel-log:
+        BeforeFuntions:
+        - db: groups
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: name
+          output_value: name
+        bodyKeys:
+        - id
+        formatEN: delete group [name]
+        formatZH: 删除组 [name]
+        paramKeys: []
+  /hosts/group/search:
+    post:
+      consumes:
+      - application/json
+      description: 查询系统组
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GroupSearch'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: List groups
+      tags:
+      - System Group
+  /hosts/group/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新系统组
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GroupOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update group
+      tags:
+      - System Group
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        - type
+        formatEN: update group [name][type]
+        formatZH: 更新组 [name][type]
         paramKeys: []
   /hosts/search:
     post:
@@ -6471,6 +6219,230 @@ paths:
         - websiteId
         formatEN: Update nginx conf [domain]
         formatZH: 更新 nginx 配置 [domain]
+        paramKeys: []
+  /settings/backup:
+    post:
+      consumes:
+      - application/json
+      description: 创建备份账号
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BackupOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create backup account
+      tags:
+      - Backup Account
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - type
+        formatEN: create backup account [type]
+        formatZH: 创建备份账号 [type]
+        paramKeys: []
+  /settings/backup/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除备份账号
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BatchDeleteReq'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete backup account
+      tags:
+      - Backup Account
+      x-panel-log:
+        BeforeFuntions:
+        - db: backup_accounts
+          input_colume: id
+          input_value: ids
+          isList: true
+          output_colume: type
+          output_value: types
+        bodyKeys:
+        - ids
+        formatEN: delete backup account [types]
+        formatZH: 删除备份账号 [types]
+        paramKeys: []
+  /settings/backup/record/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除备份记录
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BatchDeleteReq'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete backup record
+      tags:
+      - Backup Account
+      x-panel-log:
+        BeforeFuntions:
+        - db: backup_records
+          input_colume: id
+          input_value: ids
+          isList: true
+          output_colume: file_name
+          output_value: files
+        bodyKeys:
+        - ids
+        formatEN: delete backup records [files]
+        formatZH: 删除备份记录 [files]
+        paramKeys: []
+  /settings/backup/record/download:
+    post:
+      consumes:
+      - application/json
+      description: 下载备份记录
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.DownloadRecord'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Download backup record
+      tags:
+      - Backup Account
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - source
+        - fileName
+        formatEN: download backup records [source][fileName]
+        formatZH: 下载备份记录 [source][fileName]
+        paramKeys: []
+  /settings/backup/record/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取备份记录列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RecordSearch'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Page backup records
+      tags:
+      - Backup Account
+  /settings/backup/search:
+    get:
+      description: 获取备份账号列表
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: List backup accounts
+      tags:
+      - Backup Account
+    post:
+      consumes:
+      - application/json
+      description: 获取 bucket 列表
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ForBuckets'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: List buckets
+      tags:
+      - Backup Account
+  /settings/backup/search/files:
+    post:
+      consumes:
+      - application/json
+      description: 获取备份账号内文件列表
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BackupSearchFile'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: List files from backup accounts
+      tags:
+      - Backup Account
+  /settings/backup/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新备份账号信息
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BackupOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update backup account
+      tags:
+      - Backup Account
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - type
+        formatEN: update backup account [types]
+        formatZH: 更新备份账号 [types]
         paramKeys: []
   /settings/basedir:
     get:

@@ -15,7 +15,7 @@ import (
 // @Param request body dto.BackupOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /backups [post]
+// @Router /settings/backup [post]
 // @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建备份账号 [type]","formatEN":"create backup account [type]"}
 func (b *BaseApi) CreateBackup(c *gin.Context) {
 	var req dto.BackupOperate
@@ -41,7 +41,7 @@ func (b *BaseApi) CreateBackup(c *gin.Context) {
 // @Param request body dto.ForBuckets true "request"
 // @Success 200 {anrry} string
 // @Security ApiKeyAuth
-// @Router /backups/search [post]
+// @Router /settings/backup/search [post]
 func (b *BaseApi) ListBuckets(c *gin.Context) {
 	var req dto.ForBuckets
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -67,7 +67,7 @@ func (b *BaseApi) ListBuckets(c *gin.Context) {
 // @Param request body dto.BatchDeleteReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /backups/del [post]
+// @Router /settings/backup/del [post]
 // @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"ids","isList":true,"db":"backup_accounts","output_colume":"type","output_value":"types"}],"formatZH":"删除备份账号 [types]","formatEN":"delete backup account [types]"}
 func (b *BaseApi) DeleteBackup(c *gin.Context) {
 	var req dto.BatchDeleteReq
@@ -94,7 +94,7 @@ func (b *BaseApi) DeleteBackup(c *gin.Context) {
 // @Param request body dto.RecordSearch true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /backups/record/search [post]
+// @Router /settings/backup/record/search [post]
 func (b *BaseApi) SearchBackupRecords(c *gin.Context) {
 	var req dto.RecordSearch
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -121,7 +121,7 @@ func (b *BaseApi) SearchBackupRecords(c *gin.Context) {
 // @Param request body dto.DownloadRecord true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /backups/record/download [post]
+// @Router /settings/backup/record/download [post]
 // @x-panel-log {"bodyKeys":["source","fileName"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"下载备份记录 [source][fileName]","formatEN":"download backup records [source][fileName]"}
 func (b *BaseApi) DownloadRecord(c *gin.Context) {
 	var req dto.DownloadRecord
@@ -149,7 +149,7 @@ func (b *BaseApi) DownloadRecord(c *gin.Context) {
 // @Param request body dto.BatchDeleteReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /backups/record/del [post]
+// @Router /settings/backup/record/del [post]
 // @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"ids","isList":true,"db":"backup_records","output_colume":"file_name","output_value":"files"}],"formatZH":"删除备份记录 [files]","formatEN":"delete backup records [files]"}
 func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 	var req dto.BatchDeleteReq
@@ -176,7 +176,7 @@ func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 // @Param request body dto.BackupOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /backups/update [post]
+// @Router /settings/backup/update [post]
 // @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新备份账号 [types]","formatEN":"update backup account [types]"}
 func (b *BaseApi) UpdateBackup(c *gin.Context) {
 	var req dto.BackupOperate
@@ -200,7 +200,7 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 // @Description 获取备份账号列表
 // @Success 200 {anrry} dto.BackupInfo
 // @Security ApiKeyAuth
-// @Router /backups/search [get]
+// @Router /settings/backup/search [get]
 func (b *BaseApi) ListBackup(c *gin.Context) {
 	data, err := backupService.List()
 	if err != nil {
@@ -218,7 +218,7 @@ func (b *BaseApi) ListBackup(c *gin.Context) {
 // @Param request body dto.BackupSearchFile true "request"
 // @Success 200 {anrry} string
 // @Security ApiKeyAuth
-// @Router /backups/search/files [post]
+// @Router /settings/backup/search/files [post]
 func (b *BaseApi) LoadFilesFromBackup(c *gin.Context) {
 	var req dto.BackupSearchFile
 	if err := c.ShouldBindJSON(&req); err != nil {

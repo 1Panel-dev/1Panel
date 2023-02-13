@@ -237,7 +237,7 @@
 import { dateFormatSimple, dateFormat } from '@/utils/util';
 import { onMounted, ref } from 'vue';
 import LayoutContent from '@/layout/layout-content.vue';
-import { getBackupList, deleteBackup } from '@/api/modules/backup';
+import { getBackupList, deleteBackup } from '@/api/modules/setting';
 import DialogOperate from '@/views/setting/backup-account/operate/index.vue';
 import { Backup } from '@/api/interface/backup';
 import { ElForm } from 'element-plus';

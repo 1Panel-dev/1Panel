@@ -15,7 +15,7 @@ import (
 // @Param request body dto.CommandOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /commands [post]
+// @Router /hosts/command [post]
 // @x-panel-log {"bodyKeys":["name","command"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建快捷命令 [name][command]","formatEN":"create quick command [name][command]"}
 func (b *BaseApi) CreateCommand(c *gin.Context) {
 	var req dto.CommandOperate
@@ -41,7 +41,7 @@ func (b *BaseApi) CreateCommand(c *gin.Context) {
 // @Param request body dto.SearchWithPage true "request"
 // @Success 200 {object} dto.PageResult
 // @Security ApiKeyAuth
-// @Router /commands/search [post]
+// @Router /hosts/command/search [post]
 func (b *BaseApi) SearchCommand(c *gin.Context) {
 	var req dto.SearchWithPage
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -66,7 +66,7 @@ func (b *BaseApi) SearchCommand(c *gin.Context) {
 // @Description 获取快速命令列表
 // @Success 200 {object} dto.CommandInfo
 // @Security ApiKeyAuth
-// @Router /commands [get]
+// @Router /hosts/command [get]
 func (b *BaseApi) ListCommand(c *gin.Context) {
 	list, err := commandService.List()
 	if err != nil {
@@ -84,7 +84,7 @@ func (b *BaseApi) ListCommand(c *gin.Context) {
 // @Param request body dto.BatchDeleteReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /commands/del [post]
+// @Router /hosts/command/del [post]
 // @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"ids","isList":true,"db":"commands","output_colume":"name","output_value":"names"}],"formatZH":"删除快捷命令 [names]","formatEN":"delete quick command [names]"}
 func (b *BaseApi) DeleteCommand(c *gin.Context) {
 	var req dto.BatchDeleteReq
@@ -111,7 +111,7 @@ func (b *BaseApi) DeleteCommand(c *gin.Context) {
 // @Param request body dto.CommandOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /commands/update [post]
+// @Router /hosts/command/update [post]
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新快捷命令 [name]","formatEN":"update quick command [name]"}
 func (b *BaseApi) UpdateCommand(c *gin.Context) {
 	var req dto.CommandOperate

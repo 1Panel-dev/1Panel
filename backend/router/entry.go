@@ -4,10 +4,7 @@ type RouterGroup struct {
 	BaseRouter
 	DashboardRouter
 	HostRouter
-	BackupRouter
-	GroupRouter
 	ContainerRouter
-	CommandRouter
 	MonitorRouter
 	LogRouter
 	FileRouter
