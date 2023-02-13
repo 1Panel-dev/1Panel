@@ -162,7 +162,7 @@ import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import { loadBackupName } from '@/views/setting/helper';
 import FileList from '@/components/file-list/index.vue';
-import { getBackupList } from '@/api/modules/backup';
+import { getBackupList } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { Cronjob } from '@/api/interface/cronjob';

@@ -38,7 +38,7 @@ import { backup, recover } from '@/api/modules/database';
 import i18n from '@/lang';
 import { ElMessage } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords } from '@/api/modules/backup';
+import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords } from '@/api/modules/setting';
 import { Backup } from '@/api/interface/backup';
 
 const selects = ref<any>([]);

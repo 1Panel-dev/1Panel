@@ -37,7 +37,7 @@
             :destroy-on-close="true"
         >
             <el-alert :closable="false" :title="$t('app.checkInstalledWarn', ['Redis-Commander'])" type="info">
-                <el-link icon="Position" @click="goRouter('/apps')" type="primary">
+                <el-link icon="Position" @click="getAppDetail('redis-commander')" type="primary">
                     {{ $t('database.goInstall') }}
                 </el-link>
             </el-alert>
@@ -81,10 +81,6 @@ const onSetting = async () => {
     settingRef.value!.acceptParams({ status: redisStatus.value, redisName: redisName.value });
 };
 
-const goRouter = async (path: string) => {
-    router.push({ path: path });
-};
-
 const goDashboard = async () => {
     if (redisCommandPort.value === 0) {
         commandVisiable.value = true;
@@ -93,6 +89,9 @@ const goDashboard = async () => {
     let href = window.location.href;
     let ipLocal = href.split('//')[1].split(':')[0];
     window.open(`http://${ipLocal}:${redisCommandPort.value}`, '_blank');
+};
+const getAppDetail = (key: string) => {
+    router.push({ name: 'AppDetail', params: { appKey: key } });
 };
 
 const loadDashboardPort = async () => {

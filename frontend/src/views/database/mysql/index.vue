@@ -124,7 +124,7 @@
             :destroy-on-close="true"
         >
             <el-alert :closable="false" :title="$t('app.checkInstalledWarn', ['phpMyAdmin'])" type="info">
-                <el-link icon="Position" @click="goRouter('/apps/installed')" type="primary">
+                <el-link icon="Position" @click="getAppDetail('phpmyadmin')" type="primary">
                     {{ $t('database.goInstall') }}
                 </el-link>
             </el-alert>
@@ -258,10 +258,6 @@ const onChange = async (info: any) => {
     }
 };
 
-const goRouter = async (path: string) => {
-    router.push({ path: path });
-};
-
 const goDashboard = async () => {
     if (phpadminPort.value === 0) {
         phpVisiable.value = true;
@@ -270,6 +266,9 @@ const goDashboard = async () => {
     let href = window.location.href;
     let ipLocal = href.split('//')[1].split(':')[0];
     window.open(`http://${ipLocal}:${phpadminPort.value}`, '_blank');
+};
+const getAppDetail = (key: string) => {
+    router.push({ name: 'AppDetail', params: { appKey: key } });
 };
 
 const loadDashboardPort = async () => {

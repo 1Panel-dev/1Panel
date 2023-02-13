@@ -157,7 +157,7 @@ import { Setting } from '@/api/interface/setting';
 import LayoutContent from '@/layout/layout-content.vue';
 import RecoverStatus from '@/views/setting/snapshot/status/index.vue';
 import SnapshotImport from '@/views/setting/snapshot/import/index.vue';
-import { getBackupList } from '@/api/modules/backup';
+import { getBackupList } from '@/api/modules/setting';
 import { loadBackupName } from '../helper';
 
 const loading = ref(false);
