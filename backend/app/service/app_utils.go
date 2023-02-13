@@ -86,7 +86,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 		}
 	}
 
-	if !reflect.DeepEqual(dbConfig, dto.AppDatabase{}) {
+	if !reflect.DeepEqual(dbConfig, dto.AppDatabase{}) && dbConfig.DbName != "" && dbConfig.DbUser != "" && dbConfig.Password != "" {
 		dbInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithServiceName(dbConfig.ServiceName))
 		if err != nil {
 			return err
