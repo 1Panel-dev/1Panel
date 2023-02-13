@@ -465,7 +465,7 @@ export default {
         createVolume: 'Create volume',
 
         repo: 'Repo',
-        createRepo: 'Create repo',
+        createRepo: 'Add repo',
         name: 'Name',
         protocol: 'protocol',
         httpRepo: 'The http repository needs to restart the docker service to add credit',

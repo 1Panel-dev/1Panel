@@ -12,7 +12,7 @@
             <template #toolbar>
                 <el-row>
                     <el-col :span="16">
-                        <el-button type="primary" @click="onOpenDialog('create')">
+                        <el-button type="primary" @click="onOpenDialog('add')">
                             {{ $t('container.createRepo') }}
                         </el-button>
                         <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">

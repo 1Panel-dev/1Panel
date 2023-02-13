@@ -493,7 +493,7 @@ export default {
         createVolume: '创建存储卷',
 
         repo: '仓库',
-        createRepo: '创建仓库',
+        createRepo: '添加仓库',
         name: '名称',
         protocol: '协议',
         downloadUrl: '下载地址',
