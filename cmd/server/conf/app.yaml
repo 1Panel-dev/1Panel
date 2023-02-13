@@ -24,6 +24,3 @@ cors:
       allow-methods: GET, POST
       expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type
       allow-credentials: true
-
-encrypt:
-  key: 1Panel_key@2023!

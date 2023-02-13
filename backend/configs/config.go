@@ -5,5 +5,4 @@ type ServerConfig struct {
 	System    System    `mapstructure:"system"`
 	LogConfig LogConfig `mapstructure:"log"`
 	CORS      CORS      `mapstructure:"cors"`
-	Encrypt   Encrypt   `mapstructure:"encrypt"`
 }
