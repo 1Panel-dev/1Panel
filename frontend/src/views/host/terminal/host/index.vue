@@ -47,7 +47,9 @@
                         <template #default="{ node, data }">
                             <span class="custom-tree-node" @mouseover="hover = data.id" @mouseleave="hover = null">
                                 <div v-if="node.label !== currentGroup || !data.onEdit">
-                                    <span v-if="node.label.length <= 35">{{ node.label }}</span>
+                                    <span v-if="node.label.length <= 35" @click="onEdit(node, data)">
+                                        {{ node.label }}
+                                    </span>
                                     <el-tooltip v-else :content="node.label" placement="top-start">
                                         <span>{{ node.label.substring(0, 32) }}...</span>
                                     </el-tooltip>

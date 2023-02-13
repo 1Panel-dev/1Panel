@@ -263,21 +263,24 @@ const loadDetail = (row: any) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.handle'),
-        icon: 'Pointer',
         click: (row: Cronjob.CronjobInfo) => {
             onHandle(row);
         },
     },
     {
         label: i18n.global.t('commons.button.edit'),
-        icon: 'Edit',
         click: (row: Cronjob.CronjobInfo) => {
             onOpenDialog('edit', row);
         },
     },
     {
+        label: i18n.global.t('cronjob.record'),
+        click: (row: Cronjob.CronjobInfo) => {
+            loadDetail(row);
+        },
+    },
+    {
         label: i18n.global.t('commons.button.delete'),
-        icon: 'Delete',
         click: (row: Cronjob.CronjobInfo) => {
             onBatchDelete(row);
         },

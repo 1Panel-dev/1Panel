@@ -40,14 +40,8 @@
                     :key="item.Refresh"
                 ></Terminal>
                 <div>
-                    <el-select
-                        v-model="quickCmd"
-                        clearable
-                        filterable
-                        @change="quickInput"
-                        style="width: 25%"
-                        :placeholder="$t('terminal.quickCommand')"
-                    >
+                    <el-select v-model="quickCmd" clearable filterable @change="quickInput" style="width: 25%">
+                        <template #prefix>{{ $t('terminal.quickCommand') }}</template>
                         <el-option
                             v-for="cmd in commandList"
                             :key="cmd.id"
@@ -55,14 +49,9 @@
                             :value="cmd.command"
                         />
                     </el-select>
-                    <el-input
-                        :placeholder="$t('terminal.batchInput')"
-                        v-model="batchVal"
-                        @keyup.enter="batchInput"
-                        style="width: 75%"
-                    >
-                        <template #append>
-                            <el-switch v-model="isBatch" class="ml-2" />
+                    <el-input v-model="batchVal" @keyup.enter="batchInput" style="width: 75%">
+                        <template #prepend>
+                            <el-checkbox :label="$t('terminal.batchInput')" v-model="isBatch" />
                         </template>
                     </el-input>
                 </div>
