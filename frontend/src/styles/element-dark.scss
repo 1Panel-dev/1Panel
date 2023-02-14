@@ -46,6 +46,9 @@ html.dark {
         --el-table-border: var(--panel-border);
         --el-table-border-color: rgb(64, 67, 67);
     }
+    .el-message-box {
+        --el-messagebox-title-color: #999999;
+    }
 
     .el-alert--info {
         --el-alert-bg-color: rgb(56, 59, 59);
@@ -57,7 +60,7 @@ html.dark {
     }
 
     .el-pagination {
-			--el-pagination-button-color: #999999;
+        --el-pagination-button-color: #999999;
     }
 
     // * wangEditor
@@ -77,6 +80,9 @@ html.dark {
             .el-input__wrapper {
                 background-color: #ffffff;
                 box-shadow: 0 0 0 1px #dcdfe6 inset;
+            }
+            .el-input__inner {
+                color: #606266;
             }
         }
     }

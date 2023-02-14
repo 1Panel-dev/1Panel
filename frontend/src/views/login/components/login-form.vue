@@ -357,7 +357,7 @@ onMounted(() => {
             background: none !important;
             box-shadow: none !important;
             border-radius: 0 !important;
-            border-top: 1px solid #f2f2f2;
+            border-bottom: 1px solid #dcdfe6;
         }
     }
 
