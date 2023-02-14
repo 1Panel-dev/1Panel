@@ -3,6 +3,7 @@ system:
   app_repo_owner: 1Panel-dev
   app_repo_name: appstore
   base_dir: /opt
+  mode: dev
 
 log:
   level: debug
