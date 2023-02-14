@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"strings"
 	"time"
 
@@ -208,29 +207,25 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 			return err
 		}
 	}
-	exStr := []string{}
-	exStr = append(exStr, "zcvf")
-	exStr = append(exStr, targetDir+"/"+name)
+
 	excludes := strings.Split(exclusionRules, ";")
+	excludeRules := ""
 	for _, exclude := range excludes {
 		if len(exclude) == 0 {
 			continue
 		}
-		exStr = append(exStr, "--exclude")
-		exStr = append(exStr, exclude)
+		excludeRules += (" --exclude" + exclude)
 	}
+	path := ""
 	if len(strings.Split(sourceDir, "/")) > 3 {
-		exStr = append(exStr, "-C")
 		itemDir := strings.ReplaceAll(sourceDir[strings.LastIndex(sourceDir, "/"):], "/", "")
 		aheadDir := strings.ReplaceAll(sourceDir, itemDir, "")
-		exStr = append(exStr, aheadDir)
-		exStr = append(exStr, itemDir)
+		path += fmt.Sprintf("-C %s %s", aheadDir, itemDir)
 	} else {
-		exStr = append(exStr, sourceDir)
+		path = sourceDir
 	}
-	cmd := exec.Command("tar", exStr...)
-	stdout, err := cmd.CombinedOutput()
-	fmt.Println(string(stdout))
+
+	stdout, err := cmd.Execf("tar zcvf %s %s %s", targetDir+"/"+name, excludeRules, path)
 	if err != nil {
 		return errors.New(string(stdout))
 	}
@@ -244,8 +239,7 @@ func handleUnTar(sourceFile, targetDir string) error {
 		}
 	}
 
-	cmd := exec.Command("tar", "zxvfC", sourceFile, targetDir)
-	stdout, err := cmd.CombinedOutput()
+	stdout, err := cmd.Execf("tar zxvfC %s %s", sourceFile, targetDir)
 	if err != nil {
 		return errors.New(string(stdout))
 	}

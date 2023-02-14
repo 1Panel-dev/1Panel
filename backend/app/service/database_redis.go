@@ -14,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -160,9 +161,8 @@ func (u *RedisService) Backup() error {
 	if err != nil {
 		return err
 	}
-	commands := append(redisExec(redisInfo.ContainerName, redisInfo.Password), "save")
-	cmd := exec.Command("docker", commands...)
-	if stdout, err := cmd.CombinedOutput(); err != nil {
+	stdout, err := cmd.Execf("docker exec %s redis-cli -a %s --no-auth-warning save", redisInfo.ContainerName, redisInfo.Password)
+	if err != nil {
 		return errors.New(string(stdout))
 	}
 	localDir, err := loadLocalDir()
@@ -195,9 +195,9 @@ func (u *RedisService) Backup() error {
 	}
 
 	name := fmt.Sprintf("%s.rdb", time.Now().Format("20060102150405"))
-	cmd2 := exec.Command("docker", "cp", fmt.Sprintf("%s:/data/dump.rdb", redisInfo.ContainerName), fmt.Sprintf("%s/%s", fullDir, name))
-	if stdout, err := cmd2.CombinedOutput(); err != nil {
-		return errors.New(string(stdout))
+	stdout1, err1 := cmd.Execf("docker cp %s:/data/dump.rdb %s/%s", redisInfo.ContainerName, fullDir, name)
+	if err1 != nil {
+		return errors.New(string(stdout1))
 	}
 	return nil
 }

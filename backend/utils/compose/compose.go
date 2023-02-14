@@ -1,45 +1,38 @@
 package compose
 
 import (
-	"os/exec"
-
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/compose-spec/compose-go/loader"
 	"github.com/compose-spec/compose-go/types"
 )
 
 func Up(filePath string) (string, error) {
-	cmd := exec.Command("docker-compose", "-f", filePath, "up", "-d")
-	stdout, err := cmd.CombinedOutput()
+	stdout, err := cmd.Execf("docker-compose -f %s up -d", filePath)
 	return string(stdout), err
 }
 
 func Down(filePath string) (string, error) {
-	cmd := exec.Command("docker-compose", "-f", filePath, "down")
-	stdout, err := cmd.CombinedOutput()
+	stdout, err := cmd.Execf("docker-compose -f %s down", filePath)
 	return string(stdout), err
 }
 
 func Stop(filePath string) (string, error) {
-	cmd := exec.Command("docker-compose", "-f", filePath, "stop")
-	stdout, err := cmd.CombinedOutput()
+	stdout, err := cmd.Execf("docker-compose -f %s stop", filePath)
 	return string(stdout), err
 }
 
 func Restart(filePath string) (string, error) {
-	cmd := exec.Command("docker-compose", "-f", filePath, "restart")
-	stdout, err := cmd.CombinedOutput()
+	stdout, err := cmd.Execf("docker-compose -f %s restart", filePath)
 	return string(stdout), err
 }
 
 func Operate(filePath, operation string) (string, error) {
-	cmd := exec.Command("docker-compose", "-f", filePath, operation)
-	stdout, err := cmd.CombinedOutput()
+	stdout, err := cmd.Execf("docker-compose -f %s %s", filePath, operation)
 	return string(stdout), err
 }
 
 func Rmf(filePath string) (string, error) {
-	cmd := exec.Command("docker-compose", "-f", filePath, "rm", "-f")
-	stdout, err := cmd.CombinedOutput()
+	stdout, err := cmd.Execf("docker-compose -f %s rm -f", filePath)
 	return string(stdout), err
 }
 

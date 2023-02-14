@@ -444,9 +444,13 @@ const onDownload = async (recordID: number, backupID: number) => {
     a.style.display = 'none';
     a.href = downloadUrl;
     if (dialogData.value.rowData!.type === 'database') {
-        a.download = dateFormatForName(currentRecord.value?.startTime) + '.sql.gz';
+        a.download =
+            dialogData.value.rowData!.dbName + '_' + dateFormatForName(currentRecord.value?.startTime) + '.sql.gz';
+    } else if (dialogData.value.rowData!.type === 'website') {
+        a.download =
+            dialogData.value.rowData!.website + '_' + dateFormatForName(currentRecord.value?.startTime) + '.tar.gz';
     } else {
-        a.download = dateFormatForName(currentRecord.value?.startTime) + '.tar.gz';
+        a.download = dateFormatForName(currentRecord.value?.startTime) + '.sql.gz';
     }
     const event = new MouseEvent('click');
     a.dispatchEvent(event);
