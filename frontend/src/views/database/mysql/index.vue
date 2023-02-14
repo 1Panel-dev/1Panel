@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <LayoutContent :title="'Mysql ' + $t('menu.database')">
+        <LayoutContent :title="'MySQL ' + $t('menu.database')">
             <template #app>
                 <AppStatus
                     :app-key="'mysql'"
@@ -112,7 +112,7 @@
             v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist && !loading"
             class="mask-prompt"
         >
-            <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['Mysql']) }}</span>
+            <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['MySQL']) }}</span>
         </el-card>
 
         <Setting ref="settingRef" style="margin-top: 20px" />

@@ -19,7 +19,7 @@ const databaseRouter = {
             children: [
                 {
                     path: 'mysql',
-                    name: 'Mysql',
+                    name: 'MySQL',
                     component: () => import('@/views/database/mysql/index.vue'),
                     hidden: true,
                     meta: {

@@ -13,7 +13,7 @@ import RouterButton from '@/components/router-button/index.vue';
 
 const buttons = [
     {
-        label: 'Mysql',
+        label: 'MySQL',
         path: '/databases/mysql',
     },
     {

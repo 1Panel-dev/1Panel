@@ -256,7 +256,7 @@ export default {
         backupList: 'Backup list',
         backList: 'Return',
         loadBackup: 'Import the backup',
-        setting: 'Mysql Settings',
+        setting: 'MySQL Settings',
         remoteAccess: 'Remote access',
         changePassword: 'Password change',
         changePasswordHelper:

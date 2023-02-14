@@ -19,6 +19,16 @@
                                 </el-input>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.passwd')" :rules="Rules.requiredInput" prop="password">
+                                <el-input type="password" clearable disabled v-model="form.password">
+                                    <template #append>
+                                        <el-button icon="Setting" @click="onChangePassword">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
+
                             <el-form-item :label="$t('setting.theme')" :rules="Rules.requiredSelect" prop="theme">
                                 <el-radio-group
                                     @change="onSave(panelFormRef, 'Theme', form.theme)"
@@ -96,6 +106,7 @@
                 </el-form>
             </template>
         </LayoutContent>
+        <Password ref="passwordRef" />
     </div>
 </template>
 
@@ -109,6 +120,7 @@ import { GlobalStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import Password from '@/views/setting/panel/password/index.vue';
 
 const loading = ref(false);
 const i18n = useI18n();
@@ -120,6 +132,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 
 const form = reactive({
     userName: '',
+    password: '',
     email: '',
     sessionTimeout: 0,
     localTime: '',
@@ -134,9 +147,12 @@ const TIME_COUNT = ref(10);
 const count = ref();
 const show = ref();
 
+const passwordRef = ref();
+
 const search = async () => {
     const res = await getSettingInfo();
     form.userName = res.data.userName;
+    form.password = '******';
     form.sessionTimeout = Number(res.data.sessionTimeout);
     form.localTime = res.data.localTime;
     form.panelName = res.data.panelName;
@@ -145,6 +161,10 @@ const search = async () => {
     form.complexityVerification = res.data.complexityVerification;
 };
 const panelFormRef = ref<FormInstance>();
+
+const onChangePassword = () => {
+    passwordRef.value.acceptParams({ complexityVerification: form.complexityVerification });
+};
 
 const onSave = async (formEl: FormInstance | undefined, key: string, val: any) => {
     if (!formEl) return;

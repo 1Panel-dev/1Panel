@@ -6,16 +6,6 @@
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :span="10">
-                            <el-form-item :label="$t('setting.passwd')" :rules="Rules.requiredInput" prop="password">
-                                <el-input type="password" clearable disabled v-model="form.password">
-                                    <template #append>
-                                        <el-button icon="Setting" @click="onChangePassword">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-
                             <el-form-item :label="$t('setting.panelPort')" :rules="Rules.port" prop="serverPort">
                                 <el-input clearable v-model.number="form.serverPort">
                                     <template #append>
@@ -118,14 +108,11 @@
                 </el-form>
             </template>
         </LayoutContent>
-        <el-dialog
-            v-model="timeoutVisiable"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :title="$t('setting.expirationTime')"
-            width="30%"
-        >
-            <el-form ref="timeoutFormRef" label-width="80px" label-position="left" :model="timeoutForm">
+        <el-drawer v-model="timeoutVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+            <template #header>
+                <DrawerHeader :header="$t('setting.expirationTime')" :back="handleClose" />
+            </template>
+            <el-form ref="timeoutFormRef" label-position="top" :model="timeoutForm">
                 <el-form-item :label="$t('setting.days')" prop="days" :rules="Rules.number">
                     <el-input clearable v-model.number="timeoutForm.days" />
                     <span class="input-help">{{ $t('setting.expirationHelper') }}</span>
@@ -139,54 +126,7 @@
                     </el-button>
                 </span>
             </template>
-        </el-dialog>
-        <el-dialog
-            v-model="passwordVisiable"
-            :destroy-on-close="true"
-            :close-on-click-modal="false"
-            :title="$t('setting.changePassword')"
-            width="30%"
-        >
-            <el-form
-                v-loading="dialogLoading"
-                ref="passFormRef"
-                label-width="80px"
-                label-position="left"
-                :model="passForm"
-                :rules="passRules"
-            >
-                <el-form-item :label="$t('setting.oldPassword')" prop="oldPassword">
-                    <el-input type="password" show-password clearable v-model="passForm.oldPassword" />
-                </el-form-item>
-                <el-form-item
-                    v-if="form.complexityVerification === 'disable'"
-                    :label="$t('setting.newPassword')"
-                    prop="newPassword"
-                >
-                    <el-input type="password" show-password clearable v-model="passForm.newPassword" />
-                </el-form-item>
-                <el-form-item
-                    v-if="form.complexityVerification === 'enable'"
-                    :label="$t('setting.newPassword')"
-                    prop="newPasswordComplexity"
-                >
-                    <el-input type="password" show-password clearable v-model="passForm.newPasswordComplexity" />
-                </el-form-item>
-                <el-form-item :label="$t('setting.retryPassword')" prop="retryPassword">
-                    <el-input type="password" show-password clearable v-model="passForm.retryPassword" />
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button :disabled="dialogLoading" @click="passwordVisiable = false">
-                        {{ $t('commons.button.cancel') }}
-                    </el-button>
-                    <el-button :disabled="dialogLoading" type="primary" @click="submitChangePassword(passFormRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-dialog>
+        </el-drawer>
     </div>
 </template>
 
@@ -195,37 +135,15 @@ import { ref, reactive, onMounted } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
 import LayoutContent from '@/layout/layout-content.vue';
-import { updatePassword, updateSetting, getMFA, bindMFA, getSettingInfo, updatePort } from '@/api/modules/setting';
+import DrawerHeader from '@/components/drawer-header/index.vue';
+import { updateSetting, getMFA, bindMFA, getSettingInfo, updatePort } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { dateFormatSimple } from '@/utils/util';
-import { GlobalStore } from '@/store';
-import router from '@/routers';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
-const globalStore = GlobalStore();
-const passFormRef = ref<FormInstance>();
-const passRules = reactive({
-    oldPassword: [Rules.requiredInput],
-    newPassword: [
-        Rules.requiredInput,
-        { min: 6, message: i18n.global.t('commons.rule.commonPassword'), trigger: 'blur' },
-    ],
-    newPasswordComplexity: [Rules.requiredInput, Rules.password],
-    retryPassword: [Rules.requiredInput, { validator: checkPassword, trigger: 'blur' }],
-});
-const dialogLoading = ref(false);
-const passwordVisiable = ref<boolean>(false);
-const passForm = reactive({
-    oldPassword: '',
-    newPassword: '',
-    newPasswordComplexity: '',
-    retryPassword: '',
-});
-
 const form = reactive({
-    password: '',
     serverPort: 9999,
     securityEntrance: '',
     expirationDays: 0,
@@ -243,7 +161,6 @@ const timeoutForm = reactive({
 
 const search = async () => {
     const res = await getSettingInfo();
-    form.password = '******';
     form.serverPort = Number(res.data.serverPort);
     form.securityEntrance = res.data.securityEntrance;
     form.expirationDays = Number(res.data.expirationDays);
@@ -292,14 +209,6 @@ function callback(error: any) {
         return;
     }
 }
-
-function checkPassword(rule: any, value: any, callback: any) {
-    let password = form.complexityVerification === 'disable' ? passForm.newPassword : passForm.newPasswordComplexity;
-    if (password !== passForm.retryPassword) {
-        return callback(new Error(i18n.global.t('commons.rule.rePassword')));
-    }
-    callback();
-}
 const onSavePort = async (formEl: FormInstance | undefined, key: string, val: any) => {
     if (!formEl) return;
     const result = await formEl.validateField(key.replace(key[0], key[0].toLowerCase()), callback);
@@ -328,40 +237,6 @@ const onSavePort = async (formEl: FormInstance | undefined, key: string, val: an
             });
     });
 };
-
-const onChangePassword = async () => {
-    passForm.oldPassword = '';
-    passForm.newPassword = '';
-    passForm.newPasswordComplexity = '';
-    passForm.retryPassword = '';
-    passwordVisiable.value = true;
-};
-
-const submitChangePassword = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        let password =
-            form.complexityVerification === 'disable' ? passForm.newPassword : passForm.newPasswordComplexity;
-        if (password === passForm.oldPassword) {
-            MsgError(i18n.global.t('setting.duplicatePassword'));
-            return;
-        }
-        dialogLoading.value = true;
-        await updatePassword({ oldPassword: passForm.oldPassword, newPassword: password })
-            .then(() => {
-                dialogLoading.value = false;
-                passwordVisiable.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                router.push({ name: 'login', params: { code: '' } });
-                globalStore.setLogStatus(false);
-            })
-            .catch(() => {
-                dialogLoading.value = false;
-            });
-    });
-};
-
 const handleMFA = async () => {
     console.log('dawdwda');
     if (form.mfaStatus === 'enable') {
@@ -382,6 +257,10 @@ const handleMFA = async () => {
                 loading.value = false;
             });
     }
+};
+
+const handleClose = () => {
+    timeoutVisiable.value = false;
 };
 
 const onBind = async () => {

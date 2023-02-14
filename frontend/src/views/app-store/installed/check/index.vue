@@ -61,7 +61,7 @@ const toPage = (key: string) => {
         router.push({ name: 'Website' });
     }
     if (key === 'database') {
-        router.push({ name: 'Mysql' });
+        router.push({ name: 'MySQL' });
     }
 };
 

@@ -131,7 +131,7 @@ const getTitle = (key: string) => {
         case 'nginx':
             return i18n.global.t('website.website');
         case 'mysql':
-            return 'Mysql ' + i18n.global.t('menu.database');
+            return 'MySQL ' + i18n.global.t('menu.database');
         case 'redis':
             return 'Redis ' + i18n.global.t('menu.database');
     }
