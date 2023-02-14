@@ -1,6 +1,6 @@
 <template>
     <div v-show="onSetting">
-        <LayoutContent :title="'Mysql ' + $t('database.setting')" :reload="true">
+        <LayoutContent :title="'MySQL ' + $t('database.setting')" :reload="true">
             <template #buttons>
                 <el-button type="primary" :plain="activeName !== 'conf'" @click="changeTab('conf')">
                     {{ $t('database.confChange') }}
