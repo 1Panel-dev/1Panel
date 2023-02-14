@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/git"
 	"math"
 	"os"
 	"path"
@@ -499,20 +498,11 @@ func handleErr(install model.AppInstall, err error, out string) error {
 	return reErr
 }
 
-func getAppFromRepo() error {
-	repoInfo, err := git.CheckAndGetInfo(global.CONF.System.AppRepoOwner, global.CONF.System.AppRepoName)
-	if err != nil {
-		return err
-	}
+func getAppFromRepo(downloadPath, version string) error {
+	downloadUrl := fmt.Sprintf("%s/%s/apps-%s.tar.gz", downloadPath, version, version)
 	appDir := constant.AppResourceDir
-	setting, err := NewISettingService().GetSettingInfo()
-	if err != nil {
-		return err
-	}
-	if !common.CompareVersion(repoInfo.Version, setting.AppStoreVersion) {
-		return nil
-	}
-	downloadUrl := fmt.Sprintf("%sapps-%s.tar.gz", repoInfo.DownloadPath, repoInfo.Version)
+
+	global.LOG.Infof("download file from %s", downloadUrl)
 	fileOp := files.NewFileOp()
 	if _, err := fileOp.CopyAndBackup(appDir); err != nil {
 		return err
@@ -524,7 +514,7 @@ func getAppFromRepo() error {
 	if err := fileOp.Decompress(packagePath, constant.ResourceDir, files.TarGz); err != nil {
 		return err
 	}
-	_ = NewISettingService().Update("AppStoreVersion", repoInfo.Version)
+	_ = NewISettingService().Update("AppStoreVersion", version)
 	defer func() {
 		_ = fileOp.DeleteFile(packagePath)
 	}()

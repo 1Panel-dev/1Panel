@@ -23,10 +23,7 @@ export namespace App {
 
     export interface AppResPage {
         total: number;
-        canUpdate: boolean;
-        version: string;
         items: App.App[];
-        tags: App.Tag[];
     }
 
     export interface AppDetail extends CommonModel {

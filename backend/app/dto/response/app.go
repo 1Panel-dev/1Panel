@@ -6,11 +6,14 @@ import (
 )
 
 type AppRes struct {
-	Version   string      `json:"version"`
-	CanUpdate bool        `json:"canUpdate"`
-	Items     []*AppDTO   `json:"items"`
-	Tags      []model.Tag `json:"tags"`
-	Total     int64       `json:"total"`
+	Items []*AppDTO `json:"items"`
+	Total int64     `json:"total"`
+}
+
+type AppUpdateRes struct {
+	Version      string `json:"version"`
+	CanUpdate    bool   `json:"canUpdate"`
+	DownloadPath string `json:"downloadPath"`
 }
 
 type AppDTO struct {

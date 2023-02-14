@@ -126,7 +126,6 @@ const search = async (req: App.AppReq) => {
     await SearchApp(req)
         .then((res) => {
             apps.value = res.data.items;
-            canUpdate.value = res.data.canUpdate;
         })
         .finally(() => {
             loading.value = false;
