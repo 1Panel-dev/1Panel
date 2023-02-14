@@ -12,4 +12,5 @@ type System struct {
 	AppRepoName  string `mapstructure:"app_repo_name"`
 	EncryptKey   string `mapstructure:"encrypt_key"`
 	BaseDir      string `mapstructure:"base_dir"`
+	Mode         string `mapstructure:"mode"`
 }

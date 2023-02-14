@@ -98,23 +98,7 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 	}
 	res.Items = appDTOs
 	res.Total = total
-	tags, err := tagRepo.All()
-	if err != nil {
-		return nil, err
-	}
-	res.Tags = tags
 
-	setting, err := NewISettingService().GetSettingInfo()
-	if err != nil {
-		return nil, err
-	}
-	repoInfo, err := git.CheckAndGetInfo(global.CONF.System.AppRepoOwner, global.CONF.System.AppRepoName)
-	if err != nil {
-		return nil, err
-	}
-	if common.CompareVersion(repoInfo.Version, setting.AppStoreVersion) {
-		res.CanUpdate = true
-	}
 	return res, nil
 }
 
@@ -351,8 +335,38 @@ func (a AppService) SyncInstalled(installId uint) error {
 	return appInstallRepo.Save(&appInstall)
 }
 
+func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
+	res := &response.AppUpdateRes{}
+	setting, err := NewISettingService().GetSettingInfo()
+	if err != nil {
+		return nil, err
+	}
+	contentRes, err := git.CheckAndGetContent(global.CONF.System.AppRepoOwner, global.CONF.System.AppRepoName, setting.SystemVersion, "apps/list.json")
+	if err != nil {
+		return nil, err
+	}
+	list := &dto.AppList{}
+	if err = json.Unmarshal(contentRes.Content, list); err != nil {
+		return nil, err
+	}
+	res.Version = list.Version
+	if common.CompareVersion(list.Version, setting.AppStoreVersion) {
+		res.CanUpdate = true
+		res.DownloadPath = contentRes.DownloadPath
+		return res, err
+	}
+	return nil, err
+}
+
 func (a AppService) SyncAppList() error {
-	if err := getAppFromRepo(); err != nil {
+	updateRes, err := a.GetAppUpdate()
+	if err != nil {
+		return err
+	}
+	if !updateRes.CanUpdate {
+		return nil
+	}
+	if err := getAppFromRepo(updateRes.DownloadPath, updateRes.Version); err != nil {
 		global.LOG.Errorf("get app from oss  error: %s", err.Error())
 		return err
 	}
