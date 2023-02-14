@@ -92,7 +92,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('file.mode')" prop="mode">
                         <template #default="{ row }">
-                            <el-link :underline="false" @click="openMode(row)">{{ row.mode }}</el-link>
+                            <el-link :underline="false" @click="openMode(row)" type="primary">{{ row.mode }}</el-link>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('file.user')" prop="user" show-overflow-tooltip></el-table-column>
