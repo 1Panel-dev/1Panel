@@ -47,12 +47,13 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
-import { ElMessage, FormInstance } from 'element-plus';
+import { FormInstance } from 'element-plus';
 import LayoutContent from '@/layout/layout-content.vue';
 import { cleanMonitors, getSettingInfo, updateSetting } from '@/api/modules/setting';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 const form = reactive({
@@ -89,7 +90,7 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
     await updateSetting(param)
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = false;

@@ -179,10 +179,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Setting } from '@/api/interface/setting';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { snapshotRecover, snapshotRollback } from '@/api/modules/setting';
+import { MsgSuccess } from '@/utils/message';
 
 const drawerVisiable = ref(false);
 const snapInfo = ref();
@@ -212,7 +213,7 @@ const doRecover = async (isNew: boolean) => {
             loading.value = false;
             dialogVisiable.value = false;
             drawerVisiable.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = false;
@@ -242,7 +243,7 @@ const rollbackSnapshot = async () => {
                 loading.value = false;
                 dialogVisiable.value = false;
                 drawerVisiable.value = false;
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {
                 loading.value = false;

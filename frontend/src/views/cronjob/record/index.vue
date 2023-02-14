@@ -277,12 +277,13 @@ import { loadBackupName } from '@/views/setting/helper';
 import { searchRecords, download, handleOnce, updateStatus } from '@/api/modules/cronjob';
 import { dateFormat, dateFormatForName } from '@/utils/util';
 import i18n from '@/lang';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import { LoadFile } from '@/api/modules/files';
 import LayoutContent from '@/layout/layout-content.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 const hasRecords = ref();
@@ -393,7 +394,7 @@ const onHandle = async (row: Cronjob.CronjobInfo) => {
     await handleOnce(row.id)
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             search();
         })
         .catch(() => {
@@ -408,7 +409,7 @@ const onChangeStatus = async (id: number, status: string) => {
     }).then(async () => {
         let itemStatus = status === 'enable' ? 'Enable' : 'Disable';
         await updateStatus({ id: id, status: itemStatus });
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         dialogData.value.rowData.status = itemStatus;
     });
 };

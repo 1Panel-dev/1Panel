@@ -1,7 +1,7 @@
 import { computed, onBeforeMount } from 'vue';
 import { getLightColor, getDarkColor } from '@/utils/theme/tool';
 import { GlobalStore } from '@/store';
-import { ElMessage } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
 
 export const useTheme = () => {
     const globalStore = GlobalStore();
@@ -16,7 +16,7 @@ export const useTheme = () => {
     const changePrimary = (val: string) => {
         if (!val) {
             val = '#409EFF';
-            ElMessage({ type: 'success', message: '主题颜色已重置为 #409EFF' });
+            MsgSuccess('主题颜色已重置为 #409EFF');
         }
         globalStore.setThemeConfig({ ...themeConfig.value, primary: val });
         document.documentElement.style.setProperty(

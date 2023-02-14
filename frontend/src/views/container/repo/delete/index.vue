@@ -27,8 +27,9 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import i18n from '@/lang';
-import { ElForm, ElMessage } from 'element-plus';
+import { ElForm } from 'element-plus';
 import { deleteImageRepo } from '@/api/modules/container';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 const isDelete = ref(false);
@@ -50,7 +51,7 @@ const onSubmit = async () => {
     await deleteImageRepo({ ids: ids.value, deleteInsecure: isDelete.value })
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             emit('search');
             repoVisiable.value = false;
         })

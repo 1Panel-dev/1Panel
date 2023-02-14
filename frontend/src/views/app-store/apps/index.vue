@@ -96,10 +96,10 @@ import LayoutContent from '@/layout/layout-content.vue';
 import { App } from '@/api/interface/app';
 import { onMounted, reactive, ref } from 'vue';
 import { GetAppTags, SearchApp, SyncApp } from '@/api/modules/app';
-import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
 import Detail from '../detail/index.vue';
 import router from '@/routers';
+import { MsgSuccess } from '@/utils/message';
 
 let req = reactive({
     name: '',
@@ -143,7 +143,7 @@ const sync = () => {
     loading.value = true;
     SyncApp()
         .then(() => {
-            ElMessage.success(i18n.global.t('app.syncSuccess'));
+            MsgSuccess(i18n.global.t('app.syncSuccess'));
             search(req);
         })
         .finally(() => {

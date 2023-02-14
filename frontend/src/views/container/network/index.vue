@@ -195,7 +195,7 @@ const onInspect = async (id: string) => {
 };
 
 function isSystem(val: string) {
-    return val === 'bridge' || val === '1panel' || val === 'none' || val === 'host';
+    return val === 'bridge' || val === '1panel-network' || val === 'none' || val === 'host';
 }
 
 const buttons = [

@@ -42,10 +42,11 @@
 import { WgetFile } from '@/api/modules/files';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElMessage, FormInstance, FormRules } from 'element-plus';
+import { FormInstance, FormRules } from 'element-plus';
 import { reactive, ref } from 'vue';
 import FileList from '@/components/file-list/index.vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { MsgSuccess } from '@/utils/message';
 
 interface WgetProps {
     path: string;
@@ -91,7 +92,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         WgetFile(addForm)
             .then(() => {
-                ElMessage.success(i18n.global.t('file.downloadStart'));
+                MsgSuccess(i18n.global.t('file.downloadStart'));
                 submitData.value = true;
                 handleClose();
             })

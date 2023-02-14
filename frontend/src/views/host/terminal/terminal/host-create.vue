@@ -68,13 +68,14 @@
 </template>
 
 <script setup lang="ts">
-import { ElForm, ElMessage } from 'element-plus';
+import { ElForm } from 'element-plus';
 import { Host } from '@/api/interface/host';
 import { Rules } from '@/global/form-rules';
 import { addHost, testByInfo } from '@/api/modules/host';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
+import { MsgSuccess } from '@/utils/message';
 
 const dialogVisiable = ref();
 type FormInstance = InstanceType<typeof ElForm>;
@@ -130,9 +131,9 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
             case 'testConn':
                 await testByInfo(hostInfo).then((res) => {
                     if (res.data) {
-                        ElMessage.success(i18n.global.t('terminal.connTestOk'));
+                        MsgSuccess(i18n.global.t('terminal.connTestOk'));
                     } else {
-                        ElMessage.success(i18n.global.t('terminal.connTestFailed'));
+                        MsgSuccess(i18n.global.t('terminal.connTestFailed'));
                     }
                 });
                 break;

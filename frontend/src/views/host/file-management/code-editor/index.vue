@@ -25,7 +25,7 @@
 <script lang="ts" setup>
 import { SaveFileContent } from '@/api/modules/files';
 import i18n from '@/lang';
-import { ElMessage } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
 import * as monaco from 'monaco-editor';
 import { ref } from 'vue';
 
@@ -90,7 +90,7 @@ const saveContent = (closePage: boolean) => {
     SaveFileContent(form.value).finally(() => {
         loading.value = false;
         open.value = !closePage;
-        ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+        MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
     });
 };
 

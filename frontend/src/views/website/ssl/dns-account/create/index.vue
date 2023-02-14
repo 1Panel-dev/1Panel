@@ -65,7 +65,8 @@
 import { CreateDnsAccount, UpdateDnsAccount } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElMessage, FormInstance } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
+import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 
 interface AccountProps {
@@ -150,7 +151,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         if (accountData.value.mode === 'edit') {
             UpdateDnsAccount(account.value)
                 .then(() => {
-                    ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+                    MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                     handleClose();
                 })
                 .finally(() => {
@@ -159,7 +160,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         } else {
             CreateDnsAccount(account.value)
                 .then(() => {
-                    ElMessage.success(i18n.global.t('commons.msg.createSuccess'));
+                    MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                     handleClose();
                 })
                 .finally(() => {

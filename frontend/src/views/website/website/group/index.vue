@@ -52,8 +52,8 @@ import { ref } from 'vue';
 import i18n from '@/lang';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { ListGroups, CreateGroup, DeleteGroup, UpdateGroup } from '@/api/modules/website';
-import { ElMessage } from 'element-plus';
 import Header from '@/components/drawer-header/index.vue';
+import { MsgSuccess } from '@/utils/message';
 
 interface groupData {
     id: number;
@@ -95,12 +95,12 @@ const saveGroup = (create: groupData, isDefault: boolean) => {
     }
     if (create.id == 0) {
         CreateGroup(group).then(() => {
-            ElMessage.success(i18n.global.t('commons.msg.createSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
             search();
         });
     } else {
         UpdateGroup(group).then(() => {
-            ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             search();
         });
     }
@@ -127,7 +127,7 @@ const deleteGroup = (index: number) => {
     if (group.id > 0) {
         DeleteGroup({ id: group.id }).then(() => {
             data.value.splice(index, 1);
-            ElMessage.success(i18n.global.t('commons.msg.deleteSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
         });
     } else {
         data.value.splice(index, 1);

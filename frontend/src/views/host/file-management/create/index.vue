@@ -60,12 +60,13 @@
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { ref, reactive, computed } from 'vue';
 import { File } from '@/api/interface/file';
-import { ElMessage, FormInstance, FormRules } from 'element-plus';
+import { FormInstance, FormRules } from 'element-plus';
 import { CreateFile } from '@/api/modules/files';
 import i18n from '@/lang';
 import FileRole from '@/components/file-role/index.vue';
 import { Rules } from '@/global/form-rules';
 import FileList from '@/components/file-list/index.vue';
+import { MsgSuccess } from '@/utils/message';
 
 const fileForm = ref<FormInstance>();
 let loading = ref(false);
@@ -125,7 +126,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         CreateFile(addItem as File.FileCreate)
             .then(() => {
-                ElMessage.success(i18n.global.t('commons.msg.createSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                 handleClose();
             })
             .finally(() => {

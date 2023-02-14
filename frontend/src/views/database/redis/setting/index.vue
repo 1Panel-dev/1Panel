@@ -123,7 +123,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ElMessage, FormInstance } from 'element-plus';
+import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
@@ -138,6 +138,7 @@ import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { ChangePort, GetAppDefaultConfig } from '@/api/modules/app';
 import { loadBaseDir } from '@/api/modules/setting';
+import { MsgSuccess } from '@/utils/message';
 
 const extensions = [javascript(), oneDark];
 
@@ -235,7 +236,7 @@ const onChangePort = async (formEl: FormInstance | undefined) => {
     await ChangePort(params)
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .finally(() => {
             loading.value = false;
@@ -266,7 +267,7 @@ const submtiForm = async () => {
         .then(() => {
             loadform();
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .finally(() => {
             loading.value = false;
@@ -298,7 +299,7 @@ const submtiFile = async () => {
     await updateRedisConfByFile(param)
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = true;

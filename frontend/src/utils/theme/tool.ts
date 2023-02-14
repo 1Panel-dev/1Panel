@@ -1,4 +1,4 @@
-import { ElMessage } from 'element-plus';
+import { MsgWarning } from '../message';
 
 /**
  * hex颜色转rgb颜色
@@ -8,7 +8,7 @@ import { ElMessage } from 'element-plus';
 export function hexToRgb(str: any) {
     let hexs: any = '';
     let reg = /^\#?[0-9A-Fa-f]{6}$/;
-    if (!reg.test(str)) return ElMessage.warning('输入错误的hex');
+    if (!reg.test(str)) return MsgWarning('输入错误的hex');
     str = str.replace('#', '');
     hexs = str.match(/../g);
     for (let i = 0; i < 3; i++) hexs[i] = parseInt(hexs[i], 16);
@@ -24,7 +24,7 @@ export function hexToRgb(str: any) {
  */
 export function rgbToHex(r: any, g: any, b: any) {
     let reg = /^\d{1,3}$/;
-    if (!reg.test(r) || !reg.test(g) || !reg.test(b)) return ElMessage.warning('输入错误的rgb颜色值');
+    if (!reg.test(r) || !reg.test(g) || !reg.test(b)) return MsgWarning('输入错误的rgb颜色值');
     let hexs = [r.toString(16), g.toString(16), b.toString(16)];
     for (let i = 0; i < 3; i++) if (hexs[i].length == 1) hexs[i] = `0${hexs[i]}`;
     return `#${hexs.join('')}`;
@@ -38,7 +38,7 @@ export function rgbToHex(r: any, g: any, b: any) {
  */
 export function getDarkColor(color: string, level: number) {
     let reg = /^\#?[0-9A-Fa-f]{6}$/;
-    if (!reg.test(color)) return ElMessage.warning('输入错误的hex颜色值');
+    if (!reg.test(color)) return MsgWarning('输入错误的hex颜色值');
     let rgb = hexToRgb(color);
     for (let i = 0; i < 3; i++) rgb[i] = Math.floor(rgb[i] * (1 - level));
     return rgbToHex(rgb[0], rgb[1], rgb[2]);
@@ -52,7 +52,7 @@ export function getDarkColor(color: string, level: number) {
  */
 export function getLightColor(color: string, level: number) {
     let reg = /^\#?[0-9A-Fa-f]{6}$/;
-    if (!reg.test(color)) return ElMessage.warning('输入错误的hex颜色值');
+    if (!reg.test(color)) return MsgWarning('输入错误的hex颜色值');
     let rgb = hexToRgb(color);
     for (let i = 0; i < 3; i++) rgb[i] = Math.floor((255 - rgb[i]) * level + rgb[i]);
     return rgbToHex(rgb[0], rgb[1], rgb[2]);

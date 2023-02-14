@@ -101,13 +101,14 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted, computed } from 'vue';
-import { ElMessage, ElForm } from 'element-plus';
+import { ElForm } from 'element-plus';
 import LayoutContent from '@/layout/layout-content.vue';
 import { syncTime, getSettingInfo, updateSetting } from '@/api/modules/setting';
 import { Rules } from '@/global/form-rules';
 import { GlobalStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
+import { MsgError, MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 const i18n = useI18n();
@@ -166,7 +167,7 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
             break;
         case 'SessionTimeout':
             if (Number(val) < 300) {
-                ElMessage.error(i18n.t('setting.sessionTimeoutError'));
+                MsgError(i18n.t('setting.sessionTimeoutError'));
                 search();
                 return;
             }
@@ -186,7 +187,7 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
     await updateSetting(param)
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.t('commons.msg.operationSuccess'));
             search();
         })
         .catch(() => {
@@ -223,7 +224,7 @@ const onSyncTime = async () => {
             loading.value = false;
             form.localTime = res.data;
             countdown();
-            ElMessage.success(i18n.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = false;

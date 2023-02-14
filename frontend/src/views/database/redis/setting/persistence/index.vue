@@ -127,11 +127,12 @@ import {
 } from '@/api/modules/database';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElMessage, FormInstance } from 'element-plus';
+import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { computeSize } from '@/utils/util';
 import { BatchDeleteFile } from '@/api/modules/files';
+import { MsgInfo, MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 
@@ -201,7 +202,7 @@ const onBackup = async () => {
         .then(() => {
             loading.value = false;
             loadBackupRecords();
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = false;
@@ -216,7 +217,7 @@ const onRecover = async () => {
     await recoverRedis(param)
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = false;
@@ -269,7 +270,7 @@ const onSave = async (formEl: FormInstance | undefined, type: string) => {
             await updateRedisPersistenceConf(param)
                 .then(() => {
                     loading.value = false;
-                    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 })
                 .catch(() => {
                     loading.value = false;
@@ -280,7 +281,7 @@ const onSave = async (formEl: FormInstance | undefined, type: string) => {
     let itemSaves = [] as Array<string>;
     for (const item of form.saves) {
         if (item.count === 0 || item.second === 0) {
-            ElMessage.info(i18n.global.t('database.rdbInfo'));
+            MsgInfo(i18n.global.t('database.rdbInfo'));
             return;
         }
         itemSaves.push(item.second + '', item.count + '');
@@ -291,7 +292,7 @@ const onSave = async (formEl: FormInstance | undefined, type: string) => {
     await updateRedisPersistenceConf(param)
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = false;

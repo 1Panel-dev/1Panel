@@ -97,8 +97,9 @@ import { Website } from '@/api/interface/website';
 import { CreateSSL, GetDnsResolve, SearchAcmeAccount, SearchDnsAccount } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElMessage, FormInstance } from 'element-plus';
+import { FormInstance } from 'element-plus';
 import { computed, reactive, ref } from 'vue';
+import { MsgSuccess } from '@/utils/message';
 
 const props = defineProps({
     id: {
@@ -213,7 +214,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             CreateSSL(ssl.value)
                 .then(() => {
                     handleClose();
-                    ElMessage.success(i18n.global.t('commons.msg.createSuccess'));
+                    MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                 })
                 .finally(() => {
                     loading.value = false;

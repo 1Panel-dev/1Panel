@@ -44,13 +44,14 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { ElMessage, FormInstance } from 'element-plus';
+import { FormInstance } from 'element-plus';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { snapshotImport } from '@/api/modules/setting';
 import { getBackupList, getFilesFromBackup } from '@/api/modules/setting';
 import { loadBackupName } from '../../helper';
 import { Rules } from '@/global/form-rules';
+import { MsgSuccess } from '@/utils/message';
 
 const drawerVisiable = ref(false);
 const loading = ref();
@@ -92,7 +93,7 @@ const submitImport = async (formEl: FormInstance | undefined) => {
                 emit('search');
                 loading.value = false;
                 drawerVisiable.value = false;
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {
                 loading.value = false;

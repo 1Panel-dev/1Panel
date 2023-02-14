@@ -138,9 +138,10 @@ import ComplexTable from '@/components/complex-table/index.vue';
 import Status from '@/components/status/index.vue';
 import { dateFormat } from '@/utils/util';
 import { composeOperator, ContainerOperator, inspect, searchContainer } from '@/api/modules/container';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import { Container } from '@/api/interface/container';
+import { MsgSuccess } from '@/utils/message';
 
 const composeName = ref();
 const composePath = ref();
@@ -175,6 +176,7 @@ const loading = ref(false);
 const search = async () => {
     let filterItem = filters.value;
     let params = {
+        name: '',
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         filters: filterItem,
@@ -241,7 +243,7 @@ const onOperate = async (operation: string) => {
         Promise.all(ps)
             .then(() => {
                 search();
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {
                 search();
@@ -268,7 +270,7 @@ const onComposeOperate = async (operation: string) => {
         await composeOperator(params)
             .then(() => {
                 loading.value = false;
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 if (operation === 'down') {
                     emit('back');
                 } else {

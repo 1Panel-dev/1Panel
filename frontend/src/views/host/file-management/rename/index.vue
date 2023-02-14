@@ -31,10 +31,11 @@
 <script lang="ts" setup>
 import { RenameRile } from '@/api/modules/files';
 import { Rules } from '@/global/form-rules';
-import { ElMessage, FormInstance, FormRules } from 'element-plus';
+import { FormInstance, FormRules } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { File } from '@/api/interface/file';
 import i18n from '@/lang';
+import { MsgSuccess } from '@/utils/message';
 
 interface RenameProps {
     path: string;
@@ -81,7 +82,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         RenameRile(addItem as File.FileRename)
             .then(() => {
-                ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 handleClose();
             })
             .finally(() => {

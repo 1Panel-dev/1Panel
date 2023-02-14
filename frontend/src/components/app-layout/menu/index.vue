@@ -43,8 +43,9 @@ import SubItem from './components/sub-item.vue';
 import router, { menuList } from '@/routers/router';
 import { logOutApi } from '@/api/modules/auth';
 import i18n from '@/lang';
-import { ElMessageBox, ElMessage } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import { GlobalStore } from '@/store';
+import { MsgSuccess } from '@/utils/message';
 const route = useRoute();
 const menuStore = MenuStore();
 const globalStore = GlobalStore();
@@ -80,10 +81,7 @@ const logout = () => {
         systemLogOut();
         router.push({ name: 'login' });
         globalStore.setLogStatus(false);
-        ElMessage({
-            type: 'success',
-            message: i18n.global.t('commons.msg.operationSuccess'),
-        });
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     });
 };
 

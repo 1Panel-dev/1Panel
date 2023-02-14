@@ -36,9 +36,9 @@ import { GetWafConfig, UpdateWafEnable } from '@/api/modules/website';
 import { computed, onMounted, reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { SaveFileContent } from '@/api/modules/files';
-import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
 import { checkIp } from '@/utils/util';
+import { MsgSuccess } from '@/utils/message';
 
 const props = defineProps({
     id: {
@@ -117,7 +117,7 @@ const openCreate = () => {
     }
     for (const id in ipArray) {
         if (checkIp(ipArray[id])) {
-            ElMessage.error(i18n.global.t('commons.rule.ipErr', [ipArray[id]]));
+            MsgError(i18n.global.t('commons.rule.ipErr', [ipArray[id]]));
             return;
         }
     }
@@ -135,7 +135,7 @@ const submit = async (ipList: string[]) => {
         .then(() => {
             ips.value = '';
             get();
-            ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         })
         .finally(() => {
             loading.value = false;

@@ -163,8 +163,9 @@ import NginxConfig from './nginx/index.vue';
 import i18n from '@/lang';
 import router from '@/routers';
 import { App } from '@/api/interface/app';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import { dateFormatSimple } from '@/utils/util';
+import { MsgSuccess } from '@/utils/message';
 
 const shortcuts = [
     {
@@ -292,7 +293,7 @@ const submitDate = (row: any) => {
 
     UpdateWebsite(req).then(() => {
         row.change = true;
-        ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+        MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
     });
 };
 
@@ -366,7 +367,7 @@ const opWebsite = (op: string, id: number) => {
         cancelButtonText: i18n.global.t('commons.button.cancel'),
     }).then(async () => {
         await OpWebsite({ id: id, operate: op });
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
     });
 };

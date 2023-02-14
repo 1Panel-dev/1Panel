@@ -24,8 +24,8 @@ import { ref } from 'vue';
 import { File } from '@/api/interface/file';
 import { ChangeFileMode } from '@/api/modules/files';
 import i18n from '@/lang';
-import { ElMessage } from 'element-plus';
 import FileRole from '@/components/file-role/index.vue';
+import { MsgSuccess } from '@/utils/message';
 
 let open = ref(false);
 let form = ref<File.FileCreate>({ path: '', isDir: false, mode: 0o755 });
@@ -55,7 +55,7 @@ const submit = async () => {
     loading.value = true;
     ChangeFileMode(form.value)
         .then(() => {
-            ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             handleClose();
         })
         .finally(() => {

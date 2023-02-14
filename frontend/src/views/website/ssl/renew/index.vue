@@ -37,7 +37,7 @@
 import { Website } from '@/api/interface/Website';
 import { RenewSSL } from '@/api/modules/website';
 import i18n from '@/lang';
-import { ElMessage } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
 import { reactive, ref } from 'vue';
 
 interface RenewProps {
@@ -68,7 +68,7 @@ const submit = () => {
     RenewSSL(renewReq)
         .then(() => {
             handleClose();
-            ElMessage.success(i18n.global.t('ssl.renewSuccess'));
+            MsgSuccess(i18n.global.t('ssl.renewSuccess'));
         })
         .finally(() => {
             loading.value = false;

@@ -62,9 +62,10 @@
 import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElForm, ElMessage } from 'element-plus';
+import { ElForm } from 'element-plus';
 import { createNetwork } from '@/api/modules/container';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 
@@ -111,7 +112,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         await createNetwork(form)
             .then(() => {
                 loading.value = false;
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 emit('search');
                 drawerVisiable.value = false;
             })

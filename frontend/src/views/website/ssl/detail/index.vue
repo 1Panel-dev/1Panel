@@ -66,9 +66,9 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { GetSSL } from '@/api/modules/website';
 import { ref } from 'vue';
 import { dateFormatSimple, getProvider } from '@/utils/util';
-import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
 import useClipboard from 'vue-clipboard3';
+import { MsgError, MsgSuccess } from '@/utils/message';
 const { toClipboard } = useClipboard();
 
 let open = ref(false);
@@ -96,9 +96,9 @@ const get = async () => {
 const copyText = async (msg) => {
     try {
         await toClipboard(msg);
-        ElMessage.success(i18n.global.t('commons.msg.copySuccess'));
+        MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
     } catch (e) {
-        ElMessage.error(i18n.global.t('commons.msg.copyfailed'));
+        MsgError(i18n.global.t('commons.msg.copyfailed'));
     }
 };
 

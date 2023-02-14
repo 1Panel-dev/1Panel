@@ -1,6 +1,7 @@
-import { ElMessageBox, ElMessage } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import { HandleData } from './interface';
 import i18n from '@/lang';
+import { MsgSuccess } from '@/utils/message';
 
 /**
  * @description 删除操作使用
@@ -35,10 +36,7 @@ export const useDeleteData = <P = any, R = any>(
                             done();
                             if (!res) return reject(false);
                             resolve(true);
-                            ElMessage({
-                                type: 'success',
-                                message: i18n.global.t('commons.msg.operationSuccess'),
-                            });
+                            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                         })
                         .finally(() => {
                             instance.confirmButtonLoading = false;

@@ -29,10 +29,11 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { ElMessage, UploadFile, UploadFiles, UploadInstance } from 'element-plus';
+import { UploadFile, UploadFiles, UploadInstance } from 'element-plus';
 import { UploadFileData } from '@/api/modules/files';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { MsgSuccess } from '@/utils/message';
 
 interface UploadProps {
     path: string;
@@ -73,7 +74,7 @@ const submit = () => {
     loading.value = true;
     UploadFileData(formData, { onUploadProgress: onProcess })
         .then(() => {
-            ElMessage.success(i18n.global.t('file.uploadSuccess'));
+            MsgSuccess(i18n.global.t('file.uploadSuccess'));
             handleClose();
         })
         .finally(() => {

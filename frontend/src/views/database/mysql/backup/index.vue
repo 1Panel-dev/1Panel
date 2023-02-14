@@ -36,10 +36,10 @@ import { dateFormat } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { backup, recover } from '@/api/modules/database';
 import i18n from '@/lang';
-import { ElMessage } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords } from '@/api/modules/setting';
 import { Backup } from '@/api/interface/backup';
+import { MsgSuccess } from '@/utils/message';
 
 const selects = ref<any>([]);
 
@@ -86,7 +86,7 @@ const onBackup = async () => {
         dbName: dbName.value,
     };
     await backup(params);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     search();
 };
 
@@ -97,7 +97,7 @@ const onRecover = async (row: Backup.RecordInfo) => {
         backupName: row.fileDir + '/' + row.fileName,
     };
     await recover(params);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const onDownload = async (row: Backup.RecordInfo) => {

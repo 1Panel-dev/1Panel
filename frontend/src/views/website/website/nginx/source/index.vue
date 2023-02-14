@@ -43,9 +43,9 @@ import { Codemirror } from 'vue-codemirror';
 import { StreamLanguage } from '@codemirror/language';
 import { nginx } from '@codemirror/legacy-modes/mode/nginx';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
 import { GetAppDefaultConfig } from '@/api/modules/app';
+import { MsgSuccess } from '@/utils/message';
 
 const extensions = [StreamLanguage.define(nginx), oneDark];
 
@@ -62,7 +62,7 @@ const submit = () => {
         backup: useOld.value,
     })
         .then(() => {
-            ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             getNginx();
         })
         .finally(() => {
