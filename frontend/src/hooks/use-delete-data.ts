@@ -49,9 +49,7 @@ export const useDeleteData = <P = any, R = any>(
                 }
             },
         })
-            .then(() => {
-                console.log('1111');
-            })
+            .then(() => {})
             .catch(() => {});
     });
 };

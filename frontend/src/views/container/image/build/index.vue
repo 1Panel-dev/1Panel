@@ -75,7 +75,7 @@
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="buttonDisabled" @click="drawerVisiable = false">
+                <el-button @click="drawerVisiable = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="buttonDisabled" type="primary" @click="onSubmit(formRef)">
@@ -97,6 +97,7 @@ import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
 import { imageBuild } from '@/api/modules/container';
 import { LoadFile } from '@/api/modules/files';
+import { formatImageStdout } from '@/utils/docker';
 
 const logVisiable = ref<boolean>(false);
 const logInfo = ref();
@@ -166,7 +167,7 @@ const loadLogs = async (path: string) => {
     timer = setInterval(async () => {
         if (logVisiable.value) {
             const res = await LoadFile({ path: path });
-            logInfo.value = res.data;
+            logInfo.value = formatImageStdout(res.data);
             nextTick(() => {
                 const state = view.value.state;
                 view.value.dispatch({
@@ -174,6 +175,11 @@ const loadLogs = async (path: string) => {
                     scrollIntoView: true,
                 });
             });
+            if (logInfo.value.endsWith('image build failed!') || logInfo.value.endsWith('image build successful!')) {
+                clearInterval(Number(timer));
+                timer = null;
+                buttonDisabled.value = false;
+            }
         }
     }, 1000 * 3);
 };

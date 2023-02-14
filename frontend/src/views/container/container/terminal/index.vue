@@ -52,6 +52,7 @@ import { Base64 } from 'js-base64';
 import 'xterm/css/xterm.css';
 import { FitAddon } from 'xterm-addon-fit';
 import { Rules } from '@/global/form-rules';
+import { isJson } from '@/utils/util';
 
 const terminalVisiable = ref(false);
 const terminalOpen = ref(false);
@@ -97,16 +98,6 @@ const onWSReceive = (message: any) => {
     term.element && term.focus();
     term.write(data.Data);
 };
-
-function isJson(str: string) {
-    try {
-        if (typeof JSON.parse(str) === 'object') {
-            return true;
-        }
-    } catch {
-        return false;
-    }
-}
 
 const errorRealTerminal = (ex: any) => {
     let message = ex.message;

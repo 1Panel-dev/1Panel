@@ -149,10 +149,9 @@ import { snapshotCreate, searchSnapshotPage, snapshotDelete, updateSnapshotDescr
 import { onMounted, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
-import { ElForm } from 'element-plus';
+import { ElForm, ElMessage } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElMessage } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
 import LayoutContent from '@/layout/layout-content.vue';
 import RecoverStatus from '@/views/setting/snapshot/status/index.vue';

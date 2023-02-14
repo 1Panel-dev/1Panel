@@ -121,7 +121,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
-        if (dialogData.value.title === 'create') {
+        if (dialogData.value.title === 'add') {
             await createImageRepo(dialogData.value.rowData!)
                 .then(() => {
                     loading.value = false;
