@@ -1,6 +1,8 @@
 html.dark {
+    --el-border-color-lighter: rgb(64, 67, 67);
     --el-fill-color-blank: rgb(49, 51, 51);
     --el-bg-color: rgb(36, 37, 37);
+    // --el-text-color-primary: #999999;
     --el-text-color-regular: #cfd3dc;
     --el-fill-color-light: rgb(49, 51, 51);
     --el-border-color: rgb(64, 67, 67);
@@ -13,6 +15,7 @@ html.dark {
     --el-menu-item-bg-color-active: rgb(44, 45, 46);
 
     // * panel-admin
+    --panel-text-color: rgb(174, 166, 153);
     --panel-border: 1px solid rgb(64, 67, 67);
     --panel-main-bg-color: rgb(41, 43, 43);
     --panel-button-active: rgb(44, 45, 46);
@@ -22,6 +25,14 @@ html.dark {
     --panel-popup-color: #060708;
     --panel-alert-bg: #2f3030;
     --panel-path-bg: #2f3030;
+    .el-tag.el-tag--info {
+        --el-tag-bg-color: rgb(49, 51, 51);
+        --el-tag-border-color: rgb(64, 67, 67);
+    }
+    .el-tag.el-tag--light {
+        --el-tag-bg-color: rgb(49, 51, 51);
+        --el-tag-border-color: rgb(64, 67, 67);
+    }
     .el-card {
         --el-card-border-color: rgb(64, 67, 67);
         --el-card-bg-color: rgb(36, 37, 37);
@@ -45,25 +56,30 @@ html.dark {
         --el-input-border-color: rgb(64, 67, 67);
     }
 
+    .el-pagination {
+			--el-pagination-button-color: #999999;
+    }
+
     // * wangEditor
     --w-e-textarea-bg-color: #1b1b1b;
     --w-e-textarea-color: #eeeeee;
 
     // * 以下为自定义暗黑模式内容
     // login
-    // .login-container {
-    //     background-color: var(--el-fill-color-extra-light) !important;
-    //     .login-box {
-    //         background-color: var(--el-mask-color) !important;
-    //         .login-form {
-    //             background-color: var(--el-bg-color) !important;
-    //             box-shadow: var(--panel-login-shadow-light) !important;
-    //             .logo-text {
-    //                 color: var(--el-text-color-primary) !important;
-    //             }
-    //         }
-    //     }
-    // }
+    .login-container {
+        .login-form {
+            input:-webkit-autofill {
+                box-shadow: 0 0 0 1000px #f1f4f9 inset;
+                -webkit-text-fill-color: #333333;
+                -webkit-transition: background-color 1000s ease-out 0.5s;
+                transition: background-color 1000s ease-out 0.5s;
+            }
+            .el-input__wrapper {
+                background-color: #ffffff;
+                box-shadow: 0 0 0 1px #dcdfe6 inset;
+            }
+        }
+    }
 
     // scroll-bar
     ::-webkit-scrollbar {
@@ -123,8 +139,9 @@ html.dark {
     .el-drawer .el-drawer__header span {
         color: var(--el-menu-text-color);
     }
-    span {
-        color: var(--el-menu-text-color);
+
+    .el-input__wrapper {
+        background-color: var(--el-disabled-bg-color);
     }
     .el-input.is-disabled .el-input__wrapper {
         box-shadow: 0 0 0 1px var(--el-input-border-color, var(--el-border-color)) inset;
@@ -136,6 +153,10 @@ html.dark {
         background: rgb(49, 51, 51);
         border-color: rgb(64, 67, 67);
     }
+    .el-button--primary.is-plain {
+        background: rgb(49, 51, 51);
+        border-color: rgb(64, 67, 67);
+    }
     .el-button.is-disabled {
         border-color: rgb(64, 67, 67);
     }
@@ -144,10 +165,51 @@ html.dark {
     }
     .path {
         border: var(--panel-border);
+        .split {
+            color: #666666;
+        }
     }
     input:-webkit-autofill {
         box-shadow: 0 0 0 1000px #323232 inset;
         -webkit-text-fill-color: #cfd3dc;
         transition: background-color 1000s ease-out 0.5s;
+    }
+    .el-avatar {
+        --el-avatar-bg-color: var(--el-bg-color) !important;
+    }
+    .el-page-header__content {
+        color: rgb(174, 166, 153);
+    }
+    .el-dialog {
+        .el-dialog__header {
+            border-bottom: var(--panel-border);
+            color: #999999;
+        }
+    }
+    .el-tabs__item {
+        color: #999999;
+    }
+    .el-tabs__item.is-active {
+        color: var(--el-color-primary) !important;
+    }
+    .el-descriptions__title {
+        color: #999999;
+    }
+    .el-descriptions__content.el-descriptions__cell.is-bordered-content {
+        color: #999999;
+    }
+    .terminal-tabs {
+        background: none !important;
+        .el-tabs__header {
+            background: #000000;
+        }
+    }
+    .el-pager {
+        li {
+            color: #999999;
+            &.is-active {
+                color: var(--el-pagination-hover-color);
+            }
+        }
     }
 }
