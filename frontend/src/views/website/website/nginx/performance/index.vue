@@ -57,7 +57,8 @@ import { Nginx } from '@/api/interface/nginx';
 import { GetNginxConfigByScope, UpdateNginxConfigByScope } from '@/api/modules/nginx';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElMessage, FormInstance } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
+import { FormInstance } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
 
 let req = ref<Nginx.NginxScopeReq>({
@@ -125,7 +126,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         updateReq.value.params = params;
         UpdateNginxConfigByScope(updateReq.value)
             .then(() => {
-                ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 getParams();
             })
             .finally(() => {

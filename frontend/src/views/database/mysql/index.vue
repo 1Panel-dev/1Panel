@@ -164,11 +164,11 @@ import { dateFormat } from '@/utils/util';
 import { reactive, ref } from 'vue';
 import { deleteCheckMysqlDB, loadRemoteAccess, searchMysqlDBs, updateMysqlDescription } from '@/api/modules/database';
 import i18n from '@/lang';
-import { ElMessage } from 'element-plus';
 import { Database } from '@/api/interface/database';
 import { App } from '@/api/interface/app';
 import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 
@@ -254,7 +254,7 @@ const search = async () => {
 const onChange = async (info: any) => {
     if (!info.edit) {
         await updateMysqlDescription({ id: info.id, description: info.description });
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     }
 };
 
@@ -295,7 +295,7 @@ const onCopyPassword = (row: Database.MysqlDBInfo) => {
     input.select();
     document.execCommand('Copy');
     document.body.removeChild(input);
-    ElMessage.success(i18n.global.t('commons.msg.copySuccess'));
+    MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
 };
 
 const onDelete = async (row: Database.MysqlDBInfo) => {

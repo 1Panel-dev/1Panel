@@ -28,9 +28,10 @@
 import { App } from '@/api/interface/app';
 import { GetAppUpdateVersions, InstalledOp } from '@/api/modules/app';
 import i18n from '@/lang';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import { reactive, ref } from 'vue';
 import Header from '@/components/drawer-header/index.vue';
+import { MsgSuccess } from '@/utils/message';
 
 let open = ref(false);
 let loading = ref(false);
@@ -65,7 +66,7 @@ const operate = async () => {
     await InstalledOp(operateReq)
         .then(() => {
             open.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .finally(() => {
             loading.value = false;

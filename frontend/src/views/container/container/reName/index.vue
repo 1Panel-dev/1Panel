@@ -25,7 +25,8 @@
 import { ContainerOperator } from '@/api/modules/container';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElForm, ElMessage } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
+import { ElForm } from 'element-plus';
 import { reactive, ref } from 'vue';
 
 const loading = ref(false);
@@ -53,7 +54,7 @@ const onSubmitName = async (formEl: FormInstance | undefined) => {
                 loading.value = false;
                 emit('search');
                 newNameVisiable.value = false;
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {
                 loading.value = false;

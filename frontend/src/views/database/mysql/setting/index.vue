@@ -91,7 +91,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ElMessage, FormInstance } from 'element-plus';
+import { FormInstance } from 'element-plus';
 import LayoutContent from '@/layout/layout-content.vue';
 import ContainerLog from '@/components/container-log/index.vue';
 import Status from '@/views/database/mysql/setting/status/index.vue';
@@ -108,6 +108,7 @@ import { ChangePort, GetAppDefaultConfig } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { loadBaseDir } from '@/api/modules/setting';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 
@@ -178,7 +179,7 @@ const onSubmitChangePort = async () => {
     await ChangePort(params)
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = false;
@@ -224,7 +225,7 @@ const onSubmitChangeConf = async () => {
     await updateMysqlConfByFile(param)
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = false;

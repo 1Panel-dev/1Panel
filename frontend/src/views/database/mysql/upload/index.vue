@@ -67,11 +67,12 @@ import { computeSize, dateFormatSimple } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { recoverByUpload } from '@/api/modules/database';
 import i18n from '@/lang';
-import { ElMessage, UploadFile, UploadFiles, UploadInstance, UploadProps } from 'element-plus';
+import { UploadFile, UploadFiles, UploadInstance, UploadProps } from 'element-plus';
 import { File } from '@/api/interface/file';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { BatchDeleteFile, GetFilesList, UploadFileData } from '@/api/modules/files';
 import { loadBaseDir } from '@/api/modules/setting';
+import { MsgError, MsgSuccess } from '@/utils/message';
 
 const selects = ref<any>([]);
 const baseDir = ref();
@@ -120,7 +121,7 @@ const onRecover = async (row: File.File) => {
         fileName: row.name,
     };
     await recoverByUpload(params);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const uploaderFiles = ref<UploadFiles>([]);
@@ -133,10 +134,10 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
         rawFile.name.endsWith('.zip') ||
         rawFile.name.endsWith('.tgz')
     ) {
-        ElMessage.error(i18n.global.t('database.unSupportType'));
+        MsgError(i18n.global.t('database.unSupportType'));
         return false;
     } else if (rawFile.size / 1024 / 1024 > 10) {
-        ElMessage.error(i18n.global.t('database.unSupportSize'));
+        MsgError(i18n.global.t('database.unSupportSize'));
         return false;
     }
     return true;
@@ -160,7 +161,7 @@ const onSubmit = () => {
     }
     formData.append('path', baseDir.value);
     UploadFileData(formData, {}).then(() => {
-        ElMessage.success(i18n.global.t('file.uploadSuccess'));
+        MsgSuccess(i18n.global.t('file.uploadSuccess'));
         handleClose();
         search();
     });

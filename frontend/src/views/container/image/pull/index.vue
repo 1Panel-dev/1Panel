@@ -67,7 +67,7 @@
 import { nextTick, reactive, ref, shallowRef } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElForm, ElMessage } from 'element-plus';
+import { ElForm } from 'element-plus';
 import { imagePull } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { Codemirror } from 'vue-codemirror';
@@ -76,6 +76,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { LoadFile } from '@/api/modules/files';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { formatImageStdout } from '@/utils/docker';
+import { MsgSuccess } from '@/utils/message';
 
 const drawerVisiable = ref(false);
 const form = reactive({
@@ -125,7 +126,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         logVisiable.value = true;
         buttonDisabled.value = true;
         loadLogs(res.data);
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     });
 };
 

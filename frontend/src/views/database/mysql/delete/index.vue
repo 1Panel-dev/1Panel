@@ -40,10 +40,11 @@
     </el-dialog>
 </template>
 <script lang="ts" setup>
-import { ElMessage, FormInstance } from 'element-plus';
+import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import i18n from '@/lang';
 import { deleteMysqlDB } from '@/api/modules/database';
+import { MsgSuccess } from '@/utils/message';
 
 let deleteReq = ref({
     id: 0,
@@ -80,7 +81,7 @@ const submit = async () => {
         .then(() => {
             loading.value = false;
             emit('search');
-            ElMessage.success(i18n.global.t('commons.msg.deleteSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
             dialogVisiable.value = false;
         })
         .catch(() => {

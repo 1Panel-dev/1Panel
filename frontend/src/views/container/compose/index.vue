@@ -97,11 +97,11 @@ import CreateDialog from '@/views/container/compose/create/index.vue';
 import ComposeDetial from '@/views/container/compose/detail/index.vue';
 import { composeOperator, loadDockerStatus, searchCompose } from '@/api/modules/container';
 import i18n from '@/lang';
-import { ElMessage } from 'element-plus';
 import { Container } from '@/api/interface/container';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { LoadFile } from '@/api/modules/files';
 import router from '@/routers';
+import { MsgSuccess } from '@/utils/message';
 
 const data = ref();
 const selects = ref<any>([]);
@@ -175,7 +175,7 @@ const onDelete = async (row: Container.ComposeInfo) => {
     };
     await useDeleteData(composeOperator, param, 'commons.msg.delete');
     search();
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const dialogEditRef = ref();

@@ -165,7 +165,7 @@ import {
 import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import Backups from './backup/index.vue';
 import AppResources from './check/index.vue';
 import AppDelete from './delete/index.vue';
@@ -175,6 +175,7 @@ import { App } from '@/api/interface/app';
 import Status from '@/components/status/index.vue';
 import { getAge } from '@/utils/util';
 import { useRouter } from 'vue-router';
+import { MsgSuccess } from '@/utils/message';
 
 let data = ref<any>();
 let loading = ref(false);
@@ -212,7 +213,7 @@ const sync = () => {
     loading.value = true;
     SyncInstalledApp()
         .then(() => {
-            ElMessage.success(i18n.global.t('app.syncSuccess'));
+            MsgSuccess(i18n.global.t('app.syncSuccess'));
             search();
         })
         .finally(() => {
@@ -265,7 +266,7 @@ const operate = async () => {
     loading.value = true;
     await InstalledOp(operateReq)
         .then(() => {
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             search();
         })
         .finally(() => {

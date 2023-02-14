@@ -131,9 +131,10 @@ import { reactive, onMounted, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
 import { ContainerOperator, inspect, loadDockerStatus, searchContainer } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import router from '@/routers';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 const data = ref();
@@ -274,7 +275,7 @@ const onOperate = async (operation: string) => {
             .then(() => {
                 loading.value = false;
                 search();
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {
                 loading.value = false;

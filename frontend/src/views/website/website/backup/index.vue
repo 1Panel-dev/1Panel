@@ -39,10 +39,10 @@ import { reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import i18n from '@/lang';
-import { ElMessage } from 'element-plus';
 import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords } from '@/api/modules/setting';
 import { Backup } from '@/api/interface/backup';
 import { BackupWebsite, RecoverWebsite } from '@/api/modules/website';
+import { MsgSuccess } from '@/utils/message';
 
 const selects = ref<any>([]);
 const loading = ref(false);
@@ -99,7 +99,7 @@ const onRecover = async (row: Backup.RecordInfo) => {
     await RecoverWebsite(params)
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .finally(() => {
             loading.value = false;
@@ -111,7 +111,7 @@ const onBackup = async () => {
     await BackupWebsite({ id: websiteID.value })
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             search();
         })
         .finally(() => {

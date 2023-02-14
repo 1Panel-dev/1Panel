@@ -192,7 +192,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue';
-import { ElMessage, ElForm, ElMessageBox } from 'element-plus';
+import { ElForm, ElMessageBox } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
 import LayoutContent from '@/layout/layout-content.vue';
 import { updatePassword, updateSetting, getMFA, bindMFA, getSettingInfo, updatePort } from '@/api/modules/setting';
@@ -201,6 +201,7 @@ import { Rules } from '@/global/form-rules';
 import { dateFormatSimple } from '@/utils/util';
 import { GlobalStore } from '@/store';
 import router from '@/routers';
+import { MsgError, MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 const globalStore = GlobalStore();
@@ -277,7 +278,7 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
     await updateSetting(param)
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             search();
         })
         .catch(() => {
@@ -317,7 +318,7 @@ const onSavePort = async (formEl: FormInstance | undefined, key: string, val: an
         await updatePort(param)
             .then(() => {
                 loading.value = false;
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 let href = window.location.href;
                 let ip = href.split('//')[1].split(':')[0];
                 window.open(`${href.split('//')[0]}//${ip}:${val}/1panel/login`, '_self');
@@ -343,7 +344,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
         let password =
             form.complexityVerification === 'disable' ? passForm.newPassword : passForm.newPasswordComplexity;
         if (password === passForm.oldPassword) {
-            ElMessage.error(i18n.global.t('setting.duplicatePassword'));
+            MsgError(i18n.global.t('setting.duplicatePassword'));
             return;
         }
         dialogLoading.value = true;
@@ -351,7 +352,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
             .then(() => {
                 dialogLoading.value = false;
                 passwordVisiable.value = false;
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 router.push({ name: 'login', params: { code: '' } });
                 globalStore.setLogStatus(false);
             })
@@ -375,7 +376,7 @@ const handleMFA = async () => {
             .then(() => {
                 loading.value = false;
                 search();
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {
                 loading.value = false;
@@ -389,7 +390,7 @@ const onBind = async () => {
         .then(() => {
             loading.value = false;
             search();
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             isMFAShow.value = false;
         })
         .catch(() => {

@@ -27,11 +27,12 @@
     </el-dialog>
 </template>
 <script lang="ts" setup>
-import { ElMessage, FormInstance } from 'element-plus';
+import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import { CreateAcmeAccount } from '@/api/modules/website';
 import i18n from '@/lang';
+import { MsgSuccess } from '@/utils/message';
 
 let open = ref();
 let loading = ref(false);
@@ -67,7 +68,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 
         CreateAcmeAccount(account.value)
             .then(() => {
-                ElMessage.success(i18n.global.t('commons.msg.createSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                 handleClose();
             })
             .finally(() => {

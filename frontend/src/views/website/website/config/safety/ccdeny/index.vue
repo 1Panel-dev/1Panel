@@ -44,7 +44,8 @@ import { SaveFileContent } from '@/api/modules/files';
 import { GetWafConfig, UpdateWafEnable } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElMessage, FormInstance } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
+import { FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
 
 const props = defineProps({
@@ -115,7 +116,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         SaveFileContent(fileUpdate)
             .then(() => {
-                ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             })
             .finally(() => {
                 loading.value = false;

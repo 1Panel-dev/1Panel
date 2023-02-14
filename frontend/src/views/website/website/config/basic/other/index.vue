@@ -41,8 +41,9 @@ import { GetWebsite, UpdateWebsite } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { ListGroups } from '@/api/modules/website';
-import { ElMessage, FormInstance } from 'element-plus';
+import { FormInstance } from 'element-plus';
 import i18n from '@/lang';
+import { MsgSuccess } from '@/utils/message';
 
 const websiteForm = ref<FormInstance>();
 const props = defineProps({
@@ -76,7 +77,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         UpdateWebsite(form)
             .then(() => {
-                ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 search();
             })
             .finally(() => {

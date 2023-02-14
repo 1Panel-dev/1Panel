@@ -149,7 +149,7 @@ import { snapshotCreate, searchSnapshotPage, snapshotDelete, updateSnapshotDescr
 import { onMounted, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
-import { ElForm, ElMessage } from 'element-plus';
+import { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { Setting } from '@/api/interface/setting';
@@ -158,6 +158,7 @@ import RecoverStatus from '@/views/setting/snapshot/status/index.vue';
 import SnapshotImport from '@/views/setting/snapshot/import/index.vue';
 import { getBackupList } from '@/api/modules/setting';
 import { loadBackupName } from '../helper';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 const data = ref();
@@ -202,7 +203,7 @@ const handleClose = () => {
 const onChange = async (info: any) => {
     if (!info.edit) {
         await updateSnapshotDescription({ id: info.id, description: info.description });
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     }
 };
 
@@ -216,7 +217,7 @@ const submitAddSnapshot = (formEl: FormInstance | undefined) => {
                 loading.value = false;
                 drawerVisiable.value = false;
                 search();
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {
                 loading.value = false;

@@ -36,8 +36,8 @@ import { GetWafConfig, UpdateWafEnable } from '@/api/modules/website';
 import { computed, onMounted, reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { SaveFileContent } from '@/api/modules/files';
-import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
+import { MsgSuccess } from '@/utils/message';
 
 const props = defineProps({
     id: {
@@ -138,7 +138,7 @@ const submit = async (addArray: string[]) => {
     SaveFileContent(fileUpdate)
         .then(() => {
             add.value = '';
-            ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             get();
         })
         .finally(() => {

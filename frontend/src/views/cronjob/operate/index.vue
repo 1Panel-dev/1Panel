@@ -164,13 +164,14 @@ import { loadBackupName } from '@/views/setting/helper';
 import FileList from '@/components/file-list/index.vue';
 import { getBackupList } from '@/api/modules/setting';
 import i18n from '@/lang';
-import { ElForm, ElMessage } from 'element-plus';
+import { ElForm } from 'element-plus';
 import { Cronjob } from '@/api/interface/cronjob';
 import { addCronjob, editCronjob } from '@/api/modules/cronjob';
 import { loadDBNames } from '@/api/modules/database';
 import { CheckAppInstalled } from '@/api/modules/app';
 import { GetWebsiteOptions } from '@/api/modules/website';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { MsgSuccess } from '@/utils/message';
 
 interface DialogProps {
     title: string;
@@ -367,7 +368,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             await editCronjob(dialogData.value.rowData);
         }
 
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         emit('search');
         drawerVisiable.value = false;
     });

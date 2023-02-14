@@ -79,9 +79,9 @@ import { reactive, ref } from 'vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import Header from '@/components/drawer-header/index.vue';
 import { dateFormat } from '@/utils/util';
-import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';
+import { MsgSuccess } from '@/utils/message';
 
 interface InstallRrops {
     appInstallId: number;
@@ -140,7 +140,7 @@ const backup = async () => {
     loading.value = true;
     await InstalledOp(req)
         .then(() => {
-            ElMessage.success(i18n.global.t('commons.msg.backupSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.backupSuccess'));
             search();
         })
         .finally(() => {
@@ -159,7 +159,7 @@ const restore = async () => {
     loading.value = true;
     await InstalledOp(req)
         .then(() => {
-            ElMessage.success(i18n.global.t('commons.msg.restoreSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.restoreSuccess'));
             openRestorePage.value = false;
             search();
         })

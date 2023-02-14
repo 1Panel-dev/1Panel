@@ -21,9 +21,10 @@
 import { Website } from '@/api/interface/website';
 import { GetNginxConfig, UpdateNginxConfig } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
-import { ElMessage, FormInstance } from 'element-plus';
+import { FormInstance } from 'element-plus';
 import { computed, onMounted, ref } from 'vue';
 import i18n from '@/lang';
+import { MsgSuccess } from '@/utils/message';
 
 const props = defineProps({
     id: {
@@ -60,7 +61,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         UpdateNginxConfig(req.value)
             .then(() => {
-                ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 search(req.value);
             })
             .finally(() => {

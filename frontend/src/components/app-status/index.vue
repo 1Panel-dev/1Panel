@@ -56,9 +56,10 @@ import { CheckAppInstalled, InstalledOp } from '@/api/modules/app';
 import router from '@/routers';
 import { onMounted, reactive, ref } from 'vue';
 import Status from '@/components/status/index.vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import LayoutContent from '@/layout/layout-content.vue';
+import { MsgSuccess } from '@/utils/message';
 
 const props = defineProps({
     appKey: {
@@ -116,7 +117,7 @@ const onOperate = async (operation: string) => {
         InstalledOp(operateReq)
             .then(() => {
                 em('update:loading', false);
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 onCheck();
             })
             .catch(() => {

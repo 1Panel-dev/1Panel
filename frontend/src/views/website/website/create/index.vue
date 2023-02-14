@@ -176,10 +176,11 @@ import { GetApp, GetAppDetail, SearchApp, GetAppInstalled } from '@/api/modules/
 import { CreateWebsite, ListGroups, PreCheck } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElForm, FormInstance, ElMessage } from 'element-plus';
+import { ElForm, FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import Params from '@/views/app-store/detail/params/index.vue';
 import Check from '../check/index.vue';
+import { MsgSuccess } from '@/utils/message';
 
 const buttonList = [
     {
@@ -338,7 +339,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             } else {
                 CreateWebsite(website.value)
                     .then(() => {
-                        ElMessage.success(i18n.global.t('commons.msg.createSuccess'));
+                        MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
                         handleClose();
                     })
                     .finally(() => {

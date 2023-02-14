@@ -108,7 +108,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ElMessage, FormInstance } from 'element-plus';
+import { FormInstance } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import LayoutContent from '@/layout/layout-content.vue';
@@ -123,6 +123,7 @@ import {
     updateDaemonJson,
     updateDaemonJsonByfile,
 } from '@/api/modules/container';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 const showDaemonJsonAlert = ref(false);
@@ -171,7 +172,7 @@ const onOperator = async (operation: string) => {
     await dockerOperate(param);
     search();
     changeMode();
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const onSubmitSave = async () => {
@@ -181,7 +182,7 @@ const onSubmitSave = async () => {
         await updateDaemonJsonByfile(param)
             .then(() => {
                 loading.value = false;
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {
                 loading.value = false;
@@ -207,7 +208,7 @@ const onSubmitSave = async () => {
         .then(() => {
             loading.value = false;
             search();
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = false;

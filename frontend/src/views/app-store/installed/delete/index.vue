@@ -39,11 +39,12 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { ElMessage, FormInstance } from 'element-plus';
+import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import { App } from '@/api/interface/app';
 import { InstalledOp } from '@/api/modules/app';
 import i18n from '@/lang';
+import { MsgSuccess } from '@/utils/message';
 
 let deleteReq = ref({
     operate: 'delete',
@@ -84,7 +85,7 @@ const submit = async () => {
     InstalledOp(deleteReq.value)
         .then(() => {
             handleClose();
-            ElMessage.success(i18n.global.t('commons.msg.deleteSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
         })
         .finally(() => {
             loading.value = false;

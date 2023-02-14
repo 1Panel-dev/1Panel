@@ -75,8 +75,8 @@ import { useDeleteData } from '@/hooks/use-delete-data';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElMessage } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 const data = ref();
@@ -129,7 +129,7 @@ const submitAddCommand = (formEl: FormInstance | undefined) => {
         }
         cmdVisiable.value = false;
         search();
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     });
 };
 

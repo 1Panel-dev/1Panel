@@ -169,9 +169,9 @@ import {
     deleteGroup,
 } from '@/api/modules/host';
 import { useDeleteData } from '@/hooks/use-delete-data';
-import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
 import type Node from 'element-plus/es/components/tree/src/model/node';
+import { MsgSuccess } from '@/utils/message';
 
 type FormInstance = InstanceType<typeof ElForm>;
 const hostInfoRef = ref<FormInstance>();
@@ -261,21 +261,21 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
             case 'create':
                 await addHost(hostInfo);
                 restHostForm();
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 loadHostTree();
                 break;
             case 'edit':
                 await editHost(hostInfo);
                 restHostForm();
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 loadHostTree();
                 break;
             case 'testconn':
                 await testByInfo(hostInfo).then((res) => {
                     if (res.data) {
-                        ElMessage.success(i18n.global.t('terminal.connTestOk'));
+                        MsgSuccess(i18n.global.t('terminal.connTestOk'));
                     } else {
-                        ElMessage.success(i18n.global.t('terminal.connTestFailed'));
+                        MsgSuccess(i18n.global.t('terminal.connTestFailed'));
                     }
                 });
                 break;
@@ -295,7 +295,7 @@ const onCreateGroup = async (name: string) => {
         groupOperation.value = '';
         groupInputShow.value = false;
     }
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     groupOperation.value = '';
     groupInputShow.value = false;
     loadHostTree();
@@ -309,7 +309,7 @@ const onUpdateGroup = async () => {
     }
     let group = { id: currentGroupID.value, name: currentGroupValue.value, type: 'host' };
     await editGroup(group);
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     loadHostTree();
     loadGroups();
 };

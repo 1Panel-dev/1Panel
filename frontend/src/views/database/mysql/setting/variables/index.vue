@@ -116,12 +116,13 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
-import { ElMessage, FormInstance } from 'element-plus';
+import { FormInstance } from 'element-plus';
 import { Database } from '@/api/interface/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { updateMysqlVariables } from '@/api/modules/database';
 import i18n from '@/lang';
 import { planOptions } from './../helper';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 
@@ -285,7 +286,7 @@ const onSaveVariables = async () => {
     await updateMysqlVariables(param)
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = false;

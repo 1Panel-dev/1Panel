@@ -46,9 +46,10 @@
 <script lang="ts" setup>
 import { DeleteWebsite } from '@/api/modules/website';
 import i18n from '@/lang';
-import { ElMessage, FormInstance } from 'element-plus';
+import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import { Website } from '@/api/interface/website';
+import { MsgSuccess } from '@/utils/message';
 
 let key = 1;
 let open = ref(false);
@@ -91,7 +92,7 @@ const submit = () => {
     DeleteWebsite(deleteReq.value)
         .then(() => {
             handleClose();
-            ElMessage.success(i18n.global.t('commons.msg.deleteSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
         })
         .finally(() => {
             loading.value = false;

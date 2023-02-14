@@ -66,9 +66,10 @@ import { getSettingInfo, loadUpgradeInfo, upgrade } from '@/api/modules/setting'
 import { onMounted, ref } from 'vue';
 import MdEditor from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { MsgInfo, MsgSuccess } from '@/utils/message';
 
 const version = ref();
 const upgradeInfo = ref();
@@ -104,7 +105,7 @@ const onLoadUpgradeInfo = async () => {
         .then((res) => {
             loading.value = false;
             if (!res.data) {
-                ElMessage.info(i18n.global.t('setting.noUpgrade'));
+                MsgInfo(i18n.global.t('setting.noUpgrade'));
                 return;
             }
             upgradeInfo.value = res.data;
@@ -125,7 +126,7 @@ const onUpgrade = async () => {
             .then(() => {
                 loading.value = false;
                 drawerVisiable.value = false;
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 search();
             })
             .catch(() => {

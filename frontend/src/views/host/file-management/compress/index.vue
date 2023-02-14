@@ -53,12 +53,13 @@
 import i18n from '@/lang';
 import { computed, reactive, ref } from 'vue';
 import { File } from '@/api/interface/file';
-import { ElMessage, FormInstance, FormRules } from 'element-plus';
+import { FormInstance, FormRules } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { CompressExtention, CompressType } from '@/enums/files';
 import { CompressFile } from '@/api/modules/files';
 import FileList from '@/components/file-list/index.vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { MsgSuccess } from '@/utils/message';
 
 interface CompressProps {
     files: Array<any>;
@@ -111,7 +112,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         CompressFile(addItem as File.FileCompress)
             .then(() => {
-                ElMessage.success(i18n.global.t('file.compressSuccess'));
+                MsgSuccess(i18n.global.t('file.compressSuccess'));
                 handleClose();
             })
             .finally(() => {

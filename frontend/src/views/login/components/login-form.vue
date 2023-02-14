@@ -164,12 +164,12 @@
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import type { ElForm } from 'element-plus';
-import { ElMessage } from 'element-plus';
 import { loginApi, getCaptcha, mfaLoginApi, checkIsFirst, initUser } from '@/api/modules/auth';
 import { GlobalStore } from '@/store';
 import { MenuStore } from '@/store/modules/menu';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
+import { MsgSuccess } from '@/utils/message';
 
 const globalStore = GlobalStore();
 const menuStore = MenuStore();
@@ -232,7 +232,7 @@ const register = (formEl: FormInstance | undefined) => {
         if (!valid) return;
         await initUser(registerForm);
         checkStatus();
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     });
 };
 
@@ -270,7 +270,7 @@ const login = (formEl: FormInstance | undefined) => {
             }
             globalStore.setLogStatus(true);
             menuStore.setMenuList([]);
-            ElMessage.success(i18n.global.t('commons.msg.loginSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.loginSuccess'));
             router.push({ name: 'home' });
         } catch (error) {
             loginVerify();
@@ -287,7 +287,7 @@ const mfaLogin = async () => {
         await mfaLoginApi(mfaLoginForm);
         globalStore.setLogStatus(true);
         menuStore.setMenuList([]);
-        ElMessage.success(i18n.global.t('commons.msg.loginSuccess'));
+        MsgSuccess(i18n.global.t('commons.msg.loginSuccess'));
         router.push({ name: 'home' });
     }
 };

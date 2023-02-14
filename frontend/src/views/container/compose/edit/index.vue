@@ -38,9 +38,9 @@ import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { ref } from 'vue';
-import { ElMessage } from 'element-plus';
 import { composeUpdate } from '@/api/modules/container';
 import i18n from '@/lang';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 const composeVisiable = ref(false);
@@ -59,7 +59,7 @@ const onSubmitEdit = async () => {
     await composeUpdate(param)
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             composeVisiable.value = false;
         })
         .catch(() => {

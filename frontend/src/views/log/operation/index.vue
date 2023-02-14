@@ -96,7 +96,7 @@ import LayoutContent from '@/layout/layout-content.vue';
 import { cleanLogs, getOperationLogs } from '@/api/modules/log';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import i18n from '@/lang';
-import { ElMessage } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 const data = ref();
@@ -142,7 +142,7 @@ const onClean = async () => {
 const onSubmitClean = async () => {
     await cleanLogs({ logType: 'operation' });
     search();
-    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 onMounted(() => {

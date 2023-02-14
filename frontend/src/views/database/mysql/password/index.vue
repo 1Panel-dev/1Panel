@@ -54,10 +54,11 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
-import { ElForm, ElMessage } from 'element-plus';
+import { ElForm } from 'element-plus';
 import { deleteCheckMysqlDB, updateMysqlAccess, updateMysqlPassword } from '@/api/modules/database';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { Rules } from '@/global/form-rules';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 const changeVisiable = ref(false);
@@ -128,7 +129,7 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
                         loading.value = false;
                         emit('search');
                         changeVisiable.value = false;
-                        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                     })
                     .catch(() => {
                         loading.value = false;
@@ -143,7 +144,7 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
                 loading.value = false;
                 emit('search');
                 changeVisiable.value = false;
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             })
             .catch(() => {
                 loading.value = false;
@@ -162,7 +163,7 @@ const onSubmit = async () => {
             loading.value = false;
             emit('search');
             changeVisiable.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = false;

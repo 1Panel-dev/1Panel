@@ -2,9 +2,9 @@ import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } f
 import { ResultData } from '@/api/interface';
 import { ResultEnum } from '@/enums/http-enum';
 import { checkStatus } from './helper/check-status';
-import { ElMessage } from 'element-plus';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
+import { MsgError } from '@/utils/message';
 
 const globalStore = GlobalStore();
 
@@ -71,14 +71,14 @@ class RequestHttp {
                     return data;
                 }
                 if (data.code && data.code !== ResultEnum.SUCCESS) {
-                    ElMessage.error(data.message);
+                    MsgError(data.message);
                     return Promise.reject(data);
                 }
                 return data;
             },
             async (error: AxiosError) => {
                 const { response } = error;
-                if (error.message.indexOf('timeout') !== -1) ElMessage.error('请求超时！请您稍后重试');
+                if (error.message.indexOf('timeout') !== -1) MsgError('请求超时！请您稍后重试');
                 if (response) checkStatus(response.status);
                 if (!window.navigator.onLine) router.replace({ path: '/500' });
                 return Promise.reject(error);

@@ -57,10 +57,11 @@
 import { ref, onMounted, reactive } from 'vue';
 import { Setting } from '@/api/interface/setting';
 import { getSettingInfo, handleExpired } from '@/api/modules/setting';
-import { ElForm, ElMessage } from 'element-plus';
+import { ElForm } from 'element-plus';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import router from '@/routers';
+import { MsgError, MsgSuccess } from '@/utils/message';
 let settingForm = reactive<Setting.SettingInfo>({
     userName: '',
     password: '',
@@ -119,11 +120,11 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
         let password =
             settingForm.complexityVerification === 'disable' ? passForm.newPassword : passForm.newPasswordComplexity;
         if (password === passForm.oldPassword) {
-            ElMessage.error(i18n.global.t('setting.duplicatePassword'));
+            MsgError(i18n.global.t('setting.duplicatePassword'));
             return;
         }
         await handleExpired({ oldPassword: passForm.oldPassword, newPassword: password });
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         router.push({ name: 'home' });
     });
 };

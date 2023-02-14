@@ -150,7 +150,6 @@ import { GetFilesList, DeleteFile, GetFileContent, ComputeDirSize } from '@/api/
 import { computeSize, dateFormat, getIcon, getRandomStr } from '@/utils/util';
 import { File } from '@/api/interface/file';
 import { useDeleteData } from '@/hooks/use-delete-data';
-import { ElMessage } from 'element-plus';
 import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import i18n from '@/lang';
@@ -169,6 +168,7 @@ import Process from './process/index.vue';
 import Detail from './detail/index.vue';
 import { useRouter } from 'vue-router';
 import { Back, Refresh } from '@element-plus/icons-vue';
+import { MsgWarning } from '@/utils/message';
 
 interface FilePaths {
     url: string;
@@ -365,7 +365,7 @@ const openCompress = (items: File.File[]) => {
 
 const openDeCompress = (item: File.File) => {
     if (Mimetypes.get(item.mimeType) == undefined) {
-        ElMessage.warning(i18n.global.t('file.canNotDeCompress'));
+        MsgWarning(i18n.global.t('file.canNotDeCompress'));
         return;
     }
 

@@ -49,10 +49,10 @@ import { Database } from '@/api/interface/database';
 import { LoadFile } from '@/api/modules/files';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { updateMysqlVariables } from '@/api/modules/database';
-import { ElMessage } from 'element-plus';
 import { dateFormatForName } from '@/utils/util';
 import i18n from '@/lang';
 import { loadBaseDir } from '@/api/modules/setting';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 const extensions = [javascript(), oneDark];
@@ -122,7 +122,7 @@ const onSave = async () => {
     await updateMysqlVariables(param)
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = false;

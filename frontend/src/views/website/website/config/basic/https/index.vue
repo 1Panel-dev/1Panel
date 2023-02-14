@@ -119,11 +119,12 @@
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
 import { GetHTTPSConfig, ListSSL, UpdateHTTPSConfig } from '@/api/modules/website';
-import { ElMessage, ElMessageBox, FormInstance } from 'element-plus';
+import { ElMessageBox, FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { dateFormatSimple, getProvider } from '@/utils/util';
+import { MsgSuccess } from '@/utils/message';
 
 const props = defineProps({
     id: {
@@ -214,7 +215,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         form.websiteId = id.value;
         UpdateHTTPSConfig(form)
             .then(() => {
-                ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 get();
             })
             .finally(() => {
@@ -244,7 +245,7 @@ const changeEnable = (enable: boolean) => {
                     form.websiteId = id.value;
                     UpdateHTTPSConfig(form).then(() => {
                         done();
-                        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                         get();
                     });
                 }

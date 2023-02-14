@@ -27,10 +27,10 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { GetWebsiteNginx, UpdateNginxFile } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import { File } from '@/api/interface/file';
-import { ElMessage } from 'element-plus';
 import i18n from '@/lang';
 import { StreamLanguage } from '@codemirror/language';
 import { nginx } from '@codemirror/legacy-modes/mode/nginx';
+import { MsgSuccess } from '@/utils/message';
 
 const extensions = [StreamLanguage.define(nginx), oneDark];
 
@@ -68,7 +68,7 @@ const submit = () => {
         content: content.value,
     })
         .then(() => {
-            ElMessage.success(i18n.global.t('commons.msg.updateSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         })
         .finally(() => {
             loading.value = false;

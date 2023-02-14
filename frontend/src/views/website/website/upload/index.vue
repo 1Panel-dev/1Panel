@@ -67,12 +67,13 @@ import { reactive, ref } from 'vue';
 import { computeSize, dateFormatSimple } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import i18n from '@/lang';
-import { ElMessage, UploadFile, UploadFiles, UploadInstance, UploadProps } from 'element-plus';
+import { UploadFile, UploadFiles, UploadInstance, UploadProps } from 'element-plus';
 import { File } from '@/api/interface/file';
 import { BatchDeleteFile, GetFilesList, UploadFileData } from '@/api/modules/files';
 import { RecoverWebsiteByUpload } from '@/api/modules/website';
 import { loadBaseDir } from '@/api/modules/setting';
 import Header from '@/components/drawer-header/index.vue';
+import { MsgError, MsgSuccess } from '@/utils/message';
 
 const selects = ref<any>([]);
 const baseDir = ref();
@@ -125,7 +126,7 @@ const onRecover = async (row: File.File) => {
     await RecoverWebsiteByUpload(params)
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .finally(() => {
             loading.value = false;
@@ -137,7 +138,7 @@ const uploadRef = ref<UploadInstance>();
 
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
     if (rawFile.name.endsWith('.tar.gz')) {
-        ElMessage.error(i18n.global.t('database.unSupportType'));
+        MsgError(i18n.global.t('database.unSupportType'));
         return false;
     }
     return true;
@@ -165,7 +166,7 @@ const onSubmit = () => {
     UploadFileData(formData, {})
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('file.uploadSuccess'));
+            MsgSuccess(i18n.global.t('file.uploadSuccess'));
             handleClose();
             search();
         })

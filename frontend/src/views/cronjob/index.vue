@@ -137,7 +137,8 @@ import { loadBackupName } from '@/views/setting/helper';
 import i18n from '@/lang';
 import { Cronjob } from '@/api/interface/cronjob';
 import { useDeleteData } from '@/hooks/use-delete-data';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessageBox } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 const selects = ref<any>([]);
@@ -226,7 +227,7 @@ const onChangeStatus = async (id: number, status: string) => {
     }).then(async () => {
         let itemStatus = status === 'enable' ? 'Enable' : 'Disable';
         await updateStatus({ id: id, status: itemStatus });
-        ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
     });
 };
@@ -236,7 +237,7 @@ const onHandle = async (row: Cronjob.CronjobInfo) => {
     await handleOnce(row.id)
         .then(() => {
             loading.value = false;
-            ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             search();
         })
         .catch(() => {

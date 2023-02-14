@@ -61,10 +61,11 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElForm, ElMessage } from 'element-plus';
+import { ElForm } from 'element-plus';
 import { Container } from '@/api/interface/container';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { createComposeTemplate, updateComposeTemplate } from '@/api/modules/container';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 
@@ -107,7 +108,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             await createComposeTemplate(dialogData.value.rowData!)
                 .then(() => {
                     loading.value = false;
-                    ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                     emit('search');
                     drawerVisiable.value = false;
                 })
@@ -119,7 +120,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         await updateComposeTemplate(dialogData.value.rowData!)
             .then(() => {
                 loading.value = false;
-                ElMessage.success(i18n.global.t('commons.msg.operationSuccess'));
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 emit('search');
                 drawerVisiable.value = false;
             })
