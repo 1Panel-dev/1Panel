@@ -1,9 +1,9 @@
 system:
   db_file: 1Panel.db
-  app_repo_owner: 1Panel-dev
+  app_repo_owner: 1Panel-release
   app_repo_name: appstore
   base_dir: /opt
-  mode: release
+  mode: dev
 
 log:
   level: debug
