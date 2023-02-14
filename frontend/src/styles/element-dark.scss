@@ -63,6 +63,10 @@ html.dark {
         --el-pagination-button-color: #999999;
     }
 
+    .el-popover {
+        --el-popover-title-text-color: #999999;
+    }
+
     // * wangEditor
     --w-e-textarea-bg-color: #1b1b1b;
     --w-e-textarea-color: #eeeeee;
@@ -217,5 +221,8 @@ html.dark {
                 color: var(--el-pagination-hover-color);
             }
         }
+    }
+    .el-loading-mask {
+        background-color: rgba(0, 0, 0, 0.8);
     }
 }

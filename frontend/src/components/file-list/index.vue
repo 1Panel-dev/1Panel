@@ -1,9 +1,19 @@
 <template>
-    <el-popover placement="right" :width="400" trigger="click" :title="$t('file.list')" :visible="popoverVisible">
+    <el-popover
+        placement="right"
+        :width="400"
+        trigger="click"
+        :title="$t('file.list')"
+        :visible="popoverVisible"
+        popper-class="file-list"
+    >
         <template #reference>
             <el-button :icon="Folder" @click="popoverVisible = true"></el-button>
         </template>
         <div>
+            <el-button class="close" link @click="popoverVisible = false">
+                <el-icon><Close /></el-icon>
+            </el-button>
             <BreadCrumbs>
                 <BreadCrumbItem @click="jump(-1)" :right="paths.length == 0">
                     <el-icon><HomeFilled /></el-icon>
@@ -152,3 +162,14 @@ onUpdated(() => {
     search(req);
 });
 </script>
+
+<style lang="scss">
+.file-list {
+    position: relative;
+    .close {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+    }
+}
+</style>
