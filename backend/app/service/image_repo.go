@@ -2,10 +2,8 @@ package service
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
 
@@ -109,15 +107,13 @@ func (u *ImageRepoService) BatchDelete(req dto.ImageRepoDelete) error {
 			_ = u.handleRegistries("", repo.DownloadUrl, "delete")
 		}
 		if repo.Auth {
-			cmd := exec.Command("docker", "logout", fmt.Sprintf("%s://%s", repo.Protocol, repo.DownloadUrl))
-			_, _ = cmd.CombinedOutput()
+			_, _ = cmd.Execf("docker logout %s://%s", repo.Protocol, repo.DownloadUrl)
 		}
 	}
 	if err := imageRepoRepo.Delete(commonRepo.WithIdsIn(req.Ids)); err != nil {
 		return err
 	}
-	cmd := exec.Command("systemctl", "restart", "docker")
-	stdout, err := cmd.CombinedOutput()
+	stdout, err := cmd.Exec("systemctl restart docker")
 	if err != nil {
 		return errors.New(string(stdout))
 	}
@@ -136,11 +132,9 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 	if repo.DownloadUrl != req.DownloadUrl {
 		_ = u.handleRegistries(req.DownloadUrl, repo.DownloadUrl, "update")
 		if repo.Auth {
-			cmd := exec.Command("docker", "logout", repo.DownloadUrl)
-			_, _ = cmd.CombinedOutput()
+			_, _ = cmd.Execf("docker logout %s", repo.DownloadUrl)
 		}
-		cmd := exec.Command("systemctl", "restart", "docker")
-		stdout, err := cmd.CombinedOutput()
+		stdout, err := cmd.Exec("systemctl restart docker")
 		if err != nil {
 			return errors.New(string(stdout))
 		}
@@ -163,8 +157,7 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 }
 
 func (u *ImageRepoService) checkConn(host, user, password string) error {
-	cmd := exec.Command("docker", "login", "-u", user, "-p", password, host)
-	stdout, err := cmd.CombinedOutput()
+	stdout, err := cmd.Execf("docker login -u %s -p %s %s", user, password, host)
 	if err != nil {
 		return errors.New(string(stdout))
 	}

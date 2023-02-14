@@ -7,7 +7,7 @@
                         <el-button type="primary" @click="onCreate()">
                             {{ $t('setting.createSnapshot') }}
                         </el-button>
-                        <el-button @click="onImport()">
+                        <el-button type="primary" plain @click="onImport()">
                             {{ $t('setting.importSnapshot') }}
                         </el-button>
                         <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">

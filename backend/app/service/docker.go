@@ -6,12 +6,12 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/pkg/errors"
 )
@@ -50,8 +50,7 @@ func (u *DockerService) LoadDockerStatus() string {
 
 func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 	status := constant.StatusRunning
-	cmd := exec.Command("systemctl", "is-active", "docker")
-	stdout, err := cmd.CombinedOutput()
+	stdout, err := cmd.Exec("systemctl is-active docker")
 	if string(stdout) != "active\n" || err != nil {
 		status = constant.Stopped
 	}
@@ -158,8 +157,7 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 		return err
 	}
 
-	cmd := exec.Command("systemctl", "restart", "docker")
-	stdout, err := cmd.CombinedOutput()
+	stdout, err := cmd.Exec("systemctl restart docker")
 	if err != nil {
 		return errors.New(string(stdout))
 	}
@@ -176,8 +174,7 @@ func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
 	_, _ = write.WriteString(req.File)
 	write.Flush()
 
-	cmd := exec.Command("systemctl", "restart", "docker")
-	stdout, err := cmd.CombinedOutput()
+	stdout, err := cmd.Exec("systemctl restart docker")
 	if err != nil {
 		return errors.New(string(stdout))
 	}
@@ -185,8 +182,7 @@ func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
 }
 
 func (u *DockerService) OperateDocker(req dto.DockerOperation) error {
-	cmd := exec.Command("systemctl", req.Operation, "docker")
-	stdout, err := cmd.CombinedOutput()
+	stdout, err := cmd.Execf("systemctl %s docker ", req.Operation)
 	if err != nil {
 		return errors.New(string(stdout))
 	}

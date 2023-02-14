@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
@@ -501,8 +502,7 @@ func handleWebsiteRecover(website *model.Website, fileDir string) error {
 	if err := handleUnTar(fmt.Sprintf("%s/%s.web.tar.gz", fileDir, website.Alias), siteDir); err != nil {
 		return err
 	}
-	cmd := exec.Command("docker", "exec", "-i", nginxInfo.ContainerName, "nginx", "-s", "reload")
-	stdout, err := cmd.CombinedOutput()
+	stdout, err := cmd.Execf("docker exec -i %s nginx -s reload", nginxInfo.ContainerName)
 	if err != nil {
 		return errors.New(string(stdout))
 	}
