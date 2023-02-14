@@ -20,8 +20,6 @@ import (
 	"github.com/docker/docker/pkg/archive"
 )
 
-var dockerLogDir = constant.TmpDir + "/docker_logs"
-
 type ImageService struct{}
 
 type IImageService interface {
@@ -164,11 +162,13 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 		res, err := client.ImageBuild(context.TODO(), tar, opts)
 		if err != nil {
 			global.LOG.Errorf("build image %s failed, err: %v", req.Name, err)
+			_, _ = file.WriteString("image build failed!")
 			return
 		}
 		defer res.Body.Close()
 		global.LOG.Infof("build image %s successful!", req.Name)
 		_, _ = io.Copy(file, res.Body)
+		_, _ = file.WriteString("image build successful!")
 	}()
 
 	return logName, nil
@@ -179,6 +179,7 @@ func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	dockerLogDir := global.CONF.System.TmpDir + "/docker_logs"
 	if _, err := os.Stat(dockerLogDir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dockerLogDir, os.ModePerm); err != nil {
 			return "", err
@@ -226,12 +227,14 @@ func (u *ImageService) ImagePull(req dto.ImagePull) (string, error) {
 		defer file.Close()
 		out, err := client.ImagePull(context.TODO(), image, options)
 		if err != nil {
+			_, _ = file.WriteString("image pull failed!")
 			global.LOG.Errorf("image %s pull failed, err: %v", image, err)
 			return
 		}
 		defer out.Close()
 		global.LOG.Infof("pull image %s successful!", req.ImageName)
 		_, _ = io.Copy(file, out)
+		_, _ = file.WriteString("image pull successful!")
 	}()
 	return pathItem, nil
 }
@@ -314,6 +317,8 @@ func (u *ImageService) ImagePush(req dto.ImagePush) (string, error) {
 			return "", err
 		}
 	}
+
+	dockerLogDir := global.CONF.System.TmpDir + "/docker_logs"
 	if _, err := os.Stat(dockerLogDir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dockerLogDir, os.ModePerm); err != nil {
 			return "", err
@@ -330,11 +335,13 @@ func (u *ImageService) ImagePush(req dto.ImagePush) (string, error) {
 		out, err := client.ImagePush(context.TODO(), newName, options)
 		if err != nil {
 			global.LOG.Errorf("image %s push failed, err: %v", req.TagName, err)
+			_, _ = file.WriteString("image push failed!")
 			return
 		}
 		defer out.Close()
 		global.LOG.Infof("push image %s successful!", req.Name)
 		_, _ = io.Copy(file, out)
+		_, _ = file.WriteString("image push successful!")
 	}()
 
 	return pathItem, nil

@@ -52,7 +52,7 @@
         </el-row>
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="buttonDisabled" @click="drawerVisiable = false">
+                <el-button @click="drawerVisiable = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button :disabled="buttonDisabled" type="primary" @click="onSubmit(formRef)">
@@ -75,6 +75,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { LoadFile } from '@/api/modules/files';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { formatImageStdout } from '@/utils/docker';
 
 const drawerVisiable = ref(false);
 const form = reactive({
@@ -132,7 +133,7 @@ const loadLogs = async (path: string) => {
     timer = setInterval(async () => {
         if (logVisiable.value) {
             const res = await LoadFile({ path: path });
-            logInfo.value = res.data;
+            logInfo.value = formatImageStdout(res.data);
             nextTick(() => {
                 const state = view.value.state;
                 view.value.dispatch({
@@ -140,6 +141,11 @@ const loadLogs = async (path: string) => {
                     scrollIntoView: true,
                 });
             });
+            if (logInfo.value.endsWith('image pull failed!') || logInfo.value.endsWith('image pull successful!')) {
+                clearInterval(Number(timer));
+                timer = null;
+                buttonDisabled.value = false;
+            }
         }
     }, 1000 * 3);
 };

@@ -14,7 +14,6 @@ import (
 
 	"gitee.com/openeuler/go-gitee/gitee"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
-	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
@@ -71,8 +70,8 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	global.LOG.Info("start to upgrade now...")
 	fileOp := files.NewFileOp()
 	timeStr := time.Now().Format("20060102150405")
-	rootDir := fmt.Sprintf("%s/upgrade_%s/downloads", constant.TmpDir, timeStr)
-	originalDir := fmt.Sprintf("%s/upgrade_%s/original", constant.TmpDir, timeStr)
+	rootDir := fmt.Sprintf("%s/upgrade_%s/downloads", global.CONF.System.TmpDir, timeStr)
+	originalDir := fmt.Sprintf("%s/upgrade_%s/original", global.CONF.System.TmpDir, timeStr)
 	if err := os.MkdirAll(rootDir, os.ModePerm); err != nil {
 		return err
 	}

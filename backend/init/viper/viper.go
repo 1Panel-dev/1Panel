@@ -3,18 +3,17 @@ package viper
 import (
 	"bytes"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"gopkg.in/yaml.v3"
 	"path"
 	"strings"
 
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
-
 	"github.com/1Panel-dev/1Panel/backend/configs"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/cmd/server/conf"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 )
 
 func Init() {
@@ -73,5 +72,6 @@ func Init() {
 	global.CONF.System.Backup = global.CONF.System.DataDir + "/backup"
 	global.CONF.System.DbPath = global.CONF.System.DataDir + "/db"
 	global.CONF.System.LogPath = global.CONF.System.DataDir + "/log"
+	global.CONF.System.TmpDir = global.CONF.System.DataDir + "/tmp"
 	global.Viper = v
 }

@@ -86,7 +86,7 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 		}
 		baseDir = localDir
 	} else {
-		baseDir = constant.TmpDir
+		baseDir = global.CONF.System.TmpDir
 	}
 
 	switch cronjob.Type {

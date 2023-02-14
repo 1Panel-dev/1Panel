@@ -15,9 +15,6 @@
                         <el-button type="primary" @click="onOpenDialog('add')">
                             {{ $t('container.createRepo') }}
                         </el-button>
-                        <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
-                            {{ $t('commons.button.delete') }}
-                        </el-button>
                     </el-col>
                     <el-col :span="8">
                         <TableSetting @search="search()" />
@@ -85,9 +82,10 @@ import DeleteDialog from '@/views/container/repo/delete/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFormatSimple } from '@/utils/util';
 import { Container } from '@/api/interface/container';
-import { loadDockerStatus, searchImageRepo } from '@/api/modules/container';
+import { deleteImageRepo, loadDockerStatus, searchImageRepo } from '@/api/modules/container';
 import i18n from '@/lang';
 import router from '@/routers';
+import { ElMessageBox } from 'element-plus';
 
 const loading = ref();
 const data = ref();
@@ -149,16 +147,18 @@ const onOpenDialog = async (
 };
 
 const dialogDeleteRef = ref();
-const onBatchDelete = async (row: Container.RepoInfo | null) => {
-    let ids: Array<number> = [];
-    if (row) {
-        ids.push(row.id);
-    } else {
-        selects.value.forEach((item: Container.RepoInfo) => {
-            ids.push(item.id);
+const onDelete = async (row: Container.RepoInfo) => {
+    if (row.protocol === 'https') {
+        ElMessageBox.confirm(i18n.global.t('commons.msg.delete'), i18n.global.t('commons.button.delete'), {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        }).then(async () => {
+            await deleteImageRepo({ ids: [row.id], deleteInsecure: false });
+            search();
         });
+        return;
     }
-    dialogDeleteRef.value!.acceptParams({ ids: ids });
+    dialogDeleteRef.value!.acceptParams({ ids: [row.id] });
 };
 
 const buttons = [
@@ -177,7 +177,7 @@ const buttons = [
             return row.downloadUrl === 'docker.io';
         },
         click: (row: Container.RepoInfo) => {
-            onBatchDelete(row);
+            onDelete(row);
         },
     },
 ];

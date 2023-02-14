@@ -11,6 +11,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -65,16 +66,14 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 	}
 	if req.Protocol == "http" {
 		_ = u.handleRegistries(req.DownloadUrl, "", "create")
+		stdout, err := cmd.Exec("systemctl restart docker")
+		if err != nil {
+			return errors.New(string(stdout))
+		}
 	}
 
 	if err := copier.Copy(&imageRepo, &req); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
-	}
-
-	cmd := exec.Command("systemctl", "restart", "docker")
-	stdout, err := cmd.CombinedOutput()
-	if err != nil {
-		return errors.New(string(stdout))
 	}
 
 	imageRepo.Status = constant.StatusSuccess

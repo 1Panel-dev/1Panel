@@ -15,7 +15,6 @@ func Init() {
 	constant.ResourceDir = path.Join(constant.DataDir, "resource")
 	constant.AppResourceDir = path.Join(constant.ResourceDir, "apps")
 	constant.AppInstallDir = path.Join(constant.DataDir, "apps")
-	constant.TmpDir = path.Join(constant.DataDir, "tmp")
 
 	dirs := []string{constant.DataDir, constant.ResourceDir, constant.AppResourceDir, constant.AppInstallDir, global.CONF.System.Backup}
 

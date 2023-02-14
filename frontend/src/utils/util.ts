@@ -208,3 +208,13 @@ export function getAge(d1: string): string {
     }
     return i18n.global.t('app.less1Minute');
 }
+
+export function isJson(str: string) {
+    try {
+        if (typeof JSON.parse(str) === 'object') {
+            return true;
+        }
+    } catch {
+        return false;
+    }
+}

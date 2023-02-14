@@ -659,7 +659,7 @@ func backupMysql(backupType, baseDir, backupDir, mysqlName, dbName, fileName str
 		FileDir:    backupDir,
 		FileName:   fileName,
 	}
-	if baseDir != constant.TmpDir || backupType == "LOCAL" {
+	if baseDir != global.CONF.System.TmpDir || backupType == "LOCAL" {
 		record.Source = "LOCAL"
 		record.FileDir = fullDir
 	}

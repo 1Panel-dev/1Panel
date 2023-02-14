@@ -6,6 +6,7 @@ type System struct {
 	DbPath       string `mapstructure:"db_path"`
 	LogPath      string `mapstructure:"log_path"`
 	DataDir      string `mapstructure:"data_dir"`
+	TmpDir       string `mapstructure:"tmp_dir"`
 	Cache        string `mapstructure:"cache"`
 	Backup       string `mapstructure:"backup"`
 	AppRepoOwner string `mapstructure:"app_repo_owner"`

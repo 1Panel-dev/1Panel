@@ -4,13 +4,14 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"os"
 	"os/exec"
 	"path"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -459,7 +460,7 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 		FileDir:    backupDir,
 		FileName:   fmt.Sprintf("%s.tar.gz", backupName),
 	}
-	if baseDir != constant.TmpDir || backupType == "LOCAL" {
+	if baseDir != global.CONF.System.TmpDir || backupType == "LOCAL" {
 		record.Source = "LOCAL"
 		record.FileDir = fmt.Sprintf("%s/%s", baseDir, backupDir)
 	}
