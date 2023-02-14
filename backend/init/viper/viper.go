@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"gopkg.in/yaml.v3"
 	"path"
 	"strings"
 
@@ -18,18 +19,28 @@ import (
 
 func Init() {
 	baseDir := "/opt"
-	mode := "local"
+	mode := "dev"
 	fileOp := files.NewFileOp()
 	v := viper.NewWithOptions()
 	v.SetConfigType("yaml")
-	if fileOp.Stat("/opt/1panel/conf/app.yaml") {
+
+	config := configs.ServerConfig{}
+	if err := yaml.Unmarshal(conf.AppYaml, &config); err != nil {
+		panic(err)
+	}
+	if config.System.Mode != "" {
+		mode = config.System.Mode
+	}
+	if mode != "release" {
+		if !fileOp.Stat("/opt/1panel/conf/app.yaml") {
+			panic("conf file is not exist")
+		}
 		v.SetConfigName("app")
 		v.AddConfigPath(path.Join("/opt/1panel/conf"))
 		if err := v.ReadInConfig(); err != nil {
 			panic(fmt.Errorf("Fatal error config file: %s \n", err))
 		}
 	} else {
-		mode = "release"
 		stdout, err := cmd.Exec("grep '^BASE_DIR=' /usr/bin/1pctl | cut -d'=' -f2")
 		if err != nil {
 			panic(err)
@@ -52,7 +63,7 @@ func Init() {
 	if err := v.Unmarshal(&serverConfig); err != nil {
 		panic(err)
 	}
-	if mode == "local" && serverConfig.System.BaseDir != "" {
+	if mode != "release" && serverConfig.System.BaseDir != "" {
 		baseDir = serverConfig.System.BaseDir
 	}
 	global.CONF = serverConfig
