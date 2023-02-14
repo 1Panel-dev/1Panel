@@ -59,7 +59,7 @@
 
             <el-row :gutter="5">
                 <el-col v-for="(installed, index) in data" :key="index" :span="12">
-                    <div class="app-card">
+                    <div class="install-card">
                         <el-row :gutter="24">
                             <el-col :span="4">
                                 <div class="icon">
