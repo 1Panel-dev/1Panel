@@ -29,7 +29,6 @@
                 <template #toolbar>
                     <el-button
                         style="margin-left: 10px"
-                        type="danger"
                         plain
                         :disabled="selects.length === 0"
                         @click="onBatchDelete(null)"

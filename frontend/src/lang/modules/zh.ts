@@ -1055,6 +1055,7 @@ export default {
         websiteStatictHelper: '在主机上创建网站目录',
         websiteProxyHelper:
             '代理已有服务,例如本机已安装使用 8080 端口的 halo 服务，那么代理地址为 http://127.0.0.1:8080',
+        restoreHelper: '确认使用此备份恢复？',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',

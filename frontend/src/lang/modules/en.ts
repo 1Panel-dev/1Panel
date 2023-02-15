@@ -1026,6 +1026,7 @@ export default {
         noDefaulServer: 'Not set',
         defaultServerHelper:
             'After setting the default site, all unbound domain names and IPs are directed to the default site\n which can effectively prevent malicious analysis',
+        restoreHelper: 'Are you sure to restore using this backup?',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'The hash table size of the server name',

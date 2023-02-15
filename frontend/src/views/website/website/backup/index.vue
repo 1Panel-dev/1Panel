@@ -14,7 +14,7 @@
                 <el-button type="primary" @click="onBackup()">
                     {{ $t('database.backup') }}
                 </el-button>
-                <el-button type="danger" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                <el-button plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
             </template>
@@ -43,6 +43,7 @@ import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords } from '@
 import { Backup } from '@/api/interface/backup';
 import { BackupWebsite, RecoverWebsite } from '@/api/modules/website';
 import { MsgSuccess } from '@/utils/message';
+import { ElMessageBox } from 'element-plus';
 
 const selects = ref<any>([]);
 const loading = ref(false);
@@ -90,6 +91,16 @@ const search = async () => {
 };
 
 const onRecover = async (row: Backup.RecordInfo) => {
+    ElMessageBox.confirm(i18n.global.t('website.restoreHelper'), i18n.global.t('commons.button.recover'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(() => {
+        recover(row);
+    });
+};
+
+const recover = async (row: Backup.RecordInfo) => {
     let params = {
         websiteName: websiteName.value,
         type: websiteType.value,
