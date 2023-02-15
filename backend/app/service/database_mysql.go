@@ -19,7 +19,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
@@ -589,7 +588,8 @@ func (u *MysqlService) LoadStatus() (*dto.MysqlStatus, error) {
 }
 
 func excuteSqlForMaps(containerName, password, command string) (map[string]string, error) {
-	stdout, err := cmd.Execf("docker exec %s mysql -uroot -p%s -e %s", containerName, password, command)
+	cmd := exec.Command("docker", "exec", containerName, "mysql", "-uroot", "-p"+password, "-e", command)
+	stdout, err := cmd.CombinedOutput()
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
 	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
 		return nil, errors.New(stdStr)
@@ -607,7 +607,8 @@ func excuteSqlForMaps(containerName, password, command string) (map[string]strin
 }
 
 func excuteSqlForRows(containerName, password, command string) ([]string, error) {
-	stdout, err := cmd.Execf("docker exec %s mysql -uroot -p%s -e %s", containerName, password, command)
+	cmd := exec.Command("docker", "exec", containerName, "mysql", "-uroot", "-p"+password, "-e", command)
+	stdout, err := cmd.CombinedOutput()
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
 	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
 		return nil, errors.New(stdStr)
@@ -616,7 +617,8 @@ func excuteSqlForRows(containerName, password, command string) ([]string, error)
 }
 
 func excuteSql(containerName, password, command string) error {
-	stdout, err := cmd.Execf("docker exec %s mysql -uroot -p%s -e %s", containerName, password, command)
+	cmd := exec.Command("docker", "exec", containerName, "mysql", "-uroot", "-p"+password, "-e", command)
+	stdout, err := cmd.CombinedOutput()
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
 	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
 		return errors.New(stdStr)
