@@ -231,7 +231,7 @@ const onSavePort = async (formEl: FormInstance | undefined, key: string, val: an
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 let href = window.location.href;
                 let ip = href.split('//')[1].split(':')[0];
-                window.open(`${href.split('//')[0]}//${ip}:${val}/1panel/login`, '_self');
+                window.open(`${href.split('//')[0]}//${ip}:${val}/login`, '_self');
             })
             .catch(() => {
                 loading.value = false;
@@ -239,7 +239,6 @@ const onSavePort = async (formEl: FormInstance | undefined, key: string, val: an
     });
 };
 const handleMFA = async () => {
-    console.log('dawdwda');
     if (form.mfaStatus === 'enable') {
         const res = await getMFA();
         otp.secret = res.data.secret;
