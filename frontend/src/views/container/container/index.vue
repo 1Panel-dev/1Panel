@@ -96,7 +96,7 @@
                         show-overflow-tooltip
                     />
                     <fu-table-operations
-                        width="220px"
+                        width="370px"
                         :ellipsis="10"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"

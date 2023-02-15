@@ -19,7 +19,7 @@
                             {{ $t('container.importImage') }}
                         </el-button>
                         <el-button type="primary" plain @click="onOpenBuild">
-                            {{ $t('container.build') }}
+                            {{ $t('container.imageBuild') }}
                         </el-button>
                     </el-col>
                     <el-col :span="8">

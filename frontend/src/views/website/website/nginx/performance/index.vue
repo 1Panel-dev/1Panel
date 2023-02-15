@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-form :model="form" :rules="variablesRules" ref="nginxFormRef" label-width="160px">
+        <el-form :model="form" :rules="variablesRules" ref="nginxFormRef" label-position="top">
             <el-row>
                 <el-col :span="1"><br /></el-col>
                 <el-col :span="9">
@@ -23,6 +23,11 @@
                     <el-form-item label="keepalive_timeout" prop="keepalive_timeout">
                         <el-input clearable v-model.number="form.keepalive_timeout"></el-input>
                         <span class="input-help">{{ $t('nginx.keepaliveTimeoutHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="submit(nginxFormRef)" :loading="loading">
+                            {{ $t('commons.button.save') }}
+                        </el-button>
                     </el-form-item>
                 </el-col>
                 <el-col :span="1"><br /></el-col>
@@ -47,9 +52,6 @@
                 </el-col>
             </el-row>
         </el-form>
-        <el-button type="primary" @click="submit(nginxFormRef)" :loading="loading">
-            {{ $t('commons.button.save') }}
-        </el-button>
     </div>
 </template>
 <script lang="ts" setup>

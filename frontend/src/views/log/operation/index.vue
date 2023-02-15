@@ -52,8 +52,14 @@
                             {{ $t('logs.detail.' + row.source) }}
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('logs.operate')" min-width="150px" prop="detailZH" />
-                    <el-table-column :label="$t('logs.status')" prop="status">
+                    <el-table-column :label="$t('logs.operate')" min-width="150px" prop="detailZH">
+                        <template #default="{ row }">
+                            <span v-if="globalStore.language === 'zh'">{{ row.detailZH }}</span>
+                            <span v-if="globalStore.language === 'en'">{{ row.detailEN }}</span>
+                        </template>
+                    </el-table-column>
+
+                    <el-table-column :label="$t('commons.table.status')" prop="status">
                         <template #default="{ row }">
                             <el-tag v-if="row.status === 'Success'" class="ml-2" type="success">
                                 {{ $t('commons.status.success') }}
@@ -97,6 +103,7 @@ import { cleanLogs, getOperationLogs } from '@/api/modules/log';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
 
 const loading = ref();
 const data = ref();
@@ -109,6 +116,8 @@ const paginationConfig = reactive({
 const searchName = ref<string>('');
 const searchGroup = ref<string>('');
 const searchStatus = ref<string>('');
+
+const globalStore = GlobalStore();
 
 const search = async () => {
     let params = {

@@ -17,7 +17,7 @@
                     </el-form-item>
                     <el-form-item label="Dockerfile" prop="from">
                         <el-radio-group v-model="form.from">
-                            <el-radio label="edit">{{ $t('container.edit') }}</el-radio>
+                            <el-radio label="edit">{{ $t('commons.button.edit') }}</el-radio>
                             <el-radio label="path">{{ $t('container.pathSelect') }}</el-radio>
                         </el-radio-group>
                     </el-form-item>

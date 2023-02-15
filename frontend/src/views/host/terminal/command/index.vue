@@ -28,7 +28,7 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
-        <el-drawer v-model="cmdVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+        <el-drawer v-model="cmdVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
                 <DrawerHeader
                     :header="$t('commons.button.' + operate) + $t('terminal.quickCommand')"

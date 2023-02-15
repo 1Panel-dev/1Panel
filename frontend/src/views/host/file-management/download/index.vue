@@ -5,21 +5,14 @@
         :destroy-on-close="true"
         :close-on-click-modal="false"
         :before-close="handleClose"
-        size="40%"
+        size="30%"
     >
         <template #header>
             <DrawerHeader :header="$t('file.download')" :back="handleClose" />
         </template>
-        <el-row>
-            <el-col :span="11" :offset="1">
-                <el-form
-                    ref="fileForm"
-                    label-position="top"
-                    :model="addForm"
-                    label-width="100px"
-                    :rules="rules"
-                    v-loading="loading"
-                >
+        <el-form ref="fileForm" label-position="top" :model="addForm" :rules="rules" v-loading="loading">
+            <el-row type="flex" justify="center">
+                <el-col :span="22">
                     <el-form-item :label="$t('file.compressType')" prop="type">
                         <el-select v-model="addForm.type">
                             <el-option v-for="item in options" :key="item" :label="item" :value="item" />
@@ -30,9 +23,9 @@
                             <template #append>{{ extension }}</template>
                         </el-input>
                     </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+                </el-col>
+            </el-row>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>

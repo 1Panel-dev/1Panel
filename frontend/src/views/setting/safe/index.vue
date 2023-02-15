@@ -2,7 +2,7 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('setting.safe')" :divider="true">
             <template #main>
-                <el-form :model="form" ref="panelFormRef" v-loading="loading" label-position="left" label-width="160px">
+                <el-form :model="form" ref="panelFormRef" v-loading="loading" label-position="left" label-width="180px">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :span="10">
@@ -10,6 +10,7 @@
                                 <el-input clearable v-model.number="form.serverPort">
                                     <template #append>
                                         <el-button
+                                            style="width: 85px"
                                             @click="onSavePort(panelFormRef, 'ServerPort', form.serverPort)"
                                             icon="Collection"
                                         >
@@ -26,7 +27,7 @@
                             >
                                 <el-input disabled v-model="form.expirationTime">
                                     <template #append>
-                                        <el-button @click="onChangeExpirationTime" icon="Setting">
+                                        <el-button style="width: 85px" @click="onChangeExpirationTime" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>

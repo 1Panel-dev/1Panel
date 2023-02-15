@@ -5,35 +5,44 @@
                 <DrawerHeader :header="$t('database.changePassword')" :back="handleClose" />
             </template>
             <el-form>
-                <el-form v-loading="loading" ref="changeFormRef" :model="changeForm" label-width="80px">
-                    <div v-if="changeForm.operation === 'password'">
-                        <el-form-item :label="$t('commons.login.username')" prop="userName">
-                            <el-input disabled v-model="changeForm.userName"></el-input>
-                        </el-form-item>
-                        <el-form-item
-                            :label="$t('commons.login.password')"
-                            prop="password"
-                            :rules="Rules.requiredInput"
-                        >
-                            <el-input type="password" clearable show-password v-model="changeForm.password"></el-input>
-                        </el-form-item>
-                    </div>
-                    <div v-if="changeForm.operation === 'privilege'">
-                        <el-form-item :label="$t('database.permission')" prop="privilege">
-                            <el-select style="width: 100%" v-model="changeForm.privilege">
-                                <el-option value="localhost" :label="$t('database.permissionLocal')" />
-                                <el-option value="%" :label="$t('database.permissionAll')" />
-                                <el-option value="ip" :label="$t('database.permissionForIP')" />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item
-                            v-if="changeForm.privilege === 'ip'"
-                            prop="privilegeIPs"
-                            :rules="Rules.requiredInput"
-                        >
-                            <el-input clearable v-model="changeForm.privilegeIPs" />
-                        </el-form-item>
-                    </div>
+                <el-form v-loading="loading" ref="changeFormRef" :model="changeForm" label-position="top">
+                    <el-row type="flex" justify="center">
+                        <el-col :span="22">
+                            <div v-if="changeForm.operation === 'password'">
+                                <el-form-item :label="$t('commons.login.username')" prop="userName">
+                                    <el-input disabled v-model="changeForm.userName"></el-input>
+                                </el-form-item>
+                                <el-form-item
+                                    :label="$t('commons.login.password')"
+                                    prop="password"
+                                    :rules="Rules.requiredInput"
+                                >
+                                    <el-input
+                                        type="password"
+                                        clearable
+                                        show-password
+                                        v-model="changeForm.password"
+                                    ></el-input>
+                                </el-form-item>
+                            </div>
+                            <div v-if="changeForm.operation === 'privilege'">
+                                <el-form-item :label="$t('database.permission')" prop="privilege">
+                                    <el-select style="width: 100%" v-model="changeForm.privilege">
+                                        <el-option value="localhost" :label="$t('database.permissionLocal')" />
+                                        <el-option value="%" :label="$t('database.permissionAll')" />
+                                        <el-option value="ip" :label="$t('database.permissionForIP')" />
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item
+                                    v-if="changeForm.privilege === 'ip'"
+                                    prop="privilegeIPs"
+                                    :rules="Rules.requiredInput"
+                                >
+                                    <el-input clearable v-model="changeForm.privilegeIPs" />
+                                </el-form-item>
+                            </div>
+                        </el-col>
+                    </el-row>
                 </el-form>
             </el-form>
             <template #footer>
@@ -95,7 +104,6 @@ const acceptParams = (params: DialogProps): void => {
     changeForm.privilege = params.privilege;
     changeForm.privilegeIPs = params.privilegeIPs;
     changeForm.value = params.value;
-    console.log(changeForm.password);
     changeVisiable.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();

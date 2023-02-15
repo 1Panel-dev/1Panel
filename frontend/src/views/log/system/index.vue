@@ -7,7 +7,7 @@
                     placeholder="None data"
                     :indent-with-tab="true"
                     :tabSize="4"
-                    style="height: calc(100vh - 180px)"
+                    style="height: calc(100vh - 240px)"
                     :lineWrapping="true"
                     :matchBrackets="true"
                     theme="cobalt"

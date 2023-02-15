@@ -28,7 +28,9 @@
                     </el-row>
                 </el-form>
 
-                <div style="margin-top: 20px"><span style="font-size: 14px; font-weight: 500">第三方账号</span></div>
+                <div style="margin-top: 20px">
+                    <span style="font-size: 14px; font-weight: 500">{{ $t('setting.thirdParty') }}</span>
+                </div>
                 <el-row :gutter="20" style="margin-top: 5px">
                     <el-col :span="12">
                         <el-card style="height: 265px">

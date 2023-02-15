@@ -44,7 +44,7 @@
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { nextTick, reactive, ref, shallowRef } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
 import { Database } from '@/api/interface/database';
 import { LoadFile } from '@/api/modules/files';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
@@ -151,14 +151,12 @@ const loadMysqlSlowlogs = async (path: string) => {
     });
 };
 
-const onCloseLog = async () => {
-    isWatch.value = false;
+onBeforeUnmount(() => {
     clearInterval(Number(timer));
     timer = null;
-};
+});
 
 defineExpose({
     acceptParams,
-    onCloseLog,
 });
 </script>

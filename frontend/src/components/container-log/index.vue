@@ -34,7 +34,7 @@
 import { logContainer } from '@/api/modules/container';
 import i18n from '@/lang';
 import { dateFormatForName } from '@/utils/util';
-import { nextTick, reactive, ref, shallowRef } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -74,12 +74,6 @@ const timeOptions = ref([
         value: new Date(new Date().getTime() - 600 * 1000).getTime() / 1000 + '',
     },
 ]);
-
-const onCloseLog = async () => {
-    logSearch.isWatch = false;
-    clearInterval(Number(timer));
-    timer = null;
-};
 
 const searchLogs = async () => {
     const res = await logContainer(logSearch);
@@ -121,8 +115,12 @@ const acceptParams = (props: DialogProps): void => {
     }, 1000 * 5);
 };
 
+onBeforeUnmount(() => {
+    clearInterval(Number(timer));
+    timer = null;
+});
+
 defineExpose({
     acceptParams,
-    onCloseLog,
 });
 </script>

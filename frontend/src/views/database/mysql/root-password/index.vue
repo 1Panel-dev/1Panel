@@ -1,12 +1,16 @@
 <template>
-    <el-drawer v-model="dialogVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="40%">
+    <el-drawer v-model="dialogVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
             <DrawerHeader :header="$t('database.rootPassword')" :back="handleClose" />
         </template>
         <el-form v-loading="loading" ref="formRef" :model="form" label-position="top">
-            <el-form-item :label="$t('database.rootPassword')" :rules="Rules.requiredInput" prop="password">
-                <el-input type="password" show-password clearable v-model="form.password" />
-            </el-form-item>
+            <el-row type="flex" justify="center">
+                <el-col :span="22">
+                    <el-form-item :label="$t('database.rootPassword')" :rules="Rules.requiredInput" prop="password">
+                        <el-input type="password" show-password clearable v-model="form.password" />
+                    </el-form-item>
+                </el-col>
+            </el-row>
         </el-form>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit"></ConfirmDialog>

@@ -1,9 +1,7 @@
 <template>
-    <el-dialog v-model="composeVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="70%">
+    <el-drawer v-model="composeVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <div class="card-header">
-                <span>{{ $t('commons.button.edit') }}</span>
-            </div>
+            <DrawerHeader :header="$t('commons.button.edit')" :back="handleClose" />
         </template>
         <div v-loading="loading">
             <codemirror
@@ -11,7 +9,7 @@
                 placeholder="#Define or paste the content of your docker-compose file here"
                 :indent-with-tab="true"
                 :tabSize="4"
-                style="max-height: 500px; width: 100%; min-height: 200px"
+                style="width: 100%; height: calc(100vh - 175px)"
                 :lineWrapping="true"
                 :matchBrackets="true"
                 theme="cobalt"
@@ -31,7 +29,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 <script lang="ts" setup>
 import { Codemirror } from 'vue-codemirror';
@@ -41,6 +39,7 @@ import { ref } from 'vue';
 import { composeUpdate } from '@/api/modules/container';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const loading = ref(false);
 const composeVisiable = ref(false);
@@ -78,6 +77,9 @@ const acceptParams = (props: DialogProps): void => {
     path.value = props.path;
     name.value = props.name;
     content.value = props.content;
+};
+const handleClose = () => {
+    composeVisiable.value = false;
 };
 
 defineExpose({

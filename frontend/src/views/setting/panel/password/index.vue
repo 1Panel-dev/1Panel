@@ -58,6 +58,7 @@ import { FormInstance } from 'element-plus';
 import { GlobalStore } from '@/store';
 import { reactive, ref } from 'vue';
 import { updatePassword } from '@/api/modules/setting';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const globalStore = GlobalStore();
 const passFormRef = ref<FormInstance>();
