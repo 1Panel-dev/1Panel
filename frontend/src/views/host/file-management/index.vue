@@ -86,7 +86,7 @@
                         <template #default="{ row }">
                             <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
                             <svg-icon v-else className="table-icon" :iconName="getIconName(row.extension)"></svg-icon>
-                            <el-link :underline="false" @click="open(row)">{{ row.name }}</el-link>
+                            <el-link :underline="false" @click="open(row)" type="primary">{{ row.name }}</el-link>
                             <span v-if="row.isSymlink">-> {{ row.linkPath }}</span>
                         </template>
                     </el-table-column>
@@ -95,8 +95,8 @@
                             <el-link :underline="false" @click="openMode(row)" type="primary">{{ row.mode }}</el-link>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('file.user')" prop="user" show-overflow-tooltip></el-table-column>
-                    <el-table-column :label="$t('file.group')" prop="group"></el-table-column>
+                    <!-- <el-table-column :label="$t('file.user')" prop="user" show-overflow-tooltip></el-table-column>
+                    <el-table-column :label="$t('file.group')" prop="group"></el-table-column> -->
                     <el-table-column :label="$t('file.size')" prop="size">
                         <template #default="{ row }">
                             <span v-if="row.isDir">
@@ -139,7 +139,7 @@
             <Move ref="moveRef" @close="search" />
             <Download ref="downloadRef" @close="search" />
             <Process :open="processPage.open" @close="closeProcess" />
-            <Detail ref="detailRef" />
+            <!-- <Detail ref="detailRef" /> -->
         </LayoutContent>
     </div>
 </template>
@@ -165,7 +165,7 @@ import Move from './move/index.vue';
 import Download from './download/index.vue';
 import { Mimetypes } from '@/global/mimetype';
 import Process from './process/index.vue';
-import Detail from './detail/index.vue';
+// import Detail from './detail/index.vue';
 import { useRouter } from 'vue-router';
 import { Back, Refresh } from '@element-plus/icons-vue';
 import { MsgWarning } from '@/utils/message';
@@ -205,7 +205,7 @@ const processPage = reactive({ open: false });
 
 const createRef = ref();
 const roleRef = ref();
-const detailRef = ref();
+// const detailRef = ref();
 const compressRef = ref();
 const deCompressRef = ref();
 const codeEditorRef = ref();
@@ -439,9 +439,9 @@ const openDownload = () => {
     downloadRef.value.acceptParams(fileDownload);
 };
 
-const openDetail = (row: File.File) => {
-    detailRef.value.acceptParams({ path: row.path });
-};
+// const openDetail = (row: File.File) => {
+//     detailRef.value.acceptParams({ path: row.path });
+// };
 
 const buttons = [
     {
@@ -473,10 +473,10 @@ const buttons = [
         label: i18n.global.t('commons.button.delete'),
         click: delFile,
     },
-    {
-        label: i18n.global.t('file.info'),
-        click: openDetail,
-    },
+    // {
+    //     label: i18n.global.t('file.info'),
+    //     click: openDetail,
+    // },
 ];
 
 onMounted(() => {

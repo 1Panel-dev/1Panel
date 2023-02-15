@@ -13,8 +13,8 @@
                         {{ computeSize(data.size) }}
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('file.role')">{{ data.mode }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('file.user')">{{ data.user }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('file.group')">{{ data.group }}</el-descriptions-item>
+                    <!-- <el-descriptions-item :label="$t('file.user')">{{ data.user }}</el-descriptions-item>
+                    <el-descriptions-item :label="$t('file.group')">{{ data.group }}</el-descriptions-item> -->
                     <el-descriptions-item :label="$t('commons.table.updatedAt')">
                         {{ dateFormatSimple(data.modTime) }}
                     </el-descriptions-item>
