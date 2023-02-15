@@ -69,33 +69,7 @@
             </template>
         </LayoutContent>
 
-        <el-dialog v-model="detailVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="70%">
-            <template #header>
-                <div class="card-header">
-                    <span>{{ $t('commons.button.view') }}</span>
-                </div>
-            </template>
-            <codemirror
-                :autofocus="true"
-                placeholder="None data"
-                :indent-with-tab="true"
-                :tabSize="4"
-                style="max-height: 500px"
-                :lineWrapping="true"
-                :matchBrackets="true"
-                theme="cobalt"
-                :styleActiveLine="true"
-                :extensions="extensions"
-                v-model="detailInfo"
-                :readOnly="true"
-            />
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="detailVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                </span>
-            </template>
-        </el-dialog>
-
+        <DetailDialog ref="detailRef" />
         <OperatorDialog @search="search" ref="dialogRef" />
     </div>
 </template>
@@ -104,12 +78,10 @@
 import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
-import { Codemirror } from 'vue-codemirror';
-import { javascript } from '@codemirror/lang-javascript';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFormatSimple } from '@/utils/util';
 import { Container } from '@/api/interface/container';
+import DetailDialog from '@/views/container/template/detail/index.vue';
 import OperatorDialog from '@/views/container/template/operator/index.vue';
 import { deleteComposeTemplate, loadDockerStatus, searchComposeTemplate } from '@/api/modules/container';
 import { useDeleteData } from '@/hooks/use-delete-data';
@@ -119,9 +91,6 @@ import router from '@/routers';
 const loading = ref();
 const data = ref();
 const selects = ref<any>([]);
-const detailVisiable = ref(false);
-const detailInfo = ref();
-const extensions = [javascript(), oneDark];
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -129,6 +98,8 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
+
+const detailRef = ref();
 
 const dockerStatus = ref();
 const loadStatus = async () => {
@@ -161,8 +132,7 @@ const search = async () => {
 };
 
 const onOpenDetail = async (row: Container.TemplateInfo) => {
-    detailInfo.value = row.content;
-    detailVisiable.value = true;
+    detailRef.value.acceptParams({ content: row.content });
 };
 
 const dialogRef = ref();

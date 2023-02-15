@@ -4,21 +4,14 @@
         :destroy-on-close="true"
         :close-on-click-modal="false"
         :before-close="handleClose"
-        size="40%"
+        size="30%"
     >
         <template #header>
             <DrawerHeader :header="title" :back="handleClose" />
         </template>
         <el-row>
             <el-col :span="22" :offset="1">
-                <el-form
-                    ref="fileForm"
-                    label-position="top"
-                    :model="addForm"
-                    label-width="100px"
-                    :rules="rules"
-                    v-loading="loading"
-                >
+                <el-form ref="fileForm" label-position="top" :model="addForm" :rules="rules" v-loading="loading">
                     <el-form-item :label="$t('file.path')" prop="newPath">
                         <el-input v-model="addForm.newPath">
                             <template #prepend><FileList @choose="getPath" :dir="true"></FileList></template>

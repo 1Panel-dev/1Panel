@@ -2,26 +2,41 @@
     <div v-show="onSetting">
         <LayoutContent :title="'MySQL ' + $t('database.setting')" :reload="true">
             <template #buttons>
-                <el-button type="primary" :plain="activeName !== 'conf'" @click="changeTab('conf')">
+                <el-button type="primary" :plain="activeName !== 'conf'" @click="activeName = 'conf'">
                     {{ $t('database.confChange') }}
                 </el-button>
-                <el-button type="primary" :plain="activeName !== 'status'" @click="changeTab('status')">
+                <el-button
+                    type="primary"
+                    :disabled="mysqlStatus !== 'Running'"
+                    :plain="activeName !== 'status'"
+                    @click="activeName = 'status'"
+                >
                     {{ $t('database.currentStatus') }}
                 </el-button>
-                <el-button type="primary" :plain="activeName !== 'tuning'" @click="changeTab('tuning')">
+                <el-button
+                    type="primary"
+                    :disabled="mysqlStatus !== 'Running'"
+                    :plain="activeName !== 'tuning'"
+                    @click="activeName = 'tuning'"
+                >
                     {{ $t('database.performanceTuning') }}
                 </el-button>
-                <el-button type="primary" :plain="activeName !== 'port'" @click="changeTab('port')">
+                <el-button type="primary" :plain="activeName !== 'port'" @click="activeName = 'port'">
                     {{ $t('database.portSetting') }}
                 </el-button>
-                <el-button type="primary" :plain="activeName !== 'log'" @click="changeTab('log')">
+                <el-button
+                    type="primary"
+                    :disabled="mysqlStatus !== 'Running'"
+                    :plain="activeName !== 'log'"
+                    @click="activeName = 'log'"
+                >
                     {{ $t('database.log') }}
                 </el-button>
                 <el-button
                     type="primary"
                     :disabled="mysqlStatus !== 'Running'"
+                    @click="activeName = 'slowLog'"
                     :plain="activeName !== 'slowLog'"
-                    @click="changeTab('slowLog')"
                 >
                     {{ $t('database.slowLog') }}
                 </el-button>
@@ -157,16 +172,6 @@ const acceptParams = (props: DialogProps): void => {
 };
 const onClose = (): void => {
     onSetting.value = false;
-};
-
-const changeTab = (val: string) => {
-    activeName.value = val;
-    if (val !== '5') {
-        dialogContainerLogRef.value!.onCloseLog();
-    }
-    if (val !== '6') {
-        slowLogRef.value!.onCloseLog();
-    }
 };
 
 const onSubmitChangePort = async () => {

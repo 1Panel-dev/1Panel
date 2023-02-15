@@ -69,7 +69,7 @@
                 </div>
                 <Status v-show="activeName === 'status'" ref="statusRef" />
                 <div v-if="activeName === 'tuning'">
-                    <el-form :model="form" ref="formRef" :rules="rules" label-width="120px">
+                    <el-form :model="form" ref="formRef" :rules="rules" label-position="top">
                         <el-row style="margin-top: 20px">
                             <el-col :span="1"><br /></el-col>
                             <el-col :span="10">

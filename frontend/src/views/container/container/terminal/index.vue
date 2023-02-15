@@ -1,46 +1,47 @@
 <template>
-    <el-dialog
-        v-model="terminalVisiable"
-        :destroy-on-close="true"
-        @close="onClose"
-        :close-on-click-modal="false"
-        width="70%"
-    >
+    <el-drawer v-model="terminalVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <div class="card-header">
-                <span>{{ $t('container.containerTerminal') }}</span>
-            </div>
+            <DrawerHeader :header="$t('container.containerTerminal')" :back="handleClose" />
         </template>
-        <el-form ref="formRef" :model="form" label-width="80px">
-            <el-form-item label="User" prop="user">
-                <el-input style="width: 30%" clearable v-model="form.user" />
-                <span class="input-help">{{ $t('container.emptyUser') }}</span>
-            </el-form-item>
-            <el-form-item :label="$t('container.custom')" prop="custom">
-                <el-switch v-model="form.isCustom" @change="onChangeCommand" />
-            </el-form-item>
-            <el-form-item v-if="form.isCustom" label="Command" prop="command" :rules="Rules.requiredInput">
-                <el-input style="width: 30%" clearable v-model="form.command" />
-            </el-form-item>
-            <el-form-item v-if="!form.isCustom" label="Command" prop="command" :rules="Rules.requiredSelect">
-                <el-select style="width: 30%" allow-create filterable clearable v-model="form.command">
-                    <el-option value="/bin/ash" label="/bin/ash" />
-                    <el-option value="/bin/bash" label="/bin/bash" />
-                    <el-option value="/bin/sh" label="/bin/sh" />
-                </el-select>
-            </el-form-item>
-            <el-form-item>
-                <el-button v-if="!terminalOpen" @click="initTerm(formRef)">{{ $t('commons.button.conn') }}</el-button>
-                <el-button v-else @click="onClose()">{{ $t('commons.button.disconn') }}</el-button>
-            </el-form-item>
+        <el-form ref="formRef" :model="form" label-position="top">
+            <el-row :gutter="20" type="flex" justify="center">
+                <el-col :span="12">
+                    <el-form-item label="User" prop="user">
+                        <el-input clearable v-model="form.user" />
+                        <span class="input-help">{{ $t('container.emptyUser') }}</span>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item v-if="form.isCustom" label="Command" prop="command" :rules="Rules.requiredInput">
+                        <el-checkbox style="width: 100px" border v-model="form.isCustom" @change="onChangeCommand">
+                            {{ $t('container.custom') }}
+                        </el-checkbox>
+                        <el-input style="width: calc(100% - 100px)" clearable v-model="form.command" />
+                    </el-form-item>
+                    <el-form-item v-if="!form.isCustom" label="Command" prop="command" :rules="Rules.requiredSelect">
+                        <el-checkbox style="width: 100px" border v-model="form.isCustom" @change="onChangeCommand">
+                            {{ $t('container.custom') }}
+                        </el-checkbox>
+                        <el-select style="width: calc(100% - 100px)" filterable clearable v-model="form.command">
+                            <el-option value="/bin/ash" label="/bin/ash" />
+                            <el-option value="/bin/bash" label="/bin/bash" />
+                            <el-option value="/bin/sh" label="/bin/sh" />
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <div style="height: calc(100vh - 290px)" :id="'terminal-exec'"></div>
         </el-form>
-        <div :id="'terminal-exec'"></div>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="terminalVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button type="primary" v-if="!terminalOpen" @click="initTerm(formRef)">
+                    {{ $t('commons.button.conn') }}
+                </el-button>
+                <el-button type="primary" v-else @click="handleClose()">{{ $t('commons.button.disconn') }}</el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>
@@ -53,6 +54,7 @@ import 'xterm/css/xterm.css';
 import { FitAddon } from 'xterm-addon-fit';
 import { Rules } from '@/global/form-rules';
 import { isJson } from '@/utils/util';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const terminalVisiable = ref(false);
 const terminalOpen = ref(false);
@@ -178,7 +180,8 @@ const isWsOpen = () => {
     return false;
 };
 
-function onClose() {
+function handleClose() {
+    terminalVisiable.value = false;
     terminalOpen.value = false;
     window.removeEventListener('resize', changeTerminalSize);
     if (isWsOpen()) {

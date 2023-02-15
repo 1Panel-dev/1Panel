@@ -38,7 +38,7 @@ export const GlobalStore = defineStore({
         setCsrfToken(token: string) {
             this.csrfToken = token;
         },
-        updateLanguage(language: string) {
+        updateLanguage(language: any) {
             this.language = language;
         },
         setThemeConfig(themeConfig: ThemeConfigProp) {

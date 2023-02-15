@@ -1,15 +1,16 @@
 <template>
-    <el-drawer v-model="codeVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer v-model="detailVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <DrawerHeader :header="header" :back="handleClose" />
+            <div class="card-header">
+                <span>{{ $t('commons.button.view') }}</span>
+            </div>
         </template>
         <codemirror
-            ref="mymirror"
             :autofocus="true"
             placeholder="None data"
             :indent-with-tab="true"
             :tabSize="4"
-            style="width: 100%; height: calc(100vh - 112px)"
+            style="width: 100%; height: calc(100vh - 160px)"
             :lineWrapping="true"
             :matchBrackets="true"
             theme="cobalt"
@@ -18,36 +19,30 @@
             v-model="detailInfo"
             :readOnly="true"
         />
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="detailVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+            </span>
+        </template>
     </el-drawer>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
-import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import DrawerHeader from '@/components/drawer-header/index.vue';
-
-const mymirror = ref();
-
+import { ref } from 'vue';
+import { Codemirror } from 'vue-codemirror';
 const extensions = [javascript(), oneDark];
-const header = ref();
+
+const detailVisiable = ref(false);
 const detailInfo = ref();
-const codeVisiable = ref(false);
 
 interface DialogProps {
-    header: string;
-    detailInfo: string;
+    content: string;
 }
-
-const acceptParams = (props: DialogProps): void => {
-    header.value = props.header;
-    detailInfo.value = props.detailInfo;
-    codeVisiable.value = true;
-};
-
-const handleClose = () => {
-    codeVisiable.value = false;
+const acceptParams = (params: DialogProps): void => {
+    detailInfo.value = params.content;
+    detailVisiable.value = true;
 };
 
 defineExpose({

@@ -10,6 +10,7 @@
                                 <el-input clearable v-model="form.userName">
                                     <template #append>
                                         <el-button
+                                            style="width: 85px"
                                             @click="onSave(panelFormRef, 'UserName', form.userName)"
                                             icon="Collection"
                                         >
@@ -22,7 +23,7 @@
                             <el-form-item :label="$t('setting.passwd')" :rules="Rules.requiredInput" prop="password">
                                 <el-input type="password" clearable disabled v-model="form.password">
                                     <template #append>
-                                        <el-button icon="Setting" @click="onChangePassword">
+                                        <el-button style="width: 85px" icon="Setting" @click="onChangePassword">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -49,6 +50,7 @@
                                 <el-input clearable v-model="form.panelName">
                                     <template #append>
                                         <el-button
+                                            style="width: 85px"
                                             @click="onSave(panelFormRef, 'PanelName', form.panelName)"
                                             icon="Collection"
                                         >
@@ -77,6 +79,7 @@
                                 <el-input v-model.number="form.sessionTimeout">
                                     <template #append>
                                         <el-button
+                                            style="width: 85px"
                                             @click="onSave(panelFormRef, 'SessionTimeout', form.sessionTimeout)"
                                             icon="Collection"
                                         >
@@ -94,7 +97,12 @@
                             <el-form-item :label="$t('setting.syncTime')">
                                 <el-input disabled v-model="form.localTime">
                                     <template #append>
-                                        <el-button v-show="!show" @click="onSyncTime" icon="Refresh">
+                                        <el-button
+                                            style="width: 85px"
+                                            v-show="!show"
+                                            @click="onSyncTime"
+                                            icon="Refresh"
+                                        >
                                             {{ $t('commons.button.sync') }}
                                         </el-button>
                                         <span v-show="show">{{ count }} S</span>

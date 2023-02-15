@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-form :model="mysqlVariables" :rules="variablesRules" ref="variableFormRef" label-width="160px">
+        <el-form :model="mysqlVariables" :rules="variablesRules" ref="variableFormRef" label-position="top">
             <el-row>
                 <el-col :span="1"><br /></el-col>
                 <el-col :span="9">

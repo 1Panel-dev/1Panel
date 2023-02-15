@@ -1,50 +1,33 @@
 <template>
-    <el-dialog
-        v-model="monitorVisiable"
-        :destroy-on-close="true"
-        @close="onClose"
-        :close-on-click-modal="false"
-        width="70%"
-    >
+    <el-drawer v-model="monitorVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <div class="card-header">
-                <span>{{ $t('container.monitor') }}</span>
-            </div>
+            <DrawerHeader :header="$t('container.monitor')" :back="handleClose" />
         </template>
-        <span>{{ $t('container.refreshTime') }}</span>
-        <el-select style="margin-left: 10px" v-model="timeInterval" @change="changeTimer">
-            <el-option label="1s" :value="1" />
-            <el-option label="3s" :value="3" />
-            <el-option label="5s" :value="5" />
-            <el-option label="10s" :value="10" />
-            <el-option label="30s" :value="30" />
-            <el-option label="60s" :value="60" />
-        </el-select>
-        <el-row :gutter="20" style="margin-top: 10px">
-            <el-col :span="12">
-                <el-card style="overflow: inherit">
-                    <div id="cpuChart" style="width: 100%; height: 230px"></div>
-                </el-card>
-            </el-col>
-            <el-col :span="12">
-                <el-card style="overflow: inherit">
-                    <div id="memoryChart" style="width: 100%; height: 230px"></div>
-                </el-card>
-            </el-col>
-        </el-row>
-        <el-row :gutter="20" style="margin-top: 10px">
-            <el-col :span="12">
-                <el-card style="overflow: inherit">
-                    <div id="ioChart" style="width: 100%; height: 230px"></div>
-                </el-card>
-            </el-col>
-            <el-col :span="12">
-                <el-card style="overflow: inherit">
-                    <div id="networkChart" style="width: 100%; height: 230px"></div>
-                </el-card>
-            </el-col>
-        </el-row>
-    </el-dialog>
+        <el-form label-position="top">
+            <el-form-item :label="$t('container.refreshTime')">
+                <el-select v-model="timeInterval" @change="changeTimer">
+                    <el-option label="1s" :value="1" />
+                    <el-option label="3s" :value="3" />
+                    <el-option label="5s" :value="5" />
+                    <el-option label="10s" :value="10" />
+                    <el-option label="30s" :value="30" />
+                    <el-option label="60s" :value="60" />
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <el-card>
+            <div id="cpuChart" style="width: 100%; height: 200px"></div>
+        </el-card>
+        <el-card style="margin-top: 10px">
+            <div id="memoryChart" style="width: 100%; height: 200px"></div>
+        </el-card>
+        <el-card style="margin-top: 10px">
+            <div id="ioChart" style="width: 100%; height: 200px"></div>
+        </el-card>
+        <el-card style="margin-top: 10px">
+            <div id="networkChart" style="width: 100%; height: 200px"></div>
+        </el-card>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>
@@ -53,6 +36,7 @@ import { ContainerStats } from '@/api/modules/container';
 import { dateFormatForSecond } from '@/utils/util';
 import * as echarts from 'echarts';
 import i18n from '@/lang';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const monitorVisiable = ref(false);
 const timeInterval = ref();
@@ -276,7 +260,8 @@ function freshChart(chartName: string, legendDatas: any, xDatas: any, yDatas: an
     itemChart?.setOption(option, true);
 }
 
-const onClose = async () => {
+const handleClose = async () => {
+    monitorVisiable.value = false;
     clearInterval(Number(timer));
     timer = null;
     window.removeEventListener('resize', changeChartSize);

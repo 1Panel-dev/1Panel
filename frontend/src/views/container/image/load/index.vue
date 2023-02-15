@@ -1,16 +1,20 @@
 <template>
-    <el-drawer v-model="loadVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="40%">
+    <el-drawer v-model="loadVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
             <DrawerHeader :header="$t('container.importImage')" :back="handleClose" />
         </template>
         <el-form v-loading="loading" ref="formRef" :model="form" label-position="top">
-            <el-form-item :label="$t('container.path')" :rules="Rules.requiredSelect" prop="path">
-                <el-input v-model="form.path">
-                    <template #prepend>
-                        <FileList @choose="loadLoadDir" :dir="false"></FileList>
-                    </template>
-                </el-input>
-            </el-form-item>
+            <el-row type="flex" justify="center">
+                <el-col :span="22">
+                    <el-form-item :label="$t('container.path')" :rules="Rules.requiredSelect" prop="path">
+                        <el-input v-model="form.path">
+                            <template #prepend>
+                                <FileList @choose="loadLoadDir" :dir="false"></FileList>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -33,6 +37,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { imageLoad } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const loading = ref(false);
 

@@ -1,15 +1,7 @@
 <template>
-    <el-dialog
-        v-model="logVisiable"
-        @close="onCloseLog"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        width="70%"
-    >
+    <el-drawer v-model="logVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <div class="card-header">
-                <span>{{ $t('commons.button.log') }}</span>
-            </div>
+            <DrawerHeader :header="$t('commons.button.log')" :back="handleClose" />
         </template>
         <div>
             <el-select @change="searchLogs" style="width: 10%; float: left" v-model="logSearch.mode">
@@ -28,7 +20,7 @@
             placeholder="None data"
             :indent-with-tab="true"
             :tabSize="4"
-            style="margin-top: 10px; max-height: 500px"
+            style="margin-top: 20px; height: calc(100vh - 230px)"
             :lineWrapping="true"
             :matchBrackets="true"
             theme="cobalt"
@@ -43,7 +35,7 @@
                 <el-button @click="logVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>
@@ -54,6 +46,7 @@ import { nextTick, reactive, ref, shallowRef } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const extensions = [javascript(), oneDark];
 
@@ -93,8 +86,10 @@ const timeOptions = ref([
     },
 ]);
 
-const onCloseLog = async () => {
+const handleClose = async () => {
+    logVisiable.value = false;
     clearInterval(Number(timer));
+    timer = null;
 };
 
 const searchLogs = async () => {

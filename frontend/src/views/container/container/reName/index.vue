@@ -1,12 +1,16 @@
 <template>
-    <el-drawer v-model="newNameVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="40%">
+    <el-drawer v-model="newNameVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
             <DrawerHeader :header="$t('container.rename')" :back="handleClose" />
         </template>
         <el-form ref="newNameRef" v-loading="loading" :model="renameForm" label-position="top">
-            <el-form-item :label="$t('container.newName')" :rules="Rules.requiredInput" prop="newName">
-                <el-input v-model="renameForm.newName"></el-input>
-            </el-form-item>
+            <el-row type="flex" justify="center">
+                <el-col :span="22">
+                    <el-form-item :label="$t('container.newName')" :rules="Rules.requiredInput" prop="newName">
+                        <el-input v-model="renameForm.newName"></el-input>
+                    </el-form-item>
+                </el-col>
+            </el-row>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -28,6 +32,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElForm } from 'element-plus';
 import { reactive, ref } from 'vue';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const loading = ref(false);
 
@@ -67,7 +72,6 @@ interface DialogProps {
 }
 
 const acceptParams = (props: DialogProps): void => {
-    console.log(props.container);
     renameForm.name = props.container;
     renameForm.newName = '';
     newNameVisiable.value = true;

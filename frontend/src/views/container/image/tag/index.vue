@@ -1,7 +1,7 @@
 <template>
     <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <DrawerHeader :header="'Tag ' + $t('container.image')" :back="handleClose" />
+            <DrawerHeader :header="$t('container.image') + ' Tag'" :back="handleClose" />
         </template>
         <el-form v-loading="loading" label-position="top" ref="formRef" :model="form" label-width="80px">
             <el-row type="flex" justify="center">
