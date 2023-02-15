@@ -1,6 +1,6 @@
 system:
   db_file: 1Panel.db
-  app_repo_owner: 1Panel-release
+  app_repo_owner: zhengkunwang223
   app_repo_name: appstore
   base_dir: /opt
   mode: dev
