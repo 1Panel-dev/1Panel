@@ -183,22 +183,22 @@ const freshChart = (chartName: string, Title: string, Data: number) => {
                 text: Data + '%',
                 textStyle: {
                     color: '#0f0f0f',
-                    lineHeight: 30,
+                    lineHeight: 25,
                     fontSize: 20,
                     fontWeight: '400',
                 },
-                left: '50%',
+                left: '49%',
                 top: '32%',
                 subtext: Title,
                 subtextStyle: {
-                    color: '#000000',
-                    fontSize: 14,
+                    color: '#646A73',
+                    fontSize: 13,
                 },
                 textAlign: 'center',
             },
         ],
         polar: {
-            radius: ['72%', '92%'],
+            radius: ['71%', '82%'],
             center: ['50%', '50%'],
         },
         angleAxis: {
@@ -245,7 +245,7 @@ const freshChart = (chartName: string, Title: string, Data: number) => {
             },
             {
                 type: 'pie',
-                radius: ['0%', '55%'],
+                radius: ['0%', '61%'],
                 center: ['50%', '50%'],
                 label: {
                     show: false,
@@ -256,7 +256,7 @@ const freshChart = (chartName: string, Title: string, Data: number) => {
                         value: 0,
                         itemStyle: {
                             shadowColor: '#e3e3e3',
-                            shadowBlur: 20,
+                            shadowBlur: 5,
                         },
                     },
                 ],

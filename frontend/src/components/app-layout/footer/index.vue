@@ -19,13 +19,13 @@
     border-top: 1px solid #e4e7ed;
     box-sizing: border-box;
     a {
-        font-size: 14px;
+        font-size: 12px;
         color: #858585;
         text-decoration: none;
         letter-spacing: 0.5px;
     }
     span {
-        font-size: 14px;
+        font-size: 12px;
         color: #858585;
         text-decoration: none;
         letter-spacing: 0.5px;
