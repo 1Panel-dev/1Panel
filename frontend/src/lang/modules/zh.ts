@@ -201,7 +201,7 @@ export default {
         logs: '面板日志',
     },
     home: {
-        overview: '概 览',
+        overview: '概览',
         appInstalled: '已安装应用',
         systemInfo: '系统信息',
         hostname: '主机名称',

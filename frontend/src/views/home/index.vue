@@ -10,7 +10,7 @@
         />
         <el-row :gutter="20" style="margin-top: 20px">
             <el-col :span="16">
-                <CardWithHeader :header="$t('home.overview')" height="180px">
+                <CardWithHeader :header="$t('home.overview')" height="146px">
                     <template #body>
                         <div class="h-overview">
                             <el-row>
@@ -46,7 +46,7 @@
                         </div>
                     </template>
                 </CardWithHeader>
-                <CardWithHeader :header="$t('commons.table.status')" style="margin-top: 20px" height="285px">
+                <CardWithHeader :header="$t('commons.table.status')" style="margin-top: 20px" height="275px">
                     <template #body>
                         <Status ref="statuRef" />
                     </template>
@@ -117,7 +117,7 @@
                 </CardWithHeader>
             </el-col>
             <el-col :span="8">
-                <CardWithHeader :header="$t('home.systemInfo')" height="350px">
+                <CardWithHeader :header="$t('home.systemInfo')" height="306px">
                     <template #body>
                         <el-descriptions :column="1" class="h-systemInfo">
                             <el-descriptions-item class-name="system-content">
@@ -583,14 +583,14 @@ onBeforeUnmount(() => {
     text-align: center;
 
     span:first-child {
-        font-size: 18px;
+        font-size: 14px;
         color: #646a73;
     }
 
     .count {
         margin-top: 10px;
         span {
-            font-size: 28px;
+            font-size: 25px;
             color: $primary-color;
             font-weight: 500;
             line-height: 32px;
@@ -605,12 +605,12 @@ onBeforeUnmount(() => {
 
 .system-label {
     font-weight: 400 !important;
-    font-size: 16px !important;
+    font-size: 14px !important;
     color: #1f2329;
 }
 
 .system-content {
-    font-size: 15px !important;
+    font-size: 13px !important;
 }
 
 .monitor-tags {

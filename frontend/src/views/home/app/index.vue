@@ -5,7 +5,7 @@
                 <el-row :gutter="10">
                     <el-col :span="5">
                         <div>
-                            <el-avatar shape="square" :size="60" :src="'data:image/png;base64,' + app.icon" />
+                            <el-avatar shape="square" :size="55" :src="'data:image/png;base64,' + app.icon" />
                         </div>
                     </el-col>
                     <el-col :span="15">
@@ -33,7 +33,6 @@
                         </el-button>
                     </el-col>
                 </el-row>
-                <div class="h-app-divider"></div>
             </div>
         </el-scrollbar>
     </div>
@@ -101,18 +100,18 @@ defineExpose({
 <style lang="scss">
 .h-app-card {
     cursor: pointer;
-    padding: 15px;
+    padding: 10px 15px;
 
     .h-app-content {
         .h-app-title {
             font-weight: 500;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .h-app-desc {
             span {
                 font-weight: 400;
-                font-size: 14px;
+                font-size: 12px;
                 color: #646a73;
             }
         }
@@ -126,7 +125,7 @@ defineExpose({
 }
 
 .h-app-divider {
-    margin-top: 5px;
+    margin-top: 13px;
     border: 0;
     border-top: var(--panel-border);
 }
