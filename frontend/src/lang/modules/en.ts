@@ -90,6 +90,7 @@ export default {
             uploadSuccess: 'Update Success',
             operate: 'Operate',
             inputOrSelect: 'Please select or enter',
+            backupSuccess: 'Backup Success',
         },
         login: {
             firstLogin: 'First login, please create an initial administrator user!',
@@ -110,6 +111,7 @@ export default {
             warnning:
                 'Note: [Closing the security entrance] will make your panel login address directly exposed to the Internet, very dangerous, please exercise caution',
             codeInput: 'Please enter the 6-digit verification code of the MFA validator',
+            title: 'A modern, open source Linux server operation and maintenance management panel',
         },
         rule: {
             username: 'Please enter a username',
@@ -232,6 +234,11 @@ export default {
         koInfo: 'Open source lightweight Kubernetes distribution',
         kubepiInfo: 'Modern open source Kubernetes panel',
         goInstall: 'Go install',
+
+        allNetworkCard: 'All',
+        networkCard: 'NetworkCard',
+        disk: 'Disk',
+        allDisk: 'All',
     },
     tabs: {
         more: 'More',
@@ -835,7 +842,7 @@ export default {
         install: 'Install',
         author: 'Author',
         source: 'Source',
-        sync: 'Synchronous',
+        sync: 'Sync',
         appName: 'Application Name',
         status: 'Status',
         container: 'Container',
@@ -848,10 +855,10 @@ export default {
         deleteWarn:
             'The delete operation will delete all data and backups together. This operation cannot be rolled back. Do you want to continue? ',
         syncSuccess: 'Sync successfully',
-        canUpdate: 'can be upgraded',
+        canUpdate: 'Upgraded',
         backup: 'Backup',
-        backupName: 'file name',
-        backupPath: 'file path',
+        backupName: 'File Name',
+        backupPath: 'File Path',
         backupdate: 'Backup time',
         restore: 'Restore',
         restoreWarn:
@@ -877,6 +884,13 @@ export default {
         noService: 'No {0}',
         toInstall: 'to install',
         param: 'parameter configuration',
+        port: ' Port',
+        areadyRun: 'Age',
+        day: ' Day ',
+        hour: ' Hour',
+        syncAppList: 'Sync',
+        updatePrompt: 'The current application is the latest version',
+        installPrompt: 'No apps installed yet',
     },
     website: {
         website: 'Website',
