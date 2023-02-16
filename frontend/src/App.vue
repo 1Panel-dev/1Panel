@@ -23,8 +23,6 @@ const i18nLocale = computed((): any => {
     return '';
 });
 
-// const assemblySize = computed((): string => globalStore.assemblySize);
-
 let isRouterAlive = ref(true);
 
 const reload = () => {
