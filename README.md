@@ -18,7 +18,7 @@
 
 ## UI 展示
 
-![UI展示](http://1panel.oss-cn-hangzhou.aliyuncs.com/img/app-store.png)
+![UI展示](http://1panel.oss-cn-hangzhou.aliyuncs.com/img/overview.png)
 
 ## 快速开始
 
