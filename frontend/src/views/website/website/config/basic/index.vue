@@ -1,8 +1,7 @@
 <template>
-    <!-- <div style="border: 1px solid #6495ed"> -->
     <el-tabs tab-position="left" v-model="tabIndex">
         <el-tab-pane :label="$t('website.domainConfig')">
-            <Doamin :id="id" v-if="tabIndex == '0'"></Doamin>
+            <Doamin :key="id" :id="id" v-if="tabIndex == '0'"></Doamin>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.sitePath')">
             <SitePath :id="id" v-if="tabIndex == '1'"></SitePath>
@@ -20,7 +19,6 @@
             <Other :id="id" v-if="tabIndex == '5'"></Other>
         </el-tab-pane>
     </el-tabs>
-    <!-- </div> -->
 </template>
 
 <script lang="ts" setup name="Basic">
@@ -36,7 +34,7 @@ import SitePath from './site-folder/index.vue';
 const props = defineProps({
     id: {
         type: Number,
-        default: 0,
+        default: -1,
     },
 });
 
