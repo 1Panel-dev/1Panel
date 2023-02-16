@@ -116,6 +116,7 @@ export default {
             warnning: '注意：【关闭安全入口】将使您的面板登录地址被直接暴露在互联网上，非常危险，请谨慎操作',
             codeInput: '请输入 MFA 验证器的 6 位验证码',
             mfaTitle: 'MFA认证',
+            title: '一个现代化、开源的 Linux 服务器运维管理面板',
         },
         rule: {
             username: '请输入用户名',

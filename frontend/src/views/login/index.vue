@@ -4,7 +4,7 @@
             <div class="login-wrapper" v-if="screenWidth > 1000">
                 <div class="left inline-block">
                     <div class="login-title">
-                        <span>1Panel 现代化的 Linux 面板</span>
+                        <span>{{ $t('commons.login.title') }}</span>
                     </div>
                     <img src="@/assets/images/1Panel-login.png" alt="" />
                 </div>
@@ -16,7 +16,7 @@
             </div>
             <div class="login-wrapper" v-else>
                 <div class="login-title">
-                    <span>1Panel 现代化的 Linux 面板</span>
+                    <span>{{ $t('commons.login.title') }}</span>
                 </div>
                 <div class="login-container">
                     <LoginForm ref="loginRef"></LoginForm>
