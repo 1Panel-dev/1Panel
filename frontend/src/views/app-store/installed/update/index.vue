@@ -1,19 +1,25 @@
 <template>
-    <el-drawer :close-on-click-modal="false" v-model="open" size="40%">
+    <el-drawer :close-on-click-modal="false" v-model="open" size="30%">
         <template #header>
-            <Header :header="$t('commons.msg.operate')" :resource="resourceName" :back="handleClose"></Header>
+            <Header :header="$t('app.update')" :resource="resourceName" :back="handleClose"></Header>
         </template>
-        <div style="text-align: center" v-loading="loading">
-            <p>{{ $t('app.versioneSelect') }}</p>
-            <el-select v-model="operateReq.detailId">
-                <el-option
-                    v-for="(version, index) in versions"
-                    :key="index"
-                    :value="version.detailId"
-                    :label="version.version"
-                ></el-option>
-            </el-select>
-        </div>
+
+        <el-row>
+            <el-col :span="22" :offset="1">
+                <div v-loading="loading">
+                    <p>{{ $t('app.versioneSelect') }}</p>
+                    <el-select v-model="operateReq.detailId">
+                        <el-option
+                            v-for="(version, index) in versions"
+                            :key="index"
+                            :value="version.detailId"
+                            :label="version.version"
+                        ></el-option>
+                    </el-select>
+                </div>
+            </el-col>
+        </el-row>
+
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
