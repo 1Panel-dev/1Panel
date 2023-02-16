@@ -1048,9 +1048,9 @@ export default {
         nextYear: '一年后',
         allGroup: '所有分组',
         noLog: '当前没有日志...',
-        defaulServer: '默认站点',
+        defaultServer: '默认站点',
         noDefaulServer: '未设置',
-        defaulServerHelper: '设置默认站点后,所有未绑定的域名和IP都被定向到默认站点\n可有效防止恶意解析',
+        defaultServerHelper: '设置默认站点后,所有未绑定的域名和IP都被定向到默认站点\n可有效防止恶意解析',
         websiteDeploymentHelper: '使用从 1Panel 部署的应用创建网站',
         websiteStatictHelper: '在主机上创建网站目录',
         websiteProxyHelper:

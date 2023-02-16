@@ -4,7 +4,23 @@
             <DrawerHeader :header="$t('website.create')" :back="handleClose">
                 <template #buttons>
                     <span class="drawer-header-button">
-                        <template v-for="item in buttonList" :key="item.value">
+                        <template
+                            v-for="item in [
+                                {
+                                    label: i18n.global.t('website.deployment'),
+                                    value: 'deployment',
+                                },
+                                {
+                                    label: i18n.global.t('website.static'),
+                                    value: 'static',
+                                },
+                                {
+                                    label: i18n.global.t('website.proxy'),
+                                    value: 'proxy',
+                                },
+                            ]"
+                            :key="item.value"
+                        >
                             <el-button
                                 :class="website.type === item.value ? 'active-button' : ''"
                                 @click="website.type = item.value"
@@ -181,21 +197,6 @@ import { reactive, ref } from 'vue';
 import Params from '@/views/app-store/detail/params/index.vue';
 import Check from '../check/index.vue';
 import { MsgSuccess } from '@/utils/message';
-
-const buttonList = [
-    {
-        label: i18n.global.t('website.deployment'),
-        value: 'deployment',
-    },
-    {
-        label: i18n.global.t('website.static'),
-        value: 'static',
-    },
-    {
-        label: i18n.global.t('website.proxy'),
-        value: 'proxy',
-    },
-];
 
 const websiteForm = ref<FormInstance>();
 const website = ref({
