@@ -27,7 +27,7 @@
                             {{ $t('website.group') }}
                         </el-button>
                         <el-button type="primary" plain @click="openDefault">
-                            {{ $t('website.defaulServer') }}
+                            {{ $t('website.defaultServer') }}
                         </el-button>
                     </el-col>
                     <el-col :span="4">

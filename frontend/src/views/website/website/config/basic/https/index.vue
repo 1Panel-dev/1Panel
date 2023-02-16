@@ -1,6 +1,6 @@
 <template>
     <el-row :gutter="20">
-        <el-col :span="12" :offset="1">
+        <el-col :span="14" :offset="1">
             <el-form
                 ref="httpsForm"
                 label-position="left"

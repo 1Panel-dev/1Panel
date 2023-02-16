@@ -1,12 +1,12 @@
 <template>
     <el-drawer :close-on-click-modal="false" v-model="open" size="40%">
         <template #header>
-            <DrawerHeader :header="$t('website.defaulServer')" :back="handleClose"></DrawerHeader>
+            <DrawerHeader :header="$t('website.defaultServer')" :back="handleClose"></DrawerHeader>
         </template>
         <el-row>
             <el-col :span="22" :offset="1">
                 <el-form label-position="top">
-                    <el-form-item :label="$t('website.defaulServer')">
+                    <el-form-item :label="$t('website.defaultServer')">
                         <el-select v-model="defaultId" style="width: 100%">
                             <el-option :value="0" :key="-1" :label="$t('website.noDefaulServer')"></el-option>
                             <el-option
@@ -20,7 +20,7 @@
                 </el-form>
                 <el-alert :closable="false">
                     <template #default>
-                        <span style="white-space: pre-line">{{ $t('website.defaulServerHelper') }}</span>
+                        <span style="white-space: pre-line">{{ $t('website.defaultServerHelper') }}</span>
                     </template>
                 </el-alert>
             </el-col>

@@ -4,7 +4,7 @@
             <el-form
                 ref="websiteForm"
                 label-position="right"
-                label-width="80px"
+                label-width="130px"
                 :model="form"
                 :rules="rules"
                 :loading="loading"
