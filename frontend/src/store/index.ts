@@ -40,6 +40,7 @@ export const GlobalStore = defineStore({
         },
         updateLanguage(language: any) {
             this.language = language;
+            localStorage.setItem('lang', language);
         },
         setThemeConfig(themeConfig: ThemeConfigProp) {
             this.themeConfig = themeConfig;

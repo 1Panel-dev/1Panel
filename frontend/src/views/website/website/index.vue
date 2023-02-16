@@ -166,10 +166,11 @@ import { App } from '@/api/interface/app';
 import { ElMessageBox } from 'element-plus';
 import { dateFormatSimple } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
+import { useI18n } from 'vue-i18n';
 
 const shortcuts = [
     {
-        text: i18n.global.t('website.ever'),
+        text: useI18n().t('website.ever'),
         value: () => {
             return new Date('1970-01-01');
         },
