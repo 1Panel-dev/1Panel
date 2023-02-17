@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
-	"github.com/1Panel-dev/1Panel/backend/utils/git"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"path"
 	"strings"
@@ -336,23 +338,30 @@ func (a AppService) SyncInstalled(installId uint) error {
 }
 
 func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
-	res := &response.AppUpdateRes{}
+	res := &response.AppUpdateRes{
+		CanUpdate: false,
+	}
 	setting, err := NewISettingService().GetSettingInfo()
 	if err != nil {
 		return nil, err
 	}
-	contentRes, err := git.CheckAndGetContent(global.CONF.System.AppRepoOwner, global.CONF.System.AppRepoName, setting.SystemVersion, "apps/list.json")
+	versionRes, err := http.Get(fmt.Sprintf("%s/%s/%s/appstore/apps.json", global.CONF.System.RepoUrl, global.CONF.System.Mode, setting.SystemVersion))
+	if err != nil {
+		return nil, err
+	}
+	defer versionRes.Body.Close()
+	body, err := ioutil.ReadAll(versionRes.Body)
 	if err != nil {
 		return nil, err
 	}
 	list := &dto.AppList{}
-	if err = json.Unmarshal(contentRes.Content, list); err != nil {
+	if err = json.Unmarshal(body, list); err != nil {
 		return nil, err
 	}
 	res.Version = list.Version
 	if common.CompareVersion(list.Version, setting.AppStoreVersion) {
 		res.CanUpdate = true
-		res.DownloadPath = contentRes.DownloadPath
+		res.DownloadPath = fmt.Sprintf("%s/%s/%s/appstore/apps-%s.tar.gz", global.CONF.System.RepoUrl, global.CONF.System.Mode, setting.SystemVersion, list.Version)
 		return res, err
 	}
 	return nil, err
@@ -380,7 +389,6 @@ func (a AppService) SyncAppList() error {
 	if err := json.Unmarshal(content, list); err != nil {
 		return err
 	}
-
 	var (
 		tags    []*model.Tag
 		appTags []*model.AppTag

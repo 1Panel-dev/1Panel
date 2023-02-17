@@ -30,10 +30,7 @@ func Init() {
 	if config.System.Mode != "" {
 		mode = config.System.Mode
 	}
-	if mode != "release" {
-		if !fileOp.Stat("/opt/1panel/conf/app.yaml") {
-			panic("conf file is not exist")
-		}
+	if mode == "dev" && fileOp.Stat("/opt/1panel/conf/app.yaml") {
 		v.SetConfigName("app")
 		v.AddConfigPath(path.Join("/opt/1panel/conf"))
 		if err := v.ReadInConfig(); err != nil {
