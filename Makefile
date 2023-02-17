@@ -4,9 +4,6 @@ GOCLEAN=$(GOCMD) clean
 GOARCH=amd64
 GOOS=linux
 
-GOARCH=$(shell go env GOARCH)
-GOOS=$(shell go env GOOS )
-
 BASE_PAH := $(shell pwd)
 BUILD_PATH = $(BASE_PAH)/build
 WEB_PATH=$(BASE_PAH)/frontend
