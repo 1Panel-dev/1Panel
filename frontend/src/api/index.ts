@@ -44,13 +44,13 @@ class RequestHttp {
                 }
                 if (data.code == ResultEnum.OVERDUE || data.code == ResultEnum.FORBIDDEN) {
                     router.replace({
-                        path: '/login',
+                        path: '/',
                     });
                     return Promise.reject(data);
                 }
                 if (data.code == ResultEnum.UNSAFETY) {
                     router.replace({
-                        path: '/login',
+                        path: '/',
                     });
                     return data;
                 }
