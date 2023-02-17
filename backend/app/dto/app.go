@@ -42,7 +42,8 @@ type AppDefine struct {
 	Name               string   `json:"name"`
 	Tags               []string `json:"tags"`
 	Versions           []string `json:"versions"`
-	ShortDesc          string   `json:"shortDesc"`
+	ShortDescZh        string   `json:"shortDescZh"`
+	ShortDescEn        string   `json:"shortDescEn"`
 	Type               string   `json:"type"`
 	Required           []string `json:"Required"`
 	CrossVersionUpdate bool     `json:"crossVersionUpdate"`

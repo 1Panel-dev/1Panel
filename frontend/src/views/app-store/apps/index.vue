@@ -20,7 +20,7 @@
                             :type="activeTag === item.key ? 'primary' : ''"
                             :plain="activeTag !== item.key"
                         >
-                            {{ item.name }}
+                            {{ language == 'zh' ? item.name : item.key }}
                         </el-button>
                     </div>
                 </el-col>
@@ -71,12 +71,12 @@
                                     </div>
                                     <div class="app-desc">
                                         <span class="desc">
-                                            {{ app.shortDesc }}
+                                            {{ language == 'zh' ? app.shortDescZh : app.shortDescEn }}
                                         </span>
                                     </div>
                                     <div class="app-tag">
                                         <el-tag v-for="(tag, ind) in app.tags" :key="ind" :colr="getColor(ind)">
-                                            {{ tag.name }}
+                                            {{ language == 'zh' ? tag.name : tag.key }}
                                         </el-tag>
                                     </div>
                                     <div class="divider"></div>
@@ -100,6 +100,9 @@ import i18n from '@/lang';
 import Detail from '../detail/index.vue';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
+import { useI18n } from 'vue-i18n';
+
+const language = useI18n().locale.value;
 
 let req = reactive({
     name: '',
