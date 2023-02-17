@@ -77,7 +77,7 @@
         <LayoutContent :title="$t('cronjob.record')" :reload="true">
             <template #search v-if="hasRecords">
                 <el-row :gutter="20">
-                    <el-col :span="6">
+                    <el-col :span="8">
                         <el-date-picker
                             style="width: calc(100% - 20px)"
                             @change="search()"
@@ -89,7 +89,7 @@
                             :shortcuts="shortcuts"
                         ></el-date-picker>
                     </el-col>
-                    <el-col :span="18">
+                    <el-col :span="16">
                         <el-select @change="search()" v-model="searchInfo.status">
                             <template #prefix>{{ $t('commons.table.status') }}</template>
                             <el-option :label="$t('commons.table.all')" value="" />
@@ -101,7 +101,7 @@
             </template>
             <template #main>
                 <el-row :gutter="20" v-if="hasRecords">
-                    <el-col :span="6">
+                    <el-col :span="8">
                         <el-card>
                             <ul v-infinite-scroll="nextPage" class="infinite-list" style="overflow: auto">
                                 <li
@@ -123,7 +123,7 @@
                             </div>
                         </el-card>
                     </el-col>
-                    <el-col :span="18">
+                    <el-col :span="16">
                         <el-card style="height: 362px">
                             <el-form>
                                 <el-row v-if="hasScript()">
@@ -157,7 +157,21 @@
                                     </el-col>
                                     <el-col :span="8" v-if="dialogData.rowData!.type === 'directory'">
                                         <el-form-item :label="$t('cronjob.directory')">
-                                            {{ dialogData.rowData!.sourceDir }}
+                                            <span v-if="dialogData.rowData!.sourceDir.length <= 20">
+                                                {{ dialogData.rowData!.sourceDir }}
+                                            </span>
+                                            <div v-else>
+                                                <el-popover
+                                                    placement="top-start"
+                                                    trigger="hover"
+                                                    width="250"
+                                                    :content="dialogData.rowData!.sourceDir"
+                                                >
+                                                    <template #reference>
+                                                        {{ dialogData.rowData!.sourceDir.substring(0, 20) }}...
+                                                    </template>
+                                                </el-popover>
+                                            </div>
                                         </el-form-item>
                                     </el-col>
                                     <el-col :span="8" v-if="isBackup()">
@@ -450,7 +464,8 @@ const onDownload = async (recordID: number, backupID: number) => {
         a.download =
             dialogData.value.rowData!.website + '_' + dateFormatForName(currentRecord.value?.startTime) + '.tar.gz';
     } else {
-        a.download = dateFormatForName(currentRecord.value?.startTime) + '.sql.gz';
+        let name = dialogData.value.rowData!.sourceDir.replaceAll('/', '_');
+        a.download = name + '_' + dateFormatForName(currentRecord.value?.startTime) + '.tar.gz';
     }
     const event = new MouseEvent('click');
     a.dispatchEvent(event);

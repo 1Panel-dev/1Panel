@@ -405,7 +405,7 @@ export default {
 
         custom: 'Custom',
         emptyUser: 'When empty, you will log in as  default',
-        containerTerminal: 'Container terminal',
+        containerTerminal: 'Terminal',
 
         port: 'Port',
         exposePort: 'Expose port',

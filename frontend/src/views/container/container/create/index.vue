@@ -10,7 +10,7 @@
                         <el-input clearable v-model.trim="form.name" />
                     </el-form-item>
                     <el-form-item :label="$t('container.image')" prop="image">
-                        <el-select style="width: 100%" filterable v-model="form.image">
+                        <el-select style="width: 100%" allow-create filterable v-model="form.image">
                             <el-option
                                 v-for="(item, index) of images"
                                 :key="index"
