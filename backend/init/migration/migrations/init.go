@@ -143,7 +143,7 @@ var AddTableSetting = &gormigrate.Migration{
 			tx.Rollback()
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "AppStoreVersion", Value: "0"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "AppStoreVersion", Value: ""}).Error; err != nil {
 			return err
 		}
 		return nil

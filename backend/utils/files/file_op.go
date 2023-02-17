@@ -142,15 +142,18 @@ func (f FileOp) DownloadFileWithProcess(url, dst, key string) error {
 	resp, err := http.Get(url)
 	if err != nil {
 		global.LOG.Errorf("get download file [%s] error, err %s", dst, err.Error())
+		return err
 	}
 	header, err := http.Head(url)
 	if err != nil {
 		global.LOG.Errorf("get download file [%s] error, err %s", dst, err.Error())
+		return err
 	}
 
 	out, err := os.Create(dst)
 	if err != nil {
 		global.LOG.Errorf("create download file [%s] error, err %s", dst, err.Error())
+		return err
 	}
 
 	go func() {

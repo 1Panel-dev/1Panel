@@ -59,9 +59,10 @@ func Init() {
 	if err := v.Unmarshal(&serverConfig); err != nil {
 		panic(err)
 	}
-	if mode != "release" && serverConfig.System.BaseDir != "" {
+	if mode == "dev" && fileOp.Stat("/opt/1panel/conf/app.yaml") && serverConfig.System.BaseDir != "" {
 		baseDir = serverConfig.System.BaseDir
 	}
+
 	global.CONF = serverConfig
 	global.CONF.BaseDir = baseDir
 	global.CONF.System.DataDir = global.CONF.BaseDir + "/1panel"
