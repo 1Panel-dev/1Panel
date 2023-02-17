@@ -584,7 +584,7 @@ onBeforeUnmount(() => {
 
     span:first-child {
         font-size: 14px;
-        color: #646a73;
+        color: var(--el-text-color-regular);
     }
 
     .count {

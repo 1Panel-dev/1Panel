@@ -1,24 +1,25 @@
 html.dark {
-    --el-border-color-lighter: rgb(64, 67, 67);
-    --el-fill-color-blank: rgb(49, 51, 51);
+    --el-box-shadow-light: 0px 0px 4px rgba(0, 0, 0, 0.1) !important;
+    --el-border-color-lighter: #1d2023;
+    --el-fill-color-blank: #111417;
     --el-bg-color: rgba(0, 11, 21, 1);
     // --el-text-color-primary: #999999;
-    --el-text-color-regular: #cfd3dc;
-    --el-fill-color-light: rgb(49, 51, 51);
-    --el-border-color: rgb(64, 67, 67);
+    --el-text-color-regular: #bbbfc4 !important;
+    --el-fill-color-light: #111417;
+    --el-border-color: #303438;
     --el-bg-color-overlay: rgba(0, 11, 21, 1);
-    --el-border-color-light: rgb(64, 67, 67);
+    --el-border-color-light: #1d2023;
     // * menu
     --el-menu-bg-color: #111417 !important;
-    --el-menu-item-bg-color: rgba(0, 11, 21, 1);
+    --el-menu-item-bg-color: #111417;
     --el-menu-text-color: #ffffff;
     --el-menu-item-bg-color-active: rgb(44, 45, 46);
 
     // * panel-admin
     --panel-text-color: rgb(174, 166, 153);
-    --panel-border: 1px solid rgb(64, 67, 67);
-    --panel-main-bg-color: rgb(41, 43, 43);
-    --panel-button-active: rgb(44, 45, 46);
+    --panel-border: 1px solid #303438;
+    --panel-main-bg-color: rgba(12, 12, 12, 1);
+    --panel-button-active: var(--el-color-primary);
 
     --panel-login-shadow-light: 5px 5px 15px rgb(255 255 255 / 20%);
     --panel-box-shadow-light: 0 0 10px rgb(255 255 255 / 10%);
@@ -30,13 +31,16 @@ html.dark {
         --el-tag-border-color: rgb(64, 67, 67);
     }
     .el-tag.el-tag--light {
-        --el-tag-bg-color: rgb(49, 51, 51);
-        --el-tag-border-color: rgb(64, 67, 67);
+        --el-tag-bg-color: #111417;
+        --el-tag-border-color: var(--el-color-primary);
+    }
+    .el-tag.el-tag--success {
+        --el-tag-border-color: var(--el-color-success);
     }
     .el-card {
-        --el-card-border-color: rgb(64, 67, 67);
-        --el-card-bg-color: rgba(0, 11, 21, 1);
-        color: rgb(174, 166, 153);
+        --el-card-bg-color: #111417;
+        color: #ffffff;
+        border: none !important;
     }
 
     .el-table {
@@ -56,7 +60,7 @@ html.dark {
 
     .el-input {
         --el-input-bg-color: rgb(47 48 48);
-        --el-input-border-color: rgb(64, 67, 67);
+        --el-input-border-color: #303438;
     }
 
     .el-pagination {
@@ -107,8 +111,11 @@ html.dark {
     }
     .el-menu {
         .el-menu-item {
+            &:hover {
+                background: rgba(37, 39, 44, 1);
+            }
             &.is-active {
-                background: #005eeb;
+                background: var(--el-color-primary);
                 color: #ffffff;
                 &:hover {
                     .el-icon {
@@ -140,9 +147,6 @@ html.dark {
             border-top: var(--panel-border);
         }
     }
-    .el-descriptions__body {
-        background-color: rgba(0, 11, 21, 1);
-    }
     .system-label {
         color: var(--el-menu-text-color);
     }
@@ -150,6 +154,10 @@ html.dark {
     .router_card_button {
         .el-radio-button__inner {
             background: none;
+        }
+        .el-radio-button__original-radio:checked + .el-radio-button__inner {
+            color: #ffffff;
+            box-shadow: none !important;
         }
     }
     // content-box
@@ -170,18 +178,18 @@ html.dark {
         box-shadow: 0 0 0 1px var(--el-input-border-color, var(--el-border-color)) inset;
     }
     .el-radio-button__inner {
-        background: rgb(49, 51, 51);
+        background: #1d2023;
     }
     .el-button--primary.is-plain.is-disabled {
-        background: rgb(49, 51, 51);
-        border-color: rgb(64, 67, 67);
+        background: #1d2023;
+        border-color: #303438;
     }
     .el-button--primary.is-plain {
-        background: rgb(49, 51, 51);
-        border-color: rgb(64, 67, 67);
+        background: #1d2023;
+        border-color: #303438;
     }
     .el-button.is-disabled {
-        border-color: rgb(64, 67, 67);
+        border-color: #303438;
     }
     .el-popper.is-dark {
         color: rgb(171 173 173);
@@ -198,7 +206,9 @@ html.dark {
         transition: background-color 1000s ease-out 0.5s;
     }
     .el-avatar {
-        --el-avatar-bg-color: var(--el-bg-color) !important;
+        --el-avatar-bg-color: #111417 !important;
+        box-shadow: 0px 0px 4px rgba(0, 94, 235, 0.1);
+        border: 0.5px solid #1f2022;
     }
     .el-page-header__content {
         color: rgb(174, 166, 153);
@@ -237,5 +247,13 @@ html.dark {
     }
     .el-loading-mask {
         background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    .h-app-card {
+        .h-app-content {
+            .h-app-title {
+                color: #f2f8ff;
+            }
+        }
     }
 }
