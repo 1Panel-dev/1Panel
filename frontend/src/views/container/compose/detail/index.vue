@@ -6,7 +6,7 @@
                     <div>
                         <el-tag effect="dark" type="success">{{ composeName }}</el-tag>
                     </div>
-                    <div v-if="createdBy === '1Panel'">
+                    <div v-if="createdBy === '1Panel'" style="margin-left: 50px">
                         <el-button link type="primary" @click="onComposeOperate('start')">
                             {{ $t('container.start') }}
                         </el-button>
@@ -111,7 +111,6 @@
 
                 <CodemirrorDialog ref="mydetail" />
 
-                <ReNameDialog @search="search" ref="dialogReNameRef" />
                 <ContainerLogDialog ref="dialogContainerLogRef" />
                 <CreateDialog @search="search" ref="dialogCreateRef" />
                 <MonitorDialog ref="dialogMonitorRef" />
@@ -124,7 +123,6 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import LayoutContent from '@/layout/layout-content.vue';
-import ReNameDialog from '@/views/container/container/rename/index.vue';
 import CreateDialog from '@/views/container/container/create/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import ContainerLogDialog from '@/views/container/container/log/index.vue';
@@ -290,7 +288,6 @@ const onTerminal = (containerID: string) => {
 };
 
 const dialogContainerLogRef = ref();
-const dialogReNameRef = ref();
 
 const buttons = [
     {
@@ -309,12 +306,6 @@ const buttons = [
         },
         click: (row: Container.ContainerInfo) => {
             onMonitor(row.containerID);
-        },
-    },
-    {
-        label: i18n.global.t('container.rename'),
-        click: (row: Container.ContainerInfo) => {
-            dialogReNameRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
         },
     },
     {

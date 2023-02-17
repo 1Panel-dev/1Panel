@@ -309,6 +309,9 @@ const buttons = [
             console.log(row.name);
             dialogReNameRef.value!.acceptParams({ container: row.name });
         },
+        disabled: (row: any) => {
+            return row.isFromCompose;
+        },
     },
     {
         label: i18n.global.t('commons.button.log'),

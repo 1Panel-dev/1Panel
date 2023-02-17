@@ -94,14 +94,19 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 	}
 
 	for _, container := range records {
+		IsFromCompose := false
+		if _, ok := container.Labels[composeProjectLabel]; ok {
+			IsFromCompose = true
+		}
 		backDatas = append(backDatas, dto.ContainerInfo{
-			ContainerID: container.ID,
-			CreateTime:  time.Unix(container.Created, 0).Format("2006-01-02 15:04:05"),
-			Name:        container.Names[0][1:],
-			ImageId:     strings.Split(container.ImageID, ":")[1],
-			ImageName:   container.Image,
-			State:       container.State,
-			RunTime:     container.Status,
+			ContainerID:   container.ID,
+			CreateTime:    time.Unix(container.Created, 0).Format("2006-01-02 15:04:05"),
+			Name:          container.Names[0][1:],
+			ImageId:       strings.Split(container.ImageID, ":")[1],
+			ImageName:     container.Image,
+			State:         container.State,
+			RunTime:       container.Status,
+			IsFromCompose: IsFromCompose,
 		})
 	}
 

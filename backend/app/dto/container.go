@@ -21,6 +21,8 @@ type ContainerInfo struct {
 	CreateTime  string `json:"createTime"`
 	State       string `json:"state"`
 	RunTime     string `json:"runTime"`
+
+	IsFromCompose bool `json:"isFromCompose"`
 }
 
 type ContainerCreate struct {

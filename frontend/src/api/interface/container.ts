@@ -42,6 +42,8 @@ export namespace Container {
         createTime: string;
         state: string;
         runTime: string;
+
+        isFromCompose: string;
     }
     export interface ContainerStats {
         cpuPercent: number;
