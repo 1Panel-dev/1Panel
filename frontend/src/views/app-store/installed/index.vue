@@ -49,14 +49,12 @@
         </template>
 
         <template #main>
-            <div class="update-prompt" v-if="data == null">
-                <el-empty
-                    :description="mode === 'update' ? $t('app.updatePrompt') : $t('app.installPrompt')"
-                    image="/src/assets/images/no_update_app.svg"
-                    :image-size="200"
-                ></el-empty>
+            <div class="update-prompt" v-if="mode === 'update' && data == null">
+                <span>{{ mode === 'update' ? $t('app.updatePrompt') : $t('app.installPrompt') }}</span>
+                <div>
+                    <img src="@/assets/images/no_update_app.svg" />
+                </div>
             </div>
-
             <el-row :gutter="5">
                 <el-col v-for="(installed, index) in data" :key="index" :span="12">
                     <div class="install-card">
