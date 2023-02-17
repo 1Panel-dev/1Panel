@@ -49,7 +49,6 @@ import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { snapshotImport } from '@/api/modules/setting';
 import { getBackupList, getFilesFromBackup } from '@/api/modules/setting';
-import { loadBackupName } from '../../helper';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 
@@ -106,7 +105,7 @@ const loadBackups = async () => {
     backupOptions.value = [];
     for (const item of res.data) {
         if (item.type !== 'LOCAL' && item.id !== 0) {
-            backupOptions.value.push({ label: loadBackupName(item.type), value: item.type });
+            backupOptions.value.push({ label: i18n.global.t('setting' + item.type), value: item.type });
         }
     }
 };

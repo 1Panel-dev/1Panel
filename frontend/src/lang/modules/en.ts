@@ -745,10 +745,12 @@ export default {
         thirdParty: 'Third-party account',
         createBackupAccount: 'Create {0} backup account',
         noTypeForCreate: 'No backup type is currently created',
-        serverDisk: 'Server disks',
+        LOCAL: 'Server disks',
         currentPath: 'Current path',
         OSS: 'Ali OSS',
         S3: 'Amazon S3',
+        MINIO: 'MINIO',
+        SFTP: 'SFTP',
         backupAccount: 'Backup account',
         loadBucket: 'Get bucket',
         accountName: 'Account name',
@@ -759,7 +761,7 @@ export default {
         password: 'Password',
         path: 'Path',
 
-        safe: 'Safe',
+        safe: 'Security',
         safeEntrance: 'Security entrance',
         safeEntranceHelper:
             'Panel management portal. You can log in to the panel only through a specified security portal, for example: onepanel',

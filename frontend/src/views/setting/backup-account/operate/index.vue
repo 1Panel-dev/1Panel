@@ -7,7 +7,7 @@
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('commons.table.type')" prop="type" :rules="Rules.requiredSelect">
-                        <el-tag>{{ dialogData.rowData!.type }}</el-tag>
+                        <el-tag>{{ $t('setting.' + dialogData.rowData!.type) }}</el-tag>
                     </el-form-item>
                     <el-form-item
                         v-if="dialogData.rowData!.type === 'LOCAL'"

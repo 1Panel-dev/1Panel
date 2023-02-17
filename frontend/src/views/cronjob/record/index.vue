@@ -162,7 +162,7 @@
                                     </el-col>
                                     <el-col :span="8" v-if="isBackup()">
                                         <el-form-item :label="$t('cronjob.target')">
-                                            {{ loadBackupName(dialogData.rowData!.targetDir) }}
+                                            {{ dialogData.rowData!.targetDir }}
                                             <el-button
                                                 v-if="currentRecord?.status! !== 'Failed'"
                                                 type="primary"
@@ -273,7 +273,6 @@
 import { reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import { loadZero } from '@/utils/util';
-import { loadBackupName } from '@/views/setting/helper';
 import { searchRecords, download, handleOnce, updateStatus } from '@/api/modules/cronjob';
 import { dateFormat, dateFormatForName } from '@/utils/util';
 import i18n from '@/lang';

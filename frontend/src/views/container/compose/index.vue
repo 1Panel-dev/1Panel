@@ -195,6 +195,9 @@ const buttons = [
         click: (row: Container.ComposeInfo) => {
             onEdit(row);
         },
+        disabled: (row: any) => {
+            return row.createdBy !== '1Panel';
+        },
     },
     {
         label: i18n.global.t('commons.button.delete'),

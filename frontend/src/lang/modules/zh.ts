@@ -751,10 +751,12 @@ export default {
         thirdParty: '第三方账号',
         createBackupAccount: '添加 {0} 备份账号',
         noTypeForCreate: '当前无可创建备份类型',
-        serverDisk: '服务器磁盘',
+        LOCAL: '服务器磁盘',
         currentPath: '当前路径',
         OSS: '阿里云 OSS',
         S3: '亚马逊 S3 云存储',
+        MINIO: 'MINIO',
+        SFTP: 'SFTP',
         backupAccount: '备份账号',
         loadBucket: '获取桶',
         accountName: '账户名称',
@@ -816,7 +818,7 @@ export default {
 
         monitor: '监控',
         enableMonitor: '监控状态',
-        storeDays: '过期时间 (天)',
+        storeDays: 'Retention days (days)',
         cleanMonitor: '清空监控记录',
 
         message: '通知',

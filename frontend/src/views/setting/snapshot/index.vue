@@ -47,7 +47,11 @@
                         fix
                     />
                     <el-table-column prop="version" :label="$t('app.version')" />
-                    <el-table-column :label="$t('setting.backupAccount')" min-width="80" prop="from" />
+                    <el-table-column :label="$t('setting.backupAccount')" min-width="80" prop="from">
+                        <template #default="{ row }">
+                            {{ $t('setting.' + row.from) }}
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" min-width="80" prop="status">
                         <template #default="{ row }">
                             <el-tag v-if="row.status === 'Success'" type="success">
@@ -158,7 +162,6 @@ import LayoutContent from '@/layout/layout-content.vue';
 import RecoverStatus from '@/views/setting/snapshot/status/index.vue';
 import SnapshotImport from '@/views/setting/snapshot/import/index.vue';
 import { getBackupList } from '@/api/modules/setting';
-import { loadBackupName } from '../helper';
 import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
@@ -231,7 +234,7 @@ const loadBackups = async () => {
     backupOptions.value = [];
     for (const item of res.data) {
         if (item.type !== 'LOCAL' && item.id !== 0) {
-            backupOptions.value.push({ label: loadBackupName(item.type), value: item.type });
+            backupOptions.value.push({ label: i18n.global.t('setting.' + item.type), value: item.type });
         }
     }
 };

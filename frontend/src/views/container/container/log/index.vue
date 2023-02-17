@@ -4,7 +4,7 @@
             <DrawerHeader :header="$t('commons.button.log')" :back="handleClose" />
         </template>
         <div>
-            <el-select @change="searchLogs" style="width: 10%; float: left" v-model="logSearch.mode">
+            <el-select @change="searchLogs" style="width: 30%; float: left" v-model="logSearch.mode">
                 <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
             </el-select>
             <div style="margin-left: 20px; float: left">
