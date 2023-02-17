@@ -18,13 +18,13 @@
 
 ## UI 展示
 
-![UI展示](http://1panel.oss-cn-hangzhou.aliyuncs.com/img/overview.png)
+![UI展示](https://1panel.oss-cn-hangzhou.aliyuncs.com/img/overview.png)
 
 ## 快速开始
 
 **在线体验**
 
-- 环境地址：<https://1panel.fit2cloud.com/>
+- 环境地址：<https://demo.1panel.cn/>
 - 用户名：demo
 - 密码：1panel
 
@@ -33,7 +33,7 @@
 以 root 用户执行如下命令一键安装 1Panel:
 
 ```sh
-curl -sSL https://github.com/1Panel-dev/1Panel/releases/latest/download/quick_start.sh -o quick_start.sh && sh quick_start.sh
+INSTALL_MODE=stable bash -c "$(curl -sSL http://1panel.oss-cn-hangzhou.aliyuncs.com/package/quick_start.sh)"
 ```
 
 **学习资料**
