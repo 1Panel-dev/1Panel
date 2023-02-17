@@ -33,6 +33,7 @@
                         </el-button>
                     </el-col>
                 </el-row>
+                <div class="h-app-divider" />
             </div>
         </el-scrollbar>
     </div>
@@ -108,13 +109,14 @@ defineExpose({
         .h-app-title {
             font-weight: 500;
             font-size: 15px;
+            color: #1f2329;
         }
 
         .h-app-desc {
             span {
                 font-weight: 400;
                 font-size: 12px;
-                color: #646a73;
+                color: var(--el-text-color-regular);
             }
         }
     }
