@@ -1,9 +1,8 @@
 system:
   db_file: 1Panel.db
-  app_repo_owner: zhengkunwang223
-  app_repo_name: appstore
   base_dir: /opt
   mode: dev
+  repo_url: https://1panel.oss-cn-hangzhou.aliyuncs.com/package
 
 log:
   level: debug
@@ -11,17 +10,3 @@ log:
   log_name: 1Panel
   log_suffix: .log
   log_backup: 10
-
-cors:
-  mode: whitelist
-  whitelist:
-    - allow-origin: example1.com
-      allow-headers: content-type
-      allow-methods: GET, POST
-      expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type
-      allow-credentials: true
-    - allow-origin: example2.com
-      allow-headers: content-type
-      allow-methods: GET, POST
-      expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type
-      allow-credentials: true
