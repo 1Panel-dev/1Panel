@@ -3,6 +3,7 @@
         <el-card :style="{ height: height }" class="home-card">
             <div class="header">
                 <span>{{ header }}</span>
+                <slot name="header-r" />
             </div>
 
             <div>

@@ -95,6 +95,8 @@ import { Dashboard } from '@/api/interface/dashboard';
 import i18n from '@/lang';
 import * as echarts from 'echarts';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const baseInfo = ref<Dashboard.BaseInfo>({
     haloID: 0,
@@ -177,28 +179,40 @@ const freshChart = (chartName: string, Title: string, Data: number) => {
     if (myChart === null || myChart === undefined) {
         myChart = echarts.init(document.getElementById(chartName) as HTMLElement);
     }
+    const theme = globalStore.$state.themeConfig.theme || 'light';
+    let percentText = String(Data).split('.');
     const option = {
         title: [
             {
-                text: Data + '%',
+                text: `{a|${percentText[0]}.}{b|${percentText[1] || 0} %}`,
                 textStyle: {
-                    color: '#0f0f0f',
+                    rich: {
+                        a: {
+                            fontSize: '22',
+                        },
+                        b: {
+                            fontSize: '14',
+                            padding: [5, 0, 0, 0],
+                        },
+                    },
+
+                    color: theme === 'dark' ? '#ffffff' : '#0f0f0f',
                     lineHeight: 25,
-                    fontSize: 20,
-                    fontWeight: '400',
+                    // fontSize: 20,
+                    fontWeight: 500,
                 },
                 left: '49%',
                 top: '32%',
                 subtext: Title,
                 subtextStyle: {
-                    color: '#646A73',
+                    color: theme === 'dark' ? '#BBBFC4' : '#646A73',
                     fontSize: 13,
                 },
                 textAlign: 'center',
             },
         ],
         polar: {
-            radius: ['71%', '82%'],
+            radius: ['71%', '80%'],
             center: ['50%', '50%'],
         },
         angleAxis: {
@@ -225,6 +239,9 @@ const freshChart = (chartName: string, Title: string, Data: number) => {
                 barWidth: 30,
                 showBackground: true,
                 coordinateSystem: 'polar',
+                backgroundStyle: {
+                    color: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 94, 235, 0.05)',
+                },
                 color: [
                     new echarts.graphic.LinearGradient(0, 1, 0, 0, [
                         {
@@ -236,7 +253,6 @@ const freshChart = (chartName: string, Title: string, Data: number) => {
                             color: '#4261F6',
                         },
                     ]),
-                    '#f2f2f2',
                 ],
                 label: {
                     show: false,
@@ -245,17 +261,17 @@ const freshChart = (chartName: string, Title: string, Data: number) => {
             },
             {
                 type: 'pie',
-                radius: ['0%', '61%'],
+                radius: ['0%', '60%'],
                 center: ['50%', '50%'],
                 label: {
                     show: false,
                 },
-                color: '#fff',
+                color: theme === 'dark' ? '#16191D' : '#fff',
                 data: [
                     {
                         value: 0,
                         itemStyle: {
-                            shadowColor: '#e3e3e3',
+                            shadowColor: theme === 'dark' ? '#16191D' : 'rgba(0, 94, 235, 0.1)',
                             shadowBlur: 5,
                         },
                     },

@@ -46,13 +46,13 @@
                         </div>
                     </template>
                 </CardWithHeader>
-                <CardWithHeader :header="$t('commons.table.status')" style="margin-top: 20px" height="275px">
+                <CardWithHeader :header="$t('commons.table.status')" style="margin-top: 20px" height="300px">
                     <template #body>
                         <Status ref="statuRef" />
                     </template>
                 </CardWithHeader>
-                <CardWithHeader :header="$t('menu.monitor')" style="margin-top: 20px" height="485px">
-                    <template #body>
+                <CardWithHeader :header="$t('menu.monitor')" style="margin-top: 20px" height="450">
+                    <template #header-r>
                         <el-radio-group
                             style="float: right; margin-left: 5px"
                             v-model="chartOption"
@@ -89,30 +89,34 @@
                                 :value="item"
                             />
                         </el-select>
-                        <div class="monitor-tags" v-if="chartOption === 'network'">
-                            <el-tag>{{ $t('monitor.up') }}: {{ currentChartInfo.netBytesSent }} KB/s</el-tag>
-                            <el-tag>{{ $t('monitor.down') }}: {{ currentChartInfo.netBytesRecv }} KB/s</el-tag>
-                            <el-tag>{{ $t('home.totalSend') }}: {{ computeSize(currentInfo.netBytesSent) }}</el-tag>
-                            <el-tag>{{ $t('home.totalRecv') }}: {{ computeSize(currentInfo.netBytesRecv) }}</el-tag>
+                    </template>
+                    <template #body>
+                        <div style="position: relative; margin-top: 20px">
+                            <div class="monitor-tags" v-if="chartOption === 'network'">
+                                <el-tag>{{ $t('monitor.up') }}: {{ currentChartInfo.netBytesSent }} KB/s</el-tag>
+                                <el-tag>{{ $t('monitor.down') }}: {{ currentChartInfo.netBytesRecv }} KB/s</el-tag>
+                                <el-tag>{{ $t('home.totalSend') }}: {{ computeSize(currentInfo.netBytesSent) }}</el-tag>
+                                <el-tag>{{ $t('home.totalRecv') }}: {{ computeSize(currentInfo.netBytesRecv) }}</el-tag>
+                            </div>
+                            <div class="monitor-tags" v-if="chartOption === 'io'">
+                                <el-tag>{{ $t('monitor.read') }}: {{ currentChartInfo.ioReadBytes }} MB</el-tag>
+                                <el-tag>{{ $t('monitor.write') }}: {{ currentChartInfo.ioWriteBytes }} MB</el-tag>
+                                <el-tag>
+                                    {{ $t('home.rwPerSecond') }}: {{ currentChartInfo.ioCount }} {{ $t('home.time') }}
+                                </el-tag>
+                                <el-tag>{{ $t('home.rwPerSecond') }}: {{ currentInfo.ioTime }} ms</el-tag>
+                            </div>
+                            <div
+                                v-if="chartOption === 'io'"
+                                id="ioChart"
+                                style="margin-top: 20px; width: 100%; height: 324px"
+                            ></div>
+                            <div
+                                v-if="chartOption === 'network'"
+                                id="networkChart"
+                                style="margin-top: 40px; width: 100%; height: 324px"
+                            ></div>
                         </div>
-                        <div class="monitor-tags" v-if="chartOption === 'io'">
-                            <el-tag>{{ $t('monitor.read') }}: {{ currentChartInfo.ioReadBytes }} MB</el-tag>
-                            <el-tag>{{ $t('monitor.write') }}: {{ currentChartInfo.ioWriteBytes }} MB</el-tag>
-                            <el-tag>
-                                {{ $t('home.rwPerSecond') }}: {{ currentChartInfo.ioCount }} {{ $t('home.time') }}
-                            </el-tag>
-                            <el-tag>{{ $t('home.rwPerSecond') }}: {{ currentInfo.ioTime }} ms</el-tag>
-                        </div>
-                        <div
-                            v-if="chartOption === 'io'"
-                            id="ioChart"
-                            style="margin-top: 20px; width: 100%; height: 324px"
-                        ></div>
-                        <div
-                            v-if="chartOption === 'network'"
-                            id="networkChart"
-                            style="margin-top: 20px; width: 100%; height: 324px"
-                        ></div>
                     </template>
                 </CardWithHeader>
             </el-col>
@@ -172,7 +176,7 @@
                     </template>
                 </CardWithHeader>
 
-                <CardWithHeader :header="$t('home.app')" style="margin-top: 20px" height="621px">
+                <CardWithHeader :header="$t('home.app')" style="margin-top: 20px" height="586px">
                     <template #body>
                         <App ref="appRef" />
                     </template>
@@ -195,6 +199,8 @@ import { useRouter } from 'vue-router';
 import RouterButton from '@/components/router-button/index.vue';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 const router = useRouter();
 
 const statuRef = ref();
@@ -528,11 +534,13 @@ function freshChart(chartName: string, legendDatas: any, xDatas: any, yDatas: an
         isInit.value = false;
     }
     let itemChart = echarts.getInstanceByDom(document.getElementById(chartName) as HTMLElement);
+    const theme = globalStore.$state.themeConfig.theme || 'light';
     const option = {
         title: [
             {
                 left: 'center',
                 text: yTitle,
+                show: false,
             },
         ],
         zlevel: 1,
@@ -551,9 +559,23 @@ function freshChart(chartName: string, legendDatas: any, xDatas: any, yDatas: an
         legend: {
             data: legendDatas,
             right: 10,
+            itemWidth: 8,
+            textStyle: {
+                color: '#646A73',
+            },
+            icon: 'circle',
         },
         xAxis: { data: xDatas, boundaryGap: false },
-        yAxis: { name: '( ' + formatStr + ' )' },
+        yAxis: {
+            name: '( ' + formatStr + ' )',
+            splitLine: {
+                //分隔辅助线
+                lineStyle: {
+                    type: 'dashed', //线的类型 虚线0
+                    opacity: theme === 'dark' ? 0.1 : 1, //透明度
+                },
+            },
+        },
         series: yDatas,
         dataZoom: [{ startValue: xDatas[0] }],
     };
@@ -614,8 +636,9 @@ onBeforeUnmount(() => {
 }
 
 .monitor-tags {
-    margin-top: 20px;
-    margin-left: 8px;
+    position: absolute;
+    top: -10px;
+    left: 20px;
 
     .el-tag {
         margin-right: 10px;

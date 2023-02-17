@@ -17,7 +17,7 @@ html.dark {
 
     // * panel-admin
     --panel-text-color: rgb(174, 166, 153);
-    --panel-border: 1px solid #303438;
+    --panel-border: 1px solid #1d2023;
     --panel-main-bg-color: rgba(12, 12, 12, 1);
     --panel-button-active: var(--el-color-primary);
 
@@ -26,6 +26,7 @@ html.dark {
     --panel-popup-color: #060708;
     --panel-alert-bg: #2f3030;
     --panel-path-bg: #2f3030;
+		
     .el-tag.el-tag--info {
         --el-tag-bg-color: rgb(49, 51, 51);
         --el-tag-border-color: rgb(64, 67, 67);
@@ -128,6 +129,13 @@ html.dark {
                 }
                 &::before {
                     background: #ffffff;
+                }
+            }
+        }
+        .el-sub-menu {
+            .el-sub-menu__title {
+                &:hover {
+                    background: rgba(37, 39, 44, 1);
                 }
             }
         }
