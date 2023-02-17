@@ -49,7 +49,7 @@
         </template>
 
         <template #main>
-            <div class="update-prompt" v-if="mode === 'update' && data == null">
+            <div class="update-prompt" v-if="data == null">
                 <span>{{ mode === 'update' ? $t('app.updatePrompt') : $t('app.installPrompt') }}</span>
                 <div>
                     <img src="@/assets/images/no_update_app.svg" />
