@@ -1,17 +1,17 @@
 html.dark {
     --el-border-color-lighter: rgb(64, 67, 67);
     --el-fill-color-blank: rgb(49, 51, 51);
-    --el-bg-color: rgb(36, 37, 37);
+    --el-bg-color: rgba(0, 11, 21, 1);
     // --el-text-color-primary: #999999;
     --el-text-color-regular: #cfd3dc;
     --el-fill-color-light: rgb(49, 51, 51);
     --el-border-color: rgb(64, 67, 67);
-    --el-bg-color-overlay: rgb(36, 37, 37);
+    --el-bg-color-overlay: rgba(0, 11, 21, 1);
     --el-border-color-light: rgb(64, 67, 67);
     // * menu
-    --el-menu-bg-color: rgb(36, 37, 37) !important;
-    --el-menu-item-bg-color: rgb(36, 37, 37);
-    --el-menu-text-color: rgb(174, 166, 153);
+    --el-menu-bg-color: rgba(0, 11, 21, 1) !important;
+    --el-menu-item-bg-color: rgba(0, 11, 21, 1);
+    --el-menu-text-color: #ffffff;
     --el-menu-item-bg-color-active: rgb(44, 45, 46);
 
     // * panel-admin
@@ -35,14 +35,14 @@ html.dark {
     }
     .el-card {
         --el-card-border-color: rgb(64, 67, 67);
-        --el-card-bg-color: rgb(36, 37, 37);
+        --el-card-bg-color: rgba(0, 11, 21, 1);
         color: rgb(174, 166, 153);
     }
 
     .el-table {
-        --el-table-bg-color: rgb(36, 37, 37);
-        --el-table-tr-bg-color: rgb(36, 37, 37);
-        --el-table-header-bg-color: rgb(36, 37, 37);
+        --el-table-bg-color: rgba(0, 11, 21, 1);
+        --el-table-tr-bg-color: rgba(0, 11, 21, 1);
+        --el-table-header-bg-color: rgba(0, 11, 21, 1);
         --el-table-border: var(--panel-border);
         --el-table-border-color: rgb(64, 67, 67);
     }
@@ -107,8 +107,21 @@ html.dark {
     }
     .el-menu {
         .el-menu-item {
-            &:hover {
-                background-color: var(--el-menu-item-bg-color-active);
+            &.is-active {
+                background: #005eeb;
+                color: #ffffff;
+                &:hover {
+                    .el-icon {
+                        color: #ffffff !important;
+                    }
+
+                    span {
+                        color: #ffffff !important;
+                    }
+                }
+                &::before {
+                    background: #ffffff;
+                }
             }
         }
     }
@@ -128,7 +141,7 @@ html.dark {
         }
     }
     .el-descriptions__body {
-        background-color: rgb(36, 37, 37);
+        background-color: rgba(0, 11, 21, 1);
     }
     .system-label {
         color: var(--el-menu-text-color);
