@@ -3,9 +3,7 @@ module github.com/1Panel-dev/1Panel
 go 1.18
 
 require (
-	gitee.com/openeuler/go-gitee v0.0.0-20220530104019-3af895bc380c
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.5+incompatible
-	github.com/antihax/optional v1.0.0
 	github.com/aws/aws-sdk-go v1.44.99
 	github.com/compose-spec/compose-go v1.6.0
 	github.com/creack/pty v1.1.18
@@ -23,7 +21,6 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gogf/gf v1.16.9
 	github.com/golang-jwt/jwt/v4 v4.4.2
-	github.com/google/go-github v17.0.0+incompatible
 	github.com/gorilla/websocket v1.5.0
 	github.com/jinzhu/copier v0.3.5
 	github.com/joho/godotenv v1.4.0
@@ -154,12 +151,10 @@ require (
 	go.opentelemetry.io/otel/trace v1.3.0 // indirect
 	golang.org/x/image v0.0.0-20190802002840-cff245a6509b // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1 // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
 	golang.org/x/tools v0.1.12 // indirect
-	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/ini.v1 v1.66.6 // indirect
 )
