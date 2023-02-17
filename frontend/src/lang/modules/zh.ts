@@ -418,7 +418,7 @@ export default {
         newName: '新名称',
 
         custom: '自定义',
-        containerTerminal: '容器终端',
+        containerTerminal: '终端',
         emptyUser: '为空时，将使用容器默认的用户登录',
 
         port: '端口',
