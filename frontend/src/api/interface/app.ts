@@ -6,7 +6,8 @@ export namespace App {
         icon: string;
         key: string;
         tags: Tag[];
-        shortDesc: string;
+        shortDescZh: string;
+        shortDescEn: string;
         author: string;
         source: string;
         type: string;

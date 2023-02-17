@@ -359,12 +359,12 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 		return nil, err
 	}
 	res.Version = list.Version
-	if common.CompareVersion(list.Version, setting.AppStoreVersion) {
+	if setting.AppStoreVersion == "" || common.CompareVersion(list.Version, setting.AppStoreVersion) {
 		res.CanUpdate = true
 		res.DownloadPath = fmt.Sprintf("%s/%s/%s/appstore/apps-%s.tar.gz", global.CONF.System.RepoUrl, global.CONF.System.Mode, setting.SystemVersion, list.Version)
 		return res, err
 	}
-	return nil, err
+	return res, nil
 }
 
 func (a AppService) SyncAppList() error {

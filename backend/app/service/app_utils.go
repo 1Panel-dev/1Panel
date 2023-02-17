@@ -474,7 +474,8 @@ func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
 		app.Name = item.Name
 		app.Limit = item.Limit
 		app.Key = item.Key
-		app.ShortDesc = item.ShortDesc
+		app.ShortDescZh = item.ShortDescZh
+		app.ShortDescEn = item.ShortDescEn
 		app.Website = item.Website
 		app.Document = item.Document
 		app.Github = item.Github

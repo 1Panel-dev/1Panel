@@ -15,7 +15,7 @@
                             </div>
                             <div class="h-app-desc">
                                 <span>
-                                    {{ app.shortDesc }}
+                                    {{ language == 'zh' ? app.shortDescZh : app.shortDescEn }}
                                 </span>
                             </div>
                         </div>
@@ -43,8 +43,10 @@ import { App } from '@/api/interface/app';
 import { Dashboard } from '@/api/interface/dashboard';
 import { SearchApp } from '@/api/modules/app';
 import { reactive, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 const router = useRouter();
+const language = useI18n().locale.value;
 
 let req = reactive({
     name: '',

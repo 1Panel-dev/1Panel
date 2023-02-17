@@ -6,6 +6,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/cmd/server/cmd"
 	_ "github.com/1Panel-dev/1Panel/cmd/server/docs"
+	_ "net/http/pprof"
 )
 
 // @title 1Panel

@@ -15,7 +15,7 @@
                             </div>
                             <div class="description">
                                 <span>
-                                    {{ app.shortDesc }}
+                                    {{ language == 'zh' ? app.shortDescZh : app.shortDescEn }}
                                 </span>
                             </div>
                             <div class="version">
@@ -94,10 +94,11 @@
 import { GetApp, GetAppDetail } from '@/api/modules/app';
 import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import Install from './install/index.vue';
+const language = useI18n().locale.value;
 
 interface OperateProps {
-    // id: number;
     appKey: string;
 }
 
