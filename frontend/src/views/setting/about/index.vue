@@ -43,9 +43,6 @@
                 <el-form-item :label="$t('setting.newVersion')">
                     <el-tag>{{ upgradeInfo.newVersion }}</el-tag>
                 </el-form-item>
-                <el-form-item :label="$t('commons.table.createdAt')">
-                    <el-tag>{{ upgradeInfo.createdAt }}</el-tag>
-                </el-form-item>
                 <el-form-item :label="$t('setting.upgradeNotes')">
                     <MdEditor style="height: calc(100vh - 330px)" v-model="upgradeInfo.releaseNote" previewOnly />
                 </el-form-item>

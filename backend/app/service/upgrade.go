@@ -1,10 +1,8 @@
 package service
 
 import (
-	"context"
-	"crypto/tls"
-	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"runtime"
@@ -12,12 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"gitee.com/openeuler/go-gitee/gitee"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"github.com/google/go-github/github"
 )
 
 type UpgradeService struct{}
@@ -32,38 +28,40 @@ func NewIUpgradeService() IUpgradeService {
 }
 
 func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
+	var upgrade dto.UpgradeInfo
 	currentVersion, err := settingRepo.Get(settingRepo.WithByKey("SystemVersion"))
 	if err != nil {
 		return nil, err
 	}
 
-	var releaseInfo dto.UpgradeInfo
-	isGiteeOK := checkValid("https://gitee.com/wanghe-fit2cloud/1Panel")
-	if isGiteeOK {
-		releaseInfo, err = u.loadLatestFromGitee()
-		if err != nil {
-			global.LOG.Error(err)
-		}
+	versionRes, err := http.Get(fmt.Sprintf("%s/%s/latest", global.CONF.System.RepoUrl, global.CONF.System.Mode))
+	if err != nil {
+		return nil, err
 	}
-	if len(releaseInfo.NewVersion) == 0 {
-		isGithubOK := checkValid("https://gitee.com/1Panel-dev/1Panel")
-		if isGithubOK {
-			releaseInfo, err = u.loadLatestFromGithub()
-			if err != nil {
-				global.LOG.Error(err)
-				return nil, err
-			}
-		}
+	defer versionRes.Body.Close()
+	version, err := ioutil.ReadAll(versionRes.Body)
+	if err != nil {
+		return nil, err
 	}
-	if len(releaseInfo.NewVersion) != 0 {
-		isNew, err := compareVersion(currentVersion.Value, releaseInfo.NewVersion)
-		if !isNew || err != nil {
-			return nil, err
-		}
-		return &releaseInfo, nil
+	isNew, err := compareVersion(currentVersion.Value, string(version))
+	if !isNew || err != nil {
+		return nil, err
 	}
 
-	return nil, errors.New("both gitee and github were unavailable")
+	upgrade.NewVersion = string(version)
+
+	releaseNotes, err := http.Get(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, global.CONF.System.Mode, upgrade.NewVersion, upgrade.NewVersion))
+	if err != nil {
+		return nil, err
+	}
+	defer releaseNotes.Body.Close()
+	release, err := ioutil.ReadAll(releaseNotes.Body)
+	if err != nil {
+		return nil, err
+	}
+	upgrade.ReleaseNote = string(release)
+
+	return &upgrade, nil
 }
 
 func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
@@ -79,20 +77,11 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		return err
 	}
 
-	downloadPath := fmt.Sprintf("https://gitee.com/%s/%s/releases/download/%s/", "wanghe-fit2cloud", "1Panel", req.Version)
-	isGiteeOK := checkValid(downloadPath)
-	if !isGiteeOK {
-		downloadPath = fmt.Sprintf("https://github.com/%s/%s/releases/download/%s/", "wanghe-fit2cloud", "1Panel", req.Version)
-		isGithubOK := checkValid(downloadPath)
-		if !isGithubOK {
-			return errors.New("both gitee and github were unavailabl")
-		}
-	}
-
+	downloadPath := fmt.Sprintf("%s/%s/%s/release", global.CONF.System.RepoUrl, global.CONF.System.Mode, req.Version)
 	fileName := fmt.Sprintf("1panel-%s-%s-%s.tar.gz", req.Version, "linux", runtime.GOARCH)
 	_ = settingRepo.Update("SystemStatus", "Upgrading")
 	go func() {
-		if err := fileOp.DownloadFile(downloadPath+fileName, rootDir+"/service.tar.gz"); err != nil {
+		if err := fileOp.DownloadFile(downloadPath+"/"+fileName, rootDir+"/service.tar.gz"); err != nil {
 			global.LOG.Errorf("download service file failed, err: %v", err)
 			_ = settingRepo.Update("SystemStatus", "Free")
 			return
@@ -179,36 +168,6 @@ func (u *UpgradeService) handleRollback(fileOp files.FileOp, originalDir string,
 
 }
 
-func (u *UpgradeService) loadLatestFromGithub() (dto.UpgradeInfo, error) {
-	var info dto.UpgradeInfo
-	client := github.NewClient(nil)
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-	stats, res, err := client.Repositories.GetLatestRelease(ctx, "wanghe-fit2cloud", "1Panel")
-	if res.StatusCode != 200 || err != nil {
-		return info, fmt.Errorf("load upgrade info from github failed, err: %v", err)
-	}
-	info.NewVersion = string(*stats.Name)
-	info.ReleaseNote = string(*stats.Body)
-	info.CreatedAt = stats.PublishedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05")
-	return info, nil
-}
-
-func (u *UpgradeService) loadLatestFromGitee() (dto.UpgradeInfo, error) {
-	var info dto.UpgradeInfo
-	client := gitee.NewAPIClient(gitee.NewConfiguration())
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-	stats, res, err := client.RepositoriesApi.GetV5ReposOwnerRepoReleasesLatest(ctx, "wanghe-fit2cloud", "1Panel", &gitee.GetV5ReposOwnerRepoReleasesLatestOpts{})
-	if res.StatusCode != 200 || err != nil {
-		return info, fmt.Errorf("load upgrade info from gitee failed, err: %v", err)
-	}
-	info.NewVersion = string(stats.Name)
-	info.ReleaseNote = string(stats.Body)
-	info.CreatedAt = stats.CreatedAt.Format("2006-01-02 15:04:05")
-	return info, nil
-}
-
 func compareVersion(version, newVersion string) (bool, error) {
 	if version == newVersion {
 		return false, nil
@@ -247,19 +206,4 @@ func compareVersion(version, newVersion string) (bool, error) {
 	} else {
 		return false, nil
 	}
-}
-
-func checkValid(addr string) bool {
-	timeout := time.Duration(2 * time.Second)
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := http.Client{
-		Transport: tr,
-		Timeout:   timeout,
-	}
-	if _, err := client.Get(addr); err != nil {
-		return false
-	}
-	return true
 }

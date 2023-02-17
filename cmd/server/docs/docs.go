@@ -10593,9 +10593,6 @@ var doc = `{
         "dto.UpgradeInfo": {
             "type": "object",
             "properties": {
-                "createdAt": {
-                    "type": "string"
-                },
                 "newVersion": {
                     "type": "string"
                 },
