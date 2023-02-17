@@ -75,9 +75,9 @@
                         </el-col>
                     </el-row>
                 </div>
-                <Status v-if="activeName === 'status'" ref="statusRef" />
-                <Variables v-if="activeName === 'tuning'" ref="variablesRef" />
-                <div v-if="activeName === 'port'">
+                <Status v-show="activeName === 'status'" ref="statusRef" />
+                <Variables v-show="activeName === 'tuning'" ref="variablesRef" />
+                <div v-show="activeName === 'port'">
                     <el-form :model="baseInfo" ref="panelFormRef" label-width="120px">
                         <el-row>
                             <el-col :span="1"><br /></el-col>
@@ -95,8 +95,8 @@
                         </el-row>
                     </el-form>
                 </div>
-                <ContainerLog v-if="activeName === 'log'" ref="dialogContainerLogRef" />
-                <SlowLog v-if="activeName === 'slowLog'" ref="slowLogRef" />
+                <ContainerLog v-show="activeName === 'log'" ref="dialogContainerLogRef" />
+                <SlowLog v-show="activeName === 'slowLog'" ref="slowLogRef" />
             </template>
         </LayoutContent>
 

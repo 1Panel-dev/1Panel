@@ -1,14 +1,16 @@
 <template>
-    <el-dialog v-model="dialogVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
+    <el-drawer v-model="dialogVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
-            <div class="card-header">
-                <span>{{ $t('database.requirepass') }}</span>
-            </div>
+            <DrawerHeader :header="$t('database.requirepass')" :back="handleClose" />
         </template>
         <el-form v-loading="loading" ref="formRef" :model="form" label-width="80px">
-            <el-form-item :label="$t('database.requirepass')" :rules="Rules.requiredInput" prop="password">
-                <el-input type="password" show-password clearable v-model="form.password" />
-            </el-form-item>
+            <el-row type="flex" justify="center">
+                <el-col :span="22">
+                    <el-form-item :label="$t('database.requirepass')" :rules="Rules.requiredInput" prop="password">
+                        <el-input type="password" show-password clearable v-model="form.password" />
+                    </el-form-item>
+                </el-col>
+            </el-row>
         </el-form>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmit"></ConfirmDialog>
@@ -23,7 +25,7 @@
                 </el-button>
             </span>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>
@@ -35,6 +37,7 @@ import { changeRedisPassword } from '@/api/modules/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { GetAppPassword } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const loading = ref(false);
 
@@ -54,6 +57,9 @@ const acceptParams = (): void => {
     form.password = '';
     loadPassword();
     dialogVisiable.value = true;
+};
+const handleClose = () => {
+    dialogVisiable.value = false;
 };
 
 const loadPassword = async () => {

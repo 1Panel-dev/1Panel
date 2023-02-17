@@ -3,35 +3,31 @@
         <div class="app-content" style="margin-top: 20px">
             <el-card class="app-card">
                 <el-row :gutter="20">
-                    <el-col :lg="3" :xl="2">
-                        <div>
-                            <el-tag effect="dark" type="success">{{ composeName }}</el-tag>
-                        </div>
-                    </el-col>
-                    <el-col :lg="8" :xl="12">
-                        <div v-if="createdBy === '1Panel'">
-                            <el-button link type="primary" @click="onComposeOperate('start')">
-                                {{ $t('container.start') }}
-                            </el-button>
-                            <el-divider direction="vertical" />
-                            <el-button link type="primary" @click="onComposeOperate('stop')">
-                                {{ $t('container.stop') }}
-                            </el-button>
-                            <el-divider direction="vertical" />
-                            <el-button link type="primary" @click="onComposeOperate('down')">
-                                {{ $t('container.remove') }}
-                            </el-button>
-                        </div>
-                        <div v-else>
-                            <el-alert
-                                style="margin-top: -5px"
-                                :closable="false"
-                                show-icon
-                                :title="$t('container.composeDetailHelper')"
-                                type="info"
-                            />
-                        </div>
-                    </el-col>
+                    <div>
+                        <el-tag effect="dark" type="success">{{ composeName }}</el-tag>
+                    </div>
+                    <div v-if="createdBy === '1Panel'">
+                        <el-button link type="primary" @click="onComposeOperate('start')">
+                            {{ $t('container.start') }}
+                        </el-button>
+                        <el-divider direction="vertical" />
+                        <el-button link type="primary" @click="onComposeOperate('stop')">
+                            {{ $t('container.stop') }}
+                        </el-button>
+                        <el-divider direction="vertical" />
+                        <el-button link type="primary" @click="onComposeOperate('down')">
+                            {{ $t('container.remove') }}
+                        </el-button>
+                    </div>
+                    <div v-else>
+                        <el-alert
+                            style="margin-top: -5px; margin-left: 50px"
+                            :closable="false"
+                            show-icon
+                            :title="$t('container.composeDetailHelper')"
+                            type="info"
+                        />
+                    </div>
                 </el-row>
             </el-card>
         </div>

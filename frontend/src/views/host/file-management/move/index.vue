@@ -4,7 +4,7 @@
         :destroy-on-close="true"
         :close-on-click-modal="false"
         :before-close="handleClose"
-        size="30%"
+        size="40%"
     >
         <template #header>
             <DrawerHeader :header="title" :back="handleClose" />

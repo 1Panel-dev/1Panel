@@ -104,7 +104,7 @@
                     </el-table-column>
                     <el-table-column :min-width="80" :label="$t('cronjob.target')" prop="targetDir">
                         <template #default="{ row }">
-                            {{ loadBackupName(row.targetDir) }}
+                            {{ row.targetDir }}
                         </template>
                     </el-table-column>
                     <fu-table-operations
@@ -133,7 +133,6 @@ import { loadZero } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
 import RouterButton from '@/components/router-button/index.vue';
 import { deleteCronjob, getCronjobPage, handleOnce, updateStatus } from '@/api/modules/cronjob';
-import { loadBackupName } from '@/views/setting/helper';
 import i18n from '@/lang';
 import { Cronjob } from '@/api/interface/cronjob';
 import { useDeleteData } from '@/hooks/use-delete-data';
@@ -175,7 +174,7 @@ const search = async () => {
             data.value = res.data.items || [];
             for (const item of data.value) {
                 if (item.targetDir !== '-') {
-                    item.targetDir = loadBackupName(item.targetDir);
+                    item.targetDir = i18n.global.t('setting.' + item.targetDir);
                 }
             }
             paginationConfig.total = res.data.total;

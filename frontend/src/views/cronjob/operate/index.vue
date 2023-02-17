@@ -160,7 +160,6 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
-import { loadBackupName } from '@/views/setting/helper';
 import FileList from '@/components/file-list/index.vue';
 import { getBackupList } from '@/api/modules/setting';
 import i18n from '@/lang';
@@ -324,7 +323,7 @@ const loadBackups = async () => {
                 dialogData.value.rowData!.targetDirID = item.id;
             }
         }
-        backupOptions.value.push({ label: loadBackupName(item.type), value: item.id });
+        backupOptions.value.push({ label: i18n.global.t('setting.' + item.type), value: item.id });
     }
 };
 

@@ -9,7 +9,7 @@
                                 <template #header>
                                     <svg-icon style="font-size: 7px" iconName="p-file-folder"></svg-icon>
                                     <span style="font-size: 16px; font-weight: 500">
-                                        &nbsp;{{ $t('setting.serverDisk') }}
+                                        &nbsp;{{ $t('setting.LOCAL') }}
                                     </span>
                                     <div style="float: right">
                                         <el-button round @click="onOpenDialog('edit', 'local', localData)">
@@ -86,7 +86,7 @@
                         <el-card style="height: 265px">
                             <template #header>
                                 <svg-icon style="font-size: 7px" iconName="p-oss"></svg-icon>
-                                <span style="font-size: 16px; font-weight: 500">&nbsp;OSS</span>
+                                <span style="font-size: 16px; font-weight: 500">&nbsp;{{ $t('setting.OSS') }}</span>
                                 <div style="float: right">
                                     <el-button round :disabled="ossData.id === 0" @click="onBatchDelete(ossData)">
                                         {{ $t('commons.button.delete') }}
@@ -135,7 +135,7 @@
                         <el-card style="height: 265px">
                             <template #header>
                                 <svg-icon style="font-size: 7px" iconName="p-minio"></svg-icon>
-                                <span style="font-size: 16px; font-weight: 500">&nbsp;MIMIO</span>
+                                <span style="font-size: 16px; font-weight: 500">&nbsp;MINIO</span>
                                 <div style="float: right">
                                     <el-button :disabled="minioData.id === 0" round @click="onBatchDelete(minioData)">
                                         {{ $t('commons.button.delete') }}
