@@ -54,7 +54,12 @@ func (w WebsiteDnsAccountService) Update(update request.WebsiteDnsAccountUpdate)
 	if err != nil {
 		return request.WebsiteDnsAccountUpdate{}, err
 	}
-
+	exists, _ := websiteDnsRepo.List(commonRepo.WithByName(update.Name))
+	for _, exist := range exists {
+		if exist.ID != update.ID {
+			return request.WebsiteDnsAccountUpdate{}, buserr.New(constant.ErrNameIsExist)
+		}
+	}
 	if err := websiteDnsRepo.Save(model.WebsiteDnsAccount{
 		BaseModel: model.BaseModel{
 			ID: update.ID,
