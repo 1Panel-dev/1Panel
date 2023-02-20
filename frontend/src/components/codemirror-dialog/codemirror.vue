@@ -16,7 +16,7 @@
             :styleActiveLine="true"
             :extensions="extensions"
             v-model="detailInfo"
-            :readOnly="true"
+            :disabled="true"
         />
         <template #footer>
             <span class="dialog-footer">

@@ -15,7 +15,7 @@
                     :extensions="extensions"
                     @ready="handleReady"
                     v-model="logs"
-                    :readOnly="true"
+                    :disabled="true"
                 />
             </template>
         </LayoutContent>

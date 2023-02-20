@@ -94,7 +94,6 @@
                         :styleActiveLine="true"
                         :extensions="extensions"
                         v-model="dockerConf"
-                        :readOnly="true"
                     />
                     <el-button :disabled="loading" type="primary" @click="onSaveFile" style="margin-top: 5px">
                         {{ $t('commons.button.save') }}

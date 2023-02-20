@@ -25,7 +25,7 @@
             :extensions="extensions"
             @ready="handleReady"
             v-model="logInfo"
-            :readOnly="true"
+            :disabled="true"
         />
     </div>
 </template>

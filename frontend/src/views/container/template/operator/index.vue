@@ -35,7 +35,6 @@
                             :styleActiveLine="true"
                             :extensions="extensions"
                             v-model="dialogData.rowData!.content"
-                            :readOnly="true"
                         />
                     </el-form-item>
                 </el-col>

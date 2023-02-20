@@ -12,7 +12,6 @@
             :styleActiveLine="true"
             :extensions="extensions"
             v-model="content"
-            :readOnly="true"
         />
         <div style="margin-top: 10px">
             <el-button type="primary" @click="submit()">

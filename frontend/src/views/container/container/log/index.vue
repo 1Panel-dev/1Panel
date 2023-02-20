@@ -28,7 +28,7 @@
             :extensions="extensions"
             v-model="logInfo"
             @ready="handleReady"
-            :readOnly="true"
+            :disabled="true"
         />
         <template #footer>
             <span class="dialog-footer">

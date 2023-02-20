@@ -31,7 +31,7 @@
             :styleActiveLine="true"
             :extensions="extensions"
             v-model="data.content"
-            :readOnly="true"
+            :disabled="true"
             @ready="handleReady"
         />
     </div>
