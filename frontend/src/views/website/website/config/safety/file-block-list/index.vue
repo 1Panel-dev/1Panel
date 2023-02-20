@@ -54,7 +54,7 @@ let data = ref([]);
 let req = ref<Website.WafReq>({
     websiteId: 0,
     key: '$fileExtDeny',
-    rule: 'fileExtBlockList',
+    rule: 'file_ext_block',
 });
 let fileUpdate = reactive({
     path: '',
