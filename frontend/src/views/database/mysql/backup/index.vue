@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <el-drawer v-model="backupVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
                 <DrawerHeader :header="$t('database.backup')" :resource="dbName" :back="handleClose" />
@@ -42,6 +42,7 @@ import { Backup } from '@/api/interface/backup';
 import { MsgSuccess } from '@/utils/message';
 
 const selects = ref<any>([]);
+const loading = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -85,9 +86,16 @@ const onBackup = async () => {
         mysqlName: mysqlName.value,
         dbName: dbName.value,
     };
-    await backup(params);
-    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    search();
+    loading.value = true;
+    await backup(params)
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onRecover = async (row: Backup.RecordInfo) => {
@@ -96,8 +104,15 @@ const onRecover = async (row: Backup.RecordInfo) => {
         dbName: dbName.value,
         backupName: row.fileDir + '/' + row.fileName,
     };
-    await recover(params);
-    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    loading.value = true;
+    await recover(params)
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onDownload = async (row: Backup.RecordInfo) => {

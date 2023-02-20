@@ -56,7 +56,7 @@ import Setting from '@/views/database/redis/setting/index.vue';
 import Password from '@/views/database/redis/password/index.vue';
 import Terminal from '@/views/database/redis/terminal/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
-import { nextTick, ref } from 'vue';
+import { nextTick, onBeforeUnmount, ref } from 'vue';
 import { App } from '@/api/interface/app';
 import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
@@ -131,4 +131,7 @@ const onBefore = () => {
     closeTerminal(true);
     loading.value = true;
 };
+onBeforeUnmount(() => {
+    closeTerminal(false);
+});
 </script>

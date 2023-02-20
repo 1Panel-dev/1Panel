@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <el-drawer v-model="upVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
                 <DrawerHeader :header="$t('commons.button.import')" :back="handleClose" />
@@ -14,9 +14,6 @@
                 <template #trigger>
                     <el-button type="primary" plain>{{ $t('database.selectFile') }}</el-button>
                 </template>
-                <el-button style="margin-left: 10px" icon="Upload" @click="onSubmit">
-                    {{ $t('commons.button.upload') }}
-                </el-button>
             </el-upload>
             <div style="margin-left: 10px">
                 <span class="input-help">{{ $t('database.supportUpType') }}</span>
@@ -24,6 +21,9 @@
                     {{ $t('database.zipFormat') }}
                 </span>
             </div>
+            <el-button style="margin-top: 10px" v-if="uploaderFiles.length === 1" icon="Upload" @click="onSubmit">
+                {{ $t('commons.button.upload') }}
+            </el-button>
             <el-divider />
             <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data">
                 <template #toolbar>
@@ -74,6 +74,7 @@ import { BatchDeleteFile, GetFilesList, UploadFileData } from '@/api/modules/fil
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError, MsgSuccess } from '@/utils/message';
 
+const loading = ref();
 const selects = ref<any>([]);
 const baseDir = ref();
 
@@ -120,8 +121,15 @@ const onRecover = async (row: File.File) => {
         fileDir: baseDir.value,
         fileName: row.name,
     };
-    await recoverByUpload(params);
-    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    loading.value = true;
+    await recoverByUpload(params)
+        .then(() => {
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const uploaderFiles = ref<UploadFiles>([]);

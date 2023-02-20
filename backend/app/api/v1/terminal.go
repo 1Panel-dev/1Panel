@@ -90,6 +90,12 @@ func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
+	redisConf, err := redisService.LoadConf()
+	if err != nil {
+		global.LOG.Errorf("load redis container failed, err: %v", err)
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
 
 	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
@@ -97,12 +103,6 @@ func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 		return
 	}
 	defer wsConn.Close()
-
-	redisConf, err := redisService.LoadConf()
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
 	auth := ""
 	if len(redisConf.Requirepass) != 0 {
 		auth = fmt.Sprintf("-a %s --no-auth-warning", redisConf.Requirepass)

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <el-form :model="mysqlVariables" :rules="variablesRules" ref="variableFormRef" label-position="top">
             <el-row>
                 <el-col :span="1"><br /></el-col>
