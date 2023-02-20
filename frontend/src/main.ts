@@ -10,12 +10,6 @@ import '@/assets/fonts/font.scss';
 import '@/assets/iconfont/iconfont.css';
 import '@/assets/iconfont/iconfont.js';
 
-import VMdPreview from '@kangc/v-md-editor/lib/preview';
-import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
-import '@kangc/v-md-editor/lib/theme/style/github.css';
-import '@kangc/v-md-editor/lib/style/preview.css';
-import hljs from 'highlight.js';
-
 import directives from '@/directives/index';
 import router from '@/routers/index';
 import I18n from '@/lang/index';
@@ -25,10 +19,6 @@ import SvgIcon from './components/svg-icon/svg-icon.vue';
 import ElementPlus from 'element-plus';
 import Fit2CloudPlus from 'fit2cloud-ui-plus';
 import * as Icons from '@element-plus/icons-vue';
-
-VMdPreview.use(githubTheme, {
-    hljs,
-});
 
 const app = createApp(App);
 app.component('SvgIcon', SvgIcon);
@@ -42,5 +32,4 @@ app.use(router);
 app.use(I18n);
 app.use(pinia);
 app.use(directives);
-app.use(VMdPreview);
 app.mount('#app');
