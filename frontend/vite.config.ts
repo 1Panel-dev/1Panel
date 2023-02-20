@@ -37,7 +37,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             open: viteEnv.VITE_OPEN,
             proxy: {
                 '/api/v1': {
-                    target: 'http://172.16.10.181:9999/', // http://172.16.10.181:9999
+                    target: 'http://localhost:9999/',
                     changeOrigin: true,
                 },
             },

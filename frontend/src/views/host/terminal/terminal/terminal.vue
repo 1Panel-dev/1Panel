@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted, nextTick } from 'vue';
+import { ref, nextTick, onBeforeUnmount } from 'vue';
 import { Terminal } from 'xterm';
 import { AttachAddon } from 'xterm-addon-attach';
 import { Base64 } from 'js-base64';
@@ -182,7 +182,7 @@ defineExpose({
     onSendMsg,
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
     onClose();
 });
 </script>
