@@ -45,6 +45,9 @@ func Init() {
 		if len(baseDir) == 0 {
 			panic("error `BASE_DIR` find in /usr/bin/1pctl")
 		}
+		if strings.HasSuffix(baseDir, "/") {
+			baseDir = baseDir[:strings.LastIndex(baseDir, "/")]
+		}
 		reader := bytes.NewReader(conf.AppYaml)
 		if err := v.ReadConfig(reader); err != nil {
 			panic(fmt.Errorf("Fatal error config file: %s \n", err))
