@@ -82,8 +82,8 @@
                     </el-row>
                 </div>
             </div>
-            <div v-loading="loadingDetail" style="margin-left: -32px">
-                <v-md-preview :text="appDetail.readme"></v-md-preview>
+            <div v-loading="loadingDetail" style="margin-left: 10px">
+                <MdEditor v-model="appDetail.readme" previewOnly />
             </div>
         </template>
     </LayoutContent>
@@ -93,6 +93,8 @@
 <script lang="ts" setup>
 import { GetApp, GetAppDetail } from '@/api/modules/app';
 import LayoutContent from '@/layout/layout-content.vue';
+import MdEditor from 'md-editor-v3';
+import 'md-editor-v3/lib/style.css';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Install from './install/index.vue';
