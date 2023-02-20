@@ -8,7 +8,7 @@
                 <el-button type="primary" @click="openCreate">{{ $t('website.addAccount') }}</el-button>
             </template>
             <el-table-column :label="$t('website.email')" fix show-overflow-tooltip prop="email"></el-table-column>
-            <el-table-column label="URL" show-overflow-tooltip prop="url"></el-table-column>
+            <el-table-column label="URL" show-overflow-tooltip prop="url" min-width="300px"></el-table-column>
             <fu-table-operations
                 :ellipsis="1"
                 :buttons="buttons"
