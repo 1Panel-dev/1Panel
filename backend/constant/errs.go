@@ -70,6 +70,7 @@ var (
 	ErrSSLCannotDelete     = "ErrSSLCannotDelete"
 	ErrAccountCannotDelete = "ErrAccountCannotDelete"
 	ErrSSLApply            = "ErrSSLApply"
+	ErrEmailIsExist        = "ErrEmailIsExist"
 )
 
 //file

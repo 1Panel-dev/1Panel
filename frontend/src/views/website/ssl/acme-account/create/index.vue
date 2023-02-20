@@ -11,7 +11,7 @@
             <el-col :span="22" :offset="1">
                 <el-form ref="accountForm" label-position="top" :model="account" :rules="rules" v-loading="loading">
                     <el-form-item :label="$t('website.email')" prop="email">
-                        <el-input v-model="account.email"></el-input>
+                        <el-input v-model.trim="account.email"></el-input>
                     </el-form-item>
                 </el-form>
             </el-col>
