@@ -111,7 +111,7 @@ export default {
             warnning:
                 'Note: [Closing the security entrance] will make your panel login address directly exposed to the Internet, very dangerous, please exercise caution',
             codeInput: 'Please enter the 6-digit verification code of the MFA validator',
-            title: 'A modern, open source Linux server operation and maintenance management panel',
+            title: 'Modern、OpenSource Linux server operation and maintenance management panel',
         },
         rule: {
             username: 'Please enter a username',
