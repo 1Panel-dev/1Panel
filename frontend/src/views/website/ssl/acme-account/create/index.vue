@@ -38,7 +38,7 @@ let open = ref();
 let loading = ref(false);
 let accountForm = ref<FormInstance>();
 let rules = ref({
-    email: [Rules.requiredInput],
+    email: [Rules.requiredInput, Rules.email],
 });
 let account = ref({
     email: '',
