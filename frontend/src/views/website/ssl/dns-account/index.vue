@@ -16,11 +16,6 @@
                     <span v-else>{{ row.type }}</span>
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('website.key')">
-                <template #default="{ row }">
-                    <el-link type="primary" @click="openEdit(row)">{{ $t('website.check') }}</el-link>
-                </template>
-            </el-table-column>
             <fu-table-operations
                 :ellipsis="1"
                 :buttons="buttons"
@@ -55,8 +50,14 @@ let open = ref(false);
 
 const buttons = [
     {
+        label: i18n.global.t('commons.button.edit'),
+        click: function (row: Website.DnsAccount) {
+            openEdit(row);
+        },
+    },
+    {
         label: i18n.global.t('app.delete'),
-        click: function (row: Website.Website) {
+        click: function (row: Website.DnsAccount) {
             deleteAccount(row.id);
         },
     },

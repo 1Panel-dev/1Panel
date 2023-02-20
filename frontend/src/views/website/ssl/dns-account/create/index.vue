@@ -11,7 +11,7 @@
             <el-col :span="22" :offset="1">
                 <el-form ref="accountForm" label-position="top" :model="account" :rules="rules">
                     <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input v-model="account.name"></el-input>
+                        <el-input v-model.trim="account.name"></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('website.type')" prop="type">
                         <el-select v-model="account.type" :disabled="accountData.mode === 'edit'">
@@ -80,12 +80,12 @@ const accountData = ref<AccountProps>({
 
 const types = [
     {
-        label: 'DnsPod',
-        value: 'DnsPod',
-    },
-    {
         label: i18n.global.t('website.aliyun'),
         value: 'AliYun',
+    },
+    {
+        label: 'DnsPod',
+        value: 'DnsPod',
     },
     {
         label: 'CloudFlare',
@@ -111,7 +111,7 @@ let rules = ref({
 let account = ref({
     id: 0,
     name: '',
-    type: 'DnsPod',
+    type: 'AliYun',
     authorization: {},
 });
 const em = defineEmits(['close']);
