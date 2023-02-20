@@ -16,7 +16,6 @@
                 :styleActiveLine="true"
                 :extensions="extensions"
                 v-model="content"
-                :readOnly="true"
             />
         </div>
         <template #footer>

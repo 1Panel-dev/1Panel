@@ -50,7 +50,6 @@
                                 :styleActiveLine="true"
                                 :extensions="extensions"
                                 v-model="form.file"
-                                :readOnly="true"
                             />
                         </el-form-item>
                     </el-col>

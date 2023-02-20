@@ -47,7 +47,6 @@
                         :styleActiveLine="true"
                         :extensions="extensions"
                         v-model="redisConf"
-                        :readOnly="true"
                     />
                     <el-button style="margin-top: 10px" @click="getDefaultConfig()">
                         {{ $t('app.defaultConfig') }}

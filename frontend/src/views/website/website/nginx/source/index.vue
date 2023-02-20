@@ -13,7 +13,6 @@
             :extensions="extensions"
             :mode="'text/x-nginx-conf'"
             v-model="content"
-            :readOnly="true"
         />
         <div style="margin-top: 10px">
             <el-button @click="getDefaultConfig()" :disabled="loading">

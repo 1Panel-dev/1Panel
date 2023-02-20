@@ -33,7 +33,7 @@
             :extensions="extensions"
             @ready="handleReady"
             v-model="slowLogs"
-            :readOnly="true"
+            :disabled="true"
         />
 
         <br />

@@ -141,7 +141,7 @@
                                         :styleActiveLine="true"
                                         :extensions="extensions"
                                         v-model="dialogData.rowData!.script"
-                                        :readOnly="true"
+                                        :disabled="true"
                                     />
                                 </el-row>
                                 <el-row>
@@ -263,7 +263,7 @@
                                         :styleActiveLine="true"
                                         :extensions="extensions"
                                         v-model="currentRecordDetail"
-                                        :readOnly="true"
+                                        :disabled="true"
                                     />
                                 </el-row>
                             </el-form>
