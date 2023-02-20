@@ -24,10 +24,10 @@
                         </el-select>
                     </el-form-item>
                     <div v-if="account.type === 'AliYun'">
-                        <el-form-item label="AccessKey" prop="authorization.accessKey">
+                        <el-form-item label="Access Key" prop="authorization.accessKey">
                             <el-input v-model="account.authorization['accessKey']"></el-input>
                         </el-form-item>
-                        <el-form-item label="SecretKey" prop="authorization.secretKey">
+                        <el-form-item label="Secret Key" prop="authorization.secretKey">
                             <el-input v-model="account.authorization['secretKey']"></el-input>
                         </el-form-item>
                     </div>
