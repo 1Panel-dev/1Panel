@@ -2,10 +2,10 @@
     <div>
         <div class="login-backgroud" v-if="statusCode == 1">
             <div class="login-wrapper" v-if="screenWidth > 1000">
+                <div class="login-title">
+                    <span>{{ $t('commons.login.title') }}</span>
+                </div>
                 <div class="left inline-block">
-                    <div class="login-title">
-                        <span>{{ $t('commons.login.title') }}</span>
-                    </div>
                     <img src="@/assets/images/1Panel-login.png" alt="" />
                 </div>
                 <div class="right inline-block">
@@ -95,11 +95,12 @@ onMounted(() => {
         rgba(0, 57, 142, 0.05);
 
     .login-wrapper {
-        padding-top: 10%;
+        padding-top: 8%;
         width: 80%;
         margin: 0 auto;
-        @media only screen and (max-width: 1280px) {
+        @media only screen and (max-width: 1440px) {
             width: 100%;
+            padding-top: 6%;
         }
         .left {
             vertical-align: middle;
@@ -118,14 +119,15 @@ onMounted(() => {
 
     .login-title {
         // margin-top: 10%;
-        margin-right: 15%;
+        // margin-right: 15%;
+        margin-left: 10%;
         span:first-child {
             color: $primary-color;
             font-size: 40px;
             font-family: pingFangSC-Regular;
             font-weight: 600;
             @media only screen and (max-width: 1440px) {
-                font-size: 38px;
+                margin-left: 0;
             }
         }
         @media only screen and (max-width: 1000px) {
@@ -146,10 +148,10 @@ onMounted(() => {
         border-radius: 4px;
         box-shadow: 2px 4px 22px rgba(0, 94, 235, 0.2);
         @media only screen and (max-width: 1440px) {
-            margin-top: 100px;
+            margin-top: 60px;
         }
         @media only screen and (max-width: 1000px) {
-            margin: 0 auto;
+            margin: 60px auto 0;
         }
     }
 }
