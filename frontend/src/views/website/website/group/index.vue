@@ -112,6 +112,14 @@ const acceptParams = async () => {
 };
 
 const openCreate = () => {
+    for (const d of data.value) {
+        if (d.name == '') {
+            return;
+        }
+        if (d.edit) {
+            d.edit = false;
+        }
+    }
     const g = {
         id: 0,
         name: '',
@@ -135,6 +143,15 @@ const deleteGroup = (index: number) => {
 };
 
 const editGroup = (index: number) => {
+    for (const i in data.value) {
+        const d = data.value[i];
+        if (d.name == '') {
+            data.value.splice(Number(i), 1);
+        }
+        if (d.edit) {
+            d.edit = false;
+        }
+    }
     data.value[index].edit = true;
 };
 
