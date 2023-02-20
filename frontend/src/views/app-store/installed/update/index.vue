@@ -3,23 +3,22 @@
         <template #header>
             <Header :header="$t('app.update')" :resource="resourceName" :back="handleClose"></Header>
         </template>
-
         <el-row>
             <el-col :span="22" :offset="1">
-                <div v-loading="loading">
-                    <p>{{ $t('app.versioneSelect') }}</p>
-                    <el-select v-model="operateReq.detailId">
-                        <el-option
-                            v-for="(version, index) in versions"
-                            :key="index"
-                            :value="version.detailId"
-                            :label="version.version"
-                        ></el-option>
-                    </el-select>
-                </div>
+                <el-form ref="updateRef" :rules="rules" label-position="top" :model="operateReq" v-loading="loading">
+                    <el-form-item :label="$t('app.versioneSelect')" prop="detailId">
+                        <el-select v-model="operateReq.detailId">
+                            <el-option
+                                v-for="(version, index) in versions"
+                                :key="index"
+                                :value="version.detailId"
+                                :label="version.version"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-form>
             </el-col>
         </el-row>
-
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -34,11 +33,13 @@
 import { App } from '@/api/interface/app';
 import { GetAppUpdateVersions, InstalledOp } from '@/api/modules/app';
 import i18n from '@/lang';
-import { ElMessageBox } from 'element-plus';
+import { ElMessageBox, FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import Header from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
+import { Rules } from '@/global/form-rules';
 
+const updateRef = ref<FormInstance>();
 let open = ref(false);
 let loading = ref(false);
 let versions = ref<App.VersionDetail[]>();
@@ -48,6 +49,9 @@ let operateReq = reactive({
     installId: 0,
 });
 const resourceName = ref('');
+let rules = ref<any>({
+    detailId: [Rules.requiredSelect],
+});
 
 const em = defineEmits(['close']);
 const handleClose = () => {
