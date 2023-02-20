@@ -687,7 +687,7 @@ func (w WebsiteService) GetWafConfig(req request.WebsiteWafReq) (response.Websit
 		return res, nil
 	}
 
-	filePath := path.Join(nginxFull.SiteDir, "sites", website.Alias, "waf", "rules", req.Rule)
+	filePath := path.Join(nginxFull.SiteDir, "sites", website.Alias, "waf", "rules", req.Rule+".json")
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return res, nil

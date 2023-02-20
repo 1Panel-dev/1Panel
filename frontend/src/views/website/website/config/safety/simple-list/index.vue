@@ -39,6 +39,7 @@ import { SaveFileContent } from '@/api/modules/files';
 import i18n from '@/lang';
 import { checkIp } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
+import { MsgError } from '@/utils/message';
 
 const props = defineProps({
     id: {
@@ -69,7 +70,7 @@ let data = ref([]);
 let req = ref<Website.WafReq>({
     websiteId: 0,
     key: '$ipWhiteAllow',
-    rule: 'ipWhiteList',
+    rule: 'ip_white',
 });
 let fileUpdate = reactive({
     path: '',
@@ -110,18 +111,18 @@ const removeIp = (index: number) => {
 };
 
 const openCreate = () => {
-    console.log(ips.value);
     const ipArray = ips.value.split('\n');
     if (ipArray.length == 0) {
         return;
     }
-    for (const id in ipArray) {
-        if (checkIp(ipArray[id])) {
-            MsgError(i18n.global.t('commons.rule.ipErr', [ipArray[id]]));
-            return;
+    if (req.value.rule.indexOf('ip') > -1) {
+        for (const id in ipArray) {
+            if (checkIp(ipArray[id])) {
+                MsgError(i18n.global.t('commons.rule.ipErr', [ipArray[id]]));
+                return;
+            }
         }
     }
-
     data.value.forEach((d) => {
         ipArray.push(d.ip);
     });

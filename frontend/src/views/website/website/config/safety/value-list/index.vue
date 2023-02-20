@@ -1,17 +1,31 @@
 <template>
     <el-row>
-        <el-col :span="10" :offset="1">
-            <el-form-item prop="enable" :label="$t('website.enable')">
-                <el-switch v-model="enableUpdate.enable" @change="updateEnable"></el-switch>
-            </el-form-item>
-            <el-form-item :label="$t('website.data')">
-                <el-input
-                    type="textarea"
-                    :autosize="{ minRows: 4, maxRows: 8 }"
-                    v-model="add"
-                    :placeholder="$t('website.wafInputHelper')"
-                />
-            </el-form-item>
+        <el-col :span="14" :offset="1">
+            <el-form>
+                <el-form-item prop="enable" :label="$t('website.enable')">
+                    <el-switch v-model="enableUpdate.enable" @change="updateEnable"></el-switch>
+                </el-form-item>
+                <el-form-item :label="$t('website.data')">
+                    <el-row :gutter="10" style="width: 100%">
+                        <el-col :span="12">
+                            <el-input
+                                type="text"
+                                v-model="add.value"
+                                label="value"
+                                :placeholder="$t('website.wafValueHelper')"
+                            />
+                        </el-col>
+                        <el-col :span="12">
+                            <el-input
+                                type="text"
+                                v-model="add.remark"
+                                label="remark"
+                                :placeholder="$t('website.wafRemarkHelper')"
+                            />
+                        </el-col>
+                    </el-row>
+                </el-form-item>
+            </el-form>
             <ComplexTable :data="data" v-loading="loading">
                 <template #toolbar>
                     <el-button type="primary" icon="Plus" @click="openCreate">
@@ -19,6 +33,7 @@
                     </el-button>
                 </template>
                 <el-table-column :label="$t('website.value')" prop="value"></el-table-column>
+                <el-table-column :label="$t('website.remark')" prop="remark"></el-table-column>
                 <el-table-column :label="$t('commons.table.operate')" width="100px">
                     <template #default="{ $index }">
                         <el-button link type="primary" @click="remove($index)">
@@ -79,7 +94,12 @@ let enableUpdate = ref<Website.WafUpdate>({
     key: '$UrlDeny',
     enable: false,
 });
-let add = ref();
+let add = ref({
+    value: '',
+    remark: '',
+    enbale: 1,
+});
+let contentArray = ref([]);
 
 const get = async () => {
     data.value = [];
@@ -88,11 +108,13 @@ const get = async () => {
     loading.value = false;
     enableUpdate.value.enable = res.data.enable;
     if (res.data.content != '') {
-        const urlList = res.data.content.split('\n');
-        urlList.forEach((value) => {
+        contentArray.value = JSON.parse(res.data.content);
+        contentArray.value.forEach((value) => {
             if (value != '') {
                 data.value.push({
-                    value: value,
+                    value: value[0],
+                    remark: value[1],
+                    enable: value[2],
                 });
             }
         });
@@ -101,23 +123,21 @@ const get = async () => {
 };
 
 const remove = (index: number) => {
-    data.value.splice(index, 1);
-    const addArray = [];
-    data.value.forEach((d) => {
-        addArray.push(d.value);
-    });
-    submit(addArray);
+    contentArray.value.splice(index, 1);
+    submit([]);
 };
 
 const openCreate = () => {
-    const addArray = add.value.split('\n');
-    if (addArray.length == 0) {
+    if (add.value.value == '') {
         return;
     }
-    data.value.forEach((d) => {
-        addArray.push(d.value);
-    });
-    submit(addArray);
+    let newArray = [];
+    newArray[0] = add.value.value;
+    newArray[1] = add.value.remark;
+    newArray[2] = add.value.enbale;
+
+    data.value.push(newArray);
+    submit(newArray);
 };
 
 const updateEnable = async (enable: boolean) => {
@@ -128,16 +148,19 @@ const updateEnable = async (enable: boolean) => {
 };
 
 const submit = async (addArray: string[]) => {
-    let urlList = '';
-    addArray.forEach((row) => {
-        urlList = urlList + row + '\n';
-    });
+    if (addArray.length > 0) {
+        contentArray.value.push(addArray);
+    }
 
-    fileUpdate.content = urlList;
+    fileUpdate.content = JSON.stringify(contentArray.value);
     loading.value = true;
     SaveFileContent(fileUpdate)
         .then(() => {
-            add.value = '';
+            add.value = {
+                value: '',
+                remark: '',
+                enbale: 1,
+            };
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             get();
         })

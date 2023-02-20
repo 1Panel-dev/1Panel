@@ -3,7 +3,7 @@
         <template #toolbar>
             <el-row :gutter="5">
                 <el-col :span="20">
-                    <div v-if="data != null">
+                    <div>
                         <el-button
                             class="tag-button"
                             :class="activeTag === 'all' ? '' : 'no-active'"

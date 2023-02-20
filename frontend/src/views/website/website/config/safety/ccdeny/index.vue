@@ -68,7 +68,7 @@ let form = reactive({
 let req = ref<Website.WafReq>({
     websiteId: 0,
     key: '$CCDeny',
-    rule: 'ccRate',
+    rule: 'cc',
 });
 let enableUpdate = ref<Website.WafUpdate>({
     websiteId: 0,
