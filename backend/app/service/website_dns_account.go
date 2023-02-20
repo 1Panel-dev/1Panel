@@ -28,6 +28,11 @@ func (w WebsiteDnsAccountService) Page(search dto.PageInfo) (int64, []response.W
 }
 
 func (w WebsiteDnsAccountService) Create(create request.WebsiteDnsAccountCreate) (request.WebsiteDnsAccountCreate, error) {
+	exist, _ := websiteDnsRepo.GetFirst(commonRepo.WithByName(create.Name))
+	if exist != nil {
+		return request.WebsiteDnsAccountCreate{}, buserr.New(constant.ErrNameIsExist)
+	}
+
 	authorization, err := json.Marshal(create.Authorization)
 	if err != nil {
 		return request.WebsiteDnsAccountCreate{}, err
