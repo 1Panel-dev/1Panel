@@ -25,6 +25,11 @@ func (w WebsiteAcmeAccountService) Page(search dto.PageInfo) (int64, []response.
 }
 
 func (w WebsiteAcmeAccountService) Create(create request.WebsiteAcmeAccountCreate) (response.WebsiteAcmeAccountDTO, error) {
+	exist, _ := websiteAcmeRepo.GetFirst(websiteAcmeRepo.WithEmail(create.Email))
+	if exist != nil {
+		return response.WebsiteAcmeAccountDTO{}, buserr.New(constant.ErrEmailIsExist)
+	}
+
 	client, err := ssl.NewAcmeClient(create.Email, "")
 	if err != nil {
 		return response.WebsiteAcmeAccountDTO{}, err
