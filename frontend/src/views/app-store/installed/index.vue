@@ -123,11 +123,14 @@
                                         </div>
                                     </div>
                                     <div class="app-divider" />
-                                    <div class="d-button" v-if="mode === 'installed'">
+                                    <div
+                                        class="d-button"
+                                        v-if="mode === 'installed' && installed.status != 'Installing'"
+                                    >
                                         <el-button
                                             v-for="(button, key) in buttons"
                                             :key="key"
-                                            type="primary"
+                                            :type="!button.disabled ? 'primary' : 'info'"
                                             plain
                                             round
                                             size="small"
