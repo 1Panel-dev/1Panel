@@ -40,11 +40,12 @@
 </template>
 <script lang="ts" setup>
 import { FormInstance } from 'element-plus';
-import { ref } from 'vue';
+import { onBeforeUnmount, ref } from 'vue';
 import { App } from '@/api/interface/app';
 import { InstalledOp } from '@/api/modules/app';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import bus from '../../bus';
 
 let deleteReq = ref({
     operate: 'delete',
@@ -86,11 +87,16 @@ const submit = async () => {
         .then(() => {
             handleClose();
             MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+            bus.emit('update', true);
         })
         .finally(() => {
             loading.value = false;
         });
 };
+
+onBeforeUnmount(() => {
+    bus.off('update');
+});
 
 defineExpose({
     acceptParams,
