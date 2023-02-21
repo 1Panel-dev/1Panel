@@ -31,7 +31,7 @@ export const ChangePort = (params: App.ChangePort) => {
 };
 
 export const SearchAppInstalled = (search: App.AppInstallSearch) => {
-    return http.post<ResPage<App.AppInstalled>>('apps/installed', search);
+    return http.post<ResPage<App.AppInstalled>>('apps/installed/search', search);
 };
 
 export const GetAppPort = (key: string) => {
@@ -51,7 +51,7 @@ export const AppInstalledDeleteCheck = (appInstallId: number) => {
 };
 
 export const GetAppInstalled = (search: App.AppInstalledSearch) => {
-    return http.post<App.AppInstalled[]>('apps/installed', search);
+    return http.post<App.AppInstalled[]>('apps/installed/search', search);
 };
 
 export const InstalledOp = (op: App.AppInstalledOp) => {

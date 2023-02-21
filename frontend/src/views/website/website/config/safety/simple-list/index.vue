@@ -102,9 +102,10 @@ const get = async () => {
 };
 
 const removeIp = (index: number) => {
-    data.value.splice(index, 1);
+    const copyList = data.value.concat();
+    copyList.splice(index, 1);
     let ipArray = [];
-    data.value.forEach((d) => {
+    copyList.forEach((d) => {
         ipArray.push(d.ip);
     });
     submit(ipArray);
@@ -146,8 +147,12 @@ const submit = async (ipList: string[]) => {
 const updateEnable = async (enable: boolean) => {
     enableUpdate.value.enable = enable;
     loading.value = true;
-    await UpdateWafEnable(enableUpdate.value);
-    loading.value = false;
+    try {
+        await UpdateWafEnable(enableUpdate.value);
+    } catch (error) {
+        enableUpdate.value.enable = !enable;
+        loading.value = false;
+    }
 };
 
 onMounted(() => {

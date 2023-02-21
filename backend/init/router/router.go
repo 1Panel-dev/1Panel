@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"html/template"
 	"net/http"
 
@@ -44,6 +45,10 @@ func Routers() *gin.Engine {
 	Router.Use(middleware.OperationLog())
 	// Router.Use(middleware.CSRF())
 	// Router.Use(middleware.LoadCsrfToken())
+
+	if global.CONF.System.IsDemo {
+		Router.Use(middleware.DemoHandle())
+	}
 
 	setWebStatic(Router)
 

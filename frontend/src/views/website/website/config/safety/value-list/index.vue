@@ -143,8 +143,12 @@ const openCreate = () => {
 const updateEnable = async (enable: boolean) => {
     enableUpdate.value.enable = enable;
     loading.value = true;
-    await UpdateWafEnable(enableUpdate.value);
-    loading.value = false;
+    try {
+        await UpdateWafEnable(enableUpdate.value);
+    } catch (error) {
+        enableUpdate.value.enable = !enable;
+        loading.value = false;
+    }
 };
 
 const submit = async (addArray: string[]) => {

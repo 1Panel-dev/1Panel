@@ -13,4 +13,5 @@ type System struct {
 	BaseDir    string `mapstructure:"base_dir"`
 	Mode       string `mapstructure:"mode"`
 	RepoUrl    string `mapstructure:"repo_url"`
+	IsDemo     bool   `mapstructure:"is_demo"`
 }

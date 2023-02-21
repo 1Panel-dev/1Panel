@@ -45,6 +45,7 @@ var (
 	ErrTypePasswordExpired = "ErrPasswordExpired"
 	ErrTypeNotSafety       = "ErrNotSafety"
 	ErrNameIsExist         = "ErrNameIsExist"
+	ErrDemoEnvironment     = "ErrDemoEnvironment"
 )
 
 // app

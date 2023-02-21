@@ -15,6 +15,7 @@ ErrRepoNotValid: "远程仓库校验失败！"
 
 #common
 ErrNameIsExist: "名称已存在"
+ErrDemoEnvironment: "演示服务器，禁止此操作!"
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被占用！"
