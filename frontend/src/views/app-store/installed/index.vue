@@ -297,15 +297,6 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('app.update'),
-        click: (row: any) => {
-            openOperate(row, 'update');
-        },
-        disabled: (row: any) => {
-            return !row.canUpdate;
-        },
-    },
-    {
         label: i18n.global.t('app.restart'),
         click: (row: any) => {
             openOperate(row, 'restart');
