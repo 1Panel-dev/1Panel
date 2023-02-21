@@ -1,6 +1,7 @@
 package files
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -81,6 +82,21 @@ func (f FileOp) WriteFile(dst string, in io.Reader, mode fs.FileMode) error {
 	if _, err = file.Stat(); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (f FileOp) SaveFile(dst string, content string, mode fs.FileMode) error {
+	if !f.Stat(path.Dir(dst)) {
+		_ = f.CreateDir(path.Dir(dst), mode.Perm())
+	}
+	file, err := f.Fs.OpenFile(dst, os.O_RDWR|os.O_CREATE|os.O_TRUNC, mode)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	write := bufio.NewWriter(file)
+	_, _ = write.WriteString(string(content))
+	write.Flush()
 	return nil
 }
 

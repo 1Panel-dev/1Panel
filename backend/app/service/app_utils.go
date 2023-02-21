@@ -3,14 +3,12 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"math"
 	"os"
 	"path"
 	"reflect"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -24,7 +22,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
 )
 
 type DatabaseOp string
@@ -177,11 +174,9 @@ func updateInstall(installId uint, detailId uint) error {
 	if install.Version == detail.Version {
 		return errors.New("two version is same")
 	}
-	tx, ctx := getTxAndContext()
-	if err := backupInstall(ctx, install); err != nil {
+	if err := NewIBackupService().AppBackup(dto.CommonBackup{Name: install.App.Key, DetailName: install.Name}); err != nil {
 		return err
 	}
-	tx.Commit()
 	if _, err = compose.Down(install.GetComposePath()); err != nil {
 		return err
 	}
@@ -195,118 +190,6 @@ func updateInstall(installId uint, detailId uint) error {
 	if _, err = compose.Up(install.GetComposePath()); err != nil {
 		return err
 	}
-	return appInstallRepo.Save(&install)
-}
-
-func backupInstall(ctx context.Context, install model.AppInstall) error {
-	var backup model.AppInstallBackup
-	appPath := install.GetPath()
-
-	backupAccount, err := backupRepo.Get(commonRepo.WithByType("LOCAL"))
-	if err != nil {
-		return err
-	}
-	varMap := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(backupAccount.Vars), &varMap); err != nil {
-		return err
-	}
-	dir, ok := varMap["dir"]
-	if !ok {
-		return errors.New("load local backup dir failed")
-	}
-	baseDir, ok := dir.(string)
-	if !ok {
-		return errors.New("load local backup dir failed")
-	}
-	backupDir := path.Join(baseDir, "apps", install.App.Key, install.Name)
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(backupDir) {
-		_ = fileOp.CreateDir(backupDir, 0775)
-	}
-	now := time.Now()
-	day := now.Format("20060102150405")
-	fileName := fmt.Sprintf("%s_%s%s", install.Name, day, ".tar.gz")
-	if err := fileOp.Compress([]string{appPath}, backupDir, fileName, files.TarGz); err != nil {
-		return err
-	}
-	backup.Name = fileName
-	backup.Path = backupDir
-	backup.AppInstallId = install.ID
-	backup.AppDetailId = install.AppDetailId
-	backup.Param = install.Param
-
-	return appInstallBackupRepo.Create(ctx, backup)
-}
-
-func restoreInstall(install model.AppInstall, backupId uint) error {
-	backup, err := appInstallBackupRepo.GetFirst(commonRepo.WithByID(backupId))
-	if err != nil {
-		return err
-	}
-	if _, err := compose.Down(install.GetComposePath()); err != nil {
-		return err
-	}
-	installKeyDir := path.Join(constant.AppInstallDir, install.App.Key)
-	installDir := path.Join(installKeyDir, install.Name)
-	backupFile := path.Join(backup.Path, backup.Name)
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(backupFile) {
-		return errors.New(fmt.Sprintf("%s file is not exist", backup.Name))
-	}
-
-	backupDir, err := fileOp.Backup(installDir)
-	if err != nil {
-		return err
-	}
-	if err := fileOp.Decompress(backupFile, installKeyDir, files.TarGz); err != nil {
-		return err
-	}
-	composeContent, err := os.ReadFile(install.GetComposePath())
-	if err != nil {
-		return err
-	}
-	install.DockerCompose = string(composeContent)
-	envContent, err := os.ReadFile(path.Join(installDir, ".env"))
-	if err != nil {
-		return err
-	}
-	install.Env = string(envContent)
-	envMaps, err := godotenv.Unmarshal(string(envContent))
-	if err != nil {
-		return err
-	}
-	install.HttpPort = 0
-	httpPort, ok := envMaps["PANEL_APP_PORT_HTTP"]
-	if ok {
-		httpPortN, _ := strconv.Atoi(httpPort)
-		install.HttpPort = httpPortN
-	}
-	install.HttpsPort = 0
-	httpsPort, ok := envMaps["PANEL_APP_PORT_HTTPS"]
-	if ok {
-		httpsPortN, _ := strconv.Atoi(httpsPort)
-		install.HttpsPort = httpsPortN
-	}
-
-	composeMap := make(map[string]interface{})
-	if err := yaml.Unmarshal(composeContent, &composeMap); err != nil {
-		return err
-	}
-	servicesMap := composeMap["services"].(map[string]interface{})
-	for k, v := range servicesMap {
-		install.ServiceName = k
-		value := v.(map[string]interface{})
-		install.ContainerName = value["container_name"].(string)
-	}
-
-	install.Param = backup.Param
-	_ = fileOp.DeleteDir(backupDir)
-	if out, err := compose.Up(install.GetComposePath()); err != nil {
-		return handleErr(install, err, out)
-	}
-	install.AppDetailId = backup.AppDetailId
-	install.Version = backup.AppDetail.Version
-	install.Status = constant.Running
 	return appInstallRepo.Save(&install)
 }
 

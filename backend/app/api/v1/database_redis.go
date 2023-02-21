@@ -140,46 +140,6 @@ func (b *BaseApi) UpdateRedisPersistenceConf(c *gin.Context) {
 }
 
 // @Tags Database Redis
-// @Summary Backup redis
-// @Description 备份 redis 数据库
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /databases/redis/backup [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"备份 redis 数据库","formatEN":"backup redis database"}
-func (b *BaseApi) RedisBackup(c *gin.Context) {
-	if err := redisService.Backup(); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, nil)
-}
-
-// @Tags Database Redis
-// @Summary Recover redis
-// @Description 恢复 redis 数据库
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /databases/redis/recover [post]
-// @x-panel-log {"bodyKeys":["fileDir","fileName"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"redis 数据库从 [fileDir]/[fileName] 恢复","formatEN":"redis database recover from [fileDir]/[fileName]"}
-func (b *BaseApi) RedisRecover(c *gin.Context) {
-	var req dto.RedisBackupRecover
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-
-	if err := redisService.Recover(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, nil)
-}
-
-// @Tags Database Redis
 // @Summary Page redis backups
 // @Description 获取 redis 备份记录分页
 // @Accept json

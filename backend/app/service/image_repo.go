@@ -184,9 +184,7 @@ func (u *ImageRepoService) CheckConn(host, user, password string) error {
 func (u *ImageRepoService) handleRegistries(newHost, delHost, handle string) error {
 	if _, err := os.Stat(constant.DaemonJsonPath); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(path.Dir(constant.DaemonJsonPath), os.ModePerm); err != nil {
-			if err != nil {
-				return err
-			}
+			return err
 		}
 		_, _ = os.Create(constant.DaemonJsonPath)
 	}

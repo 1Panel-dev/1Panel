@@ -272,10 +272,8 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 	dir := path.Dir(paths[0])
 	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
-			if err != nil {
-				helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, fmt.Errorf("mkdir %s failed, err: %v", dir, err))
-				return
-			}
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, fmt.Errorf("mkdir %s failed, err: %v", dir, err))
+			return
 		}
 	}
 	success := 0

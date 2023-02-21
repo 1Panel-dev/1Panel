@@ -6,16 +6,6 @@ export const searchMysqlDBs = (params: SearchWithPage) => {
     return http.post<ResPage<Database.MysqlDBInfo>>(`/databases/search`, params);
 };
 
-export const backup = (params: Database.Backup) => {
-    return http.post(`/databases/backup`, params);
-};
-export const recover = (params: Database.Recover) => {
-    return http.post(`/databases/recover`, params);
-};
-export const recoverByUpload = (params: Database.RecoverByUpload) => {
-    return http.post(`/databases/recover/byupload`, params);
-};
-
 export const addMysqlDB = (params: Database.MysqlDBCreate) => {
     return http.post(`/databases`, params);
 };
@@ -78,9 +68,6 @@ export const updateRedisConf = (params: Database.RedisConfUpdate) => {
 };
 export const updateRedisConfByFile = (params: Database.RedisConfUpdateByFile) => {
     return http.post(`/databases/redis/conffile/update`, params);
-};
-export const backupRedis = () => {
-    return http.post(`/databases/redis/backup`);
 };
 export const recoverRedis = (param: Database.RedisRecover) => {
     return http.post(`/databases/redis/recover`, param);

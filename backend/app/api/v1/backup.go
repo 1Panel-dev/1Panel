@@ -237,3 +237,128 @@ func (b *BaseApi) LoadFilesFromBackup(c *gin.Context) {
 
 	helper.SuccessWithData(c, data)
 }
+
+// @Tags Backup Account
+// @Summary Backup system data
+// @Description 备份系统数据
+// @Accept json
+// @Param request body dto.CommonBackup true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/backup/ [post]
+// @x-panel-log {"bodyKeys":["type","name","detailName"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"备份 [type] 数据 [name][detailName]","formatEN":"backup [type] data [name][detailName]"}
+func (b *BaseApi) Backup(c *gin.Context) {
+	var req dto.CommonBackup
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	switch req.Type {
+	case "app":
+		if err := backupService.AppBackup(req); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+	case "mysql":
+		if err := backupService.MysqlBackup(req); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+	case "website":
+		if err := backupService.WebsiteBackup(req); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+	case "redis":
+		if err := backupService.RedisBackup(); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Backup Account
+// @Summary Recover system data
+// @Description 恢复系统数据
+// @Accept json
+// @Param request body dto.CommonRecover true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/backup/recover [post]
+// @x-panel-log {"bodyKeys":["type","name","detailName","file"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"从 [file] 恢复 [type] 数据 [name][detailName]","formatEN":"recover [type] data [name][detailName] from [file]"}
+func (b *BaseApi) Recover(c *gin.Context) {
+	var req dto.CommonRecover
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	switch req.Type {
+	case "mysql":
+		if err := backupService.MysqlRecover(req); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+	case "website":
+		if err := backupService.WebsiteRecover(req); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Backup Account
+// @Summary Recover system data by upload
+// @Description 从上传恢复系统数据
+// @Accept json
+// @Param request body dto.CommonRecover true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/backup/recover/byupload [post]
+// @x-panel-log {"bodyKeys":["type","name","detailName","file"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"从 [file] 恢复 [type] 数据 [name][detailName]","formatEN":"recover [type] data [name][detailName] from [file]"}
+func (b *BaseApi) RecoverByUpload(c *gin.Context) {
+	var req dto.CommonRecover
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	switch req.Type {
+	case "app":
+		if err := backupService.AppRecover(req); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+	case "mysql":
+		if err := backupService.MysqlRecoverByUpload(req); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+	case "website":
+		if err := backupService.WebsiteRecover(req); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+	case "redis":
+		if err := backupService.RedisRecover(req); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+	}
+	helper.SuccessWithData(c, nil)
+}

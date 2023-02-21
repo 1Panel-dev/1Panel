@@ -23,18 +23,6 @@ export const OpWebsiteLog = (req: Website.WebSiteOpLog) => {
     return http.post<Website.WebSiteLog>(`/websites/log`, req);
 };
 
-export const BackupWebsite = (req: Website.BackupReq) => {
-    return http.post(`/websites/backup`, req);
-};
-
-export const RecoverWebsite = (req: Website.WebSiteRecover) => {
-    return http.post(`/websites/recover`, req);
-};
-
-export const RecoverWebsiteByUpload = (req: Website.WebsiteRecoverByUpload) => {
-    return http.post(`/websites/recover/byupload`, req);
-};
-
 export const UpdateWebsite = (req: Website.WebSiteUpdateReq) => {
     return http.post<any>(`/websites/update`, req);
 };

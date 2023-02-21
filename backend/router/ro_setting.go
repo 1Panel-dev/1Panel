@@ -35,6 +35,9 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/snapshot/description/update", baseApi.UpdateSnapDescription)
 
 		settingRouter.GET("/backup/search", baseApi.ListBackup)
+		settingRouter.POST("/backup/backup", baseApi.Backup)
+		settingRouter.POST("/backup/recover", baseApi.Recover)
+		settingRouter.POST("/backup/recover/byupload", baseApi.RecoverByUpload)
 		settingRouter.POST("/backup/search/files", baseApi.LoadFilesFromBackup)
 		settingRouter.POST("/backup/buckets", baseApi.ListBuckets)
 		settingRouter.POST("/backup", baseApi.CreateBackup)
