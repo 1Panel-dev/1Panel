@@ -155,6 +155,9 @@ const submit = async (formEl: FormInstance | undefined) => {
                 search(req);
             })
             .finally(() => {
+                if (req.operate === 'add') {
+                    enable.value = false;
+                }
                 loading.value = false;
             });
     });

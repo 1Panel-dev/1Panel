@@ -87,9 +87,10 @@ const get = async () => {
 };
 
 const remove = (index: number) => {
-    data.value.splice(index, 1);
+    const copyList = data.value.concat();
+    copyList.splice(index, 1);
     const extArray = [];
-    data.value.forEach((d) => {
+    copyList.forEach((d) => {
         extArray.push(d.file);
     });
     submit(extArray);
@@ -123,8 +124,12 @@ const submit = async (extArray: string[]) => {
 const updateEnable = async (enable: boolean) => {
     enableUpdate.value.enable = enable;
     loading.value = true;
-    await UpdateWafEnable(enableUpdate.value);
-    loading.value = false;
+    try {
+        await UpdateWafEnable(enableUpdate.value);
+    } catch (error) {
+        enableUpdate.value.enable = !enable;
+        loading.value = false;
+    }
 };
 
 onMounted(() => {

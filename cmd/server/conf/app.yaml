@@ -3,6 +3,7 @@ system:
   base_dir: /opt
   mode: dev
   repo_url: https://1panel.oss-cn-hangzhou.aliyuncs.com/package
+  is_demo: false
 
 log:
   level: debug

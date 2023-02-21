@@ -26,7 +26,7 @@ func (a *AppRouter) InitAppRouter(Router *gin.RouterGroup) {
 		appRouter.GET("/installed/loadport/:key", baseApi.LoadPort)
 		appRouter.GET("/installed/loadpassword/:key", baseApi.LoadPassword)
 		appRouter.GET("/installed/delete/check/:appInstallId", baseApi.DeleteCheck)
-		appRouter.POST("/installed", baseApi.SearchAppInstalled)
+		appRouter.POST("/installed/search", baseApi.SearchAppInstalled)
 		appRouter.POST("/installed/op", baseApi.OperateInstalled)
 		appRouter.POST("/installed/sync", baseApi.SyncInstalled)
 		appRouter.POST("/installed/backups", baseApi.SearchInstalledBackup)

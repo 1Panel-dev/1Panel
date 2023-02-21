@@ -333,21 +333,25 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        PreCheck({}).then((res) => {
-            if (res.data) {
+        PreCheck({})
+            .then((res) => {
+                if (res.data) {
+                    loading.value = false;
+                    preCheckRef.value.acceptParams({ items: res.data });
+                } else {
+                    CreateWebsite(website.value)
+                        .then(() => {
+                            MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+                            handleClose();
+                        })
+                        .finally(() => {
+                            loading.value = false;
+                        });
+                }
+            })
+            .catch(() => {
                 loading.value = false;
-                preCheckRef.value.acceptParams({ items: res.data });
-            } else {
-                CreateWebsite(website.value)
-                    .then(() => {
-                        MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
-                        handleClose();
-                    })
-                    .finally(() => {
-                        loading.value = false;
-                    });
-            }
-        });
+            });
     });
 };
 

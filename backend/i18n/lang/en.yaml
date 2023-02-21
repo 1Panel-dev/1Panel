@@ -15,6 +15,7 @@ ErrRepoNotValid: "Remote repository verification failed！"
 
 #common
 ErrNameIsExist: "Name is already exist"
+ErrDemoEnvironment: "Demo server, prohibit this operation!"
 
 #app
 ErrPortInUsed: "{{ .detail }} port already in use"
