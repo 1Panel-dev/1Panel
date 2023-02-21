@@ -86,6 +86,7 @@ func (a AppInstallService) CheckExist(key string) (*response.AppInstalledCheck, 
 	if err := syncById(appInstall.ID); err != nil {
 		return nil, err
 	}
+	appInstall, _ = appInstallRepo.GetFirst(commonRepo.WithByID(appInstall.ID))
 
 	res.ContainerName = appInstall.ContainerName
 	res.Name = appInstall.Name
