@@ -15,6 +15,7 @@ import RouterButton from '@/components/router-button/index.vue';
 import i18n from '@/lang';
 import { onMounted, ref } from 'vue';
 import { SearchAppInstalled } from '@/api/modules/app';
+import bus from './bus';
 let showButton = ref(false);
 const buttons = [
     {
@@ -31,12 +32,26 @@ const buttons = [
         count: 0,
     },
 ];
+
+const search = () => {
+    SearchAppInstalled({ update: true, page: 1, pageSize: 100 })
+        .then((res) => {
+            if (res.data.items) {
+                buttons[2].count = res.data.items.length;
+            } else {
+                buttons[2].count = 0;
+            }
+        })
+        .finally(() => {
+            showButton.value = true;
+        });
+};
+
 onMounted(() => {
-    SearchAppInstalled({ update: true, page: 1, pageSize: 100 }).then((res) => {
-        if (res.data.items) {
-            buttons[2].count = res.data.items.length;
-        }
-        showButton.value = true;
+    search();
+    bus.on('update', () => {
+        showButton.value = false;
+        search();
     });
 });
 </script>

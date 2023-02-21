@@ -8,7 +8,7 @@
                 size="large"
                 :key="index"
             >
-                <el-badge :value="button.count" class="item" v-if="button.count > 0">
+                <el-badge :value="button.count" class="item" v-if="button.count > 0" is-dot>
                     <span>{{ button.label }}</span>
                 </el-badge>
             </el-radio-button>

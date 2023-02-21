@@ -34,10 +34,11 @@ import { App } from '@/api/interface/app';
 import { GetAppUpdateVersions, InstalledOp } from '@/api/modules/app';
 import i18n from '@/lang';
 import { ElMessageBox, FormInstance } from 'element-plus';
-import { reactive, ref } from 'vue';
+import { reactive, ref, onBeforeUnmount } from 'vue';
 import Header from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
+import bus from '../../bus';
 
 const updateRef = ref<FormInstance>();
 let open = ref(false);
@@ -75,8 +76,9 @@ const operate = async () => {
     loading.value = true;
     await InstalledOp(operateReq)
         .then(() => {
-            open.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            bus.emit('update', true);
+            handleClose();
         })
         .finally(() => {
             loading.value = false;
@@ -96,6 +98,10 @@ const onOperate = async () => {
         operate();
     });
 };
+
+onBeforeUnmount(() => {
+    bus.off('update');
+});
 
 defineExpose({
     acceptParams,
