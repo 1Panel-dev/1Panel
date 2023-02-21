@@ -5,7 +5,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/gin-gonic/gin"
 )
 
@@ -107,82 +106,6 @@ func (b *BaseApi) OpWebsite(c *gin.Context) {
 	}
 	err := websiteService.OpWebsite(req)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, nil)
-}
-
-// @Tags Website
-// @Summary Backup website
-// @Description 备份网站
-// @Accept json
-// @Param request body request.WebsiteResourceReq true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /websites/backup [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"备份网站 [domain]","formatEN":"Backup website [domain]"}
-func (b *BaseApi) BackupWebsite(c *gin.Context) {
-	var req request.WebsiteResourceReq
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := websiteService.Backup(req.ID); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, nil)
-}
-
-// @Tags Website
-// @Summary Recover website by upload
-// @Description 从上传恢复网站
-// @Accept json
-// @Param request body request.WebsiteRecoverByFile true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /websites/recover/byupload [post]
-// @x-panel-log {"bodyKeys":["websiteName","fileDir","fileName"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"[websiteName] 从上传恢复 [fileDir]/[fileName]","formatEN":"[websiteName] recover from uploads [fileDir]/[fileName]"}
-func (b *BaseApi) RecoverWebsiteByUpload(c *gin.Context) {
-	var req request.WebsiteRecoverByFile
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-
-	if err := websiteService.RecoverByUpload(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, nil)
-}
-
-// @Tags Website
-// @Summary Recover website
-// @Description 从备份恢复网站
-// @Accept json
-// @Param request body request.WebsiteRecover true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /websites/recover [post]
-// @x-panel-log {"bodyKeys":["websiteName","backupName"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"[websiteName] 从备份恢复 [backupName]","formatEN":"[websiteName] recover from backups [backupName]"}
-func (b *BaseApi) RecoverWebsite(c *gin.Context) {
-	var req request.WebsiteRecover
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-
-	if err := websiteService.Recover(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

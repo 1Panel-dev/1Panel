@@ -51,6 +51,15 @@ export const loadBaseDir = () => {
 };
 
 // backup
+export const handleBackup = (params: Backup.Backup) => {
+    return http.post(`/settings/backup/backup`, params);
+};
+export const handleRecover = (params: Backup.Recover) => {
+    return http.post(`/settings/backup/recover`, params);
+};
+export const handleRecoverByUpload = (params: Backup.Recover) => {
+    return http.post(`/settings/backup/recover/byupload`, params);
+};
 export const getBackupList = () => {
     return http.get<Array<Backup.BackupInfo>>(`/settings/backup/search`);
 };

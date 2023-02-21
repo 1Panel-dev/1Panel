@@ -3,18 +3,18 @@ package service
 import (
 	"context"
 	"crypto/x509"
-	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
-	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
-	"github.com/1Panel-dev/1Panel/backend/app/repo"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"os"
 	"path"
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -33,9 +33,6 @@ type IWebsiteService interface {
 	CreateWebsite(ctx context.Context, create request.WebsiteCreate) error
 	OpWebsite(req request.WebsiteOp) error
 	GetWebsiteOptions() ([]string, error)
-	Backup(id uint) error
-	Recover(req request.WebsiteRecover) error
-	RecoverByUpload(req request.WebsiteRecoverByFile) error
 	UpdateWebsite(req request.WebsiteUpdate) error
 	DeleteWebsite(req request.WebsiteDelete) error
 	GetWebsite(id uint) (response.WebsiteDTO, error)
@@ -196,74 +193,6 @@ func (w WebsiteService) GetWebsiteOptions() ([]string, error) {
 		datas = append(datas, web.PrimaryDomain)
 	}
 	return datas, nil
-}
-
-func (w WebsiteService) Backup(id uint) error {
-	localDir, err := loadLocalDir()
-	if err != nil {
-		return err
-	}
-	website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
-	if err != nil {
-		return err
-	}
-
-	fileName := fmt.Sprintf("%s_%s", website.PrimaryDomain, time.Now().Format("20060102150405"))
-	backupDir := fmt.Sprintf("website/%s", website.PrimaryDomain)
-	if err := handleWebsiteBackup("LOCAL", localDir, backupDir, website.PrimaryDomain, fileName); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (w WebsiteService) RecoverByUpload(req request.WebsiteRecoverByFile) error {
-	if err := handleUnTar(fmt.Sprintf("%s/%s", req.FileDir, req.FileName), req.FileDir); err != nil {
-		return err
-	}
-	tmpDir := fmt.Sprintf("%s/%s", req.FileDir, strings.ReplaceAll(req.FileName, ".tar.gz", ""))
-	webJson, err := os.ReadFile(fmt.Sprintf("%s/website.json", tmpDir))
-	if err != nil {
-		return err
-	}
-	var websiteInfo WebsiteInfo
-	if err := json.Unmarshal(webJson, &websiteInfo); err != nil {
-		return err
-	}
-	if websiteInfo.WebsiteName != req.WebsiteName || websiteInfo.WebsiteType != req.Type {
-		return errors.New("上传文件与选中网站不匹配，无法恢复")
-	}
-
-	website, err := websiteRepo.GetFirst(websiteRepo.WithDomain(req.WebsiteName))
-	if err != nil {
-		return err
-	}
-	if err := handleWebsiteRecover(&website, tmpDir); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (w WebsiteService) Recover(req request.WebsiteRecover) error {
-	website, err := websiteRepo.GetFirst(websiteRepo.WithDomain(req.WebsiteName))
-	if err != nil {
-		return err
-	}
-
-	if !strings.Contains(req.BackupName, "/") {
-		return errors.New("error path of request")
-	}
-	fileDir := path.Dir(req.BackupName)
-	pathName := strings.ReplaceAll(path.Base(req.BackupName), ".tar.gz", "")
-	if err := handleUnTar(req.BackupName, fileDir); err != nil {
-		return err
-	}
-	fileDir = fileDir + "/" + pathName
-
-	if err := handleWebsiteRecover(&website, fileDir); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (w WebsiteService) UpdateWebsite(req request.WebsiteUpdate) error {

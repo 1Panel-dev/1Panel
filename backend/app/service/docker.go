@@ -104,9 +104,7 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 	if _, err := os.Stat(constant.DaemonJsonPath); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(path.Dir(constant.DaemonJsonPath), os.ModePerm); err != nil {
-			if err != nil {
-				return err
-			}
+			return err
 		}
 		_, _ = os.Create(constant.DaemonJsonPath)
 	}

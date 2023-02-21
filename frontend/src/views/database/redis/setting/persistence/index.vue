@@ -119,12 +119,13 @@ import ComplexTable from '@/components/complex-table/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { Database } from '@/api/interface/database';
 import {
-    backupRedis,
     recoverRedis,
     redisBackupRedisRecords,
     RedisPersistenceConf,
     updateRedisPersistenceConf,
 } from '@/api/modules/database';
+
+import { handleBackup } from '@/api/modules/setting';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
@@ -198,7 +199,7 @@ const loadBackupRecords = async () => {
 };
 const onBackup = async () => {
     loading.value = true;
-    await backupRedis()
+    await handleBackup({ name: '', detailName: '', type: 'redis' })
         .then(() => {
             loading.value = false;
             loadBackupRecords();

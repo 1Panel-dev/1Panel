@@ -2,14 +2,12 @@ package service
 
 import (
 	"bufio"
-	"compress/gzip"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -21,7 +19,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
-	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -38,11 +35,6 @@ type IMysqlService interface {
 	UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
 	UpdateConfByFile(info dto.MysqlConfUpdateByFile) error
 	UpdateDescription(req dto.UpdateDescription) error
-
-	RecoverByUpload(req dto.UploadRecover) error
-	Backup(db dto.BackupDB) error
-	Recover(db dto.RecoverDB) error
-
 	DeleteCheck(id uint) ([]string, error)
 	Delete(ctx context.Context, req dto.MysqlDBDelete) error
 	LoadStatus() (*dto.MysqlStatus, error)
@@ -66,83 +58,6 @@ func (u *MysqlService) SearchWithPage(search dto.SearchWithPage) (int64, interfa
 		dtoMysqls = append(dtoMysqls, item)
 	}
 	return total, dtoMysqls, err
-}
-
-func (u *MysqlService) RecoverByUpload(req dto.UploadRecover) error {
-	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
-	if err != nil {
-		return err
-	}
-	file := req.FileDir + "/" + req.FileName
-	if !strings.HasSuffix(req.FileName, ".sql") && !strings.HasSuffix(req.FileName, ".gz") {
-		fileOp := files.NewFileOp()
-		fileNameItem := time.Now().Format("20060102150405")
-		dstDir := fmt.Sprintf("%s/%s", req.FileDir, fileNameItem)
-		if _, err := os.Stat(dstDir); err != nil && os.IsNotExist(err) {
-			if err = os.MkdirAll(dstDir, os.ModePerm); err != nil {
-				if err != nil {
-					return fmt.Errorf("mkdir %s failed, err: %v", dstDir, err)
-				}
-			}
-		}
-		var compressType files.CompressType
-		switch {
-		case strings.HasSuffix(req.FileName, ".tar.gz"), strings.HasSuffix(req.FileName, ".tgz"):
-			compressType = files.TarGz
-		case strings.HasSuffix(req.FileName, ".zip"):
-			compressType = files.Zip
-		}
-		if err := fileOp.Decompress(req.FileDir+"/"+req.FileName, dstDir, compressType); err != nil {
-			_ = os.RemoveAll(dstDir)
-			return err
-		}
-		global.LOG.Infof("decompress file %s successful, now start to check test.sql is exist", req.FileDir+"/"+req.FileName)
-		hasTestSql := false
-		_ = filepath.Walk(dstDir, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return nil
-			}
-			if !info.IsDir() && info.Name() == "test.sql" {
-				hasTestSql = true
-				file = path
-			}
-			return nil
-		})
-		if !hasTestSql {
-			_ = os.RemoveAll(dstDir)
-			return fmt.Errorf("no such file named test.sql in %s, err: %v", req.FileName, err)
-		}
-		defer func() {
-			_ = os.RemoveAll(dstDir)
-		}()
-	}
-
-	global.LOG.Info("start to do recover from uploads")
-	fi, _ := os.Open(file)
-	defer fi.Close()
-	cmd := exec.Command("docker", "exec", "-i", app.ContainerName, "mysql", "-uroot", "-p"+app.Password, req.DBName)
-	if strings.HasSuffix(req.FileName, ".gz") {
-		gzipFile, err := os.Open(file)
-		if err != nil {
-			return err
-		}
-		defer gzipFile.Close()
-		gzipReader, err := gzip.NewReader(gzipFile)
-		if err != nil {
-			return err
-		}
-		defer gzipReader.Close()
-		cmd.Stdin = gzipReader
-	} else {
-		cmd.Stdin = fi
-	}
-	stdout, err := cmd.CombinedOutput()
-	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
-	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
-		return errors.New(stdStr)
-	}
-	global.LOG.Info("recover from uploads successful!")
-	return nil
 }
 
 func (u *MysqlService) ListDBName() ([]string, error) {
@@ -205,46 +120,6 @@ func (u *MysqlService) UpdateDescription(req dto.UpdateDescription) error {
 	return mysqlRepo.Update(req.ID, map[string]interface{}{"description": req.Description})
 }
 
-func (u *MysqlService) Backup(db dto.BackupDB) error {
-	localDir, err := loadLocalDir()
-	if err != nil {
-		return err
-	}
-	backupDir := fmt.Sprintf("database/mysql/%s/%s", db.MysqlName, db.DBName)
-	fileName := fmt.Sprintf("%s_%s.sql.gz", db.DBName, time.Now().Format("20060102150405"))
-	if err := backupMysql("LOCAL", localDir, backupDir, db.MysqlName, db.DBName, fileName); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (u *MysqlService) Recover(req dto.RecoverDB) error {
-	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
-	if err != nil {
-		return err
-	}
-
-	global.LOG.Infof("recover database %s-%s from backup file %s", req.MysqlName, req.DBName, req.BackupName)
-	gzipFile, err := os.Open(req.BackupName)
-	if err != nil {
-		return err
-	}
-	defer gzipFile.Close()
-	gzipReader, err := gzip.NewReader(gzipFile)
-	if err != nil {
-		return err
-	}
-	defer gzipReader.Close()
-	cmd := exec.Command("docker", "exec", "-i", app.ContainerName, "mysql", "-uroot", "-p"+app.Password, req.DBName)
-	cmd.Stdin = gzipReader
-	stdout, err := cmd.CombinedOutput()
-	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
-	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
-		return errors.New(stdStr)
-	}
-	return nil
-}
-
 func (u *MysqlService) DeleteCheck(id uint) ([]string, error) {
 	var appInUsed []string
 	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
@@ -301,7 +176,7 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 		}
 		global.LOG.Infof("delete database %s-%s backups successful", app.Name, db.Name)
 	}
-	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("database-mysql"), commonRepo.WithByName(app.Name), backupRepo.WithByDetailName(db.Name))
+	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("mysql"), commonRepo.WithByName(app.Name), backupRepo.WithByDetailName(db.Name))
 
 	_ = mysqlRepo.Delete(ctx, commonRepo.WithByID(db.ID))
 	return nil
@@ -622,49 +497,6 @@ func excuteSql(containerName, password, command string) error {
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
 	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
 		return errors.New(stdStr)
-	}
-	return nil
-}
-
-func backupMysql(backupType, baseDir, backupDir, mysqlName, dbName, fileName string) error {
-	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
-	if err != nil {
-		return err
-	}
-
-	fullDir := baseDir + "/" + backupDir
-	if _, err := os.Stat(fullDir); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(fullDir, os.ModePerm); err != nil {
-			if err != nil {
-				return fmt.Errorf("mkdir %s failed, err: %v", fullDir, err)
-			}
-		}
-	}
-	outfile, _ := os.OpenFile(fullDir+"/"+fileName, os.O_RDWR|os.O_CREATE, 0755)
-	global.LOG.Infof("start to mysqldump | gzip > %s.gzip", fullDir+"/"+fileName)
-	cmd := exec.Command("docker", "exec", app.ContainerName, "mysqldump", "-uroot", "-p"+app.Password, dbName)
-	gzipCmd := exec.Command("gzip", "-cf")
-	gzipCmd.Stdin, _ = cmd.StdoutPipe()
-	gzipCmd.Stdout = outfile
-	_ = gzipCmd.Start()
-	_ = cmd.Run()
-	_ = gzipCmd.Wait()
-
-	record := &model.BackupRecord{
-		Type:       "database-mysql",
-		Name:       app.Name,
-		DetailName: dbName,
-		Source:     backupType,
-		BackupType: backupType,
-		FileDir:    backupDir,
-		FileName:   fileName,
-	}
-	if baseDir != global.CONF.System.TmpDir || backupType == "LOCAL" {
-		record.Source = "LOCAL"
-		record.FileDir = fullDir
-	}
-	if err := backupRepo.CreateRecord(record); err != nil {
-		global.LOG.Errorf("save backup record failed, err: %v", err)
 	}
 	return nil
 }

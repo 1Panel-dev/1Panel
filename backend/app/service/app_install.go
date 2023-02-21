@@ -187,16 +187,6 @@ func (a AppInstallService) Operate(req request.AppInstalledOperate) error {
 		return nil
 	case constant.Sync:
 		return syncById(install.ID)
-	case constant.Backup:
-		tx, ctx := getTxAndContext()
-		if err := backupInstall(ctx, install); err != nil {
-			tx.Rollback()
-			return err
-		}
-		tx.Commit()
-		return nil
-	case constant.Restore:
-		return restoreInstall(install, req.BackupId)
 	case constant.Update:
 		return updateInstall(install.ID, req.DetailId)
 	default:

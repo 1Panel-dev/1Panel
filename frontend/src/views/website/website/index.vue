@@ -143,7 +143,7 @@
         <DeleteWebsite ref="deleteRef" @close="search" />
         <WebSiteGroup ref="groupRef" />
         <UploadDialog ref="uploadRef" />
-        <BackupRecords ref="dialogBackupRef" />
+        <Backups ref="dialogBackupRef" />
         <DefaultServer ref="defaultRef" />
     </div>
 </template>
@@ -151,7 +151,7 @@
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
 import RouterButton from '@/components/router-button/index.vue';
-import BackupRecords from '@/views/website/website/backup/index.vue';
+import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/views/website/website/upload/index.vue';
 import DefaultServer from '@/views/website/website/default/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
@@ -312,9 +312,9 @@ const buttons = [
         label: i18n.global.t('database.backupList'),
         click: (row: Website.Website) => {
             let params = {
-                id: row.id,
-                type: row.type,
+                type: 'website',
                 name: row.primaryDomain,
+                detailName: '',
             };
             dialogBackupRef.value!.acceptParams(params);
         },

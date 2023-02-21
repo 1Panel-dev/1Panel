@@ -31,6 +31,20 @@ type IBackupService interface {
 	NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error)
 
 	ListFiles(req dto.BackupSearchFile) ([]interface{}, error)
+
+	MysqlBackup(db dto.CommonBackup) error
+	MysqlRecover(db dto.CommonRecover) error
+	MysqlRecoverByUpload(req dto.CommonRecover) error
+
+	RedisBackup() error
+	RedisRecover(db dto.CommonRecover) error
+
+	WebsiteBackup(db dto.CommonBackup) error
+	WebsiteRecover(req dto.CommonRecover) error
+	WebsiteRecoverByUpload(req dto.CommonRecover) error
+
+	AppBackup(db dto.CommonBackup) error
+	AppRecover(req dto.CommonRecover) error
 }
 
 func NewIBackupService() IBackupService {
@@ -285,9 +299,7 @@ func loadLocalDir() (string, error) {
 	if ok {
 		if _, err := os.Stat(baseDir); err != nil && os.IsNotExist(err) {
 			if err = os.MkdirAll(baseDir, os.ModePerm); err != nil {
-				if err != nil {
-					return "", fmt.Errorf("mkdir %s failed, err: %v", baseDir, err)
-				}
+				return "", fmt.Errorf("mkdir %s failed, err: %v", baseDir, err)
 			}
 		}
 		return baseDir, nil

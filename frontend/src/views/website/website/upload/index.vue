@@ -69,8 +69,7 @@ import i18n from '@/lang';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps } from 'element-plus';
 import { File } from '@/api/interface/file';
 import { BatchDeleteFile, GetFilesList, UploadFileData } from '@/api/modules/files';
-import { RecoverWebsiteByUpload } from '@/api/modules/website';
-import { loadBaseDir } from '@/api/modules/setting';
+import { handleRecoverByUpload, loadBaseDir } from '@/api/modules/setting';
 import Header from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 
@@ -116,13 +115,13 @@ const search = async () => {
 
 const onRecover = async (row: File.File) => {
     let params = {
-        websiteName: websiteName.value,
-        type: websiteType.value,
-        fileDir: baseDir.value,
-        fileName: row.name,
+        name: websiteName.value,
+        detailName: '',
+        type: 'website',
+        file: baseDir.value + '/' + row.name,
     };
     loading.value = true;
-    await RecoverWebsiteByUpload(params)
+    await handleRecoverByUpload(params)
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

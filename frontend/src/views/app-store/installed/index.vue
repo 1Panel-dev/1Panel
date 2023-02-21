@@ -95,7 +95,7 @@
                                             plain
                                             round
                                             size="small"
-                                            @click="openBackups(installed.id, installed.name)"
+                                            @click="openBackups(installed.app.key, installed.name)"
                                             v-if="mode === 'installed'"
                                         >
                                             {{ $t('app.backup') }}
@@ -163,7 +163,7 @@ import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
-import Backups from './backup/index.vue';
+import Backups from '@/components/backup/index.vue';
 import AppResources from './check/index.vue';
 import AppDelete from './delete/index.vue';
 import AppParams from './detail/index.vue';
@@ -335,10 +335,11 @@ const buttons = [
     },
 ];
 
-const openBackups = (installId: number, installName: string) => {
+const openBackups = (key: string, name: string) => {
     let params = {
-        appInstallId: installId,
-        appInstallName: installName,
+        type: 'app',
+        name: key,
+        detailName: name,
     };
     backupRef.value.acceptParams(params);
 };

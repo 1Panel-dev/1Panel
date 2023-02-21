@@ -5,10 +5,6 @@ export namespace Database {
         mysqlName: string;
         dbName: string;
     }
-    export interface Backup {
-        mysqlName: string;
-        dbName: string;
-    }
     export interface Recover {
         mysqlName: string;
         dbName: string;

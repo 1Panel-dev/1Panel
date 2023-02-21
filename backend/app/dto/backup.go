@@ -30,6 +30,18 @@ type BackupSearchFile struct {
 	Type string `json:"type" validate:"required"`
 }
 
+type CommonBackup struct {
+	Type       string `json:"type" validate:"required,oneof=app mysql redis website"`
+	Name       string `json:"name"`
+	DetailName string `json:"detailName"`
+}
+type CommonRecover struct {
+	Type       string `json:"type" validate:"required,oneof=app mysql redis website"`
+	Name       string `json:"name"`
+	DetailName string `json:"detailName"`
+	File       string `json:"file"`
+}
+
 type RecordSearch struct {
 	PageInfo
 	Type       string `json:"type" validate:"required"`

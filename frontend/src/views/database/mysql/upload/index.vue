@@ -65,7 +65,7 @@ import ComplexTable from '@/components/complex-table/index.vue';
 import { reactive, ref } from 'vue';
 import { computeSize, dateFormatSimple } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
-import { recoverByUpload } from '@/api/modules/database';
+import { handleRecoverByUpload } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps } from 'element-plus';
 import { File } from '@/api/interface/file';
@@ -116,13 +116,13 @@ const search = async () => {
 
 const onRecover = async (row: File.File) => {
     let params = {
-        mysqlName: mysqlName.value,
-        dbName: dbName.value,
-        fileDir: baseDir.value,
-        fileName: row.name,
+        type: 'mysql',
+        name: mysqlName.value,
+        detailName: dbName.value,
+        file: baseDir.value + '/' + row.name,
     };
     loading.value = true;
-    await recoverByUpload(params)
+    await handleRecoverByUpload(params)
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -157,6 +157,7 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
 
 const handleClose = () => {
     uploadRef.value!.clearFiles();
+    upVisiable.value = false;
 };
 
 const onSubmit = () => {

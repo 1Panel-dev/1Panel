@@ -9,12 +9,9 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -30,9 +27,7 @@ type IRedisService interface {
 	LoadConf() (*dto.RedisConf, error)
 	LoadPersistenceConf() (*dto.RedisPersistence, error)
 
-	Backup() error
 	SearchBackupListWithPage(req dto.PageInfo) (int64, interface{}, error)
-	Recover(req dto.RedisBackupRecover) error
 }
 
 func NewIRedisService() IRedisService {
@@ -154,89 +149,6 @@ func (u *RedisService) LoadPersistenceConf() (*dto.RedisPersistence, error) {
 		return nil, err
 	}
 	return &item, nil
-}
-
-func (u *RedisService) Backup() error {
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
-	if err != nil {
-		return err
-	}
-	stdout, err := cmd.Execf("docker exec %s redis-cli -a %s --no-auth-warning save", redisInfo.ContainerName, redisInfo.Password)
-	if err != nil {
-		return errors.New(string(stdout))
-	}
-	localDir, err := loadLocalDir()
-	if err != nil {
-		return err
-	}
-	backupDir := fmt.Sprintf("database/redis/%s/", redisInfo.Name)
-	fullDir := fmt.Sprintf("%s/%s", localDir, backupDir)
-	if _, err := os.Stat(fullDir); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(fullDir, os.ModePerm); err != nil {
-			if err != nil {
-				return fmt.Errorf("mkdir %s failed, err: %v", fullDir, err)
-			}
-		}
-	}
-
-	appendonly, err := configGetStr(redisInfo.ContainerName, redisInfo.Password, "appendonly")
-	if err != nil {
-		return err
-	}
-
-	global.LOG.Infof("appendonly in redis conf is %s", appendonly)
-	if appendonly == "yes" {
-		redisDataDir := fmt.Sprintf("%s/%s/%s/data", constant.AppInstallDir, "redis", redisInfo.Name)
-		name := fmt.Sprintf("%s.tar.gz", time.Now().Format("20060102150405"))
-		if err := handleTar(redisDataDir+"/appendonlydir", fullDir, name, ""); err != nil {
-			return err
-		}
-		return nil
-	}
-
-	name := fmt.Sprintf("%s.rdb", time.Now().Format("20060102150405"))
-	stdout1, err1 := cmd.Execf("docker cp %s:/data/dump.rdb %s/%s", redisInfo.ContainerName, fullDir, name)
-	if err1 != nil {
-		return errors.New(string(stdout1))
-	}
-	return nil
-}
-
-func (u *RedisService) Recover(req dto.RedisBackupRecover) error {
-	redisInfo, err := appInstallRepo.LoadBaseInfo("redis", "")
-	if err != nil {
-		return err
-	}
-	appendonly, err := configGetStr(redisInfo.ContainerName, redisInfo.Password, "appendonly")
-	if err != nil {
-		return err
-	}
-	global.LOG.Infof("appendonly in redis conf is %s", appendonly)
-
-	composeDir := fmt.Sprintf("%s/redis/%s", constant.AppInstallDir, redisInfo.Name)
-	if _, err := compose.Down(composeDir + "/docker-compose.yml"); err != nil {
-		return err
-	}
-	fullName := fmt.Sprintf("%s/%s", req.FileDir, req.FileName)
-	if appendonly == "yes" {
-		redisDataDir := fmt.Sprintf("%s/%s/%s/data/", constant.AppInstallDir, "redis", redisInfo.Name)
-		if err := handleUnTar(fullName, redisDataDir); err != nil {
-			return err
-		}
-	} else {
-		input, err := ioutil.ReadFile(fullName)
-		if err != nil {
-			return err
-		}
-		if err = ioutil.WriteFile(composeDir+"/data/dump.rdb", input, 0640); err != nil {
-			return err
-		}
-	}
-	if _, err := compose.Up(composeDir + "/docker-compose.yml"); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (u *RedisService) SearchBackupListWithPage(req dto.PageInfo) (int64, interface{}, error) {
