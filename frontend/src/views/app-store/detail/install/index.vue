@@ -10,7 +10,7 @@
             <Header :header="$t('app.install')" :back="handleClose" />
         </template>
 
-        <el-row>
+        <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-form
                     ref="paramForm"
@@ -64,7 +64,7 @@ let form = ref<{ [key: string]: any }>({});
 let rules = ref<FormRules>({
     NAME: [Rules.linuxName],
 });
-let loading = false;
+let loading = ref(false);
 const paramForm = ref<FormInstance>();
 const req = reactive({
     appDetailId: 0,
@@ -99,10 +99,15 @@ const submit = async (formEl: FormInstance | undefined) => {
         req.appDetailId = installData.value.appDetailId;
         req.params = form.value;
         req.name = form.value['NAME'];
-        InstallApp(req).then(() => {
-            handleClose();
-            router.push({ path: '/apps/installed' });
-        });
+        loading.value = true;
+        InstallApp(req)
+            .then(() => {
+                handleClose();
+                router.push({ path: '/apps/installed' });
+            })
+            .finally(() => {
+                loading.value = false;
+            });
     });
 };
 

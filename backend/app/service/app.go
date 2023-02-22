@@ -189,9 +189,7 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	if err := checkRequiredAndLimit(app); err != nil {
 		return nil, err
 	}
-	if err := copyAppData(app.Key, appDetail.Version, req.Name, req.Params); err != nil {
-		return nil, err
-	}
+
 	paramByte, err := json.Marshal(req.Params)
 	if err != nil {
 		return nil, err
@@ -211,16 +209,25 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	if err := yaml.Unmarshal([]byte(appDetail.DockerCompose), &composeMap); err != nil {
 		return nil, err
 	}
-	servicesMap := composeMap["services"].(map[string]interface{})
+
+	value, ok := composeMap["services"]
+	if !ok {
+		return nil, buserr.New("")
+	}
+	servicesMap := value.(map[string]interface{})
 	changeKeys := make(map[string]string, len(servicesMap))
-	for k, v := range servicesMap {
+	index := 0
+	for k := range servicesMap {
 		serviceName := k + "-" + common.RandStr(4)
 		changeKeys[k] = serviceName
-		value := v.(map[string]interface{})
 		containerName := constant.ContainerPrefix + k + "-" + common.RandStr(4)
-		value["container_name"] = containerName
+		if index > 0 {
+			continue
+		}
+		req.Params["CONTAINER_NAME"] = containerName
 		appInstall.ServiceName = serviceName
 		appInstall.ContainerName = containerName
+		index++
 	}
 	for k, v := range changeKeys {
 		servicesMap[v] = servicesMap[k]
@@ -231,6 +238,10 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		return nil, err
 	}
 	appInstall.DockerCompose = string(composeByte)
+
+	if err := copyAppData(app.Key, appDetail.Version, req.Name, req.Params); err != nil {
+		return nil, err
+	}
 
 	fileOp := files.NewFileOp()
 	if err := fileOp.WriteFile(appInstall.GetComposePath(), strings.NewReader(string(composeByte)), 0775); err != nil {
