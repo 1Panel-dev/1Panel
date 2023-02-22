@@ -106,8 +106,8 @@ const updateEnable = async (enable: boolean) => {
         await UpdateWafEnable(enableUpdate.value);
     } catch (error) {
         form.enable = !enable;
-        loading.value = false;
     }
+    loading.value = false;
 };
 
 const submit = async (formEl: FormInstance | undefined) => {
