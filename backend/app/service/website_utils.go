@@ -51,12 +51,12 @@ func getDomain(domainStr string, websiteID uint) (model.WebsiteDomain, error) {
 }
 
 func createStaticHtml(website *model.Website) error {
-	nginxInstall, err := getAppInstallByKey(constant.AppNginx)
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
 	}
 
-	indexFolder := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name, "www", "sites", website.Alias, "index")
+	indexFolder := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.Alias, "index")
 	indexPath := path.Join(indexFolder, "index.html")
 	indexContent := string(nginx_conf.Index)
 	fileOp := files.NewFileOp()
@@ -77,7 +77,7 @@ func createStaticHtml(website *model.Website) error {
 }
 
 func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) error {
-	nginxFolder := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name)
+	nginxFolder := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name)
 	siteFolder := path.Join(nginxFolder, "www", "sites", website.Alias)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(siteFolder) {
@@ -109,7 +109,7 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) 
 }
 
 func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, appInstall *model.AppInstall) error {
-	nginxInstall, err := getAppInstallByKey(constant.AppNginx)
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
 	}
@@ -118,7 +118,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	}
 
 	nginxFileName := website.Alias + ".conf"
-	configPath := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name, "conf", "conf.d", nginxFileName)
+	configPath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "conf.d", nginxFileName)
 	nginxContent := string(nginx_conf.WebsiteDefault)
 	config := parser.NewStringParser(nginxContent).Parse()
 	servers := config.FindServers()
@@ -169,7 +169,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 }
 
 func delNginxConfig(website model.Website, force bool) error {
-	nginxApp, err := appRepo.GetFirst(appRepo.WithKey(constant.AppNginx))
+	nginxApp, err := appRepo.GetFirst(appRepo.WithKey(constant.AppOpenresty))
 	if err != nil {
 		return err
 	}
@@ -182,7 +182,7 @@ func delNginxConfig(website model.Website, force bool) error {
 	}
 
 	nginxFileName := website.Alias + ".conf"
-	configPath := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name, "conf", "conf.d", nginxFileName)
+	configPath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "conf.d", nginxFileName)
 	fileOp := files.NewFileOp()
 
 	if !fileOp.Stat(configPath) {
@@ -191,7 +191,7 @@ func delNginxConfig(website model.Website, force bool) error {
 	if err := fileOp.DeleteFile(configPath); err != nil {
 		return err
 	}
-	sitePath := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name, "www", "sites", website.PrimaryDomain)
+	sitePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.PrimaryDomain)
 	if fileOp.Stat(sitePath) {
 		_ = fileOp.DeleteDir(sitePath)
 	}
@@ -247,7 +247,7 @@ func deleteListenAndServerName(website model.Website, ports []int, domains []str
 }
 
 func createPemFile(website model.Website, websiteSSL model.WebsiteSSL) error {
-	nginxApp, err := appRepo.GetFirst(appRepo.WithKey(constant.AppNginx))
+	nginxApp, err := appRepo.GetFirst(appRepo.WithKey(constant.AppOpenresty))
 	if err != nil {
 		return err
 	}
@@ -256,7 +256,7 @@ func createPemFile(website model.Website, websiteSSL model.WebsiteSSL) error {
 		return err
 	}
 
-	configDir := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name, "www", "sites", website.Alias, "ssl")
+	configDir := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.Alias, "ssl")
 	fileOp := files.NewFileOp()
 
 	if !fileOp.Stat(configDir) {
@@ -417,7 +417,7 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 	}
 	global.LOG.Info("put website into tmp dir successful")
 
-	nginxInfo, err := appInstallRepo.LoadBaseInfo(constant.AppNginx, "")
+	nginxInfo, err := appInstallRepo.LoadBaseInfo(constant.AppOpenresty, "")
 	if err != nil {
 		return err
 	}
@@ -472,7 +472,7 @@ func handleWebsiteBackup(backupType, baseDir, backupDir, domain, backupName stri
 }
 
 func handleWebsiteRecover(website *model.Website, fileDir string) error {
-	nginxInfo, err := appInstallRepo.LoadBaseInfo(constant.AppNginx, "")
+	nginxInfo, err := appInstallRepo.LoadBaseInfo(constant.AppOpenresty, "")
 	if err != nil {
 		return err
 	}
@@ -566,7 +566,7 @@ func saveWebsiteJson(website *model.Website, tmpDir string) error {
 }
 
 func deleteWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) error {
-	nginxFolder := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name)
+	nginxFolder := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name)
 	siteFolder := path.Join(nginxFolder, "www", "sites", website.Alias)
 	fileOp := files.NewFileOp()
 	if fileOp.Stat(siteFolder) {

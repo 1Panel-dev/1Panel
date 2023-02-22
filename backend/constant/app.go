@@ -12,9 +12,9 @@ const (
 	AppNormal   = "Normal"
 	AppTakeDown = "TakeDown"
 
-	AppNginx = "nginx"
-	AppMysql = "mysql"
-	AppRedis = "redis"
+	AppOpenresty = "openresty"
+	AppMysql     = "mysql"
+	AppRedis     = "redis"
 )
 
 type AppOperate string

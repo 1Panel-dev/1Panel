@@ -20,12 +20,12 @@ import (
 
 func getNginxFull(website *model.Website) (dto.NginxFull, error) {
 	var nginxFull dto.NginxFull
-	nginxInstall, err := getAppInstallByKey("nginx")
+	nginxInstall, err := getAppInstallByKey("openresty")
 	if err != nil {
 		return nginxFull, err
 	}
 	nginxFull.Install = nginxInstall
-	nginxFull.Dir = path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name)
+	nginxFull.Dir = path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name)
 	nginxFull.ConfigDir = path.Join(nginxFull.Dir, "conf")
 	nginxFull.ConfigFile = "nginx.conf"
 	nginxFull.SiteDir = path.Join(nginxFull.Dir, "www")
@@ -47,7 +47,7 @@ func getNginxFull(website *model.Website) (dto.NginxFull, error) {
 		nginxFull.Website = *website
 		var siteNginxConfig dto.NginxConfig
 		nginxFileName := website.Alias + ".conf"
-		siteConfigPath := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name, "conf", "conf.d", nginxFileName)
+		siteConfigPath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "conf.d", nginxFileName)
 		siteNginxConfig.FilePath = siteConfigPath
 		siteNginxContent, err := os.ReadFile(siteConfigPath)
 		if err != nil {

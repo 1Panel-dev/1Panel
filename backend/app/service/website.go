@@ -293,11 +293,11 @@ func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
 	}
 	res.Website = website
 
-	nginxInstall, err := getAppInstallByKey(constant.AppNginx)
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return res, err
 	}
-	sitePath := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name, "www", "sites", website.Alias)
+	sitePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.Alias)
 	res.ErrorLogPath = path.Join(sitePath, "log", "error.log")
 	res.AccessLogPath = path.Join(sitePath, "log", "access.log")
 	res.SitePath = sitePath
@@ -468,7 +468,7 @@ func (w WebsiteService) GetWebsiteNginxConfig(websiteId uint) (response.FileInfo
 		return response.FileInfo{}, err
 	}
 
-	nginxApp, err := appRepo.GetFirst(appRepo.WithKey(constant.AppNginx))
+	nginxApp, err := appRepo.GetFirst(appRepo.WithKey(constant.AppOpenresty))
 	if err != nil {
 		return response.FileInfo{}, err
 	}
@@ -477,7 +477,7 @@ func (w WebsiteService) GetWebsiteNginxConfig(websiteId uint) (response.FileInfo
 		return response.FileInfo{}, err
 	}
 
-	configPath := path.Join(constant.AppInstallDir, constant.AppNginx, nginxInstall.Name, "conf", "conf.d", website.Alias+".conf")
+	configPath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "conf.d", website.Alias+".conf")
 
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:   configPath,
@@ -619,7 +619,7 @@ func (w WebsiteService) PreInstallCheck(req request.WebsiteInstallCheckReq) ([]r
 		showErr  = false
 	)
 
-	app, err := appRepo.GetFirst(appRepo.WithKey(constant.AppNginx))
+	app, err := appRepo.GetFirst(appRepo.WithKey(constant.AppOpenresty))
 	if err != nil {
 		return nil, err
 	}

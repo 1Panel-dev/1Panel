@@ -324,7 +324,7 @@ func (a AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, error
 			})
 		}
 	}
-	if app.Key == constant.AppNginx {
+	if app.Key == constant.AppOpenresty {
 		websites, _ := websiteRepo.GetBy()
 		for _, website := range websites {
 			res = append(res, dto.AppResource{
@@ -369,7 +369,7 @@ func (a AppInstallService) GetDefaultConfigByKey(key string) (string, error) {
 	if key == constant.AppRedis {
 		filePath = path.Join(filePath, "redis.conf")
 	}
-	if key == constant.AppNginx {
+	if key == constant.AppOpenresty {
 		filePath = path.Join(filePath, "nginx.conf")
 	}
 	contentByte, err := os.ReadFile(filePath)

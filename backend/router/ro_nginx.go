@@ -10,7 +10,7 @@ type NginxRouter struct {
 }
 
 func (a *NginxRouter) InitNginxRouter(Router *gin.RouterGroup) {
-	groupRouter := Router.Group("nginx")
+	groupRouter := Router.Group("openresty")
 	groupRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
 
 	baseApi := v1.ApiGroupApp.BaseApi

@@ -130,7 +130,7 @@
                                         <el-button
                                             v-for="(button, key) in buttons"
                                             :key="key"
-                                            :type="!button.disabled ? 'primary' : 'info'"
+                                            :type="button.disabled && button.disabled(installed) ? 'info' : 'primary'"
                                             plain
                                             round
                                             size="small"
@@ -315,6 +315,9 @@ const buttons = [
         label: i18n.global.t('app.down'),
         click: (row: any) => {
             openOperate(row, 'down');
+        },
+        disabled: (row: any) => {
+            return row.status !== 'Running';
         },
     },
     {

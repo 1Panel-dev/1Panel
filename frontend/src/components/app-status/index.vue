@@ -64,7 +64,7 @@ import { MsgSuccess } from '@/utils/message';
 const props = defineProps({
     appKey: {
         type: String,
-        default: 'nginx',
+        default: 'openresty',
     },
 });
 
