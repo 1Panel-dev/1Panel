@@ -1,7 +1,7 @@
 <template>
-    <el-row :gutter="20">
+    <el-row :gutter="20" v-loading="loading">
         <el-col :span="8" :offset="1">
-            <el-form ref="defaultForm" label-position="top" :model="defaultModel" :rules="rules" :loading="loading">
+            <el-form ref="defaultForm" label-position="top" :model="defaultModel" :rules="rules">
                 <el-form-item :label="$t('website.defaultDoc')" prop="index">
                     <el-input
                         v-model="defaultModel.index"
@@ -10,7 +10,7 @@
                     ></el-input>
                 </el-form-item>
             </el-form>
-            <el-button type="primary" @click="submit(defaultForm)" :loading="loading">
+            <el-button type="primary" @click="submit(defaultForm)" :disabled="loading">
                 {{ $t('commons.button.save') }}
             </el-button>
         </el-col>

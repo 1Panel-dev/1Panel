@@ -7,7 +7,7 @@
         width="30%"
         :before-close="handleClose"
     >
-        <div style="text-align: center">
+        <div style="text-align: center" v-loading="loading">
             <div v-if="websites.length > 0">
                 <span>{{ $t('ssl.renewWebsite') }}</span>
                 <div>
@@ -25,7 +25,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit()" :disabled="loading" :loading="loading">
+                <el-button type="primary" @click="submit()" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

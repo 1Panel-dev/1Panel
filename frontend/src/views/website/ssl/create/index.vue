@@ -3,7 +3,7 @@
         <template #header>
             <DrawerHeader :header="$t('ssl.create')" :back="handleClose" />
         </template>
-        <el-row>
+        <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-form
                     ref="sslForm"
@@ -83,7 +83,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(sslForm)" :loading="loading">
+                <el-button type="primary" @click="submit(sslForm)" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
