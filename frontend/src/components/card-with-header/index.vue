@@ -40,20 +40,6 @@ defineProps({
                 border-radius: 10px;
             }
         }
-        // span:first-child {
-        //     background: $primary-color;
-        //     border-radius: 7px;
-        //     flex: none;
-        //     order: 0;
-        //     flex-grow: 0;
-        //     padding: 3px;
-        // }
-
-        // span:nth-child(2) {
-        //     font-size: 18px;
-        //     font-weight: 700;
-        //     margin-left: 10px;
-        // }
     }
 
     div:nth-child(2) {

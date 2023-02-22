@@ -583,8 +583,12 @@ function freshChart(chartName: string, legendDatas: any, xDatas: any, yDatas: an
 }
 
 function changeChartSize() {
-    echarts.getInstanceByDom(document.getElementById('ioChart') as HTMLElement)?.resize();
-    echarts.getInstanceByDom(document.getElementById('networkChart') as HTMLElement)?.resize();
+    if (document.getElementById('ioChart') != null) {
+        echarts.getInstanceByDom(document.getElementById('ioChart') as HTMLElement)?.resize();
+    }
+    if (document.getElementById('networkChart') != null) {
+        echarts.getInstanceByDom(document.getElementById('networkChart') as HTMLElement)?.resize();
+    }
 }
 
 onMounted(() => {
