@@ -11,7 +11,7 @@
         <LayoutContent :title="$t('website.website')" v-loading="loading">
             <template #app>
                 <AppStatus
-                    :app-key="'nginx'"
+                    :app-key="'openresty'"
                     @setting="setting"
                     v-model:loading="loading"
                     @is-exist="checkExist"

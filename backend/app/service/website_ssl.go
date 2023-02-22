@@ -92,11 +92,11 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 			return res, err
 		}
 	case constant.Http:
-		appInstall, err := getAppInstallByKey(constant.AppNginx)
+		appInstall, err := getAppInstallByKey(constant.AppOpenresty)
 		if err != nil {
 			return request.WebsiteSSLCreate{}, err
 		}
-		if err := client.UseHTTP(path.Join(constant.AppInstallDir, constant.AppNginx, appInstall.Name, "root")); err != nil {
+		if err := client.UseHTTP(path.Join(constant.AppInstallDir, constant.AppOpenresty, appInstall.Name, "root")); err != nil {
 			return res, err
 		}
 	}
@@ -160,11 +160,11 @@ func (w WebsiteSSLService) Renew(sslId uint) error {
 			return err
 		}
 	case constant.Http:
-		appInstall, err := getAppInstallByKey(constant.AppNginx)
+		appInstall, err := getAppInstallByKey(constant.AppOpenresty)
 		if err != nil {
 			return err
 		}
-		if err := client.UseHTTP(path.Join(constant.AppInstallDir, constant.AppNginx, appInstall.Name, "root")); err != nil {
+		if err := client.UseHTTP(path.Join(constant.AppInstallDir, constant.AppOpenresty, appInstall.Name, "root")); err != nil {
 			return err
 		}
 	}
@@ -197,7 +197,7 @@ func (w WebsiteSSLService) Renew(sslId uint) error {
 		}
 	}
 	if len(websites) > 0 {
-		nginxInstall, err := getAppInstallByKey(constant.AppNginx)
+		nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 		if err != nil {
 			return err
 		}
