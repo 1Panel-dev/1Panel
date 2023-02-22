@@ -128,8 +128,8 @@ const updateEnable = async (enable: boolean) => {
         await UpdateWafEnable(enableUpdate.value);
     } catch (error) {
         enableUpdate.value.enable = !enable;
-        loading.value = false;
     }
+    loading.value = false;
 };
 
 onMounted(() => {
