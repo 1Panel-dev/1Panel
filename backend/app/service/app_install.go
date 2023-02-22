@@ -213,6 +213,9 @@ func (a AppInstallService) SyncAll() error {
 	}
 	go func() {
 		for _, i := range allList {
+			if i.Status == constant.Installing {
+				continue
+			}
 			if err := syncById(i.ID); err != nil {
 				global.LOG.Errorf("sync install app[%s] error,mgs: %s", i.Name, err.Error())
 			}
