@@ -1,16 +1,49 @@
 <template>
     <el-row>
-        <el-col :span="12">
-            <el-descriptions :column="1" border>
-                <el-descriptions-item :width="100" :label="$t('nginx.connections')">
-                    {{ data.active }}
+        <el-col :span="22" :offset="1">
+            <el-descriptions :column="4" direction="vertical">
+                <el-descriptions-item>
+                    <template #label>
+                        <span class="status-label">{{ $t('nginx.connections') }}</span>
+                    </template>
+                    <span class="status-count">{{ data.active }}</span>
                 </el-descriptions-item>
-                <el-descriptions-item :label="$t('nginx.accepts')">{{ data.accepts }}</el-descriptions-item>
-                <el-descriptions-item :label="$t('nginx.handled')">{{ data.handled }}</el-descriptions-item>
-                <el-descriptions-item :label="$t('nginx.requests')">{{ data.requests }}</el-descriptions-item>
-                <el-descriptions-item :label="$t('nginx.reading')">{{ data.reading }}</el-descriptions-item>
-                <el-descriptions-item :label="$t('nginx.writing')">{{ data.writing }}</el-descriptions-item>
-                <el-descriptions-item :label="$t('nginx.waiting')">{{ data.waiting }}</el-descriptions-item>
+                <el-descriptions-item>
+                    <template #label>
+                        <span class="status-label">{{ $t('nginx.accepts') }}</span>
+                    </template>
+                    <span class="status-count">{{ data.accepts }}</span>
+                </el-descriptions-item>
+                <el-descriptions-item>
+                    <template #label>
+                        <span class="status-label">{{ $t('nginx.handled') }}</span>
+                    </template>
+                    <span class="status-count">{{ data.handled }}</span>
+                </el-descriptions-item>
+                <el-descriptions-item>
+                    <template #label>
+                        <span class="status-label">{{ $t('nginx.requests') }}</span>
+                    </template>
+                    <span class="status-count">{{ data.requests }}</span>
+                </el-descriptions-item>
+                <el-descriptions-item>
+                    <template #label>
+                        <span class="status-label">{{ $t('nginx.reading') }}</span>
+                    </template>
+                    <span class="status-count">{{ data.reading }}</span>
+                </el-descriptions-item>
+                <el-descriptions-item>
+                    <template #label>
+                        <span class="status-label">{{ $t('nginx.writing') }}</span>
+                    </template>
+                    <span class="status-count">{{ data.writing }}</span>
+                </el-descriptions-item>
+                <el-descriptions-item>
+                    <template #label>
+                        <span class="status-label">{{ $t('nginx.waiting') }}</span>
+                    </template>
+                    <span class="status-count">{{ data.waiting }}</span>
+                </el-descriptions-item>
             </el-descriptions>
         </el-col>
     </el-row>
@@ -50,3 +83,14 @@ onMounted(() => {
     get();
 });
 </script>
+
+<style lang="scss" scoped>
+.status-count {
+    font-size: 24px;
+}
+
+.status-label {
+    font-size: 14px;
+    color: #646a73;
+}
+</style>

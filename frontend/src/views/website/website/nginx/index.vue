@@ -2,10 +2,10 @@
     <LayoutContent :title="$t('nginx.nginxConfig')" :reload="true">
         <template #buttons>
             <el-button type="primary" :plain="activeName !== '1'" @click="changeTab('1')">
-                {{ $t('nginx.configResource') }}
+                {{ $t('nginx.status') }}
             </el-button>
             <el-button type="primary" :plain="activeName !== '2'" @click="changeTab('2')">
-                {{ $t('nginx.status') }}
+                {{ $t('nginx.configResource') }}
             </el-button>
             <el-button type="primary" :plain="activeName !== '3'" @click="changeTab('3')">
                 {{ $t('website.nginxPer') }}
@@ -15,8 +15,8 @@
             </el-button>
         </template>
         <template #main>
-            <Source v-if="activeName === '1'"></Source>
-            <Status v-if="activeName === '2'" :status="status" />
+            <Status v-if="activeName === '1'" :status="status" />
+            <Source v-if="activeName === '2'"></Source>
             <NginxPer v-if="activeName === '3'" />
             <ContainerLog v-if="activeName === '4'" ref="dialogContainerLogRef" />
         </template>
