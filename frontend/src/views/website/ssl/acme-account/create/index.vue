@@ -52,7 +52,11 @@ const handleClose = () => {
     em('close', false);
 };
 
-const resetForm = () => {};
+const resetForm = () => {
+    account.value = {
+        email: '',
+    };
+};
 
 const acceptParams = () => {
     open.value = true;
