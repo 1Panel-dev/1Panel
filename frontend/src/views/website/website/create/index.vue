@@ -258,7 +258,7 @@ const handleClose = () => {
 };
 
 const searchAppInstalled = () => {
-    GetAppInstalled({ type: 'website' }).then((res) => {
+    GetAppInstalled({ type: 'website', unused: true }).then((res) => {
         appInstalles.value = res.data;
         if (res.data.length > 0) {
             website.value.appInstallId = res.data[0].id;
