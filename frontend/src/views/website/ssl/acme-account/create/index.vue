@@ -7,7 +7,7 @@
         width="30%"
         :before-close="handleClose"
     >
-        <el-row>
+        <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-form ref="accountForm" label-position="top" :model="account" :rules="rules" v-loading="loading">
                     <el-form-item :label="$t('website.email')" prop="email">
@@ -19,7 +19,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(accountForm)" :loading="loading">
+                <el-button type="primary" @click="submit(accountForm)" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

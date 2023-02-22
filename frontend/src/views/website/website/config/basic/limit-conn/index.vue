@@ -35,7 +35,7 @@
                     <span class="input-help">{{ $t('website.rateHelper') }}</span>
                 </el-form-item>
             </el-form>
-            <el-button type="primary" @click="submit(limitForm)" :loading="loading">
+            <el-button type="primary" @click="submit(limitForm)" :disabled="loading">
                 <span v-if="enable">{{ $t('commons.button.save') }}</span>
                 <span v-else>{{ $t('commons.button.saveAndEnable') }}</span>
             </el-button>
