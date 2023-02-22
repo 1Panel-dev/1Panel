@@ -117,6 +117,7 @@ export namespace App {
 
     export interface AppInstalledSearch {
         type: string;
+        unused?: boolean;
     }
 
     export interface AppService {
