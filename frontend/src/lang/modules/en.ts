@@ -857,7 +857,7 @@ export default {
         deleteWarn:
             'The delete operation will delete all data and backups together. This operation cannot be rolled back. Do you want to continue? ',
         syncSuccess: 'Sync successfully',
-        canUpdate: 'Upgraded',
+        canUpdate: 'Upgrade',
         backup: 'Backup',
         backupName: 'File Name',
         backupPath: 'File Path',
