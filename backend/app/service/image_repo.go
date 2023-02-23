@@ -92,32 +92,9 @@ func (u *ImageRepoService) BatchDelete(req dto.ImageRepoDelete) error {
 			return errors.New("The default value cannot be edit !")
 		}
 	}
-	if !req.DeleteInsecure {
-		if err := imageRepoRepo.Delete(commonRepo.WithIdsIn(req.Ids)); err != nil {
-			return err
-		}
-		return nil
-	}
-	repos, err := imageRepoRepo.List(commonRepo.WithIdsIn(req.Ids))
-	if err != nil {
-		return err
-	}
-	for _, repo := range repos {
-		if repo.Protocol == "http" {
-			_ = u.handleRegistries("", repo.DownloadUrl, "delete")
-		}
-		if repo.Auth {
-			_, _ = cmd.Execf("docker logout %s://%s", repo.Protocol, repo.DownloadUrl)
-		}
-	}
 	if err := imageRepoRepo.Delete(commonRepo.WithIdsIn(req.Ids)); err != nil {
 		return err
 	}
-	stdout, err := cmd.Exec("systemctl restart docker")
-	if err != nil {
-		return errors.New(string(stdout))
-	}
-
 	return nil
 }
 

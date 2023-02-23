@@ -157,7 +157,6 @@ export namespace Container {
     }
     export interface RepoDelete {
         ids: Array<number>;
-        deleteInsecure: boolean;
     }
     export interface RepoInfo {
         id: number;

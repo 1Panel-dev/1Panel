@@ -336,11 +336,14 @@ export default {
 
         log: 'Logs',
         slowLog: 'Slowlogs',
+        noData: 'No slow log yet...',
 
         isOn: 'Is on',
         longQueryTime: 'Slow query threshold',
 
         status: 'The current state',
+        baseParam: 'Basic parameter',
+        performanceParam: 'Performance parameter',
         terminal: 'Terminal mode',
         second: 'Second',
         timeout: 'Timeout',
@@ -403,6 +406,8 @@ export default {
         last10Min: 'Last 10 Minutes',
         newName: 'New name',
 
+        user: 'User',
+        command: 'Command',
         custom: 'Custom',
         emptyUser: 'When empty, you will log in as  default',
         containerTerminal: 'Terminal',
@@ -490,6 +495,8 @@ export default {
         registrieHelper: 'One in a row, for example:\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: 'Compose',
+        apps: 'Apps',
+        local: 'Local',
         createCompose: 'Create compose',
         composeTemplate: 'Compose template',
         createComposeTemplate: 'Create compose template',

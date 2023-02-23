@@ -1,108 +1,143 @@
 <template>
     <div>
-        <el-row :gutter="20">
-            <el-col :span="8">
-                <el-row style="margin-top: 20px">
-                    <table style="width: 100%" class="myTable">
-                        <tr>
-                            <td>{{ $t('database.runTime') }}</td>
-                            <td>{{ mysqlStatus.run }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ $t('database.connections') }}</td>
-                            <td>{{ mysqlStatus.connections }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ $t('database.bytesSent') }}</td>
-                            <td>{{ mysqlStatus!.bytesSent }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ $t('database.bytesReceived') }}</td>
-                            <td>{{ mysqlStatus!.bytesReceived }}</td>
-                        </tr>
-                    </table>
-                </el-row>
-                <el-row style="margin-top: 20px">
-                    <table style="width: 100%" class="myTable">
-                        <tr>
-                            <td>{{ $t('database.queryPerSecond') }}</td>
-                            <td>{{ mysqlStatus!.queryPerSecond }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ $t('database.queryPerSecond') }}</td>
-                            <td>{{ mysqlStatus!.txPerSecond }}</td>
-                        </tr>
-                        <tr>
-                            <td>File</td>
-                            <td>{{ mysqlStatus!.file }}</td>
-                        </tr>
-                        <tr>
-                            <td>Position</td>
-                            <td>{{ mysqlStatus!.position }}</td>
-                        </tr>
-                    </table>
-                </el-row>
-            </el-col>
-            <el-col :span="16">
-                <table style="margin-top: 20px; width: 100%" class="myTable">
-                    <tr>
-                        <td>{{ $t('database.queryPerSecond') }}</td>
-                        <td>{{ mysqlStatus!.connInfo }}</td>
-                        <td>{{ $t('database.connInfoHelper') }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ $t('database.threadCacheHit') }}</td>
-                        <td>{{ mysqlStatus!.threadCacheHit }}</td>
-                        <td>{{ $t('database.threadCacheHitHelper') }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ $t('database.indexHit') }}</td>
-                        <td>{{ mysqlStatus!.indexHit }}</td>
-                        <td>{{ $t('database.indexHitHelper') }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ $t('database.innodbIndexHit') }}</td>
-                        <td>{{ mysqlStatus!.innodbIndexHit }}</td>
-                        <td>{{ $t('database.innodbIndexHitHelper') }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ $t('database.cacheHit') }}</td>
-                        <td>{{ mysqlStatus!.cacheHit }}</td>
-                        <td>{{ $t('database.cacheHitHelper') }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ $t('database.tmpTableToDB') }}</td>
-                        <td>{{ mysqlStatus!.tmpTableToDB }}</td>
-                        <td>{{ $t('database.tmpTableToDBHelper') }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ $t('database.openTables') }}</td>
-                        <td>{{ mysqlStatus!.openTables }}</td>
-                        <td>{{ $t('database.openTablesHelper') }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ $t('database.selectFullJoin') }}</td>
-                        <td>{{ mysqlStatus!.selectFullJoin }}</td>
-                        <td>{{ $t('database.selectFullJoinHelper') }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ $t('database.selectRangeCheck') }}</td>
-                        <td>{{ mysqlStatus!.selectRangeCheck }}</td>
-                        <td>{{ $t('database.selectRangeCheckHelper') }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ $t('database.sortMergePasses') }}</td>
-                        <td>{{ mysqlStatus!.sortMergePasses }}</td>
-                        <td>{{ $t('database.sortMergePassesHelper') }}</td>
-                    </tr>
-                    <tr>
-                        <td>{{ $t('database.tableLocksWaited') }}</td>
-                        <td>{{ mysqlStatus!.tableLocksWaited }}</td>
-                        <td>{{ $t('database.tableLocksWaitedHelper') }}</td>
-                    </tr>
-                </table>
-            </el-col>
-        </el-row>
+        <el-form label-position="top">
+            <span class="title">{{ $t('database.baseParam') }}</span>
+            <el-divider class="devider" />
+            <el-row type="flex" style="margin-left: 50px" justify="center">
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.runTime') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.run }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.connections') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.connections }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.bytesSent') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.bytesSent }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.bytesReceived') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.bytesReceived }}</span>
+                </el-form-item>
+
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.queryPerSecond') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.queryPerSecond }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.txPerSecond') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.txPerSecond }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">File</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.file }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">Position</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.position }}</span>
+                </el-form-item>
+            </el-row>
+
+            <span class="title">{{ $t('database.performanceParam') }}</span>
+            <el-divider class="devider" />
+            <el-row type="flex" style="margin-left: 50px" justify="center">
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.queryPerSecond') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.queryPerSecond }}</span>
+                    <span class="input-help">{{ $t('database.connInfoHelper') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.threadCacheHit') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.threadCacheHit }}</span>
+                    <span class="input-help">{{ $t('database.threadCacheHitHelper') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.indexHit') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.indexHit }}</span>
+                    <span class="input-help">{{ $t('database.indexHitHelper') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.innodbIndexHit') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.innodbIndexHit }}</span>
+                    <span class="input-help">{{ $t('database.innodbIndexHitHelper') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.cacheHit') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.cacheHit }}</span>
+                    <span class="input-help">{{ $t('database.cacheHitHelper') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.tmpTableToDB') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.tmpTableToDB }}</span>
+                    <span class="input-help">{{ $t('database.tmpTableToDBHelper') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.openTables') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.openTables }}</span>
+                    <span class="input-help">{{ $t('database.openTablesHelper') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.selectFullJoin') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.selectFullJoin }}</span>
+                    <span class="input-help">{{ $t('database.selectFullJoinHelper') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.selectRangeCheck') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.selectRangeCheck }}</span>
+                    <span class="input-help">{{ $t('database.selectRangeCheckHelper') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.sortMergePasses') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.sortMergePasses }}</span>
+                    <span class="input-help">{{ $t('database.sortMergePassesHelper') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">{{ $t('database.tableLocksWaited') }}</span>
+                    </template>
+                    <span class="status-count">{{ mysqlStatus.tableLocksWaited }}</span>
+                    <span class="input-help">{{ $t('database.tableLocksWaitedHelper') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%"></el-form-item>
+            </el-row>
+        </el-form>
     </div>
 </template>
 <script lang="ts" setup>
@@ -176,3 +211,25 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style lang="scss" scoped>
+.status-count {
+    font-size: 24px;
+}
+.status-label {
+    font-size: 14px;
+    color: #646a73;
+}
+.devider {
+    display: block;
+    height: 1px;
+    width: 100%;
+    margin: 12px 0;
+    border-top: 1px var(--el-border-color) var(--el-border-style);
+}
+.title {
+    font-size: 20px;
+    font-weight: 500;
+    margin-left: 50px;
+}
+</style>

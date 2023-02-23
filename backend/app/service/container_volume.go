@@ -55,7 +55,10 @@ func (u *ContainerService) PageVolume(req dto.SearchWithPage) (int64, interface{
 		for _, val := range item.Labels {
 			tag = append(tag, val)
 		}
-		createTime, _ := time.Parse("2006-01-02T15:04:05Z", item.CreatedAt)
+		if len(item.CreatedAt) > 19 {
+			item.CreatedAt = item.CreatedAt[0:19]
+		}
+		createTime, _ := time.Parse("2006-01-02T15:04:05", item.CreatedAt)
 		data = append(data, dto.Volume{
 			CreatedAt:  createTime,
 			Name:       item.Name,

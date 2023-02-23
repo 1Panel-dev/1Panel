@@ -32,13 +32,12 @@
             </el-card>
         </div>
         <LayoutContent
-            v-loading="loading"
             style="margin-top: 30px"
             back-name="Compose"
             :title="$t('container.containerList')"
             :reload="true"
         >
-            <template #toolbar>
+            <template #main>
                 <el-button-group>
                     <el-button :disabled="checkStatus('start')" @click="onOperate('start')">
                         {{ $t('container.start') }}
@@ -62,11 +61,10 @@
                         {{ $t('container.remove') }}
                     </el-button>
                 </el-button-group>
-            </template>
-            <template #main>
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
+                    style="margin-top: 20px"
                     :data="data"
                     @search="search"
                 >

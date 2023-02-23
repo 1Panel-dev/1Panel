@@ -22,7 +22,7 @@
         </el-button>
         <codemirror
             :autofocus="true"
-            placeholder="None data"
+            :placeholder="$t('database.noData')"
             :indent-with-tab="true"
             :tabSize="4"
             style="margin-top: 10px; height: calc(100vh - 392px)"

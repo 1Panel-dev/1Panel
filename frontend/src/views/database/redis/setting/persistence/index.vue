@@ -49,13 +49,13 @@
                                 <el-input type="number" v-model="row.second"></el-input>
                             </td>
                             <td width="60px">
-                                <span>{{ $t('database.rdbHelper1') }}</span>
+                                {{ $t('database.rdbHelper1') }}
                             </td>
                             <td width="32%">
                                 <el-input type="number" v-model="row.count"></el-input>
                             </td>
                             <td width="12%">
-                                <span>{{ $t('database.rdbHelper2') }}</span>
+                                {{ $t('database.rdbHelper2') }}
                             </td>
                             <td>
                                 <el-button link type="primary" style="font-size: 10px" @click="handleDelete(index)">

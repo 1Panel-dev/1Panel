@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <div class="a-card" style="margin-top: 20px">
             <el-card>
                 <div>
@@ -35,7 +35,7 @@
             </el-card>
         </div>
 
-        <LayoutContent v-loading="loading" style="margin-top: 20px" :title="$t('container.setting')" :divider="true">
+        <LayoutContent style="margin-top: 20px" :title="$t('container.setting')" :divider="true">
             <template #main>
                 <el-radio-group v-model="confShowType" @change="changeMode">
                     <el-radio-button label="base">{{ $t('database.baseConf') }}</el-radio-button>
@@ -169,10 +169,17 @@ const onOperator = async (operation: string) => {
     let param = {
         operation: operation,
     };
-    await dockerOperate(param);
-    search();
-    changeMode();
-    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    loading.value = true;
+    await dockerOperate(param)
+        .then(() => {
+            loading.value = false;
+            search();
+            changeMode();
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onSubmitSave = async () => {

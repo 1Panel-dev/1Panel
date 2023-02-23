@@ -40,6 +40,5 @@ type ImageRepoOption struct {
 }
 
 type ImageRepoDelete struct {
-	DeleteInsecure bool   `json:"deleteInsecure"`
-	Ids            []uint `json:"ids" validate:"required"`
+	Ids []uint `json:"ids" validate:"required"`
 }

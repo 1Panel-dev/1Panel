@@ -43,15 +43,22 @@
                     @search="search"
                 >
                     <el-table-column type="selection" fix />
-                    <el-table-column
-                        :label="$t('commons.table.name')"
-                        show-overflow-tooltip
-                        min-width="80"
-                        prop="name"
-                        fix
-                    >
+                    <el-table-column :label="$t('commons.table.name')" min-width="80" prop="name" fix>
                         <template #default="{ row }">
-                            <el-link @click="onInspect(row.name)" type="primary">{{ row.name }}</el-link>
+                            <el-tooltip
+                                v-if="row.name.length > 20"
+                                class="box-item"
+                                effect="dark"
+                                :content="row.name"
+                                placement="top"
+                            >
+                                <el-link @click="onInspect(row.name)" type="primary">
+                                    {{ row.name.substring(0, 20) }}...
+                                </el-link>
+                            </el-tooltip>
+                            <el-link v-else @click="onInspect(row.name)" type="primary">
+                                {{ row.name }}
+                            </el-link>
                         </template>
                     </el-table-column>
                     <el-table-column

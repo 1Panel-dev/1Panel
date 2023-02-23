@@ -295,6 +295,8 @@ export default {
         zipFormat: 'zip、tar.gz 压缩包结构：test.zip 或 test.tar.gz 压缩包内，必需包含 test.sql',
 
         currentStatus: '当前状态',
+        baseParam: '基础参数',
+        performanceParam: '性能参数',
         runTime: '启动时间',
         connections: '总连接数',
         bytesSent: '发送',
@@ -344,6 +346,7 @@ export default {
 
         log: '日志',
         slowLog: '慢日志',
+        noData: '暂无慢日志...',
 
         isOn: '是否开启',
         longQueryTime: '慢查询阈值',
@@ -417,6 +420,8 @@ export default {
         last10Min: '最近 10 分钟',
         newName: '新名称',
 
+        user: '用户',
+        command: '命令',
         custom: '自定义',
         containerTerminal: '终端',
         emptyUser: '为空时，将使用容器默认的用户登录',
@@ -504,6 +509,8 @@ export default {
         registrieHelper: '一行一个，例：\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: '编排',
+        apps: '应用商店',
+        local: '本地',
         createCompose: '创建编排',
         composeTemplate: '编排模版',
         createComposeTemplate: '创建编排模版',

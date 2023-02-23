@@ -94,18 +94,17 @@
                     </el-form>
                 </div>
                 <div v-if="activeName === 'port'">
-                    <el-form :model="form" ref="portRef" label-width="120px">
+                    <el-form :model="form" ref="portRef" label-position="top">
                         <el-row>
                             <el-col :span="1"><br /></el-col>
                             <el-col :span="10">
                                 <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
-                                    <el-input clearable type="number" v-model.number="form.port">
-                                        <template #append>
-                                            <el-button @click="onSavePort(portRef)" icon="Collection">
-                                                {{ $t('commons.button.save') }}
-                                            </el-button>
-                                        </template>
-                                    </el-input>
+                                    <el-input clearable type="number" v-model.number="form.port" />
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button @click="onSavePort(portRef)" icon="Collection">
+                                        {{ $t('commons.button.save') }}
+                                    </el-button>
                                 </el-form-item>
                             </el-col>
                         </el-row>
