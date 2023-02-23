@@ -1,77 +1,110 @@
 <template>
     <div v-if="statusShow">
-        <el-row>
-            <el-col :span="1"><br /></el-col>
-            <el-col :span="12">
-                <table style="width: 100%" class="myTable">
-                    <tr>
-                        <td>uptime_in_days</td>
-                        <td>{{ redisStatus!.uptime_in_days }}</td>
-                        <td>{{ $t('database.uptimeInDays') }}</td>
-                    </tr>
-                    <tr>
-                        <td>tcp_port</td>
-                        <td>{{ redisStatus!.tcp_port }}</td>
-                        <td>{{ $t('database.tcpPort') }}</td>
-                    </tr>
-                    <tr>
-                        <td>connected_clients</td>
-                        <td>{{ redisStatus!.connected_clients }}</td>
-                        <td>{{ $t('database.connectedClients') }}</td>
-                    </tr>
-                    <tr>
-                        <td>used_memory_rss</td>
-                        <td>{{ redisStatus!.used_memory_rss }}</td>
-                        <td>{{ $t('database.usedMemoryRss') }}</td>
-                    </tr>
-                    <tr>
-                        <td>used_memory</td>
-                        <td>{{ redisStatus!.used_memory }}</td>
-                        <td>{{ $t('database.usedMemory') }}</td>
-                    </tr>
-                    <tr>
-                        <td>mem_fragmentation_ratio</td>
-                        <td>{{ redisStatus!.mem_fragmentation_ratio }}</td>
-                        <td>{{ $t('database.tmpTableToDBHelper') }}</td>
-                    </tr>
-                    <tr>
-                        <td>total_connections_received</td>
-                        <td>{{ redisStatus!.total_connections_received }}</td>
-                        <td>{{ $t('database.totalConnectionsReceived') }}</td>
-                    </tr>
-                    <tr>
-                        <td>total_commands_processed</td>
-                        <td>{{ redisStatus!.total_commands_processed }}</td>
-                        <td>{{ $t('database.totalCommandsProcessed') }}</td>
-                    </tr>
-                    <tr>
-                        <td>instantaneous_ops_per_sec</td>
-                        <td>{{ redisStatus!.instantaneous_ops_per_sec }}</td>
-                        <td>{{ $t('database.instantaneousOpsPerSec') }}</td>
-                    </tr>
-                    <tr>
-                        <td>keyspace_hits</td>
-                        <td>{{ redisStatus!.keyspace_hits }}</td>
-                        <td>{{ $t('database.keyspaceHits') }}</td>
-                    </tr>
-                    <tr>
-                        <td>keyspace_misses</td>
-                        <td>{{ redisStatus!.keyspace_misses }}</td>
-                        <td>{{ $t('database.keyspaceMisses') }}</td>
-                    </tr>
-                    <tr>
-                        <td>hit</td>
-                        <td>{{ redisStatus!.hit }}</td>
-                        <td>{{ $t('database.hit') }}</td>
-                    </tr>
-                    <tr>
-                        <td>latest_fork_usec</td>
-                        <td>{{ redisStatus!.latest_fork_usec }}</td>
-                        <td>{{ $t('database.latestForkUsec') }}</td>
-                    </tr>
-                </table>
-            </el-col>
-        </el-row>
+        <el-form label-position="top">
+            <span class="title">{{ $t('database.baseParam') }}</span>
+            <el-divider class="devider" />
+            <el-row type="flex" style="margin-left: 50px" justify="center">
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">uptime_in_days</span>
+                    </template>
+                    <span class="status-count">{{ redisStatus.uptime_in_days }}</span>
+                    <span class="input-help">{{ $t('database.uptimeInDays') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">tcp_port</span>
+                    </template>
+                    <span class="status-count">{{ redisStatus.tcp_port }}</span>
+                    <span class="input-help">{{ $t('database.tcpPort') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">connected_clients</span>
+                    </template>
+                    <span class="status-count">{{ redisStatus.connected_clients }}</span>
+                    <span class="input-help">{{ $t('database.connectedClients') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%"></el-form-item>
+            </el-row>
+
+            <span class="title">{{ $t('database.performanceParam') }}</span>
+            <el-divider class="devider" />
+            <el-row type="flex" style="margin-left: 50px" justify="center">
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">used_memory_rss</span>
+                    </template>
+                    <span class="status-count">{{ redisStatus.used_memory_rss }}</span>
+                    <span class="input-help">{{ $t('database.usedMemoryRss') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">used_memory</span>
+                    </template>
+                    <span class="status-count">{{ redisStatus.used_memory }}</span>
+                    <span class="input-help">{{ $t('database.usedMemory') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">mem_fragmentation_ratio</span>
+                    </template>
+                    <span class="status-count">{{ redisStatus.mem_fragmentation_ratio }}</span>
+                    <span class="input-help">{{ $t('database.tmpTableToDBHelper') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">total_connections_received</span>
+                    </template>
+                    <span class="status-count">{{ redisStatus.total_connections_received }}</span>
+                    <span class="input-help">{{ $t('database.totalConnectionsReceived') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">total_commands_processed</span>
+                    </template>
+                    <span class="status-count">{{ redisStatus.total_commands_processed }}</span>
+                    <span class="input-help">{{ $t('database.totalCommandsProcessed') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">instantaneous_ops_per_sec</span>
+                    </template>
+                    <span class="status-count">{{ redisStatus.instantaneous_ops_per_sec }}</span>
+                    <span class="input-help">{{ $t('database.instantaneousOpsPerSec') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">keyspace_hits</span>
+                    </template>
+                    <span class="status-count">{{ redisStatus.keyspace_hits }}</span>
+                    <span class="input-help">{{ $t('database.keyspaceHits') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">keyspace_misses</span>
+                    </template>
+                    <span class="status-count">{{ redisStatus.keyspace_misses }}</span>
+                    <span class="input-help">{{ $t('database.keyspaceMisses') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">hit</span>
+                    </template>
+                    <span class="status-count">{{ redisStatus.hit }}</span>
+                    <span class="input-help">{{ $t('database.hit') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%">
+                    <template #label>
+                        <span class="status-label">latest_fork_usec</span>
+                    </template>
+                    <span class="status-count">{{ redisStatus.latest_fork_usec }}</span>
+                    <span class="input-help">{{ $t('database.latestForkUsec') }}</span>
+                </el-form-item>
+                <el-form-item style="width: 25%"></el-form-item>
+                <el-form-item style="width: 25%"></el-form-item>
+            </el-row>
+        </el-form>
     </div>
 </template>
 
@@ -138,3 +171,25 @@ defineExpose({
     onClose,
 });
 </script>
+
+<style lang="scss" scoped>
+.status-count {
+    font-size: 24px;
+}
+.status-label {
+    font-size: 14px;
+    color: #646a73;
+}
+.devider {
+    display: block;
+    height: 1px;
+    width: 100%;
+    margin: 12px 0;
+    border-top: 1px var(--el-border-color) var(--el-border-style);
+}
+.title {
+    font-size: 20px;
+    font-weight: 500;
+    margin-left: 50px;
+}
+</style>

@@ -1,6 +1,6 @@
 <template>
-    <div v-show="onSetting">
-        <LayoutContent :title="'MySQL ' + $t('database.setting')" :reload="true" v-loading="loading">
+    <div v-show="onSetting" v-loading="loading">
+        <LayoutContent :title="'MySQL ' + $t('database.setting')" :reload="true">
             <template #buttons>
                 <el-button type="primary" :plain="activeName !== 'conf'" @click="activeName = 'conf'">
                     {{ $t('database.confChange') }}
@@ -78,18 +78,17 @@
                 <Status v-show="activeName === 'status'" ref="statusRef" />
                 <Variables v-show="activeName === 'tuning'" ref="variablesRef" />
                 <div v-show="activeName === 'port'">
-                    <el-form :model="baseInfo" ref="panelFormRef" label-width="120px">
+                    <el-form :model="baseInfo" ref="panelFormRef" label-position="top">
                         <el-row>
                             <el-col :span="1"><br /></el-col>
                             <el-col :span="10">
                                 <el-form-item :label="$t('setting.port')" prop="port" :rules="Rules.port">
-                                    <el-input clearable type="number" v-model.number="baseInfo.port">
-                                        <template #append>
-                                            <el-button @click="onSavePort(panelFormRef)" icon="Collection">
-                                                {{ $t('commons.button.save') }}
-                                            </el-button>
-                                        </template>
-                                    </el-input>
+                                    <el-input clearable type="number" v-model.number="baseInfo.port" />
+                                </el-form-item>
+                                <el-form-item>
+                                    <el-button type="primary" @click="onSavePort(panelFormRef)" icon="Collection">
+                                        {{ $t('commons.button.save') }}
+                                    </el-button>
                                 </el-form-item>
                             </el-col>
                         </el-row>

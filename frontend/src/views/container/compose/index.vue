@@ -60,8 +60,9 @@
                     </el-table-column>
                     <el-table-column :label="$t('container.from')" prop="createdBy" min-width="80" fix>
                         <template #default="{ row }">
-                            <span v-if="row.createdBy === ''">Local</span>
-                            <span v-else>{{ row.createdBy }}</span>
+                            <span v-if="row.createdBy === ''">{{ $t('container.local') }}</span>
+                            <span v-if="row.createdBy === 'Apps'">{{ $t('container.apps') }}</span>
+                            <span v-if="row.createdBy === '1Panel'">1Panel</span>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -194,7 +195,7 @@ const buttons = [
             onEdit(row);
         },
         disabled: (row: any) => {
-            return row.createdBy !== '1Panel';
+            return row.createdBy === 'Local';
         },
     },
     {

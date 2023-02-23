@@ -13,7 +13,7 @@
             <el-col :span="22">
                 <el-form ref="formRef" label-position="top" :model="form" label-width="80px">
                     <el-form-item :label="$t('container.tag')" :rules="Rules.requiredSelect" prop="tagName">
-                        <el-select filterable v-model="form.tagName">
+                        <el-select filterable v-model="form.tagName" @change="form.name = form.tagName">
                             <el-option v-for="item in form.tags" :key="item" :value="item" :label="item" />
                         </el-select>
                     </el-form-item>
@@ -27,7 +27,7 @@
                             />
                         </el-select>
                     </el-form-item>
-                    <el-form-item :label="$t('container.label')" :rules="Rules.requiredInput" prop="name">
+                    <el-form-item :label="$t('container.image')" :rules="Rules.requiredInput" prop="name">
                         <el-input v-model.trim="form.name">
                             <template #prepend>{{ loadDetailInfo(form.repoID) }}/</template>
                         </el-input>
@@ -114,8 +114,8 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     drawerVisiable.value = true;
     form.tags = params.tags;
     form.repoID = 1;
-    form.tagName = '';
-    form.name = '';
+    form.tagName = form.tags.length !== 0 ? form.tags[0] : '';
+    form.name = form.tags.length !== 0 ? form.tags[0] : '';
     dialogData.value.repos = params.repos;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();

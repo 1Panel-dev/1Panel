@@ -135,7 +135,7 @@
             </template>
         </el-dialog>
 
-        <PasswordDialog ref="passwordRef" />
+        <PasswordDialog ref="passwordRef" @search="search" />
         <RootPasswordDialog ref="rootPasswordRef" />
         <RemoteAccessDialog ref="remoteAccessRef" />
         <UploadDialog ref="uploadRef" />

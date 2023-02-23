@@ -71,7 +71,6 @@
             </template>
         </LayoutContent>
         <OperatorDialog @search="search" ref="dialogRef" />
-        <DeleteDialog @search="search" ref="dialogDeleteRef" />
     </div>
 </template>
 
@@ -80,7 +79,6 @@ import LayoutContent from '@/layout/layout-content.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import OperatorDialog from '@/views/container/repo/operator/index.vue';
-import DeleteDialog from '@/views/container/repo/delete/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
 import { Container } from '@/api/interface/container';
@@ -148,19 +146,14 @@ const onOpenDialog = async (
     dialogRef.value!.acceptParams(params);
 };
 
-const dialogDeleteRef = ref();
 const onDelete = async (row: Container.RepoInfo) => {
-    if (row.protocol === 'https') {
-        ElMessageBox.confirm(i18n.global.t('commons.msg.delete'), i18n.global.t('commons.button.delete'), {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-        }).then(async () => {
-            await deleteImageRepo({ ids: [row.id], deleteInsecure: false });
-            search();
-        });
-        return;
-    }
-    dialogDeleteRef.value!.acceptParams({ ids: [row.id] });
+    ElMessageBox.confirm(i18n.global.t('commons.msg.delete'), i18n.global.t('commons.button.delete'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).then(async () => {
+        await deleteImageRepo({ ids: [row.id] });
+        search();
+    });
 };
 
 const buttons = [
