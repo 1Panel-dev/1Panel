@@ -95,7 +95,7 @@ let hostInfo = reactive<Host.HostOperate>({
 });
 
 const rules = reactive({
-    addr: [Rules.requiredInput],
+    addr: [Rules.ip],
     port: [Rules.requiredInput, Rules.port],
     user: [Rules.requiredInput],
     authMode: [Rules.requiredSelect],
@@ -108,6 +108,16 @@ interface DialogProps {
     isLocal: boolean;
 }
 const acceptParams = (props: DialogProps) => {
+    hostInfo.addr = '';
+    hostInfo.name = '';
+    hostInfo.groupBelong = 'default';
+    hostInfo.addr = '';
+    hostInfo.port = 22;
+    hostInfo.user = '';
+    hostInfo.authMode = 'password';
+    hostInfo.password = '';
+    hostInfo.privateKey = '';
+    hostInfo.description = '';
     isLocal.value = props.isLocal;
     if (props.isLocal) {
         hostInfo.addr = '127.0.0.1';
@@ -144,7 +154,7 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
                 if (res.data.name.length !== 0) {
                     title = res.data.name + '-' + title;
                 }
-                emit('on-conn-terminal', title, res.data.id, res.data.addr, '');
+                emit('on-conn-terminal', title, res.data.id, false);
                 emit('load-host-tree');
         }
     });

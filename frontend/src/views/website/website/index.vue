@@ -49,7 +49,7 @@
                 <div :class="{ mask: nginxStatus != 'Running' }">
                     <el-select v-model="req.websiteGroupId" @change="search()">
                         <template #prefix>{{ $t('website.group') }}</template>
-                        <el-option :label="$t('website.allGroup')" :value="0"></el-option>
+                        <el-option :label="$t('commons.table.all')" :value="0"></el-option>
                         <el-option
                             v-for="(group, index) in groups"
                             :key="index"

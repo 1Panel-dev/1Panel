@@ -215,7 +215,7 @@ var AddTableWebsite = &gormigrate.Migration{
 			return err
 		}
 		item := &model.WebsiteGroup{
-			Name:    "默认分组",
+			Name:    "默认",
 			Default: true,
 		}
 		if err := tx.Create(item).Error; err != nil {
