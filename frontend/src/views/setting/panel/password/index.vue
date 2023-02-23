@@ -59,6 +59,7 @@ import { GlobalStore } from '@/store';
 import { reactive, ref } from 'vue';
 import { updatePassword } from '@/api/modules/setting';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { logOutApi } from '@/api/modules/auth';
 
 const globalStore = GlobalStore();
 const passFormRef = ref<FormInstance>();
@@ -113,10 +114,11 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
         }
         loading.value = true;
         await updatePassword({ oldPassword: passForm.oldPassword, newPassword: password })
-            .then(() => {
+            .then(async () => {
                 loading.value = false;
                 passwordVisiable.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                await logOutApi();
                 router.push({ name: 'login', params: { code: '' } });
                 globalStore.setLogStatus(false);
             })

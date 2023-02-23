@@ -5,14 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path"
+	"os/exec"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cloud_storage"
-	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 )
@@ -205,7 +205,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	if err != nil {
 		return constant.ErrRecordNotFound
 	}
-	varMap := make(map[string]string)
+	varMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(req.Vars), &varMap); err != nil {
 		return err
 	}
@@ -218,10 +218,12 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	}
 	if backup.Type == "LOCAL" {
 		if dir, ok := varMap["dir"]; ok {
-			if err := updateBackupDir(dir); err != nil {
-				upMap["vars"] = backup.Vars
-				_ = backupRepo.Update(req.ID, upMap)
-				return err
+			if dirStr, isStr := dir.(string); isStr {
+				if err := updateBackupDir(dirStr); err != nil {
+					upMap["vars"] = backup.Vars
+					_ = backupRepo.Update(req.ID, upMap)
+					return err
+				}
 			}
 		}
 	}
@@ -295,20 +297,19 @@ func loadLocalDir() (string, error) {
 
 func updateBackupDir(dir string) error {
 	oldDir := global.CONF.System.Backup
-	fileOp := files.NewFileOp()
 	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
 			return err
 		}
 	}
-	global.Viper.Set("system.backup", path.Join(dir, "backup"))
-	if err := global.Viper.WriteConfig(); err != nil {
-		return err
+	if strings.HasSuffix(oldDir, "/") {
+		oldDir = oldDir[:strings.LastIndex(oldDir, "/")]
 	}
-	if err := fileOp.CopyDir(oldDir, dir); err != nil {
-		global.Viper.Set("system.backup", oldDir)
-		_ = global.Viper.WriteConfig()
-		return err
+	cmd := exec.Command("cp", "-r", oldDir+"/*", dir)
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return errors.New(string(stdout))
 	}
+	global.CONF.System.Backup = dir
 	return nil
 }
