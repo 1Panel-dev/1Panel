@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-form :model="form" :rules="variablesRules" ref="nginxFormRef" label-position="top">
-            <el-row>
+            <el-row v-loading="loading">
                 <el-col :span="1"><br /></el-col>
                 <el-col :span="9">
                     <el-form-item label="server_names_hash_bucket_size" prop="server_names_hash_bucket_size">
@@ -25,7 +25,7 @@
                         <span class="input-help">{{ $t('nginx.keepaliveTimeoutHelper') }}</span>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="submit(nginxFormRef)" :loading="loading">
+                        <el-button type="primary" @click="submit(nginxFormRef)">
                             {{ $t('commons.button.save') }}
                         </el-button>
                     </el-form-item>

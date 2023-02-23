@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <codemirror
             :autofocus="true"
             placeholder="None data"
@@ -16,10 +16,10 @@
             :readOnly="true"
         />
         <div style="margin-top: 10px">
-            <el-button @click="getDefaultConfig()" :loading="loading">
+            <el-button @click="getDefaultConfig()" :disabled="loading">
                 {{ $t('app.defaultConfig') }}
             </el-button>
-            <el-button type="primary" @click="submit()" :loading="loading">
+            <el-button type="primary" @click="submit()" :disabled="loading">
                 {{ $t('commons.button.save') }}
             </el-button>
         </div>

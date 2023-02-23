@@ -1,14 +1,7 @@
 <template>
-    <el-row :gutter="20">
+    <el-row :gutter="20" v-loading="loading">
         <el-col :span="14" :offset="1">
-            <el-form
-                ref="httpsForm"
-                label-position="left"
-                label-width="auto"
-                :model="form"
-                :rules="rules"
-                :loading="loading"
-            >
+            <el-form ref="httpsForm" label-position="left" label-width="auto" :model="form" :rules="rules">
                 <el-form-item prop="enable" :label="$t('website.enableHTTPS')">
                     <el-switch v-model="form.enable" @change="changeEnable"></el-switch>
                 </el-form-item>
@@ -100,7 +93,7 @@
                         ></el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="submit(httpsForm)" :loading="loading">
+                        <el-button type="primary" @click="submit(httpsForm)">
                             {{ $t('commons.button.save') }}
                         </el-button>
                     </el-form-item>

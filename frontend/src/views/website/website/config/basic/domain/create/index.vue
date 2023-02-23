@@ -10,7 +10,7 @@
             <DrawerHeader :header="$t('website.addDomain')" :back="handleClose" />
         </template>
 
-        <el-row>
+        <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-form ref="domainForm" label-position="top" :model="domain" :rules="rules">
                     <el-form-item :label="$t('website.domain')" prop="domain">
@@ -25,7 +25,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(domainForm)" :loading="loading">
+                <el-button type="primary" @click="submit(domainForm)" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

@@ -1,14 +1,7 @@
 <template>
-    <el-row :gutter="20">
+    <el-row :gutter="20" v-loading="loading">
         <el-col :span="8" :offset="1">
-            <el-form
-                ref="websiteForm"
-                label-position="right"
-                label-width="130px"
-                :model="form"
-                :rules="rules"
-                :loading="loading"
-            >
+            <el-form ref="websiteForm" label-position="left" label-width="80px" :model="form" :rules="rules">
                 <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
                     <el-input v-model="form.primaryDomain" disabled></el-input>
                 </el-form-item>
@@ -26,7 +19,7 @@
                     <el-input v-model="form.remark"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="submit(websiteForm)" :loading="loading">
+                    <el-button type="primary" @click="submit(websiteForm)" :disabled="loading">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </el-form-item>

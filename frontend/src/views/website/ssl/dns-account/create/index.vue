@@ -53,7 +53,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(accountForm)" :loading="loading">
+                <el-button type="primary" @click="submit(accountForm)" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -96,7 +96,7 @@ const types = [
 let open = ref();
 let loading = ref(false);
 let accountForm = ref<FormInstance>();
-let rules = ref({
+let rules = ref<any>({
     name: [Rules.requiredInput, Rules.linuxName],
     type: [Rules.requiredSelect],
     authorization: {
