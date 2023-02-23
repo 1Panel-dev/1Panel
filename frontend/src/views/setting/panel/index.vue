@@ -105,7 +105,7 @@
                                         >
                                             {{ $t('commons.button.sync') }}
                                         </el-button>
-                                        <span v-show="show">{{ count }} S</span>
+                                        <span v-show="show">{{ count }} {{ $t('setting.second') }}</span>
                                     </template>
                                 </el-input>
                             </el-form-item>
@@ -129,6 +129,8 @@ import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import Password from '@/views/setting/panel/password/index.vue';
+import router from '@/routers';
+import { logOutApi } from '@/api/modules/auth';
 
 const loading = ref(false);
 const i18n = useI18n();
@@ -214,7 +216,15 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
         value: val + '',
     };
     await updateSetting(param)
-        .then(() => {
+        .then(async () => {
+            loading.value = false;
+            MsgSuccess(i18n.t('commons.msg.operationSuccess'));
+            if (param.key === 'UserName') {
+                await logOutApi();
+                router.push({ name: 'login', params: { code: '' } });
+                globalStore.setLogStatus(false);
+                return;
+            }
             loading.value = false;
             MsgSuccess(i18n.t('commons.msg.operationSuccess'));
             search();

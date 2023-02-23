@@ -15,17 +15,17 @@
                         <el-tag v-else round style="margin-left: 10px">{{ $t('setting.upgrading') }}</el-tag>
                     </h3>
                     <div style="margin-top: 10px">
-                        <el-link @click="toGithub">
+                        <el-link @click="toDoc">
+                            <el-icon><Document /></el-icon>
+                            <span>{{ $t('setting.doc') }}</span>
+                        </el-link>
+                        <el-link @click="toGithub" style="margin-left: 15px">
                             <svg-icon style="font-size: 7px; margin-bottom: 3px" iconName="p-huaban88"></svg-icon>
                             <span style="line-height: 20px">{{ $t('setting.project') }}</span>
                         </el-link>
                         <el-link @click="toIssue" style="margin-left: 15px">
                             <svg-icon style="font-size: 7px; margin-bottom: 3px" iconName="p-bug"></svg-icon>
                             <span>{{ $t('setting.issue') }}</span>
-                        </el-link>
-                        <el-link @click="toTalk" style="margin-left: 15px">
-                            <svg-icon style="font-size: 7px; margin-bottom: 3px" iconName="p-taolun"></svg-icon>
-                            <span>{{ $t('setting.chat') }}</span>
                         </el-link>
                         <el-link @click="toGithubStar" style="margin-left: 15px">
                             <svg-icon style="font-size: 7px; margin-bottom: 3px" iconName="p-star"></svg-icon>
@@ -66,7 +66,7 @@ import 'md-editor-v3/lib/style.css';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { MsgInfo, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 
 const version = ref();
 const upgradeInfo = ref();
@@ -79,14 +79,14 @@ const search = async () => {
     version.value = res.data.systemVersion;
 };
 
+const toDoc = () => {
+    window.open('https://1panel.cn/docs/', '_blank');
+};
 const toGithub = () => {
     window.open('https://github.com/1Panel-dev/1Panel', '_blank');
 };
 const toIssue = () => {
     window.open('https://github.com/1Panel-dev/1Panel/issues', '_blank');
-};
-const toTalk = () => {
-    window.open('https://github.com/1Panel-dev/1Panel', '_blank');
 };
 const toGithubStar = () => {
     window.open('https://github.com/1Panel-dev/1Panel', '_blank');
@@ -102,7 +102,7 @@ const onLoadUpgradeInfo = async () => {
         .then((res) => {
             loading.value = false;
             if (!res.data) {
-                MsgInfo(i18n.global.t('setting.noUpgrade'));
+                MsgSuccess(i18n.global.t('setting.noUpgrade'));
                 return;
             }
             upgradeInfo.value = res.data;

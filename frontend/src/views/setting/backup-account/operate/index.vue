@@ -82,14 +82,10 @@
                         </el-button>
                     </el-form-item>
                     <div v-if="dialogData.rowData!.type === 'SFTP'">
-                        <el-form-item
-                            :label="$t('setting.address')"
-                            prop="varsJson.address"
-                            :rules="Rules.requiredInput"
-                        >
+                        <el-form-item :label="$t('setting.address')" prop="varsJson.address" :rules="Rules.ip">
                             <el-input v-model.trim="dialogData.rowData!.varsJson['address']" />
                         </el-form-item>
-                        <el-form-item :label="$t('setting.port')" prop="varsJson.port" :rules="[Rules.number]">
+                        <el-form-item :label="$t('setting.port')" prop="varsJson.port" :rules="[Rules.port]">
                             <el-input-number
                                 :min="0"
                                 :max="65535"
@@ -107,7 +103,7 @@
                                 v-model="dialogData.rowData!.credential"
                             />
                         </el-form-item>
-                        <el-form-item :label="$t('setting.path')" prop="bucket">
+                        <el-form-item :label="$t('setting.path')" prop="bucket" :rules="[Rules.requiredInput]">
                             <el-input v-model="dialogData.rowData!.bucket" />
                         </el-form-item>
                     </div>
@@ -167,6 +163,9 @@ const acceptParams = (params: DialogProps): void => {
                 dialogData.value.rowData!.varsJson['endpoint'].split('://')[1];
         }
     }
+    if (dialogData.value.title === 'create' && dialogData.value.rowData!.type === 'SFTP') {
+        dialogData.value.rowData.varsJson['port'] = 22;
+    }
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     drawerVisiable.value = true;
 };
@@ -186,6 +185,9 @@ const getBuckets = async () => {
     loading.value = true;
     let item = deepCopy(dialogData.value.rowData!.varsJson);
     if (dialogData.value.rowData!.type === 'MINIO') {
+        dialogData.value.rowData!.varsJson['endpointItem'] = dialogData.value
+            .rowData!.varsJson['endpointItem'].replace('https://', '')
+            .replace('http://', '');
         item['endpoint'] = endpoints.value + '://' + dialogData.value.rowData!.varsJson['endpointItem'];
         item['endpointItem'] = undefined;
     }
@@ -211,6 +213,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         if (!dialogData.value.rowData) return;
         if (dialogData.value.rowData!.type === 'MINIO') {
+            dialogData.value.rowData!.varsJson['endpointItem'].replace('https://', '').replace('http://', '');
             dialogData.value.rowData!.varsJson['endpoint'] =
                 endpoints.value + '://' + dialogData.value.rowData!.varsJson['endpointItem'];
             dialogData.value.rowData!.varsJson['endpointItem'] = undefined;
