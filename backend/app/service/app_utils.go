@@ -318,8 +318,11 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	var containerNames []string
+	containerNames := []string{install.ContainerName}
 	for _, service := range project.AllServices() {
+		if service.ContainerName == "${CONTAINER_NAME}" || service.ContainerName == "" {
+			continue
+		}
 		containerNames = append(containerNames, service.ContainerName)
 	}
 	return containerNames, nil
