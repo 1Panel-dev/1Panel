@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <codemirror
             :autofocus="true"
             placeholder="None data"
@@ -15,7 +15,7 @@
             :readOnly="true"
         />
         <div style="margin-top: 10px">
-            <el-button type="primary" @click="submit()" :loading="loading">
+            <el-button type="primary" @click="submit()">
                 {{ $t('nginx.saveAndReload') }}
             </el-button>
         </div>

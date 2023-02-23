@@ -1073,7 +1073,7 @@ export default {
         connections: '活动连接(Active connections)',
         accepts: '总连接次数(accepts)',
         handled: '总握手次数(handled)',
-        requests: '总握手次数(requests)',
+        requests: '总请求数(requests)',
         reading: '请求数(Reading)',
         writing: '响应数(Writing)',
         waiting: '驻留进程(Waiting)',

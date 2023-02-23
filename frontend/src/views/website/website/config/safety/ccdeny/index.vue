@@ -1,14 +1,7 @@
 <template>
-    <el-row :gutter="20">
+    <el-row :gutter="20" v-loading="loading">
         <el-col :span="10" :offset="1">
-            <el-form
-                ref="wafForm"
-                label-position="left"
-                label-width="auto"
-                :model="form"
-                :rules="rules"
-                :loading="loading"
-            >
+            <el-form ref="wafForm" label-position="left" label-width="auto" :model="form" :rules="rules">
                 <el-form-item prop="enable" :label="$t('website.enable')">
                     <el-switch v-model="form.enable" @change="updateEnable"></el-switch>
                 </el-form-item>
@@ -29,7 +22,7 @@
                 ></el-alert>
                 <el-form-item></el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="submit(wafForm)" :loading="loading">
+                    <el-button type="primary" @click="submit(wafForm)">
                         {{ $t('commons.button.save') }}
                     </el-button>
                 </el-form-item>

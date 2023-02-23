@@ -1,17 +1,10 @@
 <template>
-    <el-row :gutter="20">
+    <el-row :gutter="20" v-loading="loading">
         <el-col :span="8" :offset="1">
             <el-form-item prop="enable" :label="$t('website.enableOrNot')">
                 <el-switch v-model="enable" @change="changeEnable"></el-switch>
             </el-form-item>
-            <el-form
-                ref="limitForm"
-                label-position="left"
-                :model="form"
-                :rules="rules"
-                :loading="loading"
-                label-width="100px"
-            >
+            <el-form ref="limitForm" label-position="left" :model="form" :rules="rules" label-width="100px">
                 <el-form-item :label="$t('website.limit')">
                     <el-select v-model="ruleKey" @change="changeRule(ruleKey)">
                         <el-option
