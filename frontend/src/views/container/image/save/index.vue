@@ -6,7 +6,7 @@
         <el-form v-loading="loading" label-position="top" ref="formRef" :model="form" label-width="80px">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
-                    <el-form-item label="Tag" :rules="Rules.requiredSelect" prop="tagName">
+                    <el-form-item :label="$t('container.tag')" :rules="Rules.requiredSelect" prop="tagName">
                         <el-select filterable v-model="form.tagName">
                             <el-option
                                 :disabled="item.indexOf(':<none>') !== -1"

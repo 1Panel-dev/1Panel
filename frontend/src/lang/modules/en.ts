@@ -813,7 +813,7 @@ export default {
 
         monitor: 'Monitor',
         enableMonitor: 'Enable',
-        storeDays: 'Expiration time (day)',
+        storeDays: 'Expiration days',
         cleanMonitor: 'Clearing monitoring records',
 
         message: 'Message',

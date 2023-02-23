@@ -12,7 +12,7 @@
         <el-row type="flex" justify="center">
             <el-col :span="22">
                 <el-form ref="formRef" label-position="top" :model="form" label-width="80px">
-                    <el-form-item label="Tag" :rules="Rules.requiredSelect" prop="tagName">
+                    <el-form-item :label="$t('container.tag')" :rules="Rules.requiredSelect" prop="tagName">
                         <el-select filterable v-model="form.tagName">
                             <el-option v-for="item in form.tags" :key="item" :value="item" :label="item" />
                         </el-select>

@@ -18,6 +18,11 @@
             v-model="detailInfo"
             :readOnly="true"
         />
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="codeVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+            </span>
+        </template>
     </el-drawer>
 </template>
 

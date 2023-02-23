@@ -49,11 +49,12 @@
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('container.size')" prop="size" min-width="70" fix />
-                    <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
-                        <template #default="{ row }">
-                            {{ dateFormatSimple(row.createdAt) }}
-                        </template>
-                    </el-table-column>
+                    <el-table-column
+                        prop="createdAt"
+                        min-width="90"
+                        :label="$t('commons.table.date')"
+                        :formatter="dateFormat"
+                    />
                     <fu-table-operations
                         width="200px"
                         :ellipsis="10"
@@ -78,7 +79,7 @@
 import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import { reactive, onMounted, ref } from 'vue';
-import { dateFormatSimple } from '@/utils/util';
+import { dateFormat } from '@/utils/util';
 import { Container } from '@/api/interface/container';
 import LayoutContent from '@/layout/layout-content.vue';
 import Pull from '@/views/container/image/pull/index.vue';
@@ -88,9 +89,10 @@ import Save from '@/views/container/image/save/index.vue';
 import Load from '@/views/container/image/load/index.vue';
 import Build from '@/views/container/image/build/index.vue';
 import Delete from '@/views/container/image/delete/index.vue';
-import { searchImage, listImageRepo, loadDockerStatus } from '@/api/modules/container';
+import { searchImage, listImageRepo, loadDockerStatus, imageRemove } from '@/api/modules/container';
 import i18n from '@/lang';
 import router from '@/routers';
+import { useDeleteData } from '@/hooks/use-delete-data';
 
 const loading = ref(false);
 
@@ -157,7 +159,7 @@ const onOpenload = () => {
 
 const buttons = [
     {
-        label: 'Tag',
+        label: i18n.global.t('container.tag'),
         click: (row: Container.ImageInfo) => {
             let params = {
                 repos: repos.value,
@@ -188,7 +190,11 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        click: (row: Container.ImageInfo) => {
+        click: async (row: Container.ImageInfo) => {
+            if (row.tags.length <= 1) {
+                await useDeleteData(imageRemove, { names: [row.id] }, 'commons.msg.delete');
+                return;
+            }
             let params = {
                 id: row.id,
                 tags: row.tags,
