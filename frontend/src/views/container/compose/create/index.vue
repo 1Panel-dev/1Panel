@@ -59,8 +59,10 @@
         </div>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="onSubmit(formRef)">
+                <el-button :disabled="loading" @click="drawerVisiable = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button type="primary" :disabled="loading" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

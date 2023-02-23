@@ -101,7 +101,6 @@ import { Container } from '@/api/interface/container';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { LoadFile } from '@/api/modules/files';
 import router from '@/routers';
-import { MsgSuccess } from '@/utils/message';
 
 const data = ref();
 const selects = ref<any>([]);
@@ -175,7 +174,6 @@ const onDelete = async (row: Container.ComposeInfo) => {
     };
     await useDeleteData(composeOperator, param, 'commons.msg.delete');
     search();
-    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const dialogEditRef = ref();

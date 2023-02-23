@@ -500,7 +500,7 @@ func handleErr(install model.AppInstall, err error, out string) error {
 }
 
 func getAppFromRepo(downloadPath, version string) error {
-	downloadUrl := fmt.Sprintf(downloadPath)
+	downloadUrl := downloadPath
 	appDir := constant.AppResourceDir
 
 	global.LOG.Infof("download file from %s", downloadUrl)

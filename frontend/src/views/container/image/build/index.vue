@@ -40,7 +40,7 @@
                     <el-form-item v-else :rules="Rules.requiredSelect" prop="dockerfile">
                         <el-input clearable v-model="form.dockerfile">
                             <template #prepend>
-                                <FileList @choose="loadBuildDir" :dir="true"></FileList>
+                                <FileList @choose="loadBuildDir"></FileList>
                             </template>
                         </el-input>
                     </el-form-item>

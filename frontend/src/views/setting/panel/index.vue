@@ -1,8 +1,8 @@
 <template>
-    <div>
-        <LayoutContent v-loading="loading" :title="$t('setting.panel')" :divider="true">
+    <div v-loading="loading">
+        <LayoutContent :title="$t('setting.panel')" :divider="true">
             <template #main>
-                <el-form :model="form" ref="panelFormRef" label-position="left" v-loading="loading" label-width="160px">
+                <el-form :model="form" ref="panelFormRef" label-position="left" label-width="160px">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :span="10">
@@ -195,6 +195,7 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
             break;
         case 'SessionTimeout':
             if (Number(val) < 300) {
+                loading.value = false;
                 MsgError(i18n.t('setting.sessionTimeoutError'));
                 search();
                 return;

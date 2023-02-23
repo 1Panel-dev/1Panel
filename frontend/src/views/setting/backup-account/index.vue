@@ -60,7 +60,7 @@
                                 {{ s3Data.bucket }}
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
-                                {{ dateFormatSimple(s3Data.createdAt) }}
+                                {{ dateFormat(0, 0, s3Data.createdAt) }}
                             </el-form-item>
                         </div>
                         <el-alert v-else center class="alert" style="height: 167px" :closable="false">
@@ -96,7 +96,7 @@
                                 {{ ossData.bucket }}
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
-                                {{ dateFormatSimple(ossData.createdAt) }}
+                                {{ dateFormat(0, 0, ossData.createdAt) }}
                             </el-form-item>
                         </div>
                         <el-alert v-else center class="alert" style="height: 167px" :closable="false">
@@ -133,7 +133,7 @@
                                 {{ minioData.bucket }}
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
-                                {{ dateFormatSimple(minioData.createdAt) }}
+                                {{ dateFormat(0, 0, minioData.createdAt) }}
                             </el-form-item>
                         </div>
                         <el-alert v-else center class="alert" style="height: 167px" :closable="false">
@@ -172,7 +172,7 @@
                                 {{ sftpData.bucket }}
                             </el-form-item>
                             <el-form-item :label="$t('commons.table.createdAt')">
-                                {{ dateFormatSimple(sftpData.createdAt) }}
+                                {{ dateFormat(0, 0, sftpData.createdAt) }}
                             </el-form-item>
                         </div>
                         <el-alert v-else center class="alert" style="height: 167px" :closable="false">
@@ -188,7 +188,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { dateFormatSimple, dateFormat } from '@/utils/util';
+import { dateFormat } from '@/utils/util';
 import { onMounted, ref } from 'vue';
 import LayoutContent from '@/layout/layout-content.vue';
 import { getBackupList, deleteBackup } from '@/api/modules/setting';

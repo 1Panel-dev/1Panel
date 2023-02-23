@@ -818,7 +818,7 @@ export default {
 
         monitor: '监控',
         enableMonitor: '监控状态',
-        storeDays: 'Retention days (days)',
+        storeDays: '保存天数',
         cleanMonitor: '清空监控记录',
 
         message: '通知',

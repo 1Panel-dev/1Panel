@@ -59,11 +59,13 @@
                             </el-tooltip>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.createdAt')" min-width="80" fix>
-                        <template #default="{ row }">
-                            {{ dateFormatSimple(row.createdAt) }}
-                        </template>
-                    </el-table-column>
+                    <el-table-column
+                        prop="createdAt"
+                        :label="$t('commons.table.createdAt')"
+                        min-width="80"
+                        fix
+                        :formatter="dateFormat"
+                    />
                     <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" />
                 </ComplexTable>
             </template>
@@ -80,7 +82,7 @@ import TableSetting from '@/components/table-setting/index.vue';
 import OperatorDialog from '@/views/container/repo/operator/index.vue';
 import DeleteDialog from '@/views/container/repo/delete/index.vue';
 import { reactive, onMounted, ref } from 'vue';
-import { dateFormatSimple } from '@/utils/util';
+import { dateFormat } from '@/utils/util';
 import { Container } from '@/api/interface/container';
 import { deleteImageRepo, loadDockerStatus, searchImageRepo } from '@/api/modules/container';
 import i18n from '@/lang';

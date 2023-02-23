@@ -3,7 +3,7 @@
         <template #header>
             <DrawerHeader :header="$t('database.requirepass')" :back="handleClose" />
         </template>
-        <el-form v-loading="loading" ref="formRef" :model="form" label-width="80px">
+        <el-form v-loading="loading" ref="formRef" :model="form" label-position="top">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('database.requirepass')" :rules="Rules.requiredInput" prop="password">
