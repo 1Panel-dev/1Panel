@@ -173,7 +173,7 @@ const search = async () => {
             loading.value = false;
             data.value = res.data.items || [];
             for (const item of data.value) {
-                if (item.targetDir !== '-') {
+                if (item.targetDir !== '-' || item.targetDir !== '') {
                     item.targetDir = i18n.global.t('setting.' + item.targetDir);
                 }
             }
@@ -191,6 +191,7 @@ const onOpenDialog = async (
     title: string,
     rowData: Partial<Cronjob.CronjobInfo> = {
         specType: 'perMonth',
+        type: 'shell',
         week: 1,
         day: 3,
         hour: 1,

@@ -71,7 +71,7 @@
                             <el-option
                                 v-for="item in netOptions"
                                 :key="item"
-                                :label="item == 'all' ? $t('home.allNetworkCard') : item"
+                                :label="item == 'all' ? $t('commons.table.all') : item"
                                 :value="item"
                             />
                         </el-select>
@@ -85,7 +85,7 @@
                             <el-option
                                 v-for="item in ioOptions"
                                 :key="item"
-                                :label="item == 'all' ? $t('home.allDisk') : item"
+                                :label="item == 'all' ? $t('commons.table.all') : item"
                                 :value="item"
                             />
                         </el-select>

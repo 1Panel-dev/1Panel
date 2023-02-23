@@ -42,12 +42,7 @@
                 <div>
                     <el-select v-model="quickCmd" clearable filterable @change="quickInput" style="width: 25%">
                         <template #prefix>{{ $t('terminal.quickCommand') }}</template>
-                        <el-option
-                            v-for="cmd in commandList"
-                            :key="cmd.id"
-                            :label="cmd.name + ' [ ' + cmd.command + ' ] '"
-                            :value="cmd.command"
-                        />
+                        <el-option v-for="cmd in commandList" :key="cmd.id" :label="cmd.name" :value="cmd.command" />
                     </el-select>
                     <el-input v-model="batchVal" @keyup.enter="batchInput" style="width: 75%">
                         <template #prepend>
@@ -64,13 +59,16 @@
                         icon="Plus"
                     ></el-button>
                     <el-popover ref="popoverRef" width="250px" trigger="hover" virtual-triggering persistent>
-                        <el-button-group style="width: 100%">
-                            <el-button @click="onNewSsh">New ssh</el-button>
-                            <el-button @click="onNewLocal">New tab</el-button>
-                        </el-button-group>
-                        <el-input clearable style="margin-top: 5px" v-model="hostfilterInfo">
-                            <template #append><el-button icon="search" /></template>
-                        </el-input>
+                        <el-button link type="primary" @click="onNewSsh">{{ $t('terminal.createConn') }}</el-button>
+                        <div class="search-button" style="float: none">
+                            <el-input
+                                v-model="hostfilterInfo"
+                                style="margin-top: 5px"
+                                clearable
+                                suffix-icon="Search"
+                                :placeholder="$t('commons.button.search')"
+                            ></el-input>
+                        </div>
                         <el-tree
                             ref="treeRef"
                             :expand-on-click-node="false"
@@ -277,7 +275,7 @@ const onClickConn = (node: Node, data: Tree) => {
     if (node.level === 1) {
         return;
     }
-    onConnTerminal(node.label, data.id);
+    onConnTerminal(node.label, data.id, false);
 };
 
 const onReconnect = async (item: any) => {
@@ -307,16 +305,19 @@ const onConnTerminal = async (title: string, wsID: number, isLocal?: boolean) =>
             }
         }
     }
+    console.log('走到了这里');
     terminalTabs.value.push({
         index: tabIndex,
         title: title,
         wsID: wsID,
         status: res.data ? 'online' : 'closed',
     });
+    console.log(terminalTabs.value);
     terminalValue.value = tabIndex;
     if (!res.data && isLocal) {
         dialogRef.value!.acceptParams({ isLocal: true });
     }
+    console.log(terminalValue.value);
     nextTick(() => {
         ctx.refs[`t-${terminalValue.value}`] &&
             ctx.refs[`t-${terminalValue.value}`][0].acceptParams({
@@ -381,5 +382,12 @@ defineExpose({
 }
 .el-tabs--top.el-tabs--card > .el-tabs__header .el-tabs__item:last-child {
     padding-right: 0px;
+}
+.el-input__wrapper {
+    border-radius: 50px;
+}
+.el-input-group__prepend {
+    border-top-left-radius: 50px;
+    border-bottom-left-radius: 50px;
 }
 </style>

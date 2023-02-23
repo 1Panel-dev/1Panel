@@ -92,7 +92,7 @@ func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, e
 }
 
 func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
-	host, _ := hostRepo.Get(commonRepo.WithByName(req.Name))
+	host, _ := hostRepo.Get(hostRepo.WithByAddr(req.Addr))
 	if host.ID != 0 {
 		return nil, constant.ErrRecordExist
 	}

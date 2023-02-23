@@ -4,7 +4,7 @@
             <el-card>
                 <div>
                     <el-tag style="float: left" effect="dark" type="success">
-                        {{ dialogData.rowData.name }}-{{ $t('cronjob.' + dialogData.rowData.type) }}
+                        {{ $t('cronjob.' + dialogData.rowData.type) }} - {{ dialogData.rowData.name }}
                     </el-tag>
                     <el-tag v-if="dialogData.rowData.status === 'Enable'" round class="status-content" type="success">
                         {{ $t('commons.status.running') }}
@@ -75,7 +75,7 @@
         </div>
 
         <LayoutContent :title="$t('cronjob.record')" :reload="true">
-            <template #search v-if="hasRecords">
+            <template #search>
                 <el-row :gutter="20">
                     <el-col :span="8">
                         <el-date-picker
@@ -321,7 +321,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
         pageSize: searchInfo.pageSize,
         cronjobID: dialogData.value.rowData!.id,
         startTime: new Date(new Date().setHours(0, 0, 0, 0)),
-        endTime: new Date(),
+        endTime: new Date(new Date().setHours(23, 59, 59, 0)),
         status: searchInfo.status,
     };
     const res = await searchRecords(itemSearch);
@@ -343,7 +343,7 @@ const shortcuts = [
     {
         text: i18n.global.t('monitor.today'),
         value: () => {
-            const end = new Date();
+            const end = new Date(new Date().setHours(23, 59, 59, 999));
             const start = new Date(new Date().setHours(0, 0, 0, 0));
             return [start, end];
         },
@@ -361,7 +361,7 @@ const shortcuts = [
         text: i18n.global.t('monitor.lastNDay', [3]),
         value: () => {
             const start = new Date(new Date().getTime() - 3600 * 1000 * 24 * 3);
-            const end = new Date();
+            const end = new Date(new Date().setHours(23, 59, 59, 999));
             return [start, end];
         },
     },
@@ -369,7 +369,7 @@ const shortcuts = [
         text: i18n.global.t('monitor.lastNDay', [7]),
         value: () => {
             const start = new Date(new Date().getTime() - 3600 * 1000 * 24 * 7);
-            const end = new Date();
+            const end = new Date(new Date().setHours(23, 59, 59, 999));
             return [start, end];
         },
     },
@@ -377,7 +377,7 @@ const shortcuts = [
         text: i18n.global.t('monitor.lastNDay', [30]),
         value: () => {
             const start = new Date(new Date().getTime() - 3600 * 1000 * 24 * 30);
-            const end = new Date();
+            const end = new Date(new Date().setHours(23, 59, 59, 999));
             return [start, end];
         },
     },
@@ -391,14 +391,17 @@ const weekOptions = [
     { label: i18n.global.t('cronjob.saturday'), value: 6 },
     { label: i18n.global.t('cronjob.sunday'), value: 7 },
 ];
-const timeRangeLoad = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
+const timeRangeLoad = ref<[Date, Date]>([
+    new Date(new Date().setHours(0, 0, 0, 0)),
+    new Date(new Date().setHours(23, 59, 59, 999)),
+]);
 const searchInfo = reactive({
     page: 1,
     pageSize: 8,
     recordTotal: 0,
     cronjobID: 0,
     startTime: new Date(new Date().setHours(0, 0, 0, 0)),
-    endTime: new Date(),
+    endTime: new Date(new Date().setHours(23, 59, 59, 999)),
     status: '',
 });
 
