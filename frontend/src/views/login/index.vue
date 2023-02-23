@@ -6,7 +6,7 @@
                     <span>{{ $t('commons.login.title') }}</span>
                 </div>
                 <div class="left inline-block">
-                    <img src="@/assets/images/1Panel-login.png" alt="" />
+                    <img src="@/assets/images/1panel-login.png" alt="" />
                 </div>
                 <div class="right inline-block">
                     <div class="login-container">
