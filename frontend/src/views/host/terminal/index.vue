@@ -60,7 +60,7 @@ onUnmounted(() => {
 <style lang="scss">
 .router_card {
     --el-card-border-radius: 8px;
-    --el-card-padding: 0;
+    --el-card-padding: 0 !important;
     padding: 0px;
     padding-bottom: 2px;
     padding-top: 2px;

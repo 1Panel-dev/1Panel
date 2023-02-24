@@ -37,7 +37,6 @@ func (w *safeBuffer) Reset() {
 const (
 	wsMsgCmd    = "cmd"
 	wsMsgResize = "resize"
-	wsMsgClose  = "close"
 )
 
 type wsMsg struct {
