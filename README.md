@@ -33,7 +33,7 @@
 以 root 用户执行如下命令一键安装 1Panel:
 
 ```sh
-INSTALL_MODE=stable bash -c "$(curl -sSL http://1panel.oss-cn-hangzhou.aliyuncs.com/package/quick_start.sh)"
+INSTALL_MODE=stable bash -c "$(curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh)"
 ```
 
 **学习资料**
