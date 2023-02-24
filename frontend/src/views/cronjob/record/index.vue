@@ -183,7 +183,7 @@
                                                 style="margin-left: 10px"
                                                 link
                                                 icon="Download"
-                                                @click="onDownload(currentRecord!.id, dialogData.rowData!.targetDirID)"
+                                                @click="onDownload(currentRecord, dialogData.rowData!.targetDirID)"
                                             >
                                                 {{ $t('file.download') }}
                                             </el-button>
@@ -253,7 +253,7 @@
                                     <codemirror
                                         ref="mymirror"
                                         :autofocus="true"
-                                        placeholder="None data"
+                                        :placeholder="$t('cronjob.noLogs')"
                                         :indent-with-tab="true"
                                         :tabSize="4"
                                         style="height: 130px; width: 100%; margin-top: 5px"
@@ -288,7 +288,7 @@ import { reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import { loadZero } from '@/utils/util';
 import { searchRecords, download, handleOnce, updateStatus } from '@/api/modules/cronjob';
-import { dateFormat, dateFormatForName } from '@/utils/util';
+import { dateFormat } from '@/utils/util';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import { LoadFile } from '@/api/modules/files';
@@ -296,7 +296,7 @@ import LayoutContent from '@/layout/layout-content.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 const hasRecords = ref();
@@ -334,7 +334,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     hasRecords.value = true;
     currentRecord.value = records.value[0];
     currentRecordIndex.value = 0;
-    loadRecord(currentRecord.value.records);
+    loadRecord(currentRecord.value);
     searchInfo.recordTotal = res.data.total;
     recordShow.value = true;
 };
@@ -446,13 +446,26 @@ const search = async () => {
         endTime: searchInfo.endTime,
         status: searchInfo.status,
     };
+    records.value = [];
     const res = await searchRecords(params);
-    records.value = res.data.items || [];
+    if (!res.data.items) {
+        hasRecords.value = false;
+        return;
+    }
+    records.value = res.data.items;
+    hasRecords.value = true;
+    currentRecord.value = records.value[0];
+    currentRecordIndex.value = 0;
+    loadRecord(currentRecord.value);
     searchInfo.recordTotal = res.data.total;
 };
-const onDownload = async (recordID: number, backupID: number) => {
+const onDownload = async (record: any, backupID: number) => {
+    if (!record.file || record.file.indexOf('/') === -1) {
+        MsgError(i18n.global.t('cronjob.errPath', [record.file]));
+        return;
+    }
     let params = {
-        recordID: recordID,
+        recordID: record.id,
         backupAccountID: backupID,
     };
     const res = await download(params);
@@ -460,15 +473,9 @@ const onDownload = async (recordID: number, backupID: number) => {
     const a = document.createElement('a');
     a.style.display = 'none';
     a.href = downloadUrl;
-    if (dialogData.value.rowData!.type === 'database') {
-        a.download =
-            dialogData.value.rowData!.dbName + '_' + dateFormatForName(currentRecord.value?.startTime) + '.sql.gz';
-    } else if (dialogData.value.rowData!.type === 'website') {
-        a.download =
-            dialogData.value.rowData!.website + '_' + dateFormatForName(currentRecord.value?.startTime) + '.tar.gz';
-    } else {
-        let name = dialogData.value.rowData!.sourceDir.replaceAll('/', '_');
-        a.download = name + '_' + dateFormatForName(currentRecord.value?.startTime) + '.tar.gz';
+    if (record.file && record.file.indexOf('/') !== -1) {
+        let pathItem = record.file.split('/');
+        a.download = pathItem[pathItem.length - 1];
     }
     const event = new MouseEvent('click');
     a.dispatchEvent(event);
@@ -484,11 +491,15 @@ const nextPage = async () => {
 const forDetail = async (row: Cronjob.Record, index: number) => {
     currentRecord.value = row;
     currentRecordIndex.value = index;
-    loadRecord(row.records);
+    loadRecord(row);
 };
-const loadRecord = async (path: string) => {
-    if (path) {
-        const res = await LoadFile({ path: path });
+const loadRecord = async (row: Cronjob.Record) => {
+    if (row.status === 'Failed') {
+        currentRecordDetail.value = row.records;
+        return;
+    }
+    if (row.records) {
+        const res = await LoadFile({ path: row.records });
         currentRecordDetail.value = res.data;
     }
 };
@@ -521,7 +532,6 @@ defineExpose({
     height: 310px;
     padding: 0;
     margin: 0;
-    list-style: none;
 }
 .infinite-list .infinite-list-item {
     display: flex;

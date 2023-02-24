@@ -107,7 +107,7 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 		}
 		fileName = fileName + ".tar.gz"
 	default:
-		fileName = fmt.Sprintf("%s.tar.gz", startTime.Format("20060102150405"))
+		fileName = fmt.Sprintf("directory%s_%s.tar.gz", strings.ReplaceAll(cronjob.SourceDir, "/", "_"), startTime.Format("20060102150405"))
 		backupDir = fmt.Sprintf("%s/%s", cronjob.Type, cronjob.Name)
 		global.LOG.Infof("handle tar %s to %s", backupDir, fileName)
 		if err := handleTar(cronjob.SourceDir, baseDir+"/"+backupDir, fileName, cronjob.ExclusionRules); err != nil {
@@ -214,10 +214,10 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 		if len(exclude) == 0 {
 			continue
 		}
-		excludeRules += (" --exclude" + exclude)
+		excludeRules += (" --exclude " + exclude)
 	}
 	path := ""
-	if len(strings.Split(sourceDir, "/")) > 3 {
+	if strings.Contains(sourceDir, "/") {
 		itemDir := strings.ReplaceAll(sourceDir[strings.LastIndex(sourceDir, "/"):], "/", "")
 		aheadDir := strings.ReplaceAll(sourceDir, itemDir, "")
 		path += fmt.Sprintf("-C %s %s", aheadDir, itemDir)
@@ -225,6 +225,7 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 		path = sourceDir
 	}
 
+	global.LOG.Debugf("tar zcvf %s %s %s \n", targetDir+"/"+name, excludeRules, path)
 	stdout, err := cmd.Execf("tar zcvf %s %s %s", targetDir+"/"+name, excludeRules, path)
 	if err != nil {
 		return errors.New(string(stdout))

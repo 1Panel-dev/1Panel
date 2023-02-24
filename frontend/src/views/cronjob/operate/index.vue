@@ -130,7 +130,7 @@
                     </el-form-item>
 
                     <el-form-item
-                        v-if="dialogData.rowData!.type === 'website' || dialogData.rowData!.type === 'directory'"
+                        v-if="dialogData.rowData!.type === 'directory'"
                         :label="$t('cronjob.exclusionRules')"
                         prop="exclusionRules"
                     >
@@ -282,7 +282,7 @@ const weekOptions = [
     { label: i18n.global.t('cronjob.sunday'), value: 7 },
 ];
 const rules = reactive({
-    name: [Rules.requiredInput, Rules.name],
+    name: [Rules.requiredInput],
     type: [Rules.requiredSelect],
     specType: [Rules.requiredSelect],
     spec: [

@@ -126,6 +126,7 @@ func (u *CronjobRepo) EndRecords(record model.JobRecords, status, message, recor
 	errMap := make(map[string]interface{})
 	errMap["records"] = records
 	errMap["status"] = status
+	errMap["file"] = record.File
 	errMap["message"] = message
 	errMap["interval"] = time.Since(record.StartTime).Milliseconds()
 	if err := global.DB.Model(&model.JobRecords{}).Where("id = ?", record.ID).Updates(errMap).Error; err != nil {

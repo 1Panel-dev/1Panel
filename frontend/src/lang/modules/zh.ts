@@ -128,6 +128,7 @@ export default {
             simpleName: '支持英文、数字、_,长度1-30',
             dbName: '支持英文、中文、数字、.-_,长度1-16',
             imageName: '支持英文、中文、数字、:.-_,长度1-30',
+            volumeName: '支持英文、数字、.-和_,长度1-30',
             complexityPassword: '请输入 8 位以上、必须含有字母、数字、特殊符号的密码',
             commonPassword: '请输入 6 位以上长度密码',
             linuxName: '长度1-30，名称不能含有{0}等符号',
@@ -581,6 +582,8 @@ export default {
         errRecord: '错误的日志记录',
         errHandle: '任务执行失败',
         noRecord: '当前计划任务暂未产生记录',
+        noLogs: '暂无任务输出...',
+        errPath: '备份路径 [{0}] 错误，无法下载！',
     },
     monitor: {
         avgLoad: '平均负载',
