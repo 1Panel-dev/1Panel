@@ -162,7 +162,10 @@ func (u *CronjobService) HandleOnce(id uint) error {
 	if cronjob.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
-	u.HandleJob(&cronjob)
+
+	record := cronjobRepo.StartRecords(cronjob.ID, "")
+	record.FromLocal = cronjob.KeepLocal
+	go u.HandleJob(&cronjob)
 	return nil
 }
 

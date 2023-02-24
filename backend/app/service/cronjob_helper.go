@@ -24,46 +24,48 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 	)
 	record := cronjobRepo.StartRecords(cronjob.ID, "")
 	record.FromLocal = cronjob.KeepLocal
-	switch cronjob.Type {
-	case "shell":
-		if len(cronjob.Script) == 0 {
-			return
+	go func() {
+		switch cronjob.Type {
+		case "shell":
+			if len(cronjob.Script) == 0 {
+				return
+			}
+			stdout, errExec := cmd.Exec(cronjob.Script)
+			if errExec != nil {
+				err = errExec
+			}
+			message = []byte(stdout)
+		case "website":
+			record.File, err = u.HandleBackup(cronjob, record.StartTime)
+		case "database":
+			record.File, err = u.HandleBackup(cronjob, record.StartTime)
+		case "directory":
+			if len(cronjob.SourceDir) == 0 {
+				return
+			}
+			record.File, err = u.HandleBackup(cronjob, record.StartTime)
+		case "curl":
+			if len(cronjob.URL) == 0 {
+				return
+			}
+			stdout, errCurl := cmd.Exec("curl " + cronjob.URL)
+			if err != nil {
+				err = errCurl
+			}
+			message = []byte(stdout)
 		}
-		stdout, errExec := cmd.Exec(cronjob.Script)
-		if errExec != nil {
-			err = errExec
-		}
-		message = []byte(stdout)
-	case "website":
-		record.File, err = u.HandleBackup(cronjob, record.StartTime)
-	case "database":
-		record.File, err = u.HandleBackup(cronjob, record.StartTime)
-	case "directory":
-		if len(cronjob.SourceDir) == 0 {
-			return
-		}
-		record.File, err = u.HandleBackup(cronjob, record.StartTime)
-	case "curl":
-		if len(cronjob.URL) == 0 {
-			return
-		}
-		stdout, errCurl := cmd.Exec("curl " + cronjob.URL)
 		if err != nil {
-			err = errCurl
+			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), string(message))
+			return
 		}
-		message = []byte(stdout)
-	}
-	if err != nil {
-		cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), string(message))
-		return
-	}
-	if len(message) != 0 {
-		record.Records, err = mkdirAndWriteFile(cronjob, record.StartTime, message)
-		if err != nil {
-			global.LOG.Errorf("save file %s failed, err: %v", record.Records, err)
+		if len(message) != 0 {
+			record.Records, err = mkdirAndWriteFile(cronjob, record.StartTime, message)
+			if err != nil {
+				global.LOG.Errorf("save file %s failed, err: %v", record.Records, err)
+			}
 		}
-	}
-	cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
+		cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
+	}()
 }
 
 func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Time) (string, error) {

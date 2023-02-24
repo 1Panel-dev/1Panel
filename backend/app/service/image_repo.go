@@ -1,14 +1,17 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/jinzhu/copier"
@@ -64,10 +67,22 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 	}
 	if req.Protocol == "http" {
 		_ = u.handleRegistries(req.DownloadUrl, "", "create")
-		stdout, err := cmd.Exec("systemctl restart docker")
-		if err != nil {
-			return errors.New(string(stdout))
+		ticker := time.NewTicker(3 * time.Second)
+		ctx, cancle := context.WithTimeout(context.Background(), time.Second*20)
+		for range ticker.C {
+			select {
+			case <-ctx.Done():
+				cancle()
+				return errors.New("the docker service cannot be restarted")
+			default:
+				stdout, err := cmd.Exec("systemctl is-active docker")
+				if string(stdout) == "active\n" && err == nil {
+					global.LOG.Info("docker restart with new conf successful!")
+					cancle()
+				}
+			}
 		}
+		cancle()
 	}
 
 	if err := copier.Copy(&imageRepo, &req); err != nil {

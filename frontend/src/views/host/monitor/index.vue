@@ -21,7 +21,7 @@
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
-                            style="float: right; right: 20px"
+                            style="float: right"
                         ></el-date-picker>
                     </template>
                     <div id="loadLoadChart" style="width: 100%; height: 400px"></div>
@@ -41,7 +41,7 @@
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
-                            style="float: right; right: 20px"
+                            style="float: right"
                         ></el-date-picker>
                     </template>
                     <div id="loadCPUChart" style="width: 100%; height: 400px"></div>
@@ -59,7 +59,7 @@
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
-                            style="float: right; right: 20px"
+                            style="float: right"
                         ></el-date-picker>
                     </template>
                     <div id="loadMemoryChart" style="width: 100%; height: 400px"></div>
@@ -79,27 +79,16 @@
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
-                            style="float: right; right: 20px"
+                            style="float: right"
                         ></el-date-picker>
                     </template>
-                    <div id="loadIOChart" style="width: 100%; height: 400px"></div>
+                    <div id="loadIOChart" style="width: 100%; height: 400px; margin-top: 34px"></div>
                 </el-card>
             </el-col>
             <el-col :span="12">
                 <el-card style="overflow: inherit">
                     <template #header>
                         <span style="font-size: 16px; font-weight: 500">{{ $t('monitor.network') }} IO</span>
-                        <el-select
-                            v-model="networkChoose"
-                            clearable
-                            filterable
-                            @change="search('network')"
-                            style="margin-left: 20px"
-                            placeholder="Select"
-                        >
-                            <template #prefix>{{ $t('monitor.networkCard') }}</template>
-                            <el-option v-for="item in netOptions" :key="item" :label="item" :value="item" />
-                        </el-select>
                         <el-date-picker
                             @change="search('network')"
                             v-model="timeRangeNetwork"
@@ -108,9 +97,20 @@
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
-                            style="float: right; right: 20px"
+                            style="float: right"
                         ></el-date-picker>
                     </template>
+                    <el-select
+                        v-model="networkChoose"
+                        clearable
+                        filterable
+                        @change="search('network')"
+                        style="margin-left: 20px"
+                        placeholder="Select"
+                    >
+                        <template #prefix>{{ $t('monitor.networkCard') }}</template>
+                        <el-option v-for="item in netOptions" :key="item" :label="item" :value="item" />
+                    </el-select>
                     <div id="loadNetworkChart" style="width: 100%; height: 400px"></div>
                 </el-card>
             </el-col>
