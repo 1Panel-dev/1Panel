@@ -31,7 +31,7 @@ func CreateCaptcha() (*dto.CaptchaResponse, error) {
 	driverString.Height = 50
 	driverString.NoiseCount = 0
 	driverString.Length = 4
-	driverString.Fonts = []string{"wqy-microhei.ttc"}
+	driverString.Fonts = []string{"RitaSmith.ttf", "actionj.ttf", "chromohv.ttf"}
 	driver := driverString.ConvertFonts()
 	c := base64Captcha.NewCaptcha(driver, store)
 	id, b64s, err := c.Generate()
