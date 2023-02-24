@@ -93,4 +93,5 @@ type Record struct {
 	Message    string    `json:"message"`
 	TargetPath string    `json:"targetPath"`
 	Interval   int       `json:"interval"`
+	File       string    `json:"file"`
 }

@@ -80,6 +80,19 @@ const checkImageName = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkVolumeName = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.volumeName')));
+    } else {
+        const reg = /^[a-zA-Z0-9]{1}[a-z:A-Z0-9_.-]{0,30}$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.volumeName')));
+        } else {
+            callback();
+        }
+    }
+};
+
 const checkLinuxName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.linuxName', ['/\\:*?"<>|'])));
@@ -128,6 +141,7 @@ interface CommonRule {
     simpleName: FormItemRule;
     dbName: FormItemRule;
     imageName: FormItemRule;
+    volumeName: FormItemRule;
     linuxName: FormItemRule;
     password: FormItemRule;
     email: FormItemRule;
@@ -170,6 +184,11 @@ export const Rules: CommonRule = {
     imageName: {
         required: true,
         validator: checkImageName,
+        trigger: 'blur',
+    },
+    volumeName: {
+        required: true,
+        validator: checkVolumeName,
         trigger: 'blur',
     },
     name: {

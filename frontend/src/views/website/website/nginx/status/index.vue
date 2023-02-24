@@ -1,52 +1,54 @@
 <template>
-    <el-row>
-        <el-col :span="22" :offset="1">
-            <el-descriptions :column="4" direction="vertical">
-                <el-descriptions-item>
+    <div>
+        <el-form label-position="top">
+            <el-row type="flex" style="margin-left: 50px" justify="center">
+                <el-form-item style="width: 25%">
                     <template #label>
-                        <span class="status-label">{{ $t('nginx.connections') }}</span>
+                        <span class="status-label">{{ $t('database.connections') }}</span>
                     </template>
                     <span class="status-count">{{ data.active }}</span>
-                </el-descriptions-item>
-                <el-descriptions-item>
+                </el-form-item>
+                <el-form-item style="width: 25%">
                     <template #label>
-                        <span class="status-label">{{ $t('nginx.accepts') }}</span>
+                        <span class="status-label">{{ $t('database.accepts') }}</span>
                     </template>
                     <span class="status-count">{{ data.accepts }}</span>
-                </el-descriptions-item>
-                <el-descriptions-item>
+                </el-form-item>
+                <el-form-item style="width: 25%">
                     <template #label>
-                        <span class="status-label">{{ $t('nginx.handled') }}</span>
+                        <span class="status-label">{{ $t('database.handled') }}</span>
                     </template>
                     <span class="status-count">{{ data.handled }}</span>
-                </el-descriptions-item>
-                <el-descriptions-item>
+                </el-form-item>
+                <el-form-item style="width: 25%">
                     <template #label>
-                        <span class="status-label">{{ $t('nginx.requests') }}</span>
+                        <span class="status-label">{{ $t('database.requests') }}</span>
                     </template>
                     <span class="status-count">{{ data.requests }}</span>
-                </el-descriptions-item>
-                <el-descriptions-item>
+                </el-form-item>
+
+                <el-form-item style="width: 25%">
                     <template #label>
-                        <span class="status-label">{{ $t('nginx.reading') }}</span>
+                        <span class="status-label">{{ $t('database.reading') }}</span>
                     </template>
                     <span class="status-count">{{ data.reading }}</span>
-                </el-descriptions-item>
-                <el-descriptions-item>
+                </el-form-item>
+                <el-form-item style="width: 25%">
                     <template #label>
-                        <span class="status-label">{{ $t('nginx.writing') }}</span>
+                        <span class="status-label">{{ $t('database.writing') }}</span>
                     </template>
                     <span class="status-count">{{ data.writing }}</span>
-                </el-descriptions-item>
-                <el-descriptions-item>
+                </el-form-item>
+                <el-form-item style="width: 25%">
                     <template #label>
-                        <span class="status-label">{{ $t('nginx.waiting') }}</span>
+                        <span class="status-label">{{ $t('database.waiting') }}</span>
                     </template>
                     <span class="status-count">{{ data.waiting }}</span>
-                </el-descriptions-item>
-            </el-descriptions>
-        </el-col>
-    </el-row>
+                </el-form-item>
+                <el-form-item style="width: 25%" />
+            </el-row>
+        </el-form>
+    </div>
 </template>
 
 <script lang="ts" setup>
