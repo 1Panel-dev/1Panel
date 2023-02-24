@@ -15,7 +15,7 @@ func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
 		Use(middleware.PasswordExpired())
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		baRouter.GET("/exec", baseApi.ContainerExec)
+		baRouter.GET("/exec", baseApi.ContainerWsSsh)
 		baRouter.GET("/stats/:id", baseApi.ContainerStats)
 
 		baRouter.POST("", baseApi.ContainerCreate)

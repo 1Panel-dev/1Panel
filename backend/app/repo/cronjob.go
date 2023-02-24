@@ -116,7 +116,7 @@ func (u *CronjobRepo) StartRecords(cronjobID uint, targetPath string) model.JobR
 	var record model.JobRecords
 	record.StartTime = time.Now()
 	record.CronjobID = cronjobID
-	record.Status = constant.StatusRunning
+	record.Status = constant.StatusWaiting
 	if err := global.DB.Create(&record).Error; err != nil {
 		global.LOG.Errorf("create record status failed, err: %v", err)
 	}

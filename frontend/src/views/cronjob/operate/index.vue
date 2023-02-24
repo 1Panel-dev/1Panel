@@ -7,7 +7,7 @@
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('cronjob.taskType')" prop="type">
-                        <el-select style="width: 100%" v-model="dialogData.rowData!.type">
+                        <el-select style="width: 100%" @change="changeType" v-model="dialogData.rowData!.type">
                             <el-option value="shell" :label="$t('cronjob.shell')" />
                             <el-option value="website" :label="$t('cronjob.website')" />
                             <el-option value="database" :label="$t('cronjob.database')" />
@@ -184,6 +184,7 @@ const dialogData = ref<DialogProps>({
 });
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
+    changeType();
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     drawerVisiable.value = true;
     checkMysqlInstalled();
@@ -308,6 +309,39 @@ const formRef = ref<FormInstance>();
 
 const loadDir = async (path: string) => {
     dialogData.value.rowData!.sourceDir = path;
+};
+
+const changeType = () => {
+    switch (dialogData.value.rowData!.type) {
+        case 'shell':
+            dialogData.value.rowData.specType = 'perWeek';
+            dialogData.value.rowData.week = 1;
+            dialogData.value.rowData.hour = 1;
+            dialogData.value.rowData.minute = 30;
+            break;
+        case 'database':
+            dialogData.value.rowData.specType = 'perDay';
+            dialogData.value.rowData.hour = 2;
+            dialogData.value.rowData.minute = 30;
+            break;
+        case 'website':
+            dialogData.value.rowData.specType = 'perWeek';
+            dialogData.value.rowData.week = 1;
+            dialogData.value.rowData.hour = 1;
+            dialogData.value.rowData.minute = 30;
+            break;
+        case 'directory':
+            dialogData.value.rowData.specType = 'perDay';
+            dialogData.value.rowData.hour = 1;
+            dialogData.value.rowData.minute = 30;
+            break;
+        case 'curl':
+            dialogData.value.rowData.specType = 'perWeek';
+            dialogData.value.rowData.week = 1;
+            dialogData.value.rowData.hour = 1;
+            dialogData.value.rowData.minute = 30;
+            break;
+    }
 };
 
 const loadBackups = async () => {
