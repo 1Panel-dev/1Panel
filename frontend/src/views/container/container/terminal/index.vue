@@ -34,11 +34,11 @@
                 </el-select>
             </el-form-item>
 
-            <el-button type="primary" v-if="!terminalOpen" @click="initTerm(formRef)">
+            <el-button v-if="!terminalOpen" @click="initTerm(formRef)">
                 {{ $t('commons.button.conn') }}
             </el-button>
-            <el-button type="primary" v-else @click="handleClose()">{{ $t('commons.button.disconn') }}</el-button>
-            <div style="height: calc(100vh - 290px)" :id="'terminal-exec'"></div>
+            <el-button v-else @click="handleClose()">{{ $t('commons.button.disconn') }}</el-button>
+            <div style="height: calc(100vh - 302px)" :id="'terminal-exec'"></div>
         </el-form>
     </el-drawer>
 </template>
@@ -180,13 +180,13 @@ const isWsOpen = () => {
 };
 
 function handleClose() {
-    terminalVisiable.value = false;
-    terminalOpen.value = false;
     window.removeEventListener('resize', changeTerminalSize);
     if (isWsOpen()) {
         terminalSocket && terminalSocket.close();
         term.dispose();
     }
+    terminalVisiable.value = false;
+    terminalOpen.value = false;
 }
 
 function changeTerminalSize() {

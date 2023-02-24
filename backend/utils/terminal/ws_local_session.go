@@ -35,6 +35,7 @@ func (sws *LocalWsSession) Start(quitChan chan bool) {
 
 func (sws *LocalWsSession) handleSlaveEvent(exitCh chan bool) {
 	defer setQuit(exitCh)
+	defer global.LOG.Debug("thread of handle slave event has exited now")
 
 	buffer := make([]byte, 1024)
 	for {
@@ -62,6 +63,7 @@ func (sws *LocalWsSession) masterWrite(data []byte) error {
 func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 	wsConn := sws.wsConn
 	defer setQuit(exitCh)
+	defer global.LOG.Debug("thread of receive ws msg has exited now")
 	for {
 		select {
 		case <-exitCh:

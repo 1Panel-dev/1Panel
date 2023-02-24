@@ -1,7 +1,6 @@
 package terminal
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"syscall"
@@ -27,8 +26,8 @@ type LocalCommand struct {
 	ptyClosed chan struct{}
 }
 
-func NewCommand(containerName string, auth string) (*LocalCommand, error) {
-	cmd := exec.Command("sh", "-c", fmt.Sprintf("docker exec -it %s redis-cli %s", containerName, auth))
+func NewCommand(commands string) (*LocalCommand, error) {
+	cmd := exec.Command("sh", "-c", commands)
 
 	pty, err := pty.Start(cmd)
 	if err != nil {

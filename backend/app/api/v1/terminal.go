@@ -103,11 +103,63 @@ func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 		return
 	}
 	defer wsConn.Close()
-	auth := ""
+	commands := fmt.Sprintf("docker exec -it %s redis-cli", redisConf.ContainerName)
 	if len(redisConf.Requirepass) != 0 {
-		auth = fmt.Sprintf("-a %s --no-auth-warning", redisConf.Requirepass)
+		commands = fmt.Sprintf("docker exec -it %s redis-cli -a %s --no-auth-warning", redisConf.ContainerName, redisConf.Requirepass)
 	}
-	slave, err := terminal.NewCommand(redisConf.ContainerName, auth)
+	slave, err := terminal.NewCommand(commands)
+	if wshandleError(wsConn, err) {
+		return
+	}
+	defer slave.Close()
+
+	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave)
+	if wshandleError(wsConn, err) {
+		return
+	}
+
+	quitChan := make(chan bool, 3)
+	tty.Start(quitChan)
+	go slave.Wait(quitChan)
+
+	<-quitChan
+
+	global.LOG.Info("websocket finished")
+	if wshandleError(wsConn, err) {
+		return
+	}
+}
+
+func (b *BaseApi) ContainerWsSsh(c *gin.Context) {
+	containerID := c.Query("containerid")
+	command := c.Query("command")
+	user := c.Query("user")
+	if len(command) == 0 || len(containerID) == 0 {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, errors.New("error param of command or containerID"))
+		return
+	}
+	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		global.LOG.Errorf("gin context http handler failed, err: %v", err)
+		return
+	}
+	defer wsConn.Close()
+	commands := fmt.Sprintf("docker exec -it %s %s", containerID, command)
+	if len(user) != 0 {
+		commands = fmt.Sprintf("docker exec -it -u %s %s %s", user, containerID, command)
+	}
+	slave, err := terminal.NewCommand(commands)
 	if wshandleError(wsConn, err) {
 		return
 	}

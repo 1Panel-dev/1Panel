@@ -1,16 +1,10 @@
 package v1
 
 import (
-	"context"
-	"strconv"
-
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/docker"
-	"github.com/1Panel-dev/1Panel/backend/utils/terminal"
-	"github.com/docker/docker/api/types"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 )
@@ -229,63 +223,6 @@ func (b *BaseApi) Inspect(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, result)
-}
-
-func (b *BaseApi) ContainerExec(c *gin.Context) {
-	containerID := c.Query("containerid")
-	command := c.Query("command")
-	user := c.Query("user")
-	cols, err := strconv.Atoi(c.DefaultQuery("cols", "80"))
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	rows, err := strconv.Atoi(c.DefaultQuery("rows", "40"))
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-
-	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
-	if err != nil {
-		global.LOG.Errorf("gin context http handler failed, err: %v", err)
-		return
-	}
-	defer wsConn.Close()
-
-	client, err := docker.NewDockerClient()
-	if wshandleError(wsConn, errors.WithMessage(err, "New docker client failed.")) {
-		return
-	}
-
-	conf := types.ExecConfig{Tty: true, Cmd: []string{command}, AttachStderr: true, AttachStdin: true, AttachStdout: true}
-	if len(user) != 0 {
-		conf.User = user
-	}
-	ir, err := client.ContainerExecCreate(context.TODO(), containerID, conf)
-	if wshandleError(wsConn, errors.WithMessage(err, "failed to set exec conf.")) {
-		return
-	}
-	hr, err := client.ContainerExecAttach(c, ir.ID, types.ExecStartCheck{Detach: false, Tty: true})
-	if wshandleError(wsConn, errors.WithMessage(err, "failed to set up the connection.")) {
-		return
-	}
-	defer hr.Close()
-
-	sws, err := terminal.NewExecConn(cols, rows, wsConn, hr.Conn)
-	if wshandleError(wsConn, err) {
-		return
-	}
-
-	quitChan := make(chan bool, 3)
-	ctx, cancel := context.WithCancel(context.Background())
-	sws.Start(ctx, quitChan)
-	<-quitChan
-	cancel()
-
-	if wshandleError(wsConn, err) {
-		return
-	}
 }
 
 // @Tags Container

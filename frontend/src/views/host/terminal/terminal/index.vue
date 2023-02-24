@@ -6,6 +6,7 @@
             style="background-color: #efefef; margin-top: 20px"
             v-model="terminalValue"
             :before-leave="beforeLeave"
+            @tab-change="quickCmd = ''"
             @edit="handleTabsRemove"
         >
             <el-tab-pane
@@ -305,19 +306,16 @@ const onConnTerminal = async (title: string, wsID: number, isLocal?: boolean) =>
             }
         }
     }
-    console.log('走到了这里');
     terminalTabs.value.push({
         index: tabIndex,
         title: title,
         wsID: wsID,
         status: res.data ? 'online' : 'closed',
     });
-    console.log(terminalTabs.value);
     terminalValue.value = tabIndex;
     if (!res.data && isLocal) {
         dialogRef.value!.acceptParams({ isLocal: true });
     }
-    console.log(terminalValue.value);
     nextTick(() => {
         ctx.refs[`t-${terminalValue.value}`] &&
             ctx.refs[`t-${terminalValue.value}`][0].acceptParams({
