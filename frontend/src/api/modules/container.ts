@@ -76,6 +76,9 @@ export const createVolume = (params: Container.VolumeCreate) => {
 };
 
 // repo
+export const checkRepoStatus = (id: number) => {
+    return http.post(`/containers/repo/status`, { id: id });
+};
 export const searchImageRepo = (params: SearchWithPage) => {
     return http.post<ResPage<Container.RepoInfo>>(`/containers/repo/search`, params);
 };

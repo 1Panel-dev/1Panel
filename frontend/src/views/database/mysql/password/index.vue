@@ -38,7 +38,13 @@
                                     prop="privilegeIPs"
                                     :rules="Rules.requiredInput"
                                 >
-                                    <el-input clearable v-model="changeForm.privilegeIPs" />
+                                    <el-input
+                                        :placeholder="$t('database.remoteHelper')"
+                                        clearable
+                                        :autosize="{ minRows: 2, maxRows: 5 }"
+                                        type="textarea"
+                                        v-model="changeForm.privilegeIPs"
+                                    />
                                 </el-form-item>
                             </div>
                         </el-col>
@@ -145,7 +151,11 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
             }
             return;
         }
-        param.value = changeForm.privilege;
+        if (changeForm.privilege !== 'ip') {
+            param.value = changeForm.privilege;
+        } else {
+            param.value = changeForm.privilegeIPs.replaceAll('/n', ',');
+        }
         loading.value = true;
         await updateMysqlAccess(param)
             .then(() => {

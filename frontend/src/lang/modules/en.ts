@@ -266,6 +266,7 @@ export default {
         loadBackup: 'Import',
         setting: 'Settings',
         remoteAccess: 'Remote access',
+        remoteHelper: 'One in a row, for example:\n172.16.10.111\n172.16.10.112',
         remoteConnHelper:
             'Remote connection to mysql as user root may have security risks. Therefore, perform this operation with caution.',
         changePassword: 'Password',

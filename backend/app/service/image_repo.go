@@ -23,6 +23,7 @@ type ImageRepoService struct{}
 type IImageRepoService interface {
 	Page(search dto.SearchWithPage) (int64, interface{}, error)
 	List() ([]dto.ImageRepoOption, error)
+	Login(req dto.OperateByID) error
 	Create(req dto.ImageRepoCreate) error
 	Update(req dto.ImageRepoUpdate) error
 	BatchDelete(req dto.ImageRepoDelete) error
@@ -43,6 +44,19 @@ func (u *ImageRepoService) Page(req dto.SearchWithPage) (int64, interface{}, err
 		dtoOps = append(dtoOps, item)
 	}
 	return total, dtoOps, err
+}
+
+func (u *ImageRepoService) Login(req dto.OperateByID) error {
+	repo, err := imageRepoRepo.Get(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	if err := u.CheckConn(repo.DownloadUrl, repo.Username, repo.Password); err != nil {
+		_ = imageRepoRepo.Update(repo.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error})
+		return err
+	}
+	_ = imageRepoRepo.Update(repo.ID, map[string]interface{}{"status": constant.StatusSuccess})
+	return nil
 }
 
 func (u *ImageRepoService) List() ([]dto.ImageRepoOption, error) {
@@ -67,22 +81,30 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 	}
 	if req.Protocol == "http" {
 		_ = u.handleRegistries(req.DownloadUrl, "", "create")
+		stdout, err := cmd.Exec("systemctl restart docker")
+		if err != nil {
+			return errors.New(string(stdout))
+		}
 		ticker := time.NewTicker(3 * time.Second)
 		ctx, cancle := context.WithTimeout(context.Background(), time.Second*20)
-		for range ticker.C {
-			select {
-			case <-ctx.Done():
-				cancle()
-				return errors.New("the docker service cannot be restarted")
-			default:
-				stdout, err := cmd.Exec("systemctl is-active docker")
-				if string(stdout) == "active\n" && err == nil {
-					global.LOG.Info("docker restart with new conf successful!")
+		if err := func() error {
+			for range ticker.C {
+				select {
+				case <-ctx.Done():
 					cancle()
+					return errors.New("the docker service cannot be restarted")
+				default:
+					stdout, err := cmd.Exec("systemctl is-active docker")
+					if string(stdout) == "active\n" && err == nil {
+						global.LOG.Info("docker restart with new conf successful!")
+						return nil
+					}
 				}
 			}
+			return nil
+		}(); err != nil {
+			return err
 		}
-		cancle()
 	}
 
 	if err := copier.Copy(&imageRepo, &req); err != nil {
@@ -90,7 +112,7 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 	}
 
 	imageRepo.Status = constant.StatusSuccess
-	if err := u.checkConn(req.DownloadUrl, req.Username, req.Password); err != nil {
+	if err := u.CheckConn(req.DownloadUrl, req.Username, req.Password); err != nil {
 		imageRepo.Status = constant.StatusFailed
 		imageRepo.Message = err.Error()
 	}
@@ -141,14 +163,14 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 
 	upMap["status"] = constant.StatusSuccess
 	upMap["message"] = ""
-	if err := u.checkConn(req.DownloadUrl, req.Username, req.Password); err != nil {
+	if err := u.CheckConn(req.DownloadUrl, req.Username, req.Password); err != nil {
 		upMap["status"] = constant.StatusFailed
 		upMap["message"] = err.Error()
 	}
 	return imageRepoRepo.Update(req.ID, upMap)
 }
 
-func (u *ImageRepoService) checkConn(host, user, password string) error {
+func (u *ImageRepoService) CheckConn(host, user, password string) error {
 	stdout, err := cmd.Execf("docker login -u %s -p %s %s", user, password, host)
 	if err != nil {
 		return errors.New(string(stdout))

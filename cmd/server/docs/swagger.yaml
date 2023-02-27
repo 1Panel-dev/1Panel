@@ -717,27 +717,8 @@ definitions:
     - repoID
     - tagName
     type: object
-  dto.ImageRepoCreate:
-    properties:
-      auth:
-        type: boolean
-      downloadUrl:
-        type: string
-      name:
-        type: string
-      password:
-        type: string
-      protocol:
-        type: string
-      username:
-        type: string
-    required:
-    - name
-    type: object
   dto.ImageRepoDelete:
     properties:
-      deleteInsecure:
-        type: boolean
       ids:
         items:
           type: integer
@@ -1509,7 +1490,9 @@ definitions:
         type: integer
       required:
         type: string
-      shortDesc:
+      shortDescEn:
+        type: string
+      shortDescZh:
         type: string
       status:
         type: string
@@ -2392,7 +2375,9 @@ definitions:
         type: integer
       required:
         type: string
-      shortDesc:
+      shortDescEn:
+        type: string
+      shortDescZh:
         type: string
       status:
         type: string
@@ -3860,7 +3845,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.ImageRepoCreate'
+          $ref: '#/definitions/dto.ImageRepoDelete'
       produces:
       - application/json
       responses:
@@ -3935,6 +3920,28 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Page image repos
+      tags:
+      - Container Image-repo
+  /containers/repo/status:
+    get:
+      consumes:
+      - application/json
+      description: 获取 docker 仓库状态
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperateByID'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Load repo status
       tags:
       - Container Image-repo
   /containers/repo/update:
@@ -6111,9 +6118,9 @@ paths:
       summary: Page operation logs
       tags:
       - Logs
-  /nginx:
+  /openResty:
     get:
-      description: 获取 nginx 配置信息
+      description: 获取 OpenResty 配置信息
       responses:
         "200":
           description: OK
@@ -6121,14 +6128,14 @@ paths:
             $ref: '#/definitions/response.FileInfo'
       security:
       - ApiKeyAuth: []
-      summary: Load nginx conf
+      summary: Load OpenResty conf
       tags:
-      - Nginx
-  /nginx/file:
+      - OpenResty
+  /openResty/file:
     post:
       consumes:
       - application/json
-      description: 上传更新 nginx 配置文件
+      description: 上传更新 OpenResty 配置文件
       parameters:
       - description: request
         in: body
@@ -6141,20 +6148,20 @@ paths:
           description: ""
       security:
       - ApiKeyAuth: []
-      summary: Update nginx conf by upload file
+      summary: Update OpenResty conf by upload file
       tags:
-      - Nginx
+      - OpenResty
       x-panel-log:
         BeforeFuntions: []
         bodyKeys: []
         formatEN: Update nginx conf
         formatZH: 更新 nginx 配置
         paramKeys: []
-  /nginx/scope:
+  /openResty/scope:
     post:
       consumes:
       - application/json
-      description: 获取部分 nginx 配置信息
+      description: 获取部分 OpenResty 配置信息
       parameters:
       - description: request
         in: body
@@ -6169,12 +6176,12 @@ paths:
             type: anrry
       security:
       - ApiKeyAuth: []
-      summary: Load partial nginx conf
+      summary: Load partial OpenResty conf
       tags:
-      - Nginx
-  /nginx/status:
+      - OpenResty
+  /openResty/status:
     get:
-      description: 获取 nginx 状态信息
+      description: 获取 OpenResty 状态信息
       responses:
         "200":
           description: OK
@@ -6182,14 +6189,14 @@ paths:
             $ref: '#/definitions/response.NginxStatus'
       security:
       - ApiKeyAuth: []
-      summary: Load nginx status info
+      summary: Load OpenResty status info
       tags:
-      - Nginx
-  /nginx/update:
+      - OpenResty
+  /openResty/update:
     post:
       consumes:
       - application/json
-      description: 更新 nginx 配置信息
+      description: 更新 OpenResty 配置信息
       parameters:
       - description: request
         in: body
@@ -6202,9 +6209,9 @@ paths:
           description: ""
       security:
       - ApiKeyAuth: []
-      summary: Update nginx conf
+      summary: Update OpenResty conf
       tags:
-      - Nginx
+      - OpenResty
       x-panel-log:
         BeforeFuntions:
         - db: websites
