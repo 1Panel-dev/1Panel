@@ -1947,7 +1947,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.ImageRepoCreate"
+                            "$ref": "#/definitions/dto.ImageRepoDelete"
                         }
                     }
                 ],
@@ -2056,6 +2056,42 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/dto.PageResult"
                         }
+                    }
+                }
+            }
+        },
+        "/containers/repo/status": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 docker 仓库状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container Image-repo"
+                ],
+                "summary": "Load repo status",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperateByID"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
                     }
                 }
             }
@@ -5475,18 +5511,18 @@ var doc = `{
                 }
             }
         },
-        "/nginx": {
+        "/openResty": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "获取 nginx 配置信息",
+                "description": "获取 OpenResty 配置信息",
                 "tags": [
-                    "Nginx"
+                    "OpenResty"
                 ],
-                "summary": "Load nginx conf",
+                "summary": "Load OpenResty conf",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -5497,21 +5533,21 @@ var doc = `{
                 }
             }
         },
-        "/nginx/file": {
+        "/openResty/file": {
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "上传更新 nginx 配置文件",
+                "description": "上传更新 OpenResty 配置文件",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
-                    "Nginx"
+                    "OpenResty"
                 ],
-                "summary": "Update nginx conf by upload file",
+                "summary": "Update OpenResty conf by upload file",
                 "parameters": [
                     {
                         "description": "request",
@@ -5537,21 +5573,21 @@ var doc = `{
                 }
             }
         },
-        "/nginx/scope": {
+        "/openResty/scope": {
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "获取部分 nginx 配置信息",
+                "description": "获取部分 OpenResty 配置信息",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
-                    "Nginx"
+                    "OpenResty"
                 ],
-                "summary": "Load partial nginx conf",
+                "summary": "Load partial OpenResty conf",
                 "parameters": [
                     {
                         "description": "request",
@@ -5573,18 +5609,18 @@ var doc = `{
                 }
             }
         },
-        "/nginx/status": {
+        "/openResty/status": {
             "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "获取 nginx 状态信息",
+                "description": "获取 OpenResty 状态信息",
                 "tags": [
-                    "Nginx"
+                    "OpenResty"
                 ],
-                "summary": "Load nginx status info",
+                "summary": "Load OpenResty status info",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -5595,21 +5631,21 @@ var doc = `{
                 }
             }
         },
-        "/nginx/update": {
+        "/openResty/update": {
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "更新 nginx 配置信息",
+                "description": "更新 OpenResty 配置信息",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
-                    "Nginx"
+                    "OpenResty"
                 ],
-                "summary": "Update nginx conf",
+                "summary": "Update OpenResty conf",
                 "parameters": [
                     {
                         "description": "request",
@@ -9589,41 +9625,12 @@ var doc = `{
                 }
             }
         },
-        "dto.ImageRepoCreate": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "auth": {
-                    "type": "boolean"
-                },
-                "downloadUrl": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "protocol": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.ImageRepoDelete": {
             "type": "object",
             "required": [
                 "ids"
             ],
             "properties": {
-                "deleteInsecure": {
-                    "type": "boolean"
-                },
                 "ids": {
                     "type": "array",
                     "items": {
@@ -10785,7 +10792,10 @@ var doc = `{
                 "required": {
                     "type": "string"
                 },
-                "shortDesc": {
+                "shortDescEn": {
+                    "type": "string"
+                },
+                "shortDescZh": {
                     "type": "string"
                 },
                 "status": {
@@ -12108,7 +12118,10 @@ var doc = `{
                 "required": {
                     "type": "string"
                 },
-                "shortDesc": {
+                "shortDescEn": {
+                    "type": "string"
+                },
+                "shortDescZh": {
                     "type": "string"
                 },
                 "status": {

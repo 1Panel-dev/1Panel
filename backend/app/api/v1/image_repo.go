@@ -58,10 +58,36 @@ func (b *BaseApi) ListRepo(c *gin.Context) {
 }
 
 // @Tags Container Image-repo
+// @Summary Load repo status
+// @Description 获取 docker 仓库状态
+// @Accept json
+// @Param request body dto.OperateByID true "request"
+// @Produce json
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/repo/status [get]
+func (b *BaseApi) CheckRepoStatus(c *gin.Context) {
+	var req dto.OperateByID
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := imageRepoService.Login(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Container Image-repo
 // @Summary Create image repo
 // @Description 创建镜像仓库
 // @Accept json
-// @Param request body dto.ImageRepoCreate true "request"
+// @Param request body dto.ImageRepoDelete true "request"
 // @Produce json
 // @Success 200
 // @Security ApiKeyAuth

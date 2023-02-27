@@ -217,10 +217,10 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
     };
     await updateSetting(param)
         .then(async () => {
-            loading.value = false;
-            MsgSuccess(i18n.t('commons.msg.operationSuccess'));
             if (param.key === 'UserName') {
                 await logOutApi();
+                loading.value = false;
+                MsgSuccess(i18n.t('commons.msg.operationSuccess'));
                 router.push({ name: 'login', params: { code: '' } });
                 globalStore.setLogStatus(false);
                 return;

@@ -82,7 +82,7 @@ import OperatorDialog from '@/views/container/repo/operator/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
 import { Container } from '@/api/interface/container';
-import { deleteImageRepo, loadDockerStatus, searchImageRepo } from '@/api/modules/container';
+import { checkRepoStatus, deleteImageRepo, loadDockerStatus, searchImageRepo } from '@/api/modules/container';
 import i18n from '@/lang';
 import router from '@/routers';
 import { ElMessageBox } from 'element-plus';
@@ -156,7 +156,25 @@ const onDelete = async (row: Container.RepoInfo) => {
     });
 };
 
+const onCheckConn = async (row: Container.RepoInfo) => {
+    loading.value = true;
+    await checkRepoStatus(row.id)
+        .then(() => {
+            loading.value = false;
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
 const buttons = [
+    {
+        label: i18n.global.t('commons.button.sync'),
+        click: (row: Container.RepoInfo) => {
+            onCheckConn(row);
+        },
+    },
     {
         label: i18n.global.t('commons.button.edit'),
         disabled: (row: Container.RepoInfo) => {
