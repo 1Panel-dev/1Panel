@@ -46,12 +46,12 @@
                         </div>
                     </template>
                 </CardWithHeader>
-                <CardWithHeader :header="$t('commons.table.status')" style="margin-top: 20px" height="300px">
+                <CardWithHeader :header="$t('commons.table.status')" style="margin-top: 20px">
                     <template #body>
-                        <Status ref="statuRef" />
+                        <Status ref="statuRef" style="margin-top: -7px" />
                     </template>
                 </CardWithHeader>
-                <CardWithHeader :header="$t('menu.monitor')" style="margin-top: 20px" height="450">
+                <CardWithHeader :header="$t('menu.monitor')" style="margin-top: 20px">
                     <template #header-r>
                         <el-radio-group
                             style="float: right; margin-left: 5px"
@@ -109,19 +109,19 @@
                             <div
                                 v-if="chartOption === 'io'"
                                 id="ioChart"
-                                style="margin-top: 20px; width: 100%; height: 324px"
+                                style="margin-top: 20px; width: 100%; height: 300px"
                             ></div>
                             <div
                                 v-if="chartOption === 'network'"
                                 id="networkChart"
-                                style="margin-top: 40px; width: 100%; height: 324px"
+                                style="margin-top: 40px; width: 100%; height: 300px"
                             ></div>
                         </div>
                     </template>
                 </CardWithHeader>
             </el-col>
             <el-col :span="8">
-                <CardWithHeader :header="$t('home.systemInfo')" height="306px">
+                <CardWithHeader :header="$t('home.systemInfo')">
                     <template #body>
                         <el-descriptions :column="1" class="h-systemInfo">
                             <el-descriptions-item class-name="system-content">
@@ -176,7 +176,7 @@
                     </template>
                 </CardWithHeader>
 
-                <CardWithHeader :header="$t('home.app')" style="margin-top: 20px" height="586px">
+                <CardWithHeader :header="$t('home.app')" style="margin-top: 20px">
                     <template #body>
                         <App ref="appRef" />
                     </template>
