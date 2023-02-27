@@ -8,32 +8,27 @@ import (
 
 func Up(filePath string) (string, error) {
 	stdout, err := cmd.Execf("docker-compose -f %s up -d", filePath)
-	return string(stdout), err
+	return stdout, err
 }
 
 func Down(filePath string) (string, error) {
 	stdout, err := cmd.Execf("docker-compose -f %s down", filePath)
-	return string(stdout), err
+	return stdout, err
 }
 
 func Stop(filePath string) (string, error) {
 	stdout, err := cmd.Execf("docker-compose -f %s stop", filePath)
-	return string(stdout), err
+	return stdout, err
 }
 
 func Restart(filePath string) (string, error) {
 	stdout, err := cmd.Execf("docker-compose -f %s restart", filePath)
-	return string(stdout), err
+	return stdout, err
 }
 
 func Operate(filePath, operation string) (string, error) {
 	stdout, err := cmd.Execf("docker-compose -f %s %s", filePath, operation)
-	return string(stdout), err
-}
-
-func Rmf(filePath string) (string, error) {
-	stdout, err := cmd.Execf("docker-compose -f %s rm -f", filePath)
-	return string(stdout), err
+	return stdout, err
 }
 
 func GetComposeProject(yml []byte, env map[string]string) (*types.Project, error) {

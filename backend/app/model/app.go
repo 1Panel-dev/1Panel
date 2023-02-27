@@ -16,7 +16,7 @@ type App struct {
 	Github             string      `json:"github" gorm:"type:varchar(64);not null"`
 	Document           string      `json:"document" gorm:"type:varchar(64);not null"`
 	Recommend          int         `json:"recommend" gorm:"type:Integer;not null"`
-	Details            []AppDetail `json:"-"`
+	Details            []AppDetail `json:"-" gorm:"-:migration"`
 	TagsKey            []string    `json:"-" gorm:"-"`
-	AppTags            []AppTag    `json:"-" `
+	AppTags            []AppTag    `json:"-" gorm:"-:migration"`
 }

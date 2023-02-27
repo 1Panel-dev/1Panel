@@ -1,12 +1,8 @@
 import { createApp } from 'vue';
 import App from './App.vue';
-// import 'element-plus/dist/index.css';
-// import 'element-plus/theme-chalk/dark/css-vars.css';
 
 import '@/styles/index.scss';
-// import '@/styles/reset.scss';
 import '@/styles/common.scss';
-import '@/assets/fonts/font.scss';
 import '@/assets/iconfont/iconfont.css';
 import '@/assets/iconfont/iconfont.js';
 

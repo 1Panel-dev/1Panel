@@ -21,8 +21,8 @@ type AppInstall struct {
 	ServiceName   string             `json:"serviceName" gorm:"type:varchar(256);not null"`
 	HttpPort      int                `json:"httpPort" gorm:"type:integer;not null"`
 	HttpsPort     int                `json:"httpsPort" gorm:"type:integer;not null"`
-	App           App                `json:"app"`
-	Backups       []AppInstallBackup `json:"backups"`
+	App           App                `json:"app" gorm:"-:migration"`
+	Backups       []AppInstallBackup `json:"backups" gorm:"-:migration"`
 }
 
 func (i *AppInstall) GetPath() string {

@@ -356,7 +356,9 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 	if err != nil {
 		return nil, err
 	}
-	versionRes, err := http.Get(fmt.Sprintf("%s/%s/%s/appstore/apps.json", global.CONF.System.RepoUrl, global.CONF.System.Mode, setting.SystemVersion))
+	versionUrl := fmt.Sprintf("%s/%s/%s/appstore/apps.json", global.CONF.System.RepoUrl, global.CONF.System.Mode, setting.SystemVersion)
+	versionRes, err := http.Get(versionUrl)
+	global.LOG.Infof("get current version from [%s]", versionUrl)
 	if err != nil {
 		return nil, err
 	}
@@ -384,6 +386,7 @@ func (a AppService) SyncAppList() error {
 		return err
 	}
 	if !updateRes.CanUpdate {
+		global.LOG.Infof("The latest version is [%s] The app store is already up to date", updateRes.Version)
 		return nil
 	}
 	if err := getAppFromRepo(updateRes.DownloadPath, updateRes.Version); err != nil {

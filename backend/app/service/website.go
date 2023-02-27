@@ -143,7 +143,7 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 				return err
 			}
 			appInstall = &install
-			website.AppInstallID = 0
+			website.AppInstallID = appInstall.ID
 		}
 	}
 
