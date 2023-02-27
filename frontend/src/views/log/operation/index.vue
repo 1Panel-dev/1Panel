@@ -132,6 +132,11 @@ const search = async () => {
         .then((res) => {
             loading.value = false;
             data.value = res.data.items;
+            if (globalStore.language === 'zh') {
+                for (const item of data.value) {
+                    item.detailZH = loadDetail(item.detailZH);
+                }
+            }
             paginationConfig.total = res.data.total;
         })
         .catch(() => {
@@ -146,6 +151,58 @@ const onClean = async () => {
         submitInputInfo: i18n.global.t('logs.deleteLogs'),
     };
     confirmDialogRef.value!.acceptParams(params);
+};
+
+const loadDetail = (log: string) => {
+    if (log.indexOf('[enable]') !== -1) {
+        log = log.replace('[enable]', '[' + i18n.global.t('commons.button.enable') + ']');
+    }
+    if (log.indexOf('[disable]') !== -1) {
+        log = log.replace('[disable]', '[' + i18n.global.t('commons.button.disable') + ']');
+    }
+    if (log.indexOf('[light]') !== -1) {
+        log = log.replace('[light]', '[' + i18n.global.t('setting.light') + ']');
+    }
+    if (log.indexOf('[dark]') !== -1) {
+        log = log.replace('[dark]', '[' + i18n.global.t('setting.dark') + ']');
+    }
+    if (log.indexOf('[UserName]') !== -1) {
+        return log.replace('[UserName]', '[' + i18n.global.t('setting.user') + ']');
+    }
+    if (log.indexOf('[PanelName]') !== -1) {
+        return log.replace('[PanelName]', '[' + i18n.global.t('setting.title') + ']');
+    }
+    if (log.indexOf('[Language]') !== -1) {
+        return log.replace('[Language]', '[' + i18n.global.t('setting.language') + ']');
+    }
+    if (log.indexOf('[Theme]') !== -1) {
+        return log.replace('[Theme]', '[' + i18n.global.t('setting.theme') + ']');
+    }
+    if (log.indexOf('[SessionTimeout]') !== -1) {
+        return log.replace('[SessionTimeout]', '[' + i18n.global.t('setting.sessionTimeout') + ']');
+    }
+    if (log.indexOf('[ExpirationDays]') !== -1) {
+        return log.replace('[ExpirationDays]', '[' + i18n.global.t('setting.expirationTime') + ']');
+    }
+    if (log.indexOf('[ComplexityVerification]') !== -1) {
+        return log.replace('[ComplexityVerification]', '[' + i18n.global.t('setting.complexity') + ']');
+    }
+    if (log.indexOf('[MFAStatus]') !== -1) {
+        return log.replace('[MFAStatus]', '[' + i18n.global.t('setting.mfa') + ']');
+    }
+    if (log.indexOf('[MonitorStatus]') !== -1) {
+        return log.replace('[MonitorStatus]', '[' + i18n.global.t('setting.enableMonitor') + ']');
+    }
+    if (log.indexOf('[MonitorStoreDays]') !== -1) {
+        return log.replace('[MonitorStoreDays]', '[' + i18n.global.t('setting.monitor') + ']');
+    }
+    if (log.indexOf('[MonitorStoreDays]') !== -1) {
+        return log.replace('[MonitorStoreDays]', '[' + i18n.global.t('setting.monitor') + ']');
+    }
+    if (log.indexOf('[MonitorStoreDays]') !== -1) {
+        return log.replace('[MonitorStoreDays]', '[' + i18n.global.t('setting.monitor') + ']');
+    }
+    return log;
 };
 
 const onSubmitClean = async () => {

@@ -847,7 +847,7 @@ export default {
         issue: '问题反馈',
         doc: '官方文档',
         star: '点亮 Star',
-        description: '1Panel，一款现代化的开源 Linux 面板。',
+        description: '1Panel，现代化、开源的 Linux 服务器运维管理面板。',
     },
     app: {
         app: '应用',

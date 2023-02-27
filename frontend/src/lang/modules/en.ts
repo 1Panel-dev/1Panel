@@ -842,7 +842,7 @@ export default {
         issue: 'Feedback',
         doc: 'Official document',
         star: 'Star',
-        description: '1Panel, A modern open source Linux panel.',
+        description: '1Panel, Modern, open source Linux server operation and maintenance management panel.',
     },
     app: {
         app: 'Application',
