@@ -19,8 +19,8 @@ type Website struct {
 	ErrorLog       bool            `json:"errorLog"`
 	AccessLog      bool            `json:"accessLog"`
 	DefaultServer  bool            `json:"defaultServer"`
-	Domains        []WebsiteDomain `json:"domains"`
-	WebsiteSSL     WebsiteSSL      `json:"webSiteSSL"`
+	Domains        []WebsiteDomain `json:"domains" gorm:"-:migration"`
+	WebsiteSSL     WebsiteSSL      `json:"webSiteSSL" gorm:"-:migration"`
 }
 
 func (w Website) TableName() string {

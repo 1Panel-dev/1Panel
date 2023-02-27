@@ -21,7 +21,9 @@ func Init() {
 			panic(fmt.Errorf("init db file falied, err: %v", err))
 		}
 	}
-	db, err := gorm.Open(sqlite.Open(fullPath), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(fullPath), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+	})
 	if err != nil {
 		panic(err)
 	}

@@ -4,6 +4,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/gin-gonic/gin"
 )
 
@@ -37,10 +38,13 @@ func (b *BaseApi) SearchApp(c *gin.Context) {
 // @Router /apps/sync [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"应用商店同步","formatEN":"App store synchronization"}
 func (b *BaseApi) SyncApp(c *gin.Context) {
+	global.LOG.Infof("sync app list start ...")
 	if err := appService.SyncAppList(); err != nil {
+		global.LOG.Errorf("sync app list error [%s]", err.Error())
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
+	global.LOG.Infof("sync app list success!")
 	helper.SuccessWithData(c, "")
 }
 

@@ -18,8 +18,8 @@ type WebsiteSSL struct {
 	ExpireDate    time.Time `json:"expireDate"`
 	StartDate     time.Time `json:"startDate"`
 
-	AcmeAccount WebsiteAcmeAccount `json:"acmeAccount"`
-	Websites    []Website          `json:"websites"`
+	AcmeAccount WebsiteAcmeAccount `json:"acmeAccount" gorm:"-:migration"`
+	Websites    []Website          `json:"websites" gorm:"-:migration"`
 }
 
 func (w WebsiteSSL) TableName() string {
