@@ -5,13 +5,11 @@
         :before-close="handleClose"
         destroy-on-close
         width="70%"
-        draggable
         @opened="onOpen"
+        class="coder-dialog"
     >
-        <div>
-            <div v-loading="loading">
-                <div id="codeBox" style="height: 60vh"></div>
-            </div>
+        <div v-loading="loading">
+            <div id="codeBox" style="height: 60vh"></div>
         </div>
         <template #footer>
             <span class="dialog-footer">
@@ -106,3 +104,9 @@ const onOpen = () => {
 
 defineExpose({ acceptParams });
 </script>
+
+<style lang="scss">
+.coder-dialog {
+    --el-dialog-margin-top: 10vh;
+}
+</style>
