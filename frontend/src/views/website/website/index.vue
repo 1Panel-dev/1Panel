@@ -68,7 +68,7 @@
                 >
                     <el-table-column :label="$t('commons.table.name')" fix show-overflow-tooltip prop="primaryDomain">
                         <template #default="{ row }">
-                            <el-link type="primary" @click="openConfig(row.id)">
+                            <el-link type="primary" :underline="false" @click="openConfig(row.id)">
                                 {{ row.primaryDomain }}
                             </el-link>
                         </template>
@@ -99,6 +99,7 @@
                         <template #default="{ row, $index }">
                             <div v-show="row.showdate">
                                 <el-date-picker
+                                    style="width: 120px"
                                     v-model="row.expireDate"
                                     type="date"
                                     :disabled-date="checkDate"
@@ -112,12 +113,14 @@
                                 ></el-date-picker>
                             </div>
                             <div v-show="!row.showdate">
-                                <span v-if="isEver(row.expireDate)" @click="openDatePicker(row, $index)">
-                                    {{ $t('website.neverExpire') }}
-                                </span>
-                                <span v-else @click="openDatePicker(row, $index)">
-                                    {{ dateFormatSimple(row.expireDate) }}
-                                </span>
+                                <el-link type="primary" :underline="false" @click="openDatePicker(row, $index)">
+                                    <span v-if="isEver(row.expireDate)">
+                                        {{ $t('website.neverExpire') }}
+                                    </span>
+                                    <span v-else>
+                                        {{ dateFormatSimple(row.expireDate) }}
+                                    </span>
+                                </el-link>
                             </div>
                         </template>
                     </el-table-column>
