@@ -26,7 +26,7 @@ html.dark {
     --panel-popup-color: #060708;
     --panel-alert-bg: #2f3030;
     --panel-path-bg: #2f3030;
-		
+
     .el-tag.el-tag--info {
         --el-tag-bg-color: rgb(49, 51, 51);
         --el-tag-border-color: rgb(64, 67, 67);
@@ -41,7 +41,7 @@ html.dark {
     .el-card {
         --el-card-bg-color: #111417;
         color: #ffffff;
-        border: none !important;
+        border: 1px solid var(--el-card-border-color) !important;
     }
 
     .el-table {
@@ -109,6 +109,9 @@ html.dark {
         .el-menu--popup-container {
             border: none;
         }
+    }
+    .menu {
+			border-right: 1px solid var(--el-border-color-light);
     }
     .el-menu {
         .el-menu-item {
