@@ -7,7 +7,7 @@
                 <el-descriptions-item :label="$t('website.primaryPath')">
                     {{ website.sitePath }}
                     <el-button type="primary" link @click="toFolder(website.sitePath)">
-                        <el-icon><CopyDocument /></el-icon>
+                        <el-icon><FolderOpened /></el-icon>
                     </el-button>
                 </el-descriptions-item>
             </el-descriptions>
