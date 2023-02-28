@@ -84,7 +84,7 @@ const types = [
         value: 'AliYun',
     },
     {
-        label: 'DnsPod',
+        label: 'DNSPod',
         value: 'DnsPod',
     },
     {
