@@ -1039,7 +1039,7 @@ export default {
         privateKey: '密钥(KEY)',
         certificate: '证书(PEM格式)',
         HTTPConfig: 'HTTP 选项',
-        HTTPSOnly: '禁止 HTTTP',
+        HTTPSOnly: '禁止 HTTP',
         HTTPToHTTPS: '访问HTTP自动跳转到HTTPS',
         HTTPAlso: 'HTTP可直接访问',
         sslConfig: 'SSL 选项',
