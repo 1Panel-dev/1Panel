@@ -114,10 +114,10 @@
                                     </div>
                                     <div class="d-description">
                                         <el-tag>{{ $t('app.version') }}：{{ installed.version }}</el-tag>
-                                        <el-tag>HTTP{{ $t('app.port') }}：{{ installed.httpPort }}</el-tag>
+                                        <!-- <el-tag>HTTP{{ $t('app.port') }}：{{ installed.httpPort }}</el-tag>
                                         <el-tag v-if="installed.httpsPort > 0">
                                             HTTPS{{ $t('app.port') }}：{{ installed.httpsPort }}
-                                        </el-tag>
+                                        </el-tag> -->
                                         <div class="description">
                                             <span>{{ $t('app.areadyRun') }}： {{ getAge(installed.createdAt) }}</span>
                                         </div>
