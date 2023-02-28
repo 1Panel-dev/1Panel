@@ -114,10 +114,6 @@
                                     </div>
                                     <div class="d-description">
                                         <el-tag>{{ $t('app.version') }}：{{ installed.version }}</el-tag>
-                                        <!-- <el-tag>HTTP{{ $t('app.port') }}：{{ installed.httpPort }}</el-tag>
-                                        <el-tag v-if="installed.httpsPort > 0">
-                                            HTTPS{{ $t('app.port') }}：{{ installed.httpsPort }}
-                                        </el-tag> -->
                                         <div class="description">
                                             <span>{{ $t('app.areadyRun') }}： {{ getAge(installed.createdAt) }}</span>
                                         </div>
@@ -232,12 +228,17 @@ const changeTag = (key: string) => {
 };
 
 const search = () => {
+    loading.value = true;
     searchReq.page = paginationConfig.currentPage;
     searchReq.pageSize = paginationConfig.pageSize;
-    SearchAppInstalled(searchReq).then((res) => {
-        data.value = res.data.items;
-        paginationConfig.total = res.data.total;
-    });
+    SearchAppInstalled(searchReq)
+        .then((res) => {
+            data.value = res.data.items;
+            paginationConfig.total = res.data.total;
+        })
+        .finally(() => {
+            loading.value = false;
+        });
     GetAppTags().then((res) => {
         tags.value = res.data;
     });
