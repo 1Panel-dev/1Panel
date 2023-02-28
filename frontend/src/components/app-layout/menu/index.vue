@@ -18,7 +18,7 @@
                 popper-class="menu-popper"
             >
                 <SubItem :menuList="routerMenus"></SubItem>
-                <el-menu-item>
+                <el-menu-item :index="''">
                     <el-icon @click="logout">
                         <SvgIcon :iconName="'p-logout'" :className="'svg-icon'"></SvgIcon>
                     </el-icon>
@@ -77,12 +77,14 @@ const logout = () => {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'warning',
-    }).then(() => {
-        systemLogOut();
-        router.push({ name: 'login' });
-        globalStore.setLogStatus(false);
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    });
+    })
+        .then(() => {
+            systemLogOut();
+            router.push({ name: 'login' });
+            globalStore.setLogStatus(false);
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {});
 };
 
 const systemLogOut = async () => {
