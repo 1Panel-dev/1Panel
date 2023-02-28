@@ -109,7 +109,7 @@
                             <div
                                 v-if="chartOption === 'io'"
                                 id="ioChart"
-                                style="margin-top: 20px; width: 100%; height: 300px"
+                                style="margin-top: 40px; width: 100%; height: 300px"
                             ></div>
                             <div
                                 v-if="chartOption === 'network'"

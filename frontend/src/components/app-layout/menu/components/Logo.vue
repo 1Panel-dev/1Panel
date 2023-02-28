@@ -1,7 +1,6 @@
 <template>
     <div class="logo flx-center">
-        <img v-show="!isCollapse" :src="getLogoUrl(isCollapse)" alt="" />
-        <img v-show="isCollapse" :src="getLogoUrl(isCollapse)" alt="" />
+        <img :src="getLogoUrl(isCollapse)" alt="" />
     </div>
 </template>
 
@@ -26,13 +25,10 @@ const getLogoUrl = (isCollapse: boolean) => {
     box-sizing: border-box;
     height: 55px;
     margin: 5px 0;
-    img:first-child {
-        width: 130px;
+    padding: 0 15px;
+    img {
         object-fit: contain;
-    }
-    img:nth-child(2) {
-        height: 45px;
-        object-fit: contain;
+        height: 40px;
     }
 }
 </style>
