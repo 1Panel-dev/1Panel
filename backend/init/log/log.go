@@ -33,7 +33,7 @@ func setOutput(logger *logrus.Logger, config configs.LogConfig) {
 		LogPath:            global.CONF.System.LogPath,
 		FileName:           config.LogName,
 		TimeTagFormat:      FileTImeFormat,
-		MaxRemain:          config.LogBackup,
+		MaxRemain:          config.MaxBackup,
 		RollingTimePattern: RollingTimePattern,
 		LogSuffix:          config.LogSuffix,
 	})

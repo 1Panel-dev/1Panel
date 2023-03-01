@@ -5,5 +5,5 @@ type LogConfig struct {
 	TimeZone  string `mapstructure:"timeZone"`
 	LogName   string `mapstructure:"log_name"`
 	LogSuffix string `mapstructure:"log_suffix"`
-	LogBackup int    `mapstructure:"log_backup"`
+	MaxBackup int    `mapstructure:"max_backup"`
 }
