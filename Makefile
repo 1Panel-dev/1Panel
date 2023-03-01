@@ -16,7 +16,7 @@ build_web:
 
 build_bin:
 	cd $(SERVER_PATH) \
-    && CGO_ENABLED=1 GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOBUILD) -o $(BUILD_PATH)/$(APP_NAME) $(MAIN)
+    && CGO_ENABLED=1 GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOBUILD) -trimpath -ldflags '-s -w --extldflags "-static -fpic"' -o $(BUILD_PATH)/$(APP_NAME) $(MAIN)
 
 build_linux_on_mac:
 	cd $(SERVER_PATH) \
