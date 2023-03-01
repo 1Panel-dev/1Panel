@@ -114,8 +114,8 @@ const handleParams = () => {
             pObj.prop = propStart.value + p.envKey;
             pObj.disabled = p.disabled;
             paramObjs.value.push(pObj);
-            if (p.default == 'random') {
-                form[p.envKey] = getRandomStr(6);
+            if (p.random) {
+                form[p.envKey] = p.default + '_' + getRandomStr(6);
             } else {
                 form[p.envKey] = p.default;
             }
@@ -124,8 +124,8 @@ const handleParams = () => {
                     rules[p.envKey] = [Rules.requiredSelect];
                 } else {
                     rules[p.envKey] = [Rules.requiredInput];
-                    if (p.envKey === 'PANEL_DB_NAME') {
-                        rules[p.envKey].push(Rules.dbName);
+                    if (p.rule && p.rule != '') {
+                        rules[p.envKey].push(Rules[p.rule]);
                     }
                 }
             }

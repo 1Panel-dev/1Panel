@@ -133,6 +133,11 @@ export default {
             ip: 'Please enter the correct IP address',
             port: 'Please enter the correct port',
             selectHelper: 'Please select the correct {0} file',
+            domain: 'domain name format error',
+            databaseName: 'Support English, numbers, _, length 1-30',
+            ipErr: 'IP [{0}] format error, please check',
+            paramName: 'Support English, numbers, .- and _, length 6-30',
+            paramComplexity: 'Support English, numbers, {0}, length 6-30',
         },
         res: {
             paramError: 'The request failed, please try again later!',
