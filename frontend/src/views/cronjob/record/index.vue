@@ -94,6 +94,7 @@
                             <template #prefix>{{ $t('commons.table.status') }}</template>
                             <el-option :label="$t('commons.table.all')" value="" />
                             <el-option :label="$t('commons.status.success')" value="Success" />
+                            <el-option :label="$t('commons.status.waiting')" value="Waiting" />
                             <el-option :label="$t('commons.status.failed')" value="Failed" />
                         </el-select>
                     </el-col>
@@ -111,6 +112,7 @@
                                     class="infinite-list-item"
                                 >
                                     <el-icon v-if="item.status === 'Success'"><Select /></el-icon>
+                                    <el-icon v-if="item.status === 'Waiting'"><Loading /></el-icon>
                                     <el-icon v-if="item.status === 'Failed'"><CloseBold /></el-icon>
                                     <span v-if="index === currentRecordIndex" style="color: red">
                                         {{ dateFormat(0, 0, item.startTime) }}
@@ -242,8 +244,11 @@
                                             >
                                                 <el-tag type="danger">{{ $t('commons.table.statusFailed') }}</el-tag>
                                             </el-tooltip>
-                                            <el-tag type="success" v-else>
+                                            <el-tag type="success" v-if="currentRecord?.status === 'Success'">
                                                 {{ $t('commons.table.statusSuccess') }}
+                                            </el-tag>
+                                            <el-tag type="info" v-if="currentRecord?.status === 'Waiting'">
+                                                {{ $t('commons.table.statusWaiting') }}
                                             </el-tag>
                                         </el-form-item>
                                     </el-col>
