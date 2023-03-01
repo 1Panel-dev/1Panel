@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"strings"
 	"time"
 
@@ -38,8 +39,8 @@ func (u *BackupService) RedisBackup() error {
 	if appendonly == "yes" {
 		fileName = fmt.Sprintf("%s.tar.gz", timeNow)
 	}
-	backupDir := fmt.Sprintf("%s/database/redis/%s/", localDir, redisInfo.Name)
-	if err := handleBackupRedis(redisInfo, backupDir, fileName); err != nil {
+	backupDir := fmt.Sprintf("%s/database/redis/%s", localDir, redisInfo.Name)
+	if err := handleRedisBackup(redisInfo, backupDir, fileName); err != nil {
 		return err
 	}
 	record := &model.BackupRecord{
@@ -62,13 +63,13 @@ func (u *BackupService) RedisRecover(req dto.CommonRecover) error {
 		return err
 	}
 	global.LOG.Infof("recover redis from backup file %s", req.File)
-	if err := handleRecoverRedis(redisInfo, req.File); err != nil {
+	if err := handleRedisRecover(redisInfo, req.File, false); err != nil {
 		return err
 	}
 	return nil
 }
 
-func handleBackupRedis(redisInfo *repo.RootInfo, backupDir, fileName string) error {
+func handleRedisBackup(redisInfo *repo.RootInfo, backupDir, fileName string) error {
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(backupDir) {
 		if err := os.MkdirAll(backupDir, os.ModePerm); err != nil {
@@ -96,17 +97,44 @@ func handleBackupRedis(redisInfo *repo.RootInfo, backupDir, fileName string) err
 	return nil
 }
 
-func handleRecoverRedis(redisInfo *repo.RootInfo, recoverFile string) error {
+func handleRedisRecover(redisInfo *repo.RootInfo, recoverFile string, isRollback bool) error {
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(recoverFile) {
-		return errors.New(fmt.Sprintf("%s file is not exist", recoverFile))
+		return fmt.Errorf("%s file is not exist", recoverFile)
 	}
 
 	appendonly, err := configGetStr(redisInfo.ContainerName, redisInfo.Password, "appendonly")
 	if err != nil {
 		return err
 	}
+	if (appendonly == "yes" && !strings.HasSuffix(recoverFile, ".tar.gz")) || (appendonly != "yes" && !strings.HasSuffix(recoverFile, ".rdb")) {
+		return fmt.Errorf("recover redis with appendonly=%s from file %s format error", appendonly, recoverFile)
+	}
 	global.LOG.Infof("appendonly in redis conf is %s", appendonly)
+	isOk := false
+	if !isRollback {
+		defer func() {
+			suffix := "tar.gz"
+			if appendonly != "yes" {
+				suffix = "rdb"
+			}
+			rollbackFile := fmt.Sprintf("%s/original/database/redis/%s_%s.%s", global.CONF.System.BaseDir, redisInfo.Name, time.Now().Format("20060102150405"), suffix)
+			if err := handleRedisBackup(redisInfo, path.Dir(rollbackFile), path.Base(rollbackFile)); err != nil {
+				global.LOG.Errorf("backup database %s for rollback before recover failed, err: %v", redisInfo.Name, err)
+			}
+			defer func() {
+				if !isOk {
+					if err := handleRedisRecover(redisInfo, rollbackFile, true); err != nil {
+						global.LOG.Errorf("rollback redis from %s failed, err: %v", rollbackFile, err)
+					}
+					global.LOG.Infof("rollback redis from %s successful", rollbackFile)
+					_ = os.RemoveAll(rollbackFile)
+				} else {
+					_ = os.RemoveAll(rollbackFile)
+				}
+			}()
+		}()
+	}
 	composeDir := fmt.Sprintf("%s/redis/%s", constant.AppInstallDir, redisInfo.Name)
 	if _, err := compose.Down(composeDir + "/docker-compose.yml"); err != nil {
 		return err

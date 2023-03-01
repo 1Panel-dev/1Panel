@@ -79,12 +79,7 @@
             </el-col>
         </el-row>
         <el-card style="margin-top: 20px">
-            <ComplexTable
-                :pagination-config="paginationConfig"
-                v-model:selects="selects"
-                @search="loadBackupRecords"
-                :data="data"
-            >
+            <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" @search="search" :data="data">
                 <template #toolbar>
                     <el-button type="primary" @click="onBackup">{{ $t('setting.backup') }}</el-button>
                     <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
@@ -93,13 +88,9 @@
                 </template>
                 <el-table-column type="selection" fix />
                 <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="fileName" />
+                <el-table-column :label="$t('database.source')" prop="backupType" />
                 <el-table-column :label="$t('file.dir')" show-overflow-tooltip prop="fileDir" />
-                <el-table-column :label="$t('file.size')" prop="size">
-                    <template #default="{ row }">
-                        {{ computeSize(row.size) }}
-                    </template>
-                </el-table-column>
-                <el-table-column :label="$t('commons.table.createdAt')" prop="createdAt" />
+                <el-table-column :label="$t('commons.table.createdAt')" :formatter="dateFormat" prop="createdAt" />
                 <fu-table-operations
                     width="300px"
                     :buttons="buttons"
@@ -118,22 +109,16 @@
 import ComplexTable from '@/components/complex-table/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { Database } from '@/api/interface/database';
-import {
-    recoverRedis,
-    redisBackupRedisRecords,
-    RedisPersistenceConf,
-    updateRedisPersistenceConf,
-} from '@/api/modules/database';
-
-import { handleBackup } from '@/api/modules/setting';
+import { redisPersistenceConf, updateRedisPersistenceConf } from '@/api/modules/database';
+import { deleteBackupRecord, handleBackup, handleRecover, searchBackupRecords } from '@/api/modules/setting';
 import { Rules } from '@/global/form-rules';
+import { dateFormat } from '@/utils/util';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
-import { computeSize } from '@/utils/util';
-import { BatchDeleteFile } from '@/api/modules/files';
 import { MsgInfo, MsgSuccess } from '@/utils/message';
+import { Backup } from '@/api/interface/backup';
 
 const loading = ref(false);
 
@@ -160,11 +145,8 @@ const acceptParams = (prop: DialogProps): void => {
     persistenceShow.value = true;
     if (prop.status === 'Running') {
         loadform();
-        loadBackupRecords();
+        search();
     }
-};
-const onClose = (): void => {
-    persistenceShow.value = false;
 };
 
 const data = ref();
@@ -188,12 +170,15 @@ const handleDelete = (index: number) => {
     form.saves.splice(index, 1);
 };
 
-const loadBackupRecords = async () => {
+const search = async () => {
     let params = {
+        type: 'redis',
+        name: '',
+        detailName: '',
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
-    const res = await redisBackupRedisRecords(params);
+    const res = await searchBackupRecords(params);
     data.value = res.data.items || [];
     paginationConfig.total = res.data.total;
 };
@@ -202,7 +187,7 @@ const onBackup = async () => {
     await handleBackup({ name: '', detailName: '', type: 'redis' })
         .then(() => {
             loading.value = false;
-            loadBackupRecords();
+            search();
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
@@ -211,11 +196,13 @@ const onBackup = async () => {
 };
 const onRecover = async () => {
     let param = {
-        fileName: currentRow.value.fileName,
-        fileDir: currentRow.value.fileDir,
+        type: 'redis',
+        name: '',
+        detailName: '',
+        file: currentRow.value.fileDir + '/' + currentRow.value.fileName,
     };
     loading.value = true;
-    await recoverRedis(param)
+    await handleRecover(param)
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -225,22 +212,23 @@ const onRecover = async () => {
         });
 };
 
-const onBatchDelete = async (row: Database.FileRecord | null) => {
-    let files: Array<string> = [];
+const onBatchDelete = async (row: Backup.RecordInfo | null) => {
+    let ids: Array<number> = [];
     if (row) {
-        files.push(row.fileDir + '/' + row.fileName);
+        ids.push(row.id);
     } else {
-        selects.value.forEach((item: Database.FileRecord) => {
-            files.push(item.fileDir + '/' + item.fileName);
+        selects.value.forEach((item: Backup.RecordInfo) => {
+            ids.push(item.id);
         });
     }
-    await useDeleteData(BatchDeleteFile, { isDir: false, paths: files }, 'commons.msg.delete');
-    loadBackupRecords();
+    await useDeleteData(deleteBackupRecord, { ids: ids }, 'commons.msg.delete');
+    search();
 };
+
 const buttons = [
     {
         label: i18n.global.t('commons.button.recover'),
-        click: (row: Database.FileRecord) => {
+        click: (row: Backup.RecordInfo) => {
             currentRow.value = row;
             let params = {
                 header: i18n.global.t('commons.button.recover'),
@@ -252,7 +240,7 @@ const buttons = [
     },
     {
         label: i18n.global.t('commons.button.delete'),
-        click: (row: Database.FileRecord) => {
+        click: (row: Backup.RecordInfo) => {
             onBatchDelete(row);
         },
     },
@@ -302,7 +290,7 @@ const onSave = async (formEl: FormInstance | undefined, type: string) => {
 
 const loadform = async () => {
     form.saves = [];
-    const res = await RedisPersistenceConf();
+    const res = await redisPersistenceConf();
     form.appendonly = res.data?.appendonly;
     form.appendfsync = res.data?.appendfsync;
     let itemSaves = res.data?.save.split(' ');
@@ -315,6 +303,5 @@ const loadform = async () => {
 
 defineExpose({
     acceptParams,
-    onClose,
 });
 </script>

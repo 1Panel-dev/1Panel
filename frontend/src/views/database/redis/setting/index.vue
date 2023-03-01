@@ -178,7 +178,6 @@ interface DialogProps {
 
 const changeTab = (val: string) => {
     activeName.value = val;
-    console.log(activeName.value);
 };
 
 const acceptParams = (prop: DialogProps): void => {
@@ -191,9 +190,6 @@ const acceptParams = (prop: DialogProps): void => {
         persistenceRef.value!.acceptParams({ status: prop.status });
         loadform();
     }
-};
-const onClose = (): void => {
-    settingShow.value = false;
 };
 
 const portRef = ref();
@@ -322,6 +318,5 @@ const loadConfFile = async () => {
 
 defineExpose({
     acceptParams,
-    onClose,
 });
 </script>

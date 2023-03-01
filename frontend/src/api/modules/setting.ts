@@ -60,6 +60,16 @@ export const handleRecover = (params: Backup.Recover) => {
 export const handleRecoverByUpload = (params: Backup.Recover) => {
     return http.post(`/settings/backup/recover/byupload`, params);
 };
+export const downloadBackupRecord = (params: Backup.RecordDownload) => {
+    return http.download<BlobPart>(`/settings/backup/record/download`, params, { responseType: 'blob' });
+};
+export const deleteBackupRecord = (params: { ids: number[] }) => {
+    return http.post(`/settings/backup/record/del`, params);
+};
+export const searchBackupRecords = (params: Backup.SearchBackupRecord) => {
+    return http.post<ResPage<Backup.RecordInfo>>(`/settings/backup/record/search`, params);
+};
+
 export const getBackupList = () => {
     return http.get<Array<Backup.BackupInfo>>(`/settings/backup/search`);
 };
@@ -74,15 +84,6 @@ export const editBackup = (params: Backup.BackupOperate) => {
 };
 export const deleteBackup = (params: { ids: number[] }) => {
     return http.post(`/settings/backup/del`, params);
-};
-export const downloadBackupRecord = (params: Backup.RecordDownload) => {
-    return http.download<BlobPart>(`/settings/backup/record/download`, params, { responseType: 'blob' });
-};
-export const deleteBackupRecord = (params: { ids: number[] }) => {
-    return http.post(`/settings/backup/record/del`, params);
-};
-export const searchBackupRecords = (params: Backup.SearchBackupRecord) => {
-    return http.post<ResPage<Backup.RecordInfo>>(`/settings/backup/record/search`, params);
 };
 export const listBucket = (params: Backup.ForBucket) => {
     return http.post(`/settings/backup/buckets`, params);

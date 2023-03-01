@@ -314,6 +314,16 @@ func (b *BaseApi) Recover(c *gin.Context) {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
 		}
+	case "redis":
+		if err := backupService.RedisRecover(req); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+	case "app":
+		if err := backupService.AppRecover(req); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
 	}
 	helper.SuccessWithData(c, nil)
 }
@@ -339,11 +349,6 @@ func (b *BaseApi) RecoverByUpload(c *gin.Context) {
 	}
 
 	switch req.Type {
-	case "app":
-		if err := backupService.AppRecover(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-			return
-		}
 	case "mysql":
 		if err := backupService.MysqlRecoverByUpload(req); err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -351,11 +356,6 @@ func (b *BaseApi) RecoverByUpload(c *gin.Context) {
 		}
 	case "website":
 		if err := backupService.WebsiteRecover(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-			return
-		}
-	case "redis":
-		if err := backupService.RedisRecover(req); err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
 		}

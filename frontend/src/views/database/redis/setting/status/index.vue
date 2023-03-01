@@ -140,9 +140,6 @@ const acceptParams = (prop: DialogProps): void => {
         loadStatus();
     }
 };
-const onClose = (): void => {
-    statusShow.value = false;
-};
 
 const loadStatus = async () => {
     const res = await loadRedisStatus();
@@ -168,7 +165,6 @@ const loadStatus = async () => {
 
 defineExpose({
     acceptParams,
-    onClose,
 });
 </script>
 

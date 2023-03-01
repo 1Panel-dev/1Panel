@@ -77,7 +77,7 @@ const isRefresh = ref();
 
 const onSetting = async () => {
     isOnSetting.value = true;
-    terminalRef.value.onClose(false);
+    terminalRef.value?.onClose(false);
     settingRef.value!.acceptParams({ status: redisStatus.value, redisName: redisName.value });
 };
 
@@ -124,7 +124,7 @@ const initTerminal = async () => {
 };
 const closeTerminal = async (isKeepShow: boolean) => {
     isRefresh.value = !isRefresh.value;
-    terminalRef.value!.onClose(isKeepShow);
+    terminalRef.value?.onClose(isKeepShow);
 };
 
 const onBefore = () => {
