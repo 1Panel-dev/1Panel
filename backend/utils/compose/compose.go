@@ -16,6 +16,11 @@ func Down(filePath string) (string, error) {
 	return stdout, err
 }
 
+func Start(filePath string) (string, error) {
+	stdout, err := cmd.Execf("docker-compose -f %s start", filePath)
+	return stdout, err
+}
+
 func Stop(filePath string) (string, error) {
 	stdout, err := cmd.Execf("docker-compose -f %s stop", filePath)
 	return stdout, err

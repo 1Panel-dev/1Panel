@@ -298,24 +298,30 @@ const buttons = [
         },
     },
     {
+        label: i18n.global.t('app.rebuild'),
+        click: (row: any) => {
+            openOperate(row, 'rebuild');
+        },
+    },
+    {
         label: i18n.global.t('app.restart'),
         click: (row: any) => {
             openOperate(row, 'restart');
         },
     },
     {
-        label: i18n.global.t('app.up'),
+        label: i18n.global.t('app.start'),
         click: (row: any) => {
-            openOperate(row, 'up');
+            openOperate(row, 'start');
         },
         disabled: (row: any) => {
             return row.status === 'Running';
         },
     },
     {
-        label: i18n.global.t('app.down'),
+        label: i18n.global.t('app.stop'),
         click: (row: any) => {
-            openOperate(row, 'down');
+            openOperate(row, 'stop');
         },
         disabled: (row: any) => {
             return row.status !== 'Running';

@@ -159,13 +159,23 @@ func (a AppInstallService) Operate(req request.AppInstalledOperate) error {
 	}
 	dockerComposePath := install.GetComposePath()
 	switch req.Operate {
-	case constant.Up:
-		out, err := compose.Up(dockerComposePath)
+	case constant.Rebuild:
+		out, err := compose.Down(dockerComposePath)
+		if err != nil {
+			return handleErr(install, err, out)
+		}
+		out, err = compose.Up(dockerComposePath)
+		if err != nil {
+			return handleErr(install, err, out)
+		}
+		return nil
+	case constant.Start:
+		out, err := compose.Start(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
 		}
 		install.Status = constant.Running
-	case constant.Down:
+	case constant.Stop:
 		out, err := compose.Stop(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)

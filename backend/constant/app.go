@@ -6,6 +6,7 @@ const (
 	Error      = "Error"
 	Stopped    = "Stopped"
 	Installing = "Installing"
+	Syncing    = "Syncing"
 
 	ContainerPrefix = "1Panel-"
 
@@ -22,10 +23,13 @@ type AppOperate string
 var (
 	Up      AppOperate = "up"
 	Down    AppOperate = "down"
+	Start   AppOperate = "start"
+	Stop    AppOperate = "stop"
 	Restart AppOperate = "restart"
 	Delete  AppOperate = "delete"
 	Sync    AppOperate = "sync"
 	Backup  AppOperate = "backup"
 	Restore AppOperate = "restore"
 	Update  AppOperate = "update"
+	Rebuild AppOperate = "rebuild"
 )
