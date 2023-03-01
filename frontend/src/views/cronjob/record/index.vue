@@ -542,18 +542,17 @@ defineExpose({
     margin: 10px;
     color: var(--el-color-primary);
     cursor: pointer;
+    &:hover {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 30px;
+        background: var(--el-color-primary-light-9);
+        margin: 10px;
+        font-weight: 500;
+        color: red;
+    }
 }
-.infinite-list .infinite-list-item:hover {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 30px;
-    background: var(--el-color-primary-light-9);
-    margin: 10px;
-    font-weight: 500;
-    color: red;
-}
-
 .a-card {
     font-size: 17px;
     .el-card {

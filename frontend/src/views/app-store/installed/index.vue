@@ -56,10 +56,10 @@
                 </div>
             </div>
             <el-row :gutter="5">
-                <el-col v-for="(installed, index) in data" :key="index" :span="12">
+                <el-col v-for="(installed, index) in data" :key="index" :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
                     <div class="install-card">
                         <el-row :gutter="24">
-                            <el-col :span="4">
+                            <el-col :xs="3" :sm="3" :md="3" :lg="4" :xl="4">
                                 <div class="icon">
                                     <el-avatar
                                         shape="square"
@@ -68,7 +68,7 @@
                                     />
                                 </div>
                             </el-col>
-                            <el-col :span="20">
+                            <el-col :xs="21" :sm="21" :md="21" :lg="20" :xl="20">
                                 <div class="a-detail">
                                     <div class="d-name">
                                         <span class="name">{{ installed.name }}</span>

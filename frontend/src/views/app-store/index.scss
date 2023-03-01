@@ -1,12 +1,8 @@
 .install-card {
-    height: 140px;
     margin-top: 10px;
     cursor: pointer;
     padding: 10px;
 
-    .icon {
-        margin-left: 20px;
-    }
 
     .a-detail {
         height: 100%;
@@ -45,6 +41,7 @@
         }
         .d-button {
             margin-top: 10px;
+						min-width: 440px;
         }
     }
     &:hover {

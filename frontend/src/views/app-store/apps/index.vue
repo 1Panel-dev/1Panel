@@ -46,15 +46,15 @@
         </template>
         <template #main>
             <el-row :gutter="5">
-                <el-col v-for="(app, index) in apps" :key="index" :span="8">
+                <el-col v-for="(app, index) in apps" :key="index" :xs="12" :sm="12" :md="8" :lg="8" :xl="8">
                     <div class="app-card">
                         <el-row :gutter="24">
-                            <el-col :span="5">
+                            <el-col :xs="5" :sm="5" :md="6" :lg="6" :xl="5">
                                 <div class="app-icon">
                                     <el-avatar shape="square" :size="60" :src="'data:image/png;base64,' + app.icon" />
                                 </div>
                             </el-col>
-                            <el-col :span="19">
+                            <el-col :xs="19" :sm="19" :md="18" :lg="18" :xl="19">
                                 <div class="app-content">
                                     <div class="app-header">
                                         <span class="app-title">{{ app.name }}</span>
@@ -179,7 +179,6 @@ onMounted(() => {
 }
 
 .app-card {
-    height: 120px;
     margin-top: 10px;
     cursor: pointer;
     padding: 5px;
@@ -208,13 +207,14 @@ onMounted(() => {
         }
 
         .app-desc {
-            margin-top: 10px;
+            margin-top: 5px;
             overflow: hidden;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
 
             text-overflow: ellipsis;
+            height: 45px;
 
             .desc {
                 font-size: 14px;
