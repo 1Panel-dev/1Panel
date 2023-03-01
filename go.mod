@@ -7,7 +7,7 @@ require (
 	github.com/aws/aws-sdk-go v1.44.99
 	github.com/compose-spec/compose-go v1.6.0
 	github.com/creack/pty v1.1.18
-	github.com/dgraph-io/badger/v3 v3.2103.2
+	github.com/dgraph-io/badger/v3 v3.2103.5
 	github.com/docker/docker v20.10.18+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/fsnotify/fsnotify v1.5.4
@@ -67,7 +67,7 @@ require (
 	github.com/cloudflare/cloudflare-go v0.49.0 // indirect
 	github.com/containerd/cgroups v1.0.4 // indirect
 	github.com/containerd/containerd v1.6.18 // indirect
-	github.com/dgraph-io/ristretto v0.1.0 // indirect
+	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/distribution/distribution/v3 v3.0.0-20220725133111-4bf3547399eb // indirect
 	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/docker/go-units v0.5.0 // indirect
