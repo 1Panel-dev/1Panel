@@ -20,7 +20,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
-	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"gopkg.in/yaml.v3"
 )
@@ -34,7 +33,7 @@ type IAppService interface {
 	GetApp(key string) (*response.AppDTO, error)
 	GetAppDetail(appId uint, version string) (response.AppDetailDTO, error)
 	Install(ctx context.Context, req request.AppInstallCreate) (*model.AppInstall, error)
-	SyncInstalled(installId uint) error
+	//SyncInstalled(installId uint) error
 	SyncAppList() error
 }
 
@@ -259,94 +258,94 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	return &appInstall, nil
 }
 
-func (a AppService) SyncInstalled(installId uint) error {
-	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
-	if err != nil {
-		return err
-	}
-
-	containerNames, err := getContainerNames(appInstall)
-	if err != nil {
-		return err
-	}
-
-	cli, err := docker.NewClient()
-	if err != nil {
-		return err
-	}
-	containers, err := cli.ListContainersByName(containerNames)
-	if err != nil {
-		return err
-	}
-	var (
-		errorContainers    []string
-		notFoundContainers []string
-		runningContainers  []string
-	)
-
-	for _, n := range containers {
-		if n.State != "running" {
-			errorContainers = append(errorContainers, n.Names[0])
-		} else {
-			runningContainers = append(runningContainers, n.Names[0])
-		}
-	}
-	for _, old := range containerNames {
-		exist := false
-		for _, new := range containers {
-			if common.ExistWithStrArray(old, new.Names) {
-				exist = true
-				break
-			}
-		}
-		if !exist {
-			notFoundContainers = append(notFoundContainers, old)
-		}
-	}
-
-	containerCount := len(containers)
-	errCount := len(errorContainers)
-	notFoundCount := len(notFoundContainers)
-	normalCount := len(containerNames)
-	runningCount := len(runningContainers)
-
-	if containerCount == 0 {
-		appInstall.Status = constant.Error
-		appInstall.Message = "container is not found"
-		return appInstallRepo.Save(&appInstall)
-	}
-	if errCount == 0 && notFoundCount == 0 {
-		appInstall.Status = constant.Running
-		return appInstallRepo.Save(&appInstall)
-	}
-	if errCount == normalCount {
-		appInstall.Status = constant.Error
-	}
-	if notFoundCount == normalCount {
-		appInstall.Status = constant.Stopped
-	}
-	if runningCount < normalCount {
-		appInstall.Status = constant.UnHealthy
-	}
-
-	var errMsg strings.Builder
-	if errCount > 0 {
-		errMsg.Write([]byte(string(rune(errCount)) + " error containers:"))
-		for _, e := range errorContainers {
-			errMsg.Write([]byte(e))
-		}
-		errMsg.Write([]byte("\n"))
-	}
-	if notFoundCount > 0 {
-		errMsg.Write([]byte(string(rune(notFoundCount)) + " not found containers:"))
-		for _, e := range notFoundContainers {
-			errMsg.Write([]byte(e))
-		}
-		errMsg.Write([]byte("\n"))
-	}
-	appInstall.Message = errMsg.String()
-	return appInstallRepo.Save(&appInstall)
-}
+//func (a AppService) SyncInstalled(installId uint) error {
+//	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
+//	if err != nil {
+//		return err
+//	}
+//
+//	containerNames, err := getContainerNames(appInstall)
+//	if err != nil {
+//		return err
+//	}
+//
+//	cli, err := docker.NewClient()
+//	if err != nil {
+//		return err
+//	}
+//	containers, err := cli.ListContainersByName(containerNames)
+//	if err != nil {
+//		return err
+//	}
+//	var (
+//		errorContainers    []string
+//		notFoundContainers []string
+//		runningContainers  []string
+//	)
+//
+//	for _, n := range containers {
+//		if n.State != "running" {
+//			errorContainers = append(errorContainers, n.Names[0])
+//		} else {
+//			runningContainers = append(runningContainers, n.Names[0])
+//		}
+//	}
+//	for _, old := range containerNames {
+//		exist := false
+//		for _, new := range containers {
+//			if common.ExistWithStrArray(old, new.Names) {
+//				exist = true
+//				break
+//			}
+//		}
+//		if !exist {
+//			notFoundContainers = append(notFoundContainers, old)
+//		}
+//	}
+//
+//	containerCount := len(containers)
+//	errCount := len(errorContainers)
+//	notFoundCount := len(notFoundContainers)
+//	normalCount := len(containerNames)
+//	runningCount := len(runningContainers)
+//
+//	if containerCount == 0 {
+//		appInstall.Status = constant.ContainerNotFound
+//		appInstall.Message = "container is not found"
+//		return appInstallRepo.Save(&appInstall)
+//	}
+//	if errCount == 0 && notFoundCount == 0 {
+//		appInstall.Status = constant.Running
+//		return appInstallRepo.Save(&appInstall)
+//	}
+//	if errCount == normalCount {
+//		appInstall.Status = constant.Error
+//	}
+//	if notFoundCount == normalCount {
+//		appInstall.Status = constant.Stopped
+//	}
+//	if runningCount < normalCount {
+//		appInstall.Status = constant.UnHealthy
+//	}
+//
+//	var errMsg strings.Builder
+//	if errCount > 0 {
+//		errMsg.Write([]byte(string(rune(errCount)) + " error containers:"))
+//		for _, e := range errorContainers {
+//			errMsg.Write([]byte(e))
+//		}
+//		errMsg.Write([]byte("\n"))
+//	}
+//	if notFoundCount > 0 {
+//		errMsg.Write([]byte(string(rune(notFoundCount)) + " not found containers:"))
+//		for _, e := range notFoundContainers {
+//			errMsg.Write([]byte(e))
+//		}
+//		errMsg.Write([]byte("\n"))
+//	}
+//	appInstall.Message = errMsg.String()
+//	return appInstallRepo.Save(&appInstall)
+//}
 
 func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 	res := &response.AppUpdateRes{
