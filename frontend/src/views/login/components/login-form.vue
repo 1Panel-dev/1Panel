@@ -190,8 +190,8 @@ const registerForm = reactive({
 });
 const registerRules = reactive({
     name: [Rules.requiredInput],
-    password: [Rules.requiredInput],
-    rePassword: [Rules.requiredInput, { validator: checkPassword, trigger: 'blur' }],
+    password: [Rules.requiredInput, Rules.password],
+    rePassword: [Rules.requiredInput, Rules.password, { validator: checkPassword, trigger: 'blur' }],
 });
 
 const loginButtonFocused = ref();

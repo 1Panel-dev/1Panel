@@ -6,7 +6,7 @@
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :span="10">
-                            <el-form-item :label="$t('setting.user')" :rules="Rules.requiredInput" prop="userName">
+                            <el-form-item :label="$t('setting.user')" :rules="Rules.userName" prop="userName">
                                 <el-input clearable v-model="form.userName">
                                     <template #append>
                                         <el-button

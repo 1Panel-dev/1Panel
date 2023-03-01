@@ -60,7 +60,7 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo,
 	if err != nil {
 		return nil, constant.ErrAuth
 	}
-	if info.Password != pass && nameSetting.Value == info.Name {
+	if info.Password != pass || nameSetting.Value != info.Name {
 		return nil, constant.ErrAuth
 	}
 	mfa, err := settingRepo.Get(settingRepo.WithByKey("MFAStatus"))
