@@ -164,6 +164,7 @@ export default {
         status: {
             running: 'Running',
             stopped: 'Stopped',
+            waiting: 'Waiting',
             success: 'Success',
             failed: 'Failed',
             error: 'Error',

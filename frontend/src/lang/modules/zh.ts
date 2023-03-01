@@ -170,6 +170,7 @@ export default {
         status: {
             running: '已启动',
             success: '成功',
+            waiting: '执行中',
             failed: '失败',
             stopped: '已停止',
             error: '失败',
