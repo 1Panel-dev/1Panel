@@ -189,7 +189,7 @@ const registerForm = reactive({
     rePassword: '',
 });
 const registerRules = reactive({
-    name: [Rules.requiredInput],
+    name: [Rules.requiredInput, Rules.userName],
     password: [Rules.requiredInput, Rules.password],
     rePassword: [Rules.requiredInput, Rules.password, { validator: checkPassword, trigger: 'blur' }],
 });
