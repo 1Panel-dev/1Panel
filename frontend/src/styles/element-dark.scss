@@ -111,7 +111,7 @@ html.dark {
         }
     }
     .menu {
-			border-right: 1px solid var(--el-border-color-light);
+        border-right: 1px solid var(--el-border-color-light);
     }
     .el-menu {
         .el-menu-item {
@@ -265,6 +265,13 @@ html.dark {
             .h-app-title {
                 color: #f2f8ff;
             }
+        }
+    }
+
+    .infinite-list .infinite-list-item {
+        background: #212426;
+        &:hover {
+            background: #212426;
         }
     }
 }
