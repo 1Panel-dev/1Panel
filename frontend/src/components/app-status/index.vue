@@ -8,11 +8,11 @@
                     <el-tag class="status-content">{{ $t('app.version') }}:{{ data.version }}</el-tag>
 
                     <span class="buttons">
-                        <el-button type="primary" v-if="data.status != 'Running'" link @click="onOperate('up')">
-                            {{ $t('app.up') }}
+                        <el-button type="primary" v-if="data.status != 'Running'" link @click="onOperate('start')">
+                            {{ $t('app.start') }}
                         </el-button>
-                        <el-button type="primary" v-if="data.status === 'Running'" link @click="onOperate('down')">
-                            {{ $t('app.down') }}
+                        <el-button type="primary" v-if="data.status === 'Running'" link @click="onOperate('stop')">
+                            {{ $t('app.stop') }}
                         </el-button>
                         <el-divider direction="vertical" />
                         <el-button type="primary" link @click="onOperate('restart')">
