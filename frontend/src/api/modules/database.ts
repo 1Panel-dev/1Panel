@@ -1,5 +1,5 @@
 import http from '@/api';
-import { SearchWithPage, ReqPage, ResPage, DescriptionUpdate } from '../interface';
+import { SearchWithPage, ResPage, DescriptionUpdate } from '../interface';
 import { Database } from '../interface/database';
 
 export const searchMysqlDBs = (params: SearchWithPage) => {
@@ -54,7 +54,7 @@ export const loadRedisStatus = () => {
 export const loadRedisConf = () => {
     return http.get<Database.RedisConf>(`/databases/redis/conf`);
 };
-export const RedisPersistenceConf = () => {
+export const redisPersistenceConf = () => {
     return http.get<Database.RedisPersistenceConf>(`/databases/redis/persistence/conf`);
 };
 export const changeRedisPassword = (params: Database.ChangeInfo) => {
@@ -68,10 +68,4 @@ export const updateRedisConf = (params: Database.RedisConfUpdate) => {
 };
 export const updateRedisConfByFile = (params: Database.RedisConfUpdateByFile) => {
     return http.post(`/databases/redis/conffile/update`, params);
-};
-export const recoverRedis = (param: Database.RedisRecover) => {
-    return http.post(`/databases/redis/recover`, param);
-};
-export const redisBackupRedisRecords = (param: ReqPage) => {
-    return http.post<ResPage<Database.FileRecord>>(`/databases/redis/backup/search`, param);
 };

@@ -76,7 +76,7 @@ func (u *BackupService) AppRecover(req dto.CommonRecover) error {
 	if _, err := compose.Down(install.GetComposePath()); err != nil {
 		return err
 	}
-	if err := handleAppRecover(&install, req.File); err != nil {
+	if err := handleAppRecover(&install, req.File, false); err != nil {
 		return err
 	}
 	return nil
@@ -120,7 +120,8 @@ func handleAppBackup(install *model.AppInstall, backupDir, fileName string) erro
 	return nil
 }
 
-func handleAppRecover(install *model.AppInstall, recoverFile string) error {
+func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback bool) error {
+	isOk := false
 	fileOp := files.NewFileOp()
 	if err := fileOp.Decompress(recoverFile, path.Dir(recoverFile), files.TarGz); err != nil {
 		return err
@@ -133,6 +134,24 @@ func handleAppRecover(install *model.AppInstall, recoverFile string) error {
 	if !fileOp.Stat(tmpPath+"/app.json") || !fileOp.Stat(tmpPath+"/app.tar.gz") {
 		return errors.New("the wrong recovery package does not have app.json or app.tar.gz files")
 	}
+	if !isRollback {
+		rollbackFile := fmt.Sprintf("%s/original/app/%s_%s.tar.gz", global.CONF.System.BaseDir, install.Name, time.Now().Format("20060102150405"))
+		if err := handleAppBackup(install, path.Dir(rollbackFile), path.Base(rollbackFile)); err != nil {
+			global.LOG.Errorf("backup app %s for rollback before recover failed, err: %v", install.Name, err)
+		}
+		defer func() {
+			if !isOk {
+				if err := handleAppRecover(install, rollbackFile, true); err != nil {
+					global.LOG.Errorf("rollback app %s from %s failed, err: %v", install.Name, rollbackFile, err)
+				}
+				global.LOG.Infof("rollback app %s from %s successful", install.Name, rollbackFile)
+				_ = os.RemoveAll(rollbackFile)
+			} else {
+				_ = os.RemoveAll(rollbackFile)
+			}
+		}()
+	}
+
 	appjson, err := os.ReadFile(tmpPath + "/" + "app.json")
 	if err != nil {
 		return err
@@ -195,5 +214,6 @@ func handleAppRecover(install *model.AppInstall, recoverFile string) error {
 	if err := appInstallRepo.Save(install); err != nil {
 		return err
 	}
+	isOk = true
 	return nil
 }

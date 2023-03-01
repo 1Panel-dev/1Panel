@@ -59,7 +59,7 @@ func (u *BackupService) MysqlRecover(req dto.CommonRecover) error {
 		return errors.New(fmt.Sprintf("%s file is not exist", req.File))
 	}
 	global.LOG.Infof("recover database %s-%s from backup file %s", req.Name, req.DetailName, req.File)
-	if err := handleMysqlRecover(app, path.Dir(req.File), req.DetailName, path.Base(req.File)); err != nil {
+	if err := handleMysqlRecover(app, path.Dir(req.File), req.DetailName, path.Base(req.File), false); err != nil {
 		return err
 	}
 	return nil
@@ -114,7 +114,7 @@ func (u *BackupService) MysqlRecoverByUpload(req dto.CommonRecover) error {
 		}()
 	}
 
-	if err := handleMysqlRecover(app, path.Dir(file), req.DetailName, fileName); err != nil {
+	if err := handleMysqlRecover(app, path.Dir(file), req.DetailName, fileName, false); err != nil {
 		return err
 	}
 	global.LOG.Info("recover from uploads successful!")
@@ -141,7 +141,25 @@ func handleMysqlBackup(app *repo.RootInfo, backupDir, dbName, fileName string) e
 	return nil
 }
 
-func handleMysqlRecover(mysqlInfo *repo.RootInfo, recoverDir, dbName, fileName string) error {
+func handleMysqlRecover(mysqlInfo *repo.RootInfo, recoverDir, dbName, fileName string, isRollback bool) error {
+	isOk := false
+	if !isRollback {
+		rollbackFile := fmt.Sprintf("%s/original/database/%s_%s.sql.gz", global.CONF.System.BaseDir, mysqlInfo.Name, time.Now().Format("20060102150405"))
+		if err := handleMysqlBackup(mysqlInfo, path.Dir(rollbackFile), dbName, path.Base(rollbackFile)); err != nil {
+			global.LOG.Errorf("backup mysql db %s for rollback before recover failed, err: %v", mysqlInfo.Name, err)
+		}
+		defer func() {
+			if !isOk {
+				if err := handleMysqlRecover(mysqlInfo, path.Dir(rollbackFile), dbName, path.Base(rollbackFile), true); err != nil {
+					global.LOG.Errorf("rollback mysql db %s from %s failed, err: %v", dbName, rollbackFile, err)
+				}
+				global.LOG.Infof("rollback mysql db %s from %s successful", dbName, rollbackFile)
+				_ = os.RemoveAll(rollbackFile)
+			} else {
+				_ = os.RemoveAll(rollbackFile)
+			}
+		}()
+	}
 	file := recoverDir + "/" + fileName
 	fi, _ := os.Open(file)
 	defer fi.Close()
@@ -166,5 +184,6 @@ func handleMysqlRecover(mysqlInfo *repo.RootInfo, recoverDir, dbName, fileName s
 	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
 		return errors.New(stdStr)
 	}
+	isOk = true
 	return nil
 }

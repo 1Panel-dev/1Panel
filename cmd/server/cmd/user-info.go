@@ -39,7 +39,7 @@ var userinfoCmd = &cobra.Command{
 		user := getSettingByKey(db, "UserName")
 		password := getSettingByKey(db, "Password")
 		port := getSettingByKey(db, "ServerPort")
-		enptrySetting := getSettingByKey(db, "ServerPort")
+		enptrySetting := getSettingByKey(db, "EncryptKey")
 
 		p := ""
 		if len(enptrySetting) == 16 {
