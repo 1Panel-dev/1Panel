@@ -146,6 +146,46 @@ const checkDomain = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkParamCommon = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.paramName')));
+    } else {
+        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9._-]{6,30}$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.paramName')));
+        } else {
+            callback();
+        }
+    }
+};
+
+const checkParamComplexity = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.paramComplexity', ['.%@$!&~_'])));
+    } else {
+        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9.%@$!&~_]{6,30}$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.paramComplexity', ['.%@$!&~_'])));
+        } else {
+            callback();
+        }
+    }
+};
+
+const checkParamUrlAndPort = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.paramUrlAndPort')));
+    } else {
+        const reg =
+            /^(https?:\/\/)?((localhost)|([a-zA-Z0-9_-]+\.)*[a-zA-Z0-9_-]+)(:[1-9]\d{0,3}|:[1-5]\d{4}|:6[0-4]\d{3}|:65[0-4]\d{2}|:655[0-2]\d|:6553[0-5])?(\/\S*)?$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.paramUrlAndPort')));
+        } else {
+            callback();
+        }
+    }
+};
+
 interface CommonRule {
     requiredInput: FormItemRule;
     requiredSelect: FormItemRule;
@@ -164,6 +204,11 @@ interface CommonRule {
     port: FormItemRule;
     domain: FormItemRule;
     databaseName: FormItemRule;
+
+    paramCommon: FormItemRule;
+    paramComplexity: FormItemRule;
+    paramPort: FormItemRule;
+    paramExtUrl: FormItemRule;
 }
 
 export const Rules: CommonRule = {
@@ -258,6 +303,29 @@ export const Rules: CommonRule = {
     domain: {
         required: true,
         validator: checkDomain,
+        trigger: 'blur',
+    },
+    paramCommon: {
+        required: true,
+        validator: checkParamCommon,
+        trigger: 'blur',
+    },
+    paramComplexity: {
+        required: true,
+        validator: checkParamComplexity,
+        trigger: 'blur',
+    },
+    paramPort: {
+        required: true,
+        trigger: 'blur',
+        min: 1,
+        max: 65535,
+        type: 'number',
+        message: i18n.global.t('commons.rule.port'),
+    },
+    paramExtUrl: {
+        required: true,
+        validator: checkParamUrlAndPort,
         trigger: 'blur',
     },
 };
