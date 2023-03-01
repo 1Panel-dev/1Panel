@@ -60,7 +60,14 @@
                         icon="Plus"
                     ></el-button>
                     <el-popover ref="popoverRef" width="250px" trigger="hover" virtual-triggering persistent>
-                        <el-button link type="primary" @click="onNewSsh">{{ $t('terminal.createConn') }}</el-button>
+                        <div style="margin-left: 10px">
+                            <el-button link type="primary" @click="onNewSsh">{{ $t('terminal.createConn') }}</el-button>
+                        </div>
+                        <div style="margin-left: 10px">
+                            <el-button link type="primary" @click="onNewLocal">
+                                {{ $t('terminal.localhost') }}
+                            </el-button>
+                        </div>
                         <div class="search-button" style="float: none">
                             <el-input
                                 v-model="hostfilterInfo"

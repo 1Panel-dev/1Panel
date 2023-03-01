@@ -3,7 +3,7 @@
         <template #header>
             <DrawerHeader :header="$t('cronjob.cronTask')" :back="handleClose" />
         </template>
-        <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules" label-width="120px">
+        <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('cronjob.taskType')" prop="type">

@@ -95,7 +95,7 @@ func (b *BaseApi) TestByID(c *gin.Context) {
 // @Param request body dto.SearchForTree true "request"
 // @Success 200 {anrry} dto.HostTree
 // @Security ApiKeyAuth
-// @Router /hosts/search [post]
+// @Router /hosts/tree [post]
 func (b *BaseApi) HostTree(c *gin.Context) {
 	var req dto.SearchForTree
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -110,6 +110,33 @@ func (b *BaseApi) HostTree(c *gin.Context) {
 	}
 
 	helper.SuccessWithData(c, data)
+}
+
+// @Tags Host
+// @Summary Page host
+// @Description 获取主机列表分页
+// @Accept json
+// @Param request body dto.SearchHostWithPage true "request"
+// @Success 200 {anrry} dto.HostTree
+// @Security ApiKeyAuth
+// @Router /hosts/search [post]
+func (b *BaseApi) SearchHost(c *gin.Context) {
+	var req dto.SearchHostWithPage
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	total, list, err := hostService.SearchWithPage(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, dto.PageResult{
+		Items: list,
+		Total: total,
+	})
 }
 
 // @Tags Host
@@ -143,13 +170,13 @@ func (b *BaseApi) GetHostInfo(c *gin.Context) {
 // @Summary Delete host
 // @Description 删除主机
 // @Accept json
-// @Param request body dto.OperateByID true "request"
+// @Param request body dto.BatchDeleteReq true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /hosts/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"hosts","output_colume":"addr","output_value":"addr"}],"formatZH":"删除主机 [addr]","formatEN":"delete host [addr]"}
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"ids","isList":true,"db":"hosts","output_colume":"addr","output_value":"addrs"}],"formatZH":"删除主机 [addrs]","formatEN":"delete host [addrs]"}
 func (b *BaseApi) DeleteHost(c *gin.Context) {
-	var req dto.OperateByID
+	var req dto.BatchDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -159,7 +186,7 @@ func (b *BaseApi) DeleteHost(c *gin.Context) {
 		return
 	}
 
-	if err := hostService.Delete(req.ID); err != nil {
+	if err := hostService.Delete(req.Ids); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -196,6 +223,35 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 	upMap["password"] = req.Password
 	upMap["private_key"] = req.PrivateKey
 	upMap["description"] = req.Description
+	if err := hostService.Update(req.ID, upMap); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Host
+// @Summary Update host group
+// @Description 切换分组
+// @Accept json
+// @Param request body dto.ChangeHostGroup true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /hosts/update [post]
+// @x-panel-log {"bodyKeys":["id","group"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"hosts","output_colume":"addr","output_value":"addr"}],"formatZH":"切换主机[addr]分组 => [group]","formatEN":"change host [addr] group => [group]"}
+func (b *BaseApi) UpdateHostGroup(c *gin.Context) {
+	var req dto.ChangeHostGroup
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	upMap := make(map[string]interface{})
+	upMap["group_belong"] = req.Group
 	if err := hostService.Update(req.ID, upMap); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

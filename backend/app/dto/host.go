@@ -27,8 +27,19 @@ type HostConnTest struct {
 	Password   string `json:"password"`
 }
 
+type SearchHostWithPage struct {
+	PageInfo
+	Group string `json:"group"`
+	Info  string `json:"info"`
+}
+
 type SearchForTree struct {
 	Info string `json:"info"`
+}
+
+type ChangeHostGroup struct {
+	ID    uint   `json:"id" validate:"required"`
+	Group string `json:"group" validate:"required"`
 }
 
 type HostInfo struct {
