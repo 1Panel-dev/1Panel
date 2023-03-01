@@ -17,9 +17,10 @@ type IHostService interface {
 	TestLocalConn(id uint) bool
 	GetHostInfo(id uint) (*model.Host, error)
 	SearchForTree(search dto.SearchForTree) ([]dto.HostTree, error)
+	SearchWithPage(search dto.SearchHostWithPage) (int64, interface{}, error)
 	Create(hostDto dto.HostOperate) (*dto.HostInfo, error)
 	Update(id uint, upMap map[string]interface{}) error
-	Delete(id uint) error
+	Delete(id []uint) error
 }
 
 func NewIHostService() IHostService {
@@ -61,6 +62,22 @@ func (u *HostService) GetHostInfo(id uint) (*model.Host, error) {
 		return nil, constant.ErrRecordNotFound
 	}
 	return &host, err
+}
+
+func (u *HostService) SearchWithPage(search dto.SearchHostWithPage) (int64, interface{}, error) {
+	total, hosts, err := hostRepo.Page(search.Page, search.PageSize, hostRepo.WithByInfo(search.Info), hostRepo.WithByGroup(search.Group))
+	if err != nil {
+		return 0, nil, err
+	}
+	var dtoHosts []dto.HostInfo
+	for _, host := range hosts {
+		var item dto.HostInfo
+		if err := copier.Copy(&item, &host); err != nil {
+			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+		}
+		dtoHosts = append(dtoHosts, item)
+	}
+	return total, dtoHosts, err
 }
 
 func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, error) {
@@ -136,15 +153,17 @@ func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 	return &hostinfo, nil
 }
 
-func (u *HostService) Delete(id uint) error {
-	host, _ := hostRepo.Get(commonRepo.WithByID(id))
-	if host.ID == 0 {
-		return constant.ErrRecordNotFound
+func (u *HostService) Delete(ids []uint) error {
+	hosts, _ := hostRepo.GetList(commonRepo.WithIdsIn(ids))
+	for _, host := range hosts {
+		if host.ID == 0 {
+			return constant.ErrRecordNotFound
+		}
+		if host.Addr == "127.0.0.1" {
+			return errors.New("the local connection information cannot be deleted!")
+		}
 	}
-	if host.Addr == "127.0.0.1" {
-		return errors.New("the local connection information cannot be deleted!")
-	}
-	return hostRepo.Delete(commonRepo.WithByID(id))
+	return hostRepo.Delete(commonRepo.WithIdsIn(ids))
 }
 
 func (u *HostService) Update(id uint, upMap map[string]interface{}) error {

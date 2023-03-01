@@ -4,8 +4,11 @@ import { Command } from '../interface/command';
 import { Group } from '../interface/group';
 import { Host } from '../interface/host';
 
+export const searchHosts = (params: Host.SearchWithPage) => {
+    return http.post<ResPage<Host.Host>>(`/hosts/search`, params);
+};
 export const getHostTree = (params: Host.ReqSearch) => {
-    return http.post<Array<Host.HostTree>>(`/hosts/search`, params);
+    return http.post<Array<Host.HostTree>>(`/hosts/tree`, params);
 };
 export const getHostInfo = (id: number) => {
     return http.get<Host.Host>(`/hosts/` + id);
@@ -22,8 +25,11 @@ export const testByID = (id: number) => {
 export const editHost = (params: Host.HostOperate) => {
     return http.post(`/hosts/update`, params);
 };
-export const deleteHost = (id: number) => {
-    return http.post(`/hosts/del`, { id: id });
+export const editHostGroup = (params: Host.GroupChange) => {
+    return http.post(`/hosts/update/group`, params);
+};
+export const deleteHost = (params: { ids: number[] }) => {
+    return http.post(`/hosts/del`, params);
 };
 
 // group

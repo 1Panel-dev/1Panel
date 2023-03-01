@@ -1,239 +1,140 @@
 <template>
     <div>
-        <el-row class="row-box" style="margin-top: 20px" :gutter="20">
-            <el-col :span="8">
-                <el-card class="el-card">
-                    <el-tooltip
-                        class="box-item"
-                        effect="dark"
-                        :content="$t('terminal.createConn')"
-                        placement="top-start"
-                    >
-                        <el-button icon="Plus" @click="restHostForm" />
-                    </el-tooltip>
-                    <el-tooltip
-                        class="box-item"
-                        effect="dark"
-                        :content="$t('terminal.createGroup')"
-                        placement="top-start"
-                    >
-                        <el-button icon="FolderAdd" @click="onGroupCreate" />
-                    </el-tooltip>
-                    <el-tooltip class="box-item" effect="dark" :content="$t('terminal.expand')" placement="top-start">
-                        <el-button icon="Expand" @click="setTreeStatus(true)" />
-                    </el-tooltip>
-                    <el-tooltip class="box-item" effect="dark" :content="$t('terminal.fold')" placement="top-start">
-                        <el-button icon="Fold" @click="setTreeStatus(false)" />
-                    </el-tooltip>
-                    <el-input @input="loadHostTree" clearable style="margin-top: 5px" v-model="searcConfig.info">
-                        <template #append><el-button icon="search" @click="loadHostTree" /></template>
-                    </el-input>
-                    <el-input v-if="groupInputShow" clearable style="margin-top: 5px" v-model="groupInputValue">
-                        <template #append>
-                            <el-button-group>
-                                <el-button icon="Check" @click="onCreateGroup(groupInputValue)" />
-                                <el-button icon="Close" @click="groupInputShow = false" />
-                            </el-button-group>
+        <LayoutContent v-loading="loading" :title="$t('terminal.host')">
+            <template #toolbar>
+                <el-row>
+                    <el-col :span="20">
+                        <el-button type="primary" @click="onOpenDialog('create')">
+                            {{ $t('terminal.addHost') }}
+                        </el-button>
+                        <el-button type="primary" plain @click="onOpenGroupDialog()">
+                            {{ $t('terminal.group') }}
+                        </el-button>
+                        <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
+                    </el-col>
+                    <el-col :span="4">
+                        <div class="search-button">
+                            <el-input
+                                v-model="info"
+                                clearable
+                                @clear="search()"
+                                suffix-icon="Search"
+                                @keyup.enter="search()"
+                                @blur="search()"
+                                :placeholder="$t('commons.button.search')"
+                            ></el-input>
+                        </div>
+                    </el-col>
+                </el-row>
+            </template>
+            <template #search>
+                <el-select v-model="group" @change="search()" clearable>
+                    <template #prefix>{{ $t('terminal.group') }}</template>
+                    <el-option v-for="item in groupList" :key="item.name" :value="item.name" :label="item.name" />
+                </el-select>
+            </template>
+            <template #main>
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    v-model:selects="selects"
+                    :data="data"
+                    @search="search"
+                >
+                    <el-table-column type="selection" :selectable="selectable" fix />
+                    <el-table-column :label="$t('commons.table.name')" prop="name" fix>
+                        <template #default="{ row }">
+                            <span v-if="row.addr === '127.0.0.1'">{{ $t('terminal.localhost') }}</span>
+                            <span v-else>{{ row.name }}</span>
                         </template>
-                    </el-input>
-                    <el-tree
-                        ref="tree"
-                        :expand-on-click-node="false"
-                        node-key="id"
-                        :default-expand-all="true"
-                        :data="hostTree"
-                        :props="defaultProps"
-                    >
-                        <template #default="{ node, data }">
-                            <span class="custom-tree-node" @mouseover="hover = data.id" @mouseleave="hover = null">
-                                <div v-if="node.label !== currentGroup || !data.onEdit">
-                                    <span v-if="node.label.length <= 35" @click="onEdit(node, data)">
-                                        {{ node.label }}
-                                    </span>
-                                    <el-tooltip v-else :content="node.label" placement="top-start">
-                                        <span>{{ node.label.substring(0, 32) }}...</span>
-                                    </el-tooltip>
-                                </div>
-                                <el-input v-else v-model="currentGroupValue"></el-input>
-                                <div
-                                    style="margin-left: 10px"
-                                    v-if="!(node.level === 1 && data.label === 'default') && data.id === hover"
-                                >
-                                    <el-button v-if="!data.onEdit" icon="Edit" link @click="onEdit(node, data)" />
-                                    <el-button
-                                        v-if="!data.onEdit && node.label.indexOf('@127.0.0.1:') === -1"
-                                        icon="Delete"
-                                        link
-                                        @click="onDelete(node, data)"
-                                    />
-                                    <el-button v-if="data.onEdit" icon="Check" link @click="onUpdateGroup()" />
-                                    <el-button v-if="data.onEdit" icon="Close" link @click="data.onEdit = false" />
-                                </div>
-                            </span>
-                        </template>
-                    </el-tree>
-                </el-card>
-            </el-col>
-            <el-col :span="16">
-                <el-card class="el-card">
-                    <el-form ref="hostInfoRef" label-width="100px" :model="hostInfo" :rules="rules">
-                        <el-form-item :label="$t('terminal.ip')" prop="addr">
-                            <span v-if="hostInfo.addr === '127.0.0.1' && hostOperation === 'edit'">
-                                {{ hostInfo.addr }}
-                            </span>
-                            <el-input v-else clearable v-model="hostInfo.addr" />
-                        </el-form-item>
-                        <el-form-item :label="$t('terminal.user')" prop="user">
-                            <el-input clearable v-model="hostInfo.user" />
-                        </el-form-item>
-                        <el-form-item :label="$t('terminal.authMode')" prop="authMode">
-                            <el-radio-group v-model="hostInfo.authMode">
-                                <el-radio label="password">{{ $t('terminal.passwordMode') }}</el-radio>
-                                <el-radio label="key">{{ $t('terminal.keyMode') }}</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item
-                            :label="$t('terminal.password')"
-                            v-if="hostInfo.authMode === 'password'"
-                            prop="password"
-                        >
-                            <el-input clearable show-password type="password" v-model="hostInfo.password" />
-                        </el-form-item>
-                        <el-form-item :label="$t('terminal.key')" v-if="hostInfo.authMode === 'key'" prop="privateKey">
-                            <el-input clearable type="textarea" v-model="hostInfo.privateKey" />
-                        </el-form-item>
-                        <el-form-item :label="$t('terminal.port')" prop="port">
-                            <el-input clearable v-model.number="hostInfo.port" />
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.table.group')" prop="groupBelong">
-                            <el-select filterable v-model="hostInfo.groupBelong" clearable style="width: 100%">
-                                <el-option
-                                    v-for="item in groupList"
-                                    :key="item.id"
-                                    :label="item.name"
-                                    :value="item.name"
-                                />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.table.title')" prop="name">
-                            <el-input clearable v-model="hostInfo.name" />
-                        </el-form-item>
-                        <el-form-item :label="$t('commons.table.description')" prop="description">
-                            <el-input clearable type="textarea" v-model="hostInfo.description" />
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button @click="restHostForm">
-                                {{ $t('commons.button.reset') }}
-                            </el-button>
-                            <el-button @click="submitAddHost(hostInfoRef, 'testconn')">
-                                {{ $t('terminal.testConn') }}
-                            </el-button>
-                            <el-button
-                                v-if="hostOperation === 'create'"
-                                type="primary"
-                                @click="submitAddHost(hostInfoRef, 'create')"
-                            >
-                                {{ $t('commons.button.save') }}
-                            </el-button>
-                            <el-button
-                                v-if="hostOperation === 'edit'"
-                                type="primary"
-                                @click="submitAddHost(hostInfoRef, 'edit')"
-                            >
-                                {{ $t('commons.button.confirm') }}
-                            </el-button>
-                        </el-form-item>
-                    </el-form>
-                </el-card>
-            </el-col>
-        </el-row>
+                    </el-table-column>
+                    <el-table-column :label="$t('commons.table.group')" show-overflow-tooltip prop="groupBelong" />
+                    <el-table-column :label="$t('terminal.ip')">
+                        <template #default="{ row }">{{ row.addr }}:{{ row.port }}</template>
+                    </el-table-column>
+                    <el-table-column :label="$t('terminal.user')" show-overflow-tooltip prop="user" />
+                    <el-table-column
+                        :label="$t('commons.table.description')"
+                        show-overflow-tooltip
+                        prop="description"
+                    />
+                    <fu-table-operations width="200px" :buttons="buttons" :label="$t('commons.table.operate')" fix />
+                </ComplexTable>
+            </template>
+        </LayoutContent>
+
+        <OperateDialog @search="search" ref="dialogRef" />
+        <GroupDialog @search="search" ref="dialogGroupRef" />
+        <GroupChangeDialog @search="search" ref="dialogGroupChangeRef" />
     </div>
 </template>
 
-<script lang="ts" setup>
-import { ref, reactive } from 'vue';
-import type { ElForm } from 'element-plus';
-import { Rules } from '@/global/form-rules';
-import { Host } from '@/api/interface/host';
-import { Group } from '@/api/interface/group';
-import {
-    getHostTree,
-    getHostInfo,
-    addHost,
-    editHost,
-    deleteHost,
-    testByInfo,
-    getGroupList,
-    addGroup,
-    editGroup,
-    deleteGroup,
-} from '@/api/modules/host';
-import { useDeleteData } from '@/hooks/use-delete-data';
+<script setup lang="ts">
+import LayoutContent from '@/layout/layout-content.vue';
+import GroupDialog from '@/views/host/terminal/host/group/index.vue';
+import GroupChangeDialog from '@/views/host/terminal/host/change-group/index.vue';
+import OperateDialog from '@/views/host/terminal/host/operate/index.vue';
+import ComplexTable from '@/components/complex-table/index.vue';
+import { deleteHost, getGroupList, searchHosts } from '@/api/modules/host';
+import { reactive, ref } from 'vue';
 import i18n from '@/lang';
-import type Node from 'element-plus/es/components/tree/src/model/node';
-import { MsgSuccess } from '@/utils/message';
+import { Host } from '@/api/interface/host';
+import { useDeleteData } from '@/hooks/use-delete-data';
 
-type FormInstance = InstanceType<typeof ElForm>;
-const hostInfoRef = ref<FormInstance>();
-const rules = reactive({
-    groupBelong: [Rules.requiredSelect],
-    addr: [Rules.requiredInput],
-    port: [Rules.requiredInput, Rules.port],
-    user: [Rules.requiredInput],
-    authMode: [Rules.requiredSelect],
-    password: [Rules.requiredInput],
-    privateKey: [Rules.requiredInput],
+const loading = ref();
+const data = ref();
+const groupList = ref();
+const selects = ref<any>([]);
+const paginationConfig = reactive({
+    currentPage: 1,
+    pageSize: 10,
+    total: 0,
 });
-let hostOperation = ref<string>('create');
-let hostInfo = reactive<Host.HostOperate>({
-    id: 0,
-    name: '',
-    groupBelong: 'default',
-    addr: '',
-    port: 22,
-    user: '',
-    authMode: 'password',
-    password: '',
-    privateKey: '',
-    description: '',
-});
-
-interface Tree {
-    id: number;
-    label: string;
-    children?: Tree[];
-    onEdit: boolean;
-}
-
-let searcConfig = reactive<Host.ReqSearch>({
-    info: '',
-});
-const tree = ref<any>(null);
-const hover = ref();
-const hostTree = ref<Array<Host.HostTree>>();
-const defaultProps = {
-    label: 'label',
-    children: 'children',
-};
-
-const groupList = ref<Array<Group.GroupInfo>>();
-
-const groupInputValue = ref();
-const currentGroup = ref();
-const currentGroupID = ref();
-const currentGroupValue = ref();
-
-let groupOperation = ref<string>('create');
-let groupInputShow = ref<boolean>(false);
-
-const loadHostTree = async () => {
-    const res = await getHostTree(searcConfig);
-    hostTree.value = res.data;
-};
+const info = ref();
+const group = ref();
+const dialogGroupChangeRef = ref();
 
 const acceptParams = () => {
-    loadHostTree();
-    loadGroups();
+    search();
+};
+
+function selectable(row) {
+    return row.addr !== '127.0.0.1';
+}
+const dialogRef = ref();
+const onOpenDialog = async (
+    title: string,
+    rowData: Partial<Host.Host> = {
+        groupBelong: 'default',
+        port: 22,
+        user: 'root',
+        authMode: 'password',
+    },
+) => {
+    let params = {
+        title,
+        rowData: { ...rowData },
+    };
+    dialogRef.value!.acceptParams(params);
+};
+
+const dialogGroupRef = ref();
+const onOpenGroupDialog = () => {
+    dialogGroupRef.value!.acceptParams();
+};
+
+const onBatchDelete = async (row: Host.Host | null) => {
+    let ids: Array<number> = [];
+    if (row) {
+        ids.push(row.id);
+    } else {
+        selects.value.forEach((item: Host.Host) => {
+            ids.push(item.id);
+        });
+    }
+    await useDeleteData(deleteHost, { ids: ids }, 'commons.msg.delete');
+    search();
 };
 
 const loadGroups = async () => {
@@ -241,129 +142,54 @@ const loadGroups = async () => {
     groupList.value = res.data;
 };
 
-function setTreeStatus(expend: boolean) {
-    for (let i = 0; i < tree.value.store._getAllNodes().length; i++) {
-        tree.value.store._getAllNodes()[i].expanded = expend;
-    }
-}
+const buttons = [
+    {
+        label: i18n.global.t('terminal.groupChange'),
+        click: (row: any) => {
+            dialogGroupChangeRef.value!.acceptParams({ id: row.id, group: row.groupBelong });
+        },
+        disabled: (row: any) => {
+            return row.addr === '127.0.0.1';
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.edit'),
+        click: (row: any) => {
+            onOpenDialog('edit', row);
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.delete'),
+        click: (row: Host.Host) => {
+            onBatchDelete(row);
+        },
+        disabled: (row: any) => {
+            return row.addr === '127.0.0.1';
+        },
+    },
+];
 
-function restHostForm() {
-    if (hostInfoRef.value) {
-        hostInfoRef.value.resetFields();
-    }
-}
-
-const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        switch (ops) {
-            case 'create':
-                await addHost(hostInfo);
-                restHostForm();
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                loadHostTree();
-                break;
-            case 'edit':
-                await editHost(hostInfo);
-                restHostForm();
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                loadHostTree();
-                break;
-            case 'testconn':
-                await testByInfo(hostInfo).then((res) => {
-                    if (res.data) {
-                        MsgSuccess(i18n.global.t('terminal.connTestOk'));
-                    } else {
-                        MsgSuccess(i18n.global.t('terminal.connTestFailed'));
-                    }
-                });
-                break;
-        }
-    });
-};
-
-const onGroupCreate = () => {
-    groupInputShow.value = true;
-    groupInputValue.value = '';
-    groupOperation.value = 'create';
-};
-const onCreateGroup = async (name: string) => {
-    if (groupOperation.value === 'create') {
-        let group = { id: 0, name: name, type: 'host' };
-        await addGroup(group);
-        groupOperation.value = '';
-        groupInputShow.value = false;
-    }
-    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    groupOperation.value = '';
-    groupInputShow.value = false;
-    loadHostTree();
+const search = async () => {
+    let params = {
+        page: paginationConfig.currentPage,
+        pageSize: paginationConfig.pageSize,
+        group: group.value,
+        info: info.value,
+    };
     loadGroups();
-};
-
-const onUpdateGroup = async () => {
-    if (currentGroup.value === currentGroupValue.value) {
-        currentGroup.value = '';
-        return;
-    }
-    let group = { id: currentGroupID.value, name: currentGroupValue.value, type: 'host' };
-    await editGroup(group);
-    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    loadHostTree();
-    loadGroups();
-};
-
-const onDelete = async (node: Node, data: Tree) => {
-    if (node.level === 1 && data.label === 'default') {
-        return;
-    }
-    if (node.level === 1) {
-        await useDeleteData(deleteGroup, data.id - 10000, 'terminal.groupDeleteHelper');
-        loadGroups();
-    } else {
-        await useDeleteData(deleteHost, data.id, 'commons.msg.delete');
-    }
-    loadHostTree();
-    loadGroups();
-};
-
-const onEdit = async (node: Node, data: Tree) => {
-    if (node.level === 1 && data.label === 'default') {
-        return;
-    }
-    if (node.level === 1) {
-        currentGroup.value = data.label;
-        currentGroupValue.value = data.label;
-        currentGroupID.value = data.id - 10000;
-        groupOperation.value = 'edit';
-        data.onEdit = true;
-        return;
-    } else {
-        const res = await getHostInfo(data.id);
-        hostInfo.id = res.data.id;
-        hostInfo.name = res.data.name;
-        hostInfo.groupBelong = res.data.groupBelong;
-        hostInfo.addr = res.data.addr;
-        hostInfo.port = res.data.port;
-        hostInfo.user = res.data.user;
-        hostInfo.description = res.data.description;
-        hostOperation.value = 'edit';
-    }
+    loading.value = true;
+    await searchHosts(params)
+        .then((res) => {
+            loading.value = false;
+            data.value = res.data.items || [];
+            paginationConfig.total = res.data.total;
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 defineExpose({
     acceptParams,
 });
 </script>
-
-<style>
-.custom-tree-node {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 14px;
-    padding-right: 8px;
-}
-</style>

@@ -11,10 +11,12 @@ type HostRepo struct{}
 type IHostRepo interface {
 	Get(opts ...DBOption) (model.Host, error)
 	GetList(opts ...DBOption) ([]model.Host, error)
+	Page(limit, offset int, opts ...DBOption) (int64, []model.Host, error)
 	WithByInfo(info string) DBOption
 	WithByPort(port uint) DBOption
 	WithByUser(user string) DBOption
 	WithByAddr(addr string) DBOption
+	WithByGroup(group string) DBOption
 	Create(host *model.Host) error
 	ChangeGroup(oldGroup, newGroup string) error
 	Update(id uint, vars map[string]interface{}) error
@@ -45,6 +47,18 @@ func (u *HostRepo) GetList(opts ...DBOption) ([]model.Host, error) {
 	return hosts, err
 }
 
+func (u *HostRepo) Page(page, size int, opts ...DBOption) (int64, []model.Host, error) {
+	var users []model.Host
+	db := global.DB.Model(&model.Host{})
+	for _, opt := range opts {
+		db = opt(db)
+	}
+	count := int64(0)
+	db = db.Count(&count)
+	err := db.Limit(size).Offset(size * (page - 1)).Find(&users).Error
+	return count, users, err
+}
+
 func (c *HostRepo) WithByInfo(info string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		if len(info) == 0 {
@@ -68,6 +82,14 @@ func (u *HostRepo) WithByUser(user string) DBOption {
 func (u *HostRepo) WithByAddr(addr string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("addr = ?", addr)
+	}
+}
+func (u *HostRepo) WithByGroup(group string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if len(group) == 0 {
+			return g
+		}
+		return g.Where("group_belong = ?", group)
 	}
 }
 

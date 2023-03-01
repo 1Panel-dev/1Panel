@@ -1,4 +1,4 @@
-import { CommonModel } from '.';
+import { CommonModel, ReqPage } from '.';
 
 export namespace Host {
     export interface HostTree {
@@ -40,7 +40,15 @@ export namespace Host {
         privateKey: string;
         password: string;
     }
+    export interface GroupChange {
+        id: number;
+        group: string;
+    }
     export interface ReqSearch {
+        info?: string;
+    }
+    export interface SearchWithPage extends ReqPage {
+        group: string;
         info?: string;
     }
 }
