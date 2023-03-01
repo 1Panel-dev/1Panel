@@ -10,4 +10,4 @@ log:
   time_zone: Asia/Shanghai
   log_name: 1Panel
   log_suffix: .log
-  log_backup: 10
+  max_backup: 10
