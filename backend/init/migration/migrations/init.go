@@ -107,7 +107,7 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "ExpirationDays", Value: "0"}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "ComplexityVerification", Value: "disable"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "ComplexityVerification", Value: "enable"}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "MFAStatus", Value: "disable"}).Error; err != nil {

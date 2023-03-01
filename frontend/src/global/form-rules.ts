@@ -41,6 +41,19 @@ const checkName = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkUserName = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.userName')));
+    } else {
+        const reg = /^[a-zA-Z\u4e00-\u9fa5]{1}[a-zA-Z0-9_\u4e00-\u9fa5]{5,30}$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.userName')));
+        } else {
+            callback();
+        }
+    }
+};
+
 const checkSimpleName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.simpleName')));
@@ -138,6 +151,7 @@ interface CommonRule {
     requiredSelect: FormItemRule;
     requiredSelectBusiness: FormItemRule;
     name: FormItemRule;
+    userName: FormItemRule;
     simpleName: FormItemRule;
     dbName: FormItemRule;
     imageName: FormItemRule;
@@ -194,6 +208,11 @@ export const Rules: CommonRule = {
     name: {
         required: true,
         validator: checkName,
+        trigger: 'blur',
+    },
+    userName: {
+        required: true,
+        validator: checkUserName,
         trigger: 'blur',
     },
     linuxName: {

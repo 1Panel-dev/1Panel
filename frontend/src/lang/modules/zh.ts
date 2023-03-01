@@ -125,6 +125,7 @@ export default {
             requiredInput: '请填写必填项',
             requiredSelect: '请选择必选项',
             commonName: '支持英文、中文、数字、.-和_,长度1-30',
+            userName: '支持英文、中文、数字和_,长度5-30',
             simpleName: '支持英文、数字、_,长度1-30',
             dbName: '支持英文、中文、数字、.-_,长度1-16',
             imageName: '支持英文、中文、数字、:.-_,长度1-30',

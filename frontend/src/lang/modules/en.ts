@@ -120,6 +120,7 @@ export default {
             requiredInput: 'Please enter the required fields',
             requiredSelect: 'Please select the required fields',
             commonName: 'Support English, Chinese, numbers, .-, and _ length 1-30',
+            userName: 'Support English, Chinese, numbers and _ length 5-30',
             simpleName: 'Support English, numbers and _ length 1-30',
             dbName: 'Support English, Chinese, numbers, .-, and _ length 1-16',
             imageName: 'Support English, Chinese, numbers, :.-_, length 1-30',
