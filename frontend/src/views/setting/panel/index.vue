@@ -11,7 +11,7 @@
                                     <template #append>
                                         <el-button
                                             style="width: 85px"
-                                            @click="onSave(panelFormRef, 'UserName', form.userName)"
+                                            @click="onSaveUserName(panelFormRef, 'UserName', form.userName)"
                                             icon="Collection"
                                         >
                                             {{ $t('commons.button.save') }}
@@ -120,7 +120,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted, computed } from 'vue';
-import { ElForm } from 'element-plus';
+import { ElForm, ElMessageBox } from 'element-plus';
 import LayoutContent from '@/layout/layout-content.vue';
 import { syncTime, getSettingInfo, updateSetting } from '@/api/modules/setting';
 import { Rules } from '@/global/form-rules';
@@ -174,6 +174,32 @@ const panelFormRef = ref<FormInstance>();
 
 const onChangePassword = () => {
     passwordRef.value.acceptParams({ complexityVerification: form.complexityVerification });
+};
+
+const onSaveUserName = async (formEl: FormInstance | undefined, key: string, val: any) => {
+    if (!formEl) return;
+    const result = await formEl.validateField('userName', callback);
+    if (!result) {
+        return;
+    }
+    ElMessageBox.confirm(i18n.t('setting.userChangeHelper'), i18n.t('setting.userChange'), {
+        confirmButtonText: i18n.t('commons.button.confirm'),
+        cancelButtonText: i18n.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        await updateSetting({ key: key, value: val })
+            .then(async () => {
+                await logOutApi();
+                loading.value = false;
+                MsgSuccess(i18n.t('commons.msg.operationSuccess'));
+                router.push({ name: 'login', params: { code: '' } });
+                globalStore.setLogStatus(false);
+                return;
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const onSave = async (formEl: FormInstance | undefined, key: string, val: any) => {
