@@ -19,7 +19,7 @@ const complexityPassword = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.complexityPassword')));
     } else {
-        const reg = /^(?=.*\d)(?=.*[a-zA-Z])(?=.*[~!@#$%^&*.-_])[\da-zA-Z~!@#$%^&*.-_]{8,}$/;
+        const reg = /^(?![\d]+$)(?![a-zA-Z]+$)(?![^\da-zA-Z]+$).{8,30}$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.complexityPassword')));
         } else {

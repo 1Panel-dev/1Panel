@@ -126,7 +126,7 @@ export default {
             imageName: 'Support English, Chinese, numbers, :.-_, length 1-30',
             volumeName: 'Support English, numbers, .-_, length 1-30',
             complexityPassword:
-                'Please enter a password with more than 8 characters and must contain letters, digits, and special symbols(~!@#$%^&*.-_)',
+                'Please enter a password with more than 8 characters and at least two combinations of letters, numbers, and special symbols',
             commonPassword: 'Please enter a password with more than 6 characters',
             email: 'Email format error',
             number: 'Please enter the correct number',
@@ -734,7 +734,7 @@ export default {
         panel: 'Panel',
         user: 'UserName',
         userChange: 'Change username',
-        userChangeHelper: 'Change the user name and restart the service. Do you want to continue?',
+        userChangeHelper: 'Change the user name to log out. Do you want to continue?',
         passwd: 'Password',
         emailHelper: 'For password retrieval',
         title: 'Panel alias',

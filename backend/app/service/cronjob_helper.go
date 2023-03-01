@@ -96,8 +96,8 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 			return "", err
 		}
 		record.Type = "mysql"
-		record.Name = "mysql"
-		record.DetailName = app.Name
+		record.Name = app.Name
+		record.DetailName = cronjob.DBName
 	case "website":
 		fileName = fmt.Sprintf("website_%s_%s.tar.gz", cronjob.Website, startTime.Format("20060102150405"))
 		backupDir = fmt.Sprintf("%s/website/%s", localDir, cronjob.Website)
