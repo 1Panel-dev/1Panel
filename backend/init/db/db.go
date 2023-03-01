@@ -28,4 +28,5 @@ func Init() {
 		panic(err)
 	}
 	global.DB = db
+	global.LOG.Info("init db successfully")
 }
