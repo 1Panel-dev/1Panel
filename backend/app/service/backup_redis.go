@@ -113,26 +113,25 @@ func handleRedisRecover(redisInfo *repo.RootInfo, recoverFile string, isRollback
 	global.LOG.Infof("appendonly in redis conf is %s", appendonly)
 	isOk := false
 	if !isRollback {
+		suffix := "tar.gz"
+		if appendonly != "yes" {
+			suffix = "rdb"
+		}
+		rollbackFile := fmt.Sprintf("%s/original/database/redis/%s_%s.%s", global.CONF.System.BaseDir, redisInfo.Name, time.Now().Format("20060102150405"), suffix)
+		if err := handleRedisBackup(redisInfo, path.Dir(rollbackFile), path.Base(rollbackFile)); err != nil {
+			global.LOG.Errorf("backup database %s for rollback before recover failed, err: %v", redisInfo.Name, err)
+		}
 		defer func() {
-			suffix := "tar.gz"
-			if appendonly != "yes" {
-				suffix = "rdb"
-			}
-			rollbackFile := fmt.Sprintf("%s/original/database/redis/%s_%s.%s", global.CONF.System.BaseDir, redisInfo.Name, time.Now().Format("20060102150405"), suffix)
-			if err := handleRedisBackup(redisInfo, path.Dir(rollbackFile), path.Base(rollbackFile)); err != nil {
-				global.LOG.Errorf("backup database %s for rollback before recover failed, err: %v", redisInfo.Name, err)
-			}
-			defer func() {
-				if !isOk {
-					if err := handleRedisRecover(redisInfo, rollbackFile, true); err != nil {
-						global.LOG.Errorf("rollback redis from %s failed, err: %v", rollbackFile, err)
-					}
-					global.LOG.Infof("rollback redis from %s successful", rollbackFile)
-					_ = os.RemoveAll(rollbackFile)
-				} else {
-					_ = os.RemoveAll(rollbackFile)
+			if !isOk {
+				if err := handleRedisRecover(redisInfo, rollbackFile, true); err != nil {
+					global.LOG.Errorf("rollback redis from %s failed, err: %v", rollbackFile, err)
+					return
 				}
-			}()
+				global.LOG.Infof("rollback redis from %s successful", rollbackFile)
+				_ = os.RemoveAll(rollbackFile)
+			} else {
+				_ = os.RemoveAll(rollbackFile)
+			}
 		}()
 	}
 	composeDir := fmt.Sprintf("%s/redis/%s", constant.AppInstallDir, redisInfo.Name)

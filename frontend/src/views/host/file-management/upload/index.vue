@@ -1,30 +1,40 @@
 <template>
-    <el-drawer v-model="open" :before-close="handleClose" size="40%">
-        <template #header>
-            <DrawerHeader :header="$t('file.upload')" :back="handleClose" />
-        </template>
-        <el-upload
-            action="#"
-            :auto-upload="false"
-            ref="uploadRef"
-            :multiple="true"
-            :on-change="fileOnChange"
-            v-loading="loading"
-        >
-            <template #trigger>
-                <el-button type="primary">{{ $t('file.selectFile') }}</el-button>
+    <div>
+        <el-drawer v-model="open" :before-close="handleClose" size="40%">
+            <template #header>
+                <DrawerHeader :header="$t('file.upload')" :back="handleClose" />
             </template>
-        </el-upload>
-        <el-progress v-if="loading" :text-inside="true" :stroke-width="26" :percentage="uploadPrecent"></el-progress>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit()" :disabled="loading">
-                    {{ $t('commons.button.confirm') }}
-                </el-button>
-            </span>
-        </template>
-    </el-drawer>
+            <el-upload
+                action="#"
+                drag
+                :auto-upload="false"
+                ref="uploadRef"
+                :multiple="true"
+                :on-change="fileOnChange"
+                v-loading="loading"
+            >
+                <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                <div class="el-upload__text">
+                    {{ $t('database.dropHelper') }}
+                    <em>{{ $t('database.clickHelper') }}</em>
+                </div>
+            </el-upload>
+            <el-progress
+                v-if="loading"
+                :text-inside="true"
+                :stroke-width="26"
+                :percentage="uploadPrecent"
+            ></el-progress>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button type="primary" @click="submit()" :disabled="loading">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </span>
+            </template>
+        </el-drawer>
+    </div>
 </template>
 
 <script setup lang="ts">

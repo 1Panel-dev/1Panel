@@ -52,34 +52,6 @@ func (u *BackupService) WebsiteBackup(req dto.CommonBackup) error {
 	return nil
 }
 
-func (u *BackupService) WebsiteRecoverByUpload(req dto.CommonRecover) error {
-	if err := handleUnTar(req.File, path.Dir(req.File)); err != nil {
-		return err
-	}
-	tmpDir := strings.ReplaceAll(req.File, ".tar.gz", "")
-	webJson, err := os.ReadFile(fmt.Sprintf("%s/website.json", tmpDir))
-	if err != nil {
-		return err
-	}
-	var websiteInfo WebsiteInfo
-	if err := json.Unmarshal(webJson, &websiteInfo); err != nil {
-		return err
-	}
-	if websiteInfo.WebsiteName != req.Name {
-		return errors.New("the uploaded file does not match the selected website and cannot be recovered")
-	}
-
-	website, err := websiteRepo.GetFirst(websiteRepo.WithDomain(req.Name))
-	if err != nil {
-		return err
-	}
-	if err := handleWebsiteRecover(&website, tmpDir, false); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (u *BackupService) WebsiteRecover(req dto.CommonRecover) error {
 	website, err := websiteRepo.GetFirst(websiteRepo.WithDomain(req.Name))
 	if err != nil {
@@ -98,23 +70,35 @@ func (u *BackupService) WebsiteRecover(req dto.CommonRecover) error {
 
 func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback bool) error {
 	fileOp := files.NewFileOp()
-	fileDir := strings.ReplaceAll(recoverFile, ".tar.gz", "")
-	if err := fileOp.Decompress(recoverFile, path.Dir(recoverFile), files.TarGz); err != nil {
+	tmpPath := strings.ReplaceAll(recoverFile, ".tar.gz", "")
+	if err := handleUnTar(recoverFile, path.Dir(recoverFile)); err != nil {
 		return err
 	}
 	defer func() {
-		_ = os.RemoveAll(fileDir)
+		_ = os.RemoveAll(tmpPath)
 	}()
 
-	itemDir := fmt.Sprintf("%s/%s", fileDir, website.Alias)
-	if !fileOp.Stat(itemDir+".conf") || !fileOp.Stat(itemDir+".web.tar.gz") {
+	temPathWithName := tmpPath + "/" + website.Alias
+	if !fileOp.Stat(tmpPath+"/website.json") || !fileOp.Stat(temPathWithName+".conf") || !fileOp.Stat(temPathWithName+".web.tar.gz") {
 		return errors.New("the wrong recovery package does not have .conf or .web.tar.gz files")
 	}
 	if website.Type == constant.Deployment {
-		if !fileOp.Stat(itemDir+".sql.gz") || !fileOp.Stat(itemDir+".app.tar.gz") {
-			return errors.New("the wrong recovery package does not have .sql.gz or .app.tar.gz files")
+		if !fileOp.Stat(temPathWithName + ".app.tar.gz") {
+			return errors.New("the wrong recovery package does not have .app.tar.gz files")
 		}
 	}
+	var oldWebsite model.Website
+	websiteJson, err := os.ReadFile(tmpPath + "/website.json")
+	if err != nil {
+		return err
+	}
+	if err := json.Unmarshal(websiteJson, &oldWebsite); err != nil {
+		return fmt.Errorf("unmarshal app.json failed, err: %v", err)
+	}
+	if oldWebsite.Alias != website.Alias || oldWebsite.Type != website.Type || oldWebsite.ID != website.ID {
+		return errors.New("the current backup file does not match the application")
+	}
+
 	isOk := false
 	if !isRollback {
 		rollbackFile := fmt.Sprintf("%s/original/website/%s_%s.tar.gz", global.CONF.System.BaseDir, website.Alias, time.Now().Format("20060102150405"))
@@ -125,6 +109,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 			if !isOk {
 				if err := handleWebsiteRecover(website, rollbackFile, true); err != nil {
 					global.LOG.Errorf("rollback website %s from %s failed, err: %v", website.Alias, rollbackFile, err)
+					return
 				}
 				global.LOG.Infof("rollback website %s from %s successful", website.Alias, rollbackFile)
 				_ = os.RemoveAll(rollbackFile)
@@ -139,31 +124,16 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		return err
 	}
 	nginxConfPath := fmt.Sprintf("%s/openresty/%s/conf/conf.d", constant.AppInstallDir, nginxInfo.Name)
-	if err := fileOp.CopyFile(fmt.Sprintf("%s/%s.conf", fileDir, website.Alias), nginxConfPath); err != nil {
+	if err := fileOp.CopyFile(fmt.Sprintf("%s/%s.conf", tmpPath, website.Alias), nginxConfPath); err != nil {
 		return err
 	}
 
 	if website.Type == constant.Deployment {
-		mysqlInfo, err := appInstallRepo.LoadBaseInfo(constant.AppMysql, "")
-		if err != nil {
-			return err
-		}
-		resource, err := appInstallResourceRepo.GetFirst(appInstallResourceRepo.WithAppInstallId(website.AppInstallID))
-		if err != nil {
-			return err
-		}
-		db, err := mysqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
-		if err != nil {
-			return err
-		}
-		if err := handleMysqlRecover(mysqlInfo, fileDir, db.Name, fmt.Sprintf("%s.sql.gz", website.Alias), isRollback); err != nil {
-			return err
-		}
 		app, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 		if err != nil {
 			return err
 		}
-		if err := handleAppRecover(&app, fmt.Sprintf("%s/%s.app.tar.gz", fileDir, website.Alias), isRollback); err != nil {
+		if err := handleAppRecover(&app, fmt.Sprintf("%s/%s.app.tar.gz", tmpPath, website.Alias), true); err != nil {
 			return err
 		}
 		if _, err := compose.Restart(fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, app.App.Key, app.Name)); err != nil {
@@ -171,7 +141,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		}
 	}
 	siteDir := fmt.Sprintf("%s/openresty/%s/www/sites", constant.AppInstallDir, nginxInfo.Name)
-	if err := fileOp.Decompress(fmt.Sprintf("%s/%s.web.tar.gz", fileDir, website.Alias), siteDir, files.TarGz); err != nil {
+	if err := handleUnTar(fmt.Sprintf("%s/%s.web.tar.gz", tmpPath, website.Alias), siteDir); err != nil {
 		return err
 	}
 	stdout, err := cmd.Execf("docker exec -i %s nginx -s reload", nginxInfo.ContainerName)
@@ -179,12 +149,10 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 		return errors.New(string(stdout))
 	}
 
+	if err := websiteRepo.SaveWithoutCtx(&oldWebsite); err != nil {
+		return err
+	}
 	return nil
-}
-
-type WebsiteInfo struct {
-	WebsiteName string `json:"websiteName"`
-	WebsiteType string `json:"websiteType"`
 }
 
 func handleWebsiteBackup(website *model.Website, backupDir, fileName string) error {
@@ -199,14 +167,11 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName string) err
 		_ = os.RemoveAll(tmpDir)
 	}()
 
-	var websiteInfo WebsiteInfo
-	websiteInfo.WebsiteType = website.Type
-	websiteInfo.WebsiteName = website.PrimaryDomain
-	remarkInfo, _ := json.Marshal(websiteInfo)
+	remarkInfo, _ := json.Marshal(website)
 	if err := fileOp.SaveFile(tmpDir+"/website.json", string(remarkInfo), fs.ModePerm); err != nil {
 		return err
 	}
-	global.LOG.Info("put websitejson into tmp dir successful")
+	global.LOG.Info("put website.json into tmp dir successful")
 
 	nginxInfo, err := appInstallRepo.LoadBaseInfo(constant.AppOpenresty, "")
 	if err != nil {
@@ -219,21 +184,6 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName string) err
 	global.LOG.Info("put openresty conf into tmp dir successful")
 
 	if website.Type == constant.Deployment {
-		mysqlInfo, err := appInstallRepo.LoadBaseInfo(constant.AppMysql, "")
-		if err != nil {
-			return err
-		}
-		resource, err := appInstallResourceRepo.GetFirst(appInstallResourceRepo.WithAppInstallId(website.AppInstallID))
-		if err != nil {
-			return err
-		}
-		db, err := mysqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
-		if err != nil {
-			return err
-		}
-		if err := handleMysqlBackup(mysqlInfo, tmpDir, db.Name, fmt.Sprintf("%s.sql.gz", website.Alias)); err != nil {
-			return err
-		}
 		app, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 		if err != nil {
 			return err
@@ -241,13 +191,13 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName string) err
 		if err := handleAppBackup(&app, tmpDir, fmt.Sprintf("%s.app.tar.gz", website.Alias)); err != nil {
 			return err
 		}
-		global.LOG.Info("put app tar into tmp dir successful")
+		global.LOG.Info("put app.tar.gz into tmp dir successful")
 	}
 	websiteDir := fmt.Sprintf("%s/openresty/%s/www/sites/%s", constant.AppInstallDir, nginxInfo.Name, website.Alias)
 	if err := fileOp.Compress([]string{websiteDir}, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.Alias), files.TarGz); err != nil {
 		return err
 	}
-	global.LOG.Info("put website tar into tmp dir successful, now start to tar tmp dir")
+	global.LOG.Info("put web.tar.gz into tmp dir successful, now start to tar tmp dir")
 	if err := fileOp.Compress([]string{tmpDir}, backupDir, fileName, files.TarGz); err != nil {
 		return err
 	}

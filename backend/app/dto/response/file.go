@@ -1,9 +1,17 @@
 package response
 
-import "github.com/1Panel-dev/1Panel/backend/utils/files"
+import (
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
+)
 
 type FileInfo struct {
 	files.FileInfo
+}
+
+type UploadInfo struct {
+	Name      string `json:"name"`
+	Size      int    `json:"size"`
+	CreatedAt string `json:"createdAt"`
 }
 
 type FileTree struct {

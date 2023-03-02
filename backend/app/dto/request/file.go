@@ -1,9 +1,17 @@
 package request
 
-import "github.com/1Panel-dev/1Panel/backend/utils/files"
+import (
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
+)
 
 type FileOption struct {
 	files.FileOption
+}
+
+type SearchUploadWithPage struct {
+	dto.PageInfo
+	Path string `json:"path" validate:"required"`
 }
 
 type FileCreate struct {

@@ -1,15 +1,5 @@
 basePath: /api/v1
 definitions:
-  dto.BackupDB:
-    properties:
-      dbName:
-        type: string
-      mysqlName:
-        type: string
-    required:
-    - dbName
-    - mysqlName
-    type: object
   dto.BackupOperate:
     properties:
       accessKey:
@@ -69,6 +59,16 @@ definitions:
     required:
     - value
     type: object
+  dto.ChangeHostGroup:
+    properties:
+      group:
+        type: string
+      id:
+        type: integer
+    required:
+    - group
+    - id
+    type: object
   dto.CleanLog:
     properties:
       logType:
@@ -99,6 +99,40 @@ definitions:
     required:
     - command
     - name
+    type: object
+  dto.CommonBackup:
+    properties:
+      detailName:
+        type: string
+      name:
+        type: string
+      type:
+        enum:
+        - app
+        - mysql
+        - redis
+        - website
+        type: string
+    required:
+    - type
+    type: object
+  dto.CommonRecover:
+    properties:
+      detailName:
+        type: string
+      file:
+        type: string
+      name:
+        type: string
+      type:
+        enum:
+        - app
+        - mysql
+        - redis
+        - website
+        type: string
+    required:
+    - type
     type: object
   dto.ComposeCreate:
     properties:
@@ -1089,19 +1123,6 @@ definitions:
     - pageSize
     - type
     type: object
-  dto.RecoverDB:
-    properties:
-      backupName:
-        type: string
-      dbName:
-        type: string
-      mysqlName:
-        type: string
-    required:
-    - backupName
-    - dbName
-    - mysqlName
-    type: object
   dto.RedisConf:
     properties:
       containerName:
@@ -1193,6 +1214,20 @@ definitions:
     properties:
       info:
         type: string
+    type: object
+  dto.SearchHostWithPage:
+    properties:
+      group:
+        type: string
+      info:
+        type: string
+      page:
+        type: integer
+      pageSize:
+        type: integer
+    required:
+    - page
+    - pageSize
     type: object
   dto.SearchLgLogWithPage:
     properties:
@@ -1368,20 +1403,6 @@ definitions:
         type: string
       releaseNote:
         type: string
-    type: object
-  dto.UploadRecover:
-    properties:
-      dbName:
-        type: string
-      fileDir:
-        type: string
-      fileName:
-        type: string
-      mysqlName:
-        type: string
-    required:
-    - dbName
-    - mysqlName
     type: object
   dto.UserLoginInfo:
     properties:
@@ -2003,6 +2024,19 @@ definitions:
       port:
         type: integer
     type: object
+  request.SearchUploadWithPage:
+    properties:
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      path:
+        type: string
+    required:
+    - page
+    - pageSize
+    - path
+    type: object
   request.WebsiteAcmeAccountCreate:
     properties:
       email:
@@ -2220,35 +2254,6 @@ definitions:
         type: string
     required:
     - id
-    type: object
-  request.WebsiteRecover:
-    properties:
-      backupName:
-        type: string
-      type:
-        type: string
-      websiteName:
-        type: string
-    required:
-    - backupName
-    - type
-    - websiteName
-    type: object
-  request.WebsiteRecoverByFile:
-    properties:
-      fileDir:
-        type: string
-      fileName:
-        type: string
-      type:
-        type: string
-      websiteName:
-        type: string
-    required:
-    - fileDir
-    - fileName
-    - type
-    - websiteName
     type: object
   request.WebsiteResourceReq:
     properties:
@@ -4593,34 +4598,6 @@ paths:
         formatEN: create mysql database [name]
         formatZH: 创建 mysql 数据库 [name]
         paramKeys: []
-  /databases/backup:
-    post:
-      consumes:
-      - application/json
-      description: 备份 mysql 数据库
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.BackupDB'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Backup mysql database
-      tags:
-      - Database Mysql
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - mysqlName
-        - dbName
-        formatEN: backup mysql database [mysqlName][dbName]
-        formatZH: 备份 mysql 数据库 [mysqlName][dbName]
-        paramKeys: []
   /databases/baseinfo:
     get:
       description: 获取 mysql 基础信息
@@ -4837,82 +4814,6 @@ paths:
       summary: List mysql database names
       tags:
       - Database Mysql
-  /databases/recover:
-    post:
-      consumes:
-      - application/json
-      description: Mysql 数据库恢复
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.RecoverDB'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Recover mysql database
-      tags:
-      - Database Mysql
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - mysqlName
-        - dbName
-        - backupName
-        formatEN: 恢复 mysql 数据库 [mysqlName][dbName] [backupName]
-        formatZH: 恢复 mysql 数据库 [mysqlName][dbName] [backupName]
-        paramKeys: []
-  /databases/recover/byupload:
-    post:
-      consumes:
-      - application/json
-      description: Mysql 数据库从上传文件恢复
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.UploadRecover'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Recover mysql database by upload file
-      tags:
-      - Database Mysql
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - fileDir
-        - fileName
-        - mysqlName
-        - dbName
-        formatEN: mysql database recover [fileDir]/[fileName] from [mysqlName][dbName]
-        formatZH: mysql 数据库从 [fileDir]/[fileName] 恢复 [mysqlName][dbName]
-        paramKeys: []
-  /databases/redis/backup:
-    post:
-      description: 备份 redis 数据库
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Backup redis
-      tags:
-      - Database Redis
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys: []
-        formatEN: backup redis database
-        formatZH: 备份 redis 数据库
-        paramKeys: []
   /databases/redis/backup/search:
     post:
       consumes:
@@ -5064,25 +4965,6 @@ paths:
         bodyKeys: []
         formatEN: redis database persistence configuration update
         formatZH: redis 数据库持久化配置更新
-        paramKeys: []
-  /databases/redis/recover:
-    post:
-      description: 恢复 redis 数据库
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Recover redis
-      tags:
-      - Database Redis
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - fileDir
-        - fileName
-        formatEN: redis database recover from [fileDir]/[fileName]
-        formatZH: redis 数据库从 [fileDir]/[fileName] 恢复
         paramKeys: []
   /databases/redis/status:
     get:
@@ -5610,6 +5492,28 @@ paths:
         formatEN: Upload file [path]
         formatZH: 上传文件 [path]
         paramKeys: []
+  /files/upload/search:
+    post:
+      consumes:
+      - application/json
+      description: 分页获取上传文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.SearchUploadWithPage'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: Page file
+      tags:
+      - File
   /files/wget:
     post:
       consumes:
@@ -5821,7 +5725,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.OperateByID'
+          $ref: '#/definitions/dto.BatchDeleteReq'
       responses:
         "200":
           description: ""
@@ -5834,14 +5738,14 @@ paths:
         BeforeFuntions:
         - db: hosts
           input_colume: id
-          input_value: id
-          isList: false
+          input_value: ids
+          isList: true
           output_colume: addr
-          output_value: addr
+          output_value: addrs
         bodyKeys:
-        - id
-        formatEN: delete host [addr]
-        formatZH: 删除主机 [addr]
+        - ids
+        formatEN: delete host [addrs]
+        formatZH: 删除主机 [addrs]
         paramKeys: []
   /hosts/group:
     post:
@@ -5958,14 +5862,14 @@ paths:
     post:
       consumes:
       - application/json
-      description: 加载主机树
+      description: 获取主机列表分页
       parameters:
       - description: request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.SearchForTree'
+          $ref: '#/definitions/dto.SearchHostWithPage'
       responses:
         "200":
           description: OK
@@ -5973,7 +5877,7 @@ paths:
             type: anrry
       security:
       - ApiKeyAuth: []
-      summary: Load host tree
+      summary: Page host
       tags:
       - Host
   /hosts/test/byid/:id:
@@ -6017,33 +5921,61 @@ paths:
       summary: Test host conn by info
       tags:
       - Host
-  /hosts/update:
+  /hosts/tree:
     post:
       consumes:
       - application/json
-      description: 更新主机
+      description: 加载主机树
       parameters:
       - description: request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.HostOperate'
+          $ref: '#/definitions/dto.SearchForTree'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: anrry
+      security:
+      - ApiKeyAuth: []
+      summary: Load host tree
+      tags:
+      - Host
+  /hosts/update:
+    post:
+      consumes:
+      - application/json
+      description: 切换分组
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ChangeHostGroup'
       responses:
         "200":
           description: ""
       security:
       - ApiKeyAuth: []
-      summary: Update host
+      summary: Update host group
       tags:
       - Host
       x-panel-log:
-        BeforeFuntions: []
+        BeforeFuntions:
+        - db: hosts
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: addr
+          output_value: addr
         bodyKeys:
-        - name
-        - addr
-        formatEN: update host [name][addr]
-        formatZH: 更新主机信息 [name][addr]
+        - id
+        - group
+        formatEN: change host [addr] group => [group]
+        formatZH: 切换主机[addr]分组 => [group]
         paramKeys: []
   /logs/clean:
     post:
@@ -6252,6 +6184,35 @@ paths:
         formatEN: create backup account [type]
         formatZH: 创建备份账号 [type]
         paramKeys: []
+  /settings/backup/:
+    post:
+      consumes:
+      - application/json
+      description: 备份系统数据
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CommonBackup'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Backup system data
+      tags:
+      - Backup Account
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - type
+        - name
+        - detailName
+        formatEN: backup [type] data [name][detailName]
+        formatZH: 备份 [type] 数据 [name][detailName]
+        paramKeys: []
   /settings/backup/del:
     post:
       consumes:
@@ -6366,6 +6327,66 @@ paths:
       summary: Page backup records
       tags:
       - Backup Account
+  /settings/backup/recover:
+    post:
+      consumes:
+      - application/json
+      description: 恢复系统数据
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CommonRecover'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Recover system data
+      tags:
+      - Backup Account
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - type
+        - name
+        - detailName
+        - file
+        formatEN: recover [type] data [name][detailName] from [file]
+        formatZH: 从 [file] 恢复 [type] 数据 [name][detailName]
+        paramKeys: []
+  /settings/backup/recover/byupload:
+    post:
+      consumes:
+      - application/json
+      description: 从上传恢复系统数据
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CommonRecover'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Recover system data by upload
+      tags:
+      - Backup Account
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - type
+        - name
+        - detailName
+        - file
+        formatEN: recover [type] data [name][detailName] from [file]
+        formatZH: 从 [file] 恢复 [type] 数据 [name][detailName]
+        paramKeys: []
   /settings/backup/search:
     get:
       description: 获取备份账号列表
@@ -7126,39 +7147,6 @@ paths:
       summary: Page website acme accounts
       tags:
       - Website Acme
-  /websites/backup:
-    post:
-      consumes:
-      - application/json
-      description: 备份网站
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.WebsiteResourceReq'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Backup website
-      tags:
-      - Website
-      x-panel-log:
-        BeforeFuntions:
-        - db: websites
-          input_colume: id
-          input_value: id
-          isList: false
-          output_colume: primary_domain
-          output_value: domain
-        bodyKeys:
-        - id
-        formatEN: Backup website [domain]
-        formatZH: 备份网站 [domain]
-        paramKeys: []
   /websites/check:
     post:
       consumes:
@@ -7723,63 +7711,6 @@ paths:
       summary: List website names
       tags:
       - Website
-  /websites/recover:
-    post:
-      consumes:
-      - application/json
-      description: 从备份恢复网站
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.WebsiteRecover'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Recover website
-      tags:
-      - Website
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - websiteName
-        - backupName
-        formatEN: '[websiteName] recover from backups [backupName]'
-        formatZH: '[websiteName] 从备份恢复 [backupName]'
-        paramKeys: []
-  /websites/recover/byupload:
-    post:
-      consumes:
-      - application/json
-      description: 从上传恢复网站
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.WebsiteRecoverByFile'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Recover website by upload
-      tags:
-      - Website
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - websiteName
-        - fileDir
-        - fileName
-        formatEN: '[websiteName] recover from uploads [fileDir]/[fileName]'
-        formatZH: '[websiteName] 从上传恢复 [fileDir]/[fileName]'
-        paramKeys: []
   /websites/search:
     post:
       consumes:

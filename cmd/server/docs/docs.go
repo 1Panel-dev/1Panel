@@ -3117,49 +3117,6 @@ var doc = `{
                 }
             }
         },
-        "/databases/backup": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "备份 mysql 数据库",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Database Mysql"
-                ],
-                "summary": "Backup mysql database",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.BackupDB"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "mysqlName",
-                        "dbName"
-                    ],
-                    "formatEN": "backup mysql database [mysqlName][dbName]",
-                    "formatZH": "备份 mysql 数据库 [mysqlName][dbName]",
-                    "paramKeys": []
-                }
-            }
-        },
         "/databases/baseinfo": {
             "get": {
                 "security": [
@@ -3499,121 +3456,6 @@ var doc = `{
                 }
             }
         },
-        "/databases/recover": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Mysql 数据库恢复",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Database Mysql"
-                ],
-                "summary": "Recover mysql database",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.RecoverDB"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "mysqlName",
-                        "dbName",
-                        "backupName"
-                    ],
-                    "formatEN": "恢复 mysql 数据库 [mysqlName][dbName] [backupName]",
-                    "formatZH": "恢复 mysql 数据库 [mysqlName][dbName] [backupName]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/databases/recover/byupload": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Mysql 数据库从上传文件恢复",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Database Mysql"
-                ],
-                "summary": "Recover mysql database by upload file",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.UploadRecover"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "fileDir",
-                        "fileName",
-                        "mysqlName",
-                        "dbName"
-                    ],
-                    "formatEN": "mysql database recover [fileDir]/[fileName] from [mysqlName][dbName]",
-                    "formatZH": "mysql 数据库从 [fileDir]/[fileName] 恢复 [mysqlName][dbName]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/databases/redis/backup": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "备份 redis 数据库",
-                "tags": [
-                    "Database Redis"
-                ],
-                "summary": "Backup redis",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [],
-                    "formatEN": "backup redis database",
-                    "formatZH": "备份 redis 数据库",
-                    "paramKeys": []
-                }
-            }
-        },
         "/databases/redis/backup/search": {
             "post": {
                 "security": [
@@ -3850,35 +3692,6 @@ var doc = `{
                     "bodyKeys": [],
                     "formatEN": "redis database persistence configuration update",
                     "formatZH": "redis 数据库持久化配置更新",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/databases/redis/recover": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "恢复 redis 数据库",
-                "tags": [
-                    "Database Redis"
-                ],
-                "summary": "Recover redis",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "fileDir",
-                        "fileName"
-                    ],
-                    "formatEN": "redis database recover from [fileDir]/[fileName]",
-                    "formatZH": "redis 数据库从 [fileDir]/[fileName] 恢复",
                     "paramKeys": []
                 }
             }
@@ -4711,6 +4524,42 @@ var doc = `{
                 }
             }
         },
+        "/files/upload/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "分页获取上传文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "File"
+                ],
+                "summary": "Page file",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.SearchUploadWithPage"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "anrry"
+                        }
+                    }
+                }
+            }
+        },
         "/files/wget": {
             "post": {
                 "security": [
@@ -5046,7 +4895,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.OperateByID"
+                            "$ref": "#/definitions/dto.BatchDeleteReq"
                         }
                     }
                 ],
@@ -5060,17 +4909,17 @@ var doc = `{
                         {
                             "db": "hosts",
                             "input_colume": "id",
-                            "input_value": "id",
-                            "isList": false,
+                            "input_value": "ids",
+                            "isList": true,
                             "output_colume": "addr",
-                            "output_value": "addr"
+                            "output_value": "addrs"
                         }
                     ],
                     "bodyKeys": [
-                        "id"
+                        "ids"
                     ],
-                    "formatEN": "delete host [addr]",
-                    "formatZH": "删除主机 [addr]",
+                    "formatEN": "delete host [addrs]",
+                    "formatZH": "删除主机 [addrs]",
                     "paramKeys": []
                 }
             }
@@ -5255,14 +5104,14 @@ var doc = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "加载主机树",
+                "description": "获取主机列表分页",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Host"
                 ],
-                "summary": "Load host tree",
+                "summary": "Page host",
                 "parameters": [
                     {
                         "description": "request",
@@ -5270,7 +5119,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.SearchForTree"
+                            "$ref": "#/definitions/dto.SearchHostWithPage"
                         }
                     }
                 ],
@@ -5351,21 +5200,21 @@ var doc = `{
                 }
             }
         },
-        "/hosts/update": {
+        "/hosts/tree": {
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "更新主机",
+                "description": "加载主机树",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Host"
                 ],
-                "summary": "Update host",
+                "summary": "Load host tree",
                 "parameters": [
                     {
                         "description": "request",
@@ -5373,7 +5222,43 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.HostOperate"
+                            "$ref": "#/definitions/dto.SearchForTree"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "anrry"
+                        }
+                    }
+                }
+            }
+        },
+        "/hosts/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "切换分组",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host"
+                ],
+                "summary": "Update host group",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ChangeHostGroup"
                         }
                     }
                 ],
@@ -5383,13 +5268,22 @@ var doc = `{
                     }
                 },
                 "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "name",
-                        "addr"
+                    "BeforeFuntions": [
+                        {
+                            "db": "hosts",
+                            "input_colume": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_colume": "addr",
+                            "output_value": "addr"
+                        }
                     ],
-                    "formatEN": "update host [name][addr]",
-                    "formatZH": "更新主机信息 [name][addr]",
+                    "bodyKeys": [
+                        "id",
+                        "group"
+                    ],
+                    "formatEN": "change host [addr] group =\u003e [group]",
+                    "formatZH": "切换主机[addr]分组 =\u003e [group]",
                     "paramKeys": []
                 }
             }
@@ -5724,6 +5618,50 @@ var doc = `{
                 }
             }
         },
+        "/settings/backup/": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "备份系统数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "Backup system data",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CommonBackup"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "type",
+                        "name",
+                        "detailName"
+                    ],
+                    "formatEN": "backup [type] data [name][detailName]",
+                    "formatZH": "备份 [type] 数据 [name][detailName]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/settings/backup/del": {
             "post": {
                 "security": [
@@ -5899,6 +5837,96 @@ var doc = `{
                     "200": {
                         "description": ""
                     }
+                }
+            }
+        },
+        "/settings/backup/recover": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "恢复系统数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "Recover system data",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CommonRecover"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "type",
+                        "name",
+                        "detailName",
+                        "file"
+                    ],
+                    "formatEN": "recover [type] data [name][detailName] from [file]",
+                    "formatZH": "从 [file] 恢复 [type] 数据 [name][detailName]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/settings/backup/recover/byupload": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "从上传恢复系统数据",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Backup Account"
+                ],
+                "summary": "Recover system data by upload",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.CommonRecover"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "type",
+                        "name",
+                        "detailName",
+                        "file"
+                    ],
+                    "formatEN": "recover [type] data [name][detailName] from [file]",
+                    "formatZH": "从 [file] 恢复 [type] 数据 [name][detailName]",
+                    "paramKeys": []
                 }
             }
         },
@@ -7098,57 +7126,6 @@ var doc = `{
                 }
             }
         },
-        "/websites/backup": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "备份网站",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Website"
-                ],
-                "summary": "Backup website",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.WebsiteResourceReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [
-                        {
-                            "db": "websites",
-                            "input_colume": "id",
-                            "input_value": "id",
-                            "isList": false,
-                            "output_colume": "primary_domain",
-                            "output_value": "domain"
-                        }
-                    ],
-                    "bodyKeys": [
-                        "id"
-                    ],
-                    "formatEN": "Backup website [domain]",
-                    "formatZH": "备份网站 [domain]",
-                    "paramKeys": []
-                }
-            }
-        },
         "/websites/check": {
             "post": {
                 "security": [
@@ -8033,93 +8010,6 @@ var doc = `{
                 }
             }
         },
-        "/websites/recover": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "从备份恢复网站",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Website"
-                ],
-                "summary": "Recover website",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.WebsiteRecover"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "websiteName",
-                        "backupName"
-                    ],
-                    "formatEN": "[websiteName] recover from backups [backupName]",
-                    "formatZH": "[websiteName] 从备份恢复 [backupName]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/websites/recover/byupload": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "从上传恢复网站",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Website"
-                ],
-                "summary": "Recover website by upload",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.WebsiteRecoverByFile"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "websiteName",
-                        "fileDir",
-                        "fileName"
-                    ],
-                    "formatEN": "[websiteName] recover from uploads [fileDir]/[fileName]",
-                    "formatZH": "[websiteName] 从上传恢复 [fileDir]/[fileName]",
-                    "paramKeys": []
-                }
-            }
-        },
         "/websites/search": {
             "post": {
                 "security": [
@@ -8565,21 +8455,6 @@ var doc = `{
         }
     },
     "definitions": {
-        "dto.BackupDB": {
-            "type": "object",
-            "required": [
-                "dbName",
-                "mysqlName"
-            ],
-            "properties": {
-                "dbName": {
-                    "type": "string"
-                },
-                "mysqlName": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.BackupOperate": {
             "type": "object",
             "required": [
@@ -8671,6 +8546,21 @@ var doc = `{
                 }
             }
         },
+        "dto.ChangeHostGroup": {
+            "type": "object",
+            "required": [
+                "group",
+                "id"
+            ],
+            "properties": {
+                "group": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.CleanLog": {
             "type": "object",
             "required": [
@@ -8715,6 +8605,55 @@ var doc = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.CommonBackup": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "detailName": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "app",
+                        "mysql",
+                        "redis",
+                        "website"
+                    ]
+                }
+            }
+        },
+        "dto.CommonRecover": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "detailName": {
+                    "type": "string"
+                },
+                "file": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "app",
+                        "mysql",
+                        "redis",
+                        "website"
+                    ]
                 }
             }
         },
@@ -10183,25 +10122,6 @@ var doc = `{
                 }
             }
         },
-        "dto.RecoverDB": {
-            "type": "object",
-            "required": [
-                "backupName",
-                "dbName",
-                "mysqlName"
-            ],
-            "properties": {
-                "backupName": {
-                    "type": "string"
-                },
-                "dbName": {
-                    "type": "string"
-                },
-                "mysqlName": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.RedisConf": {
             "type": "object",
             "properties": {
@@ -10340,6 +10260,27 @@ var doc = `{
             "properties": {
                 "info": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.SearchHostWithPage": {
+            "type": "object",
+            "required": [
+                "page",
+                "pageSize"
+            ],
+            "properties": {
+                "group": {
+                    "type": "string"
+                },
+                "info": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
                 }
             }
         },
@@ -10604,27 +10545,6 @@ var doc = `{
                     "type": "string"
                 },
                 "releaseNote": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.UploadRecover": {
-            "type": "object",
-            "required": [
-                "dbName",
-                "mysqlName"
-            ],
-            "properties": {
-                "dbName": {
-                    "type": "string"
-                },
-                "fileDir": {
-                    "type": "string"
-                },
-                "fileName": {
-                    "type": "string"
-                },
-                "mysqlName": {
                     "type": "string"
                 }
             }
@@ -11565,6 +11485,25 @@ var doc = `{
                 }
             }
         },
+        "request.SearchUploadWithPage": {
+            "type": "object",
+            "required": [
+                "page",
+                "pageSize",
+                "path"
+            ],
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "path": {
+                    "type": "string"
+                }
+            }
+        },
         "request.WebsiteAcmeAccountCreate": {
             "type": "object",
             "required": [
@@ -11886,48 +11825,6 @@ var doc = `{
                     "type": "integer"
                 },
                 "operate": {
-                    "type": "string"
-                }
-            }
-        },
-        "request.WebsiteRecover": {
-            "type": "object",
-            "required": [
-                "backupName",
-                "type",
-                "websiteName"
-            ],
-            "properties": {
-                "backupName": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "websiteName": {
-                    "type": "string"
-                }
-            }
-        },
-        "request.WebsiteRecoverByFile": {
-            "type": "object",
-            "required": [
-                "fileDir",
-                "fileName",
-                "type",
-                "websiteName"
-            ],
-            "properties": {
-                "fileDir": {
-                    "type": "string"
-                },
-                "fileName": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "websiteName": {
                     "type": "string"
                 }
             }

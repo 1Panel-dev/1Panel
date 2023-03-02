@@ -152,7 +152,7 @@
 import LayoutContent from '@/layout/layout-content.vue';
 import RouterButton from '@/components/router-button/index.vue';
 import Backups from '@/components/backup/index.vue';
-import UploadDialog from '@/views/website/website/upload/index.vue';
+import UploadDialog from '@/components/upload/index.vue';
 import DefaultServer from '@/views/website/website/default/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
@@ -323,8 +323,9 @@ const buttons = [
         label: i18n.global.t('database.loadBackup'),
         click: (row: Website.Website) => {
             let params = {
-                websiteName: row.primaryDomain,
-                websiteType: row.type,
+                type: 'website',
+                name: row.primaryDomain,
+                detailName: '',
             };
             uploadRef.value!.acceptParams(params);
         },

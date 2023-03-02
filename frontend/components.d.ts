@@ -83,6 +83,7 @@ declare module 'vue' {
     SubItem: typeof import('./src/components/app-layout/menu/components/sub-item.vue')['default']
     SvgIcon: typeof import('./src/components/svg-icon/svg-icon.vue')['default']
     TableSetting: typeof import('./src/components/table-setting/index.vue')['default']
+    Upload: typeof import('./src/components/upload/index.vue')['default']
   }
 }
 

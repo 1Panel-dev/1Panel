@@ -30,6 +30,15 @@ export namespace File {
         containSub?: boolean;
     }
 
+    export interface SearchUploadInfo extends ReqPage {
+        path: string;
+    }
+    export interface UploadInfo {
+        name: string;
+        size: number;
+        createdAt: string;
+    }
+
     export interface FileTree {
         id: string;
         name: string;

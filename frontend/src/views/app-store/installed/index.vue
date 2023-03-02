@@ -95,6 +95,17 @@
                                             plain
                                             round
                                             size="small"
+                                            @click="openUploads(installed.app.key, installed.name)"
+                                            v-if="mode === 'installed'"
+                                        >
+                                            {{ $t('database.loadBackup') }}
+                                        </el-button>
+                                        <el-button
+                                            class="h-button"
+                                            type="primary"
+                                            plain
+                                            round
+                                            size="small"
                                             @click="openBackups(installed.app.key, installed.name)"
                                             v-if="mode === 'installed'"
                                         >
@@ -145,6 +156,7 @@
         </template>
     </LayoutContent>
     <Backups ref="backupRef" @close="search" />
+    <Uploads ref="uploadRef" />
     <AppResources ref="checkRef" />
     <AppDelete ref="deleteRef" @close="search" />
     <AppParams ref="appParamRef" />
@@ -164,6 +176,7 @@ import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import Backups from '@/components/backup/index.vue';
+import Uploads from '@/components/upload/index.vue';
 import AppResources from './check/index.vue';
 import AppDelete from './delete/index.vue';
 import AppParams from './detail/index.vue';
@@ -189,6 +202,7 @@ let operateReq = reactive({
     detailId: 0,
 });
 const backupRef = ref();
+const uploadRef = ref();
 const checkRef = ref();
 const deleteRef = ref();
 const appParamRef = ref();
@@ -348,6 +362,15 @@ const openBackups = (key: string, name: string) => {
         detailName: name,
     };
     backupRef.value.acceptParams(params);
+};
+
+const openUploads = (key: string, name: string) => {
+    let params = {
+        type: 'app',
+        name: key,
+        detailName: name,
+    };
+    uploadRef.value.acceptParams(params);
 };
 
 const openParam = (installId: number) => {

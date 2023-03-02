@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"os"
 	"path"
-	"strconv"
 	"strings"
 	"time"
 
@@ -16,9 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
-	"gopkg.in/yaml.v3"
 )
 
 func (u *BackupService) AppBackup(req dto.CommonBackup) error {
@@ -82,12 +79,6 @@ func (u *BackupService) AppRecover(req dto.CommonRecover) error {
 	return nil
 }
 
-type AppInfo struct {
-	AppDetailId uint   `json:"appDetailId"`
-	Param       string `json:"param"`
-	Version     string `json:"version"`
-}
-
 func handleAppBackup(install *model.AppInstall, backupDir, fileName string) error {
 	fileOp := files.NewFileOp()
 	tmpDir := fmt.Sprintf("%s/%s", backupDir, strings.ReplaceAll(fileName, ".tar.gz", ""))
@@ -100,11 +91,7 @@ func handleAppBackup(install *model.AppInstall, backupDir, fileName string) erro
 		_ = os.RemoveAll(tmpDir)
 	}()
 
-	var appInfo AppInfo
-	appInfo.Param = install.Param
-	appInfo.AppDetailId = install.AppDetailId
-	appInfo.Version = install.Version
-	remarkInfo, _ := json.Marshal(appInfo)
+	remarkInfo, _ := json.Marshal(install)
 	remarkInfoPath := fmt.Sprintf("%s/app.json", tmpDir)
 	if err := fileOp.SaveFile(remarkInfoPath, string(remarkInfo), fs.ModePerm); err != nil {
 		return err
@@ -114,6 +101,22 @@ func handleAppBackup(install *model.AppInstall, backupDir, fileName string) erro
 	if err := fileOp.Compress([]string{appPath}, tmpDir, "app.tar.gz", files.TarGz); err != nil {
 		return err
 	}
+
+	resource, _ := appInstallResourceRepo.GetFirst(appInstallResourceRepo.WithAppInstallId(install.ID))
+	if resource.ID != 0 {
+		mysqlInfo, err := appInstallRepo.LoadBaseInfo(constant.AppMysql, "")
+		if err != nil {
+			return err
+		}
+		db, err := mysqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
+		if err != nil {
+			return err
+		}
+		if err := handleMysqlBackup(mysqlInfo, tmpDir, db.Name, fmt.Sprintf("%s.sql.gz", install.Name)); err != nil {
+			return err
+		}
+	}
+
 	if err := fileOp.Compress([]string{tmpDir}, backupDir, fileName, files.TarGz); err != nil {
 		return err
 	}
@@ -123,17 +126,30 @@ func handleAppBackup(install *model.AppInstall, backupDir, fileName string) erro
 func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback bool) error {
 	isOk := false
 	fileOp := files.NewFileOp()
-	if err := fileOp.Decompress(recoverFile, path.Dir(recoverFile), files.TarGz); err != nil {
+	if err := handleUnTar(recoverFile, path.Dir(recoverFile)); err != nil {
 		return err
 	}
 	tmpPath := strings.ReplaceAll(recoverFile, ".tar.gz", "")
 	defer func() {
+		_, _ = compose.Up(install.GetComposePath())
 		_ = os.RemoveAll(strings.ReplaceAll(recoverFile, ".tar.gz", ""))
 	}()
 
 	if !fileOp.Stat(tmpPath+"/app.json") || !fileOp.Stat(tmpPath+"/app.tar.gz") {
 		return errors.New("the wrong recovery package does not have app.json or app.tar.gz files")
 	}
+	var oldInstall model.AppInstall
+	appjson, err := os.ReadFile(tmpPath + "/app.json")
+	if err != nil {
+		return err
+	}
+	if err := json.Unmarshal(appjson, &oldInstall); err != nil {
+		return fmt.Errorf("unmarshal app.json failed, err: %v", err)
+	}
+	if oldInstall.App.Key != install.App.Key || oldInstall.Name != install.Name || oldInstall.Version != install.Version || oldInstall.ID != install.ID {
+		return errors.New("the current backup file does not match the application")
+	}
+
 	if !isRollback {
 		rollbackFile := fmt.Sprintf("%s/original/app/%s_%s.tar.gz", global.CONF.System.BaseDir, install.Name, time.Now().Format("20060102150405"))
 		if err := handleAppBackup(install, path.Dir(rollbackFile), path.Base(rollbackFile)); err != nil {
@@ -143,6 +159,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 			if !isOk {
 				if err := handleAppRecover(install, rollbackFile, true); err != nil {
 					global.LOG.Errorf("rollback app %s from %s failed, err: %v", install.Name, rollbackFile, err)
+					return
 				}
 				global.LOG.Infof("rollback app %s from %s successful", install.Name, rollbackFile)
 				_ = os.RemoveAll(rollbackFile)
@@ -152,65 +169,26 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 		}()
 	}
 
-	appjson, err := os.ReadFile(tmpPath + "/" + "app.json")
-	if err != nil {
-		return err
-	}
-	var appInfo AppInfo
-	_ = json.Unmarshal(appjson, &appInfo)
-
-	if err := fileOp.Decompress(tmpPath+"/app.tar.gz", fmt.Sprintf("%s/%s", constant.AppInstallDir, install.App.Key), files.TarGz); err != nil {
-		return err
-	}
-	composeContent, err := os.ReadFile(install.GetComposePath())
-	if err != nil {
-		return err
-	}
-	install.DockerCompose = string(composeContent)
-	envContent, err := os.ReadFile(fmt.Sprintf("%s/%s/%s/.env", constant.AppInstallDir, install.App.Key, install.Name))
-	if err != nil {
-		return err
-	}
-	install.Env = string(envContent)
-	envMaps, err := godotenv.Unmarshal(string(envContent))
-	if err != nil {
-		return err
-	}
-	install.HttpPort = 0
-	httpPort, ok := envMaps["PANEL_APP_PORT_HTTP"]
-	if ok {
-		httpPortN, _ := strconv.Atoi(httpPort)
-		install.HttpPort = httpPortN
-	}
-	install.HttpsPort = 0
-	httpsPort, ok := envMaps["PANEL_APP_PORT_HTTPS"]
-	if ok {
-		httpsPortN, _ := strconv.Atoi(httpsPort)
-		install.HttpsPort = httpsPortN
-	}
-
-	composeMap := make(map[string]interface{})
-	if err := yaml.Unmarshal(composeContent, &composeMap); err != nil {
-		return err
-	}
-	servicesMap := composeMap["services"].(map[string]interface{})
-	for k, v := range servicesMap {
-		install.ServiceName = k
-		value := v.(map[string]interface{})
-		install.ContainerName = value["container_name"].(string)
-	}
-
-	install.Param = appInfo.Param
-	if out, err := compose.Up(install.GetComposePath()); err != nil {
-		install.Message = err.Error()
-		if len(out) != 0 {
-			install.Message = out
+	resource, _ := appInstallResourceRepo.GetFirst(appInstallResourceRepo.WithAppInstallId(install.ID))
+	if resource.ID != 0 && install.App.Key != "mysql" {
+		mysqlInfo, err := appInstallRepo.LoadBaseInfo(resource.Key, "")
+		if err != nil {
+			return err
 		}
-		return errors.New(out)
+		db, err := mysqlRepo.Get(commonRepo.WithByID(resource.ResourceId))
+		if err != nil {
+			return err
+		}
+		if err := handleMysqlRecover(mysqlInfo, tmpPath, db.Name, fmt.Sprintf("%s.sql.gz", install.Name), true); err != nil {
+			return err
+		}
 	}
-	install.AppDetailId = appInfo.AppDetailId
-	install.Version = appInfo.Version
-	install.Status = constant.Running
+
+	if err := handleUnTar(tmpPath+"/app.tar.gz", fmt.Sprintf("%s/%s", constant.AppInstallDir, install.App.Key)); err != nil {
+		return err
+	}
+
+	oldInstall.Status = constant.Running
 	if err := appInstallRepo.Save(install); err != nil {
 		return err
 	}

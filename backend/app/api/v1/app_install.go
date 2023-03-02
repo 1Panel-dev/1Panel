@@ -20,7 +20,7 @@ import (
 // @Param request body request.AppInstalledSearch true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /apps/installed [post]
+// @Router /apps/installed/search [post]
 func (b *BaseApi) SearchAppInstalled(c *gin.Context) {
 	var req request.AppInstalledSearch
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -152,31 +152,6 @@ func (b *BaseApi) SyncInstalled(c *gin.Context) {
 }
 
 // @Tags App
-// @Summary Page installed backups
-// @Description 查询已安装备份列表分页
-// @Accept json
-// @Param request body request.AppBackupSearch true "request"
-// @Success 200 {object} dto.PageResult
-// @Security ApiKeyAuth
-// @Router /apps/installed/backups [post]
-func (b *BaseApi) SearchInstalledBackup(c *gin.Context) {
-	var req request.AppBackupSearch
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	total, list, err := appInstallService.PageInstallBackups(req)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, dto.PageResult{
-		Items: list,
-		Total: total,
-	})
-}
-
-// @Tags App
 // @Summary Operate installed app
 // @Description 操作已安装应用
 // @Accept json
@@ -192,28 +167,6 @@ func (b *BaseApi) OperateInstalled(c *gin.Context) {
 		return
 	}
 	if err := appInstallService.Operate(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, nil)
-}
-
-// @Tags App
-// @Summary Delete app backup record
-// @Description 删除应用备份记录
-// @Accept json
-// @Param request body request.AppBackupDelete true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /apps/installed/backups/del [post]
-// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"ids","isList":true,"db":"app_install_backups","output_colume":"name","output_value":"names"}],"formatZH":"删除应用备份 [names]","formatEN":"Deleting an Application Backup [names]"}
-func (b *BaseApi) DeleteAppBackup(c *gin.Context) {
-	var req request.AppBackupDelete
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := appInstallService.DeleteBackup(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

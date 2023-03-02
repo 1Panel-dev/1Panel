@@ -5,17 +5,6 @@ export namespace Database {
         mysqlName: string;
         dbName: string;
     }
-    export interface Recover {
-        mysqlName: string;
-        dbName: string;
-        backupName: string;
-    }
-    export interface RecoverByUpload {
-        mysqlName: string;
-        dbName: string;
-        fileName: string;
-        fileDir: string;
-    }
     export interface MysqlDBInfo {
         id: number;
         createdAt: Date;

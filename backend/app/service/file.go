@@ -2,15 +2,16 @@ package service
 
 import (
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
-	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
-	"github.com/1Panel-dev/1Panel/backend/constant"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
@@ -33,6 +34,37 @@ func (f FileService) GetFileList(op request.FileOption) (response.FileInfo, erro
 	}
 	fileInfo.FileInfo = *info
 	return fileInfo, nil
+}
+
+func (f FileService) SearchUploadWithPage(req request.SearchUploadWithPage) (int64, interface{}, error) {
+	var (
+		files     []response.UploadInfo
+		backDatas []response.UploadInfo
+	)
+
+	_ = filepath.Walk(req.Path, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
+		}
+		if !info.IsDir() {
+			files = append(files, response.UploadInfo{
+				CreatedAt: info.ModTime().Format("2006-01-02 15:04:05"),
+				Size:      int(info.Size()),
+				Name:      info.Name(),
+			})
+		}
+		return nil
+	})
+	total, start, end := len(files), (req.Page-1)*req.PageSize, req.Page*req.PageSize
+	if start > total {
+		backDatas = make([]response.UploadInfo, 0)
+	} else {
+		if end >= total {
+			end = total
+		}
+		backDatas = files[start:end]
+	}
+	return int64(total), backDatas, nil
 }
 
 func (f FileService) GetFileTree(op request.FileOption) ([]response.FileTree, error) {

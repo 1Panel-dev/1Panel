@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -20,6 +21,7 @@ type IWebsiteRepo interface {
 	GetFirst(opts ...DBOption) (model.Website, error)
 	GetBy(opts ...DBOption) ([]model.Website, error)
 	Save(ctx context.Context, app *model.Website) error
+	SaveWithoutCtx(app *model.Website) error
 	DeleteBy(ctx context.Context, opts ...DBOption) error
 	Create(ctx context.Context, app *model.Website) error
 }
@@ -106,6 +108,10 @@ func (w *WebsiteRepo) Create(ctx context.Context, app *model.Website) error {
 
 func (w *WebsiteRepo) Save(ctx context.Context, app *model.Website) error {
 	return getTx(ctx).Omit(clause.Associations).Save(app).Error
+}
+
+func (w *WebsiteRepo) SaveWithoutCtx(website *model.Website) error {
+	return global.DB.Save(website).Error
 }
 
 func (w *WebsiteRepo) DeleteBy(ctx context.Context, opts ...DBOption) error {

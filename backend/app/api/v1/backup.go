@@ -354,6 +354,11 @@ func (b *BaseApi) RecoverByUpload(c *gin.Context) {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 			return
 		}
+	case "app":
+		if err := backupService.AppRecover(req); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
 	case "website":
 		if err := backupService.WebsiteRecover(req); err != nil {
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)

@@ -34,18 +34,6 @@ export namespace Website {
         websiteGroupId: number;
     }
 
-    export interface WebSiteRecover {
-        websiteName: string;
-        type: string;
-        backupName: string;
-    }
-    export interface WebsiteRecoverByUpload {
-        websiteName: string;
-        type: string;
-        fileDir: string;
-        fileName: string;
-    }
-
     export interface WebSiteDel {
         id: number;
         deleteApp: boolean;
@@ -264,10 +252,6 @@ export namespace Website {
     }
 
     export interface DelReq {
-        id: number;
-    }
-
-    export interface BackupReq {
         id: number;
     }
 
