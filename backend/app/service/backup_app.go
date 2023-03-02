@@ -153,7 +153,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 	if !isRollback {
 		rollbackFile := fmt.Sprintf("%s/original/app/%s_%s.tar.gz", global.CONF.System.BaseDir, install.Name, time.Now().Format("20060102150405"))
 		if err := handleAppBackup(install, path.Dir(rollbackFile), path.Base(rollbackFile)); err != nil {
-			global.LOG.Errorf("backup app %s for rollback before recover failed, err: %v", install.Name, err)
+			return fmt.Errorf("backup app %s for rollback before recover failed, err: %v", install.Name, err)
 		}
 		defer func() {
 			if !isOk {

@@ -119,7 +119,7 @@ func handleRedisRecover(redisInfo *repo.RootInfo, recoverFile string, isRollback
 		}
 		rollbackFile := fmt.Sprintf("%s/original/database/redis/%s_%s.%s", global.CONF.System.BaseDir, redisInfo.Name, time.Now().Format("20060102150405"), suffix)
 		if err := handleRedisBackup(redisInfo, path.Dir(rollbackFile), path.Base(rollbackFile)); err != nil {
-			global.LOG.Errorf("backup database %s for rollback before recover failed, err: %v", redisInfo.Name, err)
+			return fmt.Errorf("backup database %s for rollback before recover failed, err: %v", redisInfo.Name, err)
 		}
 		defer func() {
 			if !isOk {

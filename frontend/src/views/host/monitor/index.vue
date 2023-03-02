@@ -21,7 +21,7 @@
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
-                            style="float: right"
+                            style="float: right; width: 330px"
                         ></el-date-picker>
                     </template>
                     <div id="loadLoadChart" style="width: 100%; height: 400px"></div>
@@ -41,7 +41,7 @@
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
-                            style="float: right"
+                            style="float: right; width: 330px"
                         ></el-date-picker>
                     </template>
                     <div id="loadCPUChart" style="width: 100%; height: 400px"></div>
@@ -59,7 +59,7 @@
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
-                            style="float: right"
+                            style="float: right; width: 330px"
                         ></el-date-picker>
                     </template>
                     <div id="loadMemoryChart" style="width: 100%; height: 400px"></div>
@@ -79,16 +79,30 @@
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
-                            style="float: right"
+                            style="float: right; width: 330px"
                         ></el-date-picker>
                     </template>
-                    <div id="loadIOChart" style="width: 100%; height: 400px; margin-top: 34px"></div>
+                    <div id="loadIOChart" style="width: 100%; height: 400px"></div>
                 </el-card>
             </el-col>
             <el-col :span="12">
                 <el-card style="overflow: inherit">
                     <template #header>
-                        <span style="font-size: 16px; font-weight: 500">{{ $t('monitor.network') }} IO</span>
+                        <span style="font-size: 16px; font-weight: 500">{{ $t('monitor.network') }} IO:</span>
+                        <el-popover placement="bottom" :width="200" trigger="click">
+                            <el-select @change="search('network')" v-model="networkChoose">
+                                <template #prefix>{{ $t('monitor.networkCard') }}</template>
+                                <div v-for="item in netOptions" :key="item">
+                                    <el-option v-if="item === 'all'" :label="$t('commons.table.all')" :value="item" />
+                                    <el-option v-else :label="item" :value="item" />
+                                </div>
+                            </el-select>
+                            <template #reference>
+                                <span class="networkOption">
+                                    {{ networkChoose }}
+                                </span>
+                            </template>
+                        </el-popover>
                         <el-date-picker
                             @change="search('network')"
                             v-model="timeRangeNetwork"
@@ -97,20 +111,9 @@
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
-                            style="float: right"
+                            style="float: right; width: 330px"
                         ></el-date-picker>
                     </template>
-                    <el-select
-                        v-model="networkChoose"
-                        clearable
-                        filterable
-                        @change="search('network')"
-                        style="margin-left: 20px"
-                        placeholder="Select"
-                    >
-                        <template #prefix>{{ $t('monitor.networkCard') }}</template>
-                        <el-option v-for="item in netOptions" :key="item" :label="item" :value="item" />
-                    </el-select>
                     <div id="loadNetworkChart" style="width: 100%; height: 400px"></div>
                 </el-card>
             </el-col>
@@ -649,3 +652,13 @@ onBeforeUnmount(() => {
     window.removeEventListener('resize', changeChartSize);
 });
 </script>
+
+<style scoped lang="scss">
+.networkOption {
+    font-size: 16px;
+    font-weight: 500;
+    margin-left: 5px;
+    cursor: pointer;
+    color: var(--el-color-primary);
+}
+</style>

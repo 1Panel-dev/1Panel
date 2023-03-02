@@ -103,7 +103,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 	if !isRollback {
 		rollbackFile := fmt.Sprintf("%s/original/website/%s_%s.tar.gz", global.CONF.System.BaseDir, website.Alias, time.Now().Format("20060102150405"))
 		if err := handleWebsiteBackup(website, path.Dir(rollbackFile), path.Base(rollbackFile)); err != nil {
-			global.LOG.Errorf("backup website %s for rollback before recover failed, err: %v", website.Alias, err)
+			return fmt.Errorf("backup website %s for rollback before recover failed, err: %v", website.Alias, err)
 		}
 		defer func() {
 			if !isOk {
