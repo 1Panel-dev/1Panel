@@ -63,7 +63,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 	)
 	opts = append(opts, commonRepo.WithOrderBy("created_at desc"))
 	if req.Name != "" {
-		opts = append(opts, websiteRepo.WithDomain(req.Name))
+		opts = append(opts, websiteRepo.WithDomainLike(req.Name))
 	}
 	if req.WebsiteGroupID != 0 {
 		opts = append(opts, websiteRepo.WithGroupID(req.WebsiteGroupID))

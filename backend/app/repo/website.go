@@ -16,6 +16,7 @@ type IWebsiteRepo interface {
 	WithWebsiteSSLID(sslId uint) DBOption
 	WithGroupID(groupId uint) DBOption
 	WithDefaultServer() DBOption
+	WithDomainLike(domain string) DBOption
 	Page(page, size int, opts ...DBOption) (int64, []model.Website, error)
 	List(opts ...DBOption) ([]model.Website, error)
 	GetFirst(opts ...DBOption) (model.Website, error)
@@ -42,6 +43,12 @@ func (w *WebsiteRepo) WithAppInstallId(appInstallId uint) DBOption {
 func (w *WebsiteRepo) WithDomain(domain string) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("primary_domain = ?", domain)
+	}
+}
+
+func (w *WebsiteRepo) WithDomainLike(domain string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("primary_domain like ?", "%"+domain+"%")
 	}
 }
 
