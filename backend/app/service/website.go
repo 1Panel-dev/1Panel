@@ -34,7 +34,7 @@ type IWebsiteService interface {
 	OpWebsite(req request.WebsiteOp) error
 	GetWebsiteOptions() ([]string, error)
 	UpdateWebsite(req request.WebsiteUpdate) error
-	DeleteWebsite(req request.WebsiteDelete) error
+	DeleteWebsite(ctx context.Context, req request.WebsiteDelete) error
 	GetWebsite(id uint) (response.WebsiteDTO, error)
 	CreateWebsiteDomain(create request.WebsiteDomainCreate) (model.WebsiteDomain, error)
 	GetWebsiteDomain(websiteId uint) ([]model.WebsiteDomain, error)
@@ -233,7 +233,7 @@ func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
 	return res, nil
 }
 
-func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
+func (w WebsiteService) DeleteWebsite(ctx context.Context, req request.WebsiteDelete) error {
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
 	if err != nil {
 		return err
@@ -241,7 +241,6 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 	if err := delNginxConfig(website, req.ForceDelete); err != nil {
 		return err
 	}
-	tx, ctx := getTxAndContext()
 
 	if req.DeleteApp {
 		websites, _ := websiteRepo.GetBy(websiteRepo.WithAppInstallId(website.AppInstallID))
@@ -266,21 +265,17 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 				_ = fileOp.DeleteDir(b.FileDir)
 			}
 			if err := backupRepo.DeleteRecord(ctx, backupRepo.WithByType("website-"+website.Type), commonRepo.WithByName(website.PrimaryDomain)); err != nil {
-				tx.Rollback()
 				return err
 			}
 		}
 	}
 
 	if err := websiteRepo.DeleteBy(ctx, commonRepo.WithByID(req.ID)); err != nil {
-		tx.Rollback()
 		return err
 	}
 	if err := websiteDomainRepo.DeleteBy(ctx, websiteDomainRepo.WithWebsiteId(req.ID)); err != nil {
-		tx.Rollback()
 		return err
 	}
-	tx.Commit()
 	return nil
 }
 
