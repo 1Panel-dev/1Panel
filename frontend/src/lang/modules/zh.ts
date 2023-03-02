@@ -141,6 +141,7 @@ export default {
             domain: '域名格式错误',
             databaseName: '支持英文、数字、_,长度1-30',
             ipErr: 'IP [{0}] 格式错误,请检查',
+            numberRange: '数字范围: {0} - {1}',
             paramName: '支持英文、数字、.-和_,长度2-30',
             paramComplexity: '支持英文、数字、{0},长度6-30',
             paramUrlAndPort: '格式为 http(s)://(域名/ip):(端口)',

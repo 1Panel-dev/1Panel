@@ -5,23 +5,27 @@
                 <el-col :span="1"><br /></el-col>
                 <el-col :span="9">
                     <el-form-item label="server_names_hash_bucket_size" prop="server_names_hash_bucket_size">
-                        <el-input clearable v-model.number="form.server_names_hash_bucket_size"></el-input>
+                        <el-input
+                            clearable
+                            type="number"
+                            v-model.number="form.server_names_hash_bucket_size"
+                        ></el-input>
                         <span class="input-help">{{ $t('nginx.serverNamesHashBucketSizeHelper') }}</span>
                     </el-form-item>
                     <el-form-item label="client_header_buffer_size" prop="client_header_buffer_size">
-                        <el-input clearable v-model.number="form.client_header_buffer_size">
+                        <el-input clearable type="number" v-model.number="form.client_header_buffer_size">
                             <template #append>K</template>
                         </el-input>
                         <span class="input-help">{{ $t('nginx.clientHeaderBufferSizeHelper') }}</span>
                     </el-form-item>
                     <el-form-item label="client_max_body_size" prop="client_max_body_size">
-                        <el-input clearable v-model.number="form.client_max_body_size">
+                        <el-input clearable type="number" v-model.number="form.client_max_body_size">
                             <template #append>MB</template>
                         </el-input>
                         <span class="input-help">{{ $t('nginx.clientMaxBodySizeHelper') }}</span>
                     </el-form-item>
                     <el-form-item label="keepalive_timeout" prop="keepalive_timeout">
-                        <el-input clearable v-model.number="form.keepalive_timeout"></el-input>
+                        <el-input clearable type="number" v-model.number="form.keepalive_timeout"></el-input>
                         <span class="input-help">{{ $t('nginx.keepaliveTimeoutHelper') }}</span>
                     </el-form-item>
                     <el-form-item>
@@ -57,7 +61,7 @@
 <script lang="ts" setup>
 import { Nginx } from '@/api/interface/nginx';
 import { GetNginxConfigByScope, UpdateNginxConfigByScope } from '@/api/modules/nginx';
-import { Rules } from '@/global/form-rules';
+import { checkNumberRange, Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
@@ -85,13 +89,13 @@ let nginxFormRef = ref();
 let loading = ref(false);
 
 const variablesRules = reactive({
-    server_names_hash_bucket_size: [Rules.number],
-    client_header_buffer_size: [Rules.number],
-    client_max_body_size: [Rules.number],
-    keepalive_timeout: [Rules.number],
+    server_names_hash_bucket_size: [checkNumberRange(1, 9999)],
+    client_header_buffer_size: [checkNumberRange(0, 999999999)],
+    client_max_body_size: [checkNumberRange(0, 999999999)],
+    keepalive_timeout: [checkNumberRange(0, 999999999)],
     gzip: [Rules.requiredSelect],
     gzip_min_length: [Rules.requiredSelect],
-    gzip_comp_level: [Rules.number],
+    gzip_comp_level: [checkNumberRange(1, 9)],
 });
 
 const getParams = async () => {
