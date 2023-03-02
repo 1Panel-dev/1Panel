@@ -4,7 +4,7 @@
             <el-form ref="defaultForm" label-position="top" :model="defaultModel" :rules="rules">
                 <el-form-item :label="$t('website.defaultDoc')" prop="index">
                     <el-input
-                        v-model="defaultModel.index"
+                        v-model.trim="defaultModel.index"
                         type="textarea"
                         :autosize="{ minRows: 8, maxRows: 20 }"
                     ></el-input>
