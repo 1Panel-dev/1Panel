@@ -15,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/global"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -257,18 +258,23 @@ func (w WebsiteService) DeleteWebsite(ctx context.Context, req request.WebsiteDe
 			}
 		}
 	}
-	if req.DeleteBackup {
-		backups, _ := backupRepo.ListRecord(backupRepo.WithByType("website-"+website.Type), commonRepo.WithByName(website.PrimaryDomain))
-		if len(backups) > 0 {
-			fileOp := files.NewFileOp()
-			for _, b := range backups {
-				_ = fileOp.DeleteDir(b.FileDir)
-			}
-			if err := backupRepo.DeleteRecord(ctx, backupRepo.WithByType("website-"+website.Type), commonRepo.WithByName(website.PrimaryDomain)); err != nil {
-				return err
-			}
-		}
+
+	uploadDir := fmt.Sprintf("%s/1panel/uploads/website/%s", global.CONF.System.BaseDir, website.Alias)
+	if _, err := os.Stat(uploadDir); err == nil {
+		_ = os.RemoveAll(uploadDir)
 	}
+	if req.DeleteBackup {
+		localDir, err := loadLocalDir()
+		if err != nil && !req.ForceDelete {
+			return err
+		}
+		backupDir := fmt.Sprintf("%s/website/%s", localDir, website.Alias)
+		if _, err := os.Stat(backupDir); err == nil {
+			_ = os.RemoveAll(backupDir)
+		}
+		global.LOG.Infof("delete website %s backups successful", website.Alias)
+	}
+	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("website"), commonRepo.WithByName(website.Alias))
 
 	if err := websiteRepo.DeleteBy(ctx, commonRepo.WithByID(req.ID)); err != nil {
 		return err

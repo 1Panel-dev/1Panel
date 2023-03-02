@@ -45,6 +45,35 @@ func (b *BaseApi) ListFiles(c *gin.Context) {
 }
 
 // @Tags File
+// @Summary Page file
+// @Description 分页获取上传文件
+// @Accept json
+// @Param request body request.SearchUploadWithPage true "request"
+// @Success 200 {anrry} response.FileInfo
+// @Security ApiKeyAuth
+// @Router /files/upload/search [post]
+func (b *BaseApi) SearchUploadWithPage(c *gin.Context) {
+	var req request.SearchUploadWithPage
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	total, files, err := fileService.SearchUploadWithPage(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, dto.PageResult{
+		Items: files,
+		Total: total,
+	})
+}
+
+// @Tags File
 // @Summary Load files tree
 // @Description 加载文件树
 // @Accept json

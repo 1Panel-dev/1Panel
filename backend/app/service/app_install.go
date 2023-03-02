@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -23,7 +22,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
-	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
 )
 
@@ -96,9 +94,6 @@ func (a AppInstallService) CheckExist(key string) (*response.AppInstalledCheck, 
 	res.AppInstallID = appInstall.ID
 	res.IsExist = true
 	res.InstallPath = path.Join(constant.AppInstallDir, app.Key, appInstall.Name)
-	if len(appInstall.Backups) > 0 {
-		res.LastBackupAt = appInstall.Backups[0].CreatedAt.Format("2006-01-02 15:04:05")
-	}
 
 	return res, nil
 }
@@ -221,34 +216,6 @@ func (a AppInstallService) SyncAll() error {
 			}
 		}
 	}()
-	return nil
-}
-
-func (a AppInstallService) PageInstallBackups(req request.AppBackupSearch) (int64, []model.AppInstallBackup, error) {
-	return appInstallBackupRepo.Page(req.Page, req.PageSize, appInstallBackupRepo.WithAppInstallID(req.AppInstallID))
-}
-
-func (a AppInstallService) DeleteBackup(req request.AppBackupDelete) error {
-	backups, err := appInstallBackupRepo.GetBy(commonRepo.WithIdsIn(req.Ids))
-	if err != nil {
-		return err
-	}
-	fileOp := files.NewFileOp()
-
-	var errStr strings.Builder
-	for _, backup := range backups {
-		dst := path.Join(backup.Path, backup.Name)
-		if err := fileOp.DeleteFile(dst); err != nil {
-			errStr.WriteString(err.Error())
-			continue
-		}
-		if err := appInstallBackupRepo.Delete(context.TODO(), commonRepo.WithIdsIn(req.Ids)); err != nil {
-			errStr.WriteString(err.Error())
-		}
-	}
-	if errStr.String() != "" {
-		return errors.New(errStr.String())
-	}
 	return nil
 }
 

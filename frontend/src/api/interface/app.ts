@@ -126,21 +126,6 @@ export namespace App {
         config?: Object;
     }
 
-    export interface AppBackupReq extends ReqPage {
-        appInstallId: number;
-    }
-
-    export interface AppBackupDelReq {
-        ids: number[];
-    }
-
-    export interface AppBackup extends CommonModel {
-        name: string;
-        path: string;
-        appInstallId: string;
-        appDetail: AppDetail;
-    }
-
     export interface VersionDetail {
         version: string;
         detailId: number;

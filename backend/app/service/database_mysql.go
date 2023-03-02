@@ -161,7 +161,7 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 	}
 	global.LOG.Info("execute delete database sql successful, now start to drop uploads and records")
 
-	uploadDir := fmt.Sprintf("%s/uploads/database/mysql/%s/%s", constant.DataDir, app.Name, db.Name)
+	uploadDir := fmt.Sprintf("%s/1panel/uploads/database/mysql/%s/%s", global.CONF.System.BaseDir, app.Name, db.Name)
 	if _, err := os.Stat(uploadDir); err == nil {
 		_ = os.RemoveAll(uploadDir)
 	}

@@ -8,7 +8,6 @@ type RepoGroup struct {
 	AppDetailRepo
 	AppInstallRepo
 	AppInstallResourceRpo
-	AppInstallBackupRepo
 	ImageRepoRepo
 	ComposeTemplateRepo
 	MysqlRepo

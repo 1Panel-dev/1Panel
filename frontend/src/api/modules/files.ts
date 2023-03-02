@@ -1,9 +1,14 @@
 import { File } from '@/api/interface/file';
 import http from '@/api';
 import { AxiosRequestConfig } from 'axios';
+import { ResPage } from '../interface';
 
 export const GetFilesList = (params: File.ReqFile) => {
     return http.post<File.File>('files/search', params, 200000);
+};
+
+export const GetUploadList = (params: File.SearchUploadInfo) => {
+    return http.post<ResPage<File.UploadInfo>>('files/upload/search', params);
 };
 
 export const GetFilesTree = (params: File.ReqFile) => {

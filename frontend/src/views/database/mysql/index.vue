@@ -155,11 +155,11 @@ import DeleteDialog from '@/views/database/mysql/delete/index.vue';
 import PasswordDialog from '@/views/database/mysql/password/index.vue';
 import RootPasswordDialog from '@/views/database/mysql/root-password/index.vue';
 import RemoteAccessDialog from '@/views/database/mysql/remote/index.vue';
-import UploadDialog from '@/views/database/mysql/upload/index.vue';
 import AppResources from '@/views/database/mysql/check/index.vue';
 import Setting from '@/views/database/mysql/setting/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import Backups from '@/components/backup/index.vue';
+import UploadDialog from '@/components/upload/index.vue';
 import { dateFormat } from '@/utils/util';
 import { reactive, ref } from 'vue';
 import { deleteCheckMysqlDB, loadRemoteAccess, searchMysqlDBs, updateMysqlDescription } from '@/api/modules/database';
@@ -350,8 +350,9 @@ const buttons = [
         label: i18n.global.t('database.loadBackup'),
         click: (row: Database.MysqlDBInfo) => {
             let params = {
-                mysqlName: mysqlName.value,
-                dbName: row.name,
+                type: 'mysql',
+                name: mysqlName.value,
+                detailName: row.name,
             };
             uploadRef.value!.acceptParams(params);
         },

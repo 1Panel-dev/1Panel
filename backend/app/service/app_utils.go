@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"math"
 	"os"
 	"path"
@@ -128,15 +129,23 @@ func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBacku
 	if err := deleteLink(ctx, &install); err != nil && !forceDelete {
 		return err
 	}
+	uploadDir := fmt.Sprintf("%s/1panel/uploads/app/%s/%s", global.CONF.System.BaseDir, install.App.Key, install.Name)
+	if _, err := os.Stat(uploadDir); err == nil {
+		_ = os.RemoveAll(uploadDir)
+	}
 	if deleteBackup {
-		backups, _ := appInstallBackupRepo.GetBy(appInstallBackupRepo.WithAppInstallID(install.ID))
-		for _, backup := range backups {
-			_ = op.DeleteDir(backup.Path)
-		}
-		if err := appInstallBackupRepo.Delete(ctx, appInstallBackupRepo.WithAppInstallID(install.ID)); err != nil && !forceDelete {
+		localDir, err := loadLocalDir()
+		if err != nil && !forceDelete {
 			return err
 		}
+		backupDir := fmt.Sprintf("%s/app/%s/%s", localDir, install.App.Key, install.Name)
+		if _, err := os.Stat(backupDir); err == nil {
+			_ = os.RemoveAll(backupDir)
+		}
+		global.LOG.Infof("delete app %s-%s backups successful", install.App.Key, install.Name)
 	}
+	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), backupRepo.WithByDetailName(install.Name))
+
 	return nil
 }
 

@@ -15,6 +15,7 @@ func (f *FileRouter) InitFileRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		fileRouter.POST("/search", baseApi.ListFiles)
+		fileRouter.POST("/upload/search", baseApi.SearchUploadWithPage)
 		fileRouter.POST("/tree", baseApi.GetFileTree)
 		fileRouter.POST("", baseApi.CreateFile)
 		fileRouter.POST("/del", baseApi.DeleteFile)

@@ -46,7 +46,6 @@ var ServiceGroupApp = new(ServiceGroup)
 var (
 	commonRepo = repo.RepoGroupApp.CommonRepo
 
-	appInstallBackupRepo   = repo.RepoGroupApp.AppInstallBackupRepo
 	appRepo                = repo.RepoGroupApp.AppRepo
 	appTagRepo             = repo.RepoGroupApp.AppTagRepo
 	appDetailRepo          = repo.RepoGroupApp.AppDetailRepo
