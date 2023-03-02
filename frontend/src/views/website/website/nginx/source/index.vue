@@ -78,7 +78,7 @@ const getNginx = async () => {
 
 const getDefaultConfig = async () => {
     loading.value = true;
-    const res = await GetAppDefaultConfig('nginx');
+    const res = await GetAppDefaultConfig('openresty');
     content.value = res.data;
     useOld.value = true;
     loading.value = false;
