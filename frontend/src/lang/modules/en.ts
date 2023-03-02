@@ -136,7 +136,7 @@ export default {
             domain: 'domain name format error',
             databaseName: 'Support English, numbers, _, length 1-30',
             ipErr: 'IP [{0}] format error, please check',
-            paramName: 'Support English, numbers, .- and _, length 6-30',
+            paramName: 'Support English, numbers, .- and _, length 2-30',
             paramComplexity: 'Support English, numbers, {0}, length 6-30',
         },
         res: {
