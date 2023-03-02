@@ -79,7 +79,12 @@ class RequestHttp {
             async (error: AxiosError) => {
                 const { response } = error;
                 if (error.message.indexOf('timeout') !== -1) MsgError('请求超时！请您稍后重试');
-                if (response) checkStatus(response.status, response.data['message']);
+                if (response) {
+                    checkStatus(
+                        response.status,
+                        response.data && response.data['message'] ? response.data['message'] : '',
+                    );
+                }
                 if (!window.navigator.onLine) router.replace({ path: '/500' });
                 return Promise.reject(error);
             },
