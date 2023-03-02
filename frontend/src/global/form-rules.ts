@@ -150,7 +150,7 @@ const checkParamCommon = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.paramName')));
     } else {
-        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9._-]{6,30}$/;
+        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9._-]{2,30}$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.paramName')));
         } else {
