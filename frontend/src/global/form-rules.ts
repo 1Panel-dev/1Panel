@@ -186,6 +186,17 @@ const checkParamUrlAndPort = (rule: any, value: any, callback: any) => {
     }
 };
 
+export function checkNumberRange(min: number, max: number): FormItemRule {
+    return {
+        required: true,
+        trigger: 'blur',
+        min: min,
+        max: max,
+        type: 'number',
+        message: i18n.global.t('commons.rule.numberRange', [min, max]),
+    };
+}
+
 interface CommonRule {
     requiredInput: FormItemRule;
     requiredSelect: FormItemRule;
