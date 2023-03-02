@@ -146,7 +146,7 @@ func handleMysqlRecover(mysqlInfo *repo.RootInfo, recoverDir, dbName, fileName s
 	if !isRollback {
 		rollbackFile := fmt.Sprintf("%s/original/database/%s_%s.sql.gz", global.CONF.System.BaseDir, mysqlInfo.Name, time.Now().Format("20060102150405"))
 		if err := handleMysqlBackup(mysqlInfo, path.Dir(rollbackFile), dbName, path.Base(rollbackFile)); err != nil {
-			global.LOG.Errorf("backup mysql db %s for rollback before recover failed, err: %v", mysqlInfo.Name, err)
+			return fmt.Errorf("backup mysql db %s for rollback before recover failed, err: %v", mysqlInfo.Name, err)
 		}
 		defer func() {
 			if !isOk {

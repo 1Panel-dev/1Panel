@@ -316,7 +316,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.log'),
         click: (row: Container.ContainerInfo) => {
-            dialogContainerLogRef.value!.acceptParams({ containerID: row.containerID });
+            dialogContainerLogRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
         },
     },
 ];
