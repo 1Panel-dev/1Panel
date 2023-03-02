@@ -53,5 +53,9 @@ func (w WebsiteGroupService) UpdateGroup(update request.WebsiteGroupUpdate) erro
 }
 
 func (w WebsiteGroupService) DeleteGroup(id uint) error {
+	websites, _ := websiteRepo.GetBy(websiteRepo.WithGroupID(id))
+	if len(websites) > 0 {
+		return buserr.New(constant.ErrGroupIsUsed)
+	}
 	return websiteGroupRepo.DeleteBy(commonRepo.WithByID(id))
 }

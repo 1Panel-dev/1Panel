@@ -64,6 +64,7 @@ var (
 	ErrDomainIsExist = "ErrDomainIsExist"
 	ErrAliasIsExist  = "ErrAliasIsExist"
 	ErrAppDelete     = "ErrAppDelete"
+	ErrGroupIsUsed   = "ErrGroupIsUsed"
 )
 
 //ssl
