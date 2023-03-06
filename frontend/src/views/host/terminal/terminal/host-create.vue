@@ -84,7 +84,7 @@ const hostRef = ref<FormInstance>();
 let hostInfo = reactive<Host.HostOperate>({
     id: 0,
     name: '',
-    groupBelong: '',
+    groupID: 0,
     addr: '',
     port: 22,
     user: '',
@@ -110,7 +110,7 @@ interface DialogProps {
 const acceptParams = (props: DialogProps) => {
     hostInfo.addr = '';
     hostInfo.name = '';
-    hostInfo.groupBelong = 'default';
+    hostInfo.groupID = 0;
     hostInfo.addr = '';
     hostInfo.port = 22;
     hostInfo.user = '';
@@ -136,7 +136,7 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        hostInfo.groupBelong = 'default';
+        hostInfo.groupID = 0;
         switch (ops) {
             case 'testConn':
                 await testByInfo(hostInfo).then((res) => {

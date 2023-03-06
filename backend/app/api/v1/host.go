@@ -215,7 +215,7 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 
 	upMap := make(map[string]interface{})
 	upMap["name"] = req.Name
-	upMap["group_belong"] = req.GroupBelong
+	upMap["group_id"] = req.GroupID
 	upMap["addr"] = req.Addr
 	upMap["port"] = req.Port
 	upMap["user"] = req.User
@@ -251,7 +251,7 @@ func (b *BaseApi) UpdateHostGroup(c *gin.Context) {
 	}
 
 	upMap := make(map[string]interface{})
-	upMap["group_belong"] = req.Group
+	upMap["group_id"] = req.GroupID
 	if err := hostService.Update(req.ID, upMap); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

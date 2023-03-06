@@ -61,12 +61,12 @@ definitions:
     type: object
   dto.ChangeHostGroup:
     properties:
-      group:
-        type: string
+      groupID:
+        type: integer
       id:
         type: integer
     required:
-    - group
+    - groupID
     - id
     type: object
   dto.CleanLog:
@@ -608,7 +608,7 @@ definitions:
     - type
     - vars
     type: object
-  dto.GroupOperate:
+  dto.GroupCreate:
     properties:
       id:
         type: integer
@@ -626,6 +626,15 @@ definitions:
         type: string
     required:
     - type
+    type: object
+  dto.GroupUpdate:
+    properties:
+      id:
+        type: integer
+      isDefault:
+        type: boolean
+      name:
+        type: string
     type: object
   dto.HostConnTest:
     properties:
@@ -663,6 +672,8 @@ definitions:
         type: string
       groupBelong:
         type: string
+      groupID:
+        type: integer
       id:
         type: integer
       name:
@@ -683,8 +694,8 @@ definitions:
         type: string
       description:
         type: string
-      groupBelong:
-        type: string
+      groupID:
+        type: integer
       id:
         type: integer
       name:
@@ -701,7 +712,6 @@ definitions:
         type: string
     required:
     - addr
-    - groupBelong
     - port
     - user
     type: object
@@ -1217,8 +1227,8 @@ definitions:
     type: object
   dto.SearchHostWithPage:
     properties:
-      group:
-        type: string
+      groupID:
+        type: integer
       info:
         type: string
       page:
@@ -1532,10 +1542,6 @@ definitions:
         type: integer
       appId:
         type: integer
-      backups:
-        items:
-          $ref: '#/definitions/model.AppInstallBackup'
-        type: array
       containerName:
         type: string
       createdAt:
@@ -1565,25 +1571,6 @@ definitions:
       updatedAt:
         type: string
       version:
-        type: string
-    type: object
-  model.AppInstallBackup:
-    properties:
-      app_detail_id:
-        type: integer
-      app_install_id:
-        type: integer
-      createdAt:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      param:
-        type: string
-      path:
-        type: string
-      updatedAt:
         type: string
     type: object
   model.Tag:
@@ -1712,25 +1699,6 @@ definitions:
         items:
           $ref: '#/definitions/model.Website'
         type: array
-    type: object
-  request.AppBackupDelete:
-    properties:
-      ids:
-        items:
-          type: integer
-        type: array
-    type: object
-  request.AppBackupSearch:
-    properties:
-      appInstallID:
-        type: integer
-      page:
-        type: integer
-      pageSize:
-        type: integer
-    required:
-    - page
-    - pageSize
     type: object
   request.AppInstallCreate:
     properties:
@@ -2721,26 +2689,6 @@ paths:
         formatEN: Install app [appKey]-[name]
         formatZH: 安装应用 [appKey]-[name]
         paramKeys: []
-  /apps/installed:
-    post:
-      consumes:
-      - application/json
-      description: 获取已安装应用列表
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.AppInstalledSearch'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: List app installed
-      tags:
-      - App
   /apps/installed/:appInstallId/versions:
     get:
       consumes:
@@ -2762,61 +2710,6 @@ paths:
       summary: Search app update version by install id
       tags:
       - App
-  /apps/installed/backups:
-    post:
-      consumes:
-      - application/json
-      description: 查询已安装备份列表分页
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.AppBackupSearch'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.PageResult'
-      security:
-      - ApiKeyAuth: []
-      summary: Page installed backups
-      tags:
-      - App
-  /apps/installed/backups/del:
-    post:
-      consumes:
-      - application/json
-      description: 删除应用备份记录
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.AppBackupDelete'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Delete app backup record
-      tags:
-      - App
-      x-panel-log:
-        BeforeFuntions:
-        - db: app_install_backups
-          input_colume: id
-          input_value: ids
-          isList: true
-          output_colume: name
-          output_value: names
-        bodyKeys:
-        - ids
-        formatEN: Deleting an Application Backup [names]
-        formatZH: 删除应用备份 [names]
-        paramKeys: []
   /apps/installed/check/:key:
     get:
       consumes:
@@ -3018,6 +2911,26 @@ paths:
         formatEN: Application port update [key]-[name] => [port]
         formatZH: 应用端口修改 [key]-[name] => [port]
         paramKeys: []
+  /apps/installed/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取已安装应用列表
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.AppInstalledSearch'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: List app installed
+      tags:
+      - App
   /apps/installed/sync:
     post:
       description: 同步已安装应用列表
@@ -5758,7 +5671,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.GroupOperate'
+          $ref: '#/definitions/dto.GroupCreate'
       responses:
         "200":
           description: ""
@@ -5803,10 +5716,16 @@ paths:
           isList: false
           output_colume: name
           output_value: name
+        - db: groups
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: type
+          output_value: type
         bodyKeys:
         - id
-        formatEN: delete group [name]
-        formatZH: 删除组 [name]
+        formatEN: delete group [type][name]
+        formatZH: 删除组 [type][name]
         paramKeys: []
   /hosts/group/search:
     post:
@@ -5841,7 +5760,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.GroupOperate'
+          $ref: '#/definitions/dto.GroupUpdate'
       responses:
         "200":
           description: ""

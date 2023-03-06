@@ -16,6 +16,7 @@ type ICommonRepo interface {
 	WithByName(name string) DBOption
 	WithByType(tp string) DBOption
 	WithOrderBy(orderStr string) DBOption
+	WithByGroupID(groupID uint) DBOption
 	WithLikeName(name string) DBOption
 	WithIdsIn(ids []uint) DBOption
 	WithByDate(startTime, endTime time.Time) DBOption
@@ -51,6 +52,15 @@ func (c *CommonRepo) WithByStartDate(startTime time.Time) DBOption {
 func (c *CommonRepo) WithByType(tp string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("type = ?", tp)
+	}
+}
+
+func (c *CommonRepo) WithByGroupID(groupID uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if groupID == 0 {
+			return g
+		}
+		return g.Where("group_id = ?", groupID)
 	}
 }
 

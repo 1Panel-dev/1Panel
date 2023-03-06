@@ -164,39 +164,6 @@ var doc = `{
                 }
             }
         },
-        "/apps/installed": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取已安装应用列表",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "App"
-                ],
-                "summary": "List app installed",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.AppInstalledSearch"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
         "/apps/installed/:appInstallId/versions": {
             "get": {
                 "security": [
@@ -228,93 +195,6 @@ var doc = `{
                             "type": "anrry"
                         }
                     }
-                }
-            }
-        },
-        "/apps/installed/backups": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "查询已安装备份列表分页",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "App"
-                ],
-                "summary": "Page installed backups",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.AppBackupSearch"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.PageResult"
-                        }
-                    }
-                }
-            }
-        },
-        "/apps/installed/backups/del": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "删除应用备份记录",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "App"
-                ],
-                "summary": "Delete app backup record",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.AppBackupDelete"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [
-                        {
-                            "db": "app_install_backups",
-                            "input_colume": "id",
-                            "input_value": "ids",
-                            "isList": true,
-                            "output_colume": "name",
-                            "output_value": "names"
-                        }
-                    ],
-                    "bodyKeys": [
-                        "ids"
-                    ],
-                    "formatEN": "Deleting an Application Backup [names]",
-                    "formatZH": "删除应用备份 [names]",
-                    "paramKeys": []
                 }
             }
         },
@@ -631,6 +511,39 @@ var doc = `{
                     "formatEN": "Application port update [key]-[name] =\u003e [port]",
                     "formatZH": "应用端口修改 [key]-[name] =\u003e [port]",
                     "paramKeys": []
+                }
+            }
+        },
+        "/apps/installed/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取已安装应用列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "App"
+                ],
+                "summary": "List app installed",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AppInstalledSearch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
                 }
             }
         },
@@ -4946,7 +4859,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.GroupOperate"
+                            "$ref": "#/definitions/dto.GroupCreate"
                         }
                     }
                 ],
@@ -5007,13 +4920,21 @@ var doc = `{
                             "isList": false,
                             "output_colume": "name",
                             "output_value": "name"
+                        },
+                        {
+                            "db": "groups",
+                            "input_colume": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_colume": "type",
+                            "output_value": "type"
                         }
                     ],
                     "bodyKeys": [
                         "id"
                     ],
-                    "formatEN": "delete group [name]",
-                    "formatZH": "删除组 [name]",
+                    "formatEN": "delete group [type][name]",
+                    "formatZH": "删除组 [type][name]",
                     "paramKeys": []
                 }
             }
@@ -5076,7 +4997,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.GroupOperate"
+                            "$ref": "#/definitions/dto.GroupUpdate"
                         }
                     }
                 ],
@@ -8549,12 +8470,12 @@ var doc = `{
         "dto.ChangeHostGroup": {
             "type": "object",
             "required": [
-                "group",
+                "groupID",
                 "id"
             ],
             "properties": {
-                "group": {
-                    "type": "string"
+                "groupID": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -9353,7 +9274,7 @@ var doc = `{
                 }
             }
         },
-        "dto.GroupOperate": {
+        "dto.GroupCreate": {
             "type": "object",
             "required": [
                 "name",
@@ -9378,6 +9299,20 @@ var doc = `{
             ],
             "properties": {
                 "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.GroupUpdate": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "isDefault": {
+                    "type": "boolean"
+                },
+                "name": {
                     "type": "string"
                 }
             }
@@ -9434,6 +9369,9 @@ var doc = `{
                 "groupBelong": {
                     "type": "string"
                 },
+                "groupID": {
+                    "type": "integer"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -9452,7 +9390,6 @@ var doc = `{
             "type": "object",
             "required": [
                 "addr",
-                "groupBelong",
                 "port",
                 "user"
             ],
@@ -9470,8 +9407,8 @@ var doc = `{
                 "description": {
                     "type": "string"
                 },
-                "groupBelong": {
-                    "type": "string"
+                "groupID": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -10270,8 +10207,8 @@ var doc = `{
                 "pageSize"
             ],
             "properties": {
-                "group": {
-                    "type": "string"
+                "groupID": {
+                    "type": "integer"
                 },
                 "info": {
                     "type": "string"
@@ -10744,12 +10681,6 @@ var doc = `{
                 "appId": {
                     "type": "integer"
                 },
-                "backups": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.AppInstallBackup"
-                    }
-                },
                 "containerName": {
                     "type": "string"
                 },
@@ -10793,35 +10724,6 @@ var doc = `{
                     "type": "string"
                 },
                 "version": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.AppInstallBackup": {
-            "type": "object",
-            "properties": {
-                "app_detail_id": {
-                    "type": "integer"
-                },
-                "app_install_id": {
-                    "type": "integer"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "param": {
-                    "type": "string"
-                },
-                "path": {
-                    "type": "string"
-                },
-                "updatedAt": {
                     "type": "string"
                 }
             }
@@ -11016,35 +10918,6 @@ var doc = `{
                     "items": {
                         "$ref": "#/definitions/model.Website"
                     }
-                }
-            }
-        },
-        "request.AppBackupDelete": {
-            "type": "object",
-            "properties": {
-                "ids": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
-                }
-            }
-        },
-        "request.AppBackupSearch": {
-            "type": "object",
-            "required": [
-                "page",
-                "pageSize"
-            ],
-            "properties": {
-                "appInstallID": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "pageSize": {
-                    "type": "integer"
                 }
             }
         },

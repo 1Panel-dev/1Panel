@@ -12,6 +12,7 @@ export namespace Host {
     }
     export interface Host extends CommonModel {
         name: string;
+        groupID: number;
         groupBelong: string;
         addr: string;
         port: number;
@@ -22,7 +23,7 @@ export namespace Host {
     export interface HostOperate {
         id: number;
         name: string;
-        groupBelong: string;
+        groupID: number;
         addr: string;
         port: number;
         user: string;
@@ -42,13 +43,13 @@ export namespace Host {
     }
     export interface GroupChange {
         id: number;
-        group: string;
+        groupID: number;
     }
     export interface ReqSearch {
         info?: string;
     }
     export interface SearchWithPage extends ReqPage {
-        group: string;
+        groupID: number;
         info?: string;
     }
 }
