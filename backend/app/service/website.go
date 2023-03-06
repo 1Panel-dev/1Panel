@@ -253,7 +253,7 @@ func (w WebsiteService) DeleteWebsite(ctx context.Context, req request.WebsiteDe
 			return err
 		}
 		if !reflect.DeepEqual(model.AppInstall{}, appInstall) {
-			if err := deleteAppInstall(ctx, appInstall, true, req.ForceDelete); err != nil && !req.ForceDelete {
+			if err := deleteAppInstall(ctx, appInstall, true, req.ForceDelete, true); err != nil && !req.ForceDelete {
 				return err
 			}
 		}

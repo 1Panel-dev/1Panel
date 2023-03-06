@@ -184,7 +184,7 @@ func (a AppInstallService) Operate(req request.AppInstalledOperate) error {
 		install.Status = constant.Running
 	case constant.Delete:
 		tx, ctx := getTxAndContext()
-		if err := deleteAppInstall(ctx, install, req.DeleteBackup, req.ForceDelete); err != nil && !req.ForceDelete {
+		if err := deleteAppInstall(ctx, install, req.DeleteBackup, req.ForceDelete, req.DeleteDB); err != nil && !req.ForceDelete {
 			tx.Rollback()
 			return err
 		}

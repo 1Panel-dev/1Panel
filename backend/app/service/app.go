@@ -33,7 +33,6 @@ type IAppService interface {
 	GetApp(key string) (*response.AppDTO, error)
 	GetAppDetail(appId uint, version string) (response.AppDetailDTO, error)
 	Install(ctx context.Context, req request.AppInstallCreate) (*model.AppInstall, error)
-	//SyncInstalled(installId uint) error
 	SyncAppList() error
 }
 

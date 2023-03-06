@@ -45,6 +45,7 @@ type AppInstalledOperate struct {
 	Operate      constant.AppOperate `json:"operate" validate:"required"`
 	ForceDelete  bool                `json:"forceDelete"`
 	DeleteBackup bool                `json:"deleteBackup"`
+	DeleteDB     bool                `json:"deleteDB"`
 }
 
 type PortUpdate struct {
