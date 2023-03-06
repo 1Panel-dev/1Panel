@@ -71,9 +71,10 @@ type FileMove struct {
 }
 
 type FileDownload struct {
-	Paths []string `json:"paths" validate:"required"`
-	Type  string   `json:"type" validate:"required"`
-	Name  string   `json:"name" validate:"required"`
+	Paths    []string `json:"paths" validate:"required"`
+	Type     string   `json:"type" validate:"required"`
+	Name     string   `json:"name" validate:"required"`
+	Compress bool     `json:"compress" validate:"required"`
 }
 
 type DirSizeReq struct {

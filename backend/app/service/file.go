@@ -38,8 +38,8 @@ func (f FileService) GetFileList(op request.FileOption) (response.FileInfo, erro
 
 func (f FileService) SearchUploadWithPage(req request.SearchUploadWithPage) (int64, interface{}, error) {
 	var (
-		files     []response.UploadInfo
-		backDatas []response.UploadInfo
+		files    []response.UploadInfo
+		backData []response.UploadInfo
 	)
 
 	_ = filepath.Walk(req.Path, func(path string, info os.FileInfo, err error) error {
@@ -57,14 +57,14 @@ func (f FileService) SearchUploadWithPage(req request.SearchUploadWithPage) (int
 	})
 	total, start, end := len(files), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
-		backDatas = make([]response.UploadInfo, 0)
+		backData = make([]response.UploadInfo, 0)
 	} else {
 		if end >= total {
 			end = total
 		}
-		backDatas = files[start:end]
+		backData = files[start:end]
 	}
-	return int64(total), backDatas, nil
+	return int64(total), backData, nil
 }
 
 func (f FileService) GetFileTree(op request.FileOption) ([]response.FileTree, error) {
@@ -216,15 +216,18 @@ func (f FileService) MvFile(m request.FileMove) error {
 }
 
 func (f FileService) FileDownload(d request.FileDownload) (string, error) {
-	tempPath := filepath.Join(os.TempDir(), fmt.Sprintf("%d", time.Now().UnixNano()))
-	if err := os.MkdirAll(tempPath, os.ModePerm); err != nil {
-		return "", err
+	filePath := d.Paths[0]
+	if d.Compress {
+		tempPath := filepath.Join(os.TempDir(), fmt.Sprintf("%d", time.Now().UnixNano()))
+		if err := os.MkdirAll(tempPath, os.ModePerm); err != nil {
+			return "", err
+		}
+		fo := files.NewFileOp()
+		if err := fo.Compress(d.Paths, tempPath, d.Name, files.CompressType(d.Type)); err != nil {
+			return "", err
+		}
+		filePath = filepath.Join(tempPath, d.Name)
 	}
-	fo := files.NewFileOp()
-	if err := fo.Compress(d.Paths, tempPath, d.Name, files.CompressType(d.Type)); err != nil {
-		return "", err
-	}
-	filePath := filepath.Join(tempPath, d.Name)
 	return filePath, nil
 }
 
