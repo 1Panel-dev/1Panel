@@ -2,7 +2,7 @@
     <el-dialog
         v-model="open"
         :title="$t('commons.button.delete') + ' - ' + appInstallName"
-        width="30%"
+        width="40%"
         :close-on-click-modal="false"
         :before-close="handleClose"
     >
@@ -17,6 +17,12 @@
                 <el-checkbox v-model="deleteReq.deleteBackup" :label="$t('app.deleteBackup')" />
                 <span class="input-help">
                     {{ $t('app.deleteBackupHelper') }}
+                </span>
+            </el-form-item>
+            <el-form-item v-if="appType === 'website'">
+                <el-checkbox v-model="deleteReq.deleteDB" :label="$t('app.deleteDB')" />
+                <span class="input-help">
+                    {{ $t('app.deleteDBHelper') }}
                 </span>
             </el-form-item>
             <el-form-item>
@@ -50,12 +56,14 @@ let deleteReq = ref({
     installId: 0,
     deleteBackup: false,
     forceDelete: false,
+    deleteDB: true,
 });
 let open = ref(false);
 let loading = ref(false);
 let deleteHelper = ref('');
 let deleteInfo = ref('');
 let appInstallName = ref('');
+let appType = ref('');
 
 const deleteForm = ref<FormInstance>();
 const em = defineEmits(['close']);
@@ -71,9 +79,11 @@ const acceptParams = async (app: App.AppInstalled) => {
         installId: 0,
         deleteBackup: false,
         forceDelete: false,
+        deleteDB: true,
     };
     deleteInfo.value = '';
     deleteReq.value.installId = app.id;
+    appType.value = app.app.type;
     deleteHelper.value = i18n.global.t('website.deleteConfirmHelper', [app.name]);
     appInstallName.value = app.name;
     open.value = true;

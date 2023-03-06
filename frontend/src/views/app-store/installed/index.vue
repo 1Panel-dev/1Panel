@@ -348,7 +348,7 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('app.detail'),
+        label: i18n.global.t('app.params'),
         click: (row: any) => {
             openParam(row.id);
         },

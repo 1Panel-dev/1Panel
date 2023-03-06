@@ -57,6 +57,7 @@ var (
 	ErrFileToLarge    = "ErrFileToLarge"
 	ErrNotInstall     = "ErrNotInstall"
 	ErrPortInOtherApp = "ErrPortInOtherApp"
+	ErrDbUserNotValid = "ErrDbUserNotValid"
 )
 
 //website

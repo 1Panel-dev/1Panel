@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"math"
 	"os"
 	"path"
@@ -88,18 +89,29 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 		if err != nil {
 			return err
 		}
-		var createMysql dto.MysqlDBCreate
-		createMysql.Name = dbConfig.DbName
-		createMysql.Username = dbConfig.DbUser
-		createMysql.Format = "utf8mb4"
-		createMysql.Permission = "%"
-		createMysql.Password = dbConfig.Password
-		mysqldb, err := NewIMysqlService().Create(ctx, createMysql)
-		if err != nil {
-			return err
+		iMysqlRepo := repo.NewIMysqlRepo()
+		oldMysqlDb, _ := iMysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName))
+		resourceId := oldMysqlDb.ID
+		if oldMysqlDb.ID > 0 {
+			if oldMysqlDb.Username != dbConfig.DbUser || oldMysqlDb.Password != dbConfig.Password {
+				return buserr.New(constant.ErrDbUserNotValid)
+			}
+		} else {
+			var createMysql dto.MysqlDBCreate
+			createMysql.Name = dbConfig.DbName
+			createMysql.Username = dbConfig.DbUser
+			createMysql.Format = "utf8mb4"
+			createMysql.Permission = "%"
+			createMysql.Password = dbConfig.Password
+			mysqldb, err := NewIMysqlService().Create(ctx, createMysql)
+			if err != nil {
+				return err
+			}
+			resourceId = mysqldb.ID
 		}
+
 		var installResource model.AppInstallResource
-		installResource.ResourceId = mysqldb.ID
+		installResource.ResourceId = resourceId
 		installResource.AppInstallId = appInstall.ID
 		installResource.LinkId = dbInstall.ID
 		installResource.Key = dbInstall.App.Key
@@ -110,7 +122,7 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 	return nil
 }
 
-func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBackup bool, forceDelete bool) error {
+func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBackup bool, forceDelete bool, deleteDB bool) error {
 	op := files.NewFileOp()
 	appDir := install.GetPath()
 	dir, _ := os.Stat(appDir)
@@ -126,7 +138,7 @@ func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBacku
 	if err := appInstallRepo.Delete(ctx, install); err != nil && !forceDelete {
 		return err
 	}
-	if err := deleteLink(ctx, &install); err != nil && !forceDelete {
+	if err := deleteLink(ctx, &install, deleteDB); err != nil && !forceDelete {
 		return err
 	}
 	uploadDir := fmt.Sprintf("%s/1panel/uploads/app/%s/%s", global.CONF.System.BaseDir, install.App.Key, install.Name)
@@ -149,14 +161,14 @@ func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBacku
 	return nil
 }
 
-func deleteLink(ctx context.Context, install *model.AppInstall) error {
+func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool) error {
 	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
 	if len(resources) == 0 {
 		return nil
 	}
 	for _, re := range resources {
 		mysqlService := NewIMysqlService()
-		if re.Key == "mysql" {
+		if re.Key == "mysql" && deleteDB {
 			database, _ := mysqlRepo.Get(commonRepo.WithByID(re.ResourceId))
 			if reflect.DeepEqual(database, model.DatabaseMysql{}) {
 				continue

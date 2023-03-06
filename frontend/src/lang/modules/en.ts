@@ -863,6 +863,7 @@ export default {
         all: 'All',
         version: 'Version',
         detail: 'Details',
+        params: 'Param',
         install: 'Install',
         author: 'Author',
         source: 'Source',
@@ -905,7 +906,9 @@ export default {
         forceDeleteHelper:
             'Forced deletion will ignore errors generated during the deletion process and eventually delete metadata',
         deleteBackup: 'Delete backup',
-        deleteBackupHelper: 'Delete application backup at the same time',
+        deleteBackupHelper: 'Also delete the application backup',
+        deleteDB: 'Delete Database',
+        deleteDBHelper: 'Also delete the database',
         noService: 'No {0}',
         toInstall: 'to install',
         param: 'parameter configuration',
