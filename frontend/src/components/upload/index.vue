@@ -31,7 +31,12 @@
                 </el-button>
 
                 <el-divider />
-                <ComplexTable :pagination-config="paginationConfig" v-model:selects="selects" :data="data">
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    @search="search"
+                    v-model:selects="selects"
+                    :data="data"
+                >
                     <template #toolbar>
                         <el-button
                             style="margin-left: 10px"
@@ -164,9 +169,11 @@ const beforeAvatarUpload = (rawFile) => {
         return true;
     }
     if (
-        !rawFile.name.endsWith('.sql') ||
-        !rawFile.name.endsWith('.gz') ||
-        !rawFile.name.endsWith('.zip') ||
+        !rawFile.name.endsWith('.sql') &&
+        !rawFile.name.endsWith('.zip') &&
+        !rawFile.name.endsWith('.tar.gz') &&
+        !rawFile.name.endsWith('.sql.gz') &&
+        !rawFile.name.endsWith('.zip') &&
         !rawFile.name.endsWith('.tgz')
     ) {
         MsgError(i18n.global.t('database.unSupportType'));
