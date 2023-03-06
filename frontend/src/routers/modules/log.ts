@@ -24,6 +24,7 @@ const logsRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/logs',
+                        requiresAuth: false,
                     },
                 },
                 {
@@ -33,6 +34,7 @@ const logsRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/logs',
+                        requiresAuth: false,
                     },
                 },
                 {
@@ -42,6 +44,7 @@ const logsRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/logs',
+                        requiresAuth: false,
                     },
                 },
             ],

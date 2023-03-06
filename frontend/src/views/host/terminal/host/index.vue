@@ -43,17 +43,16 @@
                     @search="search"
                 >
                     <el-table-column type="selection" :selectable="selectable" fix />
-                    <el-table-column :label="$t('commons.table.name')" prop="name" fix>
+                    <el-table-column :label="$t('terminal.ip')" prop="addr" fix />
+                    <el-table-column :label="$t('terminal.user')" show-overflow-tooltip prop="user" />
+                    <el-table-column :label="$t('terminal.port')" prop="port" />
+                    <el-table-column :label="$t('commons.table.group')" show-overflow-tooltip prop="groupBelong" />
+                    <el-table-column :label="$t('commons.table.title')" show-overflow-tooltip prop="name">
                         <template #default="{ row }">
                             <span v-if="row.addr === '127.0.0.1'">{{ $t('terminal.localhost') }}</span>
                             <span v-else>{{ row.name }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.group')" show-overflow-tooltip prop="groupBelong" />
-                    <el-table-column :label="$t('terminal.ip')">
-                        <template #default="{ row }">{{ row.addr }}:{{ row.port }}</template>
-                    </el-table-column>
-                    <el-table-column :label="$t('terminal.user')" show-overflow-tooltip prop="user" />
                     <el-table-column
                         :label="$t('commons.table.description')"
                         show-overflow-tooltip

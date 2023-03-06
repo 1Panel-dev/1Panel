@@ -25,6 +25,7 @@ const appStoreRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/apps',
+                        requiresAuth: false,
                     },
                 },
                 {
@@ -35,6 +36,7 @@ const appStoreRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/apps',
+                        requiresAuth: false,
                     },
                 },
                 {
@@ -45,6 +47,7 @@ const appStoreRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/apps',
+                        requiresAuth: false,
                     },
                 },
                 {
@@ -55,6 +58,7 @@ const appStoreRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/apps',
+                        requiresAuth: false,
                     },
                 },
             ],

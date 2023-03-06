@@ -16,6 +16,7 @@ const webSiteRouter = {
             component: () => import('@/views/website/website/index.vue'),
             meta: {
                 title: 'menu.website',
+                requiresAuth: false,
             },
         },
         {
@@ -26,6 +27,7 @@ const webSiteRouter = {
             props: true,
             meta: {
                 activeMenu: '/websites',
+                requiresAuth: false,
             },
         },
         {
@@ -34,6 +36,7 @@ const webSiteRouter = {
             component: () => import('@/views/website/ssl/index.vue'),
             meta: {
                 title: 'menu.ssl',
+                requiresAuth: false,
             },
         },
     ],

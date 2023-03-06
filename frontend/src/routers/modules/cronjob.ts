@@ -14,7 +14,9 @@ const cronRouter = {
             path: '/cronjobs',
             name: 'Cronjob',
             component: () => import('@/views/cronjob/index.vue'),
-            meta: {},
+            meta: {
+                requiresAuth: false,
+            },
         },
     ],
 };

@@ -24,6 +24,7 @@ const databaseRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/databases',
+                        requiresAuth: false,
                     },
                 },
                 {
@@ -33,6 +34,7 @@ const databaseRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/databases',
+                        requiresAuth: false,
                     },
                 },
             ],

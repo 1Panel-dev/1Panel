@@ -4,7 +4,7 @@
             :buttons="[
                 {
                     label: i18n.global.t('menu.home'),
-                    path: '/home',
+                    path: '/',
                 },
             ]"
         />

@@ -25,6 +25,7 @@ const containerRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/containers',
+                        requiresAuth: false,
                     },
                 },
                 {
@@ -35,6 +36,7 @@ const containerRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/containers',
+                        requiresAuth: false,
                     },
                 },
                 {
@@ -44,6 +46,7 @@ const containerRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/containers',
+                        requiresAuth: false,
                     },
                 },
                 {
@@ -53,6 +56,7 @@ const containerRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/containers',
+                        requiresAuth: false,
                     },
                 },
                 {
@@ -62,6 +66,7 @@ const containerRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/containers',
+                        requiresAuth: false,
                     },
                 },
                 {
@@ -71,6 +76,7 @@ const containerRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/containers',
+                        requiresAuth: false,
                     },
                 },
                 {
@@ -80,6 +86,7 @@ const containerRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/containers',
+                        requiresAuth: false,
                     },
                 },
                 {
@@ -89,6 +96,7 @@ const containerRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/containers',
+                        requiresAuth: false,
                     },
                 },
                 {
@@ -98,6 +106,7 @@ const containerRouter = {
                     hidden: true,
                     meta: {
                         activeMenu: '/containers',
+                        requiresAuth: false,
                     },
                 },
             ],

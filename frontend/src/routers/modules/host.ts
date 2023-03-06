@@ -17,6 +17,7 @@ const hostRouter = {
             component: () => import('@/views/host/file-management/index.vue'),
             meta: {
                 title: 'menu.files',
+                requiresAuth: false,
             },
         },
         {
@@ -25,6 +26,7 @@ const hostRouter = {
             component: () => import('@/views/host/monitor/index.vue'),
             meta: {
                 title: 'menu.monitor',
+                requiresAuth: false,
             },
         },
         {
@@ -34,6 +36,7 @@ const hostRouter = {
             meta: {
                 title: 'menu.terminal',
                 keepAlive: true,
+                requiresAuth: false,
             },
         },
     ],

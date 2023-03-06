@@ -4,9 +4,9 @@ import { Layout } from '@/routers/constant';
 const modules = import.meta.globEager('./modules/*.ts');
 
 const homeRouter: RouteRecordRaw = {
-    path: '/home',
+    path: '/',
     component: Layout,
-    redirect: '/home',
+    redirect: '/',
     meta: {
         keepAlive: true,
         title: 'menu.home',
@@ -14,9 +14,12 @@ const homeRouter: RouteRecordRaw = {
     },
     children: [
         {
-            path: '/home',
+            path: '/',
             name: 'home',
             component: () => import('@/views/home/index.vue'),
+            meta: {
+                requiresAuth: true,
+            },
         },
     ],
 };
@@ -55,7 +58,7 @@ menuList.unshift(homeRouter);
 export const routes: RouteRecordRaw[] = [
     homeRouter,
     {
-        path: '/',
+        path: '/login',
         name: 'login',
         props: true,
         component: () => import('@/views/login/index.vue'),

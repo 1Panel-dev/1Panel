@@ -11,7 +11,7 @@ export const checkStatus = (status: number, msg: string): void => {
             MsgError(msg ? msg : i18n.global.t('commons.res.notFound'));
             break;
         case 403:
-            router.replace({ path: '/' });
+            router.replace({ path: '/login' });
             MsgError(msg ? msg : i18n.global.t('commons.res.forbidden'));
             break;
         case 500:
