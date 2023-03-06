@@ -146,7 +146,7 @@
 
 <script setup lang="ts">
 import { nextTick, onMounted, reactive, ref } from '@vue/runtime-core';
-import { GetFilesList, DeleteFile, GetFileContent, ComputeDirSize } from '@/api/modules/files';
+import { GetFilesList, DeleteFile, GetFileContent, ComputeDirSize, DownloadFile } from '@/api/modules/files';
 import { computeSize, dateFormat, getIcon, getRandomStr } from '@/utils/util';
 import { File } from '@/api/interface/file';
 import { useDeleteData } from '@/hooks/use-delete-data';
@@ -435,8 +435,25 @@ const openDownload = () => {
         paths.push(s['path']);
     }
     fileDownload.paths = paths;
-    fileDownload.name = getRandomStr(6);
-    downloadRef.value.acceptParams(fileDownload);
+    if (selects.value.length > 1 || selects.value[0].isDir) {
+        fileDownload.name = selects.value.length > 1 ? getRandomStr(6) : selects.value[0].name;
+        downloadRef.value.acceptParams(fileDownload);
+    } else {
+        fileDownload.name = selects.value[0].name;
+        DownloadFile(fileDownload as File.FileDownload)
+            .then((res) => {
+                const downloadUrl = window.URL.createObjectURL(new Blob([res], { type: 'application/octet-stream' }));
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = downloadUrl;
+                a.download = fileDownload.name;
+                const event = new MouseEvent('click');
+                a.dispatchEvent(event);
+            })
+            .finally(() => {
+                loading.value = false;
+            });
+    }
 };
 
 // const openDetail = (row: File.File) => {

@@ -24,6 +24,7 @@ ErrAppRequired: "{{ .detail }} app is required"
 ErrNotInstall: "App not installed"
 ErrPortInOtherApp: "{{ .port }} port  already in use by  {{ .apps }}"
 ErrDbUserNotValid: "Stock database, username and password do not match！"
+ErrDockerComposeNotValid: "docker-compose file format error!"
 
 #file
 ErrFileCanNotRead: "File can not read"

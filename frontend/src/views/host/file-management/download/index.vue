@@ -72,24 +72,12 @@ let addForm = ref({
     paths: [] as string[],
     type: '',
     name: '',
+    compress: true,
 });
 
 const extension = computed(() => {
     return CompressExtention[addForm.value.type];
 });
-
-// const onOpen = () => {
-//     addForm.value = {
-//         type: 'zip',
-//         paths: props.paths,
-//         name: props.name,
-//     };
-//     console.log(addForm);
-//     options.value = [];
-//     for (const t in CompressType) {
-//         options.value.push(CompressType[t]);
-//     }
-// };
 
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
@@ -121,6 +109,7 @@ const acceptParams = (props: DownloadProps) => {
     addForm.value.paths = props.paths;
     addForm.value.name = props.name;
     addForm.value.type = 'zip';
+    addForm.value.compress = true;
     options.value = [];
     for (const t in CompressType) {
         options.value.push(CompressType[t]);
