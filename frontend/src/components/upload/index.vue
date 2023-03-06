@@ -5,14 +5,7 @@
                 <DrawerHeader :header="$t('commons.button.import')" :resource="title" :back="handleClose" />
             </template>
             <div v-loading="loading">
-                <el-upload
-                    ref="uploadRef"
-                    drag
-                    :on-change="fileOnChange"
-                    :before-upload="beforeAvatarUpload"
-                    class="upload-demo"
-                    :auto-upload="false"
-                >
+                <el-upload ref="uploadRef" drag :on-change="fileOnChange" class="upload-demo" :auto-upload="false">
                     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                     <div class="el-upload__text">
                         {{ $t('database.dropHelper') }}
@@ -81,7 +74,7 @@ import { computeSize } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { handleRecoverByUpload } from '@/api/modules/setting';
 import i18n from '@/lang';
-import { UploadFile, UploadFiles, UploadInstance, UploadProps } from 'element-plus';
+import { UploadFile, UploadFiles, UploadInstance } from 'element-plus';
 import { File } from '@/api/interface/file';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { BatchDeleteFile, GetUploadList, UploadFileData } from '@/api/modules/files';
@@ -159,9 +152,9 @@ const onRecover = async (row: File.File) => {
 const uploaderFiles = ref<UploadFiles>([]);
 const uploadRef = ref<UploadInstance>();
 
-const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+const beforeAvatarUpload = (rawFile) => {
     if (type.value === 'app' || type.value === 'website') {
-        if (rawFile.name.endsWith('.tar.gz')) {
+        if (!rawFile.name.endsWith('.tar.gz')) {
             MsgError(i18n.global.t('database.unSupportType'));
             return false;
         } else if (rawFile.size / 1024 / 1024 > 50) {
@@ -171,10 +164,10 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
         return true;
     }
     if (
-        rawFile.name.endsWith('.sql') ||
-        rawFile.name.endsWith('.gz') ||
-        rawFile.name.endsWith('.zip') ||
-        rawFile.name.endsWith('.tgz')
+        !rawFile.name.endsWith('.sql') ||
+        !rawFile.name.endsWith('.gz') ||
+        !rawFile.name.endsWith('.zip') ||
+        !rawFile.name.endsWith('.tgz')
     ) {
         MsgError(i18n.global.t('database.unSupportType'));
         return false;
@@ -202,6 +195,10 @@ const onSubmit = () => {
     }
     if (uploaderFiles.value[0]!.raw != undefined) {
         formData.append('file', uploaderFiles.value[0]!.raw);
+    }
+    let isOk = beforeAvatarUpload(uploaderFiles.value[0]!.raw);
+    if (!isOk) {
+        return;
     }
     formData.append('path', baseDir.value);
     loading.value = true;
