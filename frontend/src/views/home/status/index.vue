@@ -2,28 +2,42 @@
     <el-row :gutter="10">
         <el-col :span="6" align="center">
             <el-popover placement="bottom" :width="300" trigger="hover">
-                <div style="margin-bottom: 10px">
-                    <el-tag>{{ baseInfo.cpuModelName }}</el-tag>
+                <div>
+                    <el-tooltip
+                        effect="dark"
+                        :content="baseInfo.cpuModelName"
+                        v-if="baseInfo.cpuModelName.length > 40"
+                        placement="top"
+                    >
+                        <el-tag>
+                            {{ baseInfo.cpuModelName.substring(0, 40) + '...' }}
+                        </el-tag>
+                    </el-tooltip>
+                    <el-tag v-else>
+                        {{ baseInfo.cpuModelName }}
+                    </el-tag>
                 </div>
-                <el-tag>
-                    {{ $t('home.core') }} *{{ baseInfo.cpuCores }}； {{ $t('home.logicCore') }} *{{
+                <el-tag class="tagClass">
+                    {{ $t('home.core') }} *{{ baseInfo.cpuCores }} {{ $t('home.logicCore') }} *{{
                         baseInfo.cpuLogicalCores
                     }}
                 </el-tag>
                 <br />
-                <el-tag style="margin-top: 5px" v-for="(item, index) of currentInfo.cpuPercent" :key="index">
-                    CPU-{{ index }}: {{ formatNumber(item) }}%
-                </el-tag>
+                <el-row :gutter="5">
+                    <el-col :span="12" v-for="(item, index) of currentInfo.cpuPercent" :key="index">
+                        <el-tag class="tagClass">CPU-{{ index }}: {{ formatNumber(item) }}%</el-tag>
+                    </el-col>
+                </el-row>
                 <template #reference>
-                    <div id="cpu" style="width: 100%; height: 160px"></div>
+                    <div id="cpu" class="chartClass"></div>
                 </template>
             </el-popover>
-            <span class="input-help" style="margin-top: -10px">
+            <span class="input-help">
                 ( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} ) Core
             </span>
         </el-col>
         <el-col :span="6" align="center">
-            <div id="memory" style="width: 100%; height: 160px"></div>
+            <div id="memory" class="chartClass"></div>
             <span class="input-help">
                 ( {{ formatNumber(currentInfo.memoryUsed / 1024 / 1024) }} /
                 {{ formatNumber(currentInfo.memoryTotal / 1024 / 1024) }} ) MB
@@ -31,17 +45,17 @@
         </el-col>
         <el-col :span="6" align="center">
             <el-popover placement="bottom" :width="200" trigger="hover">
-                <el-tag style="margin-top: 5px">
+                <el-tag class="tagClass">
                     {{ $t('home.loadAverage', [1]) }}: {{ formatNumber(currentInfo.load1) }}
                 </el-tag>
-                <el-tag style="margin-top: 5px">
+                <el-tag class="tagClass">
                     {{ $t('home.loadAverage', [5]) }}: {{ formatNumber(currentInfo.load5) }}
                 </el-tag>
-                <el-tag style="margin-top: 5px">
+                <el-tag class="tagClass">
                     {{ $t('home.loadAverage', [15]) }}: {{ formatNumber(currentInfo.load15) }}
                 </el-tag>
                 <template #reference>
-                    <div id="load" style="width: 100%; height: 160px"></div>
+                    <div id="load" class="chartClass"></div>
                 </template>
             </el-popover>
             <span class="input-help">{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
@@ -51,35 +65,35 @@
                 <el-row :gutter="5">
                     <el-col :span="12">
                         <el-tag>{{ $t('home.mount') }}: /</el-tag>
-                        <div><el-tag style="margin-top: 10px">iNode</el-tag></div>
-                        <el-tag style="margin-top: 5px">{{ $t('home.total') }}: {{ currentInfo.inodesTotal }}</el-tag>
-                        <el-tag style="margin-top: 3px">{{ $t('home.used') }}: {{ currentInfo.inodesUsed }}</el-tag>
-                        <el-tag style="margin-top: 3px">{{ $t('home.free') }}: {{ currentInfo.inodesFree }}</el-tag>
-                        <el-tag style="margin-top: 3px">
+                        <div><el-tag class="tagClass">iNode</el-tag></div>
+                        <el-tag class="tagClass">{{ $t('home.total') }}: {{ currentInfo.inodesTotal }}</el-tag>
+                        <el-tag class="tagClass">{{ $t('home.used') }}: {{ currentInfo.inodesUsed }}</el-tag>
+                        <el-tag class="tagClass">{{ $t('home.free') }}: {{ currentInfo.inodesFree }}</el-tag>
+                        <el-tag class="tagClass">
                             {{ $t('home.percent') }}: {{ formatNumber(currentInfo.inodesUsedPercent) }}%
                         </el-tag>
                     </el-col>
 
                     <el-col :span="12">
                         <div>
-                            <el-tag style="margin-top: 35px">{{ $t('monitor.disk') }}</el-tag>
+                            <el-tag style="margin-top: 27px">{{ $t('monitor.disk') }}</el-tag>
                         </div>
-                        <el-tag style="margin-top: 5px">
+                        <el-tag class="tagClass">
                             {{ $t('home.total') }}: {{ formatNumber(currentInfo.total / 1024 / 1024 / 1024) }} GB
                         </el-tag>
-                        <el-tag style="margin-top: 3px">
+                        <el-tag class="tagClass">
                             {{ $t('home.used') }}: {{ formatNumber(currentInfo.used / 1024 / 1024 / 1024) }} GB
                         </el-tag>
-                        <el-tag style="margin-top: 3px">
+                        <el-tag class="tagClass">
                             {{ $t('home.free') }}: {{ formatNumber(currentInfo.free / 1024 / 1024 / 1024) }} GB
                         </el-tag>
-                        <el-tag style="margin-top: 3px">
+                        <el-tag class="tagClass">
                             {{ $t('home.percent') }}: {{ formatNumber(currentInfo.usedPercent) }}%
                         </el-tag>
                     </el-col>
                 </el-row>
                 <template #reference>
-                    <div id="disk" style="width: 100%; height: 160px"></div>
+                    <div id="disk" class="chartClass"></div>
                 </template>
             </el-popover>
             <span class="input-help">
@@ -318,3 +332,13 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style scoped lang="scss">
+.tagClass {
+    margin-top: 3px;
+}
+.chartClass {
+    width: 100%;
+    height: 160px;
+}
+</style>
