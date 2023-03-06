@@ -39,18 +39,13 @@
                         <el-form-item :label="$t('terminal.port')" prop="port">
                             <el-input clearable v-model.number="dialogData.rowData!.port" />
                         </el-form-item>
-                        <el-form-item :label="$t('commons.table.group')" prop="groupBelong">
-                            <el-select
-                                filterable
-                                v-model="dialogData.rowData!.groupBelong"
-                                clearable
-                                style="width: 100%"
-                            >
+                        <el-form-item :label="$t('commons.table.group')" prop="groupID">
+                            <el-select filterable v-model="dialogData.rowData!.groupID" clearable style="width: 100%">
                                 <el-option
                                     v-for="item in groupList"
                                     :key="item.id"
                                     :label="item.name"
-                                    :value="item.name"
+                                    :value="item.id"
                                 />
                             </el-select>
                         </el-form-item>
@@ -82,7 +77,7 @@
 import { ref, reactive } from 'vue';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
-import { addHost, editHost, testByInfo, getGroupList } from '@/api/modules/host';
+import { addHost, editHost, testByInfo, GetGroupList } from '@/api/modules/host';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 
@@ -113,7 +108,7 @@ const handleClose = () => {
 type FormInstance = InstanceType<typeof ElForm>;
 const hostInfoRef = ref<FormInstance>();
 const rules = reactive({
-    groupBelong: [Rules.requiredSelect],
+    groupID: [Rules.requiredSelect],
     addr: [Rules.requiredInput],
     port: [Rules.requiredInput, Rules.port],
     user: [Rules.requiredInput],
@@ -123,7 +118,7 @@ const rules = reactive({
 });
 
 const loadGroups = async () => {
-    const res = await getGroupList({ type: 'host' });
+    const res = await GetGroupList({ type: 'host' });
     groupList.value = res.data;
 };
 

@@ -33,16 +33,16 @@ export const deleteHost = (params: { ids: number[] }) => {
 };
 
 // group
-export const getGroupList = (params: Group.GroupSearch) => {
+export const GetGroupList = (params: Group.GroupSearch) => {
     return http.post<Array<Group.GroupInfo>>(`/hosts/group/search`, params);
 };
-export const addGroup = (params: Group.GroupOperate) => {
-    return http.post<Group.GroupOperate>(`/hosts/group`, params);
+export const CreateGroup = (params: Group.GroupCreate) => {
+    return http.post<Group.GroupCreate>(`/hosts/group`, params);
 };
-export const editGroup = (params: Group.GroupOperate) => {
+export const UpdateGroup = (params: Group.GroupUpdate) => {
     return http.post(`/hosts/group/update`, params);
 };
-export const deleteGroup = (id: number) => {
+export const DeleteGroup = (id: number) => {
     return http.post(`/hosts/group/del`, { id: id });
 };
 

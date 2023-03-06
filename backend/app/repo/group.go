@@ -11,10 +11,11 @@ type GroupRepo struct{}
 type IGroupRepo interface {
 	Get(opts ...DBOption) (model.Group, error)
 	GetList(opts ...DBOption) ([]model.Group, error)
-	WithByType(groupType string) DBOption
 	Create(group *model.Group) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
+	CancelDefault() error
+	WithByIsDefault(isDefault bool) DBOption
 }
 
 func NewIGroupRepo() IGroupRepo {
@@ -41,12 +42,6 @@ func (u *GroupRepo) GetList(opts ...DBOption) ([]model.Group, error) {
 	return groups, err
 }
 
-func (c *GroupRepo) WithByType(groupType string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("type = ?", groupType)
-	}
-}
-
 func (u *GroupRepo) Create(group *model.Group) error {
 	return global.DB.Create(group).Error
 }
@@ -55,10 +50,20 @@ func (u *GroupRepo) Update(id uint, vars map[string]interface{}) error {
 	return global.DB.Model(&model.Group{}).Where("id = ?", id).Updates(vars).Error
 }
 
+func (u *GroupRepo) WithByIsDefault(isDefault bool) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("is_default = ?", isDefault)
+	}
+}
+
 func (u *GroupRepo) Delete(opts ...DBOption) error {
 	db := global.DB
 	for _, opt := range opts {
 		db = opt(db)
 	}
 	return db.Delete(&model.Group{}).Error
+}
+
+func (w GroupRepo) CancelDefault() error {
+	return global.DB.Model(&model.Group{}).Where("`is_default` = 1").Updates(map[string]interface{}{"is_default": 0}).Error
 }

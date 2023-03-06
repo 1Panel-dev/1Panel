@@ -108,7 +108,6 @@ const onBackup = async () => {
     loading.value = true;
     await handleBackup(params)
         .then(() => {
-            console.log(loading.value);
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             search();

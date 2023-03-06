@@ -173,13 +173,17 @@ const acceptParams = async () => {
     timer = setInterval(() => {
         syncTerminal();
     }, 1000 * 5);
-    for (const item of hostTree.value) {
-        if (!item.children) {
+    for (let gIndex = 0; gIndex < hostTree.value.length; gIndex++) {
+        if (!hostTree.value[gIndex].children) {
             continue;
         }
-        for (const host of item.children) {
-            if (host.label.indexOf('127.0.0.1') !== -1) {
-                localHostID.value = host.id;
+        for (let i = 0; i < hostTree.value[gIndex].children.length; i++) {
+            if (hostTree.value[gIndex].children[i].label.indexOf('@127.0.0.1:') !== -1) {
+                localHostID.value = hostTree.value[gIndex].children[i].id;
+                hostTree.value[gIndex].children.splice(i, 1);
+                if (hostTree.value[gIndex].children.length === 0) {
+                    hostTree.value.splice(gIndex, 1);
+                }
                 if (terminalTabs.value.length !== 0) {
                     return;
                 }

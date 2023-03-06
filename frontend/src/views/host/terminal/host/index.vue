@@ -32,7 +32,7 @@
             <template #search>
                 <el-select v-model="group" @change="search()" clearable>
                     <template #prefix>{{ $t('terminal.group') }}</template>
-                    <el-option v-for="item in groupList" :key="item.name" :value="item.name" :label="item.name" />
+                    <el-option v-for="item in groupList" :key="item.name" :value="item.id" :label="item.name" />
                 </el-select>
             </template>
             <template #main>
@@ -71,11 +71,11 @@
 
 <script setup lang="ts">
 import LayoutContent from '@/layout/layout-content.vue';
-import GroupDialog from '@/views/host/terminal/host/group/index.vue';
+import GroupDialog from '@/components/group/index.vue';
 import GroupChangeDialog from '@/views/host/terminal/host/change-group/index.vue';
 import OperateDialog from '@/views/host/terminal/host/operate/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
-import { deleteHost, getGroupList, searchHosts } from '@/api/modules/host';
+import { deleteHost, GetGroupList, searchHosts } from '@/api/modules/host';
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { Host } from '@/api/interface/host';
@@ -105,7 +105,6 @@ const dialogRef = ref();
 const onOpenDialog = async (
     title: string,
     rowData: Partial<Host.Host> = {
-        groupBelong: 'default',
         port: 22,
         user: 'root',
         authMode: 'password',
@@ -120,7 +119,7 @@ const onOpenDialog = async (
 
 const dialogGroupRef = ref();
 const onOpenGroupDialog = () => {
-    dialogGroupRef.value!.acceptParams();
+    dialogGroupRef.value!.acceptParams({ type: 'host' });
 };
 
 const onBatchDelete = async (row: Host.Host | null) => {
@@ -137,7 +136,7 @@ const onBatchDelete = async (row: Host.Host | null) => {
 };
 
 const loadGroups = async () => {
-    const res = await getGroupList({ type: 'host' });
+    const res = await GetGroupList({ type: 'host' });
     groupList.value = res.data;
 };
 
@@ -172,7 +171,7 @@ const search = async () => {
     let params = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
-        group: group.value,
+        groupID: Number(group.value),
         info: info.value,
     };
     loadGroups();

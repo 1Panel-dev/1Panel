@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -11,8 +12,8 @@ type GroupService struct{}
 
 type IGroupService interface {
 	List(req dto.GroupSearch) ([]dto.GroupInfo, error)
-	Create(groupDto dto.GroupOperate) error
-	Update(id uint, name string) error
+	Create(req dto.GroupCreate) error
+	Update(req dto.GroupUpdate) error
 	Delete(id uint) error
 }
 
@@ -21,7 +22,7 @@ func NewIGroupService() IGroupService {
 }
 
 func (u *GroupService) List(req dto.GroupSearch) ([]dto.GroupInfo, error) {
-	groups, err := groupRepo.GetList(groupRepo.WithByType(req.Type))
+	groups, err := groupRepo.GetList(commonRepo.WithByType(req.Type))
 	if err != nil {
 		return nil, constant.ErrRecordNotFound
 	}
@@ -36,12 +37,12 @@ func (u *GroupService) List(req dto.GroupSearch) ([]dto.GroupInfo, error) {
 	return dtoUsers, err
 }
 
-func (u *GroupService) Create(groupDto dto.GroupOperate) error {
-	group, _ := groupRepo.Get(commonRepo.WithByName(groupDto.Name), commonRepo.WithByName(groupDto.Name))
+func (u *GroupService) Create(req dto.GroupCreate) error {
+	group, _ := groupRepo.Get(commonRepo.WithByName(req.Name), commonRepo.WithByName(req.Name))
 	if group.ID != 0 {
 		return constant.ErrRecordExist
 	}
-	if err := copier.Copy(&group, &groupDto); err != nil {
+	if err := copier.Copy(&group, &req); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 	if err := groupRepo.Create(&group); err != nil {
@@ -55,22 +56,30 @@ func (u *GroupService) Delete(id uint) error {
 	if group.ID == 0 {
 		return constant.ErrRecordNotFound
 	}
-	if err := hostRepo.ChangeGroup(group.Name, "default"); err != nil {
-		return err
+	switch group.Type {
+	case "website":
+		websites, _ := websiteRepo.GetBy(commonRepo.WithByGroupID(id))
+		if len(websites) > 0 {
+			return buserr.New(constant.ErrGroupIsUsed)
+		}
+	case "host":
+		hosts, _ := hostRepo.GetList(commonRepo.WithByGroupID(id))
+		if len(hosts) > 0 {
+			return buserr.New(constant.ErrGroupIsUsed)
+		}
 	}
 	return groupRepo.Delete(commonRepo.WithByID(id))
 }
 
-func (u *GroupService) Update(id uint, name string) error {
-	group, _ := groupRepo.Get(commonRepo.WithByID(id))
-	if group.ID == 0 {
-		return constant.ErrRecordNotFound
+func (u *GroupService) Update(req dto.GroupUpdate) error {
+	if req.IsDefault {
+		if err := groupRepo.CancelDefault(); err != nil {
+			return err
+		}
 	}
-
 	upMap := make(map[string]interface{})
-	upMap["name"] = name
-	if err := hostRepo.ChangeGroup(group.Name, name); err != nil {
-		return err
-	}
-	return groupRepo.Update(id, upMap)
+	upMap["name"] = req.Name
+	upMap["is_default"] = req.IsDefault
+
+	return groupRepo.Update(req.ID, upMap)
 }

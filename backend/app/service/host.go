@@ -65,7 +65,7 @@ func (u *HostService) GetHostInfo(id uint) (*model.Host, error) {
 }
 
 func (u *HostService) SearchWithPage(search dto.SearchHostWithPage) (int64, interface{}, error) {
-	total, hosts, err := hostRepo.Page(search.Page, search.PageSize, hostRepo.WithByInfo(search.Info), hostRepo.WithByGroup(search.Group))
+	total, hosts, err := hostRepo.Page(search.Page, search.PageSize, hostRepo.WithByInfo(search.Info), commonRepo.WithByGroupID(search.GroupID))
 	if err != nil {
 		return 0, nil, err
 	}
@@ -75,6 +75,8 @@ func (u *HostService) SearchWithPage(search dto.SearchHostWithPage) (int64, inte
 		if err := copier.Copy(&item, &host); err != nil {
 			return 0, nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 		}
+		group, _ := groupRepo.Get(commonRepo.WithByID(host.GroupID))
+		item.GroupBelong = group.Name
 		dtoHosts = append(dtoHosts, item)
 	}
 	return total, dtoHosts, err
@@ -85,7 +87,7 @@ func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, e
 	if err != nil {
 		return nil, err
 	}
-	groups, err := groupRepo.GetList()
+	groups, err := groupRepo.GetList(commonRepo.WithByType("host"))
 	if err != nil {
 		return nil, err
 	}
@@ -99,11 +101,13 @@ func (u *HostService) SearchForTree(search dto.SearchForTree) ([]dto.HostTree, e
 			if len(host.Name) != 0 {
 				label = fmt.Sprintf("%s - %s@%s:%d", host.Name, host.User, host.Addr, host.Port)
 			}
-			if host.GroupBelong == group.Name {
+			if host.GroupID == group.ID {
 				data.Children = append(data.Children, dto.TreeChild{ID: host.ID, Label: label})
 			}
 		}
-		datas = append(datas, data)
+		if len(data.Children) != 0 {
+			datas = append(datas, data)
+		}
 	}
 	return datas, err
 }
@@ -112,6 +116,14 @@ func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 	var host model.Host
 	if err := copier.Copy(&host, &req); err != nil {
 		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
+	}
+	if req.GroupID == 0 {
+		group, err := groupRepo.Get(groupRepo.WithByIsDefault(true))
+		if err != nil {
+			return nil, errors.New("get default group failed")
+		}
+		host.GroupID = group.ID
+		req.GroupID = group.ID
 	}
 	var sameHostID uint
 	if req.Addr == "127.0.0.1" {
@@ -125,7 +137,7 @@ func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 		host.ID = sameHostID
 		upMap := make(map[string]interface{})
 		upMap["name"] = req.Name
-		upMap["group_belong"] = req.GroupBelong
+		upMap["group_id"] = req.GroupID
 		upMap["addr"] = req.Addr
 		upMap["port"] = req.Port
 		upMap["user"] = req.User

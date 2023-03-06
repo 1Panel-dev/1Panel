@@ -12,13 +12,13 @@ import (
 // @Summary Create group
 // @Description 创建系统组
 // @Accept json
-// @Param request body dto.GroupOperate true "request"
+// @Param request body dto.GroupCreate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /hosts/group [post]
 // @x-panel-log {"bodyKeys":["name","type"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建组 [name][type]","formatEN":"create group [name][type]"}
 func (b *BaseApi) CreateGroup(c *gin.Context) {
-	var req dto.GroupOperate
+	var req dto.GroupCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -42,7 +42,7 @@ func (b *BaseApi) CreateGroup(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /hosts/group/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"groups","output_colume":"name","output_value":"name"}],"formatZH":"删除组 [name]","formatEN":"delete group [name]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"groups","output_colume":"name","output_value":"name"},{"input_colume":"id","input_value":"id","isList":false,"db":"groups","output_colume":"type","output_value":"type"}],"formatZH":"删除组 [type][name]","formatEN":"delete group [type][name]"}
 func (b *BaseApi) DeleteGroup(c *gin.Context) {
 	var req dto.OperateByID
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -65,13 +65,13 @@ func (b *BaseApi) DeleteGroup(c *gin.Context) {
 // @Summary Update group
 // @Description 更新系统组
 // @Accept json
-// @Param request body dto.GroupOperate true "request"
+// @Param request body dto.GroupUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /hosts/group/update [post]
 // @x-panel-log {"bodyKeys":["name","type"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新组 [name][type]","formatEN":"update group [name][type]"}
 func (b *BaseApi) UpdateGroup(c *gin.Context) {
-	var req dto.GroupOperate
+	var req dto.GroupUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -80,8 +80,7 @@ func (b *BaseApi) UpdateGroup(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-
-	if err := groupService.Update(req.ID, req.Name); err != nil {
+	if err := groupService.Update(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

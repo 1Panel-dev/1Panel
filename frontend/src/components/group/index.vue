@@ -1,10 +1,10 @@
 <template>
-    <el-drawer :close-on-click-modal="false" v-model="drawerVisiable" size="50%" :before-close="handleClose">
+    <el-drawer :close-on-click-modal="false" v-model="open" size="50%" :before-close="handleClose">
         <template #header>
             <Header :header="$t('website.group')" :back="handleClose"></Header>
         </template>
 
-        <ComplexTable v-loading="loading" :data="data" @search="search()">
+        <ComplexTable :data="data" @search="search()">
             <template #toolbar>
                 <el-button type="primary" @click="openCreate">{{ $t('website.createGroup') }}</el-button>
             </template>
@@ -12,6 +12,7 @@
                 <template #default="{ row }">
                     <span v-if="!row.edit">
                         {{ row.name }}
+                        <span v-if="row.isDefault">({{ $t('website.default') }})</span>
                     </span>
                     <el-input v-if="row.edit" v-model="row.name"></el-input>
                 </template>
@@ -19,29 +20,26 @@
             <el-table-column :label="$t('commons.table.operate')">
                 <template #default="{ row, $index }">
                     <div>
-                        <el-button link v-if="row.edit" type="primary" @click="onSaveGroup(row)">
+                        <el-button link v-if="row.edit" type="primary" @click="saveGroup(row, false)">
                             {{ $t('commons.button.save') }}
                         </el-button>
-                        <el-button
-                            link
-                            v-if="!row.edit"
-                            :disabled="row.name === 'default'"
-                            type="primary"
-                            @click="onEditGroup($index)"
-                        >
+                        <el-button link v-if="!row.edit" type="primary" @click="editGroup($index)">
                             {{ $t('commons.button.edit') }}
                         </el-button>
                         <el-button
                             link
                             v-if="!row.edit"
-                            :disabled="row.name === 'default'"
+                            :disabled="row.isDefault"
                             type="primary"
-                            @click="onDeleteGroup($index)"
+                            @click="deleteGroup($index)"
                         >
                             {{ $t('commons.button.delete') }}
                         </el-button>
                         <el-button link v-if="row.edit" type="primary" @click="cancelEdit($index)">
                             {{ $t('commons.button.cancel') }}
+                        </el-button>
+                        <el-button link v-if="!row.edit && !row.isDefault" type="primary" @click="saveGroup(row, true)">
+                            {{ $t('website.setDefault') }}
                         </el-button>
                     </div>
                 </template>
@@ -53,33 +51,38 @@
 import { ref } from 'vue';
 import i18n from '@/lang';
 import ComplexTable from '@/components/complex-table/index.vue';
+import { CreateGroup, DeleteGroup, GetGroupList, UpdateGroup } from '@/api/modules/host';
 import Header from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
-import { addGroup, deleteGroup, editGroup, getGroupList } from '@/api/modules/host';
-import { useDeleteData } from '@/hooks/use-delete-data';
+import { Group } from '@/api/interface/group';
 
-const loading = ref();
-
-interface groupData {
-    id: number;
-    name: string;
-}
-
-let drawerVisiable = ref(false);
-let data = ref();
+const open = ref(false);
+const type = ref();
+const data = ref();
 const handleClose = () => {
-    drawerVisiable.value = false;
+    open.value = false;
     data.value = [];
     emit('search');
 };
 
+interface DialogProps {
+    type: string;
+}
+const acceptParams = (params: DialogProps): void => {
+    type.value = params.type;
+    open.value = true;
+    search();
+};
+const emit = defineEmits<{ (e: 'search'): void }>();
+
 const search = () => {
     data.value = [];
-    getGroupList({ type: 'host' }).then((res) => {
+    GetGroupList({ type: type.value }).then((res) => {
         for (const d of res.data) {
             const g = {
                 id: d.id,
                 name: d.name,
+                isDefault: d.isDefault,
                 edit: false,
             };
             data.value.push(g);
@@ -87,41 +90,21 @@ const search = () => {
     });
 };
 
-const onSaveGroup = (create: groupData) => {
-    const group = {
-        id: create.id,
-        type: 'host',
-        name: create.name,
-    };
-    loading.value = true;
+const saveGroup = (group: Group.GroupInfo, isDefault: boolean) => {
+    group.type = type.value;
     if (group.id == 0) {
-        addGroup(group)
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
-                search();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+        CreateGroup(group).then(() => {
+            MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+            search();
+        });
     } else {
-        editGroup(group)
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-                search();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+        group.isDefault = isDefault;
+        UpdateGroup(group).then(() => {
+            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+            search();
+        });
     }
 };
-
-const acceptParams = async () => {
-    drawerVisiable.value = true;
-    search();
-};
-const emit = defineEmits<{ (e: 'search'): void }>();
 
 const openCreate = () => {
     for (const d of data.value) {
@@ -134,30 +117,27 @@ const openCreate = () => {
     }
     const g = {
         id: 0,
-        type: 'host',
         name: '',
+        isDefault: false,
         edit: true,
     };
     data.value.push(g);
 };
 
-const onDeleteGroup = async (index: number) => {
+const deleteGroup = (index: number) => {
     const group = data.value[index];
+
     if (group.id > 0) {
-        await useDeleteData(deleteGroup, group.id, 'terminal.groupDeleteHelper')
-            .then(() => {
-                loading.value = false;
-                search();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+        DeleteGroup(group.id).then(() => {
+            data.value.splice(index, 1);
+            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+        });
     } else {
         data.value.splice(index, 1);
     }
 };
 
-const onEditGroup = (index: number) => {
+const editGroup = (index: number) => {
     for (const i in data.value) {
         const d = data.value[i];
         if (d.name == '') {
@@ -176,7 +156,6 @@ const cancelEdit = (index: number) => {
     } else {
         data.value[index].edit = false;
     }
-    search();
 };
 
 defineExpose({ acceptParams });

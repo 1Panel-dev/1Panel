@@ -5,15 +5,15 @@ import (
 )
 
 type HostOperate struct {
-	ID          uint   `json:"id"`
-	GroupBelong string `json:"groupBelong" validate:"required"`
-	Name        string `json:"name"`
-	Addr        string `json:"addr" validate:"required,ip"`
-	Port        uint   `json:"port" validate:"required,number,max=65535,min=1"`
-	User        string `json:"user" validate:"required"`
-	AuthMode    string `json:"authMode" validate:"oneof=password key"`
-	PrivateKey  string `json:"privateKey"`
-	Password    string `json:"password"`
+	ID         uint   `json:"id"`
+	GroupID    uint   `json:"groupID"`
+	Name       string `json:"name"`
+	Addr       string `json:"addr" validate:"required,ip"`
+	Port       uint   `json:"port" validate:"required,number,max=65535,min=1"`
+	User       string `json:"user" validate:"required"`
+	AuthMode   string `json:"authMode" validate:"oneof=password key"`
+	PrivateKey string `json:"privateKey"`
+	Password   string `json:"password"`
 
 	Description string `json:"description"`
 }
@@ -29,8 +29,8 @@ type HostConnTest struct {
 
 type SearchHostWithPage struct {
 	PageInfo
-	Group string `json:"group"`
-	Info  string `json:"info"`
+	GroupID uint   `json:"groupID"`
+	Info    string `json:"info"`
 }
 
 type SearchForTree struct {
@@ -38,13 +38,14 @@ type SearchForTree struct {
 }
 
 type ChangeHostGroup struct {
-	ID    uint   `json:"id" validate:"required"`
-	Group string `json:"group" validate:"required"`
+	ID      uint `json:"id" validate:"required"`
+	GroupID uint `json:"groupID" validate:"required"`
 }
 
 type HostInfo struct {
 	ID          uint      `json:"id"`
 	CreatedAt   time.Time `json:"createdAt"`
+	GroupID     uint      `json:"groupID"`
 	GroupBelong string    `json:"groupBelong"`
 	Name        string    `json:"name"`
 	Addr        string    `json:"addr"`

@@ -39,7 +39,7 @@ var AddTableHost = &gormigrate.Migration{
 			return err
 		}
 		host := model.Host{
-			Name: "localhost", Addr: "127.0.0.1", User: "root", Port: 22, GroupBelong: "default",
+			Name: "localhost", Addr: "127.0.0.1", User: "root", Port: 22, GroupID: group.ID,
 		}
 		if err := tx.Create(&host).Error; err != nil {
 			return err

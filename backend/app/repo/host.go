@@ -16,9 +16,7 @@ type IHostRepo interface {
 	WithByPort(port uint) DBOption
 	WithByUser(user string) DBOption
 	WithByAddr(addr string) DBOption
-	WithByGroup(group string) DBOption
 	Create(host *model.Host) error
-	ChangeGroup(oldGroup, newGroup string) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
 }
@@ -95,10 +93,6 @@ func (u *HostRepo) WithByGroup(group string) DBOption {
 
 func (u *HostRepo) Create(host *model.Host) error {
 	return global.DB.Create(host).Error
-}
-
-func (u *HostRepo) ChangeGroup(oldGroup, newGroup string) error {
-	return global.DB.Model(&model.Host{}).Where("group_belong = ?", oldGroup).Updates(map[string]interface{}{"group_belong": newGroup}).Error
 }
 
 func (u *HostRepo) Update(id uint, vars map[string]interface{}) error {
