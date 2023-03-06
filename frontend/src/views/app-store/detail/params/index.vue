@@ -35,11 +35,47 @@
                     :label="service.label"
                 ></el-option>
             </el-select>
-            <span v-if="p.type === 'service' && !p.services" style="margin-left: 5px">
-                <el-link type="primary" :underline="false" @click="toPage(p.key)">
-                    {{ $t('app.toInstall') }}
-                </el-link>
-            </span>
+            <el-row :gutter="10" v-if="p.type == 'apps'">
+                <el-col :span="12">
+                    <el-form-item :prop="p.prop">
+                        <el-select
+                            v-model="form[p.envKey]"
+                            @change="getServices(p.child.envKey, form[p.envKey], p)"
+                            style="width: 100%"
+                        >
+                            <el-option
+                                v-for="service in p.values"
+                                :label="service.label"
+                                :key="service.value"
+                                :value="service.value"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="12">
+                    <el-form-item :prop="p.childProp">
+                        <el-select
+                            v-model="form[p.child.envKey]"
+                            v-if="p.child.type == 'service'"
+                            @change="changeService(form[p.child.envKey], p.services)"
+                        >
+                            <el-option
+                                v-for="service in p.services"
+                                :key="service.label"
+                                :value="service.value"
+                                :label="service.label"
+                            ></el-option>
+                        </el-select>
+                    </el-form-item>
+                </el-col>
+                <el-col>
+                    <span v-if="p.child.type === 'service' && p.services.length === 0">
+                        <el-link type="primary" :underline="false" @click="toPage(form[p.envKey])">
+                            {{ $t('app.toInstall') }}
+                        </el-link>
+                    </span>
+                </el-col>
+            </el-row>
         </el-form-item>
     </div>
 </template>
@@ -57,6 +93,7 @@ interface ParamObj extends App.FromField {
     services: App.AppService[];
     prop: string;
     disabled: false;
+    childProp: string;
 }
 
 const emit = defineEmits(['update:form', 'update:rules']);
@@ -120,18 +157,30 @@ const handleParams = () => {
                 form[p.envKey] = p.default;
             }
             if (p.required) {
-                if (p.type === 'service') {
+                if (p.type === 'service' || p.type === 'apps') {
                     rules[p.envKey] = [Rules.requiredSelect];
+                    if (p.child) {
+                        p.childProp = p.child.envKey;
+                        if (p.child.type === 'service') {
+                            rules[p.child.envKey] = [Rules.requiredSelect];
+                        }
+                    }
                 } else {
                     rules[p.envKey] = [Rules.requiredInput];
-                    if (p.rule && p.rule != '') {
-                        rules[p.envKey].push(Rules[p.rule]);
-                    }
+                }
+                if (p.rule && p.rule != '') {
+                    rules[p.envKey].push(Rules[p.rule]);
                 }
             }
-            if (p.key) {
+            if (p.type === 'apps') {
+                getServices(p.child.envKey, p.default, p);
+                p.child.services = [];
+                form[p.child.envKey] = '';
+            }
+            if (p.type === 'service') {
+                getServices(p.envKey, p.key, p);
+                p.services = [];
                 form[p.envKey] = '';
-                getServices(p.envKey, p.key, pObj);
             }
             emit('update:rules', rules);
             updateParam();
@@ -139,28 +188,28 @@ const handleParams = () => {
     }
 };
 
-const getServices = async (envKey: string, key: string | undefined, pObj: ParamObj) => {
+const getServices = async (childKey: string, key: string | undefined, pObj: ParamObj | undefined) => {
+    pObj.services = [];
     await GetAppService(key).then((res) => {
-        pObj.services = res.data;
+        pObj.services = res.data || [];
+        form[childKey] = '';
         if (res.data && res.data.length > 0) {
-            form[envKey] = res.data[0].value;
-            if (res.data[0].config) {
-                Object.entries(res.data[0].config).forEach(([k, v]) => {
-                    params.value.formFields.forEach((field) => {
-                        if (field.envKey === k) {
-                            form[k] = v;
-                        }
-                    });
+            form[childKey] = res.data[0].value;
+            if (pObj.params) {
+                pObj.params.forEach((param: App.FromParam) => {
+                    if (param.key === key) {
+                        form[param.envKey] = param.value;
+                    }
                 });
             }
-            updateParam();
+            changeService(form[childKey], pObj.services);
         }
     });
 };
 
 const changeService = (value: string, services: App.AppService[]) => {
     services.forEach((item) => {
-        if (item.value === value) {
+        if (item.value === value && item.config) {
             Object.entries(item.config).forEach(([k, v]) => {
                 if (form.hasOwnProperty(k)) {
                     form[k] = v;

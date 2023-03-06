@@ -56,6 +56,25 @@ export namespace App {
         default: any;
         envKey: string;
         key?: string;
+        values?: ServiceParam[];
+        child?: FromFieldChild;
+        params?: FromParam[];
+    }
+
+    export interface FromFieldChild extends FromField {
+        services: App.AppService[];
+    }
+
+    export interface FromParam {
+        type: string;
+        key: string;
+        value: string;
+        envKey: string;
+    }
+
+    export interface ServiceParam {
+        label: '';
+        value: '';
     }
 
     export interface AppInstall {
