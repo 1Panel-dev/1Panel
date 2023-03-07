@@ -1,5 +1,5 @@
 <template>
-    <div v-if="persistenceShow" v-loading="loading">
+    <div v-if="persistenceShow">
         <el-row :gutter="20" style="margin-top: 5px" class="row-box">
             <el-col :span="12">
                 <el-card class="el-card">
@@ -88,7 +88,9 @@
                 </template>
                 <el-table-column type="selection" fix />
                 <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="fileName" />
-                <el-table-column :label="$t('database.source')" prop="backupType" />
+                <el-table-column :label="$t('database.source')" prop="backupType">
+                    <template #default="{ row }">{{ $t('setting.' + row.source) }}</template>
+                </el-table-column>
                 <el-table-column :label="$t('file.dir')" show-overflow-tooltip prop="fileDir" />
                 <el-table-column :label="$t('commons.table.createdAt')" :formatter="dateFormat" prop="createdAt" />
                 <fu-table-operations
@@ -120,8 +122,6 @@ import { useDeleteData } from '@/hooks/use-delete-data';
 import { MsgInfo, MsgSuccess } from '@/utils/message';
 import { Backup } from '@/api/interface/backup';
 
-const loading = ref(false);
-
 interface saveStruct {
     second: number;
     count: number;
@@ -148,6 +148,7 @@ const acceptParams = (prop: DialogProps): void => {
         search();
     }
 };
+const emit = defineEmits(['loading']);
 
 const data = ref();
 const selects = ref<any>([]);
@@ -183,15 +184,15 @@ const search = async () => {
     paginationConfig.total = res.data.total;
 };
 const onBackup = async () => {
-    loading.value = true;
+    emit('loading', true);
     await handleBackup({ name: '', detailName: '', type: 'redis' })
         .then(() => {
-            loading.value = false;
+            emit('loading', false);
             search();
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
-            loading.value = false;
+            emit('loading', false);
         });
 };
 const onRecover = async () => {
@@ -201,14 +202,14 @@ const onRecover = async () => {
         detailName: '',
         file: currentRow.value.fileDir + '/' + currentRow.value.fileName,
     };
-    loading.value = true;
+    emit('loading', true);
     await handleRecover(param)
         .then(() => {
-            loading.value = false;
+            emit('loading', false);
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
-            loading.value = false;
+            emit('loading', false);
         });
 };
 
@@ -255,14 +256,14 @@ const onSave = async (formEl: FormInstance | undefined, type: string) => {
             param.type = type;
             param.appendfsync = form.appendfsync;
             param.appendonly = form.appendonly;
-            loading.value = true;
+            emit('loading', true);
             await updateRedisPersistenceConf(param)
                 .then(() => {
-                    loading.value = false;
+                    emit('loading', false);
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 })
                 .catch(() => {
-                    loading.value = false;
+                    emit('loading', false);
                 });
         });
         return;
@@ -277,14 +278,14 @@ const onSave = async (formEl: FormInstance | undefined, type: string) => {
     }
     param.type = type;
     param.save = itemSaves.join(' ');
-    loading.value = true;
+    emit('loading', true);
     await updateRedisPersistenceConf(param)
         .then(() => {
-            loading.value = false;
+            emit('loading', false);
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
-            loading.value = false;
+            emit('loading', false);
         });
 };
 

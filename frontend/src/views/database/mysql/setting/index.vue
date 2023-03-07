@@ -75,7 +75,7 @@
                     </el-row>
                 </div>
                 <Status v-show="activeName === 'status'" ref="statusRef" />
-                <Variables v-show="activeName === 'tuning'" ref="variablesRef" />
+                <Variables @loading="changeLoading" v-show="activeName === 'tuning'" ref="variablesRef" />
                 <div v-show="activeName === 'port'">
                     <el-form :model="baseInfo" ref="panelFormRef" label-position="top">
                         <el-row>
@@ -94,7 +94,7 @@
                     </el-form>
                 </div>
                 <ContainerLog v-show="activeName === 'log'" ref="dialogContainerLogRef" />
-                <SlowLog v-show="activeName === 'slowLog'" ref="slowLogRef" />
+                <SlowLog @loading="changeLoading" v-show="activeName === 'slowLog'" ref="slowLogRef" />
             </template>
         </LayoutContent>
 
@@ -257,6 +257,10 @@ const loadBaseInfo = async () => {
     const pathRes = await loadBaseDir();
     loadMysqlConf(`${pathRes.data}/apps/mysql/${mysqlName.value}/conf/my.cnf`);
     loadContainerLog(baseInfo.containerID);
+};
+
+const changeLoading = (status: boolean) => {
+    loading.value = status;
 };
 
 const loadVariables = async () => {

@@ -1,6 +1,6 @@
 <template>
-    <div v-show="settingShow">
-        <LayoutContent :title="'Redis ' + $t('database.setting')" :reload="true" v-loading="loading">
+    <div v-show="settingShow" v-loading="loading">
+        <LayoutContent :title="'Redis ' + $t('database.setting')" :reload="true">
             <template #buttons>
                 <el-button type="primary" :plain="activeName !== 'conf'" @click="changeTab('conf')">
                     {{ $t('database.confChange') }}
@@ -109,14 +109,14 @@
                         </el-row>
                     </el-form>
                 </div>
-                <Persistence v-show="activeName === 'persistence'" ref="persistenceRef" />
+                <Persistence @loading="changeLoading" v-show="activeName === 'persistence'" ref="persistenceRef" />
             </template>
         </LayoutContent>
 
         <ConfirmDialog ref="confirmDialogRef" @confirm="submtiFile"></ConfirmDialog>
         <ConfirmDialog ref="confirmFileRef" @confirm="submtiFile"></ConfirmDialog>
         <ConfirmDialog ref="confirmFormRef" @confirm="submtiForm"></ConfirmDialog>
-        <ConfirmDialog ref="confirmPortRef" @confirm="onChangePort(formRef)"></ConfirmDialog>
+        <ConfirmDialog ref="confirmPortRef" @confirm="onChangePort(portRef)"></ConfirmDialog>
     </div>
 </template>
 
@@ -180,6 +180,10 @@ const changeTab = (val: string) => {
     activeName.value = val;
 };
 
+const changeLoading = (status: boolean) => {
+    loading.value = status;
+};
+
 const acceptParams = (prop: DialogProps): void => {
     redisStatus.value = prop.status;
     redisName.value = prop.redisName;
@@ -216,9 +220,11 @@ function callback(error: any) {
     }
 }
 const onChangePort = async (formEl: FormInstance | undefined) => {
+    console.log('asdqwdwqd');
     if (!formEl) return;
     const result = await formEl.validateField('port', callback);
     if (!result) {
+        console.log('daqdwq');
         return;
     }
     let params = {
