@@ -91,6 +91,8 @@ export default {
             operate: 'Operate',
             inputOrSelect: 'Please select or enter',
             backupSuccess: 'Backup Success',
+            unSupportType: 'Current file type is not supported!',
+            unSupportSize: 'The uploaded file exceeds {0}M, please confirm!',
         },
         login: {
             firstLogin: 'First login, please create an initial administrator user!',
@@ -288,8 +290,6 @@ export default {
         portHelper:
             'This port is the exposed port of the container. You need to save the modification separately and restart the container!',
 
-        unSupportType: 'Current file type is not supported!',
-        unSupportSize: 'The uploaded file exceeds 10M, please confirm!',
         selectFile: 'Select file',
         supportUpType: 'Only sql, zip, sql.gz, and (tar.gz gz tgz) files within 10 MB are supported',
         zipFormat:
@@ -615,8 +615,9 @@ export default {
         connTestOk: 'Connection information available',
         connTestFailed: 'Connection unavailable, please check connection information!',
         host: 'Host',
-        createConn: 'Create a connection',
+        createConn: 'New connection',
         group: 'Group',
+        noHost: 'No host',
         groupChange: 'Change group',
         expand: 'Expand all',
         fold: 'All contract',

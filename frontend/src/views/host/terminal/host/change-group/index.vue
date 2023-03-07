@@ -9,12 +9,14 @@
                     <el-form ref="hostInfoRef" label-position="top" :model="dialogData" :rules="rules">
                         <el-form-item :label="$t('commons.table.group')" prop="group">
                             <el-select filterable v-model="dialogData.groupID" clearable style="width: 100%">
-                                <el-option
-                                    v-for="item in groupList"
-                                    :key="item.id"
-                                    :label="item.name"
-                                    :value="item.id"
-                                />
+                                <div v-for="item in groupList" :key="item.id">
+                                    <el-option
+                                        v-if="item.name === 'default'"
+                                        :label="$t('website.default')"
+                                        :value="item.id"
+                                    />
+                                    <el-option v-else :label="item.name" :value="item.id" />
+                                </div>
                             </el-select>
                         </el-form-item>
                     </el-form>

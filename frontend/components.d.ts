@@ -73,7 +73,6 @@ declare module 'vue' {
     FileList: typeof import('./src/components/file-list/index.vue')['default']
     FileRole: typeof import('./src/components/file-role/index.vue')['default']
     Footer: typeof import('./src/components/app-layout/footer/index.vue')['default']
-    Gropu: typeof import('./src/components/gropu/index.vue')['default']
     Group: typeof import('./src/components/group/index.vue')['default']
     InfiniteScroll: typeof import('element-plus/es')['ElInfiniteScroll']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
