@@ -401,6 +401,7 @@ func handleErr(install model.AppInstall, err error, out string) error {
 	if out != "" {
 		install.Message = out
 		reErr = errors.New(out)
+		install.Status = constant.Error
 	}
 	_ = appInstallRepo.Save(&install)
 	return reErr

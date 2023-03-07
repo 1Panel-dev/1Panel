@@ -296,6 +296,9 @@ const operate = async () => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             search();
         })
+        .catch(() => {
+            search();
+        })
         .finally(() => {
             loading.value = false;
         });
@@ -398,7 +401,7 @@ onMounted(() => {
     search();
     timer = setInterval(() => {
         search();
-    }, 1000 * 8);
+    }, 10000 * 6);
 });
 
 onUnmounted(() => {
