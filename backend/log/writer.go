@@ -8,10 +8,12 @@ import (
 	"log"
 	"os"
 	"path"
+	"runtime"
 	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
+	"syscall"
 	"time"
 	"unsafe"
 )
@@ -78,6 +80,8 @@ var _asyncBufferPool = sync.Pool{
 	},
 }
 
+var stdErrFileHandler *os.File
+
 func NewWriterFromConfig(c *Config) (RollingWriter, error) {
 	if c.LogPath == "" || c.FileName == "" {
 		return nil, ErrInvalidArgument
@@ -91,6 +95,16 @@ func NewWriterFromConfig(c *Config) (RollingWriter, error) {
 	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return nil, err
+	}
+	stdErrFileHandler = file
+
+	if runtime.GOOS != "windows" {
+		if err = syscall.Dup2(int(file.Fd()), int(os.Stderr.Fd())); err != nil {
+			return nil, err
+		}
+		runtime.SetFinalizer(stdErrFileHandler, func(fd *os.File) {
+			fd.Close()
+		})
 	}
 
 	mng, err := NewManager(c)

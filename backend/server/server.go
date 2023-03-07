@@ -28,8 +28,8 @@ import (
 
 func Start() {
 	viper.Init()
-	app.Init()
 	log.Init()
+	app.Init()
 	db.Init()
 	migration.Init()
 	validator.Init()
