@@ -12,6 +12,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 
@@ -269,6 +270,9 @@ func (a AppInstallService) GetUpdateVersions(installId uint) ([]dto.AppVersion, 
 }
 
 func (a AppInstallService) ChangeAppPort(req request.PortUpdate) error {
+	if common.ScanPort(int(req.Port)) {
+		return buserr.WithDetail(constant.ErrPortInUsed, req.Port, nil)
+	}
 	return updateInstallInfoInDB(req.Key, "", "port", true, strconv.FormatInt(req.Port, 10))
 }
 

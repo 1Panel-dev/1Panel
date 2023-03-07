@@ -6,9 +6,11 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/gin-gonic/gin"
 )
@@ -62,6 +64,10 @@ func (u *SettingService) Update(key, value string) error {
 }
 
 func (u *SettingService) UpdatePort(port uint) error {
+	if common.ScanPort(int(port)) {
+		return buserr.WithDetail(constant.ErrPortInUsed, port, nil)
+	}
+
 	if err := settingRepo.Update("ServerPort", strconv.Itoa(int(port))); err != nil {
 		return err
 	}
