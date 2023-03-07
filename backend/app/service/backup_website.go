@@ -152,6 +152,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 	if err := websiteRepo.SaveWithoutCtx(&oldWebsite); err != nil {
 		return err
 	}
+	isOk = true
 	return nil
 }
 
@@ -194,11 +195,11 @@ func handleWebsiteBackup(website *model.Website, backupDir, fileName string) err
 		global.LOG.Info("put app.tar.gz into tmp dir successful")
 	}
 	websiteDir := fmt.Sprintf("%s/openresty/%s/www/sites/%s", constant.AppInstallDir, nginxInfo.Name, website.Alias)
-	if err := fileOp.Compress([]string{websiteDir}, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.Alias), files.TarGz); err != nil {
+	if err := handleTar(websiteDir, tmpDir, fmt.Sprintf("%s.web.tar.gz", website.Alias), ""); err != nil {
 		return err
 	}
 	global.LOG.Info("put web.tar.gz into tmp dir successful, now start to tar tmp dir")
-	if err := fileOp.Compress([]string{tmpDir}, backupDir, fileName, files.TarGz); err != nil {
+	if err := handleTar(tmpDir, backupDir, fileName, ""); err != nil {
 		return err
 	}
 

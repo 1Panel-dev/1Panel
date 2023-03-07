@@ -169,14 +169,7 @@ const beforeAvatarUpload = (rawFile) => {
         }
         return true;
     }
-    if (
-        !rawFile.name.endsWith('.sql') &&
-        !rawFile.name.endsWith('.zip') &&
-        !rawFile.name.endsWith('.tar.gz') &&
-        !rawFile.name.endsWith('.sql.gz') &&
-        !rawFile.name.endsWith('.zip') &&
-        !rawFile.name.endsWith('.tgz')
-    ) {
+    if (!rawFile.name.endsWith('.sql') && !rawFile.name.endsWith('.tar.gz') && !rawFile.name.endsWith('.sql.gz')) {
         MsgError(i18n.global.t('commons.msg.unSupportType'));
         return false;
     }

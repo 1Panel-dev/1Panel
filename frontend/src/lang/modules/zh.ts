@@ -299,8 +299,8 @@ export default {
         selectFile: '选择文件',
         dropHelper: '将上传文件拖拽到此处，或者',
         clickHelper: '点击上传',
-        supportUpType: '仅支持 10M 以内 sql、zip、sql.gz、(tar.gz gz tgz) 文件',
-        zipFormat: 'zip、tar.gz 压缩包结构：test.zip 或 test.tar.gz 压缩包内，必需包含 test.sql',
+        supportUpType: '仅支持 10M 以内 sql、sql.gz、tar.gz 文件',
+        zipFormat: 'tar.gz 压缩包结构：test.tar.gz 压缩包内，必需包含 test.sql',
 
         currentStatus: '当前状态',
         baseParam: '基础参数',

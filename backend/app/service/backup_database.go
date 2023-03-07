@@ -72,8 +72,7 @@ func (u *BackupService) MysqlRecoverByUpload(req dto.CommonRecover) error {
 	}
 	file := req.File
 	fileName := path.Base(req.File)
-	if !strings.HasSuffix(fileName, ".sql") && !strings.HasSuffix(fileName, ".gz") {
-		fileOp := files.NewFileOp()
+	if strings.HasSuffix(fileName, ".tar.gz") {
 		fileNameItem := time.Now().Format("20060102150405")
 		dstDir := fmt.Sprintf("%s/%s", path.Dir(req.File), fileNameItem)
 		if _, err := os.Stat(dstDir); err != nil && os.IsNotExist(err) {
@@ -81,14 +80,7 @@ func (u *BackupService) MysqlRecoverByUpload(req dto.CommonRecover) error {
 				return fmt.Errorf("mkdir %s failed, err: %v", dstDir, err)
 			}
 		}
-		var compressType files.CompressType
-		switch {
-		case strings.HasSuffix(fileName, ".tar.gz"), strings.HasSuffix(fileName, ".tgz"):
-			compressType = files.TarGz
-		case strings.HasSuffix(fileName, ".zip"):
-			compressType = files.Zip
-		}
-		if err := fileOp.Decompress(req.File, dstDir, compressType); err != nil {
+		if err := handleUnTar(req.File, dstDir); err != nil {
 			_ = os.RemoveAll(dstDir)
 			return err
 		}

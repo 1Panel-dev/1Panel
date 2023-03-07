@@ -190,7 +190,7 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 			return
 		}
 
-		if err := fileOp.Compress([]string{rootDir}, fmt.Sprintf("%s/system", localDir), fmt.Sprintf("1panel_%s_%s.tar.gz", versionItem.Value, timeNow), files.TarGz); err != nil {
+		if err := handleTar(rootDir, fmt.Sprintf("%s/system", localDir), fmt.Sprintf("1panel_%s_%s.tar.gz", versionItem.Value, timeNow), ""); err != nil {
 			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
 			return
 		}
@@ -264,7 +264,7 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 		}
 		fileOp := files.NewFileOp()
 		if !isReTry || snap.InterruptStep == "Decompress" || (isReTry && req.ReDownload) {
-			if err := fileOp.Decompress(fmt.Sprintf("%s/%s.tar.gz", baseDir, snap.Name), baseDir, files.TarGz); err != nil {
+			if err := handleUnTar(fmt.Sprintf("%s/%s.tar.gz", baseDir, snap.Name), baseDir); err != nil {
 				if req.ReDownload {
 					updateRecoverStatus(snap.ID, snap.InterruptStep, constant.StatusFailed, fmt.Sprintf("decompress file failed, err: %v", err))
 					return

@@ -28,7 +28,11 @@
                 <el-table-column type="selection" fix />
                 <el-table-column :label="$t('commons.table.name')" prop="fileName" show-overflow-tooltip />
                 <el-table-column :label="$t('database.source')" prop="backupType">
-                    <template #default="{ row }">{{ $t('setting.' + row.source) }}</template>
+                    <template #default="{ row }">
+                        <span v-if="row.source">
+                            {{ $t('setting.' + row.source) }}
+                        </span>
+                    </template>
                 </el-table-column>
                 <el-table-column
                     prop="createdAt"
