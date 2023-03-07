@@ -80,3 +80,9 @@ var (
 var (
 	ErrPathNotFound = "ErrPathNotFound"
 )
+
+//mysql
+var (
+	ErrUserIsExist     = "ErrUserIsExist"
+	ErrDatabaseIsExist = "ErrDatabaseIsExist"
+)
