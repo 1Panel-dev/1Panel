@@ -221,41 +221,41 @@ func confSet(redisName string, changeConf []redisConfig) error {
 	}
 	files := strings.Split(string(lineBytes), "\n")
 
-	isStartRange := false
-	isEndRange := false
+	startIndex, endIndex := 0, 0
 	var newFiles []string
-	for _, line := range files {
-		if !isStartRange {
-			if line == "# Redis configuration rewrite by 1Panel" {
-				isStartRange = true
-			}
-			newFiles = append(newFiles, line)
-			continue
+	for i := 0; i < len(files); i++ {
+		if files[i] == "# Redis configuration rewrite by 1Panel" {
+			startIndex = i
 		}
-		if !isEndRange {
-			isExist := false
-			for _, item := range changeConf {
-				if strings.HasPrefix(line, item.key) || strings.HasPrefix(line, "# "+item.key) {
-					if item.value == "0" || len(item.value) == 0 {
-						newFiles = append(newFiles, fmt.Sprintf("# %s %s", item.key, item.value))
-					} else {
-						newFiles = append(newFiles, fmt.Sprintf("%s %s", item.key, item.value))
-					}
-					isExist = true
-					break
-				}
-			}
-			if isExist {
-				continue
-			}
-			newFiles = append(newFiles, line)
-			if line == "# End Redis configuration rewrite by 1Panel" {
-				isEndRange = true
-			}
-			continue
+		if files[i] == "# End Redis configuration rewrite by 1Panel" {
+			endIndex = i
+			break
 		}
-		newFiles = append(newFiles, line)
+		newFiles = append(newFiles, files[i])
 	}
+	for _, item := range changeConf {
+		isExist := false
+		for i := startIndex; i < endIndex; i++ {
+			if strings.HasPrefix(newFiles[i], item.key) || strings.HasPrefix(newFiles[i], "# "+item.key) {
+				if item.value == "0" || len(item.value) == 0 {
+					newFiles[i] = fmt.Sprintf("# %s %s", item.key, item.value)
+				} else {
+					newFiles[i] = fmt.Sprintf("%s %s", item.key, item.value)
+				}
+				isExist = true
+				break
+			}
+		}
+		if !isExist {
+			if item.value == "0" || len(item.value) == 0 {
+				newFiles = append(newFiles, fmt.Sprintf("# %s %s", item.key, item.value))
+			} else {
+				newFiles = append(newFiles, fmt.Sprintf("%s %s", item.key, item.value))
+			}
+		}
+	}
+	newFiles = append(newFiles, "# End Redis configuration rewrite by 1Panel")
+
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0666)
 	if err != nil {
 		return err
