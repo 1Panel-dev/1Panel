@@ -33,7 +33,7 @@ var AddTableHost = &gormigrate.Migration{
 			return err
 		}
 		group := model.Group{
-			Name: "default", Type: "host",
+			Name: "default", Type: "host", IsDefault: true,
 		}
 		if err := tx.Create(&group).Error; err != nil {
 			return err

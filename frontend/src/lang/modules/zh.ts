@@ -130,7 +130,7 @@ export default {
             dbName: '支持英文、中文、数字、.-_,长度1-16',
             imageName: '支持英文、中文、数字、:.-_,长度1-30',
             volumeName: '支持英文、数字、.-和_,长度1-30',
-            complexityPassword: '请输入 8 位以上、必须含有字母、数字、特殊符号至少两种组合的密码',
+            complexityPassword: '请输入长度大于 8 位且包含字母、数字、特殊字符至少两项的密码组合',
             commonPassword: '请输入 6 位以上长度密码',
             linuxName: '长度1-30，名称不能含有{0}等符号',
             email: '请输入正确的邮箱',

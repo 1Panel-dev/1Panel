@@ -126,7 +126,7 @@ export default {
             imageName: 'Support English, Chinese, numbers, :.-_, length 1-30',
             volumeName: 'Support English, numbers, .-_, length 1-30',
             complexityPassword:
-                'Please enter a password with more than 8 characters and at least two combinations of letters, numbers, and special symbols',
+                'Enter a password that is longer than eight characters and contains at least two letters, digits, and special characters',
             commonPassword: 'Please enter a password with more than 6 characters',
             email: 'Email format error',
             number: 'Please enter the correct number',

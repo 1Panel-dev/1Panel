@@ -10,10 +10,13 @@
             </template>
             <el-table-column :label="$t('commons.table.name')" prop="name">
                 <template #default="{ row }">
-                    <span v-if="!row.edit">
-                        {{ row.name }}
+                    <div v-if="!row.edit">
+                        <span v-if="row.name === 'default'">
+                            {{ $t('website.default') }}
+                        </span>
+                        <span v-if="row.name !== 'default'">{{ row.name }}</span>
                         <span v-if="row.isDefault">({{ $t('website.default') }})</span>
-                    </span>
+                    </div>
                     <el-input v-if="row.edit" v-model="row.name"></el-input>
                 </template>
             </el-table-column>
