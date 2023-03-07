@@ -164,25 +164,25 @@ func (a AppInstallService) Operate(req request.AppInstalledOperate) error {
 		if err != nil {
 			return handleErr(install, err, out)
 		}
-		return nil
+		return syncById(install.ID)
 	case constant.Start:
 		out, err := compose.Start(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
 		}
-		install.Status = constant.Running
+		return syncById(install.ID)
 	case constant.Stop:
 		out, err := compose.Stop(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
 		}
-		install.Status = constant.Stopped
+		return syncById(install.ID)
 	case constant.Restart:
 		out, err := compose.Restart(dockerComposePath)
 		if err != nil {
 			return handleErr(install, err, out)
 		}
-		install.Status = constant.Running
+		return syncById(install.ID)
 	case constant.Delete:
 		tx, ctx := getTxAndContext()
 		if err := deleteAppInstall(ctx, install, req.DeleteBackup, req.ForceDelete, req.DeleteDB); err != nil && !req.ForceDelete {
@@ -198,8 +198,6 @@ func (a AppInstallService) Operate(req request.AppInstalledOperate) error {
 	default:
 		return errors.New("operate not support")
 	}
-
-	return appInstallRepo.Save(&install)
 }
 
 func (a AppInstallService) SyncAll() error {

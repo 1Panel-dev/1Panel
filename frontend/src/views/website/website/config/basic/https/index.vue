@@ -53,7 +53,7 @@
                                 {{ websiteSSL.primaryDomain }}
                             </el-descriptions-item>
                             <el-descriptions-item :label="$t('website.otherDomains')">
-                                {{ websiteSSL.otherDomains }}
+                                {{ websiteSSL.domains }}
                             </el-descriptions-item>
                             <el-descriptions-item :label="$t('ssl.provider')">
                                 {{ getProvider(websiteSSL.provider) }}

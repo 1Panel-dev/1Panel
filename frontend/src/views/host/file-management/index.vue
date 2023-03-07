@@ -43,20 +43,22 @@
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
-                <el-button plain @click="openUpload" style="margin-left: 10px">{{ $t('file.upload') }}</el-button>
-                <el-button plain @click="openWget">{{ $t('file.remoteFile') }}</el-button>
-                <el-button plain @click="openMove('copy')" :disabled="selects.length === 0">
-                    {{ $t('file.copy') }}
-                </el-button>
-                <el-button plain @click="openMove('cut')" :disabled="selects.length === 0">
-                    {{ $t('file.move') }}
-                </el-button>
-                <el-button plain @click="openCompress(selects)" :disabled="selects.length === 0">
-                    {{ $t('file.compress') }}
-                </el-button>
-                <el-button plain @click="openDownload" :disabled="selects.length === 0">
-                    {{ $t('file.download') }}
-                </el-button>
+                <el-button-group style="margin-left: 10px">
+                    <el-button plain @click="openUpload">{{ $t('file.upload') }}</el-button>
+                    <el-button plain @click="openWget">{{ $t('file.remoteFile') }}</el-button>
+                    <el-button plain @click="openMove('copy')" :disabled="selects.length === 0">
+                        {{ $t('file.copy') }}
+                    </el-button>
+                    <el-button plain @click="openMove('cut')" :disabled="selects.length === 0">
+                        {{ $t('file.move') }}
+                    </el-button>
+                    <el-button plain @click="openCompress(selects)" :disabled="selects.length === 0">
+                        {{ $t('file.compress') }}
+                    </el-button>
+                    <el-button plain @click="openDownload" :disabled="selects.length === 0">
+                        {{ $t('file.download') }}
+                    </el-button>
+                </el-button-group>
                 <div class="search search-button">
                     <el-input
                         v-model="req.search"

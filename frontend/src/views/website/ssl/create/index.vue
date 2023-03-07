@@ -5,14 +5,7 @@
         </template>
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
-                <el-form
-                    ref="sslForm"
-                    label-position="top"
-                    :model="ssl"
-                    label-width="100px"
-                    :rules="rules"
-                    v-loading="loading"
-                >
+                <el-form ref="sslForm" label-position="top" :model="ssl" label-width="100px" :rules="rules">
                     <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
                         <el-input v-model="ssl.primaryDomain"></el-input>
                     </el-form-item>
@@ -139,7 +132,7 @@ let ssl = ref({
     websiteId: 0,
     acmeAccountId: undefined,
     dnsAccountId: undefined,
-    autoRenew: false,
+    autoRenew: true,
 });
 let dnsResolve = ref<Website.DNSResolve[]>([]);
 let hasResolve = ref(false);
@@ -160,7 +153,7 @@ const resetForm = () => {
         websiteId: 0,
         acmeAccountId: undefined,
         dnsAccountId: undefined,
-        autoRenew: false,
+        autoRenew: true,
     };
 };
 
