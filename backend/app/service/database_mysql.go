@@ -15,6 +15,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
@@ -92,12 +93,19 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 		return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
 
-	createSql := fmt.Sprintf("create database if not exists `%s` default character set %s collate %s", req.Name, req.Format, formatMap[req.Format])
+	createSql := fmt.Sprintf("create database `%s` default character set %s collate %s", req.Name, req.Format, formatMap[req.Format])
 	if err := excuteSql(app.ContainerName, app.Password, createSql); err != nil {
+		if strings.Contains(err.Error(), "ERROR 1007") {
+			return nil, buserr.New(constant.ErrDatabaseIsExist)
+		}
 		return nil, err
 	}
 	tmpPermission := req.Permission
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create user if not exists '%s'@'%s' identified by '%s';", req.Username, tmpPermission, req.Password)); err != nil {
+	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create user '%s'@'%s' identified by '%s';", req.Username, tmpPermission, req.Password)); err != nil {
+		_ = excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop database `%s`", req.Name))
+		if strings.Contains(err.Error(), "ERROR 1396") {
+			return nil, buserr.New(constant.ErrUserIsExist)
+		}
 		return nil, err
 	}
 	grantStr := fmt.Sprintf("grant all privileges on `%s`.* to '%s'@'%s'", req.Name, req.Username, tmpPermission)

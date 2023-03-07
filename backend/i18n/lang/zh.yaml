@@ -35,10 +35,14 @@ ErrPathNotFound: "目录不存在"
 ErrDomainIsExist: "域名已存在"
 ErrAliasIsExist: "代号已存在"
 ErrAppDelete: '其他网站使用此应用,无法删除'
-ErrGroupIsUsed: '分组已经关联网站，无法删除'
+ErrGroupIsUsed: '分组正在使用中，无法删除'
 
 #ssl
 ErrSSLCannotDelete: "证书正在被网站使用，无法删除"
 ErrAccountCannotDelete: "账号关联证书，无法删除"
 ErrSSLApply: "证书续签成功，openresty reload失败，请检查配置！"
 ErrEmailIsExist: '邮箱已存在'
+
+#mysql
+ErrUserIsExist: "当前用户已存在，请重新输入"
+ErrDatabaseIsExist: "当前数据库已存在，请重新输入"

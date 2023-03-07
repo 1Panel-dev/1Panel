@@ -35,10 +35,14 @@ ErrPathNotFound: "Path is not found"
 ErrDomainIsExist: "Domain is already exist"
 ErrAliasIsExist: "Alias is already exist"
 ErrAppDelete: 'Other Website use this App'
-ErrGroupIsUsed: 'The group has been associated with a website and cannot be deleted'
+ErrGroupIsUsed: 'The group is in use and cannot be deleted'
 
 #ssl
 ErrSSLCannotDelete: "The certificate is being used by the website and cannot be removed"
 ErrAccountCannotDelete: "The certificate associated with the account cannot be deleted"
 ErrSSLApply: "The certificate continues to be signed successfully, but openresty reload fails, please check the configuration！"
 ErrEmailIsExist: 'Email is already exist'
+
+#mysql
+ErrUserIsExist: "The current user already exists. Please enter a new user"
+ErrDatabaseIsExist: "The current database already exists. Please enter a new database"
