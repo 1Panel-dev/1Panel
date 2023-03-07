@@ -160,10 +160,11 @@ const uploadRef = ref<UploadInstance>();
 const beforeAvatarUpload = (rawFile) => {
     if (type.value === 'app' || type.value === 'website') {
         if (!rawFile.name.endsWith('.tar.gz')) {
-            MsgError(i18n.global.t('database.unSupportType'));
+            MsgError(i18n.global.t('commons.msg.unSupportType'));
             return false;
-        } else if (rawFile.size / 1024 / 1024 > 50) {
-            MsgError(i18n.global.t('database.unSupportSize'));
+        }
+        if (rawFile.size / 1024 / 1024 > 50) {
+            MsgError(i18n.global.t('commons.msg.unSupportSize', [50]));
             return false;
         }
         return true;
@@ -176,10 +177,11 @@ const beforeAvatarUpload = (rawFile) => {
         !rawFile.name.endsWith('.zip') &&
         !rawFile.name.endsWith('.tgz')
     ) {
-        MsgError(i18n.global.t('database.unSupportType'));
+        MsgError(i18n.global.t('commons.msg.unSupportType'));
         return false;
-    } else if (rawFile.size / 1024 / 1024 > 10) {
-        MsgError(i18n.global.t('database.unSupportSize'));
+    }
+    if (rawFile.size / 1024 / 1024 > 10) {
+        MsgError(i18n.global.t('commons.msg.unSupportSize', [10]));
         return false;
     }
     return true;

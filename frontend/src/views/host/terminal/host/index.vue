@@ -32,7 +32,11 @@
             <template #search>
                 <el-select v-model="group" @change="search()" clearable>
                     <template #prefix>{{ $t('terminal.group') }}</template>
-                    <el-option v-for="item in groupList" :key="item.name" :value="item.id" :label="item.name" />
+                    <el-option :label="$t('commons.table.all')" value=""></el-option>
+                    <div v-for="item in groupList" :key="item.name">
+                        <el-option v-if="item.name === 'default'" :label="$t('website.default')" :value="item.id" />
+                        <el-option v-else :value="item.id" :label="item.name" />
+                    </div>
                 </el-select>
             </template>
             <template #main>
@@ -46,7 +50,12 @@
                     <el-table-column :label="$t('terminal.ip')" prop="addr" fix />
                     <el-table-column :label="$t('terminal.user')" show-overflow-tooltip prop="user" />
                     <el-table-column :label="$t('terminal.port')" prop="port" />
-                    <el-table-column :label="$t('commons.table.group')" show-overflow-tooltip prop="groupBelong" />
+                    <el-table-column :label="$t('commons.table.group')" show-overflow-tooltip prop="groupBelong">
+                        <template #default="{ row }">
+                            <span v-if="row.groupBelong === 'default'">{{ $t('website.default') }}</span>
+                            <span v-else>{{ row.groupBelong }}</span>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.title')" show-overflow-tooltip prop="name">
                         <template #default="{ row }">
                             <span v-if="row.addr === '127.0.0.1'">{{ $t('terminal.localhost') }}</span>
@@ -91,7 +100,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const info = ref();
-const group = ref();
+const group = ref<string>('');
 const dialogGroupChangeRef = ref();
 
 const acceptParams = () => {

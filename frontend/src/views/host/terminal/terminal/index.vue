@@ -85,17 +85,23 @@
                             :data="hostTree"
                             :props="defaultProps"
                             :filter-node-method="filterHost"
+                            :empty-text="$t('terminal.noHost')"
                         >
                             <template #default="{ node, data }">
                                 <span class="custom-tree-node">
-                                    <span v-if="node.label.length <= 25">
-                                        <a @click="onClickConn(node, data)">{{ node.label }}</a>
-                                    </span>
-                                    <el-tooltip v-else :content="node.label" placement="top-start">
-                                        <span>
-                                            <a @click="onClickConn(node, data)">{{ node.label.substring(0, 22) }}...</a>
+                                    <span v-if="node.label === 'default'">{{ $t('website.default') }}</span>
+                                    <div v-else>
+                                        <span v-if="node.label.length <= 25">
+                                            <a @click="onClickConn(node, data)">{{ node.label }}</a>
                                         </span>
-                                    </el-tooltip>
+                                        <el-tooltip v-else :content="node.label" placement="top-start">
+                                            <span>
+                                                <a @click="onClickConn(node, data)">
+                                                    {{ node.label.substring(0, 22) }}...
+                                                </a>
+                                            </span>
+                                        </el-tooltip>
+                                    </div>
                                 </span>
                             </template>
                         </el-tree>

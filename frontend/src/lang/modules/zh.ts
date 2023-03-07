@@ -97,6 +97,8 @@ export default {
             backupSuccess: '备份成功',
             restoreSuccess: '备份成功',
             notFound: '抱歉，您访问的页面不存在',
+            unSupportType: '不支持当前文件类型！',
+            unSupportSize: '上传文件超过 {0}M，请确认！',
         },
         login: {
             firstLogin: '首次登录，请创建初始管理员用户！',
@@ -294,8 +296,6 @@ export default {
 
         confChange: '配置修改',
 
-        unSupportType: '不支持当前文件类型！',
-        unSupportSize: '上传文件超过 10M，请确认！',
         selectFile: '选择文件',
         dropHelper: '将上传文件拖拽到此处，或者',
         clickHelper: '点击上传',
@@ -625,6 +625,7 @@ export default {
         host: '主机',
         createConn: '新建连接',
         group: '分组',
+        noHost: '暂无主机',
         groupChange: '切换分组',
         expand: '全部展开',
         fold: '全部收缩',
