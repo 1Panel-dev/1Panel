@@ -273,7 +273,28 @@ func (a AppInstallService) ChangeAppPort(req request.PortUpdate) error {
 	if common.ScanPort(int(req.Port)) {
 		return buserr.WithDetail(constant.ErrPortInUsed, req.Port, nil)
 	}
-	return updateInstallInfoInDB(req.Key, "", "port", true, strconv.FormatInt(req.Port, 10))
+
+	appInstall, err := appInstallRepo.LoadBaseInfo(req.Key, req.Name)
+	if err != nil {
+		return nil
+	}
+
+	if err := updateInstallInfoInDB(req.Key, "", "port", true, strconv.FormatInt(req.Port, 10)); err != nil {
+		return nil
+	}
+
+	appRess, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(appInstall.ID))
+	for _, appRes := range appRess {
+		appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(appRes.AppInstallId))
+		if err != nil {
+			return err
+		}
+		if _, err := compose.Restart(fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, appInstall.App.Key, appInstall.Name)); err != nil {
+			global.LOG.Errorf("docker-compose restart %s[%s] failed, err: %v", appInstall.App.Key, appInstall.Name, err)
+		}
+	}
+
+	return nil
 }
 
 func (a AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, error) {
