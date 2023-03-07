@@ -528,7 +528,7 @@ func updateMyCnf(oldFiles []string, group string, param string, value interface{
 			newFiles = append(newFiles, line)
 			continue
 		}
-		if strings.HasPrefix(line, param) || strings.HasPrefix(line, "# "+param) {
+		if strings.HasPrefix(line, param+"=") || strings.HasPrefix(line, "# "+param+"=") {
 			newFiles = append(newFiles, fmt.Sprintf("%s=%v", param, value))
 			hasKey = true
 			continue

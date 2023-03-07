@@ -2,7 +2,7 @@
     <div v-show="onSetting" v-loading="loading">
         <LayoutContent :title="'MySQL ' + $t('database.setting')" :reload="true">
             <template #buttons>
-                <el-button type="primary" :plain="activeName !== 'conf'" @click="activeName = 'conf'">
+                <el-button type="primary" :plain="activeName !== 'conf'" @click="jumpToConf">
                     {{ $t('database.confChange') }}
                 </el-button>
                 <el-button
@@ -35,7 +35,7 @@
                 <el-button
                     type="primary"
                     :disabled="mysqlStatus !== 'Running'"
-                    @click="activeName = 'slowLog'"
+                    @click="jumpToSlowlog"
                     :plain="activeName !== 'slowLog'"
                 >
                     {{ $t('database.slowLog') }}
@@ -94,7 +94,12 @@
                     </el-form>
                 </div>
                 <ContainerLog v-show="activeName === 'log'" ref="dialogContainerLogRef" />
-                <SlowLog @loading="changeLoading" v-show="activeName === 'slowLog'" ref="slowLogRef" />
+                <SlowLog
+                    @loading="changeLoading"
+                    @refresh="loadBaseInfo"
+                    v-show="activeName === 'slowLog'"
+                    ref="slowLogRef"
+                />
             </template>
         </LayoutContent>
 
@@ -125,6 +130,7 @@ import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 
+const baseDir = ref();
 const extensions = [javascript(), oneDark];
 const activeName = ref('conf');
 
@@ -170,6 +176,17 @@ const acceptParams = (props: DialogProps): void => {
 };
 const onClose = (): void => {
     onSetting.value = false;
+};
+
+const jumpToConf = async () => {
+    activeName.value = 'conf';
+    const pathRes = await loadBaseDir();
+    loadMysqlConf(`${pathRes.data}/apps/mysql/${mysqlName.value}/conf/my.cnf`);
+};
+
+const jumpToSlowlog = async () => {
+    activeName.value = 'slowLog';
+    loadSlowLogs();
 };
 
 const onSubmitChangePort = async () => {
@@ -255,6 +272,7 @@ const loadBaseInfo = async () => {
     baseInfo.port = res.data?.port;
     baseInfo.containerID = res.data?.containerName;
     const pathRes = await loadBaseDir();
+    baseDir.value = pathRes.data;
     loadMysqlConf(`${pathRes.data}/apps/mysql/${mysqlName.value}/conf/my.cnf`);
     loadContainerLog(baseInfo.containerID);
 };
@@ -274,7 +292,9 @@ const loadVariables = async () => {
 };
 
 const loadSlowLogs = async () => {
-    await Promise.all([loadBaseInfo(), loadVariables()]);
+    const res = await loadMysqlVariables();
+    variables.value = res.data;
+
     let param = {
         mysqlName: mysqlName.value,
         variables: variables.value,
