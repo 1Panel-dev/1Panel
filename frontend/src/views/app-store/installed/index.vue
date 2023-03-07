@@ -56,7 +56,16 @@
                 </div>
             </div>
             <el-row :gutter="5">
-                <el-col v-for="(installed, index) in data" :key="index" :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
+                <el-col
+                    v-for="(installed, index) in data"
+                    :key="index"
+                    :xs="24"
+                    :sm="24"
+                    :md="24"
+                    :lg="12"
+                    :xl="12"
+                    class="install-card-col-12"
+                >
                     <div class="install-card">
                         <el-row :gutter="24">
                             <el-col :xs="3" :sm="3" :md="3" :lg="4" :xl="4">
@@ -398,4 +407,10 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 @import '../index.scss';
+@media only screen and (max-width: 1300px) {
+    .install-card-col-12 {
+        max-width: 100%;
+        flex: 0 0 100%;
+    }
+}
 </style>
