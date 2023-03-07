@@ -98,7 +98,7 @@ func handleAppBackup(install *model.AppInstall, backupDir, fileName string) erro
 	}
 
 	appPath := fmt.Sprintf("%s/%s/%s", constant.AppInstallDir, install.App.Key, install.Name)
-	if err := fileOp.Compress([]string{appPath}, tmpDir, "app.tar.gz", files.TarGz); err != nil {
+	if err := handleTar(appPath, tmpDir, "app.tar.gz", ""); err != nil {
 		return err
 	}
 
@@ -117,7 +117,7 @@ func handleAppBackup(install *model.AppInstall, backupDir, fileName string) erro
 		}
 	}
 
-	if err := fileOp.Compress([]string{tmpDir}, backupDir, fileName, files.TarGz); err != nil {
+	if err := handleTar(tmpDir, backupDir, fileName, ""); err != nil {
 		return err
 	}
 	return nil

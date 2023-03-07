@@ -104,6 +104,7 @@
                                             plain
                                             round
                                             size="small"
+                                            :disabled="installed.status !== 'Running'"
                                             @click="openUploads(installed.app.key, installed.name)"
                                             v-if="mode === 'installed'"
                                         >
@@ -115,6 +116,7 @@
                                             plain
                                             round
                                             size="small"
+                                            :disabled="installed.status !== 'Running'"
                                             @click="openBackups(installed.app.key, installed.name)"
                                             v-if="mode === 'installed'"
                                         >
