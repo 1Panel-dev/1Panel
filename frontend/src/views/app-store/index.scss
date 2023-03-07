@@ -2,7 +2,9 @@
     margin-top: 10px;
     cursor: pointer;
     padding: 10px;
-
+    .icon {
+        text-align: center;
+    }
 
     .a-detail {
         height: 100%;
@@ -41,7 +43,7 @@
         }
         .d-button {
             margin-top: 10px;
-						min-width: 440px;
+            min-width: 440px;
         }
     }
     &:hover {
