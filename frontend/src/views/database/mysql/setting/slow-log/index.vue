@@ -2,9 +2,10 @@
     <div>
         <span style="float: left; line-height: 30px">{{ $t('database.longQueryTime') }}</span>
         <div style="margin-left: 5px; float: left">
-            <el-input type="number" v-model.number="variables.long_query_time">
+            <el-input @input="checkValid" type="number" v-model.number="variables.long_query_time">
                 <template #append>{{ $t('database.second') }}</template>
             </el-input>
+            <span v-if="errTime" class="input-error">{{ $t('commons.rule.numberRange', [1, 600]) }}</span>
         </div>
         <span style="float: left; margin-left: 20px; line-height: 30px">{{ $t('database.isOn') }}</span>
         <el-switch
@@ -25,7 +26,7 @@
             :placeholder="$t('database.noData')"
             :indent-with-tab="true"
             :tabSize="4"
-            style="margin-top: 10px; height: calc(100vh - 392px)"
+            style="margin-top: 10px; height: calc(100vh - 392px); width: 100%"
             :lineWrapping="true"
             :matchBrackets="true"
             theme="cobalt"
@@ -63,6 +64,7 @@ const handleReady = (payload) => {
 
 const confirmDialogRef = ref();
 
+const errTime = ref();
 const isWatch = ref();
 let timer: NodeJS.Timer | null = null;
 
@@ -109,7 +111,14 @@ const onCancle = async () => {
     variables.slow_query_log = variables.slow_query_log === 'ON' ? 'OFF' : 'ON';
 };
 
+const checkValid = () => {
+    errTime.value = !(variables.long_query_time > 0 && variables.long_query_time < 600);
+};
+
 const onSave = async () => {
+    if (!(variables.long_query_time > 0 && variables.long_query_time < 600)) {
+        return;
+    }
     let param = [] as Array<Database.VariablesUpdate>;
     if (variables.slow_query_log !== oldVariables.value.slow_query_log) {
         param.push({ param: 'slow_query_log', value: variables.slow_query_log });

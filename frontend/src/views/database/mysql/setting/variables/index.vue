@@ -115,7 +115,7 @@
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { Rules } from '@/global/form-rules';
+import { checkNumberRange, Rules } from '@/global/form-rules';
 import { FormInstance } from 'element-plus';
 import { Database } from '@/api/interface/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
@@ -151,23 +151,23 @@ let mysqlVariables = reactive({
     long_query_time: 0,
 });
 const variablesRules = reactive({
-    key_buffer_size: [Rules.number],
-    query_cache_size: [Rules.number],
-    tmp_table_size: [Rules.number],
-    innodb_buffer_pool_size: [Rules.number],
-    innodb_log_buffer_size: [Rules.number],
-    sort_buffer_size: [Rules.number],
-    read_buffer_size: [Rules.number],
-    read_rnd_buffer_size: [Rules.number],
-    join_buffer_size: [Rules.number],
-    thread_stack: [Rules.number],
-    binlog_cache_size: [Rules.number],
-    thread_cache_size: [Rules.number],
-    table_open_cache: [Rules.number],
-    max_connections: [Rules.number],
+    key_buffer_size: [Rules.number, checkNumberRange(1, 102400)],
+    query_cache_size: [Rules.number, checkNumberRange(1, 102400)],
+    tmp_table_size: [Rules.number, checkNumberRange(1, 102400)],
+    innodb_buffer_pool_size: [Rules.number, checkNumberRange(1, 102400)],
+    innodb_log_buffer_size: [Rules.number, checkNumberRange(1, 102400)],
+    sort_buffer_size: [Rules.number, checkNumberRange(1, 102400)],
+    read_buffer_size: [Rules.number, checkNumberRange(1, 102400)],
+    read_rnd_buffer_size: [Rules.number, checkNumberRange(1, 102400)],
+    join_buffer_size: [Rules.number, checkNumberRange(1, 102400)],
+    thread_stack: [Rules.number, checkNumberRange(1, 102400)],
+    binlog_cache_size: [Rules.number, checkNumberRange(1, 102400)],
+    thread_cache_size: [Rules.number, checkNumberRange(1, 10000)],
+    table_open_cache: [Rules.number, checkNumberRange(1, 10000)],
+    max_connections: [Rules.number, checkNumberRange(1, 10000)],
 
     slow_query_log: [Rules.requiredSelect],
-    long_query_time: [Rules.number],
+    long_query_time: [Rules.number, checkNumberRange(1, 102400)],
 });
 
 const mysqlName = ref();
