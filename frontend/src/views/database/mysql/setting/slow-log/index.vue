@@ -1,5 +1,5 @@
 <template>
-    <div v-loading="loading">
+    <div>
         <span style="float: left; line-height: 30px">{{ $t('database.longQueryTime') }}</span>
         <div style="margin-left: 5px; float: left">
             <el-input type="number" v-model.number="variables.long_query_time">
@@ -54,7 +54,6 @@ import i18n from '@/lang';
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
 
-const loading = ref();
 const extensions = [javascript(), oneDark];
 const slowLogs = ref();
 const view = shallowRef();
@@ -95,6 +94,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     }, 1000 * 5);
     oldVariables.value = { ...variables };
 };
+const emit = defineEmits(['loading']);
 
 const handleSlowLogs = async () => {
     let params = {
@@ -118,14 +118,14 @@ const onSave = async () => {
         param.push({ param: 'long_query_time', value: variables.long_query_time + '' });
         param.push({ param: 'slow_query_log_file', value: '/var/lib/mysql/1Panel-slow.log' });
     }
-    loading.value = true;
+    emit('loading', true);
     await updateMysqlVariables(param)
         .then(() => {
-            loading.value = false;
+            emit('loading', false);
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
-            loading.value = false;
+            emit('loading', false);
         });
 };
 

@@ -1,5 +1,5 @@
 <template>
-    <div v-loading="loading">
+    <div>
         <el-form :model="mysqlVariables" :rules="variablesRules" ref="variableFormRef" label-position="top">
             <el-row>
                 <el-col :span="1"><br /></el-col>
@@ -63,7 +63,7 @@
                     </el-form-item>
 
                     <el-form-item>
-                        <el-button :disabled="loading" @click="onSaveStart(variableFormRef)" type="primary">
+                        <el-button @click="onSaveStart(variableFormRef)" type="primary">
                             {{ $t('commons.button.save') }}
                         </el-button>
                     </el-form-item>
@@ -123,8 +123,6 @@ import { updateMysqlVariables } from '@/api/modules/database';
 import i18n from '@/lang';
 import { planOptions } from './../helper';
 import { MsgSuccess } from '@/utils/message';
-
-const loading = ref(false);
 
 const plan = ref();
 const confirmDialogRef = ref();
@@ -198,6 +196,7 @@ const acceptParams = (params: DialogProps): void => {
     mysqlVariables.max_connections = Number(params.variables.max_connections);
     oldVariables.value = { ...mysqlVariables };
 };
+const emit = defineEmits(['loading']);
 
 const changePlan = async () => {
     for (const item of planOptions) {
@@ -282,14 +281,14 @@ const onSaveVariables = async () => {
     if (oldVariables.value?.max_connections !== mysqlVariables.max_connections) {
         param.push({ param: 'max_connections', value: mysqlVariables.max_connections });
     }
-    loading.value = true;
+    emit('loading', true);
     await updateMysqlVariables(param)
         .then(() => {
-            loading.value = false;
+            emit('loading', false);
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
-            loading.value = false;
+            emit('loading', false);
         });
 };
 
