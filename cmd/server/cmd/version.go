@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	cmdUtils "github.com/1Panel-dev/1Panel/backend/utils/cmd"
-	"github.com/glebarez/sqlite"
 	"github.com/spf13/cobra"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 

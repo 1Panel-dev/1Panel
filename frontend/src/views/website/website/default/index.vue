@@ -3,7 +3,7 @@
         <template #header>
             <DrawerHeader :header="$t('website.defaultServer')" :back="handleClose"></DrawerHeader>
         </template>
-        <el-row>
+        <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-form label-position="top">
                     <el-form-item :label="$t('website.defaultServer')">
@@ -70,11 +70,15 @@ const get = async () => {
 };
 
 const submit = () => {
-    ChangeDefaultServer({ id: defaultId.value }).then(() => {
-        MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-        handleClose();
-    });
+    loading.value = true;
+    ChangeDefaultServer({ id: defaultId.value })
+        .then(() => {
+            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+            handleClose();
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
-
 defineExpose({ acceptParams });
 </script>

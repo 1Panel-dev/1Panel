@@ -147,6 +147,7 @@ export default {
             paramName: '支持英文、数字、.-和_,长度2-30',
             paramComplexity: '支持英文、数字、{0},长度6-30',
             paramUrlAndPort: '格式为 http(s)://(域名/ip):(端口)',
+            nginxDoc: '仅支持英文大小写，数字，和.',
         },
         res: {
             paramError: '请求失败,请稍后重试!',

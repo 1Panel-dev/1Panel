@@ -186,6 +186,19 @@ const checkParamUrlAndPort = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkDoc = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.nginxDoc')));
+    } else {
+        const reg = /^[A-Za-z0-9\n.]+$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.nginxDoc')));
+        } else {
+            callback();
+        }
+    }
+};
+
 export function checkNumberRange(min: number, max: number): FormItemRule {
     return {
         required: true,
@@ -215,6 +228,7 @@ interface CommonRule {
     port: FormItemRule;
     domain: FormItemRule;
     databaseName: FormItemRule;
+    nginxDoc: FormItemRule;
 
     paramCommon: FormItemRule;
     paramComplexity: FormItemRule;
@@ -337,6 +351,11 @@ export const Rules: CommonRule = {
     paramExtUrl: {
         required: true,
         validator: checkParamUrlAndPort,
+        trigger: 'blur',
+    },
+    nginxDoc: {
+        required: true,
+        validator: checkDoc,
         trigger: 'blur',
     },
 };
