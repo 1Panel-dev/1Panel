@@ -47,3 +47,6 @@ ErrEmailIsExist: 'Email is already exist'
 #mysql
 ErrUserIsExist: "The current user already exists. Please enter a new user"
 ErrDatabaseIsExist: "The current database already exists. Please enter a new database"
+
+#redis
+ErrTypeOfRedis: "The recovery file type does not match the current persistence mode. Modify the file type and try again"

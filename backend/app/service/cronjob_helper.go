@@ -245,10 +245,12 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 		path = sourceDir
 	}
 
-	global.LOG.Debugf("tar zcvf %s %s %s \n", targetDir+"/"+name, excludeRules, path)
-	stdout, err := cmd.Execf("tar zcvf %s %s %s", targetDir+"/"+name, excludeRules, path)
+	commands := fmt.Sprintf("tar zcvf %s %s %s", targetDir+"/"+name, excludeRules, path)
+	global.LOG.Debug(commands)
+	stdout, err := cmd.Exec(commands)
 	if err != nil {
-		return errors.New(string(stdout))
+		global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
+		return errors.New(stdout)
 	}
 	return nil
 }
@@ -260,9 +262,12 @@ func handleUnTar(sourceFile, targetDir string) error {
 		}
 	}
 
-	stdout, err := cmd.Execf("tar zxvfC %s %s", sourceFile, targetDir)
+	commands := fmt.Sprintf("tar zxvfC %s %s", sourceFile, targetDir)
+	global.LOG.Debug(commands)
+	stdout, err := cmd.Exec(commands)
 	if err != nil {
-		return errors.New(string(stdout))
+		global.LOG.Errorf("do handle untar failed, stdout: %s, err: %v", stdout, err)
+		return errors.New(stdout)
 	}
 	return nil
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
@@ -108,7 +109,7 @@ func handleRedisRecover(redisInfo *repo.RootInfo, recoverFile string, isRollback
 		return err
 	}
 	if (appendonly == "yes" && !strings.HasSuffix(recoverFile, ".tar.gz")) || (appendonly != "yes" && !strings.HasSuffix(recoverFile, ".rdb")) {
-		return fmt.Errorf("recover redis with appendonly=%s from file %s format error", appendonly, recoverFile)
+		return buserr.New(constant.ErrTypeOfRedis)
 	}
 	global.LOG.Infof("appendonly in redis conf is %s", appendonly)
 	isOk := false
@@ -140,7 +141,7 @@ func handleRedisRecover(redisInfo *repo.RootInfo, recoverFile string, isRollback
 		return err
 	}
 	if appendonly == "yes" {
-		redisDataDir := fmt.Sprintf("%s/%s/%s/data/", constant.AppInstallDir, "redis", redisInfo.Name)
+		redisDataDir := fmt.Sprintf("%s/%s/%s/data", constant.AppInstallDir, "redis", redisInfo.Name)
 		if err := handleUnTar(recoverFile, redisDataDir); err != nil {
 			return err
 		}

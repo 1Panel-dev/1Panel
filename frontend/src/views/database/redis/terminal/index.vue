@@ -61,6 +61,7 @@ const closeRealTerminal = (ev: CloseEvent) => {
 const initTerm = () => {
     let ifm = document.getElementById('terminal-exec') as HTMLInputElement | null;
     let href = window.location.href;
+    let protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     let ipLocal = href.split('//')[1].split('/')[0];
     term = new Terminal({
         lineHeight: 1.2,
@@ -77,7 +78,7 @@ const initTerm = () => {
     if (ifm) {
         term.open(ifm);
         terminalSocket = new WebSocket(
-            `ws://${ipLocal}/api/v1/databases/redis/exec?cols=${term.cols}&rows=${term.rows}`,
+            `${protocol}://${ipLocal}/api/v1/databases/redis/exec?cols=${term.cols}&rows=${term.rows}`,
         );
         terminalSocket.onopen = runRealTerminal;
         terminalSocket.onmessage = onWSReceive;
