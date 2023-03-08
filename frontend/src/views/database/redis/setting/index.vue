@@ -73,14 +73,19 @@
                             <el-col :span="1"><br /></el-col>
                             <el-col :span="10">
                                 <el-form-item :label="$t('database.timeout')" prop="timeout">
-                                    <el-input clearable type="number" v-model.number="form.timeout" />
+                                    <el-input clearable type="number" v-model.number="form.timeout">
+                                        <template #append>{{ $t('home.Second') }}</template>
+                                    </el-input>
                                     <span class="input-help">{{ $t('database.timeoutHelper') }}</span>
                                 </el-form-item>
                                 <el-form-item :label="$t('database.maxclients')" prop="maxclients">
                                     <el-input clearable type="number" v-model.number="form.maxclients" />
                                 </el-form-item>
                                 <el-form-item :label="$t('database.maxmemory')" prop="maxmemory">
-                                    <el-input clearable type="number" v-model.number="form.maxmemory" />
+                                    <el-input clearable type="number" v-model.number="form.maxmemory">
+                                        <template #append>mb</template>
+                                    </el-input>
+
                                     <span class="input-help">{{ $t('database.maxmemoryHelper') }}</span>
                                 </el-form-item>
                                 <el-form-item>
@@ -178,6 +183,21 @@ interface DialogProps {
 
 const changeTab = (val: string) => {
     activeName.value = val;
+    switch (val) {
+        case 'conf':
+            loadConfFile();
+            break;
+        case 'persistence':
+            persistenceRef.value!.acceptParams({ status: redisStatus.value });
+            break;
+        case 'tuning':
+        case 'port':
+            loadform();
+            break;
+        case 'status':
+            statusRef.value!.acceptParams({ status: redisStatus.value });
+            break;
+    }
 };
 
 const changeLoading = (status: boolean) => {
@@ -189,11 +209,6 @@ const acceptParams = (prop: DialogProps): void => {
     redisName.value = prop.redisName;
     settingShow.value = true;
     loadConfFile();
-    if (redisStatus.value === 'Running') {
-        statusRef.value!.acceptParams({ status: prop.status });
-        persistenceRef.value!.acceptParams({ status: prop.status });
-        loadform();
-    }
 };
 
 const portRef = ref();
@@ -220,7 +235,6 @@ function callback(error: any) {
     }
 }
 const onChangePort = async (formEl: FormInstance | undefined) => {
-    console.log('asdqwdwqd');
     if (!formEl) return;
     const result = await formEl.validateField('port', callback);
     if (!result) {
@@ -260,7 +274,7 @@ const submtiForm = async () => {
     let param = {
         timeout: form.timeout + '',
         maxclients: form.maxclients + '',
-        maxmemory: form.maxmemory + '',
+        maxmemory: form.maxmemory + 'mb',
     };
     loading.value = true;
     await updateRedisConf(param)
@@ -311,7 +325,7 @@ const loadform = async () => {
     form.name = res.data?.name;
     form.timeout = Number(res.data?.timeout);
     form.maxclients = Number(res.data?.maxclients);
-    form.maxmemory = Number(res.data?.maxmemory);
+    form.maxmemory = Number(res.data?.maxmemory.replaceAll('mb', '')) / 1048576;
     form.port = Number(res.data?.port);
 };
 

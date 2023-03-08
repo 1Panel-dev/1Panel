@@ -48,13 +48,13 @@
                             <td width="32%">
                                 <el-input type="number" v-model="row.second"></el-input>
                             </td>
-                            <td width="60px">
+                            <td width="80px">
                                 {{ $t('database.rdbHelper1') }}
                             </td>
                             <td width="32%">
                                 <el-input type="number" v-model="row.count"></el-input>
                             </td>
-                            <td width="12%">
+                            <td width="10%">
                                 {{ $t('database.rdbHelper2') }}
                             </td>
                             <td>
@@ -89,7 +89,11 @@
                 <el-table-column type="selection" fix />
                 <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="fileName" />
                 <el-table-column :label="$t('database.source')" prop="backupType">
-                    <template #default="{ row }">{{ $t('setting.' + row.source) }}</template>
+                    <template #default="{ row }">
+                        <span v-if="row.source">
+                            {{ $t('setting.' + row.source) }}
+                        </span>
+                    </template>
                 </el-table-column>
                 <el-table-column :label="$t('file.dir')" show-overflow-tooltip prop="fileDir" />
                 <el-table-column :label="$t('commons.table.createdAt')" :formatter="dateFormat" prop="createdAt" />
@@ -270,7 +274,7 @@ const onSave = async (formEl: FormInstance | undefined, type: string) => {
     }
     let itemSaves = [] as Array<string>;
     for (const item of form.saves) {
-        if (item.count === 0 || item.second === 0) {
+        if (item.count < 0 || item.count > 100000 || item.second < 0 || item.second > 100000) {
             MsgInfo(i18n.global.t('database.rdbInfo'));
             return;
         }
@@ -290,6 +294,7 @@ const onSave = async (formEl: FormInstance | undefined, type: string) => {
 };
 
 const loadform = async () => {
+    console.log('adqwdqw');
     form.saves = [];
     const res = await redisPersistenceConf();
     form.appendonly = res.data?.appendonly;

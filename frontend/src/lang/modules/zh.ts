@@ -409,7 +409,7 @@ export default {
         rdbHelper1: '秒內,插入',
         rdbHelper2: '条数据',
         rdbHelper3: '符合任意一个条件将会触发RDB持久化',
-        rdbInfo: '规则列表存在 0 值，请确认后重试！',
+        rdbInfo: '请确认规则列表中值在 1-100000 之间',
     },
     container: {
         createContainer: '创建容器',

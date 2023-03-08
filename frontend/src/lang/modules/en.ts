@@ -396,7 +396,7 @@ export default {
         rdbHelper1: 'In seconds, insert',
         rdbHelper2: 'The data',
         rdbHelper3: 'Meeting either condition triggers RDB persistence',
-        rdbInfo: 'Rule list has 0 value, please confirm and try again!',
+        rdbInfo: 'Ensure that the value in the rule list ranges from 1 to 100000',
     },
     container: {
         createContainer: 'Create container',

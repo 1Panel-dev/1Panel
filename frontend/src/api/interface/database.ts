@@ -143,7 +143,7 @@ export namespace Database {
         timeout: number;
         maxclients: number;
         requirepass: string;
-        maxmemory: number;
+        maxmemory: string;
     }
     export interface RedisPersistenceConf {
         appendonly: string;
