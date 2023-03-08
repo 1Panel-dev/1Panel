@@ -1072,7 +1072,7 @@ export default {
         notSecurity: '（不安全）',
         encryptHelper:
             "Let's Encrypt 签发证书有频率限制，但足以满足正常需求，过于频繁操作会导致签发失败。具体限制请看 <a target=“_blank” href='https://letsencrypt.org/zh-cn/docs/rate-limits/'>官方文档</a> ",
-        ipValue: 'IP值',
+        ipValue: '值',
         ext: '文件扩展名',
         wafInputHelper: '按行输入数据，一行一个',
         data: '数据',

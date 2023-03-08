@@ -18,7 +18,7 @@
                         {{ $t('commons.button.add') }}
                     </el-button>
                 </template>
-                <el-table-column label="IP" prop="ip"></el-table-column>
+                <el-table-column :label="$t('website.ipValue')" prop="ip"></el-table-column>
                 <el-table-column :label="$t('commons.table.operate')">
                     <template #default="{ $index }">
                         <el-button link type="primary" @click="removeIp($index)">
@@ -116,18 +116,30 @@ const openCreate = () => {
     if (ipArray.length == 0) {
         return;
     }
+    let newIpArray = [];
+    ipArray.forEach((ip: string) => {
+        const newIp = ip.replace(/(^\s*)|(\s*$)/g, '');
+        if (newIp != '') {
+            newIpArray.push(newIp);
+        }
+    });
+    if (newIpArray.length == 0) {
+        return;
+    }
     if (req.value.rule.indexOf('ip') > -1) {
-        for (const id in ipArray) {
-            if (checkIp(ipArray[id])) {
+        for (const id in newIpArray) {
+            if (checkIp(newIpArray[id])) {
                 MsgError(i18n.global.t('commons.rule.ipErr', [ipArray[id]]));
                 return;
             }
         }
     }
     data.value.forEach((d) => {
-        ipArray.push(d.ip);
+        newIpArray.push(d.ip);
     });
-    submit(ipArray);
+    if (newIpArray.length > 0) {
+        submit(newIpArray);
+    }
 };
 
 const submit = async (ipList: string[]) => {
