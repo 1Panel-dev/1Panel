@@ -24,6 +24,7 @@
                 @change="updateParam"
             ></el-input>
             <el-select
+                style="width: 100%"
                 v-model="form[p.envKey]"
                 v-if="p.type == 'service'"
                 @change="changeService(form[p.envKey], p.services)"
@@ -35,6 +36,12 @@
                     :label="service.label"
                 ></el-option>
             </el-select>
+            <span v-if="p.type === 'service' && p.services.length === 0">
+                <el-link type="primary" :underline="false" @click="toPage(p.key)">
+                    {{ $t('app.toInstall') }}
+                </el-link>
+            </span>
+
             <el-row :gutter="10" v-if="p.type == 'apps'">
                 <el-col :span="12">
                     <el-form-item :prop="p.prop">
