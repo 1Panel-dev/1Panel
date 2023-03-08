@@ -87,3 +87,8 @@ var (
 	ErrUserIsExist     = "ErrUserIsExist"
 	ErrDatabaseIsExist = "ErrDatabaseIsExist"
 )
+
+//redis
+var (
+	ErrTypeOfRedis = "ErrTypeOfRedis"
+)
