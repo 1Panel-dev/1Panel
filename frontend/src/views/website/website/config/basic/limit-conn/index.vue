@@ -16,15 +16,15 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item :label="$t('website.perserver')" prop="perserver">
-                    <el-input v-model="form.perserver"></el-input>
+                    <el-input v-model.number="form.perserver" min="1" max="65535" type="number"></el-input>
                     <span class="input-help">{{ $t('website.perserverHelper') }}</span>
                 </el-form-item>
                 <el-form-item :label="$t('website.perip')" prop="perip">
-                    <el-input v-model="form.perip"></el-input>
+                    <el-input v-model.number="form.perip" type="number"></el-input>
                     <span class="input-help">{{ $t('website.peripHelper') }}</span>
                 </el-form-item>
                 <el-form-item :label="$t('website.rate')" prop="rate">
-                    <el-input v-model="form.rate"></el-input>
+                    <el-input v-model.number="form.rate" type="number"></el-input>
                     <span class="input-help">{{ $t('website.rateHelper') }}</span>
                 </el-form-item>
             </el-form>
@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts" setup>
-import { Rules } from '@/global/form-rules';
+import { checkNumberRange, Rules } from '@/global/form-rules';
 import { Website } from '@/api/interface/website';
 import { GetNginxConfig, UpdateNginxConfig } from '@/api/modules/website';
 import { FormInstance } from 'element-plus';
@@ -54,10 +54,10 @@ const props = defineProps({
 const websiteId = computed(() => {
     return Number(props.id);
 });
-let rules = ref({
-    perserver: [Rules.requiredInput],
-    perip: [Rules.requiredInput],
-    rate: [Rules.requiredInput],
+let rules = reactive({
+    perserver: [Rules.requiredInput, checkNumberRange(1, 65535)],
+    perip: [Rules.requiredInput, checkNumberRange(1, 65535)],
+    rate: [Rules.requiredInput, checkNumberRange(1, 99999999)],
 });
 const limitForm = ref<FormInstance>();
 let form = reactive({
