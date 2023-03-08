@@ -157,6 +157,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 		}
 		defer func() {
 			if !isOk {
+				global.LOG.Info("recover failed, start to rollback now")
 				if err := handleAppRecover(install, rollbackFile, true); err != nil {
 					global.LOG.Errorf("rollback app %s from %s failed, err: %v", install.Name, rollbackFile, err)
 					return

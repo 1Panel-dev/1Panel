@@ -157,6 +157,7 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
                 let isLocal = hostInfo.addr === '127.0.0.1';
                 emit('on-conn-terminal', title, res.data.id, isLocal);
                 emit('load-host-tree');
+                break;
         }
     });
 };

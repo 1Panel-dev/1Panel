@@ -390,6 +390,10 @@ function hasScript() {
 }
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
+    dialogData.value.rowData.week = Number(dialogData.value.rowData.week);
+    dialogData.value.rowData.day = Number(dialogData.value.rowData.day);
+    dialogData.value.rowData.hour = Number(dialogData.value.rowData.hour);
+    dialogData.value.rowData.minute = Number(dialogData.value.rowData.minute);
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;

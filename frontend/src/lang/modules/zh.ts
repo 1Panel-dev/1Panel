@@ -943,7 +943,7 @@ export default {
         static: '静态网站',
         deployment: '一键部署',
         supportUpType: '仅支持 50M 以内 .tar.gz 文件',
-        zipFormat: '.tar.gz 压缩包结构：test.tar.gz 压缩包内，必需包含 website.json 文件',
+        zipFormat: '.tar.gz 压缩包结构：test.tar.gz 压缩包内，必需包含 {0} 文件',
         proxy: '反向代理',
         alias: '代号',
         remark: '备注',

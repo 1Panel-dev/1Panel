@@ -106,6 +106,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 			return fmt.Errorf("backup website %s for rollback before recover failed, err: %v", website.Alias, err)
 		}
 		defer func() {
+			global.LOG.Info("recover failed, start to rollback now")
 			if !isOk {
 				if err := handleWebsiteRecover(website, rollbackFile, true); err != nil {
 					global.LOG.Errorf("rollback website %s from %s failed, err: %v", website.Alias, rollbackFile, err)
