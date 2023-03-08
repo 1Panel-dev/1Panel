@@ -96,7 +96,7 @@ func (w WebsiteService) GetWebsites() ([]response.WebsiteDTO, error) {
 
 func (w WebsiteService) CreateWebsite(ctx context.Context, create request.WebsiteCreate) error {
 	if exist, _ := websiteRepo.GetBy(websiteRepo.WithDomain(create.PrimaryDomain)); len(exist) > 0 {
-		return buserr.New(constant.ErrNameIsExist)
+		return buserr.New(constant.ErrDomainIsExist)
 	}
 	if exist, _ := websiteRepo.GetBy(websiteRepo.WithAlias(create.Alias)); len(exist) > 0 {
 		return buserr.New(constant.ErrAliasIsExist)
