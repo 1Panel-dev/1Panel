@@ -46,6 +46,14 @@ func WithDetail(Key string, detail interface{}, err error) BusinessError {
 	}
 }
 
+func WithErr(Key string, err error) BusinessError {
+	return BusinessError{
+		Msg:    Key,
+		Detail: "",
+		Err:    err,
+	}
+}
+
 func WithMap(Key string, maps map[string]interface{}, err error) BusinessError {
 	return BusinessError{
 		Msg: Key,

@@ -25,6 +25,7 @@ ErrNotInstall: "App not installed"
 ErrPortInOtherApp: "{{ .port }} port  already in use by  {{ .apps }}"
 ErrDbUserNotValid: "Stock database, username and password do not match！"
 ErrDockerComposeNotValid: "docker-compose file format error!"
+ErrUpdateBuWebsite: 'The application was updated successfully, but the modification of the website configuration file failed, please check the configuration!'
 
 #file
 ErrFileCanNotRead: "File can not read"
