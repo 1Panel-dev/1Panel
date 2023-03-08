@@ -1068,7 +1068,7 @@ export default {
         notSecurity: '(not safe)',
         encryptHelper:
             "Let's Encrypt has a frequency limit for issuing certificates, but it is sufficient to meet normal needs. Too frequent operations will cause issuance failure. For specific restrictions, please see <a target='_blank' href='https://letsencrypt.org/zh-cn/docs /rate-limits/'>official document</a> ",
-        ipValue: 'IP value',
+        ipValue: 'Value',
         ext: 'file extension',
         wafInputHelper: 'Input data by line, one line',
         data: 'data',
