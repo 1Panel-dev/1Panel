@@ -21,7 +21,7 @@
                         <div v-else class="el-upload__tip">
                             <span class="input-help">{{ $t('website.supportUpType') }}</span>
                             <span class="input-help">
-                                {{ $t('website.zipFormat') }}
+                                {{ $t('website.zipFormat', [type + '.json']) }}
                             </span>
                         </div>
                     </template>

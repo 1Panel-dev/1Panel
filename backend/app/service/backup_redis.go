@@ -123,6 +123,7 @@ func handleRedisRecover(redisInfo *repo.RootInfo, recoverFile string, isRollback
 		}
 		defer func() {
 			if !isOk {
+				global.LOG.Info("recover failed, start to rollback now")
 				if err := handleRedisRecover(redisInfo, rollbackFile, true); err != nil {
 					global.LOG.Errorf("rollback redis from %s failed, err: %v", rollbackFile, err)
 					return

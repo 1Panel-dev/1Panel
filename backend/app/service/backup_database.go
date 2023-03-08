@@ -142,6 +142,7 @@ func handleMysqlRecover(mysqlInfo *repo.RootInfo, recoverDir, dbName, fileName s
 		}
 		defer func() {
 			if !isOk {
+				global.LOG.Info("recover failed, start to rollback now")
 				if err := handleMysqlRecover(mysqlInfo, path.Dir(rollbackFile), dbName, path.Base(rollbackFile), true); err != nil {
 					global.LOG.Errorf("rollback mysql db %s from %s failed, err: %v", dbName, rollbackFile, err)
 					return

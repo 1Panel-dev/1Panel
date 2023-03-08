@@ -228,6 +228,7 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
                 search();
                 return;
             }
+            break;
         case 'PanelName':
             globalStore.setThemeConfig({ ...themeConfig.value, panelName: val });
             document.title = val;

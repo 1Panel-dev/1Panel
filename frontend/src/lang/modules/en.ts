@@ -932,8 +932,7 @@ export default {
         static: 'Static',
         deployment: 'Deployment',
         supportUpType: 'Only .tar.gz files within 50 MB are supported',
-        zipFormat:
-            '.tar.gz compressed package structure: test.tar.gz compressed package must contain website.json file',
+        zipFormat: '.tar.gz compressed package structure: test.tar.gz compressed package must contain {0} file',
         proxy: 'Reverse Proxy',
         alias: 'Path Name',
         remark: 'Remark',

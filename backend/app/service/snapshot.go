@@ -856,6 +856,7 @@ func (u *SnapshotService) handleTar(sourceDir, targetDir, name, exclusionRules s
 	global.LOG.Debug(ss)
 	stdout, err := cmd.Exec(ss)
 	if err != nil {
+		global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
 		return errors.New(stdout)
 	}
 	return nil
@@ -869,6 +870,7 @@ func (u *SnapshotService) handleUnTar(sourceDir, targetDir string) error {
 	}
 	stdout, err := cmd.Exec(fmt.Sprintf("tar zxf %s -C %s .", sourceDir, targetDir))
 	if err != nil {
+		global.LOG.Errorf("do handle untar failed, stdout: %s, err: %v", stdout, err)
 		return errors.New(string(stdout))
 	}
 	return nil
