@@ -143,6 +143,7 @@ export default {
             paramComplexity: 'Support English, numbers, {0}, length 6-30',
             paramUrlAndPort: 'The format is http(s)://(domain name/ip):(port)',
             nginxDoc: 'Only supports English case, numbers, and .',
+            appName: 'Support English, numbers, - and _, length 2-30, and cannot start and end with -_',
         },
         res: {
             paramError: 'The request failed, please try again later!',
