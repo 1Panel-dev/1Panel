@@ -75,6 +75,7 @@ declare module 'vue' {
     Footer: typeof import('./src/components/app-layout/footer/index.vue')['default']
     Group: typeof import('./src/components/group/index.vue')['default']
     InfiniteScroll: typeof import('element-plus/es')['ElInfiniteScroll']
+    Line: typeof import('./src/components/v-charts/components/Line.vue')['default']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
     Logo: typeof import('./src/components/app-layout/menu/components/Logo.vue')['default']
     Menu: typeof import('./src/components/app-layout/menu/index.vue')['default']
@@ -85,6 +86,7 @@ declare module 'vue' {
     SvgIcon: typeof import('./src/components/svg-icon/svg-icon.vue')['default']
     TableSetting: typeof import('./src/components/table-setting/index.vue')['default']
     Upload: typeof import('./src/components/upload/index.vue')['default']
+    VCharts: typeof import('./src/components/v-charts/index.vue')['default']
   }
 }
 
