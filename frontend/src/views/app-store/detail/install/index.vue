@@ -23,7 +23,12 @@
                     <el-form-item :label="$t('app.name')" prop="NAME">
                         <el-input v-model.trim="form['NAME']"></el-input>
                     </el-form-item>
-                    <Params v-model:form="form" v-model:params="installData.params" v-model:rules="rules"></Params>
+                    <Params
+                        v-if="open"
+                        v-model:form="form"
+                        v-model:params="installData.params"
+                        v-model:rules="rules"
+                    ></Params>
                 </el-form>
             </el-col>
         </el-row>
