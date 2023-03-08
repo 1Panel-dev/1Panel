@@ -25,6 +25,7 @@ func (f *FileRouter) InitFileRouter(Router *gin.RouterGroup) {
 		fileRouter.POST("/decompress", baseApi.DeCompressFile)
 		fileRouter.POST("/content", baseApi.GetContent)
 		fileRouter.POST("/save", baseApi.SaveContent)
+		fileRouter.POST("/check", baseApi.CheckFile)
 		fileRouter.POST("/upload", baseApi.UploadFiles)
 		fileRouter.POST("/rename", baseApi.ChangeFileName)
 		fileRouter.POST("/wget", baseApi.WgetFile)
