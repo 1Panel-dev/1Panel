@@ -8,7 +8,7 @@
                 show-icon
                 :closable="false"
             />
-            <el-col :span="12" :offset="6">
+            <el-col :span="20" :offset="2">
                 <br />
                 <el-descriptions border :column="1">
                     <el-descriptions-item v-for="(item, key) in map" :key="key">
