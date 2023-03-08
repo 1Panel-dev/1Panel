@@ -6,12 +6,12 @@
                     <el-switch v-model="form.enable" @change="updateEnable"></el-switch>
                 </el-form-item>
                 <el-form-item prop="cycle" :label="$t('website.cycle')">
-                    <el-input v-model.number="form.cycle" type="number">
+                    <el-input v-model="form.cycle" type="number">
                         <template #append>{{ $t('website.seconds') }}</template>
                     </el-input>
                 </el-form-item>
                 <el-form-item prop="frequency" :label="$t('website.frequency')">
-                    <el-input v-model.number="form.frequency" type="number">
+                    <el-input v-model="form.frequency" type="number">
                         <template #append>{{ $t('website.count') }}</template>
                     </el-input>
                 </el-form-item>
@@ -35,7 +35,7 @@
 import { Website } from '@/api/interface/website';
 import { SaveFileContent } from '@/api/modules/files';
 import { GetWafConfig, UpdateWafEnable } from '@/api/modules/website';
-import { Rules } from '@/global/form-rules';
+import { checkNumberRange, Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
@@ -73,8 +73,8 @@ let fileUpdate = reactive({
     content: '',
 });
 let rules = ref({
-    cycle: [Rules.requiredInput],
-    frequency: [Rules.requiredInput],
+    cycle: [Rules.requiredInput, checkNumberRange(1, 9999999)],
+    frequency: [Rules.requiredInput, checkNumberRange(1, 9999999)],
 });
 const wafForm = ref<FormInstance>();
 
