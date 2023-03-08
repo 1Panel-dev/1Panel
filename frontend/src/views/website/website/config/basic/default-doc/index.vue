@@ -4,7 +4,7 @@
             <el-form ref="defaultForm" label-position="top" :model="defaultModel" :rules="rules">
                 <el-form-item :label="$t('website.defaultDoc')" prop="index">
                     <el-input
-                        v-model.trim="defaultModel.index"
+                        v-model="defaultModel.index"
                         type="textarea"
                         :autosize="{ minRows: 8, maxRows: 20 }"
                     ></el-input>
@@ -37,7 +37,7 @@ const websiteId = computed(() => {
 });
 const defaultForm = ref<FormInstance>();
 let rules = ref({
-    index: [Rules.requiredInput],
+    index: [Rules.requiredInput, Rules.nginxDoc],
 });
 let defaultModel = ref({
     index: '',

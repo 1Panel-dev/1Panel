@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	"github.com/glebarez/sqlite"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"os"
 
