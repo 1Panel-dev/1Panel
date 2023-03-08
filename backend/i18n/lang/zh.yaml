@@ -25,6 +25,7 @@ ErrNotInstall: "应用未安装"
 ErrPortInOtherApp: "{{ .port }} 端口已被 {{ .apps }}占用！"
 ErrDbUserNotValid: "存量数据库，用户名密码不匹配！"
 ErrDockerComposeNotValid: "docker-compose 文件格式错误"
+ErrUpdateBuWebsite: '应用更新成功，但是网站配置文件修改失败，请检查配置！'
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"

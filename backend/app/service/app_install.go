@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
 	"github.com/joho/godotenv"
 	"io/ioutil"
 	"math"
@@ -199,10 +200,12 @@ func (a AppInstallService) Update(req request.AppInstalledUpdate) error {
 	if err != nil {
 		return err
 	}
+	changePort := false
 	port, ok := req.Params["PANEL_APP_PORT_HTTP"]
 	if ok {
 		portN := int(math.Ceil(port.(float64)))
 		if portN != installed.HttpPort {
+			changePort = true
 			httpPort, err := checkPort("PANEL_APP_PORT_HTTP", req.Params)
 			if err != nil {
 				return err
@@ -237,7 +240,33 @@ func (a AppInstallService) Update(req request.AppInstalledUpdate) error {
 		return err
 	}
 	_ = appInstallRepo.Save(&installed)
-	return rebuildApp(installed)
+
+	if err := rebuildApp(installed); err != nil {
+		return err
+	}
+	website, _ := websiteRepo.GetFirst(websiteRepo.WithAppInstallId(installed.ID))
+	if changePort && website.ID != 0 && website.Status == constant.Running {
+		nginxInstall, err := getNginxFull(&website)
+		if err != nil {
+			return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+		}
+		config := nginxInstall.SiteConfig.Config
+		servers := config.FindServers()
+		if len(servers) == 0 {
+			return buserr.WithErr(constant.ErrUpdateBuWebsite, errors.New("nginx config is not valid"))
+		}
+		server := servers[0]
+		proxy := fmt.Sprintf("http://127.0.0.1:%d", installed.HttpPort)
+		server.UpdateRootProxy([]string{proxy})
+
+		if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+			return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+		}
+		if err := nginxCheckAndReload(nginxInstall.SiteConfig.OldContent, config.FilePath, nginxInstall.Install.ContainerName); err != nil {
+			return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+		}
+	}
+	return nil
 }
 
 func (a AppInstallService) SyncAll() error {
