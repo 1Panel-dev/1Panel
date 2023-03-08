@@ -839,9 +839,6 @@ definitions:
         type: string
       password:
         type: string
-    required:
-    - name
-    - password
     type: object
   dto.MFALogin:
     properties:
@@ -855,10 +852,6 @@ definitions:
         type: string
       secret:
         type: string
-    required:
-    - name
-    - password
-    - secret
     type: object
   dto.MfaCredential:
     properties:
@@ -1723,6 +1716,8 @@ definitions:
         type: integer
       deleteBackup:
         type: boolean
+      deleteDB:
+        type: boolean
       detailId:
         type: integer
       forceDelete:
@@ -1859,6 +1854,8 @@ definitions:
     type: object
   request.FileDownload:
     properties:
+      compress:
+        type: boolean
       name:
         type: string
       paths:
@@ -1868,6 +1865,7 @@ definitions:
       type:
         type: string
     required:
+    - compress
     - name
     - paths
     - type
@@ -1915,6 +1913,13 @@ definitions:
         type: string
       showHidden:
         type: boolean
+    type: object
+  request.FilePathCheck:
+    properties:
+      path:
+        type: string
+    required:
+    - path
     type: object
   request.FileRename:
     properties:
@@ -5032,6 +5037,33 @@ paths:
         - paths
         formatEN: Batch delete dir or file [paths]
         formatZH: 批量删除文件/文件夹 [paths]
+        paramKeys: []
+  /files/check:
+    post:
+      consumes:
+      - application/json
+      description: 检测文件是否存在
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FilePathCheck'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Check file exist
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - path
+        formatEN: Check whether file [path] exists
+        formatZH: 检测文件 [path] 是否存在
         paramKeys: []
   /files/compress:
     post:

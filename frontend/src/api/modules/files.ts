@@ -51,6 +51,10 @@ export const SaveFileContent = (params: File.FileEdit) => {
     return http.post<File.File>('files/save', params);
 };
 
+export const CheckFile = (path: string) => {
+    return http.post<boolean>('files/check', { path: path });
+};
+
 export const UploadFileData = (params: FormData, config: AxiosRequestConfig) => {
     return http.upload<File.File>('files/upload', params, config);
 };

@@ -324,6 +324,34 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 }
 
 // @Tags File
+// @Summary Check file exist
+// @Description 检测文件是否存在
+// @Accept json
+// @Param request body request.FilePathCheck true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /files/check [post]
+// @x-panel-log {"bodyKeys":["path"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"检测文件 [path] 是否存在","formatEN":"Check whether file [path] exists"}
+func (b *BaseApi) CheckFile(c *gin.Context) {
+	var req request.FilePathCheck
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if _, err := os.Stat(req.Path); err != nil && os.IsNotExist(err) {
+		helper.SuccessWithData(c, true)
+		return
+	}
+
+	helper.SuccessWithData(c, false)
+}
+
+// @Tags File
 // @Summary Change file name
 // @Description 修改文件名称
 // @Accept json

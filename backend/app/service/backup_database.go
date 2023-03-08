@@ -99,7 +99,7 @@ func (u *BackupService) MysqlRecoverByUpload(req dto.CommonRecover) error {
 		})
 		if !hasTestSql {
 			_ = os.RemoveAll(dstDir)
-			return fmt.Errorf("no such file named test.sql in %s, err: %v", fileName, err)
+			return fmt.Errorf("no such file named test.sql in %s", fileName)
 		}
 		defer func() {
 			_ = os.RemoveAll(dstDir)

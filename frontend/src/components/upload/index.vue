@@ -82,7 +82,7 @@ import i18n from '@/lang';
 import { UploadFile, UploadFiles, UploadInstance } from 'element-plus';
 import { File } from '@/api/interface/file';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { BatchDeleteFile, GetUploadList, UploadFileData } from '@/api/modules/files';
+import { BatchDeleteFile, CheckFile, GetUploadList, UploadFileData } from '@/api/modules/files';
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError, MsgSuccess } from '@/utils/message';
 
@@ -190,14 +190,26 @@ const handleClose = () => {
     upVisiable.value = false;
 };
 
-const onSubmit = () => {
+const onSubmit = async () => {
     const formData = new FormData();
     if (uploaderFiles.value.length !== 1) {
         return;
     }
-    if (uploaderFiles.value[0]!.raw != undefined) {
-        formData.append('file', uploaderFiles.value[0]!.raw);
+    if (!uploaderFiles.value[0]!.raw.name) {
+        MsgError(i18n.global.t('commons.msg.fileNameErr'));
+        return;
     }
+    let reg = /^[a-zA-Z0-9\u4e00-\u9fa5]{1}[a-z:A-Z0-9_.\u4e00-\u9fa5-]{0,50}$/;
+    if (!reg.test(uploaderFiles.value[0]!.raw.name)) {
+        MsgError(i18n.global.t('commons.msg.fileNameErr'));
+        return;
+    }
+    const res = await CheckFile(baseDir.value + '/' + uploaderFiles.value[0]!.raw.name);
+    if (!res.data) {
+        MsgError(i18n.global.t('commons.msg.fileExist'));
+        return;
+    }
+    formData.append('file', uploaderFiles.value[0]!.raw);
     let isOk = beforeAvatarUpload(uploaderFiles.value[0]!.raw);
     if (!isOk) {
         return;

@@ -99,6 +99,8 @@ export default {
             notFound: '抱歉，您访问的页面不存在',
             unSupportType: '不支持当前文件类型！',
             unSupportSize: '上传文件超过 {0}M，请确认！',
+            fileExist: '当前文件夹已存在该文件，不支持重复上传！',
+            fileNameErr: '仅支持上传名称包含英文、中文、数字或者 .-_ ,长度 1-50 位的文件',
         },
         login: {
             firstLogin: '首次登录，请创建初始管理员用户！',

@@ -58,6 +58,10 @@ type FileRename struct {
 	NewName string `json:"newName" validate:"required"`
 }
 
+type FilePathCheck struct {
+	Path string `json:"path" validate:"required"`
+}
+
 type FileWget struct {
 	Url  string `json:"url" validate:"required"`
 	Path string `json:"path" validate:"required"`

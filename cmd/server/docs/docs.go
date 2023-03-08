@@ -3857,6 +3857,48 @@ var doc = `{
                 }
             }
         },
+        "/files/check": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "检测文件是否存在",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "File"
+                ],
+                "summary": "Check file exist",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.FilePathCheck"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "path"
+                    ],
+                    "formatEN": "Check whether file [path] exists",
+                    "formatZH": "检测文件 [path] 是否存在",
+                    "paramKeys": []
+                }
+            }
+        },
         "/files/compress": {
             "post": {
                 "security": [
@@ -9603,10 +9645,6 @@ var doc = `{
         },
         "dto.Login": {
             "type": "object",
-            "required": [
-                "name",
-                "password"
-            ],
             "properties": {
                 "authMethod": {
                     "type": "string"
@@ -9627,11 +9665,6 @@ var doc = `{
         },
         "dto.MFALogin": {
             "type": "object",
-            "required": [
-                "name",
-                "password",
-                "secret"
-            ],
             "properties": {
                 "authMethod": {
                     "type": "string"
@@ -10959,6 +10992,9 @@ var doc = `{
                 "deleteBackup": {
                     "type": "boolean"
                 },
+                "deleteDB": {
+                    "type": "boolean"
+                },
                 "detailId": {
                     "type": "integer"
                 },
@@ -11159,11 +11195,15 @@ var doc = `{
         "request.FileDownload": {
             "type": "object",
             "required": [
+                "compress",
                 "name",
                 "paths",
                 "type"
             ],
             "properties": {
+                "compress": {
+                    "type": "boolean"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -11241,6 +11281,17 @@ var doc = `{
                 },
                 "showHidden": {
                     "type": "boolean"
+                }
+            }
+        },
+        "request.FilePathCheck": {
+            "type": "object",
+            "required": [
+                "path"
+            ],
+            "properties": {
+                "path": {
+                    "type": "string"
                 }
             }
         },
