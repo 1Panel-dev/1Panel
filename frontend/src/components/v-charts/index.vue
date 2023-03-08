@@ -1,5 +1,5 @@
 <template>
-    <component :is="typeComponentMap[type]" :height="height" :option="option" />
+    <component :is="typeComponentMap[type]" :height="height" :option="option" :dataZoom="dataZoom" />
 </template>
 <script lang="ts" setup>
 import line from './components/Line.vue';
@@ -13,6 +13,7 @@ defineProps({
         type: String,
         default: '200px',
     },
+    dataZoom: Boolean,
     option: {
         type: Object,
         required: true,
