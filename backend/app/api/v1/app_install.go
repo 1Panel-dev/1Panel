@@ -283,3 +283,25 @@ func (b *BaseApi) GetParams(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, content)
 }
+
+// @Tags App
+// @Summary Change app params
+// @Description 修改应用参数
+// @Accept json
+// @Param request body request.AppInstalledUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /apps/installed/params/update [post]
+// @x-panel-log {"bodyKeys":["installId"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"应用参数修改 [installId]","formatEN":"Application param update [installId]"}
+func (b *BaseApi) UpdateInstalled(c *gin.Context) {
+	var req request.AppInstalledUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := appInstallService.Update(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}

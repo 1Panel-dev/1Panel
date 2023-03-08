@@ -27,8 +27,8 @@ const buttons = [
         path: '/apps/installed',
     },
     {
-        label: i18n.global.t('app.canUpdate'),
-        path: '/apps/update',
+        label: i18n.global.t('app.canUpgrade'),
+        path: '/apps/upgrade',
         count: 0,
     },
 ];
@@ -49,7 +49,7 @@ const search = () => {
 
 onMounted(() => {
     search();
-    bus.on('update', () => {
+    bus.on('upgrade', () => {
         showButton.value = false;
         search();
     });

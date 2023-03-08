@@ -32,4 +32,5 @@ var (
 	Restore AppOperate = "restore"
 	Update  AppOperate = "update"
 	Rebuild AppOperate = "rebuild"
+	Upgrade AppOperate = "upgrade"
 )

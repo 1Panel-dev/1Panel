@@ -76,6 +76,8 @@ type AppFormFields struct {
 	Default  interface{} `json:"default"`
 	EnvKey   string      `json:"envKey"`
 	Disabled bool        `json:"disabled"`
+	Edit     bool        `json:"edit"`
+	Rule     string      `json:"rule"`
 }
 
 type AppResource struct {

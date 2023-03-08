@@ -48,6 +48,11 @@ type AppInstalledOperate struct {
 	DeleteDB     bool                `json:"deleteDB"`
 }
 
+type AppInstalledUpdate struct {
+	InstallId uint                   `json:"installId" validate:"required"`
+	Params    map[string]interface{} `json:"params" validate:"required"`
+}
+
 type PortUpdate struct {
 	Key  string `json:"key"`
 	Name string `json:"name"`
