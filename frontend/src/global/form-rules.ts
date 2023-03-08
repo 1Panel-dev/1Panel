@@ -108,11 +108,11 @@ const checkVolumeName = (rule: any, value: any, callback: any) => {
 
 const checkLinuxName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
-        callback(new Error(i18n.global.t('commons.rule.linuxName', ['/\\:*?"<>|'])));
+        callback(new Error(i18n.global.t('commons.rule.linuxName', ['/\\:*?\'"<>|'])));
     } else {
-        const reg = /^((?!\\|\/|:|\*|\?|<|>|\||'|%).){1,30}$/;
+        const reg = /^[^/\\\"'|<>?*]{1,30}$/;
         if (!reg.test(value) && value !== '') {
-            callback(new Error(i18n.global.t('commons.rule.linuxName', ['/\\:*?"<>|'])));
+            callback(new Error(i18n.global.t('commons.rule.linuxName', ['/\\:*?\'"<>|'])));
         } else {
             callback();
         }
@@ -180,6 +180,19 @@ const checkParamUrlAndPort = (rule: any, value: any, callback: any) => {
             /^(https?:\/\/)?((localhost)|([a-zA-Z0-9_-]+\.)*[a-zA-Z0-9_-]+)(:[1-9]\d{0,3}|:[1-5]\d{4}|:6[0-4]\d{3}|:65[0-4]\d{2}|:655[0-2]\d|:6553[0-5])?(\/\S*)?$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.paramUrlAndPort')));
+        } else {
+            callback();
+        }
+    }
+};
+
+const checkPort = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.port')));
+    } else {
+        const reg = /^([1-9](\d{0,3}))$|^([1-5]\d{4})$|^(6[0-4]\d{3})$|^(65[0-4]\d{2})$|^(655[0-2]\d)$|^(6553[0-5])$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.port')));
         } else {
             callback();
         }
@@ -343,10 +356,7 @@ export const Rules: CommonRule = {
     paramPort: {
         required: true,
         trigger: 'blur',
-        min: 1,
-        max: 65535,
-        type: 'number',
-        message: i18n.global.t('commons.rule.port'),
+        validator: checkPort,
     },
     paramExtUrl: {
         required: true,

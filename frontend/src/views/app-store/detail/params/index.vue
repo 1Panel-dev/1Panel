@@ -9,7 +9,7 @@
                 :disabled="p.disabled"
             ></el-input>
             <el-input
-                v-model.number="form[p.envKey]"
+                v-model="form[p.envKey]"
                 v-if="p.type == 'number'"
                 :type="p.type"
                 @change="updateParam"
