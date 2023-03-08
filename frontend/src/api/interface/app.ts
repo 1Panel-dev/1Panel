@@ -151,7 +151,12 @@ export namespace App {
     }
 
     export interface InstallParams {
-        label: string;
-        value: string;
+        labelZh: string;
+        labelEn: string;
+        value: any;
+        edit: boolean;
+        key: string;
+        rule: string;
+        type: string;
     }
 }

@@ -50,7 +50,7 @@
 
         <template #main>
             <div class="update-prompt" v-if="data == null">
-                <span>{{ mode === 'update' ? $t('app.updatePrompt') : $t('app.installPrompt') }}</span>
+                <span>{{ mode === 'upgrade' ? $t('app.updatePrompt') : $t('app.installPrompt') }}</span>
                 <div>
                     <img src="@/assets/images/no_update_app.svg" />
                 </div>
@@ -129,7 +129,7 @@
                                             round
                                             size="small"
                                             @click="openOperate(installed, 'update')"
-                                            v-if="mode === 'update'"
+                                            v-if="mode === 'upgrade'"
                                         >
                                             {{ $t('app.update') }}
                                         </el-button>
@@ -171,7 +171,7 @@
     <AppResources ref="checkRef" />
     <AppDelete ref="deleteRef" @close="search" />
     <AppParams ref="appParamRef" />
-    <AppUpdate ref="updateRef" @close="search" />
+    <AppUpgrade ref="upgradeRef" @close="search" />
 </template>
 
 <script lang="ts" setup>
@@ -191,7 +191,7 @@ import Uploads from '@/components/upload/index.vue';
 import AppResources from './check/index.vue';
 import AppDelete from './delete/index.vue';
 import AppParams from './detail/index.vue';
-import AppUpdate from './update/index.vue';
+import AppUpgrade from './upgrade/index.vue';
 import { App } from '@/api/interface/app';
 import Status from '@/components/status/index.vue';
 import { getAge } from '@/utils/util';
@@ -217,7 +217,7 @@ const uploadRef = ref();
 const checkRef = ref();
 const deleteRef = ref();
 const appParamRef = ref();
-const updateRef = ref();
+const upgradeRef = ref();
 let tags = ref<App.Tag[]>([]);
 let activeTag = ref('all');
 let searchReq = reactive({
@@ -273,7 +273,7 @@ const openOperate = (row: any, op: string) => {
     operateReq.installId = row.id;
     operateReq.operate = op;
     if (op == 'update') {
-        updateRef.value.acceptParams(row.id, row.name);
+        upgradeRef.value.acceptParams(row.id, row.name);
     } else if (op == 'delete') {
         AppInstalledDeleteCheck(row.id).then(async (res) => {
             const items = res.data;
@@ -393,9 +393,9 @@ const openParam = (installId: number) => {
 
 onMounted(() => {
     const path = router.currentRoute.value.path;
-    if (path == '/apps/update') {
-        activeName.value = i18n.global.t('app.canUpdate');
-        mode.value = 'update';
+    if (path == '/apps/upgrade') {
+        activeName.value = i18n.global.t('app.canUpgrade');
+        mode.value = 'upgrade';
         searchReq.update = true;
     }
     search();

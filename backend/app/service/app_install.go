@@ -3,7 +3,9 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/joho/godotenv"
 	"io/ioutil"
+	"math"
 	"os"
 	"path"
 	"reflect"
@@ -156,15 +158,7 @@ func (a AppInstallService) Operate(req request.AppInstalledOperate) error {
 	dockerComposePath := install.GetComposePath()
 	switch req.Operate {
 	case constant.Rebuild:
-		out, err := compose.Down(dockerComposePath)
-		if err != nil {
-			return handleErr(install, err, out)
-		}
-		out, err = compose.Up(dockerComposePath)
-		if err != nil {
-			return handleErr(install, err, out)
-		}
-		return syncById(install.ID)
+		return rebuildApp(install)
 	case constant.Start:
 		out, err := compose.Start(dockerComposePath)
 		if err != nil {
@@ -193,11 +187,57 @@ func (a AppInstallService) Operate(req request.AppInstalledOperate) error {
 		return nil
 	case constant.Sync:
 		return syncById(install.ID)
-	case constant.Update:
+	case constant.Upgrade:
 		return updateInstall(install.ID, req.DetailId)
 	default:
 		return errors.New("operate not support")
 	}
+}
+
+func (a AppInstallService) Update(req request.AppInstalledUpdate) error {
+	installed, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallId))
+	if err != nil {
+		return err
+	}
+	port, ok := req.Params["PANEL_APP_PORT_HTTP"]
+	if ok {
+		portN := int(math.Ceil(port.(float64)))
+		if portN != installed.HttpPort {
+			httpPort, err := checkPort("PANEL_APP_PORT_HTTP", req.Params)
+			if err != nil {
+				return err
+			}
+			installed.HttpPort = httpPort
+		}
+	}
+	ports, ok := req.Params["PANEL_APP_PORT_HTTPS"]
+	if ok {
+		portN := int(math.Ceil(ports.(float64)))
+		if portN != installed.HttpsPort {
+			httpsPort, err := checkPort("PANEL_APP_PORT_HTTPS", req.Params)
+			if err != nil {
+				return err
+			}
+			installed.HttpsPort = httpsPort
+		}
+	}
+
+	envPath := path.Join(installed.GetPath(), ".env")
+	oldEnvMaps, err := godotenv.Read(envPath)
+	if err != nil {
+		return err
+	}
+	handleMap(req.Params, oldEnvMaps)
+	paramByte, err := json.Marshal(oldEnvMaps)
+	if err != nil {
+		return err
+	}
+	installed.Env = string(paramByte)
+	if err := godotenv.Write(oldEnvMaps, envPath); err != nil {
+		return err
+	}
+	_ = appInstallRepo.Save(&installed)
+	return rebuildApp(installed)
 }
 
 func (a AppInstallService) SyncAll() error {
@@ -391,17 +431,24 @@ func (a AppInstallService) GetParams(id uint) ([]response.AppParam, error) {
 	}
 	for _, form := range appForm.FormFields {
 		if v, ok := envs[form.EnvKey]; ok {
+			appParam := response.AppParam{
+				Edit: false,
+				Key:  form.EnvKey,
+				Rule: form.Rule,
+				Type: form.Type,
+			}
+			if form.Edit {
+				appParam.Edit = true
+			}
+			appParam.LabelZh = form.LabelZh
+			appParam.LabelEn = form.LabelEn
 			if form.Type == "service" {
 				appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithServiceName(v.(string)))
-				res = append(res, response.AppParam{
-					Label: form.LabelZh,
-					Value: appInstall.Name,
-				})
+				appParam.Value = appInstall.Name
+				res = append(res, appParam)
 			} else {
-				res = append(res, response.AppParam{
-					Label: form.LabelZh,
-					Value: v,
-				})
+				appParam.Value = v
+				res = append(res, appParam)
 			}
 		}
 	}

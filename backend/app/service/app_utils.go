@@ -345,6 +345,19 @@ func upApp(composeFilePath string, appInstall model.AppInstall) {
 	}
 }
 
+func rebuildApp(appInstall model.AppInstall) error {
+	dockerComposePath := appInstall.GetComposePath()
+	out, err := compose.Down(dockerComposePath)
+	if err != nil {
+		return handleErr(appInstall, err, out)
+	}
+	out, err = compose.Up(dockerComposePath)
+	if err != nil {
+		return handleErr(appInstall, err, out)
+	}
+	return syncById(appInstall.ID)
+}
+
 func getAppDetails(details []model.AppDetail, versions []string) map[string]model.AppDetail {
 	appDetails := make(map[string]model.AppDetail, len(details))
 	for _, old := range details {

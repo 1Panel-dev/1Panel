@@ -881,7 +881,7 @@ export default {
         deleteWarn:
             'The delete operation will delete all data and backups together. This operation cannot be rolled back. Do you want to continue? ',
         syncSuccess: 'Sync successfully',
-        canUpdate: 'Upgrade',
+        canUpgrade: 'Upgrade',
         backup: 'Backup',
         backupName: 'File Name',
         backupPath: 'File Path',
@@ -889,7 +889,8 @@ export default {
         restore: 'Restore',
         restoreWarn:
             'The restore operation will restart the application and replace the data. This operation cannot be rolled back. Do you want to continue?',
-        update: 'upgrade',
+        update: 'update',
+        upgrade: 'upgrade',
         versioneSelect: 'Please select a version',
         operatorHelper: 'Operation {0} will be performed on the selected application, continue? ',
         checkInstalledWarn: '{0} is not detected, please enter the app store and click to install!',
@@ -919,6 +920,7 @@ export default {
         syncAppList: 'Sync',
         updatePrompt: 'The current application is the latest version',
         installPrompt: 'No apps installed yet',
+        updateHelper: 'Updating parameters may cause the application to fail to start, please operate with caution',
     },
     website: {
         website: 'Website',

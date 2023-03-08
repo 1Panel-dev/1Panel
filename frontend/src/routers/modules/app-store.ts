@@ -51,8 +51,8 @@ const appStoreRouter = {
                     },
                 },
                 {
-                    path: 'update',
-                    name: 'AppUpdate',
+                    path: 'upgrade',
+                    name: 'AppUpgrade',
                     component: () => import('@/views/app-store/installed/index.vue'),
                     props: true,
                     hidden: true,

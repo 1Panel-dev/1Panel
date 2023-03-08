@@ -46,7 +46,7 @@ let loading = ref(false);
 let versions = ref<App.VersionDetail[]>();
 let operateReq = reactive({
     detailId: 0,
-    operate: 'update',
+    operate: 'upgrade',
     installId: 0,
 });
 const resourceName = ref('');
@@ -77,7 +77,7 @@ const operate = async () => {
     await InstalledOp(operateReq)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            bus.emit('update', true);
+            bus.emit('upgrade', true);
             handleClose();
         })
         .finally(() => {
@@ -100,7 +100,7 @@ const onOperate = async () => {
 };
 
 onBeforeUnmount(() => {
-    bus.off('update');
+    bus.off('upgrade');
 });
 
 defineExpose({
