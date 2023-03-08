@@ -1026,7 +1026,7 @@ export default {
         proxyHelper: '例如: http://127.0.0.1:8080',
         forceDelete: '强制删除',
         forceDeleteHelper: '强制删除，会忽略删除过程中产生的错误并最终删除元数据',
-        deleteAppHelper: '同时删除关联应用以及应用备份',
+        deleteAppHelper: '同时删除关联应用、数据库以及应用备份',
         deleteBackupHelper: '同时删除网站备份',
         deleteConfirmHelper: '删除操作无法回滚，请输入 <span style="color:red"> "{0}" </span> 删除',
         staticPath: '对应主目录:',
