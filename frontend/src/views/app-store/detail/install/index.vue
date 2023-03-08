@@ -62,7 +62,7 @@ const installData = ref<InstallRrops>({
 let open = ref(false);
 let form = ref<{ [key: string]: any }>({});
 let rules = ref<FormRules>({
-    NAME: [Rules.linuxName],
+    NAME: [Rules.appName],
 });
 let loading = ref(false);
 const paramForm = ref<FormInstance>();

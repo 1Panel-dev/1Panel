@@ -132,6 +132,19 @@ const checkDatabaseName = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkAppName = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.appName')));
+    } else {
+        const reg = /^(?![_-])[a-zA-Z0-9_-]{1,29}[a-zA-Z0-9]$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.appName')));
+        } else {
+            callback();
+        }
+    }
+};
+
 const checkDomain = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.domain')));
@@ -242,6 +255,7 @@ interface CommonRule {
     domain: FormItemRule;
     databaseName: FormItemRule;
     nginxDoc: FormItemRule;
+    appName: FormItemRule;
 
     paramCommon: FormItemRule;
     paramComplexity: FormItemRule;
@@ -367,5 +381,10 @@ export const Rules: CommonRule = {
         required: true,
         validator: checkDoc,
         trigger: 'blur',
+    },
+    appName: {
+        required: true,
+        trigger: 'blur',
+        validator: checkAppName,
     },
 };
