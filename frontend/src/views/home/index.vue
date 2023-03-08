@@ -111,16 +111,20 @@
                                 <v-charts
                                     height="300px"
                                     id="ioChart"
+                                    type="line"
                                     :option="chartsOption['ioChart']"
                                     v-if="chartsOption['ioChart']"
+                                    :dataZoom="true"
                                 />
                             </div>
                             <div v-if="chartOption === 'network'" style="margin-top: 40px">
                                 <v-charts
                                     height="300px"
                                     id="networkChart"
+                                    type="line"
                                     :option="chartsOption['networkChart']"
                                     v-if="chartsOption['networkChart']"
+                                    :dataZoom="true"
                                 />
                             </div>
                         </div>
@@ -446,20 +450,19 @@ function loadUpTime(uptime: number) {
 
 const loadData = async () => {
     if (chartOption.value === 'io') {
-        const yDatas = [
-            {
-                name: i18n.global.t('monitor.read'),
-                data: ioReadBytes.value,
-            },
-            {
-                name: i18n.global.t('monitor.write'),
-                data: ioWriteBytes.value,
-            },
-        ];
         chartsOption.value['ioChart'] = {
-            title: i18n.global.t('home.io'),
+            // title: i18n.global.t('home.io'),
             xDatas: timeIODatas.value,
-            yDatas: yDatas,
+            yDatas: [
+                {
+                    name: i18n.global.t('monitor.read'),
+                    data: ioReadBytes.value,
+                },
+                {
+                    name: i18n.global.t('monitor.write'),
+                    data: ioWriteBytes.value,
+                },
+            ],
             formatStr: 'MB',
         };
 
@@ -508,20 +511,19 @@ const loadData = async () => {
         //     'MB',
         // );
     } else {
-        const yDatas = [
-            {
-                name: i18n.global.t('monitor.up'),
-                data: netBytesRecvs.value,
-            },
-            {
-                name: i18n.global.t('monitor.down'),
-                data: netBytesSents.value,
-            },
-        ];
         chartsOption.value['networkChart'] = {
-            title: i18n.global.t('home.network'),
+            // title: i18n.global.t('home.network'),
             xDatas: timeNetDatas.value,
-            yDatas: yDatas,
+            yDatas: [
+                {
+                    name: i18n.global.t('monitor.up'),
+                    data: netBytesRecvs.value,
+                },
+                {
+                    name: i18n.global.t('monitor.down'),
+                    data: netBytesSents.value,
+                },
+            ],
             formatStr: 'KB/s',
         };
         // let netTxYDatas = {

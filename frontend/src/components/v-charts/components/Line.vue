@@ -23,6 +23,10 @@ const props = defineProps({
         type: String,
         default: 'line',
     },
+    dataZoom: {
+        type: Boolean,
+        default: false,
+    },
     option: {
         type: Object,
         required: true,
@@ -37,13 +41,56 @@ function initChart() {
     }
 
     const theme = globalStore.$state.themeConfig.theme || 'light';
+
+    const series = [];
+    if (props.option?.yDatas?.length) {
+        series.push({
+            name: props.option?.yDatas[0]?.name,
+            type: 'line',
+            areaStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    {
+                        offset: 0,
+                        color: 'rgba(0, 94, 235, .5)',
+                    },
+                    {
+                        offset: 1,
+                        color: 'rgba(0, 94, 235, 0)',
+                    },
+                ]),
+            },
+            data: props.option?.yDatas[0]?.data,
+            showSymbol: false,
+        });
+        if (props.option?.yDatas?.length > 1) {
+            series.push({
+                name: props.option?.yDatas[1]?.name,
+                type: 'line',
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        {
+                            offset: 0,
+                            color: 'rgba(27, 143, 60, .5)',
+                        },
+                        {
+                            offset: 1,
+                            color: 'rgba(27, 143, 60, 0)',
+                        },
+                    ]),
+                },
+                data: props.option?.yDatas[1]?.data,
+                showSymbol: false,
+            });
+        }
+    }
+
     // 把配置和数据放这里
     const option = {
         title: [
             {
                 left: 'center',
                 text: props.option.title,
-                show: false,
+                show: props.option.title,
             },
         ],
         zlevel: 1,
@@ -60,7 +107,6 @@ function initChart() {
         },
         grid: { left: '7%', right: '7%', bottom: '20%' },
         legend: {
-            data: [props.option?.yDatas[0]?.name, props.option?.yDatas[1]?.name],
             right: 10,
             itemWidth: 8,
             textStyle: {
@@ -79,45 +125,8 @@ function initChart() {
                 },
             },
         },
-        series: [
-            {
-                name: props.option?.yDatas[0]?.name,
-                type: 'line',
-                areaStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        {
-                            offset: 0,
-                            color: 'rgba(0, 94, 235, .5)',
-                        },
-                        {
-                            offset: 1,
-                            color: 'rgba(0, 94, 235, 0)',
-                        },
-                    ]),
-                },
-                data: props.option?.yDatas[0]?.data,
-                showSymbol: false,
-            },
-            {
-                name: props.option?.yDatas[1]?.name,
-                type: 'line',
-                areaStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        {
-                            offset: 0,
-                            color: 'rgba(27, 143, 60, .5)',
-                        },
-                        {
-                            offset: 1,
-                            color: 'rgba(27, 143, 60, 0)',
-                        },
-                    ]),
-                },
-                data: props.option?.yDatas[1]?.data,
-                showSymbol: false,
-            },
-        ],
-        dataZoom: [{ startValue: props?.option.xDatas[0] }],
+        series: series,
+        dataZoom: [{ startValue: props?.option.xDatas[0], show: props.dataZoom }],
     };
     // 渲染数据
     itemChart.setOption(option, true);
