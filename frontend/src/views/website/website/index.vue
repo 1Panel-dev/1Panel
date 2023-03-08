@@ -93,7 +93,12 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.remark')" prop="remark"></el-table-column>
+                    <el-table-column
+                        :label="$t('website.remark')"
+                        show-overflow-tooltip
+                        fix
+                        prop="remark"
+                    ></el-table-column>
                     <el-table-column :label="$t('website.protocol')" prop="protocol"></el-table-column>
                     <el-table-column :label="$t('website.expireDate')">
                         <template #default="{ row, $index }">
