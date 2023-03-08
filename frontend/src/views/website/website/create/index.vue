@@ -23,7 +23,7 @@
                         >
                             <el-button
                                 :class="website.type === item.value ? 'active-button' : ''"
-                                @click="website.type = item.value"
+                                @click="changeType(item.value)"
                                 :type="website.type === item.value ? '' : 'info'"
                                 :plain="website.type === item.value"
                                 :text="website.type !== item.value"
@@ -255,6 +255,18 @@ const em = defineEmits(['close']);
 const handleClose = () => {
     open.value = false;
     em('close', false);
+};
+
+const changeType = (type: string) => {
+    if (type == 'deployemnt') {
+        if (appInstalles.value && appInstalles.value.length > 0) {
+            website.value.appInstallId = appInstalles.value[0].id;
+            console.log(website.value);
+        }
+    } else {
+        website.value.appInstallId = undefined;
+    }
+    website.value.type = type;
 };
 
 const searchAppInstalled = () => {
