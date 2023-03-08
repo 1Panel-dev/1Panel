@@ -219,10 +219,15 @@ let req = reactive({
 const search = async () => {
     req.page = paginationConfig.currentPage;
     req.pageSize = paginationConfig.pageSize;
-    SearchWebsites(req).then((res) => {
-        data.value = res.data.items;
-        paginationConfig.total = res.data.total;
-    });
+    loading.value = true;
+    await SearchWebsites(req)
+        .then((res) => {
+            data.value = res.data.items;
+            paginationConfig.total = res.data.total;
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 const listGroup = async () => {
