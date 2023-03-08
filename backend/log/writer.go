@@ -99,7 +99,7 @@ func NewWriterFromConfig(c *Config) (RollingWriter, error) {
 	stdErrFileHandler = file
 
 	if runtime.GOOS != "windows" {
-		if err = syscall.Dup3(int(file.Fd()), int(os.Stderr.Fd()), 0); err != nil {
+		if err = syscall.Dup2(int(file.Fd()), int(os.Stderr.Fd())); err != nil {
 			return nil, err
 		}
 		runtime.SetFinalizer(stdErrFileHandler, func(fd *os.File) {

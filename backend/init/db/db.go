@@ -2,11 +2,11 @@ package db
 
 import (
 	"fmt"
+	"github.com/glebarez/sqlite"
+	"gorm.io/gorm"
 	"os"
 
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 )
 
 func Init() {
@@ -21,6 +21,7 @@ func Init() {
 			panic(fmt.Errorf("init db file falied, err: %v", err))
 		}
 	}
+
 	db, err := gorm.Open(sqlite.Open(fullPath), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
 	})
