@@ -10,6 +10,7 @@
             ></el-input>
             <el-input
                 v-model="form[p.envKey]"
+                @blur="form[p.envKey] = Number(form[p.envKey])"
                 v-if="p.type == 'number'"
                 :type="p.type"
                 @change="updateParam"

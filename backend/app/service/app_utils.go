@@ -84,32 +84,34 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 		}
 	}
 
-	if !reflect.DeepEqual(dbConfig, dto.AppDatabase{}) && dbConfig.DbName != "" && dbConfig.DbUser != "" && dbConfig.Password != "" {
+	if !reflect.DeepEqual(dbConfig, dto.AppDatabase{}) && dbConfig.ServiceName != "" {
 		dbInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithServiceName(dbConfig.ServiceName))
 		if err != nil {
 			return err
 		}
-		iMysqlRepo := repo.NewIMysqlRepo()
-		oldMysqlDb, _ := iMysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName))
-		resourceId := oldMysqlDb.ID
-		if oldMysqlDb.ID > 0 {
-			if oldMysqlDb.Username != dbConfig.DbUser || oldMysqlDb.Password != dbConfig.Password {
-				return buserr.New(constant.ErrDbUserNotValid)
+		var resourceId uint
+		if dbConfig.DbName != "" && dbConfig.DbUser != "" && dbConfig.Password != "" {
+			iMysqlRepo := repo.NewIMysqlRepo()
+			oldMysqlDb, _ := iMysqlRepo.Get(commonRepo.WithByName(dbConfig.DbName))
+			resourceId = oldMysqlDb.ID
+			if oldMysqlDb.ID > 0 {
+				if oldMysqlDb.Username != dbConfig.DbUser || oldMysqlDb.Password != dbConfig.Password {
+					return buserr.New(constant.ErrDbUserNotValid)
+				}
+			} else {
+				var createMysql dto.MysqlDBCreate
+				createMysql.Name = dbConfig.DbName
+				createMysql.Username = dbConfig.DbUser
+				createMysql.Format = "utf8mb4"
+				createMysql.Permission = "%"
+				createMysql.Password = dbConfig.Password
+				mysqldb, err := NewIMysqlService().Create(ctx, createMysql)
+				if err != nil {
+					return err
+				}
+				resourceId = mysqldb.ID
 			}
-		} else {
-			var createMysql dto.MysqlDBCreate
-			createMysql.Name = dbConfig.DbName
-			createMysql.Username = dbConfig.DbUser
-			createMysql.Format = "utf8mb4"
-			createMysql.Permission = "%"
-			createMysql.Password = dbConfig.Password
-			mysqldb, err := NewIMysqlService().Create(ctx, createMysql)
-			if err != nil {
-				return err
-			}
-			resourceId = mysqldb.ID
 		}
-
 		var installResource model.AppInstallResource
 		installResource.ResourceId = resourceId
 		installResource.AppInstallId = appInstall.ID
