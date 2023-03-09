@@ -8,12 +8,10 @@ import (
 	"log"
 	"os"
 	"path"
-	"runtime"
 	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
-	"syscall"
 	"time"
 	"unsafe"
 )
@@ -80,33 +78,21 @@ var _asyncBufferPool = sync.Pool{
 	},
 }
 
-var stdErrFileHandler *os.File
-
 func NewWriterFromConfig(c *Config) (RollingWriter, error) {
 	if c.LogPath == "" || c.FileName == "" {
 		return nil, ErrInvalidArgument
 	}
-
 	if err := os.MkdirAll(c.LogPath, 0700); err != nil {
 		return nil, err
 	}
-
 	filepath := FilePath(c)
 	file, err := os.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return nil, err
 	}
-	stdErrFileHandler = file
-
-	if runtime.GOOS != "windows" {
-		if err = syscall.Dup2(int(file.Fd()), int(os.Stderr.Fd())); err != nil {
-			return nil, err
-		}
-		runtime.SetFinalizer(stdErrFileHandler, func(fd *os.File) {
-			fd.Close()
-		})
+	if err := dupWrite(file); err != nil {
+		return nil, err
 	}
-
 	mng, err := NewManager(c)
 	if err != nil {
 		return nil, err
@@ -120,7 +106,6 @@ func NewWriterFromConfig(c *Config) (RollingWriter, error) {
 		fire:    mng.Fire(),
 		cf:      c,
 	}
-
 	if c.MaxRemain > 0 {
 		writer.rollingfilech = make(chan string, c.MaxRemain)
 		dir, err := ioutil.ReadDir(c.LogPath)
