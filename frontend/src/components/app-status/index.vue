@@ -8,14 +8,25 @@
                     <el-tag class="status-content">{{ $t('app.version') }}:{{ data.version }}</el-tag>
 
                     <span class="buttons">
-                        <el-button type="primary" v-if="data.status != 'Running'" link @click="onOperate('start')">
+                        <el-button
+                            type="primary"
+                            v-if="data.status != 'Running'"
+                            link
+                            @click="onOperate('start')"
+                            :disabled="data.status === 'Installing'"
+                        >
                             {{ $t('app.start') }}
                         </el-button>
                         <el-button type="primary" v-if="data.status === 'Running'" link @click="onOperate('stop')">
                             {{ $t('app.stop') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" link @click="onOperate('restart')">
+                        <el-button
+                            type="primary"
+                            link
+                            :disabled="data.status === 'Installing'"
+                            @click="onOperate('restart')"
+                        >
                             {{ $t('app.restart') }}
                         </el-button>
                         <el-divider direction="vertical" />
@@ -23,7 +34,9 @@
                             type="primary"
                             @click="setting"
                             link
-                            :disabled="data.status !== 'Running' && data.app === 'OpenResty'"
+                            :disabled="
+                                data.status === 'Installing' || (data.status !== 'Running' && data.app === 'OpenResty')
+                            "
                         >
                             {{ $t('commons.button.set') }}
                         </el-button>
@@ -128,7 +141,7 @@ const onOperate = async (operation: string) => {
 
 const getTitle = (key: string) => {
     switch (key) {
-        case 'nginx':
+        case 'openresty':
             return i18n.global.t('website.website');
         case 'mysql':
             return 'MySQL ' + i18n.global.t('menu.database');

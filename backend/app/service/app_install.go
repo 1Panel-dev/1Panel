@@ -490,6 +490,9 @@ func syncById(installId uint) error {
 	if err != nil {
 		return err
 	}
+	if appInstall.Status == constant.Installing {
+		return nil
+	}
 
 	containerNames, err := getContainerNames(appInstall)
 	if err != nil {
