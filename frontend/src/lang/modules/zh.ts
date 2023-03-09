@@ -133,7 +133,7 @@ export default {
             userName: '支持英文、中文、数字和_,长度3-30',
             simpleName: '支持英文、数字、_,长度1-30',
             dbName: '支持英文、中文、数字、.-_,长度1-16',
-            imageName: '支持英文、中文、数字、:.-_,长度1-30',
+            imageName: '支持英文、数字、:/.-_,长度1-150',
             volumeName: '支持英文、数字、.-和_,长度1-30',
             complexityPassword: '请输入长度大于 8 位且包含字母、数字、特殊字符至少两项的密码组合',
             commonPassword: '请输入 6 位以上长度密码',

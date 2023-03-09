@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -13,6 +12,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cloud_storage"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 )
@@ -232,6 +232,9 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	if backup.Type == "LOCAL" {
 		if dir, ok := varMap["dir"]; ok {
 			if dirStr, isStr := dir.(string); isStr {
+				if strings.HasSuffix(dirStr, "/") {
+					dirStr = dirStr[:strings.LastIndex(dirStr, "/")]
+				}
 				if err := updateBackupDir(dirStr); err != nil {
 					upMap["vars"] = backup.Vars
 					_ = backupRepo.Update(req.ID, upMap)
@@ -316,8 +319,7 @@ func updateBackupDir(dir string) error {
 	if strings.HasSuffix(oldDir, "/") {
 		oldDir = oldDir[:strings.LastIndex(oldDir, "/")]
 	}
-	cmd := exec.Command("cp", "-r", oldDir+"/*", dir)
-	stdout, err := cmd.CombinedOutput()
+	stdout, err := cmd.Execf("cp -r %s/* %s", oldDir, dir)
 	if err != nil {
 		return errors.New(string(stdout))
 	}

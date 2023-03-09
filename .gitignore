@@ -16,7 +16,6 @@ build/1panel
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
-/build
 /pkg/
 backend/__debug_bin
 cmd/server/__debug_bin

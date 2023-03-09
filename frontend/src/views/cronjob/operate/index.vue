@@ -7,13 +7,19 @@
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('cronjob.taskType')" prop="type">
-                        <el-select style="width: 100%" @change="changeType" v-model="dialogData.rowData!.type">
+                        <el-select
+                            v-if="dialogData.title === 'create'"
+                            style="width: 100%"
+                            @change="changeType"
+                            v-model="dialogData.rowData!.type"
+                        >
                             <el-option value="shell" :label="$t('cronjob.shell')" />
                             <el-option value="website" :label="$t('cronjob.website')" />
                             <el-option value="database" :label="$t('cronjob.database')" />
                             <el-option value="directory" :label="$t('cronjob.directory')" />
                             <el-option value="curl" :label="$t('cronjob.curl')" />
                         </el-select>
+                        <el-tag v-else>{{ dialogData.rowData!.type }}</el-tag>
                     </el-form-item>
 
                     <el-form-item :label="$t('cronjob.taskName')" prop="name">
@@ -120,6 +126,8 @@
                             <el-input-number
                                 :min="1"
                                 :max="30"
+                                step-strictly
+                                :step="1"
                                 v-model.number="dialogData.rowData!.retainCopies"
                             ></el-input-number>
                         </el-form-item>
@@ -184,7 +192,9 @@ const dialogData = ref<DialogProps>({
 });
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
-    changeType();
+    if (dialogData.value.title === 'create') {
+        changeType();
+    }
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     drawerVisiable.value = true;
     checkMysqlInstalled();

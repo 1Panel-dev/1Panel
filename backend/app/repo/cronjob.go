@@ -86,7 +86,7 @@ func (u *CronjobRepo) Page(page, size int, opts ...DBOption) (int64, []model.Cro
 
 func (u *CronjobRepo) RecordFirst(id uint) (model.JobRecords, error) {
 	var record model.JobRecords
-	err := global.DB.Order("created_at desc").First(&record).Error
+	err := global.DB.Where("cronjob_id = ?", id).Order("created_at desc").First(&record).Error
 	return record, err
 }
 

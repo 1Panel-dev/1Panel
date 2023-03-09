@@ -27,7 +27,7 @@
                             />
                         </el-select>
                     </el-form-item>
-                    <el-form-item :label="$t('container.image')" :rules="Rules.requiredInput" prop="name">
+                    <el-form-item :label="$t('container.image')" :rules="Rules.imageName" prop="name">
                         <el-input v-model.trim="form.name">
                             <template #prepend>{{ loadDetailInfo(form.repoID) }}/</template>
                         </el-input>
