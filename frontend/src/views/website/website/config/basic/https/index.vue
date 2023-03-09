@@ -233,7 +233,6 @@ const changeEnable = (enable: boolean) => {
                     done();
                 } else {
                     instance.confirmButtonLoading = true;
-                    instance.cancelButtonLoading = true;
                     form.enable = false;
                     form.websiteId = id.value;
                     UpdateHTTPSConfig(form).then(() => {

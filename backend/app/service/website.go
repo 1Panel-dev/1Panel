@@ -73,8 +73,17 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 		return 0, nil, err
 	}
 	for _, web := range websites {
+		var appName string
+		if web.Type == constant.Deployment {
+			appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(web.AppInstallID))
+			if err != nil {
+				return 0, nil, err
+			}
+			appName = appInstall.Name
+		}
 		websiteDTOs = append(websiteDTOs, response.WebsiteDTO{
 			Website: web,
+			AppName: appName,
 		})
 	}
 	return total, websiteDTOs, nil

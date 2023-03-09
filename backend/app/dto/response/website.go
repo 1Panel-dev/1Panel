@@ -9,6 +9,7 @@ type WebsiteDTO struct {
 	ErrorLogPath  string `json:"errorLogPath"`
 	AccessLogPath string `json:"accessLogPath"`
 	SitePath      string `json:"sitePath"`
+	AppName       string `json:"appName"`
 }
 
 type WebsitePreInstallCheck struct {
