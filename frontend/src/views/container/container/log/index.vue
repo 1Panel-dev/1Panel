@@ -72,19 +72,19 @@ const timeOptions = ref([
     { label: i18n.global.t('container.all'), value: 'all' },
     {
         label: i18n.global.t('container.lastDay'),
-        value: new Date(new Date().getTime() - 3600 * 1000 * 24 * 1).getTime() / 1000 + '',
+        value: '24h',
     },
     {
         label: i18n.global.t('container.last4Hour'),
-        value: new Date(new Date().getTime() - 3600 * 1000 * 4).getTime() / 1000 + '',
+        value: '4h',
     },
     {
         label: i18n.global.t('container.lastHour'),
-        value: new Date(new Date().getTime() - 3600 * 1000).getTime() / 1000 + '',
+        value: '1h',
     },
     {
         label: i18n.global.t('container.last10Min'),
-        value: new Date(new Date().getTime() - 600 * 1000).getTime() / 1000 + '',
+        value: '10m',
     },
 ]);
 

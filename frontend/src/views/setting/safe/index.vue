@@ -114,7 +114,7 @@
                 <DrawerHeader :header="$t('setting.expirationTime')" :back="handleClose" />
             </template>
             <el-form ref="timeoutFormRef" label-position="top" :model="timeoutForm">
-                <el-form-item :label="$t('setting.days')" prop="days" :rules="Rules.number">
+                <el-form-item :label="$t('setting.days')" prop="days" :rules="[Rules.number, checkNumberRange(0, 60)]">
                     <el-input clearable v-model.number="timeoutForm.days" />
                     <span class="input-help">{{ $t('setting.expirationHelper') }}</span>
                 </el-form-item>
@@ -139,7 +139,7 @@ import LayoutContent from '@/layout/layout-content.vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { updateSetting, getMFA, bindMFA, getSettingInfo, updatePort } from '@/api/modules/setting';
 import i18n from '@/lang';
-import { Rules } from '@/global/form-rules';
+import { Rules, checkNumberRange } from '@/global/form-rules';
 import { dateFormatSimple } from '@/utils/util';
 import { MsgError, MsgSuccess } from '@/utils/message';
 

@@ -1,12 +1,11 @@
 package service
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
+	"os/exec"
 	"sort"
 	"strconv"
 	"strings"
@@ -20,7 +19,6 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
@@ -221,32 +219,15 @@ func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error 
 }
 
 func (u *ContainerService) ContainerLogs(req dto.ContainerLog) (string, error) {
-	var (
-		options types.ContainerLogsOptions
-		logs    io.ReadCloser
-		buf     *bytes.Buffer
-		err     error
-	)
-	client, err := docker.NewDockerClient()
+	cmd := exec.Command("docker", "logs", req.ContainerID)
+	if req.Mode != "all" {
+		cmd = exec.Command("docker", "logs", req.ContainerID, "--since", req.Mode)
+	}
+	stdout, err := cmd.CombinedOutput()
 	if err != nil {
 		return "", err
 	}
-	options = types.ContainerLogsOptions{
-		ShowStdout: true,
-		Timestamps: true,
-	}
-	if req.Mode != "all" {
-		options.Since = req.Mode
-	}
-	if logs, err = client.ContainerLogs(context.Background(), req.ContainerID, options); err != nil {
-		return "", err
-	}
-	defer logs.Close()
-	buf = new(bytes.Buffer)
-	if _, err = stdcopy.StdCopy(buf, nil, logs); err != nil {
-		return "", err
-	}
-	return buf.String(), nil
+	return string(stdout), nil
 }
 
 func (u *ContainerService) ContainerStats(id string) (*dto.ContainterStats, error) {

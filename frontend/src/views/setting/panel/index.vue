@@ -73,7 +73,7 @@
 
                             <el-form-item
                                 :label="$t('setting.sessionTimeout')"
-                                :rules="Rules.number"
+                                :rules="[Rules.number, checkNumberRange(300, 864000)]"
                                 prop="sessionTimeout"
                             >
                                 <el-input v-model.number="form.sessionTimeout">
@@ -125,7 +125,7 @@ import { ref, reactive, onMounted, computed } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
 import LayoutContent from '@/layout/layout-content.vue';
 import { syncTime, getSettingInfo, updateSetting } from '@/api/modules/setting';
-import { Rules } from '@/global/form-rules';
+import { Rules, checkNumberRange } from '@/global/form-rules';
 import { GlobalStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
