@@ -75,6 +75,7 @@ let submitModel = ref<any>({});
 let canEdit = ref(false);
 
 const acceptParams = async (props: ParamProps) => {
+    canEdit.value = false;
     submitModel.value.installId = props.id;
     params.value = [];
     paramData.value.id = props.id;

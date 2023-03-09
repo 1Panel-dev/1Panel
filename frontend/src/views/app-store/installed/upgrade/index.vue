@@ -1,7 +1,7 @@
 <template>
     <el-drawer :close-on-click-modal="false" v-model="open" size="30%">
         <template #header>
-            <Header :header="$t('app.update')" :resource="resourceName" :back="handleClose"></Header>
+            <Header :header="$t('app.upgrade')" :resource="resourceName" :back="handleClose"></Header>
         </template>
         <el-row>
             <el-col :span="22" :offset="1">
@@ -87,8 +87,8 @@ const operate = async () => {
 
 const onOperate = async () => {
     ElMessageBox.confirm(
-        i18n.global.t('app.operatorHelper', [i18n.global.t('app.update')]),
-        i18n.global.t('app.update'),
+        i18n.global.t('app.operatorHelper', [i18n.global.t('app.upgrade')]),
+        i18n.global.t('app.upgrade'),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
