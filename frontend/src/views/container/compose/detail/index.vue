@@ -319,7 +319,7 @@ defineExpose({
 });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .app-card {
     font-size: 14px;
     height: 60px;
