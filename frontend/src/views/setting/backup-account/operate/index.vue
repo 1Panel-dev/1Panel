@@ -72,14 +72,14 @@
                         v-if="dialogData.rowData!.type !== '' && hasBucket(dialogData.rowData!.type)"
                         label="Bucket"
                         prop="bucket"
-                        :rules="Rules.requiredSelect"
                     >
-                        <el-select style="width: 80%" v-model="dialogData.rowData!.bucket">
+                        <el-select style="width: 80%" @change="errBuckets = false" v-model="dialogData.rowData!.bucket">
                             <el-option v-for="item in buckets" :key="item" :value="item" />
                         </el-select>
-                        <el-button style="width: 20%" plain @click="getBuckets">
+                        <el-button style="width: 20%" plain @click="getBuckets(formRef)">
                             {{ $t('setting.loadBucket') }}
                         </el-button>
+                        <span v-if="errBuckets" class="input-error">{{ $t('commons.rule.requiredSelect') }}</span>
                     </el-form-item>
                     <div v-if="dialogData.rowData!.type === 'SFTP'">
                         <el-form-item :label="$t('setting.address')" prop="varsJson.address" :rules="Rules.ip">
@@ -139,6 +139,7 @@ const loading = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 const buckets = ref();
+const errBuckets = ref();
 
 const endpoints = ref('http');
 
@@ -181,33 +182,41 @@ function hasBucket(val: string) {
     return val === 'OSS' || val === 'S3' || val === 'MINIO';
 }
 
-const getBuckets = async () => {
-    loading.value = true;
-    let item = deepCopy(dialogData.value.rowData!.varsJson);
-    if (dialogData.value.rowData!.type === 'MINIO') {
-        dialogData.value.rowData!.varsJson['endpointItem'] = dialogData.value
-            .rowData!.varsJson['endpointItem'].replace('https://', '')
-            .replace('http://', '');
-        item['endpoint'] = endpoints.value + '://' + dialogData.value.rowData!.varsJson['endpointItem'];
-        item['endpointItem'] = undefined;
-    }
-    listBucket({
-        type: dialogData.value.rowData!.type,
-        vars: JSON.stringify(item),
-        accessKey: dialogData.value.rowData!.accessKey,
-        credential: dialogData.value.rowData!.credential,
-    })
-        .then((res) => {
-            loading.value = false;
-            buckets.value = res.data;
+const getBuckets = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    formEl.validate(async (valid) => {
+        if (!valid) return;
+        loading.value = true;
+        let item = deepCopy(dialogData.value.rowData!.varsJson);
+        if (dialogData.value.rowData!.type === 'MINIO') {
+            dialogData.value.rowData!.varsJson['endpointItem'] = dialogData.value
+                .rowData!.varsJson['endpointItem'].replace('https://', '')
+                .replace('http://', '');
+            item['endpoint'] = endpoints.value + '://' + dialogData.value.rowData!.varsJson['endpointItem'];
+            item['endpointItem'] = undefined;
+        }
+        listBucket({
+            type: dialogData.value.rowData!.type,
+            vars: JSON.stringify(item),
+            accessKey: dialogData.value.rowData!.accessKey,
+            credential: dialogData.value.rowData!.credential,
         })
-        .catch(() => {
-            buckets.value = [];
-            loading.value = false;
-        });
+            .then((res) => {
+                loading.value = false;
+                buckets.value = res.data;
+            })
+            .catch(() => {
+                buckets.value = [];
+                loading.value = false;
+            });
+    });
 };
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
+    if (!dialogData.value.rowData.bucket) {
+        errBuckets.value = true;
+        return;
+    }
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;

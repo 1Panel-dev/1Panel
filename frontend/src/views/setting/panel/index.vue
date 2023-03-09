@@ -105,7 +105,9 @@
                                         >
                                             {{ $t('commons.button.sync') }}
                                         </el-button>
-                                        <span v-show="show">{{ count }} {{ $t('setting.second') }}</span>
+                                        <div style="width: 45px" v-show="show">
+                                            <span>{{ count }} {{ $t('setting.second') }}</span>
+                                        </div>
                                     </template>
                                 </el-input>
                             </el-form-item>

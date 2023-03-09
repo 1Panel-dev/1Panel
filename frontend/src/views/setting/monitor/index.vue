@@ -20,7 +20,7 @@
                             </el-form-item>
                             <el-form-item
                                 :label="$t('setting.storeDays')"
-                                :rules="Rules.number"
+                                :rules="[Rules.number, checkNumberRange(1, 30)]"
                                 prop="monitorStoreDays"
                             >
                                 <el-input clearable v-model.number="form.monitorStoreDays">
@@ -51,7 +51,7 @@ import { FormInstance } from 'element-plus';
 import LayoutContent from '@/layout/layout-content.vue';
 import { cleanMonitors, getSettingInfo, updateSetting } from '@/api/modules/setting';
 import { useDeleteData } from '@/hooks/use-delete-data';
-import { Rules } from '@/global/form-rules';
+import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 
