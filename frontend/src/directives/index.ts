@@ -5,6 +5,7 @@ import draggable from './modules/draggable';
 import debounce from './modules/debounce';
 import throttle from './modules/throttle';
 import longpress from './modules/longpress';
+import drawerDrag from './modules/drawer-drag';
 
 const directivesList: any = {
     // Custom directives
@@ -14,6 +15,7 @@ const directivesList: any = {
     debounce,
     throttle,
     longpress,
+    drawerDrag,
 };
 
 const directives = {

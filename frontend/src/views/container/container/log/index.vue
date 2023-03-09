@@ -1,41 +1,43 @@
 <template>
-    <el-drawer v-model="logVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
-        <template #header>
-            <DrawerHeader :header="$t('commons.button.log')" :back="handleClose" />
-        </template>
-        <div>
-            <el-select @change="searchLogs" style="width: 30%; float: left" v-model="logSearch.mode">
-                <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
-            </el-select>
-            <div style="margin-left: 20px; float: left">
-                <el-checkbox border v-model="logSearch.isWatch">{{ $t('commons.button.watch') }}</el-checkbox>
+    <div>
+        <el-drawer v-model="logVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+            <template #header>
+                <DrawerHeader :header="$t('commons.button.log')" :back="handleClose" />
+            </template>
+            <div>
+                <el-select @change="searchLogs" style="width: 30%; float: left" v-model="logSearch.mode">
+                    <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
+                </el-select>
+                <div style="margin-left: 20px; float: left">
+                    <el-checkbox border v-model="logSearch.isWatch">{{ $t('commons.button.watch') }}</el-checkbox>
+                </div>
+                <el-button style="margin-left: 20px" @click="onDownload" icon="Download">
+                    {{ $t('file.download') }}
+                </el-button>
             </div>
-            <el-button style="margin-left: 20px" @click="onDownload" icon="Download">
-                {{ $t('file.download') }}
-            </el-button>
-        </div>
 
-        <codemirror
-            :autofocus="true"
-            placeholder="None data"
-            :indent-with-tab="true"
-            :tabSize="4"
-            style="margin-top: 20px; height: calc(100vh - 230px)"
-            :lineWrapping="true"
-            :matchBrackets="true"
-            theme="cobalt"
-            :styleActiveLine="true"
-            :extensions="extensions"
-            v-model="logInfo"
-            @ready="handleReady"
-            :disabled="true"
-        />
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button @click="logVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-            </span>
-        </template>
-    </el-drawer>
+            <codemirror
+                :autofocus="true"
+                placeholder="None data"
+                :indent-with-tab="true"
+                :tabSize="4"
+                style="margin-top: 20px; height: calc(100vh - 230px)"
+                :lineWrapping="true"
+                :matchBrackets="true"
+                theme="cobalt"
+                :styleActiveLine="true"
+                :extensions="extensions"
+                v-model="logInfo"
+                @ready="handleReady"
+                :disabled="true"
+            />
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="logVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                </span>
+            </template>
+        </el-drawer>
+    </div>
 </template>
 
 <script lang="ts" setup>
