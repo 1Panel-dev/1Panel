@@ -27,7 +27,6 @@ func GetPrivateKey(priKey crypto.PrivateKey) []byte {
 }
 
 func NewRegisterClient(email string) (*AcmeClient, error) {
-
 	priKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		panic(err)
@@ -58,7 +57,6 @@ func NewRegisterClient(email string) (*AcmeClient, error) {
 }
 
 func NewPrivateKeyClient(email string, privateKey string) (*AcmeClient, error) {
-
 	block, _ := pem.Decode([]byte(privateKey))
 	priKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
