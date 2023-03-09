@@ -52,6 +52,7 @@ const handleClose = () => {
 };
 
 const resetForm = () => {
+    accountForm.value.resetFields();
     account.value = {
         email: '',
     };

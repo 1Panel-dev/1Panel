@@ -188,12 +188,15 @@ const changeProvider = () => {
 const getDnsResolve = async (acmeAccountId: number, domains: string[]) => {
     hasResolve.value = false;
     loading.value = true;
-    const res = await GetDnsResolve({ acmeAccountId: acmeAccountId, domains: domains });
-    if (res.data) {
-        dnsResolve.value = res.data;
-        hasResolve.value = true;
+    try {
+        const res = await GetDnsResolve({ acmeAccountId: acmeAccountId, domains: domains });
+        if (res.data) {
+            dnsResolve.value = res.data;
+            hasResolve.value = true;
+        }
+    } finally {
+        loading.value = false;
     }
-    loading.value = false;
 };
 
 const submit = async (formEl: FormInstance | undefined) => {
