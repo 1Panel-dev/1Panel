@@ -927,6 +927,8 @@ export default {
         updatePrompt: 'The current application is the latest version',
         installPrompt: 'No apps installed yet',
         updateHelper: 'Updating parameters may cause the application to fail to start, please operate with caution',
+        updateWarn: 'Update parameters need to rebuild the application, continue? ',
+        busPort: 'Service Port',
     },
     website: {
         website: 'Website',

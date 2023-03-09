@@ -205,6 +205,7 @@ func updateInstall(installId uint, detailId uint) error {
 	}
 	install.DockerCompose = detail.DockerCompose
 	install.Version = detail.Version
+	install.AppDetailId = detailId
 
 	fileOp := files.NewFileOp()
 	if err := fileOp.WriteFile(install.GetComposePath(), strings.NewReader(install.DockerCompose), 0775); err != nil {

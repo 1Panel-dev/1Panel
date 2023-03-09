@@ -937,6 +937,7 @@ export default {
         installPrompt: '尚未安装任何应用',
         updateHelper: '更新参数可能导致应用无法启动，请提前备份并谨慎操作',
         updateWarn: '更新参数需要重建应用，是否继续？',
+        busPort: '服务端口',
     },
     website: {
         website: '网站',

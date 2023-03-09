@@ -128,14 +128,17 @@
                                             plain
                                             round
                                             size="small"
-                                            @click="openOperate(installed, 'update')"
+                                            @click="openOperate(installed, 'upgrade')"
                                             v-if="mode === 'upgrade'"
                                         >
-                                            {{ $t('app.update') }}
+                                            {{ $t('app.upgrade') }}
                                         </el-button>
                                     </div>
                                     <div class="d-description">
                                         <el-tag>{{ $t('app.version') }}：{{ installed.version }}</el-tag>
+                                        <el-tag v-if="installed.httpPort > 0">
+                                            {{ $t('app.busPort') }}：{{ installed.httpPort }}
+                                        </el-tag>
                                         <div class="description">
                                             <span>{{ $t('app.areadyRun') }}： {{ getAge(installed.createdAt) }}</span>
                                         </div>
@@ -272,7 +275,7 @@ const search = () => {
 const openOperate = (row: any, op: string) => {
     operateReq.installId = row.id;
     operateReq.operate = op;
-    if (op == 'update') {
+    if (op == 'upgrade') {
         upgradeRef.value.acceptParams(row.id, row.name);
     } else if (op == 'delete') {
         AppInstalledDeleteCheck(row.id).then(async (res) => {
