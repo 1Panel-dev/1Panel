@@ -94,11 +94,12 @@
                                 v-if="row.status === 'Running'"
                                 link
                                 type="success"
+                                :icon="VideoPlay"
                                 @click="opWebsite('stop', row.id)"
                             >
                                 {{ $t('commons.status.running') }}
                             </el-button>
-                            <el-button v-else link type="danger" @click="opWebsite('start', row.id)">
+                            <el-button v-else link type="danger" :icon="VideoPause" @click="opWebsite('start', row.id)">
                                 {{ $t('commons.status.stopped') }}
                             </el-button>
                         </template>
@@ -185,7 +186,7 @@ import { ElMessageBox } from 'element-plus';
 import { dateFormatSimple } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
-import { Promotion } from '@element-plus/icons-vue';
+import { Promotion, VideoPlay, VideoPause } from '@element-plus/icons-vue';
 
 const shortcuts = [
     {

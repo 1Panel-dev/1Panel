@@ -46,6 +46,5 @@ var ScopeKeyMap = map[NginxKey][]string{
 
 var StaticFileKeyMap = map[NginxKey]struct {
 }{
-	SSL:       {},
-	LimitConn: {},
+	SSL: {},
 }

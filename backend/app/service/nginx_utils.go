@@ -160,9 +160,6 @@ func getNginxParamsFromStaticFile(scope dto.NginxKey, newParams []dto.NginxParam
 	switch scope {
 	case dto.SSL:
 		newConfig = parser.NewStringParser(string(nginx_conf.SSL)).Parse()
-	case dto.LimitConn:
-		updateScope = constant.NginxScopeOut
-		newConfig = parser.NewStringParser(string(nginx_conf.Limit)).Parse()
 	}
 	for _, dir := range newConfig.GetDirectives() {
 		addParam := dto.NginxParam{

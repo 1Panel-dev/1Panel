@@ -10,8 +10,5 @@ var SSL []byte
 //go:embed  website_default.conf
 var WebsiteDefault []byte
 
-//go:embed limit.conf
-var Limit []byte
-
 //go:embed index.html
 var Index []byte
