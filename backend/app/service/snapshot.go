@@ -124,15 +124,15 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 	backupDockerDir := fmt.Sprintf("%s/docker", rootDir)
 	_ = os.MkdirAll(backupDockerDir, os.ModePerm)
 
+	_ = settingRepo.Update("SystemStatus", "Snapshoting")
 	snap := model.Snapshot{
 		Name:        fmt.Sprintf("1panel_%s_%s", versionItem.Value, timeNow),
 		Description: req.Description,
 		From:        req.From,
 		Version:     versionItem.Value,
-		Status:      constant.StatusWaiting,
+		Status:      constant.StatusSuccess,
 	}
 	_ = snapshotRepo.Create(&snap)
-	_ = settingRepo.Update("SystemStatus", "Snapshoting")
 	go func() {
 		defer func() {
 			_ = os.RemoveAll(rootDir)
@@ -153,7 +153,6 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
 			return
 		}
-		_, _ = cmd.Exec("systemctl restart docker")
 
 		if err := u.handlePanelBinary(fileOp, "snapshot", "", backupPanelDir+"/1panel"); err != nil {
 			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
@@ -177,6 +176,7 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
 			return
 		}
+		_, _ = cmd.Exec("systemctl restart docker")
 
 		snapJson := SnapshotJson{
 			BaseDir:            global.CONF.BaseDir,
@@ -664,11 +664,9 @@ func (u *SnapshotService) handlePanelDatas(snapID uint, fileOp files.FileOp, ope
 			exclusionRules += ("." + strings.ReplaceAll(dockerDir, source, "") + ";")
 		}
 
-		_ = snapshotRepo.Update(snapID, map[string]interface{}{"status": constant.StatusSuccess})
 		if err := u.handleTar(source, target, "1panel_data.tar.gz", exclusionRules); err != nil {
 			return fmt.Errorf("backup panel data failed, err: %v", err)
 		}
-		_ = snapshotRepo.Update(snapID, map[string]interface{}{"status": constant.StatusWaiting})
 	case "recover":
 		exclusionRules := "./tmp/;./cache;"
 		if strings.Contains(backupDir, target) {
@@ -852,9 +850,9 @@ func (u *SnapshotService) handleTar(sourceDir, targetDir, name, exclusionRules s
 		exStr += exclude
 	}
 
-	ss := fmt.Sprintf("tar --warning=no-file-changed -zcf %s %s -C %s .", targetDir+"/"+name, exStr, sourceDir)
-	global.LOG.Debug(ss)
-	stdout, err := cmd.Exec(ss)
+	commands := fmt.Sprintf("tar -zcf %s %s -C %s .", targetDir+"/"+name, exStr, sourceDir)
+	global.LOG.Debug(commands)
+	stdout, err := cmd.Exec(commands)
 	if err != nil {
 		global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
 		return errors.New(stdout)
@@ -868,10 +866,13 @@ func (u *SnapshotService) handleUnTar(sourceDir, targetDir string) error {
 			return err
 		}
 	}
-	stdout, err := cmd.Exec(fmt.Sprintf("tar zxf %s -C %s .", sourceDir, targetDir))
+
+	commands := fmt.Sprintf("tar -zxf %s -C %s .", sourceDir, targetDir)
+	global.LOG.Debug(commands)
+	stdout, err := cmd.Exec(commands)
 	if err != nil {
 		global.LOG.Errorf("do handle untar failed, stdout: %s, err: %v", stdout, err)
-		return errors.New(string(stdout))
+		return errors.New(stdout)
 	}
 	return nil
 }

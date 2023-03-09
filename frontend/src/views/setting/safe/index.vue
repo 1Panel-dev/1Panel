@@ -141,7 +141,7 @@ import { updateSetting, getMFA, bindMFA, getSettingInfo, updatePort } from '@/ap
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { dateFormatSimple } from '@/utils/util';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 const form = reactive({
@@ -264,6 +264,10 @@ const handleClose = () => {
 };
 
 const onBind = async () => {
+    if (!mfaCode.value) {
+        MsgError(i18n.global.t('commons.msg.comfimNoNull', ['code']));
+        return;
+    }
     loading.value = true;
     await bindMFA({ code: mfaCode.value, secret: otp.secret })
         .then(() => {
