@@ -110,6 +110,7 @@ const getFileName = (url: string) => {
 const acceptParams = (props: WgetProps) => {
     addForm.path = props.path;
     open.value = true;
+    submitData.value = false;
 };
 
 defineExpose({ acceptParams });
