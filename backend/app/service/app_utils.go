@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
+	"github.com/1Panel-dev/1Panel/backend/utils/env"
 	"math"
 	"os"
 	"path"
@@ -22,7 +23,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 )
 
@@ -326,7 +326,7 @@ func copyAppData(key, version, installName string, params map[string]interface{}
 
 	envParams := make(map[string]string, len(params))
 	handleMap(params, envParams)
-	if err = godotenv.Write(envParams, envPath); err != nil {
+	if err = env.Write(envParams, envPath); err != nil {
 		return
 	}
 	return
@@ -525,7 +525,7 @@ func updateToolApp(installed model.AppInstall) {
 	}
 	envFileMap := make(map[string]string)
 	handleMap(envMap, envFileMap)
-	if err = godotenv.Write(envFileMap, envPath); err != nil {
+	if err = env.Write(envFileMap, envPath); err != nil {
 		global.LOG.Errorf("update tool app [%s] error : %s", toolInstall.Name, err.Error())
 		return
 	}
