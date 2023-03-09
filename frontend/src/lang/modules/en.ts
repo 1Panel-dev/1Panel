@@ -129,7 +129,7 @@ export default {
             userName: 'Support English, Chinese, numbers and _ length 3-30',
             simpleName: 'Support English, numbers and _ length 1-30',
             dbName: 'Support English, Chinese, numbers, .-, and _ length 1-16',
-            imageName: 'Support English, Chinese, numbers, :.-_, length 1-30',
+            imageName: 'Support English, numbers, :/.-_, length 1-150',
             volumeName: 'Support English, numbers, .-_, length 1-30',
             complexityPassword:
                 'Enter a password that is longer than eight characters and contains at least two letters, digits, and special characters',

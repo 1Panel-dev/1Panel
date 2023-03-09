@@ -114,7 +114,7 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 		fileName = fmt.Sprintf("directory%s_%s.tar.gz", strings.ReplaceAll(cronjob.SourceDir, "/", "_"), startTime.Format("20060102150405"))
 		backupDir = fmt.Sprintf("%s/%s/%s", localDir, cronjob.Type, cronjob.Name)
 		global.LOG.Infof("handle tar %s to %s", backupDir, fileName)
-		if err := handleTar(cronjob.SourceDir, localDir+"/"+backupDir, fileName, cronjob.ExclusionRules); err != nil {
+		if err := handleTar(cronjob.SourceDir, backupDir, fileName, cronjob.ExclusionRules); err != nil {
 			return "", err
 		}
 	}
@@ -197,20 +197,25 @@ func (u *CronjobService) HandleRmExpired(backType, backupDir string, cronjob *mo
 	if len(files) == 0 {
 		return
 	}
-	if cronjob.Type == "database" {
-		dbCopies := uint64(0)
-		for i := len(files) - 1; i >= 0; i-- {
-			if strings.HasPrefix(files[i].Name(), "db_") {
-				dbCopies++
-				if dbCopies > cronjob.RetainCopies {
-					_ = os.Remove(backupDir + "/" + files[i].Name())
-					_ = backupRepo.DeleteRecord(context.Background(), backupRepo.WithByFileName(files[i].Name()))
-				}
+
+	prefix := ""
+	switch cronjob.Type {
+	case "database":
+		prefix = "db_"
+	case "website":
+		prefix = "website_"
+	case "directory":
+		prefix = "directory_"
+	}
+
+	dbCopies := uint64(0)
+	for i := len(files) - 1; i >= 0; i-- {
+		if strings.HasPrefix(files[i].Name(), prefix) {
+			dbCopies++
+			if dbCopies > cronjob.RetainCopies {
+				_ = os.Remove(backupDir + "/" + files[i].Name())
+				_ = backupRepo.DeleteRecord(context.Background(), backupRepo.WithByFileName(files[i].Name()))
 			}
-		}
-	} else {
-		for i := 0; i < len(files)-int(cronjob.RetainCopies); i++ {
-			_ = os.Remove(backupDir + "/" + files[i].Name())
 		}
 	}
 	records, _ := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(cronjob.ID)))

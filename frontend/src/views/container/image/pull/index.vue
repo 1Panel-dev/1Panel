@@ -25,7 +25,7 @@
                             <el-option v-for="item in repos" :key="item.id" :value="item.id" :label="item.name" />
                         </el-select>
                     </el-form-item>
-                    <el-form-item :label="$t('container.imageName')" :rules="Rules.requiredInput" prop="imageName">
+                    <el-form-item :label="$t('container.imageName')" :rules="Rules.imageName" prop="imageName">
                         <el-input v-model.trim="form.imageName">
                             <template v-if="form.fromRepo" #prepend>{{ loadDetailInfo(form.repoID) }}/</template>
                         </el-input>

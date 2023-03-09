@@ -151,7 +151,7 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 		}
 		return fmt.Sprintf("%v/database/mysql/%s/%s/db_%s_%s.sql.gz", varMap["dir"], mysqlInfo.Name, cronjob.DBName, cronjob.DBName, record.StartTime.Format("20060102150405")), nil
 	case "directory":
-		return fmt.Sprintf("%v/%s/%s/%s.tar.gz", varMap["dir"], cronjob.Type, cronjob.Name, record.StartTime.Format("20060102150405")), nil
+		return fmt.Sprintf("%v/%s/%s/directory%s_%s.tar.gz", varMap["dir"], cronjob.Type, cronjob.Name, strings.ReplaceAll(cronjob.SourceDir, "/", "_"), record.StartTime.Format("20060102150405")), nil
 	default:
 		return "", fmt.Errorf("not support type %s", cronjob.Type)
 	}
@@ -220,6 +220,11 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	if err := copier.Copy(&cronjob, &req); err != nil {
 		return errors.WithMessage(constant.ErrStructTransform, err.Error())
 	}
+	cronModel, err := cronjobRepo.Get(commonRepo.WithByID(id))
+	if err != nil {
+		return constant.ErrRecordNotFound
+	}
+	cronjob.EntryID = cronModel.EntryID
 	cronjob.Spec = loadSpec(cronjob)
 	if err := u.StartJob(&cronjob); err != nil {
 		return err

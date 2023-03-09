@@ -85,14 +85,3 @@ onMounted(() => {
     get();
 });
 </script>
-
-<style lang="scss" scoped>
-.status-count {
-    font-size: 24px;
-}
-
-.status-label {
-    font-size: 14px;
-    color: #646a73;
-}
-</style>
