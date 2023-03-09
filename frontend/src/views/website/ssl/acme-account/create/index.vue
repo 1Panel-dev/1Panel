@@ -2,14 +2,13 @@
     <el-dialog
         v-model="open"
         :title="$t('website.addAccount')"
-        :destroy-on-close="true"
         :close-on-click-modal="false"
         width="30%"
         :before-close="handleClose"
     >
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
-                <el-form ref="accountForm" label-position="top" :model="account" :rules="rules">
+                <el-form ref="accountForm" label-position="top" :model="account" :rules="rules" @submit.enter.prevent>
                     <el-form-item :label="$t('website.email')" prop="email">
                         <el-input v-model.trim="account.email"></el-input>
                     </el-form-item>
