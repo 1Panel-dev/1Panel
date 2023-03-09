@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/env"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
 	"github.com/joho/godotenv"
 	"io/ioutil"
@@ -236,7 +237,7 @@ func (a AppInstallService) Update(req request.AppInstalledUpdate) error {
 		return err
 	}
 	installed.Env = string(paramByte)
-	if err := godotenv.Write(oldEnvMaps, envPath); err != nil {
+	if err := env.Write(oldEnvMaps, envPath); err != nil {
 		return err
 	}
 	_ = appInstallRepo.Save(&installed)
