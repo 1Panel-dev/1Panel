@@ -66,16 +66,26 @@
                     @search="search()"
                     :class="{ mask: nginxStatus != 'Running' }"
                 >
-                    <el-table-column :label="$t('commons.table.name')" fix show-overflow-tooltip prop="primaryDomain">
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        fix
+                        show-overflow-tooltip
+                        prop="primaryDomain"
+                        min-width="120px"
+                    >
                         <template #default="{ row }">
-                            <el-link type="primary" :underline="false" @click="openConfig(row.id)">
-                                {{ row.primaryDomain }}
-                            </el-link>
+                            <el-button link :icon="Promotion" @click="openUrl(row)"></el-button>
+                            <span>
+                                <el-link type="primary" :underline="false" @click="openConfig(row.id)">
+                                    <span style="margin-left: 10px">{{ row.primaryDomain }}</span>
+                                </el-link>
+                            </span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.type')" fix prop="type">
                         <template #default="{ row }">
                             {{ $t('website.' + row.type) }}
+                            <span v-if="row.type === 'deployment'">[{{ row.appName }}]</span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status">
@@ -175,6 +185,7 @@ import { ElMessageBox } from 'element-plus';
 import { dateFormatSimple } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
+import { Promotion } from '@element-plus/icons-vue';
 
 const shortcuts = [
     {
@@ -220,6 +231,11 @@ let req = reactive({
     pageSize: 15,
     websiteGroupId: 0,
 });
+
+const openUrl = (row: Website.WebsiteDTO) => {
+    const url = row.protocol.toLowerCase() + '://' + row.primaryDomain;
+    window.open(url);
+};
 
 const search = async () => {
     req.page = paginationConfig.currentPage;

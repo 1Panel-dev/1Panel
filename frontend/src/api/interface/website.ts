@@ -12,6 +12,7 @@ export namespace Website {
         webSiteGroupId: number;
         otherDomains: string;
         defaultServer: boolean;
+        protocol: string;
         autoRenew: boolean;
         appinstall?: NewAppInstall;
         webSiteSSL: SSL;
@@ -21,6 +22,7 @@ export namespace Website {
         errorLogPath: string;
         accessLogPath: string;
         sitePath: string;
+        appName: string;
     }
 
     export interface NewAppInstall {

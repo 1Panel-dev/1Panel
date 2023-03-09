@@ -4,7 +4,7 @@ import { Website } from '../interface/Website';
 import { File } from '../interface/file';
 
 export const SearchWebsites = (req: Website.WebSiteSearch) => {
-    return http.post<ResPage<Website.Website>>(`/websites/search`, req);
+    return http.post<ResPage<Website.WebsiteDTO>>(`/websites/search`, req);
 };
 
 export const ListWebsites = () => {
