@@ -41,7 +41,6 @@ func (f FileService) SearchUploadWithPage(req request.SearchUploadWithPage) (int
 		files    []response.UploadInfo
 		backData []response.UploadInfo
 	)
-
 	_ = filepath.Walk(req.Path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return nil
