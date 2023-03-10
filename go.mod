@@ -148,7 +148,7 @@ require (
 	go.opencensus.io v0.23.0 // indirect
 	go.opentelemetry.io/otel v1.3.0 // indirect
 	go.opentelemetry.io/otel/trace v1.3.0 // indirect
-	golang.org/x/image v0.0.0-20190802002840-cff245a6509b // indirect
+	golang.org/x/image v0.5.0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
 	golang.org/x/sys v0.5.0 // indirect
@@ -159,8 +159,5 @@ require (
 )
 
 replace (
-	// base64Captcha v1.3.5
-	golang.org/x/image v0.0.0-20190802002840-cff245a6509b => golang.org/x/image v0.5.0
-
 	golang.org/x/net => golang.org/x/net v0.7.0
 )
