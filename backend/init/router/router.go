@@ -1,11 +1,11 @@
 package router
 
 import (
-	"github.com/1Panel-dev/1Panel/backend/global"
 	"html/template"
 	"net/http"
 
 	v1 "github.com/1Panel-dev/1Panel/backend/app/api/v1"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/1Panel-dev/1Panel/backend/middleware"
 	rou "github.com/1Panel-dev/1Panel/backend/router"

@@ -177,11 +177,11 @@ func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
 	cronjob.Status = constant.StatusEnable
 	cronjob.Spec = loadSpec(cronjob)
 
-	if err := cronjobRepo.Create(&cronjob); err != nil {
-		return err
-	}
 	global.LOG.Infof("create cronjob %s successful, spec: %s", cronjob.Name, cronjob.Spec)
 	if err := u.StartJob(&cronjob); err != nil {
+		return err
+	}
+	if err := cronjobRepo.Create(&cronjob); err != nil {
 		return err
 	}
 	return nil

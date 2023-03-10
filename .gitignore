@@ -16,11 +16,12 @@ build/1panel
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+/build
 /pkg/
 backend/__debug_bin
 cmd/server/__debug_bin
-cmd/server/web/assets/
+cmd/server/web/assets
 cmd/server/web/monacoeditorwork
-cmd/server/web/favicon.png
 cmd/server/web/index.html
+cmd/server/web/favicon.png
 frontend/auto-imports.d.ts
