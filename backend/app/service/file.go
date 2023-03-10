@@ -161,7 +161,6 @@ func (f FileService) GetContent(op request.FileOption) (response.FileInfo, error
 }
 
 func (f FileService) SaveContent(edit request.FileEdit) error {
-
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:   edit.Path,
 		Expand: false,
@@ -190,7 +189,11 @@ func (f FileService) MvFile(m request.FileMove) error {
 	if !fo.Stat(m.NewPath) {
 		return buserr.New(constant.ErrPathNotFound)
 	}
-
+	for _, path := range m.OldPaths {
+		if path == m.NewPath || strings.Contains(m.NewPath, path) {
+			return buserr.New(constant.ErrMovePathFailed)
+		}
+	}
 	if m.Type == "cut" {
 		return fo.Cut(m.OldPaths, m.NewPath)
 	}

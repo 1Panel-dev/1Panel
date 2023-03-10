@@ -31,6 +31,7 @@ ErrUpdateBuWebsite: '应用更新成功，但是网站配置文件修改失败�
 ErrFileCanNotRead: "此文件不支持预览"
 ErrFileToLarge: "文件超过10M,无法打开"
 ErrPathNotFound: "目录不存在"
+ErrMovePathFailed: "目标路径不能包含原路径！"
 
 #website
 ErrDomainIsExist: "域名已存在"

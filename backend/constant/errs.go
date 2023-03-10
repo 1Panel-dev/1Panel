@@ -79,7 +79,8 @@ var (
 
 //file
 var (
-	ErrPathNotFound = "ErrPathNotFound"
+	ErrPathNotFound   = "ErrPathNotFound"
+	ErrMovePathFailed = "ErrMovePathFailed"
 )
 
 //mysql

@@ -31,6 +31,7 @@ ErrUpdateBuWebsite: 'The application was updated successfully, but the modificat
 ErrFileCanNotRead: "File can not read"
 ErrFileToLarge: "file is too large"
 ErrPathNotFound: "Path is not found"
+ErrMovePathFailed: "The target path cannot contain the original path!"
 
 #website
 ErrDomainIsExist: "Domain is already exist"

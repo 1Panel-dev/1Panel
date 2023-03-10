@@ -19,6 +19,7 @@
                     label-width="100px"
                     :rules="rules"
                     v-loading="loading"
+                    @submit.enter.prevent
                 >
                     <el-form-item :label="$t('file.name')" prop="name">
                         <el-input v-model="addForm.name" />
