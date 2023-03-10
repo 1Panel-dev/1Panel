@@ -30,7 +30,6 @@ func (c *Client) Read() {
 	defer func() {
 		close(c.Msg)
 	}()
-
 	for {
 		_, message, err := c.Socket.ReadMessage()
 		if err != nil {
@@ -46,7 +45,6 @@ func (c *Client) Write() {
 	defer func() {
 		c.Socket.Close()
 	}()
-
 	for {
 		message, ok := <-c.Msg
 		if !ok {
@@ -57,7 +55,6 @@ func (c *Client) Write() {
 }
 
 func ProcessData(c *Client, msg *WsMsg) {
-
 	if msg.Type == "wget" {
 		var res []files.Process
 		for _, k := range msg.Keys {
@@ -66,7 +63,6 @@ func ProcessData(c *Client, msg *WsMsg) {
 				global.LOG.Errorf("get cache error,err %s", err.Error())
 				return
 			}
-
 			process := &files.Process{}
 			_ = json.Unmarshal(value, process)
 			res = append(res, *process)

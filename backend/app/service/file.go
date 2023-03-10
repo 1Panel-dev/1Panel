@@ -143,9 +143,8 @@ func (f FileService) ChangeMode(op request.FileCreate) error {
 func (f FileService) Compress(c request.FileCompress) error {
 	fo := files.NewFileOp()
 	if !c.Replace && fo.Stat(filepath.Join(c.Dst, c.Name)) {
-		return errors.New("file is exist")
+		return buserr.New(constant.ErrFileIsExit)
 	}
-
 	return fo.Compress(c.Files, c.Dst, c.Name, files.CompressType(c.Type))
 }
 
@@ -216,7 +215,6 @@ func (f FileService) MvFile(m request.FileMove) error {
 	if errString != "" {
 		return errors.New(errString)
 	}
-
 	return nil
 }
 

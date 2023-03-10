@@ -512,7 +512,7 @@ func (b *BaseApi) Ws(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	wsClient := websocket2.NewWsClient("13232", ws)
+	wsClient := websocket2.NewWsClient("wsClient", ws)
 	go wsClient.Read()
 	go wsClient.Write()
 }
