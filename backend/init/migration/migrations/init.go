@@ -88,7 +88,7 @@ var AddTableSetting = &gormigrate.Migration{
 			return err
 		}
 
-		if err := tx.Create(&model.Setting{Key: "ServerPort", Value: "9999"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "ServerPort", Value: global.CONF.System.Port}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "SecurityEntrance", Value: "onepanel"}).Error; err != nil {

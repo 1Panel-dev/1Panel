@@ -18,6 +18,7 @@ import (
 
 func Init() {
 	baseDir := "/opt"
+	port := "9999"
 	mode := ""
 	fileOp := files.NewFileOp()
 	v := viper.NewWithOptions()
@@ -45,6 +46,16 @@ func Init() {
 		if len(baseDir) == 0 {
 			panic("error `BASE_DIR` find in /usr/bin/1pctl")
 		}
+
+		stdoutPort, err := cmd.Exec("grep '^PANEL_PORT=' /usr/bin/1pctl | cut -d'=' -f2")
+		if err != nil {
+			panic(err)
+		}
+		port = strings.ReplaceAll(stdoutPort, "\n", "")
+		if len(port) == 0 {
+			panic("error `PANEL_PORT` find in /usr/bin/1pctl")
+		}
+
 		if strings.HasSuffix(baseDir, "/") {
 			baseDir = baseDir[:strings.LastIndex(baseDir, "/")]
 		}
@@ -65,6 +76,9 @@ func Init() {
 	if mode == "dev" && fileOp.Stat("/opt/1panel/conf/app.yaml") && serverConfig.System.BaseDir != "" {
 		baseDir = serverConfig.System.BaseDir
 	}
+	if mode == "dev" && fileOp.Stat("/opt/1panel/conf/app.yaml") && serverConfig.System.Port != "" {
+		port = serverConfig.System.Port
+	}
 
 	global.CONF = serverConfig
 	global.CONF.BaseDir = baseDir
@@ -75,5 +89,6 @@ func Init() {
 	global.CONF.System.DbPath = global.CONF.System.DataDir + "/db"
 	global.CONF.System.LogPath = global.CONF.System.DataDir + "/log"
 	global.CONF.System.TmpDir = global.CONF.System.DataDir + "/tmp"
+	global.CONF.System.Port = port
 	global.Viper = v
 }
