@@ -149,7 +149,7 @@ export default {
             ipErr: 'IP [{0}] 格式错误,请检查',
             numberRange: '数字范围: {0} - {1}',
             paramName: '支持英文、数字、.-和_,长度2-30',
-            paramComplexity: '支持英文、数字、{0},长度6-30',
+            paramComplexity: '支持英文、数字、{0},长度6-30，特殊字符不能在首尾',
             paramUrlAndPort: '格式为 http(s)://(域名/ip):(端口)',
             nginxDoc: '仅支持英文大小写，数字，和.',
             appName: '支持英文、数字、-和_,长度2-30,并且不能以-_开头和结尾',
