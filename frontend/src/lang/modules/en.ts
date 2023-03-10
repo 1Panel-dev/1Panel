@@ -145,7 +145,8 @@ export default {
             ipErr: 'IP [{0}] format error, please check',
             numberRange: 'Number range: {0} - {1}',
             paramName: 'Support English, numbers, .- and _, length 2-30',
-            paramComplexity: 'Support English, numbers, {0}, length 6-30',
+            paramComplexity:
+                'Support English, numbers, {0}, length 6-30,Special characters cannot be at the beginning and end',
             paramUrlAndPort: 'The format is http(s)://(domain name/ip):(port)',
             nginxDoc: 'Only supports English case, numbers, and .',
             appName: 'Support English, numbers, - and _, length 2-30, and cannot start and end with -_',
