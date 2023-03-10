@@ -294,7 +294,6 @@ const onSave = async (formEl: FormInstance | undefined, type: string) => {
 };
 
 const loadform = async () => {
-    console.log('adqwdqw');
     form.saves = [];
     const res = await redisPersistenceConf();
     form.appendonly = res.data?.appendonly;

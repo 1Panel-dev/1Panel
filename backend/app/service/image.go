@@ -5,8 +5,10 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -249,8 +251,16 @@ func (u *ImageService) ImageLoad(req dto.ImageLoad) error {
 	if err != nil {
 		return err
 	}
-	if _, err := client.ImageLoad(context.TODO(), file, true); err != nil {
+	res, err := client.ImageLoad(context.TODO(), file, true)
+	if err != nil {
 		return err
+	}
+	content, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+	if strings.Contains(string(content), "Error") {
+		return errors.New(string(content))
 	}
 	return nil
 }

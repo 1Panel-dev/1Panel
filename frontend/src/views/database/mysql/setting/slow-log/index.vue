@@ -13,7 +13,7 @@
                 <div style="float: left">
                     <el-input type="number" v-model.number="variables.long_query_time" />
                 </div>
-                <el-button style="float: left; margin-left: 10px" @click="openSlowLogs" type="primary">
+                <el-button style="float: left; margin-left: 10px" @click="openSlowLogs">
                     {{ $t('commons.button.save') }}
                 </el-button>
                 <div style="float: left; margin-left: 20px">
@@ -152,6 +152,9 @@ const onSave = async () => {
         .then(() => {
             emit('loading', false);
             isOnEdit.value = false;
+            if (variables.slow_query_log !== 'ON') {
+                detailShow.value = false;
+            }
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
