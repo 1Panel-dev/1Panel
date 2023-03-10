@@ -159,7 +159,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { Rules } from '@/global/form-rules';
+import { checkNumberRange, Rules } from '@/global/form-rules';
 import FileList from '@/components/file-list/index.vue';
 import { getBackupList } from '@/api/modules/setting';
 import i18n from '@/lang';
@@ -170,7 +170,7 @@ import { loadDBNames } from '@/api/modules/database';
 import { CheckAppInstalled } from '@/api/modules/app';
 import { GetWebsiteOptions } from '@/api/modules/website';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 
 interface DialogProps {
     title: string;
@@ -291,9 +291,9 @@ const rules = reactive({
         { validator: varifySpec, trigger: 'change', required: true },
     ],
     week: [Rules.requiredSelect, Rules.number],
-    day: [Rules.number, { max: 31, min: 1 }],
-    hour: [Rules.number, { max: 23, min: 0 }],
-    minute: [Rules.number, { max: 60, min: 1 }],
+    day: [Rules.number, checkNumberRange(1, 31)],
+    hour: [Rules.number, checkNumberRange(1, 23)],
+    minute: [Rules.number, checkNumberRange(1, 59)],
 
     script: [Rules.requiredInput],
     website: [Rules.requiredSelect],
@@ -389,11 +389,36 @@ function hasScript() {
     return dialogData.value.rowData!.type === 'shell';
 }
 
+function checkScript() {
+    let row = dialogData.value.rowData;
+    console.log(row.specType, row.week, row.day, row.hour, row.minute);
+    switch (row.specType) {
+        case 'perMonth':
+            return row.day > 0 && row.day < 32 && row.hour >= 0 && row.hour < 24 && row.minute >= 0 && row.minute < 60;
+        case 'perWeek':
+            return row.week > 0 && row.week < 8 && row.hour >= 0 && row.hour < 24 && row.minute >= 0 && row.minute < 60;
+        case 'perDay':
+            return row.hour >= 0 && row.hour < 24 && row.minute >= 0 && row.minute < 60;
+        case 'perHour':
+            return row.minute > 0 && row.minute < 60;
+        case 'perNDay':
+            return row.day > 0 && row.day < 366 && row.hour >= 0 && row.hour < 24 && row.minute >= 0 && row.minute < 60;
+        case 'perNHour':
+            return row.hour > 0 && row.hour < 8784 && row.minute >= 0 && row.minute < 60;
+        case 'perNMinute':
+            return row.minute > 0 && row.minute < 527040;
+    }
+}
+
 const onSubmit = async (formEl: FormInstance | undefined) => {
     dialogData.value.rowData.week = Number(dialogData.value.rowData.week);
     dialogData.value.rowData.day = Number(dialogData.value.rowData.day);
     dialogData.value.rowData.hour = Number(dialogData.value.rowData.hour);
     dialogData.value.rowData.minute = Number(dialogData.value.rowData.minute);
+    if (!checkScript()) {
+        MsgError(i18n.global.t('cronjob.cronSpecHelper'));
+        return;
+    }
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;

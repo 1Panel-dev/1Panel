@@ -564,6 +564,7 @@ export default {
         curl: '访问 URL',
         taskName: '任务名称',
         cronSpec: '执行周期',
+        cronSpecHelper: '请输入正确的执行周期',
         directory: '备份目录',
         sourceDir: '备份目录',
         exclusionRules: '排除规则',

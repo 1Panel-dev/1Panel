@@ -7,9 +7,9 @@ type CronjobCreate struct {
 	Type     string `json:"type" validate:"required"`
 	SpecType string `json:"specType" validate:"required"`
 	Week     int    `json:"week" validate:"number,max=7,min=1"`
-	Day      int    `json:"day" validate:"number,max=31,min=1"`
-	Hour     int    `json:"hour" validate:"number,max=23,min=0"`
-	Minute   int    `json:"minute" validate:"number,max=59,min=0"`
+	Day      int    `json:"day" validate:"number"`
+	Hour     int    `json:"hour" validate:"number"`
+	Minute   int    `json:"minute" validate:"number"`
 
 	Script         string `json:"script"`
 	Website        string `json:"website"`
@@ -27,9 +27,9 @@ type CronjobUpdate struct {
 	Name     string `json:"name" validate:"required"`
 	SpecType string `json:"specType" validate:"required"`
 	Week     int    `json:"week" validate:"number,max=7,min=1"`
-	Day      int    `json:"day" validate:"number,max=31,min=1"`
-	Hour     int    `json:"hour" validate:"number,max=23,min=0"`
-	Minute   int    `json:"minute" validate:"number,max=59,min=0"`
+	Day      int    `json:"day" validate:"number"`
+	Hour     int    `json:"hour" validate:"number"`
+	Minute   int    `json:"minute" validate:"number"`
 
 	Script         string `json:"script"`
 	Website        string `json:"website"`

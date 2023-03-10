@@ -556,6 +556,7 @@ export default {
         curl: 'Access URL',
         taskName: 'Task name',
         cronSpec: 'Lifecycle',
+        cronSpecHelper: 'Enter the correct execution period',
         directory: 'Backup directory',
         sourceDir: 'Backup directory',
         exclusionRules: 'Exclusive rule',
