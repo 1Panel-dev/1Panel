@@ -361,8 +361,9 @@ export default {
         slowLog: '慢日志',
         noData: '暂无慢日志...',
 
-        isOn: '是否开启',
-        longQueryTime: '慢查询阈值',
+        isOn: '开启',
+        longQueryTime: '阈值(秒)',
+        thresholdRangeHelper: '请输入正确的阈值(1 - 600)',
 
         status: '当前状态',
         terminal: '终端模式',

@@ -352,8 +352,9 @@ export default {
         slowLog: 'Slowlogs',
         noData: 'No slow log yet...',
 
-        isOn: 'Is on',
-        longQueryTime: 'Slow query threshold',
+        isOn: 'On',
+        longQueryTime: 'threshold(s)',
+        thresholdRangeHelper: 'Please enter the correct threshold (1 - 600).',
 
         status: 'The current state',
         baseParam: 'Basic parameter',
