@@ -22,7 +22,7 @@
                     @submit.enter.prevent
                 >
                     <el-form-item :label="$t('file.name')" prop="name">
-                        <el-input v-model="addForm.name" />
+                        <el-input v-model.trim="addForm.name" />
                     </el-form-item>
                     <el-form-item v-if="!addForm.isDir">
                         <el-checkbox v-model="addForm.isLink" :label="$t('file.link')"></el-checkbox>
