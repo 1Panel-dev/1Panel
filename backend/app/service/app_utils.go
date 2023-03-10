@@ -219,9 +219,11 @@ func updateInstall(installId uint, detailId uint) error {
 
 func getContainerNames(install model.AppInstall) ([]string, error) {
 	composeMap := install.DockerCompose
-	envMap := make(map[string]string)
+	envMap := make(map[string]interface{})
 	_ = json.Unmarshal([]byte(install.Env), &envMap)
-	project, err := compose.GetComposeProject([]byte(composeMap), envMap)
+	newEnvMap := make(map[string]string, len(envMap))
+	handleMap(envMap, newEnvMap)
+	project, err := compose.GetComposeProject([]byte(composeMap), newEnvMap)
 	if err != nil {
 		return nil, err
 	}
