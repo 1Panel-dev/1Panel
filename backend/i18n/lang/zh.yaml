@@ -32,6 +32,8 @@ ErrFileCanNotRead: "此文件不支持预览"
 ErrFileToLarge: "文件超过10M,无法打开"
 ErrPathNotFound: "目录不存在"
 ErrMovePathFailed: "目标路径不能包含原路径！"
+ErrLinkPathNotFound: "目标路径不存在!"
+ErrFileIsExit: "文件已存在！"
 
 #website
 ErrDomainIsExist: "域名已存在"

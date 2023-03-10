@@ -93,12 +93,15 @@ func (f FileService) GetFileTree(op request.FileOption) ([]response.FileTree, er
 func (f FileService) Create(op request.FileCreate) error {
 	fo := files.NewFileOp()
 	if fo.Stat(op.Path) {
-		return errors.New("file is exist")
+		return buserr.New(constant.ErrFileIsExit)
 	}
 	if op.IsDir {
 		return fo.CreateDir(op.Path, fs.FileMode(op.Mode))
 	} else {
 		if op.IsLink {
+			if !fo.Stat(op.Path) {
+				return buserr.New(constant.ErrLinkPathNotFound)
+			}
 			return fo.LinkFile(op.LinkPath, op.Path, op.IsSymlink)
 		} else {
 			return fo.CreateFile(op.Path)

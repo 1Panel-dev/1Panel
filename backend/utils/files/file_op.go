@@ -151,7 +151,6 @@ func (w *WriteCounter) SaveProcess() {
 			global.LOG.Errorf("save cache error, err %s", err.Error())
 		}
 	}
-
 }
 
 func (f FileOp) DownloadFileWithProcess(url, dst, key string) error {
@@ -183,7 +182,6 @@ func (f FileOp) DownloadFileWithProcess(url, dst, key string) error {
 		out.Close()
 		resp.Body.Close()
 	}()
-
 	return nil
 }
 
@@ -205,7 +203,6 @@ func (f FileOp) DownloadFile(url, dst string) error {
 	}
 	out.Close()
 	resp.Body.Close()
-
 	return nil
 }
 
