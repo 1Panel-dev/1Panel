@@ -92,7 +92,12 @@ const submit = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         MoveFile(addForm)
             .then(() => {
-                MsgSuccess(i18n.global.t('file.moveStart'));
+                if (type.value === 'cut') {
+                    MsgSuccess(i18n.global.t('file.moveSuccess'));
+                } else {
+                    MsgSuccess(i18n.global.t('file.copySuccess'));
+                }
+
                 handleClose();
             })
             .finally(() => {
