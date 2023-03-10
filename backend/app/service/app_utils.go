@@ -137,10 +137,10 @@ func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBacku
 			return err
 		}
 	}
-	if err := appInstallRepo.Delete(ctx, install); err != nil && !forceDelete {
+	if err := appInstallRepo.Delete(ctx, install); err != nil {
 		return err
 	}
-	if err := deleteLink(ctx, &install, deleteDB); err != nil && !forceDelete {
+	if err := deleteLink(ctx, &install, deleteDB, forceDelete); err != nil && !forceDelete {
 		return err
 	}
 	uploadDir := fmt.Sprintf("%s/1panel/uploads/app/%s/%s", global.CONF.System.BaseDir, install.App.Key, install.Name)
@@ -163,7 +163,7 @@ func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBacku
 	return nil
 }
 
-func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool) error {
+func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, forceDelete bool) error {
 	resources, _ := appInstallResourceRepo.GetBy(appInstallResourceRepo.WithAppInstallId(install.ID))
 	if len(resources) == 0 {
 		return nil
@@ -176,8 +176,9 @@ func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool) e
 				continue
 			}
 			if err := mysqlService.Delete(ctx, dto.MysqlDBDelete{
-				ID: database.ID,
-			}); err != nil {
+				ID:          database.ID,
+				ForceDelete: forceDelete,
+			}); err != nil && !forceDelete {
 				return err
 			}
 		}

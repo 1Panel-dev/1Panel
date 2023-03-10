@@ -403,17 +403,6 @@ func (a AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, error
 			})
 		}
 	}
-
-	if app.Key == constant.AppMysql {
-		databases, _ := mysqlRepo.List()
-		for _, database := range databases {
-			res = append(res, dto.AppResource{
-				Type: "database",
-				Name: database.Name,
-			})
-		}
-	}
-
 	return res, nil
 }
 
