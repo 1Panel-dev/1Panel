@@ -130,18 +130,18 @@ func (w *WriteCounter) Write(p []byte) (n int, err error) {
 }
 
 func (w *WriteCounter) SaveProcess() {
-	percent := float64(w.Written) / float64(w.Total) * 100
-	percentValue, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", percent), 64)
-
+	percentValue := 0.0
+	if w.Total > 0 {
+		percent := float64(w.Written) / float64(w.Total) * 100
+		percentValue, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", percent), 64)
+	}
 	process := Process{
 		Total:   w.Total,
 		Written: w.Written,
 		Percent: percentValue,
 		Name:    w.Name,
 	}
-
 	by, _ := json.Marshal(process)
-
 	if percentValue < 100 {
 		if err := global.CACHE.Set(w.Key, string(by)); err != nil {
 			global.LOG.Errorf("save cache error, err %s", err.Error())
@@ -154,33 +154,49 @@ func (w *WriteCounter) SaveProcess() {
 }
 
 func (f FileOp) DownloadFileWithProcess(url, dst, key string) error {
-	resp, err := http.Get(url)
+	client := &http.Client{}
+	request, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil
+	}
+	request.Header.Set("Accept-Encoding", "identity")
+	resp, err := client.Do(request)
 	if err != nil {
 		global.LOG.Errorf("get download file [%s] error, err %s", dst, err.Error())
 		return err
 	}
-	header, err := http.Head(url)
-	if err != nil {
-		global.LOG.Errorf("get download file [%s] error, err %s", dst, err.Error())
-		return err
-	}
-
 	out, err := os.Create(dst)
 	if err != nil {
 		global.LOG.Errorf("create download file [%s] error, err %s", dst, err.Error())
 		return err
 	}
-
 	go func() {
 		counter := &WriteCounter{}
 		counter.Key = key
-		counter.Total = uint64(header.ContentLength)
+		if resp.ContentLength > 0 {
+			counter.Total = uint64(resp.ContentLength)
+		}
 		counter.Name = filepath.Base(dst)
 		if _, err = io.Copy(out, io.TeeReader(resp.Body, counter)); err != nil {
 			global.LOG.Errorf("save download file [%s] error, err %s", dst, err.Error())
 		}
 		out.Close()
 		resp.Body.Close()
+
+		value, err := global.CACHE.Get(counter.Key)
+		if err != nil {
+			global.LOG.Errorf("get cache error,err %s", err.Error())
+			return
+		}
+		process := &Process{}
+		_ = json.Unmarshal(value, process)
+		process.Percent = 100
+		process.Name = counter.Name
+		process.Total = process.Written
+		by, _ := json.Marshal(process)
+		if err := global.CACHE.SetWithTTL(counter.Key, string(by), time.Second*time.Duration(10)); err != nil {
+			global.LOG.Errorf("save cache error, err %s", err.Error())
+		}
 	}()
 	return nil
 }
