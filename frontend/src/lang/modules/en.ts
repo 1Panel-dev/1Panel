@@ -105,6 +105,7 @@ export default {
             rePassword: 'Confirm Password',
             welcome: 'Welcome back, please enter your username and password to log in!',
             errorAuthInfo: 'The user name or password you entered is incorrect, please re-enter!',
+            errorMfaInfo: 'Incorrect authentication information, please try again!',
             captchaHelper: 'Please enter the verification code',
             errorCaptcha: 'Verification code error!',
             safeEntrance: 'Please use the correct entry to log in to the panel',

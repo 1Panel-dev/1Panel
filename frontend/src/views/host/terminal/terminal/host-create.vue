@@ -75,7 +75,7 @@ import { addHost, testByInfo } from '@/api/modules/host';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 
 const dialogVisiable = ref();
 type FormInstance = InstanceType<typeof ElForm>;
@@ -143,7 +143,7 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
                     if (res.data) {
                         MsgSuccess(i18n.global.t('terminal.connTestOk'));
                     } else {
-                        MsgSuccess(i18n.global.t('terminal.connTestFailed'));
+                        MsgError(i18n.global.t('terminal.connTestFailed'));
                     }
                 });
                 break;
