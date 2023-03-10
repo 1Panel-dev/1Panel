@@ -100,6 +100,7 @@ const props = defineProps({
 const em = defineEmits(['choose']);
 
 const checkFile = (row: any) => {
+    console.log(row.path);
     rowName.value = row.name;
     em('choose', row.path);
     popoverVisible.value = false;

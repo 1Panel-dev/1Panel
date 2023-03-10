@@ -68,11 +68,11 @@
                         @blur="search()"
                         :placeholder="$t('file.search')"
                     >
-                        <template #prepend>
+                        <!-- <template #prepend>
                             <el-checkbox :disabled="req.path == '/'" v-model="req.containSub">
                                 {{ $t('file.sub') }}
                             </el-checkbox>
-                        </template>
+                        </template> -->
                     </el-input>
                 </div>
             </template>
