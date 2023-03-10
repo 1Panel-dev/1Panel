@@ -20,7 +20,7 @@ type FileCreate struct {
 	IsDir     bool   `json:"isDir"`
 	Mode      int64  `json:"mode" validate:"required"`
 	IsLink    bool   `json:"isLink"`
-	IsSymlink bool   `json:"isSymlink "`
+	IsSymlink bool   `json:"isSymlink"`
 	LinkPath  string `json:"linkPath"`
 }
 
