@@ -84,6 +84,9 @@
                                 </el-icon>
                             </template>
                         </el-input>
+                        <span v-if="errMfaInfo" class="input-error" style="line-height: 14px">
+                            {{ $t('commons.login.errorMfaInfo') }}
+                        </span>
                     </el-form-item>
                     <el-form-item>
                         <el-button class="login-button" type="primary" size="default" round @click="mfaLogin()">
@@ -176,6 +179,7 @@ const menuStore = MenuStore();
 
 const errAuthInfo = ref(false);
 const errCaptcha = ref(false);
+const errMfaInfo = ref(false);
 
 const isFirst = ref();
 
@@ -265,6 +269,7 @@ const login = (formEl: FormInstance | undefined) => {
             }
             if (res.data.mfaStatus === 'enable') {
                 mfaShow.value = true;
+                errMfaInfo.value = false;
                 mfaLoginForm.secret = res.data.mfaSecret;
                 return;
             }
@@ -284,7 +289,11 @@ const mfaLogin = async () => {
     if (mfaLoginForm.code) {
         mfaLoginForm.name = loginForm.name;
         mfaLoginForm.password = loginForm.password;
-        await mfaLoginApi(mfaLoginForm);
+        const res = await mfaLoginApi(mfaLoginForm);
+        if (res.code === 406) {
+            errMfaInfo.value = true;
+            return;
+        }
         globalStore.setLogStatus(true);
         menuStore.setMenuList([]);
         MsgSuccess(i18n.global.t('commons.msg.loginSuccess'));

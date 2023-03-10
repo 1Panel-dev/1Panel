@@ -98,7 +98,10 @@
                                 </div>
                             </el-select>
                             <template #reference>
-                                <span class="networkOption">
+                                <span class="networkOption" v-if="networkChoose === 'all'">
+                                    {{ $t('commons.table.all') }}
+                                </span>
+                                <span v-else class="networkOption">
                                     {{ networkChoose }}
                                 </span>
                             </template>

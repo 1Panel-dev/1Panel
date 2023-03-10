@@ -17,7 +17,13 @@
                     @search="search"
                 >
                     <el-table-column type="selection" fix />
-                    <el-table-column :label="$t('commons.table.name')" min-width="100" prop="name" fix />
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        show-overflow-tooltip=""
+                        min-width="100"
+                        prop="name"
+                        fix
+                    />
                     <el-table-column
                         :label="$t('terminal.command')"
                         min-width="300"
@@ -109,7 +115,9 @@ let commandInfo = reactive<Command.CommandOperate>({
 const cmdVisiable = ref<boolean>(false);
 
 const onCreate = async () => {
-    restcommandForm();
+    commandInfo.id = 0;
+    commandInfo.name = '';
+    commandInfo.command = '';
     operate.value = 'create';
     cmdVisiable.value = true;
 };
@@ -156,11 +164,6 @@ const batchDelete = async (row: Command.CommandInfo | null) => {
     search();
 };
 
-function restcommandForm() {
-    if (commandInfoRef.value) {
-        commandInfoRef.value.resetFields();
-    }
-}
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),

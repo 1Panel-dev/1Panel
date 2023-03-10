@@ -46,6 +46,7 @@
                         theme="cobalt"
                         :styleActiveLine="true"
                         :extensions="extensions"
+                        @ready="handleReady"
                         v-model="redisConf"
                     />
                     <el-button style="margin-top: 10px" @click="getDefaultConfig()">
@@ -127,7 +128,7 @@
 
 <script lang="ts" setup>
 import { FormInstance } from 'element-plus';
-import { reactive, ref } from 'vue';
+import { nextTick, reactive, ref, shallowRef } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import LayoutContent from '@/layout/layout-content.vue';
@@ -146,6 +147,11 @@ import { MsgSuccess } from '@/utils/message';
 const extensions = [javascript(), oneDark];
 
 const loading = ref(false);
+
+const view = shallowRef();
+const handleReady = (payload) => {
+    view.value = payload.view;
+};
 
 const form = reactive({
     name: '',
@@ -332,8 +338,22 @@ const loadform = async () => {
 const loadConfFile = async () => {
     const pathRes = await loadBaseDir();
     let path = `${pathRes.data}/apps/redis/${redisName.value}/conf/redis.conf`;
-    const res = await LoadFile({ path: path });
-    redisConf.value = res.data;
+    loading.value = true;
+    await LoadFile({ path: path })
+        .then((res) => {
+            loading.value = false;
+            redisConf.value = res.data;
+            nextTick(() => {
+                const state = view.value.state;
+                view.value.dispatch({
+                    selection: { anchor: state.doc.length, head: state.doc.length },
+                    scrollIntoView: true,
+                });
+            });
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 defineExpose({

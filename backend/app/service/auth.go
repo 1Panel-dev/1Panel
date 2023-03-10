@@ -10,6 +10,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/backend/utils/jwt"
+	"github.com/1Panel-dev/1Panel/backend/utils/mfa"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
@@ -68,11 +69,7 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo,
 		return nil, err
 	}
 	if mfa.Value == "enable" {
-		mfaSecret, err := settingRepo.Get(settingRepo.WithByKey("MFASecret"))
-		if err != nil {
-			return nil, err
-		}
-		return &dto.UserLoginInfo{Name: nameSetting.Value, MfaStatus: mfa.Value, MfaSecret: mfaSecret.Value}, nil
+		return &dto.UserLoginInfo{Name: nameSetting.Value, MfaStatus: mfa.Value}, nil
 	}
 
 	return u.generateSession(c, info.Name, info.AuthMethod)
@@ -91,7 +88,16 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin) (*dto.UserLogi
 	if err != nil {
 		return nil, constant.ErrAuth
 	}
-	if info.Password != pass && nameSetting.Value == info.Name {
+	if info.Password != pass && nameSetting.Value != info.Name {
+		return nil, constant.ErrAuth
+	}
+
+	mfaSecret, err := settingRepo.Get(settingRepo.WithByKey("MFASecret"))
+	if err != nil {
+		return nil, err
+	}
+	success := mfa.ValidCode(info.Code, mfaSecret.Value)
+	if !success {
 		return nil, constant.ErrAuth
 	}
 
