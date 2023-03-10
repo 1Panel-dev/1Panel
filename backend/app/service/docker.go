@@ -163,7 +163,7 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 }
 
 func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
-	file, err := os.OpenFile(req.Path, os.O_WRONLY|os.O_TRUNC, 0640)
+	file, err := os.OpenFile(constant.DaemonJsonPath, os.O_WRONLY|os.O_TRUNC, 0640)
 	if err != nil {
 		return err
 	}

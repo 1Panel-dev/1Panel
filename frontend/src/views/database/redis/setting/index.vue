@@ -139,7 +139,7 @@ import Status from '@/views/database/redis/setting/status/index.vue';
 import Persistence from '@/views/database/redis/setting/persistence/index.vue';
 import { loadRedisConf, updateRedisConf, updateRedisConfByFile } from '@/api/modules/database';
 import i18n from '@/lang';
-import { Rules } from '@/global/form-rules';
+import { checkNumberRange, Rules } from '@/global/form-rules';
 import { ChangePort, GetAppDefaultConfig } from '@/api/modules/app';
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
@@ -162,9 +162,9 @@ const form = reactive({
 });
 const rules = reactive({
     port: [Rules.port],
-    timeout: [Rules.number],
-    maxclients: [Rules.number],
-    maxmemory: [Rules.number],
+    timeout: [Rules.number, checkNumberRange(0, 9999999)],
+    maxclients: [Rules.number, checkNumberRange(1, 999999)],
+    maxmemory: [Rules.number, checkNumberRange(0, 999999)],
 });
 
 const activeName = ref('conf');

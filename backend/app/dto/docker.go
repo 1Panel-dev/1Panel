@@ -1,7 +1,6 @@
 package dto
 
 type DaemonJsonUpdateByFile struct {
-	Path string `json:"path" validate:"required"`
 	File string `json:"file"`
 }
 
