@@ -529,6 +529,10 @@ export default {
         composeOperatorHelper: '{1} operation will be performed on {0}. Do you want to continue?',
 
         setting: 'Setting',
+        stopHelper: 'docker service includes docker.service and docker.socket: ',
+        stopHelper2:
+            'When docker.service is stopped, Docker.socket will keep listening state. When docker command request is listened, The docker.service will be pulled up again.',
+        stopHelper3: 'Stopping docker.socket will make the docker.service service unavailable',
         dockerStatus: 'Docker Service',
         daemonJsonPathHelper: 'Ensure that the configuration path is the same as that specified in docker.service.',
         mirrors: 'Registry mirrors',

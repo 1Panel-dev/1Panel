@@ -241,6 +241,8 @@ export namespace Container {
         file: string;
     }
     export interface DockerOperate {
+        stopSocket: boolean;
+        stopService: boolean;
         operation: string;
     }
     export interface DaemonJsonConf {
