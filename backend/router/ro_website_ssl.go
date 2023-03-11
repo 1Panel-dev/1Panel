@@ -11,7 +11,7 @@ type WebsiteSSLRouter struct {
 
 func (a *WebsiteSSLRouter) InitWebsiteSSLRouter(Router *gin.RouterGroup) {
 	groupRouter := Router.Group("websites/ssl")
-	groupRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
+	groupRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 
 	baseApi := v1.ApiGroupApp.BaseApi
 	{

@@ -11,7 +11,7 @@ type AppRouter struct {
 
 func (a *AppRouter) InitAppRouter(Router *gin.RouterGroup) {
 	appRouter := Router.Group("apps")
-	appRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
+	appRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 
 	baseApi := v1.ApiGroupApp.BaseApi
 	{

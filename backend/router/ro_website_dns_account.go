@@ -11,7 +11,7 @@ type WebsiteDnsAccountRouter struct {
 
 func (a *WebsiteDnsAccountRouter) InitWebsiteDnsAccountRouter(Router *gin.RouterGroup) {
 	groupRouter := Router.Group("websites/dns")
-	groupRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
+	groupRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 
 	baseApi := v1.ApiGroupApp.BaseApi
 	{

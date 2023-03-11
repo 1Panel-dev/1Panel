@@ -11,7 +11,7 @@ type WebsiteRouter struct {
 
 func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 	groupRouter := Router.Group("websites")
-	groupRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth())
+	groupRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
