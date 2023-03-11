@@ -237,11 +237,31 @@ const images = ref();
 const volumes = ref();
 
 const acceptParams = (): void => {
+    handlReset();
     drawerVisiable.value = true;
-    form.restartPolicy = 'no';
-    form.memoryUnit = 'MB';
     loadImageOptions();
     loadVolumeOptions();
+};
+
+const handlReset = () => {
+    form.name = '';
+    form.image = '';
+    form.cmdStr = '';
+    form.cmd = [];
+    form.publishAllPorts = false;
+    form.exposedPorts = [];
+    form.nanoCPUs = 1;
+    form.memory = 100;
+    form.memoryItem = 100;
+    form.memoryUnit = 'MB';
+    form.cpuUnit = 'Core';
+    form.volumes = [];
+    form.autoRemove = false;
+    form.labels = [];
+    form.labelsStr = '';
+    form.env = [];
+    form.envStr = '';
+    form.restartPolicy = 'no';
 };
 
 const handleClose = () => {
