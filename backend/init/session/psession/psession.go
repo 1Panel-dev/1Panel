@@ -2,8 +2,9 @@ package psession
 
 import (
 	"encoding/json"
-	"github.com/1Panel-dev/1Panel/backend/init/cache/badger_db"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/init/cache/badger_db"
 )
 
 type SessionUser struct {
@@ -39,4 +40,8 @@ func (p *PSession) Set(sessionID string, user SessionUser, ttlSeconds int) error
 
 func (p *PSession) Delete(sessionID string) error {
 	return p.store.Del(sessionID)
+}
+
+func (p *PSession) Clean() error {
+	return p.store.Clean()
 }
