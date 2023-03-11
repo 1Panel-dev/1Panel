@@ -60,6 +60,9 @@ func (u *SettingService) Update(key, value string) error {
 	if err := settingRepo.Update(key, value); err != nil {
 		return err
 	}
+	if key == "UserName" {
+		_ = global.SESSION.Clean()
+	}
 	return nil
 }
 
@@ -115,13 +118,6 @@ func (u *SettingService) UpdatePassword(c *gin.Context, old, new string) error {
 	if err := u.HandlePasswordExpired(c, old, new); err != nil {
 		return err
 	}
-	sID, _ := c.Cookie(constant.SessionName)
-	if sID != "" {
-		c.SetCookie(constant.SessionName, sID, -1, "", "", false, false)
-		err := global.SESSION.Delete(sID)
-		if err != nil {
-			return err
-		}
-	}
+	_ = global.SESSION.Clean()
 	return nil
 }
