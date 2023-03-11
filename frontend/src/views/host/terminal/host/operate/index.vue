@@ -11,7 +11,7 @@
                             <span v-if="dialogData.rowData!.addr === '127.0.0.1' && dialogData.title === 'edit'">
                                 {{ dialogData.rowData!.addr }}
                             </span>
-                            <el-input v-else clearable v-model="dialogData.rowData!.addr" />
+                            <el-input v-else clearable v-model.trim="dialogData.rowData!.addr" />
                         </el-form-item>
                         <el-form-item :label="$t('terminal.user')" prop="user">
                             <el-input clearable v-model="dialogData.rowData!.user" />
@@ -113,8 +113,6 @@ const rules = reactive({
     port: [Rules.requiredInput, Rules.port],
     user: [Rules.requiredInput],
     authMode: [Rules.requiredSelect],
-    password: [Rules.requiredInput],
-    privateKey: [Rules.requiredInput],
 });
 
 const loadGroups = async () => {

@@ -455,6 +455,7 @@ export default {
         mount: '挂载卷',
         serverPath: '服务器目录',
         containerDir: '容器目录',
+        volumeHelper: '请确认存储卷内容输入正确',
         modeRW: '读写',
         modeR: '只读',
         mode: '权限',
@@ -524,6 +525,7 @@ export default {
         registrieHelper: '一行一个，例：\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: '编排',
+        composePathHelper: '容器编排将保存在: {0}',
         apps: '应用商店',
         local: '本地',
         createCompose: '创建编排',
