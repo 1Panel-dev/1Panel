@@ -260,6 +260,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 .catch(() => {
                     loading.value = false;
                 });
+            return;
         }
         await editBackup(dialogData.value.rowData)
             .then(() => {

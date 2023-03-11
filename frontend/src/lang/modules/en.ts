@@ -443,6 +443,7 @@ export default {
         mount: 'Mount',
         serverPath: 'Server path',
         containerDir: 'Container path',
+        volumeHelper: 'Ensure that the content of the storage volume is correct',
         modeRW: 'RW',
         modeR: 'R',
         mode: 'Mode',

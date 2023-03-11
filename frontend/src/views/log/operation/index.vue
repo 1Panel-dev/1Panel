@@ -131,7 +131,7 @@ const search = async () => {
     await getOperationLogs(params)
         .then((res) => {
             loading.value = false;
-            data.value = res.data.items;
+            data.value = res.data.items || [];
             if (globalStore.language === 'zh') {
                 for (const item of data.value) {
                     item.detailZH = loadDetail(item.detailZH);

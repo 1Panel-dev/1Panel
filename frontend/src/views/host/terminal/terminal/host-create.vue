@@ -16,7 +16,7 @@
                             type="warning"
                         />
                         <el-form-item :label="$t('terminal.ip')" prop="addr">
-                            <el-input v-if="!isLocal" clearable v-model="hostInfo.addr" />
+                            <el-input v-if="!isLocal" clearable v-model.trim="hostInfo.addr" />
                             <div style="margin-left: 12px">
                                 <span v-if="isLocal">{{ hostInfo.addr }}</span>
                             </div>

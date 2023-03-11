@@ -155,9 +155,6 @@ const buttons = [
         click: (row: any) => {
             dialogGroupChangeRef.value!.acceptParams({ id: row.id, group: row.groupBelong });
         },
-        disabled: (row: any) => {
-            return row.addr === '127.0.0.1';
-        },
     },
     {
         label: i18n.global.t('commons.button.edit'),

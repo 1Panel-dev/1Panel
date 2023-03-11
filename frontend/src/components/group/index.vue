@@ -17,13 +17,18 @@
                         <span v-if="row.name !== 'default'">{{ row.name }}</span>
                         <span v-if="row.isDefault">({{ $t('website.default') }})</span>
                     </div>
-                    <el-input v-if="row.edit" v-model="row.name"></el-input>
+
+                    <el-form ref="groupForm" v-if="row.edit" :model="row">
+                        <el-form-item prop="name" v-if="row.edit" :rules="Rules.name">
+                            <el-input v-model="row.name"></el-input>
+                        </el-form-item>
+                    </el-form>
                 </template>
             </el-table-column>
             <el-table-column :label="$t('commons.table.operate')">
                 <template #default="{ row, $index }">
                     <div>
-                        <el-button link v-if="row.edit" type="primary" @click="saveGroup(row, false)">
+                        <el-button link v-if="row.edit" type="primary" @click="saveGroup(groupForm, row, true)">
                             {{ $t('commons.button.save') }}
                         </el-button>
                         <el-button link v-if="!row.edit" type="primary" @click="editGroup($index)">
@@ -38,10 +43,15 @@
                         >
                             {{ $t('commons.button.delete') }}
                         </el-button>
-                        <el-button link v-if="row.edit" type="primary" @click="cancelEdit($index)">
+                        <el-button link v-if="row.edit" type="primary" @click="search()">
                             {{ $t('commons.button.cancel') }}
                         </el-button>
-                        <el-button link v-if="!row.edit && !row.isDefault" type="primary" @click="saveGroup(row, true)">
+                        <el-button
+                            link
+                            v-if="!row.edit && !row.isDefault"
+                            type="primary"
+                            @click="saveGroup(groupForm, row, false)"
+                        >
                             {{ $t('website.setDefault') }}
                         </el-button>
                     </div>
@@ -58,6 +68,8 @@ import { CreateGroup, DeleteGroup, GetGroupList, UpdateGroup } from '@/api/modul
 import Header from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { Group } from '@/api/interface/group';
+import { Rules } from '@/global/form-rules';
+import { FormInstance } from 'element-plus';
 
 const open = ref(false);
 const type = ref();
@@ -67,10 +79,11 @@ const handleClose = () => {
     data.value = [];
     emit('search');
 };
-
 interface DialogProps {
     type: string;
 }
+
+const groupForm = ref();
 const acceptParams = (params: DialogProps): void => {
     type.value = params.type;
     open.value = true;
@@ -93,20 +106,28 @@ const search = () => {
     });
 };
 
-const saveGroup = (group: Group.GroupInfo, isDefault: boolean) => {
-    group.type = type.value;
-    if (group.id == 0) {
-        CreateGroup(group).then(() => {
-            MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
-            search();
-        });
-    } else {
-        group.isDefault = isDefault;
-        UpdateGroup(group).then(() => {
-            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
-            search();
-        });
-    }
+const saveGroup = async (formEl: FormInstance, group: Group.GroupInfo, isEdit: boolean) => {
+    if (!formEl) return;
+    await formEl.validate((valid) => {
+        if (!valid) {
+            return;
+        }
+        group.type = type.value;
+        if (!isEdit) {
+            group.isDefault = true;
+        }
+        if (group.id == 0) {
+            CreateGroup(group).then(() => {
+                MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+                search();
+            });
+        } else {
+            UpdateGroup(group).then(() => {
+                MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+                search();
+            });
+        }
+    });
 };
 
 const openCreate = () => {
@@ -151,14 +172,6 @@ const editGroup = (index: number) => {
         }
     }
     data.value[index].edit = true;
-};
-
-const cancelEdit = (index: number) => {
-    if (data.value[index].id == 0) {
-        data.value.splice(index, 1);
-    } else {
-        data.value[index].edit = false;
-    }
 };
 
 defineExpose({ acceptParams });
