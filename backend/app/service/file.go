@@ -17,7 +17,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
-	uuid "github.com/satori/go.uuid"
 )
 
 type FileService struct {
@@ -181,7 +180,7 @@ func (f FileService) ChangeName(req request.FileRename) error {
 
 func (f FileService) Wget(w request.FileWget) (string, error) {
 	fo := files.NewFileOp()
-	key := "file-wget-" + uuid.NewV4().String()
+	key := "file-wget-" + common.GetUuid()
 	return key, fo.DownloadFileWithProcess(w.Url, filepath.Join(w.Path, w.Name), key)
 }
 

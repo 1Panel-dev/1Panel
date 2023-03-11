@@ -12,8 +12,8 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/jwt"
 	"github.com/1Panel-dev/1Panel/backend/utils/mfa"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	uuid "github.com/satori/go.uuid"
 )
 
 type AuthService struct{}
@@ -128,7 +128,7 @@ func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (
 	sID, _ := c.Cookie(constant.SessionName)
 	sessionUser, err := global.SESSION.Get(sID)
 	if err != nil {
-		sID = uuid.NewV4().String()
+		sID = uuid.New().String()
 		c.SetCookie(constant.SessionName, sID, 604800, "", "", false, false)
 		err := global.SESSION.Set(sID, sessionUser, lifeTime)
 		if err != nil {
