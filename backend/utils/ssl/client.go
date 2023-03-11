@@ -194,11 +194,11 @@ func (p *manualDnsProvider) CleanUp(domain, token, keyAuth string) error {
 func (c *AcmeClient) GetDNSResolve(domains []string) (map[string]Resolve, error) {
 	core, err := api.New(c.Config.HTTPClient, c.Config.UserAgent, c.Config.CADirURL, c.User.Registration.URI, c.User.Key)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	order, err := core.Orders.New(domains)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	resolves := make(map[string]Resolve)
 	resc, errc := make(chan acme.Authorization), make(chan domainError)
