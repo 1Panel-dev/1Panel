@@ -4,6 +4,7 @@ system:
   mode: dev
   repo_url: https://resource.fit2cloud.com/1panel/package
   is_demo: false
+  port: 9999
 
 log:
   level: debug

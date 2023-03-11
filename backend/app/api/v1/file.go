@@ -3,23 +3,21 @@ package v1
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"path"
-	"strings"
-
+	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
-
-	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
-	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	websocket2 "github.com/1Panel-dev/1Panel/backend/utils/websocket"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"path"
+	"strings"
 )
 
 // @Tags File
