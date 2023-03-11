@@ -208,7 +208,7 @@ import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { listImage, listVolume, createContainer } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 
@@ -292,6 +292,14 @@ const loadVolumeOptions = async () => {
     volumes.value = res.data;
 };
 const onSubmit = async (formEl: FormInstance | undefined) => {
+    if (form.volumes.length !== 0) {
+        for (const item of form.volumes) {
+            if (!item.containerDir || !item.sourceDir) {
+                MsgError(i18n.global.t('container.volumeHelper'));
+                return;
+            }
+        }
+    }
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;

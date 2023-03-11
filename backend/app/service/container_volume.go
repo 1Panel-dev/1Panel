@@ -2,11 +2,13 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
@@ -104,14 +106,28 @@ func (u *ContainerService) CreateVolume(req dto.VolumeCreat) error {
 	if err != nil {
 		return err
 	}
+	var array []filters.KeyValuePair
+	array = append(array, filters.Arg("name", req.Name))
+	vos, _ := client.VolumeList(context.TODO(), filters.NewArgs(array...))
+	if len(vos.Volumes) != 0 {
+		for _, v := range vos.Volumes {
+			if v.Name == req.Name {
+				return constant.ErrRecordExist
+			}
+		}
+	}
 	options := volume.VolumeCreateBody{
 		Name:       req.Name,
 		Driver:     req.Driver,
 		DriverOpts: stringsToMap(req.Options),
 		Labels:     stringsToMap(req.Labels),
 	}
-	if _, err := client.VolumeCreate(context.TODO(), options); err != nil {
+	stat, err := client.VolumeCreate(context.TODO(), options)
+	if err != nil {
 		return err
 	}
+	// if len(stat.CreatedAt) != 0 {
+	fmt.Println(stat)
+	// }
 	return nil
 }

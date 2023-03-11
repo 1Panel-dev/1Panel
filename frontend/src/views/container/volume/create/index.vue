@@ -75,6 +75,11 @@ const form = reactive({
 });
 
 const acceptParams = (): void => {
+    form.name = '';
+    form.labels = [];
+    form.labelStr = '';
+    form.options = [];
+    form.optionStr = '';
     drawerVisiable.value = true;
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -84,7 +89,7 @@ const handleClose = () => {
 };
 
 const rules = reactive({
-    name: [Rules.requiredInput, Rules.name],
+    name: [Rules.requiredInput, Rules.volumeName],
     driver: [Rules.requiredSelect],
 });
 
