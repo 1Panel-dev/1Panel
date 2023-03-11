@@ -20,7 +20,7 @@
                             </el-form-item>
                             <el-form-item
                                 :label="$t('setting.storeDays')"
-                                :rules="[Rules.number, checkNumberRange(1, 30)]"
+                                :rules="[Rules.integerNumber, checkNumberRange(1, 30)]"
                                 prop="monitorStoreDays"
                             >
                                 <el-input clearable v-model.number="form.monitorStoreDays">

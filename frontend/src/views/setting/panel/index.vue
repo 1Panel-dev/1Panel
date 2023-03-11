@@ -73,7 +73,7 @@
 
                             <el-form-item
                                 :label="$t('setting.sessionTimeout')"
-                                :rules="[Rules.number, checkNumberRange(300, 864000)]"
+                                :rules="[Rules.integerNumber, checkNumberRange(300, 864000)]"
                                 prop="sessionTimeout"
                             >
                                 <el-input v-model.number="form.sessionTimeout">
@@ -253,6 +253,9 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
                 router.push({ name: 'login', params: { code: '' } });
                 globalStore.setLogStatus(false);
                 return;
+            }
+            if (param.key === 'Language') {
+                location.reload();
             }
             loading.value = false;
             MsgSuccess(i18n.t('commons.msg.operationSuccess'));
