@@ -102,6 +102,24 @@
             </template>
         </LayoutContent>
 
+        <el-dialog v-model="stopVisiable" :title="$t('app.checkTitle')" width="50%" :destroy-on-close="true">
+            <el-alert :closable="false">
+                {{ $t('container.stopHelper') }}
+                <li>{{ $t('container.stopHelper2') }}</li>
+                <li>{{ $t('container.stopHelper3') }}</li>
+            </el-alert>
+            <div style="margin-top: 10px">
+                <el-checkbox v-model="stopService" label="docker.service" />
+            </div>
+            <div class="stopCheckbox"><el-checkbox v-model="stopSocket" label="docker.socket" /></div>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="stopVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button type="primary" @click="submitStop">{{ $t('commons.button.confirm') }}</el-button>
+                </span>
+            </template>
+        </el-dialog>
+
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmitSave"></ConfirmDialog>
     </div>
 </template>
@@ -142,6 +160,10 @@ const formRef = ref<FormInstance>();
 const dockerConf = ref();
 const confirmDialogRef = ref();
 
+const stopVisiable = ref();
+const stopSocket = ref();
+const stopService = ref();
+
 const onSave = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
@@ -165,8 +187,33 @@ const onSaveFile = async () => {
 };
 
 const onOperator = async (operation: string) => {
+    if (operation === 'stop') {
+        stopVisiable.value = true;
+        return;
+    }
     let param = {
+        stopService: false,
+        stopSocket: false,
         operation: operation,
+    };
+    loading.value = true;
+    await dockerOperate(param)
+        .then(() => {
+            loading.value = false;
+            search();
+            changeMode();
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+const submitStop = async () => {
+    let param = {
+        stopService: stopService.value,
+        stopSocket: stopSocket.value,
+        operation: 'stop',
     };
     loading.value = true;
     await dockerOperate(param)

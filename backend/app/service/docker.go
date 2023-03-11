@@ -180,7 +180,14 @@ func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
 }
 
 func (u *DockerService) OperateDocker(req dto.DockerOperation) error {
-	stdout, err := cmd.Execf("systemctl %s docker ", req.Operation)
+	service := "docker"
+	if req.Operation == "stop" {
+		service = "docker.service"
+		if req.StopSocket {
+			service = "docker.socket"
+		}
+	}
+	stdout, err := cmd.Execf("systemctl %s %s ", req.Operation, service)
 	if err != nil {
 		return errors.New(string(stdout))
 	}
