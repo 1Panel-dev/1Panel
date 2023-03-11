@@ -210,6 +210,20 @@ const checkStatus = (operation: string) => {
                 }
             }
             return false;
+        case 'pause':
+            for (const item of selects.value) {
+                if (item.state === 'paused' || item.state === 'exited') {
+                    return true;
+                }
+            }
+            return false;
+        case 'unpause':
+            for (const item of selects.value) {
+                if (item.state !== 'paused') {
+                    return true;
+                }
+            }
+            return false;
     }
 };
 

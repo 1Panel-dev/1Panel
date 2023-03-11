@@ -7,9 +7,6 @@
             <el-form ref="formRef" label-position="top" :model="form" :rules="rules" label-width="80px">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('container.name')" prop="name">
-                            <el-input v-model.trim="form.name"></el-input>
-                        </el-form-item>
                         <el-form-item :label="$t('container.from')">
                             <el-radio-group v-model="form.from">
                                 <el-radio label="edit">{{ $t('commons.button.edit') }}</el-radio>
@@ -27,6 +24,12 @@
                                 </template>
                             </el-input>
                         </el-form-item>
+                        <el-form-item v-if="form.from === 'edit'" prop="name">
+                            <el-input @input="changePath" v-model.trim="form.name">
+                                <template #prepend>{{ $t('file.dir') }}</template>
+                            </el-input>
+                            <span class="input-help">{{ $t('container.composePathHelper', [composeFile]) }}</span>
+                        </el-form-item>
                         <el-form-item v-if="form.from === 'template'" prop="template">
                             <el-select v-model="form.template">
                                 <el-option
@@ -43,7 +46,7 @@
                                 placeholder="#Define or paste the content of your docker-compose file here"
                                 :indent-with-tab="true"
                                 :tabSize="4"
-                                style="width: 100%; height: calc(100vh - 351px)"
+                                style="width: 100%; height: calc(100vh - 340px)"
                                 :lineWrapping="true"
                                 :matchBrackets="true"
                                 theme="cobalt"
@@ -81,12 +84,15 @@ import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { listComposeTemplate, upCompose } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
+import { loadBaseDir } from '@/api/modules/setting';
 
 const extensions = [javascript(), oneDark];
 const drawerVisiable = ref(false);
 const templateOptions = ref();
 
 const loading = ref(false);
+const baseDir = ref();
+const composeFile = ref();
 
 const varifyPath = (rule: any, value: any, callback: any) => {
     if (value.indexOf('docker-compose.yml') === -1) {
@@ -102,7 +108,7 @@ const form = reactive({
     template: null as number,
 });
 const rules = reactive({
-    name: [Rules.requiredInput, Rules.name],
+    name: [Rules.requiredInput, Rules.imageName],
     path: [Rules.requiredSelect, { validator: varifyPath, trigger: 'change', required: true }],
 });
 
@@ -121,11 +127,22 @@ const acceptParams = (): void => {
     form.path = '';
     form.file = '';
     loadTemplates();
+    loadPath();
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const handleClose = () => {
     drawerVisiable.value = false;
+};
+
+const loadPath = async () => {
+    const pathRes = await loadBaseDir();
+    baseDir.value = pathRes.data;
+    changePath();
+};
+
+const changePath = async () => {
+    composeFile.value = baseDir.value + '/docker/compose/' + form.name + '/docker-compose.yml';
 };
 
 type FormInstance = InstanceType<typeof ElForm>;
