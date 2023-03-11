@@ -25,7 +25,7 @@ const getType = (status: string) => {
         case 'error':
             return 'danger';
         case 'stopped':
-            return 'warning';
+            return 'danger';
         default:
             return '';
     }
