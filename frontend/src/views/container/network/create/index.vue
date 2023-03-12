@@ -92,7 +92,7 @@ const handleClose = () => {
 };
 
 const rules = reactive({
-    name: [Rules.requiredInput, Rules.name],
+    name: [Rules.requiredInput, Rules.imageName],
     driver: [Rules.requiredSelect],
 });
 
