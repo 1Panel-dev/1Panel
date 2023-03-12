@@ -97,7 +97,7 @@ func (f FileService) Create(op request.FileCreate) error {
 		return fo.CreateDir(op.Path, fs.FileMode(op.Mode))
 	} else {
 		if op.IsLink {
-			if !fo.Stat(op.Path) {
+			if !fo.Stat(op.LinkPath) {
 				return buserr.New(constant.ErrLinkPathNotFound)
 			}
 			return fo.LinkFile(op.LinkPath, op.Path, op.IsSymlink)
