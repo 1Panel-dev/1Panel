@@ -6,12 +6,12 @@
                     <el-switch v-model="form.enable" @change="updateEnable"></el-switch>
                 </el-form-item>
                 <el-form-item prop="cycle" :label="$t('website.cycle')">
-                    <el-input v-model="form.cycle" maxlength="15">
+                    <el-input v-model.number="form.cycle" maxlength="15">
                         <template #append>{{ $t('website.seconds') }}</template>
                     </el-input>
                 </el-form-item>
                 <el-form-item prop="frequency" :label="$t('website.frequency')">
-                    <el-input v-model="form.frequency" maxlength="15">
+                    <el-input v-model.number="form.frequency" maxlength="15">
                         <template #append>{{ $t('website.count') }}</template>
                     </el-input>
                 </el-form-item>
