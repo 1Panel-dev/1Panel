@@ -1,7 +1,7 @@
 <template>
-    <LayoutContent :title="$t('app.detail')" :back-name="'App'" :v-loading="loadingDetail" :divider="true">
+    <LayoutContent :title="$t('app.detail')" :back-name="'App'" :divider="true">
         <template #main>
-            <div class="brief">
+            <div class="brief" v-loading="loadingApp">
                 <el-row :gutter="20">
                     <div>
                         <el-col :span="3">
@@ -34,7 +34,7 @@
                             </div>
 
                             <br />
-                            <div>
+                            <div v-if="!loadingDetail">
                                 <el-alert
                                     style="width: 300px"
                                     v-if="!appDetail.enable"
@@ -112,26 +112,30 @@ let app = ref<any>({});
 let appDetail = ref<any>({});
 let version = ref('');
 let loadingDetail = ref(false);
+let loadingApp = ref(false);
 // let appKey = ref();
 const installRef = ref();
 
-const getApp = () => {
-    GetApp(props.appKey).then((res) => {
+const getApp = async () => {
+    loadingApp.value = true;
+    try {
+        const res = await GetApp(props.appKey);
         app.value = res.data;
         version.value = app.value.versions[0];
         getDetail(app.value.id, version.value);
-    });
+    } finally {
+        loadingApp.value = false;
+    }
 };
 
-const getDetail = (id: number, version: string) => {
+const getDetail = async (id: number, version: string) => {
     loadingDetail.value = true;
-    GetAppDetail(id, version)
-        .then((res) => {
-            appDetail.value = res.data;
-        })
-        .finally(() => {
-            loadingDetail.value = false;
-        });
+    try {
+        const res = await GetAppDetail(id, version);
+        appDetail.value = res.data;
+    } finally {
+        loadingDetail.value = false;
+    }
 };
 
 const toLink = (link: string) => {

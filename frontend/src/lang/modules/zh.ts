@@ -754,6 +754,7 @@ export default {
         root: '根目录',
         list: '文件列表',
         sub: '包含子目录',
+        downlodSuccess: '下载完成',
     },
     setting: {
         all: '全部',

@@ -82,7 +82,7 @@
                             </span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.type')" fix prop="type">
+                    <el-table-column :label="$t('commons.table.type')" fix show-overflow-tooltip prop="type">
                         <template #default="{ row }">
                             {{ $t('website.' + row.type) }}
                             <span v-if="row.type === 'deployment'">[{{ row.appName }}]</span>
@@ -413,5 +413,11 @@ onMounted(() => {
 .search-button {
     float: right;
     display: inline;
+}
+
+.tooltip {
+    white-space: pre-wrap; /* 自动换行 */
+    word-break: break-all; /* 单词内换行 */
+    max-width: 200px; /* 控制最大宽度 */
 }
 </style>
