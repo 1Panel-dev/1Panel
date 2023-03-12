@@ -16,15 +16,15 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item :label="$t('website.perserver')" prop="perserver">
-                    <el-input v-model.number="form.perserver" maxlength="10"></el-input>
+                    <el-input v-model.number="form.perserver" maxlength="15"></el-input>
                     <span class="input-help">{{ $t('website.perserverHelper') }}</span>
                 </el-form-item>
                 <el-form-item :label="$t('website.perip')" prop="perip">
-                    <el-input v-model.number="form.perip" maxlength="10"></el-input>
+                    <el-input v-model.number="form.perip" maxlength="15"></el-input>
                     <span class="input-help">{{ $t('website.peripHelper') }}</span>
                 </el-form-item>
                 <el-form-item :label="$t('website.rate')" prop="rate">
-                    <el-input v-model.number="form.rate" maxlength="10"></el-input>
+                    <el-input v-model.number="form.rate" maxlength="15"></el-input>
                     <span class="input-help">{{ $t('website.rateHelper') }}</span>
                 </el-form-item>
             </el-form>
