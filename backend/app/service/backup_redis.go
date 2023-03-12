@@ -38,7 +38,11 @@ func (u *BackupService) RedisBackup() error {
 	timeNow := time.Now().Format("20060102150405")
 	fileName := fmt.Sprintf("%s.rdb", timeNow)
 	if appendonly == "yes" {
-		fileName = fmt.Sprintf("%s.tar.gz", timeNow)
+		if redisInfo.Version == "6.0.16" {
+			fileName = fmt.Sprintf("%s.aof", timeNow)
+		} else {
+			fileName = fmt.Sprintf("%s.tar.gz", timeNow)
+		}
 	}
 	backupDir := fmt.Sprintf("%s/database/redis/%s", localDir, redisInfo.Name)
 	if err := handleRedisBackup(redisInfo, backupDir, fileName); err != nil {
@@ -90,6 +94,13 @@ func handleRedisBackup(redisInfo *repo.RootInfo, backupDir, fileName string) err
 		}
 		return nil
 	}
+	if strings.HasSuffix(fileName, ".aof") {
+		stdout1, err := cmd.Execf("docker cp %s:/data/appendonly.aof %s/%s", redisInfo.ContainerName, backupDir, fileName)
+		if err != nil {
+			return errors.New(string(stdout1))
+		}
+		return nil
+	}
 
 	stdout1, err1 := cmd.Execf("docker cp %s:/data/dump.rdb %s/%s", redisInfo.ContainerName, backupDir, fileName)
 	if err1 != nil {
@@ -108,15 +119,27 @@ func handleRedisRecover(redisInfo *repo.RootInfo, recoverFile string, isRollback
 	if err != nil {
 		return err
 	}
-	if (appendonly == "yes" && !strings.HasSuffix(recoverFile, ".tar.gz")) || (appendonly != "yes" && !strings.HasSuffix(recoverFile, ".rdb")) {
-		return buserr.New(constant.ErrTypeOfRedis)
+
+	if appendonly == "yes" {
+		if !strings.HasSuffix(recoverFile, ".tar.gz") || !strings.HasSuffix(recoverFile, ".aof") {
+			return buserr.New(constant.ErrTypeOfRedis)
+		}
+	} else {
+		if !strings.HasSuffix(recoverFile, ".rdb") {
+			return buserr.New(constant.ErrTypeOfRedis)
+		}
 	}
+
 	global.LOG.Infof("appendonly in redis conf is %s", appendonly)
 	isOk := false
 	if !isRollback {
-		suffix := "tar.gz"
-		if appendonly != "yes" {
-			suffix = "rdb"
+		suffix := "rdb"
+		if appendonly == "yes" {
+			if redisInfo.Version == "6.0.16" {
+				suffix = "aof"
+			} else {
+				suffix = "tar.gz"
+			}
 		}
 		rollbackFile := fmt.Sprintf("%s/original/database/redis/%s_%s.%s", global.CONF.System.BaseDir, redisInfo.Name, time.Now().Format("20060102150405"), suffix)
 		if err := handleRedisBackup(redisInfo, path.Dir(rollbackFile), path.Base(rollbackFile)); err != nil {
@@ -140,17 +163,21 @@ func handleRedisRecover(redisInfo *repo.RootInfo, recoverFile string, isRollback
 	if _, err := compose.Down(composeDir + "/docker-compose.yml"); err != nil {
 		return err
 	}
-	if appendonly == "yes" {
+	if appendonly == "yes" && redisInfo.Version == "7.0.5" {
 		redisDataDir := fmt.Sprintf("%s/%s/%s/data", constant.AppInstallDir, "redis", redisInfo.Name)
 		if err := handleUnTar(recoverFile, redisDataDir); err != nil {
 			return err
 		}
 	} else {
+		itemName := "dump.rdb"
+		if redisInfo.Version == "6.0.16" {
+			itemName = "appendonly.aof"
+		}
 		input, err := ioutil.ReadFile(recoverFile)
 		if err != nil {
 			return err
 		}
-		if err = ioutil.WriteFile(composeDir+"/data/dump.rdb", input, 0640); err != nil {
+		if err = ioutil.WriteFile(composeDir+"/data/"+itemName, input, 0640); err != nil {
 			return err
 		}
 	}

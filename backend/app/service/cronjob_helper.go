@@ -135,7 +135,7 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 
 	fullPath := fmt.Sprintf("%s/%s", record.FileDir, fileName)
 	if backup.Type == "LOCAL" {
-		u.HandleRmExpired(backup.Type, record.FileDir, cronjob, nil)
+		u.HandleRmExpired(backup.Type, backupDir, cronjob, nil)
 		return fullPath, nil
 	}
 
