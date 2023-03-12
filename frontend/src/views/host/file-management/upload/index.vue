@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { UploadFile, UploadFiles, UploadInstance } from 'element-plus';
-import { UploadFileData } from '@/api/modules/files';
+import { ChunkUploadFileData } from '@/api/modules/files';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
@@ -95,7 +95,7 @@ const submit = async () => {
         formData.append('chunkCount', chunkCount.toString());
 
         try {
-            await UploadFileData(formData, {
+            await ChunkUploadFileData(formData, {
                 onUploadProgress: (progressEvent) => {
                     const progress = Math.round(
                         ((uploadedChunkCount + progressEvent.loaded / progressEvent.total) * 100) / chunkCount,
