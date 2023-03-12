@@ -59,6 +59,10 @@ export const UploadFileData = (params: FormData, config: AxiosRequestConfig) => 
     return http.upload<File.File>('files/upload', params, config);
 };
 
+export const ChunkUploadFileData = (params: FormData, config: AxiosRequestConfig) => {
+    return http.upload<File.File>('files/chunkupload', params, config);
+};
+
 export const RenameRile = (params: File.FileRename) => {
     return http.post<File.File>('files/rename', params);
 };
