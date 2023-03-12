@@ -7,7 +7,9 @@
         :title="$t('file.downloadProcess')"
     >
         <div v-for="(value, index) in res" :key="index">
-            <span>{{ $t('file.downloading') }} {{ value['name'] }}</span>
+            <span>
+                {{ value['percent'] === 100 ? $t('file.downlodSuccess') : $t('file.downloading') }} {{ value['name'] }}
+            </span>
             <el-progress v-if="value['total'] == 0" :percentage="100" :indeterminate="true" :duration="1" />
             <el-progress v-else :text-inside="true" :stroke-width="15" :percentage="value['percent']"></el-progress>
             <span>
@@ -60,7 +62,7 @@ const onClose = () => {};
 
 const initProcess = () => {
     let href = window.location.href;
-    let protocol = href.split('//')[0] === 'http' ? 'ws' : 'wss';
+    let protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     let ipLocal = href.split('//')[1].split('/')[0];
     processSocket = new WebSocket(`${protocol}://${ipLocal}/api/v1/files/ws`);
     processSocket.onopen = onOpenProcess;

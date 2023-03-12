@@ -9,10 +9,10 @@
                 :disabled="p.disabled"
             ></el-input>
             <el-input
-                v-model="form[p.envKey]"
+                v-model.number="form[p.envKey]"
                 @blur="form[p.envKey] = Number(form[p.envKey])"
                 v-if="p.type == 'number'"
-                :type="p.type"
+                maxlength="15"
                 @change="updateParam"
                 :disabled="p.disabled"
             ></el-input>

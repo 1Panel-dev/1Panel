@@ -747,6 +747,7 @@ export default {
         type: 'Type',
         list: 'File List',
         sub: 'Include subdirectory',
+        downlodSuccess: 'Download Success',
     },
     setting: {
         all: 'All',
