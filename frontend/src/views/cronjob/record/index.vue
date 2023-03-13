@@ -134,7 +134,7 @@
                                     </template>
                                     <span class="status-count">{{ dialogData.rowData!.targetDir }}</span>
                                     <el-button
-                                        v-if="currentRecord?.status! === 'Success'"
+                                        v-if="currentRecord?.status === 'Success'"
                                         type="primary"
                                         style="margin-left: 10px"
                                         link

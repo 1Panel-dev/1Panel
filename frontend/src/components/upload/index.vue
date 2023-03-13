@@ -204,7 +204,7 @@ const onSubmit = async () => {
         MsgError(i18n.global.t('commons.msg.fileNameErr'));
         return;
     }
-    const res = await CheckFile(baseDir.value + '/' + uploaderFiles.value[0]!.raw.name);
+    const res = await CheckFile(baseDir.value + uploaderFiles.value[0]!.raw.name);
     if (!res.data) {
         MsgError(i18n.global.t('commons.msg.fileExist'));
         return;
