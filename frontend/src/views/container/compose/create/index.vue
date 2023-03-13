@@ -24,7 +24,7 @@
                                 </template>
                             </el-input>
                         </el-form-item>
-                        <el-form-item v-if="form.from === 'edit'" prop="name">
+                        <el-form-item v-if="form.from === 'edit' || form.from === 'template'" prop="name">
                             <el-input @input="changePath" v-model.trim="form.name">
                                 <template #prepend>{{ $t('file.dir') }}</template>
                             </el-input>

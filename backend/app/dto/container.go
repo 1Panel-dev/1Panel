@@ -129,7 +129,7 @@ type ComposeContainer struct {
 	State       string `json:"state"`
 }
 type ComposeCreate struct {
-	Name     string `json:"name" validate:"required"`
+	Name     string `json:"name"`
 	From     string `json:"from" validate:"required,oneof=edit path template"`
 	File     string `json:"file"`
 	Path     string `json:"path"`

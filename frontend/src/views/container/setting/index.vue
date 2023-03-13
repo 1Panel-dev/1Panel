@@ -219,6 +219,7 @@ const submitStop = async () => {
     await dockerOperate(param)
         .then(() => {
             loading.value = false;
+            stopVisiable.value = false;
             search();
             changeMode();
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

@@ -39,7 +39,6 @@
                     :data="data"
                     @search="search"
                 >
-                    <el-table-column type="selection" :selectable="selectable" fix />
                     <el-table-column :label="$t('commons.table.name')" prop="name" min-width="60" />
                     <el-table-column
                         :label="$t('container.downloadUrl')"
@@ -129,11 +128,6 @@ const search = async () => {
             loading.value = false;
         });
 };
-
-function selectable(row) {
-    return !(row.name === 'Docker Hub');
-}
-
 const dialogRef = ref();
 const onOpenDialog = async (
     title: string,
