@@ -165,7 +165,7 @@ import CodeEditor from './code-editor/index.vue';
 import Wget from './wget/index.vue';
 import Move from './move/index.vue';
 import Download from './download/index.vue';
-import { Mimetypes } from '@/global/mimetype';
+import { Mimetypes, Languages } from '@/global/mimetype';
 import Process from './process/index.vue';
 // import Detail from './detail/index.vue';
 import { useRouter } from 'vue-router';
@@ -196,7 +196,7 @@ let pathWidth = ref(0);
 const fileCreate = reactive({ path: '/', isDir: false, mode: 0o755 });
 const fileCompress = reactive({ files: [''], name: '', dst: '', operate: 'compress' });
 const fileDeCompress = reactive({ path: '', name: '', dst: '', mimeType: '' });
-const fileEdit = reactive({ content: '', path: '', name: '' });
+const fileEdit = reactive({ content: '', path: '', name: '', language: 'json' });
 const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100 });
 const fileUpload = reactive({ path: '' });
 const fileRename = reactive({ path: '', oldName: '' });
@@ -382,12 +382,25 @@ const openDeCompress = (item: File.File) => {
 const openCodeEditor = (row: File.File) => {
     codeReq.path = row.path;
     codeReq.expand = true;
-    GetFileContent(codeReq).then((res) => {
-        fileEdit.content = res.data.content;
-        fileEdit.path = res.data.path;
-        fileEdit.name = res.data.name;
-        codeEditorRef.value.acceptParams(fileEdit);
-    });
+
+    if (row.extension != '') {
+        Languages.forEach((language) => {
+            const ext = row.extension.substring(1);
+            if (language.value == ext) {
+                fileEdit.language = language.value;
+            }
+        });
+    }
+
+    GetFileContent(codeReq)
+        .then((res) => {
+            fileEdit.content = res.data.content;
+            fileEdit.path = res.data.path;
+            fileEdit.name = res.data.name;
+
+            codeEditorRef.value.acceptParams(fileEdit);
+        })
+        .catch(() => {});
 };
 
 const openUpload = () => {

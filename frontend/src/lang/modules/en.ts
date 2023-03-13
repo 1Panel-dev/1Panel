@@ -748,6 +748,8 @@ export default {
         list: 'File List',
         sub: 'Include subdirectory',
         downlodSuccess: 'Download Success',
+        theme: 'Theme',
+        language: 'Language',
     },
     setting: {
         all: 'All',

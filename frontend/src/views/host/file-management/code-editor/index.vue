@@ -6,9 +6,20 @@
         destroy-on-close
         width="70%"
         @opened="onOpen"
-        class="coder-dialog"
     >
-        <div v-loading="loading">
+        <el-form :inline="true" :model="config">
+            <el-form-item :label="$t('file.theme')">
+                <el-select v-model="config.theme" @change="initEditor()">
+                    <el-option v-for="item in themes" :key="item.label" :value="item.value" :label="item.label" />
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('file.language')">
+                <el-select v-model="config.language" @change="initEditor()">
+                    <el-option v-for="lang in Languages" :key="lang.label" :value="lang.value" :label="lang.label" />
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <div class="coder-editor" v-loading="loading">
             <div id="codeBox" style="height: 60vh"></div>
         </div>
         <template #footer>
@@ -25,7 +36,8 @@ import { SaveFileContent } from '@/api/modules/files';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import * as monaco from 'monaco-editor';
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
+import { Languages } from '@/global/mimetype';
 
 let editor: monaco.editor.IStandaloneCodeEditor | undefined;
 
@@ -36,9 +48,33 @@ interface EditProps {
     name: string;
 }
 
+interface EditorConfig {
+    theme: string;
+    language: string;
+}
+
 let open = ref(false);
 let loading = ref(false);
-let language = ref('json');
+
+let config = reactive<EditorConfig>({
+    theme: 'vs-dark',
+    language: 'json',
+});
+
+const themes = [
+    {
+        label: 'Visual Studio',
+        value: 'vs',
+    },
+    {
+        label: 'Visual Studio Dark',
+        value: 'vs-dark',
+    },
+    {
+        label: 'High Contrast Dark',
+        value: 'hc-black',
+    },
+];
 
 let form = ref({
     content: '',
@@ -61,11 +97,11 @@ const initEditor = () => {
     }
     const codeBox = document.getElementById('codeBox');
     editor = monaco.editor.create(codeBox as HTMLElement, {
-        theme: 'vs-dark', //官方自带三种主题vs, hc-black, or vs-dark
+        theme: config.theme, //官方自带三种主题vs, hc-black, or vs-dark
         value: form.value.content,
         readOnly: false,
         automaticLayout: true,
-        language: language.value,
+        language: config.language,
         folding: true, //代码折叠
         roundedSelection: false, // 右侧不显示编辑器预览框
     });
@@ -95,6 +131,7 @@ const saveContent = (closePage: boolean) => {
 const acceptParams = (props: EditProps) => {
     form.value.content = props.content;
     form.value.path = props.path;
+    config.language = props.language;
     open.value = true;
 };
 
@@ -106,7 +143,7 @@ defineExpose({ acceptParams });
 </script>
 
 <style lang="scss">
-.coder-dialog {
-    --el-dialog-margin-top: 10vh;
+.coder-editor {
+    margin-top: 10px;
 }
 </style>

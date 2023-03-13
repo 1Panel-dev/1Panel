@@ -15,3 +15,62 @@ export const Mimetypes = new Map([
     ['gzip/document', CompressType.TarGz],
     ['application/x-xz', CompressType.Xz],
 ]);
+
+export const Languages = [
+    {
+        label: 'go',
+        value: 'go',
+    },
+    {
+        label: 'html',
+        value: 'html',
+    },
+    {
+        label: 'javascript',
+        value: 'javascript',
+    },
+    {
+        label: 'java',
+        value: 'java',
+    },
+    {
+        label: 'kotlin',
+        value: 'kotlin',
+    },
+    {
+        label: 'markdown',
+        value: 'markdown',
+    },
+    {
+        label: 'mysql',
+        value: 'mysql',
+    },
+    {
+        label: 'php',
+        value: 'php',
+    },
+    {
+        label: 'redis',
+        value: 'redis',
+    },
+    {
+        label: 'shell',
+        value: 'shell',
+    },
+    {
+        label: 'sql',
+        value: 'sql',
+    },
+    {
+        label: 'yaml',
+        value: 'yaml',
+    },
+    {
+        label: 'json',
+        value: 'json',
+    },
+    {
+        label: 'css',
+        value: 'css',
+    },
+];

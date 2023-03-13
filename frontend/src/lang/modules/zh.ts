@@ -755,6 +755,8 @@ export default {
         list: '文件列表',
         sub: '包含子目录',
         downlodSuccess: '下载完成',
+        theme: '主题',
+        language: '语言',
     },
     setting: {
         all: '全部',
