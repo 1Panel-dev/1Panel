@@ -49,7 +49,7 @@
 import { onMounted, reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import LayoutContent from '@/layout/layout-content.vue';
-import { cleanMonitors, getSettingInfo, updateSetting } from '@/api/modules/setting';
+import { cleanMonitors, getSettingInfo, getSystemAvailable, updateSetting } from '@/api/modules/setting';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -110,5 +110,6 @@ const onClean = async () => {
 
 onMounted(() => {
     search();
+    getSystemAvailable();
 });
 </script>

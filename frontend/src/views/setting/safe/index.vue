@@ -137,7 +137,7 @@ import { ElForm, ElMessageBox } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
 import LayoutContent from '@/layout/layout-content.vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { updateSetting, getMFA, bindMFA, getSettingInfo, updatePort } from '@/api/modules/setting';
+import { updateSetting, getMFA, bindMFA, getSettingInfo, updatePort, getSystemAvailable } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { dateFormatSimple } from '@/utils/util';
@@ -326,5 +326,6 @@ function loadTimeOut() {
 
 onMounted(() => {
     search();
+    getSystemAvailable();
 });
 </script>
