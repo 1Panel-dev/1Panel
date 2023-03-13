@@ -1,6 +1,7 @@
 package files
 
 import (
+	"archive/zip"
 	"bufio"
 	"context"
 	"encoding/json"
@@ -12,6 +13,7 @@ import (
 	"path"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -379,7 +381,9 @@ func getFormat(cType CompressType) archiver.CompressedArchive {
 		format.Compression = archiver.Gz{}
 		format.Archival = archiver.Tar{}
 	case Zip:
-		format.Archival = archiver.Zip{}
+		format.Archival = archiver.Zip{
+			Compression: zip.Deflate,
+		}
 	case Bz2:
 		format.Compression = archiver.Bz2{}
 		format.Archival = archiver.Tar{}
@@ -413,9 +417,19 @@ func (f FileOp) Compress(srcRiles []string, dst string, name string, cType Compr
 		return err
 	}
 
-	err = format.Archive(context.Background(), out, files)
-	if err != nil {
-		return err
+	switch cType {
+	case Zip:
+		if err := ZipFile(files, out); err != nil {
+			_ = f.DeleteFile(dstFile)
+			return err
+		}
+	default:
+		err = format.Archive(context.Background(), out, files)
+		if err != nil {
+			_ = f.DeleteFile(dstFile)
+			return err
+		}
+		break
 	}
 	return nil
 }
@@ -487,4 +501,47 @@ func (f FileOp) CopyAndBackup(src string) (string, error) {
 		return backupPath, err
 	}
 	return backupPath, nil
+}
+
+func ZipFile(files []archiver.File, dst afero.File) error {
+	zw := zip.NewWriter(dst)
+	defer zw.Close()
+
+	for _, file := range files {
+		hdr, err := zip.FileInfoHeader(file)
+		if err != nil {
+			return err
+		}
+		hdr.Name = file.NameInArchive
+		if file.IsDir() {
+			if !strings.HasSuffix(hdr.Name, "/") {
+				hdr.Name += "/"
+			}
+			hdr.Method = zip.Store
+		}
+		w, err := zw.CreateHeader(hdr)
+		if err != nil {
+			return err
+		}
+		if file.IsDir() {
+			continue
+		}
+
+		if file.LinkTarget != "" {
+			_, err = w.Write([]byte(filepath.ToSlash(file.LinkTarget)))
+			if err != nil {
+				return err
+			}
+		} else {
+			fileReader, err := file.Open()
+			if err != nil {
+				return err
+			}
+			_, err = io.Copy(w, fileReader)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
