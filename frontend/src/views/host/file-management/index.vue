@@ -183,7 +183,7 @@ let selects = ref<any>([]);
 let req = reactive({
     path: '/',
     expand: true,
-    showHidden: false,
+    showHidden: true,
     page: 1,
     pageSize: 100,
     search: '',
