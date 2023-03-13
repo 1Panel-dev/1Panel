@@ -118,10 +118,12 @@ const rules = reactive({
 const loadGroups = async () => {
     const res = await GetGroupList({ type: 'host' });
     groupList.value = res.data;
-    for (const item of groupList.value) {
-        if (item.isDefault) {
-            dialogData.value.rowData.groupID = item.id;
-            break;
+    if (dialogData.value.title === 'create') {
+        for (const item of groupList.value) {
+            if (item.isDefault) {
+                dialogData.value.rowData.groupID = item.id;
+                break;
+            }
         }
     }
 };
