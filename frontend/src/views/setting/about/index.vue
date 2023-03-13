@@ -36,7 +36,7 @@
 
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
-import { getSettingInfo } from '@/api/modules/setting';
+import { getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
 import { onMounted, ref } from 'vue';
 import 'md-editor-v3/lib/style.css';
 import SystemUpgrade from '@/components/system-upgrade/index.vue';
@@ -63,6 +63,7 @@ const toGithubStar = () => {
 
 onMounted(() => {
     search();
+    getSystemAvailable();
 });
 </script>
 
