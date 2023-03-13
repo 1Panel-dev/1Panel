@@ -12,8 +12,10 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -136,6 +138,13 @@ func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
 }
 
 func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
+	if len(req.ExposedPorts) != 0 {
+		for _, port := range req.ExposedPorts {
+			if common.ScanPort(port.HostPort) {
+				return buserr.WithDetail(constant.ErrPortInUsed, port.HostPort, nil)
+			}
+		}
+	}
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return err
