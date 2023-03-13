@@ -84,7 +84,7 @@
                     <el-form-item :label="$t('container.cpuQuota')" prop="nanoCPUs">
                         <el-input type="number" style="width: 40%" v-model.number="form.nanoCPUs">
                             <template #append>
-                                <el-select v-model="form.cpuUnit" disabled style="width: 65px">
+                                <el-select v-model="form.cpuUnit" disabled style="width: 85px">
                                     <el-option label="Core" value="Core" />
                                 </el-select>
                             </template>
@@ -94,7 +94,7 @@
                     <el-form-item :label="$t('container.memoryLimit')" prop="memoryItem">
                         <el-input style="width: 40%" v-model.number="form.memoryItem">
                             <template #append>
-                                <el-select v-model="form.memoryUnit" placeholder="Select" style="width: 65px">
+                                <el-select v-model="form.memoryUnit" placeholder="Select" style="width: 85px">
                                     <el-option label="KB" value="KB" />
                                     <el-option label="MB" value="MB" />
                                     <el-option label="GB" value="GB" />
