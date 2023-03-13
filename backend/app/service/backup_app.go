@@ -103,7 +103,7 @@ func handleAppBackup(install *model.AppInstall, backupDir, fileName string) erro
 	}
 
 	resource, _ := appInstallResourceRepo.GetFirst(appInstallResourceRepo.WithAppInstallId(install.ID))
-	if resource.ID != 0 {
+	if resource.ID != 0 && resource.ResourceId != 0 {
 		mysqlInfo, err := appInstallRepo.LoadBaseInfo(constant.AppMysql, "")
 		if err != nil {
 			return err
