@@ -8,71 +8,40 @@
                     </div>
                     <h3>{{ $t('setting.description') }}</h3>
                     <h3>
-                        {{ version }}
-                        <el-button v-if="version !== 'Waiting'" type="primary" link @click="onLoadUpgradeInfo">
-                            {{ $t('setting.upgradeCheck') }}
-                        </el-button>
-                        <el-tag v-else round style="margin-left: 10px">{{ $t('setting.upgrading') }}</el-tag>
+                        <SystemUpgrade />
                     </h3>
                     <div style="margin-top: 10px">
                         <el-link @click="toDoc">
                             <el-icon><Document /></el-icon>
                             <span>{{ $t('setting.doc') }}</span>
                         </el-link>
-                        <el-link @click="toGithub" style="margin-left: 15px">
-                            <svg-icon style="font-size: 7px; margin-bottom: 3px" iconName="p-huaban88"></svg-icon>
-                            <span style="line-height: 20px">{{ $t('setting.project') }}</span>
+                        <el-link @click="toGithub" class="system-link">
+                            <svg-icon iconName="p-huaban88"></svg-icon>
+                            <span>{{ $t('setting.project') }}</span>
                         </el-link>
-                        <el-link @click="toIssue" style="margin-left: 15px">
-                            <svg-icon style="font-size: 7px; margin-bottom: 3px" iconName="p-bug"></svg-icon>
+                        <el-link @click="toIssue" class="system-link">
+                            <svg-icon iconName="p-bug"></svg-icon>
                             <span>{{ $t('setting.issue') }}</span>
                         </el-link>
-                        <el-link @click="toGithubStar" style="margin-left: 15px">
-                            <svg-icon style="font-size: 7px; margin-bottom: 3px" iconName="p-star"></svg-icon>
+                        <el-link @click="toGithubStar" class="system-link">
+                            <svg-icon iconName="p-star"></svg-icon>
                             <span>{{ $t('setting.star') }}</span>
                         </el-link>
                     </div>
                 </div>
             </template>
         </LayoutContent>
-        <el-drawer :close-on-click-modal="false" :key="refresh" v-model="drawerVisiable" size="50%">
-            <template #header>
-                <DrawerHeader :header="$t('setting.upgrade')" :back="handleClose" />
-            </template>
-            <el-form label-width="120px">
-                <el-form-item :label="$t('setting.newVersion')">
-                    <el-tag>{{ upgradeInfo.newVersion }}</el-tag>
-                </el-form-item>
-                <el-form-item :label="$t('setting.upgradeNotes')">
-                    <MdEditor style="height: calc(100vh - 330px)" v-model="upgradeInfo.releaseNote" previewOnly />
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button type="primary" @click="onUpgrade">{{ $t('setting.upgradeNow') }}</el-button>
-                </span>
-            </template>
-        </el-drawer>
     </div>
 </template>
 
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
-import { getSettingInfo, loadUpgradeInfo, upgrade } from '@/api/modules/setting';
+import { getSettingInfo } from '@/api/modules/setting';
 import { onMounted, ref } from 'vue';
-import MdEditor from 'md-editor-v3';
 import 'md-editor-v3/lib/style.css';
-import { ElMessageBox } from 'element-plus';
-import i18n from '@/lang';
-import DrawerHeader from '@/components/drawer-header/index.vue';
-import { MsgSuccess } from '@/utils/message';
+import SystemUpgrade from '@/components/system-upgrade/index.vue';
 
 const version = ref();
-const upgradeInfo = ref();
-const drawerVisiable = ref();
-const refresh = ref();
-
 const loading = ref();
 const search = async () => {
     const res = await getSettingInfo();
@@ -92,47 +61,21 @@ const toGithubStar = () => {
     window.open('https://github.com/1Panel-dev/1Panel', '_blank');
 };
 
-const handleClose = () => {
-    drawerVisiable.value = false;
-};
-
-const onLoadUpgradeInfo = async () => {
-    loading.value = true;
-    await loadUpgradeInfo()
-        .then((res) => {
-            loading.value = false;
-            if (!res.data) {
-                MsgSuccess(i18n.global.t('setting.noUpgrade'));
-                return;
-            }
-            upgradeInfo.value = res.data;
-            drawerVisiable.value = true;
-        })
-        .catch(() => {
-            loading.value = false;
-        });
-};
-const onUpgrade = async () => {
-    ElMessageBox.confirm(i18n.global.t('setting.upgradeHelper', i18n.global.t('setting.upgrade')), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(() => {
-        loading.value = true;
-        upgrade(upgradeInfo.value.newVersion)
-            .then(() => {
-                loading.value = false;
-                drawerVisiable.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    });
-};
-
 onMounted(() => {
     search();
 });
 </script>
+
+<style lang="scss" scoped>
+.system-link {
+    margin-left: 15px;
+
+    .svg-icon {
+        font-size: 7px;
+        margin-bottom: 3px;
+    }
+    span {
+        line-height: 20px;
+    }
+}
+</style>

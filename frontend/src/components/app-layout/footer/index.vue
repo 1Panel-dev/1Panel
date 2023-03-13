@@ -7,10 +7,14 @@
             <a href="https://fit2cloud.com/" target="_blank">杭州飞致云信息科技有限公司</a>
         </div>
         <div class="footer-right">
-            <span>Version V1</span>
+            <SystemUpgrade />
         </div>
     </div>
 </template>
+
+<script setup lang="ts">
+import SystemUpgrade from '@/components/system-upgrade/index.vue';
+</script>
 
 <style scoped lang="scss">
 .footer {
