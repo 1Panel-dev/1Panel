@@ -76,8 +76,13 @@
                         <template #default="{ row }">
                             <el-button link :icon="Promotion" @click="openUrl(row)"></el-button>
                             <span>
-                                <el-link type="primary" :underline="false" @click="openConfig(row.id)">
-                                    <span style="margin-left: 10px">{{ row.primaryDomain }}</span>
+                                <el-link
+                                    style="margin-left: 10px"
+                                    type="primary"
+                                    :underline="false"
+                                    @click="openConfig(row.id)"
+                                >
+                                    <MsgInfo :info="row.primaryDomain" width="120" />
                                 </el-link>
                             </span>
                         </template>
@@ -104,12 +109,11 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column
-                        :label="$t('website.remark')"
-                        show-overflow-tooltip
-                        fix
-                        prop="remark"
-                    ></el-table-column>
+                    <el-table-column :label="$t('website.remark')" fix prop="remark">
+                        <template #default="{ row }">
+                            <MsgInfo :info="row.remark" width="120" />
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('website.protocol')" prop="protocol"></el-table-column>
                     <el-table-column :label="$t('website.expireDate')">
                         <template #default="{ row, $index }">
@@ -187,6 +191,7 @@ import { dateFormatSimple } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { Promotion, VideoPlay, VideoPause } from '@element-plus/icons-vue';
+import MsgInfo from '@/components/msg-info/index.vue';
 
 const shortcuts = [
     {

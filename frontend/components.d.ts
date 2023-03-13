@@ -80,6 +80,7 @@ declare module 'vue' {
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
     Logo: typeof import('./src/components/app-layout/menu/components/Logo.vue')['default']
     Menu: typeof import('./src/components/app-layout/menu/index.vue')['default']
+    MsgInfo: typeof import('./src/components/msg-info/index.vue')['default']
     Popover: typeof import('element-plus/es')['ElPopoverDirective']
     RouterButton: typeof import('./src/components/router-button/index.vue')['default']
     Status: typeof import('./src/components/status/index.vue')['default']
