@@ -14,9 +14,10 @@
             drag
             :auto-upload="false"
             ref="uploadRef"
-            :multiple="true"
             :on-change="fileOnChange"
             v-loading="loading"
+            :limit="1"
+            :on-exceed="handleExceed"
         >
             <el-icon class="el-icon--upload"><upload-filled /></el-icon>
             <div class="el-upload__text">
@@ -38,17 +39,18 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { UploadFile, UploadFiles, UploadInstance } from 'element-plus';
+import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
 import { ChunkUploadFileData } from '@/api/modules/files';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 
-interface UploadProps {
+interface UploadFileProps {
     path: string;
 }
 
 const uploadRef = ref<UploadInstance>();
+
 const loading = ref(false);
 let uploadPrecent = ref(0);
 let open = ref(false);
@@ -67,10 +69,11 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     uploaderFiles.value = uploadFiles;
 };
 
-// const onProcess = (e: any) => {
-//     const { loaded, total } = e;
-//     uploadPrecent.value = ((loaded / total) * 100) | 0;
-// };
+const handleExceed: UploadProps['onExceed'] = (files) => {
+    uploadRef.value!.clearFiles();
+    const file = files[0] as UploadRawFile;
+    uploadRef.value!.handleStart(file);
+};
 
 const submit = async () => {
     loading.value = true;
@@ -109,12 +112,13 @@ const submit = async () => {
         }
         if (uploadedChunkCount == chunkCount) {
             loading.value = false;
+            uploadRef.value!.clearFiles();
             MsgSuccess(i18n.global.t('file.uploadSuccess'));
         }
     }
 };
 
-const acceptParams = (props: UploadProps) => {
+const acceptParams = (props: UploadFileProps) => {
     path.value = props.path;
     open.value = true;
     uploadPrecent.value = 0;
