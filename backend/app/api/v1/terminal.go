@@ -9,7 +9,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/copier"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssh"
 	"github.com/1Panel-dev/1Panel/backend/utils/terminal"
@@ -156,15 +155,6 @@ func (b *BaseApi) ContainerWsSsh(c *gin.Context) {
 		return
 	}
 	defer wsConn.Close()
-
-	cmds := fmt.Sprintf("docker exec %s %s", containerID, command)
-	if len(user) != 0 {
-		cmds = fmt.Sprintf("docker exec -u %s %s %s", user, containerID, command)
-	}
-	stdout, err := cmd.Exec(cmds)
-	if wshandleError(wsConn, errors.WithMessage(err, stdout)) {
-		return
-	}
 
 	commands := fmt.Sprintf("docker exec -it %s %s", containerID, command)
 	if len(user) != 0 {
