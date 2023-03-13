@@ -9,6 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/copier"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssh"
 	"github.com/1Panel-dev/1Panel/backend/utils/terminal"
@@ -156,6 +157,15 @@ func (b *BaseApi) ContainerWsSsh(c *gin.Context) {
 	}
 	defer wsConn.Close()
 
+	cmds := fmt.Sprintf("docker exec %s %s", containerID, command)
+	if len(user) != 0 {
+		cmds = fmt.Sprintf("docker exec -u %s %s %s", user, containerID, command)
+	}
+	stdout, err := cmd.Exec(cmds)
+	if wshandleError(wsConn, errors.WithMessage(err, stdout)) {
+		return
+	}
+
 	commands := fmt.Sprintf("docker exec -it %s %s", containerID, command)
 	if len(user) != 0 {
 		commands = fmt.Sprintf("docker exec -it -u %s %s %s", user, containerID, command)
@@ -187,8 +197,8 @@ func wshandleError(ws *websocket.Conn, err error) bool {
 	if err != nil {
 		global.LOG.Errorf("handler ws faled:, err: %v", err)
 		dt := time.Now().Add(time.Second)
-		if err := ws.WriteControl(websocket.CloseMessage, []byte(err.Error()), dt); err != nil {
-			global.LOG.Errorf("websocket writes control message failed, err: %v", err)
+		if ctlerr := ws.WriteControl(websocket.CloseMessage, []byte(err.Error()), dt); ctlerr != nil {
+			_ = ws.WriteMessage(websocket.TextMessage, []byte(err.Error()))
 		}
 		return true
 	}
