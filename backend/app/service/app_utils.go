@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/app/repo"
-	"github.com/1Panel-dev/1Panel/backend/utils/env"
 	"math"
 	"os"
 	"path"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
+	"github.com/1Panel-dev/1Panel/backend/utils/env"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
@@ -159,6 +160,7 @@ func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBacku
 		global.LOG.Infof("delete app %s-%s backups successful", install.App.Key, install.Name)
 	}
 	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), backupRepo.WithByDetailName(install.Name))
+	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(install.App.Key))
 
 	return nil
 }

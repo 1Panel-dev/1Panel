@@ -121,7 +121,7 @@ func handleRedisRecover(redisInfo *repo.RootInfo, recoverFile string, isRollback
 	}
 
 	if appendonly == "yes" {
-		if !strings.HasSuffix(recoverFile, ".tar.gz") || !strings.HasSuffix(recoverFile, ".aof") {
+		if !strings.HasSuffix(recoverFile, ".tar.gz") && !strings.HasSuffix(recoverFile, ".aof") {
 			return buserr.New(constant.ErrTypeOfRedis)
 		}
 	} else {
@@ -170,7 +170,7 @@ func handleRedisRecover(redisInfo *repo.RootInfo, recoverFile string, isRollback
 		}
 	} else {
 		itemName := "dump.rdb"
-		if redisInfo.Version == "6.0.16" {
+		if appendonly == "yes" && redisInfo.Version == "6.0.16" {
 			itemName = "appendonly.aof"
 		}
 		input, err := ioutil.ReadFile(recoverFile)
@@ -184,5 +184,6 @@ func handleRedisRecover(redisInfo *repo.RootInfo, recoverFile string, isRollback
 	if _, err := compose.Up(composeDir + "/docker-compose.yml"); err != nil {
 		return err
 	}
+	isOk = true
 	return nil
 }
