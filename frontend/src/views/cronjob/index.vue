@@ -45,7 +45,10 @@
                     <el-table-column type="selection" fix />
                     <el-table-column :label="$t('cronjob.taskName')" :min-width="120" prop="name">
                         <template #default="{ row }">
-                            <el-tooltip effect="dark" :content="row.name" v-if="row.name.length > 12" placement="top">
+                            <el-tooltip effect="dark" v-if="row.name.length > 12" placement="top">
+                                <template #content>
+                                    <div style="width: 300px; word-break: break-all">{{ row.name }}</div>
+                                </template>
                                 <el-link @click="loadDetail(row)" type="primary">
                                     {{ row.name.substring(0, 15) }}...
                                 </el-link>

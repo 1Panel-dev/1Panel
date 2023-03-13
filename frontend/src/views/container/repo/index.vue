@@ -54,7 +54,10 @@
                             <el-tag v-if="row.status === 'Success'" type="success">
                                 {{ $t('commons.status.success') }}
                             </el-tag>
-                            <el-tooltip v-else effect="dark" :content="row.message" placement="bottom">
+                            <el-tooltip v-else effect="dark" placement="bottom">
+                                <template #content>
+                                    <div style="width: 300px; word-break: break-all">{{ row.message }}</div>
+                                </template>
                                 <el-tag type="danger">{{ $t('commons.status.failed') }}</el-tag>
                             </el-tooltip>
                         </template>

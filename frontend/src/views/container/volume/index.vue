@@ -45,13 +45,10 @@
                     <el-table-column type="selection" fix />
                     <el-table-column :label="$t('commons.table.name')" min-width="80" prop="name" fix>
                         <template #default="{ row }">
-                            <el-tooltip
-                                v-if="row.name.length > 20"
-                                class="box-item"
-                                effect="dark"
-                                :content="row.name"
-                                placement="top"
-                            >
+                            <el-tooltip v-if="row.name.length > 20" effect="dark" placement="bottom">
+                                <template #content>
+                                    <div style="width: 300px; word-break: break-all">{{ row.name }}</div>
+                                </template>
                                 <el-link @click="onInspect(row.name)" type="primary">
                                     {{ row.name.substring(0, 20) }}...
                                 </el-link>
