@@ -850,7 +850,7 @@ func (u *SnapshotService) handleTar(sourceDir, targetDir, name, exclusionRules s
 		exStr += exclude
 	}
 
-	commands := fmt.Sprintf("tar -zcf %s %s -C %s .", targetDir+"/"+name, exStr, sourceDir)
+	commands := fmt.Sprintf("tar --warning=no-file-changed -zcf %s %s -C %s .", targetDir+"/"+name, exStr, sourceDir)
 	global.LOG.Debug(commands)
 	stdout, err := cmd.Exec(commands)
 	if err != nil {
