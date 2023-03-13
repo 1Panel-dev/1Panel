@@ -82,7 +82,7 @@
                                     :underline="false"
                                     @click="openConfig(row.id)"
                                 >
-                                    <MsgInfo :info="row.primaryDomain" width="120" />
+                                    <MsgInfo :info="row.primaryDomain" width="300" />
                                 </el-link>
                             </span>
                         </template>
