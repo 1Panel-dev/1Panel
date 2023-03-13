@@ -28,7 +28,7 @@
             <el-table-column :label="$t('commons.table.operate')">
                 <template #default="{ row, $index }">
                     <div>
-                        <el-button link v-if="row.edit" type="primary" @click="saveGroup(groupForm, row, true)">
+                        <el-button link v-if="row.edit" type="primary" @click="saveGroup(groupForm, row)">
                             {{ $t('commons.button.save') }}
                         </el-button>
                         <el-button link v-if="!row.edit" type="primary" @click="editGroup($index)">
@@ -46,12 +46,7 @@
                         <el-button link v-if="row.edit" type="primary" @click="search()">
                             {{ $t('commons.button.cancel') }}
                         </el-button>
-                        <el-button
-                            link
-                            v-if="!row.edit && !row.isDefault"
-                            type="primary"
-                            @click="saveGroup(groupForm, row, false)"
-                        >
+                        <el-button link v-if="!row.edit && !row.isDefault" type="primary" @click="setDefault(row)">
                             {{ $t('website.setDefault') }}
                         </el-button>
                     </div>
@@ -83,7 +78,7 @@ interface DialogProps {
     type: string;
 }
 
-const groupForm = ref();
+const groupForm = ref<FormInstance>();
 const acceptParams = (params: DialogProps): void => {
     type.value = params.type;
     open.value = true;
@@ -106,16 +101,13 @@ const search = () => {
     });
 };
 
-const saveGroup = async (formEl: FormInstance, group: Group.GroupInfo, isEdit: boolean) => {
+const saveGroup = async (formEl: FormInstance, group: Group.GroupInfo) => {
     if (!formEl) return;
     await formEl.validate((valid) => {
         if (!valid) {
             return;
         }
         group.type = type.value;
-        if (!isEdit) {
-            group.isDefault = true;
-        }
         if (group.id == 0) {
             CreateGroup(group).then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
@@ -127,6 +119,14 @@ const saveGroup = async (formEl: FormInstance, group: Group.GroupInfo, isEdit: b
                 search();
             });
         }
+    });
+};
+
+const setDefault = (group: Group.GroupInfo) => {
+    group.isDefault = true;
+    UpdateGroup(group).then(() => {
+        MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+        search();
     });
 };
 
