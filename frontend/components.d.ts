@@ -19,7 +19,6 @@ declare module 'vue' {
     ContainerLog: typeof import('./src/components/container-log/index.vue')['default']
     DrawerHeader: typeof import('./src/components/drawer-header/index.vue')['default']
     ElAlert: typeof import('element-plus/es')['ElAlert']
-    ElAlter: typeof import('element-plus/es')['ElAlter']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElBadge: typeof import('element-plus/es')['ElBadge']
