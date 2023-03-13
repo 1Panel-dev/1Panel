@@ -38,6 +38,9 @@ html.dark {
     .el-tag.el-tag--success {
         --el-tag-border-color: var(--el-color-success);
     }
+    .el-tag.el-tag--danger {
+        --el-tag-border-color: var(--el-color-danger);
+    }
     .el-card {
         --el-card-bg-color: #111417;
         color: #ffffff;
