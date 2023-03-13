@@ -87,7 +87,6 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 };
 
 const onChangeCommand = async () => {
-    console.log('addqwd');
     form.command = '';
 };
 

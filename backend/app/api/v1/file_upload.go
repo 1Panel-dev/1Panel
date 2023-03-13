@@ -2,15 +2,16 @@ package v1
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strconv"
+
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/gin-gonic/gin"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"strconv"
 )
 
 func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int) error {
@@ -73,7 +74,7 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 	filename := c.PostForm("filename")
 	fileDir := filepath.Join(global.CONF.System.DataDir, "upload", filename)
 
-	os.MkdirAll(fileDir, 0755)
+	_ = os.MkdirAll(fileDir, 0755)
 	filePath := filepath.Join(fileDir, filename)
 
 	emptyFile, err := os.Create(filePath)
