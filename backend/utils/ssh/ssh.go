@@ -4,11 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"net"
 	"sync"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/backend/global"
 	gossh "golang.org/x/crypto/ssh"
 )
 
@@ -46,7 +44,7 @@ func (c *ConnInfo) NewClient() (*ConnInfo, error) {
 	}
 	config.Timeout = c.DialTimeOut
 
-	config.HostKeyCallback = func(hostname string, remote net.Addr, key gossh.PublicKey) error { return nil }
+	config.HostKeyCallback = gossh.InsecureIgnoreHostKey()
 	client, err := gossh.Dial("tcp", addr, config)
 	if nil != err {
 		return c, err
@@ -73,9 +71,7 @@ func (c *ConnInfo) Run(shell string) (string, error) {
 }
 
 func (c *ConnInfo) Close() {
-	if err := c.Client.Close(); err != nil {
-		global.LOG.Errorf("close ssh client failed, err: %v", err)
-	}
+	_ = c.Client.Close()
 }
 
 type SshConn struct {

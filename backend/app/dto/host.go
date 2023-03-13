@@ -8,7 +8,7 @@ type HostOperate struct {
 	ID         uint   `json:"id"`
 	GroupID    uint   `json:"groupID"`
 	Name       string `json:"name"`
-	Addr       string `json:"addr" validate:"required,ip"`
+	Addr       string `json:"addr" validate:"required"`
 	Port       uint   `json:"port" validate:"required,number,max=65535,min=1"`
 	User       string `json:"user" validate:"required"`
 	AuthMode   string `json:"authMode" validate:"oneof=password key"`
@@ -19,7 +19,7 @@ type HostOperate struct {
 }
 
 type HostConnTest struct {
-	Addr       string `json:"addr" validate:"required,ip"`
+	Addr       string `json:"addr" validate:"required"`
 	Port       uint   `json:"port" validate:"required,number,max=65535,min=1"`
 	User       string `json:"user" validate:"required"`
 	AuthMode   string `json:"authMode" validate:"oneof=password key"`
