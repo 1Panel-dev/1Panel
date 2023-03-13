@@ -57,15 +57,14 @@ func (b *BaseApi) TestByInfo(c *gin.Context) {
 	}
 
 	var connInfo ssh.ConnInfo
-	if err := copier.Copy(&connInfo, &req); err != nil {
-		helper.SuccessWithData(c, false)
-	}
+	_ = copier.Copy(&connInfo, &req)
+	connInfo.PrivateKey = []byte(req.PrivateKey)
 	client, err := connInfo.NewClient()
 	if err != nil {
 		helper.SuccessWithData(c, false)
+		return
 	}
 	defer client.Close()
-
 	helper.SuccessWithData(c, true)
 }
 

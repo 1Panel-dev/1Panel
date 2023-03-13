@@ -40,10 +40,8 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 		return
 	}
 	var connInfo ssh.ConnInfo
-	if err := copier.Copy(&connInfo, &host); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, constant.ErrStructTransform)
-		return
-	}
+	_ = copier.Copy(&connInfo, &host)
+	connInfo.PrivateKey = []byte(host.PrivateKey)
 
 	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
