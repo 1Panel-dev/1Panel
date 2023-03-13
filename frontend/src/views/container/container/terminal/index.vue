@@ -1,5 +1,11 @@
 <template>
-    <el-drawer v-model="terminalVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer
+        v-model="terminalVisiable"
+        @close="handleClose"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        size="50%"
+    >
         <template #header>
             <DrawerHeader :header="$t('container.containerTerminal')" :back="handleClose" />
         </template>
