@@ -63,13 +63,10 @@
                             <el-tag v-if="row.status === 'Uploading'" type="info">
                                 {{ $t('commons.status.uploading') }}...
                             </el-tag>
-                            <el-tooltip
-                                v-if="row.status === 'Failed'"
-                                class="box-item"
-                                effect="dark"
-                                :content="row.message"
-                                placement="top-start"
-                            >
+                            <el-tooltip v-if="row.status === 'Failed'" effect="dark" placement="top">
+                                <template #content>
+                                    <div style="width: 300px; word-break: break-all">{{ row.message }}</div>
+                                </template>
                                 <el-tag type="danger">{{ $t('commons.table.statusFailed') }}</el-tag>
                             </el-tooltip>
                         </template>

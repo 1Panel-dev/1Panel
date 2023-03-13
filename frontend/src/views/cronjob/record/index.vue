@@ -221,12 +221,12 @@
                                     <template #label>
                                         <span class="status-label">{{ $t('commons.table.status') }}</span>
                                     </template>
-                                    <el-tooltip
-                                        v-if="currentRecord?.status === 'Failed'"
-                                        class="box-item"
-                                        :content="currentRecord?.message"
-                                        placement="top"
-                                    >
+                                    <el-tooltip v-if="currentRecord?.status === 'Failed'" placement="top">
+                                        <template #content>
+                                            <div style="width: 300px; word-break: break-all">
+                                                {{ currentRecord?.message }}
+                                            </div>
+                                        </template>
                                         <el-tag type="danger">{{ $t('commons.table.statusFailed') }}</el-tag>
                                     </el-tooltip>
                                     <el-tag type="success" v-if="currentRecord?.status === 'Success'">
