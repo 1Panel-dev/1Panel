@@ -167,6 +167,15 @@ func (b *BaseApi) InitUserInfo(c *gin.Context) {
 	helper.SuccessWithData(c, nil)
 }
 
+// @Tags Auth
+// @Summary Check System isDemo
+// @Description 判断是否为demo环境
+// @Success 200
+// @Router /auth/demo [get]
+func (b *BaseApi) CheckIsDemo(c *gin.Context) {
+	helper.SuccessWithData(c, global.CONF.System.IsDemo)
+}
+
 func saveLoginLogs(c *gin.Context, err error) {
 	var logs model.LoginLog
 	if err != nil {

@@ -17,5 +17,6 @@ func (s *BaseRouter) InitBaseRouter(Router *gin.RouterGroup) {
 		baseRouter.GET("/status", baseApi.CheckIsFirstLogin)
 		baseRouter.POST("/init", baseApi.InitUserInfo)
 		baseRouter.POST("/logout", baseApi.LogOut)
+		baseRouter.GET("/demo", baseApi.CheckIsDemo)
 	}
 }

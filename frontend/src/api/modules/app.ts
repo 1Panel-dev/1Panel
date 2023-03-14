@@ -7,7 +7,7 @@ export const SyncApp = () => {
 };
 
 export const GetAppListUpdate = () => {
-    return http.post<App.AppUpdateRes>('apps/checkupdate', {});
+    return http.get<App.AppUpdateRes>('apps/checkupdate');
 };
 
 export const SearchApp = (req: App.AppReq) => {
