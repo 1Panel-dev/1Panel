@@ -121,7 +121,10 @@ func handleRedisRecover(redisInfo *repo.RootInfo, recoverFile string, isRollback
 	}
 
 	if appendonly == "yes" {
-		if !strings.HasSuffix(recoverFile, ".tar.gz") && !strings.HasSuffix(recoverFile, ".aof") {
+		if redisInfo.Version == "6.0.16" && !strings.HasSuffix(recoverFile, ".aof") {
+			return buserr.New(constant.ErrTypeOfRedis)
+		}
+		if redisInfo.Version == "7.0.5" && !strings.HasSuffix(recoverFile, ".tar.gz") {
 			return buserr.New(constant.ErrTypeOfRedis)
 		}
 	} else {
