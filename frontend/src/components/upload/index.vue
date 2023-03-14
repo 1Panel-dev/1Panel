@@ -115,12 +115,11 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     const pathRes = await loadBaseDir();
     if (type.value === 'mysql') {
         title.value = name.value + ' [ ' + detailName.value + ' ]';
-        baseDir.value = `${pathRes.data}/uploads/database/mysql/${name.value}/${detailName.value}/`;
     }
     if (type.value === 'website' || type.value === 'app') {
         title.value = name.value;
-        baseDir.value = `${pathRes.data}/uploads/${type.value}/${name.value}/`;
     }
+    baseDir.value = `${pathRes.data}/uploads/${type.value}/${name.value}/${detailName.value}/`;
     upVisiable.value = true;
     search();
 };
