@@ -71,9 +71,9 @@ func Init() {
 	}
 
 	global.CONF = serverConfig
-	global.CONF.BaseDir = baseDir
+	global.CONF.System.BaseDir = baseDir
 	global.CONF.System.IsDemo = v.GetBool("system.is_demo")
-	global.CONF.System.DataDir = global.CONF.BaseDir + "/1panel"
+	global.CONF.System.DataDir = global.CONF.System.BaseDir + "/1panel"
 	global.CONF.System.Cache = global.CONF.System.DataDir + "/cache"
 	global.CONF.System.Backup = global.CONF.System.DataDir + "/backup"
 	global.CONF.System.DbPath = global.CONF.System.DataDir + "/db"

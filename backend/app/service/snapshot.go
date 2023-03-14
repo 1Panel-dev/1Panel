@@ -172,17 +172,17 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 			return
 		}
 
-		if err := u.handlePanelDatas(snap.ID, fileOp, "snapshot", global.CONF.BaseDir+"/1panel", backupPanelDir, localDir, dockerDataDir); err != nil {
+		if err := u.handlePanelDatas(snap.ID, fileOp, "snapshot", global.CONF.System.BaseDir+"/1panel", backupPanelDir, localDir, dockerDataDir); err != nil {
 			updateSnapshotStatus(snap.ID, constant.StatusFailed, err.Error())
 			return
 		}
 		_, _ = cmd.Exec("systemctl restart docker")
 
 		snapJson := SnapshotJson{
-			BaseDir:            global.CONF.BaseDir,
+			BaseDir:            global.CONF.System.BaseDir,
 			DockerDataDir:      dockerDataDir,
 			BackupDataDir:      localDir,
-			PanelDataDir:       global.CONF.BaseDir + "/1panel",
+			PanelDataDir:       global.CONF.System.BaseDir + "/1panel",
 			LiveRestoreEnabled: liveRestoreStatus,
 		}
 		if err := u.saveJson(snapJson, rootDir); err != nil {
@@ -287,8 +287,8 @@ func (u *SnapshotService) SnapshotRecover(req dto.SnapshotRecover) error {
 		u.OriginalPath = fmt.Sprintf("%s/original_%s", snapJson.BaseDir, snap.Name)
 		_ = os.MkdirAll(u.OriginalPath, os.ModePerm)
 
-		snapJson.OldBaseDir = global.CONF.BaseDir
-		snapJson.OldPanelDataDir = global.CONF.BaseDir + "/1panel"
+		snapJson.OldBaseDir = global.CONF.System.BaseDir
+		snapJson.OldPanelDataDir = global.CONF.System.BaseDir + "/1panel"
 		snapJson.OldBackupDataDir = localDir
 		recoverPanelDir := fmt.Sprintf("%s/%s/1panel", baseDir, snap.Name)
 		liveRestore := false
