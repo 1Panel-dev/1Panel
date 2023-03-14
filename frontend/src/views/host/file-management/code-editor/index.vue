@@ -58,7 +58,7 @@ let loading = ref(false);
 
 let config = reactive<EditorConfig>({
     theme: 'vs-dark',
-    language: 'json',
+    language: 'plaintext',
 });
 
 const themes = [
@@ -97,13 +97,13 @@ const initEditor = () => {
     }
     const codeBox = document.getElementById('codeBox');
     editor = monaco.editor.create(codeBox as HTMLElement, {
-        theme: config.theme, //官方自带三种主题vs, hc-black, or vs-dark
+        theme: config.theme,
         value: form.value.content,
         readOnly: false,
         automaticLayout: true,
         language: config.language,
-        folding: true, //代码折叠
-        roundedSelection: false, // 右侧不显示编辑器预览框
+        folding: true,
+        roundedSelection: false,
     });
 
     editor.onDidChangeModelContent(() => {
