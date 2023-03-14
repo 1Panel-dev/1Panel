@@ -18,7 +18,6 @@
             </div>
             <MdEditor v-model="upgradeInfo.releaseNote" previewOnly />
         </div>
-
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
@@ -31,8 +30,11 @@
 import { getSettingInfo, loadUpgradeInfo, upgrade } from '@/api/modules/setting';
 import MdEditor from 'md-editor-v3';
 import i18n from '@/lang';
+import 'md-editor-v3/lib/style.css';
 import { MsgSuccess } from '@/utils/message';
 import { onMounted, ref } from 'vue';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const version = ref();
 let loading = ref(false);
@@ -72,18 +74,12 @@ const onUpgrade = async () => {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
-    }).then(() => {
-        loading.value = true;
-        upgrade(upgradeInfo.value.newVersion)
-            .then(() => {
-                loading.value = false;
-                drawerVisiable.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+    }).then(async () => {
+        globalStore.isLoading = true;
+        await upgrade(upgradeInfo.value.newVersion);
+        drawerVisiable.value = false;
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        search();
     });
 };
 

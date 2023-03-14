@@ -81,7 +81,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	fileName := fmt.Sprintf("1panel-%s-%s-%s.tar.gz", req.Version, "linux", runtime.GOARCH)
 	_ = settingRepo.Update("SystemStatus", "Upgrading")
 	go func() {
-		if err := fileOp.DownloadFile(downloadPath+"/"+fileName, rootDir+"/service.tar.gz"); err != nil {
+		if err := fileOp.DownloadFile(downloadPath+"/"+fileName, rootDir+"/"+fileName); err != nil {
 			global.LOG.Errorf("download service file failed, err: %v", err)
 			_ = settingRepo.Update("SystemStatus", "Free")
 			return
@@ -90,11 +90,12 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		defer func() {
 			_ = os.Remove(rootDir)
 		}()
-		if err := fileOp.Decompress(rootDir+"/service.tar.gz", rootDir, files.TarGz); err != nil {
+		if err := handleUnTar(rootDir+"/"+fileName, rootDir); err != nil {
 			global.LOG.Errorf("decompress file failed, err: %v", err)
 			_ = settingRepo.Update("SystemStatus", "Free")
 			return
 		}
+		tmpDir := rootDir + "/" + strings.ReplaceAll(fileName, ".tar.gz", "")
 
 		if err := u.handleBackup(fileOp, originalDir); err != nil {
 			global.LOG.Errorf("handle backup original file failed, err: %v", err)
@@ -103,17 +104,17 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		}
 		global.LOG.Info("backup original data successful, now start to upgrade!")
 
-		if err := cpBinary(rootDir+"/1panel", "/usr/local/bin/1panel"); err != nil {
+		if err := cpBinary(tmpDir+"/1panel", "/usr/local/bin/1panel"); err != nil {
 			u.handleRollback(fileOp, originalDir, 1)
 			global.LOG.Errorf("upgrade 1panel failed, err: %v", err)
 			return
 		}
-		if err := cpBinary(fmt.Sprintf("%s/1panel-online-installer-%s/1pctl", rootDir, req.Version), "/usr/local/bin/1pctl"); err != nil {
+		if err := cpBinary(tmpDir+"/1pctl", "/usr/local/bin/1pctl"); err != nil {
 			u.handleRollback(fileOp, originalDir, 2)
 			global.LOG.Errorf("upgrade 1pctl failed, err: %v", err)
 			return
 		}
-		if err := cpBinary(fmt.Sprintf("%s/1panel-online-installer-%s/1panel/conf/1panel.service", rootDir, req.Version), "/etc/systemd/system/1panel.service"); err != nil {
+		if err := cpBinary(tmpDir+"/1panel.service", "/etc/systemd/system/1panel.service"); err != nil {
 			u.handleRollback(fileOp, originalDir, 3)
 			global.LOG.Errorf("upgrade 1panel.service failed, err: %v", err)
 			return

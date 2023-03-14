@@ -57,15 +57,17 @@ const loadStatus = async () => {
             await getSystemAvailable()
                 .then((res) => {
                     if (res) {
+                        location.reload();
                         clearInterval(Number(timer));
                         timer = null;
                     }
                 })
                 .catch(() => {
+                    location.reload();
                     clearInterval(Number(timer));
                     timer = null;
                 });
-        }, 1000 * 20);
+        }, 1000 * 10);
     }
 };
 
