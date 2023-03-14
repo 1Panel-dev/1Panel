@@ -161,7 +161,9 @@ func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBacku
 	}
 	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), backupRepo.WithByDetailName(install.Name))
 	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(install.App.Key))
-
+	if install.App.Key == constant.AppMysql {
+		_ = mysqlRepo.DeleteAll(ctx)
+	}
 	return nil
 }
 
