@@ -331,7 +331,7 @@ const buttons = [
                 privilegeIPs: '',
                 password: '',
             };
-            if (row.permission === '%' || row.permission === 'localhost') {
+            if (row.permission === '%') {
                 param.privilege = row.permission;
             } else {
                 param.privilegeIPs = row.permission;

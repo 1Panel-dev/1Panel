@@ -28,7 +28,6 @@
                             <div v-if="changeForm.operation === 'privilege'">
                                 <el-form-item :label="$t('database.permission')" prop="privilege">
                                     <el-select style="width: 100%" v-model="changeForm.privilege">
-                                        <el-option value="localhost" :label="$t('database.permissionLocal')" />
                                         <el-option value="%" :label="$t('database.permissionAll')" />
                                         <el-option value="ip" :label="$t('database.permissionForIP')" />
                                     </el-select>
