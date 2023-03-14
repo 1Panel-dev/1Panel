@@ -18,6 +18,14 @@ export const Mimetypes = new Map([
 
 export const Languages = [
     {
+        label: 'plaintext',
+        value: 'plaintext',
+    },
+    {
+        label: 'json',
+        value: 'json',
+    },
+    {
         label: 'go',
         value: 'go',
     },
@@ -64,10 +72,6 @@ export const Languages = [
     {
         label: 'yaml',
         value: 'yaml',
-    },
-    {
-        label: 'json',
-        value: 'json',
     },
     {
         label: 'css',
