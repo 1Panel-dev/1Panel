@@ -1,6 +1,6 @@
 <template>
     <div>
-        {{ version }}
+        <span class="version">{{ version }}</span>
         <el-button v-if="version !== 'Waiting'" type="primary" link @click="onLoadUpgradeInfo">
             {{ $t('setting.upgradeCheck') }}
         </el-button>
@@ -90,3 +90,12 @@ onMounted(() => {
     search();
 });
 </script>
+
+<style lang="scss" scoped>
+.version {
+    font-size: 14px;
+    color: #858585;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+}
+</style>
