@@ -1,5 +1,5 @@
 <template>
-    <LayoutContent v-loading="loading" :title="activeName" :divider="true">
+    <LayoutContent v-loading="loading || syncLoading" :title="activeName" :divider="true">
         <template #toolbar>
             <el-row :gutter="5">
                 <el-col :span="20">
@@ -203,6 +203,7 @@ import { MsgSuccess } from '@/utils/message';
 
 let data = ref<any>();
 let loading = ref(false);
+let syncLoading = ref(false);
 let timer: NodeJS.Timer | null = null;
 const paginationConfig = reactive({
     currentPage: 1,
@@ -235,14 +236,14 @@ let activeName = ref(i18n.global.t('app.installed'));
 let mode = ref('installed');
 
 const sync = () => {
-    loading.value = true;
+    syncLoading.value = true;
     SyncInstalledApp()
         .then(() => {
             MsgSuccess(i18n.global.t('app.syncSuccess'));
             search();
         })
         .finally(() => {
-            loading.value = false;
+            syncLoading.value = false;
         });
 };
 
