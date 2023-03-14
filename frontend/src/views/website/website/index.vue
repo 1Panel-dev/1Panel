@@ -75,7 +75,7 @@
                     >
                         <template #default="{ row }">
                             <el-button link :icon="Promotion" @click="openUrl(row)"></el-button>
-                            <span>
+                            <!-- <span>
                                 <el-link
                                     style="margin-left: 10px"
                                     type="primary"
@@ -84,7 +84,11 @@
                                 >
                                     <MsgInfo :info="row.primaryDomain" width="300" />
                                 </el-link>
-                            </span>
+                            </span> -->
+
+                            <el-link type="primary" :underline="false" @click="openConfig(row.id)">
+                                <span style="margin-left: 10px">{{ row.primaryDomain }}</span>
+                            </el-link>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.type')" fix show-overflow-tooltip prop="type">
