@@ -117,7 +117,7 @@ const form = reactive({
     tags: [] as Array<string>,
 });
 const varifyPath = (rule: any, value: any, callback: any) => {
-    if (value.indexOf('docker-compose.yml') === -1) {
+    if (value.indexOf('Dockerfile') === -1) {
         callback(new Error(i18n.global.t('commons.rule.selectHelper', ['Dockerfile'])));
     }
     callback();
