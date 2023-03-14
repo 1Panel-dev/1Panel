@@ -38,7 +38,6 @@
 import LayoutContent from '@/layout/layout-content.vue';
 import { getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
 import { onMounted, ref } from 'vue';
-import 'md-editor-v3/lib/style.css';
 import SystemUpgrade from '@/components/system-upgrade/index.vue';
 
 const version = ref();

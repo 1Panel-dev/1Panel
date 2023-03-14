@@ -7,18 +7,18 @@
         <el-tag v-else round style="margin-left: 10px">{{ $t('setting.upgrading') }}</el-tag>
     </div>
 
-    <el-drawer :close-on-click-modal="false" :key="refresh" v-model="drawerVisiable" size="50%">
+    <el-drawer :close-on-click-modal="false" :key="refresh" v-model="drawerVisiable" size="50%" append-to-body>
         <template #header>
             <DrawerHeader :header="$t('setting.upgrade')" :back="handleClose" />
         </template>
-        <el-form label-width="120px">
-            <el-form-item :label="$t('setting.newVersion')">
-                <el-tag>{{ upgradeInfo.newVersion }}</el-tag>
-            </el-form-item>
-            <el-form-item :label="$t('setting.upgradeNotes')">
-                <MdEditor style="height: calc(100vh - 330px)" v-model="upgradeInfo.releaseNote" previewOnly />
-            </el-form-item>
-        </el-form>
+        <div class="panel-MdEditor">
+            <div class="default-theme">
+                <h2 class="inline-block">{{ $t('setting.newVersion') }}</h2>
+                <el-tag class="inline-block tag">{{ upgradeInfo.newVersion }}</el-tag>
+            </div>
+            <MdEditor v-model="upgradeInfo.releaseNote" previewOnly />
+        </div>
+
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
@@ -29,6 +29,7 @@
 </template>
 <script setup lang="ts">
 import { getSettingInfo, loadUpgradeInfo, upgrade } from '@/api/modules/setting';
+import MdEditor from 'md-editor-v3';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { onMounted, ref } from 'vue';
@@ -97,5 +98,22 @@ onMounted(() => {
     color: #858585;
     text-decoration: none;
     letter-spacing: 0.5px;
+}
+.panel-MdEditor {
+    height: calc(100vh - 330px);
+    margin-left: 70px;
+    .tag {
+        margin-left: 20px;
+        margin-top: -6px;
+        vertical-align: middle;
+    }
+    :deep(.md-editor-preview) {
+        font-size: 14px;
+    }
+    :deep(.default-theme h2) {
+        margin: 13px 0;
+        padding: 0;
+        font-size: 16px;
+    }
 }
 </style>
