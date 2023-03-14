@@ -34,6 +34,7 @@ type IAppService interface {
 	GetAppDetail(appId uint, version string) (response.AppDetailDTO, error)
 	Install(ctx context.Context, req request.AppInstallCreate) (*model.AppInstall, error)
 	SyncAppList() error
+	GetAppUpdate() (*response.AppUpdateRes, error)
 }
 
 func NewIAppService() IAppService {

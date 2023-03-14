@@ -27,6 +27,11 @@ export namespace App {
         items: App.App[];
     }
 
+    export interface AppUpdateRes {
+        version: string;
+        canUpdate: boolean;
+    }
+
     export interface AppDetail extends CommonModel {
         appId: string;
         icon: string;

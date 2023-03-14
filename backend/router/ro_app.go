@@ -16,6 +16,7 @@ func (a *AppRouter) InitAppRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		appRouter.POST("/sync", baseApi.SyncApp)
+		appRouter.POST("/checkupdate", baseApi.GetAppListUpdate)
 		appRouter.POST("/search", baseApi.SearchApp)
 		appRouter.GET("/:key", baseApi.GetApp)
 		appRouter.GET("/detail/:appId/:version", baseApi.GetAppDetail)

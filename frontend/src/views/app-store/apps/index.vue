@@ -95,7 +95,7 @@
 import LayoutContent from '@/layout/layout-content.vue';
 import { App } from '@/api/interface/app';
 import { onMounted, reactive, ref } from 'vue';
-import { GetAppTags, SearchApp, SyncApp } from '@/api/modules/app';
+import { GetAppListUpdate, GetAppTags, SearchApp, SyncApp } from '@/api/modules/app';
 import i18n from '@/lang';
 import Detail from '../detail/index.vue';
 import router from '@/routers';
@@ -147,11 +147,17 @@ const sync = () => {
     SyncApp()
         .then(() => {
             MsgSuccess(i18n.global.t('app.syncSuccess'));
+            canUpdate.value = false;
             search(req);
         })
         .finally(() => {
             loading.value = false;
         });
+};
+
+const getAppListUpdate = async () => {
+    const res = await GetAppListUpdate();
+    canUpdate.value = res.data.canUpdate;
 };
 
 const changeTag = (key: string) => {
@@ -169,6 +175,7 @@ const searchByName = (name: string) => {
 };
 
 onMounted(() => {
+    getAppListUpdate();
     search(req);
 });
 </script>
