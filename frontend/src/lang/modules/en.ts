@@ -35,6 +35,7 @@ export default {
             saveAndEnable: 'Save and enable',
             import: 'Import',
             search: 'Search',
+            refresh: 'Refresh',
         },
         search: {
             timeStart: 'Time start',

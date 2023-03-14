@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/app/service"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/cron/job"
@@ -44,8 +45,12 @@ func Run() {
 		global.LOG.Errorf("start my cronjob failed, err: %v", err)
 	}
 	for _, cronjob := range cronJobs {
-		if err := service.ServiceGroupApp.StartJob(&cronjob); err != nil {
+		entryID, err := service.ServiceGroupApp.StartJob(&cronjob)
+		if err != nil {
 			global.LOG.Errorf("start %s job %s failed, err: %v", cronjob.Type, cronjob.Name, err)
+		}
+		if err := repo.NewICronjobRepo().Update(cronjob.ID, map[string]interface{}{"entry_id": entryID}); err != nil {
+			global.LOG.Errorf("update cronjob %s %s failed, err: %v", cronjob.Type, cronjob.Name, err)
 		}
 	}
 }

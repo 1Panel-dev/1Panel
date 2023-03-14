@@ -36,6 +36,7 @@ export default {
             saveAndEnable: '保存并启用',
             import: '导入',
             search: '搜索',
+            refresh: '刷新',
         },
         search: {
             timeStart: '开始时间',

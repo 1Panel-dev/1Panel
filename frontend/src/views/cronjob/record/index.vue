@@ -49,6 +49,10 @@
                         &nbsp;{{ $t('cronjob.handle') }}
                     </el-tag>
                     <span class="buttons">
+                        <el-button type="primary" @click="onRefresh" link>
+                            {{ $t('commons.button.refresh') }}
+                        </el-button>
+                        <el-divider direction="vertical" />
                         <el-button type="primary" @click="onHandle(dialogData.rowData)" link>
                             {{ $t('commons.button.handle') }}
                         </el-button>
@@ -450,6 +454,14 @@ const search = async () => {
     loadRecord(currentRecord.value);
     searchInfo.recordTotal = res.data.total;
 };
+
+const onRefresh = () => {
+    records.value = [];
+    searchInfo.page = 1;
+    searchInfo.pageSize = 8;
+    search();
+};
+
 const onDownload = async (record: any, backupID: number) => {
     if (!record.file || record.file.indexOf('/') === -1) {
         MsgError(i18n.global.t('cronjob.errPath', [record.file]));

@@ -222,6 +222,12 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 	if err := json.Unmarshal([]byte(req.Vars), &varMap); err != nil {
 		return err
 	}
+
+	oldVars := backup.Vars
+	oldDir, err := loadLocalDir()
+	if err != nil {
+		return err
+	}
 	upMap := make(map[string]interface{})
 	upMap["bucket"] = req.Bucket
 	upMap["credential"] = req.Credential
@@ -235,9 +241,8 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 				if strings.HasSuffix(dirStr, "/") {
 					dirStr = dirStr[:strings.LastIndex(dirStr, "/")]
 				}
-				if err := updateBackupDir(dirStr); err != nil {
-					upMap["vars"] = backup.Vars
-					_ = backupRepo.Update(req.ID, upMap)
+				if err := updateBackupDir(dirStr, oldDir); err != nil {
+					_ = backupRepo.Update(req.ID, (map[string]interface{}{"vars": oldVars}))
 					return err
 				}
 			}
@@ -309,8 +314,7 @@ func loadLocalDir() (string, error) {
 	return "", fmt.Errorf("error type dir: %T", varMap["dir"])
 }
 
-func updateBackupDir(dir string) error {
-	oldDir := global.CONF.System.Backup
+func updateBackupDir(dir, oldDir string) error {
 	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
 			return err
@@ -323,6 +327,5 @@ func updateBackupDir(dir string) error {
 	if err != nil {
 		return errors.New(string(stdout))
 	}
-	global.CONF.System.Backup = dir
 	return nil
 }
