@@ -122,7 +122,7 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 		return "", err
 	}
 	if req.From == "edit" {
-		dir := fmt.Sprintf("%s/docker/build/%s", constant.DataDir, req.Name)
+		dir := fmt.Sprintf("%s/docker/build/%s", constant.DataDir, strings.ReplaceAll(req.Name, ":", "_"))
 		if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 			if err = os.MkdirAll(dir, os.ModePerm); err != nil {
 				return "", err
@@ -139,6 +139,8 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 		_, _ = write.WriteString(string(req.Dockerfile))
 		write.Flush()
 		req.Dockerfile = dir
+	} else {
+		req.Dockerfile = strings.ReplaceAll(req.Dockerfile, "/Dockerfile", "")
 	}
 	tar, err := archive.TarWithOptions(req.Dockerfile+"/", &archive.TarOptions{})
 	if err != nil {
@@ -161,13 +163,27 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 	go func() {
 		defer file.Close()
 		defer tar.Close()
-		res, err := client.ImageBuild(context.TODO(), tar, opts)
+		res, err := client.ImageBuild(context.Background(), tar, opts)
 		if err != nil {
 			global.LOG.Errorf("build image %s failed, err: %v", req.Name, err)
 			_, _ = file.WriteString("image build failed!")
 			return
 		}
 		defer res.Body.Close()
+		body, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			global.LOG.Errorf("build image %s failed, err: %v", req.Name, err)
+			_, _ = file.WriteString(fmt.Sprintf("build image %s failed, err: %v", req.Name, err))
+			_, _ = file.WriteString("image build failed!")
+			return
+		}
+
+		if strings.Contains(string(body), "error") && strings.Contains(string(body), "failed:") {
+			global.LOG.Errorf("build image %s failed", req.Name)
+			_, _ = file.Write(body)
+			_, _ = file.WriteString("image build failed!")
+			return
+		}
 		global.LOG.Infof("build image %s successful!", req.Name)
 		_, _ = io.Copy(file, res.Body)
 		_, _ = file.WriteString("image build successful!")
