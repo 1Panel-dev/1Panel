@@ -55,19 +55,10 @@ const getStatus = async () => {
     statusCode.value = 1;
 };
 
-// watch(
-//     () => screenWidth.value,
-//     (newVal) => {
-//     console.log()
-//     },
-// );
-
 onMounted(() => {
     getStatus();
-    // 屏幕适配
     screenWidth.value = document.body.clientWidth;
     window.onresize = () => {
-        //屏幕尺寸变化就重新赋值
         return (() => {
             screenWidth.value = document.body.clientWidth;
         })();
@@ -118,8 +109,6 @@ onMounted(() => {
     }
 
     .login-title {
-        // margin-top: 10%;
-        // margin-right: 15%;
         margin-left: 10%;
         span:first-child {
             color: $primary-color;
@@ -138,11 +127,9 @@ onMounted(() => {
         }
     }
     .login-container {
-        // margin-left: 15%;
         margin-top: 40px;
         padding: 40px 0;
         width: 390px;
-        // height: 422px;
         box-sizing: border-box;
         background-color: rgba(255, 255, 255, 0.55);
         border-radius: 4px;

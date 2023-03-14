@@ -28,6 +28,11 @@ export const loginStatus = () => {
 export const checkIsFirst = () => {
     return http.get<boolean>('/auth/status');
 };
+
 export const initUser = (params: Login.InitUser) => {
     return http.post(`/auth/init`, params);
+};
+
+export const checkIsDemo = () => {
+    return http.get<boolean>('/auth/demo');
 };

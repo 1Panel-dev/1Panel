@@ -158,6 +158,11 @@
                         </el-button>
                     </el-form-item>
                 </el-form>
+                <div class="demo">
+                    <span v-if="isDemo">
+                        {{ $t('commons.login.username') }}:demo {{ $t('commons.login.password') }}:1panel
+                    </span>
+                </div>
             </div>
         </div>
     </div>
@@ -167,7 +172,7 @@
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import type { ElForm } from 'element-plus';
-import { loginApi, getCaptcha, mfaLoginApi, checkIsFirst, initUser } from '@/api/modules/auth';
+import { loginApi, getCaptcha, mfaLoginApi, checkIsFirst, initUser, checkIsDemo } from '@/api/modules/auth';
 import { GlobalStore } from '@/store';
 import { MenuStore } from '@/store/modules/menu';
 import i18n from '@/lang';
@@ -180,6 +185,7 @@ const menuStore = MenuStore();
 const errAuthInfo = ref(false);
 const errCaptcha = ref(false);
 const errMfaInfo = ref(false);
+const isDemo = ref(false);
 
 const isFirst = ref();
 
@@ -315,6 +321,11 @@ const checkStatus = async () => {
     }
 };
 
+const checkIsSystemDemo = async () => {
+    const res = await checkIsDemo();
+    isDemo.value = res.data;
+};
+
 function checkPassword(rule: any, value: any, callback: any) {
     if (registerForm.password !== registerForm.rePassword) {
         return callback(new Error(i18n.global.t('commons.rule.rePassword')));
@@ -325,6 +336,7 @@ function checkPassword(rule: any, value: any, callback: any) {
 onMounted(() => {
     document.title = globalStore.themeConfig.panelName;
     checkStatus();
+    checkIsSystemDemo();
     document.onkeydown = (e: any) => {
         e = window.event || e;
         if (e.keyCode === 13) {
@@ -351,15 +363,11 @@ onMounted(() => {
     }
 
     .login-title {
-        // margin-top: 50px;
         font-size: 30px;
         letter-spacing: 0;
         text-align: center;
         color: #646a73;
         margin-bottom: 30px;
-        // @media only screen and (max-width: 1280px) {
-        //     margin-top: 20px;
-        // }
     }
     .no-border {
         :deep(.el-input__wrapper) {
@@ -420,6 +428,13 @@ onMounted(() => {
         width: 100%;
         height: 45px;
         margin-top: 10px;
+    }
+
+    .demo {
+        text-align: center;
+        span {
+            color: red;
+        }
     }
 }
 </style>
