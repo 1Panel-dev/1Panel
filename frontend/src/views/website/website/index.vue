@@ -75,17 +75,6 @@
                     >
                         <template #default="{ row }">
                             <el-button link :icon="Promotion" @click="openUrl(row)"></el-button>
-                            <!-- <span>
-                                <el-link
-                                    style="margin-left: 10px"
-                                    type="primary"
-                                    :underline="false"
-                                    @click="openConfig(row.id)"
-                                >
-                                    <MsgInfo :info="row.primaryDomain" width="300" />
-                                </el-link>
-                            </span> -->
-
                             <el-link type="primary" :underline="false" @click="openConfig(row.id)">
                                 <span style="margin-left: 10px">{{ row.primaryDomain }}</span>
                             </el-link>

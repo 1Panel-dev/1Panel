@@ -6,6 +6,10 @@ export const SyncApp = () => {
     return http.post<any>('apps/sync', {});
 };
 
+export const GetAppListUpdate = () => {
+    return http.post<App.AppUpdateRes>('apps/checkupdate', {});
+};
+
 export const SearchApp = (req: App.AppReq) => {
     return http.post<App.AppResPage>('apps/search', req);
 };

@@ -128,3 +128,18 @@ func (b *BaseApi) GetAppTags(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, tags)
 }
+
+// @Tags App
+// @Summary Get app list update
+// @Description 获取应用更新版本
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /apps/checkupdate [get]
+func (b *BaseApi) GetAppListUpdate(c *gin.Context) {
+	res, err := appService.GetAppUpdate()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
