@@ -61,11 +61,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { onBeforeUnmount, ref } from 'vue';
 import { ContainerStats } from '@/api/modules/container';
 import { dateFormatForSecond } from '@/utils/util';
 import VCharts from '@/components/v-charts/index.vue';
-// import * as echarts from 'echarts';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 
@@ -222,6 +221,10 @@ const handleClose = async () => {
     timer = null;
     chartsOption.value = { cpuChart: null, memoryChart: null, ioChart: null, networkChart: null };
 };
+
+onBeforeUnmount(() => {
+    handleClose;
+});
 
 defineExpose({
     acceptParams,
