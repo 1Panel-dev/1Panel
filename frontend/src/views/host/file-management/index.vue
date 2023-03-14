@@ -454,6 +454,7 @@ const openDownload = () => {
         fileDownload.name = selects.value.length > 1 ? getRandomStr(6) : selects.value[0].name;
         downloadRef.value.acceptParams(fileDownload);
     } else {
+        loading.value = true;
         fileDownload.name = selects.value[0].name;
         DownloadFile(fileDownload as File.FileDownload)
             .then((res) => {
