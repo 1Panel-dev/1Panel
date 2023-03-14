@@ -1,9 +1,9 @@
 <template>
-    <div v-loading="loading">
-        <el-drawer v-model="createVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
-            <template #header>
-                <DrawerHeader :header="$t('database.create')" :back="handleClose" />
-            </template>
+    <el-drawer v-model="createVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+        <template #header>
+            <DrawerHeader :header="$t('database.create')" :back="handleClose" />
+        </template>
+        <div v-loading="loading">
             <el-form ref="formRef" label-position="top" :model="form" :rules="rules">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
@@ -28,7 +28,6 @@
 
                         <el-form-item :label="$t('database.permission')" prop="permission">
                             <el-select v-model="form.permission">
-                                <el-option value="localhost" :label="$t('database.permissionLocal')" />
                                 <el-option value="%" :label="$t('database.permissionAll')" />
                                 <el-option value="ip" :label="$t('database.permissionForIP')" />
                             </el-select>
@@ -42,16 +41,19 @@
                     </el-col>
                 </el-row>
             </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="createVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button type="primary" @click="onSubmit(formRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-drawer>
-    </div>
+        </div>
+
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button :disabled="loading" @click="createVisiable = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button :disabled="loading" type="primary" @click="onSubmit(formRef)">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </span>
+        </template>
+    </el-drawer>
 </template>
 
 <script lang="ts" setup>
@@ -94,7 +96,7 @@ const acceptParams = (params: DialogProps): void => {
     form.format = 'utf8mb4';
     form.username = '';
     form.password = '';
-    form.permission = 'localhost';
+    form.permission = '%';
     form.permissionIPs = '';
     form.description = '';
     createVisiable.value = true;
