@@ -20,6 +20,7 @@ func Init() {
 	baseDir := "/opt"
 	port := "9999"
 	mode := ""
+	version := ""
 	fileOp := files.NewFileOp()
 	v := viper.NewWithOptions()
 	v.SetConfigType("yaml")
@@ -38,23 +39,9 @@ func Init() {
 			panic(fmt.Errorf("Fatal error config file: %s \n", err))
 		}
 	} else {
-		stdout, err := cmd.Exec("grep '^BASE_DIR=' /usr/bin/1pctl | cut -d'=' -f2")
-		if err != nil {
-			panic(err)
-		}
-		baseDir = strings.ReplaceAll(stdout, "\n", "")
-		if len(baseDir) == 0 {
-			panic("error `BASE_DIR` find in /usr/bin/1pctl")
-		}
-
-		stdoutPort, err := cmd.Exec("grep '^PANEL_PORT=' /usr/bin/1pctl | cut -d'=' -f2")
-		if err != nil {
-			panic(err)
-		}
-		port = strings.ReplaceAll(stdoutPort, "\n", "")
-		if len(port) == 0 {
-			panic("error `PANEL_PORT` find in /usr/bin/1pctl")
-		}
+		baseDir = loadParams("BASE_DIR")
+		port = loadParams("PANEL_PORT")
+		version = loadParams("ORIGINAL_INSTALLED_VERSION")
 
 		if strings.HasSuffix(baseDir, "/") {
 			baseDir = baseDir[:strings.LastIndex(baseDir, "/")]
@@ -79,6 +66,9 @@ func Init() {
 	if mode == "dev" && fileOp.Stat("/opt/1panel/conf/app.yaml") && serverConfig.System.Port != "" {
 		port = serverConfig.System.Port
 	}
+	if mode == "dev" && fileOp.Stat("/opt/1panel/conf/app.yaml") && serverConfig.System.Version != "" {
+		version = serverConfig.System.Version
+	}
 
 	global.CONF = serverConfig
 	global.CONF.BaseDir = baseDir
@@ -90,5 +80,18 @@ func Init() {
 	global.CONF.System.LogPath = global.CONF.System.DataDir + "/log"
 	global.CONF.System.TmpDir = global.CONF.System.DataDir + "/tmp"
 	global.CONF.System.Port = port
+	global.CONF.System.Version = version
 	global.Viper = v
+}
+
+func loadParams(param string) string {
+	stdout, err := cmd.Execf("grep '^%s=' /usr/bin/1pctl | cut -d'=' -f2", param)
+	if err != nil {
+		panic(err)
+	}
+	baseDir := strings.ReplaceAll(stdout, "\n", "")
+	if len(baseDir) == 0 {
+		panic(fmt.Sprintf("error `%s` find in /usr/bin/1pctl", param))
+	}
+	return baseDir
 }

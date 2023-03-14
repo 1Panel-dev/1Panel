@@ -199,7 +199,6 @@
 
 <script lang="ts" setup>
 import { onMounted, onBeforeUnmount, ref, reactive } from 'vue';
-// import * as echarts from 'echarts';
 import Status from '@/views/home/status/index.vue';
 import App from '@/views/home/app/index.vue';
 import VCharts from '@/components/v-charts/index.vue';
@@ -211,8 +210,6 @@ import { useRouter } from 'vue-router';
 import RouterButton from '@/components/router-button/index.vue';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
-// import { GlobalStore } from '@/store';
-// const globalStore = GlobalStore();
 const router = useRouter();
 
 const statuRef = ref();
@@ -451,7 +448,6 @@ function loadUpTime(uptime: number) {
 const loadData = async () => {
     if (chartOption.value === 'io') {
         chartsOption.value['ioChart'] = {
-            // title: i18n.global.t('home.io'),
             xDatas: timeIODatas.value,
             yDatas: [
                 {
@@ -465,54 +461,8 @@ const loadData = async () => {
             ],
             formatStr: 'MB',
         };
-
-        // let ioReadYDatas = {
-        //     name: i18n.global.t('monitor.read'),
-        //     type: 'line',
-        //     areaStyle: {
-        //         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-        //             {
-        //                 offset: 0,
-        //                 color: 'rgba(27, 143, 60, 1)',
-        //             },
-        //             {
-        //                 offset: 1,
-        //                 color: 'rgba(27, 143, 60, 0)',
-        //             },
-        //         ]),
-        //     },
-        //     data: ioReadBytes.value,
-        //     showSymbol: false,
-        // };
-        // let ioWriteYDatas = {
-        //     name: i18n.global.t('monitor.write'),
-        //     type: 'line',
-        //     areaStyle: {
-        //         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-        //             {
-        //                 offset: 0,
-        //                 color: 'rgba(0, 94, 235, 1)',
-        //             },
-        //             {
-        //                 offset: 1,
-        //                 color: 'rgba(0, 94, 235, 0)',
-        //             },
-        //         ]),
-        //     },
-        //     data: ioWriteBytes.value,
-        //     showSymbol: false,
-        // };
-        // freshChart(
-        //     'ioChart',
-        //     [i18n.global.t('monitor.read'), i18n.global.t('monitor.write')],
-        //     timeIODatas.value,
-        //     [ioReadYDatas, ioWriteYDatas],
-        //     i18n.global.t('home.io'),
-        //     'MB',
-        // );
     } else {
         chartsOption.value['networkChart'] = {
-            // title: i18n.global.t('home.network'),
             xDatas: timeNetDatas.value,
             yDatas: [
                 {
@@ -526,115 +476,8 @@ const loadData = async () => {
             ],
             formatStr: 'KB/s',
         };
-        // let netTxYDatas = {
-        //     name: i18n.global.t('monitor.up'),
-        //     type: 'line',
-        //     areaStyle: {
-        //         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-        //             {
-        //                 offset: 0,
-        //                 color: 'rgba(0, 94, 235, .5)',
-        //             },
-        //             {
-        //                 offset: 1,
-        //                 color: 'rgba(0, 94, 235, 0)',
-        //             },
-        //         ]),
-        //     },
-        //     data: netBytesRecvs.value,
-        //     showSymbol: false,
-        // };
-        // let netRxYDatas = {
-        //     name: i18n.global.t('monitor.down'),
-        //     type: 'line',
-        //     areaStyle: {
-        //         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-        //             {
-        //                 offset: 0,
-        //                 color: 'rgba(27, 143, 60, .5)',
-        //             },
-        //             {
-        //                 offset: 1,
-        //                 color: 'rgba(27, 143, 60, 0)',
-        //             },
-        //         ]),
-        //     },
-        //     data: netBytesSents.value,
-        //     showSymbol: false,
-        // };
-        // freshChart(
-        //     'networkChart',
-        //     [i18n.global.t('monitor.up'), i18n.global.t('monitor.down')],
-        //     timeNetDatas.value,
-        //     [netTxYDatas, netRxYDatas],
-        //     i18n.global.t('home.network'),
-        //     'KB/s',
-        // );
     }
 };
-
-// function freshChart(chartName: string, legendDatas: any, xDatas: any, yDatas: any, yTitle: string, formatStr: string) {
-//     if (isInit.value) {
-//         echarts.init(document.getElementById(chartName) as HTMLElement);
-//         isInit.value = false;
-//     }
-//     let itemChart = echarts.getInstanceByDom(document.getElementById(chartName) as HTMLElement);
-//     const theme = globalStore.$state.themeConfig.theme || 'light';
-//     const option = {
-//         title: [
-//             {
-//                 left: 'center',
-//                 text: yTitle,
-//                 show: false,
-//             },
-//         ],
-//         zlevel: 1,
-//         z: 1,
-//         tooltip: {
-//             trigger: 'axis',
-//             formatter: function (datas: any) {
-//                 let res = datas[0].name + '<br/>';
-//                 for (const item of datas) {
-//                     res += item.marker + ' ' + item.seriesName + '：' + item.data + formatStr + '<br/>';
-//                 }
-//                 return res;
-//             },
-//         },
-//         grid: { left: '7%', right: '7%', bottom: '20%' },
-//         legend: {
-//             data: legendDatas,
-//             right: 10,
-//             itemWidth: 8,
-//             textStyle: {
-//                 color: '#646A73',
-//             },
-//             icon: 'circle',
-//         },
-//         xAxis: { data: xDatas, boundaryGap: false },
-//         yAxis: {
-//             name: '( ' + formatStr + ' )',
-//             splitLine: {
-//                 //分隔辅助线
-//                 lineStyle: {
-//                     type: 'dashed', //线的类型 虚线0
-//                     opacity: theme === 'dark' ? 0.1 : 1, //透明度
-//                 },
-//             },
-//         },
-//         series: yDatas,
-//         dataZoom: [{ startValue: xDatas[0] }],
-//     };
-//     itemChart?.setOption(option, true);
-// }
-
-// function changeChartSize() {
-//     if (document.getElementById('ioChart') != null) {
-//         echarts.getInstanceByDom(document.getElementById('ioChart') as HTMLElement)?.resize();
-//     }
-//     if (document.getElementById('networkChart') != null) {
-//         echarts.getInstanceByDom(document.getElementById('networkChart') as HTMLElement)?.resize();
-//     }
-// }
 
 onMounted(() => {
     onLoadNetworkOptions();
@@ -645,7 +488,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
     clearInterval(Number(timer));
     timer = null;
-    // window.removeEventListener('resize', changeChartSize);
 });
 </script>
 
