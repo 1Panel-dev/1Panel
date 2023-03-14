@@ -403,6 +403,7 @@ const onHandle = async (row: Cronjob.CronjobInfo) => {
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            searchInfo.pageSize = searchInfo.pageSize * searchInfo.page;
             searchInfo.page = 1;
             records.value = [];
             search();
@@ -457,8 +458,8 @@ const search = async () => {
 
 const onRefresh = () => {
     records.value = [];
+    searchInfo.pageSize = searchInfo.pageSize * searchInfo.page;
     searchInfo.page = 1;
-    searchInfo.pageSize = 8;
     search();
 };
 
