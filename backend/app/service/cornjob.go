@@ -178,24 +178,27 @@ func (u *CronjobService) Create(cronjobDto dto.CronjobCreate) error {
 	cronjob.Spec = loadSpec(cronjob)
 
 	global.LOG.Infof("create cronjob %s successful, spec: %s", cronjob.Name, cronjob.Spec)
-	if err := u.StartJob(&cronjob); err != nil {
+	entryID, err := u.StartJob(&cronjob)
+	if err != nil {
 		return err
 	}
+	cronjob.EntryID = uint64(entryID)
 	if err := cronjobRepo.Create(&cronjob); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *CronjobService) StartJob(cronjob *model.Cronjob) error {
-	global.Cron.Remove(cron.EntryID(cronjob.EntryID))
-	global.LOG.Infof("stop cronjob entryID: %d", cronjob.EntryID)
+func (u *CronjobService) StartJob(cronjob *model.Cronjob) (int, error) {
+	if cronjob.EntryID != 0 {
+		global.Cron.Remove(cron.EntryID(cronjob.EntryID))
+	}
 	entryID, err := u.AddCronJob(cronjob)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	_ = cronjobRepo.Update(cronjob.ID, map[string]interface{}{"entry_id": entryID})
-	return nil
+	global.LOG.Debug(global.Cron.Entries())
+	return entryID, nil
 }
 
 func (u *CronjobService) Delete(ids []uint) error {
@@ -225,12 +228,15 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 		return constant.ErrRecordNotFound
 	}
 	cronjob.EntryID = cronModel.EntryID
+	cronjob.Type = cronModel.Type
 	cronjob.Spec = loadSpec(cronjob)
-	if err := u.StartJob(&cronjob); err != nil {
+	newEntryID, err := u.StartJob(&cronjob)
+	if err != nil {
 		return err
 	}
 
 	upMap := make(map[string]interface{})
+	upMap["entry_id"] = newEntryID
 	upMap["name"] = req.Name
 	upMap["script"] = req.Script
 	upMap["spec_type"] = req.SpecType
@@ -254,15 +260,20 @@ func (u *CronjobService) UpdateStatus(id uint, status string) error {
 	if cronjob.ID == 0 {
 		return errors.WithMessage(constant.ErrRecordNotFound, "record not found")
 	}
+	var (
+		entryID int
+		err     error
+	)
 	if status == constant.StatusEnable {
-		if err := u.StartJob(&cronjob); err != nil {
+		entryID, err = u.StartJob(&cronjob)
+		if err != nil {
 			return err
 		}
 	} else {
 		global.Cron.Remove(cron.EntryID(cronjob.EntryID))
 		global.LOG.Infof("stop cronjob entryID: %d", cronjob.EntryID)
 	}
-	return cronjobRepo.Update(cronjob.ID, map[string]interface{}{"status": status})
+	return cronjobRepo.Update(cronjob.ID, map[string]interface{}{"status": status, "entry_id": entryID})
 }
 
 func (u *CronjobService) AddCronJob(cronjob *model.Cronjob) (int, error) {
