@@ -94,7 +94,6 @@
 import { GetApp, GetAppDetail } from '@/api/modules/app';
 import LayoutContent from '@/layout/layout-content.vue';
 import MdEditor from 'md-editor-v3';
-import 'md-editor-v3/lib/style.css';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Install from './install/index.vue';
