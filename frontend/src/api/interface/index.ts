@@ -32,10 +32,3 @@ export interface DescriptionUpdate {
     id: number;
     description: string;
 }
-
-// * 文件上传模块
-export namespace Upload {
-    export interface ResFileUrl {
-        fileUrl: string;
-    }
-}
