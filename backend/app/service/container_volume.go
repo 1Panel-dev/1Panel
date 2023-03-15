@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"sort"
 	"strings"
 	"time"
@@ -122,12 +121,8 @@ func (u *ContainerService) CreateVolume(req dto.VolumeCreat) error {
 		DriverOpts: stringsToMap(req.Options),
 		Labels:     stringsToMap(req.Labels),
 	}
-	stat, err := client.VolumeCreate(context.TODO(), options)
-	if err != nil {
+	if _, err := client.VolumeCreate(context.TODO(), options); err != nil {
 		return err
 	}
-	// if len(stat.CreatedAt) != 0 {
-	fmt.Println(stat)
-	// }
 	return nil
 }

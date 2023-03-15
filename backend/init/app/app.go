@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"path"
 
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -35,12 +34,12 @@ func createDir(fileOp files.FileOp, dirPath string) {
 func createDefaultDockerNetwork() {
 	cli, err := docker.NewClient()
 	if err != nil {
-		fmt.Println("init docker client error", err.Error())
+		global.LOG.Errorf("init docker client error", err.Error())
 		return
 	}
 	if !cli.NetworkExist("1panel-network") {
 		if err := cli.CreateNetwork("1panel-network"); err != nil {
-			fmt.Println("init docker client error", err.Error())
+			global.LOG.Errorf("init docker client error", err.Error())
 			return
 		}
 	}

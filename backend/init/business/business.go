@@ -1,7 +1,6 @@
 package business
 
 import (
-	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/service"
 	"github.com/1Panel-dev/1Panel/backend/global"
 )
@@ -13,7 +12,6 @@ func Init() {
 		return
 	}
 	if setting.AppStoreVersion != "" {
-		fmt.Println(setting.AppStoreVersion)
 		global.LOG.Info("do not sync")
 		return
 	}

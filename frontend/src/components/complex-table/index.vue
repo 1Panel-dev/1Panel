@@ -53,7 +53,6 @@ defineProps({
 const emit = defineEmits(['search', 'update:selects']);
 const condition = ref({});
 function search(conditions: any, e: any) {
-    console.log(conditions);
     if (conditions) {
         condition.value = conditions;
     }

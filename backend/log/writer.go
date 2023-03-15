@@ -1,9 +1,6 @@
 package log
 
 import (
-	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"io/ioutil"
 	"log"
 	"os"
@@ -14,6 +11,9 @@ import (
 	"sync/atomic"
 	"time"
 	"unsafe"
+
+	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 )
 
 type Writer struct {
@@ -261,7 +261,6 @@ func (w *Writer) CompressFile(logFile string) error {
 	comFileName := path.Base(logFile) + ".gz"
 	filePath := path.Dir(logFile)
 
-	fmt.Println(path.Dir(logFile))
 	if err := op.Compress([]string{logFile}, filePath, comFileName, files.Gz); err != nil {
 		return err
 	}

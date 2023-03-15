@@ -3,6 +3,14 @@ package v1
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"path"
+	"path/filepath"
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
@@ -14,13 +22,6 @@ import (
 	websocket2 "github.com/1Panel-dev/1Panel/backend/utils/websocket"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"path"
-	"path/filepath"
-	"strconv"
-	"strings"
 )
 
 // @Tags File
@@ -584,7 +585,6 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 	if chunkIndex+1 == chunkCount {
 		err = mergeChunks(filename, fileDir, c.PostForm("path"), chunkCount)
 		if err != nil {
-			fmt.Println(err.Error())
 			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrAppDelete, err)
 			return
 		}

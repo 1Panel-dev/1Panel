@@ -122,7 +122,7 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 		tempPath := fmt.Sprintf("%s/download/%s", constant.DataDir, commonDir)
 		if _, err := os.Stat(tempPath); err != nil && os.IsNotExist(err) {
 			if err = os.MkdirAll(tempPath, os.ModePerm); err != nil {
-				fmt.Println(err)
+				global.LOG.Errorf("mkdir %s failed, err: %v", tempPath, err)
 			}
 		}
 

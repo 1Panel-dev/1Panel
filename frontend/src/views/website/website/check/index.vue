@@ -44,7 +44,6 @@ let items = ref([]);
 const acceptParams = async (props: InstallRrops) => {
     items.value = props.items;
     open.value = true;
-    console.log(items);
 };
 
 const handleClose = () => {
