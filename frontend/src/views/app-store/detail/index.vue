@@ -5,7 +5,7 @@
                 <el-row :gutter="20">
                     <div>
                         <el-col :span="3">
-                            <el-avatar shape="square" :size="180" :src="'data:image/png;base64,' + app.icon" />
+                            <el-avatar shape="square" :size="180" :src="app.icon" />
                         </el-col>
                     </div>
                     <el-col :span="18">
@@ -120,6 +120,7 @@ const getApp = async () => {
     try {
         const res = await GetApp(props.appKey);
         app.value = res.data;
+        app.value.icon = 'data:image/png;base64,' + res.data.icon;
         version.value = app.value.versions[0];
         getDetail(app.value.id, version.value);
     } finally {
