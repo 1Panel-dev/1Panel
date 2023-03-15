@@ -2,6 +2,7 @@ package v1
 
 import (
 	"bufio"
+	"encoding/base64"
 	"fmt"
 	"os"
 
@@ -106,6 +107,15 @@ func (b *BaseApi) ChangeRedisPassword(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
+	if len(req.Value) != 0 {
+		value, err := base64.StdEncoding.DecodeString(req.Value)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.Value = string(value)
+	}
+
 	if err := redisService.ChangePassword(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

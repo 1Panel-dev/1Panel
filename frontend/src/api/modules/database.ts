@@ -1,4 +1,6 @@
 import http from '@/api';
+import { deepCopy } from '@/utils/util';
+import { Base64 } from 'js-base64';
 import { SearchWithPage, ResPage, DescriptionUpdate } from '../interface';
 import { Database } from '../interface/database';
 
@@ -7,13 +9,21 @@ export const searchMysqlDBs = (params: SearchWithPage) => {
 };
 
 export const addMysqlDB = (params: Database.MysqlDBCreate) => {
-    return http.post(`/databases`, params);
+    let reqest = deepCopy(params) as Database.MysqlDBCreate;
+    if (reqest.password) {
+        reqest.password = Base64.encode(reqest.password);
+    }
+    return http.post(`/databases`, reqest);
 };
 export const updateMysqlAccess = (params: Database.ChangeInfo) => {
     return http.post(`/databases/change/access`, params);
 };
 export const updateMysqlPassword = (params: Database.ChangeInfo) => {
-    return http.post(`/databases/change/password`, params);
+    let reqest = deepCopy(params) as Database.ChangeInfo;
+    if (reqest.value) {
+        reqest.value = Base64.encode(reqest.value);
+    }
+    return http.post(`/databases/change/password`, reqest);
 };
 export const updateMysqlDescription = (params: DescriptionUpdate) => {
     return http.post(`/databases/description/update`, params);
@@ -58,7 +68,11 @@ export const redisPersistenceConf = () => {
     return http.get<Database.RedisPersistenceConf>(`/databases/redis/persistence/conf`);
 };
 export const changeRedisPassword = (params: Database.ChangeInfo) => {
-    return http.post(`/databases/redis/password`, params);
+    let reqest = deepCopy(params) as Database.ChangeInfo;
+    if (reqest.value) {
+        reqest.value = Base64.encode(reqest.value);
+    }
+    return http.post(`/databases/redis/password`, reqest);
 };
 export const updateRedisPersistenceConf = (params: Database.RedisConfPersistenceUpdate) => {
     return http.post(`/databases/redis/persistence/update`, params);
