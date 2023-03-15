@@ -1,0 +1,17 @@
+on:
+  push:
+    branches:    
+      - 'pr@**'
+      - 'repr@**'
+
+name: 针对特定分支名自动创建 PR
+
+jobs:
+  generic_handler:
+    name: 自动创建 PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create pull request
+        uses: jumpserver/action-generic-handler@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUBTOKEN }}
