@@ -39,7 +39,7 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 **学习资料**
 
 - [在线文档](https://1panel.cn/docs/)
-- [入门视频](https://1panel.cn/video.html)
+- [教学视频](https://space.bilibili.com/510493147/channel/collectiondetail?sid=1199760)
 
 ## 社区
 
