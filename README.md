@@ -30,10 +30,10 @@
 
 **一键安装**
 
-以 root 用户执行如下命令一键安装 1Panel:
+执行如下命令一键安装 1Panel:
 
 ```sh
-curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && sh quick_start.sh
+curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && sudo bash quick_start.sh
 ```
 
 **学习资料**
