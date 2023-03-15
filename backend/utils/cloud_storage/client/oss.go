@@ -77,7 +77,7 @@ func (oss ossClient) Upload(src, target string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	err = bucket.PutObjectFromFile(target, src)
+	err = bucket.UploadFile(target, src, 200*1024*1024, osssdk.Routines(5), osssdk.Checkpoint(true, ""))
 	if err != nil {
 		return false, err
 	}
@@ -89,7 +89,7 @@ func (oss ossClient) Download(src, target string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	err = bucket.GetObjectToFile(src, target)
+	err = bucket.DownloadFile(src, target, 200*1024*1024, osssdk.Routines(5), osssdk.Checkpoint(true, ""))
 	if err != nil {
 		return false, err
 	}
