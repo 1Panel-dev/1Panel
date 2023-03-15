@@ -1,6 +1,6 @@
 on: pull_request
 
-name: MeterSphere 通用 PR 处理
+name: 1Panel 通用 PR 处理
 
 permissions:
   pull-requests: write
