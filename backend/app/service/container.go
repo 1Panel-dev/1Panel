@@ -98,6 +98,10 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 		if _, ok := container.Labels[composeProjectLabel]; ok {
 			IsFromCompose = true
 		}
+		IsFromApp := false
+		if created, ok := container.Labels[composeCreatedBy]; ok && created == "Apps" {
+			IsFromApp = true
+		}
 		backDatas = append(backDatas, dto.ContainerInfo{
 			ContainerID:   container.ID,
 			CreateTime:    time.Unix(container.Created, 0).Format("2006-01-02 15:04:05"),
@@ -106,6 +110,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 			ImageName:     container.Image,
 			State:         container.State,
 			RunTime:       container.Status,
+			IsFromApp:     IsFromApp,
 			IsFromCompose: IsFromCompose,
 		})
 	}

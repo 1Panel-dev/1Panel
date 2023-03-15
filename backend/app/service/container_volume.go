@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/docker/docker/api/types"
@@ -95,6 +96,9 @@ func (u *ContainerService) DeleteVolume(req dto.BatchDelete) error {
 	}
 	for _, id := range req.Names {
 		if err := client.VolumeRemove(context.TODO(), id, true); err != nil {
+			if strings.Contains(err.Error(), "volume is in use") {
+				return buserr.New(constant.ErrInUsed)
+			}
 			return err
 		}
 	}

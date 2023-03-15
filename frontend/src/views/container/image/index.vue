@@ -193,6 +193,7 @@ const buttons = [
         click: async (row: Container.ImageInfo) => {
             if (row.tags.length <= 1) {
                 await useDeleteData(imageRemove, { names: [row.id] }, 'commons.msg.delete');
+                search();
                 return;
             }
             let params = {

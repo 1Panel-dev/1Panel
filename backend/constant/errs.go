@@ -95,3 +95,8 @@ var (
 var (
 	ErrTypeOfRedis = "ErrTypeOfRedis"
 )
+
+//container
+var (
+	ErrInUsed = "ErrInUsed"
+)

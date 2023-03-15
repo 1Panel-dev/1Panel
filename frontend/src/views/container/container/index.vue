@@ -252,15 +252,18 @@ const checkStatus = (operation: string) => {
     }
 };
 const onOperate = async (operation: string) => {
-    ElMessageBox.confirm(
-        i18n.global.t('container.operatorHelper', [i18n.global.t('container.' + operation)]),
-        i18n.global.t('container.' + operation),
-        {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-            type: 'info',
-        },
-    ).then(() => {
+    let msg = i18n.global.t('container.operatorHelper', [i18n.global.t('container.' + operation)]);
+    for (const item of selects.value) {
+        if (item.isFromApp) {
+            msg = i18n.global.t('container.operatorAppHelper', [i18n.global.t('container.' + operation)]);
+            break;
+        }
+    }
+    ElMessageBox.confirm(msg, i18n.global.t('container.' + operation), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(() => {
         let ps = [];
         for (const item of selects.value) {
             const param = {
