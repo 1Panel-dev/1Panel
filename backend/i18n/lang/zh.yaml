@@ -53,3 +53,6 @@ ErrDatabaseIsExist: "当前数据库已存在，请重新输入"
 
 #redis
 ErrTypeOfRedis: "恢复文件类型与当前持久化方式不符，请修改后重试"
+
+#container 
+ErrInUsed: "该删除对象正被使用，无法删除"
