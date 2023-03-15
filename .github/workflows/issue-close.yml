@@ -1,0 +1,16 @@
+name: Issue Close Check
+
+on:
+  issues:
+    types: [closed]
+
+jobs:
+  issue-close-remove-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove labels
+        uses: actions-cool/issues-helper@v2
+        if: ${{ !github.event.issue.pull_request }}
+        with:
+          actions: 'remove-labels'
+          labels: '状态:待处理'

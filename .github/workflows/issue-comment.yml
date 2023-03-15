@@ -1,0 +1,38 @@
+on:
+  issue_comment:
+    types: [created]
+
+name: Add issues workflow labels
+
+jobs:
+  add-label-if-is-author:
+    runs-on: ubuntu-latest
+    if: ${{ (github.event.issue.user.id == github.event.comment.user.id) && (!github.event.issue.pull_request) }}
+    steps:
+      - name: Add require handle label
+        uses: actions-cool/issues-helper@v2
+        with:
+          actions: 'add-labels'
+          labels: '状态:待处理'
+
+      - name: Remove require reply label
+        uses: actions-cool/issues-helper@v2
+        with:
+          actions: 'remove-labels'
+          labels: '状态:待用户反馈'
+
+  add-label-if-not-author:
+    runs-on: ubuntu-latest
+    if: ${{ (github.event.issue.user.id != github.event.comment.user.id) && (!github.event.issue.pull_request) && (github.event.issue.state == 'open') }}
+    steps:
+      - name: Add require replay label
+        uses: actions-cool/issues-helper@v2
+        with:
+          actions: 'add-labels'
+          labels: '状态:待用户反馈'
+
+      - name: Remove require handle label
+        uses: actions-cool/issues-helper@v2
+        with:
+          actions: 'remove-labels'
+          labels: '状态:待处理'
