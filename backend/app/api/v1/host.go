@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"encoding/base64"
+
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -29,6 +31,23 @@ func (b *BaseApi) CreateHost(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
+	if req.AuthMode == "password" && len(req.Password) != 0 {
+		password, err := base64.StdEncoding.DecodeString(req.Password)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.Password = string(password)
+	}
+	if req.AuthMode == "key" && len(req.PrivateKey) != 0 {
+		privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.PrivateKey = string(privateKey)
+	}
+
 	host, err := hostService.Create(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -54,6 +73,22 @@ func (b *BaseApi) TestByInfo(c *gin.Context) {
 	if err := global.VALID.Struct(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
+	}
+	if req.AuthMode == "password" && len(req.Password) != 0 {
+		password, err := base64.StdEncoding.DecodeString(req.Password)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.Password = string(password)
+	}
+	if req.AuthMode == "key" && len(req.PrivateKey) != 0 {
+		privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.PrivateKey = string(privateKey)
 	}
 
 	var connInfo ssh.ConnInfo
@@ -210,6 +245,22 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 	if err := global.VALID.Struct(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
+	}
+	if req.AuthMode == "password" && len(req.Password) != 0 {
+		password, err := base64.StdEncoding.DecodeString(req.Password)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.Password = string(password)
+	}
+	if req.AuthMode == "key" && len(req.PrivateKey) != 0 {
+		privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.PrivateKey = string(privateKey)
 	}
 
 	upMap := make(map[string]interface{})

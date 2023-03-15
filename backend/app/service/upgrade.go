@@ -128,6 +128,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		}
 
 		global.LOG.Info("upgrade successful!")
+		go writeLogs(req.Version)
 		_ = settingRepo.Update("SystemVersion", req.Version)
 		_ = settingRepo.Update("SystemStatus", "Free")
 		_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")

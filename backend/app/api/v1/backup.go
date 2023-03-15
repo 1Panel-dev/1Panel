@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"encoding/base64"
+
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -27,6 +29,23 @@ func (b *BaseApi) CreateBackup(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
+	if len(req.Credential) != 0 {
+		credential, err := base64.StdEncoding.DecodeString(req.Credential)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.Credential = string(credential)
+	}
+	if len(req.AccessKey) != 0 {
+		accessKey, err := base64.StdEncoding.DecodeString(req.AccessKey)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.AccessKey = string(accessKey)
+	}
+
 	if err := backupService.Create(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -52,6 +71,23 @@ func (b *BaseApi) ListBuckets(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
+	if len(req.Credential) != 0 {
+		credential, err := base64.StdEncoding.DecodeString(req.Credential)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.Credential = string(credential)
+	}
+	if len(req.AccessKey) != 0 {
+		accessKey, err := base64.StdEncoding.DecodeString(req.AccessKey)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.AccessKey = string(accessKey)
+	}
+
 	buckets, err := backupService.GetBuckets(req)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
@@ -188,6 +224,23 @@ func (b *BaseApi) UpdateBackup(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
+	if len(req.Credential) != 0 {
+		credential, err := base64.StdEncoding.DecodeString(req.Credential)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.Credential = string(credential)
+	}
+	if len(req.AccessKey) != 0 {
+		accessKey, err := base64.StdEncoding.DecodeString(req.AccessKey)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
+		req.AccessKey = string(accessKey)
+	}
+
 	if err := backupService.Update(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

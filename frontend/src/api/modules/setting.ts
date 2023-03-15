@@ -1,4 +1,6 @@
 import http from '@/api';
+import { deepCopy } from '@/utils/util';
+import { Base64 } from 'js-base64';
 import { ResPage, SearchWithPage, DescriptionUpdate } from '../interface';
 import { Backup } from '../interface/backup';
 import { Setting } from '../interface/setting';
@@ -77,16 +79,37 @@ export const getFilesFromBackup = (type: string) => {
     return http.post<Array<any>>(`/settings/backup/search/files`, { type: type });
 };
 export const addBackup = (params: Backup.BackupOperate) => {
-    return http.post<Backup.BackupOperate>(`/settings/backup`, params);
+    let reqest = deepCopy(params) as Backup.BackupOperate;
+    if (reqest.accessKey) {
+        reqest.accessKey = Base64.encode(reqest.accessKey);
+    }
+    if (reqest.credential) {
+        reqest.credential = Base64.encode(reqest.credential);
+    }
+    return http.post<Backup.BackupOperate>(`/settings/backup`, reqest);
 };
 export const editBackup = (params: Backup.BackupOperate) => {
-    return http.post(`/settings/backup/update`, params);
+    let reqest = deepCopy(params) as Backup.BackupOperate;
+    if (reqest.accessKey) {
+        reqest.accessKey = Base64.encode(reqest.accessKey);
+    }
+    if (reqest.credential) {
+        reqest.credential = Base64.encode(reqest.credential);
+    }
+    return http.post(`/settings/backup/update`, reqest);
 };
 export const deleteBackup = (params: { ids: number[] }) => {
     return http.post(`/settings/backup/del`, params);
 };
 export const listBucket = (params: Backup.ForBucket) => {
-    return http.post(`/settings/backup/buckets`, params);
+    let reqest = deepCopy(params) as Backup.BackupOperate;
+    if (reqest.accessKey) {
+        reqest.accessKey = Base64.encode(reqest.accessKey);
+    }
+    if (reqest.credential) {
+        reqest.credential = Base64.encode(reqest.credential);
+    }
+    return http.post(`/settings/backup/buckets`, reqest);
 };
 
 // snapshot

@@ -559,7 +559,7 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 	filename := c.PostForm("filename")
 	fileDir := filepath.Join(global.CONF.System.DataDir, "upload", filename)
 
-	os.MkdirAll(fileDir, 0755)
+	_ = os.MkdirAll(fileDir, 0755)
 	filePath := filepath.Join(fileDir, filename)
 
 	emptyFile, err := os.Create(filePath)

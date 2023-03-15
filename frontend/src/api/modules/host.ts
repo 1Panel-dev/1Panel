@@ -3,6 +3,8 @@ import { ResPage } from '../interface';
 import { Command } from '../interface/command';
 import { Group } from '../interface/group';
 import { Host } from '../interface/host';
+import { Base64 } from 'js-base64';
+import { deepCopy } from '@/utils/util';
 
 export const searchHosts = (params: Host.SearchWithPage) => {
     return http.post<ResPage<Host.Host>>(`/hosts/search`, params);
@@ -14,16 +16,37 @@ export const getHostInfo = (id: number) => {
     return http.get<Host.Host>(`/hosts/` + id);
 };
 export const addHost = (params: Host.HostOperate) => {
-    return http.post<Host.HostOperate>(`/hosts`, params);
+    let reqest = deepCopy(params) as Host.HostOperate;
+    if (reqest.password) {
+        reqest.password = Base64.encode(reqest.password);
+    }
+    if (reqest.privateKey) {
+        reqest.privateKey = Base64.encode(reqest.privateKey);
+    }
+    return http.post<Host.HostOperate>(`/hosts`, reqest);
 };
 export const testByInfo = (params: Host.HostConnTest) => {
-    return http.post<boolean>(`/hosts/test/byinfo`, params);
+    let reqest = deepCopy(params) as Host.HostOperate;
+    if (reqest.password) {
+        reqest.password = Base64.encode(reqest.password);
+    }
+    if (reqest.privateKey) {
+        reqest.privateKey = Base64.encode(reqest.privateKey);
+    }
+    return http.post<boolean>(`/hosts/test/byinfo`, reqest);
 };
 export const testByID = (id: number) => {
     return http.post<boolean>(`/hosts/test/byid/${id}`);
 };
 export const editHost = (params: Host.HostOperate) => {
-    return http.post(`/hosts/update`, params);
+    let reqest = deepCopy(params) as Host.HostOperate;
+    if (reqest.password) {
+        reqest.password = Base64.encode(reqest.password);
+    }
+    if (reqest.privateKey) {
+        reqest.privateKey = Base64.encode(reqest.privateKey);
+    }
+    return http.post(`/hosts/update`, reqest);
 };
 export const editHostGroup = (params: Host.GroupChange) => {
     return http.post(`/hosts/update/group`, params);
