@@ -407,6 +407,8 @@ export default {
         createContainer: 'Create container',
         containerList: 'Container list',
         operatorHelper: '{0} will be performed on the selected container. Do you want to continue?',
+        operatorAppHelper:
+            'There is a container from the App store. The {0} operation may affect the normal use of this service. Are you sure?',
         start: 'Start',
         stop: 'Stop',
         restart: 'Restart',

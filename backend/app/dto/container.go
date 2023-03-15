@@ -22,6 +22,7 @@ type ContainerInfo struct {
 	State       string `json:"state"`
 	RunTime     string `json:"runTime"`
 
+	IsFromApp     bool `json:"isFromApp"`
 	IsFromCompose bool `json:"isFromCompose"`
 }
 

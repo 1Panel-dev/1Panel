@@ -43,7 +43,8 @@ export namespace Container {
         state: string;
         runTime: string;
 
-        isFromCompose: string;
+        isFromApp: boolean;
+        isFromCompose: boolean;
     }
     export interface ContainerStats {
         cpuPercent: number;

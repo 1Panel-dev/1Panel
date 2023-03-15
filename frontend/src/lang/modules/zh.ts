@@ -419,6 +419,7 @@ export default {
         createContainer: '创建容器',
         containerList: '容器列表',
         operatorHelper: '将对选中容器进行 {0} 操作，是否继续？',
+        operatorAppHelper: '存在来源于应用商店的容器，{0} 操作可能会影响到该服务的正常使用，是否确认？',
         start: '启动',
         stop: '停止',
         restart: '重启',
