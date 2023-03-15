@@ -306,7 +306,6 @@ const buttons = [
     {
         label: i18n.global.t('container.rename'),
         click: (row: Container.ContainerInfo) => {
-            console.log(row.name);
             dialogReNameRef.value!.acceptParams({ container: row.name });
         },
         disabled: (row: any) => {

@@ -244,7 +244,6 @@ const onChangePort = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     const result = await formEl.validateField('port', callback);
     if (!result) {
-        console.log('daqdwq');
         return;
     }
     let params = {

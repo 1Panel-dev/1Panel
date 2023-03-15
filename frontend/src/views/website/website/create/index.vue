@@ -261,7 +261,6 @@ const changeType = (type: string) => {
     if (type == 'deployemnt') {
         if (appInstalles.value && appInstalles.value.length > 0) {
             website.value.appInstallId = appInstalles.value[0].id;
-            console.log(website.value);
         }
     } else {
         website.value.appInstallId = undefined;

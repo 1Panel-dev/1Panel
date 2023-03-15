@@ -134,7 +134,7 @@ func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) 
 	tempPath := fmt.Sprintf("%sdownload%s", constant.DataDir, info.FileDir)
 	if _, err := os.Stat(tempPath); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(tempPath, os.ModePerm); err != nil {
-			fmt.Println(err)
+			global.LOG.Errorf("mkdir %s failed, err: %v", tempPath, err)
 		}
 	}
 	targetPath := tempPath + info.FileName

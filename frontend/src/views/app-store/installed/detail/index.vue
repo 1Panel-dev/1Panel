@@ -101,7 +101,6 @@ const get = async () => {
         if (res.data && res.data.length > 0) {
             res.data.forEach((d) => {
                 if (d.edit) {
-                    console.log(d.edit);
                     canEdit.value = true;
                 }
                 let value = d.value;

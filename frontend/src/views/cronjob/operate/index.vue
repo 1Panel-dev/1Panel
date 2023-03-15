@@ -401,7 +401,6 @@ function hasScript() {
 
 function checkScript() {
     let row = dialogData.value.rowData;
-    console.log(row.specType, row.week, row.day, row.hour, row.minute);
     switch (row.specType) {
         case 'perMonth':
             return row.day > 0 && row.day < 32 && row.hour >= 0 && row.hour < 24 && row.minute >= 0 && row.minute < 60;

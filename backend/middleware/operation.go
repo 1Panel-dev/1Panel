@@ -96,7 +96,6 @@ func OperationLog() gin.HandlerFunc {
 						var names []string
 						if funcs.IsList {
 							sql := fmt.Sprintf("SELECT %s FROM %s where %s in (?);", funcs.OutputColume, funcs.DB, funcs.InputColume)
-							fmt.Println(value)
 							_ = global.DB.Raw(sql, value).Scan(&names)
 						} else {
 							_ = global.DB.Raw(fmt.Sprintf("select %s from %s where %s = ?;", funcs.OutputColume, funcs.DB, funcs.InputColume), value).Scan(&names)

@@ -272,7 +272,6 @@ const onSubmitSave = async () => {
 const loadDockerConf = async () => {
     const res = await loadDaemonJsonFile();
     if (res.data === 'daemon.json is not find in path') {
-        console.log(res.data);
         showDaemonJsonAlert.value = true;
     } else {
         dockerConf.value = res.data;
