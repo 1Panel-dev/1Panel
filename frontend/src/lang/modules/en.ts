@@ -996,7 +996,7 @@ export default {
         addAccount: 'Add new account',
         acmeAccount: 'Acme Account',
         provider: 'Verification method',
-        dnsCommon: 'Manual resolution',
+        dnsManual: 'Manual resolution',
         expireDate: 'Expiration Time',
         brand: 'Issuer',
         deploySSL: 'Deployment',
