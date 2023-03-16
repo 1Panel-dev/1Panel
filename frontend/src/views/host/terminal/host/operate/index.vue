@@ -79,7 +79,7 @@ import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { addHost, editHost, testByInfo, GetGroupList } from '@/api/modules/host';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 
@@ -165,7 +165,7 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
                 if (res.data) {
                     MsgSuccess(i18n.global.t('terminal.connTestOk'));
                 } else {
-                    MsgSuccess(i18n.global.t('terminal.connTestFailed'));
+                    MsgError(i18n.global.t('terminal.connTestFailed'));
                 }
             });
         }

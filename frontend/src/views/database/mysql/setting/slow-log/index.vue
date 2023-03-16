@@ -13,7 +13,7 @@
                 <div style="float: left">
                     <el-input type="number" v-model.number="variables.long_query_time" />
                 </div>
-                <el-button style="float: left; margin-left: 10px" @click="openSlowLogs">
+                <el-button style="float: left; margin-left: 10px" @click="changeSlowLogs">
                     {{ $t('commons.button.save') }}
                 </el-button>
                 <div style="float: left; margin-left: 20px">
@@ -56,7 +56,7 @@ import { updateMysqlVariables } from '@/api/modules/database';
 import { dateFormatForName } from '@/utils/util';
 import i18n from '@/lang';
 import { loadBaseDir } from '@/api/modules/setting';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
 
 const extensions = [javascript(), oneDark];
 const slowLogs = ref();
@@ -65,7 +65,7 @@ const handleReady = (payload) => {
     view.value = payload.view;
 };
 const detailShow = ref();
-const isOnEdit = ref();
+const currentStatus = ref();
 
 const confirmDialogRef = ref();
 
@@ -88,17 +88,18 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     variables.slow_query_log = params.variables.slow_query_log;
     variables.long_query_time = Number(params.variables.long_query_time);
 
-    const pathRes = await loadBaseDir();
-    let path = `${pathRes.data}/apps/mysql/${mysqlName.value}/data/1Panel-slow.log`;
     if (variables.slow_query_log === 'ON') {
+        currentStatus.value = true;
         detailShow.value = true;
+        const pathRes = await loadBaseDir();
+        let path = `${pathRes.data}/apps/mysql/${mysqlName.value}/data/1Panel-slow.log`;
         loadMysqlSlowlogs(path);
+        timer = setInterval(() => {
+            if (variables.slow_query_log === 'ON' && isWatch.value) {
+                loadMysqlSlowlogs(path);
+            }
+        }, 1000 * 5);
     }
-    timer = setInterval(() => {
-        if (variables.slow_query_log === 'ON' && isWatch.value) {
-            loadMysqlSlowlogs(path);
-        }
-    }, 1000 * 5);
     oldVariables.value = { ...variables };
 };
 const emit = defineEmits(['loading']);
@@ -106,11 +107,6 @@ const emit = defineEmits(['loading']);
 const handleSlowLogs = async () => {
     if (variables.slow_query_log === 'ON') {
         detailShow.value = true;
-        isOnEdit.value = true;
-        return;
-    }
-    if (isOnEdit.value) {
-        detailShow.value = false;
         return;
     }
     let params = {
@@ -121,7 +117,7 @@ const handleSlowLogs = async () => {
     confirmDialogRef.value!.acceptParams(params);
 };
 
-const openSlowLogs = () => {
+const changeSlowLogs = () => {
     if (!(variables.long_query_time > 0 && variables.long_query_time <= 600)) {
         MsgError(i18n.global.t('database.thresholdRangeHelper'));
         return;
@@ -135,7 +131,7 @@ const openSlowLogs = () => {
 };
 
 const onCancle = async () => {
-    variables.slow_query_log = variables.slow_query_log === 'ON' ? 'OFF' : 'ON';
+    variables.slow_query_log = currentStatus.value ? 'ON' : 'OFF';
 };
 
 const onSave = async () => {
@@ -151,10 +147,9 @@ const onSave = async () => {
     await updateMysqlVariables(param)
         .then(() => {
             emit('loading', false);
-            isOnEdit.value = false;
-            if (variables.slow_query_log !== 'ON') {
-                detailShow.value = false;
-            }
+            currentStatus.value = variables.slow_query_log === 'ON';
+            detailShow.value = variables.slow_query_log === 'ON';
+            oldVariables.value.slow_query_log = variables.slow_query_log;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
@@ -163,6 +158,10 @@ const onSave = async () => {
 };
 
 const onDownload = async () => {
+    if (!slowLogs.value) {
+        MsgInfo(i18n.global.t('database.noData'));
+        return;
+    }
     const downloadUrl = window.URL.createObjectURL(new Blob([slowLogs.value]));
     const a = document.createElement('a');
     a.style.display = 'none';
@@ -174,7 +173,7 @@ const onDownload = async () => {
 
 const loadMysqlSlowlogs = async (path: string) => {
     const res = await LoadFile({ path: path });
-    slowLogs.value = res.data;
+    slowLogs.value = res.data || '';
     nextTick(() => {
         const state = view.value.state;
         view.value.dispatch({
