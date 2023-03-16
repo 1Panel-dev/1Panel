@@ -66,18 +66,14 @@
                     @search="search()"
                     :class="{ mask: nginxStatus != 'Running' }"
                 >
-                    <el-table-column
-                        :label="$t('commons.table.name')"
-                        fix
-                        show-overflow-tooltip
-                        prop="primaryDomain"
-                        min-width="120px"
-                    >
+                    <el-table-column width="30px">
                         <template #default="{ row }">
                             <el-button link :icon="Promotion" @click="openUrl(row)"></el-button>
-                            <span class="table-link" style="margin-left: 10px" @click="openConfig(row.id)">
-                                {{ row.primaryDomain }}
-                            </span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('commons.table.name')" fix prop="primaryDomain" min-width="120px">
+                        <template #default="{ row }">
+                            <Tooltip @click="openConfig(row.id)" :text="row.primaryDomain" />
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.type')" fix show-overflow-tooltip prop="type">

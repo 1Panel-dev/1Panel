@@ -64,6 +64,7 @@ declare module 'vue' {
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     ElSwitch: typeof import('element-plus/es')['ElSwitch']
     ElTable: typeof import('element-plus/es')['ElTable']
+    ElTableColmn: typeof import('element-plus/es')['ElTableColmn']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTabPane: typeof import('element-plus/es')['ElTabPane']
     ElTabs: typeof import('element-plus/es')['ElTabs']
@@ -87,6 +88,7 @@ declare module 'vue' {
     SvgIcon: typeof import('./src/components/svg-icon/svg-icon.vue')['default']
     SystemUpgrade: typeof import('./src/components/system-upgrade/index.vue')['default']
     TableSetting: typeof import('./src/components/table-setting/index.vue')['default']
+    Tooltip: typeof import('./src/components/tooltip/index.vue')['default']
     Upload: typeof import('./src/components/upload/index.vue')['default']
     VCharts: typeof import('./src/components/v-charts/index.vue')['default']
   }

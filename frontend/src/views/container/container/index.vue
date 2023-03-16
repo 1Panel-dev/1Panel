@@ -66,15 +66,9 @@
                     @search="search"
                 >
                     <el-table-column type="selection" fix />
-                    <el-table-column
-                        :label="$t('commons.table.name')"
-                        show-overflow-tooltip
-                        min-width="80"
-                        prop="name"
-                        fix
-                    >
+                    <el-table-column :label="$t('commons.table.name')" min-width="80" prop="name" fix>
                         <template #default="{ row }">
-                            <el-link @click="onInspect(row.containerID)" type="primary">{{ row.name }}</el-link>
+                            <Tooltip @click="onInspect(row.containerID)" :text="row.name" />
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -118,6 +112,7 @@
 
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
+import Tooltip from '@/components/tooltip/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import ReNameDialog from '@/views/container/container/rename/index.vue';
