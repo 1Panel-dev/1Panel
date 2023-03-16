@@ -4,7 +4,7 @@
             <template #app>
                 <AppStatus
                     :app-key="'redis'"
-                    style="margin-top: 20px"
+                    v-model:loading="loading"
                     @before="onBefore"
                     @setting="onSetting"
                     @is-exist="checkExist"
@@ -129,7 +129,6 @@ const closeTerminal = async (isKeepShow: boolean) => {
 
 const onBefore = () => {
     closeTerminal(true);
-    loading.value = true;
 };
 onBeforeUnmount(() => {
     closeTerminal(false);
