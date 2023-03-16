@@ -227,7 +227,7 @@ let rules = ref<any>({
     appType: [Rules.requiredInput],
     proxy: [Rules.requiredInput],
     appinstall: {
-        name: [Rules.linuxName],
+        name: [Rules.appName],
         appId: [Rules.requiredSelectBusiness],
         params: {},
     },
