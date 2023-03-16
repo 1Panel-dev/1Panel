@@ -8,11 +8,12 @@ import VueSetupExtend from 'vite-plugin-vue-setup-extend';
 import eslintPlugin from 'vite-plugin-eslint';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import DefineOptions from 'unplugin-vue-define-options/vite';
-import MonacoEditorPlugin from 'vite-plugin-monaco-editor';
 
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
+
+const prefix = `monaco-editor/esm/vs`;
 
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     const env = loadEnv(mode, process.cwd());
@@ -50,8 +51,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             }),
             vueJsx(),
             VueSetupExtend(),
-
-            MonacoEditorPlugin({}),
             viteEnv.VITE_REPORT && visualizer(),
             viteEnv.VITE_BUILD_GZIP &&
                 viteCompression({
@@ -87,6 +86,13 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
                     chunkFileNames: 'assets/js/[name]-[hash].js',
                     entryFileNames: 'assets/js/[name]-[hash].js',
                     assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
+                    manualChunks: {
+                        jsonWorker: [`${prefix}/language/json/json.worker`],
+                        cssWorker: [`${prefix}/language/css/css.worker`],
+                        htmlWorker: [`${prefix}/language/html/html.worker`],
+                        tsWorker: [`${prefix}/language/typescript/ts.worker`],
+                        editorWorker: [`${prefix}/editor/editor.worker`],
+                    },
                 },
             },
         },
