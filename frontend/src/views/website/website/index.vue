@@ -75,9 +75,7 @@
                     >
                         <template #default="{ row }">
                             <el-button link :icon="Promotion" @click="openUrl(row)"></el-button>
-                            <el-link type="primary" :underline="false" @click="openConfig(row.id)">
-                                <span style="margin-left: 10px">{{ row.primaryDomain }}</span>
-                            </el-link>
+                            <span class="primary-domain" @click="openConfig(row.id)">{{ row.primaryDomain }}</span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.type')" fix show-overflow-tooltip prop="type">
@@ -407,15 +405,20 @@ onMounted(() => {
     listGroup();
 });
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .search-button {
     float: right;
     display: inline;
 }
 
-.tooltip {
-    white-space: pre-wrap; /* 自动换行 */
-    word-break: break-all; /* 单词内换行 */
-    max-width: 200px; /* 控制最大宽度 */
+.primary-domain {
+    margin-left: 10px;
+    color: $primary-color;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.primary-domain:hover {
+    opacity: 0.6;
 }
 </style>
