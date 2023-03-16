@@ -42,7 +42,6 @@
         "sass-loader": "^13.0.2",
         "screenfull": "^6.0.2",
         "unplugin-vue-define-options": "^0.7.3",
-        "vite-plugin-monaco-editor": "^1.1.0",
         "vue": "^3.2.25",
         "vue-clipboard3": "^2.0.0",
         "vue-codemirror": "^6.1.1",
