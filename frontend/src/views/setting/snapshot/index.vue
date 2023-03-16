@@ -49,7 +49,9 @@
                     <el-table-column prop="version" :label="$t('app.version')" />
                     <el-table-column :label="$t('setting.backupAccount')" min-width="80" prop="from">
                         <template #default="{ row }">
-                            {{ $t('setting.' + row.from) }}
+                            <span v-if="row.from">
+                                {{ $t('setting.' + row.from) }}
+                            </span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" min-width="80" prop="status">
