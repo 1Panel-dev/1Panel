@@ -55,4 +55,5 @@ ErrDatabaseIsExist: "The current database already exists. Please enter a new dat
 ErrTypeOfRedis: "The recovery file type does not match the current persistence mode. Modify the file type and try again"
 
 #container 
-ErrInUsed: "The deleted object is in use and cannot be deleted"
+ErrInUsed: "{{ .detail }} is in use and cannot be deleted"
+ErrObjectInUsed: "This object is in use and cannot be deleted"

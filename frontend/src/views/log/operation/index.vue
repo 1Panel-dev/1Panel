@@ -49,7 +49,9 @@
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
                     <el-table-column :label="$t('logs.resource')" prop="group" fix>
                         <template #default="{ row }">
-                            {{ $t('logs.detail.' + row.source) }}
+                            <span v-if="row.source">
+                                {{ $t('logs.detail.' + row.source) }}
+                            </span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('logs.operate')" min-width="150px" prop="detailZH">
