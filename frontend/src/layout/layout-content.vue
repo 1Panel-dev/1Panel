@@ -133,4 +133,8 @@ const showBack = computed(() => {
     border: 0;
     border-top: var(--panel-border);
 }
+
+.main-box {
+    position: relative;
+}
 </style>

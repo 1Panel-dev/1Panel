@@ -176,9 +176,12 @@
 .mask-prompt {
     position: absolute;
     z-index: 9999;
-    top: 25%;
-    left: 50%;
+    top: 220px;
+    left: 45%;
     transform: translate(-50%, -50%);
+    width: 300px;
+    text-align: center;
+    font-size: 14px;
 }
 
 .table-button {
@@ -287,3 +290,12 @@
     color: #646a73;
 }
 
+.table-link {
+    color: $primary-color;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.table-link:hover {
+    opacity: 0.6;
+}
