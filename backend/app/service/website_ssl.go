@@ -99,6 +99,10 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		if err := client.UseHTTP(path.Join(constant.AppInstallDir, constant.AppOpenresty, appInstall.Name, "root")); err != nil {
 			return res, err
 		}
+	case constant.DnsManual:
+		if err := client.UseManualDns(); err != nil {
+			return res, err
+		}
 	}
 
 	domains := []string{create.PrimaryDomain}

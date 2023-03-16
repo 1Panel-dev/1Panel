@@ -1004,7 +1004,7 @@ export default {
         addAccount: '创建账户',
         acmeAccount: 'Acme 账户',
         provider: '验证方式',
-        dnsCommon: '手动解析',
+        dnsManual: '手动解析',
         expireDate: '过期时间',
         brand: '颁发者',
         deploySSL: '部署',

@@ -29,7 +29,7 @@
                     <el-form-item :label="$t('website.provider')" prop="provider">
                         <el-radio-group v-model="ssl.provider" @change="changeProvider()">
                             <el-radio label="dnsAccount">{{ $t('website.dnsAccount') }}</el-radio>
-                            <el-radio label="dnsManual">{{ $t('website.dnsCommon') }}</el-radio>
+                            <el-radio label="dnsManual">{{ $t('website.dnsManual') }}</el-radio>
                             <el-radio label="http">HTTP</el-radio>
                         </el-radio-group>
                     </el-form-item>

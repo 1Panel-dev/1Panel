@@ -89,6 +89,7 @@ func NewPrivateKeyClient(email string, privateKey string) (*AcmeClient, error) {
 func newConfig(user *AcmeUser) *lego.Config {
 	config := lego.NewConfig(user)
 	config.CADirURL = "https://acme-v02.api.letsencrypt.org/directory"
+	//config.CADirURL = "https://acme-staging-v02.api.letsencrypt.org/directory"
 	config.UserAgent = "acm_go/0.0.1"
 	config.Certificate.KeyType = certcrypto.RSA2048
 	return config

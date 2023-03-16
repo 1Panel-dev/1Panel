@@ -115,22 +115,12 @@ func (c *AcmeClient) UseDns(dnsType DnsType, params string) error {
 	return c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(3*time.Minute))
 }
 
-func (c *AcmeClient) UseManualDns(domains []string) (*Resolve, error) {
+func (c *AcmeClient) UseManualDns() error {
 	p := &manualDnsProvider{}
 	if err := c.Client.Challenge.SetDNS01Provider(p, dns01.AddDNSTimeout(3*time.Minute)); err != nil {
-		return nil, nil
+		return err
 	}
-
-	request := certificate.ObtainRequest{
-		Domains: domains,
-		Bundle:  true,
-	}
-
-	_, err := c.Client.Certificate.Obtain(request)
-	if err != nil {
-		return nil, err
-	}
-	return p.Resolve, nil
+	return nil
 }
 
 func (c *AcmeClient) UseHTTP(path string) error {

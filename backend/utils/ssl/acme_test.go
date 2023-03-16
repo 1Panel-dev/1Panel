@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/go-acme/lego/v4/acme/api"
 	"github.com/go-acme/lego/v4/certcrypto"
@@ -154,10 +155,10 @@ func TestSSL(t *testing.T) {
 	//	panic(err)
 	//}
 
-	// err = client.Challenge.SetDNS01Provider(&plainDnsProvider{}, dns01.AddDNSTimeout(6*time.Minute))
-	// if err != nil {
-	// 	panic(err)
-	// }
+	err = client.Challenge.SetDNS01Provider(&manualDnsProvider{}, dns01.AddDNSTimeout(6*time.Minute))
+	if err != nil {
+		panic(err)
+	}
 
 	core, err := api.New(config.HTTPClient, config.UserAgent, config.CADirURL, reg.URI, priKey)
 	if err != nil {
