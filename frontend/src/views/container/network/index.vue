@@ -47,16 +47,14 @@
                     @search="search"
                 >
                     <el-table-column type="selection" :selectable="selectable" fix />
-                    <el-table-column
-                        :label="$t('commons.table.name')"
-                        show-overflow-tooltip
-                        min-width="80"
-                        prop="name"
-                        fix
-                    >
+                    <el-table-column :label="$t('commons.table.name')" min-width="80" prop="name" fix>
                         <template #default="{ row }">
-                            <el-link @click="onInspect(row.id)" type="primary">{{ row.name }}</el-link>
-                            <el-tag effect="dark" round v-if="row.isSystem" style="margin-left: 5px">system</el-tag>
+                            <Tooltip @click="onInspect(row.id)" :text="row.name" />
+                        </template>
+                    </el-table-column>
+                    <el-table-column min-width="50">
+                        <template #default="{ row }">
+                            <el-tag effect="dark" round v-if="row.isSystem">system</el-tag>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -99,6 +97,7 @@
 
 <script lang="ts" setup>
 import LayoutContent from '@/layout/layout-content.vue';
+import Tooltip from '@/components/tooltip/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import CreateDialog from '@/views/container/network/create/index.vue';
