@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
@@ -378,8 +379,14 @@ func (u *ImageService) ImageRemove(req dto.BatchDelete) error {
 	if err != nil {
 		return err
 	}
-	for _, ids := range req.Names {
-		if _, err := client.ImageRemove(context.TODO(), ids, types.ImageRemoveOptions{Force: true, PruneChildren: true}); err != nil {
+	for _, id := range req.Names {
+		if _, err := client.ImageRemove(context.TODO(), id, types.ImageRemoveOptions{Force: true, PruneChildren: true}); err != nil {
+			if strings.Contains(err.Error(), "image is being used") {
+				if strings.Contains(id, "sha256:") {
+					return buserr.New(constant.ErrObjectInUsed)
+				}
+				return buserr.WithDetail(constant.ErrInUsed, id, nil)
+			}
 			return err
 		}
 	}

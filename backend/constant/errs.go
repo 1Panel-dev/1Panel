@@ -98,5 +98,6 @@ var (
 
 //container
 var (
-	ErrInUsed = "ErrInUsed"
+	ErrInUsed       = "ErrInUsed"
+	ErrObjectInUsed = "ErrObjectInUsed"
 )
