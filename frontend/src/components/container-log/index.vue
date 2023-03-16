@@ -77,7 +77,7 @@ const timeOptions = ref([
 
 const searchLogs = async () => {
     const res = await logContainer(logSearch);
-    logInfo.value = res.data;
+    logInfo.value = res.data || '';
     nextTick(() => {
         const state = view.value.state;
         view.value.dispatch({
