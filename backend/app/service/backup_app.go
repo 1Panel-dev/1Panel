@@ -181,16 +181,19 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 			return err
 		}
 		if err := handleMysqlRecover(mysqlInfo, tmpPath, db.Name, fmt.Sprintf("%s.sql.gz", install.Name), true); err != nil {
+			global.LOG.Errorf("handle recover from sql.gz failed, err: %v", err)
 			return err
 		}
 	}
 
 	if err := handleUnTar(tmpPath+"/app.tar.gz", fmt.Sprintf("%s/%s", constant.AppInstallDir, install.App.Key)); err != nil {
+		global.LOG.Errorf("handle recover from app.tar.gz failed, err: %v", err)
 		return err
 	}
 
 	oldInstall.Status = constant.Running
 	if err := appInstallRepo.Save(install); err != nil {
+		global.LOG.Errorf("save db app install failed, err: %v", err)
 		return err
 	}
 	isOk = true
