@@ -8,7 +8,6 @@ import VueSetupExtend from 'vite-plugin-vue-setup-extend';
 import eslintPlugin from 'vite-plugin-eslint';
 import vueJsx from '@vitejs/plugin-vue-jsx';
 import DefineOptions from 'unplugin-vue-define-options/vite';
-import MonacoEditorPlugin from 'vite-plugin-monaco-editor';
 
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
@@ -51,7 +50,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             vueJsx(),
             VueSetupExtend(),
 
-            MonacoEditorPlugin({}),
             viteEnv.VITE_REPORT && visualizer(),
             viteEnv.VITE_BUILD_GZIP &&
                 viteCompression({
