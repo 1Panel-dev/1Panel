@@ -40,7 +40,11 @@
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
-                    <el-table-column label="ID" show-overflow-tooltip prop="id" min-width="60" />
+                    <el-table-column label="ID" prop="id" min-width="60">
+                        <template #default="{ row }">
+                            <Tooltip :islink="false" :text="row.id" />
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('container.tag')" prop="tags" min-width="160" fix>
                         <template #default="{ row }">
                             <el-tag style="margin-left: 5px" v-for="(item, index) of row.tags" :key="index">
@@ -76,6 +80,7 @@
 </template>
 
 <script lang="ts" setup>
+import Tooltip from '@/components/tooltip/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import { reactive, onMounted, ref } from 'vue';

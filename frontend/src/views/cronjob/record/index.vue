@@ -4,7 +4,7 @@
             <el-card>
                 <div>
                     <el-tag style="float: left" effect="dark" type="success">
-                        {{ $t('cronjob.' + dialogData.rowData.type) }} - {{ dialogData.rowData.name }}
+                        {{ $t('cronjob.' + dialogData.rowData.type) }}
                     </el-tag>
                     <el-tag v-if="dialogData.rowData.status === 'Enable'" round class="status-content" type="success">
                         {{ $t('commons.status.running') }}

@@ -45,17 +45,7 @@
                     <el-table-column type="selection" fix />
                     <el-table-column :label="$t('cronjob.taskName')" :min-width="120" prop="name">
                         <template #default="{ row }">
-                            <el-tooltip effect="dark" v-if="row.name.length > 12" placement="top">
-                                <template #content>
-                                    <div style="width: 300px; word-break: break-all">{{ row.name }}</div>
-                                </template>
-                                <el-link @click="loadDetail(row)" type="primary">
-                                    {{ row.name.substring(0, 15) }}...
-                                </el-link>
-                            </el-tooltip>
-                            <el-link v-else @click="loadDetail(row)" type="primary">
-                                {{ row.name }}
-                            </el-link>
+                            <Tooltip @click="loadDetail(row)" :text="row.name" />
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" :min-width="80" prop="status">
@@ -136,6 +126,7 @@
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
+import Tooltip from '@/components/tooltip/index.vue';
 import OperatrDialog from '@/views/cronjob/operate/index.vue';
 import Records from '@/views/cronjob/record/index.vue';
 import LayoutContent from '@/layout/layout-content.vue';
