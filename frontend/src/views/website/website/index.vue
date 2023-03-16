@@ -75,7 +75,9 @@
                     >
                         <template #default="{ row }">
                             <el-button link :icon="Promotion" @click="openUrl(row)"></el-button>
-                            <span class="primary-domain" @click="openConfig(row.id)">{{ row.primaryDomain }}</span>
+                            <span class="table-link" style="margin-left: 10px" @click="openConfig(row.id)">
+                                {{ row.primaryDomain }}
+                            </span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.type')" fix show-overflow-tooltip prop="type">
@@ -145,7 +147,7 @@
                     />
                 </ComplexTable>
                 <el-card width="30%" v-if="nginxStatus != 'Running'" class="mask-prompt">
-                    <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['OpenResty']) }}</span>
+                    <span>{{ $t('commons.service.serviceNotStarted', ['OpenResty']) }}</span>
                 </el-card>
             </template>
         </LayoutContent>
@@ -409,16 +411,5 @@ onMounted(() => {
 .search-button {
     float: right;
     display: inline;
-}
-
-.primary-domain {
-    margin-left: 10px;
-    color: $primary-color;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.primary-domain:hover {
-    opacity: 0.6;
 }
 </style>
