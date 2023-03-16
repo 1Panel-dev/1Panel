@@ -106,8 +106,8 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 			return fmt.Errorf("backup website %s for rollback before recover failed, err: %v", website.Alias, err)
 		}
 		defer func() {
-			global.LOG.Info("recover failed, start to rollback now")
 			if !isOk {
+				global.LOG.Info("recover failed, start to rollback now")
 				if err := handleWebsiteRecover(website, rollbackFile, true); err != nil {
 					global.LOG.Errorf("rollback website %s from %s failed, err: %v", website.Alias, rollbackFile, err)
 					return
@@ -126,6 +126,7 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 	}
 	nginxConfPath := fmt.Sprintf("%s/openresty/%s/conf/conf.d", constant.AppInstallDir, nginxInfo.Name)
 	if err := fileOp.CopyFile(fmt.Sprintf("%s/%s.conf", tmpPath, website.Alias), nginxConfPath); err != nil {
+		global.LOG.Errorf("handle recover from conf.d failed, err: %v", err)
 		return err
 	}
 
@@ -135,22 +136,27 @@ func handleWebsiteRecover(website *model.Website, recoverFile string, isRollback
 			return err
 		}
 		if err := handleAppRecover(&app, fmt.Sprintf("%s/%s.app.tar.gz", tmpPath, website.Alias), true); err != nil {
+			global.LOG.Errorf("handle recover from app.tar.gz failed, err: %v", err)
 			return err
 		}
 		if _, err := compose.Restart(fmt.Sprintf("%s/%s/%s/docker-compose.yml", constant.AppInstallDir, app.App.Key, app.Name)); err != nil {
+			global.LOG.Errorf("docker-compose restart failed, err: %v", err)
 			return err
 		}
 	}
 	siteDir := fmt.Sprintf("%s/openresty/%s/www/sites", constant.AppInstallDir, nginxInfo.Name)
 	if err := handleUnTar(fmt.Sprintf("%s/%s.web.tar.gz", tmpPath, website.Alias), siteDir); err != nil {
+		global.LOG.Errorf("handle recover from web.tar.gz failed, err: %v", err)
 		return err
 	}
 	stdout, err := cmd.Execf("docker exec -i %s nginx -s reload", nginxInfo.ContainerName)
 	if err != nil {
+		global.LOG.Errorf("nginx -s reload failed, err: %s", stdout)
 		return errors.New(string(stdout))
 	}
 
 	if err := websiteRepo.SaveWithoutCtx(&oldWebsite); err != nil {
+		global.LOG.Errorf("handle save website data failed, err: %v", err)
 		return err
 	}
 	isOk = true

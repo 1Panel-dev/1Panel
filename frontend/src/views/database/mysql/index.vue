@@ -4,7 +4,7 @@
             <template #app>
                 <AppStatus
                     :app-key="'mysql'"
-                    style="margin-top: 20px"
+                    v-model:loading="loading"
                     @setting="onSetting"
                     @is-exist="checkExist"
                 ></AppStatus>

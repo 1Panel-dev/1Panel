@@ -9,12 +9,12 @@
     >
         <el-form :inline="true" :model="config">
             <el-form-item :label="$t('file.theme')">
-                <el-select v-model="config.theme" @change="initEditor()">
+                <el-select v-model="config.theme" @change="changeTheme()">
                     <el-option v-for="item in themes" :key="item.label" :value="item.value" :label="item.label" />
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('file.language')">
-                <el-select v-model="config.language" @change="initEditor()">
+                <el-select v-model="config.language" @change="changeLanguage()">
                     <el-option v-for="lang in Languages" :key="lang.label" :value="lang.value" :label="lang.label" />
                 </el-select>
             </el-form-item>
@@ -36,10 +36,33 @@ import { SaveFileContent } from '@/api/modules/files';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import * as monaco from 'monaco-editor';
-import { reactive, ref } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, ref } from 'vue';
 import { Languages } from '@/global/mimetype';
+import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
+import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
+import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
+import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 
 let editor: monaco.editor.IStandaloneCodeEditor | undefined;
+
+self.MonacoEnvironment = {
+    getWorker(workerId, label) {
+        if (label === 'json') {
+            return new jsonWorker();
+        }
+        if (label === 'css' || label === 'scss' || label === 'less') {
+            return new cssWorker();
+        }
+        if (label === 'html' || label === 'handlebars' || label === 'razor') {
+            return new htmlWorker();
+        }
+        if (['typescript', 'javascript'].includes(label)) {
+            return new tsWorker();
+        }
+        return new EditorWorker();
+    },
+};
 
 interface EditProps {
     language: string;
@@ -90,29 +113,39 @@ const handleClose = () => {
     }
     em('close', false);
 };
+const changeLanguage = () => {
+    monaco.editor.setModelLanguage(editor.getModel(), config.language);
+};
+
+const changeTheme = () => {
+    monaco.editor.setTheme(config.theme);
+};
 
 const initEditor = () => {
     if (editor) {
         editor.dispose();
     }
-    const codeBox = document.getElementById('codeBox');
-    editor = monaco.editor.create(codeBox as HTMLElement, {
-        theme: config.theme,
-        value: form.value.content,
-        readOnly: false,
-        automaticLayout: true,
-        language: config.language,
-        folding: true,
-        roundedSelection: false,
-    });
+    nextTick(() => {
+        const codeBox = document.getElementById('codeBox');
+        editor = monaco.editor.create(codeBox as HTMLElement, {
+            theme: config.theme,
+            value: form.value.content,
+            readOnly: false,
+            automaticLayout: true,
+            language: config.language,
+            folding: true,
+            roundedSelection: false,
+            overviewRulerBorder: false,
+        });
 
-    editor.onDidChangeModelContent(() => {
-        if (editor) {
-            form.value.content = editor.getValue();
-        }
-    });
+        editor.onDidChangeModelContent(() => {
+            if (editor) {
+                form.value.content = editor.getValue();
+            }
+        });
 
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, quickSave);
+        editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, quickSave);
+    });
 };
 
 const quickSave = () => {
@@ -138,6 +171,12 @@ const acceptParams = (props: EditProps) => {
 const onOpen = () => {
     initEditor();
 };
+
+onBeforeUnmount(() => {
+    if (editor) {
+        editor.dispose();
+    }
+});
 
 defineExpose({ acceptParams });
 </script>
