@@ -88,7 +88,7 @@
                         <template #default="{ row }">
                             <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
                             <svg-icon v-else className="table-icon" :iconName="getIconName(row.extension)"></svg-icon>
-                            <el-link :underline="false" @click="open(row)" type="primary">{{ row.name }}</el-link>
+                            <span class="file-name" @click="open(row)" type="primary">{{ row.name }}</span>
                             <span v-if="row.isSymlink">-> {{ row.linkPath }}</span>
                         </template>
                     </el-table-column>
@@ -546,5 +546,15 @@ onMounted(() => {
     float: right;
     display: inline;
     width: 20%;
+}
+
+.file-name {
+    color: $primary-color;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.file-name:hover {
+    opacity: 0.6;
 }
 </style>
