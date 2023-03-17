@@ -220,9 +220,9 @@ const form = reactive({
     cmd: [] as Array<string>,
     publishAllPorts: false,
     exposedPorts: [] as Array<Container.Port>,
-    nanoCPUs: 1,
-    memory: 100,
-    memoryItem: 100,
+    nanoCPUs: 0,
+    memory: 0,
+    memoryItem: 0,
     memoryUnit: 'MB',
     cpuUnit: 'Core',
     volumes: [] as Array<Container.Volume>,
@@ -250,9 +250,9 @@ const handlReset = () => {
     form.cmd = [];
     form.publishAllPorts = false;
     form.exposedPorts = [];
-    form.nanoCPUs = 1;
-    form.memory = 100;
-    form.memoryItem = 100;
+    form.nanoCPUs = 0;
+    form.memory = 0;
+    form.memoryItem = 0;
     form.memoryUnit = 'MB';
     form.cpuUnit = 'Core';
     form.volumes = [];
