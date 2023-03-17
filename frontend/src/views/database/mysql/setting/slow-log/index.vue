@@ -17,9 +17,11 @@
                     {{ $t('commons.button.save') }}
                 </el-button>
                 <div style="float: left; margin-left: 20px">
-                    <el-checkbox border v-model="isWatch">{{ $t('commons.button.watch') }}</el-checkbox>
+                    <el-checkbox style="margin-top: 2px" :disabled="!currentStatus" border v-model="isWatch">
+                        {{ $t('commons.button.watch') }}
+                    </el-checkbox>
                 </div>
-                <el-button style="margin-left: 20px" @click="onDownload" icon="Download">
+                <el-button :disabled="!currentStatus" style="margin-left: 20px" @click="onDownload" icon="Download">
                     {{ $t('file.download') }}
                 </el-button>
             </el-form-item>
@@ -29,7 +31,7 @@
             :placeholder="$t('database.noData')"
             :indent-with-tab="true"
             :tabSize="4"
-            style="height: calc(100vh - 427px); width: 100%"
+            style="height: calc(100vh - 428px); width: 100%"
             :lineWrapping="true"
             :matchBrackets="true"
             theme="cobalt"
@@ -77,7 +79,6 @@ const variables = reactive({
     slow_query_log: 'OFF',
     long_query_time: 10,
 });
-const oldVariables = ref();
 
 interface DialogProps {
     mysqlName: string;
@@ -100,7 +101,6 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
             }
         }, 1000 * 5);
     }
-    oldVariables.value = { ...variables };
 };
 const emit = defineEmits(['loading']);
 
@@ -132,13 +132,12 @@ const changeSlowLogs = () => {
 
 const onCancle = async () => {
     variables.slow_query_log = currentStatus.value ? 'ON' : 'OFF';
+    detailShow.value = currentStatus.value;
 };
 
 const onSave = async () => {
     let param = [] as Array<Database.VariablesUpdate>;
-    if (variables.slow_query_log !== oldVariables.value.slow_query_log) {
-        param.push({ param: 'slow_query_log', value: variables.slow_query_log });
-    }
+    param.push({ param: 'slow_query_log', value: variables.slow_query_log });
     if (variables.slow_query_log === 'ON') {
         param.push({ param: 'long_query_time', value: variables.long_query_time + '' });
         param.push({ param: 'slow_query_log_file', value: '/var/lib/mysql/1Panel-slow.log' });
@@ -149,7 +148,6 @@ const onSave = async () => {
             emit('loading', false);
             currentStatus.value = variables.slow_query_log === 'ON';
             detailShow.value = variables.slow_query_log === 'ON';
-            oldVariables.value.slow_query_log = variables.slow_query_log;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
