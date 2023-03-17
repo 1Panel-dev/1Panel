@@ -163,7 +163,7 @@ const form = reactive({
 const rules = reactive({
     port: [Rules.port],
     timeout: [Rules.number, checkNumberRange(0, 9999999)],
-    maxclients: [Rules.number, checkNumberRange(1, 999999)],
+    maxclients: [Rules.number, checkNumberRange(1, 65504)],
     maxmemory: [Rules.number, checkNumberRange(0, 999999)],
 });
 
