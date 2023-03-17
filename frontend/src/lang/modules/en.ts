@@ -1,4 +1,5 @@
-export default {
+import fit2cloudEnLocale from 'fit2cloud-ui-plus/src/locale/lang/en';
+const message = {
     commons: {
         true: 'true',
         false: 'false',
@@ -1163,4 +1164,9 @@ export default {
         postCheck: 'POST parameter verification',
         cookieBlockList: 'Cookie Blacklist',
     },
+};
+
+export default {
+    ...fit2cloudEnLocale,
+    ...message,
 };

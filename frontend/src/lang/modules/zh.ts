@@ -1,4 +1,5 @@
-export default {
+import fit2cloudZhLocale from 'fit2cloud-ui-plus/src/locale/lang/zh-cn';
+const message = {
     commons: {
         true: '是',
         false: '否',
@@ -1166,4 +1167,8 @@ export default {
         postCheck: 'POST 参数校验',
         cookieBlockList: 'Cookie 黑名单',
     },
+};
+export default {
+    ...fit2cloudZhLocale,
+    ...message,
 };

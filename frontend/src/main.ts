@@ -15,11 +15,12 @@ import SvgIcon from './components/svg-icon/svg-icon.vue';
 import ElementPlus from 'element-plus';
 import Fit2CloudPlus from 'fit2cloud-ui-plus';
 import * as Icons from '@element-plus/icons-vue';
-
 const app = createApp(App);
 app.component('SvgIcon', SvgIcon);
 app.use(ElementPlus);
-app.use(Fit2CloudPlus);
+
+app.use(Fit2CloudPlus, { locale: I18n.global.messages.value[localStorage.getItem('lang') || 'zh'] });
+
 Object.keys(Icons).forEach((key) => {
     app.component(key, Icons[key as keyof typeof Icons]);
 });
