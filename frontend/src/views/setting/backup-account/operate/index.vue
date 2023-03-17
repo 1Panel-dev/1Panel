@@ -93,7 +93,7 @@
                             <span v-if="errBuckets" class="input-error">{{ $t('commons.rule.requiredSelect') }}</span>
                         </el-form-item>
                         <div v-if="dialogData.rowData!.type === 'SFTP'">
-                            <el-form-item :label="$t('setting.address')" prop="varsJson.address" :rules="Rules.ip">
+                            <el-form-item :label="$t('setting.address')" prop="varsJson.address" :rules="Rules.host">
                                 <el-input v-model.trim="dialogData.rowData!.varsJson['address']" />
                             </el-form-item>
                             <el-form-item :label="$t('setting.port')" prop="varsJson.port" :rules="[Rules.port]">
