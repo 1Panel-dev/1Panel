@@ -56,6 +56,10 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 - 邮箱：support@fit2cloud.com 
 - 电话：400-052-0755
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/1Panel&type=Date)](https://star-history.com/#1Panel-dev/1Panel&Date)
+
 ## License
 
 Copyright (c) 2014-2023 飞致云 FIT2CLOUD, All rights reserved.
