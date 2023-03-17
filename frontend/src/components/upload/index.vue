@@ -119,7 +119,11 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     if (type.value === 'website' || type.value === 'app') {
         title.value = name.value;
     }
-    baseDir.value = `${pathRes.data}/uploads/${type.value}/${name.value}/${detailName.value}/`;
+    if (detailName.value) {
+        baseDir.value = `${pathRes.data}/uploads/${type.value}/${name.value}/${detailName.value}/`;
+    } else {
+        baseDir.value = `${pathRes.data}/uploads/${type.value}/${name.value}/`;
+    }
     upVisiable.value = true;
     search();
 };
@@ -198,7 +202,7 @@ const onSubmit = async () => {
         MsgError(i18n.global.t('commons.msg.fileNameErr'));
         return;
     }
-    let reg = /^[a-zA-Z0-9\u4e00-\u9fa5]{1}[a-z:A-Z0-9_.\u4e00-\u9fa5-]{0,50}$/;
+    let reg = /^[a-zA-Z0-9\u4e00-\u9fa5]{1}[a-z:A-Z0-9_.\u4e00-\u9fa5-]{0,256}$/;
     if (!reg.test(uploaderFiles.value[0]!.raw.name)) {
         MsgError(i18n.global.t('commons.msg.fileNameErr'));
         return;
