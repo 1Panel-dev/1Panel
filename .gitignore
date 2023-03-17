@@ -22,5 +22,4 @@ cmd/server/__debug_bin
 cmd/server/web/assets
 cmd/server/web/monacoeditorwork
 cmd/server/web/index.html
-cmd/server/web/favicon.png
 frontend/auto-imports.d.ts
