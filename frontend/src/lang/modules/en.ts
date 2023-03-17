@@ -107,8 +107,8 @@ export default {
             welcome: 'Welcome back, please enter your username and password to log in!',
             errorAuthInfo: 'The user name or password you entered is incorrect, please re-enter!',
             errorMfaInfo: 'Incorrect authentication information, please try again!',
-            captchaHelper: 'Please enter the verification code',
-            errorCaptcha: 'Verification code error!',
+            captchaHelper: 'Captcha',
+            errorCaptcha: 'Captcha code error!',
             safeEntrance: 'Please use the correct entry to log in to the panel',
             reason: 'Cause of error:',
             reasonHelper:
@@ -119,7 +119,7 @@ export default {
             warnning:
                 'Note: [Closing the security entrance] will make your panel login address directly exposed to the Internet, very dangerous, please exercise caution',
             codeInput: 'Please enter the 6-digit verification code of the MFA validator',
-            title: 'Linux server operation and maintenance management panel',
+            title: 'Linux Server Management Panel',
         },
         rule: {
             username: 'Please enter a username',
@@ -134,7 +134,7 @@ export default {
             imageName: 'Support English, numbers, :/.-_, length 1-150',
             volumeName: 'Support English, numbers, .-_, length 2-30',
             complexityPassword:
-                'Enter a password that is longer than eight characters and contains at least two letters, digits, and special characters',
+                'Longer than eight characters and contains at least two combinations of letters, digits, and special characters',
             commonPassword: 'Please enter a password with more than 6 characters',
             email: 'Email format error',
             number: 'Please enter the correct number',
