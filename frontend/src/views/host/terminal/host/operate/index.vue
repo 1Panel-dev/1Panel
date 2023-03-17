@@ -109,7 +109,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const hostInfoRef = ref<FormInstance>();
 const rules = reactive({
     groupID: [Rules.requiredSelect],
-    addr: [Rules.requiredInput],
+    addr: [Rules.host],
     port: [Rules.requiredInput, Rules.port],
     user: [Rules.requiredInput],
     authMode: [Rules.requiredSelect],

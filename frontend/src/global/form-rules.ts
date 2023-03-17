@@ -15,6 +15,21 @@ const checkIp = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkHost = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+    } else {
+        const regIP =
+            /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+        const regHost = /^(?=^.{3,255}$)[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})+$/;
+        if (!regIP.test(value) && !regHost.test(value)) {
+            callback(new Error(i18n.global.t('commons.rule.host')));
+        } else {
+            callback();
+        }
+    }
+};
+
 const complexityPassword = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.complexityPassword')));
@@ -265,6 +280,7 @@ interface CommonRule {
     number: FormItemRule;
     integerNumber: FormItemRule;
     ip: FormItemRule;
+    host: FormItemRule;
     port: FormItemRule;
     domain: FormItemRule;
     databaseName: FormItemRule;
@@ -360,6 +376,11 @@ export const Rules: CommonRule = {
     },
     ip: {
         validator: checkIp,
+        required: true,
+        trigger: 'blur',
+    },
+    host: {
+        validator: checkHost,
         required: true,
         trigger: 'blur',
     },

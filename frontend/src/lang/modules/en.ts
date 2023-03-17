@@ -140,6 +140,7 @@ export default {
             number: 'Please enter the correct number',
             integer: 'Please enter the correct positive integer',
             ip: 'Please enter the correct IP address',
+            host: 'Enter the correct IP address or domain name',
             port: 'Please enter the correct port',
             selectHelper: 'Please select the correct {0} file',
             domain: 'domain name format error',

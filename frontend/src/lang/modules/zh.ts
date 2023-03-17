@@ -144,6 +144,7 @@ export default {
             number: '请输入正确的数字',
             integer: '请输入正确的正整数',
             ip: '请输入正确的 IP 地址',
+            host: '请输入正确的 IP 或者域名',
             port: '请输入正确的端口,1-65535',
             selectHelper: '请选择正确的 {0} 文件',
             domain: '域名格式错误',

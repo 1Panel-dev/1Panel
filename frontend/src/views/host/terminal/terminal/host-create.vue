@@ -95,7 +95,7 @@ let hostInfo = reactive<Host.HostOperate>({
 });
 
 const rules = reactive({
-    addr: [Rules.ip],
+    addr: [Rules.host],
     port: [Rules.requiredInput, Rules.port],
     user: [Rules.requiredInput],
     authMode: [Rules.requiredSelect],
