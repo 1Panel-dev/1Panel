@@ -1,0 +1,85 @@
+.install-card {
+    margin-top: 10px;
+    cursor: pointer;
+    padding: 10px;
+    .icon {
+        text-align: center;
+    }
+
+    .a-detail {
+        height: 100%;
+        width: 100%;
+
+        .d-name {
+            height: 20%;
+            .name {
+                font-weight: 500;
+                font-size: 18px;
+                color: var(--panel-text-color);
+            }
+            .status {
+                margin-left: 10px;
+            }
+            .h-button {
+                float: right;
+                margin-right: 10px;
+            }
+        }
+
+        .d-description {
+            margin-top: 10px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            .el-tag {
+                margin-right: 5px;
+            }
+            .description {
+                margin-top: 10px;
+                font-size: 14px;
+                color: var(--el-text-color-regular);
+            }
+        }
+        .d-button {
+            margin-top: 10px;
+            min-width: 440px;
+        }
+    }
+    &:hover {
+        background-color: rgba(0, 94, 235, 0.03);
+    }
+}
+
+.table-button {
+    display: inline;
+    margin-right: 5px;
+}
+
+.app-divider {
+    margin-top: 5px;
+    border: 0;
+    border-top: var(--panel-border);
+}
+
+.update-prompt {
+    text-align: center;
+    margin-top: 100px;
+
+    span {
+        color: #bbbfc4;
+    }
+
+    img {
+        width: 300px;
+        height: 300px;
+    }
+}
+
+.tag-button {
+    margin-right: 10px;
+    &.no-active {
+        background: none;
+        border: none;
+    }
+}

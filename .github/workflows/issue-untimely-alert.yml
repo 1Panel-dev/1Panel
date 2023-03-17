@@ -1,0 +1,17 @@
+on:
+  schedule:
+    - cron: "0 9 * * 1-5"
+
+name: Check untimely handle issues
+
+jobs:
+  check-untimely-handle-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check untimely issues and send msg
+        uses: jumpserver/action-issues-alert@master
+        with:
+          hook: ${{ secrets.WECHAT_GROUP_WEB_HOOK }}
+          type: untimely
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

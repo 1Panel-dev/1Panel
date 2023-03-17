@@ -1,0 +1,192 @@
+@font-face {
+  font-family: "panel"; /* Project id 3575356 */
+  src: url('iconfont.woff2?t=1673865903517') format('woff2'),
+       url('iconfont.woff?t=1673865903517') format('woff'),
+       url('iconfont.ttf?t=1673865903517') format('truetype'),
+       url('iconfont.svg?t=1673865903517#panel') format('svg');
+}
+
+.panel {
+  font-family: "panel" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.p-file-ppt:before {
+  content: "\e6e2";
+}
+
+.p-file-html:before {
+  content: "\d123";
+}
+
+.p-file-word:before {
+  content: "\e6e4";
+}
+
+.p-file-excel:before {
+  content: "\e6e6";
+}
+
+.p-file-pdf:before {
+  content: "\e6e7";
+}
+
+.p-file-mp3:before {
+  content: "\e6e8";
+}
+
+.p-file-svg:before {
+  content: "\e6e9";
+}
+
+.p-file-jpg:before {
+  content: "\e6ea";
+}
+
+.p-file-video:before {
+  content: "\e6eb";
+}
+
+.p-star:before {
+  content: "\e60f";
+}
+
+.p-aws:before {
+  content: "\e600";
+}
+
+.p-taolun:before {
+  content: "\e602";
+}
+
+.p-bug:before {
+  content: "\e616";
+}
+
+.p-SFTP:before {
+  content: "\e647";
+}
+
+.p-huaban88:before {
+  content: "\e67c";
+}
+
+.p-oss:before {
+  content: "\e607";
+}
+
+.p-minio:before {
+  content: "\e63c";
+}
+
+.p-logout:before {
+  content: "\e8fe";
+}
+
+.p-terminal2:before {
+  content: "\e82a";
+}
+
+.p-yingwen:before {
+  content: "\e6c3";
+}
+
+.p-zhongwen:before {
+  content: "\e6c8";
+}
+
+.p-plan:before {
+  content: "\e746";
+}
+
+.p-database:before {
+  content: "\e754";
+}
+
+.p-rejected-order:before {
+  content: "\e75e";
+}
+
+.p-toolbox:before {
+  content: "\e769";
+}
+
+.p-website:before {
+  content: "\e781";
+}
+
+.p-config:before {
+  content: "\e78e";
+}
+
+.p-appstore1:before {
+  content: "\e792";
+}
+
+.p-log:before {
+  content: "\e793";
+}
+
+.p-host:before {
+  content: "\e7b1";
+}
+
+.p-home:before {
+  content: "\e7c6";
+}
+
+.p-appstore:before {
+  content: "\eb65";
+}
+
+.p-docker:before {
+  content: "\e659";
+}
+
+.p-arrow-right:before {
+  content: "\e665";
+}
+
+.p-terminal:before {
+  content: "\e864";
+}
+
+.p-terminal1:before {
+  content: "\e663";
+}
+
+.p-language:before {
+  content: "\e605";
+}
+
+.p-theme:before {
+  content: "\e638";
+}
+
+.p-file-folder:before {
+  content: "\66";
+}
+
+.p-file-unknown:before {
+  content: "\233";
+}
+
+.p-file-txt:before {
+  content: "\74";
+}
+
+.p-file-normal:before {
+  content: "\e7ac";
+}
+
+.p-txt:before {
+  content: "\e6e3";
+}
+
+.p-file-zip:before {
+  content: "\e606";
+}
+

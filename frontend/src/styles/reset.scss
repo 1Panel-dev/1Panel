@@ -1,0 +1,12 @@
+html,
+body,
+#app {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+:-webkit-any(article, aside, nav, section) h1 {
+    font-size: 2em;
+}

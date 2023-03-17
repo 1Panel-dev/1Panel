@@ -1,0 +1,17 @@
+on: pull_request
+
+name: 1Panel 通用 PR 处理
+
+permissions:
+  pull-requests: write
+
+jobs:
+  generic_handler:
+    name: 为 PR 添加标签
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.GITHUBTOKEN }}
+          labels: ${{ github.base_ref }}

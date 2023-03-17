@@ -1,0 +1,281 @@
+package components
+
+import (
+	"errors"
+)
+
+type Server struct {
+	Comment    string
+	Listens    []*ServerListen
+	Directives []IDirective
+	Line       int
+}
+
+func NewServer(directive IDirective) (*Server, error) {
+	server := &Server{}
+	if block := directive.GetBlock(); block != nil {
+		server.Line = directive.GetBlock().GetLine()
+		server.Comment = block.GetComment()
+		directives := block.GetDirectives()
+		for _, dir := range directives {
+			switch dir.GetName() {
+			case "listen":
+				server.Listens = append(server.Listens, NewServerListen(dir.GetParameters(), dir.GetLine()))
+			default:
+				server.Directives = append(server.Directives, dir)
+			}
+		}
+		return server, nil
+	}
+	return nil, errors.New("server directive must have a block")
+}
+
+func (s *Server) GetName() string {
+	return "server"
+}
+
+func (s *Server) GetParameters() []string {
+	return []string{}
+}
+
+func (s *Server) GetBlock() IBlock {
+	return s
+}
+
+func (s *Server) GetComment() string {
+	return s.Comment
+}
+
+func (s *Server) GetDirectives() []IDirective {
+	directives := make([]IDirective, 0)
+	for _, ls := range s.Listens {
+		directives = append(directives, ls)
+	}
+	directives = append(directives, s.Directives...)
+	return directives
+}
+
+func (s *Server) FindDirectives(directiveName string) []IDirective {
+	directives := make([]IDirective, 0)
+	for _, directive := range s.Directives {
+		if directive.GetName() == directiveName {
+			directives = append(directives, directive)
+		}
+		if directive.GetBlock() != nil {
+			directives = append(directives, directive.GetBlock().FindDirectives(directiveName)...)
+		}
+	}
+
+	return directives
+}
+
+func (s *Server) UpdateDirective(key string, params []string) {
+	if key == "" || len(params) == 0 {
+		return
+	}
+	if key == "listen" {
+		defaultServer := false
+		if len(params) > 1 && params[1] == "default_server" {
+			defaultServer = true
+		}
+		if len(params) > 2 {
+			s.UpdateListen(params[0], defaultServer, params[2:]...)
+		} else {
+			s.UpdateListen(params[0], defaultServer)
+		}
+		return
+	}
+
+	directives := s.Directives
+	index := -1
+	for i, dir := range directives {
+		if dir.GetName() == key {
+			if IsRepeatKey(key) {
+				oldParams := dir.GetParameters()
+				if !(len(oldParams) > 0 && oldParams[0] == params[0]) {
+					continue
+				}
+			}
+			index = i
+			break
+		}
+	}
+	newDirective := &Directive{
+		Name:       key,
+		Parameters: params,
+	}
+	if index > -1 {
+		directives[index] = newDirective
+	} else {
+		directives = append(directives, newDirective)
+	}
+	s.Directives = directives
+}
+
+func (s *Server) RemoveDirective(key string, params []string) {
+	directives := s.Directives
+	var newDirectives []IDirective
+	for _, dir := range directives {
+		if dir.GetName() == key {
+			if IsRepeatKey(key) && len(params) > 0 {
+				oldParams := dir.GetParameters()
+				if oldParams[0] == params[0] {
+					continue
+				}
+			} else {
+				continue
+			}
+		}
+		newDirectives = append(newDirectives, dir)
+	}
+	s.Directives = newDirectives
+}
+
+func (s *Server) GetLine() int {
+	return s.Line
+}
+
+func (s *Server) AddListen(bind string, defaultServer bool, params ...string) {
+	listen := &ServerListen{
+		Bind:       bind,
+		Parameters: params,
+	}
+	if defaultServer {
+		listen.DefaultServer = DefaultServer
+	}
+	s.Listens = append(s.Listens, listen)
+}
+
+func (s *Server) UpdateListen(bind string, defaultServer bool, params ...string) {
+	listen := &ServerListen{
+		Bind:       bind,
+		Parameters: params,
+	}
+	if defaultServer {
+		listen.DefaultServer = DefaultServer
+	}
+	var newListens []*ServerListen
+	exist := false
+	for _, li := range s.Listens {
+		if li.Bind == bind {
+			exist = true
+			newListens = append(newListens, listen)
+		} else {
+			newListens = append(newListens, li)
+		}
+	}
+	if !exist {
+		newListens = append(newListens, listen)
+	}
+
+	s.Listens = newListens
+}
+
+func (s *Server) DeleteListen(bind string) {
+	var newListens []*ServerListen
+	for _, li := range s.Listens {
+		if li.Bind != bind {
+			newListens = append(newListens, li)
+		}
+	}
+	s.Listens = newListens
+}
+
+func (s *Server) DeleteServerName(name string) {
+	var names []string
+	dirs := s.FindDirectives("server_name")
+	params := dirs[0].GetParameters()
+	for _, param := range params {
+		if param != name {
+			names = append(names, param)
+		}
+	}
+	s.UpdateServerName(names)
+}
+
+func (s *Server) AddServerName(name string) {
+	dirs := s.FindDirectives("server_name")
+	params := dirs[0].GetParameters()
+	params = append(params, name)
+	s.UpdateServerName(params)
+}
+
+func (s *Server) UpdateServerName(names []string) {
+	s.UpdateDirective("server_name", names)
+}
+
+func (s *Server) UpdateRoot(path string) {
+	s.UpdateDirective("root", []string{path})
+}
+
+func (s *Server) UpdateRootLocation() {
+	newDir := Directive{
+		Name:       "location",
+		Parameters: []string{"/"},
+		Block:      &Block{},
+	}
+	block := &Block{}
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "root",
+		Parameters: []string{"index.html"},
+	})
+	newDir.Block = block
+}
+
+func (s *Server) UpdateRootProxy(proxy []string) {
+	newDir := Directive{
+		Name:       "location",
+		Parameters: []string{"/"},
+		Block:      &Block{},
+	}
+	block := &Block{}
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "proxy_pass",
+		Parameters: proxy,
+	})
+	newDir.Block = block
+	s.UpdateDirectiveBySecondKey("location", "/", newDir)
+}
+
+func (s *Server) UpdateDirectiveBySecondKey(name string, key string, directive Directive) {
+	directives := s.Directives
+	index := -1
+	for i, dir := range directives {
+		if dir.GetName() == name && dir.GetParameters()[0] == key {
+			index = i
+			break
+		}
+	}
+	if index > -1 {
+		directives[index] = &directive
+	} else {
+		directives = append(directives, &directive)
+	}
+	s.Directives = directives
+}
+
+func (s *Server) RemoveListenByBind(bind string) {
+	var listens []*ServerListen
+	for _, listen := range s.Listens {
+		if listen.Bind != bind || len(listen.Parameters) > 0 {
+			listens = append(listens, listen)
+		}
+	}
+	s.Listens = listens
+}
+
+func (s *Server) AddHTTP2HTTPS() {
+	newDir := Directive{
+		Name:       "if",
+		Parameters: []string{"($scheme = http)"},
+		Block:      &Block{},
+	}
+	block := &Block{}
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "return",
+		Parameters: []string{"301", "https://$host$request_uri"},
+	})
+	newDir.Block = block
+	s.UpdateDirectiveBySecondKey("if", "($scheme", newDir)
+
+}

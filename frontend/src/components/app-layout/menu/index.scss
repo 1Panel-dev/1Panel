@@ -1,0 +1,83 @@
+.el-menu {
+    background: none !important;
+    width: 100%;
+    padding: 0 7px;
+    .el-menu-item {
+        border-radius: 4px !important;
+        background-color: var(--el-menu-item-bg-color);
+        margin: 6px 0;
+        height: 46px !important;
+        box-shadow: 0px 0px 4px rgba(0, 94, 235, 0.1);
+        box-sizing: border-box;
+        min-width: auto;
+        padding-left: 22px;
+
+        &:hover {
+            .el-icon {
+                color: $primary-color;
+            }
+
+            span {
+                color: $primary-color;
+            }
+        }
+        &.is-active {
+            background-color: var(--el-menu-item-bg-color-active);;
+            border: 2px solid $primary-color;
+
+            &::before {
+                position: absolute;
+                border-radius: 4px;
+                top: 14px;
+                bottom: 15px;
+                left: 12px;
+                width: 4px;
+                height: 14px;
+                content: '';
+                background: $primary-color;
+            }
+        }
+    }
+    .el-sub-menu {
+        &.is-active {
+            .el-sub-menu__title {
+                span {
+                    color: $primary-color;
+                }
+
+                .el-icon {
+                    color: $primary-color;
+                }
+            }
+        }
+        .el-sub-menu__title {
+            background-color: var(--el-menu-item-bg-color);
+            box-shadow: 0px 0px 4px rgba(0, 94, 235, 0.1);
+            height: 44px;
+            border-radius: 4px !important;
+            &:hover {
+                .el-icon {
+                    color: $primary-color;
+                }
+
+                span {
+                    color: $primary-color;
+                }
+            }
+        }
+        .el-menu {
+            padding: 0;
+            .el-menu-item {
+                box-shadow: none;
+                padding-left: 35px !important;
+            }
+        }
+    }
+}
+
+.menu-popper {
+    .el-menu {
+        background-color: var(--el-menu-bg-color) !important;
+        padding: 4px 8px;
+    }
+}

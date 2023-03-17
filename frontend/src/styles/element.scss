@@ -1,0 +1,193 @@
+html {
+    --el-box-shadow-light: 0px 0px 4px rgba(0, 94, 235, 0.1) !important;
+
+    --el-text-color-regular: #646a73 !important;
+    // * menu
+    --el-menu-bg-color: rgba(0, 94, 235, 0.1) !important;
+    --el-menu-item-bg-color: rgba(255, 255, 255, 0.3);
+    --el-menu-item-bg-color-active: #ffffff;
+
+    --panel-text-color: #1f2329;
+    --panel-border: 1px solid #f2f2f2;
+    --panel-button-active: #ffffff;
+
+    --panel-alert-bg: #e2e4ec;
+    --panel-path-bg: #ffffff;
+}
+
+.el-notification {
+    z-index: 99999 !important;
+}
+
+.el-message {
+    z-index: 99999 !important;
+}
+
+.table-box {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .table-search {
+        display: flex;
+        margin-bottom: 10px;
+        .el-form {
+            max-width: 1260px;
+            .el-form-item {
+                margin-right: 5px;
+                .el-input,
+                .el-select,
+                .el-date-editor--timerange {
+                    width: 210px;
+                }
+                .el-date-editor--datetimerange,
+                .el-date-editor--daterange {
+                    width: 400px;
+                }
+
+                .el-range-editor.el-input__wrapper {
+                    padding: 0 10px;
+                }
+
+                .el-select__tags {
+                    overflow: hidden;
+                    white-space: nowrap;
+                }
+            }
+            .more-item {
+                display: inline;
+            }
+        }
+        .search-operation {
+            margin-left: 15px;
+            white-space: nowrap;
+            .search-isOpen {
+                margin-left: 20px;
+            }
+        }
+    }
+
+    .table-header {
+        .header-button-lf {
+            float: left;
+            .el-button {
+                margin-bottom: 20px;
+            }
+        }
+        .header-button-ri {
+            float: right;
+            .el-button {
+                margin-bottom: 20px;
+            }
+        }
+    }
+
+    .el-table {
+        flex: 1;
+        .el-table__header th,
+        .el-table__body td {
+            text-align: center;
+        }
+        .el-table__header th {
+            height: 50px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #252525;
+            background: #fafafa;
+        }
+
+        .table-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .el-table__header .el-table__cell > .cell {
+            white-space: nowrap;
+        }
+        .el-table__row {
+            height: 52px;
+        }
+
+        .el-table__empty-block {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .table-empty {
+            line-height: 30px;
+        }
+    }
+
+    .el-pagination {
+        display: flex;
+        justify-content: flex-end;
+        margin: 23px 0 10px;
+    }
+}
+
+.el-drawer {
+    .el-drawer__header {
+        padding: 15px 20px 14px;
+        margin-bottom: 0;
+        border-bottom: var(--panel-border);
+        span {
+            font-size: 17px;
+            color: #303133;
+        }
+    }
+
+    .el-drawer__footer {
+        border-top: var(--panel-border);
+    }
+    .el-select {
+        width: 100%;
+    }
+
+    .drawer-multiColumn-form {
+        display: flex;
+        flex-wrap: wrap;
+        .el-form-item {
+            width: 47%;
+            &:nth-child(2n-1) {
+                margin-right: 5%;
+            }
+        }
+    }
+}
+
+.el-dialog {
+    .el-dialog__header {
+        padding: 15px 20px;
+        margin: 0;
+        border-bottom: 1px solid #f0f0f0;
+        .el-dialog__title {
+            font-size: 17px;
+        }
+    }
+    border-radius: 5px;
+}
+
+.row-box {
+    display: flex;
+    flex-flow: wrap;
+    .el-card {
+        min-width: 100%;
+        height: 100%;
+        margin-right: 20px;
+        border: 0;
+    }
+}
+
+.el-avatar {
+    --el-avatar-bg-color: #ffffff !important;
+    border: 0.5px solid #eaeaea;
+    box-shadow: 0px 0px 2px 1px rgba(186, 186, 186, 0.22);
+    border-radius: 8px !important;
+    padding: 5px;
+}
+
+.el-card {
+    border: none !important;
+}

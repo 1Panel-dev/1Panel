@@ -1,0 +1,59 @@
+ErrInvalidParams: "Request parameter error: {{ .detail }}"
+ErrToken: "Token information is incorrect.: {{ .detail }}"
+ErrTokenParse: "Token generation error: {{ .detail }}"
+ErrTokenTimeOut: "Login information is out of date: {{ .detail }}"
+ErrInitialPassword: "Initial password error"
+ErrInternalServer: "Service internal error: {{ .detail }}"
+ErrRecordExist: "Record already exists"
+ErrRecordNotFound: "Records not found"
+ErrStructTransform: "Type conversion failure: {{ .detail }}"
+ErrNotLogin: "User is not Login: {{ .detail }}"
+ErrNotSafety: "The login status of the current user is unsafe: {{ .detail }}"
+ErrPasswordExpired: "The current password has expired: {{ .detail }}"
+ErrNotSupportType: "The system does not support the current type: {{ .detail }}"
+ErrRepoNotValid: "Remote repository verification failed！"
+
+#common
+ErrNameIsExist: "Name is already exist"
+ErrDemoEnvironment: "Demo server, prohibit this operation!"
+
+#app
+ErrPortInUsed: "{{ .detail }} port already in use"
+ErrAppLimit: "App exceeds install limit"
+ErrAppRequired: "{{ .detail }} app is required"
+ErrNotInstall: "App not installed"
+ErrPortInOtherApp: "{{ .port }} port  already in use by  {{ .apps }}"
+ErrDbUserNotValid: "Stock database, username and password do not match！"
+ErrDockerComposeNotValid: "docker-compose file format error!"
+ErrUpdateBuWebsite: 'The application was updated successfully, but the modification of the website configuration file failed, please check the configuration!'
+
+#file
+ErrFileCanNotRead: "File can not read"
+ErrFileToLarge: "file is too large"
+ErrPathNotFound: "Path is not found"
+ErrMovePathFailed: "The target path cannot contain the original path!"
+ErrLinkPathNotFound: "Target path does not exist!"
+ErrFileIsExit: "File already exists!"
+
+#website
+ErrDomainIsExist: "Domain is already exist"
+ErrAliasIsExist: "Alias is already exist"
+ErrAppDelete: 'Other Website use this App'
+ErrGroupIsUsed: 'The group is in use and cannot be deleted'
+
+#ssl
+ErrSSLCannotDelete: "The certificate is being used by the website and cannot be removed"
+ErrAccountCannotDelete: "The certificate associated with the account cannot be deleted"
+ErrSSLApply: "The certificate continues to be signed successfully, but openresty reload fails, please check the configuration！"
+ErrEmailIsExist: 'Email is already exist'
+
+#mysql
+ErrUserIsExist: "The current user already exists. Please enter a new user"
+ErrDatabaseIsExist: "The current database already exists. Please enter a new database"
+
+#redis
+ErrTypeOfRedis: "The recovery file type does not match the current persistence mode. Modify the file type and try again"
+
+#container 
+ErrInUsed: "{{ .detail }} is in use and cannot be deleted"
+ErrObjectInUsed: "This object is in use and cannot be deleted"
