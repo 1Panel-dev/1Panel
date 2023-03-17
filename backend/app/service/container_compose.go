@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path"
 	"sort"
 	"strings"
 	"time"
@@ -152,11 +153,16 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 		req.Path = path
 	}
 	global.LOG.Infof("docker-compose.yml %s create successful, start to docker-compose up", req.Name)
-	if stdout, err := compose.Up(req.Path); err != nil {
-		return errors.New(string(stdout))
-	}
 
+	if req.From == "path" {
+		req.Name = path.Base(strings.ReplaceAll(req.Path, "/docker-compose.yml", ""))
+	}
+	if stdout, err := compose.Up(req.Path); err != nil {
+		_, _ = compose.Down(req.Path)
+		return errors.New(stdout)
+	}
 	_ = composeRepo.CreateRecord(&model.Compose{Name: req.Name})
+
 	return nil
 }
 
