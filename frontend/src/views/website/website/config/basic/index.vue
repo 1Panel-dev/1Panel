@@ -1,7 +1,7 @@
 <template>
     <el-tabs tab-position="left" v-model="tabIndex">
         <el-tab-pane :label="$t('website.domainConfig')">
-            <Doamin :key="id" :id="id" v-if="tabIndex == '0'"></Doamin>
+            <Doamin :key="id" :id="id" v-if="tabIndex == '0' && id > 0"></Doamin>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.sitePath')">
             <SitePath :id="id" v-if="tabIndex == '1'"></SitePath>

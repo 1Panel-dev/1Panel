@@ -66,11 +66,6 @@
                     @search="search()"
                     :class="{ mask: nginxStatus != 'Running' }"
                 >
-                    <el-table-column width="30px">
-                        <template #default="{ row }">
-                            <el-button link :icon="Promotion" @click="openUrl(row)"></el-button>
-                        </template>
-                    </el-table-column>
                     <el-table-column :label="$t('commons.table.name')" fix prop="primaryDomain" min-width="120px">
                         <template #default="{ row }">
                             <Tooltip @click="openConfig(row.id)" :text="row.primaryDomain" />
@@ -180,7 +175,7 @@ import { ElMessageBox } from 'element-plus';
 import { dateFormatSimple } from '@/utils/util';
 import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
-import { Promotion, VideoPlay, VideoPause } from '@element-plus/icons-vue';
+import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
 import MsgInfo from '@/components/msg-info/index.vue';
 
 const shortcuts = [
@@ -227,11 +222,6 @@ let req = reactive({
     pageSize: 15,
     websiteGroupId: 0,
 });
-
-const openUrl = (row: Website.WebsiteDTO) => {
-    const url = row.protocol.toLowerCase() + '://' + row.primaryDomain;
-    window.open(url);
-};
 
 const search = async () => {
     req.page = paginationConfig.currentPage;
