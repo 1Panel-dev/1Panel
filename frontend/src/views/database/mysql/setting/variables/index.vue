@@ -152,7 +152,7 @@ let mysqlVariables = reactive({
 });
 const variablesRules = reactive({
     key_buffer_size: [Rules.number, checkNumberRange(1, 102400)],
-    query_cache_size: [Rules.number, checkNumberRange(1, 102400)],
+    query_cache_size: [Rules.number, checkNumberRange(0, 102400)],
     tmp_table_size: [Rules.number, checkNumberRange(1, 102400)],
     innodb_buffer_pool_size: [Rules.number, checkNumberRange(1, 102400)],
     innodb_log_buffer_size: [Rules.number, checkNumberRange(1, 102400)],
