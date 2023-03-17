@@ -6,13 +6,13 @@ import (
 	"net/http"
 	"os"
 	"runtime"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 )
 
@@ -43,8 +43,8 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	isNew, err := compareVersion(currentVersion.Value, string(version))
-	if !isNew || err != nil {
+	isNew := common.CompareVersion(string(version), currentVersion.Value)
+	if !isNew {
 		return nil, err
 	}
 
@@ -175,44 +175,4 @@ func (u *UpgradeService) handleRollback(fileOp files.FileOp, originalDir string,
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
 
-}
-
-func compareVersion(version, newVersion string) (bool, error) {
-	if version == newVersion {
-		return false, nil
-	}
-	if len(version) == 0 || len(newVersion) == 0 {
-		return false, fmt.Errorf("incorrect version or new version entered %v -- %v", version, newVersion)
-	}
-	versions := strings.Split(strings.ReplaceAll(version, "v", ""), ".")
-	if len(versions) != 3 {
-		return false, fmt.Errorf("incorrect version input %v", version)
-	}
-	newVersions := strings.Split(strings.ReplaceAll(newVersion, "v", ""), ".")
-	if len(newVersions) != 3 {
-		return false, fmt.Errorf("incorrect newVersions input %v", version)
-	}
-	version1, _ := strconv.Atoi(versions[0])
-	newVersion1, _ := strconv.Atoi(newVersions[0])
-	if newVersion1 > version1 {
-		return true, nil
-	} else if newVersion1 == version1 {
-		version2, _ := strconv.Atoi(versions[1])
-		newVersion2, _ := strconv.Atoi(newVersions[1])
-		if newVersion2 > version2 {
-			return true, nil
-		} else if newVersion2 == version2 {
-			version3, _ := strconv.Atoi(versions[2])
-			newVersion3, _ := strconv.Atoi(newVersions[2])
-			if newVersion3 > version3 {
-				return true, nil
-			} else {
-				return false, nil
-			}
-		} else {
-			return false, nil
-		}
-	} else {
-		return false, nil
-	}
 }
