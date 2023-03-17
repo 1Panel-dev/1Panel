@@ -118,6 +118,8 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 			return "", err
 		}
 	}
+
+	itemFileDir := strings.ReplaceAll(backupDir, localDir+"/", "")
 	if len(record.Name) != 0 {
 		record.FileName = fileName
 		record.FileDir = backupDir
@@ -125,7 +127,7 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 		record.BackupType = backup.Type
 		if !cronjob.KeepLocal && backup.Type != "LOCAL" {
 			record.Source = backup.Type
-			record.FileDir = strings.ReplaceAll(backupDir, localDir+"/", "")
+			record.FileDir = itemFileDir
 		}
 		if err := backupRepo.CreateRecord(&record); err != nil {
 			global.LOG.Errorf("save backup record failed, err: %v", err)
@@ -148,10 +150,13 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 	if err != nil {
 		return fullPath, err
 	}
-	if _, err = client.Upload(backupDir+"/"+fileName, fullPath); err != nil {
+	if _, err = client.Upload(backupDir+"/"+fileName, itemFileDir+"/"+fileName); err != nil {
 		return fullPath, err
 	}
-	u.HandleRmExpired(backup.Type, backupDir, cronjob, client)
+	u.HandleRmExpired(backup.Type, itemFileDir, cronjob, client)
+	if cronjob.KeepLocal {
+		u.HandleRmExpired("LOCAL", backupDir, cronjob, client)
+	}
 	return fullPath, nil
 }
 
@@ -185,9 +190,7 @@ func (u *CronjobService) HandleRmExpired(backType, backupDir string, cronjob *mo
 		for i := 0; i < len(currentObjs)-int(cronjob.RetainCopies); i++ {
 			_, _ = backClient.Delete(currentObjs[i].(string))
 		}
-		if !cronjob.KeepLocal {
-			return
-		}
+		return
 	}
 	files, err := ioutil.ReadDir(backupDir)
 	if err != nil {

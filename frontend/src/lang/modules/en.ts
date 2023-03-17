@@ -97,7 +97,7 @@ const message = {
             unSupportSize: 'The uploaded file exceeds {0}M, please confirm!',
             fileExist: 'The file already exists in the current folder. Repeat uploading is not supported!',
             fileNameErr:
-                'You can upload only files whose name contains 1 to 50 characters, including English, Chinese, digits, or periods (.-_)',
+                'You can upload only files whose name contains 1 to 256 characters, including English, Chinese, digits, or periods (.-_)',
             comfimNoNull: 'Make sure the value {0} is not empty',
         },
         login: {

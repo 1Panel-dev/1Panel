@@ -54,13 +54,13 @@ export const loadBaseDir = () => {
 
 // backup
 export const handleBackup = (params: Backup.Backup) => {
-    return http.post(`/settings/backup/backup`, params);
+    return http.post(`/settings/backup/backup`, params, 400000);
 };
 export const handleRecover = (params: Backup.Recover) => {
-    return http.post(`/settings/backup/recover`, params);
+    return http.post(`/settings/backup/recover`, params, 400000);
 };
 export const handleRecoverByUpload = (params: Backup.Recover) => {
-    return http.post(`/settings/backup/recover/byupload`, params);
+    return http.post(`/settings/backup/recover/byupload`, params, 400000);
 };
 export const downloadBackupRecord = (params: Backup.RecordDownload) => {
     return http.download<BlobPart>(`/settings/backup/record/download`, params, { responseType: 'blob' });
