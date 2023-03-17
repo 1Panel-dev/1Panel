@@ -292,7 +292,7 @@ func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
 	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create user if not exists '%s'@'%s' identified by '%s';", mysql.Username, info.Value, mysql.Password)); err != nil {
 		return err
 	}
-	grantStr := fmt.Sprintf("grant all privileges on %s.* to '%s'@'%s'", mysql.Name, mysql.Username, info.Value)
+	grantStr := fmt.Sprintf("grant all privileges on `%s`.* to '%s'@'%s'", mysql.Name, mysql.Username, info.Value)
 	if app.Version == "5.7.39" {
 		grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, mysql.Password)
 	}
