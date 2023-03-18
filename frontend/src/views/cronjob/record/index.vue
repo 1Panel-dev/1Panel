@@ -283,7 +283,7 @@ import { searchRecords, download, handleOnce, updateStatus } from '@/api/modules
 import { dateFormat } from '@/utils/util';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
-import { LoadFile } from '@/api/modules/files';
+import { DownloadByPath, LoadFile } from '@/api/modules/files';
 import LayoutContent from '@/layout/layout-content.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
@@ -472,17 +472,19 @@ const onDownload = async (record: any, backupID: number) => {
         recordID: record.id,
         backupAccountID: backupID,
     };
-    const res = await download(params);
-    const downloadUrl = window.URL.createObjectURL(new Blob([res]));
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = downloadUrl;
-    if (record.file && record.file.indexOf('/') !== -1) {
-        let pathItem = record.file.split('/');
-        a.download = pathItem[pathItem.length - 1];
-    }
-    const event = new MouseEvent('click');
-    a.dispatchEvent(event);
+    await download(params).then(async (res) => {
+        const file = await DownloadByPath(res.data);
+        const downloadUrl = window.URL.createObjectURL(new Blob([file]));
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = downloadUrl;
+        if (record.file && record.file.indexOf('/') !== -1) {
+            let pathItem = record.file.split('/');
+            a.download = pathItem[pathItem.length - 1];
+        }
+        const event = new MouseEvent('click');
+        a.dispatchEvent(event);
+    });
 };
 
 const nextPage = async () => {

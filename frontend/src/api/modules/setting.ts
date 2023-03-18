@@ -63,7 +63,7 @@ export const handleRecoverByUpload = (params: Backup.Recover) => {
     return http.post(`/settings/backup/recover/byupload`, params, 400000);
 };
 export const downloadBackupRecord = (params: Backup.RecordDownload) => {
-    return http.download<BlobPart>(`/settings/backup/record/download`, params, { responseType: 'blob' });
+    return http.post<string>(`/settings/backup/record/download`, params);
 };
 export const deleteBackupRecord = (params: { ids: number[] }) => {
     return http.post(`/settings/backup/record/del`, params);
