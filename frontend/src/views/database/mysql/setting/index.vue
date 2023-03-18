@@ -244,6 +244,7 @@ const onSubmitChangeConf = async () => {
     loading.value = true;
     await updateMysqlConfByFile(param)
         .then(() => {
+            useOld.value = false;
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
@@ -303,6 +304,7 @@ const loadSlowLogs = async () => {
 };
 
 const loadMysqlConf = async (path: string) => {
+    useOld.value = false;
     const res = await LoadFile({ path: path });
     loading.value = false;
     mysqlConf.value = res.data;
