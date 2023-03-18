@@ -144,7 +144,7 @@ func (b *BaseApi) DeleteCheck(c *gin.Context) {
 // @Router /apps/installed/sync [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"同步已安装应用列表","formatEN":"Sync the list of installed apps"}
 func (b *BaseApi) SyncInstalled(c *gin.Context) {
-	if err := appInstallService.SyncAll(); err != nil {
+	if err := appInstallService.SyncAll(false); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
