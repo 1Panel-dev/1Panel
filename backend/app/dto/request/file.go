@@ -81,6 +81,10 @@ type FileDownload struct {
 	Compress bool     `json:"compress" validate:"required"`
 }
 
+type FilePath struct {
+	Path string `json:"path" validate:"required"`
+}
+
 type DirSizeReq struct {
 	Path string `json:"path" validate:"required"`
 }

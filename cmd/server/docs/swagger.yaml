@@ -152,7 +152,6 @@ definitions:
         type: integer
     required:
     - from
-    - name
     type: object
   dto.ComposeOperation:
     properties:
@@ -294,22 +293,16 @@ definitions:
   dto.CronjobCreate:
     properties:
       day:
-        maximum: 31
-        minimum: 1
         type: integer
       dbName:
         type: string
       exclusionRules:
         type: string
       hour:
-        maximum: 23
-        minimum: 0
         type: integer
       keepLocal:
         type: boolean
       minute:
-        maximum: 59
-        minimum: 0
         type: integer
       name:
         type: string
@@ -352,24 +345,18 @@ definitions:
   dto.CronjobUpdate:
     properties:
       day:
-        maximum: 31
-        minimum: 1
         type: integer
       dbName:
         type: string
       exclusionRules:
         type: string
       hour:
-        maximum: 23
-        minimum: 0
         type: integer
       id:
         type: integer
       keepLocal:
         type: boolean
       minute:
-        maximum: 59
-        minimum: 0
         type: integer
       name:
         type: string
@@ -439,10 +426,6 @@ definitions:
     properties:
       file:
         type: string
-      path:
-        type: string
-    required:
-    - path
     type: object
   dto.DashboardBase:
     properties:
@@ -564,6 +547,10 @@ definitions:
         - restart
         - stop
         type: string
+      stopService:
+        type: boolean
+      stopSocket:
+        type: boolean
     required:
     - operation
     type: object
@@ -1752,6 +1739,17 @@ definitions:
     - page
     - pageSize
     type: object
+  request.AppInstalledUpdate:
+    properties:
+      installId:
+        type: integer
+      params:
+        additionalProperties: true
+        type: object
+    required:
+    - installId
+    - params
+    type: object
   request.AppSearch:
     properties:
       name:
@@ -1913,6 +1911,13 @@ definitions:
         type: string
       showHidden:
         type: boolean
+    type: object
+  request.FilePath:
+    properties:
+      path:
+        type: string
+    required:
+    - path
     type: object
   request.FilePathCheck:
     properties:
@@ -2421,7 +2426,17 @@ definitions:
     type: object
   response.AppParam:
     properties:
-      label:
+      edit:
+        type: boolean
+      key:
+        type: string
+      labelEn:
+        type: string
+      labelZh:
+        type: string
+      rule:
+        type: string
+      type:
         type: string
       value: {}
     type: object
@@ -2515,6 +2530,8 @@ definitions:
         type: string
       appInstallId:
         type: integer
+      appName:
+        type: string
       createdAt:
         type: string
       defaultServer:
@@ -2626,6 +2643,17 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Search app by key
+      tags:
+      - App
+  /apps/checkupdate:
+    get:
+      description: 获取应用更新版本
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Get app list update
       tags:
       - App
   /apps/detail/:appId/:version:
@@ -2887,6 +2915,33 @@ paths:
       summary: Search params by appInstallId
       tags:
       - App
+  /apps/installed/params/update:
+    post:
+      consumes:
+      - application/json
+      description: 修改应用参数
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.AppInstalledUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Change app params
+      tags:
+      - App
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - installId
+        formatEN: Application param update [installId]
+        formatZH: 应用参数修改 [installId]
+        paramKeys: []
   /apps/installed/port/change:
     post:
       consumes:
@@ -3020,6 +3075,15 @@ paths:
           schema:
             $ref: '#/definitions/dto.CaptchaResponse'
       summary: Load captcha
+      tags:
+      - Auth
+  /auth/demo:
+    get:
+      description: 判断是否为demo环境
+      responses:
+        "200":
+          description: ""
+      summary: Check System isDemo
       tags:
       - Auth
   /auth/init:
@@ -5065,6 +5129,30 @@ paths:
         formatEN: Check whether file [path] exists
         formatZH: 检测文件 [path] 是否存在
         paramKeys: []
+  /files/chunkupload:
+    post:
+      description: 分片上传文件
+      parameters:
+      - description: request
+        in: formData
+        name: file
+        required: true
+        type: file
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: ChunkUpload file
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - path
+        formatEN: Upload file [path]
+        formatZH: 上传文件 [path]
+        paramKeys: []
   /files/compress:
     post:
       consumes:
@@ -5201,6 +5289,33 @@ paths:
         - name
         formatEN: Download file [name]
         formatZH: 下载文件 [name]
+        paramKeys: []
+  /files/download/bypath:
+    post:
+      consumes:
+      - application/json
+      description: 下载指定文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FilePath'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Download file with path
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - path
+        formatEN: Download file [path]
+        formatZH: 下载文件 [path]
         paramKeys: []
   /files/loadfile:
     post:

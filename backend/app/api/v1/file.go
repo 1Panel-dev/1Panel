@@ -446,6 +446,28 @@ func (b *BaseApi) Download(c *gin.Context) {
 }
 
 // @Tags File
+// @Summary Download file with path
+// @Description 下载指定文件
+// @Accept json
+// @Param request body request.FilePath true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /files/download/bypath [post]
+// @x-panel-log {"bodyKeys":["path"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"下载文件 [path]","formatEN":"Download file [path]"}
+func (b *BaseApi) DownloadFile(c *gin.Context) {
+	var req request.FilePath
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	c.File(req.Path)
+}
+
+// @Tags File
 // @Summary Load file size
 // @Description 获取文件夹大小
 // @Accept json
