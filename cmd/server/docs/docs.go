@@ -62,6 +62,25 @@ var doc = `{
                 }
             }
         },
+        "/apps/checkupdate": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取应用更新版本",
+                "tags": [
+                    "App"
+                ],
+                "summary": "Get app list update",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/apps/detail/:appId/:version": {
             "get": {
                 "security": [
@@ -470,6 +489,48 @@ var doc = `{
                 }
             }
         },
+        "/apps/installed/params/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改应用参数",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "App"
+                ],
+                "summary": "Change app params",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.AppInstalledUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "installId"
+                    ],
+                    "formatEN": "Application param update [installId]",
+                    "formatZH": "应用参数修改 [installId]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/apps/installed/port/change": {
             "post": {
                 "security": [
@@ -679,6 +740,20 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/dto.CaptchaResponse"
                         }
+                    }
+                }
+            }
+        },
+        "/auth/demo": {
+            "get": {
+                "description": "判断是否为demo环境",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Check System isDemo",
+                "responses": {
+                    "200": {
+                        "description": ""
                     }
                 }
             }
@@ -3899,6 +3974,43 @@ var doc = `{
                 }
             }
         },
+        "/files/chunkupload": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "分片上传文件",
+                "tags": [
+                    "File"
+                ],
+                "summary": "ChunkUpload file",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "request",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "path"
+                    ],
+                    "formatEN": "Upload file [path]",
+                    "formatZH": "上传文件 [path]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/files/compress": {
             "post": {
                 "security": [
@@ -4108,6 +4220,48 @@ var doc = `{
                     ],
                     "formatEN": "Download file [name]",
                     "formatZH": "下载文件 [name]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/files/download/bypath": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "下载指定文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "File"
+                ],
+                "summary": "Download file with path",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.FilePath"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "path"
+                    ],
+                    "formatEN": "Download file [path]",
+                    "formatZH": "下载文件 [path]",
                     "paramKeys": []
                 }
             }
@@ -8623,8 +8777,7 @@ var doc = `{
         "dto.ComposeCreate": {
             "type": "object",
             "required": [
-                "from",
-                "name"
+                "from"
             ],
             "properties": {
                 "file": {
@@ -8860,9 +9013,7 @@ var doc = `{
             ],
             "properties": {
                 "day": {
-                    "type": "integer",
-                    "maximum": 31,
-                    "minimum": 1
+                    "type": "integer"
                 },
                 "dbName": {
                     "type": "string"
@@ -8871,17 +9022,13 @@ var doc = `{
                     "type": "string"
                 },
                 "hour": {
-                    "type": "integer",
-                    "maximum": 23,
-                    "minimum": 0
+                    "type": "integer"
                 },
                 "keepLocal": {
                     "type": "boolean"
                 },
                 "minute": {
-                    "type": "integer",
-                    "maximum": 59,
-                    "minimum": 0
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -8942,9 +9089,7 @@ var doc = `{
             ],
             "properties": {
                 "day": {
-                    "type": "integer",
-                    "maximum": 31,
-                    "minimum": 1
+                    "type": "integer"
                 },
                 "dbName": {
                     "type": "string"
@@ -8953,9 +9098,7 @@ var doc = `{
                     "type": "string"
                 },
                 "hour": {
-                    "type": "integer",
-                    "maximum": 23,
-                    "minimum": 0
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
@@ -8964,9 +9107,7 @@ var doc = `{
                     "type": "boolean"
                 },
                 "minute": {
-                    "type": "integer",
-                    "maximum": 59,
-                    "minimum": 0
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -9060,14 +9201,8 @@ var doc = `{
         },
         "dto.DaemonJsonUpdateByFile": {
             "type": "object",
-            "required": [
-                "path"
-            ],
             "properties": {
                 "file": {
-                    "type": "string"
-                },
-                "path": {
                     "type": "string"
                 }
             }
@@ -9254,6 +9389,12 @@ var doc = `{
                         "restart",
                         "stop"
                     ]
+                },
+                "stopService": {
+                    "type": "boolean"
+                },
+                "stopSocket": {
+                    "type": "boolean"
                 }
             }
         },
@@ -11042,6 +11183,22 @@ var doc = `{
                 }
             }
         },
+        "request.AppInstalledUpdate": {
+            "type": "object",
+            "required": [
+                "installId",
+                "params"
+            ],
+            "properties": {
+                "installId": {
+                    "type": "integer"
+                },
+                "params": {
+                    "type": "object",
+                    "additionalProperties": true
+                }
+            }
+        },
         "request.AppSearch": {
             "type": "object",
             "required": [
@@ -11281,6 +11438,17 @@ var doc = `{
                 },
                 "showHidden": {
                     "type": "boolean"
+                }
+            }
+        },
+        "request.FilePath": {
+            "type": "object",
+            "required": [
+                "path"
+            ],
+            "properties": {
+                "path": {
+                    "type": "string"
                 }
             }
         },
@@ -12042,7 +12210,22 @@ var doc = `{
         "response.AppParam": {
             "type": "object",
             "properties": {
-                "label": {
+                "edit": {
+                    "type": "boolean"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "labelEn": {
+                    "type": "string"
+                },
+                "labelZh": {
+                    "type": "string"
+                },
+                "rule": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 },
                 "value": {}
@@ -12184,6 +12367,9 @@ var doc = `{
                 },
                 "appInstallId": {
                     "type": "integer"
+                },
+                "appName": {
+                    "type": "string"
                 },
                 "createdAt": {
                     "type": "string"

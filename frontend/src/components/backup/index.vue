@@ -58,6 +58,7 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { deleteBackupRecord, downloadBackupRecord, searchBackupRecords } from '@/api/modules/setting';
 import { Backup } from '@/api/interface/backup';
 import { MsgSuccess } from '@/utils/message';
+import { DownloadByPath } from '@/api/modules/files';
 
 const selects = ref<any>([]);
 const loading = ref();
@@ -145,14 +146,16 @@ const onDownload = async (row: Backup.RecordInfo) => {
         fileDir: row.fileDir,
         fileName: row.fileName,
     };
-    const res = await downloadBackupRecord(params);
-    const downloadUrl = window.URL.createObjectURL(new Blob([res]));
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = downloadUrl;
-    a.download = row.fileName;
-    const event = new MouseEvent('click');
-    a.dispatchEvent(event);
+    await downloadBackupRecord(params).then(async (res) => {
+        const file = await DownloadByPath(res.data);
+        const downloadUrl = window.URL.createObjectURL(new Blob([file]));
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = downloadUrl;
+        a.download = row.fileName;
+        const event = new MouseEvent('click');
+        a.dispatchEvent(event);
+    });
 };
 
 const onBatchDelete = async (row: Backup.RecordInfo | null) => {

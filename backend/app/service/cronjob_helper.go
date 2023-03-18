@@ -22,8 +22,7 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 		message []byte
 		err     error
 	)
-	record := cronjobRepo.StartRecords(cronjob.ID, "")
-	record.FromLocal = cronjob.KeepLocal
+	record := cronjobRepo.StartRecords(cronjob.ID, cronjob.KeepLocal, "")
 	go func() {
 		switch cronjob.Type {
 		case "shell":
@@ -135,7 +134,10 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 		}
 	}
 
-	fullPath := fmt.Sprintf("%s/%s", record.FileDir, fileName)
+	fullPath := fmt.Sprintf("%s/%s", backupDir, fileName)
+	if backup.Type != "LOCAL" {
+		fullPath = fmt.Sprintf("%s/%s", itemFileDir, fileName)
+	}
 	if backup.Type == "LOCAL" {
 		u.HandleRmExpired(backup.Type, backupDir, cronjob, nil)
 		return fullPath, nil
