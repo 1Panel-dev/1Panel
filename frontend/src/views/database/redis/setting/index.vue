@@ -317,6 +317,7 @@ const submtiFile = async () => {
     loading.value = true;
     await updateRedisConfByFile(param)
         .then(() => {
+            useOld.value = false;
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
@@ -337,6 +338,7 @@ const loadform = async () => {
 const loadConfFile = async () => {
     const pathRes = await loadBaseDir();
     let path = `${pathRes.data}/apps/redis/${redisName.value}/conf/redis.conf`;
+    useOld.value = false;
     loading.value = true;
     await LoadFile({ path: path })
         .then((res) => {
