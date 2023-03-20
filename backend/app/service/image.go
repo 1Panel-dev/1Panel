@@ -186,7 +186,7 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 			return
 		}
 		global.LOG.Infof("build image %s successful!", req.Name)
-		_, _ = io.Copy(file, res.Body)
+		_, _ = file.Write(body)
 		_, _ = file.WriteString("image build successful!")
 	}()
 
