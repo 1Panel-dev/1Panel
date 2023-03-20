@@ -1,12 +1,18 @@
 <template>
-    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer
+        v-model="drawerVisiable"
+        @close="handleClose"
+        :destroy-on-close="true"
+        :close-on-click-modal="false"
+        size="50%"
+    >
         <template #header>
             <DrawerHeader :header="$t('container.compose')" :back="handleClose" />
         </template>
-        <div v-loading="loading">
-            <el-form ref="formRef" label-position="top" :model="form" :rules="rules" label-width="80px">
-                <el-row type="flex" justify="center">
-                    <el-col :span="22">
+        <div>
+            <el-row type="flex" justify="center">
+                <el-col :span="22">
+                    <el-form ref="formRef" label-position="top" :model="form" :rules="rules" label-width="80px">
                         <el-form-item :label="$t('container.from')">
                             <el-radio-group v-model="form.from">
                                 <el-radio label="edit">{{ $t('commons.button.edit') }}</el-radio>
@@ -46,7 +52,7 @@
                                 placeholder="#Define or paste the content of your docker-compose file here"
                                 :indent-with-tab="true"
                                 :tabSize="4"
-                                style="width: 100%; height: calc(100vh - 340px)"
+                                style="width: 100%; height: 200px"
                                 :lineWrapping="true"
                                 :matchBrackets="true"
                                 theme="cobalt"
@@ -55,16 +61,32 @@
                                 v-model="form.file"
                             />
                         </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
+                    </el-form>
+                    <codemirror
+                        v-if="logVisiable"
+                        :autofocus="true"
+                        placeholder="Waiting for build output..."
+                        :indent-with-tab="true"
+                        :tabSize="4"
+                        style="max-height: calc(100vh - 537px)"
+                        :lineWrapping="true"
+                        :matchBrackets="true"
+                        theme="cobalt"
+                        :styleActiveLine="true"
+                        :extensions="extensions"
+                        @ready="handleReady"
+                        v-model="logInfo"
+                        :readOnly="true"
+                    />
+                </el-col>
+            </el-row>
         </div>
         <template #footer>
             <span class="dialog-footer">
-                <el-button :disabled="loading" @click="drawerVisiable = false">
+                <el-button @click="drawerVisiable = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" :disabled="loading" @click="onSubmit(formRef)">
+                <el-button type="primary" :disabled="buttonDisabled" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -73,7 +95,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { nextTick, reactive, ref, shallowRef } from 'vue';
 import FileList from '@/components/file-list/index.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
@@ -83,16 +105,26 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { listComposeTemplate, upCompose } from '@/api/modules/container';
-import { MsgSuccess } from '@/utils/message';
 import { loadBaseDir } from '@/api/modules/setting';
+import { LoadFile } from '@/api/modules/files';
+import { formatImageStdout } from '@/utils/docker';
 
 const extensions = [javascript(), oneDark];
+const view = shallowRef();
+const handleReady = (payload) => {
+    view.value = payload.view;
+};
+const logVisiable = ref();
+const logInfo = ref();
+
 const drawerVisiable = ref(false);
 const templateOptions = ref();
+const buttonDisabled = ref(false);
 
-const loading = ref(false);
 const baseDir = ref();
 const composeFile = ref();
+
+let timer: NodeJS.Timer | null = null;
 
 const varifyPath = (rule: any, value: any, callback: any) => {
     if (value.indexOf('docker-compose.yml') === -1) {
@@ -100,6 +132,7 @@ const varifyPath = (rule: any, value: any, callback: any) => {
     }
     callback();
 };
+
 const form = reactive({
     name: '',
     from: 'edit',
@@ -126,12 +159,17 @@ const acceptParams = (): void => {
     form.from = 'edit';
     form.path = '';
     form.file = '';
+    logVisiable.value = false;
+    logInfo.value = '';
     loadTemplates();
     loadPath();
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const handleClose = () => {
+    emit('search');
+    clearInterval(Number(timer));
+    timer = null;
     drawerVisiable.value = false;
 };
 
@@ -152,18 +190,36 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        loading.value = true;
-        upCompose(form)
-            .then(() => {
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                loading.value = false;
-                emit('search');
-                drawerVisiable.value = false;
-            })
-            .finally(() => {
-                loading.value = false;
-            });
+        const res = await upCompose(form);
+        logInfo.value = '';
+        buttonDisabled.value = true;
+        logVisiable.value = true;
+        loadLogs(res.data);
     });
+};
+
+const loadLogs = async (path: string) => {
+    timer = setInterval(async () => {
+        if (logVisiable.value) {
+            const res = await LoadFile({ path: path });
+            logInfo.value = formatImageStdout(res.data);
+            nextTick(() => {
+                const state = view.value.state;
+                view.value.dispatch({
+                    selection: { anchor: state.doc.length, head: state.doc.length },
+                    scrollIntoView: true,
+                });
+            });
+            if (
+                logInfo.value.endsWith('docker-compose up failed!') ||
+                logInfo.value.endsWith('docker-compose up successful!')
+            ) {
+                clearInterval(Number(timer));
+                timer = null;
+                buttonDisabled.value = false;
+            }
+        }
+    }, 1000 * 3);
 };
 
 const loadDir = async (path: string) => {

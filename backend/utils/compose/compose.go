@@ -7,7 +7,7 @@ import (
 )
 
 func Up(filePath string) (string, error) {
-	stdout, err := cmd.Execf("docker-compose -f %s up -d --quiet-pull", filePath)
+	stdout, err := cmd.Execf("docker-compose -f %s up -d", filePath)
 	return stdout, err
 }
 

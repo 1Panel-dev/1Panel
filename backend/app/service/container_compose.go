@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"sort"
 	"strings"
@@ -124,11 +125,11 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 	return int64(total), BackDatas, nil
 }
 
-func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
+func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) {
 	if req.From == "template" {
 		template, err := composeRepo.Get(commonRepo.WithByID(req.Template))
 		if err != nil {
-			return err
+			return "", err
 		}
 		req.From = "edit"
 		req.File = template.Content
@@ -137,14 +138,14 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 		dir := fmt.Sprintf("%s/docker/compose/%s", constant.DataDir, req.Name)
 		if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 			if err = os.MkdirAll(dir, os.ModePerm); err != nil {
-				return err
+				return "", err
 			}
 		}
 
 		path := fmt.Sprintf("%s/docker-compose.yml", dir)
 		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		if err != nil {
-			return err
+			return "", err
 		}
 		defer file.Close()
 		write := bufio.NewWriter(file)
@@ -157,13 +158,28 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
 	if req.From == "path" {
 		req.Name = path.Base(strings.ReplaceAll(req.Path, "/docker-compose.yml", ""))
 	}
-	if stdout, err := compose.Up(req.Path); err != nil {
-		_, _ = compose.Down(req.Path)
-		return errors.New(stdout)
+	logName := strings.ReplaceAll(req.Path, "docker-compose.yml", "compose.log")
+	file, err := os.OpenFile(logName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		return "", err
 	}
-	_ = composeRepo.CreateRecord(&model.Compose{Name: req.Name})
+	go func() {
+		defer file.Close()
+		cmd := exec.Command("docker-compose", "-f", req.Path, "up", "-d")
+		stdout, err := cmd.CombinedOutput()
+		_, _ = file.Write(stdout)
+		if err != nil {
+			global.LOG.Errorf("docker-compose up %s failed, err: %v", req.Name, err)
+			_, _ = compose.Down(req.Path)
+			_, _ = file.WriteString("docker-compose up failed!")
+			return
+		}
+		global.LOG.Infof("docker-compose up %s successful!", req.Name)
+		_ = composeRepo.CreateRecord(&model.Compose{Name: req.Name})
+		_, _ = file.WriteString("docker-compose up successful!")
+	}()
 
-	return nil
+	return logName, nil
 }
 
 func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {

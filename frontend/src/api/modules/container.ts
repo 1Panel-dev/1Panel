@@ -117,7 +117,7 @@ export const searchCompose = (params: SearchWithPage) => {
     return http.post<ResPage<Container.ComposeInfo>>(`/containers/compose/search`, params);
 };
 export const upCompose = (params: Container.ComposeCreate) => {
-    return http.post(`/containers/compose`, params, 600000);
+    return http.post<string>(`/containers/compose`, params, 600000);
 };
 export const composeOperator = (params: Container.ComposeOpration) => {
     return http.post(`/containers/compose/operate`, params);

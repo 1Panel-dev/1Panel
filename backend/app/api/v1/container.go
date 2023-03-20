@@ -90,11 +90,12 @@ func (b *BaseApi) CreateCompose(c *gin.Context) {
 		return
 	}
 
-	if err := containerService.CreateCompose(req); err != nil {
+	log, err := containerService.CreateCompose(req)
+	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithData(c, log)
 }
 
 // @Tags Container Compose
