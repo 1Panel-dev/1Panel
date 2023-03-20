@@ -157,6 +157,20 @@
                             {{ $t('commons.button.login') }}
                         </el-button>
                     </el-form-item>
+                    <el-form-item prop="agreeLicense">
+                        <el-checkbox v-model="loginForm.agreeLicense">
+                            <template #default>
+                                <span v-html="$t('commons.login.licenseHelper')"></span>
+                            </template>
+                        </el-checkbox>
+                        <span
+                            v-if="errAgree && loginForm.agreeLicense === false"
+                            class="input-error"
+                            style="line-height: 14px"
+                        >
+                            {{ $t('commons.login.errorAgree') }}
+                        </span>
+                    </el-form-item>
                 </el-form>
                 <div class="demo">
                     <span v-if="isDemo">
@@ -186,6 +200,7 @@ const errAuthInfo = ref(false);
 const errCaptcha = ref(false);
 const errMfaInfo = ref(false);
 const isDemo = ref(false);
+const errAgree = ref(false);
 
 const isFirst = ref();
 
@@ -212,6 +227,7 @@ const loginForm = reactive({
     captcha: '',
     captchaID: '',
     authMethod: '',
+    agreeLicense: false,
 });
 const loginRules = reactive({
     name: [{ required: true, message: i18n.global.t('commons.rule.username'), trigger: 'blur' }],
@@ -259,6 +275,14 @@ const login = (formEl: FormInstance | undefined) => {
                 captchaID: captcha.captchaID,
                 authMethod: '',
             };
+            if (requestLoginForm.captcha == '') {
+                errCaptcha.value = true;
+                return;
+            }
+            if (loginForm.agreeLicense == false) {
+                errAgree.value = true;
+                return;
+            }
             const res = await loginApi(requestLoginForm);
             if (res.code === 406) {
                 if (res.message === 'ErrCaptchaCode') {
@@ -280,6 +304,7 @@ const login = (formEl: FormInstance | undefined) => {
                 return;
             }
             globalStore.setLogStatus(true);
+            globalStore.setAgreeLicense(true);
             menuStore.setMenuList([]);
             MsgSuccess(i18n.global.t('commons.msg.loginSuccess'));
             router.push({ name: 'home' });
@@ -335,6 +360,7 @@ function checkPassword(rule: any, value: any, callback: any) {
 
 onMounted(() => {
     document.title = globalStore.themeConfig.panelName;
+    loginForm.agreeLicense = globalStore.agreeLicense;
     checkStatus();
     checkIsSystemDemo();
     document.onkeydown = (e: any) => {
