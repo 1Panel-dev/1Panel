@@ -854,7 +854,12 @@ const message = {
         upgrading: 'Please wait while the upgrade is underway...',
         upgradeHelper: 'The upgrade requires a service restart. Do you want to continue?',
         noUpgrade: 'It is currently the latest version',
-        newVersion: 'Latest version',
+        versionHelper:
+            'Name rules: [major version].[functional version].[Bug fix version], as shown in the following example:',
+        versionHelper1: 'v1.0.1 is a Bug fix after v1.0.0',
+        versionHelper2: 'v1.1.0 is a feature release after v1.0.0',
+        newVersion: '(Bug fix version)',
+        latestVersion: '(Functional version)',
         upgradeCheck: 'Check for updates',
         upgradeNotes: 'Release note',
         upgradeNow: 'Upgrade now',
