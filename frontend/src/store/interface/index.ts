@@ -16,6 +16,7 @@ export interface GlobalState {
     // assemblySize: string; // small | default | large
     themeConfig: ThemeConfigProp;
     isFullScreen: boolean;
+    agreeLicense: boolean;
 }
 
 export interface MenuState {

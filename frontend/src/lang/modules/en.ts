@@ -121,6 +121,9 @@ const message = {
                 'Note: [Closing the security entrance] will make your panel login address directly exposed to the Internet, very dangerous, please exercise caution',
             codeInput: 'Please enter the 6-digit verification code of the MFA validator',
             title: 'Linux Server Management Panel',
+            licenseHelper:
+                'Agree to FIT2CLOUD &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank">Community Software License Agreement</a> &raquo;',
+            errorAgree: 'Please click to agree to the Community Software License Agreement',
         },
         rule: {
             username: 'Please enter a username',

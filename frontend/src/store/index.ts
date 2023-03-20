@@ -20,6 +20,7 @@ export const GlobalStore = defineStore({
             footer: true,
         },
         isFullScreen: false,
+        agreeLicense: false,
     }),
     getters: {},
     actions: {
@@ -44,6 +45,9 @@ export const GlobalStore = defineStore({
         },
         setThemeConfig(themeConfig: ThemeConfigProp) {
             this.themeConfig = themeConfig;
+        },
+        setAgreeLicense(agree: boolean) {
+            this.agreeLicense = agree;
         },
     },
     persist: piniaPersistConfig('GlobalState'),

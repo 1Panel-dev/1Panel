@@ -125,6 +125,9 @@ const message = {
             codeInput: '请输入 MFA 验证器的 6 位验证码',
             mfaTitle: 'MFA认证',
             title: 'Linux 服务器运维管理面板',
+            licenseHelper:
+                '同意 FIT2CLOUD 飞致云 &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank"> 社区软件许可协议</a> &raquo;',
+            errorAgree: '请点击同意社区软件许可协议',
         },
         rule: {
             username: '请输入用户名',
