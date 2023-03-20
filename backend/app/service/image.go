@@ -54,8 +54,8 @@ func (u *ImageService) Page(req dto.SearchWithPage) (int64, interface{}, error) 
 		return 0, nil, err
 	}
 	if len(req.Info) != 0 {
-		lenth, count := len(list), 0
-		for count < lenth {
+		length, count := len(list), 0
+		for count < length {
 			hasTag := false
 			for _, tag := range list[count].RepoTags {
 				if strings.Contains(tag, req.Info) {
@@ -65,7 +65,7 @@ func (u *ImageService) Page(req dto.SearchWithPage) (int64, interface{}, error) 
 			}
 			if !hasTag {
 				list = append(list[:count], list[(count+1):]...)
-				lenth--
+				length--
 			} else {
 				count++
 			}
