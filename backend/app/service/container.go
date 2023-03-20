@@ -33,7 +33,7 @@ type IContainerService interface {
 	PageVolume(req dto.SearchWithPage) (int64, interface{}, error)
 	ListVolume() ([]dto.Options, error)
 	PageCompose(req dto.SearchWithPage) (int64, interface{}, error)
-	CreateCompose(req dto.ComposeCreate) error
+	CreateCompose(req dto.ComposeCreate) (string, error)
 	ComposeOperation(req dto.ComposeOperation) error
 	ContainerCreate(req dto.ContainerCreate) error
 	ContainerOperation(req dto.ContainerOperation) error

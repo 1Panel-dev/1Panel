@@ -2,7 +2,7 @@
     <el-drawer
         v-model="drawerVisiable"
         :destroy-on-close="true"
-        @close="onCloseLog"
+        @close="handleClose"
         :close-on-click-modal="false"
         size="50%"
     >
@@ -141,6 +141,9 @@ const emit = defineEmits<{ (e: 'search'): void }>();
 
 const handleClose = () => {
     drawerVisiable.value = false;
+    emit('search');
+    clearInterval(Number(timer));
+    timer = null;
 };
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -180,11 +183,6 @@ const loadLogs = async (path: string) => {
             }
         }
     }, 1000 * 3);
-};
-const onCloseLog = async () => {
-    emit('search');
-    clearInterval(Number(timer));
-    timer = null;
 };
 
 const loadBuildDir = async (path: string) => {
