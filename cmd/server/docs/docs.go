@@ -4246,7 +4246,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/request.FilePath"
+                            "$ref": "#/definitions/dto.FilePath"
                         }
                     }
                 ],
@@ -6860,17 +6860,28 @@ var doc = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "系统更新信息",
+                "description": "获取版本 release notes",
+                "consumes": [
+                    "application/json"
+                ],
                 "tags": [
                     "System Setting"
                 ],
-                "summary": "Load upgrade info",
+                "summary": "Load release notes by version",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Upgrade"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/dto.UpgradeInfo"
-                        }
+                        "description": ""
                     }
                 }
             },
@@ -10652,6 +10663,9 @@ var doc = `{
         "dto.UpgradeInfo": {
             "type": "object",
             "properties": {
+                "latestVersion": {
+                    "type": "string"
+                },
                 "newVersion": {
                     "type": "string"
                 },
@@ -11438,17 +11452,6 @@ var doc = `{
                 },
                 "showHidden": {
                     "type": "boolean"
-                }
-            }
-        },
-        "request.FilePath": {
-            "type": "object",
-            "required": [
-                "path"
-            ],
-            "properties": {
-                "path": {
-                    "type": "string"
                 }
             }
         },

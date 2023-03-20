@@ -1,6 +1,8 @@
 package service
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -20,6 +22,7 @@ type UpgradeService struct{}
 
 type IUpgradeService interface {
 	Upgrade(req dto.Upgrade) error
+	LoadNotes(req dto.Upgrade) (string, error)
 	SearchUpgrade() (*dto.UpgradeInfo, error)
 }
 
@@ -34,34 +37,43 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 		return nil, err
 	}
 
-	versionRes, err := http.Get(fmt.Sprintf("%s/%s/latest", global.CONF.System.RepoUrl, global.CONF.System.Mode))
+	latestVersion, err := u.loadVersion(true, currentVersion.Value)
 	if err != nil {
+		global.LOG.Infof("load latest version failed, err: %v", err)
 		return nil, err
 	}
-	defer versionRes.Body.Close()
-	version, err := ioutil.ReadAll(versionRes.Body)
+	if !common.CompareVersion(string(latestVersion), currentVersion.Value) {
+		return nil, err
+	}
+	upgrade.LatestVersion = latestVersion
+	if latestVersion[0:4] == currentVersion.Value[0:4] {
+		upgrade.NewVersion = ""
+	} else {
+		newerVersion, err := u.loadVersion(false, currentVersion.Value)
+		if err != nil {
+			global.LOG.Infof("load newer version failed, err: %v", err)
+			return nil, err
+		}
+		if newerVersion == currentVersion.Value {
+			upgrade.NewVersion = ""
+		} else {
+			upgrade.NewVersion = newerVersion
+		}
+	}
+	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, global.CONF.System.Mode, upgrade.LatestVersion, upgrade.LatestVersion))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("load relase-notes of version %s failed, err: %v", latestVersion, err)
 	}
-	isNew := common.CompareVersion(string(version), currentVersion.Value)
-	if !isNew {
-		return nil, err
-	}
-
-	upgrade.NewVersion = string(version)
-
-	releaseNotes, err := http.Get(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, global.CONF.System.Mode, upgrade.NewVersion, upgrade.NewVersion))
-	if err != nil {
-		return nil, err
-	}
-	defer releaseNotes.Body.Close()
-	release, err := ioutil.ReadAll(releaseNotes.Body)
-	if err != nil {
-		return nil, err
-	}
-	upgrade.ReleaseNote = string(release)
-
+	upgrade.ReleaseNote = notes
 	return &upgrade, nil
+}
+
+func (u *UpgradeService) LoadNotes(req dto.Upgrade) (string, error) {
+	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, global.CONF.System.Mode, req.Version, req.Version))
+	if err != nil {
+		return "", fmt.Errorf("load relase-notes of version %s failed, err: %v", req.Version, err)
+	}
+	return notes, nil
 }
 
 func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
@@ -174,5 +186,49 @@ func (u *UpgradeService) handleRollback(fileOp files.FileOp, originalDir string,
 	if err := cpBinary(originalDir+"/1panel.service", "/etc/systemd/system/1panel.service"); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
+}
 
+func (u *UpgradeService) loadVersion(isLatest bool, currentVersion string) (string, error) {
+	path := fmt.Sprintf("%s/%s/latest", global.CONF.System.RepoUrl, global.CONF.System.Mode)
+	if !isLatest {
+		path = fmt.Sprintf("%s/%s/latest.current", global.CONF.System.RepoUrl, global.CONF.System.Mode)
+	}
+	latestVersionRes, err := http.Get(path)
+	if err != nil {
+		return "", err
+	}
+	defer latestVersionRes.Body.Close()
+	version, err := ioutil.ReadAll(latestVersionRes.Body)
+	if err != nil {
+		return "", err
+	}
+	if isLatest {
+		return string(version), nil
+	}
+
+	versionMap := make(map[string]string)
+	if err := json.Unmarshal(version, &versionMap); err != nil {
+		return "", fmt.Errorf("load version map failed, err: %v", err)
+	}
+
+	if len(currentVersion) < 4 {
+		return "", fmt.Errorf("current version is error format: %s", currentVersion)
+	}
+	if version, ok := versionMap[currentVersion[0:4]]; ok {
+		return version, nil
+	}
+	return "", errors.New("load version failed in latest.current")
+}
+
+func (u *UpgradeService) loadReleaseNotes(path string) (string, error) {
+	releaseNotes, err := http.Get(path)
+	if err != nil {
+		return "", err
+	}
+	defer releaseNotes.Body.Close()
+	release, err := ioutil.ReadAll(releaseNotes.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(release), nil
 }

@@ -449,7 +449,7 @@ func (b *BaseApi) Download(c *gin.Context) {
 // @Summary Download file with path
 // @Description 下载指定文件
 // @Accept json
-// @Param request body request.FilePath true "request"
+// @Param request body dto.FilePath true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /files/download/bypath [post]

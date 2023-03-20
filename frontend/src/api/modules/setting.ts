@@ -139,6 +139,9 @@ export const searchSnapshotPage = (param: SearchWithPage) => {
 export const loadUpgradeInfo = () => {
     return http.get<Setting.UpgradeInfo>(`/settings/upgrade`);
 };
+export const loadReleaseNotes = (version: string) => {
+    return http.post<string>(`/settings/upgrade/notes`, { version: version });
+};
 export const upgrade = (version: string) => {
     return http.post(`/settings/upgrade`, { version: version });
 };
