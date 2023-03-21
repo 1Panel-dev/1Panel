@@ -3,6 +3,7 @@ package job
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/app/service"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"time"
 )
@@ -19,13 +20,16 @@ func (ssl *ssl) Run() {
 	sslService := service.NewIWebsiteSSLService()
 	sslList, _ := sslRepo.List()
 	global.LOG.Info("ssl renew cron job start...")
-	now := time.Now()
+	now := time.Now().Add(10 * time.Second)
 	for _, s := range sslList {
 		if !s.AutoRenew || s.Provider == "manual" || s.Provider == "dnsManual" {
 			continue
 		}
-		sum := s.ExpireDate.Sub(now)
-		if sum.Hours() < 168 {
+		expireDate, _ := time.ParseInLocation(constant.DateTimeLayout, s.ExpireDate.String(), time.Now().Location())
+		sum := expireDate.Sub(now)
+		global.LOG.Info(expireDate)
+		global.LOG.Info(sum.Hours())
+		if sum.Hours() < 720 {
 			if err := sslService.Renew(s.ID); err != nil {
 				global.LOG.Errorf("renew doamin [%s] ssl failed err:%s", s.PrimaryDomain, err.Error())
 			}

@@ -20,7 +20,7 @@ func NewWebsiteJob() *website {
 func (w *website) Run() {
 	websites, _ := repo.NewIWebsiteRepo().List()
 	global.LOG.Info("website cron job start...")
-	now := time.Now()
+	now := time.Now().Add(10 * time.Second)
 	if len(websites) > 0 {
 		neverExpireDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
 		var wg sync.WaitGroup
@@ -28,7 +28,8 @@ func (w *website) Run() {
 			if site.Status != constant.WebRunning || neverExpireDate.Equal(site.ExpireDate) {
 				continue
 			}
-			if site.ExpireDate.Before(now) {
+			expireDate, _ := time.ParseInLocation(constant.DateTimeLayout, site.ExpireDate.String(), time.Now().Location())
+			if expireDate.Before(now) {
 				wg.Add(1)
 				go func(ws model.Website) {
 					stopWebsite(ws.ID, &wg)
