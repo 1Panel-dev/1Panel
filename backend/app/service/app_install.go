@@ -3,9 +3,6 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/env"
-	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
-	"github.com/joho/godotenv"
 	"io/ioutil"
 	"math"
 	"os"
@@ -13,6 +10,10 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/env"
+	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
+	"github.com/joho/godotenv"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
@@ -648,7 +649,7 @@ func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value 
 		}, commonRepo.WithByID(appInstall.ID))
 	}
 	if param == "user-password" {
-		oldVal = fmt.Sprintf("\"PANEL_DB_USER_PASSWORD\":\"%v\"", appInstall.Password)
+		oldVal = fmt.Sprintf("\"PANEL_DB_USER_PASSWORD\":\"%v\"", appInstall.UserPassword)
 		newVal = fmt.Sprintf("\"PANEL_DB_USER_PASSWORD\":\"%v\"", value)
 		_ = appInstallRepo.BatchUpdateBy(map[string]interface{}{
 			"param": strings.ReplaceAll(appInstall.Param, oldVal, newVal),
