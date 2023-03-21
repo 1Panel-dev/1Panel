@@ -532,6 +532,7 @@ const message = {
         registrieHelper: '一行一个，例：\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: '编排',
+        composeHelper: '当前内容已通过格式验证，请点击确认完成创建',
         composePathHelper: '容器编排将保存在: {0}',
         apps: '应用商店',
         local: '本地',
@@ -842,7 +843,7 @@ const message = {
         versionHelper: '1Panel 版本号命名规则为： [大版本].[功能版本].[Bug 修复版本]，示例如下：',
         versionHelper1: 'v1.0.1 是 v1.0.0 之后的 Bug 修复版本',
         versionHelper2: 'v1.1.0 是 v1.0.0 之后的功能版本',
-        newVersion: '(Bug fix version)',
+        newVersion: '(Bug 修复版本)',
         latestVersion: '(功能版本)',
         upgradeCheck: '检查更新',
         upgradeNotes: '更新内容',

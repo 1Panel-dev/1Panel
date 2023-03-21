@@ -521,6 +521,8 @@ const message = {
         registrieHelper: 'One in a row, for example:\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: 'Compose',
+        composeHelper:
+            'The current content has passed the format verification. Please click Submit to complete the creation',
         apps: 'Apps',
         local: 'Local',
         createCompose: 'Create compose',

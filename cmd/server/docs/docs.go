@@ -1038,6 +1038,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/containers/compose/test": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "测试 compose 是否可用",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container Compose"
+                ],
+                "summary": "Test compose",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ComposeCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name"
+                    ],
+                    "formatEN": "create compose [name]",
+                    "formatZH": "创建 compose [name]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/containers/compose/update": {
             "post": {
                 "security": [
