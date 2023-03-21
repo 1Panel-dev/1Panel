@@ -1401,6 +1401,8 @@ definitions:
     type: object
   dto.UpgradeInfo:
     properties:
+      latestVersion:
+        type: string
       newVersion:
         type: string
       releaseNote:
@@ -6983,15 +6985,22 @@ paths:
         paramKeys: []
   /settings/upgrade:
     get:
-      description: 系统更新信息
+      consumes:
+      - application/json
+      description: 获取版本 release notes
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Upgrade'
       responses:
         "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/dto.UpgradeInfo'
+          description: ""
       security:
       - ApiKeyAuth: []
-      summary: Load upgrade info
+      summary: Load release notes by version
       tags:
       - System Setting
     post:

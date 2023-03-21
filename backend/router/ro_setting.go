@@ -51,6 +51,7 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/backup/record/del", baseApi.DeleteBackupRecord)
 
 		settingRouter.POST("/upgrade", baseApi.Upgrade)
+		settingRouter.POST("/upgrade/notes", baseApi.GetNotesByVersion)
 		settingRouter.GET("/upgrade", baseApi.GetUpgradeInfo)
 		settingRouter.GET("/basedir", baseApi.LoadBaseDir)
 	}

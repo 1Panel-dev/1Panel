@@ -82,9 +82,11 @@ type SnapshotInfo struct {
 }
 
 type UpgradeInfo struct {
-	NewVersion  string `json:"newVersion"`
-	ReleaseNote string `json:"releaseNote"`
+	NewVersion    string `json:"newVersion"`
+	LatestVersion string `json:"latestVersion"`
+	ReleaseNote   string `json:"releaseNote"`
 }
+
 type Upgrade struct {
 	Version string `json:"version"`
 }
