@@ -139,6 +139,10 @@ export const RenewSSL = (req: Website.SSLRenew) => {
     return http.post<any>(`/websites/ssl/renew`, req);
 };
 
+export const UpdateSSL = (req: Website.SSLUpdate) => {
+    return http.post<any>(`/websites/ssl/update`, req);
+};
+
 export const GetDnsResolve = (req: Website.DNSResolveReq) => {
     return http.post<Website.DNSResolve[]>(`/websites/ssl/resolve`, req);
 };

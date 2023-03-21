@@ -22,5 +22,6 @@ func (a *WebsiteSSLRouter) InitWebsiteSSLRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/del", baseApi.DeleteWebsiteSSL)
 		groupRouter.GET("/website/:websiteId", baseApi.GetWebsiteSSLByWebsiteId)
 		groupRouter.GET("/:id", baseApi.GetWebsiteSSLById)
+		groupRouter.POST("/update", baseApi.UpdateWebsiteSSL)
 	}
 }

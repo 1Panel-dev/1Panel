@@ -160,6 +160,7 @@ export namespace Website {
         startDate: string;
         provider: string;
         websites?: Website.Website[];
+        autoRenew: boolean;
     }
 
     export interface SSLCreate {
@@ -177,6 +178,11 @@ export namespace Website {
 
     export interface SSLRenew {
         SSLId: number;
+    }
+
+    export interface SSLUpdate {
+        id: number;
+        autoRenew: boolean;
     }
 
     export interface AcmeAccount extends CommonModel {

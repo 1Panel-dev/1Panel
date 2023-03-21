@@ -27,6 +27,7 @@ type IWebsiteSSLService interface {
 	GetDNSResolve(req request.WebsiteDNSReq) ([]response.WebsiteDNSRes, error)
 	GetWebsiteSSL(websiteId uint) (response.WebsiteSSLDTO, error)
 	Delete(id uint) error
+	Update(update request.WebsiteSSLUpdate) error
 }
 
 func NewIWebsiteSSLService() IWebsiteSSLService {
@@ -132,6 +133,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 	websiteSSL.StartDate = cert.NotBefore
 	websiteSSL.Type = cert.Issuer.CommonName
 	websiteSSL.Organization = cert.Issuer.Organization[0]
+	websiteSSL.AutoRenew = create.AutoRenew
 
 	if err := websiteSSLRepo.Create(context.TODO(), &websiteSSL); err != nil {
 		return res, err
@@ -257,4 +259,13 @@ func (w WebsiteSSLService) Delete(id uint) error {
 		return buserr.New(constant.ErrSSLCannotDelete)
 	}
 	return websiteSSLRepo.DeleteBy(commonRepo.WithByID(id))
+}
+
+func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
+	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(update.ID))
+	if err != nil {
+		return err
+	}
+	websiteSSL.AutoRenew = update.AutoRenew
+	return websiteSSLRepo.Save(websiteSSL)
 }
