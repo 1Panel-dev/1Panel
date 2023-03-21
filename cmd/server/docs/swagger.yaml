@@ -3286,6 +3286,33 @@ paths:
       summary: Page composes
       tags:
       - Container Compose
+  /containers/compose/test:
+    post:
+      consumes:
+      - application/json
+      description: 测试 compose 是否可用
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ComposeCreate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Test compose
+      tags:
+      - Container Compose
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        formatEN: create compose [name]
+        formatZH: 创建 compose [name]
+        paramKeys: []
   /containers/compose/update:
     post:
       consumes:

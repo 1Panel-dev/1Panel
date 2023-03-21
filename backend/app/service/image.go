@@ -122,6 +122,7 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	fileName := "Dockerfile"
 	if req.From == "edit" {
 		dir := fmt.Sprintf("%s/docker/build/%s", constant.DataDir, strings.ReplaceAll(req.Name, ":", "_"))
 		if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
@@ -141,7 +142,8 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 		write.Flush()
 		req.Dockerfile = dir
 	} else {
-		req.Dockerfile = strings.ReplaceAll(req.Dockerfile, "/Dockerfile", "")
+		fileName = path.Base(req.Dockerfile)
+		req.Dockerfile = path.Dir(req.Dockerfile)
 	}
 	tar, err := archive.TarWithOptions(req.Dockerfile+"/", &archive.TarOptions{})
 	if err != nil {
@@ -149,7 +151,7 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 	}
 
 	opts := types.ImageBuildOptions{
-		Dockerfile: "Dockerfile",
+		Dockerfile: fileName,
 		Tags:       []string{req.Name},
 		Remove:     true,
 		Labels:     stringsToMap(req.Tags),
