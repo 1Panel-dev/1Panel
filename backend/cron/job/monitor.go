@@ -118,6 +118,9 @@ func loadNetIO() {
 	netStatAll2, _ := net.IOCounters(false)
 	for _, net2 := range netStatAll2 {
 		for _, net1 := range netStatAll {
+			if net1.BytesSent == 0 || net1.BytesRecv == 0 {
+				continue
+			}
 			if net2.Name == net1.Name {
 				var itemNet model.MonitorNetwork
 				itemNet.Name = net1.Name
