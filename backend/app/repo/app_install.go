@@ -113,6 +113,7 @@ type RootInfo struct {
 	Name          string `json:"name"`
 	Port          int64  `json:"port"`
 	Password      string `json:"password"`
+	UserPassword  string `json:"userPassword"`
 	ContainerName string `json:"containerName"`
 	Param         string `json:"param"`
 	Env           string `json:"env"`
@@ -145,6 +146,10 @@ func (a *AppInstallRepo) LoadBaseInfo(key string, name string) (*RootInfo, error
 	password, ok := envMap["PANEL_DB_ROOT_PASSWORD"].(string)
 	if ok {
 		info.Password = password
+	}
+	userPassword, ok := envMap["PANEL_DB_USER_PASSWORD"].(string)
+	if ok {
+		info.UserPassword = userPassword
 	}
 	info.Port = int64(appInstall.HttpPort)
 	info.ID = appInstall.ID
