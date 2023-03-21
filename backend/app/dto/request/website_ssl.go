@@ -44,3 +44,8 @@ type WebsiteDnsAccountUpdate struct {
 type WebsiteResourceReq struct {
 	ID uint `json:"id" validate:"required"`
 }
+
+type WebsiteSSLUpdate struct {
+	ID        uint `json:"id" validate:"required"`
+	AutoRenew bool `json:"autoRenew" validate:"required"`
+}
