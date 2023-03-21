@@ -66,6 +66,9 @@ func (u *SnapshotService) SnapshotImport(req dto.SnapshotImport) error {
 		if err != nil {
 			return fmt.Errorf("incorrect snapshot name format of %s", snap)
 		}
+		if strings.HasSuffix(snap, ".tar.gz") {
+			snap = strings.ReplaceAll(snap, ".tar.gz", "")
+		}
 		itemSnap := model.Snapshot{
 			Name:        snap,
 			From:        req.From,
