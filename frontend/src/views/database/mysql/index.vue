@@ -112,7 +112,7 @@
             v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist && !loading"
             class="mask-prompt"
         >
-            <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['MySQL']) }}</span>
+            <span>{{ $t('commons.service.serviceNotStarted', ['MySQL']) }}</span>
         </el-card>
 
         <Setting ref="settingRef" style="margin-top: 20px" />

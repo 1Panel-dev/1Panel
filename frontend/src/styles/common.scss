@@ -179,9 +179,12 @@
     top: 220px;
     left: 45%;
     transform: translate(-50%, -50%);
-    width: 300px;
+    width: 400px;
     text-align: center;
     font-size: 14px;
+    .bt {
+        margin-top: -2px;
+    }
 }
 
 .table-button {
