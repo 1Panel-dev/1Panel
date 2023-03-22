@@ -27,14 +27,11 @@ func (ssl *ssl) Run() {
 		}
 		expireDate, _ := time.ParseInLocation(constant.DateTimeLayout, s.ExpireDate.String(), time.Now().Location())
 		sum := expireDate.Sub(now)
-		global.LOG.Info(expireDate)
-		global.LOG.Info(sum.Hours())
 		if sum.Hours() < 720 {
 			if err := sslService.Renew(s.ID); err != nil {
 				global.LOG.Errorf("renew doamin [%s] ssl failed err:%s", s.PrimaryDomain, err.Error())
 			}
 		}
 	}
-
 	global.LOG.Info("ssl renew cron job end...")
 }

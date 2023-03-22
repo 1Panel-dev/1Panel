@@ -54,7 +54,7 @@
                 <div v-if="slots.prompt" class="prompt">
                     <slot name="prompt"></slot>
                 </div>
-                <div class="main">
+                <div class="main-content">
                     <slot name="main"></slot>
                 </div>
             </el-card>
@@ -132,5 +132,9 @@ const showBack = computed(() => {
 
 .main-box {
     position: relative;
+}
+
+.main-content {
+    margin-top: 20px;
 }
 </style>

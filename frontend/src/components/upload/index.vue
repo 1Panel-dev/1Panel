@@ -251,6 +251,7 @@ const submitUpload = async (file: any) => {
             uploadedChunkCount++;
         } catch (error) {
             isUpload.value = false;
+            break;
         }
         if (uploadedChunkCount == chunkCount) {
             isUpload.value = false;

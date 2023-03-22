@@ -110,6 +110,7 @@ const submit = async () => {
             uploadedChunkCount++;
         } catch (error) {
             loading.value = false;
+            break;
         }
         if (uploadedChunkCount == chunkCount) {
             loading.value = false;
