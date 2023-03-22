@@ -1059,7 +1059,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -6900,7 +6900,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             },
@@ -12313,10 +12313,14 @@
                 "rule": {
                     "type": "string"
                 },
+                "showValue": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 },
-                "value": {}
+                "value": {},
+                "values": {}
             }
         },
         "response.FileInfo": {

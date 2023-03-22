@@ -2441,9 +2441,12 @@ definitions:
         type: string
       rule:
         type: string
+      showValue:
+        type: string
       type:
         type: string
       value: {}
+      values: {}
     type: object
   response.FileInfo:
     properties:
@@ -3288,7 +3291,7 @@ paths:
           $ref: '#/definitions/dto.ComposeCreate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Test compose
@@ -7005,7 +7008,7 @@ paths:
           $ref: '#/definitions/dto.Upgrade'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Load release notes by version

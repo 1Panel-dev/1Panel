@@ -486,14 +486,20 @@ func (a *AppInstallService) GetParams(id uint) ([]response.AppParam, error) {
 			}
 			appParam.LabelZh = form.LabelZh
 			appParam.LabelEn = form.LabelEn
+			appParam.Value = v
 			if form.Type == "service" {
 				appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithServiceName(v.(string)))
-				appParam.Value = appInstall.Name
-				res = append(res, appParam)
-			} else {
-				appParam.Value = v
-				res = append(res, appParam)
+				appParam.ShowValue = appInstall.Name
+			} else if form.Type == "select" {
+				for _, fv := range form.Values {
+					if fv.Value == v {
+						appParam.ShowValue = fv.Label
+						break
+					}
+				}
+				appParam.Values = form.Values
 			}
+			res = append(res, appParam)
 		}
 	}
 	return res, nil

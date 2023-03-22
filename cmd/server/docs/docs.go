@@ -1073,7 +1073,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -6914,7 +6914,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             },
@@ -12327,10 +12327,14 @@ var doc = `{
                 "rule": {
                     "type": "string"
                 },
+                "showValue": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 },
-                "value": {}
+                "value": {},
+                "values": {}
             }
         },
         "response.FileInfo": {
