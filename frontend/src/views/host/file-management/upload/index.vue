@@ -15,7 +15,6 @@
             :auto-upload="false"
             ref="uploadRef"
             :on-change="fileOnChange"
-            v-loading="loading"
             :limit="1"
             :on-exceed="handleExceed"
         >
@@ -24,8 +23,10 @@
                 {{ $t('database.dropHelper') }}
                 <em>{{ $t('database.clickHelper') }}</em>
             </div>
+            <template #tip>
+                <el-progress v-if="loading" text-inside :stroke-width="12" :percentage="uploadPrecent"></el-progress>
+            </template>
         </el-upload>
-        <el-progress v-if="loading" :text-inside="true" :stroke-width="26" :percentage="uploadPrecent"></el-progress>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>

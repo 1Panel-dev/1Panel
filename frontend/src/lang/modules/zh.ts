@@ -311,7 +311,7 @@ const message = {
         selectFile: '选择文件',
         dropHelper: '将上传文件拖拽到此处，或者',
         clickHelper: '点击上传',
-        supportUpType: '仅支持 10M 以内 sql、sql.gz、tar.gz 文件',
+        supportUpType: '仅支持 sql、sql.gz、tar.gz 文件',
         zipFormat: 'tar.gz 压缩包结构：test.tar.gz 压缩包内，必需包含 test.sql',
 
         currentStatus: '当前状态',
@@ -971,7 +971,7 @@ const message = {
         type: '类型',
         static: '静态网站',
         deployment: '一键部署',
-        supportUpType: '仅支持 50M 以内 .tar.gz 文件',
+        supportUpType: '仅支持 .tar.gz 文件',
         zipFormat: '.tar.gz 压缩包结构：test.tar.gz 压缩包内，必需包含 {0} 文件',
         proxy: '反向代理',
         alias: '代号',
