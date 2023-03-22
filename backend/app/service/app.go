@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -166,6 +167,9 @@ func (a AppService) GetAppDetail(appId uint, version string) (response.AppDetail
 }
 
 func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (*model.AppInstall, error) {
+	if err := docker.CreateDefaultDockerNetwork(); err != nil {
+		return nil, buserr.WithDetail(constant.Err1PanelNetworkFailed, err.Error(), nil)
+	}
 	if list, _ := appInstallRepo.ListBy(commonRepo.WithByName(req.Name)); len(list) > 0 {
 		return nil, buserr.New(constant.ErrNameIsExist)
 	}

@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"github.com/1Panel-dev/1Panel/backend/global"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
@@ -72,4 +73,19 @@ func (c Client) NetworkExist(name string) bool {
 		return false
 	}
 	return len(networks) > 0
+}
+
+func CreateDefaultDockerNetwork() error {
+	cli, err := NewClient()
+	if err != nil {
+		global.LOG.Errorf("init docker client error %s", err.Error())
+		return err
+	}
+	if !cli.NetworkExist("1panel-network") {
+		if err := cli.CreateNetwork("1panel-network"); err != nil {
+			global.LOG.Errorf("create default docker network  error %s", err.Error())
+			return err
+		}
+	}
+	return nil
 }

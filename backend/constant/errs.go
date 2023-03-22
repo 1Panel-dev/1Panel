@@ -50,15 +50,16 @@ var (
 
 // app
 var (
-	ErrPortInUsed      = "ErrPortInUsed"
-	ErrAppLimit        = "ErrAppLimit"
-	ErrAppRequired     = "ErrAppRequired"
-	ErrFileCanNotRead  = "ErrFileCanNotRead"
-	ErrFileToLarge     = "ErrFileToLarge"
-	ErrNotInstall      = "ErrNotInstall"
-	ErrPortInOtherApp  = "ErrPortInOtherApp"
-	ErrDbUserNotValid  = "ErrDbUserNotValid"
-	ErrUpdateBuWebsite = "ErrUpdateBuWebsite"
+	ErrPortInUsed          = "ErrPortInUsed"
+	ErrAppLimit            = "ErrAppLimit"
+	ErrAppRequired         = "ErrAppRequired"
+	ErrFileCanNotRead      = "ErrFileCanNotRead"
+	ErrFileToLarge         = "ErrFileToLarge"
+	ErrNotInstall          = "ErrNotInstall"
+	ErrPortInOtherApp      = "ErrPortInOtherApp"
+	ErrDbUserNotValid      = "ErrDbUserNotValid"
+	ErrUpdateBuWebsite     = "ErrUpdateBuWebsite"
+	Err1PanelNetworkFailed = "Err1PanelNetworkFailed"
 )
 
 //website
