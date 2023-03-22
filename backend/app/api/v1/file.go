@@ -519,6 +519,12 @@ func (b *BaseApi) LoadFromFile(c *gin.Context) {
 }
 
 func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int) error {
+	if _, err := os.Stat(path.Dir(dstDir)); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(path.Dir(dstDir), os.ModePerm); err != nil {
+			return err
+		}
+	}
+
 	targetFile, err := os.Create(filepath.Join(dstDir, fileName))
 	if err != nil {
 		return err
@@ -547,7 +553,6 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int)
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /files/chunkupload [post]
-// @x-panel-log {"bodyKeys":["path"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"上传文件 [path]","formatEN":"Upload file [path]"}
 func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 	fileForm, err := c.FormFile("chunk")
 	if err != nil {

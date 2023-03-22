@@ -305,7 +305,7 @@ const message = {
             'This port is the exposed port of the container. You need to save the modification separately and restart the container!',
 
         selectFile: 'Select file',
-        supportUpType: 'Only sql, sql.gz, and tar.gz files within 10 MB are supported',
+        supportUpType: 'Only sql, sql.gz, and tar.gz files are supported',
         zipFormat: 'tar.gz compressed package structure: test.tar.gz compressed package must contain test.sql',
 
         currentStatus: 'Current state',
@@ -965,7 +965,7 @@ const message = {
         type: 'Type',
         static: 'Static',
         deployment: 'Deployment',
-        supportUpType: 'Only .tar.gz files within 50 MB are supported',
+        supportUpType: 'Only .tar.gz files are supported',
         zipFormat: '.tar.gz compressed package structure: test.tar.gz compressed package must contain {0} file',
         proxy: 'Reverse Proxy',
         alias: 'Path Name',

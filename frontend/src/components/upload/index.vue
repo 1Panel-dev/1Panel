@@ -12,6 +12,12 @@
                         <em>{{ $t('database.clickHelper') }}</em>
                     </div>
                     <template #tip>
+                        <el-progress
+                            v-if="isUpload"
+                            text-inside
+                            :stroke-width="12"
+                            :percentage="uploadPrecent"
+                        ></el-progress>
                         <div v-if="type === 'mysql'" class="el-upload__tip">
                             <span class="input-help">{{ $t('database.supportUpType') }}</span>
                             <span class="input-help">
@@ -26,7 +32,7 @@
                         </div>
                     </template>
                 </el-upload>
-                <el-button v-if="uploaderFiles.length === 1" icon="Upload" @click="onSubmit">
+                <el-button :disabled="isUpload" v-if="uploaderFiles.length === 1" icon="Upload" @click="onSubmit">
                     {{ $t('commons.button.upload') }}
                 </el-button>
 
@@ -82,11 +88,13 @@ import i18n from '@/lang';
 import { UploadFile, UploadFiles, UploadInstance } from 'element-plus';
 import { File } from '@/api/interface/file';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { BatchDeleteFile, CheckFile, GetUploadList, UploadFileData } from '@/api/modules/files';
+import { BatchDeleteFile, CheckFile, ChunkUploadFileData, GetUploadList } from '@/api/modules/files';
 import { loadBaseDir } from '@/api/modules/setting';
 import { MsgError, MsgSuccess } from '@/utils/message';
 
 const loading = ref();
+const isUpload = ref();
+const uploadPrecent = ref<number>(0);
 const selects = ref<any>([]);
 const baseDir = ref();
 
@@ -166,18 +174,10 @@ const beforeAvatarUpload = (rawFile) => {
             MsgError(i18n.global.t('commons.msg.unSupportType'));
             return false;
         }
-        if (rawFile.size / 1024 / 1024 > 50) {
-            MsgError(i18n.global.t('commons.msg.unSupportSize', [50]));
-            return false;
-        }
         return true;
     }
     if (!rawFile.name.endsWith('.sql') && !rawFile.name.endsWith('.tar.gz') && !rawFile.name.endsWith('.sql.gz')) {
         MsgError(i18n.global.t('commons.msg.unSupportType'));
-        return false;
-    }
-    if (rawFile.size / 1024 / 1024 > 10) {
-        MsgError(i18n.global.t('commons.msg.unSupportSize', [10]));
         return false;
     }
     return true;
@@ -194,42 +194,72 @@ const handleClose = () => {
 };
 
 const onSubmit = async () => {
-    const formData = new FormData();
     if (uploaderFiles.value.length !== 1) {
         return;
     }
-    if (!uploaderFiles.value[0]!.raw.name) {
+    const file = uploaderFiles.value[0];
+    if (!file.raw.name) {
         MsgError(i18n.global.t('commons.msg.fileNameErr'));
         return;
     }
     let reg = /^[a-zA-Z0-9\u4e00-\u9fa5]{1}[a-z:A-Z0-9_.\u4e00-\u9fa5-]{0,256}$/;
-    if (!reg.test(uploaderFiles.value[0]!.raw.name)) {
+    if (!reg.test(file.raw.name)) {
         MsgError(i18n.global.t('commons.msg.fileNameErr'));
         return;
     }
-    const res = await CheckFile(baseDir.value + uploaderFiles.value[0]!.raw.name);
+    const res = await CheckFile(baseDir.value + file.raw.name);
     if (!res.data) {
         MsgError(i18n.global.t('commons.msg.fileExist'));
         return;
     }
-    formData.append('file', uploaderFiles.value[0]!.raw);
-    let isOk = beforeAvatarUpload(uploaderFiles.value[0]!.raw);
+    let isOk = beforeAvatarUpload(file.raw);
     if (!isOk) {
         return;
     }
-    formData.append('path', baseDir.value);
-    loading.value = true;
-    UploadFileData(formData, {})
-        .then(() => {
-            loading.value = false;
+    submitUpload(file);
+};
+
+const submitUpload = async (file: any) => {
+    isUpload.value = true;
+    const CHUNK_SIZE = 1024 * 1024;
+    const fileSize = file.size;
+    const chunkCount = Math.ceil(fileSize / CHUNK_SIZE);
+    let uploadedChunkCount = 0;
+
+    for (let i = 0; i < chunkCount; i++) {
+        const start = i * CHUNK_SIZE;
+        const end = Math.min(start + CHUNK_SIZE, fileSize);
+        const chunk = file.raw.slice(start, end);
+
+        const formData = new FormData();
+
+        formData.append('filename', file.name);
+        formData.append('path', baseDir.value);
+        formData.append('chunk', chunk);
+        formData.append('chunkIndex', i.toString());
+        formData.append('chunkCount', chunkCount.toString());
+
+        try {
+            await ChunkUploadFileData(formData, {
+                onUploadProgress: (progressEvent) => {
+                    const progress = Math.round(
+                        ((uploadedChunkCount + progressEvent.loaded / progressEvent.total) * 100) / chunkCount,
+                    );
+                    uploadPrecent.value = progress;
+                },
+            });
+            uploadedChunkCount++;
+        } catch (error) {
+            isUpload.value = false;
+        }
+        if (uploadedChunkCount == chunkCount) {
+            isUpload.value = false;
             uploadRef.value?.clearFiles();
             uploaderFiles.value = [];
             MsgSuccess(i18n.global.t('file.uploadSuccess'));
             search();
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+        }
+    }
 };
 
 const onBatchDelete = async (row: File.File | null) => {
