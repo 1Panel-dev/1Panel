@@ -79,17 +79,6 @@ export namespace Website {
         content: string;
     }
 
-    export interface Group extends CommonModel {
-        name: string;
-        default: boolean;
-    }
-
-    export interface GroupOp {
-        name: string;
-        id?: number;
-        default: boolean;
-    }
-
     export interface Domain {
         websiteId: number;
         port: number;

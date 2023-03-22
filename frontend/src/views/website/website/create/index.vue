@@ -187,9 +187,8 @@
 <script lang="ts" setup name="CreateWebSite">
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { App } from '@/api/interface/app';
-import { Website } from '@/api/interface/website';
 import { GetApp, GetAppDetail, SearchApp, GetAppInstalled } from '@/api/modules/app';
-import { CreateWebsite, ListGroups, PreCheck } from '@/api/modules/website';
+import { CreateWebsite, PreCheck } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, FormInstance } from 'element-plus';
@@ -197,6 +196,8 @@ import { reactive, ref } from 'vue';
 import Params from '@/views/app-store/detail/params/index.vue';
 import Check from '../check/index.vue';
 import { MsgSuccess } from '@/utils/message';
+import { GetGroupList } from '@/api/modules/group';
+import { Group } from '@/api/interface/group';
 
 const websiteForm = ref<FormInstance>();
 const website = ref({
@@ -235,7 +236,8 @@ let rules = ref<any>({
 
 let open = ref(false);
 let loading = ref(false);
-let groups = ref<Website.Group[]>([]);
+let groups = ref<Group.GroupInfo[]>([]);
+
 let appInstalles = ref<App.AppInstalled[]>([]);
 let appReq = reactive({
     type: 'website',
@@ -321,11 +323,12 @@ const acceptParams = async (installPath: string) => {
         websiteForm.value.resetFields();
     }
     staticPath.value = installPath + '/www/sites/';
-    await ListGroups().then((res) => {
-        groups.value = res.data;
-        website.value.webSiteGroupId = res.data[0].id;
-        open.value = true;
-    });
+
+    const res = await GetGroupList({ type: 'website' });
+    groups.value = res.data;
+    open.value = true;
+    website.value.webSiteGroupId = res.data[0].id;
+
     searchAppInstalled();
 };
 

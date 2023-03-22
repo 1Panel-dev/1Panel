@@ -43,22 +43,6 @@ export const DeleteWebsite = (req: Website.WebSiteDel) => {
     return http.post<any>(`/websites/del`, req);
 };
 
-export const ListGroups = () => {
-    return http.get<Website.Group[]>(`/websites/groups`);
-};
-
-export const CreateGroup = (req: Website.GroupOp) => {
-    return http.post<any>(`/websites/groups`, req);
-};
-
-export const UpdateGroup = (req: Website.GroupOp) => {
-    return http.post<any>(`/websites/groups/update`, req);
-};
-
-export const DeleteGroup = (req: Website.DelReq) => {
-    return http.post<any>(`/websites/groups/del`, req);
-};
-
 export const ListDomains = (id: number) => {
     return http.get<Website.Domain[]>(`/websites/domains/${id}`);
 };

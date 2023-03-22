@@ -211,14 +211,7 @@ var AddTableDatabaseMysql = &gormigrate.Migration{
 var AddTableWebsite = &gormigrate.Migration{
 	ID: "20201009-add-table-website",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.Website{}, &model.WebsiteDomain{}, &model.WebsiteGroup{}, &model.WebsiteDnsAccount{}, &model.WebsiteSSL{}, &model.WebsiteAcmeAccount{}); err != nil {
-			return err
-		}
-		item := &model.WebsiteGroup{
-			Name:    "默认",
-			Default: true,
-		}
-		if err := tx.Create(item).Error; err != nil {
+		if err := tx.AutoMigrate(&model.Website{}, &model.WebsiteDomain{}, &model.WebsiteDnsAccount{}, &model.WebsiteSSL{}, &model.WebsiteAcmeAccount{}); err != nil {
 			return err
 		}
 		return nil
@@ -232,5 +225,19 @@ var AddTableSnap = &gormigrate.Migration{
 			return err
 		}
 		return nil
+	},
+}
+
+var AddDefaultGroup = &gormigrate.Migration{
+	ID: "2023022-change-default-group",
+	Migrate: func(tx *gorm.DB) error {
+		defaultGroup := &model.Group{
+			Name:      "默认",
+			IsDefault: true,
+			Type:      "website",
+		}
+		tx.Create(defaultGroup)
+		tx.Debug().Model(&model.Website{}).Where("1 = 1").Update("website_group_id", defaultGroup.ID)
+		return tx.Migrator().DropTable("website_groups")
 	},
 }

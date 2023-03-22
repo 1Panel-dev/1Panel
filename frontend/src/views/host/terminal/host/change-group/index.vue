@@ -38,7 +38,8 @@
 import { ref, reactive } from 'vue';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
-import { editHostGroup, GetGroupList } from '@/api/modules/host';
+import { editHostGroup } from '@/api/modules/host';
+import { GetGroupList } from '@/api/modules/group';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 

@@ -64,6 +64,6 @@ func (u *GroupRepo) Delete(opts ...DBOption) error {
 	return db.Delete(&model.Group{}).Error
 }
 
-func (w GroupRepo) CancelDefault() error {
+func (u *GroupRepo) CancelDefault() error {
 	return global.DB.Model(&model.Group{}).Where("`is_default` = 1").Updates(map[string]interface{}{"is_default": 0}).Error
 }

@@ -59,7 +59,7 @@
 import { ref } from 'vue';
 import i18n from '@/lang';
 import ComplexTable from '@/components/complex-table/index.vue';
-import { CreateGroup, DeleteGroup, GetGroupList, UpdateGroup } from '@/api/modules/host';
+import { CreateGroup, DeleteGroup, GetGroupList, UpdateGroup } from '@/api/modules/group';
 import Header from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { Group } from '@/api/interface/group';
