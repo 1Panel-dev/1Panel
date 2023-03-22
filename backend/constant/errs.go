@@ -84,6 +84,7 @@ var (
 	ErrMovePathFailed   = "ErrMovePathFailed"
 	ErrLinkPathNotFound = "ErrLinkPathNotFound"
 	ErrFileIsExit       = "ErrFileIsExit"
+	ErrFileUpload       = "ErrFileUpload"
 )
 
 //mysql

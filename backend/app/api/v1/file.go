@@ -578,13 +578,16 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 	}
 
 	fileOp := files.NewFileOp()
-	if err := fileOp.CreateDir("uploads", 0755); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
+	tmpDir := path.Join(global.CONF.System.TmpDir, "upload")
+	if !fileOp.Stat(tmpDir) {
+		if err := fileOp.CreateDir(tmpDir, 0755); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
 	}
-	//fileID := uuid.New().String()
+
 	filename := c.PostForm("filename")
-	fileDir := filepath.Join(global.CONF.System.DataDir, "upload", filename)
+	fileDir := filepath.Join(tmpDir, filename)
 
 	_ = os.MkdirAll(fileDir, 0755)
 	filePath := filepath.Join(fileDir, filename)
@@ -594,25 +597,25 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	emptyFile.Close()
+	defer emptyFile.Close()
 
 	chunkData, err := ioutil.ReadAll(uploadFile)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrFileUpload, err)
 		return
 	}
 
 	chunkPath := filepath.Join(fileDir, fmt.Sprintf("%s.%d", filename, chunkIndex))
 	err = ioutil.WriteFile(chunkPath, chunkData, 0644)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrFileUpload, err)
 		return
 	}
 
 	if chunkIndex+1 == chunkCount {
 		err = mergeChunks(filename, fileDir, c.PostForm("path"), chunkCount)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrAppDelete, err)
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrFileUpload, err)
 			return
 		}
 		helper.SuccessWithData(c, true)
