@@ -1066,7 +1066,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -1074,8 +1074,8 @@ const docTemplate = `{
                     "bodyKeys": [
                         "name"
                     ],
-                    "formatEN": "create compose [name]",
-                    "formatZH": "创建 compose [name]",
+                    "formatEN": "check compose [name]",
+                    "formatZH": "检测 compose [name] 格式",
                     "paramKeys": []
                 }
             }
@@ -6916,7 +6916,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             },
@@ -12344,10 +12344,14 @@ const docTemplate = `{
                 "rule": {
                     "type": "string"
                 },
+                "showValue": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 },
-                "value": {}
+                "value": {},
+                "values": {}
             }
         },
         "response.FileInfo": {

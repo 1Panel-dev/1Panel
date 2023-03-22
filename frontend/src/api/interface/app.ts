@@ -163,5 +163,7 @@ export namespace App {
         key: string;
         rule: string;
         type: string;
+        values?: any;
+        showValue?: string;
     }
 }

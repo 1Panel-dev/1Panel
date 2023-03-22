@@ -1059,7 +1059,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 },
                 "x-panel-log": {
@@ -1067,8 +1067,8 @@
                     "bodyKeys": [
                         "name"
                     ],
-                    "formatEN": "create compose [name]",
-                    "formatZH": "创建 compose [name]",
+                    "formatEN": "check compose [name]",
+                    "formatZH": "检测 compose [name] 格式",
                     "paramKeys": []
                 }
             }
@@ -6909,7 +6909,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     }
                 }
             },
@@ -12337,10 +12337,14 @@
                 "rule": {
                     "type": "string"
                 },
+                "showValue": {
+                    "type": "string"
+                },
                 "type": {
                     "type": "string"
                 },
-                "value": {}
+                "value": {},
+                "values": {}
             }
         },
         "response.FileInfo": {

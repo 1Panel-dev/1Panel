@@ -69,15 +69,21 @@ type AppForm struct {
 }
 
 type AppFormFields struct {
-	Type     string      `json:"type"`
-	LabelZh  string      `json:"labelZh"`
-	LabelEn  string      `json:"labelEn"`
-	Required bool        `json:"required"`
-	Default  interface{} `json:"default"`
-	EnvKey   string      `json:"envKey"`
-	Disabled bool        `json:"disabled"`
-	Edit     bool        `json:"edit"`
-	Rule     string      `json:"rule"`
+	Type     string         `json:"type"`
+	LabelZh  string         `json:"labelZh"`
+	LabelEn  string         `json:"labelEn"`
+	Required bool           `json:"required"`
+	Default  interface{}    `json:"default"`
+	EnvKey   string         `json:"envKey"`
+	Disabled bool           `json:"disabled"`
+	Edit     bool           `json:"edit"`
+	Rule     string         `json:"rule"`
+	Values   []AppFormValue `json:"values"`
+}
+
+type AppFormValue struct {
+	Label string `json:"label"`
+	Value string `json:"value"`
 }
 
 type AppResource struct {

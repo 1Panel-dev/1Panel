@@ -61,11 +61,13 @@ type AppService struct {
 }
 
 type AppParam struct {
-	Value   interface{} `json:"value"`
-	Edit    bool        `json:"edit"`
-	Key     string      `json:"key"`
-	Rule    string      `json:"rule"`
-	LabelZh string      `json:"labelZh"`
-	LabelEn string      `json:"labelEn"`
-	Type    string      `json:"type"`
+	Value     interface{} `json:"value"`
+	Edit      bool        `json:"edit"`
+	Key       string      `json:"key"`
+	Rule      string      `json:"rule"`
+	LabelZh   string      `json:"labelZh"`
+	LabelEn   string      `json:"labelEn"`
+	Type      string      `json:"type"`
+	Values    interface{} `json:"values"`
+	ShowValue string      `json:"showValue"`
 }
