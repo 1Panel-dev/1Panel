@@ -120,10 +120,6 @@ const showBack = computed(() => {
     margin-top: 20px;
 }
 
-.main {
-    margin-top: 20px;
-}
-
 .prompt {
     margin-top: 10px;
 }
