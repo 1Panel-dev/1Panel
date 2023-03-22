@@ -20,7 +20,7 @@
 
                     <el-form ref="groupForm" v-if="row.edit" :model="row">
                         <el-form-item prop="name" v-if="row.edit" :rules="Rules.name">
-                            <el-input v-model="row.name"></el-input>
+                            <div style="margin-top: 20px; width: 100%"><el-input v-model="row.name" /></div>
                         </el-form-item>
                     </el-form>
                 </template>
@@ -145,7 +145,7 @@ const openCreate = () => {
         isDefault: false,
         edit: true,
     };
-    data.value.push(g);
+    data.value.unshift(g);
 };
 
 const deleteGroup = (index: number) => {

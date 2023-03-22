@@ -229,7 +229,7 @@ const message = {
         io: 'Disk IO',
         totalSend: 'Total send',
         totalRecv: 'Total recv',
-        rwPerSecond: 'RW per second',
+        rwPerSecond: 'IO times',
         ioDelay: 'IO delay',
         time: 'Times',
         uptime: 'Up Time',
