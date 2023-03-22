@@ -1,7 +1,6 @@
 import http from '@/api';
 import { ResPage } from '../interface';
 import { Command } from '../interface/command';
-import { Group } from '../interface/group';
 import { Host } from '../interface/host';
 import { Base64 } from 'js-base64';
 import { deepCopy } from '@/utils/util';
@@ -53,20 +52,6 @@ export const editHostGroup = (params: Host.GroupChange) => {
 };
 export const deleteHost = (params: { ids: number[] }) => {
     return http.post(`/hosts/del`, params);
-};
-
-// group
-export const GetGroupList = (params: Group.GroupSearch) => {
-    return http.post<Array<Group.GroupInfo>>(`/hosts/group/search`, params);
-};
-export const CreateGroup = (params: Group.GroupCreate) => {
-    return http.post<Group.GroupCreate>(`/hosts/group`, params);
-};
-export const UpdateGroup = (params: Group.GroupUpdate) => {
-    return http.post(`/hosts/group/update`, params);
-};
-export const DeleteGroup = (id: number) => {
-    return http.post(`/hosts/group/del`, { id: id });
 };
 
 // command

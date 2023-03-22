@@ -22,7 +22,7 @@ func NewIGroupService() IGroupService {
 }
 
 func (u *GroupService) List(req dto.GroupSearch) ([]dto.GroupInfo, error) {
-	groups, err := groupRepo.GetList(commonRepo.WithByType(req.Type), commonRepo.WithOrderBy("created_at desc"))
+	groups, err := groupRepo.GetList(commonRepo.WithByType(req.Type), commonRepo.WithOrderBy("is_default desc"), commonRepo.WithOrderBy("created_at desc"))
 	if err != nil {
 		return nil, constant.ErrRecordNotFound
 	}

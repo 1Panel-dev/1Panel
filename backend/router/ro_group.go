@@ -10,14 +10,14 @@ type WebsiteGroupRouter struct {
 }
 
 func (a *WebsiteGroupRouter) InitWebsiteGroupRouter(Router *gin.RouterGroup) {
-	groupRouter := Router.Group("websites/groups")
+	groupRouter := Router.Group("groups")
 	groupRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).Use(middleware.PasswordExpired())
 
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
-		groupRouter.GET("", baseApi.GetWebGroups)
-		groupRouter.POST("", baseApi.CreateWebGroup)
-		groupRouter.POST("/update", baseApi.UpdateWebGroup)
-		groupRouter.POST("/del", baseApi.DeleteWebGroup)
+		groupRouter.POST("", baseApi.CreateGroup)
+		groupRouter.POST("/del", baseApi.DeleteGroup)
+		groupRouter.POST("/update", baseApi.UpdateGroup)
+		groupRouter.POST("/search", baseApi.ListGroup)
 	}
 }

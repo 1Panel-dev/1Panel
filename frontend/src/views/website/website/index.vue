@@ -145,10 +145,10 @@
         <NginxConfig v-if="openNginxConfig" v-loading="loading" :containerName="containerName" :status="nginxStatus" />
         <CreateWebSite ref="createRef" @close="search" />
         <DeleteWebsite ref="deleteRef" @close="search" />
-        <WebSiteGroup ref="groupRef" />
         <UploadDialog ref="uploadRef" />
         <Backups ref="dialogBackupRef" />
         <DefaultServer ref="defaultRef" />
+        <GroupDialog @search="search" ref="groupRef" />
     </div>
 </template>
 
@@ -163,8 +163,8 @@ import ComplexTable from '@/components/complex-table/index.vue';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import CreateWebSite from './create/index.vue';
 import DeleteWebsite from './delete/index.vue';
-import WebSiteGroup from './group/index.vue';
-import { ListGroups, OpWebsite, SearchWebsites, UpdateWebsite } from '@/api/modules/website';
+import GroupDialog from '@/components/group/index.vue';
+import { OpWebsite, SearchWebsites, UpdateWebsite } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import AppStatus from '@/components/app-status/index.vue';
 import NginxConfig from './nginx/index.vue';
@@ -177,6 +177,8 @@ import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
 import MsgInfo from '@/components/msg-info/index.vue';
+import { GetGroupList } from '@/api/modules/group';
+import { Group } from '@/api/interface/group';
 
 const shortcuts = [
     {
@@ -209,7 +211,7 @@ const dialogBackupRef = ref();
 const defaultRef = ref();
 const data = ref();
 let dateRefs: Map<number, any> = new Map();
-let groups = ref<Website.Group[]>([]);
+let groups = ref<Group.GroupInfo[]>([]);
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -238,9 +240,8 @@ const search = async () => {
 };
 
 const listGroup = async () => {
-    await ListGroups().then((res) => {
-        groups.value = res.data;
-    });
+    const res = await GetGroupList({ type: 'website' });
+    groups.value = res.data;
 };
 
 const setting = () => {
@@ -359,7 +360,7 @@ const openCreate = () => {
 };
 
 const openGroup = () => {
-    groupRef.value.acceptParams();
+    groupRef.value.acceptParams({ type: 'website' });
 };
 
 const openDefault = () => {

@@ -28,7 +28,6 @@ type ServiceGroup struct {
 	SettingService
 	BackupService
 
-	WebsiteGroupService
 	WebsiteService
 	WebsiteDnsAccountService
 	WebsiteSSLService
@@ -68,7 +67,6 @@ var (
 	backupRepo  = repo.RepoGroupApp.BackupRepo
 
 	websiteRepo       = repo.NewIWebsiteRepo()
-	websiteGroupRepo  = repo.RepoGroupApp.WebsiteGroupRepo
 	websiteDomainRepo = repo.RepoGroupApp.WebsiteDomainRepo
 	websiteDnsRepo    = repo.RepoGroupApp.WebsiteDnsAccountRepo
 	websiteSSLRepo    = repo.NewISSLRepo()

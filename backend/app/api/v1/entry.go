@@ -35,7 +35,6 @@ var (
 
 	commandService = service.ServiceGroupApp.CommandService
 
-	websiteGroupService       = service.ServiceGroupApp.WebsiteGroupService
 	websiteService            = service.ServiceGroupApp.WebsiteService
 	websiteDnsAccountService  = service.ServiceGroupApp.WebsiteDnsAccountService
 	websiteSSLService         = service.ServiceGroupApp.WebsiteSSLService
