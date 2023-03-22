@@ -1,11 +1,11 @@
 package app
 
 import (
+	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"path"
 
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
-	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 )
 
@@ -22,25 +22,11 @@ func Init() {
 		createDir(fileOp, dir)
 	}
 
-	createDefaultDockerNetwork()
+	_ = docker.CreateDefaultDockerNetwork()
 }
 
 func createDir(fileOp files.FileOp, dirPath string) {
 	if !fileOp.Stat(dirPath) {
 		_ = fileOp.CreateDir(dirPath, 0755)
-	}
-}
-
-func createDefaultDockerNetwork() {
-	cli, err := docker.NewClient()
-	if err != nil {
-		global.LOG.Errorf("init docker client error", err.Error())
-		return
-	}
-	if !cli.NetworkExist("1panel-network") {
-		if err := cli.CreateNetwork("1panel-network"); err != nil {
-			global.LOG.Errorf("init docker client error", err.Error())
-			return
-		}
 	}
 }
