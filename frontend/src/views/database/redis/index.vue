@@ -24,7 +24,7 @@
         </LayoutContent>
 
         <el-card width="30%" v-if="redisStatus != 'Running' && !isOnSetting && redisIsExist" class="mask-prompt">
-            <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['Redis']) }}</span>
+            <span>{{ $t('commons.service.serviceNotStarted', ['Redis']) }}</span>
         </el-card>
 
         <Setting ref="settingRef" style="margin-top: 30px" />
