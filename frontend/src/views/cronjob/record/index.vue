@@ -84,7 +84,7 @@
                     <el-col :span="8">
                         <el-date-picker
                             style="width: calc(100% - 20px)"
-                            @change="search()"
+                            @change="search(true)"
                             v-model="timeRangeLoad"
                             type="datetimerange"
                             :range-separator="$t('commons.search.timeRange')"
@@ -94,7 +94,7 @@
                         ></el-date-picker>
                     </el-col>
                     <el-col :span="16">
-                        <el-select @change="search()" v-model="searchInfo.status">
+                        <el-select @change="search(true)" v-model="searchInfo.status">
                             <template #prefix>{{ $t('commons.table.status') }}</template>
                             <el-option :label="$t('commons.table.all')" value="" />
                             <el-option :label="$t('commons.status.success')" value="Success" />
@@ -301,34 +301,15 @@ interface DialogProps {
 }
 const recordShow = ref(false);
 const dialogData = ref();
-const records = ref<Array<Cronjob.Record>>();
+const records = ref<Array<Cronjob.Record>>([]);
 const currentRecord = ref<Cronjob.Record>();
 const currentRecordDetail = ref<string>('');
 const currentRecordIndex = ref();
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
     dialogData.value = params;
-    let itemSearch = {
-        page: searchInfo.page,
-        pageSize: searchInfo.pageSize,
-        cronjobID: dialogData.value.rowData!.id,
-        startTime: new Date(new Date().setHours(0, 0, 0, 0)),
-        endTime: new Date(new Date().setHours(23, 59, 59, 0)),
-        status: searchInfo.status,
-    };
-    const res = await searchRecords(itemSearch);
-    records.value = res.data.items || [];
-    if (records.value.length === 0) {
-        hasRecords.value = false;
-        recordShow.value = true;
-        return;
-    }
-    hasRecords.value = true;
-    currentRecord.value = records.value[0];
-    currentRecordIndex.value = 0;
-    loadRecord(currentRecord.value);
-    searchInfo.recordTotal = res.data.total;
     recordShow.value = true;
+    search(true);
 };
 
 const shortcuts = [
@@ -343,33 +324,36 @@ const shortcuts = [
     {
         text: i18n.global.t('monitor.yestoday'),
         value: () => {
-            const yestoday = new Date(new Date().getTime() - 3600 * 1000 * 24 * 1);
-            const end = new Date(yestoday.setHours(23, 59, 59, 999));
-            const start = new Date(yestoday.setHours(0, 0, 0, 0));
+            const itemDate = new Date(new Date().getTime() - 3600 * 1000 * 24 * 1);
+            const end = new Date(itemDate.setHours(23, 59, 59, 999));
+            const start = new Date(itemDate.setHours(0, 0, 0, 0));
             return [start, end];
         },
     },
     {
         text: i18n.global.t('monitor.lastNDay', [3]),
         value: () => {
-            const start = new Date(new Date().getTime() - 3600 * 1000 * 24 * 3);
+            const itemDate = new Date(new Date().getTime() - 3600 * 1000 * 24 * 3);
             const end = new Date(new Date().setHours(23, 59, 59, 999));
+            const start = new Date(itemDate.setHours(0, 0, 0, 0));
             return [start, end];
         },
     },
     {
         text: i18n.global.t('monitor.lastNDay', [7]),
         value: () => {
-            const start = new Date(new Date().getTime() - 3600 * 1000 * 24 * 7);
+            const itemDate = new Date(new Date().getTime() - 3600 * 1000 * 24 * 7);
             const end = new Date(new Date().setHours(23, 59, 59, 999));
+            const start = new Date(itemDate.setHours(0, 0, 0, 0));
             return [start, end];
         },
     },
     {
         text: i18n.global.t('monitor.lastNDay', [30]),
         value: () => {
-            const start = new Date(new Date().getTime() - 3600 * 1000 * 24 * 30);
+            const itemDate = new Date(new Date().getTime() - 3600 * 1000 * 24 * 30);
             const end = new Date(new Date().setHours(23, 59, 59, 999));
+            const start = new Date(itemDate.setHours(0, 0, 0, 0));
             return [start, end];
         },
     },
@@ -384,16 +368,16 @@ const weekOptions = [
     { label: i18n.global.t('cronjob.sunday'), value: 7 },
 ];
 const timeRangeLoad = ref<[Date, Date]>([
-    new Date(new Date().setHours(0, 0, 0, 0)),
+    new Date(new Date(new Date().getTime() - 3600 * 1000 * 24 * 7).setHours(0, 0, 0, 0)),
     new Date(new Date().setHours(23, 59, 59, 999)),
 ]);
 const searchInfo = reactive({
     page: 1,
-    pageSize: 8,
+    pageSize: 12,
     recordTotal: 0,
     cronjobID: 0,
-    startTime: new Date(new Date().setHours(0, 0, 0, 0)),
-    endTime: new Date(new Date().setHours(23, 59, 59, 999)),
+    startTime: new Date(),
+    endTime: new Date(),
     status: '',
 });
 
@@ -406,7 +390,7 @@ const onHandle = async (row: Cronjob.CronjobInfo) => {
             searchInfo.pageSize = searchInfo.pageSize * searchInfo.page;
             searchInfo.page = 1;
             records.value = [];
-            search();
+            search(false);
         })
         .catch(() => {
             loading.value = false;
@@ -425,7 +409,12 @@ const onChangeStatus = async (id: number, status: string) => {
     });
 };
 
-const search = async () => {
+const search = async (isInit: boolean) => {
+    if (isInit) {
+        searchInfo.page = 1;
+        searchInfo.pageSize = 12;
+        records.value = [];
+    }
     if (timeRangeLoad.value && timeRangeLoad.value.length === 2) {
         searchInfo.startTime = timeRangeLoad.value[0];
         searchInfo.endTime = timeRangeLoad.value[1];
@@ -446,6 +435,9 @@ const search = async () => {
         hasRecords.value = false;
         return;
     }
+    if (!res.data.items) {
+        return;
+    }
     for (const item of res.data.items) {
         records.value.push(item);
     }
@@ -460,7 +452,7 @@ const onRefresh = () => {
     records.value = [];
     searchInfo.pageSize = searchInfo.pageSize * searchInfo.page;
     searchInfo.page = 1;
-    search();
+    search(true);
 };
 
 const onDownload = async (record: any, backupID: number) => {
@@ -492,7 +484,7 @@ const nextPage = async () => {
         return;
     }
     searchInfo.page = searchInfo.page + 1;
-    search();
+    search(false);
 };
 const forDetail = async (row: Cronjob.Record, index: number) => {
     currentRecord.value = row;
