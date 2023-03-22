@@ -104,7 +104,7 @@
                                 <el-tag>
                                     {{ $t('home.rwPerSecond') }}: {{ currentChartInfo.ioCount }} {{ $t('home.time') }}
                                 </el-tag>
-                                <el-tag>{{ $t('home.rwPerSecond') }}: {{ currentInfo.ioTime }} ms</el-tag>
+                                <el-tag>{{ $t('home.ioDelay') }}: {{ currentInfo.ioTime }} ms</el-tag>
                             </div>
 
                             <div v-if="chartOption === 'io'" style="margin-top: 40px">
