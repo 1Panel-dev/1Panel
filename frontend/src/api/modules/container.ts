@@ -9,7 +9,7 @@ export const createContainer = (params: Container.ContainerCreate) => {
     return http.post(`/containers`, params, 1200000);
 };
 export const logContainer = (params: Container.ContainerLogSearch) => {
-    return http.post<string>(`/containers/search/log`, params);
+    return http.post<string>(`/containers/search/log`, params, 400000);
 };
 export const ContainerStats = (id: string) => {
     return http.get<Container.ContainerStats>(`/containers/stats/${id}`);
