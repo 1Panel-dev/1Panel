@@ -181,7 +181,7 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 			return
 		}
 
-		if strings.Contains(string(body), "error") && strings.Contains(string(body), "failed:") {
+		if strings.Contains(string(body), "errorDetail") || strings.Contains(string(body), "error:") {
 			global.LOG.Errorf("build image %s failed", req.Name)
 			_, _ = file.Write(body)
 			_, _ = file.WriteString("image build failed!")

@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os/exec"
@@ -239,7 +240,7 @@ func (u *ContainerService) ContainerLogs(req dto.ContainerLog) (string, error) {
 	}
 	stdout, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", err
+		return "", errors.New(string(stdout))
 	}
 	return string(stdout), nil
 }
