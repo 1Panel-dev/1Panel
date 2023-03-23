@@ -70,7 +70,7 @@
         </div>
         <div v-else-if="mfaShow">
             <div class="login-form">
-                <el-form @submit.prevent="mfaLogin()">
+                <el-form @submit.prevent>
                     <div class="login-title">{{ $t('commons.login.mfaTitle') }}</div>
                     <el-form-item class="no-border">
                         <el-input

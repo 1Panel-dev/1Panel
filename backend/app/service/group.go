@@ -73,7 +73,7 @@ func (u *GroupService) Delete(id uint) error {
 
 func (u *GroupService) Update(req dto.GroupUpdate) error {
 	if req.IsDefault {
-		if err := groupRepo.CancelDefault(); err != nil {
+		if err := groupRepo.CancelDefault(req.Type); err != nil {
 			return err
 		}
 	}
