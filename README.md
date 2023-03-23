@@ -19,7 +19,7 @@
 
 ## UI 展示
 
-![UI展示](https://1panel.oss-cn-hangzhou.aliyuncs.com/img/overview.png)
+![UI展示](https://resource.fit2cloud.com/1panel/img/overview.png)
 
 ## 快速开始
 
