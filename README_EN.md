@@ -1,6 +1,6 @@
-[README_EN.md](README_EN.md)
+[中文 README.md](README.md)
 <p align="center"><a href="https://1panel.cn"><img src="http://1panel.oss-cn-hangzhou.aliyuncs.com/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
-<p align="center"><b>现代化、开源的 Linux 服务器运维管理面板</b></p>
+<p align="center"><b>Modern and Open-Source Linux Server Operation and Management Panel</b></p>
 <p align="center">
   <a href="https://www.gnu.org/licenses/gpl-3.0.html"><img src="https://shields.io/github/license/1Panel-dev/1Panel" alt="License: GPL v3"></a>
   <a href="https://app.codacy.com/gh/1Panel-dev/1Panel?utm_source=github.com&utm_medium=referral&utm_content=1Panel-dev/1Panel&utm_campaign=Badge_Grade_Dashboard"><img src="https://app.codacy.com/project/badge/Grade/da67574fd82b473992781d1386b937ef" alt="Codacy"></a>
@@ -10,52 +10,52 @@
 
 ------------------------------
 
-1Panel 是一个现代化、开源的 Linux 服务器运维管理面板。1Panel 的功能和优势包括：
+1Panel is a modern and Open-Source linux server operation and management panel, the functions and advantages of 1Panel include:：
 
-- **快速建站**：深度集成 Wordpress 和 [Halo](https://github.com/halo-dev/halo/)，域名绑定、SSL 证书配置等一键搞定；
-- **高效管理**：通过 Web 端轻松管理 Linux 服务器，包括应用管理、主机监控、文件管理、数据库管理、容器管理等；
-- **安全可靠**：最小漏洞暴露面，提供防火墙和安全审计等功能；
-- **一键备份**：支持一键备份和恢复，备份数据云端存储，永不丢失。
+- **Quick website building**: Deeply integrated with Wordpress and [Halo](https://github.com/halo-dev/halo/), with one-click solutions for domain name binding, SSL certificate configuration, and more;
+- **Efficient management**: Easily manage Linux servers through the web interface, including application management, host monitoring, file management, database management, container management, and more;
+- **Secure and reliable**: Minimal vulnerability exposure, with firewall and security audit functions provided;
+- **One-click backup**: Support for one-click backup and restore, with backup data stored in the cloud and never lost.
 
-## UI 展示
+## UI Display
 
-![UI展示](https://1panel.oss-cn-hangzhou.aliyuncs.com/img/overview.png)
+![UI Display](https://1panel.oss-cn-hangzhou.aliyuncs.com/img/overview.png)
 
-## 快速开始
+## Quick Start
 
-**在线体验**
+**Online Demo**
 
-- 环境地址：<https://demo.1panel.cn/>
-- 用户名：demo
-- 密码：1panel
+- Address: <https://demo.1panel.cn/>
+- Username: demo
+- Password: 1panel
 
-**一键安装**
+**One-Click Installation**
 
-执行如下命令一键安装 1Panel:
+Execute the following command to install 1Panel with one click:
 
 ```sh
 curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && sudo bash quick_start.sh
 ```
 
-**学习资料**
+**Learning Materials**
 
-- [在线文档](https://1panel.cn/docs/)
-- [教学视频](https://space.bilibili.com/510493147/channel/collectiondetail?sid=1199760)
+- [Online Documentation](https://1panel.cn/docs/)
+- [Teaching Videos](https://space.bilibili.com/510493147/channel/collectiondetail?sid=1199760)
 
-## 社区
+## Community
 
-如果您在使用过程中有任何疑问或对建议，欢迎提交 GitHub Issue 或加入到我们微信交流群进行交流沟通。
+If you have any questions or suggestions, please submit a GitHub Issue or join our WeChat group for communication.
 
-**微信交流群**
+**WeChat Group**
 
 <img src="https://1panel.cn/img/wechat-group.jpg" width="156" height="156"/>
 
-## 安全说明
+## Security Information
 
-如果您在使用过程中发现任何安全问题，请通过以下方式直接联系我们：
+If you discover any security issues, please contact us through:
 
-- 邮箱：support@fit2cloud.com
-- 电话：400-052-0755
+- Email: support@fit2cloud.com
+- Phone: 400-052-0755
 
 ## Star History
 
