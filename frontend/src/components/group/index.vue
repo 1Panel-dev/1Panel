@@ -124,6 +124,7 @@ const saveGroup = async (formEl: FormInstance, group: Group.GroupInfo) => {
 
 const setDefault = (group: Group.GroupInfo) => {
     group.isDefault = true;
+    group.type = type.value;
     UpdateGroup(group).then(() => {
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         search();

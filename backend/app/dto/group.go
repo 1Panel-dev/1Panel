@@ -13,6 +13,7 @@ type GroupSearch struct {
 type GroupUpdate struct {
 	ID        uint   `json:"id"`
 	Name      string `json:"name"`
+	Type      string `json:"type" validate:"required"`
 	IsDefault bool   `json:"isDefault"`
 }
 
