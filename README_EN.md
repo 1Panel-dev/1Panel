@@ -10,9 +10,9 @@
 
 ------------------------------
 
-1Panel is a modern and Open-Source linux server operation and management panel, the functions and advantages of 1Panel include:：
+1Panel is a modern and Open-Source linux server operation and management panel, the functions and advantages of 1Panel include:
 
-- **Quick website building**: Deeply integrated with Wordpress and [Halo](https://github.com/halo-dev/halo/), with one-click solutions for domain name binding, SSL certificate configuration, and more;
+- **Quick website building**: Deeply integrated with WordPress and [Halo](https://github.com/halo-dev/halo/), with one-click solutions for domain name binding, SSL certificate configuration, and more;
 - **Efficient management**: Easily manage Linux servers through the web interface, including application management, host monitoring, file management, database management, container management, and more;
 - **Secure and reliable**: Minimal vulnerability exposure, with firewall and security audit functions provided;
 - **One-click backup**: Support for one-click backup and restore, with backup data stored in the cloud and never lost.
