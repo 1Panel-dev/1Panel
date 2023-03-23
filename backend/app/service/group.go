@@ -58,7 +58,7 @@ func (u *GroupService) Delete(id uint) error {
 	}
 	switch group.Type {
 	case "website":
-		websites, _ := websiteRepo.GetBy(commonRepo.WithByGroupID(id))
+		websites, _ := websiteRepo.GetBy(websiteRepo.WithGroupID(id))
 		if len(websites) > 0 {
 			return buserr.New(constant.ErrGroupIsUsed)
 		}
