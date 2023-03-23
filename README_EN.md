@@ -19,7 +19,7 @@
 
 ## UI Display
 
-![UI Display](https://1panel.oss-cn-hangzhou.aliyuncs.com/img/overview.png)
+![UI Display](https://resource.fit2cloud.com/1panel/img/overview_en.png)
 
 ## Quick Start
 
