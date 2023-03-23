@@ -34,8 +34,7 @@
                     <template #prefix>{{ $t('terminal.group') }}</template>
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
                     <div v-for="item in groupList" :key="item.name">
-                        <el-option v-if="item.name === 'default'" :label="$t('website.default')" :value="item.id" />
-                        <el-option v-else :value="item.id" :label="item.name" />
+                        <el-option :value="item.id" :label="item.name" />
                     </div>
                 </el-select>
             </template>

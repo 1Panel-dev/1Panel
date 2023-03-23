@@ -38,7 +38,7 @@ func (u *GroupService) List(req dto.GroupSearch) ([]dto.GroupInfo, error) {
 }
 
 func (u *GroupService) Create(req dto.GroupCreate) error {
-	group, _ := groupRepo.Get(commonRepo.WithByName(req.Name), commonRepo.WithByName(req.Name))
+	group, _ := groupRepo.Get(commonRepo.WithByName(req.Name), commonRepo.WithByType(req.Type))
 	if group.ID != 0 {
 		return constant.ErrRecordExist
 	}

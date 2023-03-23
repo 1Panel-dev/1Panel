@@ -140,7 +140,6 @@ var AddTableSetting = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "SystemStatus", Value: "Free"}).Error; err != nil {
-			tx.Rollback()
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "AppStoreVersion", Value: ""}).Error; err != nil {
@@ -236,8 +235,15 @@ var AddDefaultGroup = &gormigrate.Migration{
 			IsDefault: true,
 			Type:      "website",
 		}
-		tx.Create(defaultGroup)
-		tx.Debug().Model(&model.Website{}).Where("1 = 1").Update("website_group_id", defaultGroup.ID)
+		if err := tx.Create(defaultGroup).Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&model.Group{}).Where("name = ? AND type = ?", "default", "host").Update("name", "默认").Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&model.Website{}).Where("1 = 1").Update("website_group_id", defaultGroup.ID).Error; err != nil {
+			return err
+		}
 		return tx.Migrator().DropTable("website_groups")
 	},
 }
