@@ -123,7 +123,8 @@ const message = {
             solutionHelper: '在 SSH 终端输入以下一种命令来解决 1.查看面板入口：/etc/init.d/bt default',
             warnning: '注意：【关闭安全入口】将使您的面板登录地址被直接暴露在互联网上，非常危险，请谨慎操作',
             codeInput: '请输入 MFA 验证器的 6 位验证码',
-            mfaTitle: 'MFA认证',
+            mfaTitle: 'MFA 认证',
+            mfaCode: 'MFA 验证码',
             title: 'Linux 服务器运维管理面板',
             licenseHelper:
                 '同意 FIT2CLOUD 飞致云 &laquo; <a href="https://www.fit2cloud.com/legal/licenses.html" target="_blank"> 社区软件许可协议</a> &raquo;',

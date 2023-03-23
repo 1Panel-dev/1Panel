@@ -86,9 +86,9 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin) (*dto.UserLogi
 	}
 	pass, err := encrypt.StringDecrypt(passwrodSetting.Value)
 	if err != nil {
-		return nil, constant.ErrAuth
+		return nil, err
 	}
-	if info.Password != pass && nameSetting.Value != info.Name {
+	if info.Password != pass || nameSetting.Value != info.Name {
 		return nil, constant.ErrAuth
 	}
 
