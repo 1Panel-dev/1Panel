@@ -9,7 +9,6 @@ type UserLoginInfo struct {
 	Name      string `json:"name"`
 	Token     string `json:"token"`
 	MfaStatus string `json:"mfaStatus"`
-	MfaSecret string `json:"mfaSecret"`
 }
 
 type MfaCredential struct {
@@ -28,7 +27,6 @@ type Login struct {
 type MFALogin struct {
 	Name       string `json:"name"`
 	Password   string `json:"password"`
-	Secret     string `json:"secret"`
 	Code       string `json:"code"`
 	AuthMethod string `json:"authMethod"`
 }

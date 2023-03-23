@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <div v-if="isFirst">
             <div class="login-form">
                 <el-form ref="registerFormRef" :model="registerForm" size="default" :rules="registerRules">
@@ -70,13 +70,13 @@
         </div>
         <div v-else-if="mfaShow">
             <div class="login-form">
-                <el-form>
+                <el-form @submit.prevent="mfaLogin()">
                     <div class="login-title">{{ $t('commons.login.mfaTitle') }}</div>
                     <el-form-item class="no-border">
                         <el-input
                             size="default"
-                            :placeholder="$t('commons.login.captchaHelper')"
-                            v-model="mfaLoginForm.code"
+                            :placeholder="$t('commons.login.mfaCode')"
+                            v-model.trim="mfaLoginForm.code"
                         >
                             <template #prefix>
                                 <el-icon class="el-input__icon">
@@ -89,7 +89,15 @@
                         </span>
                     </el-form-item>
                     <el-form-item>
-                        <el-button class="login-button" type="primary" size="default" round @click="mfaLogin()">
+                        <el-button
+                            @focus="mfaButtonFocused = true"
+                            @blur="mfaButtonFocused = false"
+                            class="login-button"
+                            type="primary"
+                            size="default"
+                            round
+                            @click="mfaLogin()"
+                        >
                             {{ $t('commons.button.verify') }}
                         </el-button>
                     </el-form-item>
@@ -233,6 +241,8 @@ const loginRules = reactive({
     name: [{ required: true, message: i18n.global.t('commons.rule.username'), trigger: 'blur' }],
     password: [{ required: true, message: i18n.global.t('commons.rule.password'), trigger: 'blur' }],
 });
+
+const mfaButtonFocused = ref();
 const mfaLoginForm = reactive({
     name: '',
     password: '',
@@ -266,41 +276,39 @@ const login = (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        loading.value = true;
+        let requestLoginForm = {
+            name: loginForm.name,
+            password: loginForm.password,
+            captcha: loginForm.captcha,
+            captchaID: captcha.captchaID,
+            authMethod: '',
+        };
+        if (requestLoginForm.captcha == '') {
+            errCaptcha.value = true;
+            return;
+        }
+        if (loginForm.agreeLicense == false) {
+            errAgree.value = true;
+            return;
+        }
         try {
-            let requestLoginForm = {
-                name: loginForm.name,
-                password: loginForm.password,
-                captcha: loginForm.captcha,
-                captchaID: captcha.captchaID,
-                authMethod: '',
-            };
-            if (requestLoginForm.captcha == '') {
-                errCaptcha.value = true;
-                return;
-            }
-            if (loginForm.agreeLicense == false) {
-                errAgree.value = true;
-                return;
-            }
+            loading.value = true;
             const res = await loginApi(requestLoginForm);
             if (res.code === 406) {
                 if (res.message === 'ErrCaptchaCode') {
                     errCaptcha.value = true;
                     errAuthInfo.value = false;
-                    loginVerify();
                 }
                 if (res.message === 'ErrAuth') {
                     errCaptcha.value = false;
                     errAuthInfo.value = true;
-                    loginVerify();
                 }
+                loginVerify();
                 return;
             }
             if (res.data.mfaStatus === 'enable') {
                 mfaShow.value = true;
                 errMfaInfo.value = false;
-                mfaLoginForm.secret = res.data.mfaSecret;
                 return;
             }
             globalStore.setLogStatus(true);
@@ -366,12 +374,16 @@ onMounted(() => {
     document.onkeydown = (e: any) => {
         e = window.event || e;
         if (e.keyCode === 13) {
-            if (loading.value) return;
-            if (isFirst.value && !registerButtonFocused.value) {
-                register(registerFormRef.value);
+            if (!mfaShow.value) {
+                if (isFirst.value && !registerButtonFocused.value) {
+                    register(registerFormRef.value);
+                }
+                if (!isFirst.value && !loginButtonFocused.value) {
+                    login(loginFormRef.value);
+                }
             }
-            if (!isFirst.value && !loginButtonFocused.value) {
-                login(loginFormRef.value);
+            if (mfaShow.value && !mfaButtonFocused.value) {
+                mfaLogin();
             }
         }
     };
