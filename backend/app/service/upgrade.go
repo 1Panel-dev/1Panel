@@ -60,7 +60,12 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 			upgrade.NewVersion = newerVersion
 		}
 	}
-	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, global.CONF.System.Mode, upgrade.LatestVersion, upgrade.LatestVersion))
+	itemVersion := upgrade.LatestVersion
+	if upgrade.NewVersion != "" {
+		itemVersion = upgrade.NewVersion
+	}
+	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, global.CONF.System.Mode, itemVersion, itemVersion))
+
 	if err != nil {
 		return nil, fmt.Errorf("load relase-notes of version %s failed, err: %v", latestVersion, err)
 	}
