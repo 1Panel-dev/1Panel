@@ -1,7 +1,6 @@
 package client
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
@@ -11,41 +10,28 @@ import (
 
 func TestFire(t *testing.T) {
 	ConnInfo := ssh.ConnInfo{
+		Addr:     "172.16.10.234",
 		User:     "ubuntu",
 		AuthMode: "password",
 		Port:     22,
 	}
-	output, err := ConnInfo.Run("sudo ufw status numbered")
+	output, err := ConnInfo.Run("sudo ufw status verbose")
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	lines := strings.Split(string(output), "\n")
-	var rules []UfwRule
+	var datas []FireInfo
+	isStart := false
 	for _, line := range lines {
-		if line == "" || !strings.HasPrefix(line, "[") {
+		if strings.HasPrefix(line, "--") {
+			isStart = true
 			continue
 		}
-		fields := strings.Fields(line)
-		rule := UfwRule{Status: fields[0], From: fields[1], To: fields[2], Proto: fields[3], Comment: strings.Join(fields[4:], " ")}
-		rules = append(rules, rule)
-	}
-	ufwStatus := UfwStatus{Rules: rules}
-	ufwStatusJSON, err := json.MarshalIndent(ufwStatus, "", " ")
-	if err != nil {
-		fmt.Println("Error:", err)
-	}
-	fmt.Println(string(ufwStatusJSON))
+		if !isStart {
+			continue
+		}
 
-}
-
-type UfwRule struct {
-	Status  string `json:"status"`
-	From    string `json:"from"`
-	To      string `json:"to"`
-	Proto   string `json:"proto"`
-	Comment string `json:"comment"`
-}
-type UfwStatus struct {
-	Rules []UfwRule `json:"rules"`
+	}
+	fmt.Println(datas)
 }

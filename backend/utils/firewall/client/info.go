@@ -1,16 +1,16 @@
 package client
 
 type FireInfo struct {
-	Family   string
-	Address  string
-	Port     string
-	Protocol string
-	Strategy string
+	Family   string `json:"family"`  // ipv4 ipv6
+	Address  string `json:"address"` // Anywhere
+	Port     string `json:"port"`
+	Protocol string `json:"protocol"` // tcp udp tcp/upd
+	Strategy string `json:"strategy"` // accept drop
 }
 
 type Forward struct {
-	Protocol string
-	Address  string
-	Port     string
-	Target   string
+	Protocol string `json:"protocol"`
+	Address  string `json:"address"`
+	Port     string `json:"port"`
+	Target   string `json:"target"`
 }

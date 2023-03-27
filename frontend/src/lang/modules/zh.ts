@@ -215,7 +215,6 @@ const message = {
         container: '容器',
         cronjob: '计划任务',
         host: '主机',
-        security: '安全',
         files: '文件',
         monitor: '监控',
         terminal: '终端',
@@ -1182,6 +1181,19 @@ const message = {
         argsCheck: 'GET 参数校验',
         postCheck: 'POST 参数校验',
         cookieBlockList: 'Cookie 黑名单',
+
+        firewall: '防火墙',
+        protocol: '协议',
+        port: '端口',
+        strategy: '策略',
+        accept: '允许',
+        drop: '拒绝',
+        source: '来源',
+        anyWhere: '所有 IP',
+        address: '指定 IP',
+        allIP: '所有 IP',
+        portRule: '端口规则',
+        ipRule: 'IP 规则',
     },
 };
 export default {

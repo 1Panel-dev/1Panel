@@ -24,6 +24,7 @@ type ServiceGroup struct {
 	GroupService
 	CommandService
 	FileService
+	FirewallService
 
 	SettingService
 	BackupService
