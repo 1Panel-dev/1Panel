@@ -59,16 +59,17 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate) error {
 	if err != nil {
 		return err
 	}
-
-	var fireInfo fireClient.FireInfo
-	if err := copier.Copy(&fireInfo, &req); err != nil {
+	if req.Protocol == "tcp/udp" {
+		req.Protocol = "tcp"
+		if err := u.createPort(client, req); err != nil {
+			return err
+		}
+		req.Protocol = "udp"
+	}
+	if err := u.createPort(client, req); err != nil {
 		return err
 	}
-
-	if len(fireInfo.Address) != 0 || fireInfo.Strategy == "drop" {
-		return client.RichRules(fireInfo, req.Operation)
-	}
-	return client.Port(fireInfo, req.Operation)
+	return client.Reload()
 }
 
 func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate) error {
@@ -81,5 +82,20 @@ func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate) error {
 	if err := copier.Copy(&fireInfo, &req); err != nil {
 		return err
 	}
-	return client.RichRules(fireInfo, req.Operation)
+	if err := client.RichRules(fireInfo, req.Operation); err != nil {
+		return err
+	}
+	return client.Reload()
+}
+
+func (u *FirewallService) createPort(client firewall.FirewallClient, req dto.PortRuleOperate) error {
+	var fireInfo fireClient.FireInfo
+	if err := copier.Copy(&fireInfo, &req); err != nil {
+		return err
+	}
+
+	if len(fireInfo.Address) != 0 || fireInfo.Strategy == "drop" {
+		return client.RichRules(fireInfo, req.Operation)
+	}
+	return client.Port(fireInfo, req.Operation)
 }
