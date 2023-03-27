@@ -51,7 +51,7 @@
 <script lang="ts" setup>
 import ComplexTable from '@/components/complex-table/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
-import OperatrDialog from '@/views/host/firewall/port/create/index.vue';
+import OperatrDialog from '@/views/host/firewall/port/operate/index.vue';
 import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { operatePortRule, searchFireRule } from '@/api/modules/host';
@@ -120,9 +120,16 @@ const onDelete = async (row: Host.RuleInfo | null) => {
             protocol: row.protocol,
             strategy: row.strategy,
         };
-        await operatePortRule(params);
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        search();
+        loading.value = true;
+        await operatePortRule(params)
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     });
 };
 

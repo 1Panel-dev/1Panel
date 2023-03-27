@@ -54,19 +54,6 @@ func (b *BaseApi) OperatePortRule(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if req.Protocol == "tcp/udp" {
-		req.Protocol = "tcp"
-		if err := firewallService.OperatePortRule(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-			return
-		}
-		req.Protocol = "udp"
-		if err := firewallService.OperatePortRule(req); err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-			return
-		}
-		helper.SuccessWithData(c, nil)
-	}
 	if err := firewallService.OperatePortRule(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

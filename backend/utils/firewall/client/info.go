@@ -4,7 +4,7 @@ type FireInfo struct {
 	Family   string `json:"family"`  // ipv4 ipv6
 	Address  string `json:"address"` // Anywhere
 	Port     string `json:"port"`
-	Protocol string `json:"protocol"` // tcp udp tcp/upd
+	Protocol string `json:"protocol"` // tcp udp tcp/udp
 	Strategy string `json:"strategy"` // accept drop
 }
 
