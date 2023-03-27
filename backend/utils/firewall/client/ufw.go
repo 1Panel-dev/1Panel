@@ -61,7 +61,7 @@ func (f *Ufw) ListPort() ([]FireInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	portInfos := strings.Split(strings.ReplaceAll(stdout, "\n", ""), " ")
+	portInfos := strings.Split(stdout, "\n")
 	var datas []FireInfo
 	isStart := false
 	for _, line := range portInfos {
@@ -73,7 +73,7 @@ func (f *Ufw) ListPort() ([]FireInfo, error) {
 			continue
 		}
 		itemFire := f.loadInfo(line, "port")
-		if len(itemFire.Address) != 0 {
+		if len(itemFire.Port) != 0 {
 			datas = append(datas, itemFire)
 		}
 	}
@@ -85,7 +85,7 @@ func (f *Ufw) ListAddress() ([]FireInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	portInfos := strings.Split(strings.ReplaceAll(stdout, "\n", ""), " ")
+	portInfos := strings.Split(stdout, "\n")
 	var datas []FireInfo
 	isStart := false
 	for _, line := range portInfos {
@@ -96,8 +96,11 @@ func (f *Ufw) ListAddress() ([]FireInfo, error) {
 		if !isStart {
 			continue
 		}
+		if !strings.Contains(line, " IN") {
+			continue
+		}
 		itemFire := f.loadInfo(line, "address")
-		if len(itemFire.Address) != 0 {
+		if len(itemFire.Port) == 0 {
 			datas = append(datas, itemFire)
 		}
 	}
@@ -166,7 +169,7 @@ func (f *Ufw) loadInfo(line string, fireType string) FireInfo {
 	if len(fields) < 4 {
 		return itemInfo
 	}
-	if fields[0] == "Anywhere" && fireType == "port" {
+	if fields[0] == "Anywhere" && fireType != "port" {
 		itemInfo.Strategy = "drop"
 		if fields[2] == "ALLOW" {
 			itemInfo.Strategy = "accept"

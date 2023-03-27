@@ -111,9 +111,6 @@ func (f *Firewall) Port(port FireInfo, operation string) error {
 	if err != nil {
 		return fmt.Errorf("%s port failed, err: %s", operation, stdout)
 	}
-	if err := f.Reload(); err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -134,9 +131,6 @@ func (f *Firewall) RichRules(rule FireInfo, operation string) error {
 	if err != nil {
 		return fmt.Errorf("%s rich rules failed, err: %s", operation, stdout)
 	}
-	if err := f.Reload(); err != nil {
-		return err
-	}
 	return nil
 }
 
@@ -149,9 +143,6 @@ func (f *Firewall) PortForward(info Forward, operation string) error {
 	stdout, err := f.Client.Run(ruleStr)
 	if err != nil {
 		return fmt.Errorf("%s port forward failed, err: %s", operation, stdout)
-	}
-	if err := f.Reload(); err != nil {
-		return err
 	}
 	return nil
 }
