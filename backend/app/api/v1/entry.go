@@ -26,9 +26,10 @@ var (
 
 	cronjobService = service.ServiceGroupApp.CronjobService
 
-	hostService  = service.ServiceGroupApp.HostService
-	groupService = service.ServiceGroupApp.GroupService
-	fileService  = service.ServiceGroupApp.FileService
+	hostService     = service.ServiceGroupApp.HostService
+	groupService    = service.ServiceGroupApp.GroupService
+	fileService     = service.ServiceGroupApp.FileService
+	firewallService = service.NewIFirewallService()
 
 	settingService = service.ServiceGroupApp.SettingService
 	backupService  = service.ServiceGroupApp.BackupService

@@ -52,4 +52,29 @@ export namespace Host {
         groupID: number;
         info?: string;
     }
+
+    export interface RuleSearch extends ReqPage {
+        info: string;
+        type: string;
+    }
+    export interface RuleInfo extends ReqPage {
+        family: string;
+        address: string;
+        port: string;
+        protocol: string;
+        strategy: string;
+    }
+    export interface RulePort {
+        operation: string;
+        address: string;
+        port: string;
+        source: string;
+        protocol: string;
+        strategy: string;
+    }
+    export interface RuleIP {
+        operation: string;
+        address: string;
+        strategy: string;
+    }
 }

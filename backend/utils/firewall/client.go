@@ -1,9 +1,6 @@
 package firewall
 
 import (
-	"errors"
-	"os"
-
 	"github.com/1Panel-dev/1Panel/backend/utils/firewall/client"
 )
 
@@ -13,7 +10,7 @@ type FirewallClient interface {
 	Reload() error
 	Status() (string, error)
 	ListPort() ([]client.FireInfo, error)
-	ListRichRules() ([]client.FireInfo, error)
+	ListAddress() ([]client.FireInfo, error)
 
 	Port(port client.FireInfo, operation string) error
 	RichRules(rule client.FireInfo, operation string) error
@@ -21,11 +18,11 @@ type FirewallClient interface {
 }
 
 func NewFirewallClient() (FirewallClient, error) {
-	if _, err := os.Stat("/usr/sbin/firewalld"); err == nil {
-		return client.NewFirewalld()
-	}
+	// if _, err := os.Stat("/usr/sbin/firewalld"); err == nil {
+	return client.NewFirewalld()
+	// }
 	// if _, err := os.Stat("/usr/sbin/ufw"); err == nil {
 	// 	return client.NewUfw()
 	// }
-	return nil, errors.New("no such type")
+	// return nil, errors.New("no such type")
 }

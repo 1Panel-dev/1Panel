@@ -30,6 +30,25 @@ const hostRouter = {
             },
         },
         {
+            path: '/hosts/firewall/port',
+            name: 'FirewallPort',
+            component: () => import('@/views/host/firewall/port/index.vue'),
+            meta: {
+                title: 'menu.firewall',
+                requiresAuth: false,
+            },
+        },
+        {
+            path: '/hosts/firewall/ip',
+            name: 'FirewallIP',
+            component: () => import('@/views/host/firewall/ip/index.vue'),
+            hidden: true,
+            meta: {
+                title: 'menu.toolbox',
+                requiresAuth: false,
+            },
+        },
+        {
             path: '/hosts/terminal',
             name: 'Terminal',
             component: () => import('@/views/host/terminal/index.vue'),
