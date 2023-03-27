@@ -1,11 +1,11 @@
 <template>
     <div>
         <div class="login-backgroud" v-if="statusCode == 1">
-            <div class="login-wrapper" v-if="screenWidth > 1000">
-                <div class="login-title">
-                    <span>{{ $t('commons.login.title') }}</span>
-                </div>
+            <div class="login-wrapper" v-if="screenWidth > 1110">
                 <div class="left inline-block">
+                    <div class="login-title">
+                        <span>{{ $t('commons.login.title') }}</span>
+                    </div>
                     <img src="@/assets/images/1panel-login.png" alt="" />
                 </div>
                 <div class="right inline-block">
@@ -89,10 +89,10 @@ onMounted(() => {
         padding-top: 8%;
         width: 80%;
         margin: 0 auto;
-        @media only screen and (max-width: 1440px) {
-            width: 100%;
-            padding-top: 6%;
-        }
+        // @media only screen and (max-width: 1440px) {
+        //     width: 100%;
+        //     padding-top: 6%;
+        // }
         .left {
             vertical-align: middle;
             text-align: right;
@@ -100,6 +100,9 @@ onMounted(() => {
             img {
                 object-fit: contain;
                 width: 100%;
+                @media only screen and (min-width: 1440px) {
+                    width: 85%;
+                }
             }
         }
         .right {
@@ -109,17 +112,18 @@ onMounted(() => {
     }
 
     .login-title {
-        margin-left: 10%;
+        text-align: right;
+        margin-right: 10%;
         span:first-child {
             color: $primary-color;
             font-size: 40px;
             font-family: pingFangSC-Regular;
             font-weight: 600;
-            @media only screen and (max-width: 1440px) {
-                margin-left: 0;
-            }
+            // @media only screen and (max-width: 1440px) {
+            //     margin-left: 0;
+            // }
         }
-        @media only screen and (max-width: 1000px) {
+        @media only screen and (max-width: 1110px) {
             margin-bottom: 20px;
             font-size: 35px;
             text-align: center;
@@ -137,7 +141,7 @@ onMounted(() => {
         @media only screen and (max-width: 1440px) {
             margin-top: 60px;
         }
-        @media only screen and (max-width: 1000px) {
+        @media only screen and (max-width: 1110px) {
             margin: 60px auto 0;
         }
     }
