@@ -70,3 +70,14 @@ export const editCommand = (params: Command.CommandOperate) => {
 export const deleteCommand = (params: { ids: number[] }) => {
     return http.post(`/hosts/command/del`, params);
 };
+
+// firewall
+export const searchFireRule = (params: Host.RuleSearch) => {
+    return http.post<ResPage<Host.RuleInfo>>(`/hosts/firewall/search`, params);
+};
+export const operatePortRule = (params: Host.RulePort) => {
+    return http.post<Host.RulePort>(`/hosts/firewall/port`, params);
+};
+export const operateIPRule = (params: Host.RuleIP) => {
+    return http.post<Host.RuleIP>(`/hosts/firewall/ip`, params);
+};
