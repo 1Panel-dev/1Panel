@@ -13,6 +13,17 @@ import (
 type WebsiteDnsAccountService struct {
 }
 
+type IWebsiteDnsAccountService interface {
+	Page(search dto.PageInfo) (int64, []response.WebsiteDnsAccountDTO, error)
+	Create(create request.WebsiteDnsAccountCreate) (request.WebsiteDnsAccountCreate, error)
+	Update(update request.WebsiteDnsAccountUpdate) (request.WebsiteDnsAccountUpdate, error)
+	Delete(id uint) error
+}
+
+func NewIWebsiteDnsAccountService() IWebsiteDnsAccountService {
+	return &WebsiteDnsAccountService{}
+}
+
 func (w WebsiteDnsAccountService) Page(search dto.PageInfo) (int64, []response.WebsiteDnsAccountDTO, error) {
 	total, accounts, err := websiteDnsRepo.Page(search.Page, search.PageSize, commonRepo.WithOrderBy("created_at desc"))
 	var accountDTOs []response.WebsiteDnsAccountDTO

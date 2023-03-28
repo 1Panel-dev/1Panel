@@ -8,6 +8,19 @@ import (
 type TagRepo struct {
 }
 
+type ITagRepo interface {
+	BatchCreate(ctx context.Context, tags []*model.Tag) error
+	DeleteAll(ctx context.Context) error
+	All() ([]model.Tag, error)
+	GetByIds(ids []uint) ([]model.Tag, error)
+	GetByKeys(keys []string) ([]model.Tag, error)
+	GetByAppId(appId uint) ([]model.Tag, error)
+}
+
+func NewITagRepo() ITagRepo {
+	return &TagRepo{}
+}
+
 func (t TagRepo) BatchCreate(ctx context.Context, tags []*model.Tag) error {
 	return getTx(ctx).Create(&tags).Error
 }

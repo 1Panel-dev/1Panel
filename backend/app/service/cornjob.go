@@ -25,6 +25,8 @@ type ICronjobService interface {
 	Update(id uint, req dto.CronjobUpdate) error
 	UpdateStatus(id uint, status string) error
 	Delete(ids []uint) error
+	Download(down dto.CronjobDownload) (string, error)
+	StartJob(cronjob *model.Cronjob) (int, error)
 }
 
 func NewICronjobService() ICronjobService {

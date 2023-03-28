@@ -20,6 +20,8 @@ type IBackupRepo interface {
 	Delete(opts ...DBOption) error
 	DeleteRecord(ctx context.Context, opts ...DBOption) error
 	WithByDetailName(detailName string) DBOption
+	WithByFileName(fileName string) DBOption
+	WithByType(backupType string) DBOption
 }
 
 func NewIBackupRepo() IBackupRepo {
