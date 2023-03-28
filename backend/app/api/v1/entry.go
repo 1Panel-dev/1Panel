@@ -9,41 +9,43 @@ type ApiGroup struct {
 var ApiGroupApp = new(ApiGroup)
 
 var (
-	authService      = service.ServiceGroupApp.AuthService
-	dashboardService = service.ServiceGroupApp.DashboardService
+	authService      = service.NewIAuthService()
+	dashboardService = service.NewIDashboardService()
 
 	appService        = service.NewIAppService()
-	appInstallService = service.ServiceGroupApp.AppInstallService
+	appInstallService = service.NewIAppInstalledService()
 
-	containerService       = service.ServiceGroupApp.ContainerService
-	composeTemplateService = service.ServiceGroupApp.ComposeTemplateService
-	imageRepoService       = service.ServiceGroupApp.ImageRepoService
-	imageService           = service.ServiceGroupApp.ImageService
-	dockerService          = service.ServiceGroupApp.DockerService
+	containerService       = service.NewIContainerService()
+	composeTemplateService = service.NewIComposeTemplateService()
+	imageRepoService       = service.NewIImageRepoService()
+	imageService           = service.NewIImageService()
+	dockerService          = service.NewIDockerService()
 
-	mysqlService = service.ServiceGroupApp.MysqlService
-	redisService = service.ServiceGroupApp.RedisService
+	mysqlService = service.NewIMysqlService()
+	redisService = service.NewIRedisService()
 
-	cronjobService = service.ServiceGroupApp.CronjobService
+	cronjobService = service.NewICronjobService()
 
-	hostService     = service.ServiceGroupApp.HostService
-	groupService    = service.ServiceGroupApp.GroupService
-	fileService     = service.ServiceGroupApp.FileService
+	hostService  = service.NewIHostService()
+	groupService = service.NewIGroupService()
+	fileService  = service.NewIFileService()
 	firewallService = service.NewIFirewallService()
 
-	settingService = service.ServiceGroupApp.SettingService
-	backupService  = service.ServiceGroupApp.BackupService
+	settingService = service.NewISettingService()
+	backupService  = service.NewIBackupService()
 
-	commandService = service.ServiceGroupApp.CommandService
+	commandService = service.NewICommandService()
 
-	websiteService            = service.ServiceGroupApp.WebsiteService
-	websiteDnsAccountService  = service.ServiceGroupApp.WebsiteDnsAccountService
-	websiteSSLService         = service.ServiceGroupApp.WebsiteSSLService
-	websiteAcmeAccountService = service.ServiceGroupApp.WebsiteAcmeAccountService
+	websiteService            = service.NewIWebsiteService()
+	websiteDnsAccountService  = service.NewIWebsiteDnsAccountService()
+	websiteSSLService         = service.NewIWebsiteSSLService()
+	websiteAcmeAccountService = service.NewIWebsiteAcmeAccountService()
 
-	nginxService = service.ServiceGroupApp.NginxService
+	nginxService = service.NewINginxService()
 
-	logService      = service.ServiceGroupApp.LogService
-	snapshotService = service.ServiceGroupApp.SnapshotService
-	upgradeService  = service.ServiceGroupApp.UpgradeService
+	logService      = service.NewILogService()
+	snapshotService = service.NewISnapshotService()
+	upgradeService  = service.NewIUpgradeService()
+
+	runtimeService = service.NewRuntimeService()
 )

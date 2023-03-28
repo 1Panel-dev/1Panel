@@ -11,6 +11,30 @@ import (
 
 type AppInstallRepo struct{}
 
+type IAppInstallRepo interface {
+	WithDetailIdsIn(detailIds []uint) DBOption
+	WithDetailIdNotIn(detailIds []uint) DBOption
+	WithAppId(appId uint) DBOption
+	WithAppIdsIn(appIds []uint) DBOption
+	WithStatus(status string) DBOption
+	WithServiceName(serviceName string) DBOption
+	WithPort(port int) DBOption
+	WithIdNotInWebsite() DBOption
+	ListBy(opts ...DBOption) ([]model.AppInstall, error)
+	GetFirst(opts ...DBOption) (model.AppInstall, error)
+	Create(ctx context.Context, install *model.AppInstall) error
+	Save(install *model.AppInstall) error
+	DeleteBy(opts ...DBOption) error
+	Delete(ctx context.Context, install model.AppInstall) error
+	Page(page, size int, opts ...DBOption) (int64, []model.AppInstall, error)
+	BatchUpdateBy(maps map[string]interface{}, opts ...DBOption) error
+	LoadBaseInfo(key string, name string) (*RootInfo, error)
+}
+
+func NewIAppInstallRepo() IAppInstallRepo {
+	return &AppInstallRepo{}
+}
+
 func (a *AppInstallRepo) WithDetailIdsIn(detailIds []uint) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("app_detail_id in (?)", detailIds)

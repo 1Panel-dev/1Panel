@@ -50,9 +50,10 @@ type IWebsiteService interface {
 	UpdateWafConfig(req request.WebsiteWafUpdate) error
 	UpdateNginxConfigFile(req request.WebsiteNginxUpdate) error
 	OpWebsiteLog(req request.WebsiteLogReq) (*response.WebsiteLog, error)
+	ChangeDefaultServer(id uint) error
 }
 
-func NewWebsiteService() IWebsiteService {
+func NewIWebsiteService() IWebsiteService {
 	return &WebsiteService{}
 }
 
@@ -138,7 +139,7 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 			req.Name = create.AppInstall.Name
 			req.AppDetailId = create.AppInstall.AppDetailId
 			req.Params = create.AppInstall.Params
-			install, err := ServiceGroupApp.Install(ctx, req)
+			install, err := NewIAppService().Install(ctx, req)
 			if err != nil {
 				return err
 			}
