@@ -2,6 +2,7 @@ package dto
 
 type RuleSearch struct {
 	PageInfo
+	Info string `json:"info"`
 	Type string `json:"type" validate:"required"`
 }
 
@@ -17,4 +18,19 @@ type AddrRuleOperate struct {
 	Operation string `json:"operation" validate:"required,oneof=add remove"`
 	Address   string `json:"address"  validate:"required"`
 	Strategy  string `json:"strategy" validate:"required,oneof=accept drop"`
+}
+
+type PortRuleUpdate struct {
+	OldRule PortRuleOperate `json:"oldRule"`
+	NewRule PortRuleOperate `json:"newRule"`
+}
+
+type AddrRuleUpdate struct {
+	OldRule AddrRuleOperate `json:"oldRule"`
+	NewRule AddrRuleOperate `json:"newRule"`
+}
+
+type BatchRuleOperate struct {
+	Type  string            `json:"type" validate:"required"`
+	Rules []PortRuleOperate `json:"rules"`
 }

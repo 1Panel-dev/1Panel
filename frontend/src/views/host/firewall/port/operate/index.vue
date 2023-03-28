@@ -17,6 +17,7 @@
 
                         <el-form-item :label="$t('firewall.port')" prop="port">
                             <el-input clearable v-model.trim="dialogData.rowData!.port" />
+                            <span class="input-help">{{ $t('firewall.portHelper') }}</span>
                         </el-form-item>
 
                         <el-form-item :label="$t('firewall.source')" prop="source">
@@ -63,9 +64,11 @@ import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
-import { operatePortRule } from '@/api/modules/host';
+import { operatePortRule, updatePortRule } from '@/api/modules/host';
+import { deepCopy } from '@/utils/util';
 
 const loading = ref();
+const oldRule = ref<Host.RulePort>();
 
 interface DialogProps {
     title: string;
@@ -79,6 +82,14 @@ const dialogData = ref<DialogProps>({
 });
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
+    if (dialogData.value.title === 'edit') {
+        if (params.rowData.address && params.rowData.address !== 'Anywhere') {
+            dialogData.value.rowData.source = 'address';
+        } else {
+            dialogData.value.rowData.source = 'anyWhere';
+        }
+        oldRule.value = deepCopy(params.rowData);
+    }
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     drawerVisiable.value = true;
 };
@@ -101,14 +112,34 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        loading.value = true;
         dialogData.value.rowData.operation = 'add';
         if (!dialogData.value.rowData) return;
-        await operatePortRule(dialogData.value.rowData);
-        loading.value = false;
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        emit('search');
-        drawerVisiable.value = false;
+        loading.value = true;
+        if (dialogData.value.title === 'create') {
+            await operatePortRule(dialogData.value.rowData)
+                .then(() => {
+                    loading.value = false;
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    emit('search');
+                    drawerVisiable.value = false;
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+            return;
+        }
+        oldRule.value.operation = 'remove';
+        dialogData.value.rowData.operation = 'add';
+        await updatePortRule({ oldRule: oldRule.value, newRule: dialogData.value.rowData })
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                emit('search');
+                drawerVisiable.value = false;
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     });
 };
 

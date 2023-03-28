@@ -77,4 +77,16 @@ export namespace Host {
         address: string;
         strategy: string;
     }
+    export interface UpdatePortRule {
+        oldRule: RulePort;
+        newRule: RulePort;
+    }
+    export interface UpdateAddrRule {
+        oldRule: RuleIP;
+        newRule: RuleIP;
+    }
+    export interface BatchRule {
+        type: string;
+        rules: Array<RulePort>;
+    }
 }

@@ -4,10 +4,27 @@
         <LayoutContent v-loading="loading" :title="$t('firewall.firewall')">
             <template #toolbar>
                 <el-row>
-                    <el-col :span="20">
+                    <el-col :span="16">
                         <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('commons.button.create') }} {{ $t('firewall.ipRule') }}
                         </el-button>
+                        <el-button @click="onDelete(null)">
+                            {{ $t('commons.button.delete') }}
+                        </el-button>
+                    </el-col>
+                    <el-col :span="8">
+                        <TableSetting @search="search()" />
+                        <div class="search-button">
+                            <el-input
+                                v-model="searchName"
+                                clearable
+                                @clear="search()"
+                                suffix-icon="Search"
+                                @keyup.enter="search()"
+                                @blur="search()"
+                                :placeholder="$t('commons.button.search')"
+                            ></el-input>
+                        </div>
                     </el-col>
                 </el-row>
             </template>
@@ -50,9 +67,10 @@
 import ComplexTable from '@/components/complex-table/index.vue';
 import OperatrDialog from '@/views/host/firewall/ip/operate/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
+import TableSetting from '@/components/table-setting/index.vue';
 import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { operateIPRule, searchFireRule } from '@/api/modules/host';
+import { batchOperateRule, searchFireRule } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
@@ -61,6 +79,7 @@ import { MsgSuccess } from '@/utils/message';
 const loading = ref();
 const activeTag = ref('address');
 const selects = ref<any>([]);
+const searchName = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -102,19 +121,36 @@ const onOpenDialog = async (
     dialogRef.value!.acceptParams(params);
 };
 
-const onDelete = async (row: Host.RuleInfo | null) => {
+const onDelete = async (row: Host.RuleIP | null) => {
     ElMessageBox.confirm(i18n.global.t('commons.msg.delete'), i18n.global.t('commons.msg.deleteTitle'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'warning',
     }).then(async () => {
-        let params = {
-            operation: 'remove',
-            address: row.address,
-            strategy: row.strategy,
-        };
+        let rules = [];
+        if (row) {
+            rules.push({
+                operation: 'remove',
+                address: row.address,
+                port: '',
+                source: '',
+                protocol: '',
+                strategy: row.strategy,
+            });
+        } else {
+            for (const item of selects.value) {
+                rules.push({
+                    operation: 'remove',
+                    address: item.address,
+                    port: '',
+                    source: '',
+                    protocol: '',
+                    strategy: item.strategy,
+                });
+            }
+        }
         loading.value = true;
-        await operateIPRule(params)
+        await batchOperateRule({ type: 'port', rules: rules })
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -128,8 +164,14 @@ const onDelete = async (row: Host.RuleInfo | null) => {
 
 const buttons = [
     {
+        label: i18n.global.t('commons.button.edit'),
+        click: (row: Host.RuleIP) => {
+            onOpenDialog('edit', row);
+        },
+    },
+    {
         label: i18n.global.t('commons.button.delete'),
-        click: (row: Host.RuleInfo) => {
+        click: (row: Host.RuleIP) => {
             onDelete(row);
         },
     },
