@@ -21,6 +21,10 @@ func NewFirewalld() (*Firewall, error) {
 	return &Firewall{Client: ConnInfo}, nil
 }
 
+func (f *Firewall) Name() string {
+	return "firewalld"
+}
+
 func (f *Firewall) Status() (string, error) {
 	stdout, err := f.Client.Run("firewall-cmd --state")
 	if err != nil {
@@ -80,7 +84,7 @@ func (f *Firewall) ListPort() ([]FireInfo, error) {
 			continue
 		}
 		itemRule := f.loadInfo(rule)
-		if len(itemRule.Port) != 0 {
+		if len(itemRule.Port) != 0 && itemRule.Family == "ipv4" {
 			datas = append(datas, itemRule)
 		}
 	}

@@ -81,3 +81,12 @@ export const operatePortRule = (params: Host.RulePort) => {
 export const operateIPRule = (params: Host.RuleIP) => {
     return http.post<Host.RuleIP>(`/hosts/firewall/ip`, params);
 };
+export const updatePortRule = (params: Host.UpdatePortRule) => {
+    return http.post(`/hosts/firewall/update/port`, params);
+};
+export const updateAddrRule = (params: Host.UpdateAddrRule) => {
+    return http.post(`/hosts/firewall/update/addr`, params);
+};
+export const batchOperateRule = (params: Host.BatchRule) => {
+    return http.post(`/hosts/firewall/batch`, params);
+};

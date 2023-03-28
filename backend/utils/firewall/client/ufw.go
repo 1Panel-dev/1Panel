@@ -21,6 +21,10 @@ func NewUfw() (*Ufw, error) {
 	return &Ufw{Client: ConnInfo}, nil
 }
 
+func (f *Ufw) Name() string {
+	return "ufw"
+}
+
 func (f *Ufw) Status() (string, error) {
 	stdout, err := f.Client.Run("sudo ufw status")
 	if err != nil {
@@ -49,10 +53,6 @@ func (f *Ufw) Stop() error {
 }
 
 func (f *Ufw) Reload() error {
-	stdout, err := f.Client.Run("sudo ufw reload")
-	if err != nil {
-		return fmt.Errorf("reload firewall failed, err: %s", stdout)
-	}
 	return nil
 }
 
@@ -73,7 +73,8 @@ func (f *Ufw) ListPort() ([]FireInfo, error) {
 			continue
 		}
 		itemFire := f.loadInfo(line, "port")
-		if len(itemFire.Port) != 0 {
+		if len(itemFire.Port) != 0 && itemFire.Port != "Anywhere" && !strings.Contains(itemFire.Port, ".") {
+			itemFire.Port = strings.ReplaceAll(itemFire.Port, ":", "-")
 			datas = append(datas, itemFire)
 		}
 	}
@@ -100,7 +101,11 @@ func (f *Ufw) ListAddress() ([]FireInfo, error) {
 			continue
 		}
 		itemFire := f.loadInfo(line, "address")
-		if len(itemFire.Port) == 0 {
+		if strings.Contains(itemFire.Port, ".") {
+			itemFire.Address += ("-" + itemFire.Port)
+			itemFire.Port = ""
+		}
+		if len(itemFire.Port) == 0 && len(itemFire.Address) != 0 {
 			datas = append(datas, itemFire)
 		}
 	}
@@ -108,16 +113,19 @@ func (f *Ufw) ListAddress() ([]FireInfo, error) {
 }
 
 func (f *Ufw) Port(port FireInfo, operation string) error {
-	switch operation {
-	case "add":
-		operation = "allow"
-	case "remove":
-		operation = "deny"
+	switch port.Strategy {
+	case "accept":
+		port.Strategy = "allow"
+	case "drop":
+		port.Strategy = "deny"
 	default:
-		return fmt.Errorf("unsupport operation %s", operation)
+		return fmt.Errorf("unsupport strategy %s", port.Strategy)
 	}
 
-	command := fmt.Sprintf("sudo ufw %s %s", operation, port.Port)
+	command := fmt.Sprintf("sudo ufw %s %s", port.Strategy, port.Port)
+	if operation == "remove" {
+		command = fmt.Sprintf("sudo ufw delete %s %s", port.Strategy, port.Port)
+	}
 	if len(port.Protocol) != 0 {
 		command += fmt.Sprintf("/%s", port.Protocol)
 	}
@@ -129,11 +137,25 @@ func (f *Ufw) Port(port FireInfo, operation string) error {
 }
 
 func (f *Ufw) RichRules(rule FireInfo, operation string) error {
-	ruleStr := "sudo ufw "
+	switch rule.Strategy {
+	case "accept":
+		rule.Strategy = "allow"
+	case "drop":
+		rule.Strategy = "deny"
+	default:
+		return fmt.Errorf("unsupport strategy %s", rule.Strategy)
+	}
+
+	ruleStr := fmt.Sprintf("sudo ufw %s ", rule.Strategy)
+	if operation == "remove" {
+		ruleStr = fmt.Sprintf("sudo ufw delete %s ", rule.Strategy)
+	}
 	if len(rule.Protocol) != 0 {
 		ruleStr += fmt.Sprintf("proto %s ", rule.Protocol)
 	}
-	if len(rule.Address) != 0 {
+	if strings.Contains(rule.Address, "-") {
+		ruleStr += fmt.Sprintf("from %s to %s ", strings.Split(rule.Address, "-")[0], strings.Split(rule.Address, "-")[1])
+	} else {
 		ruleStr += fmt.Sprintf("from %s ", rule.Address)
 	}
 	if len(rule.Port) != 0 {
@@ -169,9 +191,12 @@ func (f *Ufw) loadInfo(line string, fireType string) FireInfo {
 	if len(fields) < 4 {
 		return itemInfo
 	}
+	if fields[1] == "(v6)" {
+		return itemInfo
+	}
 	if fields[0] == "Anywhere" && fireType != "port" {
 		itemInfo.Strategy = "drop"
-		if fields[2] == "ALLOW" {
+		if fields[1] == "ALLOW" {
 			itemInfo.Strategy = "accept"
 		}
 		itemInfo.Address = fields[3]
@@ -184,27 +209,13 @@ func (f *Ufw) loadInfo(line string, fireType string) FireInfo {
 		itemInfo.Port = fields[0]
 		itemInfo.Protocol = "tcp/udp"
 	}
-
-	if fields[1] == "(v6)" {
-		if len(fields) < 5 {
-			return itemInfo
-		}
-		itemInfo.Family = "ipv6"
-		if fields[2] == "ALLOW" {
-			itemInfo.Strategy = "accept"
-		} else {
-			itemInfo.Strategy = "drop"
-		}
-		itemInfo.Address = fields[4]
+	itemInfo.Family = "ipv4"
+	if fields[1] == "ALLOW" {
+		itemInfo.Strategy = "accept"
 	} else {
-		itemInfo.Family = "ipv4"
-		if fields[1] == "ALLOW" {
-			itemInfo.Strategy = "accept"
-		} else {
-			itemInfo.Strategy = "drop"
-		}
-		itemInfo.Address = fields[3]
+		itemInfo.Strategy = "drop"
 	}
+	itemInfo.Address = fields[3]
 
 	return itemInfo
 }

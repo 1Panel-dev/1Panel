@@ -1,6 +1,8 @@
 package service
 
 import (
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/utils/firewall"
 	fireClient "github.com/1Panel-dev/1Panel/backend/utils/firewall/client"
@@ -11,8 +13,11 @@ type FirewallService struct{}
 
 type IFirewallService interface {
 	SearchWithPage(search dto.RuleSearch) (int64, interface{}, error)
-	OperatePortRule(req dto.PortRuleOperate) error
-	OperateAddressRule(req dto.AddrRuleOperate) error
+	OperatePortRule(req dto.PortRuleOperate, reload bool) error
+	OperateAddressRule(req dto.AddrRuleOperate, reload bool) error
+	UpdatePortRule(req dto.PortRuleUpdate) error
+	UpdateAddrRule(req dto.AddrRuleUpdate) error
+	BacthOperateRule(req dto.BatchRuleOperate) error
 }
 
 func NewIFirewallService() IFirewallService {
@@ -33,13 +38,29 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 		if err != nil {
 			return 0, nil, err
 		}
-		datas = ports
+		if len(req.Info) != 0 {
+			for _, port := range ports {
+				if strings.Contains(port.Port, req.Info) {
+					datas = append(datas, port)
+				}
+			}
+		} else {
+			datas = ports
+		}
 	} else {
-		address, err := client.ListAddress()
+		addrs, err := client.ListAddress()
 		if err != nil {
 			return 0, nil, err
 		}
-		datas = address
+		if len(req.Info) != 0 {
+			for _, addr := range addrs {
+				if strings.Contains(addr.Address, req.Info) {
+					datas = append(datas, addr)
+				}
+			}
+		} else {
+			datas = addrs
+		}
 	}
 	total, start, end := len(datas), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
@@ -54,25 +75,36 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 	return int64(total), backDatas, nil
 }
 
-func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate) error {
+func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) error {
 	client, err := firewall.NewFirewallClient()
 	if err != nil {
 		return err
 	}
+	if client.Name() == "ufw" {
+		req.Port = strings.ReplaceAll(req.Port, "-", ":")
+		if req.Operation == "remove" && req.Protocol == "tcp/udp" {
+			req.Protocol = ""
+			return u.operatePort(client, req)
+		}
+	}
+
 	if req.Protocol == "tcp/udp" {
 		req.Protocol = "tcp"
-		if err := u.createPort(client, req); err != nil {
+		if err := u.operatePort(client, req); err != nil {
 			return err
 		}
 		req.Protocol = "udp"
 	}
-	if err := u.createPort(client, req); err != nil {
+	if err := u.operatePort(client, req); err != nil {
 		return err
 	}
-	return client.Reload()
+	if reload {
+		return client.Reload()
+	}
+	return nil
 }
 
-func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate) error {
+func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate, reload bool) error {
 	client, err := firewall.NewFirewallClient()
 	if err != nil {
 		return err
@@ -82,16 +114,84 @@ func (u *FirewallService) OperateAddressRule(req dto.AddrRuleOperate) error {
 	if err := copier.Copy(&fireInfo, &req); err != nil {
 		return err
 	}
-	if err := client.RichRules(fireInfo, req.Operation); err != nil {
+
+	addressList := strings.Split(req.Address, ",")
+	for _, addr := range addressList {
+		if len(addr) == 0 {
+			continue
+		}
+		fireInfo.Address = addr
+		if err := client.RichRules(fireInfo, req.Operation); err != nil {
+			return err
+		}
+	}
+	if reload {
+		return client.Reload()
+	}
+	return nil
+}
+
+func (u *FirewallService) UpdatePortRule(req dto.PortRuleUpdate) error {
+	client, err := firewall.NewFirewallClient()
+	if err != nil {
+		return err
+	}
+	if err := u.OperatePortRule(req.OldRule, false); err != nil {
+		return err
+	}
+	if err := u.OperatePortRule(req.NewRule, false); err != nil {
 		return err
 	}
 	return client.Reload()
 }
 
-func (u *FirewallService) createPort(client firewall.FirewallClient, req dto.PortRuleOperate) error {
+func (u *FirewallService) UpdateAddrRule(req dto.AddrRuleUpdate) error {
+	client, err := firewall.NewFirewallClient()
+	if err != nil {
+		return err
+	}
+	if err := u.OperateAddressRule(req.OldRule, false); err != nil {
+		return err
+	}
+	if err := u.OperateAddressRule(req.NewRule, false); err != nil {
+		return err
+	}
+	return client.Reload()
+}
+
+func (u *FirewallService) BacthOperateRule(req dto.BatchRuleOperate) error {
+	client, err := firewall.NewFirewallClient()
+	if err != nil {
+		return err
+	}
+	if req.Type == "port" {
+		for _, rule := range req.Rules {
+			if err := u.OperatePortRule(rule, false); err != nil {
+				return err
+			}
+		}
+		return client.Reload()
+	}
+	for _, rule := range req.Rules {
+		itemRule := dto.AddrRuleOperate{Operation: rule.Operation, Address: rule.Address, Strategy: rule.Strategy}
+		if err := u.OperateAddressRule(itemRule, false); err != nil {
+			return err
+		}
+	}
+	return client.Reload()
+}
+
+func (u *FirewallService) operatePort(client firewall.FirewallClient, req dto.PortRuleOperate) error {
 	var fireInfo fireClient.FireInfo
 	if err := copier.Copy(&fireInfo, &req); err != nil {
 		return err
+	}
+
+	if client.Name() == "ufw" {
+		if len(fireInfo.Address) != 0 && fireInfo.Address != "Anywhere" {
+			return client.RichRules(fireInfo, req.Operation)
+		}
+		return client.Port(fireInfo, req.Operation)
 	}
 
 	if len(fireInfo.Address) != 0 || fireInfo.Strategy == "drop" {
