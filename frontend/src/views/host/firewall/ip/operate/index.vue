@@ -14,6 +14,9 @@
                                 clearable
                                 v-model="dialogData.rowData!.address"
                             />
+                            <span class="input-help">{{ $t('firewall.addressHelper1') }}</span>
+                            <span class="input-help">{{ $t('firewall.addressHelper2') }}</span>
+                            <span class="input-help">{{ $t('firewall.addressHelper3') }}</span>
                         </el-form-item>
                         <el-form-item :label="$t('firewall.strategy')" prop="strategy">
                             <el-radio-group v-model="dialogData.rowData!.strategy">
@@ -44,13 +47,15 @@ import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
-import { operateIPRule } from '@/api/modules/host';
+import { operateIPRule, updateAddrRule } from '@/api/modules/host';
+import { deepCopy } from '@/utils/util';
 
 const loading = ref();
+const oldRule = ref<Host.RuleIP>();
 
 interface DialogProps {
     title: string;
-    rowData?: Host.RulePort;
+    rowData?: Host.RuleIP;
     getTableList?: () => Promise<any>;
 }
 const title = ref<string>('');
@@ -60,6 +65,9 @@ const dialogData = ref<DialogProps>({
 });
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
+    if (dialogData.value.title === 'edit') {
+        oldRule.value = deepCopy(params.rowData);
+    }
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     drawerVisiable.value = true;
 };
@@ -83,11 +91,31 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         dialogData.value.rowData.operation = 'add';
         if (!dialogData.value.rowData) return;
-        await operateIPRule(dialogData.value.rowData);
-        loading.value = false;
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        emit('search');
-        drawerVisiable.value = false;
+        if (dialogData.value.title === 'create') {
+            await operateIPRule(dialogData.value.rowData)
+                .then(() => {
+                    loading.value = false;
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    emit('search');
+                    drawerVisiable.value = false;
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+            return;
+        }
+        oldRule.value.operation = 'remove';
+        dialogData.value.rowData.operation = 'add';
+        await updateAddrRule({ oldRule: oldRule.value, newRule: dialogData.value.rowData })
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                emit('search');
+                drawerVisiable.value = false;
+            })
+            .catch(() => {
+                loading.value = false;
+            });
     });
 };
 

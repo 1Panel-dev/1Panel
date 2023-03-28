@@ -5,6 +5,7 @@ import (
 )
 
 type FirewallClient interface {
+	Name() string
 	Start() error
 	Stop() error
 	Reload() error
