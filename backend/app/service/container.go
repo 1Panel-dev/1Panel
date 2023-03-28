@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os/exec"
 	"sort"
@@ -22,6 +23,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
@@ -193,14 +195,19 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
 	}
 
 	global.LOG.Infof("new container info %s has been made, now start to create", req.Name)
-	container, err := client.ContainerCreate(context.TODO(), config, hostConf, &network.NetworkingConfig{}, &v1.Platform{}, req.Name)
+
+	ctx := context.Background()
+	if err := pullImages(ctx, client, req.Image); err != nil {
+		return err
+	}
+	container, err := client.ContainerCreate(ctx, config, hostConf, &network.NetworkingConfig{}, &v1.Platform{}, req.Name)
 	if err != nil {
-		_ = client.ContainerRemove(context.Background(), req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
+		_ = client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 		return err
 	}
 	global.LOG.Infof("create container %s successful! now check if the container is started and delete the container information if it is not.", req.Name)
-	if err := client.ContainerStart(context.TODO(), container.ID, types.ContainerStartOptions{}); err != nil {
-		_ = client.ContainerRemove(context.Background(), req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
+	if err := client.ContainerStart(ctx, container.ID, types.ContainerStartOptions{}); err != nil {
+		_ = client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 		return fmt.Errorf("create successful but start failed, err: %v", err)
 	}
 	return nil
@@ -322,4 +329,17 @@ func calculateNetwork(network map[string]types.NetworkStats) (float64, float64) 
 		tx += float64(v.TxBytes) / 1024
 	}
 	return rx, tx
+}
+
+func pullImages(ctx context.Context, client *client.Client, image string) error {
+	out, err := client.ImagePull(ctx, image, types.ImagePullOptions{})
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	_, err = io.Copy(ioutil.Discard, out)
+	if err != nil {
+		return err
+	}
+	return nil
 }

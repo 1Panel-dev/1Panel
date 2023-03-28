@@ -202,7 +202,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         click: async (row: Container.ImageInfo) => {
-            if (row.tags.length <= 1) {
+            if (!row.tags?.length || row.tags.length <= 1) {
                 await useDeleteData(imageRemove, { names: [row.id] }, 'commons.msg.delete');
                 search();
                 return;

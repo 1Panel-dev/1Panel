@@ -6,7 +6,7 @@ export const searchContainer = (params: Container.ContainerSearch) => {
     return http.post<ResPage<Container.ContainerInfo>>(`/containers/search`, params);
 };
 export const createContainer = (params: Container.ContainerCreate) => {
-    return http.post(`/containers`, params, 1200000);
+    return http.post(`/containers`, params, 3000000);
 };
 export const logContainer = (params: Container.ContainerLogSearch) => {
     return http.post<string>(`/containers/search/log`, params, 400000);
