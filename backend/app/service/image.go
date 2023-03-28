@@ -34,6 +34,7 @@ type IImageService interface {
 	ImageSave(req dto.ImageSave) error
 	ImagePush(req dto.ImagePush) (string, error)
 	ImageRemove(req dto.BatchDelete) error
+	ImageTag(req dto.ImageTag) error
 }
 
 func NewIImageService() IImageService {

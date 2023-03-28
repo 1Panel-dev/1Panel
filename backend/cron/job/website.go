@@ -42,7 +42,7 @@ func (w *website) Run() {
 }
 
 func stopWebsite(websiteId uint, wg *sync.WaitGroup) {
-	websiteService := service.NewWebsiteService()
+	websiteService := service.NewIWebsiteService()
 	req := request.WebsiteOp{
 		ID:      websiteId,
 		Operate: constant.StopWeb,

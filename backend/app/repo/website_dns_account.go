@@ -7,6 +7,19 @@ import (
 type WebsiteDnsAccountRepo struct {
 }
 
+type IWebsiteDnsAccountRepo interface {
+	Page(page, size int, opts ...DBOption) (int64, []model.WebsiteDnsAccount, error)
+	GetFirst(opts ...DBOption) (*model.WebsiteDnsAccount, error)
+	List(opts ...DBOption) ([]model.WebsiteDnsAccount, error)
+	Create(account model.WebsiteDnsAccount) error
+	Save(account model.WebsiteDnsAccount) error
+	DeleteBy(opts ...DBOption) error
+}
+
+func NewIWebsiteDnsAccountRepo() IWebsiteDnsAccountRepo {
+	return &WebsiteDnsAccountRepo{}
+}
+
 func (w WebsiteDnsAccountRepo) Page(page, size int, opts ...DBOption) (int64, []model.WebsiteDnsAccount, error) {
 	var accounts []model.WebsiteDnsAccount
 	db := getDb(opts...).Model(&model.WebsiteDnsAccount{})

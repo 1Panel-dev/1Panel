@@ -18,6 +18,18 @@ import (
 type NginxService struct {
 }
 
+type INginxService interface {
+	GetNginxConfig() (response.FileInfo, error)
+	GetConfigByScope(req request.NginxScopeReq) ([]response.NginxParam, error)
+	UpdateConfigByScope(req request.NginxConfigUpdate) error
+	GetStatus() (response.NginxStatus, error)
+	UpdateConfigFile(req request.NginxConfigFileUpdate) error
+}
+
+func NewINginxService() INginxService {
+	return &NginxService{}
+}
+
 func (n NginxService) GetNginxConfig() (response.FileInfo, error) {
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {

@@ -47,6 +47,8 @@ type IContainerService interface {
 	CreateNetwork(req dto.NetworkCreat) error
 	DeleteVolume(req dto.BatchDelete) error
 	CreateVolume(req dto.VolumeCreat) error
+	TestCompose(req dto.ComposeCreate) (bool, error)
+	ComposeUpdate(req dto.ComposeUpdate) error
 }
 
 func NewIContainerService() IContainerService {
