@@ -156,10 +156,12 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
 		return err
 	}
 	config := &container.Config{
-		Image:  req.Image,
-		Cmd:    req.Cmd,
-		Env:    req.Env,
-		Labels: stringsToMap(req.Labels),
+		Image:     req.Image,
+		Cmd:       req.Cmd,
+		Env:       req.Env,
+		Labels:    stringsToMap(req.Labels),
+		Tty:       true,
+		OpenStdin: true,
 	}
 	hostConf := &container.HostConfig{
 		AutoRemove:      req.AutoRemove,
