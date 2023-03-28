@@ -91,8 +91,21 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 		}
 		fileName = fmt.Sprintf("db_%s_%s.sql.gz", cronjob.DBName, startTime.Format("20060102150405"))
 		backupDir = fmt.Sprintf("%s/database/mysql/%s/%s", localDir, app.Name, cronjob.DBName)
-		if err = handleMysqlBackup(app, backupDir, cronjob.DBName, fileName); err != nil {
-			return "", err
+		if cronjob.DBName == "all" {
+			mysqlService := NewIMysqlService()
+			list, err := mysqlService.ListDBName()
+			if err != nil {
+				return "", err
+			}
+			for _, dbName := range list {
+				if err = handleMysqlBackup(app, backupDir, dbName, fileName); err != nil {
+					return "", err
+				}
+			}
+		} else {
+			if err = handleMysqlBackup(app, backupDir, cronjob.DBName, fileName); err != nil {
+				return "", err
+			}
 		}
 		record.Type = "mysql"
 		record.Name = app.Name
