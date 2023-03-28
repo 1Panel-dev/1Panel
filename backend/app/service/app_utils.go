@@ -23,6 +23,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
+	composeV2 "github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
 )
@@ -223,12 +224,7 @@ func updateInstall(installId uint, detailId uint) error {
 }
 
 func getContainerNames(install model.AppInstall) ([]string, error) {
-	composeMap := install.DockerCompose
-	envMap := make(map[string]interface{})
-	_ = json.Unmarshal([]byte(install.Env), &envMap)
-	newEnvMap := make(map[string]string, len(envMap))
-	handleMap(envMap, newEnvMap)
-	project, err := compose.GetComposeProject([]byte(composeMap), newEnvMap)
+	project, err := composeV2.GetComposeProject(install.Name, install.GetPath(), []byte(install.DockerCompose), []byte(install.Env))
 	if err != nil {
 		return nil, err
 	}

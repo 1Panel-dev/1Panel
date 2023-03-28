@@ -225,9 +225,9 @@ func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error 
 	case constant.ContainerOpStart:
 		err = client.ContainerStart(ctx, req.Name, types.ContainerStartOptions{})
 	case constant.ContainerOpStop:
-		err = client.ContainerStop(ctx, req.Name, nil)
+		err = client.ContainerStop(ctx, req.Name, container.StopOptions{})
 	case constant.ContainerOpRestart:
-		err = client.ContainerRestart(ctx, req.Name, nil)
+		err = client.ContainerRestart(ctx, req.Name, container.StopOptions{})
 	case constant.ContainerOpKill:
 		err = client.ContainerKill(ctx, req.Name, "SIGKILL")
 	case constant.ContainerOpPause:
