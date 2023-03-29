@@ -622,6 +622,10 @@ definitions:
         type: boolean
       name:
         type: string
+      type:
+        type: string
+    required:
+    - type
     type: object
   dto.HostConnTest:
     properties:
@@ -836,8 +840,6 @@ definitions:
       name:
         type: string
       password:
-        type: string
-      secret:
         type: string
     type: object
   dto.MfaCredential:
@@ -1398,8 +1400,6 @@ definitions:
     type: object
   dto.UserLoginInfo:
     properties:
-      mfaSecret:
-        type: string
       mfaStatus:
         type: string
       name:
@@ -2132,24 +2132,6 @@ definitions:
     properties:
       id:
         type: integer
-    required:
-    - id
-    type: object
-  request.WebsiteGroupCreate:
-    properties:
-      name:
-        type: string
-    required:
-    - name
-    type: object
-  request.WebsiteGroupUpdate:
-    properties:
-      default:
-        type: boolean
-      id:
-        type: integer
-      name:
-        type: string
     required:
     - id
     type: object
@@ -3291,7 +3273,7 @@ paths:
           $ref: '#/definitions/dto.ComposeCreate'
       responses:
         "200":
-          description: OK
+          description: ""
       security:
       - ApiKeyAuth: []
       summary: Test compose
@@ -7008,7 +6990,7 @@ paths:
           $ref: '#/definitions/dto.Upgrade'
       responses:
         "200":
-          description: OK
+          description: ""
       security:
       - ApiKeyAuth: []
       summary: Load release notes by version
@@ -7583,105 +7565,6 @@ paths:
         - id
         formatEN: Delete domain [domain]
         formatZH: 删除域名 [domain]
-        paramKeys: []
-  /websites/groups:
-    get:
-      description: 获取网站组
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: anrry
-      security:
-      - ApiKeyAuth: []
-      summary: List website groups
-      tags:
-      - Website Group
-    post:
-      consumes:
-      - application/json
-      description: 创建网站组
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.WebsiteGroupCreate'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Create website group
-      tags:
-      - Website Group
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - name
-        formatEN: Create website groups [name]
-        formatZH: 创建网站组 [name]
-        paramKeys: []
-  /websites/groups/del:
-    post:
-      consumes:
-      - application/json
-      description: 删除网站组
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.WebsiteResourceReq'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Delete website group
-      tags:
-      - Website Group
-      x-panel-log:
-        BeforeFuntions:
-        - db: website_groups
-          input_colume: id
-          input_value: id
-          isList: false
-          output_colume: name
-          output_value: name
-        bodyKeys:
-        - id
-        formatEN: Delete website group [name]
-        formatZH: 删除网站组 [name]
-        paramKeys: []
-  /websites/groups/update:
-    post:
-      consumes:
-      - application/json
-      description: 更新网站组
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/request.WebsiteGroupUpdate'
-      responses:
-        "200":
-          description: ""
-      security:
-      - ApiKeyAuth: []
-      summary: Update website group
-      tags:
-      - Website Group
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - name
-        formatEN: Update website groups [name]
-        formatZH: 更新网站组 [name]
         paramKeys: []
   /websites/list:
     get:

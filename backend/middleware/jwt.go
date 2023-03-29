@@ -16,7 +16,6 @@ import (
 
 func JwtAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Set("authMethod", "")
 		token := c.Request.Header.Get(constant.JWTHeaderName)
 		if token == "" {
 			c.Next()
