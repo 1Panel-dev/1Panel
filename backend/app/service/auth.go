@@ -118,7 +118,7 @@ func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (
 		j := jwt.NewJWT()
 		claims := j.CreateClaims(jwt.BaseClaims{
 			Name: name,
-		}, lifeTime)
+		})
 		token, err := j.CreateToken(claims)
 		if err != nil {
 			return nil, err
