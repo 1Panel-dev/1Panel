@@ -9260,10 +9260,13 @@ var doc = `{
                 "ioReadBytes": {
                     "type": "integer"
                 },
-                "ioTime": {
+                "ioReadTime": {
                     "type": "integer"
                 },
                 "ioWriteBytes": {
+                    "type": "integer"
+                },
+                "ioWriteTime": {
                     "type": "integer"
                 },
                 "load1": {

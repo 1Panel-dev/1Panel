@@ -55,7 +55,8 @@ type DashboardCurrent struct {
 	IOReadBytes  uint64 `json:"ioReadBytes"`
 	IOWriteBytes uint64 `json:"ioWriteBytes"`
 	IOCount      uint64 `json:"ioCount"`
-	IOTime       uint64 `json:"ioTime"`
+	IOReadTime   uint64 `json:"ioReadTime"`
+	IOWriteTime  uint64 `json:"ioWriteTime"`
 
 	Total       uint64  `json:"total"`
 	Free        uint64  `json:"free"`

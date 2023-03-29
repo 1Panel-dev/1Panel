@@ -136,20 +136,17 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 			currentInfo.IOReadBytes += state.ReadBytes
 			currentInfo.IOWriteBytes += state.WriteBytes
 			currentInfo.IOCount += (state.ReadCount + state.WriteCount)
-			currentInfo.IOTime += state.ReadTime / 1000 / 1000
-			if state.WriteTime > state.ReadTime {
-				currentInfo.IOTime += state.WriteTime / 1000 / 1000
-			}
+			currentInfo.IOReadTime += state.ReadTime
+			currentInfo.IOWriteTime += state.WriteTime
 		}
 	} else {
 		diskInfo, _ := disk.IOCounters(ioOption)
 		for _, state := range diskInfo {
 			currentInfo.IOReadBytes += state.ReadBytes
 			currentInfo.IOWriteBytes += state.WriteBytes
-			currentInfo.IOTime += state.ReadTime / 1000 / 1000
-			if state.WriteTime > state.ReadTime {
-				currentInfo.IOTime += state.WriteTime / 1000 / 1000
-			}
+			currentInfo.IOCount += (state.ReadCount + state.WriteCount)
+			currentInfo.IOReadTime += state.ReadTime
+			currentInfo.IOWriteTime += state.WriteTime
 		}
 	}
 
