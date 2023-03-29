@@ -41,7 +41,6 @@
 
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
-import { Dashboard } from '@/api/interface/dashboard';
 import { SearchApp } from '@/api/modules/app';
 import { reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -57,26 +56,10 @@ let req = reactive({
     recommend: true,
 });
 
-const baseInfo = ref({
-    haloID: 0,
-    dateeaseID: 0,
-    jumpserverID: 0,
-    metersphereID: 0,
-    kubeoperatorID: 0,
-    kubepiID: 0,
-});
-
 let loading = ref(false);
 let apps = ref<App.App[]>([]);
 
-const acceptParams = (base: Dashboard.BaseInfo): void => {
-    baseInfo.value.haloID = base.haloID;
-    baseInfo.value.dateeaseID = base.dateeaseID;
-    baseInfo.value.jumpserverID = base.jumpserverID;
-    baseInfo.value.metersphereID = base.metersphereID;
-    baseInfo.value.kubeoperatorID = base.kubeoperatorID;
-    baseInfo.value.kubepiID = base.kubepiID;
-
+const acceptParams = (): void => {
     search(req);
 };
 

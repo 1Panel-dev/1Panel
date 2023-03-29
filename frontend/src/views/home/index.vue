@@ -234,13 +234,6 @@ const searchInfo = reactive({
 });
 
 const baseInfo = ref<Dashboard.BaseInfo>({
-    haloID: 0,
-    dateeaseID: 0,
-    jumpserverID: 0,
-    metersphereID: 0,
-    kubeoperatorID: 0,
-    kubepiID: 0,
-
     websiteNumber: 0,
     databaseNumber: 0,
     cronjobNumber: 0,
@@ -341,7 +334,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     currentInfo.value = baseInfo.value.currentInfo;
     onLoadCurrentInfo();
     statuRef.value.acceptParams(currentInfo.value, baseInfo.value);
-    appRef.value.acceptParams(baseInfo.value);
+    appRef.value.acceptParams();
     if (isInit) {
         // window.addEventListener('resize', changeChartSize);
         timer = setInterval(async () => {

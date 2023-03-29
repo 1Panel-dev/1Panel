@@ -9171,32 +9171,14 @@ var doc = `{
                 "databaseNumber": {
                     "type": "integer"
                 },
-                "dateeaseID": {
-                    "type": "integer"
-                },
-                "haloID": {
-                    "type": "integer"
-                },
                 "hostname": {
                     "type": "string"
-                },
-                "jumpserverID": {
-                    "type": "integer"
                 },
                 "kernelArch": {
                     "type": "string"
                 },
                 "kernelVersion": {
                     "type": "string"
-                },
-                "kubeoperatorID": {
-                    "type": "integer"
-                },
-                "kubepiID": {
-                    "type": "integer"
-                },
-                "metersphereID": {
-                    "type": "integer"
                 },
                 "os": {
                     "type": "string"
@@ -9239,20 +9221,11 @@ var doc = `{
                 "cpuUsedPercent": {
                     "type": "number"
                 },
-                "free": {
-                    "type": "integer"
-                },
-                "inodesFree": {
-                    "type": "integer"
-                },
-                "inodesTotal": {
-                    "type": "integer"
-                },
-                "inodesUsed": {
-                    "type": "integer"
-                },
-                "inodesUsedPercent": {
-                    "type": "number"
+                "diskData": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DiskInfo"
+                    }
                 },
                 "ioCount": {
                     "type": "integer"
@@ -9305,11 +9278,40 @@ var doc = `{
                 "timeSinceUptime": {
                     "type": "string"
                 },
+                "uptime": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.DiskInfo": {
+            "type": "object",
+            "properties": {
+                "device": {
+                    "type": "string"
+                },
+                "free": {
+                    "type": "integer"
+                },
+                "inodesFree": {
+                    "type": "integer"
+                },
+                "inodesTotal": {
+                    "type": "integer"
+                },
+                "inodesUsed": {
+                    "type": "integer"
+                },
+                "inodesUsedPercent": {
+                    "type": "number"
+                },
+                "path": {
+                    "type": "string"
+                },
                 "total": {
                     "type": "integer"
                 },
-                "uptime": {
-                    "type": "integer"
+                "type": {
+                    "type": "string"
                 },
                 "used": {
                     "type": "integer"
