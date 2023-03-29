@@ -1073,7 +1073,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -6914,7 +6914,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             },
@@ -7810,161 +7810,6 @@ var doc = `{
                     ],
                     "formatEN": "Delete domain [domain]",
                     "formatZH": "删除域名 [domain]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/websites/groups": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取网站组",
-                "tags": [
-                    "Website Group"
-                ],
-                "summary": "List website groups",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "anrry"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "创建网站组",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Website Group"
-                ],
-                "summary": "Create website group",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.WebsiteGroupCreate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "name"
-                    ],
-                    "formatEN": "Create website groups [name]",
-                    "formatZH": "创建网站组 [name]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/websites/groups/del": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "删除网站组",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Website Group"
-                ],
-                "summary": "Delete website group",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.WebsiteResourceReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [
-                        {
-                            "db": "website_groups",
-                            "input_colume": "id",
-                            "input_value": "id",
-                            "isList": false,
-                            "output_colume": "name",
-                            "output_value": "name"
-                        }
-                    ],
-                    "bodyKeys": [
-                        "id"
-                    ],
-                    "formatEN": "Delete website group [name]",
-                    "formatZH": "删除网站组 [name]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/websites/groups/update": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "更新网站组",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Website Group"
-                ],
-                "summary": "Update website group",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/request.WebsiteGroupUpdate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "name"
-                    ],
-                    "formatEN": "Update website groups [name]",
-                    "formatZH": "更新网站组 [name]",
                     "paramKeys": []
                 }
             }
@@ -9583,6 +9428,9 @@ var doc = `{
         },
         "dto.GroupUpdate": {
             "type": "object",
+            "required": [
+                "type"
+            ],
             "properties": {
                 "id": {
                     "type": "integer"
@@ -9591,6 +9439,9 @@ var doc = `{
                     "type": "boolean"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "type": {
                     "type": "string"
                 }
             }
@@ -9912,9 +9763,6 @@ var doc = `{
                     "type": "string"
                 },
                 "password": {
-                    "type": "string"
-                },
-                "secret": {
                     "type": "string"
                 }
             }
@@ -10761,9 +10609,6 @@ var doc = `{
         "dto.UserLoginInfo": {
             "type": "object",
             "properties": {
-                "mfaSecret": {
-                    "type": "string"
-                },
                 "mfaStatus": {
                     "type": "string"
                 },
@@ -11866,34 +11711,6 @@ var doc = `{
             "properties": {
                 "id": {
                     "type": "integer"
-                }
-            }
-        },
-        "request.WebsiteGroupCreate": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "request.WebsiteGroupUpdate": {
-            "type": "object",
-            "required": [
-                "id"
-            ],
-            "properties": {
-                "default": {
-                    "type": "boolean"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
                 }
             }
         },
