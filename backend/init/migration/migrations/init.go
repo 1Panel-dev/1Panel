@@ -247,3 +247,10 @@ var AddDefaultGroup = &gormigrate.Migration{
 		return tx.Migrator().DropTable("website_groups")
 	},
 }
+
+var AddTableRuntime = &gormigrate.Migration{
+	ID: "20230328-add-table-runtime",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.Runtime{})
+	},
+}

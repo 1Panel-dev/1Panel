@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/subosito/gotenv"
 	"math"
 	"os"
 	"path"
@@ -224,7 +225,11 @@ func updateInstall(installId uint, detailId uint) error {
 }
 
 func getContainerNames(install model.AppInstall) ([]string, error) {
-	project, err := composeV2.GetComposeProject(install.Name, install.GetPath(), []byte(install.DockerCompose), []byte(install.Env))
+	envStr, err := coverEnvJsonToStr(install.Env)
+	if err != nil {
+		return nil, err
+	}
+	project, err := composeV2.GetComposeProject(install.Name, install.GetPath(), []byte(install.DockerCompose), []byte(envStr))
 	if err != nil {
 		return nil, err
 	}
@@ -236,6 +241,18 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 		containerNames = append(containerNames, service.ContainerName)
 	}
 	return containerNames, nil
+}
+
+func coverEnvJsonToStr(envJson string) (string, error) {
+	envMap := make(map[string]interface{})
+	_ = json.Unmarshal([]byte(envJson), &envMap)
+	newEnvMap := make(map[string]string, len(envMap))
+	handleMap(envMap, newEnvMap)
+	envStr, err := gotenv.Marshal(newEnvMap)
+	if err != nil {
+		return "", err
+	}
+	return envStr, nil
 }
 
 func checkLimit(app model.App) error {
