@@ -220,6 +220,7 @@ const message = {
         toolbox: 'Toolbox',
         logs: 'Log',
         ssl: 'Certificate',
+        runtime: 'Runtime',
     },
     home: {
         overview: 'Overview',
@@ -1234,6 +1235,11 @@ const message = {
         allIP: 'All IP',
         portRule: 'Port rule',
         ipRule: 'IP rule',
+    },
+    runtime: {
+        runtime: 'Runtime',
+        image: 'Image',
+        workDir: 'WorkDir',
     },
 };
 
