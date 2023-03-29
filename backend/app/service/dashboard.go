@@ -39,27 +39,6 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 	ss, _ := json.Marshal(hostInfo)
 	baseInfo.VirtualizationSystem = string(ss)
 
-	apps, err := appRepo.GetBy()
-	if err != nil {
-		return nil, err
-	}
-	for _, app := range apps {
-		switch app.Key {
-		case "dateease":
-			baseInfo.DateeaseID = app.ID
-		case "halo":
-			baseInfo.HaloID = app.ID
-		case "metersphere":
-			baseInfo.MeterSphereID = app.ID
-		case "jumpserver":
-			baseInfo.JumpServerID = app.ID
-		case "kubeoperator":
-			baseInfo.KubeoperatorID = app.ID
-		case "kubepi":
-			baseInfo.KubepiID = app.ID
-		}
-	}
-
 	appInstall, err := appInstallRepo.ListBy()
 	if err != nil {
 		return nil, err
@@ -169,10 +148,10 @@ func loadDiskInfo() []dto.DiskInfo {
 		return datas
 	}
 	var excludes = []string{"/mnt/cdrom", "/boot", "/boot/efi", "/dev", "/dev/shm", "/run/lock", "/run", "/run/shm", "/run/user"}
-	for _, part := range parts {
+	for i := 0; i < len(parts); i++ {
 		isExclude := false
 		for _, exclude := range excludes {
-			if part.Mountpoint == exclude {
+			if parts[i].Mountpoint == exclude {
 				isExclude = true
 				break
 			}
@@ -180,11 +159,11 @@ func loadDiskInfo() []dto.DiskInfo {
 		if isExclude {
 			continue
 		}
-		state, _ := disk.Usage("/")
+		state, _ := disk.Usage(parts[i].Mountpoint)
 		var itemData dto.DiskInfo
-		itemData.Path = part.Mountpoint
-		itemData.Type = part.Fstype
-		itemData.Device = part.Device
+		itemData.Path = parts[i].Mountpoint
+		itemData.Type = parts[i].Fstype
+		itemData.Device = parts[i].Device
 		itemData.Total = state.Total
 		itemData.Free = state.Free
 		itemData.Used = state.Used
