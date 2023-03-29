@@ -49,8 +49,9 @@ export namespace Dashboard {
 
         ioReadBytes: number;
         ioWriteBytes: number;
-        ioTime: number;
         ioCount: number;
+        ioReadTime: number;
+        ioWriteTime: number;
 
         total: number;
         free: number;

@@ -104,7 +104,7 @@
                                 <el-tag>
                                     {{ $t('home.rwPerSecond') }}: {{ currentChartInfo.ioCount }} {{ $t('home.time') }}
                                 </el-tag>
-                                <el-tag>{{ $t('home.ioDelay') }}: {{ currentInfo.ioTime }} ms</el-tag>
+                                <el-tag>{{ $t('home.ioDelay') }}: {{ currentChartInfo.ioTime }} ms</el-tag>
                             </div>
 
                             <div v-if="chartOption === 'io'" style="margin-top: 40px">
@@ -282,8 +282,9 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
 
     ioReadBytes: 0,
     ioWriteBytes: 0,
-    ioTime: 0,
     ioCount: 0,
+    ioReadTime: 0,
+    ioWriteTime: 0,
 
     total: 0,
     free: 0,
@@ -304,6 +305,7 @@ const currentChartInfo = reactive({
     ioReadBytes: 0,
     ioWriteBytes: 0,
     ioCount: 0,
+    ioTime: 0,
 
     netBytesSent: 0,
     netBytesRecv: 0,
@@ -389,7 +391,11 @@ const onLoadCurrentInfo = async () => {
     if (ioWriteBytes.value.length > 20) {
         ioWriteBytes.value.splice(0, 1);
     }
-    currentChartInfo.ioCount = Number(((res.data.ioCount - currentInfo.value.ioCount) / 3).toFixed(2));
+    currentChartInfo.ioCount = Math.round(Number((res.data.ioCount - currentInfo.value.ioCount) / 3));
+    let ioReadTime = res.data.ioReadTime - currentInfo.value.ioReadTime;
+    let ioWriteTime = res.data.ioWriteTime - currentInfo.value.ioWriteTime;
+    let ioChoose = ioReadTime > ioWriteTime ? ioReadTime : ioWriteTime;
+    currentChartInfo.ioTime = Math.round(Number(ioChoose / 3));
 
     timeIODatas.value.push(dateFormatForSecond(res.data.shotTime));
     if (timeIODatas.value.length > 20) {
