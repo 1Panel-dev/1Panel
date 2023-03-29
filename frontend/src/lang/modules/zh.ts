@@ -223,6 +223,7 @@ const message = {
         settings: '面板设置',
         toolbox: '工具箱',
         logs: '面板日志',
+        runtime: '运行环境',
     },
     home: {
         overview: '概览',
@@ -1222,6 +1223,11 @@ const message = {
         allIP: '所有 IP',
         portRule: '端口规则',
         ipRule: 'IP 规则',
+    },
+    runtime: {
+        runtime: '运行环境',
+        image: '镜像',
+        workDir: '工作目录',
     },
 };
 export default {
