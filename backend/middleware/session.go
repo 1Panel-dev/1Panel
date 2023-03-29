@@ -14,6 +14,7 @@ func SessionAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if method, exist := c.Get("authMethod"); exist && method == constant.AuthMethodJWT {
 			c.Next()
+			return
 		}
 		sId, err := c.Cookie(constant.SessionName)
 		if err != nil {

@@ -28,9 +28,11 @@ func (b *BaseApi) Login(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if err := captcha.VerifyCode(req.CaptchaID, req.Captcha); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
+	if req.AuthMethod != "jwt" {
+		if err := captcha.VerifyCode(req.CaptchaID, req.Captcha); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
 	}
 
 	user, err := authService.Login(c, req)
