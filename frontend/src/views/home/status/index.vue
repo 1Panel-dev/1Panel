@@ -111,18 +111,11 @@
 import { Dashboard } from '@/api/interface/dashboard';
 import i18n from '@/lang';
 import * as echarts from 'echarts';
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
 const baseInfo = ref<Dashboard.BaseInfo>({
-    haloID: 0,
-    dateeaseID: 0,
-    jumpserverID: 0,
-    metersphereID: 0,
-    kubeoperatorID: 0,
-    kubepiID: 0,
-
     websiteNumber: 0,
     databaseNumber: 0,
     cronjobNumber: 0,
@@ -181,13 +174,15 @@ const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo):
     freshChart('cpu', 'CPU', formatNumber(currentInfo.value.cpuUsedPercent));
     freshChart('memory', i18n.global.t('monitor.memory'), formatNumber(currentInfo.value.MemoryUsedPercent));
     freshChart('load', i18n.global.t('home.load'), formatNumber(currentInfo.value.loadUsagePercent));
-    for (let i = 0; i < currentInfo.value.diskData.length; i++) {
-        freshChart(
-            'disk' + i,
-            currentInfo.value.diskData[i].path,
-            formatNumber(currentInfo.value.diskData[i].usedPercent),
-        );
-    }
+    nextTick(() => {
+        for (let i = 0; i < currentInfo.value.diskData.length; i++) {
+            freshChart(
+                'disk' + i,
+                currentInfo.value.diskData[i].path,
+                formatNumber(currentInfo.value.diskData[i].usedPercent),
+            );
+        }
+    });
 };
 
 const freshChart = (chartName: string, Title: string, Data: number) => {

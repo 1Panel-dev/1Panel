@@ -1,12 +1,5 @@
 export namespace Dashboard {
     export interface BaseInfo {
-        haloID: number;
-        dateeaseID: number;
-        jumpserverID: number;
-        metersphereID: number;
-        kubeoperatorID: number;
-        kubepiID: number;
-
         websiteNumber: number;
         databaseNumber: number;
         cronjobNumber: number;

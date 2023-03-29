@@ -3,13 +3,6 @@ package dto
 import "time"
 
 type DashboardBase struct {
-	HaloID         uint `json:"haloID"`
-	DateeaseID     uint `json:"dateeaseID"`
-	JumpServerID   uint `json:"jumpserverID"`
-	MeterSphereID  uint `json:"metersphereID"`
-	KubeoperatorID uint `json:"kubeoperatorID"`
-	KubepiID       uint `json:"kubepiID"`
-
 	WebsiteNumber     int `json:"websiteNumber"`
 	DatabaseNumber    int `json:"databaseNumber"`
 	CronjobNumber     int `json:"cronjobNumber"`
