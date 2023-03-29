@@ -286,15 +286,7 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
     ioReadTime: 0,
     ioWriteTime: 0,
 
-    total: 0,
-    free: 0,
-    used: 0,
-    usedPercent: 0,
-
-    inodesTotal: 0,
-    inodesUsed: 0,
-    inodesFree: 0,
-    inodesUsedPercent: 0,
+    diskData: [],
 
     netBytesSent: 0,
     netBytesRecv: 0,

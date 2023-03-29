@@ -120,15 +120,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	currentInfo.MemoryUsed = memoryInfo.Used
 	currentInfo.MemoryUsedPercent = memoryInfo.UsedPercent
 
-	state, _ := disk.Usage("/")
-	currentInfo.Total = state.Total
-	currentInfo.Free = state.Free
-	currentInfo.Used = state.Used
-	currentInfo.UsedPercent = state.UsedPercent
-	currentInfo.InodesTotal = state.InodesTotal
-	currentInfo.InodesUsed = state.InodesUsed
-	currentInfo.InodesFree = state.InodesFree
-	currentInfo.InodesUsedPercent = state.InodesUsedPercent
+	currentInfo.DiskData = loadDiskInfo()
 
 	if ioOption == "all" {
 		diskInfo, _ := disk.IOCounters()
@@ -168,4 +160,40 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 
 	currentInfo.ShotTime = time.Now()
 	return &currentInfo
+}
+
+func loadDiskInfo() []dto.DiskInfo {
+	var datas []dto.DiskInfo
+	parts, err := disk.Partitions(false)
+	if err != nil {
+		return datas
+	}
+	var excludes = []string{"/mnt/cdrom", "/boot", "/boot/efi", "/dev", "/dev/shm", "/run/lock", "/run", "/run/shm", "/run/user"}
+	for _, part := range parts {
+		isExclude := false
+		for _, exclude := range excludes {
+			if part.Mountpoint == exclude {
+				isExclude = true
+				break
+			}
+		}
+		if isExclude {
+			continue
+		}
+		state, _ := disk.Usage("/")
+		var itemData dto.DiskInfo
+		itemData.Path = part.Mountpoint
+		itemData.Type = part.Fstype
+		itemData.Device = part.Device
+		itemData.Total = state.Total
+		itemData.Free = state.Free
+		itemData.Used = state.Used
+		itemData.UsedPercent = state.UsedPercent
+		itemData.InodesTotal = state.InodesTotal
+		itemData.InodesUsed = state.InodesUsed
+		itemData.InodesFree = state.InodesFree
+		itemData.InodesUsedPercent = state.InodesUsedPercent
+		datas = append(datas, itemData)
+	}
+	return datas
 }
