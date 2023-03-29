@@ -53,6 +53,17 @@ export namespace Dashboard {
         ioReadTime: number;
         ioWriteTime: number;
 
+        diskData: Array<DiskInfo>;
+
+        netBytesSent: number;
+        netBytesRecv: number;
+
+        shotTime: Date;
+    }
+    export interface DiskInfo {
+        path: string;
+        type: string;
+        device: string;
         total: number;
         free: number;
         used: number;
@@ -62,10 +73,5 @@ export namespace Dashboard {
         inodesUsed: number;
         inodesFree: number;
         inodesUsedPercent: number;
-
-        netBytesSent: number;
-        netBytesRecv: number;
-
-        shotTime: Date;
     }
 }
