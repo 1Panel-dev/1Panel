@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -12,7 +13,9 @@ import (
 type FirewallService struct{}
 
 type IFirewallService interface {
+	LoadBaseInfo() (dto.FirewallBaseInfo, error)
 	SearchWithPage(search dto.RuleSearch) (int64, interface{}, error)
+	OperateFirewall(operation string) error
 	OperatePortRule(req dto.PortRuleOperate, reload bool) error
 	OperateAddressRule(req dto.AddrRuleOperate, reload bool) error
 	UpdatePortRule(req dto.PortRuleUpdate) error
@@ -22,6 +25,28 @@ type IFirewallService interface {
 
 func NewIFirewallService() IFirewallService {
 	return &FirewallService{}
+}
+
+func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
+	var baseInfo dto.FirewallBaseInfo
+	client, err := firewall.NewFirewallClient()
+	if err != nil {
+		return baseInfo, err
+	}
+	baseInfo.Name = client.Name()
+	baseInfo.Status, err = client.Status()
+	if err != nil {
+		return baseInfo, err
+	}
+	if baseInfo.Status == "not running" {
+		baseInfo.Version = "-"
+		return baseInfo, err
+	}
+	baseInfo.Version, err = client.Version()
+	if err != nil {
+		return baseInfo, err
+	}
+	return baseInfo, nil
 }
 
 func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}, error) {
@@ -73,6 +98,22 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 	}
 
 	return int64(total), backDatas, nil
+}
+
+func (u *FirewallService) OperateFirewall(operation string) error {
+	client, err := firewall.NewFirewallClient()
+	if err != nil {
+		return err
+	}
+	switch operation {
+	case "start":
+		return client.Start()
+	case "stop":
+		return client.Stop()
+	case "reload":
+		return client.Reload()
+	}
+	return fmt.Errorf("not support such operation: %s", operation)
 }
 
 func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) error {

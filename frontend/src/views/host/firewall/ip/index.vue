@@ -1,7 +1,13 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <FireRouter />
-        <LayoutContent v-loading="loading" :title="$t('firewall.firewall')">
+        <FireStatus ref="fireStatuRef" @search="search" v-model:loading="loading" v-model:status="fireStatus" />
+
+        <el-card v-if="fireStatus != 'running'" class="mask-prompt">
+            <span>{{ $t('firewall.firewallNotStart') }}</span>
+        </el-card>
+
+        <LayoutContent :title="$t('firewall.ipRule')" :class="{ mask: fireStatus != 'running' }">
             <template #toolbar>
                 <el-row>
                     <el-col :span="16">
@@ -44,8 +50,17 @@
                     </el-table-column>
                     <el-table-column :min-width="80" :label="$t('firewall.strategy')" prop="strategy">
                         <template #default="{ row }">
-                            <el-tag v-if="row.strategy === 'accept'" type="success">{{ $t('firewall.accept') }}</el-tag>
-                            <el-tag v-if="row.strategy === 'drop'" type="danger">{{ $t('firewall.drop') }}</el-tag>
+                            <el-button
+                                v-if="row.strategy === 'accept'"
+                                @click="onChangeStatus(row, 'drop')"
+                                link
+                                type="success"
+                            >
+                                {{ $t('firewall.allow') }}
+                            </el-button>
+                            <el-button v-else link type="danger" @click="onChangeStatus(row, 'accept')">
+                                {{ $t('firewall.deny') }}
+                            </el-button>
                         </template>
                     </el-table-column>
                     <fu-table-operations
@@ -68,9 +83,10 @@ import ComplexTable from '@/components/complex-table/index.vue';
 import OperatrDialog from '@/views/host/firewall/ip/operate/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
+import FireStatus from '@/views/host/firewall/status/index.vue';
 import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { batchOperateRule, searchFireRule } from '@/api/modules/host';
+import { batchOperateRule, searchFireRule, updateAddrRule } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
@@ -80,6 +96,9 @@ const loading = ref();
 const activeTag = ref('address');
 const selects = ref<any>([]);
 const searchName = ref();
+
+const fireStatus = ref('running');
+const fireStatuRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -91,7 +110,7 @@ const paginationConfig = reactive({
 const search = async () => {
     let params = {
         type: activeTag.value,
-        info: '',
+        info: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
     };
@@ -119,6 +138,41 @@ const onOpenDialog = async (
         rowData: { ...rowData },
     };
     dialogRef.value!.acceptParams(params);
+};
+
+const onChangeStatus = async (row: Host.RuleInfo, status: string) => {
+    let operation = status === 'accept' ? i18n.global.t('firewall.allow') : i18n.global.t('firewall.deny');
+    ElMessageBox.confirm(
+        i18n.global.t('firewall.changeStrategyHelper', ['IP', row.address, operation]),
+        i18n.global.t('firewall.changeStrategy', ['IP']),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        },
+    ).then(async () => {
+        let params = {
+            oldRule: {
+                operation: 'remove',
+                address: row.address,
+                strategy: row.strategy,
+            },
+            newRule: {
+                operation: 'add',
+                address: row.address,
+                strategy: status,
+            },
+        };
+        loading.value = true;
+        await updateAddrRule(params)
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const onDelete = async (row: Host.RuleIP | null) => {
@@ -178,6 +232,7 @@ const buttons = [
 ];
 
 onMounted(() => {
-    search();
+    loading.value = true;
+    fireStatuRef.value.acceptParams();
 });
 </script>

@@ -72,8 +72,14 @@ export const deleteCommand = (params: { ids: number[] }) => {
 };
 
 // firewall
+export const loadFireBaseInfo = () => {
+    return http.get<Host.FirewallBase>(`/hosts/firewall/base`);
+};
 export const searchFireRule = (params: Host.RuleSearch) => {
     return http.post<ResPage<Host.RuleInfo>>(`/hosts/firewall/search`, params);
+};
+export const operateFire = (operation: string) => {
+    return http.post(`/hosts/firewall/operate`, { operation: operation });
 };
 export const operatePortRule = (params: Host.RulePort) => {
     return http.post<Host.RulePort>(`/hosts/firewall/port`, params);

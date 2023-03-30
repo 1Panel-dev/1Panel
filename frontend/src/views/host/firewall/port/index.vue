@@ -1,7 +1,14 @@
 <template>
-    <div>
+    <div v-loading="loading">
         <FireRouter />
-        <LayoutContent v-loading="loading" :title="$t('firewall.firewall')">
+
+        <FireStatus ref="fireStatuRef" @search="search" v-model:loading="loading" v-model:status="fireStatus" />
+
+        <el-card v-if="fireStatus != 'running'" class="mask-prompt">
+            <span>{{ $t('firewall.firewallNotStart') }}</span>
+        </el-card>
+
+        <LayoutContent :title="$t('firewall.portRule')" :class="{ mask: fireStatus != 'running' }">
             <template #toolbar>
                 <el-row>
                     <el-col :span="16">
@@ -40,8 +47,17 @@
                     <el-table-column :label="$t('firewall.port')" :min-width="120" prop="port" />
                     <el-table-column :min-width="80" :label="$t('firewall.strategy')" prop="strategy">
                         <template #default="{ row }">
-                            <el-tag v-if="row.strategy === 'accept'" type="success">{{ $t('firewall.accept') }}</el-tag>
-                            <el-tag v-if="row.strategy === 'drop'" type="danger">{{ $t('firewall.drop') }}</el-tag>
+                            <el-button
+                                v-if="row.strategy === 'accept'"
+                                @click="onChangeStatus(row, 'drop')"
+                                link
+                                type="success"
+                            >
+                                {{ $t('firewall.accept') }}
+                            </el-button>
+                            <el-button v-else link type="danger" @click="onChangeStatus(row, 'accept')">
+                                {{ $t('firewall.drop') }}
+                            </el-button>
                         </template>
                     </el-table-column>
                     <el-table-column :min-width="80" :label="$t('firewall.address')" prop="address">
@@ -70,9 +86,10 @@ import ComplexTable from '@/components/complex-table/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import OperatrDialog from '@/views/host/firewall/port/operate/index.vue';
+import FireStatus from '@/views/host/firewall/status/index.vue';
 import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { batchOperateRule, searchFireRule } from '@/api/modules/host';
+import { batchOperateRule, searchFireRule, updatePortRule } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -82,6 +99,9 @@ const loading = ref();
 const activeTag = ref('port');
 const selects = ref<any>([]);
 const searchName = ref();
+
+const fireStatus = ref('running');
+const fireStatuRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -123,6 +143,47 @@ const onOpenDialog = async (
         rowData: { ...rowData },
     };
     dialogRef.value!.acceptParams(params);
+};
+
+const onChangeStatus = async (row: Host.RuleInfo, status: string) => {
+    let operation = i18n.global.t('firewall.' + status);
+    ElMessageBox.confirm(
+        i18n.global.t('firewall.changeStrategyHelper', [i18n.global.t('firewall.port'), row.port, operation]),
+        i18n.global.t('firewall.changeStrategy', [i18n.global.t('firewall.port')]),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+        },
+    ).then(async () => {
+        let params = {
+            oldRule: {
+                operation: 'remove',
+                address: row.address,
+                port: row.port,
+                source: '',
+                protocol: row.protocol,
+                strategy: row.strategy,
+            },
+            newRule: {
+                operation: 'add',
+                address: row.address,
+                port: row.port,
+                source: '',
+                protocol: row.protocol,
+                strategy: status,
+            },
+        };
+        loading.value = true;
+        await updatePortRule(params)
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const onDelete = async (row: Host.RuleInfo | null) => {
@@ -182,6 +243,7 @@ const buttons = [
 ];
 
 onMounted(() => {
-    search();
+    loading.value = true;
+    fireStatuRef.value.acceptParams();
 });
 </script>

@@ -1,5 +1,31 @@
 basePath: /api/v1
 definitions:
+  dto.AddrRuleOperate:
+    properties:
+      address:
+        type: string
+      operation:
+        enum:
+        - add
+        - remove
+        type: string
+      strategy:
+        enum:
+        - accept
+        - drop
+        type: string
+    required:
+    - address
+    - operation
+    - strategy
+    type: object
+  dto.AddrRuleUpdate:
+    properties:
+      newRule:
+        $ref: '#/definitions/dto.AddrRuleOperate'
+      oldRule:
+        $ref: '#/definitions/dto.AddrRuleOperate'
+    type: object
   dto.BackupOperate:
     properties:
       accessKey:
@@ -42,6 +68,17 @@ definitions:
         type: array
     required:
     - ids
+    type: object
+  dto.BatchRuleOperate:
+    properties:
+      rules:
+        items:
+          $ref: '#/definitions/dto.PortRuleOperate'
+        type: array
+      type:
+        type: string
+    required:
+    - type
     type: object
   dto.CaptchaResponse:
     properties:
@@ -583,6 +620,26 @@ definitions:
     required:
     - path
     type: object
+  dto.FirewallBaseInfo:
+    properties:
+      name:
+        type: string
+      status:
+        type: string
+      version:
+        type: string
+    type: object
+  dto.FirewallOperation:
+    properties:
+      operation:
+        enum:
+        - start
+        - stop
+        - reload
+        type: string
+    required:
+    - operation
+    type: object
   dto.ForBuckets:
     properties:
       accessKey:
@@ -1090,6 +1147,41 @@ definitions:
         type: integer
       hostPort:
         type: integer
+    type: object
+  dto.PortRuleOperate:
+    properties:
+      address:
+        type: string
+      operation:
+        enum:
+        - add
+        - remove
+        type: string
+      port:
+        type: string
+      protocol:
+        enum:
+        - tcp
+        - udp
+        - tcp/udp
+        type: string
+      strategy:
+        enum:
+        - accept
+        - drop
+        type: string
+    required:
+    - operation
+    - port
+    - protocol
+    - strategy
+    type: object
+  dto.PortRuleUpdate:
+    properties:
+      newRule:
+        $ref: '#/definitions/dto.PortRuleOperate'
+      oldRule:
+        $ref: '#/definitions/dto.PortRuleOperate'
     type: object
   dto.PortUpdate:
     properties:
@@ -5820,6 +5912,158 @@ paths:
         formatEN: delete host [addrs]
         formatZH: 删除主机 [addrs]
         paramKeys: []
+  /hosts/firewall/base:
+    get:
+      description: 获取防火墙基础信息
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.FirewallBaseInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Load firewall base info
+      tags:
+      - Firewall
+  /hosts/firewall/ip:
+    post:
+      consumes:
+      - application/json
+      description: 批量删除防火墙规则
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BatchRuleOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create group
+      tags:
+      - Firewall
+  /hosts/firewall/operate:
+    post:
+      consumes:
+      - application/json
+      description: 修改防火墙状态
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.FirewallOperation'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page firewall status
+      tags:
+      - Firewall
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - operation
+        formatEN: '[operation] firewall'
+        formatZH: '[operation] 防火墙'
+        paramKeys: []
+  /hosts/firewall/port:
+    post:
+      consumes:
+      - application/json
+      description: 创建防火墙端口规则
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PortRuleOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create group
+      tags:
+      - Firewall
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - port
+        - strategy
+        formatEN: create port rules {[strategy][port]}
+        formatZH: 添加端口规则 {[strategy] [port]}
+        paramKeys: []
+  /hosts/firewall/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取防火墙规则列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SearchWithPage'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page firewall rules
+      tags:
+      - Firewall
+  /hosts/firewall/update/ip:
+    post:
+      consumes:
+      - application/json
+      description: 更新 ip 防火墙规则
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddrRuleUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create group
+      tags:
+      - Firewall
+  /hosts/firewall/update/port:
+    post:
+      consumes:
+      - application/json
+      description: 更新端口防火墙规则
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PortRuleUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create group
+      tags:
+      - Firewall
   /hosts/group:
     post:
       consumes:

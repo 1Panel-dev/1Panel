@@ -53,6 +53,11 @@ export namespace Host {
         info?: string;
     }
 
+    export interface FirewallBase {
+        name: string;
+        status: string;
+        version: string;
+    }
     export interface RuleSearch extends ReqPage {
         info: string;
         type: string;
