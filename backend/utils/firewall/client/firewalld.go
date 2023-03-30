@@ -26,11 +26,16 @@ func (f *Firewall) Name() string {
 }
 
 func (f *Firewall) Status() (string, error) {
-	stdout, err := f.Client.Run("firewall-cmd --state")
-	if err != nil {
-		return "", fmt.Errorf("load the firewall status failed, err: %s", stdout)
-	}
+	stdout, _ := f.Client.Run("firewall-cmd --state")
 	return strings.ReplaceAll(stdout, "\n", ""), nil
+}
+
+func (f *Firewall) Version() (string, error) {
+	stdout, err := f.Client.Run("firewall-cmd --version")
+	if err != nil {
+		return "", fmt.Errorf("load the firewall version failed, err: %s", stdout)
+	}
+	return strings.ReplaceAll(stdout, "\n ", ""), nil
 }
 
 func (f *Firewall) Start() error {

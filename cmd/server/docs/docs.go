@@ -5066,6 +5066,251 @@ var doc = `{
                 }
             }
         },
+        "/hosts/firewall/base": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取防火墙基础信息",
+                "tags": [
+                    "Firewall"
+                ],
+                "summary": "Load firewall base info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.FirewallBaseInfo"
+                        }
+                    }
+                }
+            }
+        },
+        "/hosts/firewall/ip": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "批量删除防火墙规则",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Firewall"
+                ],
+                "summary": "Create group",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.BatchRuleOperate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/hosts/firewall/operate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改防火墙状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Firewall"
+                ],
+                "summary": "Page firewall status",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.FirewallOperation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "operation"
+                    ],
+                    "formatEN": "[operation] firewall",
+                    "formatZH": "[operation] 防火墙",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/firewall/port": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建防火墙端口规则",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Firewall"
+                ],
+                "summary": "Create group",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PortRuleOperate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "port",
+                        "strategy"
+                    ],
+                    "formatEN": "create port rules {[strategy][port]}",
+                    "formatZH": "添加端口规则 {[strategy] [port]}",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/firewall/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取防火墙规则列表分页",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Firewall"
+                ],
+                "summary": "Page firewall rules",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SearchWithPage"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.PageResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/hosts/firewall/update/ip": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新 ip 防火墙规则",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Firewall"
+                ],
+                "summary": "Create group",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddrRuleUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/hosts/firewall/update/port": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新端口防火墙规则",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Firewall"
+                ],
+                "summary": "Create group",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.PortRuleUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/hosts/group": {
             "post": {
                 "security": [
@@ -8512,6 +8757,44 @@ var doc = `{
         }
     },
     "definitions": {
+        "dto.AddrRuleOperate": {
+            "type": "object",
+            "required": [
+                "address",
+                "operation",
+                "strategy"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "operation": {
+                    "type": "string",
+                    "enum": [
+                        "add",
+                        "remove"
+                    ]
+                },
+                "strategy": {
+                    "type": "string",
+                    "enum": [
+                        "accept",
+                        "drop"
+                    ]
+                }
+            }
+        },
+        "dto.AddrRuleUpdate": {
+            "type": "object",
+            "properties": {
+                "newRule": {
+                    "$ref": "#/definitions/dto.AddrRuleOperate"
+                },
+                "oldRule": {
+                    "$ref": "#/definitions/dto.AddrRuleOperate"
+                }
+            }
+        },
         "dto.BackupOperate": {
             "type": "object",
             "required": [
@@ -8575,6 +8858,23 @@ var doc = `{
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "dto.BatchRuleOperate": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "rules": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.PortRuleOperate"
+                    }
+                },
+                "type": {
+                    "type": "string"
                 }
             }
         },
@@ -9380,6 +9680,36 @@ var doc = `{
                 }
             }
         },
+        "dto.FirewallBaseInfo": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.FirewallOperation": {
+            "type": "object",
+            "required": [
+                "operation"
+            ],
+            "properties": {
+                "operation": {
+                    "type": "string",
+                    "enum": [
+                        "start",
+                        "stop",
+                        "reload"
+                    ]
+                }
+            }
+        },
         "dto.ForBuckets": {
             "type": "object",
             "required": [
@@ -10139,6 +10469,56 @@ var doc = `{
                 },
                 "hostPort": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.PortRuleOperate": {
+            "type": "object",
+            "required": [
+                "operation",
+                "port",
+                "protocol",
+                "strategy"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "operation": {
+                    "type": "string",
+                    "enum": [
+                        "add",
+                        "remove"
+                    ]
+                },
+                "port": {
+                    "type": "string"
+                },
+                "protocol": {
+                    "type": "string",
+                    "enum": [
+                        "tcp",
+                        "udp",
+                        "tcp/udp"
+                    ]
+                },
+                "strategy": {
+                    "type": "string",
+                    "enum": [
+                        "accept",
+                        "drop"
+                    ]
+                }
+            }
+        },
+        "dto.PortRuleUpdate": {
+            "type": "object",
+            "properties": {
+                "newRule": {
+                    "$ref": "#/definitions/dto.PortRuleOperate"
+                },
+                "oldRule": {
+                    "$ref": "#/definitions/dto.PortRuleOperate"
                 }
             }
         },
