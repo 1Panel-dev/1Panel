@@ -1,25 +1,17 @@
 <template>
     <div>
         <div class="login-backgroud" v-if="statusCode == 1">
-            <div class="login-wrapper" v-if="screenWidth > 1110">
-                <div class="left inline-block">
+            <div class="login-wrapper">
+                <div :class="screenWidth > 1110 ? 'left inline-block' : ''">
                     <div class="login-title">
                         <span>{{ $t('commons.login.title') }}</span>
                     </div>
-                    <img src="@/assets/images/1panel-login.png" alt="" />
+                    <img src="@/assets/images/1panel-login.png" alt="" v-if="screenWidth > 1110" />
                 </div>
-                <div class="right inline-block">
+                <div :class="screenWidth > 1110 ? 'right inline-block' : ''">
                     <div class="login-container">
                         <LoginForm ref="loginRef"></LoginForm>
                     </div>
-                </div>
-            </div>
-            <div class="login-wrapper" v-else>
-                <div class="login-title">
-                    <span>{{ $t('commons.login.title') }}</span>
-                </div>
-                <div class="login-container">
-                    <LoginForm ref="loginRef"></LoginForm>
                 </div>
             </div>
         </div>
