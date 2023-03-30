@@ -4,21 +4,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/1Panel-dev/1Panel/backend/utils/ssh"
+	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
 
-type Firewall struct {
-	Client ssh.ConnInfo
-}
+type Firewall struct{}
 
 func NewFirewalld() (*Firewall, error) {
-	ConnInfo := ssh.ConnInfo{
-		Addr:     "172.16.10.143",
-		User:     "root",
-		AuthMode: "password",
-		Port:     22,
-	}
-	return &Firewall{Client: ConnInfo}, nil
+	return &Firewall{}, nil
 }
 
 func (f *Firewall) Name() string {
@@ -26,12 +19,12 @@ func (f *Firewall) Name() string {
 }
 
 func (f *Firewall) Status() (string, error) {
-	stdout, _ := f.Client.Run("firewall-cmd --state")
+	stdout, _ := cmd.Exec("firewall-cmd --state")
 	return strings.ReplaceAll(stdout, "\n", ""), nil
 }
 
 func (f *Firewall) Version() (string, error) {
-	stdout, err := f.Client.Run("firewall-cmd --version")
+	stdout, err := cmd.Exec("firewall-cmd --version")
 	if err != nil {
 		return "", fmt.Errorf("load the firewall version failed, err: %s", stdout)
 	}
@@ -39,15 +32,35 @@ func (f *Firewall) Version() (string, error) {
 }
 
 func (f *Firewall) Start() error {
-	stdout, err := f.Client.Run("systemctl start firewalld")
+	stdout, err := cmd.Exec("systemctl start firewalld")
 	if err != nil {
 		return fmt.Errorf("enable the firewall failed, err: %s", stdout)
 	}
 	return nil
 }
 
+func (f *Firewall) PingStatus() (string, error) {
+	stdout, _ := cmd.Exec("firewall-cmd --query-rich-rule='rule protocol value=icmp drop'")
+	if stdout == "yes\n" {
+		return constant.StatusEnable, nil
+	}
+	return constant.StatusDisable, nil
+}
+
+func (f *Firewall) UpdatePingStatus(enabel string) error {
+	operation := "add"
+	if enabel == "0" {
+		operation = "remove"
+	}
+	stdout, err := cmd.Execf("firewall-cmd --permanent --%s-rich-rule='rule protocol value=icmp drop'", operation)
+	if err != nil {
+		return fmt.Errorf("update firewall ping status failed, err: %s", stdout)
+	}
+	return f.Reload()
+}
+
 func (f *Firewall) Stop() error {
-	stdout, err := f.Client.Run("systemctl stop firewalld")
+	stdout, err := cmd.Exec("systemctl stop firewalld")
 	if err != nil {
 		return fmt.Errorf("stop the firewall failed, err: %s", stdout)
 	}
@@ -55,7 +68,7 @@ func (f *Firewall) Stop() error {
 }
 
 func (f *Firewall) Reload() error {
-	stdout, err := f.Client.Run("firewall-cmd --reload")
+	stdout, err := cmd.Exec("firewall-cmd --reload")
 	if err != nil {
 		return fmt.Errorf("reload firewall failed, err: %s", stdout)
 	}
@@ -63,7 +76,7 @@ func (f *Firewall) Reload() error {
 }
 
 func (f *Firewall) ListPort() ([]FireInfo, error) {
-	stdout, err := f.Client.Run("firewall-cmd --zone=public --list-ports")
+	stdout, err := cmd.Exec("firewall-cmd --zone=public --list-ports")
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +92,7 @@ func (f *Firewall) ListPort() ([]FireInfo, error) {
 		datas = append(datas, itemPort)
 	}
 
-	stdout1, err := f.Client.Run("firewall-cmd --zone=public --list-rich-rules")
+	stdout1, err := cmd.Exec("firewall-cmd --zone=public --list-rich-rules")
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +110,7 @@ func (f *Firewall) ListPort() ([]FireInfo, error) {
 }
 
 func (f *Firewall) ListAddress() ([]FireInfo, error) {
-	stdout, err := f.Client.Run("firewall-cmd --zone=public --list-rich-rules")
+	stdout, err := cmd.Exec("firewall-cmd --zone=public --list-rich-rules")
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +129,7 @@ func (f *Firewall) ListAddress() ([]FireInfo, error) {
 }
 
 func (f *Firewall) Port(port FireInfo, operation string) error {
-	stdout, err := f.Client.Run(fmt.Sprintf("firewall-cmd --zone=public --%s-port=%s/%s --permanent", operation, port.Port, port.Protocol))
+	stdout, err := cmd.Execf("firewall-cmd --zone=public --%s-port=%s/%s --permanent", operation, port.Port, port.Protocol)
 	if err != nil {
 		return fmt.Errorf("%s port failed, err: %s", operation, stdout)
 	}
@@ -136,7 +149,7 @@ func (f *Firewall) RichRules(rule FireInfo, operation string) error {
 	}
 	ruleStr += rule.Strategy
 
-	stdout, err := f.Client.Run(fmt.Sprintf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, ruleStr))
+	stdout, err := cmd.Execf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, ruleStr)
 	if err != nil {
 		return fmt.Errorf("%s rich rules failed, err: %s", operation, stdout)
 	}
@@ -149,7 +162,7 @@ func (f *Firewall) PortForward(info Forward, operation string) error {
 		ruleStr = fmt.Sprintf("firewall-cmd --%s-forward-port=port=%s:proto=%s:toaddr=%s:toport=%s --permanent", operation, info.Port, info.Protocol, info.Address, info.Target)
 	}
 
-	stdout, err := f.Client.Run(ruleStr)
+	stdout, err := cmd.Exec(ruleStr)
 	if err != nil {
 		return fmt.Errorf("%s port forward failed, err: %s", operation, stdout)
 	}

@@ -1,9 +1,10 @@
 package dto
 
 type FirewallBaseInfo struct {
-	Name    string `json:"name"`
-	Status  string `json:"status"`
-	Version string `json:"version"`
+	Name       string `json:"name"`
+	Status     string `json:"status"`
+	Version    string `json:"version"`
+	PingStatus string `json:"pingStatus"`
 }
 
 type RuleSearch struct {
@@ -13,7 +14,7 @@ type RuleSearch struct {
 }
 
 type FirewallOperation struct {
-	Operation string `json:"operation" validate:"required,oneof=start stop reload"`
+	Operation string `json:"operation" validate:"required,oneof=start stop disablePing enablePing"`
 }
 
 type PortRuleOperate struct {
