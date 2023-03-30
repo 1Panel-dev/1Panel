@@ -1,5 +1,5 @@
 <template>
-    <div :id="'terminal-' + terminalID"></div>
+    <div :id="'terminal-' + terminalID" @wheel="onTermWheel"></div>
 </template>
 
 <script setup lang="ts">
@@ -175,6 +175,26 @@ function changeTerminalSize() {
         );
     }
 }
+
+/**
+ * Support for Ctrl+MouseWheel to scaling fonts
+ * @param event WheelEvent
+ */
+const onTermWheel = (event: WheelEvent) => {
+    if (event.ctrlKey) {
+        event.preventDefault();
+        if (term) {
+            if (event.deltaY > 0) {
+                // web font-size mini 12px
+                if (term.options.fontSize > 12) {
+                    term.options.fontSize = term.options.fontSize - 1;
+                }
+            } else {
+                term.options.fontSize = term.options.fontSize + 1;
+            }
+        }
+    }
+};
 
 defineExpose({
     acceptParams,
