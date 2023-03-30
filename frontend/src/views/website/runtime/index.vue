@@ -4,12 +4,16 @@
             :buttons="[
                 {
                     label: 'PHP',
-                    path: '/runtimes',
+                    path: '/runtimes/php',
                 },
             ]"
         />
         <LayoutContent :title="$t('runtime.runtime')" v-loading="loading">
-            <template #toolbar></template>
+            <template #toolbar>
+                <el-button type="primary" @click="openCreate">
+                    {{ $t('runtime.create') }}
+                </el-button>
+            </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="items" @search="search()">
                     <el-table-column :label="$t('commons.table.name')" fix prop="name" min-width="120px">
@@ -28,6 +32,7 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
+        <CreateRuntime ref="createRef" />
     </div>
 </template>
 
@@ -35,10 +40,11 @@
 import { onMounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { SearchRuntimes } from '@/api/modules/runtime';
+import { dateFormat } from '@/utils/util';
 import RouterButton from '@/components/router-button/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import LayoutContent from '@/layout/layout-content.vue';
-import { dateFormat } from '@/utils/util';
+import CreateRuntime from '@/views/website/runtime/create/index.vue';
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -52,6 +58,7 @@ let req = reactive<Runtime.RuntimeReq>({
 });
 const loading = ref(false);
 const items = ref<Runtime.RuntimeDTO[]>([]);
+const createRef = ref();
 
 const search = async () => {
     req.page = paginationConfig.currentPage;
@@ -65,6 +72,10 @@ const search = async () => {
     } finally {
         loading.value = false;
     }
+};
+
+const openCreate = () => {
+    createRef.value.acceptParams();
 };
 
 onMounted(() => {

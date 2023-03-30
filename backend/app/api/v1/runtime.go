@@ -32,3 +32,25 @@ func (b *BaseApi) SearchRuntimes(c *gin.Context) {
 		Items: items,
 	})
 }
+
+// @Tags Runtime
+// @Summary Create runtime
+// @Description 创建运行环境
+// @Accept json
+// @Param request body request.RuntimeCreate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes [post]
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建运行环境 [name]","formatEN":"Create runtime [name]"}
+func (b *BaseApi) CreateRuntime(c *gin.Context) {
+	var req request.RuntimeCreate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := runtimeService.Create(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}

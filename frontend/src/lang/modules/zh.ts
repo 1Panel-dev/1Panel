@@ -1229,6 +1229,14 @@ const message = {
         runtime: '运行环境',
         image: '镜像',
         workDir: '工作目录',
+        create: '创建运行环境',
+        name: '名称',
+        resource: '来源',
+        appStore: '应用商店',
+        local: '本地',
+        app: '应用',
+        localHelper: '本地运行环境需要自行安装',
+        version: '版本',
     },
 };
 export default {

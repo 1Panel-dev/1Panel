@@ -18,4 +18,15 @@ export namespace Runtime {
     export interface RuntimeDTO extends Runtime {
         websites: string[];
     }
+
+    export interface RuntimeCreate {
+        name: string;
+        appDetailId: number;
+        image: string;
+        params: object;
+        type: string;
+        resource: string;
+        appId?: number;
+        version?: string;
+    }
 }
