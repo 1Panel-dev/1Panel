@@ -64,6 +64,7 @@ export namespace App {
         values?: ServiceParam[];
         child?: FromFieldChild;
         params?: FromParam[];
+        multiple?: boolean;
     }
 
     export interface FromFieldChild extends FromField {

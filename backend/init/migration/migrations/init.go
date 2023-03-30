@@ -249,7 +249,7 @@ var AddDefaultGroup = &gormigrate.Migration{
 }
 
 var AddTableRuntime = &gormigrate.Migration{
-	ID: "20230328-add-table-runtime",
+	ID: "20230330-add-table-runtime",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.Runtime{})
 	},

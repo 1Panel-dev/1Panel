@@ -22,8 +22,8 @@ export const GetAppTags = () => {
     return http.get<App.Tag[]>('apps/tags');
 };
 
-export const GetAppDetail = (id: number, version: string) => {
-    return http.get<App.AppDetail>(`apps/detail/${id}/${version}`);
+export const GetAppDetail = (id: number, version: string, type: string) => {
+    return http.get<App.AppDetail>(`apps/detail/${id}/${version}/${type}`);
 };
 
 export const InstallApp = (install: App.AppInstall) => {

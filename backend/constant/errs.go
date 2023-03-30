@@ -62,7 +62,7 @@ var (
 	Err1PanelNetworkFailed = "Err1PanelNetworkFailed"
 )
 
-//website
+// website
 var (
 	ErrDomainIsExist = "ErrDomainIsExist"
 	ErrAliasIsExist  = "ErrAliasIsExist"
@@ -70,7 +70,7 @@ var (
 	ErrGroupIsUsed   = "ErrGroupIsUsed"
 )
 
-//ssl
+// ssl
 var (
 	ErrSSLCannotDelete     = "ErrSSLCannotDelete"
 	ErrAccountCannotDelete = "ErrAccountCannotDelete"
@@ -78,7 +78,7 @@ var (
 	ErrEmailIsExist        = "ErrEmailIsExist"
 )
 
-//file
+// file
 var (
 	ErrPathNotFound     = "ErrPathNotFound"
 	ErrMovePathFailed   = "ErrMovePathFailed"
@@ -87,19 +87,26 @@ var (
 	ErrFileUpload       = "ErrFileUpload"
 )
 
-//mysql
+// mysql
 var (
 	ErrUserIsExist     = "ErrUserIsExist"
 	ErrDatabaseIsExist = "ErrDatabaseIsExist"
 )
 
-//redis
+// redis
 var (
 	ErrTypeOfRedis = "ErrTypeOfRedis"
 )
 
-//container
+// container
 var (
 	ErrInUsed       = "ErrInUsed"
 	ErrObjectInUsed = "ErrObjectInUsed"
+)
+
+//runtime
+
+var (
+	ErrDirNotFound  = "ErrDirNotFound"
+	ErrFileNotExist = "ErrFileNotExist"
 )

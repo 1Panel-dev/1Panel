@@ -1,0 +1,94 @@
+<template>
+    <div v-for="(p, index) in paramObjs" :key="index">
+        <el-form-item :label="getLabel(p)" :prop="p.prop">
+            <el-select v-model="form[p.envKey]" v-if="p.type == 'select'" :multiple="p.multiple">
+                <el-option
+                    v-for="service in p.values"
+                    :key="service.label"
+                    :value="service.value"
+                    :label="service.label"
+                ></el-option>
+            </el-select>
+        </el-form-item>
+    </div>
+</template>
+
+<script setup lang="ts">
+import { App } from '@/api/interface/app';
+// import { Rules } from '@/global/form-rules';
+import { computed, onMounted, reactive, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+interface ParamObj extends App.FromField {
+    services: App.AppService[];
+    prop: string;
+    disabled: false;
+    childProp: string;
+}
+const props = defineProps({
+    form: {
+        type: Object,
+        default: function () {
+            return {};
+        },
+    },
+    params: {
+        type: Object,
+        default: function () {
+            return {};
+        },
+    },
+    rules: {
+        type: Object,
+        default: function () {
+            return {};
+        },
+    },
+});
+
+let form = reactive({});
+// let rules = reactive({});
+const params = computed({
+    get() {
+        return props.params;
+    },
+    set() {},
+});
+
+const paramObjs = ref<ParamObj[]>([]);
+
+const handleParams = () => {
+    // rules = props.rules;
+    form = props.form;
+    if (params.value != undefined && params.value.formFields != undefined) {
+        for (const p of params.value.formFields) {
+            const pObj = p;
+            pObj.prop = p.envKey;
+            pObj.disabled = p.disabled;
+            form[p.envKey] = p.default;
+            paramObjs.value.push(pObj);
+            // if (p.required) {
+            //     if (p.type === 'select') {
+            //         rules[p.envKey] = [Rules.requiredSelect];
+            //     } else {
+            //         rules[p.envKey] = [Rules.requiredInput];
+            //     }
+            // }
+        }
+        console.log(form);
+    }
+};
+
+const getLabel = (row: ParamObj): string => {
+    const language = useI18n().locale.value;
+    if (language == 'zh') {
+        return row.labelZh;
+    } else {
+        return row.labelEn;
+    }
+};
+
+onMounted(() => {
+    handleParams();
+});
+</script>

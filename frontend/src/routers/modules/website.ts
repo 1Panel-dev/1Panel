@@ -40,7 +40,7 @@ const webSiteRouter = {
             },
         },
         {
-            path: '/websites/runtime',
+            path: '/websites/runtime/php',
             name: 'Runtime',
             component: () => import('@/views/website/runtime/index.vue'),
             meta: {

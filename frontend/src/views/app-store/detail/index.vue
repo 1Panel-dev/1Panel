@@ -131,7 +131,7 @@ const getApp = async () => {
 const getDetail = async (id: number, version: string) => {
     loadingDetail.value = true;
     try {
-        const res = await GetAppDetail(id, version);
+        const res = await GetAppDetail(id, version, 'app');
         appDetail.value = res.data;
     } finally {
         loadingDetail.value = false;

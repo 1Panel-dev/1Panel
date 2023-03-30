@@ -7,3 +7,13 @@ type RuntimeSearch struct {
 	Type string `json:"type"`
 	Name string `json:"name"`
 }
+
+type RuntimeCreate struct {
+	AppDetailID uint                   `json:"appDetailId"`
+	Name        string                 `json:"name"`
+	Params      map[string]interface{} `json:"params"`
+	Resource    string                 `json:"resource"`
+	Image       string                 `json:"image"`
+	Type        string                 `json:"type"`
+	Version     string                 `json:"version"`
+}
