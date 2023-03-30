@@ -16,5 +16,6 @@ func (r *RuntimeRouter) InitRuntimeRouter(Router *gin.RouterGroup) {
 	baseApi := v1.ApiGroupApp.BaseApi
 	{
 		groupRouter.POST("/search", baseApi.SearchRuntimes)
+		groupRouter.POST("", baseApi.CreateRuntime)
 	}
 }

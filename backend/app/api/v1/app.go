@@ -76,9 +76,10 @@ func (b *BaseApi) GetApp(c *gin.Context) {
 // @Accept json
 // @Param appId path integer true "app id"
 // @Param version path string true "app 版本"
+// @Param version path string true "app 类型"
 // @Success 200 {object} response.AppDetailDTO
 // @Security ApiKeyAuth
-// @Router /apps/detail/:appId/:version [get]
+// @Router /apps/detail/:appId/:version/:type [get]
 func (b *BaseApi) GetAppDetail(c *gin.Context) {
 	appId, err := helper.GetIntParamByKey(c, "appId")
 	if err != nil {
@@ -86,7 +87,8 @@ func (b *BaseApi) GetAppDetail(c *gin.Context) {
 		return
 	}
 	version := c.Param("version")
-	appDetailDTO, err := appService.GetAppDetail(appId, version)
+	appType := c.Param("type")
+	appDetailDTO, err := appService.GetAppDetail(appId, version, appType)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

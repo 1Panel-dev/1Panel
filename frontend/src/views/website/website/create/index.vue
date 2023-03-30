@@ -310,7 +310,7 @@ const getApp = () => {
 };
 
 const getAppDetail = (version: string) => {
-    GetAppDetail(website.value.appinstall.appId, version).then((res) => {
+    GetAppDetail(website.value.appinstall.appId, version, 'app').then((res) => {
         website.value.appinstall.appDetailId = res.data.id;
         appDetail.value = res.data;
         appParams.value = res.data.params;

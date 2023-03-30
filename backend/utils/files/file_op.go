@@ -37,6 +37,15 @@ func (f FileOp) OpenFile(dst string) (fs.File, error) {
 	return f.Fs.Open(dst)
 }
 
+func (f FileOp) GetContent(dst string) ([]byte, error) {
+	afs := &afero.Afero{Fs: f.Fs}
+	cByte, err := afs.ReadFile(dst)
+	if err != nil {
+		return nil, err
+	}
+	return cByte, nil
+}
+
 func (f FileOp) CreateDir(dst string, mode fs.FileMode) error {
 	return f.Fs.MkdirAll(dst, mode)
 }

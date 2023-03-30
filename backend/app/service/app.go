@@ -32,7 +32,7 @@ type IAppService interface {
 	PageApp(req request.AppSearch) (interface{}, error)
 	GetAppTags() ([]response.TagDTO, error)
 	GetApp(key string) (*response.AppDTO, error)
-	GetAppDetail(appId uint, version string) (response.AppDetailDTO, error)
+	GetAppDetail(appId uint, version, appType string) (response.AppDetailDTO, error)
 	Install(ctx context.Context, req request.AppInstallCreate) (*model.AppInstall, error)
 	SyncAppList() error
 	GetAppUpdate() (*response.AppUpdateRes, error)
@@ -138,7 +138,7 @@ func (a AppService) GetApp(key string) (*response.AppDTO, error) {
 	return &appDTO, nil
 }
 
-func (a AppService) GetAppDetail(appId uint, version string) (response.AppDetailDTO, error) {
+func (a AppService) GetAppDetail(appId uint, version, appType string) (response.AppDetailDTO, error) {
 	var (
 		appDetailDTO response.AppDetailDTO
 		opts         []repo.DBOption
@@ -148,13 +148,35 @@ func (a AppService) GetAppDetail(appId uint, version string) (response.AppDetail
 	if err != nil {
 		return appDetailDTO, err
 	}
-	paramMap := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(detail.Params), &paramMap); err != nil {
-		return appDetailDTO, err
-	}
 	appDetailDTO.AppDetail = detail
-	appDetailDTO.Params = paramMap
 	appDetailDTO.Enable = true
+
+	if appType == "runtime" {
+		app, err := appRepo.GetFirst(commonRepo.WithByID(appId))
+		if err != nil {
+			return appDetailDTO, err
+		}
+		paramsPath := path.Join(constant.AppResourceDir, app.Key, "versions", detail.Version, "build", "config.json")
+		fileOp := files.NewFileOp()
+		if !fileOp.Stat(paramsPath) {
+			return appDetailDTO, buserr.New(constant.ErrFileNotExist)
+		}
+		param, err := fileOp.GetContent(paramsPath)
+		if err != nil {
+			return appDetailDTO, err
+		}
+		paramMap := make(map[string]interface{})
+		if err := json.Unmarshal(param, &paramMap); err != nil {
+			return appDetailDTO, err
+		}
+		appDetailDTO.Params = paramMap
+	} else {
+		paramMap := make(map[string]interface{})
+		if err := json.Unmarshal([]byte(detail.Params), &paramMap); err != nil {
+			return appDetailDTO, err
+		}
+		appDetailDTO.Params = paramMap
+	}
 
 	app, err := appRepo.GetFirst(commonRepo.WithByID(detail.AppId))
 	if err != nil {
