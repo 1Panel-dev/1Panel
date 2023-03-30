@@ -57,6 +57,7 @@ export namespace Host {
         name: string;
         status: string;
         version: string;
+        pingStatus: string;
     }
     export interface RuleSearch extends ReqPage {
         info: string;

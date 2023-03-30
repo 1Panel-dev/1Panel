@@ -2,24 +2,20 @@ package client
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/utils/ssh"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
 
-type Ufw struct {
-	Client ssh.ConnInfo
-}
+const confPath = "/etc/ufw/sysctl.conf"
+
+type Ufw struct{}
 
 func NewUfw() (*Ufw, error) {
-	ConnInfo := ssh.ConnInfo{
-		Addr:     "172.16.10.234",
-		User:     "ubuntu",
-		AuthMode: "password",
-		Port:     22,
-	}
-	return &Ufw{Client: ConnInfo}, nil
+	return &Ufw{}, nil
 }
 
 func (f *Ufw) Name() string {
@@ -27,7 +23,7 @@ func (f *Ufw) Name() string {
 }
 
 func (f *Ufw) Status() (string, error) {
-	stdout, err := f.Client.Run("sudo ufw status | grep Status")
+	stdout, err := cmd.Exec("sudo ufw status | grep Status")
 	if err != nil {
 		return "", fmt.Errorf("load the firewall status failed, err: %s", stdout)
 	}
@@ -38,7 +34,7 @@ func (f *Ufw) Status() (string, error) {
 }
 
 func (f *Ufw) Version() (string, error) {
-	stdout, err := f.Client.Run("sudo ufw version | grep ufw")
+	stdout, err := cmd.Exec("sudo ufw version | grep ufw")
 	if err != nil {
 		return "", fmt.Errorf("load the firewall status failed, err: %s", stdout)
 	}
@@ -47,7 +43,7 @@ func (f *Ufw) Version() (string, error) {
 }
 
 func (f *Ufw) Start() error {
-	stdout, err := f.Client.Run("echo y | sudo ufw enable")
+	stdout, err := cmd.Exec("echo y | sudo ufw enable")
 	if err != nil {
 		return fmt.Errorf("enable the firewall failed, err: %s", stdout)
 	}
@@ -55,9 +51,9 @@ func (f *Ufw) Start() error {
 }
 
 func (f *Ufw) PingStatus() (string, error) {
-	stdout, err := f.Client.Run("cat /etc/ufw/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= ")
+	stdout, err := cmd.Exec("cat /etc/ufw/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= ")
 	if err != nil {
-		return constant.StatusDisable, fmt.Errorf("enable the firewall failed, err: %s", stdout)
+		return constant.StatusDisable, fmt.Errorf("load firewall ping status failed, err: %s", stdout)
 	}
 	if stdout == "net/ipv4/icmp_echo_ignore_all=1\n" {
 		return constant.StatusEnable, nil
@@ -65,8 +61,35 @@ func (f *Ufw) PingStatus() (string, error) {
 	return constant.StatusDisable, nil
 }
 
+func (f *Ufw) UpdatePingStatus(enabel string) error {
+	lineBytes, err := ioutil.ReadFile(confPath)
+	if err != nil {
+		return err
+	}
+	files := strings.Split(string(lineBytes), "\n")
+	var newFiles []string
+	for _, line := range files {
+		if strings.Contains(line, "net/ipv4/icmp_echo_ignore_all") || strings.HasPrefix(line, "net/ipv4/icmp_echo_ignore_all") {
+			newFiles = append(newFiles, "net/ipv4/icmp_echo_ignore_all="+enabel)
+		} else {
+			newFiles = append(newFiles, line)
+		}
+	}
+	file, err := os.OpenFile(confPath, os.O_WRONLY|os.O_TRUNC, 0666)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	_, err = file.WriteString(strings.Join(newFiles, "\n"))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (f *Ufw) Stop() error {
-	stdout, err := f.Client.Run("sudo ufw disable")
+	stdout, err := cmd.Exec("sudo ufw disable")
 	if err != nil {
 		return fmt.Errorf("stop the firewall failed, err: %s", stdout)
 	}
@@ -78,7 +101,7 @@ func (f *Ufw) Reload() error {
 }
 
 func (f *Ufw) ListPort() ([]FireInfo, error) {
-	stdout, err := f.Client.Run("sudo ufw  status verbose")
+	stdout, err := cmd.Exec("sudo ufw  status verbose")
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +126,7 @@ func (f *Ufw) ListPort() ([]FireInfo, error) {
 }
 
 func (f *Ufw) ListAddress() ([]FireInfo, error) {
-	stdout, err := f.Client.Run("sudo ufw  status verbose")
+	stdout, err := cmd.Exec("sudo ufw  status verbose")
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +173,7 @@ func (f *Ufw) Port(port FireInfo, operation string) error {
 	if len(port.Protocol) != 0 {
 		command += fmt.Sprintf("/%s", port.Protocol)
 	}
-	stdout, err := f.Client.Run(command)
+	stdout, err := cmd.Exec(command)
 	if err != nil {
 		return fmt.Errorf("%s port failed, err: %s", operation, stdout)
 	}
@@ -183,7 +206,7 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 		ruleStr += fmt.Sprintf("to any port %s ", rule.Port)
 	}
 
-	stdout, err := f.Client.Run(ruleStr)
+	stdout, err := cmd.Exec(ruleStr)
 	if err != nil {
 		return fmt.Errorf("%s rich rules failed, err: %s", operation, stdout)
 	}
@@ -196,7 +219,7 @@ func (f *Ufw) PortForward(info Forward, operation string) error {
 		ruleStr = fmt.Sprintf("firewall-cmd --%s-forward-port=port=%s:proto=%s:toaddr=%s:toport=%s --permanent", operation, info.Port, info.Protocol, info.Address, info.Target)
 	}
 
-	stdout, err := f.Client.Run(ruleStr)
+	stdout, err := cmd.Exec(ruleStr)
 	if err != nil {
 		return fmt.Errorf("%s port forward failed, err: %s", operation, stdout)
 	}

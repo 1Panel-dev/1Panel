@@ -38,6 +38,10 @@ func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 	if err != nil {
 		return baseInfo, err
 	}
+	baseInfo.PingStatus, err = client.PingStatus()
+	if err != nil {
+		return baseInfo, err
+	}
 	if baseInfo.Status == "not running" {
 		baseInfo.Version = "-"
 		return baseInfo, err
@@ -110,8 +114,10 @@ func (u *FirewallService) OperateFirewall(operation string) error {
 		return client.Start()
 	case "stop":
 		return client.Stop()
-	case "reload":
-		return client.Reload()
+	case "disablePing":
+		return client.UpdatePingStatus("0")
+	case "enablePing":
+		return client.UpdatePingStatus("1")
 	}
 	return fmt.Errorf("not support such operation: %s", operation)
 }

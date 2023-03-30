@@ -21,6 +21,8 @@ const message = {
             clean: 'Clean',
             login: 'Login',
             close: 'Close',
+            stop: 'Stop',
+            start: 'Start',
             view: 'View',
             watch: 'Watch',
             handle: 'Handle',
@@ -1178,6 +1180,38 @@ const message = {
         argsCheck: 'GET parameter check',
         postCheck: 'POST parameter verification',
         cookieBlockList: 'Cookie Blacklist',
+
+        firewall: 'Firewall',
+        firewallHelper: '{0} System firewall',
+        firewallNotStart: 'The firewall service is not enabled at present, please enable it first!',
+        stopFirewallHelper:
+            'If the firewall is disabled, the server loses security protection. Do you want to continue?',
+        startFirewallHelper:
+            'After the firewall is enabled, the current server security can be better protected. Do you want to continue?',
+        noPing: 'Disable ping',
+        noPingHelper:
+            'If the ping function is disabled, the server cannot be pinged. Do you want to continue the operation?',
+        onPingHelper: 'If you disable ping, hackers may discover your server. Do you want to continue?',
+        protocol: 'Protocol',
+        port: 'Port',
+        changeStrategy: 'Change the {0} strategy',
+        changeStrategyHelper:
+            'Change [{1}] {0} strategy to [{2}]. After setting, {0} will access {2} externally. Do you want to continue?',
+        portHelper: 'Multiple ports can be entered, such as 80,81, or range ports, such as 80-88',
+        strategy: 'Strategy',
+        accept: 'Accept',
+        drop: 'Drop',
+        source: 'Source',
+        anyWhere: 'AnyWhere',
+        address: 'Specified IP',
+        allow: 'Allow',
+        deny: 'Deny',
+        addressHelper1: 'Support for multiple IP, such as 172.16.10.11 172.16.10.99',
+        addressHelper2: 'You can enter an IP address segment, for example, 172.16.10.0/24',
+        addressHelper3: 'You can enter an IP address range, such as 172.16.10.11-172.16.10.99',
+        allIP: 'All IP',
+        portRule: 'Port rule',
+        ipRule: 'IP rule',
     },
 };
 

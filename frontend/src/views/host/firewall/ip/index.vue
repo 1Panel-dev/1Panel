@@ -14,7 +14,7 @@
                         <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('commons.button.create') }} {{ $t('firewall.ipRule') }}
                         </el-button>
-                        <el-button @click="onDelete(null)">
+                        <el-button @click="onDelete(null)" plain :disabled="selects.length === 0">
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </el-col>
