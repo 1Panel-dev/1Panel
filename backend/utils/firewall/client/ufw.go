@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssh"
 )
 
@@ -26,22 +27,42 @@ func (f *Ufw) Name() string {
 }
 
 func (f *Ufw) Status() (string, error) {
-	stdout, err := f.Client.Run("sudo ufw status")
+	stdout, err := f.Client.Run("sudo ufw status | grep Status")
 	if err != nil {
 		return "", fmt.Errorf("load the firewall status failed, err: %s", stdout)
 	}
-	if stdout == "Status: inactive\n" {
+	if stdout == "Status: active\n" {
 		return "running", nil
 	}
 	return "not running", nil
 }
 
+func (f *Ufw) Version() (string, error) {
+	stdout, err := f.Client.Run("sudo ufw version | grep ufw")
+	if err != nil {
+		return "", fmt.Errorf("load the firewall status failed, err: %s", stdout)
+	}
+	info := strings.ReplaceAll(stdout, "\n", "")
+	return strings.ReplaceAll(info, "ufw ", ""), nil
+}
+
 func (f *Ufw) Start() error {
-	stdout, err := f.Client.Run("sudo ufw enable")
+	stdout, err := f.Client.Run("echo y | sudo ufw enable")
 	if err != nil {
 		return fmt.Errorf("enable the firewall failed, err: %s", stdout)
 	}
 	return nil
+}
+
+func (f *Ufw) PingStatus() (string, error) {
+	stdout, err := f.Client.Run("cat /etc/ufw/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= ")
+	if err != nil {
+		return constant.StatusDisable, fmt.Errorf("enable the firewall failed, err: %s", stdout)
+	}
+	if stdout == "net/ipv4/icmp_echo_ignore_all=1\n" {
+		return constant.StatusEnable, nil
+	}
+	return constant.StatusDisable, nil
 }
 
 func (f *Ufw) Stop() error {

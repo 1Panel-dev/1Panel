@@ -1,9 +1,19 @@
 package dto
 
+type FirewallBaseInfo struct {
+	Name    string `json:"name"`
+	Status  string `json:"status"`
+	Version string `json:"version"`
+}
+
 type RuleSearch struct {
 	PageInfo
 	Info string `json:"info"`
 	Type string `json:"type" validate:"required"`
+}
+
+type FirewallOperation struct {
+	Operation string `json:"operation" validate:"required,oneof=start stop reload"`
 }
 
 type PortRuleOperate struct {

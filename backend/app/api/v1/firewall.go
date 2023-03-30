@@ -9,6 +9,22 @@ import (
 )
 
 // @Tags Firewall
+// @Summary Load firewall base info
+// @Description 获取防火墙基础信息
+// @Success 200 {object} dto.FirewallBaseInfo
+// @Security ApiKeyAuth
+// @Router /hosts/firewall/base [get]
+func (b *BaseApi) LoadFirewallBaseInfo(c *gin.Context) {
+	data, err := firewallService.LoadBaseInfo()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Firewall
 // @Summary Page firewall rules
 // @Description 获取防火墙规则列表分页
 // @Accept json
@@ -33,6 +49,34 @@ func (b *BaseApi) SearchFirewallRule(c *gin.Context) {
 		Items: list,
 		Total: total,
 	})
+}
+
+// @Tags Firewall
+// @Summary Page firewall status
+// @Description 修改防火墙状态
+// @Accept json
+// @Param request body dto.FirewallOperation true "request"
+// @Success 200 {object} dto.PageResult
+// @Security ApiKeyAuth
+// @Router /hosts/firewall/operate [post]
+// @x-panel-log {"bodyKeys":["operation"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"[operation] 防火墙","formatEN":"[operation] firewall"}
+func (b *BaseApi) OperateFirewall(c *gin.Context) {
+	var req dto.FirewallOperation
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := firewallService.OperateFirewall(req.Operation); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
 }
 
 // @Tags Firewall
@@ -65,7 +109,7 @@ func (b *BaseApi) OperatePortRule(c *gin.Context) {
 // @Summary Create group
 // @Description 创建防火墙 IP 规则
 // @Accept json
-// @Param request body dto.AddressCreate true "request"
+// @Param request body dto.AddrRuleOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /hosts/firewall/ip [post]

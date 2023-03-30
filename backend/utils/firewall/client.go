@@ -10,6 +10,7 @@ type FirewallClient interface {
 	Stop() error
 	Reload() error
 	Status() (string, error)
+	Version() (string, error)
 	ListPort() ([]client.FireInfo, error)
 	ListAddress() ([]client.FireInfo, error)
 
@@ -20,10 +21,10 @@ type FirewallClient interface {
 
 func NewFirewallClient() (FirewallClient, error) {
 	// if _, err := os.Stat("/usr/sbin/firewalld"); err == nil {
-	// return client.NewFirewalld()
+	return client.NewFirewalld()
 	// }
 	// if _, err := os.Stat("/usr/sbin/ufw"); err == nil {
-	return client.NewUfw()
+	// return client.NewUfw()
 	// }
 	// return nil, errors.New("no such type")
 }
