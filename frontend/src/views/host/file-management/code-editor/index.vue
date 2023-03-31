@@ -93,11 +93,11 @@ let config = reactive<EditorConfig>({
 
 const eols = [
     {
-        label: 'LF',
+        label: 'LF (Linux)',
         value: monaco.editor.EndOfLineSequence.LF,
     },
     {
-        label: 'CRLF',
+        label: 'CRLF (Windows)',
         value: monaco.editor.EndOfLineSequence.CRLF,
     },
 ];
