@@ -257,6 +257,9 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	if err := createLink(ctx, app, &appInstall, req.Params); err != nil {
 		return nil, err
 	}
+	if err := upAppPre(app, appInstall); err != nil {
+		return nil, err
+	}
 	go upApp(appInstall.GetComposePath(), appInstall)
 	go updateToolApp(appInstall)
 	return &appInstall, nil
