@@ -13,6 +13,7 @@ type IRuntimeRepo interface {
 	Create(ctx context.Context, runtime *model.Runtime) error
 	Save(runtime *model.Runtime) error
 	DeleteBy(opts ...DBOption) error
+	GetFirst(opts ...DBOption) (*model.Runtime, error)
 }
 
 func NewIRunTimeRepo() IRuntimeRepo {
@@ -39,4 +40,12 @@ func (r *RuntimeRepo) Save(runtime *model.Runtime) error {
 
 func (r *RuntimeRepo) DeleteBy(opts ...DBOption) error {
 	return getDb(opts...).Delete(&model.Runtime{}).Error
+}
+
+func (r *RuntimeRepo) GetFirst(opts ...DBOption) (*model.Runtime, error) {
+	var runtime model.Runtime
+	if err := getDb(opts...).First(&runtime).Error; err != nil {
+		return nil, err
+	}
+	return &runtime, nil
 }

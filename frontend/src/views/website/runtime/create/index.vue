@@ -22,7 +22,7 @@
                             @change="changeResource(runtimeCreate.resource)"
                         >
                             <el-radio :label="'AppStore'" :value="'AppStore'">
-                                {{ $t('runtime.appStore') }}
+                                {{ $t('runtime.appstore') }}
                             </el-radio>
                             <el-radio :label="'Local'" :value="'Local'">
                                 {{ $t('runtime.local') }}
@@ -135,6 +135,7 @@ const changeResource = (resource: string) => {
         runtimeCreate.value.image = '';
     } else {
         runtimeCreate.value.version = '';
+        searchApp();
     }
 };
 
@@ -179,7 +180,15 @@ const submit = async (formEl: FormInstance | undefined) => {
     });
 };
 
-const acceptParams = async () => {
+const acceptParams = async (type: string) => {
+    runtimeCreate.value = {
+        name: '',
+        appDetailId: undefined,
+        image: '',
+        params: {},
+        type: type,
+        resource: 'AppStore',
+    };
     searchApp();
     open.value = true;
 };

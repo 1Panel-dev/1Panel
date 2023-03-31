@@ -226,3 +226,7 @@ export function isJson(str: string) {
         return false;
     }
 }
+
+export function toLowerCase(str: string) {
+    return str.toLowerCase();
+}

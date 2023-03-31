@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -12,6 +13,8 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/subosito/gotenv"
 	"path"
+	"path/filepath"
+	"time"
 )
 
 type RuntimeService struct {
@@ -20,6 +23,7 @@ type RuntimeService struct {
 type IRuntimeService interface {
 	Page(req request.RuntimeSearch) (int64, []response.RuntimeRes, error)
 	Create(create request.RuntimeCreate) error
+	Delete(id uint) error
 }
 
 func NewRuntimeService() IRuntimeService {
@@ -50,19 +54,23 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) error {
 	if !fileOp.Stat(buildDir) {
 		return buserr.New(constant.ErrDirNotFound)
 	}
-	tempDir := path.Join(constant.RuntimeDir, app.Key)
+	runtimeDir := path.Join(constant.RuntimeDir, create.Type)
+	tempDir := filepath.Join(runtimeDir, fmt.Sprintf("%d", time.Now().UnixNano()))
 	if err := fileOp.CopyDir(buildDir, tempDir); err != nil {
 		return err
 	}
 	oldDir := path.Join(tempDir, "build")
-	newNameDir := path.Join(tempDir, create.Name)
-	defer func(defErr *error) {
-		if defErr != nil {
+	newNameDir := path.Join(runtimeDir, create.Name)
+	defer func() {
+		if err != nil {
 			_ = fileOp.DeleteDir(newNameDir)
 		}
-	}(&err)
+	}()
 	if oldDir != newNameDir {
 		if err := fileOp.Rename(oldDir, newNameDir); err != nil {
+			return err
+		}
+		if err := fileOp.DeleteDir(tempDir); err != nil {
 			return err
 		}
 	}
@@ -95,9 +103,6 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) error {
 		return err
 	}
 	composeService.SetProject(project)
-	if err := composeService.ComposeBuild(); err != nil {
-		return err
-	}
 	runtime := &model.Runtime{
 		Name:          create.Name,
 		DockerCompose: string(composeFile),
@@ -106,9 +111,14 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) error {
 		Type:          create.Type,
 		Image:         create.Image,
 		Resource:      create.Resource,
-		Status:        constant.RuntimeNormal,
+		Status:        constant.RuntimeBuildIng,
+		Version:       create.Version,
 	}
-	return runtimeRepo.Create(context.Background(), runtime)
+	if err := runtimeRepo.Create(context.Background(), runtime); err != nil {
+		return err
+	}
+	go buildRuntime(runtime, composeService)
+	return nil
 }
 
 func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.RuntimeRes, error) {
@@ -129,4 +139,19 @@ func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.Runt
 		})
 	}
 	return total, res, nil
+}
+
+func (r *RuntimeService) Delete(id uint) error {
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return err
+	}
+	//TODO 校验网站关联
+	if runtime.Resource == constant.ResourceAppstore {
+		runtimeDir := path.Join(constant.RuntimeDir, runtime.Type, runtime.Name)
+		if err := files.NewFileOp().DeleteDir(runtimeDir); err != nil {
+			return err
+		}
+	}
+	return runtimeRepo.DeleteBy(commonRepo.WithByID(id))
 }

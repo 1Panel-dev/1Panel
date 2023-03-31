@@ -104,9 +104,9 @@ var (
 	ErrObjectInUsed = "ErrObjectInUsed"
 )
 
-//runtime
-
+// runtime
 var (
-	ErrDirNotFound  = "ErrDirNotFound"
-	ErrFileNotExist = "ErrFileNotExist"
+	ErrDirNotFound   = "ErrDirNotFound"
+	ErrFileNotExist  = "ErrFileNotExist"
+	ErrImageBuildErr = "ErrImageBuildErr"
 )

@@ -83,6 +83,15 @@ func SuccessWithData(ctx *gin.Context, data interface{}) {
 	ctx.Abort()
 }
 
+func SuccessWithOutData(ctx *gin.Context) {
+	res := dto.Response{
+		Code:    constant.CodeSuccess,
+		Message: "success",
+	}
+	ctx.JSON(http.StatusOK, res)
+	ctx.Abort()
+}
+
 func SuccessWithMsg(ctx *gin.Context, msg string) {
 	res := dto.Response{
 		Code:    constant.CodeSuccess,

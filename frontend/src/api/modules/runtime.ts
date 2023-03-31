@@ -9,3 +9,7 @@ export const SearchRuntimes = (req: Runtime.RuntimeReq) => {
 export const CreateRuntime = (req: Runtime.RuntimeCreate) => {
     return http.post<any>(`/runtimes`, req);
 };
+
+export const DeleteRuntime = (req: Runtime.RuntimeDelete) => {
+    return http.post<any>(`/runtimes/del`, req);
+};

@@ -52,5 +52,28 @@ func (b *BaseApi) CreateRuntime(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Website
+// @Summary Delete runtime
+// @Description 删除运行环境
+// @Accept json
+// @Param request body request.RuntimeDelete true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/del [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"删除网站 [name]","formatEN":"Delete website [name]"}
+func (b *BaseApi) DeleteRuntime(c *gin.Context) {
+	var req request.RuntimeDelete
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	err := runtimeService.Delete(req.ID)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
 }

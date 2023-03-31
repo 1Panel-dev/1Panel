@@ -21,30 +21,64 @@
                             <Tooltip :text="row.name" />
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('runtime.resource')" prop="resource">
+                        <template #default="{ row }">
+                            <span>{{ $t('runtime.' + toLowerCase(row.resource)) }}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('runtime.version')" prop="version"></el-table-column>
                     <el-table-column :label="$t('runtime.image')" prop="image"></el-table-column>
-                    <el-table-column :label="$t('runtime.workDir')" prop="workDir"></el-table-column>
+                    <el-table-column :label="$t('runtime.status')" prop="status">
+                        <template #default="{ row }">
+                            <el-popover
+                                v-if="row.status === 'error'"
+                                placement="bottom"
+                                :width="400"
+                                trigger="hover"
+                                :content="row.message"
+                            >
+                                <template #reference>
+                                    <Status :key="row.status" :status="row.status"></Status>
+                                </template>
+                            </el-popover>
+                            <div v-else>
+                                <Status :key="row.status" :status="row.status"></Status>
+                            </div>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         prop="createdAt"
                         :label="$t('commons.table.date')"
                         :formatter="dateFormat"
                         show-overflow-tooltip
                     />
+                    <fu-table-operations
+                        :ellipsis="10"
+                        width="260px"
+                        :buttons="buttons"
+                        :label="$t('commons.table.operate')"
+                        fixed="right"
+                        fix
+                    />
                 </ComplexTable>
             </template>
         </LayoutContent>
-        <CreateRuntime ref="createRef" />
+        <CreateRuntime ref="createRef" @close="search" />
     </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
-import { SearchRuntimes } from '@/api/modules/runtime';
-import { dateFormat } from '@/utils/util';
+import { DeleteRuntime, SearchRuntimes } from '@/api/modules/runtime';
+import { dateFormat, toLowerCase } from '@/utils/util';
 import RouterButton from '@/components/router-button/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import LayoutContent from '@/layout/layout-content.vue';
 import CreateRuntime from '@/views/website/runtime/create/index.vue';
+import Status from '@/components/status/index.vue';
+import i18n from '@/lang';
+import { useDeleteData } from '@/hooks/use-delete-data';
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -56,6 +90,15 @@ let req = reactive<Runtime.RuntimeReq>({
     page: 1,
     pageSize: 15,
 });
+
+const buttons = [
+    {
+        label: i18n.global.t('commons.button.delete'),
+        click: function (row: Runtime.Runtime) {
+            openDelete(row);
+        },
+    },
+];
 const loading = ref(false);
 const items = ref<Runtime.RuntimeDTO[]>([]);
 const createRef = ref();
@@ -75,7 +118,12 @@ const search = async () => {
 };
 
 const openCreate = () => {
-    createRef.value.acceptParams();
+    createRef.value.acceptParams('php');
+};
+
+const openDelete = async (row: Runtime.Runtime) => {
+    await useDeleteData(DeleteRuntime, { id: row.id }, 'commons.msg.delete');
+    search();
 };
 
 onMounted(() => {
