@@ -768,6 +768,7 @@ const message = {
         downlodSuccess: '下载完成',
         theme: '主题',
         language: '语言',
+        eol: '行尾符',
     },
     setting: {
         all: '全部',

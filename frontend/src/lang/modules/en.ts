@@ -765,6 +765,7 @@ const message = {
         downlodSuccess: 'Download Success',
         theme: 'Theme',
         language: 'Language',
+        eol: 'End Of Line',
     },
     setting: {
         all: 'All',
