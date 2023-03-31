@@ -194,6 +194,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	upMap := make(map[string]interface{})
 	upMap["entry_id"] = newEntryID
 	upMap["name"] = req.Name
+	upMap["spec"] = cronjob.Spec
 	upMap["script"] = req.Script
 	upMap["spec_type"] = req.SpecType
 	upMap["week"] = req.Week
