@@ -29,4 +29,8 @@ export namespace Runtime {
         appId?: number;
         version?: string;
     }
+
+    export interface RuntimeDelete {
+        id: number;
+    }
 }

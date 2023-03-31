@@ -17,3 +17,7 @@ type RuntimeCreate struct {
 	Type        string                 `json:"type"`
 	Version     string                 `json:"version"`
 }
+
+type RuntimeDelete struct {
+	ID uint `json:"Id"`
+}

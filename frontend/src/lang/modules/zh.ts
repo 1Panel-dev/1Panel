@@ -203,6 +203,8 @@ const message = {
             installing: '安装中',
             enabled: '已启用',
             disabled: '已停止',
+            normal: '正常',
+            building: '制作镜像中',
         },
     },
     menu: {
@@ -1231,11 +1233,12 @@ const message = {
         create: '创建运行环境',
         name: '名称',
         resource: '来源',
-        appStore: '应用商店',
+        appstore: '应用商店',
         local: '本地',
         app: '应用',
         localHelper: '本地运行环境需要自行安装',
         version: '版本',
+        status: '状态',
     },
 };
 export default {

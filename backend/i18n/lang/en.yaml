@@ -63,3 +63,4 @@ ErrObjectInUsed: "This object is in use and cannot be deleted"
 #runtime
 ErrDirNotFound: "The build folder does not exist! Please check file integrity！"
 ErrFileNotExist: "{{ .detail }} file does not exist! Please check source file integrity！"
+ErrImageBuildErr: "Image build failed"

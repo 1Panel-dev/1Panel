@@ -1,10 +1,10 @@
 package constant
 
 const (
-	ResourceLocal    = "Local"
-	ResourceAppstore = "Appstore"
+	ResourceLocal    = "local"
+	ResourceAppstore = "appstore"
 
-	RuntimeNormal       = "Normal"
-	RuntimeBuildSuccess = "BuildSuccess"
-	RuntimeBuildFailed  = "BuildFailed"
+	RuntimeNormal   = "normal"
+	RuntimeError    = "error"
+	RuntimeBuildIng = "building"
 )

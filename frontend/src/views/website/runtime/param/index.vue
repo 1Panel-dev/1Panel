@@ -1,7 +1,7 @@
 <template>
     <div v-for="(p, index) in paramObjs" :key="index">
         <el-form-item :label="getLabel(p)" :prop="p.prop">
-            <el-select v-model="form[p.envKey]" v-if="p.type == 'select'" :multiple="p.multiple">
+            <el-select v-model="form[p.envKey]" v-if="p.type == 'select'" :multiple="p.multiple" filterable>
                 <el-option
                     v-for="service in p.values"
                     :key="service.label"
@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { App } from '@/api/interface/app';
-// import { Rules } from '@/global/form-rules';
+import { Rules } from '@/global/form-rules';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -47,7 +47,7 @@ const props = defineProps({
 });
 
 let form = reactive({});
-// let rules = reactive({});
+let rules = reactive({});
 const params = computed({
     get() {
         return props.params;
@@ -58,7 +58,7 @@ const params = computed({
 const paramObjs = ref<ParamObj[]>([]);
 
 const handleParams = () => {
-    // rules = props.rules;
+    rules = props.rules;
     form = props.form;
     if (params.value != undefined && params.value.formFields != undefined) {
         for (const p of params.value.formFields) {
@@ -67,15 +67,15 @@ const handleParams = () => {
             pObj.disabled = p.disabled;
             form[p.envKey] = p.default;
             paramObjs.value.push(pObj);
-            // if (p.required) {
-            //     if (p.type === 'select') {
-            //         rules[p.envKey] = [Rules.requiredSelect];
-            //     } else {
-            //         rules[p.envKey] = [Rules.requiredInput];
-            //     }
-            // }
+            console.log(p);
+            if (p.required) {
+                if (p.type === 'select') {
+                    rules[p.envKey] = [Rules.requiredSelect];
+                } else {
+                    rules[p.envKey] = [Rules.requiredInput];
+                }
+            }
         }
-        console.log(form);
     }
 };
 
