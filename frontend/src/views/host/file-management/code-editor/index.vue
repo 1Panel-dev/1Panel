@@ -18,6 +18,11 @@
                     <el-option v-for="lang in Languages" :key="lang.label" :value="lang.value" :label="lang.label" />
                 </el-select>
             </el-form-item>
+            <el-form-item :label="$t('file.eol')">
+                <el-select v-model="config.eol" @change="changeEOL()">
+                    <el-option v-for="eol in eols" :key="eol.label" :value="eol.value" :label="eol.label" />
+                </el-select>
+            </el-form-item>
         </el-form>
         <div class="coder-editor" v-loading="loading">
             <div id="codeBox" style="height: 60vh"></div>
@@ -74,6 +79,7 @@ interface EditProps {
 interface EditorConfig {
     theme: string;
     language: string;
+    eol: number;
 }
 
 let open = ref(false);
@@ -82,7 +88,19 @@ let loading = ref(false);
 let config = reactive<EditorConfig>({
     theme: 'vs-dark',
     language: 'plaintext',
+    eol: monaco.editor.EndOfLineSequence.LF,
 });
+
+const eols = [
+    {
+        label: 'LF',
+        value: monaco.editor.EndOfLineSequence.LF,
+    },
+    {
+        label: 'CRLF',
+        value: monaco.editor.EndOfLineSequence.CRLF,
+    },
+];
 
 const themes = [
     {
@@ -121,6 +139,10 @@ const changeTheme = () => {
     monaco.editor.setTheme(config.theme);
 };
 
+const changeEOL = () => {
+    editor.getModel().pushEOL(config.eol);
+};
+
 const initEditor = () => {
     if (editor) {
         editor.dispose();
@@ -144,6 +166,9 @@ const initEditor = () => {
             }
         });
 
+        // After onDidChangeModelContent
+        editor.getModel().pushEOL(config.eol);
+
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, quickSave);
     });
 };
@@ -165,6 +190,9 @@ const acceptParams = (props: EditProps) => {
     form.value.content = props.content;
     form.value.path = props.path;
     config.language = props.language;
+    // TODO Now,1panel only support liunux,so we can use LF.
+    // better,We should rely on the actual line feed character of the file returned from the background
+    config.eol = monaco.editor.EndOfLineSequence.LF;
     open.value = true;
 };
 
