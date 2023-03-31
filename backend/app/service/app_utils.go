@@ -339,6 +339,17 @@ func copyAppData(key, version, installName string, params map[string]interface{}
 	return
 }
 
+// 处理文件夹权限等问题
+func upAppPre(app model.App, appInstall model.AppInstall) error {
+	if app.Key == "nexus" {
+		dataPath := path.Join(appInstall.GetPath(), "data")
+		if err := files.NewFileOp().Chown(dataPath, 200, 0); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func upApp(composeFilePath string, appInstall model.AppInstall) {
 	out, err := compose.Up(composeFilePath)
 	if err != nil {
