@@ -2,9 +2,11 @@ package service
 
 import (
 	"encoding/json"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/host"
@@ -141,29 +143,54 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	return &currentInfo
 }
 
+type diskInfo struct {
+	Type   string
+	Mount  string
+	Device string
+}
+
 func loadDiskInfo() []dto.DiskInfo {
 	var datas []dto.DiskInfo
-	parts, err := disk.Partitions(false)
+	stdout, err := cmd.Exec("df -hT -P|grep '/'|grep -v tmpfs|grep -v 'snap/core'|grep -v udev")
 	if err != nil {
 		return datas
 	}
+	lines := strings.Split(stdout, "\n")
+
+	var mounts []diskInfo
 	var excludes = []string{"/mnt/cdrom", "/boot", "/boot/efi", "/dev", "/dev/shm", "/run/lock", "/run", "/run/shm", "/run/user"}
-	for i := 0; i < len(parts); i++ {
+	for _, line := range lines {
+		fields := strings.Fields(line)
+		if len(fields) < 7 {
+			continue
+		}
+		if fields[1] == "tmpfs" {
+			continue
+		}
+		if strings.Contains(fields[2], "M") || strings.Contains(fields[2], "K") {
+			continue
+		}
+		if strings.Contains(fields[6], "docker") {
+			continue
+		}
 		isExclude := false
 		for _, exclude := range excludes {
-			if parts[i].Mountpoint == exclude {
+			if exclude == fields[6] {
 				isExclude = true
-				break
 			}
 		}
 		if isExclude {
 			continue
 		}
-		state, _ := disk.Usage(parts[i].Mountpoint)
+		mounts = append(mounts, diskInfo{Type: fields[1], Device: fields[0], Mount: fields[6]})
+	}
+
+	for i := 0; i < len(mounts); i++ {
+		state, _ := disk.Usage(mounts[i].Mount)
 		var itemData dto.DiskInfo
-		itemData.Path = parts[i].Mountpoint
-		itemData.Type = parts[i].Fstype
-		itemData.Device = parts[i].Device
+		itemData.Path = mounts[i].Mount
+		itemData.Type = mounts[i].Type
+		itemData.Device = mounts[i].Device
 		itemData.Total = state.Total
 		itemData.Free = state.Free
 		itemData.Used = state.Used
