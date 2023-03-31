@@ -9,10 +9,11 @@
                     <el-col :span="22">
                         <el-form-item :label="$t('firewall.address')" prop="address">
                             <el-input
+                                :disabled="dialogData.title === 'edit'"
                                 :autosize="{ minRows: 3, maxRows: 6 }"
                                 type="textarea"
                                 clearable
-                                v-model="dialogData.rowData!.address"
+                                v-model.trim="dialogData.rowData!.address"
                             />
                             <span class="input-help">{{ $t('firewall.addressHelper1') }}</span>
                             <span class="input-help">{{ $t('firewall.addressHelper2') }}</span>
@@ -45,10 +46,10 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
 import { operateIPRule, updateAddrRule } from '@/api/modules/host';
-import { deepCopy } from '@/utils/util';
+import { checkIp, deepCopy } from '@/utils/util';
 
 const loading = ref();
 const oldRule = ref<Host.RuleIP>();
@@ -88,9 +89,25 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        loading.value = true;
         dialogData.value.rowData.operation = 'add';
         if (!dialogData.value.rowData) return;
+        let ips = [];
+        if (dialogData.value.rowData.address.indexOf('-') !== -1) {
+            ips = dialogData.value.rowData.address.split('-');
+        } else if (dialogData.value.rowData.address.indexOf(',') !== -1) {
+            ips = dialogData.value.rowData.address.split(',');
+        } else if (dialogData.value.rowData.address.indexOf('/') !== -1) {
+            ips.push(dialogData.value.rowData.address.split('/')[0]);
+        } else {
+            ips.push(dialogData.value.rowData.address);
+        }
+        for (const ip of ips) {
+            if (checkIp(ip)) {
+                MsgError(i18n.global.t('firewall.addressFormatError'));
+                return;
+            }
+        }
+        loading.value = true;
         if (dialogData.value.title === 'create') {
             await operateIPRule(dialogData.value.rowData)
                 .then(() => {

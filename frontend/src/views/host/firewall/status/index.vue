@@ -16,22 +16,21 @@
                         <el-button type="primary" @click="onOperate('stop')" link>
                             {{ $t('commons.button.stop') }}
                         </el-button>
-                        <el-divider direction="vertical" />
-                        <el-button type="primary" link>{{ $t('firewall.noPing') }}</el-button>
-                        <el-switch
-                            style="margin-left: 10px"
-                            inactive-value="Disable"
-                            active-value="Enable"
-                            @change="onPingOperate(baseInfo.pingStatus)"
-                            v-model="onPing"
-                        />
                     </span>
-
                     <span v-if="baseInfo.status === 'not running'" class="buttons">
                         <el-button type="primary" @click="onOperate('start')" link>
                             {{ $t('commons.button.start') }}
                         </el-button>
                     </span>
+                    <el-divider direction="vertical" />
+                    <el-button type="primary" link>{{ $t('firewall.noPing') }}</el-button>
+                    <el-switch
+                        style="margin-left: 10px"
+                        inactive-value="Disable"
+                        active-value="Enable"
+                        @change="onPingOperate(baseInfo.pingStatus)"
+                        v-model="onPing"
+                    />
                 </div>
             </el-card>
         </div>
@@ -42,11 +41,12 @@
 import { Host } from '@/api/interface/host';
 import { loadFireBaseInfo, operateFire } from '@/api/modules/host';
 import i18n from '@/lang';
+import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { ref } from 'vue';
 
 const baseInfo = ref<Host.FirewallBase>({ status: '', name: '', version: '', pingStatus: '' });
-const onPing = ref();
+const onPing = ref('Disable');
 
 const acceptParams = (): void => {
     loadBaseInfo(true);
@@ -59,7 +59,7 @@ const loadBaseInfo = async (search: boolean) => {
             baseInfo.value = res.data;
             onPing.value = baseInfo.value.pingStatus;
             emit('update:status', baseInfo.value.status);
-            if (baseInfo.value.status === 'running' && search) {
+            if (search) {
                 emit('search');
             } else {
                 emit('update:loading', false);
@@ -81,6 +81,7 @@ const onOperate = async (operation: string) => {
         emit('update:status', 'running');
         await operateFire(operation)
             .then(() => {
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 loadBaseInfo(true);
             })
             .catch(() => {
@@ -92,7 +93,7 @@ const onOperate = async (operation: string) => {
 const onPingOperate = async (operation: string) => {
     let operationHelper =
         operation === 'Enabel' ? i18n.global.t('firewall.noPingHelper') : i18n.global.t('firewall.onPingHelper');
-    ElMessageBox.confirm(operationHelper, i18n.global.t('firewall.noPing'), {
+    ElMessageBox.confirm(operationHelper, i18n.global.t('firewall.noPingTitle'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
     })
@@ -102,6 +103,7 @@ const onPingOperate = async (operation: string) => {
             operation = operation === 'Disable' ? 'enablePing' : 'disablePing';
             await operateFire(operation)
                 .then(() => {
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                     loadBaseInfo(false);
                 })
                 .catch(() => {

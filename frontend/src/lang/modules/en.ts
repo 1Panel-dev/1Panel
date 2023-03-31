@@ -1187,19 +1187,33 @@ const message = {
         cookieBlockList: 'Cookie Blacklist',
 
         firewall: 'Firewall',
+        used: 'Used',
+        unUsed: 'Unused',
         firewallHelper: '{0} System firewall',
         firewallNotStart: 'The firewall service is not enabled at present, please enable it first!',
         stopFirewallHelper:
-            'If the firewall is disabled, the server loses security protection. Do you want to continue?',
+            'After the system firewall is disabled, the server loses security protection. Do you want to continue?',
         startFirewallHelper:
-            'After the firewall is enabled, the current server security can be better protected. Do you want to continue?',
+            'After the firewall is enabled, the server security can be better protected. Do you want to continue?',
         noPing: 'Disable ping',
-        noPingHelper:
-            'If the ping function is disabled, the server cannot be pinged. Do you want to continue the operation?',
+        noPingTitle: 'Disable ping',
+        noPingHelper: 'If the ping function is disabled, the server cannot be pinged. Do you want to continue?',
         onPingHelper: 'If you disable ping, hackers may discover your server. Do you want to continue?',
         protocol: 'Protocol',
         port: 'Port',
         changeStrategy: 'Change the {0} strategy',
+        changeStrategyIPHelper1:
+            'Change the IP address strategy to [deny]. After the IP address is set, access to the server is prohibited. Do you want to continue?',
+        changeStrategyIPHelper2:
+            'Change the IP address strategy to [allow]. After the IP address is set, normal access is restored. Do you want to continue?',
+        changeStrategyPortHelper1:
+            'Change the port policy to [drop]. After the port policy is set, external access is denied. Do you want to continue?',
+        changeStrategyPortHelper2:
+            'Change the port policy to [accept]. After the policy is set, normal port access will be restored. Do you want to continue?',
+        stop: 'Stop',
+        portFormatError: 'Please enter the correct port information!',
+        portHelper1: 'Multiple ports, such as 8080 and 8081',
+        portHelper2: 'Range port, such as 8080-8089',
         changeStrategyHelper:
             'Change [{1}] {0} strategy to [{2}]. After setting, {0} will access {2} externally. Do you want to continue?',
         portHelper: 'Multiple ports can be entered, such as 80,81, or range ports, such as 80-88',
@@ -1211,9 +1225,10 @@ const message = {
         address: 'Specified IP',
         allow: 'Allow',
         deny: 'Deny',
-        addressHelper1: 'Support for multiple IP, such as 172.16.10.11 172.16.10.99',
-        addressHelper2: 'You can enter an IP address segment, for example, 172.16.10.0/24',
-        addressHelper3: 'You can enter an IP address range, such as 172.16.10.11-172.16.10.99',
+        addressFormatError: 'Please enter a valid ip address!',
+        addressHelper1: 'Multiple IP please separated with ",", such as 172.16.10.11, 172.16.10.99',
+        addressHelper2: 'IP segment, such as 172.16.10.0/24',
+        addressHelper3: 'IP address range, such as 172.16.10.11-172.16.10.99',
         allIP: 'All IP',
         portRule: 'Port rule',
         ipRule: 'IP rule',

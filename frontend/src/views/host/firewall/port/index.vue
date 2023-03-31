@@ -1,5 +1,5 @@
 <template>
-    <div v-loading="loading">
+    <div v-loading="loading" style="position: relative">
         <FireRouter />
 
         <FireStatus ref="fireStatuRef" @search="search" v-model:loading="loading" v-model:status="fireStatus" />
@@ -42,13 +42,24 @@
                     @search="search"
                     :data="data"
                 >
-                    <el-table-column type="selection" fix />
+                    <el-table-column type="selection" :selectable="selectable" fix />
                     <el-table-column :label="$t('firewall.protocol')" :min-width="90" prop="protocol" />
                     <el-table-column :label="$t('firewall.port')" :min-width="120" prop="port" />
+                    <el-table-column :label="$t('commons.table.status')" :min-width="120">
+                        <template #default="{ row }">
+                            <el-tag type="info" v-if="row.isUsed">
+                                {{
+                                    row.appName ? $t('firewall.used') + ' ( ' + row.appName + ' )' : $t('firewall.used')
+                                }}
+                            </el-tag>
+                            <el-tag type="success" v-else>{{ $t('firewall.unUsed') }}</el-tag>
+                        </template>
+                    </el-table-column>
                     <el-table-column :min-width="80" :label="$t('firewall.strategy')" prop="strategy">
                         <template #default="{ row }">
                             <el-button
                                 v-if="row.strategy === 'accept'"
+                                :disabled="row.appName === '1panel'"
                                 @click="onChangeStatus(row, 'drop')"
                                 link
                                 type="success"
@@ -111,6 +122,12 @@ const paginationConfig = reactive({
 });
 
 const search = async () => {
+    if (fireStatus.value !== 'running') {
+        loading.value = false;
+        data.value = [];
+        paginationConfig.total = 0;
+        return;
+    }
     let params = {
         type: activeTag.value,
         info: searchName.value,
@@ -146,15 +163,14 @@ const onOpenDialog = async (
 };
 
 const onChangeStatus = async (row: Host.RuleInfo, status: string) => {
-    let operation = i18n.global.t('firewall.' + status);
-    ElMessageBox.confirm(
-        i18n.global.t('firewall.changeStrategyHelper', [i18n.global.t('firewall.port'), row.port, operation]),
-        i18n.global.t('firewall.changeStrategy', [i18n.global.t('firewall.port')]),
-        {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-        },
-    ).then(async () => {
+    let operation =
+        status === 'accept'
+            ? i18n.global.t('firewall.changeStrategyPortHelper2')
+            : i18n.global.t('firewall.changeStrategyPortHelper1');
+    ElMessageBox.confirm(operation, i18n.global.t('firewall.changeStrategy', [i18n.global.t('firewall.port')]), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).then(async () => {
         let params = {
             oldRule: {
                 operation: 'remove',
@@ -227,17 +243,27 @@ const onDelete = async (row: Host.RuleInfo | null) => {
     });
 };
 
+function selectable(row) {
+    return row.appName !== '1panel';
+}
+
 const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         click: (row: Host.RulePort) => {
             onOpenDialog('edit', row);
         },
+        disabled: (row: any) => {
+            return row.appName === '1panel';
+        },
     },
     {
         label: i18n.global.t('commons.button.delete'),
         click: (row: Host.RuleInfo) => {
             onDelete(row);
+        },
+        disabled: (row: any) => {
+            return row.appName === '1panel';
         },
     },
 ];

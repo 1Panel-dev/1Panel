@@ -16,8 +16,13 @@
                         </el-form-item>
 
                         <el-form-item :label="$t('firewall.port')" prop="port">
-                            <el-input clearable v-model.trim="dialogData.rowData!.port" />
-                            <span class="input-help">{{ $t('firewall.portHelper') }}</span>
+                            <el-input
+                                :disabled="dialogData.title === 'edit'"
+                                clearable
+                                v-model.trim="dialogData.rowData!.port"
+                            />
+                            <span class="input-help">{{ $t('firewall.portHelper1') }}</span>
+                            <span class="input-help">{{ $t('firewall.portHelper2') }}</span>
                         </el-form-item>
 
                         <el-form-item :label="$t('firewall.source')" prop="source">
@@ -62,10 +67,10 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
 import { operatePortRule, updatePortRule } from '@/api/modules/host';
-import { deepCopy } from '@/utils/util';
+import { checkPort, deepCopy } from '@/utils/util';
 
 const loading = ref();
 const oldRule = ref<Host.RulePort>();
@@ -102,7 +107,7 @@ const handleClose = () => {
 const rules = reactive({
     protocol: [Rules.requiredSelect],
     port: [Rules.requiredInput],
-    address: [Rules.requiredInput],
+    address: [Rules.ip],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -114,6 +119,23 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
         dialogData.value.rowData.operation = 'add';
         if (!dialogData.value.rowData) return;
+        if (dialogData.value.rowData.source === 'anyWhere') {
+            dialogData.value.rowData.address = '';
+        }
+        let ports = [];
+        if (dialogData.value.rowData.port.indexOf('-') !== -1) {
+            ports = dialogData.value.rowData.port.split('-');
+        } else if (dialogData.value.rowData.port.indexOf(',') !== -1) {
+            ports = dialogData.value.rowData.port.split(',');
+        } else {
+            ports.push(dialogData.value.rowData.port);
+        }
+        for (const port of ports) {
+            if (checkPort(port)) {
+                MsgError(i18n.global.t('firewall.portFormatError'));
+                return;
+            }
+        }
         loading.value = true;
         if (dialogData.value.title === 'create') {
             await operatePortRule(dialogData.value.rowData)

@@ -85,6 +85,11 @@ func (f *Ufw) UpdatePingStatus(enabel string) error {
 		return err
 	}
 
+	stdout, err := cmd.Exec("sudo ufw reload")
+	if err != nil {
+		return fmt.Errorf("reload ufw setting failed, err: %v", stdout)
+	}
+
 	return nil
 }
 
