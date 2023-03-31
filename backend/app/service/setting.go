@@ -70,7 +70,14 @@ func (u *SettingService) UpdatePort(port uint) error {
 	if common.ScanPort(int(port)) {
 		return buserr.WithDetail(constant.ErrPortInUsed, port, nil)
 	}
-
+	serverPort, err := settingRepo.Get(settingRepo.WithByKey("ServerPort"))
+	if err != nil {
+		return err
+	}
+	portValue, _ := strconv.Atoi(serverPort.Value)
+	if err := OperateFirewallPort([]int{portValue}, []int{int(port)}); err != nil {
+		global.LOG.Errorf("set system firewall ports failed, err: %v", err)
+	}
 	if err := settingRepo.Update("ServerPort", strconv.Itoa(int(port))); err != nil {
 		return err
 	}

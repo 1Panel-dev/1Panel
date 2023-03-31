@@ -112,6 +112,7 @@ type RootInfo struct {
 	ID            uint   `json:"id"`
 	Name          string `json:"name"`
 	Port          int64  `json:"port"`
+	HttpsPort     int64  `json:"httpsPort"`
 	Password      string `json:"password"`
 	UserPassword  string `json:"userPassword"`
 	ContainerName string `json:"containerName"`
@@ -152,6 +153,7 @@ func (a *AppInstallRepo) LoadBaseInfo(key string, name string) (*RootInfo, error
 		info.UserPassword = userPassword
 	}
 	info.Port = int64(appInstall.HttpPort)
+	info.HttpsPort = int64(appInstall.HttpsPort)
 	info.ID = appInstall.ID
 	info.ContainerName = appInstall.ContainerName
 	info.Name = appInstall.Name

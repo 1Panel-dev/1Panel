@@ -2,9 +2,12 @@ package service
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/firewall"
 	fireClient "github.com/1Panel-dev/1Panel/backend/utils/firewall/client"
 	"github.com/jinzhu/copier"
@@ -101,6 +104,22 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 		backDatas = datas[start:end]
 	}
 
+	if req.Type == "port" {
+		apps := u.loadPortByApp()
+		for i := 0; i < len(backDatas); i++ {
+			backDatas[i].IsUsed = common.ScanPortWithProtocol(backDatas[i].Port, backDatas[i].Protocol)
+			if backDatas[i].Protocol == "udp" {
+				continue
+			}
+			for _, app := range apps {
+				if app.HttpPort == backDatas[i].Port || app.HttpsPort == backDatas[i].Port {
+					backDatas[i].APPName = app.AppName
+					break
+				}
+			}
+		}
+	}
+
 	return int64(total), backDatas, nil
 }
 
@@ -111,9 +130,24 @@ func (u *FirewallService) OperateFirewall(operation string) error {
 	}
 	switch operation {
 	case "start":
-		return client.Start()
+		if err := client.Start(); err != nil {
+			return err
+		}
+		serverPort, err := settingRepo.Get(settingRepo.WithByKey("ServerPort"))
+		if err != nil {
+			return err
+		}
+		if err := client.Port(fireClient.FireInfo{Port: serverPort.Value, Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
+			return err
+		}
+		_, _ = cmd.Exec("systemctl restart docker")
+		return nil
 	case "stop":
-		return client.Stop()
+		if err := client.Stop(); err != nil {
+			return err
+		}
+		_, _ = cmd.Exec("systemctl restart docker")
+		return nil
 	case "disablePing":
 		return client.UpdatePingStatus("0")
 	case "enablePing":
@@ -134,16 +168,47 @@ func (u *FirewallService) OperatePortRule(req dto.PortRuleOperate, reload bool) 
 			return u.operatePort(client, req)
 		}
 	}
-
 	if req.Protocol == "tcp/udp" {
-		req.Protocol = "tcp"
-		if err := u.operatePort(client, req); err != nil {
-			return err
+		if client.Name() == "firewalld" && strings.Contains(req.Port, ",") {
+			ports := strings.Split(req.Port, ",")
+			for _, port := range ports {
+				if len(port) == 0 {
+					continue
+				}
+				req.Port = port
+				req.Protocol = "tcp"
+				if err := u.operatePort(client, req); err != nil {
+					return err
+				}
+				req.Protocol = "udp"
+				if err := u.operatePort(client, req); err != nil {
+					return err
+				}
+			}
+		} else {
+			req.Protocol = "tcp"
+			if err := u.operatePort(client, req); err != nil {
+				return err
+			}
+			req.Protocol = "udp"
+			if err := u.operatePort(client, req); err != nil {
+				return err
+			}
 		}
-		req.Protocol = "udp"
-	}
-	if err := u.operatePort(client, req); err != nil {
-		return err
+	} else {
+		if strings.Contains(req.Port, ",") {
+			ports := strings.Split(req.Port, ",")
+			for _, port := range ports {
+				req.Port = port
+				if err := u.operatePort(client, req); err != nil {
+					return err
+				}
+			}
+		} else {
+			if err := u.operatePort(client, req); err != nil {
+				return err
+			}
+		}
 	}
 	if reload {
 		return client.Reload()
@@ -228,6 +293,26 @@ func (u *FirewallService) BacthOperateRule(req dto.BatchRuleOperate) error {
 	return client.Reload()
 }
 
+func OperateFirewallPort(oldPorts, newPorts []int) error {
+	fmt.Printf("old: %v, new: %v \n", oldPorts, newPorts)
+	client, err := firewall.NewFirewallClient()
+	if err != nil {
+		return err
+	}
+	for _, port := range newPorts {
+
+		if err := client.Port(fireClient.FireInfo{Port: strconv.Itoa(port), Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
+			return err
+		}
+	}
+	for _, port := range oldPorts {
+		if err := client.Port(fireClient.FireInfo{Port: strconv.Itoa(port), Protocol: "tcp", Strategy: "accept"}, "remove"); err != nil {
+			return err
+		}
+	}
+	return client.Reload()
+}
+
 func (u *FirewallService) operatePort(client firewall.FirewallClient, req dto.PortRuleOperate) error {
 	var fireInfo fireClient.FireInfo
 	if err := copier.Copy(&fireInfo, &req); err != nil {
@@ -245,4 +330,32 @@ func (u *FirewallService) operatePort(client firewall.FirewallClient, req dto.Po
 		return client.RichRules(fireInfo, req.Operation)
 	}
 	return client.Port(fireInfo, req.Operation)
+}
+
+type portOfApp struct {
+	AppName   string
+	HttpPort  string
+	HttpsPort string
+}
+
+func (u *FirewallService) loadPortByApp() []portOfApp {
+	var datas []portOfApp
+	apps, err := appInstallRepo.ListBy()
+	if err != nil {
+		return datas
+	}
+	for i := 0; i < len(apps); i++ {
+		datas = append(datas, portOfApp{
+			AppName:   apps[i].App.Key,
+			HttpPort:  strconv.Itoa(apps[i].HttpPort),
+			HttpsPort: strconv.Itoa(apps[i].HttpsPort),
+		})
+	}
+	systemPort, err := settingRepo.Get(settingRepo.WithByKey("ServerPort"))
+	if err != nil {
+		return datas
+	}
+	datas = append(datas, portOfApp{AppName: "1panel", HttpPort: systemPort.Value})
+
+	return datas
 }

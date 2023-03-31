@@ -1,5 +1,5 @@
 <template>
-    <div v-loading="loading">
+    <div v-loading="loading" style="position: relative">
         <FireRouter />
         <FireStatus ref="fireStatuRef" @search="search" v-model:loading="loading" v-model:status="fireStatus" />
 
@@ -108,6 +108,12 @@ const paginationConfig = reactive({
 });
 
 const search = async () => {
+    if (fireStatus.value !== 'running') {
+        loading.value = false;
+        data.value = [];
+        paginationConfig.total = 0;
+        return;
+    }
     let params = {
         type: activeTag.value,
         info: searchName.value,
@@ -141,15 +147,14 @@ const onOpenDialog = async (
 };
 
 const onChangeStatus = async (row: Host.RuleInfo, status: string) => {
-    let operation = status === 'accept' ? i18n.global.t('firewall.allow') : i18n.global.t('firewall.deny');
-    ElMessageBox.confirm(
-        i18n.global.t('firewall.changeStrategyHelper', ['IP', row.address, operation]),
-        i18n.global.t('firewall.changeStrategy', ['IP']),
-        {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-        },
-    ).then(async () => {
+    let operation =
+        status === 'accept'
+            ? i18n.global.t('firewall.changeStrategyIPHelper2')
+            : i18n.global.t('firewall.changeStrategyIPHelper1');
+    ElMessageBox.confirm(operation, i18n.global.t('firewall.changeStrategy', [' IP ']), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).then(async () => {
         let params = {
             oldRule: {
                 operation: 'remove',

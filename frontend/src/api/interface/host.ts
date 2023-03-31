@@ -69,6 +69,8 @@ export namespace Host {
         port: string;
         protocol: string;
         strategy: string;
+        appName: string;
+        isUsed: boolean;
     }
     export interface RulePort {
         operation: string;

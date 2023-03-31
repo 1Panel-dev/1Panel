@@ -20,7 +20,10 @@ func (f *Firewall) Name() string {
 
 func (f *Firewall) Status() (string, error) {
 	stdout, _ := cmd.Exec("firewall-cmd --state")
-	return strings.ReplaceAll(stdout, "\n", ""), nil
+	if stdout == "running\n" {
+		return "running", nil
+	}
+	return "not running", nil
 }
 
 func (f *Firewall) Version() (string, error) {
@@ -83,6 +86,9 @@ func (f *Firewall) ListPort() ([]FireInfo, error) {
 	ports := strings.Split(strings.ReplaceAll(stdout, "\n", ""), " ")
 	var datas []FireInfo
 	for _, port := range ports {
+		if len(port) == 0 {
+			continue
+		}
 		var itemPort FireInfo
 		if strings.Contains(port, "/") {
 			itemPort.Port = strings.Split(port, "/")[0]
@@ -121,7 +127,7 @@ func (f *Firewall) ListAddress() ([]FireInfo, error) {
 			continue
 		}
 		itemRule := f.loadInfo(rule)
-		if len(itemRule.Port) == 0 {
+		if len(itemRule.Port) == 0 && len(itemRule.Address) != 0 {
 			datas = append(datas, itemRule)
 		}
 	}
@@ -137,18 +143,22 @@ func (f *Firewall) Port(port FireInfo, operation string) error {
 }
 
 func (f *Firewall) RichRules(rule FireInfo, operation string) error {
-	ruleStr := "rule family=ipv4 "
-	if len(rule.Address) != 0 {
-		ruleStr += fmt.Sprintf("source address=%s ", rule.Address)
+	ruleStr := ""
+	if strings.Contains(rule.Address, "-") {
+		ruleStr = fmt.Sprintf("rule source ipset=%s %s", rule.Address, rule.Strategy)
+	} else {
+		ruleStr = "rule family=ipv4 "
+		if len(rule.Address) != 0 {
+			ruleStr += fmt.Sprintf("source address=%s ", rule.Address)
+		}
+		if len(rule.Port) != 0 {
+			ruleStr += fmt.Sprintf("port port=%s ", rule.Port)
+		}
+		if len(rule.Protocol) != 0 {
+			ruleStr += fmt.Sprintf("protocol=%s ", rule.Protocol)
+		}
+		ruleStr += rule.Strategy
 	}
-	if len(rule.Port) != 0 {
-		ruleStr += fmt.Sprintf("port port=%s ", rule.Port)
-	}
-	if len(rule.Protocol) != 0 {
-		ruleStr += fmt.Sprintf("protocol=%s ", rule.Protocol)
-	}
-	ruleStr += rule.Strategy
-
 	stdout, err := cmd.Execf("firewall-cmd --zone=public --%s-rich-rule '%s' --permanent", operation, ruleStr)
 	if err != nil {
 		return fmt.Errorf("%s rich rules failed, err: %s", operation, stdout)
@@ -176,13 +186,15 @@ func (f *Firewall) loadInfo(line string) FireInfo {
 		switch {
 		case strings.Contains(item, "family="):
 			itemRule.Family = strings.ReplaceAll(item, "family=", "")
+		case strings.Contains(item, "ipset="):
+			itemRule.Address = strings.ReplaceAll(item, "ipset=", "")
 		case strings.Contains(item, "address="):
 			itemRule.Address = strings.ReplaceAll(item, "address=", "")
 		case strings.Contains(item, "port="):
 			itemRule.Port = strings.ReplaceAll(item, "port=", "")
 		case strings.Contains(item, "protocol="):
 			itemRule.Protocol = strings.ReplaceAll(item, "protocol=", "")
-		case item == "accept" || item == "drop":
+		case item == "accept" || item == "drop" || item == "reject":
 			itemRule.Strategy = item
 		}
 	}

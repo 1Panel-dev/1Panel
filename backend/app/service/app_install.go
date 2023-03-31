@@ -387,6 +387,10 @@ func (a *AppInstallService) ChangeAppPort(req request.PortUpdate) error {
 		}
 	}
 
+	if err := OperateFirewallPort([]int{int(appInstall.Port)}, []int{int(req.Port)}); err != nil {
+		global.LOG.Errorf("allow firewall failed, err: %v", err)
+	}
+
 	return nil
 }
 
