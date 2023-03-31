@@ -199,6 +199,8 @@ const message = {
             exited: 'Exited',
             enabled: 'Enabled',
             disabled: 'Disabled',
+            normal: 'Normal',
+            building: 'Building',
         },
     },
     menu: {
@@ -1239,7 +1241,16 @@ const message = {
     runtime: {
         runtime: 'Runtime',
         image: 'Image',
-        workDir: 'WorkDir',
+        workDir: 'working directory',
+        create: 'Create runtime',
+        name: 'Name',
+        resource: 'Source',
+        appstore: 'App Store',
+        local: 'Local',
+        app: 'Application',
+        localHelper: 'The local operating environment needs to be installed by itself',
+        version: 'Version',
+        status: 'Status',
     },
 };
 
