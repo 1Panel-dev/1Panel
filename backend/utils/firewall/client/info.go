@@ -6,6 +6,9 @@ type FireInfo struct {
 	Port     string `json:"port"`
 	Protocol string `json:"protocol"` // tcp udp tcp/udp
 	Strategy string `json:"strategy"` // accept drop
+
+	APPName string `json:"appName"`
+	IsUsed  bool   `json:"isUsed"`
 }
 
 type Forward struct {
