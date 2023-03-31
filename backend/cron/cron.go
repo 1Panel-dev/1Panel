@@ -44,13 +44,13 @@ func Run() {
 		}).Error; err != nil {
 		global.LOG.Errorf("start my cronjob failed, err: %v", err)
 	}
-	for _, cronjob := range cronJobs {
-		entryID, err := service.ServiceGroupApp.StartJob(&cronjob)
+	for i := 0; i < len(cronJobs); i++ {
+		entryID, err := service.ServiceGroupApp.StartJob(&cronJobs[i])
 		if err != nil {
-			global.LOG.Errorf("start %s job %s failed, err: %v", cronjob.Type, cronjob.Name, err)
+			global.LOG.Errorf("start %s job %s failed, err: %v", &cronJobs[i].Type, &cronJobs[i].Name, err)
 		}
-		if err := repo.NewICronjobRepo().Update(cronjob.ID, map[string]interface{}{"entry_id": entryID}); err != nil {
-			global.LOG.Errorf("update cronjob %s %s failed, err: %v", cronjob.Type, cronjob.Name, err)
+		if err := repo.NewICronjobRepo().Update(cronJobs[i].ID, map[string]interface{}{"entry_id": entryID}); err != nil {
+			global.LOG.Errorf("update cronjob %s %s failed, err: %v", cronJobs[i].Type, cronJobs[i].Name, err)
 		}
 	}
 }
