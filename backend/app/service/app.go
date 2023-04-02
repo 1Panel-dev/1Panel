@@ -156,8 +156,9 @@ func (a AppService) GetAppDetail(appId uint, version, appType string) (response.
 		if err != nil {
 			return appDetailDTO, err
 		}
-		paramsPath := path.Join(constant.AppResourceDir, app.Key, "versions", detail.Version, "build", "config.json")
 		fileOp := files.NewFileOp()
+		buildPath := path.Join(constant.AppResourceDir, app.Key, "versions", detail.Version, "build")
+		paramsPath := path.Join(buildPath, "config.json")
 		if !fileOp.Stat(paramsPath) {
 			return appDetailDTO, buserr.New(constant.ErrFileNotExist)
 		}
@@ -170,6 +171,24 @@ func (a AppService) GetAppDetail(appId uint, version, appType string) (response.
 			return appDetailDTO, err
 		}
 		appDetailDTO.Params = paramMap
+		composePath := path.Join(buildPath, "docker-compose.yml")
+		if !fileOp.Stat(composePath) {
+			return appDetailDTO, buserr.New(constant.ErrFileNotExist)
+		}
+		compose, err := fileOp.GetContent(composePath)
+		if err != nil {
+			return appDetailDTO, err
+		}
+		composeMap := make(map[string]interface{})
+		if err := yaml.Unmarshal(compose, &composeMap); err != nil {
+			return appDetailDTO, err
+		}
+		if service, ok := composeMap["services"]; ok {
+			servicesMap := service.(map[string]interface{})
+			for k := range servicesMap {
+				appDetailDTO.Image = k
+			}
+		}
 	} else {
 		paramMap := make(map[string]interface{})
 		if err := json.Unmarshal([]byte(detail.Params), &paramMap); err != nil {

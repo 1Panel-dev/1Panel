@@ -78,6 +78,7 @@ type AppFormFields struct {
 	Disabled bool           `json:"disabled"`
 	Edit     bool           `json:"edit"`
 	Rule     string         `json:"rule"`
+	Multiple bool           `json:"multiple"`
 	Values   []AppFormValue `json:"values"`
 }
 

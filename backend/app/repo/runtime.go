@@ -3,12 +3,15 @@ package repo
 import (
 	"context"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"gorm.io/gorm"
 )
 
 type RuntimeRepo struct {
 }
 
 type IRuntimeRepo interface {
+	WithNameOrImage(name string, image string) DBOption
+	WithOtherNameOrImage(name string, image string, id uint) DBOption
 	Page(page, size int, opts ...DBOption) (int64, []model.Runtime, error)
 	Create(ctx context.Context, runtime *model.Runtime) error
 	Save(runtime *model.Runtime) error
@@ -18,6 +21,18 @@ type IRuntimeRepo interface {
 
 func NewIRunTimeRepo() IRuntimeRepo {
 	return &RuntimeRepo{}
+}
+
+func (r *RuntimeRepo) WithNameOrImage(name string, image string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("name = ? or image = ?", name, image)
+	}
+}
+
+func (r *RuntimeRepo) WithOtherNameOrImage(name string, image string, id uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("name = ? or image = ? and id != ?", name, image, id)
+	}
 }
 
 func (r *RuntimeRepo) Page(page, size int, opts ...DBOption) (int64, []model.Runtime, error) {

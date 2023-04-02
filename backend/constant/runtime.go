@@ -7,4 +7,6 @@ const (
 	RuntimeNormal   = "normal"
 	RuntimeError    = "error"
 	RuntimeBuildIng = "building"
+
+	RuntimePHP = "php"
 )
