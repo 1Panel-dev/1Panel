@@ -77,3 +77,47 @@ func (b *BaseApi) DeleteRuntime(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Runtime
+// @Summary Update runtime
+// @Description 更新运行环境
+// @Accept json
+// @Param request body request.RuntimeUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/update [post]
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新运行环境 [name]","formatEN":"Update runtime [name]"}
+func (b *BaseApi) UpdateRuntime(c *gin.Context) {
+	var req request.RuntimeUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := runtimeService.Update(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Runtime
+// @Summary Get runtime
+// @Description 获取运行环境
+// @Accept json
+// @Param id path string true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /runtimes/:id [get]
+func (b *BaseApi) GetRuntime(c *gin.Context) {
+	id, err := helper.GetIntParamByKey(c, "id")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	res, err := runtimeService.Get(id)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}

@@ -27,7 +27,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('runtime.version')" prop="version"></el-table-column>
-                    <el-table-column :label="$t('runtime.image')" prop="image"></el-table-column>
+                    <el-table-column :label="$t('runtime.image')" prop="image" show-overflow-tooltip></el-table-column>
                     <el-table-column :label="$t('runtime.status')" prop="status">
                         <template #default="{ row }">
                             <el-popover
@@ -93,6 +93,12 @@ let req = reactive<Runtime.RuntimeReq>({
 
 const buttons = [
     {
+        label: i18n.global.t('commons.button.edit'),
+        click: function (row: Runtime.Runtime) {
+            openDetail(row);
+        },
+    },
+    {
         label: i18n.global.t('commons.button.delete'),
         click: function (row: Runtime.Runtime) {
             openDelete(row);
@@ -118,7 +124,11 @@ const search = async () => {
 };
 
 const openCreate = () => {
-    createRef.value.acceptParams('php');
+    createRef.value.acceptParams({ type: 'php', mode: 'create' });
+};
+
+const openDetail = (row: Runtime.Runtime) => {
+    createRef.value.acceptParams({ type: row.type, mode: 'edit', id: row.id });
 };
 
 const openDelete = async (row: Runtime.Runtime) => {

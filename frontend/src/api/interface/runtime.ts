@@ -1,14 +1,16 @@
 import { CommonModel, ReqPage } from '.';
+import { App } from './app';
 export namespace Runtime {
     export interface Runtime extends CommonModel {
         name: string;
-        appDetailId: string;
+        appDetailId: number;
         image: string;
         workDir: string;
         dockerCompose: string;
         env: string;
         params: string;
         type: string;
+        resource: string;
     }
 
     export interface RuntimeReq extends ReqPage {
@@ -16,10 +18,24 @@ export namespace Runtime {
     }
 
     export interface RuntimeDTO extends Runtime {
-        websites: string[];
+        appParams: App.InstallParams[];
+        appId: number;
+        version: string;
     }
 
     export interface RuntimeCreate {
+        id?: number;
+        name: string;
+        appDetailId: number;
+        image: string;
+        params: object;
+        type: string;
+        resource: string;
+        appId?: number;
+        version?: string;
+    }
+
+    export interface RuntimeUpdate {
         name: string;
         appDetailId: number;
         image: string;
