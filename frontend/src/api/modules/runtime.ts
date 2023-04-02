@@ -13,3 +13,11 @@ export const CreateRuntime = (req: Runtime.RuntimeCreate) => {
 export const DeleteRuntime = (req: Runtime.RuntimeDelete) => {
     return http.post<any>(`/runtimes/del`, req);
 };
+
+export const GetRuntime = (id: number) => {
+    return http.get<Runtime.RuntimeDTO>(`/runtimes/${id}`);
+};
+
+export const UpdateRuntime = (req: Runtime.RuntimeUpdate) => {
+    return http.post<any>(`/runtimes/update`, req);
+};

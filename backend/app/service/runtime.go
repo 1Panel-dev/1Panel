@@ -2,18 +2,20 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
-	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/subosito/gotenv"
 	"path"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -24,13 +26,19 @@ type IRuntimeService interface {
 	Page(req request.RuntimeSearch) (int64, []response.RuntimeRes, error)
 	Create(create request.RuntimeCreate) error
 	Delete(id uint) error
+	Update(req request.RuntimeUpdate) error
+	Get(id uint) (res *response.RuntimeRes, err error)
 }
 
 func NewRuntimeService() IRuntimeService {
 	return &RuntimeService{}
 }
 
-func (r *RuntimeService) Create(create request.RuntimeCreate) error {
+func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
+	exist, _ := runtimeRepo.GetFirst(runtimeRepo.WithNameOrImage(create.Name, create.Image))
+	if exist != nil {
+		return buserr.New(constant.ErrNameOrImageIsExist)
+	}
 	if create.Resource == constant.ResourceLocal {
 		runtime := &model.Runtime{
 			Name:     create.Name,
@@ -40,7 +48,6 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) error {
 		}
 		return runtimeRepo.Create(context.Background(), runtime)
 	}
-	var err error
 	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(create.AppDetailID))
 	if err != nil {
 		return err
@@ -56,8 +63,8 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) error {
 	}
 	runtimeDir := path.Join(constant.RuntimeDir, create.Type)
 	tempDir := filepath.Join(runtimeDir, fmt.Sprintf("%d", time.Now().UnixNano()))
-	if err := fileOp.CopyDir(buildDir, tempDir); err != nil {
-		return err
+	if err = fileOp.CopyDir(buildDir, tempDir); err != nil {
+		return
 	}
 	oldDir := path.Join(tempDir, "build")
 	newNameDir := path.Join(runtimeDir, create.Name)
@@ -67,58 +74,38 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) error {
 		}
 	}()
 	if oldDir != newNameDir {
-		if err := fileOp.Rename(oldDir, newNameDir); err != nil {
-			return err
+		if err = fileOp.Rename(oldDir, newNameDir); err != nil {
+			return
 		}
-		if err := fileOp.DeleteDir(tempDir); err != nil {
-			return err
+		if err = fileOp.DeleteDir(tempDir); err != nil {
+			return
 		}
 	}
-	composeFile, err := fileOp.GetContent(path.Join(newNameDir, "docker-compose.yml"))
+	composeContent, envContent, forms, err := handleParams(create.Image, create.Type, newNameDir, create.Params)
 	if err != nil {
-		return err
+		return
 	}
-	env, err := gotenv.Read(path.Join(newNameDir, ".env"))
+	composeService, err := getComposeService(create.Name, newNameDir, composeContent, envContent)
 	if err != nil {
-		return err
+		return
 	}
-	newMap := make(map[string]string)
-	handleMap(create.Params, newMap)
-	for k, v := range newMap {
-		env[k] = v
-	}
-	envStr, err := gotenv.Marshal(env)
-	if err != nil {
-		return err
-	}
-	if err := gotenv.Write(env, path.Join(newNameDir, ".env")); err != nil {
-		return err
-	}
-	project, err := docker.GetComposeProject(create.Name, newNameDir, composeFile, []byte(envStr))
-	if err != nil {
-		return err
-	}
-	composeService, err := docker.NewComposeService()
-	if err != nil {
-		return err
-	}
-	composeService.SetProject(project)
 	runtime := &model.Runtime{
 		Name:          create.Name,
-		DockerCompose: string(composeFile),
-		Env:           envStr,
+		DockerCompose: string(composeContent),
+		Env:           string(envContent),
 		AppDetailID:   create.AppDetailID,
 		Type:          create.Type,
 		Image:         create.Image,
 		Resource:      create.Resource,
 		Status:        constant.RuntimeBuildIng,
 		Version:       create.Version,
+		Params:        string(forms),
 	}
-	if err := runtimeRepo.Create(context.Background(), runtime); err != nil {
-		return err
+	if err = runtimeRepo.Create(context.Background(), runtime); err != nil {
+		return
 	}
 	go buildRuntime(runtime, composeService)
-	return nil
+	return
 }
 
 func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.RuntimeRes, error) {
@@ -154,4 +141,98 @@ func (r *RuntimeService) Delete(id uint) error {
 		}
 	}
 	return runtimeRepo.DeleteBy(commonRepo.WithByID(id))
+}
+
+func (r *RuntimeService) Get(id uint) (*response.RuntimeRes, error) {
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return nil, err
+	}
+	res := &response.RuntimeRes{}
+	res.Runtime = *runtime
+	if runtime.Resource == constant.ResourceLocal {
+		return res, nil
+	}
+	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(runtime.AppDetailID))
+	if err != nil {
+		return nil, err
+	}
+	res.AppID = appDetail.AppId
+	res.Version = appDetail.Version
+	var (
+		appForm   dto.AppForm
+		appParams []response.AppParam
+	)
+	if err := json.Unmarshal([]byte(runtime.Params), &appForm); err != nil {
+		return nil, err
+	}
+	envs, err := gotenv.Unmarshal(runtime.Env)
+	if err != nil {
+		return nil, err
+	}
+	for _, form := range appForm.FormFields {
+		if v, ok := envs[form.EnvKey]; ok {
+			appParam := response.AppParam{
+				Edit:     false,
+				Key:      form.EnvKey,
+				Rule:     form.Rule,
+				Type:     form.Type,
+				Required: form.Required,
+			}
+			if form.Edit {
+				appParam.Edit = true
+			}
+			appParam.LabelZh = form.LabelZh
+			appParam.LabelEn = form.LabelEn
+			appParam.Multiple = form.Multiple
+			appParam.Value = v
+			if form.Type == "select" {
+				if form.Multiple {
+					appParam.Value = strings.Split(v, ",")
+				} else {
+					for _, fv := range form.Values {
+						if fv.Value == v {
+							appParam.ShowValue = fv.Label
+							break
+						}
+					}
+				}
+				appParam.Values = form.Values
+			}
+			appParams = append(appParams, appParam)
+		}
+	}
+	res.AppParams = appParams
+	return res, nil
+}
+
+func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
+	exist, _ := runtimeRepo.GetFirst(runtimeRepo.WithOtherNameOrImage(req.Name, req.Image, req.ID))
+	if exist != nil {
+		return buserr.New(constant.ErrNameOrImageIsExist)
+	}
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	if runtime.Resource == constant.ResourceLocal {
+		runtime.Version = req.Version
+		return runtimeRepo.Save(runtime)
+	}
+	runtimeDir := path.Join(constant.RuntimeDir, runtime.Type, runtime.Name)
+	composeContent, envContent, _, err := handleParams(req.Image, runtime.Type, runtimeDir, req.Params)
+	if err != nil {
+		return err
+	}
+	composeService, err := getComposeService(runtime.Name, runtimeDir, composeContent, envContent)
+	if err != nil {
+		return err
+	}
+	runtime.Image = req.Image
+	runtime.Env = string(envContent)
+	runtime.DockerCompose = string(composeContent)
+	runtime.Status = constant.RuntimeBuildIng
+	_ = runtimeRepo.Save(runtime)
+	go buildRuntime(runtime, composeService)
+	return nil
 }

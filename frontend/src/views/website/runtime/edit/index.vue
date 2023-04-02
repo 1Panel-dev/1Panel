@@ -2,7 +2,7 @@
     <div v-for="(p, index) in paramObjs" :key="index">
         <el-form-item :label="getLabel(p)" :prop="p.prop">
             <el-select
-                v-model="form[p.envKey]"
+                v-model="form[p.key]"
                 v-if="p.type == 'select'"
                 :multiple="p.multiple"
                 filterable
@@ -25,11 +25,8 @@ import { Rules } from '@/global/form-rules';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-interface ParamObj extends App.FromField {
-    services: App.AppService[];
+interface ParamObj extends App.InstallParams {
     prop: string;
-    disabled: false;
-    childProp: string;
 }
 const props = defineProps({
     form: {
@@ -39,9 +36,9 @@ const props = defineProps({
         },
     },
     params: {
-        type: Object,
+        type: Array<App.InstallParams>,
         default: function () {
-            return {};
+            return [];
         },
     },
     rules: {
@@ -68,18 +65,27 @@ const paramObjs = ref<ParamObj[]>([]);
 
 const handleParams = () => {
     rules = props.rules;
-    if (params.value != undefined && params.value.formFields != undefined) {
-        for (const p of params.value.formFields) {
-            const pObj = p;
-            pObj.prop = p.envKey;
-            pObj.disabled = p.disabled;
-            form[p.envKey] = '';
-            paramObjs.value.push(pObj);
+    if (params.value != undefined) {
+        for (const p of params.value) {
+            form[p.key] = p.value;
+            paramObjs.value.push({
+                prop: p.key,
+                labelEn: p.labelEn,
+                labelZh: p.labelZh,
+                values: p.values,
+                value: p.value,
+                required: p.required,
+                edit: p.edit,
+                key: p.key,
+                rule: p.rule,
+                type: p.type,
+                multiple: p.multiple,
+            });
             if (p.required) {
                 if (p.type === 'select') {
-                    rules[p.envKey] = [Rules.requiredSelect];
+                    rules[p.key] = [Rules.requiredSelect];
                 } else {
-                    rules[p.envKey] = [Rules.requiredInput];
+                    rules[p.key] = [Rules.requiredInput];
                 }
             }
         }

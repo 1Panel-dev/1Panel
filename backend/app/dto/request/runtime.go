@@ -19,5 +19,13 @@ type RuntimeCreate struct {
 }
 
 type RuntimeDelete struct {
-	ID uint `json:"Id"`
+	ID uint `json:"id"`
+}
+
+type RuntimeUpdate struct {
+	Name    string                 `json:"name"`
+	ID      uint                   `json:"id"`
+	Params  map[string]interface{} `json:"params"`
+	Image   string                 `json:"image"`
+	Version string                 `json:"version"`
 }
