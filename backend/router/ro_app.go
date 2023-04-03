@@ -20,6 +20,7 @@ func (a *AppRouter) InitAppRouter(Router *gin.RouterGroup) {
 		appRouter.POST("/search", baseApi.SearchApp)
 		appRouter.GET("/:key", baseApi.GetApp)
 		appRouter.GET("/detail/:appId/:version/:type", baseApi.GetAppDetail)
+		appRouter.GET("/details/:id", baseApi.GetAppDetailByID)
 		appRouter.POST("/install", baseApi.InstallApp)
 		appRouter.GET("/tags", baseApi.GetAppTags)
 		appRouter.GET("/installed/:appInstallId/versions", baseApi.GetUpdateVersions)

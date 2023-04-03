@@ -252,19 +252,15 @@ func (f FileOp) Copy(src, dst string) error {
 	if src = path.Clean("/" + src); src == "" {
 		return os.ErrNotExist
 	}
-
 	if dst = path.Clean("/" + dst); dst == "" {
 		return os.ErrNotExist
 	}
-
 	if src == "/" || dst == "/" {
 		return os.ErrInvalid
 	}
-
 	if dst == src {
 		return os.ErrInvalid
 	}
-
 	info, err := f.Fs.Stat(src)
 	if err != nil {
 		return err
@@ -272,7 +268,6 @@ func (f FileOp) Copy(src, dst string) error {
 	if info.IsDir() {
 		return f.CopyDir(src, dst)
 	}
-
 	return f.CopyFile(src, dst)
 }
 

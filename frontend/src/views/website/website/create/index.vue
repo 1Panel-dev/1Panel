@@ -18,6 +18,10 @@
                                     label: i18n.global.t('website.proxy'),
                                     value: 'proxy',
                                 },
+                                {
+                                    label: i18n.global.t('runtime.runtime'),
+                                    value: 'runtime',
+                                },
                             ]"
                             :key="item.value"
                         >
@@ -53,6 +57,12 @@
                 <el-alert
                     v-if="website.type == 'proxy'"
                     :title="$t('website.websiteProxyHelper')"
+                    type="info"
+                    :closable="false"
+                />
+                <el-alert
+                    v-if="website.type == 'runtime'"
+                    :title="$t('website.runtimeProxyHelper')"
                     type="info"
                     :closable="false"
                 />
@@ -140,6 +150,25 @@
                             ></Params>
                         </div>
                     </div>
+                    <div v-if="website.type === 'runtime'">
+                        <el-form-item :label="$t('runtime.runtime')" prop="runtimeID">
+                            <el-select v-model="website.runtimeID" @change="changeApp()">
+                                <el-option
+                                    v-for="(runtime, index) in runtimes"
+                                    :key="index"
+                                    :label="runtime.name"
+                                    :value="runtime.id"
+                                ></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <Params
+                            :key="paramKey"
+                            v-model:form="website.appinstall.params"
+                            v-model:rules="rules.appinstall.params"
+                            :params="appParams"
+                            :propStart="'appinstall.params.'"
+                        ></Params>
+                    </div>
                     <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
                         <el-input
                             v-model.trim="website.primaryDomain"
@@ -187,7 +216,7 @@
 <script lang="ts" setup name="CreateWebSite">
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { App } from '@/api/interface/app';
-import { GetApp, GetAppDetail, SearchApp, GetAppInstalled } from '@/api/modules/app';
+import { GetApp, GetAppDetail, SearchApp, GetAppInstalled, GetAppDetailByID } from '@/api/modules/app';
 import { CreateWebsite, PreCheck } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -198,6 +227,8 @@ import Check from '../check/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { GetGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
+import { SearchRuntimes } from '@/api/modules/runtime';
+import { Runtime } from '@/api/interface/runtime';
 
 const websiteForm = ref<FormInstance>();
 const website = ref({
@@ -210,6 +241,7 @@ const website = ref({
     webSiteGroupId: 1,
     otherDomains: '',
     proxy: '',
+    runtimeID: undefined,
     appinstall: {
         appId: 0,
         name: '',
@@ -227,6 +259,7 @@ let rules = ref<any>({
     appInstallId: [Rules.requiredSelectBusiness],
     appType: [Rules.requiredInput],
     proxy: [Rules.requiredInput],
+    runtimeID: [Rules.requiredSelectBusiness],
     appinstall: {
         name: [Rules.appName],
         appId: [Rules.requiredSelectBusiness],
@@ -251,6 +284,11 @@ let appParams = ref<App.AppParams>();
 let paramKey = ref(1);
 let preCheckRef = ref();
 let staticPath = ref('');
+const runtimeReq = ref<Runtime.RuntimeReq>({
+    page: 1,
+    pageSize: 20,
+});
+const runtimes = ref<Runtime.RuntimeDTO[]>([]);
 
 const em = defineEmits(['close']);
 
@@ -264,6 +302,8 @@ const changeType = (type: string) => {
         if (appInstalles.value && appInstalles.value.length > 0) {
             website.value.appInstallId = appInstalles.value[0].id;
         }
+    } else if (type == 'runtime') {
+        getRuntimes();
     } else {
         website.value.appInstallId = undefined;
     }
@@ -273,7 +313,7 @@ const changeType = (type: string) => {
 const searchAppInstalled = () => {
     GetAppInstalled({ type: 'website', unused: true }).then((res) => {
         appInstalles.value = res.data;
-        if (res.data.length > 0) {
+        if (res.data && res.data.length > 0) {
             website.value.appInstallId = res.data[0].id;
         }
     });
@@ -318,6 +358,27 @@ const getAppDetail = (version: string) => {
     });
 };
 
+const getAppDetailByID = (id: number) => {
+    GetAppDetailByID(id).then((res) => {
+        website.value.appinstall.appDetailId = res.data.id;
+        appDetail.value = res.data;
+        appParams.value = res.data.params;
+        paramKey.value++;
+    });
+};
+
+const getRuntimes = async () => {
+    try {
+        const res = await SearchRuntimes(runtimeReq.value);
+        runtimes.value = res.data.items || [];
+        if (runtimes.value.length > 0) {
+            const first = runtimes.value[0];
+            website.value.runtimeID = first.id;
+            getAppDetailByID(first.appDetailId);
+        }
+    } catch (error) {}
+};
+
 const acceptParams = async (installPath: string) => {
     if (websiteForm.value) {
         websiteForm.value.resetFields();
@@ -328,7 +389,7 @@ const acceptParams = async (installPath: string) => {
     groups.value = res.data;
     open.value = true;
     website.value.webSiteGroupId = res.data[0].id;
-
+    website.value.type = 'deployment';
     searchAppInstalled();
 };
 

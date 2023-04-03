@@ -237,6 +237,29 @@ func (s *Server) UpdateRootProxy(proxy []string) {
 	s.UpdateDirectiveBySecondKey("location", "/", newDir)
 }
 
+func (s *Server) UpdatePHPProxy(proxy []string) {
+	newDir := Directive{
+		Name:       "location",
+		Parameters: []string{"~ [^/]\\.php(/|$)"},
+		Block:      &Block{},
+	}
+	block := &Block{}
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "fastcgi_pass",
+		Parameters: proxy,
+	})
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "include",
+		Parameters: []string{"fastcgi-php.conf"},
+	})
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "include",
+		Parameters: []string{"fastcgi_params"},
+	})
+	newDir.Block = block
+	s.UpdateDirectiveBySecondKey("location", "~ [^/]\\.php(/|$)", newDir)
+}
+
 func (s *Server) UpdateDirectiveBySecondKey(name string, key string, directive Directive) {
 	directives := s.Directives
 	index := -1

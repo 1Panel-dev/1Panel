@@ -11,16 +11,16 @@ export namespace Runtime {
         params: string;
         type: string;
         resource: string;
+        version: string;
     }
 
     export interface RuntimeReq extends ReqPage {
-        name: string;
+        name?: string;
     }
 
     export interface RuntimeDTO extends Runtime {
         appParams: App.InstallParams[];
         appId: number;
-        version: string;
     }
 
     export interface RuntimeCreate {

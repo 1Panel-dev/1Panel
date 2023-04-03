@@ -17,6 +17,7 @@ const (
 	Deployment = "deployment"
 	Static     = "static"
 	Proxy      = "proxy"
+	Runtime    = "runtime"
 
 	SSLExisted = "existed"
 	SSLAuto    = "auto"

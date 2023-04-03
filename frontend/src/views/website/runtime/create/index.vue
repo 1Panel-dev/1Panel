@@ -22,15 +22,15 @@
                             v-model="runtime.resource"
                             @change="changeResource(runtime.resource)"
                         >
-                            <el-radio :label="'AppStore'" :value="'AppStore'">
+                            <el-radio :label="'appstore'">
                                 {{ $t('runtime.appstore') }}
                             </el-radio>
-                            <el-radio :label="'Local'" :value="'Local'">
+                            <el-radio :label="'local'">
                                 {{ $t('runtime.local') }}
                             </el-radio>
                         </el-radio-group>
                     </el-form-item>
-                    <div v-if="runtime.resource === 'AppStore'">
+                    <div v-if="runtime.resource === 'appstore'">
                         <el-form-item :label="$t('runtime.app')" prop="appId">
                             <el-row :gutter="20">
                                 <el-col :span="12">
@@ -134,7 +134,7 @@ const runtime = ref<Runtime.RuntimeCreate>({
     image: '',
     params: {},
     type: 'php',
-    resource: 'AppStore',
+    resource: 'appstore',
 });
 let rules = ref<any>({
     name: [Rules.appName],
@@ -152,7 +152,7 @@ const handleClose = () => {
 };
 
 const changeResource = (resource: string) => {
-    if (resource === 'Local') {
+    if (resource === 'local') {
         runtime.value.appDetailId = undefined;
         runtime.value.version = '';
         runtime.value.params = {};
@@ -257,7 +257,7 @@ const acceptParams = async (props: OperateRrops) => {
             image: '',
             params: {},
             type: props.type,
-            resource: 'AppStore',
+            resource: 'appstore',
         };
         searchApp(null);
     } else {

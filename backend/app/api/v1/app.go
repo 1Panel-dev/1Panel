@@ -97,6 +97,28 @@ func (b *BaseApi) GetAppDetail(c *gin.Context) {
 }
 
 // @Tags App
+// @Summary Search app detail by id
+// @Description 通过 id 获取应用详情
+// @Accept json
+// @Param appId path integer true "id"
+// @Success 200 {object} response.AppDetailDTO
+// @Security ApiKeyAuth
+// @Router /apps/detail/:id[get]
+func (b *BaseApi) GetAppDetailByID(c *gin.Context) {
+	appDetailID, err := helper.GetIntParamByKey(c, "id")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	appDetailDTO, err := appService.GetAppDetailByID(appDetailID)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, appDetailDTO)
+}
+
+// @Tags App
 // @Summary Install app
 // @Description 安装应用
 // @Accept json

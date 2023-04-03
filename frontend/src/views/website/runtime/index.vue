@@ -18,7 +18,7 @@
                 <ComplexTable :pagination-config="paginationConfig" :data="items" @search="search()">
                     <el-table-column :label="$t('commons.table.name')" fix prop="name" min-width="120px">
                         <template #default="{ row }">
-                            <Tooltip :text="row.name" />
+                            <Tooltip :text="row.name" @click="openDetail(row)" />
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('runtime.resource')" prop="resource">
