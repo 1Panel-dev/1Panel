@@ -10,8 +10,9 @@ type RuntimeRepo struct {
 }
 
 type IRuntimeRepo interface {
-	WithNameOrImage(name string, image string) DBOption
-	WithOtherNameOrImage(name string, image string, id uint) DBOption
+	WithName(name string) DBOption
+	WithImage(image string) DBOption
+	WithNotId(id uint) DBOption
 	Page(page, size int, opts ...DBOption) (int64, []model.Runtime, error)
 	Create(ctx context.Context, runtime *model.Runtime) error
 	Save(runtime *model.Runtime) error
@@ -23,15 +24,21 @@ func NewIRunTimeRepo() IRuntimeRepo {
 	return &RuntimeRepo{}
 }
 
-func (r *RuntimeRepo) WithNameOrImage(name string, image string) DBOption {
+func (r *RuntimeRepo) WithName(name string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("name = ? or image = ?", name, image)
+		return g.Where("name = ?", name)
 	}
 }
 
-func (r *RuntimeRepo) WithOtherNameOrImage(name string, image string, id uint) DBOption {
+func (r *RuntimeRepo) WithImage(image string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("name = ? or image = ? and id != ?", name, image, id)
+		return g.Where("image = ?", image)
+	}
+}
+
+func (r *RuntimeRepo) WithNotId(id uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("id != ?", id)
 	}
 }
 

@@ -1134,6 +1134,9 @@ const message = {
         restoreHelper: '确认使用此备份恢复？',
         wafValueHelper: '值',
         wafRemarkHelper: '描述',
+        runtimeProxyHelper: '使用从 1Panel 创建的运行环境',
+        runtime: '运行环境',
+        deleteRuntimeHelper: '运行环境应用需要跟网站一并删除，请谨慎处理',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',

@@ -23,6 +23,8 @@ type WebsiteCreate struct {
 	AppInstall   NewAppInstall `json:"appInstall"`
 	AppID        uint          `json:"appID"`
 	AppInstallID uint          `json:"appInstallID"`
+
+	RuntimeID uint `json:"runtimeID"`
 }
 
 type NewAppInstall struct {

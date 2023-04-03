@@ -36,6 +36,7 @@ type IAppService interface {
 	Install(ctx context.Context, req request.AppInstallCreate) (*model.AppInstall, error)
 	SyncAppList() error
 	GetAppUpdate() (*response.AppUpdateRes, error)
+	GetAppDetailByID(id uint) (*response.AppDetailDTO, error)
 }
 
 func NewIAppService() IAppService {
@@ -205,6 +206,20 @@ func (a AppService) GetAppDetail(appId uint, version, appType string) (response.
 		appDetailDTO.Enable = false
 	}
 	return appDetailDTO, nil
+}
+func (a AppService) GetAppDetailByID(id uint) (*response.AppDetailDTO, error) {
+	res := &response.AppDetailDTO{}
+	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return nil, err
+	}
+	res.AppDetail = appDetail
+	paramMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(appDetail.Params), &paramMap); err != nil {
+		return nil, err
+	}
+	res.Params = paramMap
+	return res, nil
 }
 
 func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (*model.AppInstall, error) {
