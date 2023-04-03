@@ -19,6 +19,7 @@ type Website struct {
 	ErrorLog       bool            `json:"errorLog"`
 	AccessLog      bool            `json:"accessLog"`
 	DefaultServer  bool            `json:"defaultServer"`
+	RuntimeID      uint            `gorm:"type:integer" json:"runtimeID"`
 	Domains        []WebsiteDomain `json:"domains" gorm:"-:migration"`
 	WebsiteSSL     WebsiteSSL      `json:"webSiteSSL" gorm:"-:migration"`
 }

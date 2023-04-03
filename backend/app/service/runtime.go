@@ -35,18 +35,23 @@ func NewRuntimeService() IRuntimeService {
 }
 
 func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
-	exist, _ := runtimeRepo.GetFirst(runtimeRepo.WithNameOrImage(create.Name, create.Image))
+	exist, _ := runtimeRepo.GetFirst(runtimeRepo.WithName(create.Name))
 	if exist != nil {
-		return buserr.New(constant.ErrNameOrImageIsExist)
+		return buserr.New(constant.ErrNameIsExist)
 	}
 	if create.Resource == constant.ResourceLocal {
 		runtime := &model.Runtime{
 			Name:     create.Name,
 			Resource: create.Resource,
 			Type:     create.Type,
+			Version:  create.Version,
 			Status:   constant.RuntimeNormal,
 		}
 		return runtimeRepo.Create(context.Background(), runtime)
+	}
+	exist, _ = runtimeRepo.GetFirst(runtimeRepo.WithImage(create.Image))
+	if exist != nil {
+		return buserr.New(constant.ErrImageExist)
 	}
 	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(create.AppDetailID))
 	if err != nil {
@@ -134,6 +139,7 @@ func (r *RuntimeService) Delete(id uint) error {
 		return err
 	}
 	//TODO 校验网站关联
+	//TODO 删除镜像
 	if runtime.Resource == constant.ResourceAppstore {
 		runtimeDir := path.Join(constant.RuntimeDir, runtime.Type, runtime.Name)
 		if err := files.NewFileOp().DeleteDir(runtimeDir); err != nil {
@@ -158,7 +164,6 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeRes, error) {
 		return nil, err
 	}
 	res.AppID = appDetail.AppId
-	res.Version = appDetail.Version
 	var (
 		appForm   dto.AppForm
 		appParams []response.AppParam
@@ -207,10 +212,6 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeRes, error) {
 }
 
 func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
-	exist, _ := runtimeRepo.GetFirst(runtimeRepo.WithOtherNameOrImage(req.Name, req.Image, req.ID))
-	if exist != nil {
-		return buserr.New(constant.ErrNameOrImageIsExist)
-	}
 	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(req.ID))
 	if err != nil {
 		return err
@@ -218,6 +219,10 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	if runtime.Resource == constant.ResourceLocal {
 		runtime.Version = req.Version
 		return runtimeRepo.Save(runtime)
+	}
+	exist, _ := runtimeRepo.GetFirst(runtimeRepo.WithImage(req.Name), runtimeRepo.WithNotId(req.ID))
+	if exist != nil {
+		return buserr.New(constant.ErrImageExist)
 	}
 	runtimeDir := path.Join(constant.RuntimeDir, runtime.Type, runtime.Name)
 	composeContent, envContent, _, err := handleParams(req.Image, runtime.Type, runtimeDir, req.Params)

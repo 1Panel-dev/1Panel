@@ -131,7 +131,10 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 		ErrorLog:       true,
 	}
 
-	var appInstall *model.AppInstall
+	var (
+		appInstall *model.AppInstall
+		runtime    *model.Runtime
+	)
 	switch create.Type {
 	case constant.Deployment:
 		if create.AppType == constant.NewApp {
@@ -152,6 +155,30 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 			}
 			appInstall = &install
 			website.AppInstallID = appInstall.ID
+		}
+	case constant.Runtime:
+		var err error
+		runtime, err = runtimeRepo.GetFirst(commonRepo.WithByID(create.RuntimeID))
+		if err != nil {
+			return err
+		}
+		if runtime.Resource == constant.ResourceAppstore {
+			var req request.AppInstallCreate
+			req.Name = create.PrimaryDomain
+			req.AppDetailId = create.AppInstall.AppDetailId
+			req.Params = create.AppInstall.Params
+			req.Params["IMAGE_NAME"] = runtime.Image
+			nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+			if err != nil {
+				return err
+			}
+			req.Params["PANEL_WEBSITE_DIR"] = path.Join(nginxInstall.GetPath(), "/www")
+			install, err := NewIAppService().Install(ctx, req)
+			if err != nil {
+				return err
+			}
+			website.AppInstallID = install.ID
+			appInstall = install
 		}
 	}
 
@@ -180,7 +207,7 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 			return err
 		}
 	}
-	return configDefaultNginx(website, domains, appInstall)
+	return configDefaultNginx(website, domains, appInstall, runtime)
 }
 
 func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {

@@ -12,3 +12,6 @@ var WebsiteDefault []byte
 
 //go:embed index.html
 var Index []byte
+
+//go:embed index.php
+var IndexPHP []byte

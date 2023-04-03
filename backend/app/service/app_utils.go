@@ -7,6 +7,7 @@ import (
 	"github.com/subosito/gotenv"
 	"math"
 	"os"
+	"os/exec"
 	"path"
 	"reflect"
 	"strconv"
@@ -207,7 +208,21 @@ func updateInstall(installId uint, detailId uint) error {
 	if err := NewIBackupService().AppBackup(dto.CommonBackup{Name: install.App.Key, DetailName: install.Name}); err != nil {
 		return err
 	}
-	if _, err = compose.Down(install.GetComposePath()); err != nil {
+
+	detailDir := path.Join(constant.ResourceDir, "apps", install.App.Key, "versions", detail.Version)
+	cmd := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -rf %s/* %s", detailDir, install.GetPath()))
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		if stdout != nil {
+			return errors.New(string(stdout))
+		}
+		return err
+	}
+
+	if out, err := compose.Down(install.GetComposePath()); err != nil {
+		if out != "" {
+			return errors.New(out)
+		}
 		return err
 	}
 	install.DockerCompose = detail.DockerCompose
@@ -218,7 +233,10 @@ func updateInstall(installId uint, detailId uint) error {
 	if err := fileOp.WriteFile(install.GetComposePath(), strings.NewReader(install.DockerCompose), 0775); err != nil {
 		return err
 	}
-	if _, err = compose.Up(install.GetComposePath()); err != nil {
+	if out, err := compose.Up(install.GetComposePath()); err != nil {
+		if out != "" {
+			return errors.New(out)
+		}
 		return err
 	}
 	return appInstallRepo.Save(&install)

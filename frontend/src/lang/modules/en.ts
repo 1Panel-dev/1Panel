@@ -1134,6 +1134,10 @@ const message = {
         websiteStatictHelper: 'Create a website directory on the host',
         websiteProxyHelper:
             'The proxy has existing services, for example, the machine has installed the halo service using port 8080, then the proxy address is http://127.0.0.1:8080',
+        runtimeProxyHelper: 'Use runtime created from 1Panel',
+        runtime: 'Runtime',
+        deleteRuntimeHelper:
+            'The Runtime application needs to be deleted together with the website, please handle it with caution',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'The hash table size of the server name',
