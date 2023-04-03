@@ -8,4 +8,6 @@ const (
 	OSS          = "OSS"
 	Sftp         = "SFTP"
 	MinIo        = "MINIO"
+	Cos          = "COS"
+	Kodo         = "KODO"
 )
