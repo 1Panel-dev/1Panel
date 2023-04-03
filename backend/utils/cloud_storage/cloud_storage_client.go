@@ -27,5 +27,11 @@ func NewCloudStorageClient(vars map[string]interface{}) (CloudStorageClient, err
 	if vars["type"] == constant.MinIo {
 		return client.NewMinIoClient(vars)
 	}
+	if vars["type"] == constant.Cos {
+		return client.NewCosClient(vars)
+	}
+	if vars["type"] == constant.Kodo {
+		return client.NewKodoClient(vars)
+	}
 	return nil, constant.ErrNotSupportType
 }
