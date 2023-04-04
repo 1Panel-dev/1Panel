@@ -1140,6 +1140,7 @@ const message = {
         runtime: 'Runtime',
         deleteRuntimeHelper:
             'The Runtime application needs to be deleted together with the website, please handle it with caution',
+        proxyType: 'Listening Network Type',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'The hash table size of the server name',

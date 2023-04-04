@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -40,7 +41,7 @@ type IAppInstallService interface {
 	LoadPort(key string) (int64, error)
 	LoadPassword(key string) (string, error)
 	SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error)
-	Operate(req request.AppInstalledOperate) error
+	Operate(ctx context.Context, req request.AppInstalledOperate) error
 	Update(req request.AppInstalledUpdate) error
 	SyncAll(systemInit bool) error
 	GetServices(key string) ([]response.AppService, error)
@@ -174,8 +175,8 @@ func (a *AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]
 	return handleInstalled(installs, false)
 }
 
-func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
-	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallId))
+func (a *AppInstallService) Operate(ctx context.Context, req request.AppInstalledOperate) error {
+	install, err := appInstallRepo.GetFirstByCtx(ctx, commonRepo.WithByID(req.InstallId))
 	if err != nil {
 		return err
 	}
@@ -202,12 +203,9 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 		}
 		return syncById(install.ID)
 	case constant.Delete:
-		tx, ctx := getTxAndContext()
 		if err := deleteAppInstall(ctx, install, req.DeleteBackup, req.ForceDelete, req.DeleteDB); err != nil && !req.ForceDelete {
-			tx.Rollback()
 			return err
 		}
-		tx.Commit()
 		return nil
 	case constant.Sync:
 		return syncById(install.ID)

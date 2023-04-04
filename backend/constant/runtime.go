@@ -9,4 +9,7 @@ const (
 	RuntimeBuildIng = "building"
 
 	RuntimePHP = "php"
+
+	RuntimeProxyUnix = "unix"
+	RuntimeProxyTcp  = "tcp"
 )

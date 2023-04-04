@@ -139,7 +139,7 @@
                                 </el-row>
                             </el-form-item>
                             <el-form-item :label="$t('app.name')" prop="appinstall.name">
-                                <el-input v-model="website.appinstall.name"></el-input>
+                                <el-input v-model.trim="website.appinstall.name"></el-input>
                             </el-form-item>
                             <Params
                                 :key="paramKey"
@@ -152,22 +152,34 @@
                     </div>
                     <div v-if="website.type === 'runtime'">
                         <el-form-item :label="$t('runtime.runtime')" prop="runtimeID">
-                            <el-select v-model="website.runtimeID" @change="changeApp()">
+                            <el-select v-model="website.runtimeID" @change="changeRuntime(website.runtimeID)">
                                 <el-option
-                                    v-for="(runtime, index) in runtimes"
+                                    v-for="(run, index) in runtimes"
                                     :key="index"
-                                    :label="runtime.name"
-                                    :value="runtime.id"
+                                    :label="run.name + '(' + $t('runtime.' + run.resource) + ')'"
+                                    :value="run.id"
                                 ></el-option>
                             </el-select>
                         </el-form-item>
                         <Params
+                            v-if="runtimeResource === 'appstore'"
                             :key="paramKey"
                             v-model:form="website.appinstall.params"
                             v-model:rules="rules.appinstall.params"
                             :params="appParams"
                             :propStart="'appinstall.params.'"
                         ></Params>
+                        <div v-else>
+                            <el-form-item :label="$t('website.proxyType')" prop="proxyType">
+                                <el-select v-model="website.proxyType">
+                                    <el-option :label="$t('website.tcp')" :value="'tcp'"></el-option>
+                                    <el-option :label="$t('website.unix')" :value="'unix'"></el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item v-if="website.proxyType === 'tcp'" :label="$t('website.port')" prop="port">
+                                <el-input v-model.number="website.port"></el-input>
+                            </el-form-item>
+                        </div>
                     </div>
                     <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
                         <el-input
@@ -250,6 +262,8 @@ const website = ref({
         version: '',
         appkey: '',
     },
+    proxyType: 'tcp',
+    port: 9000,
 });
 let rules = ref<any>({
     primaryDomain: [Rules.domain],
@@ -265,6 +279,8 @@ let rules = ref<any>({
         appId: [Rules.requiredSelectBusiness],
         params: {},
     },
+    proxyType: [Rules.requiredSelect],
+    port: [Rules.port],
 });
 
 let open = ref(false);
@@ -284,6 +300,7 @@ let appParams = ref<App.AppParams>();
 let paramKey = ref(1);
 let preCheckRef = ref();
 let staticPath = ref('');
+let runtimeResource = ref('appstore');
 const runtimeReq = ref<Runtime.RuntimeReq>({
     page: 1,
     pageSize: 20,
@@ -367,6 +384,14 @@ const getAppDetailByID = (id: number) => {
     });
 };
 
+const changeRuntime = (runID: number) => {
+    runtimes.value.forEach((item) => {
+        if (item.id === runID) {
+            runtimeResource.value = item.resource;
+        }
+    });
+};
+
 const getRuntimes = async () => {
     try {
         const res = await SearchRuntimes(runtimeReq.value);
@@ -374,6 +399,7 @@ const getRuntimes = async () => {
         if (runtimes.value.length > 0) {
             const first = runtimes.value[0];
             website.value.runtimeID = first.id;
+            runtimeResource.value = first.resource;
             getAppDetailByID(first.appDetailId);
         }
     } catch (error) {}
@@ -387,10 +413,13 @@ const acceptParams = async (installPath: string) => {
 
     const res = await GetGroupList({ type: 'website' });
     groups.value = res.data;
-    open.value = true;
     website.value.webSiteGroupId = res.data[0].id;
     website.value.type = 'deployment';
+    runtimeResource.value = 'appstore';
+
     searchAppInstalled();
+
+    open.value = true;
 };
 
 const changeAppType = (type: string) => {

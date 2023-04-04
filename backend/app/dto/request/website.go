@@ -25,6 +25,12 @@ type WebsiteCreate struct {
 	AppInstallID uint          `json:"appInstallID"`
 
 	RuntimeID uint `json:"runtimeID"`
+	RuntimeConfig
+}
+
+type RuntimeConfig struct {
+	ProxyType string `json:"proxyType"`
+	Port      int    `json:"port"`
 }
 
 type NewAppInstall struct {
