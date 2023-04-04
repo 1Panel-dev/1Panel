@@ -41,4 +41,7 @@ const (
 
 	AccessLog = "access.log"
 	ErrorLog  = "error.log"
+
+	ConfigPHP = "php"
+	ConfigFPM = "fpm"
 )

@@ -237,7 +237,7 @@ func (s *Server) UpdateRootProxy(proxy []string) {
 	s.UpdateDirectiveBySecondKey("location", "/", newDir)
 }
 
-func (s *Server) UpdatePHPProxy(proxy []string) {
+func (s *Server) UpdatePHPProxy(proxy []string, localPath string) {
 	newDir := Directive{
 		Name:       "location",
 		Parameters: []string{"~ [^/]\\.php(/|$)"},
@@ -256,6 +256,17 @@ func (s *Server) UpdatePHPProxy(proxy []string) {
 		Name:       "include",
 		Parameters: []string{"fastcgi_params"},
 	})
+	if localPath == "" {
+		block.Directives = append(block.Directives, &Directive{
+			Name:       "fastcgi_param",
+			Parameters: []string{"SCRIPT_FILENAME", "$document_root$fastcgi_script_name"},
+		})
+	} else {
+		block.Directives = append(block.Directives, &Directive{
+			Name:       "fastcgi_param",
+			Parameters: []string{"SCRIPT_FILENAME", localPath},
+		})
+	}
 	newDir.Block = block
 	s.UpdateDirectiveBySecondKey("location", "~ [^/]\\.php(/|$)", newDir)
 }

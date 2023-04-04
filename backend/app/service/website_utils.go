@@ -105,6 +105,15 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website, 
 		if err := fileOp.CreateDir(path.Join(siteFolder, "ssl"), 0755); err != nil {
 			return err
 		}
+		if runtime.Type == constant.RuntimePHP && runtime.Resource == constant.ResourceLocal {
+			phpPoolDir := path.Join(siteFolder, "php-pool")
+			if err := fileOp.CreateDir(phpPoolDir, 0755); err != nil {
+				return err
+			}
+			if err := fileOp.CreateFile(path.Join(phpPoolDir, "php-fpm.sock")); err != nil {
+				return err
+			}
+		}
 		if website.Type == constant.Static || website.Type == constant.Runtime {
 			if err := createIndexFile(website, runtime); err != nil {
 				return err
@@ -114,7 +123,7 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website, 
 	return fileOp.CopyDir(path.Join(nginxFolder, "www", "common", "waf", "rules"), path.Join(siteFolder, "waf"))
 }
 
-func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, appInstall *model.AppInstall, runtime *model.Runtime) error {
+func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, appInstall *model.AppInstall, runtime *model.Runtime, runtimeConfig request.RuntimeConfig) error {
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
@@ -147,25 +156,38 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	server.UpdateDirective("set", []string{"$RulePath", path.Join(siteFolder, "waf", "rules")})
 	server.UpdateDirective("set", []string{"$logdir", path.Join(siteFolder, "log")})
 
+	rootIndex := path.Join("/www/sites", website.Alias, "index")
 	switch website.Type {
 	case constant.Deployment:
 		proxy := fmt.Sprintf("http://127.0.0.1:%d", appInstall.HttpPort)
 		server.UpdateRootProxy([]string{proxy})
 	case constant.Static:
-		server.UpdateRoot(path.Join("/www/sites", website.Alias, "index"))
+		server.UpdateRoot(rootIndex)
 		//server.UpdateRootLocation()
 	case constant.Proxy:
 		server.UpdateRootProxy([]string{website.Proxy})
 	case constant.Runtime:
 		if runtime.Resource == constant.ResourceLocal {
-			server.UpdateRoot(path.Join("/www/sites", website.Alias, "index"))
+			switch runtime.Type {
+			case constant.RuntimePHP:
+				server.UpdateRoot(rootIndex)
+				proxy := ""
+				localPath := path.Join(nginxInstall.GetPath(), rootIndex, "index.php")
+				if runtimeConfig.ProxyType == constant.RuntimeProxyUnix {
+					proxy = fmt.Sprintf("unix:%s", path.Join("/www/sites", website.Alias, "php-pool", "php-fpm.sock"))
+				}
+				if runtimeConfig.ProxyType == constant.RuntimeProxyTcp {
+					proxy = fmt.Sprintf("127.0.0.1:%d", runtimeConfig.Port)
+				}
+				server.UpdatePHPProxy([]string{proxy}, localPath)
+			}
 		}
 		if runtime.Resource == constant.ResourceAppstore {
 			switch runtime.Type {
 			case constant.RuntimePHP:
-				server.UpdateRoot(path.Join("/www/sites", website.Alias, "index"))
+				server.UpdateRoot(rootIndex)
 				proxy := fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
-				server.UpdatePHPProxy([]string{proxy})
+				server.UpdatePHPProxy([]string{proxy}, "")
 			}
 		}
 	}

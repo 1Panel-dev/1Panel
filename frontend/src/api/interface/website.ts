@@ -16,6 +16,7 @@ export namespace Website {
         autoRenew: boolean;
         appinstall?: NewAppInstall;
         webSiteSSL: SSL;
+        runtimeID: number;
     }
 
     export interface WebsiteDTO extends Website {
