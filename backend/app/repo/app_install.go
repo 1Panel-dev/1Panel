@@ -29,6 +29,7 @@ type IAppInstallRepo interface {
 	Page(page, size int, opts ...DBOption) (int64, []model.AppInstall, error)
 	BatchUpdateBy(maps map[string]interface{}, opts ...DBOption) error
 	LoadBaseInfo(key string, name string) (*RootInfo, error)
+	GetFirstByCtx(ctx context.Context, opts ...DBOption) (model.AppInstall, error)
 }
 
 func NewIAppInstallRepo() IAppInstallRepo {
@@ -93,6 +94,13 @@ func (a *AppInstallRepo) ListBy(opts ...DBOption) ([]model.AppInstall, error) {
 func (a *AppInstallRepo) GetFirst(opts ...DBOption) (model.AppInstall, error) {
 	var install model.AppInstall
 	db := getDb(opts...).Model(&model.AppInstall{})
+	err := db.Preload("App").First(&install).Error
+	return install, err
+}
+
+func (a *AppInstallRepo) GetFirstByCtx(ctx context.Context, opts ...DBOption) (model.AppInstall, error) {
+	var install model.AppInstall
+	db := getTx(ctx, opts...).Model(&model.AppInstall{})
 	err := db.Preload("App").First(&install).Error
 	return install, err
 }

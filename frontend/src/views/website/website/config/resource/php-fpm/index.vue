@@ -23,7 +23,8 @@
 <script lang="ts" setup>
 import { Codemirror } from 'vue-codemirror';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { GetWebsiteConfig, UpdateNginxFile } from '@/api/modules/website';
+import { GetWebsiteConfig } from '@/api/modules/website';
+import { InstalledOp } from '@/api/modules/app';
 import { computed, onMounted, ref } from 'vue';
 import { File } from '@/api/interface/file';
 import i18n from '@/lang';
@@ -35,6 +36,14 @@ const extensions = [StreamLanguage.define(nginx), oneDark];
 
 const props = defineProps({
     id: {
+        type: Number,
+        default: 0,
+    },
+    type: {
+        type: String,
+        default: 'fpm',
+    },
+    installId: {
         type: Number,
         default: 0,
     },
@@ -50,7 +59,7 @@ let content = ref('');
 
 const get = () => {
     loading.value = true;
-    GetWebsiteConfig(id.value, 'openresty')
+    GetWebsiteConfig(id.value, props.type)
         .then((res) => {
             data.value = res.data;
             content.value = data.value.content;
@@ -60,15 +69,17 @@ const get = () => {
         });
 };
 
-const submit = () => {
+const submit = async () => {
     loading.value = true;
-    UpdateNginxFile({
-        id: id.value,
-        content: content.value,
-    })
+    let operateReq = {
+        installId: props.installId,
+        operate: 'restart',
+    };
+    await InstalledOp(operateReq)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         })
+        .catch(() => {})
         .finally(() => {
             loading.value = false;
         });

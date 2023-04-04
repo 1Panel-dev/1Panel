@@ -35,8 +35,8 @@ export const GetWebsiteOptions = () => {
     return http.get<Array<string>>(`/websites/options`);
 };
 
-export const GetWebsiteNginx = (id: number) => {
-    return http.get<File.File>(`/websites/${id}/nginx`);
+export const GetWebsiteConfig = (id: number, type: string) => {
+    return http.get<File.File>(`/websites/${id}/config/${type}`);
 };
 
 export const DeleteWebsite = (req: Website.WebSiteDel) => {

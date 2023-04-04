@@ -189,14 +189,16 @@ func (b *BaseApi) GetWebsite(c *gin.Context) {
 // @Param id path integer true "request"
 // @Success 200 {object} response.FileInfo
 // @Security ApiKeyAuth
-// @Router /websites/:id/nginx [get]
+// @Router /websites/:id/config/:type [get]
 func (b *BaseApi) GetWebsiteNginx(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
 		return
 	}
-	fileInfo, err := websiteService.GetWebsiteNginxConfig(id)
+	configType := c.Param("type")
+
+	fileInfo, err := websiteService.GetWebsiteNginxConfig(id, configType)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
