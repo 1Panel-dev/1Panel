@@ -164,19 +164,6 @@ func (sws *LogicSshWsSession) sendComboOutput(exitCh chan bool) {
 				return
 			}
 			bs := sws.comboOutput.Bytes()
-			if string(bs) == string([]byte{13, 10, 108, 111, 103, 111, 117, 116, 13, 10}) {
-				err := wsConn.WriteMessage(websocket.TextMessage, bs)
-				if err != nil {
-					global.LOG.Errorf("ssh sending combo output to webSocket failed, err: %v", err)
-				}
-				_, err = sws.logBuff.Write(bs)
-				if err != nil {
-					global.LOG.Errorf("combo output to log buffer failed, err: %v", err)
-				}
-				sws.comboOutput.buffer.Reset()
-				sws.Close()
-				return
-			}
 			if len(bs) > 0 {
 				err := wsConn.WriteMessage(websocket.TextMessage, bs)
 				if err != nil {
@@ -187,6 +174,10 @@ func (sws *LogicSshWsSession) sendComboOutput(exitCh chan bool) {
 					global.LOG.Errorf("combo output to log buffer failed, err: %v", err)
 				}
 				sws.comboOutput.buffer.Reset()
+			}
+			if string(bs) == string([]byte{13, 10, 108, 111, 103, 111, 117, 116, 13, 10}) {
+				sws.Close()
+				return
 			}
 
 		case <-exitCh:
