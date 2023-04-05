@@ -71,8 +71,8 @@ func (b *BaseApi) GetApp(c *gin.Context) {
 }
 
 // @Tags App
-// @Summary Search app detail by id
-// @Description 通过 id 获取应用详情
+// @Summary Search app detail by appid
+// @Description 通过 appid 获取应用详情
 // @Accept json
 // @Param appId path integer true "app id"
 // @Param version path string true "app 版本"
@@ -97,13 +97,13 @@ func (b *BaseApi) GetAppDetail(c *gin.Context) {
 }
 
 // @Tags App
-// @Summary Search app detail by id
+// @Summary Get app detail by id
 // @Description 通过 id 获取应用详情
 // @Accept json
 // @Param appId path integer true "id"
 // @Success 200 {object} response.AppDetailDTO
 // @Security ApiKeyAuth
-// @Router /apps/detail/:id[get]
+// @Router /apps/details/:id [get]
 func (b *BaseApi) GetAppDetailByID(c *gin.Context) {
 	appDetailID, err := helper.GetIntParamByKey(c, "id")
 	if err != nil {

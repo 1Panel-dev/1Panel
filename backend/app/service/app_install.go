@@ -260,7 +260,7 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	if err := env.Write(oldEnvMaps, envPath); err != nil {
 		return err
 	}
-	_ = appInstallRepo.Save(&installed)
+	_ = appInstallRepo.Save(context.Background(), &installed)
 
 	if err := rebuildApp(installed); err != nil {
 		return err
@@ -300,7 +300,7 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 			if systemInit {
 				i.Status = constant.Error
 				i.Message = "System restart causes application exception"
-				_ = appInstallRepo.Save(&i)
+				_ = appInstallRepo.Save(context.Background(), &i)
 			}
 			continue
 		}
@@ -569,15 +569,15 @@ func syncById(installId uint) error {
 	if containerCount == 0 {
 		appInstall.Status = constant.Error
 		appInstall.Message = "container is not found"
-		return appInstallRepo.Save(&appInstall)
+		return appInstallRepo.Save(context.Background(), &appInstall)
 	}
 	if errCount == 0 && existedCount == 0 {
 		appInstall.Status = constant.Running
-		return appInstallRepo.Save(&appInstall)
+		return appInstallRepo.Save(context.Background(), &appInstall)
 	}
 	if existedCount == normalCount {
 		appInstall.Status = constant.Stopped
-		return appInstallRepo.Save(&appInstall)
+		return appInstallRepo.Save(context.Background(), &appInstall)
 	}
 	if errCount == normalCount {
 		appInstall.Status = constant.Error
@@ -602,7 +602,7 @@ func syncById(installId uint) error {
 		errMsg.Write([]byte("\n"))
 	}
 	appInstall.Message = errMsg.String()
-	return appInstallRepo.Save(&appInstall)
+	return appInstallRepo.Save(context.Background(), &appInstall)
 }
 
 func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value interface{}) error {

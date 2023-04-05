@@ -106,8 +106,9 @@ var (
 
 // runtime
 var (
-	ErrDirNotFound   = "ErrDirNotFound"
-	ErrFileNotExist  = "ErrFileNotExist"
-	ErrImageBuildErr = "ErrImageBuildErr"
-	ErrImageExist    = "ErrImageExist"
+	ErrDirNotFound    = "ErrDirNotFound"
+	ErrFileNotExist   = "ErrFileNotExist"
+	ErrImageBuildErr  = "ErrImageBuildErr"
+	ErrImageExist     = "ErrImageExist"
+	ErrDelWithWebsite = "ErrDelWithWebsite"
 )
