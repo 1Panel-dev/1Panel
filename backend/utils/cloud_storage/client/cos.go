@@ -57,7 +57,7 @@ func (cos cosClient) ListBuckets() ([]interface{}, error) {
 	}
 	var datas []interface{}
 	for _, bucket := range buckets.Buckets {
-		datas = append(datas, bucket)
+		datas = append(datas, bucket.Name)
 	}
 	return datas, nil
 }
