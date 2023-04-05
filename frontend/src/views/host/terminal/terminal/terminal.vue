@@ -135,7 +135,7 @@ const initTerm = () => {
                 );
             }
         });
-        term.value.loadAddon(new AttachAddon(terminalSocket.value));
+        term.value.loadAddon(new AttachAddon(terminalSocket.value, { bidirectional: false }));
         term.value.loadAddon(fitAddon);
         termReady.value = true;
     }
