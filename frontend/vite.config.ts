@@ -40,6 +40,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
                 '/api/v1': {
                     target: 'http://localhost:9999/',
                     changeOrigin: true,
+                    ws: true,
                 },
             },
         },
