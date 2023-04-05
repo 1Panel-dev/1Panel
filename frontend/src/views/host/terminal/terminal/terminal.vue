@@ -34,8 +34,8 @@ const acceptParams = (props: WsProps) => {
 const fitAddon = new FitAddon();
 const webSocketReady = ref(false);
 const termReady = ref(false);
-let terminalSocket = ref(null) as unknown as WebSocket;
-let term = ref(null) as unknown as Terminal;
+const terminalSocket = ref<WebSocket>();
+const term = ref<Terminal>();
 
 const readyWatcher = watch(
     () => webSocketReady.value && termReady.value,
@@ -56,23 +56,29 @@ const onWSReceive = (message: any) => {
         return;
     }
     const data = JSON.parse(message.data);
-    term.element && term.focus();
-    term.write(data.Data);
+    if (term.value) {
+        term.value.element && term.value.focus();
+        term.value.write(data.Data);
+    }
 };
 
 const errorRealTerminal = (ex: any) => {
     let message = ex.message;
     if (!message) message = 'disconnected';
-    term.write(`\x1b[31m${message}\x1b[m\r\n`);
+    if (term.value) {
+        term.value.write(`\x1b[31m${message}\x1b[m\r\n`);
+    }
 };
 
 const closeRealTerminal = (ev: CloseEvent) => {
-    term.write(ev.reason);
+    if (term.value) {
+        term.value.write(ev.reason);
+    }
 };
 
 const initErrorTerm = (errorInfo: string) => {
     let ifm = document.getElementById('terminal-' + terminalID.value) as HTMLInputElement | null;
-    term = new Terminal({
+    term.value = new Terminal({
         lineHeight: 1.2,
         fontSize: 12,
         fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
@@ -85,9 +91,9 @@ const initErrorTerm = (errorInfo: string) => {
         tabStopWidth: 4,
     });
     if (ifm) {
-        term.open(ifm);
-        term.write(errorInfo);
-        term.loadAddon(fitAddon);
+        term.value.open(ifm);
+        term.value.write(errorInfo);
+        term.value.loadAddon(fitAddon);
         fitAddon.fit();
         termReady.value = true;
     }
@@ -98,7 +104,7 @@ const initTerm = () => {
     let href = window.location.href;
     let protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     let ipLocal = href.split('//')[1].split('/')[0];
-    term = new Terminal({
+    term.value = new Terminal({
         lineHeight: 1.2,
         fontSize: 12,
         fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
@@ -111,17 +117,17 @@ const initTerm = () => {
         tabStopWidth: 4,
     });
     if (ifm) {
-        term.open(ifm);
-        terminalSocket = new WebSocket(
-            `${protocol}://${ipLocal}/api/v1/terminals?id=${wsID.value}&cols=${term.cols}&rows=${term.rows}`,
+        term.value.open(ifm);
+        terminalSocket.value = new WebSocket(
+            `${protocol}://${ipLocal}/api/v1/terminals?id=${wsID.value}&cols=${term.value.cols}&rows=${term.value.rows}`,
         );
-        terminalSocket.onopen = runRealTerminal;
-        terminalSocket.onmessage = onWSReceive;
-        terminalSocket.onclose = closeRealTerminal;
-        terminalSocket.onerror = errorRealTerminal;
-        term.onData((data: any) => {
+        terminalSocket.value.onopen = runRealTerminal;
+        terminalSocket.value.onmessage = onWSReceive;
+        terminalSocket.value.onclose = closeRealTerminal;
+        terminalSocket.value.onerror = errorRealTerminal;
+        term.value.onData((data: any) => {
             if (isWsOpen()) {
-                terminalSocket.send(
+                terminalSocket.value!.send(
                     JSON.stringify({
                         type: 'cmd',
                         cmd: Base64.encode(data),
@@ -129,8 +135,8 @@ const initTerm = () => {
                 );
             }
         });
-        term.loadAddon(new AttachAddon(terminalSocket));
-        term.loadAddon(fitAddon);
+        term.value.loadAddon(new AttachAddon(terminalSocket.value));
+        term.value.loadAddon(fitAddon);
         termReady.value = true;
     }
 };
@@ -140,22 +146,22 @@ const fitTerm = () => {
 };
 
 const isWsOpen = () => {
-    const readyState = terminalSocket && terminalSocket.readyState;
+    const readyState = terminalSocket.value && terminalSocket.value.readyState;
     return readyState === 1;
 };
 
 function onClose() {
     window.removeEventListener('resize', changeTerminalSize);
     try {
-        terminalSocket.close();
+        terminalSocket.value?.close();
     } catch {}
     try {
-        term.dispose();
+        term.value?.dispose();
     } catch {}
 }
 
 function onSendMsg(command: string) {
-    terminalSocket.send(
+    terminalSocket.value?.send(
         JSON.stringify({
             type: 'cmd',
             cmd: Base64.encode(command),
@@ -165,9 +171,9 @@ function onSendMsg(command: string) {
 
 function changeTerminalSize() {
     fitTerm();
-    const { cols, rows } = term;
+    const { cols, rows } = term.value!;
     if (isWsOpen()) {
-        terminalSocket.send(
+        terminalSocket.value!.send(
             JSON.stringify({
                 type: 'resize',
                 cols: cols,
@@ -184,14 +190,14 @@ function changeTerminalSize() {
 const onTermWheel = (event: WheelEvent) => {
     if (event.ctrlKey) {
         event.preventDefault();
-        if (term) {
+        if (term.value) {
             if (event.deltaY > 0) {
                 // web font-size mini 12px
-                if (term.options.fontSize > 12) {
-                    term.options.fontSize = term.options.fontSize - 1;
+                if (term.value.options.fontSize > 12) {
+                    term.value.options.fontSize = term.value.options.fontSize - 1;
                 }
             } else {
-                term.options.fontSize = term.options.fontSize + 1;
+                term.value.options.fontSize = term.value.options.fontSize + 1;
             }
         }
     }
