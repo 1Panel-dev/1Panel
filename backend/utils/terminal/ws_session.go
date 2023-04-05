@@ -41,9 +41,9 @@ const (
 
 type wsMsg struct {
 	Type string `json:"type"`
-	Cmd  string `json:"cmd"`
-	Cols int    `json:"cols"`
-	Rows int    `json:"rows"`
+	Data string `json:"data,omitempty"` // wsMsgCmd
+	Cols int    `json:"cols,omitempty"` // wsMsgResize
+	Rows int    `json:"rows,omitempty"` // wsMsgResize
 }
 
 type LogicSshWsSession struct {
@@ -135,7 +135,7 @@ func (sws *LogicSshWsSession) receiveWsMsg(exitCh chan bool) {
 					}
 				}
 			case wsMsgCmd:
-				decodeBytes, err := base64.StdEncoding.DecodeString(msgObj.Cmd)
+				decodeBytes, err := base64.StdEncoding.DecodeString(msgObj.Data)
 				if err != nil {
 					global.LOG.Errorf("websock cmd string base64 decoding failed, err: %v", err)
 				}
@@ -165,7 +165,15 @@ func (sws *LogicSshWsSession) sendComboOutput(exitCh chan bool) {
 			}
 			bs := sws.comboOutput.Bytes()
 			if len(bs) > 0 {
-				err := wsConn.WriteMessage(websocket.TextMessage, bs)
+				wsData, err := json.Marshal(wsMsg{
+					Type: wsMsgCmd,
+					Data: base64.StdEncoding.EncodeToString(bs),
+				})
+				if err != nil {
+					global.LOG.Errorf("encoding combo output to json failed, err: %v", err)
+					continue
+				}
+				err = wsConn.WriteMessage(websocket.TextMessage, wsData)
 				if err != nil {
 					global.LOG.Errorf("ssh sending combo output to webSocket failed, err: %v", err)
 				}

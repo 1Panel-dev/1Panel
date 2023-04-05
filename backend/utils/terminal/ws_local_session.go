@@ -84,7 +84,7 @@ func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 					}
 				}
 			case wsMsgCmd:
-				decodeBytes, err := base64.StdEncoding.DecodeString(msgObj.Cmd)
+				decodeBytes, err := base64.StdEncoding.DecodeString(msgObj.Data)
 				if err != nil {
 					global.LOG.Errorf("websock cmd string base64 decoding failed, err: %v", err)
 				}
