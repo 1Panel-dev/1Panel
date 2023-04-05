@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick, onBeforeUnmount } from 'vue';
+import { ref, nextTick, onBeforeUnmount, watch } from 'vue';
 import { Terminal } from 'xterm';
 import { AttachAddon } from 'xterm-addon-attach';
 import { Base64 } from 'js-base64';
@@ -32,12 +32,23 @@ const acceptParams = (props: WsProps) => {
 };
 
 const fitAddon = new FitAddon();
-const loading = ref(true);
+const webSocketReady = ref(false);
+const termReady = ref(false);
 let terminalSocket = ref(null) as unknown as WebSocket;
 let term = ref(null) as unknown as Terminal;
 
+const readyWatcher = watch(
+    () => webSocketReady.value && termReady.value,
+    (ready) => {
+        if (ready) {
+            changeTerminalSize();
+            readyWatcher(); // unwatch self
+        }
+    },
+);
+
 const runRealTerminal = () => {
-    loading.value = false;
+    webSocketReady.value = true;
 };
 
 const onWSReceive = (message: any) => {
@@ -78,6 +89,7 @@ const initErrorTerm = (errorInfo: string) => {
         term.write(errorInfo);
         term.loadAddon(fitAddon);
         fitAddon.fit();
+        termReady.value = true;
     }
 };
 
@@ -119,18 +131,7 @@ const initTerm = () => {
         });
         term.loadAddon(new AttachAddon(terminalSocket));
         term.loadAddon(fitAddon);
-        setTimeout(() => {
-            fitAddon.fit();
-            if (isWsOpen()) {
-                terminalSocket.send(
-                    JSON.stringify({
-                        type: 'resize',
-                        cols: term.cols,
-                        rows: term.rows,
-                    }),
-                );
-            }
-        }, 30);
+        termReady.value = true;
     }
 };
 
