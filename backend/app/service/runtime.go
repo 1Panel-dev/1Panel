@@ -121,6 +121,9 @@ func (r *RuntimeService) Page(req request.RuntimeSearch) (int64, []response.Runt
 	if req.Name != "" {
 		opts = append(opts, commonRepo.WithLikeName(req.Name))
 	}
+	if req.Status != "" {
+		opts = append(opts, runtimeRepo.WithStatus(req.Status))
+	}
 	total, runtimes, err := runtimeRepo.Page(req.Page, req.PageSize, opts...)
 	if err != nil {
 		return 0, nil, err
@@ -138,7 +141,10 @@ func (r *RuntimeService) Delete(id uint) error {
 	if err != nil {
 		return err
 	}
-	//TODO 校验网站关联
+	website, _ := websiteRepo.GetFirst(websiteRepo.WithRuntimeID(id))
+	if website.ID > 0 {
+		return buserr.New(constant.ErrDelWithWebsite)
+	}
 	//TODO 删除镜像
 	if runtime.Resource == constant.ResourceAppstore {
 		runtimeDir := path.Join(constant.RuntimeDir, runtime.Type, runtime.Name)
@@ -193,7 +199,11 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeRes, error) {
 			appParam.Value = v
 			if form.Type == "select" {
 				if form.Multiple {
-					appParam.Value = strings.Split(v, ",")
+					if v == "" {
+						appParam.Value = []string{}
+					} else {
+						appParam.Value = strings.Split(v, ",")
+					}
 				} else {
 					for _, fv := range form.Values {
 						if fv.Value == v {

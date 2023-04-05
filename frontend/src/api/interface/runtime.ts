@@ -16,6 +16,7 @@ export namespace Runtime {
 
     export interface RuntimeReq extends ReqPage {
         name?: string;
+        status?: string;
     }
 
     export interface RuntimeDTO extends Runtime {

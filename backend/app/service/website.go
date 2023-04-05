@@ -1,10 +1,12 @@
 package service
 
 import (
+	"bufio"
 	"context"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"os"
 	"path"
 	"reflect"
@@ -52,6 +54,8 @@ type IWebsiteService interface {
 	UpdateNginxConfigFile(req request.WebsiteNginxUpdate) error
 	OpWebsiteLog(req request.WebsiteLogReq) (*response.WebsiteLog, error)
 	ChangeDefaultServer(id uint) error
+	GetPHPConfig(id uint) (*response.PHPConfig, error)
+	UpdatePHPConfig(req request.WebsitePHPConfigUpdate) error
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -179,6 +183,9 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 		runtime, err = runtimeRepo.GetFirst(commonRepo.WithByID(create.RuntimeID))
 		if err != nil {
 			return err
+		}
+		if common.ScanPort(create.Port) {
+			return buserr.WithDetail(constant.ErrPortInUsed, create.Port, nil)
 		}
 		if runtime.Resource == constant.ResourceAppstore {
 			var req request.AppInstallCreate
@@ -823,6 +830,89 @@ func (w WebsiteService) ChangeDefaultServer(id uint) error {
 		}
 		website.DefaultServer = true
 		return websiteRepo.Save(context.Background(), &website)
+	}
+	return nil
+}
+
+func (w WebsiteService) GetPHPConfig(id uint) (*response.PHPConfig, error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return nil, err
+	}
+	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+	if err != nil {
+		return nil, err
+	}
+	phpConfigPath := path.Join(appInstall.GetPath(), "conf", "php.ini")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(phpConfigPath) {
+		return nil, buserr.WithDetail(constant.ErrFileCanNotRead, "php.ini", nil)
+	}
+	params := make(map[string]string)
+	configFile, err := fileOp.OpenFile(phpConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	defer configFile.Close()
+	scanner := bufio.NewScanner(configFile)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if strings.HasPrefix(line, ";") {
+			continue
+		}
+		matches := regexp.MustCompile(`^\s*([a-z_]+)\s*=\s*(.*)$`).FindStringSubmatch(line)
+		if len(matches) == 3 {
+			params[matches[1]] = matches[2]
+		}
+	}
+	return &response.PHPConfig{Params: params}, nil
+}
+
+func (w WebsiteService) UpdatePHPConfig(req request.WebsitePHPConfigUpdate) (err error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+	if err != nil {
+		return err
+	}
+	phpConfigPath := path.Join(appInstall.GetPath(), "conf", "php.ini")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(phpConfigPath) {
+		return buserr.WithDetail(constant.ErrFileCanNotRead, "php.ini", nil)
+	}
+	configFile, err := fileOp.OpenFile(phpConfigPath)
+	if err != nil {
+		return err
+	}
+	defer configFile.Close()
+
+	contentBytes, err := fileOp.GetContent(phpConfigPath)
+	content := string(contentBytes)
+	lines := strings.Split(content, "\n")
+	for i, line := range lines {
+		if strings.HasPrefix(line, ";") {
+			continue
+		}
+		for key, value := range req.Params {
+			pattern := "^" + regexp.QuoteMeta(key) + "\\s*=\\s*.*$"
+			if matched, _ := regexp.MatchString(pattern, line); matched {
+				lines[i] = key + " = " + value
+			}
+		}
+	}
+	updatedContent := strings.Join(lines, "\n")
+	if err := fileOp.WriteFile(phpConfigPath, strings.NewReader(updatedContent), 0755); err != nil {
+		return err
+	}
+	appInstallReq := request.AppInstalledOperate{
+		InstallId: appInstall.ID,
+		Operate:   constant.Restart,
+	}
+	if err = NewIAppInstalledService().Operate(context.Background(), appInstallReq); err != nil {
+		_ = fileOp.WriteFile(phpConfigPath, strings.NewReader(string(contentBytes)), 0755)
+		return err
 	}
 	return nil
 }
