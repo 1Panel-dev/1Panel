@@ -316,7 +316,7 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	if err := upAppPre(app, appInstall); err != nil {
 		return nil, err
 	}
-	go upApp(appInstall.GetComposePath(), appInstall)
+	go upApp(ctx, appInstall.GetComposePath(), appInstall)
 	go updateToolApp(appInstall)
 	return &appInstall, nil
 }

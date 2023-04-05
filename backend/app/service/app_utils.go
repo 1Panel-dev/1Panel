@@ -239,7 +239,7 @@ func updateInstall(installId uint, detailId uint) error {
 		}
 		return err
 	}
-	return appInstallRepo.Save(&install)
+	return appInstallRepo.Save(context.Background(), &install)
 }
 
 func getContainerNames(install model.AppInstall) ([]string, error) {
@@ -381,7 +381,7 @@ func upAppPre(app model.App, appInstall model.AppInstall) error {
 	return nil
 }
 
-func upApp(composeFilePath string, appInstall model.AppInstall) {
+func upApp(ctx context.Context, composeFilePath string, appInstall model.AppInstall) {
 	out, err := compose.Up(composeFilePath)
 	if err != nil {
 		if out != "" {
@@ -390,10 +390,10 @@ func upApp(composeFilePath string, appInstall model.AppInstall) {
 			appInstall.Message = err.Error()
 		}
 		appInstall.Status = constant.Error
-		_ = appInstallRepo.Save(&appInstall)
+		_ = appInstallRepo.Save(ctx, &appInstall)
 	} else {
 		appInstall.Status = constant.Running
-		_ = appInstallRepo.Save(&appInstall)
+		_ = appInstallRepo.Save(ctx, &appInstall)
 	}
 }
 
@@ -468,7 +468,7 @@ func handleErr(install model.AppInstall, err error, out string) error {
 		reErr = errors.New(out)
 		install.Status = constant.Error
 	}
-	_ = appInstallRepo.Save(&install)
+	_ = appInstallRepo.Save(context.Background(), &install)
 	return reErr
 }
 
@@ -579,7 +579,7 @@ func updateToolApp(installed model.AppInstall) {
 		return
 	}
 	toolInstall.Env = string(contentByte)
-	if err := appInstallRepo.Save(&toolInstall); err != nil {
+	if err := appInstallRepo.Save(context.Background(), &toolInstall); err != nil {
 		global.LOG.Errorf("update tool app [%s] error : %s", toolInstall.Name, err.Error())
 		return
 	}

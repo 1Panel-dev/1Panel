@@ -152,10 +152,14 @@
                     </div>
                     <div v-if="website.type === 'runtime'">
                         <el-form-item :label="$t('runtime.runtime')" prop="runtimeID">
-                            <el-select v-model="website.runtimeID" @change="changeRuntime(website.runtimeID)">
+                            <el-select
+                                v-model="website.runtimeID"
+                                @change="changeRuntime(website.runtimeID)"
+                                filterable
+                            >
                                 <el-option
-                                    v-for="(run, index) in runtimes"
-                                    :key="index"
+                                    v-for="run in runtimes"
+                                    :key="run.name"
                                     :label="run.name + '(' + $t('runtime.' + run.resource) + ')'"
                                     :value="run.id"
                                 ></el-option>
@@ -303,7 +307,8 @@ let staticPath = ref('');
 let runtimeResource = ref('appstore');
 const runtimeReq = ref<Runtime.RuntimeReq>({
     page: 1,
-    pageSize: 20,
+    pageSize: 100,
+    status: 'normal',
 });
 const runtimes = ref<Runtime.RuntimeDTO[]>([]);
 
@@ -400,7 +405,9 @@ const getRuntimes = async () => {
             const first = runtimes.value[0];
             website.value.runtimeID = first.id;
             runtimeResource.value = first.resource;
-            getAppDetailByID(first.appDetailId);
+            if (first.type === 'appstore') {
+                getAppDetailByID(first.appDetailId);
+            }
         }
     } catch (error) {}
 };

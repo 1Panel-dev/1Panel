@@ -498,3 +498,47 @@ func (b *BaseApi) ChangeDefaultServer(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, nil)
 }
+
+// @Tags Website
+// @Summary Load websit php conf
+// @Description 获取网站 php 配置
+// @Accept json
+// @Param id path integer true "request"
+// @Success 200 {object} response.PHPConfig
+// @Security ApiKeyAuth
+// @Router /websites/php/config/:id [get]
+func (b *BaseApi) GetWebsitePHPConfig(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	data, err := websiteService.GetPHPConfig(id)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Website PHP
+// @Summary Update website php conf
+// @Description 更新 网站 PHP 配置
+// @Accept json
+// @Param request body request.WebsitePHPConfigUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/php/update [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"[domain] PHP 配置修改","formatEN":"[domain] PHP conf update"}
+func (b *BaseApi) UpdateWebsitePHPConfig(c *gin.Context) {
+	var req request.WebsitePHPConfigUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.UpdatePHPConfig(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}

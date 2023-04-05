@@ -23,7 +23,7 @@ type IAppInstallRepo interface {
 	ListBy(opts ...DBOption) ([]model.AppInstall, error)
 	GetFirst(opts ...DBOption) (model.AppInstall, error)
 	Create(ctx context.Context, install *model.AppInstall) error
-	Save(install *model.AppInstall) error
+	Save(ctx context.Context, install *model.AppInstall) error
 	DeleteBy(opts ...DBOption) error
 	Delete(ctx context.Context, install model.AppInstall) error
 	Page(page, size int, opts ...DBOption) (int64, []model.AppInstall, error)
@@ -110,8 +110,8 @@ func (a *AppInstallRepo) Create(ctx context.Context, install *model.AppInstall) 
 	return db.Create(&install).Error
 }
 
-func (a *AppInstallRepo) Save(install *model.AppInstall) error {
-	return getDb().Save(&install).Error
+func (a *AppInstallRepo) Save(ctx context.Context, install *model.AppInstall) error {
+	return getTx(ctx).Save(&install).Error
 }
 
 func (a *AppInstallRepo) DeleteBy(opts ...DBOption) error {

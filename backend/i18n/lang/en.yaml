@@ -65,3 +65,4 @@ ErrDirNotFound: "The build folder does not exist! Please check file integrity！
 ErrFileNotExist: "{{ .detail }} file does not exist! Please check source file integrity！"
 ErrImageBuildErr: "Image build failed"
 ErrImageExist: "Image is already exist！"
+ErrDelWithWebsite: "The operating environment has been associated with a website and cannot be deleted"

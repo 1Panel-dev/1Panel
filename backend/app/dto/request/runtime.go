@@ -4,8 +4,9 @@ import "github.com/1Panel-dev/1Panel/backend/app/dto"
 
 type RuntimeSearch struct {
 	dto.PageInfo
-	Type string `json:"type"`
-	Name string `json:"name"`
+	Type   string `json:"type"`
+	Name   string `json:"name"`
+	Status string `json:"status"`
 }
 
 type RuntimeCreate struct {
