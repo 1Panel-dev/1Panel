@@ -5,11 +5,9 @@
 <script setup lang="ts">
 import { ref, nextTick, onBeforeUnmount, watch } from 'vue';
 import { Terminal } from 'xterm';
-import { AttachAddon } from 'xterm-addon-attach';
 import { Base64 } from 'js-base64';
 import 'xterm/css/xterm.css';
 import { FitAddon } from 'xterm-addon-fit';
-import { isJson } from '@/utils/util';
 
 const terminalID = ref();
 const wsID = ref();
@@ -51,14 +49,16 @@ const runRealTerminal = () => {
     webSocketReady.value = true;
 };
 
-const onWSReceive = (message: any) => {
-    if (!isJson(message.data)) {
-        return;
-    }
-    const data = JSON.parse(message.data);
-    if (term.value) {
-        term.value.element && term.value.focus();
-        term.value.write(data.Data);
+const onWSReceive = (message: MessageEvent) => {
+    const wsMsg = JSON.parse(message.data);
+    switch (wsMsg.type) {
+        case 'cmd': {
+            if (term.value) {
+                term.value.element && term.value.focus();
+                term.value.write(Base64.decode(wsMsg.data));
+            }
+            break;
+        }
     }
 };
 
@@ -130,12 +130,11 @@ const initTerm = () => {
                 terminalSocket.value!.send(
                     JSON.stringify({
                         type: 'cmd',
-                        cmd: Base64.encode(data),
+                        data: Base64.encode(data),
                     }),
                 );
             }
         });
-        term.value.loadAddon(new AttachAddon(terminalSocket.value, { bidirectional: false }));
         term.value.loadAddon(fitAddon);
         termReady.value = true;
     }
@@ -164,7 +163,7 @@ function onSendMsg(command: string) {
     terminalSocket.value?.send(
         JSON.stringify({
             type: 'cmd',
-            cmd: Base64.encode(command),
+            data: Base64.encode(command),
         }),
     );
 }
