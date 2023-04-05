@@ -59,7 +59,7 @@ type BackupRecords struct {
 }
 
 type DownloadRecord struct {
-	Source   string `json:"source" validate:"required,oneof=OSS S3 SFTP MINIO LOCAL"`
+	Source   string `json:"source" validate:"required,oneof=OSS S3 SFTP MINIO LOCAL COS KODO"`
 	FileDir  string `json:"fileDir" validate:"required"`
 	FileName string `json:"fileName" validate:"required"`
 }
