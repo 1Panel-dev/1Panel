@@ -8,7 +8,7 @@ require (
 	github.com/compose-spec/compose-go v1.6.0
 	github.com/creack/pty v1.1.18
 	github.com/dgraph-io/badger/v3 v3.2103.5
-	github.com/docker/docker v20.10.18+incompatible
+	github.com/docker/docker v20.10.24+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
