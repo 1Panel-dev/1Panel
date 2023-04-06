@@ -333,7 +333,7 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, backup model.Backu
 
 	var weblist []string
 	if cronjob.Website == "all" {
-		weblist, err = NewWebsiteService().GetWebsiteOptions()
+		weblist, err = NewIWebsiteService().GetWebsiteOptions()
 		if err != nil {
 			return err
 		}
