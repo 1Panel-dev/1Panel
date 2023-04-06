@@ -184,6 +184,7 @@ const dialogData = ref<DialogProps>({
     title: '',
 });
 const acceptParams = (params: DialogProps): void => {
+    buckets.value = [];
     dialogData.value = params;
     if (dialogData.value.title === 'edit' && dialogData.value.rowData!.type === 'MINIO') {
         if (dialogData.value.rowData!.varsJson['endpoint'].indexOf('://') !== 0) {

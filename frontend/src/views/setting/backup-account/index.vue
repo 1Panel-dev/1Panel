@@ -72,7 +72,7 @@
                         </div>
                         <el-alert v-else center class="alert" style="height: 167px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'S3')">
-                                {{ $t('setting.createBackupAccount', ['S3']) }}
+                                {{ $t('setting.createBackupAccount', [$t('setting.S3')]) }}
                             </el-button>
                         </el-alert>
                     </el-col>
@@ -108,7 +108,7 @@
                         </div>
                         <el-alert v-else center class="alert" style="height: 167px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'OSS')">
-                                {{ $t('setting.createBackupAccount', ['OSS']) }}
+                                {{ $t('setting.createBackupAccount', [$t('setting.OSS')]) }}
                             </el-button>
                         </el-alert>
                     </el-col>
@@ -145,7 +145,7 @@
                         </div>
                         <el-alert v-else center class="alert" style="height: 167px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'COS')">
-                                {{ $t('setting.createBackupAccount', ['COS']) }}
+                                {{ $t('setting.createBackupAccount', [$t('setting.COS')]) }}
                             </el-button>
                         </el-alert>
                     </el-col>
@@ -181,7 +181,7 @@
                         </div>
                         <el-alert v-else center class="alert" style="height: 167px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'KODO')">
-                                {{ $t('setting.createBackupAccount', ['KODO']) }}
+                                {{ $t('setting.createBackupAccount', [$t('setting.KODO')]) }}
                             </el-button>
                         </el-alert>
                     </el-col>
@@ -218,7 +218,7 @@
                         </div>
                         <el-alert v-else center class="alert" style="height: 167px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'MINIO')">
-                                {{ $t('setting.createBackupAccount', ['MINIO']) }}
+                                {{ $t('setting.createBackupAccount', [$t('setting.MINIO')]) }}
                             </el-button>
                         </el-alert>
                     </el-col>
@@ -257,7 +257,7 @@
                         </div>
                         <el-alert v-else center class="alert" style="height: 167px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'SFTP')">
-                                {{ $t('setting.createBackupAccount', ['SFTP']) }}
+                                {{ $t('setting.createBackupAccount', [$t('setting.SFTP')]) }}
                             </el-button>
                         </el-alert>
                     </el-col>
