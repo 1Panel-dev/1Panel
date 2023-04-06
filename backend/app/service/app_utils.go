@@ -390,9 +390,13 @@ func upApp(ctx context.Context, composeFilePath string, appInstall model.AppInst
 			appInstall.Message = err.Error()
 		}
 		appInstall.Status = constant.Error
-		_ = appInstallRepo.Save(ctx, &appInstall)
 	} else {
 		appInstall.Status = constant.Running
+	}
+	exist, _ := appInstallRepo.GetFirst(commonRepo.WithByID(appInstall.ID))
+	if exist.ID > 0 {
+		_ = appInstallRepo.Save(context.Background(), &appInstall)
+	} else {
 		_ = appInstallRepo.Save(ctx, &appInstall)
 	}
 }

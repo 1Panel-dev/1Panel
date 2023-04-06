@@ -393,6 +393,9 @@ const changeRuntime = (runID: number) => {
     runtimes.value.forEach((item) => {
         if (item.id === runID) {
             runtimeResource.value = item.resource;
+            if (item.type === 'appstore') {
+                getAppDetailByID(item.appDetailId);
+            }
         }
     });
 };
@@ -405,7 +408,7 @@ const getRuntimes = async () => {
             const first = runtimes.value[0];
             website.value.runtimeID = first.id;
             runtimeResource.value = first.resource;
-            if (first.type === 'appstore') {
+            if (first.resource === 'appstore') {
                 getAppDetailByID(first.appDetailId);
             }
         }
