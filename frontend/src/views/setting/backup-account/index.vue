@@ -27,10 +27,17 @@
                     </el-row>
                 </el-form>
 
-                <div style="margin-top: 20px">
+                <div class="common-div">
                     <span style="font-size: 14px; font-weight: 500">{{ $t('setting.thirdParty') }}</span>
                 </div>
-                <el-row :gutter="20" style="margin-top: 20px">
+
+                <el-alert type="info" :closable="false" class="common-div">
+                    <template #default>
+                        <div style="margin-bottom: 3px"><span v-html="$t('setting.backupAlert')"></span></div>
+                    </template>
+                </el-alert>
+
+                <el-row :gutter="20" class="common-div">
                     <el-col :span="12">
                         <div>
                             <svg-icon style="font-size: 7px" iconName="p-aws"></svg-icon>
@@ -106,7 +113,7 @@
                         </el-alert>
                     </el-col>
                 </el-row>
-                <el-row :gutter="20" style="margin-top: 20px">
+                <el-row :gutter="20" class="common-div">
                     <el-col :span="12">
                         <div>
                             <svg-icon style="font-size: 7px" iconName="p-tengxunyun1"></svg-icon>
@@ -433,5 +440,9 @@ onMounted(() => {
 }
 .alert {
     background-color: rgba(0, 94, 235, 0.03);
+}
+
+.common-div {
+    margin-top: 20px;
 }
 </style>
