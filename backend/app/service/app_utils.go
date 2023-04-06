@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/compose-spec/compose-go/types"
 	"github.com/subosito/gotenv"
 	"math"
 	"os"
@@ -381,15 +382,35 @@ func upAppPre(app model.App, appInstall model.AppInstall) error {
 	return nil
 }
 
-func upApp(ctx context.Context, composeFilePath string, appInstall model.AppInstall) {
-	out, err := compose.Up(composeFilePath)
-	if err != nil {
-		if out != "" {
-			appInstall.Message = out
+func upApp(ctx context.Context, appInstall model.AppInstall) {
+	upProject := func(appInstall model.AppInstall) (err error) {
+		envStr, err := coverEnvJsonToStr(appInstall.Env)
+		if err == nil {
+			var (
+				project        *types.Project
+				composeService *composeV2.ComposeService
+			)
+			project, err = composeV2.GetComposeProject(appInstall.Name, appInstall.GetPath(), []byte(appInstall.DockerCompose), []byte(envStr))
+			if err != nil {
+				return err
+			}
+			composeService, err = composeV2.NewComposeService()
+			if err != nil {
+				return
+			}
+			composeService.SetProject(project)
+			err = composeService.ComposeUp()
+			if err != nil {
+				return err
+			}
+			return
 		} else {
-			appInstall.Message = err.Error()
+			return
 		}
+	}
+	if err := upProject(appInstall); err != nil {
 		appInstall.Status = constant.Error
+		appInstall.Message = err.Error()
 	} else {
 		appInstall.Status = constant.Running
 	}
