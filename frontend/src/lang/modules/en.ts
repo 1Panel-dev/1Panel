@@ -813,6 +813,8 @@ const message = {
         SFTP: 'SFTP',
         COS: 'Tencent COS Browser',
         KODO: 'Qiniu KODO',
+        backupAlert:
+            "Compatibility of some object storage service providers with Amazon S3, For details please see <a target=“_blank” href='https://1panel.cn/docs/user_manual/settings/#3'>官方文档</a> ",
         domain: 'Accelerate domain',
         backupAccount: 'Backup account',
         loadBucket: 'Get bucket',
