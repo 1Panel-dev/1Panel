@@ -249,17 +249,12 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		return nil, err
 	}
 
-	paramByte, err := json.Marshal(req.Params)
-	if err != nil {
-		return nil, err
-	}
 	appInstall := model.AppInstall{
 		Name:        req.Name,
 		AppId:       appDetail.AppId,
 		AppDetailId: appDetail.ID,
 		Version:     appDetail.Version,
 		Status:      constant.Installing,
-		Env:         string(paramByte),
 		HttpPort:    httpPort,
 		HttpsPort:   httpsPort,
 		App:         app,
@@ -301,11 +296,15 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	if err := copyAppData(app.Key, appDetail.Version, req.Name, req.Params); err != nil {
 		return nil, err
 	}
-
 	fileOp := files.NewFileOp()
 	if err := fileOp.WriteFile(appInstall.GetComposePath(), strings.NewReader(string(composeByte)), 0775); err != nil {
 		return nil, err
 	}
+	paramByte, err := json.Marshal(req.Params)
+	if err != nil {
+		return nil, err
+	}
+	appInstall.Env = string(paramByte)
 
 	if err := appInstallRepo.Create(ctx, &appInstall); err != nil {
 		return nil, err
