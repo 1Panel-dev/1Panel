@@ -35,15 +35,17 @@ func (w *safeBuffer) Reset() {
 }
 
 const (
-	wsMsgCmd    = "cmd"
-	wsMsgResize = "resize"
+	wsMsgCmd       = "cmd"
+	wsMsgResize    = "resize"
+	wsMsgHeartbeat = "heartbeat"
 )
 
 type wsMsg struct {
-	Type string `json:"type"`
-	Data string `json:"data,omitempty"` // wsMsgCmd
-	Cols int    `json:"cols,omitempty"` // wsMsgResize
-	Rows int    `json:"rows,omitempty"` // wsMsgResize
+	Type      string `json:"type"`
+	Data      string `json:"data,omitempty"`      // wsMsgCmd
+	Cols      int    `json:"cols,omitempty"`      // wsMsgResize
+	Rows      int    `json:"rows,omitempty"`      // wsMsgResize
+	Timestamp int    `json:"timestamp,omitempty"` // wsMsgHeartbeat
 }
 
 type LogicSshWsSession struct {
@@ -140,6 +142,12 @@ func (sws *LogicSshWsSession) receiveWsMsg(exitCh chan bool) {
 					global.LOG.Errorf("websock cmd string base64 decoding failed, err: %v", err)
 				}
 				sws.sendWebsocketInputCommandToSshSessionStdinPipe(decodeBytes)
+			case wsMsgHeartbeat:
+				// 接收到心跳包后将心跳包原样返回，可以用于网络延迟检测等情况
+				err = wsConn.WriteMessage(websocket.TextMessage, wsData)
+				if err != nil {
+					global.LOG.Errorf("ssh sending heartbeat to webSocket failed, err: %v", err)
+				}
 			}
 		}
 	}
