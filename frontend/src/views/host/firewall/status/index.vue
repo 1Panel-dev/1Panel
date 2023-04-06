@@ -3,7 +3,7 @@
         <div class="app-status" style="margin-top: 20px">
             <el-card>
                 <div>
-                    <el-tag style="float: left" effect="dark" type="success">{{ baseInfo.name }}</el-tag>
+                    <el-tag effect="dark" type="success">{{ baseInfo.name }}</el-tag>
                     <el-tag round class="status-content" v-if="baseInfo.status === 'running'" type="success">
                         {{ $t('commons.status.running') }}
                     </el-tag>

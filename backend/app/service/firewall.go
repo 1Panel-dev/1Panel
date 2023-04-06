@@ -34,6 +34,9 @@ func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 	var baseInfo dto.FirewallBaseInfo
 	client, err := firewall.NewFirewallClient()
 	if err != nil {
+		if err.Error() == "no such type" {
+			return dto.FirewallBaseInfo{Name: "-", Version: "-", Status: "not running", PingStatus: "Disable"}, nil
+		}
 		return baseInfo, err
 	}
 	baseInfo.Name = client.Name()
@@ -294,7 +297,6 @@ func (u *FirewallService) BacthOperateRule(req dto.BatchRuleOperate) error {
 }
 
 func OperateFirewallPort(oldPorts, newPorts []int) error {
-	fmt.Printf("old: %v, new: %v \n", oldPorts, newPorts)
 	client, err := firewall.NewFirewallClient()
 	if err != nil {
 		return err
