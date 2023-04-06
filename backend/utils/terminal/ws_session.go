@@ -35,17 +35,17 @@ func (w *safeBuffer) Reset() {
 }
 
 const (
-	wsMsgCmd       = "cmd"
-	wsMsgResize    = "resize"
-	wsMsgHeartbeat = "heartbeat"
+	WsMsgCmd       = "cmd"
+	WsMsgResize    = "resize"
+	WsMsgHeartbeat = "heartbeat"
 )
 
-type wsMsg struct {
+type WsMsg struct {
 	Type      string `json:"type"`
-	Data      string `json:"data,omitempty"`      // wsMsgCmd
-	Cols      int    `json:"cols,omitempty"`      // wsMsgResize
-	Rows      int    `json:"rows,omitempty"`      // wsMsgResize
-	Timestamp int    `json:"timestamp,omitempty"` // wsMsgHeartbeat
+	Data      string `json:"data,omitempty"`      // WsMsgCmd
+	Cols      int    `json:"cols,omitempty"`      // WsMsgResize
+	Rows      int    `json:"rows,omitempty"`      // WsMsgResize
+	Timestamp int    `json:"timestamp,omitempty"` // WsMsgHeartbeat
 }
 
 type LogicSshWsSession struct {
@@ -127,22 +127,22 @@ func (sws *LogicSshWsSession) receiveWsMsg(exitCh chan bool) {
 			if err != nil {
 				return
 			}
-			msgObj := wsMsg{}
+			msgObj := WsMsg{}
 			_ = json.Unmarshal(wsData, &msgObj)
 			switch msgObj.Type {
-			case wsMsgResize:
+			case WsMsgResize:
 				if msgObj.Cols > 0 && msgObj.Rows > 0 {
 					if err := sws.session.WindowChange(msgObj.Rows, msgObj.Cols); err != nil {
 						global.LOG.Errorf("ssh pty change windows size failed, err: %v", err)
 					}
 				}
-			case wsMsgCmd:
+			case WsMsgCmd:
 				decodeBytes, err := base64.StdEncoding.DecodeString(msgObj.Data)
 				if err != nil {
 					global.LOG.Errorf("websock cmd string base64 decoding failed, err: %v", err)
 				}
 				sws.sendWebsocketInputCommandToSshSessionStdinPipe(decodeBytes)
-			case wsMsgHeartbeat:
+			case WsMsgHeartbeat:
 				// 接收到心跳包后将心跳包原样返回，可以用于网络延迟检测等情况
 				err = wsConn.WriteMessage(websocket.TextMessage, wsData)
 				if err != nil {
@@ -173,8 +173,8 @@ func (sws *LogicSshWsSession) sendComboOutput(exitCh chan bool) {
 			}
 			bs := sws.comboOutput.Bytes()
 			if len(bs) > 0 {
-				wsData, err := json.Marshal(wsMsg{
-					Type: wsMsgCmd,
+				wsData, err := json.Marshal(WsMsg{
+					Type: WsMsgCmd,
 					Data: base64.StdEncoding.EncodeToString(bs),
 				})
 				if err != nil {

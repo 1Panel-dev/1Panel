@@ -44,7 +44,7 @@
                 {{ $t('commons.button.conn') }}
             </el-button>
             <el-button v-else @click="handleClose()">{{ $t('commons.button.disconn') }}</el-button>
-            <div style="height: calc(100vh - 302px)" :id="'terminal-exec'"></div>
+            <Terminal style="height: calc(100vh - 302px)" ref="terminalRef"></Terminal>
         </el-form>
     </el-drawer>
 </template>
@@ -52,24 +52,12 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { ElForm, FormInstance } from 'element-plus';
-import { Terminal } from 'xterm';
-import { AttachAddon } from 'xterm-addon-attach';
-import { Base64 } from 'js-base64';
-import 'xterm/css/xterm.css';
-import { FitAddon } from 'xterm-addon-fit';
 import { Rules } from '@/global/form-rules';
-import { isJson } from '@/utils/util';
+import Terminal from '@/components/terminal/index.vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const terminalVisiable = ref(false);
 const terminalOpen = ref(false);
-const fitAddon = new FitAddon();
-let terminalSocket = ref(null) as unknown as WebSocket;
-let term = ref(null) as unknown as Terminal;
-const loading = ref(true);
-const runRealTerminal = () => {
-    loading.value = false;
-};
 const form = reactive({
     isCustom: false,
     command: '',
@@ -78,6 +66,7 @@ const form = reactive({
 });
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
+const terminalRef = ref<InstanceType<typeof Terminal> | null>(null);
 
 interface DialogProps {
     containerID: string;
@@ -89,125 +78,31 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     form.user = '';
     form.command = '/bin/bash';
     terminalOpen.value = false;
-    window.addEventListener('resize', changeTerminalSize);
 };
 
 const onChangeCommand = async () => {
     form.command = '';
 };
 
-const onWSReceive = (message: any) => {
-    if (!isJson(message.data)) {
-        return;
-    }
-    const data = JSON.parse(message.data);
-    term.element && term.focus();
-    term.write(data.Data);
-};
-
-const errorRealTerminal = (ex: any) => {
-    let message = ex.message;
-    if (!message) message = 'disconnected';
-    term.write(`\x1b[31m${message}\x1b[m\r\n`);
-};
-
-const closeRealTerminal = (ev: CloseEvent) => {
-    term.write(ev.reason);
-};
-
 const initTerm = (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        let href = window.location.href;
-        let protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
-        let ipLocal = href.split('//')[1].split('/')[0];
         terminalOpen.value = true;
-        let ifm = document.getElementById('terminal-exec') as HTMLInputElement | null;
-        term = new Terminal({
-            lineHeight: 1.2,
-            fontSize: 12,
-            fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
-            theme: {
-                background: '#000000',
-            },
-            cursorBlink: true,
-            cursorStyle: 'underline',
-            scrollback: 100,
-            tabStopWidth: 4,
+        terminalRef.value!.acceptParams({
+            endpoint: '/api/v1/containers/exec',
+            args: `containerid=${form.containerID}&user=${form.user}&command=${form.command}`,
+            error: '',
         });
-        if (ifm) {
-            term.open(ifm);
-            terminalSocket = new WebSocket(
-                `${protocol}://${ipLocal}/api/v1/containers/exec?containerid=${form.containerID}&cols=${term.cols}&rows=${term.rows}&user=${form.user}&command=${form.command}`,
-            );
-            terminalSocket.onopen = runRealTerminal;
-            terminalSocket.onmessage = onWSReceive;
-            terminalSocket.onclose = closeRealTerminal;
-            terminalSocket.onerror = errorRealTerminal;
-            term.onData((data: any) => {
-                if (isWsOpen()) {
-                    terminalSocket.send(
-                        JSON.stringify({
-                            type: 'cmd',
-                            cmd: Base64.encode(data),
-                        }),
-                    );
-                }
-            });
-            term.loadAddon(new AttachAddon(terminalSocket));
-            term.loadAddon(fitAddon);
-            setTimeout(() => {
-                fitAddon.fit();
-                if (isWsOpen()) {
-                    terminalSocket.send(
-                        JSON.stringify({
-                            type: 'resize',
-                            cols: term.cols,
-                            rows: term.rows,
-                        }),
-                    );
-                }
-            }, 30);
-        }
     });
 };
 
-const fitTerm = () => {
-    fitAddon.fit();
-};
-
-const isWsOpen = () => {
-    const readyState = terminalSocket && terminalSocket.readyState;
-    if (readyState) {
-        return readyState === 1;
-    }
-    return false;
-};
-
 function handleClose() {
-    window.removeEventListener('resize', changeTerminalSize);
-    if (isWsOpen()) {
-        terminalSocket && terminalSocket.close();
-        term.dispose();
-    }
+    terminalRef.value?.onClose();
     terminalVisiable.value = false;
     terminalOpen.value = false;
 }
 
-function changeTerminalSize() {
-    fitTerm();
-    const { cols, rows } = term;
-    if (isWsOpen()) {
-        terminalSocket.send(
-            JSON.stringify({
-                type: 'resize',
-                cols: cols,
-                rows: rows,
-            }),
-        );
-    }
-}
 defineExpose({
     acceptParams,
 });

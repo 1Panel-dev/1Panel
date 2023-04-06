@@ -68,14 +68,16 @@ const initError = (errorInfo: string) => {
     }
 };
 
-function onClose() {
+function onClose(isKeepShow: boolean = false) {
     window.removeEventListener('resize', changeTerminalSize);
     try {
         terminalSocket.value?.close();
     } catch {}
-    try {
-        term.value.dispose();
-    } catch {}
+    if (!isKeepShow) {
+        try {
+            term.value.dispose();
+        } catch {}
+    }
 }
 
 // terminal 相关代码 start
@@ -162,7 +164,7 @@ const onWSReceive = (message: MessageEvent) => {
     switch (wsMsg.type) {
         case 'cmd': {
             term.value.element && term.value.focus();
-            term.value.write(Base64.decode(wsMsg.data));
+            wsMsg.data && term.value.write(Base64.decode(wsMsg.data)); // 这里理论上不用判断，但是Redis和Ctr还没实现Alive处理，所以exit后会一直发数据，todo
             break;
         }
         case 'heartbeat': {

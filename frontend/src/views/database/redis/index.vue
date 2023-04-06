@@ -19,7 +19,12 @@
                 </div>
             </template>
             <template #main v-if="redisIsExist && !isOnSetting">
-                <Terminal :key="isRefresh" ref="terminalRef" />
+                <Terminal
+                    style="height: calc(100vh - 370px)"
+                    :key="isRefresh"
+                    ref="terminalRef"
+                    v-show="terminalShow"
+                />
             </template>
         </LayoutContent>
 
@@ -54,7 +59,7 @@
 import LayoutContent from '@/layout/layout-content.vue';
 import Setting from '@/views/database/redis/setting/index.vue';
 import Password from '@/views/database/redis/password/index.vue';
-import Terminal from '@/views/database/redis/terminal/index.vue';
+import Terminal from '@/components/terminal/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import { nextTick, onBeforeUnmount, ref } from 'vue';
 import { App } from '@/api/interface/app';
@@ -63,12 +68,13 @@ import router from '@/routers';
 
 const loading = ref(false);
 
-const terminalRef = ref();
+const terminalRef = ref<InstanceType<typeof Terminal> | null>(null);
 const settingRef = ref();
 const isOnSetting = ref(false);
 const redisIsExist = ref(false);
 const redisStatus = ref();
 const redisName = ref();
+const terminalShow = ref(false);
 
 const redisCommandPort = ref();
 const commandVisiable = ref(false);
@@ -78,6 +84,7 @@ const isRefresh = ref();
 const onSetting = async () => {
     isOnSetting.value = true;
     terminalRef.value?.onClose(false);
+    terminalShow.value = false;
     settingRef.value!.acceptParams({ status: redisStatus.value, redisName: redisName.value });
 };
 
@@ -112,19 +119,32 @@ const checkExist = (data: App.CheckInstalled) => {
     if (redisStatus.value === 'Running') {
         loadDashboardPort();
         nextTick(() => {
-            terminalRef.value.acceptParams();
+            terminalShow.value = true;
+            terminalRef.value.acceptParams({
+                endpoint: '/api/v1/databases/redis/exec',
+                args: '',
+                error: '',
+            });
         });
     }
 };
 
 const initTerminal = async () => {
     if (redisStatus.value === 'Running') {
-        terminalRef.value.acceptParams();
+        nextTick(() => {
+            terminalShow.value = true;
+            terminalRef.value.acceptParams({
+                endpoint: '/api/v1/databases/redis/exec',
+                args: '',
+                error: '',
+            });
+        });
     }
 };
 const closeTerminal = async (isKeepShow: boolean) => {
     isRefresh.value = !isRefresh.value;
     terminalRef.value?.onClose(isKeepShow);
+    terminalShow.value = isKeepShow;
 };
 
 const onBefore = () => {
