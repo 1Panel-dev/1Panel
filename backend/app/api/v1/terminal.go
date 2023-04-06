@@ -1,6 +1,8 @@
 package v1
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -196,7 +198,15 @@ func wshandleError(ws *websocket.Conn, err error) bool {
 		global.LOG.Errorf("handler ws faled:, err: %v", err)
 		dt := time.Now().Add(time.Second)
 		if ctlerr := ws.WriteControl(websocket.CloseMessage, []byte(err.Error()), dt); ctlerr != nil {
-			_ = ws.WriteMessage(websocket.TextMessage, []byte(err.Error()))
+			wsData, err := json.Marshal(terminal.WsMsg{
+				Type: terminal.WsMsgCmd,
+				Data: base64.StdEncoding.EncodeToString([]byte(err.Error())),
+			})
+			if err != nil {
+				_ = ws.WriteMessage(websocket.TextMessage, []byte("{\"type\":\"cmd\",\"data\":\"failed to encoding to json\"}"))
+			} else {
+				_ = ws.WriteMessage(websocket.TextMessage, wsData)
+			}
 		}
 		return true
 	}
