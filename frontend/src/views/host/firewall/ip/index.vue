@@ -1,9 +1,15 @@
 <template>
     <div v-loading="loading" style="position: relative">
         <FireRouter />
-        <FireStatus ref="fireStatuRef" @search="search" v-model:loading="loading" v-model:status="fireStatus" />
+        <FireStatus
+            ref="fireStatuRef"
+            @search="search"
+            v-model:loading="loading"
+            v-model:mask-show="maskShow"
+            v-model:status="fireStatus"
+        />
 
-        <el-card v-if="fireStatus != 'running'" class="mask-prompt">
+        <el-card v-if="fireStatus != 'running' && maskShow" class="mask-prompt">
             <span>{{ $t('firewall.firewallNotStart') }}</span>
         </el-card>
 
@@ -97,6 +103,7 @@ const activeTag = ref('address');
 const selects = ref<any>([]);
 const searchName = ref();
 
+const maskShow = ref(true);
 const fireStatus = ref('running');
 const fireStatuRef = ref();
 

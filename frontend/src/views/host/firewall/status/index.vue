@@ -51,7 +51,7 @@ const onPing = ref('Disable');
 const acceptParams = (): void => {
     loadBaseInfo(true);
 };
-const emit = defineEmits(['search', 'update:status', 'update:loading']);
+const emit = defineEmits(['search', 'update:status', 'update:loading', 'update:maskShow']);
 
 const loadBaseInfo = async (search: boolean) => {
     await loadFireBaseInfo()
@@ -71,23 +71,29 @@ const loadBaseInfo = async (search: boolean) => {
 };
 
 const onOperate = async (operation: string) => {
+    emit('update:maskShow', false);
     let operationHelper = i18n.global.t('firewall.' + operation + 'FirewallHelper');
     let title = i18n.global.t('firewall.firewallHelper', [i18n.global.t('commons.button.' + operation)]);
     ElMessageBox.confirm(operationHelper, title, {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
-    }).then(async () => {
-        emit('update:loading', true);
-        emit('update:status', 'running');
-        await operateFire(operation)
-            .then(() => {
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                loadBaseInfo(true);
-            })
-            .catch(() => {
-                emit('update:loading', false);
-            });
-    });
+    })
+        .then(async () => {
+            emit('update:loading', true);
+            emit('update:status', 'running');
+            emit('update:maskShow', true);
+            await operateFire(operation)
+                .then(() => {
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    loadBaseInfo(true);
+                })
+                .catch(() => {
+                    emit('update:loading', false);
+                });
+        })
+        .catch(() => {
+            emit('update:maskShow', true);
+        });
 };
 
 const onPingOperate = async (operation: string) => {
