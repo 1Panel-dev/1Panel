@@ -152,13 +152,23 @@
                                     <template #label>
                                         <span class="status-label">{{ $t('cronjob.website') }}</span>
                                     </template>
-                                    <span class="status-count">{{ dialogData.rowData!.website }}</span>
+                                    <span v-if="dialogData.rowData!.website !== 'all'" class="status-count">
+                                        {{ dialogData.rowData!.website }}
+                                    </span>
+                                    <span v-else class="status-count">
+                                        {{ $t('commons.table.all') }}
+                                    </span>
                                 </el-form-item>
                                 <el-form-item class="description" v-if="dialogData.rowData!.type === 'database'">
                                     <template #label>
                                         <span class="status-label">{{ $t('cronjob.database') }}</span>
                                     </template>
-                                    <span class="status-count">{{ dialogData.rowData!.dbName }}</span>
+                                    <span v-if="dialogData.rowData!.website !== 'all'" class="status-count">
+                                        {{ dialogData.rowData!.dbName }}
+                                    </span>
+                                    <span v-else class="status-count">
+                                        {{ $t('commons.table.all') }}
+                                    </span>
                                 </el-form-item>
                                 <el-form-item class="description" v-if="dialogData.rowData!.type === 'directory'">
                                     <template #label>
@@ -288,7 +298,7 @@ import LayoutContent from '@/layout/layout-content.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 const hasRecords = ref();
@@ -456,6 +466,14 @@ const onRefresh = () => {
 };
 
 const onDownload = async (record: any, backupID: number) => {
+    if (dialogData.value.rowData.dbName === 'all') {
+        MsgInfo(i18n.global.t('cronjob.allOptionHelper', [i18n.global.t('database.database')]));
+        return;
+    }
+    if (dialogData.value.rowData.website === 'all') {
+        MsgInfo(i18n.global.t('cronjob.allOptionHelper', [i18n.global.t('website.website')]));
+        return;
+    }
     if (!record.file || record.file.indexOf('/') === -1) {
         MsgError(i18n.global.t('cronjob.errPath', [record.file]));
         return;
