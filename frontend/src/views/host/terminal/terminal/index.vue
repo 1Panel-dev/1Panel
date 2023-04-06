@@ -131,7 +131,7 @@
 
 <script setup lang="ts">
 import { ref, getCurrentInstance, watch, nextTick } from 'vue';
-import Terminal from '@/views/host/terminal/terminal/terminal.vue';
+import Terminal from '@/components/terminal/index.vue';
 import HostDialog from '@/views/host/terminal/terminal/host-create.vue';
 import type Node from 'element-plus/es/components/tree/src/model/node';
 import { ElTree } from 'element-plus';
@@ -260,11 +260,11 @@ function quickInput(val: any) {
     if (val !== '' && ctx) {
         if (isBatch.value) {
             for (const tab of terminalTabs.value) {
-                ctx.refs[`t-${tab.index}`] && ctx.refs[`t-${tab.index}`][0].onSendMsg(val + '\n');
+                ctx.refs[`t-${tab.index}`] && ctx.refs[`t-${tab.index}`][0].sendMsg(val + '\n');
             }
             return;
         }
-        ctx.refs[`t-${terminalValue.value}`] && ctx.refs[`t-${terminalValue.value}`][0].onSendMsg(val + '\n');
+        ctx.refs[`t-${terminalValue.value}`] && ctx.refs[`t-${terminalValue.value}`][0].sendMsg(val + '\n');
         quickCmd.value = '';
     }
 }
@@ -275,12 +275,12 @@ function batchInput() {
     }
     if (isBatch.value) {
         for (const tab of terminalTabs.value) {
-            ctx.refs[`t-${tab.index}`] && ctx.refs[`t-${tab.index}`][0].onSendMsg(batchVal.value + '\n');
+            ctx.refs[`t-${tab.index}`] && ctx.refs[`t-${tab.index}`][0].sendMsg(batchVal.value + '\n');
         }
         batchVal.value = '';
         return;
     }
-    ctx.refs[`t-${terminalValue.value}`] && ctx.refs[`t-${terminalValue.value}`][0].onSendMsg(batchVal.value + '\n');
+    ctx.refs[`t-${terminalValue.value}`] && ctx.refs[`t-${terminalValue.value}`][0].sendMsg(batchVal.value + '\n');
     batchVal.value = '';
 }
 
@@ -313,8 +313,8 @@ const onReconnect = async (item: any) => {
     nextTick(() => {
         ctx.refs[`t-${item.index}`] &&
             ctx.refs[`t-${item.index}`][0].acceptParams({
-                wsID: item.wsID,
-                terminalID: item.index,
+                endpoint: '/api/v1/terminals',
+                args: `id=${item.wsID}`,
                 error: res.data ? '' : 'Failed to set up the connection. Please check the host information',
             });
     });
@@ -345,8 +345,8 @@ const onConnTerminal = async (title: string, wsID: number, isLocal?: boolean) =>
     nextTick(() => {
         ctx.refs[`t-${terminalValue.value}`] &&
             ctx.refs[`t-${terminalValue.value}`][0].acceptParams({
-                wsID: wsID,
-                terminalID: terminalValue.value,
+                endpoint: '/api/v1/terminals',
+                args: `id=${wsID}`,
                 error: res.data ? '' : 'Authentication failed.  Please check the host information !',
             });
     });
