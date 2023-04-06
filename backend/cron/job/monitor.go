@@ -66,6 +66,7 @@ func loadDiskIO() {
 	time.Sleep(60 * time.Second)
 
 	ioStat2, _ := disk.IOCounters()
+	var ioList []model.MonitorIO
 	for _, io2 := range ioStat2 {
 		for _, io1 := range ioStat {
 			if io2.Name == io1.Name {
@@ -85,12 +86,13 @@ func loadDiskIO() {
 				if writeTime > itemIO.Time {
 					itemIO.Time = writeTime
 				}
-				if err := global.DB.Create(&itemIO).Error; err != nil {
-					global.LOG.Errorf("Insert io monitoring data failed, err: %v", err)
-				}
+				ioList = append(ioList, itemIO)
 				break
 			}
 		}
+	}
+	if err := global.DB.CreateInBatches(ioList, len(ioList)).Error; err != nil {
+		global.LOG.Errorf("Insert io monitoring data failed, err: %v", err)
 	}
 }
 
@@ -101,6 +103,7 @@ func loadNetIO() {
 	time.Sleep(60 * time.Second)
 
 	netStat2, _ := net.IOCounters(true)
+	var netList []model.MonitorNetwork
 	for _, net2 := range netStat2 {
 		for _, net1 := range netStat {
 			if net2.Name == net1.Name {
@@ -108,9 +111,7 @@ func loadNetIO() {
 				itemNet.Name = net1.Name
 				itemNet.Up = float64(net2.BytesSent-net1.BytesSent) / 1024 / 60
 				itemNet.Down = float64(net2.BytesRecv-net1.BytesRecv) / 1024 / 60
-				if err := global.DB.Create(&itemNet).Error; err != nil {
-					global.LOG.Errorf("Insert network monitoring data failed, err: %v", err)
-				}
+				netList = append(netList, itemNet)
 				break
 			}
 		}
@@ -126,11 +127,13 @@ func loadNetIO() {
 				itemNet.Name = net1.Name
 				itemNet.Up = float64(net2.BytesSent-net1.BytesSent) / 1024 / 60
 				itemNet.Down = float64(net2.BytesRecv-net1.BytesRecv) / 1024 / 60
-				if err := global.DB.Create(&itemNet).Error; err != nil {
-					global.LOG.Errorf("Insert network all monitoring data failed, err: %v", err)
-				}
+				netList = append(netList, itemNet)
 				break
 			}
 		}
+	}
+
+	if err := global.DB.CreateInBatches(netList, len(netList)).Error; err != nil {
+		global.LOG.Errorf("Insert network monitoring data failed, err: %v", err)
 	}
 }
