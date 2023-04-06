@@ -34,6 +34,7 @@ const webSocketReady = ref(false);
 const termReady = ref(false);
 const terminalSocket = ref<WebSocket>();
 const term = ref<Terminal>();
+const heartbeatTimer = ref<number>();
 
 const readyWatcher = watch(
     () => webSocketReady.value && termReady.value,
@@ -59,6 +60,10 @@ const onWSReceive = (message: MessageEvent) => {
             }
             break;
         }
+        case 'heartbeat': {
+            console.debug('latency', new Date().getTime() - wsMsg.timestamp, 'ms');
+            break;
+        }
     }
 };
 
@@ -71,6 +76,9 @@ const errorRealTerminal = (ex: any) => {
 };
 
 const closeRealTerminal = (ev: CloseEvent) => {
+    if (heartbeatTimer.value) {
+        clearInterval(heartbeatTimer.value);
+    }
     if (term.value) {
         term.value.write(ev.reason);
     }
@@ -125,6 +133,16 @@ const initTerm = () => {
         terminalSocket.value.onmessage = onWSReceive;
         terminalSocket.value.onclose = closeRealTerminal;
         terminalSocket.value.onerror = errorRealTerminal;
+        heartbeatTimer.value = setInterval(() => {
+            if (isWsOpen()) {
+                terminalSocket.value!.send(
+                    JSON.stringify({
+                        type: 'heartbeat',
+                        timestamp: `${new Date().getTime()}`,
+                    }),
+                );
+            }
+        }, 1000 * 10);
         term.value.onData((data: any) => {
             if (isWsOpen()) {
                 terminalSocket.value!.send(
