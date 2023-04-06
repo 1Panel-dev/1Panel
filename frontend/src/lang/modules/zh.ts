@@ -806,7 +806,7 @@ const message = {
 
         backup: '备份',
         thirdParty: '第三方账号',
-        createBackupAccount: '添加 {0} 备份账号',
+        createBackupAccount: '添加 {0}',
         noTypeForCreate: '当前无可创建备份类型',
         LOCAL: '服务器磁盘',
         currentPath: '当前路径',
@@ -814,10 +814,10 @@ const message = {
         S3: '亚马逊 S3 云存储',
         MINIO: 'MINIO',
         SFTP: 'SFTP',
-        COS: '腾讯云 COS Browser',
-        KODO: '七牛云 KODO',
+        COS: '腾讯云 COS',
+        KODO: '七牛云 Kodo',
         backupAlert:
-            "部分对象存储服务商与亚马逊 S3 的兼容性，详情请查看 <a target=“_blank” href='https://1panel.cn/docs/user_manual/settings/#3'>官方文档</a> ",
+            "理论上只要云厂商兼容 S3 协议，就可以用现有的亚马逊 S3 云存储来备份，具体配置参考 <a target=“_blank” href='https://1panel.cn/docs/user_manual/settings/#3'>官方文档</a> ",
         domain: '加速域名',
         backupAccount: '备份账号',
         loadBucket: '获取桶',

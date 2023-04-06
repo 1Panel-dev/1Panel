@@ -806,7 +806,7 @@ const message = {
 
         backup: 'Backup',
         thirdParty: 'Third-party account',
-        createBackupAccount: 'Create {0} backup account',
+        createBackupAccount: 'Add {0}',
         noTypeForCreate: 'No backup type is currently created',
         LOCAL: 'Server disks',
         currentPath: 'Current path',
@@ -814,10 +814,10 @@ const message = {
         S3: 'Amazon S3',
         MINIO: 'MINIO',
         SFTP: 'SFTP',
-        COS: 'Tencent COS Browser',
-        KODO: 'Qiniu KODO',
+        COS: 'Tencent COS',
+        KODO: 'Qiniu Kodo',
         backupAlert:
-            "Compatibility of some object storage service providers with Amazon S3, For details please see <a target=“_blank” href='https://1panel.cn/docs/user_manual/settings/#3'>官方文档</a> ",
+            "In theory, as long as the cloud provider is compatible with the S3 protocol, existing Amazon S3 cloud storage can be used for backup. For specific configurations, please refer to the <a target=“_blank” href='https://1panel.cn/docs/user_manual/settings/#3'>official documentation.</a> ",
         domain: 'Accelerate domain',
         backupAccount: 'Backup account',
         loadBucket: 'Get bucket',
