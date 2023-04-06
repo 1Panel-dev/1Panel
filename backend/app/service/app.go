@@ -316,7 +316,7 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	if err := upAppPre(app, appInstall); err != nil {
 		return nil, err
 	}
-	go upApp(ctx, appInstall.GetComposePath(), appInstall)
+	go upApp(ctx, appInstall)
 	go updateToolApp(appInstall)
 	ports := []int{appInstall.HttpPort}
 	if appInstall.HttpsPort > 0 {
