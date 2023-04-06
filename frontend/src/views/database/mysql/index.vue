@@ -5,6 +5,7 @@
                 <AppStatus
                     :app-key="'mysql'"
                     v-model:loading="loading"
+                    v-model:mask-show="maskShow"
                     @setting="onSetting"
                     @is-exist="checkExist"
                 ></AppStatus>
@@ -108,8 +109,7 @@
         </LayoutContent>
 
         <el-card
-            width="30%"
-            v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist && !loading"
+            v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist && !loading && maskShow"
             class="mask-prompt"
         >
             <span>{{ $t('commons.service.serviceNotStarted', ['MySQL']) }}</span>
@@ -171,6 +171,7 @@ import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
+const maskShow = ref(true);
 
 const mysqlName = ref();
 const isOnSetting = ref<boolean>();
