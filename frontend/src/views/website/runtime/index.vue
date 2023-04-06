@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { DeleteRuntime, SearchRuntimes } from '@/api/modules/runtime';
 import { dateFormat, toLowerCase } from '@/utils/util';
@@ -82,14 +82,15 @@ import { useDeleteData } from '@/hooks/use-delete-data';
 
 const paginationConfig = reactive({
     currentPage: 1,
-    pageSize: 15,
+    pageSize: 10,
     total: 0,
 });
 let req = reactive<Runtime.RuntimeReq>({
     name: '',
     page: 1,
-    pageSize: 15,
+    pageSize: 40,
 });
+let timer: NodeJS.Timer | null = null;
 
 const buttons = [
     {
@@ -138,5 +139,13 @@ const openDelete = async (row: Runtime.Runtime) => {
 
 onMounted(() => {
     search();
+    timer = setInterval(() => {
+        search();
+    }, 10000 * 3);
+});
+
+onUnmounted(() => {
+    clearInterval(Number(timer));
+    timer = null;
 });
 </script>

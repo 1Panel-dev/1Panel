@@ -102,7 +102,7 @@ import { MsgSuccess } from '@/utils/message';
 
 const paginationConfig = reactive({
     currentPage: 1,
-    pageSize: 20,
+    pageSize: 10,
     total: 0,
 });
 const acmeAccountRef = ref();

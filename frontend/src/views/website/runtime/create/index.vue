@@ -244,7 +244,11 @@ const getRuntime = async (id: number) => {
             version: data.version,
         };
         editParams.value = data.appParams;
-        searchApp(data.appId);
+        if (mode.value == 'create') {
+            searchApp(data.appId);
+        } else {
+            initParam.value = true;
+        }
     } catch (error) {}
 };
 
