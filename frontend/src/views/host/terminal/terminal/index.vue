@@ -18,9 +18,17 @@
             >
                 <template #label>
                     <span class="custom-tabs-label">
-                        <el-icon style="margin-top: 1px" color="#67C23A" v-if="item.status === 'online'">
-                            <circleCheck />
-                        </el-icon>
+                        <span
+                            v-if="item.status === 'online'"
+                            :style="`color: ${
+                                item.latency < 100 ? '#69db7c' : item.latency < 300 ? '#f59f00' : '#d9480f'
+                            }; display: inline-flex; align-items: center`"
+                        >
+                            <span>&nbsp;{{ item.latency }}&nbsp;ms&nbsp;</span>
+                            <el-icon>
+                                <circleCheck />
+                            </el-icon>
+                        </span>
                         <el-button
                             v-if="item.status === 'closed'"
                             icon="Refresh"
@@ -328,6 +336,7 @@ const onConnTerminal = async (title: string, wsID: number, isLocal?: boolean) =>
         title: title,
         wsID: wsID,
         status: res.data ? 'online' : 'closed',
+        latency: 0,
     });
     terminalValue.value = tabIndex;
     if (!res.data && isLocal) {
@@ -348,6 +357,7 @@ function syncTerminal() {
     for (const terminal of terminalTabs.value) {
         if (ctx && ctx.refs[`t-${terminal.index}`][0]) {
             terminal.status = ctx.refs[`t-${terminal.index}`][0].isWsOpen() ? 'online' : 'closed';
+            terminal.latency = ctx.refs[`t-${terminal.index}`][0].getLatency();
         }
     }
 }
