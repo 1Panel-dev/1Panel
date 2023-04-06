@@ -217,13 +217,13 @@ let groups = ref<Group.GroupInfo[]>([]);
 
 const paginationConfig = reactive({
     currentPage: 1,
-    pageSize: 15,
+    pageSize: 10,
     total: 0,
 });
 let req = reactive({
     name: '',
     page: 1,
-    pageSize: 15,
+    pageSize: 10,
     websiteGroupId: 0,
 });
 

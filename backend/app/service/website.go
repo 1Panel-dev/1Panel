@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"os"
 	"path"
 	"reflect"
@@ -183,9 +182,6 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 		runtime, err = runtimeRepo.GetFirst(commonRepo.WithByID(create.RuntimeID))
 		if err != nil {
 			return err
-		}
-		if common.ScanPort(create.Port) {
-			return buserr.WithDetail(constant.ErrPortInUsed, create.Port, nil)
 		}
 		if runtime.Resource == constant.ResourceAppstore {
 			var req request.AppInstallCreate

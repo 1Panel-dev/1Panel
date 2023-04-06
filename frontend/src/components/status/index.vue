@@ -1,7 +1,7 @@
 <template>
     <el-tag :type="getType(status)" round effect="light">
         {{ $t('commons.status.' + status) }}
-        <el-icon v-if="status === 'installing'" class="is-loading">
+        <el-icon v-if="loadingIcon(status)" class="is-loading">
             <Loading />
         </el-icon>
     </el-tag>
@@ -29,6 +29,12 @@ const getType = (status: string) => {
         default:
             return '';
     }
+};
+
+const loadingStatus = ['installing', 'building', 'restarting'];
+
+const loadingIcon = (status: string): boolean => {
+    return loadingStatus.indexOf(status) > -1;
 };
 
 onMounted(() => {

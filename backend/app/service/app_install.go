@@ -402,14 +402,12 @@ func (a *AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, erro
 	if err != nil {
 		return nil, err
 	}
-	if app.Type == "website" {
-		websites, _ := websiteRepo.GetBy(websiteRepo.WithAppInstallId(appInstall.ID))
-		for _, website := range websites {
-			res = append(res, dto.AppResource{
-				Type: "website",
-				Name: website.PrimaryDomain,
-			})
-		}
+	websites, _ := websiteRepo.GetBy(websiteRepo.WithAppInstallId(appInstall.ID))
+	for _, website := range websites {
+		res = append(res, dto.AppResource{
+			Type: "website",
+			Name: website.PrimaryDomain,
+		})
 	}
 	if app.Key == constant.AppOpenresty {
 		websites, _ := websiteRepo.GetBy()
