@@ -21,8 +21,8 @@
                         </el-form-item>
                         <el-form-item :label="$t('firewall.strategy')" prop="strategy">
                             <el-radio-group v-model="dialogData.rowData!.strategy">
-                                <el-radio label="accept">{{ $t('firewall.accept') }}</el-radio>
-                                <el-radio label="drop">{{ $t('firewall.drop') }}</el-radio>
+                                <el-radio label="accept">{{ $t('firewall.allow') }}</el-radio>
+                                <el-radio label="drop">{{ $t('firewall.deny') }}</el-radio>
                             </el-radio-group>
                         </el-form-item>
                     </el-col>
