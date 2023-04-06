@@ -35,6 +35,7 @@ const termReady = ref(false);
 const terminalSocket = ref<WebSocket>();
 const term = ref<Terminal>();
 const heartbeatTimer = ref<number>();
+const latency = ref(0);
 
 const readyWatcher = watch(
     () => webSocketReady.value && termReady.value,
@@ -61,7 +62,7 @@ const onWSReceive = (message: MessageEvent) => {
             break;
         }
         case 'heartbeat': {
-            console.debug('latency', new Date().getTime() - wsMsg.timestamp, 'ms');
+            latency.value = new Date().getTime() - wsMsg.timestamp;
             break;
         }
     }
@@ -225,6 +226,7 @@ defineExpose({
     onClose,
     isWsOpen,
     onSendMsg,
+    getLatency: () => latency.value,
 });
 
 onBeforeUnmount(() => {
