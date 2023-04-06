@@ -5,6 +5,7 @@
                 <AppStatus
                     :app-key="'redis'"
                     v-model:loading="loading"
+                    v-model:mask-show="maskShow"
                     @before="onBefore"
                     @setting="onSetting"
                     @is-exist="checkExist"
@@ -23,7 +24,7 @@
             </template>
         </LayoutContent>
 
-        <el-card width="30%" v-if="redisStatus != 'Running' && !isOnSetting && redisIsExist" class="mask-prompt">
+        <el-card v-if="redisStatus != 'Running' && !isOnSetting && redisIsExist && maskShow" class="mask-prompt">
             <span>{{ $t('commons.service.serviceNotStarted', ['Redis']) }}</span>
         </el-card>
 
@@ -62,6 +63,7 @@ import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
 
 const loading = ref(false);
+const maskShow = ref(true);
 
 const terminalRef = ref();
 const settingRef = ref();
