@@ -20,6 +20,7 @@ type ICronjobRepo interface {
 	Page(limit, offset int, opts ...DBOption) (int64, []model.Cronjob, error)
 	Create(cronjob *model.Cronjob) error
 	WithByJobID(id int) DBOption
+	WithByRecordDropID(id int) DBOption
 	Save(id uint, cronjob model.Cronjob) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
@@ -110,6 +111,12 @@ func (u *CronjobRepo) Create(cronjob *model.Cronjob) error {
 func (c *CronjobRepo) WithByJobID(id int) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("cronjob_id = ?", id)
+	}
+}
+
+func (c *CronjobRepo) WithByRecordDropID(id int) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("id < ?", id)
 	}
 }
 
