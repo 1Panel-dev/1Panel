@@ -67,7 +67,7 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, reactive, ref, shallowRef } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
@@ -170,6 +170,11 @@ function loadDetailInfo(id: number) {
     }
     return '';
 }
+
+onBeforeUnmount(() => {
+    clearInterval(Number(timer));
+    timer = null;
+});
 
 defineExpose({
     acceptParams,

@@ -49,10 +49,6 @@
                         &nbsp;{{ $t('cronjob.handle') }}
                     </el-tag>
                     <span class="buttons">
-                        <el-button type="primary" @click="onRefresh" link>
-                            {{ $t('commons.button.refresh') }}
-                        </el-button>
-                        <el-divider direction="vertical" />
                         <el-button type="primary" @click="onHandle(dialogData.rowData)" link>
                             {{ $t('commons.button.handle') }}
                         </el-button>
@@ -290,7 +286,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { onBeforeUnmount, reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import { loadZero } from '@/utils/util';
 import { searchRecords, download, handleOnce, updateStatus, cleanRecords } from '@/api/modules/cronjob';
@@ -306,6 +302,8 @@ import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 const hasRecords = ref();
+
+let timer: NodeJS.Timer | null = null;
 
 const mymirror = ref();
 const extensions = [javascript(), oneDark];
@@ -324,6 +322,9 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     dialogData.value = params;
     recordShow.value = true;
     search(true);
+    timer = setInterval(() => {
+        onRefresh();
+    }, 1000 * 10);
 };
 
 const shortcuts = [
@@ -462,11 +463,27 @@ const search = async (isInit: boolean) => {
     searchInfo.recordTotal = res.data.total;
 };
 
-const onRefresh = () => {
+const onRefresh = async () => {
     records.value = [];
     searchInfo.pageSize = searchInfo.pageSize * searchInfo.page;
     searchInfo.page = 1;
-    search(true);
+    if (timeRangeLoad.value && timeRangeLoad.value.length === 2) {
+        searchInfo.startTime = timeRangeLoad.value[0];
+        searchInfo.endTime = timeRangeLoad.value[1];
+    } else {
+        searchInfo.startTime = new Date(new Date().setHours(0, 0, 0, 0));
+        searchInfo.endTime = new Date();
+    }
+    let params = {
+        page: searchInfo.page,
+        pageSize: searchInfo.pageSize,
+        cronjobID: dialogData.value.rowData!.id,
+        startTime: searchInfo.startTime,
+        endTime: searchInfo.endTime,
+        status: searchInfo.status,
+    };
+    const res = await searchRecords(params);
+    records.value = res.data.items || [];
 };
 
 const onDownload = async (record: any, backupID: number) => {
@@ -550,6 +567,11 @@ function loadWeek(i: number) {
     }
     return '';
 }
+
+onBeforeUnmount(() => {
+    clearInterval(Number(timer));
+    timer = null;
+});
 
 defineExpose({
     acceptParams,
