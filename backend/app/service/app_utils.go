@@ -194,7 +194,7 @@ func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, f
 	return appInstallResourceRepo.DeleteBy(ctx, appInstallResourceRepo.WithAppInstallId(install.ID))
 }
 
-func updateInstall(installId uint, detailId uint) error {
+func upgradeInstall(installId uint, detailId uint) error {
 	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
 	if err != nil {
 		return err
@@ -252,12 +252,17 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	containerNames := []string{install.ContainerName}
+	containerMap := make(map[string]struct{})
+	containerMap[install.ContainerName] = struct{}{}
 	for _, service := range project.AllServices() {
 		if service.ContainerName == "${CONTAINER_NAME}" || service.ContainerName == "" {
 			continue
 		}
-		containerNames = append(containerNames, service.ContainerName)
+		containerMap[service.ContainerName] = struct{}{}
+	}
+	var containerNames []string
+	for k := range containerMap {
+		containerNames = append(containerNames, k)
 	}
 	return containerNames, nil
 }
@@ -382,23 +387,32 @@ func upAppPre(app model.App, appInstall model.AppInstall) error {
 	return nil
 }
 
+func getServiceFromInstall(appInstall model.AppInstall) (service *composeV2.ComposeService, err error) {
+	var (
+		project *types.Project
+		envStr  string
+	)
+	envStr, err = coverEnvJsonToStr(appInstall.Env)
+	if err != nil {
+		return
+	}
+	project, err = composeV2.GetComposeProject(appInstall.Name, appInstall.GetPath(), []byte(appInstall.DockerCompose), []byte(envStr))
+	if err != nil {
+		return
+	}
+	service, err = composeV2.NewComposeService()
+	if err != nil {
+		return
+	}
+	service.SetProject(project)
+	return
+}
+
 func upApp(ctx context.Context, appInstall model.AppInstall) {
 	upProject := func(appInstall model.AppInstall) (err error) {
-		envStr, err := coverEnvJsonToStr(appInstall.Env)
 		if err == nil {
-			var (
-				project        *types.Project
-				composeService *composeV2.ComposeService
-			)
-			project, err = composeV2.GetComposeProject(appInstall.Name, appInstall.GetPath(), []byte(appInstall.DockerCompose), []byte(envStr))
-			if err != nil {
-				return err
-			}
-			composeService, err = composeV2.NewComposeService()
-			if err != nil {
-				return
-			}
-			composeService.SetProject(project)
+			var composeService *composeV2.ComposeService
+			composeService, err = getServiceFromInstall(appInstall)
 			err = composeService.ComposeUp()
 			if err != nil {
 				return err

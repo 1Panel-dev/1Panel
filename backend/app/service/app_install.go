@@ -209,7 +209,7 @@ func (a *AppInstallService) Operate(ctx context.Context, req request.AppInstalle
 	case constant.Sync:
 		return syncById(install.ID)
 	case constant.Upgrade:
-		return updateInstall(install.ID, req.DetailId)
+		return upgradeInstall(install.ID, req.DetailId)
 	default:
 		return errors.New("operate not support")
 	}

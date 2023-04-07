@@ -10,6 +10,7 @@ import (
 	"github.com/docker/compose/v2/pkg/compose"
 	"github.com/docker/docker/client"
 	"github.com/joho/godotenv"
+	"path"
 	"strings"
 	"time"
 )
@@ -109,6 +110,7 @@ func GetComposeProject(projectName, workDir string, yml []byte, env []byte) (*ty
 	if err != nil {
 		return nil, err
 	}
+	project.ComposeFiles = []string{path.Join(workDir, "docker-compose.yml")}
 	return project, nil
 }
 
