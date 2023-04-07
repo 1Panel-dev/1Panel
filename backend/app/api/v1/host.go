@@ -291,7 +291,7 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 // @Param request body dto.ChangeHostGroup true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /hosts/update [post]
+// @Router /hosts/update/group [post]
 // @x-panel-log {"bodyKeys":["id","group"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"hosts","output_colume":"addr","output_value":"addr"}],"formatZH":"切换主机[addr]分组 => [group]","formatEN":"change host [addr] group => [group]"}
 func (b *BaseApi) UpdateHostGroup(c *gin.Context) {
 	var req dto.ChangeHostGroup

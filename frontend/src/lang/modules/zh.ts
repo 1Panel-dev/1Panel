@@ -694,6 +694,7 @@ const message = {
             apps: '应用',
             websites: '网站',
             containers: '容器',
+            runtimes: '运行环境',
             groups: '系统组',
             commands: '快捷命令',
             files: '文件管理',
