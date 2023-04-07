@@ -12,7 +12,7 @@
             <el-col :span="24">
                 <el-card style="overflow: inherit">
                     <template #header>
-                        <span style="font-size: 16px; font-weight: 500">{{ $t('monitor.avgLoad') }}</span>
+                        <span class="title">{{ $t('monitor.avgLoad') }}</span>
                         <el-date-picker
                             @change="search('load')"
                             v-model="timeRangeLoad"
@@ -21,10 +21,10 @@
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
-                            style="float: right; width: 360px"
+                            style="float: right; margin-top: -5px; width: 360px"
                         ></el-date-picker>
                     </template>
-                    <div id="loadLoadChart" style="width: 100%; height: 400px"></div>
+                    <div id="loadLoadChart" class="chart"></div>
                 </el-card>
             </el-col>
         </el-row>
@@ -32,7 +32,7 @@
             <el-col :span="12">
                 <el-card style="overflow: inherit">
                     <template #header>
-                        <span style="font-size: 16px; font-weight: 500">CPU</span>
+                        <span class="title">CPU</span>
                         <el-date-picker
                             @change="search('cpu')"
                             v-model="timeRangeCpu"
@@ -41,16 +41,16 @@
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
-                            style="float: right; width: 360px"
+                            style="float: right; margin-top: -5px; width: 360px"
                         ></el-date-picker>
                     </template>
-                    <div id="loadCPUChart" style="width: 100%; height: 400px"></div>
+                    <div id="loadCPUChart" class="chart"></div>
                 </el-card>
             </el-col>
             <el-col :span="12">
                 <el-card style="overflow: inherit">
                     <template #header>
-                        <span style="font-size: 16px; font-weight: 500">{{ $t('monitor.memory') }}</span>
+                        <span class="title">{{ $t('monitor.memory') }}</span>
                         <el-date-picker
                             @change="search('memory')"
                             v-model="timeRangeMemory"
@@ -59,10 +59,10 @@
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
-                            style="float: right; width: 360px"
+                            style="float: right; margin-top: -5px; width: 360px"
                         ></el-date-picker>
                     </template>
-                    <div id="loadMemoryChart" style="width: 100%; height: 400px"></div>
+                    <div id="loadMemoryChart" class="chart"></div>
                 </el-card>
             </el-col>
         </el-row>
@@ -70,7 +70,7 @@
             <el-col :span="12">
                 <el-card style="overflow: inherit">
                     <template #header>
-                        <span style="font-size: 16px; font-weight: 500">{{ $t('monitor.disk') }} IO</span>
+                        <span class="title">{{ $t('monitor.disk') }} IO</span>
                         <el-date-picker
                             @change="search('io')"
                             v-model="timeRangeIO"
@@ -79,16 +79,16 @@
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
-                            style="float: right; width: 360px"
+                            style="float: right; margin-top: -5px; width: 360px"
                         ></el-date-picker>
                     </template>
-                    <div id="loadIOChart" style="width: 100%; height: 400px"></div>
+                    <div id="loadIOChart" class="chart"></div>
                 </el-card>
             </el-col>
             <el-col :span="12">
                 <el-card style="overflow: inherit">
                     <template #header>
-                        <span style="font-size: 16px; font-weight: 500">{{ $t('monitor.network') }} IO:</span>
+                        <span class="title">{{ $t('monitor.network') }} IO:</span>
                         <el-popover placement="bottom" :width="200" trigger="click">
                             <el-select @change="search('network')" v-model="networkChoose">
                                 <template #prefix>{{ $t('monitor.networkCard') }}</template>
@@ -114,10 +114,10 @@
                             :start-placeholder="$t('commons.search.timeStart')"
                             :end-placeholder="$t('commons.search.timeEnd')"
                             :shortcuts="shortcuts"
-                            style="float: right; width: 360px"
+                            style="float: right; margin-top: -5px; width: 360px"
                         ></el-date-picker>
                     </template>
-                    <div id="loadNetworkChart" style="width: 100%; height: 400px"></div>
+                    <div id="loadNetworkChart" class="chart"></div>
                 </el-card>
             </el-col>
         </el-row>
@@ -663,5 +663,13 @@ onBeforeUnmount(() => {
     margin-left: 5px;
     cursor: pointer;
     color: var(--el-color-primary);
+}
+.title {
+    font-size: 16px;
+    font-weight: 500;
+}
+.chart {
+    width: 100%;
+    height: 400px;
 }
 </style>
