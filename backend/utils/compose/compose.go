@@ -10,7 +10,7 @@ func Up(filePath string) (string, error) {
 }
 
 func Down(filePath string) (string, error) {
-	stdout, err := cmd.Execf("docker-compose -f %s down", filePath)
+	stdout, err := cmd.Execf("docker-compose -f %s down --remove-orphans", filePath)
 	return stdout, err
 }
 

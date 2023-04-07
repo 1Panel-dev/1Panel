@@ -32,3 +32,7 @@ func (i *AppInstall) GetPath() string {
 func (i *AppInstall) GetComposePath() string {
 	return path.Join(constant.AppInstallDir, i.App.Key, i.Name, "docker-compose.yml")
 }
+
+func (i *AppInstall) GetEnvPath() string {
+	return path.Join(constant.AppInstallDir, i.App.Key, i.Name, ".env")
+}
