@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os/exec"
 	"sort"
 	"strconv"
@@ -47,6 +46,8 @@ type IContainerService interface {
 	CreateNetwork(req dto.NetworkCreat) error
 	DeleteVolume(req dto.BatchDelete) error
 	CreateVolume(req dto.VolumeCreat) error
+	TestCompose(req dto.ComposeCreate) (bool, error)
+	ComposeUpdate(req dto.ComposeUpdate) error
 }
 
 func NewIContainerService() IContainerService {
@@ -225,9 +226,9 @@ func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error 
 	case constant.ContainerOpStart:
 		err = client.ContainerStart(ctx, req.Name, types.ContainerStartOptions{})
 	case constant.ContainerOpStop:
-		err = client.ContainerStop(ctx, req.Name, nil)
+		err = client.ContainerStop(ctx, req.Name, container.StopOptions{})
 	case constant.ContainerOpRestart:
-		err = client.ContainerRestart(ctx, req.Name, nil)
+		err = client.ContainerRestart(ctx, req.Name, container.StopOptions{})
 	case constant.ContainerOpKill:
 		err = client.ContainerKill(ctx, req.Name, "SIGKILL")
 	case constant.ContainerOpPause:
@@ -265,7 +266,7 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainterStats, erro
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -337,7 +338,7 @@ func pullImages(ctx context.Context, client *client.Client, image string) error 
 		return err
 	}
 	defer out.Close()
-	_, err = io.Copy(ioutil.Discard, out)
+	_, err = io.Copy(io.Discard, out)
 	if err != nil {
 		return err
 	}

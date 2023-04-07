@@ -42,3 +42,7 @@ type WebsiteLog struct {
 	Enable  bool   `json:"enable"`
 	Content string `json:"content"`
 }
+
+type PHPConfig struct {
+	Params map[string]string `json:"params"`
+}

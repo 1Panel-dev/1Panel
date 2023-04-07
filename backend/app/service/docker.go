@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -66,7 +65,7 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 	if _, err := os.Stat(constant.DaemonJsonPath); err != nil {
 		return &dto.DaemonJsonConf{Status: status, Version: version}
 	}
-	file, err := ioutil.ReadFile(constant.DaemonJsonPath)
+	file, err := os.ReadFile(constant.DaemonJsonPath)
 	if err != nil {
 		return &dto.DaemonJsonConf{Status: status, Version: version}
 	}
@@ -109,7 +108,7 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 		_, _ = os.Create(constant.DaemonJsonPath)
 	}
 
-	file, err := ioutil.ReadFile(constant.DaemonJsonPath)
+	file, err := os.ReadFile(constant.DaemonJsonPath)
 	if err != nil {
 		return err
 	}
@@ -151,7 +150,7 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 	if err != nil {
 		return err
 	}
-	if err := ioutil.WriteFile(constant.DaemonJsonPath, newJson, 0640); err != nil {
+	if err := os.WriteFile(constant.DaemonJsonPath, newJson, 0640); err != nil {
 		return err
 	}
 

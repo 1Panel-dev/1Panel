@@ -45,7 +45,7 @@
                             <el-input show-password clearable v-model.trim="dialogData.rowData!.credential" />
                         </el-form-item>
                         <el-form-item
-                            v-if="dialogData.rowData!.type === 'S3'"
+                            v-if="dialogData.rowData!.type === 'S3' || dialogData.rowData!.type === 'COS'"
                             label="Region"
                             prop="varsJson.region"
                             :rules="Rules.requiredInput"
@@ -53,12 +53,20 @@
                             <el-input v-model.trim="dialogData.rowData!.varsJson['region']" />
                         </el-form-item>
                         <el-form-item
-                            v-if="hasBucket(dialogData.rowData!.type) && dialogData.rowData!.type !== 'MINIO'"
+                            v-if="hasEndpoint(dialogData.rowData!.type)"
                             label="Endpoint"
                             prop="varsJson.endpoint"
                             :rules="Rules.requiredInput"
                         >
                             <el-input v-model.trim="dialogData.rowData!.varsJson['endpoint']" />
+                        </el-form-item>
+                        <el-form-item
+                            v-if="dialogData.rowData!.type === 'KODO'"
+                            :label="$t('setting.domain')"
+                            prop="varsJson.domain"
+                            :rules="Rules.requiredInput"
+                        >
+                            <el-input v-model.trim="dialogData.rowData!.varsJson['domain']" />
                         </el-form-item>
                         <el-form-item
                             v-if="dialogData.rowData!.type === 'MINIO'"
@@ -176,6 +184,7 @@ const dialogData = ref<DialogProps>({
     title: '',
 });
 const acceptParams = (params: DialogProps): void => {
+    buckets.value = [];
     dialogData.value = params;
     if (dialogData.value.title === 'edit' && dialogData.value.rowData!.type === 'MINIO') {
         if (dialogData.value.rowData!.varsJson['endpoint'].indexOf('://') !== 0) {
@@ -199,7 +208,11 @@ const loadDir = async (path: string) => {
     dialogData.value.rowData!.varsJson['dir'] = path;
 };
 function hasBucket(val: string) {
-    return val === 'OSS' || val === 'S3' || val === 'MINIO';
+    return val === 'OSS' || val === 'S3' || val === 'MINIO' || val === 'COS' || val === 'KODO';
+}
+
+function hasEndpoint(val: string) {
+    return val === 'OSS' || val === 'S3';
 }
 
 const getBuckets = async (formEl: FormInstance | undefined) => {

@@ -21,9 +21,14 @@ type ICommonRepo interface {
 	WithIdsIn(ids []uint) DBOption
 	WithByDate(startTime, endTime time.Time) DBOption
 	WithByStartDate(startTime time.Time) DBOption
+	WithByStatus(status string) DBOption
 }
 
 type CommonRepo struct{}
+
+func NewCommonRepo() ICommonRepo {
+	return &CommonRepo{}
+}
 
 func (c *CommonRepo) WithByID(id uint) DBOption {
 	return func(g *gorm.DB) *gorm.DB {

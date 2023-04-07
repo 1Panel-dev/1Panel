@@ -13,6 +13,7 @@
                 <AppStatus
                     :app-key="'openresty'"
                     @setting="setting"
+                    v-model:mask-show="maskShow"
                     v-model:loading="loading"
                     @is-exist="checkExist"
                 ></AppStatus>
@@ -137,7 +138,7 @@
                         fix
                     />
                 </ComplexTable>
-                <el-card width="30%" v-if="nginxStatus != 'Running'" class="mask-prompt">
+                <el-card width="30%" v-if="nginxStatus != 'Running' && maskShow" class="mask-prompt">
                     <span>{{ $t('commons.service.serviceNotStarted', ['OpenResty']) }}</span>
                 </el-card>
             </template>
@@ -198,6 +199,7 @@ const shortcuts = [
 ];
 
 const loading = ref(false);
+const maskShow = ref(true);
 const createRef = ref();
 const deleteRef = ref();
 const groupRef = ref();
@@ -215,13 +217,13 @@ let groups = ref<Group.GroupInfo[]>([]);
 
 const paginationConfig = reactive({
     currentPage: 1,
-    pageSize: 15,
+    pageSize: 10,
     total: 0,
 });
 let req = reactive({
     name: '',
     page: 1,
-    pageSize: 15,
+    pageSize: 10,
     websiteGroupId: 0,
 });
 

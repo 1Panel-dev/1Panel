@@ -22,6 +22,10 @@ export const searchRecords = (params: Cronjob.SearchRecord) => {
     return http.post<ResPage<Cronjob.Record>>(`cronjobs/search/records`, params);
 };
 
+export const cleanRecords = (id: number) => {
+    return http.post(`cronjobs/records/clean`, { id: id });
+};
+
 export const getRecordDetail = (params: string) => {
     return http.post<string>(`cronjobs/search/detail`, { path: params });
 };

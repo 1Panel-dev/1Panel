@@ -93,6 +93,30 @@ func (b *BaseApi) SearchJobRecords(c *gin.Context) {
 }
 
 // @Tags Cronjob
+// @Summary Clean job records
+// @Description 清空计划任务记录
+// @Accept json
+// @Param request body dto.OperateByID true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /cronjobs/records/clean [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"cronjobs","output_colume":"name","output_value":"name"}],"formatZH":"清空计划任务记录 [name]","formatEN":"clean cronjob [name] records"}
+func (b *BaseApi) CleanRecord(c *gin.Context) {
+	var req dto.OperateByID
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := cronjobService.CleanRecord(req.ID); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Cronjob
 // @Summary Delete cronjob
 // @Description 删除计划任务
 // @Accept json

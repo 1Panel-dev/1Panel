@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"time"
@@ -484,7 +483,7 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 
 func (u *SnapshotService) saveJson(snapJson SnapshotJson, path string) error {
 	remarkInfo, _ := json.MarshalIndent(snapJson, "", "\t")
-	if err := ioutil.WriteFile(fmt.Sprintf("%s/snapshot.json", path), remarkInfo, 0640); err != nil {
+	if err := os.WriteFile(fmt.Sprintf("%s/snapshot.json", path), remarkInfo, 0640); err != nil {
 		return err
 	}
 	return nil
@@ -793,7 +792,7 @@ func (u *SnapshotService) updateLiveRestore(enabled bool) error {
 	if _, err := os.Stat(constant.DaemonJsonPath); err != nil {
 		return fmt.Errorf("load docker daemon.json conf failed, err: %v", err)
 	}
-	file, err := ioutil.ReadFile(constant.DaemonJsonPath)
+	file, err := os.ReadFile(constant.DaemonJsonPath)
 	if err != nil {
 		return err
 	}
@@ -809,7 +808,7 @@ func (u *SnapshotService) updateLiveRestore(enabled bool) error {
 	if err != nil {
 		return err
 	}
-	if err := ioutil.WriteFile(constant.DaemonJsonPath, newJson, 0640); err != nil {
+	if err := os.WriteFile(constant.DaemonJsonPath, newJson, 0640); err != nil {
 		return err
 	}
 

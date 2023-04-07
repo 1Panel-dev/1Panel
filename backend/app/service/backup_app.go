@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/fs"
@@ -192,7 +193,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 	}
 
 	oldInstall.Status = constant.Running
-	if err := appInstallRepo.Save(install); err != nil {
+	if err := appInstallRepo.Save(context.Background(), install); err != nil {
 		global.LOG.Errorf("save db app install failed, err: %v", err)
 		return err
 	}

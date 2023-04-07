@@ -11,4 +11,5 @@ var (
 	ResourceDir    = path.Join(DataDir, "resource")
 	AppResourceDir = path.Join(ResourceDir, "apps")
 	AppInstallDir  = path.Join(DataDir, "apps")
+	RuntimeDir     = path.Join(DataDir, "runtime")
 )

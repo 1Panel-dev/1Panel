@@ -16,6 +16,7 @@ export namespace Website {
         autoRenew: boolean;
         appinstall?: NewAppInstall;
         webSiteSSL: SSL;
+        runtimeID: number;
     }
 
     export interface WebsiteDTO extends Website {
@@ -259,5 +260,14 @@ export namespace Website {
 
     export interface DefaultServerUpdate {
         id: number;
+    }
+
+    export interface PHPConfig {
+        params: any;
+    }
+
+    export interface PHPConfigUpdate {
+        id: number;
+        params: any;
     }
 }

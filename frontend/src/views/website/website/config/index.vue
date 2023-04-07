@@ -30,12 +30,16 @@
                 <el-button type="primary" :plain="index !== 'resource'" @click="changeTab('resource')">
                     {{ $t('website.source') }}
                 </el-button>
+                <el-button type="primary" v-if="configPHP" :plain="index !== 'php'" @click="changeTab('php')">
+                    PHP
+                </el-button>
             </template>
             <template #main>
                 <Basic :id="id" v-if="index === 'basic'"></Basic>
                 <Safety :id="id" v-if="index === 'safety'"></Safety>
                 <Log :id="id" v-if="index === 'log'"></Log>
                 <Resource :id="id" v-if="index === 'resource'"></Resource>
+                <PHP :id="id" v-if="index === 'php'"></PHP>
             </template>
         </LayoutContent>
     </div>
@@ -48,9 +52,11 @@ import Basic from './basic/index.vue';
 import Safety from './safety/index.vue';
 import Resource from './resource/index.vue';
 import Log from './log/index.vue';
+import PHP from './php/index.vue';
 import router from '@/routers';
 import WebsiteStatus from '@/views/website/website/status/index.vue';
 import { GetWebsite } from '@/api/modules/website';
+import { GetRuntime } from '@/api/modules/runtime';
 
 const props = defineProps({
     id: {
@@ -67,6 +73,7 @@ let id = ref(0);
 let index = ref('basic');
 let website = ref<any>({});
 let loading = ref(false);
+const configPHP = ref(false);
 
 watch(index, (curr, old) => {
     if (curr != old) {
@@ -83,8 +90,14 @@ onMounted(() => {
     id.value = Number(props.id);
     loading.value = true;
     GetWebsite(id.value)
-        .then((res) => {
+        .then(async (res) => {
             website.value = res.data;
+            if (res.data.type === 'runtime') {
+                const runRes = await GetRuntime(res.data.runtimeID);
+                if (runRes.data.resource === 'appstore') {
+                    configPHP.value = true;
+                }
+            }
         })
         .finally(() => {
             loading.value = false;

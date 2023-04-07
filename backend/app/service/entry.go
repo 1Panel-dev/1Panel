@@ -2,76 +2,38 @@ package service
 
 import "github.com/1Panel-dev/1Panel/backend/app/repo"
 
-type ServiceGroup struct {
-	AuthService
-	DashboardService
-
-	AppService
-	AppInstallService
-
-	ContainerService
-	ImageService
-	ImageRepoService
-	ComposeTemplateService
-	DockerService
-
-	MysqlService
-	RedisService
-
-	CronjobService
-
-	HostService
-	GroupService
-	CommandService
-	FileService
-
-	SettingService
-	BackupService
-
-	WebsiteService
-	WebsiteDnsAccountService
-	WebsiteSSLService
-	WebsiteAcmeAccountService
-
-	NginxService
-
-	LogService
-	SnapshotService
-	UpgradeService
-}
-
-var ServiceGroupApp = new(ServiceGroup)
-
 var (
-	commonRepo = repo.RepoGroupApp.CommonRepo
+	commonRepo = repo.NewCommonRepo()
 
-	appRepo                = repo.RepoGroupApp.AppRepo
-	appTagRepo             = repo.RepoGroupApp.AppTagRepo
-	appDetailRepo          = repo.RepoGroupApp.AppDetailRepo
-	tagRepo                = repo.RepoGroupApp.TagRepo
-	appInstallRepo         = repo.RepoGroupApp.AppInstallRepo
-	appInstallResourceRepo = repo.RepoGroupApp.AppInstallResourceRpo
+	appRepo                = repo.NewIAppRepo()
+	appTagRepo             = repo.NewIAppTagRepo()
+	appDetailRepo          = repo.NewIAppDetailRepo()
+	tagRepo                = repo.NewITagRepo()
+	appInstallRepo         = repo.NewIAppInstallRepo()
+	appInstallResourceRepo = repo.NewIAppInstallResourceRpo()
 
-	mysqlRepo = repo.RepoGroupApp.MysqlRepo
+	mysqlRepo = repo.NewIMysqlRepo()
 
-	imageRepoRepo = repo.RepoGroupApp.ImageRepoRepo
-	composeRepo   = repo.RepoGroupApp.ComposeTemplateRepo
+	imageRepoRepo = repo.NewIImageRepoRepo()
+	composeRepo   = repo.NewIComposeTemplateRepo()
 
-	cronjobRepo = repo.RepoGroupApp.CronjobRepo
+	cronjobRepo = repo.NewICronjobRepo()
 
-	hostRepo    = repo.RepoGroupApp.HostRepo
-	groupRepo   = repo.RepoGroupApp.GroupRepo
-	commandRepo = repo.RepoGroupApp.CommandRepo
+	hostRepo    = repo.NewIHostRepo()
+	groupRepo   = repo.NewIGroupRepo()
+	commandRepo = repo.NewICommandRepo()
 
-	settingRepo = repo.RepoGroupApp.SettingRepo
-	backupRepo  = repo.RepoGroupApp.BackupRepo
+	settingRepo = repo.NewISettingRepo()
+	backupRepo  = repo.NewIBackupRepo()
 
 	websiteRepo       = repo.NewIWebsiteRepo()
-	websiteDomainRepo = repo.RepoGroupApp.WebsiteDomainRepo
-	websiteDnsRepo    = repo.RepoGroupApp.WebsiteDnsAccountRepo
+	websiteDomainRepo = repo.NewIWebsiteDomainRepo()
+	websiteDnsRepo    = repo.NewIWebsiteDnsAccountRepo()
 	websiteSSLRepo    = repo.NewISSLRepo()
 	websiteAcmeRepo   = repo.NewIAcmeAccountRepo()
 
-	logRepo      = repo.RepoGroupApp.LogRepo
+	logRepo      = repo.NewILogRepo()
 	snapshotRepo = repo.NewISnapshotRepo()
+
+	runtimeRepo = repo.NewIRunTimeRepo()
 )

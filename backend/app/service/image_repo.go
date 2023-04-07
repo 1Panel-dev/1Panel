@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -190,7 +189,7 @@ func (u *ImageRepoService) handleRegistries(newHost, delHost, handle string) err
 	}
 
 	deamonMap := make(map[string]interface{})
-	file, err := ioutil.ReadFile(constant.DaemonJsonPath)
+	file, err := os.ReadFile(constant.DaemonJsonPath)
 	if err != nil {
 		return err
 	}
@@ -226,7 +225,7 @@ func (u *ImageRepoService) handleRegistries(newHost, delHost, handle string) err
 	if err != nil {
 		return err
 	}
-	if err := ioutil.WriteFile(constant.DaemonJsonPath, newJson, 0640); err != nil {
+	if err := os.WriteFile(constant.DaemonJsonPath, newJson, 0640); err != nil {
 		return err
 	}
 	return nil

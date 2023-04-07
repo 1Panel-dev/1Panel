@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -77,9 +77,9 @@ func OperationLog() gin.HandlerFunc {
 
 		formatMap := make(map[string]interface{})
 		if len(operationDic.BodyKeys) != 0 {
-			body, err := ioutil.ReadAll(c.Request.Body)
+			body, err := io.ReadAll(c.Request.Body)
 			if err == nil {
-				c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+				c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
 			}
 			bodyMap := make(map[string]interface{})
 			_ = json.Unmarshal(body, &bodyMap)

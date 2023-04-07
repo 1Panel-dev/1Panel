@@ -9,6 +9,21 @@ import (
 type AppDetailRepo struct {
 }
 
+type IAppDetailRepo interface {
+	WithVersion(version string) DBOption
+	WithAppId(id uint) DBOption
+	GetFirst(opts ...DBOption) (model.AppDetail, error)
+	Update(ctx context.Context, detail model.AppDetail) error
+	BatchCreate(ctx context.Context, details []model.AppDetail) error
+	DeleteByAppIds(ctx context.Context, appIds []uint) error
+	GetBy(opts ...DBOption) ([]model.AppDetail, error)
+	BatchUpdateBy(maps map[string]interface{}, opts ...DBOption) error
+}
+
+func NewIAppDetailRepo() IAppDetailRepo {
+	return &AppDetailRepo{}
+}
+
 func (a AppDetailRepo) WithVersion(version string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("version = ?", version)

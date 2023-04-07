@@ -49,10 +49,6 @@
                         &nbsp;{{ $t('cronjob.handle') }}
                     </el-tag>
                     <span class="buttons">
-                        <el-button type="primary" @click="onRefresh" link>
-                            {{ $t('commons.button.refresh') }}
-                        </el-button>
-                        <el-divider direction="vertical" />
                         <el-button type="primary" @click="onHandle(dialogData.rowData)" link>
                             {{ $t('commons.button.handle') }}
                         </el-button>
@@ -65,6 +61,7 @@
                         >
                             {{ $t('commons.button.disable') }}
                         </el-button>
+                        <el-divider direction="vertical" />
                         <el-button
                             type="primary"
                             v-if="dialogData.rowData.status === 'Disable'"
@@ -72,6 +69,9 @@
                             link
                         >
                             {{ $t('commons.button.enable') }}
+                        </el-button>
+                        <el-button type="primary" :disabled="records.length <= 7" @click="cleanRecord()" link>
+                            {{ $t('commons.button.clean') }}
                         </el-button>
                     </span>
                 </div>
@@ -152,13 +152,23 @@
                                     <template #label>
                                         <span class="status-label">{{ $t('cronjob.website') }}</span>
                                     </template>
-                                    <span class="status-count">{{ dialogData.rowData!.website }}</span>
+                                    <span v-if="dialogData.rowData!.website !== 'all'" class="status-count">
+                                        {{ dialogData.rowData!.website }}
+                                    </span>
+                                    <span v-else class="status-count">
+                                        {{ $t('commons.table.all') }}
+                                    </span>
                                 </el-form-item>
                                 <el-form-item class="description" v-if="dialogData.rowData!.type === 'database'">
                                     <template #label>
                                         <span class="status-label">{{ $t('cronjob.database') }}</span>
                                     </template>
-                                    <span class="status-count">{{ dialogData.rowData!.dbName }}</span>
+                                    <span v-if="dialogData.rowData!.website !== 'all'" class="status-count">
+                                        {{ dialogData.rowData!.dbName }}
+                                    </span>
+                                    <span v-else class="status-count">
+                                        {{ $t('commons.table.all') }}
+                                    </span>
                                 </el-form-item>
                                 <el-form-item class="description" v-if="dialogData.rowData!.type === 'directory'">
                                     <template #label>
@@ -276,10 +286,10 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { onBeforeUnmount, reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import { loadZero } from '@/utils/util';
-import { searchRecords, download, handleOnce, updateStatus } from '@/api/modules/cronjob';
+import { searchRecords, download, handleOnce, updateStatus, cleanRecords } from '@/api/modules/cronjob';
 import { dateFormat } from '@/utils/util';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
@@ -288,10 +298,12 @@ import LayoutContent from '@/layout/layout-content.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 const hasRecords = ref();
+
+let timer: NodeJS.Timer | null = null;
 
 const mymirror = ref();
 const extensions = [javascript(), oneDark];
@@ -310,6 +322,9 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     dialogData.value = params;
     recordShow.value = true;
     search(true);
+    timer = setInterval(() => {
+        onRefresh();
+    }, 1000 * 10);
 };
 
 const shortcuts = [
@@ -448,14 +463,38 @@ const search = async (isInit: boolean) => {
     searchInfo.recordTotal = res.data.total;
 };
 
-const onRefresh = () => {
+const onRefresh = async () => {
     records.value = [];
     searchInfo.pageSize = searchInfo.pageSize * searchInfo.page;
     searchInfo.page = 1;
-    search(true);
+    if (timeRangeLoad.value && timeRangeLoad.value.length === 2) {
+        searchInfo.startTime = timeRangeLoad.value[0];
+        searchInfo.endTime = timeRangeLoad.value[1];
+    } else {
+        searchInfo.startTime = new Date(new Date().setHours(0, 0, 0, 0));
+        searchInfo.endTime = new Date();
+    }
+    let params = {
+        page: searchInfo.page,
+        pageSize: searchInfo.pageSize,
+        cronjobID: dialogData.value.rowData!.id,
+        startTime: searchInfo.startTime,
+        endTime: searchInfo.endTime,
+        status: searchInfo.status,
+    };
+    const res = await searchRecords(params);
+    records.value = res.data.items || [];
 };
 
 const onDownload = async (record: any, backupID: number) => {
+    if (dialogData.value.rowData.dbName === 'all') {
+        MsgInfo(i18n.global.t('cronjob.allOptionHelper', [i18n.global.t('database.database')]));
+        return;
+    }
+    if (dialogData.value.rowData.website === 'all') {
+        MsgInfo(i18n.global.t('cronjob.allOptionHelper', [i18n.global.t('website.website')]));
+        return;
+    }
     if (!record.file || record.file.indexOf('/') === -1) {
         MsgError(i18n.global.t('cronjob.errPath', [record.file]));
         return;
@@ -501,6 +540,18 @@ const loadRecord = async (row: Cronjob.Record) => {
         currentRecordDetail.value = res.data;
     }
 };
+const cleanRecord = async () => {
+    ElMessageBox.confirm(i18n.global.t('cronjob.cleanHelper'), i18n.global.t('commons.button.clean'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        await cleanRecords(dialogData.value.rowData.id);
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        search(true);
+    });
+};
+
 function isBackup() {
     return (
         dialogData.value.rowData!.type === 'website' ||
@@ -516,6 +567,11 @@ function loadWeek(i: number) {
     }
     return '';
 }
+
+onBeforeUnmount(() => {
+    clearInterval(Number(timer));
+    timer = null;
+});
 
 defineExpose({
     acceptParams,

@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "12959160",
+      "name": "腾讯云",
+      "font_class": "tengxunyun1",
+      "unicode": "e651",
+      "unicode_decimal": 58961
+    },
+    {
+      "icon_id": "24877229",
+      "name": "七牛云",
+      "font_class": "qiniuyun",
+      "unicode": "e62c",
+      "unicode_decimal": 58924
+    },
+    {
+      "icon_id": "19671162",
+      "name": "png-1",
+      "font_class": "file-png",
+      "unicode": "e7ae",
+      "unicode_decimal": 59310
+    },
+    {
       "icon_id": "26815641",
       "name": "PPT",
       "font_class": "file-ppt",

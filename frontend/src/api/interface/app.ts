@@ -40,6 +40,7 @@ export namespace App {
         params: AppParams;
         dockerCompose: string;
         enbale: boolean;
+        image: string;
     }
 
     export interface AppReq extends ReqPage {
@@ -64,6 +65,7 @@ export namespace App {
         values?: ServiceParam[];
         child?: FromFieldChild;
         params?: FromParam[];
+        multiple?: boolean;
     }
 
     export interface FromFieldChild extends FromField {
@@ -165,5 +167,7 @@ export namespace App {
         type: string;
         values?: any;
         showValue?: string;
+        required?: boolean;
+        multiple?: boolean;
     }
 }

@@ -23,6 +23,14 @@ type WebsiteCreate struct {
 	AppInstall   NewAppInstall `json:"appInstall"`
 	AppID        uint          `json:"appID"`
 	AppInstallID uint          `json:"appInstallID"`
+
+	RuntimeID uint `json:"runtimeID"`
+	RuntimeConfig
+}
+
+type RuntimeConfig struct {
+	ProxyType string `json:"proxyType"`
+	Port      int    `json:"port"`
 }
 
 type NewAppInstall struct {
@@ -125,4 +133,9 @@ type WebsiteLogReq struct {
 
 type WebsiteDefaultUpdate struct {
 	ID uint `json:"id" validate:"required"`
+}
+
+type WebsitePHPConfigUpdate struct {
+	ID     uint              `json:"id" validate:"required"`
+	Params map[string]string `json:"params" validate:"required"`
 }

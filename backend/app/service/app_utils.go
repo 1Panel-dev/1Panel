@@ -4,8 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/compose-spec/compose-go/types"
+	"github.com/subosito/gotenv"
 	"math"
 	"os"
+	"os/exec"
 	"path"
 	"reflect"
 	"strconv"
@@ -23,6 +26,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
+	composeV2 "github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
 )
@@ -205,7 +209,21 @@ func updateInstall(installId uint, detailId uint) error {
 	if err := NewIBackupService().AppBackup(dto.CommonBackup{Name: install.App.Key, DetailName: install.Name}); err != nil {
 		return err
 	}
-	if _, err = compose.Down(install.GetComposePath()); err != nil {
+
+	detailDir := path.Join(constant.ResourceDir, "apps", install.App.Key, "versions", detail.Version)
+	cmd := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -rf %s/* %s", detailDir, install.GetPath()))
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		if stdout != nil {
+			return errors.New(string(stdout))
+		}
+		return err
+	}
+
+	if out, err := compose.Down(install.GetComposePath()); err != nil {
+		if out != "" {
+			return errors.New(out)
+		}
 		return err
 	}
 	install.DockerCompose = detail.DockerCompose
@@ -216,19 +234,21 @@ func updateInstall(installId uint, detailId uint) error {
 	if err := fileOp.WriteFile(install.GetComposePath(), strings.NewReader(install.DockerCompose), 0775); err != nil {
 		return err
 	}
-	if _, err = compose.Up(install.GetComposePath()); err != nil {
+	if out, err := compose.Up(install.GetComposePath()); err != nil {
+		if out != "" {
+			return errors.New(out)
+		}
 		return err
 	}
-	return appInstallRepo.Save(&install)
+	return appInstallRepo.Save(context.Background(), &install)
 }
 
 func getContainerNames(install model.AppInstall) ([]string, error) {
-	composeMap := install.DockerCompose
-	envMap := make(map[string]interface{})
-	_ = json.Unmarshal([]byte(install.Env), &envMap)
-	newEnvMap := make(map[string]string, len(envMap))
-	handleMap(envMap, newEnvMap)
-	project, err := compose.GetComposeProject([]byte(composeMap), newEnvMap)
+	envStr, err := coverEnvJsonToStr(install.Env)
+	if err != nil {
+		return nil, err
+	}
+	project, err := composeV2.GetComposeProject(install.Name, install.GetPath(), []byte(install.DockerCompose), []byte(envStr))
 	if err != nil {
 		return nil, err
 	}
@@ -240,6 +260,18 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 		containerNames = append(containerNames, service.ContainerName)
 	}
 	return containerNames, nil
+}
+
+func coverEnvJsonToStr(envJson string) (string, error) {
+	envMap := make(map[string]interface{})
+	_ = json.Unmarshal([]byte(envJson), &envMap)
+	newEnvMap := make(map[string]string, len(envMap))
+	handleMap(envMap, newEnvMap)
+	envStr, err := gotenv.Marshal(newEnvMap)
+	if err != nil {
+		return "", err
+	}
+	return envStr, nil
 }
 
 func checkLimit(app model.App) error {
@@ -350,19 +382,43 @@ func upAppPre(app model.App, appInstall model.AppInstall) error {
 	return nil
 }
 
-func upApp(composeFilePath string, appInstall model.AppInstall) {
-	out, err := compose.Up(composeFilePath)
-	if err != nil {
-		if out != "" {
-			appInstall.Message = out
+func upApp(ctx context.Context, appInstall model.AppInstall) {
+	upProject := func(appInstall model.AppInstall) (err error) {
+		envStr, err := coverEnvJsonToStr(appInstall.Env)
+		if err == nil {
+			var (
+				project        *types.Project
+				composeService *composeV2.ComposeService
+			)
+			project, err = composeV2.GetComposeProject(appInstall.Name, appInstall.GetPath(), []byte(appInstall.DockerCompose), []byte(envStr))
+			if err != nil {
+				return err
+			}
+			composeService, err = composeV2.NewComposeService()
+			if err != nil {
+				return
+			}
+			composeService.SetProject(project)
+			err = composeService.ComposeUp()
+			if err != nil {
+				return err
+			}
+			return
 		} else {
-			appInstall.Message = err.Error()
+			return
 		}
+	}
+	if err := upProject(appInstall); err != nil {
 		appInstall.Status = constant.Error
-		_ = appInstallRepo.Save(&appInstall)
+		appInstall.Message = err.Error()
 	} else {
 		appInstall.Status = constant.Running
-		_ = appInstallRepo.Save(&appInstall)
+	}
+	exist, _ := appInstallRepo.GetFirst(commonRepo.WithByID(appInstall.ID))
+	if exist.ID > 0 {
+		_ = appInstallRepo.Save(context.Background(), &appInstall)
+	} else {
+		_ = appInstallRepo.Save(ctx, &appInstall)
 	}
 }
 
@@ -437,7 +493,7 @@ func handleErr(install model.AppInstall, err error, out string) error {
 		reErr = errors.New(out)
 		install.Status = constant.Error
 	}
-	_ = appInstallRepo.Save(&install)
+	_ = appInstallRepo.Save(context.Background(), &install)
 	return reErr
 }
 
@@ -548,7 +604,7 @@ func updateToolApp(installed model.AppInstall) {
 		return
 	}
 	toolInstall.Env = string(contentByte)
-	if err := appInstallRepo.Save(&toolInstall); err != nil {
+	if err := appInstallRepo.Save(context.Background(), &toolInstall); err != nil {
 		global.LOG.Errorf("update tool app [%s] error : %s", toolInstall.Name, err.Error())
 		return
 	}

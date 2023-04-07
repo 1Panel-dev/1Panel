@@ -97,6 +97,8 @@ import MdEditor from 'md-editor-v3';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Install from './install/index.vue';
+import router from '@/routers';
+
 const language = useI18n().locale.value;
 
 interface OperateProps {
@@ -131,7 +133,7 @@ const getApp = async () => {
 const getDetail = async (id: number, version: string) => {
     loadingDetail.value = true;
     try {
-        const res = await GetAppDetail(id, version);
+        const res = await GetAppDetail(id, version, 'app');
         appDetail.value = res.data;
     } finally {
         loadingDetail.value = false;
@@ -147,7 +149,12 @@ const openInstall = () => {
         params: appDetail.value.params,
         appDetailId: appDetail.value.id,
     };
-    installRef.value.acceptParams(params);
+    console.log(app.value);
+    if (app.value.type === 'php') {
+        router.push({ path: '/websites/runtime/php' });
+    } else {
+        installRef.value.acceptParams(params);
+    }
 };
 
 onMounted(() => {

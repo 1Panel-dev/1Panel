@@ -20,7 +20,7 @@ func Init() {
 	baseDir := "/opt"
 	port := "9999"
 	mode := ""
-	version := ""
+	version := "v1.0.0"
 	fileOp := files.NewFileOp()
 	v := viper.NewWithOptions()
 	v.SetConfigType("yaml")

@@ -1,14 +1,15 @@
 package service
 
 import (
-	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
-	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -16,6 +17,18 @@ import (
 )
 
 type NginxService struct {
+}
+
+type INginxService interface {
+	GetNginxConfig() (response.FileInfo, error)
+	GetConfigByScope(req request.NginxScopeReq) ([]response.NginxParam, error)
+	UpdateConfigByScope(req request.NginxConfigUpdate) error
+	GetStatus() (response.NginxStatus, error)
+	UpdateConfigFile(req request.NginxConfigFileUpdate) error
+}
+
+func NewINginxService() INginxService {
+	return &NginxService{}
 }
 
 func (n NginxService) GetNginxConfig() (response.FileInfo, error) {
@@ -55,7 +68,7 @@ func (n NginxService) GetStatus() (response.NginxStatus, error) {
 	if err != nil {
 		return response.NginxStatus{}, err
 	}
-	content, err := ioutil.ReadAll(res.Body)
+	content, err := io.ReadAll(res.Body)
 	if err != nil {
 		return response.NginxStatus{}, err
 	}

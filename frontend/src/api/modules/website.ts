@@ -35,8 +35,8 @@ export const GetWebsiteOptions = () => {
     return http.get<Array<string>>(`/websites/options`);
 };
 
-export const GetWebsiteNginx = (id: number) => {
-    return http.get<File.File>(`/websites/${id}/nginx`);
+export const GetWebsiteConfig = (id: number, type: string) => {
+    return http.get<File.File>(`/websites/${id}/config/${type}`);
 };
 
 export const DeleteWebsite = (req: Website.WebSiteDel) => {
@@ -157,4 +157,12 @@ export const UpdateNginxFile = (req: Website.NginxUpdate) => {
 
 export const ChangeDefaultServer = (req: Website.DefaultServerUpdate) => {
     return http.post<any>(`/websites/default/server`, req);
+};
+
+export const GetPHPConfig = (id: number) => {
+    return http.get<Website.PHPConfig>(`/websites/php/config/${id}`);
+};
+
+export const UpdatePHPConfig = (req: Website.PHPConfigUpdate) => {
+    return http.post<any>(`/websites/php/config/`, req);
 };

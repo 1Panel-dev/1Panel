@@ -15,6 +15,7 @@ type ICommandRepo interface {
 	Create(command *model.Command) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
+	Get(opts ...DBOption) (model.Command, error)
 }
 
 func NewICommandRepo() ICommandRepo {

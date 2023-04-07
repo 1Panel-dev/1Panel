@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bufio"
 	"context"
 	"crypto/x509"
 	"encoding/pem"
@@ -8,6 +9,7 @@ import (
 	"os"
 	"path"
 	"reflect"
+	"regexp"
 	"strings"
 	"time"
 
@@ -42,7 +44,7 @@ type IWebsiteService interface {
 	DeleteWebsiteDomain(domainId uint) error
 	GetNginxConfigByScope(req request.NginxScopeReq) (*response.WebsiteNginxConfig, error)
 	UpdateNginxConfigByScope(req request.NginxConfigUpdate) error
-	GetWebsiteNginxConfig(websiteId uint) (response.FileInfo, error)
+	GetWebsiteNginxConfig(websiteId uint, configType string) (response.FileInfo, error)
 	GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, error)
 	OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (response.WebsiteHTTPS, error)
 	PreInstallCheck(req request.WebsiteInstallCheckReq) ([]response.WebsitePreInstallCheck, error)
@@ -50,9 +52,12 @@ type IWebsiteService interface {
 	UpdateWafConfig(req request.WebsiteWafUpdate) error
 	UpdateNginxConfigFile(req request.WebsiteNginxUpdate) error
 	OpWebsiteLog(req request.WebsiteLogReq) (*response.WebsiteLog, error)
+	ChangeDefaultServer(id uint) error
+	GetPHPConfig(id uint) (*response.PHPConfig, error)
+	UpdatePHPConfig(req request.WebsitePHPConfigUpdate) error
 }
 
-func NewWebsiteService() IWebsiteService {
+func NewIWebsiteService() IWebsiteService {
 	return &WebsiteService{}
 }
 
@@ -103,7 +108,7 @@ func (w WebsiteService) GetWebsites() ([]response.WebsiteDTO, error) {
 	return websiteDTOs, nil
 }
 
-func (w WebsiteService) CreateWebsite(ctx context.Context, create request.WebsiteCreate) error {
+func (w WebsiteService) CreateWebsite(ctx context.Context, create request.WebsiteCreate) (err error) {
 	if exist, _ := websiteRepo.GetBy(websiteRepo.WithDomain(create.PrimaryDomain)); len(exist) > 0 {
 		return buserr.New(constant.ErrDomainIsExist)
 	}
@@ -124,13 +129,33 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 		ExpireDate:     defaultDate,
 		AppInstallID:   create.AppInstallID,
 		WebsiteGroupID: create.WebsiteGroupID,
+		RuntimeID:      create.RuntimeID,
 		Protocol:       constant.ProtocolHTTP,
 		Proxy:          create.Proxy,
 		AccessLog:      true,
 		ErrorLog:       true,
 	}
 
-	var appInstall *model.AppInstall
+	var (
+		appInstall *model.AppInstall
+		runtime    *model.Runtime
+	)
+
+	defer func() {
+		if err != nil {
+			if website.AppInstallID > 0 {
+				req := request.AppInstalledOperate{
+					InstallId:   website.AppInstallID,
+					Operate:     constant.Delete,
+					ForceDelete: true,
+				}
+				if err := NewIAppInstalledService().Operate(ctx, req); err != nil {
+					global.LOG.Errorf(err.Error())
+				}
+			}
+		}
+	}()
+
 	switch create.Type {
 	case constant.Deployment:
 		if create.AppType == constant.NewApp {
@@ -138,7 +163,7 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 			req.Name = create.AppInstall.Name
 			req.AppDetailId = create.AppInstall.AppDetailId
 			req.Params = create.AppInstall.Params
-			install, err := ServiceGroupApp.Install(ctx, req)
+			install, err := NewIAppService().Install(ctx, req)
 			if err != nil {
 				return err
 			}
@@ -152,9 +177,34 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 			appInstall = &install
 			website.AppInstallID = appInstall.ID
 		}
+	case constant.Runtime:
+		var err error
+		runtime, err = runtimeRepo.GetFirst(commonRepo.WithByID(create.RuntimeID))
+		if err != nil {
+			return err
+		}
+		if runtime.Resource == constant.ResourceAppstore {
+			var req request.AppInstallCreate
+			reg, _ := regexp.Compile("[^a-z0-9_\\-]+")
+			req.Name = reg.ReplaceAllString(create.PrimaryDomain, "")
+			req.AppDetailId = create.AppInstall.AppDetailId
+			req.Params = create.AppInstall.Params
+			req.Params["IMAGE_NAME"] = runtime.Image
+			nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+			if err != nil {
+				return err
+			}
+			req.Params["PANEL_WEBSITE_DIR"] = path.Join(nginxInstall.GetPath(), "/www")
+			install, err := NewIAppService().Install(ctx, req)
+			if err != nil {
+				return err
+			}
+			website.AppInstallID = install.ID
+			appInstall = install
+		}
 	}
 
-	if err := websiteRepo.Create(ctx, website); err != nil {
+	if err = websiteRepo.Create(ctx, website); err != nil {
 		return err
 	}
 	var domains []model.WebsiteDomain
@@ -175,11 +225,11 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 		domains = append(domains, domainModel)
 	}
 	if len(domains) > 0 {
-		if err := websiteDomainRepo.BatchCreate(ctx, domains); err != nil {
+		if err = websiteDomainRepo.BatchCreate(ctx, domains); err != nil {
 			return err
 		}
 	}
-	return configDefaultNginx(website, domains, appInstall)
+	return configDefaultNginx(website, domains, appInstall, runtime, create.RuntimeConfig)
 }
 
 func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {
@@ -401,23 +451,38 @@ func (w WebsiteService) UpdateNginxConfigByScope(req request.NginxConfigUpdate) 
 	return updateNginxConfig(constant.NginxScopeServer, params, &website)
 }
 
-func (w WebsiteService) GetWebsiteNginxConfig(websiteId uint) (response.FileInfo, error) {
+func (w WebsiteService) GetWebsiteNginxConfig(websiteId uint, configType string) (response.FileInfo, error) {
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(websiteId))
 	if err != nil {
 		return response.FileInfo{}, err
 	}
-
-	nginxApp, err := appRepo.GetFirst(appRepo.WithKey(constant.AppOpenresty))
-	if err != nil {
-		return response.FileInfo{}, err
+	configPath := ""
+	switch configType {
+	case constant.AppOpenresty:
+		nginxApp, err := appRepo.GetFirst(appRepo.WithKey(constant.AppOpenresty))
+		if err != nil {
+			return response.FileInfo{}, err
+		}
+		nginxInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithAppId(nginxApp.ID))
+		if err != nil {
+			return response.FileInfo{}, err
+		}
+		configPath = path.Join(nginxInstall.GetPath(), "conf", "conf.d", website.Alias+".conf")
+	case constant.ConfigFPM:
+		runtimeInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+		if err != nil {
+			return response.FileInfo{}, err
+		}
+		runtimeInstall.GetPath()
+		configPath = path.Join(runtimeInstall.GetPath(), "conf", "php-fpm.conf")
+	case constant.ConfigPHP:
+		runtimeInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+		if err != nil {
+			return response.FileInfo{}, err
+		}
+		runtimeInstall.GetPath()
+		configPath = path.Join(runtimeInstall.GetPath(), "conf", "php.ini")
 	}
-	nginxInstall, err := appInstallRepo.GetFirst(appInstallRepo.WithAppId(nginxApp.ID))
-	if err != nil {
-		return response.FileInfo{}, err
-	}
-
-	configPath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "conf", "conf.d", website.Alias+".conf")
-
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:   configPath,
 		Expand: true,
@@ -761,6 +826,89 @@ func (w WebsiteService) ChangeDefaultServer(id uint) error {
 		}
 		website.DefaultServer = true
 		return websiteRepo.Save(context.Background(), &website)
+	}
+	return nil
+}
+
+func (w WebsiteService) GetPHPConfig(id uint) (*response.PHPConfig, error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return nil, err
+	}
+	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+	if err != nil {
+		return nil, err
+	}
+	phpConfigPath := path.Join(appInstall.GetPath(), "conf", "php.ini")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(phpConfigPath) {
+		return nil, buserr.WithDetail(constant.ErrFileCanNotRead, "php.ini", nil)
+	}
+	params := make(map[string]string)
+	configFile, err := fileOp.OpenFile(phpConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	defer configFile.Close()
+	scanner := bufio.NewScanner(configFile)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if strings.HasPrefix(line, ";") {
+			continue
+		}
+		matches := regexp.MustCompile(`^\s*([a-z_]+)\s*=\s*(.*)$`).FindStringSubmatch(line)
+		if len(matches) == 3 {
+			params[matches[1]] = matches[2]
+		}
+	}
+	return &response.PHPConfig{Params: params}, nil
+}
+
+func (w WebsiteService) UpdatePHPConfig(req request.WebsitePHPConfigUpdate) (err error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+	if err != nil {
+		return err
+	}
+	phpConfigPath := path.Join(appInstall.GetPath(), "conf", "php.ini")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(phpConfigPath) {
+		return buserr.WithDetail(constant.ErrFileCanNotRead, "php.ini", nil)
+	}
+	configFile, err := fileOp.OpenFile(phpConfigPath)
+	if err != nil {
+		return err
+	}
+	defer configFile.Close()
+
+	contentBytes, err := fileOp.GetContent(phpConfigPath)
+	content := string(contentBytes)
+	lines := strings.Split(content, "\n")
+	for i, line := range lines {
+		if strings.HasPrefix(line, ";") {
+			continue
+		}
+		for key, value := range req.Params {
+			pattern := "^" + regexp.QuoteMeta(key) + "\\s*=\\s*.*$"
+			if matched, _ := regexp.MatchString(pattern, line); matched {
+				lines[i] = key + " = " + value
+			}
+		}
+	}
+	updatedContent := strings.Join(lines, "\n")
+	if err := fileOp.WriteFile(phpConfigPath, strings.NewReader(updatedContent), 0755); err != nil {
+		return err
+	}
+	appInstallReq := request.AppInstalledOperate{
+		InstallId: appInstall.ID,
+		Operate:   constant.Restart,
+	}
+	if err = NewIAppInstalledService().Operate(context.Background(), appInstallReq); err != nil {
+		_ = fileOp.WriteFile(phpConfigPath, strings.NewReader(string(contentBytes)), 0755)
+		return err
 	}
 	return nil
 }

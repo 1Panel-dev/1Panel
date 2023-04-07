@@ -1,5 +1,31 @@
 basePath: /api/v1
 definitions:
+  dto.AddrRuleOperate:
+    properties:
+      address:
+        type: string
+      operation:
+        enum:
+        - add
+        - remove
+        type: string
+      strategy:
+        enum:
+        - accept
+        - drop
+        type: string
+    required:
+    - address
+    - operation
+    - strategy
+    type: object
+  dto.AddrRuleUpdate:
+    properties:
+      newRule:
+        $ref: '#/definitions/dto.AddrRuleOperate'
+      oldRule:
+        $ref: '#/definitions/dto.AddrRuleOperate'
+    type: object
   dto.BackupOperate:
     properties:
       accessKey:
@@ -42,6 +68,17 @@ definitions:
         type: array
     required:
     - ids
+    type: object
+  dto.BatchRuleOperate:
+    properties:
+      rules:
+        items:
+          $ref: '#/definitions/dto.PortRuleOperate'
+        type: array
+      type:
+        type: string
+    required:
+    - type
     type: object
   dto.CaptchaResponse:
     properties:
@@ -570,6 +607,8 @@ definitions:
         - SFTP
         - MINIO
         - LOCAL
+        - COS
+        - KODO
         type: string
     required:
     - fileDir
@@ -582,6 +621,29 @@ definitions:
         type: string
     required:
     - path
+    type: object
+  dto.FirewallBaseInfo:
+    properties:
+      name:
+        type: string
+      pingStatus:
+        type: string
+      status:
+        type: string
+      version:
+        type: string
+    type: object
+  dto.FirewallOperation:
+    properties:
+      operation:
+        enum:
+        - start
+        - stop
+        - disablePing
+        - enablePing
+        type: string
+    required:
+    - operation
     type: object
   dto.ForBuckets:
     properties:
@@ -1091,6 +1153,41 @@ definitions:
       hostPort:
         type: integer
     type: object
+  dto.PortRuleOperate:
+    properties:
+      address:
+        type: string
+      operation:
+        enum:
+        - add
+        - remove
+        type: string
+      port:
+        type: string
+      protocol:
+        enum:
+        - tcp
+        - udp
+        - tcp/udp
+        type: string
+      strategy:
+        enum:
+        - accept
+        - drop
+        type: string
+    required:
+    - operation
+    - port
+    - protocol
+    - strategy
+    type: object
+  dto.PortRuleUpdate:
+    properties:
+      newRule:
+        $ref: '#/definitions/dto.PortRuleOperate'
+      oldRule:
+        $ref: '#/definitions/dto.PortRuleOperate'
+    type: object
   dto.PortUpdate:
     properties:
       serverPort:
@@ -1352,6 +1449,8 @@ definitions:
         - S3
         - SFTP
         - MINIO
+        - COS
+        - KODO
         type: string
     required:
     - from
@@ -1603,6 +1702,8 @@ definitions:
         type: string
       remark:
         type: string
+      runtimeID:
+        type: integer
       status:
         type: string
       type:
@@ -2000,6 +2101,59 @@ definitions:
       port:
         type: integer
     type: object
+  request.RuntimeCreate:
+    properties:
+      appDetailId:
+        type: integer
+      image:
+        type: string
+      name:
+        type: string
+      params:
+        additionalProperties: true
+        type: object
+      resource:
+        type: string
+      type:
+        type: string
+      version:
+        type: string
+    type: object
+  request.RuntimeDelete:
+    properties:
+      id:
+        type: integer
+    type: object
+  request.RuntimeSearch:
+    properties:
+      name:
+        type: string
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      status:
+        type: string
+      type:
+        type: string
+    required:
+    - page
+    - pageSize
+    type: object
+  request.RuntimeUpdate:
+    properties:
+      id:
+        type: integer
+      image:
+        type: string
+      name:
+        type: string
+      params:
+        additionalProperties: true
+        type: object
+      version:
+        type: string
+    type: object
   request.SearchUploadWithPage:
     properties:
       page:
@@ -2037,12 +2191,18 @@ definitions:
         type: string
       otherDomains:
         type: string
+      port:
+        type: integer
       primaryDomain:
         type: string
       proxy:
         type: string
+      proxyType:
+        type: string
       remark:
         type: string
+      runtimeID:
+        type: integer
       type:
         type: string
       webSiteGroupID:
@@ -2213,6 +2373,18 @@ definitions:
     required:
     - id
     type: object
+  request.WebsitePHPConfigUpdate:
+    properties:
+      id:
+        type: integer
+      params:
+        additionalProperties:
+          type: string
+        type: object
+    required:
+    - id
+    - params
+    type: object
   request.WebsiteResourceReq:
     properties:
       id:
@@ -2379,6 +2551,8 @@ definitions:
         type: boolean
       id:
         type: integer
+      image:
+        type: string
       lastVersion:
         type: string
       params: {}
@@ -2424,6 +2598,10 @@ definitions:
         type: string
       labelZh:
         type: string
+      multiple:
+        type: boolean
+      required:
+        type: boolean
       rule:
         type: string
       showValue:
@@ -2500,6 +2678,13 @@ definitions:
       writing:
         type: string
     type: object
+  response.PHPConfig:
+    properties:
+      params:
+        additionalProperties:
+          type: string
+        type: object
+    type: object
   response.WebsiteAcmeAccountDTO:
     properties:
       createdAt:
@@ -2551,6 +2736,8 @@ definitions:
         type: string
       remark:
         type: string
+      runtimeID:
+        type: integer
       sitePath:
         type: string
       status:
@@ -2649,11 +2836,11 @@ paths:
       summary: Get app list update
       tags:
       - App
-  /apps/detail/:appId/:version:
+  /apps/detail/:appId/:version/:type:
     get:
       consumes:
       - application/json
-      description: 通过 id 获取应用详情
+      description: 通过 appid 获取应用详情
       parameters:
       - description: app id
         in: path
@@ -2665,6 +2852,11 @@ paths:
         name: version
         required: true
         type: string
+      - description: app 类型
+        in: path
+        name: version
+        required: true
+        type: string
       responses:
         "200":
           description: OK
@@ -2672,7 +2864,28 @@ paths:
             $ref: '#/definitions/response.AppDetailDTO'
       security:
       - ApiKeyAuth: []
-      summary: Search app detail by id
+      summary: Search app detail by appid
+      tags:
+      - App
+  /apps/details/:id:
+    get:
+      consumes:
+      - application/json
+      description: 通过 id 获取应用详情
+      parameters:
+      - description: id
+        in: path
+        name: appId
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.AppDetailDTO'
+      security:
+      - ApiKeyAuth: []
+      summary: Get app detail by id
       tags:
       - App
   /apps/install:
@@ -4410,6 +4623,39 @@ paths:
         formatEN: manually execute the cronjob [name]
         formatZH: 手动执行计划任务 [name]
         paramKeys: []
+  /cronjobs/records/clean:
+    post:
+      consumes:
+      - application/json
+      description: 清空计划任务记录
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperateByID'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Clean job records
+      tags:
+      - Cronjob
+      x-panel-log:
+        BeforeFuntions:
+        - db: cronjobs
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: name
+          output_value: name
+        bodyKeys:
+        - id
+        formatEN: clean cronjob [name] records
+        formatZH: 清空计划任务记录 [name]
+        paramKeys: []
   /cronjobs/search:
     post:
       consumes:
@@ -5820,6 +6066,158 @@ paths:
         formatEN: delete host [addrs]
         formatZH: 删除主机 [addrs]
         paramKeys: []
+  /hosts/firewall/base:
+    get:
+      description: 获取防火墙基础信息
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.FirewallBaseInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Load firewall base info
+      tags:
+      - Firewall
+  /hosts/firewall/ip:
+    post:
+      consumes:
+      - application/json
+      description: 批量删除防火墙规则
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.BatchRuleOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create group
+      tags:
+      - Firewall
+  /hosts/firewall/operate:
+    post:
+      consumes:
+      - application/json
+      description: 修改防火墙状态
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.FirewallOperation'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page firewall status
+      tags:
+      - Firewall
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - operation
+        formatEN: '[operation] firewall'
+        formatZH: '[operation] 防火墙'
+        paramKeys: []
+  /hosts/firewall/port:
+    post:
+      consumes:
+      - application/json
+      description: 创建防火墙端口规则
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PortRuleOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create group
+      tags:
+      - Firewall
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - port
+        - strategy
+        formatEN: create port rules {[strategy][port]}
+        formatZH: 添加端口规则 {[strategy] [port]}
+        paramKeys: []
+  /hosts/firewall/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取防火墙规则列表分页
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SearchWithPage'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.PageResult'
+      security:
+      - ApiKeyAuth: []
+      summary: Page firewall rules
+      tags:
+      - Firewall
+  /hosts/firewall/update/ip:
+    post:
+      consumes:
+      - application/json
+      description: 更新 ip 防火墙规则
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddrRuleUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create group
+      tags:
+      - Firewall
+  /hosts/firewall/update/port:
+    post:
+      consumes:
+      - application/json
+      description: 更新端口防火墙规则
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.PortRuleUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create group
+      tags:
+      - Firewall
   /hosts/group:
     post:
       consumes:
@@ -6235,6 +6633,126 @@ paths:
         - websiteId
         formatEN: Update nginx conf [domain]
         formatZH: 更新 nginx 配置 [domain]
+        paramKeys: []
+  /runtimes:
+    post:
+      consumes:
+      - application/json
+      description: 创建运行环境
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.RuntimeCreate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create runtime
+      tags:
+      - Runtime
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        formatEN: Create runtime [name]
+        formatZH: 创建运行环境 [name]
+        paramKeys: []
+  /runtimes/:id:
+    get:
+      consumes:
+      - application/json
+      description: 获取运行环境
+      parameters:
+      - description: request
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Get runtime
+      tags:
+      - Runtime
+  /runtimes/del:
+    post:
+      consumes:
+      - application/json
+      description: 删除运行环境
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.RuntimeDelete'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Delete runtime
+      tags:
+      - Website
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - id
+        formatEN: Delete website [name]
+        formatZH: 删除网站 [name]
+        paramKeys: []
+  /runtimes/search:
+    post:
+      consumes:
+      - application/json
+      description: 获取运行环境列表
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.RuntimeSearch'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: List runtimes
+      tags:
+      - Runtime
+  /runtimes/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新运行环境
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.RuntimeUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update runtime
+      tags:
+      - Runtime
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        formatEN: Update runtime [name]
+        formatZH: 更新运行环境 [name]
         paramKeys: []
   /settings/backup:
     post:
@@ -7073,6 +7591,27 @@ paths:
       summary: Search website by id
       tags:
       - Website
+  /websites/:id/config/:type:
+    get:
+      consumes:
+      - application/json
+      description: 通过 id 查询网站 nginx
+      parameters:
+      - description: request
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.FileInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Search website nginx by id
+      tags:
+      - Website Nginx
   /websites/:id/https:
     get:
       consumes:
@@ -7128,27 +7667,6 @@ paths:
         formatEN: Update website https [domain] conf
         formatZH: 更新网站 [domain] https 配置
         paramKeys: []
-  /websites/:id/nginx:
-    get:
-      consumes:
-      - application/json
-      description: 通过 id 查询网站 nginx
-      parameters:
-      - description: request
-        in: path
-        name: id
-        required: true
-        type: integer
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.FileInfo'
-      security:
-      - ApiKeyAuth: []
-      summary: Search website nginx by id
-      tags:
-      - Website Nginx
   /websites/acme:
     post:
       consumes:
@@ -7698,6 +8216,60 @@ paths:
       summary: List website names
       tags:
       - Website
+  /websites/php/config/:id:
+    get:
+      consumes:
+      - application/json
+      description: 获取网站 php 配置
+      parameters:
+      - description: request
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.PHPConfig'
+      security:
+      - ApiKeyAuth: []
+      summary: Load websit php conf
+      tags:
+      - Website
+  /websites/php/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新 网站 PHP 配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsitePHPConfigUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update website php conf
+      tags:
+      - Website PHP
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: primary_domain
+          output_value: domain
+        bodyKeys:
+        - id
+        formatEN: '[domain] PHP conf update'
+        formatZH: '[domain] PHP 配置修改'
+        paramKeys: []
   /websites/search:
     post:
       consumes:

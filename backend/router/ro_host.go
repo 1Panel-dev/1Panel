@@ -26,6 +26,15 @@ func (s *HostRouter) InitHostRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/test/byid/:id", baseApi.TestByID)
 		hostRouter.GET(":id", baseApi.GetHostInfo)
 
+		hostRouter.GET("/firewall/base", baseApi.LoadFirewallBaseInfo)
+		hostRouter.POST("/firewall/search", baseApi.SearchFirewallRule)
+		hostRouter.POST("/firewall/operate", baseApi.OperateFirewall)
+		hostRouter.POST("/firewall/port", baseApi.OperatePortRule)
+		hostRouter.POST("/firewall/ip", baseApi.OperateIPRule)
+		hostRouter.POST("/firewall/batch", baseApi.BatchOperateRule)
+		hostRouter.POST("/firewall/update/port", baseApi.UpdatePortRule)
+		hostRouter.POST("/firewall/update/addr", baseApi.UpdateAddrRule)
+
 		hostRouter.GET("/command", baseApi.ListCommand)
 		hostRouter.POST("/command", baseApi.CreateCommand)
 		hostRouter.POST("/command/del", baseApi.DeleteCommand)

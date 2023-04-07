@@ -59,3 +59,10 @@ ErrTypeOfRedis: "The recovery file type does not match the current persistence m
 #container 
 ErrInUsed: "{{ .detail }} is in use and cannot be deleted"
 ErrObjectInUsed: "This object is in use and cannot be deleted"
+
+#runtime
+ErrDirNotFound: "The build folder does not exist! Please check file integrity！"
+ErrFileNotExist: "{{ .detail }} file does not exist! Please check source file integrity！"
+ErrImageBuildErr: "Image build failed"
+ErrImageExist: "Image is already exist！"
+ErrDelWithWebsite: "The operating environment has been associated with a website and cannot be deleted"

@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -34,6 +33,7 @@ type IImageService interface {
 	ImageSave(req dto.ImageSave) error
 	ImagePush(req dto.ImagePush) (string, error)
 	ImageRemove(req dto.BatchDelete) error
+	ImageTag(req dto.ImageTag) error
 }
 
 func NewIImageService() IImageService {
@@ -173,7 +173,7 @@ func (u *ImageService) ImageBuild(req dto.ImageBuild) (string, error) {
 			return
 		}
 		defer res.Body.Close()
-		body, err := ioutil.ReadAll(res.Body)
+		body, err := io.ReadAll(res.Body)
 		if err != nil {
 			global.LOG.Errorf("build image %s failed, err: %v", req.Name, err)
 			_, _ = file.WriteString(fmt.Sprintf("build image %s failed, err: %v", req.Name, err))
@@ -274,7 +274,7 @@ func (u *ImageService) ImageLoad(req dto.ImageLoad) error {
 	if err != nil {
 		return err
 	}
-	content, err := ioutil.ReadAll(res.Body)
+	content, err := io.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}

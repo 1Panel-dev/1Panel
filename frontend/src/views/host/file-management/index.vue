@@ -58,6 +58,9 @@
                     <el-button plain @click="openDownload" :disabled="selects.length === 0">
                         {{ $t('file.download') }}
                     </el-button>
+                    <el-button plain @click="batchDelFiles" :disabled="selects.length === 0">
+                        {{ $t('commons.button.delete') }}
+                    </el-button>
                 </el-button-group>
                 <div class="search search-button">
                     <el-input
@@ -170,7 +173,7 @@ import Process from './process/index.vue';
 // import Detail from './detail/index.vue';
 import { useRouter } from 'vue-router';
 import { Back, Refresh } from '@element-plus/icons-vue';
-import { MsgWarning } from '@/utils/message';
+import { MsgSuccess, MsgWarning } from '@/utils/message';
 
 interface FilePaths {
     url: string;
@@ -321,6 +324,28 @@ const handleCreate = (commnad: string) => {
 const delFile = async (row: File.File | null) => {
     await useDeleteData(DeleteFile, row as File.FileDelete, 'commons.msg.delete');
     search();
+};
+
+const batchDelFiles = () => {
+    ElMessageBox.confirm(i18n.global.t('commons.msg.delete'), i18n.global.t('commons.msg.deleteTitle'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(() => {
+        const pros = [];
+        for (const s of selects.value) {
+            pros.push(DeleteFile({ path: s['path'], isDir: s['isDir'] }));
+        }
+        loading.value = true;
+        Promise.all(pros)
+            .then(() => {
+                MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+                search();
+            })
+            .finally(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const getFileSize = (size: number) => {

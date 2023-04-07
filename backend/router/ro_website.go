@@ -31,7 +31,7 @@ func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/domains/del", baseApi.DeleteWebDomain)
 		groupRouter.POST("/domains", baseApi.CreateWebDomain)
 
-		groupRouter.GET("/:id/nginx", baseApi.GetWebsiteNginx)
+		groupRouter.GET("/:id/config/:type", baseApi.GetWebsiteNginx)
 		groupRouter.POST("/config", baseApi.GetNginxConfig)
 		groupRouter.POST("/config/update", baseApi.UpdateNginxConfig)
 		groupRouter.POST("/nginx/update", baseApi.UpdateWebsiteNginxConfig)
@@ -41,5 +41,8 @@ func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 
 		groupRouter.POST("/waf/config", baseApi.GetWebsiteWafConfig)
 		groupRouter.POST("/waf/update", baseApi.UpdateWebsiteWafConfig)
+
+		groupRouter.GET("/php/config/:id", baseApi.GetWebsitePHPConfig)
+		groupRouter.POST("/php/config", baseApi.UpdateWebsitePHPConfig)
 	}
 }

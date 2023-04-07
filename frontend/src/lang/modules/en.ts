@@ -21,6 +21,8 @@ const message = {
             clean: 'Clean',
             login: 'Login',
             close: 'Close',
+            stop: 'Stop',
+            start: 'Start',
             view: 'View',
             watch: 'Watch',
             handle: 'Handle',
@@ -197,6 +199,8 @@ const message = {
             exited: 'Exited',
             enabled: 'Enabled',
             disabled: 'Disabled',
+            normal: 'Normal',
+            building: 'Building',
         },
     },
     menu: {
@@ -218,6 +222,7 @@ const message = {
         toolbox: 'Toolbox',
         logs: 'Log',
         ssl: 'Certificate',
+        runtime: 'Runtime',
     },
     home: {
         overview: 'Overview',
@@ -579,8 +584,12 @@ const message = {
         taskName: 'Task name',
         cronSpec: 'Lifecycle',
         cronSpecHelper: 'Enter the correct execution period',
+        cleanHelper:
+            'This operation will retain the latest seven task execution records and log files. Do you want to continue?',
         directory: 'Backup directory',
         sourceDir: 'Backup directory',
+        allOptionHelper:
+            'The current task plan is to back up all {0}. Direct download is not supported at the moment. You can check the backup list of {0} menu.',
         exclusionRules: 'Exclusive rule',
         saveLocal: 'Retain local backups (the same as the number of cloud storage copies)',
         url: 'URL Address',
@@ -799,7 +808,7 @@ const message = {
 
         backup: 'Backup',
         thirdParty: 'Third-party account',
-        createBackupAccount: 'Create {0} backup account',
+        createBackupAccount: 'Add {0}',
         noTypeForCreate: 'No backup type is currently created',
         LOCAL: 'Server disks',
         currentPath: 'Current path',
@@ -807,6 +816,11 @@ const message = {
         S3: 'Amazon S3',
         MINIO: 'MINIO',
         SFTP: 'SFTP',
+        COS: 'Tencent COS',
+        KODO: 'Qiniu Kodo',
+        backupAlert:
+            "In theory, as long as the cloud provider is compatible with the S3 protocol, existing Amazon S3 cloud storage can be used for backup. For specific configurations, please refer to the <a target=“_blank” href='https://1panel.cn/docs/user_manual/settings/#3'>official documentation.</a> ",
+        domain: 'Accelerate domain',
         backupAccount: 'Backup account',
         loadBucket: 'Get bucket',
         accountName: 'Account name',
@@ -1124,6 +1138,11 @@ const message = {
         websiteStatictHelper: 'Create a website directory on the host',
         websiteProxyHelper:
             'The proxy has existing services, for example, the machine has installed the halo service using port 8080, then the proxy address is http://127.0.0.1:8080',
+        runtimeProxyHelper: 'Use runtime created from 1Panel',
+        runtime: 'Runtime',
+        deleteRuntimeHelper:
+            'The Runtime application needs to be deleted together with the website, please handle it with caution',
+        proxyType: 'Listening Network Type',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'The hash table size of the server name',
@@ -1178,6 +1197,67 @@ const message = {
         argsCheck: 'GET parameter check',
         postCheck: 'POST parameter verification',
         cookieBlockList: 'Cookie Blacklist',
+
+        firewall: 'Firewall',
+        used: 'Used',
+        unUsed: 'Unused',
+        firewallHelper: '{0} System firewall',
+        firewallNotStart: 'The firewall service is not enabled at present, please enable it first!',
+        stopFirewallHelper:
+            'After the system firewall is disabled, the server loses security protection. Do you want to continue?',
+        startFirewallHelper:
+            'After the firewall is enabled, the server security can be better protected. Do you want to continue?',
+        noPing: 'Disable ping',
+        noPingTitle: 'Disable ping',
+        noPingHelper: 'If the ping function is disabled, the server cannot be pinged. Do you want to continue?',
+        onPingHelper: 'If you disable ping, hackers may discover your server. Do you want to continue?',
+        protocol: 'Protocol',
+        port: 'Port',
+        changeStrategy: 'Change the {0} strategy',
+        changeStrategyIPHelper1:
+            'Change the IP address strategy to [deny]. After the IP address is set, access to the server is prohibited. Do you want to continue?',
+        changeStrategyIPHelper2:
+            'Change the IP address strategy to [allow]. After the IP address is set, normal access is restored. Do you want to continue?',
+        changeStrategyPortHelper1:
+            'Change the port policy to [drop]. After the port policy is set, external access is denied. Do you want to continue?',
+        changeStrategyPortHelper2:
+            'Change the port policy to [accept]. After the policy is set, normal port access will be restored. Do you want to continue?',
+        stop: 'Stop',
+        portFormatError: 'Please enter the correct port information!',
+        portHelper1: 'Multiple ports, such as 8080 and 8081',
+        portHelper2: 'Range port, such as 8080-8089',
+        changeStrategyHelper:
+            'Change [{1}] {0} strategy to [{2}]. After setting, {0} will access {2} externally. Do you want to continue?',
+        portHelper: 'Multiple ports can be entered, such as 80,81, or range ports, such as 80-88',
+        strategy: 'Strategy',
+        accept: 'Accept',
+        drop: 'Drop',
+        source: 'Source',
+        anyWhere: 'AnyWhere',
+        address: 'Specified IP',
+        allow: 'Allow',
+        deny: 'Deny',
+        addressFormatError: 'Please enter a valid ip address!',
+        addressHelper1: 'Multiple IP please separated with ",", such as 172.16.10.11, 172.16.10.99',
+        addressHelper2: 'IP segment, such as 172.16.10.0/24',
+        addressHelper3: 'IP address range, such as 172.16.10.11-172.16.10.99',
+        allIP: 'All IP',
+        portRule: 'Port rule',
+        ipRule: 'IP rule',
+    },
+    runtime: {
+        runtime: 'Runtime',
+        image: 'Image',
+        workDir: 'working directory',
+        create: 'Create runtime',
+        name: 'Name',
+        resource: 'Source',
+        appstore: 'App Store',
+        local: 'Local',
+        app: 'Application',
+        localHelper: 'The local operating environment needs to be installed by itself',
+        version: 'Version',
+        status: 'Status',
     },
 };
 

@@ -25,6 +25,9 @@ type ICronjobService interface {
 	Update(id uint, req dto.CronjobUpdate) error
 	UpdateStatus(id uint, status string) error
 	Delete(ids []uint) error
+	Download(down dto.CronjobDownload) (string, error)
+	StartJob(cronjob *model.Cronjob) (int, error)
+	CleanRecord(id uint) error
 }
 
 func NewICronjobService() ICronjobService {
@@ -74,6 +77,27 @@ func (u *CronjobService) SearchRecords(search dto.SearchRecord) (int64, interfac
 		dtoCronjobs = append(dtoCronjobs, item)
 	}
 	return total, dtoCronjobs, err
+}
+
+func (u *CronjobService) CleanRecord(id uint) error {
+	_, records, err := cronjobRepo.PageRecords(1, 7, cronjobRepo.WithByJobID(int(id)), commonRepo.WithOrderBy("created_at desc"))
+	if err != nil {
+		return err
+	}
+	if len(records) < 7 {
+		return nil
+	}
+	delRecords, err := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(id)), cronjobRepo.WithByRecordDropID(int(records[6].ID)))
+	if err != nil {
+		return err
+	}
+	for _, del := range delRecords {
+		_ = os.RemoveAll(del.Records)
+	}
+	if err := cronjobRepo.DeleteRecord(cronjobRepo.WithByJobID(int(id)), cronjobRepo.WithByRecordDropID(int(records[6].ID))); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {

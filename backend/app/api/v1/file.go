@@ -3,7 +3,7 @@ package v1
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"path"
@@ -510,7 +510,7 @@ func (b *BaseApi) LoadFromFile(c *gin.Context) {
 		return
 	}
 
-	content, err := ioutil.ReadFile(req.Path)
+	content, err := os.ReadFile(req.Path)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -533,7 +533,7 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int)
 
 	for i := 0; i < chunkCount; i++ {
 		chunkPath := filepath.Join(fileDir, fmt.Sprintf("%s.%d", fileName, i))
-		chunkData, err := ioutil.ReadFile(chunkPath)
+		chunkData, err := os.ReadFile(chunkPath)
 		if err != nil {
 			return err
 		}
@@ -599,14 +599,14 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 	}
 	defer emptyFile.Close()
 
-	chunkData, err := ioutil.ReadAll(uploadFile)
+	chunkData, err := io.ReadAll(uploadFile)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrFileUpload, err)
 		return
 	}
 
 	chunkPath := filepath.Join(fileDir, fmt.Sprintf("%s.%d", filename, chunkIndex))
-	err = ioutil.WriteFile(chunkPath, chunkData, 0644)
+	err = os.WriteFile(chunkPath, chunkData, 0644)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrFileUpload, err)
 		return

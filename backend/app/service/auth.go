@@ -26,6 +26,7 @@ type IAuthService interface {
 	SafeEntrance(c *gin.Context, code string) error
 	Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error)
 	LogOut(c *gin.Context) error
+	MFALogin(c *gin.Context, info dto.MFALogin) (*dto.UserLoginInfo, error)
 }
 
 func NewIAuthService() IAuthService {

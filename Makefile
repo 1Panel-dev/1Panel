@@ -22,4 +22,9 @@ build_linux_on_mac:
 	cd $(SERVER_PATH) \
     && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ $(GOBUILD) -trimpath -ldflags '-s -w --extldflags "-static -fpic"'  -o $(BUILD_PATH)/$(APP_NAME) $(MAIN)
 
+build_on_archlinux:
+	cd $(SERVER_PATH) \
+    && CGO_ENABLED=1 GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOBUILD) -trimpath -ldflags '-s -w --extldflags "-fpic"' -tags osusergo -o $(BUILD_PATH)/$(APP_NAME) $(MAIN)
+
+
 build_all: build_web  build_bin

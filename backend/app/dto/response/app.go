@@ -43,6 +43,7 @@ type AppDetailDTO struct {
 	model.AppDetail
 	Enable bool        `json:"enable"`
 	Params interface{} `json:"params"`
+	Image  string      `json:"image"`
 }
 
 type AppInstalledDTO struct {
@@ -70,4 +71,6 @@ type AppParam struct {
 	Type      string      `json:"type"`
 	Values    interface{} `json:"values"`
 	ShowValue string      `json:"showValue"`
+	Required  bool        `json:"required"`
+	Multiple  bool        `json:"multiple"`
 }

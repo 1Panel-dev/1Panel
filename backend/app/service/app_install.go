@@ -1,9 +1,9 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
 	"path"
@@ -40,7 +40,7 @@ type IAppInstallService interface {
 	LoadPort(key string) (int64, error)
 	LoadPassword(key string) (string, error)
 	SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error)
-	Operate(req request.AppInstalledOperate) error
+	Operate(ctx context.Context, req request.AppInstalledOperate) error
 	Update(req request.AppInstalledUpdate) error
 	SyncAll(systemInit bool) error
 	GetServices(key string) ([]response.AppService, error)
@@ -174,8 +174,8 @@ func (a *AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]
 	return handleInstalled(installs, false)
 }
 
-func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
-	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallId))
+func (a *AppInstallService) Operate(ctx context.Context, req request.AppInstalledOperate) error {
+	install, err := appInstallRepo.GetFirstByCtx(ctx, commonRepo.WithByID(req.InstallId))
 	if err != nil {
 		return err
 	}
@@ -202,12 +202,9 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 		}
 		return syncById(install.ID)
 	case constant.Delete:
-		tx, ctx := getTxAndContext()
 		if err := deleteAppInstall(ctx, install, req.DeleteBackup, req.ForceDelete, req.DeleteDB); err != nil && !req.ForceDelete {
-			tx.Rollback()
 			return err
 		}
-		tx.Commit()
 		return nil
 	case constant.Sync:
 		return syncById(install.ID)
@@ -262,7 +259,7 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	if err := env.Write(oldEnvMaps, envPath); err != nil {
 		return err
 	}
-	_ = appInstallRepo.Save(&installed)
+	_ = appInstallRepo.Save(context.Background(), &installed)
 
 	if err := rebuildApp(installed); err != nil {
 		return err
@@ -302,7 +299,7 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 			if systemInit {
 				i.Status = constant.Error
 				i.Message = "System restart causes application exception"
-				_ = appInstallRepo.Save(&i)
+				_ = appInstallRepo.Save(context.Background(), &i)
 			}
 			continue
 		}
@@ -387,6 +384,10 @@ func (a *AppInstallService) ChangeAppPort(req request.PortUpdate) error {
 		}
 	}
 
+	if err := OperateFirewallPort([]int{int(appInstall.Port)}, []int{int(req.Port)}); err != nil {
+		global.LOG.Errorf("allow firewall failed, err: %v", err)
+	}
+
 	return nil
 }
 
@@ -400,14 +401,12 @@ func (a *AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, erro
 	if err != nil {
 		return nil, err
 	}
-	if app.Type == "website" {
-		websites, _ := websiteRepo.GetBy(websiteRepo.WithAppInstallId(appInstall.ID))
-		for _, website := range websites {
-			res = append(res, dto.AppResource{
-				Type: "website",
-				Name: website.PrimaryDomain,
-			})
-		}
+	websites, _ := websiteRepo.GetBy(websiteRepo.WithAppInstallId(appInstall.ID))
+	for _, website := range websites {
+		res = append(res, dto.AppResource{
+			Type: "website",
+			Name: website.PrimaryDomain,
+		})
 	}
 	if app.Key == constant.AppOpenresty {
 		websites, _ := websiteRepo.GetBy()
@@ -567,15 +566,15 @@ func syncById(installId uint) error {
 	if containerCount == 0 {
 		appInstall.Status = constant.Error
 		appInstall.Message = "container is not found"
-		return appInstallRepo.Save(&appInstall)
+		return appInstallRepo.Save(context.Background(), &appInstall)
 	}
 	if errCount == 0 && existedCount == 0 {
 		appInstall.Status = constant.Running
-		return appInstallRepo.Save(&appInstall)
+		return appInstallRepo.Save(context.Background(), &appInstall)
 	}
 	if existedCount == normalCount {
 		appInstall.Status = constant.Stopped
-		return appInstallRepo.Save(&appInstall)
+		return appInstallRepo.Save(context.Background(), &appInstall)
 	}
 	if errCount == normalCount {
 		appInstall.Status = constant.Error
@@ -600,7 +599,7 @@ func syncById(installId uint) error {
 		errMsg.Write([]byte("\n"))
 	}
 	appInstall.Message = errMsg.String()
-	return appInstallRepo.Save(&appInstall)
+	return appInstallRepo.Save(context.Background(), &appInstall)
 }
 
 func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value interface{}) error {
@@ -612,7 +611,7 @@ func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value 
 		return nil
 	}
 	envPath := fmt.Sprintf("%s/%s/%s/.env", constant.AppInstallDir, appKey, appInstall.Name)
-	lineBytes, err := ioutil.ReadFile(envPath)
+	lineBytes, err := os.ReadFile(envPath)
 	if err != nil {
 		return err
 	}
