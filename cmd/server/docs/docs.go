@@ -4838,6 +4838,187 @@ var doc = `{
                 }
             }
         },
+        "/groups": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建系统组",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Group"
+                ],
+                "summary": "Create group",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GroupCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name",
+                        "type"
+                    ],
+                    "formatEN": "create group [name][type]",
+                    "formatZH": "创建组 [name][type]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/groups/del": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "删除系统组",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Group"
+                ],
+                "summary": "Delete group",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperateByID"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "groups",
+                            "input_colume": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_colume": "name",
+                            "output_value": "name"
+                        },
+                        {
+                            "db": "groups",
+                            "input_colume": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_colume": "type",
+                            "output_value": "type"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "id"
+                    ],
+                    "formatEN": "delete group [type][name]",
+                    "formatZH": "删除组 [type][name]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/groups/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "查询系统组",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Group"
+                ],
+                "summary": "List groups",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GroupSearch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "anrry"
+                        }
+                    }
+                }
+            }
+        },
+        "/groups/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新系统组",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Group"
+                ],
+                "summary": "Update group",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GroupUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name",
+                        "type"
+                    ],
+                    "formatEN": "update group [name][type]",
+                    "formatZH": "更新组 [name][type]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/hosts": {
             "post": {
                 "security": [
@@ -5295,8 +5476,8 @@ var doc = `{
                         "port",
                         "strategy"
                     ],
-                    "formatEN": "create port rules {[strategy][port]}",
-                    "formatZH": "添加端口规则 {[strategy] [port]}",
+                    "formatEN": "create port rules [strategy][port]",
+                    "formatZH": "添加端口规则 [strategy] [port]",
                     "paramKeys": []
                 }
             }
@@ -5400,187 +5581,6 @@ var doc = `{
                     "200": {
                         "description": ""
                     }
-                }
-            }
-        },
-        "/hosts/group": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "创建系统组",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "System Group"
-                ],
-                "summary": "Create group",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GroupCreate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "name",
-                        "type"
-                    ],
-                    "formatEN": "create group [name][type]",
-                    "formatZH": "创建组 [name][type]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/hosts/group/del": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "删除系统组",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "System Group"
-                ],
-                "summary": "Delete group",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.OperateByID"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [
-                        {
-                            "db": "groups",
-                            "input_colume": "id",
-                            "input_value": "id",
-                            "isList": false,
-                            "output_colume": "name",
-                            "output_value": "name"
-                        },
-                        {
-                            "db": "groups",
-                            "input_colume": "id",
-                            "input_value": "id",
-                            "isList": false,
-                            "output_colume": "type",
-                            "output_value": "type"
-                        }
-                    ],
-                    "bodyKeys": [
-                        "id"
-                    ],
-                    "formatEN": "delete group [type][name]",
-                    "formatZH": "删除组 [type][name]",
-                    "paramKeys": []
-                }
-            }
-        },
-        "/hosts/group/search": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "查询系统组",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "System Group"
-                ],
-                "summary": "List groups",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GroupSearch"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "anrry"
-                        }
-                    }
-                }
-            }
-        },
-        "/hosts/group/update": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "更新系统组",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "System Group"
-                ],
-                "summary": "Update group",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.GroupUpdate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "name",
-                        "type"
-                    ],
-                    "formatEN": "update group [name][type]",
-                    "formatZH": "更新组 [name][type]",
-                    "paramKeys": []
                 }
             }
         },
@@ -5724,6 +5724,49 @@ var doc = `{
             }
         },
         "/hosts/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新主机",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Host"
+                ],
+                "summary": "Update host",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.HostOperate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name",
+                        "addr"
+                    ],
+                    "formatEN": "update host [name][addr]",
+                    "formatZH": "更新主机信息 [name][addr]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/hosts/update/group": {
             "post": {
                 "security": [
                     {

@@ -694,6 +694,7 @@ const message = {
             apps: 'App',
             websites: 'Website',
             containers: 'Container',
+            runtimes: 'Runtime',
             commands: 'Command',
             groups: 'System Group',
             files: 'File Manage',

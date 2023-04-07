@@ -87,7 +87,7 @@ func (b *BaseApi) OperateFirewall(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /hosts/firewall/port [post]
-// @x-panel-log {"bodyKeys":["port","strategy"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"添加端口规则 {[strategy] [port]}","formatEN":"create port rules {[strategy][port]}"}
+// @x-panel-log {"bodyKeys":["port","strategy"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"添加端口规则 [strategy] [port]","formatEN":"create port rules [strategy][port]"}
 func (b *BaseApi) OperatePortRule(c *gin.Context) {
 	var req dto.PortRuleOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -113,7 +113,7 @@ func (b *BaseApi) OperatePortRule(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /hosts/firewall/ip [post]
-// @x-panel-log {"bodyKeys":["strategy","address"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"添加 ip 规则 {[strategy] [address]}","formatEN":"create address rules {[strategy][address]}"}
+// @x-panel-log {"bodyKeys":["strategy","address"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"添加 ip 规则 [strategy] [address]","formatEN":"create address rules [strategy][address]"}
 func (b *BaseApi) OperateIPRule(c *gin.Context) {
 	var req dto.AddrRuleOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
