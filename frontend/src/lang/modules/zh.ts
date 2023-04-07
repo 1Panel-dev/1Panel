@@ -1218,10 +1218,12 @@ const message = {
         cookieBlockList: 'Cookie 黑名单',
 
         firewall: '防火墙',
+        dockerHelper: 'Linux 防火墙 {0} 无法禁用 Docker 端口映射，需要在 Docker 配置中禁用 iptables',
+        quickJump: '快速跳转',
         used: '已使用',
         unUsed: '未使用',
         firewallHelper: '{0}系统防火墙',
-        firewallNotStart: '当前未开启防火墙服务，请先开启！',
+        firewallNotStart: '当前未开启系统防火墙，请先开启！',
         stopFirewallHelper: '系统防火墙关闭后，服务器将失去安全防护，是否继续？',
         startFirewallHelper: '系统防火墙开启后，可以更好的防护服务器安全，是否继续？',
         noPing: '禁 ping',

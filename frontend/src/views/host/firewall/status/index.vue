@@ -51,13 +51,14 @@ const onPing = ref('Disable');
 const acceptParams = (): void => {
     loadBaseInfo(true);
 };
-const emit = defineEmits(['search', 'update:status', 'update:loading', 'update:maskShow']);
+const emit = defineEmits(['search', 'update:status', 'update:loading', 'update:maskShow', 'update:name']);
 
 const loadBaseInfo = async (search: boolean) => {
     await loadFireBaseInfo()
         .then((res) => {
             baseInfo.value = res.data;
             onPing.value = baseInfo.value.pingStatus;
+            emit('update:name', baseInfo.value.name);
             emit('update:status', baseInfo.value.status);
             if (search) {
                 emit('search');

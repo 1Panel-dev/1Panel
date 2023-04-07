@@ -252,6 +252,7 @@ export namespace Container {
         registryMirrors: Array<string>;
         insecureRegistries: Array<string>;
         liveRestore: boolean;
+        iptables: boolean;
         cgroupDriver: string;
     }
 }

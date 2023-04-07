@@ -62,6 +62,9 @@
                                     v-model="form.registries"
                                 />
                             </el-form-item>
+                            <el-form-item label="iptables" prop="iptables">
+                                <el-switch v-model="form.iptables"></el-switch>
+                            </el-form-item>
                             <el-form-item label="live-restore" prop="liveRestore">
                                 <el-switch v-model="form.liveRestore"></el-switch>
                                 <span class="input-help">{{ $t('container.liveHelper') }}</span>
@@ -153,6 +156,7 @@ const form = reactive({
     mirrors: '',
     registries: '',
     liveRestore: false,
+    iptables: true,
     cgroupDriver: '',
 });
 
@@ -255,6 +259,7 @@ const onSubmitSave = async () => {
             return el !== null && el !== '' && el !== undefined;
         }),
         liveRestore: form.liveRestore,
+        iptables: form.iptables,
         cgroupDriver: form.cgroupDriver,
     };
     loading.value = true;
@@ -293,6 +298,7 @@ const search = async () => {
     form.version = res.data.version;
     form.cgroupDriver = res.data.cgroupDriver;
     form.liveRestore = res.data.liveRestore;
+    form.iptables = res.data.iptables;
     form.mirrors = res.data.registryMirrors ? res.data.registryMirrors.join('\n') : '';
     form.registries = res.data.insecureRegistries ? res.data.insecureRegistries.join('\n') : '';
 };

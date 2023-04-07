@@ -34,6 +34,7 @@ type daemonJsonItem struct {
 	Mirrors     []string `json:"registry-mirrors"`
 	Registries  []string `json:"insecure-registries"`
 	LiveRestore bool     `json:"live-restore"`
+	IPTables    bool     `json:"iptables"`
 	ExecOpts    []string `json:"exec-opts"`
 }
 
@@ -63,23 +64,26 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 		}
 	}
 	if _, err := os.Stat(constant.DaemonJsonPath); err != nil {
-		return &dto.DaemonJsonConf{Status: status, Version: version}
+		return &dto.DaemonJsonConf{Status: status, IPTables: true, Version: version}
 	}
 	file, err := os.ReadFile(constant.DaemonJsonPath)
 	if err != nil {
-		return &dto.DaemonJsonConf{Status: status, Version: version}
+		return &dto.DaemonJsonConf{Status: status, IPTables: true, Version: version}
 	}
 	var conf daemonJsonItem
 	deamonMap := make(map[string]interface{})
 	if err := json.Unmarshal(file, &deamonMap); err != nil {
-		return &dto.DaemonJsonConf{Status: status, Version: version}
+		return &dto.DaemonJsonConf{Status: status, IPTables: true, Version: version}
 	}
 	arr, err := json.Marshal(deamonMap)
 	if err != nil {
-		return &dto.DaemonJsonConf{Status: status, Version: version}
+		return &dto.DaemonJsonConf{Status: status, IPTables: true, Version: version}
 	}
 	if err := json.Unmarshal(arr, &conf); err != nil {
-		return &dto.DaemonJsonConf{Status: status, Version: version}
+		return &dto.DaemonJsonConf{Status: status, IPTables: true, Version: version}
+	}
+	if _, ok := deamonMap["iptables"]; !ok {
+		conf.IPTables = true
 	}
 	driver := "cgroupfs"
 	for _, opt := range conf.ExecOpts {
@@ -93,6 +97,7 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 		Version:      version,
 		Mirrors:      conf.Mirrors,
 		Registries:   conf.Registries,
+		IPTables:     conf.IPTables,
 		LiveRestore:  conf.LiveRestore,
 		CgroupDriver: driver,
 	}
@@ -130,6 +135,11 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 	} else {
 		deamonMap["live-restore"] = req.LiveRestore
 	}
+	if req.IPTables {
+		delete(deamonMap, "iptables")
+	} else {
+		deamonMap["live-restore"] = false
+	}
 	if opts, ok := deamonMap["exec-opts"]; ok {
 		if optsValue, isArray := opts.([]interface{}); isArray {
 			for i := 0; i < len(optsValue); i++ {
@@ -162,6 +172,12 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 }
 
 func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
+	if _, err := os.Stat(constant.DaemonJsonPath); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(path.Dir(constant.DaemonJsonPath), os.ModePerm); err != nil {
+			return err
+		}
+		_, _ = os.Create(constant.DaemonJsonPath)
+	}
 	file, err := os.OpenFile(constant.DaemonJsonPath, os.O_WRONLY|os.O_TRUNC, 0640)
 	if err != nil {
 		return err
