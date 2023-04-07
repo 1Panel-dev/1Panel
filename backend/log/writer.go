@@ -1,7 +1,6 @@
 package log
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -108,7 +107,7 @@ func NewWriterFromConfig(c *Config) (RollingWriter, error) {
 	}
 	if c.MaxRemain > 0 {
 		writer.rollingfilech = make(chan string, c.MaxRemain)
-		dir, err := ioutil.ReadDir(c.LogPath)
+		dir, err := os.ReadDir(c.LogPath)
 		if err != nil {
 			mng.Close()
 			return nil, err

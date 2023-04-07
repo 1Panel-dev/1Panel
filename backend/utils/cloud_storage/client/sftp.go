@@ -2,7 +2,7 @@ package client
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"os"
 	"path"
@@ -75,7 +75,7 @@ func (s sftpClient) Upload(src, target string) (bool, error) {
 		return false, err
 	}
 	defer dstFile.Close()
-	ff, err := ioutil.ReadAll(srcFile)
+	ff, err := io.ReadAll(srcFile)
 	if err != nil {
 		return false, err
 	}

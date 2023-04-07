@@ -3,9 +3,10 @@ package nginx
 import (
 	"bytes"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
-	"io/ioutil"
+	"os"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
 )
 
 var (
@@ -96,5 +97,5 @@ func DumpConfig(c *components.Config, style *Style) string {
 }
 
 func WriteConfig(c *components.Config, style *Style) error {
-	return ioutil.WriteFile(c.FilePath, []byte(DumpConfig(c, style)), 0644)
+	return os.WriteFile(c.FilePath, []byte(DumpConfig(c, style)), 0644)
 }

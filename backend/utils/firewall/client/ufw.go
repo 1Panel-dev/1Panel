@@ -2,7 +2,6 @@ package client
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -62,7 +61,7 @@ func (f *Ufw) PingStatus() (string, error) {
 }
 
 func (f *Ufw) UpdatePingStatus(enabel string) error {
-	lineBytes, err := ioutil.ReadFile(confPath)
+	lineBytes, err := os.ReadFile(confPath)
 	if err != nil {
 		return err
 	}

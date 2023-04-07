@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os/exec"
 	"sort"
 	"strconv"
@@ -267,7 +266,7 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainterStats, erro
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -339,7 +338,7 @@ func pullImages(ctx context.Context, client *client.Client, image string) error 
 		return err
 	}
 	defer out.Close()
-	_, err = io.Copy(ioutil.Discard, out)
+	_, err = io.Copy(io.Discard, out)
 	if err != nil {
 		return err
 	}
