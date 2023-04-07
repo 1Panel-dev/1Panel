@@ -65,6 +65,7 @@
                         >
                             {{ $t('commons.button.disable') }}
                         </el-button>
+                        <el-divider direction="vertical" />
                         <el-button
                             type="primary"
                             v-if="dialogData.rowData.status === 'Disable'"
@@ -72,6 +73,9 @@
                             link
                         >
                             {{ $t('commons.button.enable') }}
+                        </el-button>
+                        <el-button type="primary" :disabled="records.length <= 7" @click="cleanRecord()" link>
+                            {{ $t('commons.button.clean') }}
                         </el-button>
                     </span>
                 </div>
@@ -289,7 +293,7 @@
 import { reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import { loadZero } from '@/utils/util';
-import { searchRecords, download, handleOnce, updateStatus } from '@/api/modules/cronjob';
+import { searchRecords, download, handleOnce, updateStatus, cleanRecords } from '@/api/modules/cronjob';
 import { dateFormat } from '@/utils/util';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
@@ -519,6 +523,18 @@ const loadRecord = async (row: Cronjob.Record) => {
         currentRecordDetail.value = res.data;
     }
 };
+const cleanRecord = async () => {
+    ElMessageBox.confirm(i18n.global.t('cronjob.cleanHelper'), i18n.global.t('commons.button.clean'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        await cleanRecords(dialogData.value.rowData.id);
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        search(true);
+    });
+};
+
 function isBackup() {
     return (
         dialogData.value.rowData!.type === 'website' ||

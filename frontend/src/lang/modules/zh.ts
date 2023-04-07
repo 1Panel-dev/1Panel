@@ -588,6 +588,7 @@ const message = {
         taskName: '任务名称',
         cronSpec: '执行周期',
         cronSpecHelper: '请输入正确的执行周期',
+        cleanHelper: '该操作将保留最新的 7 份任务执行记录和日志文件，是否继续？',
         directory: '备份目录',
         sourceDir: '备份目录',
         allOptionHelper: '当前计划任务为备份所有 {0}，暂不支持直接下载，可在 {0} 备份列表中查看',

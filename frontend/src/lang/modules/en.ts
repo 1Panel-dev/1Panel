@@ -584,6 +584,8 @@ const message = {
         taskName: 'Task name',
         cronSpec: 'Lifecycle',
         cronSpecHelper: 'Enter the correct execution period',
+        cleanHelper:
+            'This operation will retain the latest seven task execution records and log files. Do you want to continue?',
         directory: 'Backup directory',
         sourceDir: 'Backup directory',
         allOptionHelper:
