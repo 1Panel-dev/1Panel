@@ -89,7 +89,7 @@ import FileList from '@/components/file-list/index.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { nextTick, reactive, ref, shallowRef } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
@@ -179,6 +179,11 @@ const loadLogs = async (path: string) => {
         }
     }, 1000 * 3);
 };
+
+onBeforeUnmount(() => {
+    clearInterval(Number(timer));
+    timer = null;
+});
 
 const loadBuildDir = async (path: string) => {
     form.dockerfile = path;

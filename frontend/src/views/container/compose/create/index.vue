@@ -115,7 +115,7 @@
 </template>
 
 <script lang="ts" setup>
-import { nextTick, reactive, ref, shallowRef } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
 import FileList from '@/components/file-list/index.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
@@ -264,6 +264,11 @@ const loadDir = async (path: string) => {
     form.path = path;
     hasChecked.value = false;
 };
+
+onBeforeUnmount(() => {
+    clearInterval(Number(timer));
+    timer = null;
+});
 
 defineExpose({
     acceptParams,
