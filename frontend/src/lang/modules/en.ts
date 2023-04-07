@@ -1222,10 +1222,13 @@ const message = {
         cookieBlockList: 'Cookie Blacklist',
 
         firewall: 'Firewall',
+        dockerHelper:
+            'Linux firewall {0} cannot disable Docker port mapping, you need to disable iptables in Docker configuration.',
+        quickJump: 'Quick jump',
         used: 'Used',
         unUsed: 'Unused',
         firewallHelper: '{0} System firewall',
-        firewallNotStart: 'The firewall service is not enabled at present, please enable it first!',
+        firewallNotStart: 'The system firewall is not enabled at present, please enable it first!',
         stopFirewallHelper:
             'After the system firewall is disabled, the server loses security protection. Do you want to continue?',
         startFirewallHelper:

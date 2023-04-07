@@ -10,6 +10,7 @@ type DaemonJsonConf struct {
 	Mirrors      []string `json:"registryMirrors"`
 	Registries   []string `json:"insecureRegistries"`
 	LiveRestore  bool     `json:"liveRestore"`
+	IPTables     bool     `json:"iptables"`
 	CgroupDriver string   `json:"cgroupDriver"`
 }
 

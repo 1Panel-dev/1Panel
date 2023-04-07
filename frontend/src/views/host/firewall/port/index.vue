@@ -8,6 +8,7 @@
             v-model:loading="loading"
             v-model:mask-show="maskShow"
             v-model:status="fireStatus"
+            v-model:name="fireName"
         />
 
         <el-card v-if="fireStatus != 'running' && maskShow" class="mask-prompt">
@@ -15,6 +16,23 @@
         </el-card>
 
         <LayoutContent :title="$t('firewall.portRule')" :class="{ mask: fireStatus != 'running' }">
+            <template #prompt>
+                <el-alert type="info" :closable="false">
+                    <template #default>
+                        <span>
+                            <span>{{ $t('firewall.dockerHelper', [fireName]) }}</span>
+                            <el-link
+                                style="font-size: 12px; margin-left: 5px"
+                                icon="Position"
+                                @click="quickJump()"
+                                type="primary"
+                            >
+                                {{ $t('firewall.quickJump') }}
+                            </el-link>
+                        </span>
+                    </template>
+                </el-alert>
+            </template>
             <template #toolbar>
                 <el-row>
                     <el-col :span="16">
@@ -111,6 +129,7 @@ import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
+import router from '@/routers';
 
 const loading = ref();
 const activeTag = ref('port');
@@ -119,6 +138,7 @@ const searchName = ref();
 
 const maskShow = ref(true);
 const fireStatus = ref('running');
+const fireName = ref();
 const fireStatuRef = ref();
 
 const data = ref();
@@ -167,6 +187,10 @@ const onOpenDialog = async (
         rowData: { ...rowData },
     };
     dialogRef.value!.acceptParams(params);
+};
+
+const quickJump = () => {
+    router.push({ name: 'ContainerSetting' });
 };
 
 const onChangeStatus = async (row: Host.RuleInfo, status: string) => {
