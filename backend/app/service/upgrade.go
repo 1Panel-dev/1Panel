@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"runtime"
@@ -203,7 +203,7 @@ func (u *UpgradeService) loadVersion(isLatest bool, currentVersion string) (stri
 		return "", err
 	}
 	defer latestVersionRes.Body.Close()
-	version, err := ioutil.ReadAll(latestVersionRes.Body)
+	version, err := io.ReadAll(latestVersionRes.Body)
 	if err != nil {
 		return "", err
 	}
@@ -231,7 +231,7 @@ func (u *UpgradeService) loadReleaseNotes(path string) (string, error) {
 		return "", err
 	}
 	defer releaseNotes.Body.Close()
-	release, err := ioutil.ReadAll(releaseNotes.Body)
+	release, err := io.ReadAll(releaseNotes.Body)
 	if err != nil {
 		return "", err
 	}

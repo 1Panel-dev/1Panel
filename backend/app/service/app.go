@@ -5,13 +5,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
-	"github.com/1Panel-dev/1Panel/backend/utils/docker"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
@@ -321,7 +322,9 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	if appInstall.HttpsPort > 0 {
 		ports = append(ports, appInstall.HttpsPort)
 	}
-	go OperateFirewallPort(nil, ports)
+	go func() {
+		_ = OperateFirewallPort(nil, ports)
+	}()
 	return &appInstall, nil
 }
 
@@ -340,7 +343,7 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 		return nil, err
 	}
 	defer versionRes.Body.Close()
-	body, err := ioutil.ReadAll(versionRes.Body)
+	body, err := io.ReadAll(versionRes.Body)
 	if err != nil {
 		return nil, err
 	}

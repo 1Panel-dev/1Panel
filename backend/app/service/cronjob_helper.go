@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 	"time"
@@ -170,7 +169,7 @@ func (u *CronjobService) HandleRmExpired(backType, backupDir string, cronjob *mo
 		}
 		return
 	}
-	files, err := ioutil.ReadDir(backupDir)
+	files, err := os.ReadDir(backupDir)
 	if err != nil {
 		global.LOG.Errorf("read dir %s failed, err: %v", backupDir, err)
 		return

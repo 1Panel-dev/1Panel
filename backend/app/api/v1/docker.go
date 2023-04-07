@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"io/ioutil"
 	"os"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
@@ -35,7 +34,7 @@ func (b *BaseApi) LoadDaemonJsonFile(c *gin.Context) {
 		helper.SuccessWithData(c, "daemon.json is not find in path")
 		return
 	}
-	content, err := ioutil.ReadFile(constant.DaemonJsonPath)
+	content, err := os.ReadFile(constant.DaemonJsonPath)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

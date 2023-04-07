@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"regexp"
@@ -339,7 +338,7 @@ func (u *MysqlService) UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
 	var files []string
 
 	path := fmt.Sprintf("%s/mysql/%s/conf/my.cnf", constant.AppInstallDir, app.Name)
-	lineBytes, err := ioutil.ReadFile(path)
+	lineBytes, err := os.ReadFile(path)
 	if err != nil {
 		return err
 	}

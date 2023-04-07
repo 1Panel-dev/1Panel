@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
 	"path"
@@ -612,7 +611,7 @@ func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value 
 		return nil
 	}
 	envPath := fmt.Sprintf("%s/%s/%s/.env", constant.AppInstallDir, appKey, appInstall.Name)
-	lineBytes, err := ioutil.ReadFile(envPath)
+	lineBytes, err := os.ReadFile(envPath)
 	if err != nil {
 		return err
 	}
