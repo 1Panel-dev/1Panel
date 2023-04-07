@@ -23,7 +23,12 @@
                     </el-form-item>
 
                     <el-form-item :label="$t('cronjob.taskName')" prop="name">
-                        <el-input style="width: 100%" clearable v-model.trim="dialogData.rowData!.name" />
+                        <el-input
+                            :disabled="dialogData.title === 'edit'"
+                            style="width: 100%"
+                            clearable
+                            v-model.trim="dialogData.rowData!.name"
+                        />
                     </el-form-item>
 
                     <el-form-item :label="$t('cronjob.cronSpec')" prop="spec">
@@ -82,6 +87,7 @@
                         prop="website"
                     >
                         <el-select style="width: 100%" v-model="dialogData.rowData!.website">
+                            <el-option :label="$t('commons.table.all')" value="all" />
                             <el-option v-for="item in websiteOptions" :key="item" :value="item" :label="item" />
                         </el-select>
                     </el-form-item>
@@ -89,6 +95,7 @@
                     <div v-if="dialogData.rowData!.type === 'database'">
                         <el-form-item :label="$t('cronjob.database')" prop="dbName">
                             <el-select style="width: 100%" clearable v-model="dialogData.rowData!.dbName">
+                                <el-option :label="$t('commons.table.all')" value="all" />
                                 <el-option v-for="item in mysqlInfo.dbNames" :key="item" :label="item" :value="item" />
                             </el-select>
                         </el-form-item>
