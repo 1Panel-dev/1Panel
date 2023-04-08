@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/gin-contrib/gzip"
 	"html/template"
 	"net/http"
 
@@ -50,6 +51,7 @@ func Routers() *gin.Engine {
 		Router.Use(middleware.DemoHandle())
 	}
 
+	Router.Use(gzip.Gzip(gzip.DefaultCompression))
 	setWebStatic(Router)
 
 	Router.Use(i18n.GinI18nLocalize())
