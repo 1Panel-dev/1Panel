@@ -87,6 +87,7 @@ declare module 'vue' {
     SvgIcon: typeof import('./src/components/svg-icon/svg-icon.vue')['default']
     SystemUpgrade: typeof import('./src/components/system-upgrade/index.vue')['default']
     TableSetting: typeof import('./src/components/table-setting/index.vue')['default']
+    Terminal: typeof import('./src/components/terminal/index.vue')['default']
     Tooltip: typeof import('./src/components/tooltip/index.vue')['default']
     Upload: typeof import('./src/components/upload/index.vue')['default']
     VCharts: typeof import('./src/components/v-charts/index.vue')['default']

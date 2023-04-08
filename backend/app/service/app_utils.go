@@ -293,11 +293,9 @@ func checkLimit(app model.App) error {
 }
 
 func checkRequiredAndLimit(app model.App) error {
-
 	if err := checkLimit(app); err != nil {
 		return err
 	}
-
 	if app.Required != "" {
 		var requiredArray []string
 		if err := json.Unmarshal([]byte(app.Required), &requiredArray); err != nil {
@@ -326,7 +324,6 @@ func checkRequiredAndLimit(app model.App) error {
 			}
 		}
 	}
-
 	return nil
 }
 
@@ -343,10 +340,17 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 	}
 }
 
-func copyAppData(key, version, installName string, params map[string]interface{}) (err error) {
+func copyAppData(key, version, installName string, params map[string]interface{}, isLocal bool) (err error) {
 	fileOp := files.NewFileOp()
-	resourceDir := path.Join(constant.AppResourceDir, key, "versions", version)
+	appResourceDir := constant.AppResourceDir
 	installAppDir := path.Join(constant.AppInstallDir, key)
+	appKey := key
+	if isLocal {
+		appResourceDir = constant.LocalAppResourceDir
+		appKey = strings.TrimPrefix(key, "local")
+		installAppDir = path.Join(constant.LocalAppInstallDir, appKey)
+	}
+	resourceDir := path.Join(appResourceDir, appKey, "versions", version)
 
 	if !fileOp.Stat(installAppDir) {
 		if err = fileOp.CreateDir(installAppDir, 0755); err != nil {
@@ -471,20 +475,29 @@ func getAppDetails(details []model.AppDetail, versions []string) map[string]mode
 	return appDetails
 }
 
-func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
+func getApps(oldApps []model.App, items []dto.AppDefine, isLocal bool) map[string]model.App {
 	apps := make(map[string]model.App, len(oldApps))
 	for _, old := range oldApps {
 		old.Status = constant.AppTakeDown
 		apps[old.Key] = old
 	}
 	for _, item := range items {
-		app, ok := apps[item.Key]
+		key := item.Key
+		if isLocal {
+			key = "local" + key
+		}
+		app, ok := apps[key]
 		if !ok {
 			app = model.App{}
 		}
+		if isLocal {
+			app.Resource = constant.AppResourceLocal
+		} else {
+			app.Resource = constant.AppResourceRemote
+		}
 		app.Name = item.Name
 		app.Limit = item.Limit
-		app.Key = item.Key
+		app.Key = key
 		app.ShortDescZh = item.ShortDescZh
 		app.ShortDescEn = item.ShortDescEn
 		app.Website = item.Website
@@ -494,7 +507,7 @@ func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
 		app.CrossVersionUpdate = item.CrossVersionUpdate
 		app.Required = item.GetRequired()
 		app.Status = constant.AppNormal
-		apps[item.Key] = app
+		apps[key] = app
 	}
 	return apps
 }

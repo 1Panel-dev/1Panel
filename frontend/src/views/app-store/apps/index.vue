@@ -75,8 +75,10 @@
                                         </span>
                                     </div>
                                     <div class="app-tag">
-                                        <el-tag v-for="(tag, ind) in app.tags" :key="ind" :colr="getColor(ind)">
-                                            {{ language == 'zh' ? tag.name : tag.key }}
+                                        <el-tag v-for="(tag, ind) in app.tags" :key="ind" style="margin-right: 5px">
+                                            <span :style="{ color: getColor(ind) }">
+                                                {{ language == 'zh' ? tag.name : tag.key }}
+                                            </span>
                                         </el-tag>
                                     </div>
                                     <div class="divider"></div>
@@ -113,7 +115,7 @@ let req = reactive({
 
 let apps = ref<App.App[]>([]);
 let tags = ref<App.Tag[]>([]);
-const colorArr = ['#6495ED', '#54FF9F', '#BEBEBE', '#FFF68F', '#FFFF00', '#8B0000'];
+const colorArr = ['#005eeb', '#008B45', '#BEBEBE', '#FFF68F', '#FFFF00', '#8B0000'];
 let loading = ref(false);
 let activeTag = ref('all');
 let showDetail = ref(false);

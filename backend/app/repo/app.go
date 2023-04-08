@@ -16,6 +16,7 @@ type IAppRepo interface {
 	WithType(typeStr string) DBOption
 	OrderByRecommend() DBOption
 	GetRecommend() DBOption
+	WithResource(resource string) DBOption
 	Page(page, size int, opts ...DBOption) (int64, []model.App, error)
 	GetFirst(opts ...DBOption) (model.App, error)
 	GetBy(opts ...DBOption) ([]model.App, error)
@@ -50,6 +51,12 @@ func (a AppRepo) OrderByRecommend() DBOption {
 func (a AppRepo) GetRecommend() DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("recommend < 9999")
+	}
+}
+
+func (a AppRepo) WithResource(resource string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("resource = ?", resource)
 	}
 }
 

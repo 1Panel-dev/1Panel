@@ -22,6 +22,7 @@ func Init() {
 		migrations.AddTableSnap,
 		migrations.AddDefaultGroup,
 		migrations.AddTableRuntime,
+		migrations.UpdateTableApp,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

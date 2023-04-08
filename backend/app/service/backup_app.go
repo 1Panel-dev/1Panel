@@ -33,6 +33,7 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) error {
 		return err
 	}
 	timeNow := time.Now().Format("20060102150405")
+
 	backupDir := fmt.Sprintf("%s/app/%s/%s", localDir, req.Name, req.DetailName)
 
 	fileName := fmt.Sprintf("%s_%s.tar.gz", req.DetailName, timeNow)
@@ -98,7 +99,7 @@ func handleAppBackup(install *model.AppInstall, backupDir, fileName string) erro
 		return err
 	}
 
-	appPath := fmt.Sprintf("%s/%s/%s", constant.AppInstallDir, install.App.Key, install.Name)
+	appPath := fmt.Sprintf("%s/%s", install.GetPath(), install.Name)
 	if err := handleTar(appPath, tmpDir, "app.tar.gz", ""); err != nil {
 		return err
 	}

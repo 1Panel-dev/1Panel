@@ -105,7 +105,7 @@
                                             round
                                             size="small"
                                             :disabled="installed.status !== 'Running'"
-                                            @click="openUploads(installed.app.key, installed.name)"
+                                            @click="openUploads(installed.app.name, installed.name)"
                                             v-if="mode === 'installed'"
                                         >
                                             {{ $t('database.loadBackup') }}
@@ -117,7 +117,7 @@
                                             round
                                             size="small"
                                             :disabled="installed.status !== 'Running'"
-                                            @click="openBackups(installed.app.key, installed.name)"
+                                            @click="openBackups(installed.app.name, installed.name)"
                                             v-if="mode === 'installed'"
                                         >
                                             {{ $t('app.backup') }}
@@ -201,17 +201,17 @@ import { getAge } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { MsgSuccess } from '@/utils/message';
 
-let data = ref<any>();
-let loading = ref(false);
-let syncLoading = ref(false);
+const data = ref<any>();
+const loading = ref(false);
+const syncLoading = ref(false);
 let timer: NodeJS.Timer | null = null;
 const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 20,
     total: 0,
 });
-let open = ref(false);
-let operateReq = reactive({
+const open = ref(false);
+const operateReq = reactive({
     installId: 0,
     operate: '',
     detailId: 0,
@@ -222,9 +222,9 @@ const checkRef = ref();
 const deleteRef = ref();
 const appParamRef = ref();
 const upgradeRef = ref();
-let tags = ref<App.Tag[]>([]);
-let activeTag = ref('all');
-let searchReq = reactive({
+const tags = ref<App.Tag[]>([]);
+const activeTag = ref('all');
+const searchReq = reactive({
     page: 1,
     pageSize: 15,
     name: '',
@@ -232,8 +232,8 @@ let searchReq = reactive({
     update: false,
 });
 const router = useRouter();
-let activeName = ref(i18n.global.t('app.installed'));
-let mode = ref('installed');
+const activeName = ref(i18n.global.t('app.installed'));
+const mode = ref('installed');
 
 const sync = () => {
     syncLoading.value = true;
