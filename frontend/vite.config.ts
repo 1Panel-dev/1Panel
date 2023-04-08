@@ -94,7 +94,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
                         htmlWorker: [`${prefix}/language/html/html.worker`],
                         tsWorker: [`${prefix}/language/typescript/ts.worker`],
                         editorWorker: [`${prefix}/editor/editor.worker`],
-                        echarts: ['echarts'],
                     },
                 },
             },
