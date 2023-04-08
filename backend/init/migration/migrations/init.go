@@ -254,3 +254,13 @@ var AddTableRuntime = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.Runtime{}, &model.Website{})
 	},
 }
+
+var UpdateTableApp = &gormigrate.Migration{
+	ID: "20230408-update-table-app",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.App{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

@@ -38,8 +38,9 @@ func (b *BaseApi) SearchApp(c *gin.Context) {
 // @Router /apps/sync [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"应用商店同步","formatEN":"App store synchronization"}
 func (b *BaseApi) SyncApp(c *gin.Context) {
+	appService.SyncAppListFromLocal()
 	global.LOG.Infof("sync app list start ...")
-	if err := appService.SyncAppList(); err != nil {
+	if err := appService.SyncAppListFromRemote(); err != nil {
 		global.LOG.Errorf("sync app list error [%s]", err.Error())
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

@@ -21,7 +21,7 @@ func syncApp() {
 		return
 	}
 	global.LOG.Info("sync app start...")
-	if err := service.NewIAppService().SyncAppList(); err != nil {
+	if err := service.NewIAppService().SyncAppListFromRemote(); err != nil {
 		global.LOG.Errorf("sync app error: %s", err.Error())
 		return
 	}
