@@ -1271,6 +1271,7 @@ const message = {
         localHelper: '本地运行环境需要自行安装',
         version: '版本',
         status: '状态',
+        versionHelper: 'PHP的版本,例如 v8.0',
     },
 };
 export default {

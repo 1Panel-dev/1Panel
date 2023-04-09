@@ -1275,7 +1275,7 @@ const message = {
     runtime: {
         runtime: 'Runtime',
         image: 'Image',
-        workDir: 'working directory',
+        workDir: 'Working directory',
         create: 'Create runtime',
         name: 'Name',
         resource: 'Source',
@@ -1285,6 +1285,7 @@ const message = {
         localHelper: 'The local operating environment needs to be installed by itself',
         version: 'Version',
         status: 'Status',
+        versionHelper: 'PHP version, e.g. v8.0',
     },
 };
 

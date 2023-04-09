@@ -82,7 +82,7 @@
                             <el-alert :title="$t('runtime.localHelper')" type="info" :closable="false" />
                         </el-form-item>
                         <el-form-item :label="$t('runtime.version')" prop="version">
-                            <el-input v-model="runtime.version"></el-input>
+                            <el-input v-model="runtime.version" :placeholder="$t('runtime.versionHelper')"></el-input>
                         </el-form-item>
                     </div>
                 </el-form>
@@ -144,7 +144,7 @@ const rules = ref<any>({
     name: [Rules.appName],
     resource: [Rules.requiredInput],
     appId: [Rules.requiredSelect],
-    version: [Rules.requiredInput],
+    version: [Rules.requiredInput, Rules.paramCommon],
     image: [Rules.requiredInput, Rules.imageName],
 });
 
@@ -268,6 +268,7 @@ const getRuntime = async (id: number) => {
 
 const acceptParams = async (props: OperateRrops) => {
     mode.value = props.mode;
+    initParam.value = false;
     if (props.mode === 'create') {
         runtime.value = {
             name: '',
