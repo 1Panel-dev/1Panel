@@ -248,7 +248,7 @@ func getContainerNames(install model.AppInstall) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	project, err := composeV2.GetComposeProject(install.Name, install.GetPath(), []byte(install.DockerCompose), []byte(envStr))
+	project, err := composeV2.GetComposeProject(install.Name, install.GetPath(), []byte(install.DockerCompose), []byte(envStr), true)
 	if err != nil {
 		return nil, err
 	}
@@ -400,7 +400,7 @@ func getServiceFromInstall(appInstall model.AppInstall) (service *composeV2.Comp
 	if err != nil {
 		return
 	}
-	project, err = composeV2.GetComposeProject(appInstall.Name, appInstall.GetPath(), []byte(appInstall.DockerCompose), []byte(envStr))
+	project, err = composeV2.GetComposeProject(appInstall.Name, appInstall.GetPath(), []byte(appInstall.DockerCompose), []byte(envStr), true)
 	if err != nil {
 		return
 	}
