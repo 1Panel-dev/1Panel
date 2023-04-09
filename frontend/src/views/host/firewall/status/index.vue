@@ -28,7 +28,7 @@
                         style="margin-left: 10px"
                         inactive-value="Disable"
                         active-value="Enable"
-                        @change="onPingOperate(baseInfo.pingStatus)"
+                        @change="onPingOperate"
                         v-model="onPing"
                     />
                 </div>
@@ -99,7 +99,7 @@ const onOperate = async (operation: string) => {
 
 const onPingOperate = async (operation: string) => {
     let operationHelper =
-        operation === 'Enabel' ? i18n.global.t('firewall.noPingHelper') : i18n.global.t('firewall.onPingHelper');
+        operation === 'Enable' ? i18n.global.t('firewall.noPingHelper') : i18n.global.t('firewall.onPingHelper');
     ElMessageBox.confirm(operationHelper, i18n.global.t('firewall.noPingTitle'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
@@ -107,7 +107,7 @@ const onPingOperate = async (operation: string) => {
         .then(async () => {
             emit('update:loading', true);
             emit('update:status', 'running');
-            operation = operation === 'Disable' ? 'enablePing' : 'disablePing';
+            operation = operation === 'Disable' ? 'disablePing' : 'enablePing';
             await operateFire(operation)
                 .then(() => {
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
