@@ -138,7 +138,7 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 	if req.IPTables {
 		delete(deamonMap, "iptables")
 	} else {
-		deamonMap["live-restore"] = false
+		deamonMap["iptables"] = false
 	}
 	if opts, ok := deamonMap["exec-opts"]; ok {
 		if optsValue, isArray := opts.([]interface{}); isArray {
