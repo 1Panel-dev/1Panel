@@ -156,6 +156,10 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 			deamonMap["exec-opts"] = []string{"native.cgroupdriver=systemd"}
 		}
 	}
+	if len(deamonMap) == 0 {
+		_ = os.Remove(constant.DaemonJsonPath)
+		return nil
+	}
 	newJson, err := json.MarshalIndent(deamonMap, "", "\t")
 	if err != nil {
 		return err
@@ -172,6 +176,10 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 }
 
 func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
+	if len(req.File) == 0 {
+		_ = os.Remove(constant.DaemonJsonPath)
+		return nil
+	}
 	if _, err := os.Stat(constant.DaemonJsonPath); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(path.Dir(constant.DaemonJsonPath), os.ModePerm); err != nil {
 			return err
