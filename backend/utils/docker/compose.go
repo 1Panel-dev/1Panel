@@ -106,6 +106,7 @@ func GetComposeProject(projectName, workDir string, yml []byte, env []byte) (*ty
 	project, err := loader.Load(details, func(options *loader.Options) {
 		options.SetProjectName(projectName, true)
 		options.ResolvePaths = true
+		options.SkipNormalization = true
 	})
 	if err != nil {
 		return nil, err
