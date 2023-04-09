@@ -90,7 +90,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
 	if err != nil {
 		return
 	}
-	composeService, err := getComposeService(create.Name, newNameDir, composeContent, envContent)
+	composeService, err := getComposeService(create.Name, newNameDir, composeContent, envContent, false)
 	if err != nil {
 		return
 	}
@@ -239,7 +239,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	if err != nil {
 		return err
 	}
-	composeService, err := getComposeService(runtime.Name, runtimeDir, composeContent, envContent)
+	composeService, err := getComposeService(runtime.Name, runtimeDir, composeContent, envContent, false)
 	if err != nil {
 		return err
 	}

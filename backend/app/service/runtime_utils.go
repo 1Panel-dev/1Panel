@@ -65,8 +65,8 @@ func handleParams(image, runtimeType, runtimeDir string, params map[string]inter
 	return
 }
 
-func getComposeService(name, runtimeDir string, composeFile, env []byte) (*docker.ComposeService, error) {
-	project, err := docker.GetComposeProject(name, runtimeDir, composeFile, env)
+func getComposeService(name, runtimeDir string, composeFile, env []byte, skipNormalization bool) (*docker.ComposeService, error) {
+	project, err := docker.GetComposeProject(name, runtimeDir, composeFile, env, skipNormalization)
 	if err != nil {
 		return nil, err
 	}
