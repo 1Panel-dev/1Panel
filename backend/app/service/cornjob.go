@@ -80,21 +80,15 @@ func (u *CronjobService) SearchRecords(search dto.SearchRecord) (int64, interfac
 }
 
 func (u *CronjobService) CleanRecord(id uint) error {
-	_, records, err := cronjobRepo.PageRecords(1, 7, cronjobRepo.WithByJobID(int(id)), commonRepo.WithOrderBy("created_at desc"))
-	if err != nil {
-		return err
-	}
-	if len(records) < 7 {
-		return nil
-	}
-	delRecords, err := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(id)), cronjobRepo.WithByRecordDropID(int(records[6].ID)))
+	delRecords, err := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(id)))
 	if err != nil {
 		return err
 	}
 	for _, del := range delRecords {
+		_ = os.RemoveAll(del.File)
 		_ = os.RemoveAll(del.Records)
 	}
-	if err := cronjobRepo.DeleteRecord(cronjobRepo.WithByJobID(int(id)), cronjobRepo.WithByRecordDropID(int(records[6].ID))); err != nil {
+	if err := cronjobRepo.DeleteRecord(cronjobRepo.WithByJobID(int(id))); err != nil {
 		return err
 	}
 	return nil

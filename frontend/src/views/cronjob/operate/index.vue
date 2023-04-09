@@ -129,16 +129,18 @@
                                 {{ $t('cronjob.saveLocal') }}
                             </el-checkbox>
                         </el-form-item>
-                        <el-form-item :label="$t('cronjob.retainCopies')" prop="retainCopies">
-                            <el-input-number
-                                :min="1"
-                                :max="30"
-                                step-strictly
-                                :step="1"
-                                v-model.number="dialogData.rowData!.retainCopies"
-                            ></el-input-number>
-                        </el-form-item>
                     </div>
+
+                    <el-form-item :label="$t('cronjob.retainCopies')" prop="retainCopies">
+                        <el-input-number
+                            :min="1"
+                            :max="300"
+                            step-strictly
+                            :step="1"
+                            v-model.number="dialogData.rowData!.retainCopies"
+                        ></el-input-number>
+                        <span class="input-help">{{ $t('cronjob.retainCopiesHelper') }}</span>
+                    </el-form-item>
 
                     <el-form-item v-if="dialogData.rowData!.type === 'curl'" :label="$t('cronjob.url')" prop="url">
                         <el-input style="width: 100%" clearable v-model.trim="dialogData.rowData!.url" />

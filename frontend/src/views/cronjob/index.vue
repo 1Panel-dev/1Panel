@@ -91,11 +91,7 @@
                             {{ $t('cronjob.handle') }}
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('cronjob.retainCopies')" :min-width="90" prop="retainCopies">
-                        <template #default="{ row }">
-                            {{ loadCopies(row) }}
-                        </template>
-                    </el-table-column>
+                    <el-table-column :label="$t('cronjob.retainCopies')" :min-width="90" prop="retainCopies" />
 
                     <el-table-column :label="$t('cronjob.lastRecrodTime')" :min-width="120" prop="lastRecrodTime">
                         <template #default="{ row }">
@@ -244,14 +240,6 @@ const onHandle = async (row: Cronjob.CronjobInfo) => {
         .catch(() => {
             loading.value = false;
         });
-};
-
-const loadCopies = (item) => {
-    if (item.type === 'shell' || item.type === 'curl') {
-        return '-';
-    } else {
-        return item.retainCopies + '';
-    }
 };
 
 const loadDetail = (row: any) => {

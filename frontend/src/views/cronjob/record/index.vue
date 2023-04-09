@@ -70,7 +70,7 @@
                         >
                             {{ $t('commons.button.enable') }}
                         </el-button>
-                        <el-button type="primary" :disabled="records.length <= 7" @click="cleanRecord()" link>
+                        <el-button type="primary" @click="cleanRecord()" link>
                             {{ $t('commons.button.clean') }}
                         </el-button>
                     </span>
@@ -130,7 +130,7 @@
                         </el-card>
                     </el-col>
                     <el-col :span="16">
-                        <el-form label-position="top">
+                        <el-form label-position="top" :v-key="refresh">
                             <el-row type="flex" justify="center">
                                 <el-form-item class="descriptionWide" v-if="isBackup()">
                                     <template #label>
@@ -301,6 +301,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
 
 const loading = ref();
+const refresh = ref(false);
 const hasRecords = ref();
 
 let timer: NodeJS.Timer | null = null;
@@ -324,7 +325,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     search(true);
     timer = setInterval(() => {
         onRefresh();
-    }, 1000 * 10);
+    }, 1000 * 5);
 };
 
 const shortcuts = [
@@ -402,10 +403,7 @@ const onHandle = async (row: Cronjob.CronjobInfo) => {
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            searchInfo.pageSize = searchInfo.pageSize * searchInfo.page;
-            searchInfo.page = 1;
-            records.value = [];
-            search(false);
+            onRefresh();
         })
         .catch(() => {
             loading.value = false;
@@ -483,7 +481,15 @@ const onRefresh = async () => {
         status: searchInfo.status,
     };
     const res = await searchRecords(params);
-    records.value = res.data.items || [];
+    if (res.data.items) {
+        records.value = res.data.items;
+        hasRecords.value = true;
+        currentRecord.value = records.value[0];
+    } else {
+        records.value = [];
+        hasRecords.value = false;
+        refresh.value = !refresh.value;
+    }
 };
 
 const onDownload = async (record: any, backupID: number) => {

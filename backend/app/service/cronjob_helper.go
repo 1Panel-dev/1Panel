@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -23,6 +22,7 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 		err     error
 	)
 	record := cronjobRepo.StartRecords(cronjob.ID, cronjob.KeepLocal, "")
+	logDir := fmt.Sprintf("%s/1panel/task/%s/%s", global.CONF.System.BaseDir, cronjob.Type, cronjob.Name)
 	go func() {
 		switch cronjob.Type {
 		case "shell":
@@ -34,6 +34,7 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 				err = errExec
 			}
 			message = []byte(stdout)
+			u.HandleRmExpired("LOCAL", logDir, cronjob, nil)
 		case "website":
 			record.File, err = u.HandleBackup(cronjob, record.StartTime)
 		case "database":
@@ -52,6 +53,7 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 				err = errCurl
 			}
 			message = []byte(stdout)
+			u.HandleRmExpired("LOCAL", logDir, cronjob, nil)
 		}
 		if err != nil {
 			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), string(message))
@@ -169,39 +171,13 @@ func (u *CronjobService) HandleRmExpired(backType, backupDir string, cronjob *mo
 		}
 		return
 	}
-	files, err := os.ReadDir(backupDir)
-	if err != nil {
-		global.LOG.Errorf("read dir %s failed, err: %v", backupDir, err)
-		return
-	}
-	if len(files) == 0 {
-		return
-	}
 
-	prefix := ""
-	switch cronjob.Type {
-	case "database":
-		prefix = "db_"
-	case "website":
-		prefix = "website_"
-	case "directory":
-		prefix = "directory_"
-	}
-
-	dbCopies := uint64(0)
-	for i := len(files) - 1; i >= 0; i-- {
-		if strings.HasPrefix(files[i].Name(), prefix) {
-			dbCopies++
-			if dbCopies > cronjob.RetainCopies {
-				_ = os.Remove(backupDir + "/" + files[i].Name())
-				_ = backupRepo.DeleteRecord(context.Background(), backupRepo.WithByFileName(files[i].Name()))
-			}
-		}
-	}
-	records, _ := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(cronjob.ID)))
+	records, _ := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(cronjob.ID)), commonRepo.WithOrderBy("created_at desc"))
 	if len(records) > int(cronjob.RetainCopies) {
 		for i := int(cronjob.RetainCopies); i < len(records); i++ {
-			_ = cronjobRepo.DeleteRecord(cronjobRepo.WithByJobID(int(records[i].ID)))
+			_ = cronjobRepo.DeleteRecord(commonRepo.WithByID(uint(records[i].ID)))
+			_ = os.Remove(records[i].File)
+			_ = os.Remove(records[i].Records)
 		}
 	}
 }
@@ -292,7 +268,8 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, app *repo.RootInf
 			record.Source = backup.Type
 			record.FileDir = itemFileDir
 		}
-		if err := saveBackupRecord(record); err != nil {
+		if err := backupRepo.CreateRecord(&record); err != nil {
+			global.LOG.Errorf("save backup record failed, err: %v", err)
 			return err
 		}
 		if backup.Type == "LOCAL" {
@@ -356,7 +333,8 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, backup model.Backu
 			return err
 		}
 		record.Name = website.PrimaryDomain
-		if err := saveBackupRecord(record); err != nil {
+		if err := backupRepo.CreateRecord(&record); err != nil {
+			global.LOG.Errorf("save backup record failed, err: %v", err)
 			return err
 		}
 		if backup.Type == "LOCAL" {
@@ -379,14 +357,6 @@ func (u *CronjobService) handleWebsite(cronjob model.Cronjob, backup model.Backu
 		if cronjob.KeepLocal {
 			u.HandleRmExpired("LOCAL", backupDir, &cronjob, client)
 		}
-	}
-	return nil
-}
-
-func saveBackupRecord(record model.BackupRecord) error {
-	if err := backupRepo.CreateRecord(&record); err != nil {
-		global.LOG.Errorf("save backup record failed, err: %v", err)
-		return err
 	}
 	return nil
 }
