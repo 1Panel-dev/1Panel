@@ -585,7 +585,7 @@ const message = {
         cronSpec: 'Lifecycle',
         cronSpecHelper: 'Enter the correct execution period',
         cleanHelper:
-            'This operation will retain the latest seven task execution records and log files. Do you want to continue?',
+            'This operation records all job execution records, backup files, and log files. Do you want to continue?',
         directory: 'Backup directory',
         sourceDir: 'Backup directory',
         allOptionHelper:
@@ -595,6 +595,7 @@ const message = {
         url: 'URL Address',
         target: 'Target',
         retainCopies: 'Retain copies',
+        retainCopiesHelper: 'Number of copies of execution records, log files, and backup files',
         cronSpecRule: 'Please enter a correct lifecycle',
         perMonth: 'Every monthly',
         perWeek: 'Every week',
