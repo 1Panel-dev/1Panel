@@ -3,10 +3,10 @@
         <el-tab-pane :label="'OpenResty'" name="0">
             <Nginx :id="id" v-if="index == '0'"></Nginx>
         </el-tab-pane>
-        <el-tab-pane :label="'FPM'" name="1">
+        <el-tab-pane :label="'FPM'" name="1" v-if="configPHP">
             <PHP :id="id" v-if="index == '1'" :installId="installId" :type="'fpm'"></PHP>
         </el-tab-pane>
-        <el-tab-pane :label="'PHP'" name="2">
+        <el-tab-pane :label="'PHP'" name="2" v-if="configPHP">
             <PHP :id="id" v-if="index == '2'" :installId="installId" :type="'php'"></PHP>
         </el-tab-pane>
     </el-tabs>
