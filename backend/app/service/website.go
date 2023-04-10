@@ -138,9 +138,7 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 		Remark:         create.Remark,
 		Status:         constant.WebRunning,
 		ExpireDate:     defaultDate,
-		AppInstallID:   create.AppInstallID,
 		WebsiteGroupID: create.WebsiteGroupID,
-		RuntimeID:      create.RuntimeID,
 		Protocol:       constant.ProtocolHTTP,
 		Proxy:          create.Proxy,
 		AccessLog:      true,
@@ -194,6 +192,7 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 		if err != nil {
 			return err
 		}
+		website.RuntimeID = runtime.ID
 		if runtime.Resource == constant.ResourceAppstore {
 			var req request.AppInstallCreate
 			reg, _ := regexp.Compile(`[^a-z0-9_-]+`)
@@ -313,11 +312,7 @@ func (w WebsiteService) DeleteWebsite(ctx context.Context, req request.WebsiteDe
 		return err
 	}
 
-	if req.DeleteApp {
-		websites, _ := websiteRepo.GetBy(websiteRepo.WithAppInstallId(website.AppInstallID))
-		if len(websites) > 1 {
-			return buserr.New(constant.ErrAppDelete)
-		}
+	if checkIsLinkApp(website) && req.DeleteApp {
 		appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
