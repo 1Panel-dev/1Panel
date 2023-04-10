@@ -43,7 +43,7 @@ func (f *Firewall) Start() error {
 }
 
 func (f *Firewall) PingStatus() (string, error) {
-	stdout, _ := cmd.Exec("firewall-cmd --query-rich-rule='rule protocol value=icmp drop'")
+	stdout, _ := cmd.Exec("firewall-cmd --zone=public  --query-rich-rule='rule protocol value=icmp drop'")
 	if stdout == "yes\n" {
 		return constant.StatusEnable, nil
 	}
