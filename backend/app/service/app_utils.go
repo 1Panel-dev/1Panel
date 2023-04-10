@@ -417,6 +417,9 @@ func upApp(ctx context.Context, appInstall model.AppInstall) {
 		if err == nil {
 			var composeService *composeV2.ComposeService
 			composeService, err = getServiceFromInstall(appInstall)
+			if err != nil {
+				return err
+			}
 			err = composeService.ComposeUp()
 			if err != nil {
 				return err

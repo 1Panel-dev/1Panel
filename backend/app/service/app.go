@@ -508,7 +508,6 @@ func (a AppService) SyncAppListFromLocal() {
 	}
 	tx.Commit()
 	global.LOG.Infof("sync local apps success")
-	return
 }
 func (a AppService) SyncAppListFromRemote() error {
 	updateRes, err := a.GetAppUpdate()
