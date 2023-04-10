@@ -51,10 +51,12 @@
                         :label="$t('commons.table.date')"
                         :formatter="dateFormat"
                         show-overflow-tooltip
+                        min-width="120"
+                        fix
                     />
                     <fu-table-operations
                         :ellipsis="10"
-                        width="260px"
+                        width="120px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
