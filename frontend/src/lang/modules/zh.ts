@@ -562,7 +562,7 @@ const message = {
         dockerStatus: 'Docker 服务',
         daemonJsonPathHelper: '请保证配置路径与 docker.service 中指定的配置路径保持一致。',
         mirrors: '镜像加速',
-        mirrorsHelper: '为空则关闭镜像加速；优先使用加速 URL 执行操作，请求超时将跳过使用默认加速方式',
+        mirrorsHelper: '将 Docker 镜像库的请求重定向到指定的镜像加速器，从而提高镜像的下载速度',
         registries: '私有仓库',
         liveHelper: '允许在 Docker 守护进程发生意外停机或崩溃时保留正在运行的容器状态',
         liveWithSwarmHelper: 'live-restore 守护进程配置与 Swarm 模式不兼容',

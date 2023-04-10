@@ -555,7 +555,7 @@ const message = {
         daemonJsonPathHelper: 'Ensure that the configuration path is the same as that specified in docker.service.',
         mirrors: 'Registry mirrors',
         mirrorsHelper:
-            'If empty, mirror acceleration is disabled. The accelerated URL is used first for the operation, and will skipped when the request times out',
+            'Redirecting requests for a Docker image repository to a specified image accelerator can improve the download speed of the image',
         registries: 'Insecure registries',
         liveHelper:
             'Allows the running container state to be preserved in case of unexpected shutdown or crash of the Docker daemon',
