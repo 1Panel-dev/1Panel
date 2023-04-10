@@ -5,6 +5,7 @@ type DaemonJsonUpdateByFile struct {
 }
 
 type DaemonJsonConf struct {
+	IsSwarm      bool     `json:"isSwarm"`
 	Status       string   `json:"status"`
 	Version      string   `json:"version"`
 	Mirrors      []string `json:"registryMirrors"`

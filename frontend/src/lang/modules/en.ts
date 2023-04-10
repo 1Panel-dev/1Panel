@@ -557,7 +557,9 @@ const message = {
         mirrorsHelper:
             'If empty, mirror acceleration is disabled. The accelerated URL is used first for the operation, and will skipped when the request times out',
         registries: 'Insecure registries',
-        liveHelper: 'Whether to close all containers when stopping the docker service',
+        liveHelper:
+            'Allows the running container state to be preserved in case of unexpected shutdown or crash of the Docker daemon',
+        liveWithSwarmHelper: 'live-restore daemon configuration is incompatible with swarm mode.',
         daemonJsonPath: 'Conf Path',
         serviceUnavailable: 'Docker service is not started at present, please click',
         startIn: ' to start',

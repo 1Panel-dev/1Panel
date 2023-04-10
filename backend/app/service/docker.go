@@ -49,59 +49,60 @@ func (u *DockerService) LoadDockerStatus() string {
 }
 
 func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
-	status := constant.StatusRunning
+	var data dto.DaemonJsonConf
+	data.IPTables = true
+	data.Status = constant.StatusRunning
 	stdout, err := cmd.Exec("systemctl is-active docker")
 	if string(stdout) != "active\n" || err != nil {
-		status = constant.Stopped
+		data.Status = constant.Stopped
 	}
-	version := "-"
+	data.IsSwarm = false
+	stdout2, _ := cmd.Exec("docker info  | grep Swarm")
+	if string(stdout2) == " Swarm: active\n" {
+		data.IsSwarm = true
+	}
+	data.Version = "-"
 	client, err := docker.NewDockerClient()
 	if err == nil {
 		ctx := context.Background()
 		itemVersion, err := client.ServerVersion(ctx)
 		if err == nil {
-			version = itemVersion.Version
+			data.Version = itemVersion.Version
 		}
 	}
 	if _, err := os.Stat(constant.DaemonJsonPath); err != nil {
-		return &dto.DaemonJsonConf{Status: status, IPTables: true, Version: version}
+		return &data
 	}
 	file, err := os.ReadFile(constant.DaemonJsonPath)
 	if err != nil {
-		return &dto.DaemonJsonConf{Status: status, IPTables: true, Version: version}
+		return &data
 	}
 	var conf daemonJsonItem
 	deamonMap := make(map[string]interface{})
 	if err := json.Unmarshal(file, &deamonMap); err != nil {
-		return &dto.DaemonJsonConf{Status: status, IPTables: true, Version: version}
+		return &data
 	}
 	arr, err := json.Marshal(deamonMap)
 	if err != nil {
-		return &dto.DaemonJsonConf{Status: status, IPTables: true, Version: version}
+		return &data
 	}
 	if err := json.Unmarshal(arr, &conf); err != nil {
-		return &dto.DaemonJsonConf{Status: status, IPTables: true, Version: version}
+		return &data
 	}
 	if _, ok := deamonMap["iptables"]; !ok {
 		conf.IPTables = true
 	}
-	driver := "cgroupfs"
+	data.CgroupDriver = "cgroupfs"
 	for _, opt := range conf.ExecOpts {
 		if strings.HasPrefix(opt, "native.cgroupdriver=") {
-			driver = strings.ReplaceAll(opt, "native.cgroupdriver=", "")
+			data.CgroupDriver = strings.ReplaceAll(opt, "native.cgroupdriver=", "")
 			break
 		}
 	}
-	data := dto.DaemonJsonConf{
-		Status:       status,
-		Version:      version,
-		Mirrors:      conf.Mirrors,
-		Registries:   conf.Registries,
-		IPTables:     conf.IPTables,
-		LiveRestore:  conf.LiveRestore,
-		CgroupDriver: driver,
-	}
-
+	data.Mirrors = conf.Mirrors
+	data.Registries = conf.Registries
+	data.IPTables = conf.IPTables
+	data.LiveRestore = conf.LiveRestore
 	return &data
 }
 
