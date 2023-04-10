@@ -7,7 +7,12 @@
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('database.rootPassword')" :rules="Rules.requiredInput" prop="password">
-                        <el-input type="password" show-password clearable v-model="form.password" />
+                        <el-input type="password" show-password clearable v-model="form.password">
+                            <template #append>
+                                <el-button @click="copy" icon="DocumentCopy"></el-button>
+                                <el-button style="margin-left: 1px" @click="random" icon="RefreshRight"></el-button>
+                            </template>
+                        </el-input>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -38,6 +43,7 @@ import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { GetAppPassword } from '@/api/modules/app';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
+import { getRandomStr } from '@/utils/util';
 
 const loading = ref(false);
 
@@ -55,6 +61,20 @@ const acceptParams = (): void => {
     form.password = '';
     loadPassword();
     dialogVisiable.value = true;
+};
+
+const random = async () => {
+    form.password = getRandomStr(16);
+};
+
+const copy = async () => {
+    let input = document.createElement('input');
+    input.value = form.password;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('Copy');
+    document.body.removeChild(input);
+    MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
 };
 
 const handleClose = () => {
