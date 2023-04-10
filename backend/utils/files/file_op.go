@@ -437,7 +437,6 @@ func (f FileOp) Compress(srcRiles []string, dst string, name string, cType Compr
 			_ = f.DeleteFile(dstFile)
 			return err
 		}
-		break
 	}
 	return nil
 }

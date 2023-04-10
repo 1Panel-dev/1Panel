@@ -47,7 +47,7 @@ func Run() {
 	for i := 0; i < len(cronJobs); i++ {
 		entryID, err := service.NewICronjobService().StartJob(&cronJobs[i])
 		if err != nil {
-			global.LOG.Errorf("start %s job %s failed, err: %v", &cronJobs[i].Type, &cronJobs[i].Name, err)
+			global.LOG.Errorf("start %s job %s failed, err: %v", cronJobs[i].Type, cronJobs[i].Name, err)
 		}
 		if err := repo.NewICronjobRepo().Update(cronJobs[i].ID, map[string]interface{}{"entry_id": entryID}); err != nil {
 			global.LOG.Errorf("update cronjob %s %s failed, err: %v", cronJobs[i].Type, cronJobs[i].Name, err)

@@ -150,7 +150,7 @@
         <UploadDialog ref="uploadRef" />
         <Backups ref="dialogBackupRef" />
         <DefaultServer ref="defaultRef" />
-        <GroupDialog @search="search" ref="groupRef" />
+        <GroupDialog @search="listGroup" ref="groupRef" />
     </div>
 </template>
 
