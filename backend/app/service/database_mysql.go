@@ -108,6 +108,9 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 		return nil, err
 	}
 	grantStr := fmt.Sprintf("grant all privileges on `%s`.* to '%s'@'%s'", req.Name, req.Username, tmpPermission)
+	if req.Name == "*" {
+		grantStr = fmt.Sprintf("grant all privileges on *.* to '%s'@'%s'", mysql.Username, tmpPermission)
+	}
 	if app.Version == "5.7.39" {
 		grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, req.Password)
 	}
@@ -292,6 +295,9 @@ func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
 		return err
 	}
 	grantStr := fmt.Sprintf("grant all privileges on `%s`.* to '%s'@'%s'", mysql.Name, mysql.Username, info.Value)
+	if mysql.Name == "*" {
+		grantStr = fmt.Sprintf("grant all privileges on *.* to '%s'@'%s'", mysql.Username, info.Value)
+	}
 	if app.Version == "5.7.39" {
 		grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, mysql.Password)
 	}
