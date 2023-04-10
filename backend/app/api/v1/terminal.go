@@ -44,6 +44,9 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 	var connInfo ssh.ConnInfo
 	_ = copier.Copy(&connInfo, &host)
 	connInfo.PrivateKey = []byte(host.PrivateKey)
+	if len(host.PassPhrase) != 0 {
+		connInfo.PassPhrase = []byte(host.PassPhrase)
+	}
 
 	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {

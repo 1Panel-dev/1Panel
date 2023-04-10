@@ -18,6 +18,10 @@ export namespace Host {
         port: number;
         user: string;
         authMode: string;
+        password: string;
+        privateKey: string;
+        passPhrase: string;
+        rememberPassword: boolean;
         description: string;
     }
     export interface HostOperate {
@@ -28,8 +32,10 @@ export namespace Host {
         port: number;
         user: string;
         authMode: string;
-        privateKey: string;
         password: string;
+        privateKey: string;
+        passPhrase: string;
+        rememberPassword: boolean;
 
         description: string;
     }

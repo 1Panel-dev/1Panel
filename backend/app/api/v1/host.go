@@ -245,11 +245,13 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 	upMap["port"] = req.Port
 	upMap["user"] = req.User
 	upMap["auth_mode"] = req.AuthMode
+	upMap["remember_password"] = req.RememberPassword
 	if len(req.Password) != 0 {
 		upMap["password"] = req.Password
 	}
 	if len(req.PrivateKey) != 0 {
 		upMap["private_key"] = req.PrivateKey
+		upMap["pass_phrase"] = req.PassPhrase
 	}
 	upMap["description"] = req.Description
 	if err := hostService.Update(req.ID, upMap); err != nil {
