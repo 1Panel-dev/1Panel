@@ -8,7 +8,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/copier"
-	"github.com/1Panel-dev/1Panel/backend/utils/ssh"
 	"github.com/gin-gonic/gin"
 )
 
@@ -74,33 +73,9 @@ func (b *BaseApi) TestByInfo(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if req.AuthMode == "password" && len(req.Password) != 0 {
-		password, err := base64.StdEncoding.DecodeString(req.Password)
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		req.Password = string(password)
-	}
-	if req.AuthMode == "key" && len(req.PrivateKey) != 0 {
-		privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		req.PrivateKey = string(privateKey)
-	}
 
-	var connInfo ssh.ConnInfo
-	_ = copier.Copy(&connInfo, &req)
-	connInfo.PrivateKey = []byte(req.PrivateKey)
-	client, err := connInfo.NewClient()
-	if err != nil {
-		helper.SuccessWithData(c, false)
-		return
-	}
-	defer client.Close()
-	helper.SuccessWithData(c, true)
+	connStatus := hostService.TestByInfo(req)
+	helper.SuccessWithData(c, connStatus)
 }
 
 // @Tags Host
