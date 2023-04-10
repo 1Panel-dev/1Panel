@@ -185,8 +185,8 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 		}
 		if runtime.Resource == constant.ResourceAppstore {
 			var req request.AppInstallCreate
-			reg, _ := regexp.Compile("[^a-z0-9_\\-]+")
-			req.Name = reg.ReplaceAllString(create.PrimaryDomain, "")
+			reg, _ := regexp.Compile(`[^a-z0-9_-]+`)
+			req.Name = reg.ReplaceAllString(strings.ToLower(create.PrimaryDomain), "")
 			req.AppDetailId = create.AppInstall.AppDetailId
 			req.Params = create.AppInstall.Params
 			req.Params["IMAGE_NAME"] = runtime.Image

@@ -11,6 +11,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/joho/godotenv"
 	"path"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -103,6 +104,9 @@ func GetComposeProject(projectName, workDir string, yml []byte, env []byte, skip
 		ConfigFiles: configFiles,
 		Environment: envMap,
 	}
+	projectName = strings.ToLower(projectName)
+	reg, _ := regexp.Compile(`[^a-z0-9_-]+`)
+	projectName = reg.ReplaceAllString(projectName, "")
 	project, err := loader.Load(details, func(options *loader.Options) {
 		options.SetProjectName(projectName, true)
 		options.ResolvePaths = true
