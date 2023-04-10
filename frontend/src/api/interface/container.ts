@@ -247,6 +247,7 @@ export namespace Container {
         operation: string;
     }
     export interface DaemonJsonConf {
+        isSwarm: boolean;
         status: string;
         version: string;
         registryMirrors: Array<string>;

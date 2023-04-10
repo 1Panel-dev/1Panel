@@ -66,8 +66,11 @@
                                 <el-switch v-model="form.iptables"></el-switch>
                             </el-form-item>
                             <el-form-item label="live-restore" prop="liveRestore">
-                                <el-switch v-model="form.liveRestore"></el-switch>
+                                <el-switch :disabled="form.isSwarm" v-model="form.liveRestore"></el-switch>
                                 <span class="input-help">{{ $t('container.liveHelper') }}</span>
+                                <span v-if="form.isSwarm" class="input-help">
+                                    {{ $t('container.liveWithSwarmHelper') }}
+                                </span>
                             </el-form-item>
                             <el-form-item label="cgroup-driver" prop="cgroupDriver">
                                 <el-radio-group v-model="form.cgroupDriver">
@@ -151,6 +154,7 @@ const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
 
 const form = reactive({
+    isSwarm: false,
     status: '',
     version: '',
     mirrors: '',
@@ -250,6 +254,7 @@ const onSubmitSave = async () => {
     let itemMirrors = form.mirrors.split('\n');
     let itemRegistries = form.registries.split('\n');
     let param = {
+        isSwarm: form.isSwarm,
         status: form.status,
         version: '',
         registryMirrors: itemMirrors.filter(function (el) {
@@ -294,6 +299,7 @@ const changeMode = async () => {
 
 const search = async () => {
     const res = await loadDaemonJson();
+    form.isSwarm = res.data.isSwarm;
     form.status = res.data.status;
     form.version = res.data.version;
     form.cgroupDriver = res.data.cgroupDriver;
