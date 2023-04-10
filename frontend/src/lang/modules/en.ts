@@ -452,7 +452,7 @@ const message = {
         containerPort: 'Container port',
         serverPort: 'Host port',
         cmd: 'Command',
-        cmdHelper: 'one in a row, for example: \n/bin/bash \necho "hello"',
+        cmdHelper: 'Example: echo "hello"',
         autoRemove: 'Auto remove',
         cpuQuota: 'NacosCPU',
         memoryLimit: 'Memory',
