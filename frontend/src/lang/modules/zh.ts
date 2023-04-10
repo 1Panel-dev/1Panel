@@ -461,7 +461,7 @@ const message = {
         containerPort: '容器端口',
         serverPort: '服务器端口',
         cmd: '启动命令',
-        cmdHelper: '一行一个，例：\n/bin/bash \necho "hello"',
+        cmdHelper: '例：echo "hello"',
         autoRemove: '容器退出后自动删除容器',
         cpuQuota: 'CPU 限制',
         memoryLimit: '内存限制',

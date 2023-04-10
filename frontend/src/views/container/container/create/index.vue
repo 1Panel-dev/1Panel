@@ -71,12 +71,7 @@
                         </el-card>
                     </el-form-item>
                     <el-form-item :label="$t('container.cmd')" prop="cmdStr">
-                        <el-input
-                            type="textarea"
-                            :placeholder="$t('container.cmdHelper')"
-                            :autosize="{ minRows: 2, maxRows: 4 }"
-                            v-model="form.cmdStr"
-                        />
+                        <el-input :placeholder="$t('container.cmdHelper')" v-model="form.cmdStr" />
                     </el-form-item>
                     <el-form-item prop="autoRemove">
                         <el-checkbox v-model="form.autoRemove">{{ $t('container.autoRemove') }}</el-checkbox>
@@ -330,7 +325,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             form.labels = form.labelsStr.split('\n');
         }
         if (form.cmdStr.length !== 0) {
-            form.cmd = form.cmdStr.split('\n');
+            form.cmd = form.cmdStr.split(' ');
         }
         switch (form.memoryUnit) {
             case 'KB':
