@@ -36,7 +36,22 @@
                         >
                             <el-input clearable type="textarea" v-model="dialogData.rowData!.privateKey" />
                         </el-form-item>
-                        <el-form-item :label="$t('terminal.port')" prop="port">
+                        <el-form-item
+                            :label="$t('terminal.keyPassword')"
+                            v-if="dialogData.rowData!.authMode === 'key'"
+                            prop="passPhrase"
+                        >
+                            <el-input
+                                type="password"
+                                show-password
+                                clearable
+                                v-model="dialogData.rowData!.passPhrase"
+                            />
+                        </el-form-item>
+                        <el-checkbox clearable v-model.number="dialogData.rowData!.rememberPassword">
+                            {{ $t('terminal.rememberPassword') }}
+                        </el-checkbox>
+                        <el-form-item style="margin-top: 10px" :label="$t('terminal.port')" prop="port">
                             <el-input clearable v-model.number="dialogData.rowData!.port" />
                         </el-form-item>
                         <el-form-item :label="$t('commons.table.group')" prop="groupID">

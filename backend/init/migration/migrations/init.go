@@ -264,3 +264,13 @@ var UpdateTableApp = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateTableHost = &gormigrate.Migration{
+	ID: "20230410-update-table-host",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Host{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

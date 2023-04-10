@@ -40,7 +40,17 @@
                         <el-form-item :label="$t('terminal.key')" v-if="hostInfo.authMode === 'key'" prop="privateKey">
                             <el-input clearable type="textarea" v-model="hostInfo.privateKey" />
                         </el-form-item>
-                        <el-form-item :label="$t('terminal.port')" prop="port">
+                        <el-form-item
+                            :label="$t('terminal.keyPassword')"
+                            v-if="hostInfo.authMode === 'key'"
+                            prop="passPhrase"
+                        >
+                            <el-input type="password" show-password clearable v-model="hostInfo.passPhrase" />
+                        </el-form-item>
+                        <el-checkbox clearable v-model.number="hostInfo.rememberPassword">
+                            {{ $t('terminal.rememberPassword') }}
+                        </el-checkbox>
+                        <el-form-item style="margin-top: 10px" :label="$t('terminal.port')" prop="port">
                             <el-input clearable v-model.number="hostInfo.port" />
                         </el-form-item>
                         <el-form-item :label="$t('commons.table.title')" prop="name">
@@ -91,6 +101,8 @@ let hostInfo = reactive<Host.HostOperate>({
     authMode: 'password',
     password: '',
     privateKey: '',
+    passPhrase: '',
+    rememberPassword: false,
     description: '',
 });
 

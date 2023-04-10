@@ -52,11 +52,15 @@ func (u *HostService) TestByInfo(req dto.HostConnTest) bool {
 		req.Password = host.Password
 		req.AuthMode = host.AuthMode
 		req.PrivateKey = host.PrivateKey
+		req.PassPhrase = host.PassPhrase
 	}
 
 	var connInfo ssh.ConnInfo
 	_ = copier.Copy(&connInfo, &req)
 	connInfo.PrivateKey = []byte(req.PrivateKey)
+	if len(req.PassPhrase) != 0 {
+		connInfo.PassPhrase = []byte(req.PassPhrase)
+	}
 	client, err := connInfo.NewClient()
 	if err != nil {
 		return false
@@ -84,6 +88,10 @@ func (u *HostService) TestLocalConn(id uint) bool {
 	var connInfo ssh.ConnInfo
 	if err := copier.Copy(&connInfo, &host); err != nil {
 		return false
+	}
+	connInfo.PrivateKey = []byte(host.PrivateKey)
+	if len(host.PassPhrase) != 0 {
+		connInfo.PassPhrase = []byte(host.PassPhrase)
 	}
 	client, err := connInfo.NewClient()
 	if err != nil {
@@ -115,6 +123,11 @@ func (u *HostService) SearchWithPage(search dto.SearchHostWithPage) (int64, inte
 		}
 		group, _ := groupRepo.Get(commonRepo.WithByID(host.GroupID))
 		item.GroupBelong = group.Name
+		if !item.RememberPassword {
+			item.Password = ""
+			item.PrivateKey = ""
+			item.PassPhrase = ""
+		}
 		dtoHosts = append(dtoHosts, item)
 	}
 	return total, dtoHosts, err
@@ -182,6 +195,8 @@ func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 		upMap["auth_mode"] = req.AuthMode
 		upMap["password"] = req.Password
 		upMap["private_key"] = req.PrivateKey
+		upMap["pass_phrase"] = req.PassPhrase
+		upMap["remember_password"] = req.RememberPassword
 		upMap["description"] = req.Description
 		if err := hostRepo.Update(sameHostID, upMap); err != nil {
 			return nil, err
