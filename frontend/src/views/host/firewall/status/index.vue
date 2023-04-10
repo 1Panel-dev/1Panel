@@ -47,6 +47,7 @@ import { ref } from 'vue';
 
 const baseInfo = ref<Host.FirewallBase>({ status: '', name: '', version: '', pingStatus: '' });
 const onPing = ref('Disable');
+const oldStatus = ref();
 
 const acceptParams = (): void => {
     loadBaseInfo(true);
@@ -58,6 +59,7 @@ const loadBaseInfo = async (search: boolean) => {
         .then((res) => {
             baseInfo.value = res.data;
             onPing.value = baseInfo.value.pingStatus;
+            oldStatus.value = onPing.value;
             emit('update:name', baseInfo.value.name);
             emit('update:status', baseInfo.value.status);
             if (search) {
@@ -118,8 +120,7 @@ const onPingOperate = async (operation: string) => {
                 });
         })
         .catch(() => {
-            emit('update:loading', true);
-            loadBaseInfo(false);
+            onPing.value = oldStatus.value;
         });
 };
 
