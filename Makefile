@@ -11,20 +11,19 @@ SERVER_PATH=$(BASE_PAH)/backend
 MAIN= $(BASE_PAH)/cmd/server/main.go
 APP_NAME=1panel
 
-build_web:
+build_frontend:
 	cd $(WEB_PATH) && npm install && npm run build:dev
 
-build_bin:
+build_backend_on_linux:
 	cd $(SERVER_PATH) \
     && CGO_ENABLED=1 GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOBUILD) -trimpath -ldflags '-s -w --extldflags "-static -fpic"' -tags 'osusergo,netgo' -o $(BUILD_PATH)/$(APP_NAME) $(MAIN)
 
-build_linux_on_mac:
+build_backend_on_darwin:
 	cd $(SERVER_PATH) \
     && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 CC=x86_64-linux-musl-gcc CXX=x86_64-linux-musl-g++ $(GOBUILD) -trimpath -ldflags '-s -w --extldflags "-static -fpic"'  -o $(BUILD_PATH)/$(APP_NAME) $(MAIN)
 
-build_on_archlinux:
+build_backend_on_archlinux:
 	cd $(SERVER_PATH) \
     && CGO_ENABLED=1 GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOBUILD) -trimpath -ldflags '-s -w --extldflags "-fpic"' -tags osusergo -o $(BUILD_PATH)/$(APP_NAME) $(MAIN)
 
-
-build_all: build_web  build_bin
+build_all: build_frontend  build_backend_on_linux
