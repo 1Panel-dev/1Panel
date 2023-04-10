@@ -493,3 +493,14 @@ func opWebsite(website *model.Website, operate string) error {
 	}
 	return nginxCheckAndReload(nginxInstall.SiteConfig.OldContent, config.FilePath, nginxInstall.Install.ContainerName)
 }
+
+func checkIsLinkApp(website model.Website) bool {
+	if website.Type == constant.Deployment {
+		return true
+	}
+	if website.Type == constant.Runtime {
+		runtime, _ := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+		return runtime.Resource == constant.AppResourceRemote
+	}
+	return false
+}
