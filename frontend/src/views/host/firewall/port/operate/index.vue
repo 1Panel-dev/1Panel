@@ -123,9 +123,12 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             dialogData.value.rowData.address = '';
         }
         let ports = [];
-        if (dialogData.value.rowData.port.indexOf('-') !== -1) {
+        if (dialogData.value.rowData.port.indexOf('-') !== -1 && !dialogData.value.rowData.port.startsWith('-')) {
             ports = dialogData.value.rowData.port.split('-');
-        } else if (dialogData.value.rowData.port.indexOf(',') !== -1) {
+        } else if (
+            dialogData.value.rowData.port.indexOf(',') !== -1 &&
+            !dialogData.value.rowData.port.startsWith(',')
+        ) {
             ports = dialogData.value.rowData.port.split(',');
         } else {
             ports.push(dialogData.value.rowData.port);
