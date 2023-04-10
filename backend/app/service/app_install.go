@@ -221,27 +221,35 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 		return err
 	}
 	changePort := false
+	var (
+		oldPorts []int
+		newPorts []int
+	)
 	port, ok := req.Params["PANEL_APP_PORT_HTTP"]
 	if ok {
 		portN := int(math.Ceil(port.(float64)))
 		if portN != installed.HttpPort {
+			oldPorts = append(oldPorts, installed.HttpPort)
 			changePort = true
 			httpPort, err := checkPort("PANEL_APP_PORT_HTTP", req.Params)
 			if err != nil {
 				return err
 			}
 			installed.HttpPort = httpPort
+			newPorts = append(newPorts, httpPort)
 		}
 	}
 	ports, ok := req.Params["PANEL_APP_PORT_HTTPS"]
 	if ok {
 		portN := int(math.Ceil(ports.(float64)))
 		if portN != installed.HttpsPort {
+			oldPorts = append(oldPorts, installed.HttpsPort)
 			httpsPort, err := checkPort("PANEL_APP_PORT_HTTPS", req.Params)
 			if err != nil {
 				return err
 			}
 			installed.HttpsPort = httpsPort
+			newPorts = append(newPorts, httpsPort)
 		}
 	}
 
@@ -285,6 +293,11 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 		if err := nginxCheckAndReload(nginxInstall.SiteConfig.OldContent, config.FilePath, nginxInstall.Install.ContainerName); err != nil {
 			return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
 		}
+	}
+	if changePort {
+		go func() {
+			_ = OperateFirewallPort(oldPorts, newPorts)
+		}()
 	}
 	return nil
 }
