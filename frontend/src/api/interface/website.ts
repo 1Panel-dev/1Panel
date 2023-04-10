@@ -24,6 +24,7 @@ export namespace Website {
         accessLogPath: string;
         sitePath: string;
         appName: string;
+        runtimeName: string;
     }
 
     export interface NewAppInstall {
