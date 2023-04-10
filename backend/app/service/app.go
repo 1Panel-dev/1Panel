@@ -339,7 +339,6 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 	}
 	versionUrl := fmt.Sprintf("%s/%s/%s/appstore/apps.json", global.CONF.System.RepoUrl, global.CONF.System.Mode, setting.SystemVersion)
 	versionRes, err := http.Get(versionUrl)
-	global.LOG.Infof("get current version from [%s]", versionUrl)
 	if err != nil {
 		return nil, err
 	}
