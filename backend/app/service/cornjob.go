@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -130,24 +131,19 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 	if cronjob.ID == 0 {
 		return "", constant.ErrRecordNotFound
 	}
-	if backup.Type == "LOCAL" {
+	if backup.Type == "LOCAL" || record.FromLocal {
 		if _, err := os.Stat(record.File); err != nil && os.IsNotExist(err) {
 			return "", constant.ErrRecordNotFound
 		}
 		return record.File, nil
-	}
-	if record.FromLocal {
-		local, _ := loadLocalDir()
-		if _, err := os.Stat(local + "/" + record.File); err == nil {
-			return local + "/" + record.File, nil
-		}
 	}
 	client, err := NewIBackupService().NewClient(&backup)
 	if err != nil {
 		return "", err
 	}
 	tempPath := fmt.Sprintf("%s/download/%s", constant.DataDir, record.File)
-	isOK, _ := client.Download(record.File, tempPath)
+	_ = os.MkdirAll(path.Dir(tempPath), os.ModePerm)
+	isOK, err := client.Download(record.File, tempPath)
 	if !isOK || err != nil {
 		return "", constant.ErrRecordNotFound
 	}
