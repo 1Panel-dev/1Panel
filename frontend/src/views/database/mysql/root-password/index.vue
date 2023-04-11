@@ -1,7 +1,7 @@
 <template>
     <el-drawer v-model="dialogVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
-            <DrawerHeader :header="$t('database.rootPassword')" :back="handleClose" />
+            <DrawerHeader :header="$t('database.databaseConnInfo')" :back="handleClose" />
         </template>
         <el-form v-loading="loading" ref="formRef" :model="form" label-position="top">
             <el-row type="flex" justify="center">
@@ -13,6 +13,10 @@
                                 <el-button style="margin-left: 1px" @click="random" icon="RefreshRight"></el-button>
                             </template>
                         </el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('database.serviceName')" prop="serviceName">
+                        <el-tag>{{ form.serviceName }}</el-tag>
+                        <span class="input-help">{{ $t('database.serviceNameHelper') }}</span>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -34,22 +38,24 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { updateMysqlPassword } from '@/api/modules/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import { GetAppPassword } from '@/api/modules/app';
+import { GetAppConnInfo } from '@/api/modules/app';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/util';
+import { App } from '@/api/interface/app';
 
 const loading = ref(false);
 
 const dialogVisiable = ref(false);
-const form = reactive({
+const form = ref<App.DatabaseConnInfo>({
     password: '',
+    serviceName: '',
 });
 
 const confirmDialogRef = ref();
@@ -58,18 +64,18 @@ type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
 const acceptParams = (): void => {
-    form.password = '';
+    form.value.password = '';
     loadPassword();
     dialogVisiable.value = true;
 };
 
 const random = async () => {
-    form.password = getRandomStr(16);
+    form.value.password = getRandomStr(16);
 };
 
 const copy = async () => {
     let input = document.createElement('input');
-    input.value = form.password;
+    input.value = form.value.password;
     document.body.appendChild(input);
     input.select();
     document.execCommand('Copy');
@@ -82,14 +88,14 @@ const handleClose = () => {
 };
 
 const loadPassword = async () => {
-    const res = await GetAppPassword('mysql');
-    form.password = res.data;
+    const res = await GetAppConnInfo('mysql');
+    form.value = res.data;
 };
 
 const onSubmit = async () => {
     let param = {
         id: 0,
-        value: form.password,
+        value: form.value.password,
     };
     loading.value = true;
     await updateMysqlPassword(param)

@@ -312,6 +312,40 @@
                 }
             }
         },
+        "/apps/installed/conninfo/:key": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取应用连接信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "App"
+                ],
+                "summary": "Search app password by key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "request",
+                        "name": "key",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/apps/installed/delete/check/:appInstallId": {
             "get": {
                 "security": [
@@ -341,40 +375,6 @@
                         "description": "OK",
                         "schema": {
                             "type": "anrry"
-                        }
-                    }
-                }
-            }
-        },
-        "/apps/installed/loadpassword/:key": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取应用密码",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "App"
-                ],
-                "summary": "Search app password by key",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "request",
-                        "name": "key",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
                         }
                     }
                 }
@@ -9818,6 +9818,12 @@
                         "type": "string"
                     }
                 },
+                "iptables": {
+                    "type": "boolean"
+                },
+                "isSwarm": {
+                    "type": "boolean"
+                },
                 "liveRestore": {
                     "type": "boolean"
                 },
@@ -10201,6 +10207,9 @@
                         "key"
                     ]
                 },
+                "passPhrase": {
+                    "type": "string"
+                },
                 "password": {
                     "type": "string"
                 },
@@ -10244,8 +10253,20 @@
                 "name": {
                     "type": "string"
                 },
+                "passPhrase": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
                 "port": {
                     "type": "integer"
+                },
+                "privateKey": {
+                    "type": "string"
+                },
+                "rememberPassword": {
+                    "type": "boolean"
                 },
                 "user": {
                     "type": "string"
@@ -10282,6 +10303,9 @@
                 "name": {
                     "type": "string"
                 },
+                "passPhrase": {
+                    "type": "string"
+                },
                 "password": {
                     "type": "string"
                 },
@@ -10292,6 +10316,9 @@
                 },
                 "privateKey": {
                     "type": "string"
+                },
+                "rememberPassword": {
+                    "type": "boolean"
                 },
                 "user": {
                     "type": "string"
@@ -11553,6 +11580,9 @@
                     "type": "integer"
                 },
                 "required": {
+                    "type": "string"
+                },
+                "resource": {
                     "type": "string"
                 },
                 "shortDescEn": {
@@ -12925,6 +12955,9 @@
                 "required": {
                     "type": "string"
                 },
+                "resource": {
+                    "type": "string"
+                },
                 "shortDescEn": {
                     "type": "string"
                 },
@@ -13254,6 +13287,9 @@
                 },
                 "runtimeID": {
                     "type": "integer"
+                },
+                "runtimeName": {
+                    "type": "string"
                 },
                 "sitePath": {
                     "type": "string"

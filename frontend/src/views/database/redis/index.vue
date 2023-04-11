@@ -15,7 +15,7 @@
                 <div :class="{ mask: redisStatus != 'Running' }">
                     <el-button type="primary" plain @click="goDashboard" icon="Position">Redis-Commander</el-button>
                     <el-button type="primary" plain @click="onChangePassword">
-                        {{ $t('database.changePassword') }}
+                        {{ $t('database.databaseConnInfo') }}
                     </el-button>
                 </div>
             </template>
