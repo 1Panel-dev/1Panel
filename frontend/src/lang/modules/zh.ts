@@ -828,6 +828,7 @@ const message = {
         SFTP: 'SFTP',
         COS: '腾讯云 COS',
         KODO: '七牛云 Kodo',
+        domainHelper: '加速域名必须包含 http:// 或者 https://',
         backupAlert:
             "理论上只要云厂商兼容 S3 协议，就可以用现有的亚马逊 S3 云存储来备份，具体配置参考 <a target=“_blank” href='https://1panel.cn/docs/user_manual/settings/#3'>官方文档</a> ",
         domain: '加速域名',

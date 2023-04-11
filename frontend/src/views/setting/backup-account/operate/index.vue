@@ -67,6 +67,7 @@
                             :rules="Rules.requiredInput"
                         >
                             <el-input v-model.trim="dialogData.rowData!.varsJson['domain']" />
+                            <span class="input-help">{{ $t('setting.domainHelper') }}</span>
                         </el-form-item>
                         <el-form-item
                             v-if="dialogData.rowData!.type === 'MINIO'"
