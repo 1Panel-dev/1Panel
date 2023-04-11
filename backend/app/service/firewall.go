@@ -2,16 +2,20 @@ package service
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/firewall"
 	fireClient "github.com/1Panel-dev/1Panel/backend/utils/firewall/client"
 	"github.com/jinzhu/copier"
 )
+
+const confPath = "/etc/sysctl.conf"
 
 type FirewallService struct{}
 
@@ -44,7 +48,7 @@ func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 	if err != nil {
 		return baseInfo, err
 	}
-	baseInfo.PingStatus, err = client.PingStatus()
+	baseInfo.PingStatus, err = u.PingStatus()
 	if err != nil {
 		return baseInfo, err
 	}
@@ -152,9 +156,9 @@ func (u *FirewallService) OperateFirewall(operation string) error {
 		_, _ = cmd.Exec("systemctl restart docker")
 		return nil
 	case "disablePing":
-		return client.UpdatePingStatus("0")
+		return u.UpdatePingStatus("0")
 	case "enablePing":
-		return client.UpdatePingStatus("1")
+		return u.UpdatePingStatus("1")
 	}
 	return fmt.Errorf("not support such operation: %s", operation)
 }
@@ -360,4 +364,52 @@ func (u *FirewallService) loadPortByApp() []portOfApp {
 	datas = append(datas, portOfApp{AppName: "1panel", HttpPort: systemPort.Value})
 
 	return datas
+}
+
+func (u *FirewallService) PingStatus() (string, error) {
+	stdout, err := cmd.Exec("sudo cat /etc/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= ")
+	if err != nil {
+		return constant.StatusDisable, fmt.Errorf("load firewall ping status failed, err: %s", stdout)
+	}
+	if stdout == "net/ipv4/icmp_echo_ignore_all=1\n" {
+		return constant.StatusEnable, nil
+	}
+	return constant.StatusDisable, nil
+}
+
+func (u *FirewallService) UpdatePingStatus(enabel string) error {
+	lineBytes, err := os.ReadFile(confPath)
+	if err != nil {
+		return err
+	}
+	files := strings.Split(string(lineBytes), "\n")
+	var newFiles []string
+	hasLine := false
+	for _, line := range files {
+		if strings.Contains(line, "net/ipv4/icmp_echo_ignore_all") || strings.HasPrefix(line, "net/ipv4/icmp_echo_ignore_all") {
+			newFiles = append(newFiles, "net/ipv4/icmp_echo_ignore_all="+enabel)
+			hasLine = true
+		} else {
+			newFiles = append(newFiles, line)
+		}
+	}
+	if !hasLine {
+		newFiles = append(newFiles, "net/ipv4/icmp_echo_ignore_all="+enabel)
+	}
+	file, err := os.OpenFile(confPath, os.O_WRONLY|os.O_TRUNC, 0666)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	_, err = file.WriteString(strings.Join(newFiles, "\n"))
+	if err != nil {
+		return err
+	}
+
+	stdout, err := cmd.Exec("sudo sysctl -p")
+	if err != nil {
+		return fmt.Errorf("update ping status failed, err: %v", stdout)
+	}
+
+	return nil
 }

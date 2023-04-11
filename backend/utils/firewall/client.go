@@ -15,9 +15,6 @@ type FirewallClient interface {
 	Status() (string, error) // running not running
 	Version() (string, error)
 
-	PingStatus() (string, error) // Enable Disable
-	UpdatePingStatus(enable string) error
-
 	ListPort() ([]client.FireInfo, error)
 	ListAddress() ([]client.FireInfo, error)
 
