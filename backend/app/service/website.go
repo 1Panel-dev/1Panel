@@ -168,18 +168,25 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 	switch create.Type {
 	case constant.Deployment:
 		if create.AppType == constant.NewApp {
-			var req request.AppInstallCreate
+			var (
+				req     request.AppInstallCreate
+				install *model.AppInstall
+			)
 			req.Name = create.AppInstall.Name
 			req.AppDetailId = create.AppInstall.AppDetailId
 			req.Params = create.AppInstall.Params
-			install, err := NewIAppService().Install(ctx, req)
+			tx, installCtx := getTxAndContext()
+			install, err = NewIAppService().Install(installCtx, req)
 			if err != nil {
+				tx.Rollback()
 				return err
 			}
+			tx.Commit()
 			website.AppInstallID = install.ID
 			appInstall = install
 		} else {
-			install, err := appInstallRepo.GetFirst(commonRepo.WithByID(create.AppInstallID))
+			var install model.AppInstall
+			install, err = appInstallRepo.GetFirst(commonRepo.WithByID(create.AppInstallID))
 			if err != nil {
 				return err
 			}
@@ -187,28 +194,34 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 			website.AppInstallID = appInstall.ID
 		}
 	case constant.Runtime:
-		var err error
 		runtime, err = runtimeRepo.GetFirst(commonRepo.WithByID(create.RuntimeID))
 		if err != nil {
 			return err
 		}
 		website.RuntimeID = runtime.ID
 		if runtime.Resource == constant.ResourceAppstore {
-			var req request.AppInstallCreate
+			var (
+				req          request.AppInstallCreate
+				nginxInstall model.AppInstall
+				install      *model.AppInstall
+			)
 			reg, _ := regexp.Compile(`[^a-z0-9_-]+`)
 			req.Name = reg.ReplaceAllString(strings.ToLower(create.PrimaryDomain), "")
 			req.AppDetailId = create.AppInstall.AppDetailId
 			req.Params = create.AppInstall.Params
 			req.Params["IMAGE_NAME"] = runtime.Image
-			nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+			nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
 			if err != nil {
 				return err
 			}
 			req.Params["PANEL_WEBSITE_DIR"] = path.Join(nginxInstall.GetPath(), "/www")
-			install, err := NewIAppService().Install(ctx, req)
+			tx, installCtx := getTxAndContext()
+			install, err = NewIAppService().Install(installCtx, req)
 			if err != nil {
+				tx.Rollback()
 				return err
 			}
+			tx.Commit()
 			website.AppInstallID = install.ID
 			appInstall = install
 		}

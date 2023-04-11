@@ -23,7 +23,7 @@
                     <span class="input-help">
                         {{ $t('website.deleteAppHelper') }}
                     </span>
-                    <span class="input-help" style="color: red">
+                    <span class="input-help" style="color: red" v-if="runtimeApp">
                         {{ $t('website.deleteRuntimeHelper') }}
                     </span>
                 </el-form-item>

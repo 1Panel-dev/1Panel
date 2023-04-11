@@ -91,6 +91,7 @@ var (
 var (
 	ErrUserIsExist     = "ErrUserIsExist"
 	ErrDatabaseIsExist = "ErrDatabaseIsExist"
+	ErrExecTimeOut     = "ErrExecTimeOut"
 )
 
 // redis

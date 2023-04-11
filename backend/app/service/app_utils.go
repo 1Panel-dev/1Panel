@@ -129,6 +129,22 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 	return nil
 }
 
+func handleAppInstallErr(ctx context.Context, install *model.AppInstall) error {
+	op := files.NewFileOp()
+	appDir := install.GetPath()
+	dir, _ := os.Stat(appDir)
+	if dir != nil {
+		_, _ = compose.Down(install.GetComposePath())
+		if err := op.DeleteDir(appDir); err != nil {
+			return err
+		}
+	}
+	if err := deleteLink(ctx, install, true, true); err != nil {
+		return err
+	}
+	return nil
+}
+
 func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBackup bool, forceDelete bool, deleteDB bool) error {
 	op := files.NewFileOp()
 	appDir := install.GetPath()
@@ -381,7 +397,7 @@ func copyAppData(key, version, installName string, params map[string]interface{}
 }
 
 // 处理文件夹权限等问题
-func upAppPre(app model.App, appInstall model.AppInstall) error {
+func upAppPre(app model.App, appInstall *model.AppInstall) error {
 	if app.Key == "nexus" {
 		dataPath := path.Join(appInstall.GetPath(), "data")
 		if err := files.NewFileOp().Chown(dataPath, 200, 0); err != nil {
@@ -391,7 +407,7 @@ func upAppPre(app model.App, appInstall model.AppInstall) error {
 	return nil
 }
 
-func getServiceFromInstall(appInstall model.AppInstall) (service *composeV2.ComposeService, err error) {
+func getServiceFromInstall(appInstall *model.AppInstall) (service *composeV2.ComposeService, err error) {
 	var (
 		project *types.Project
 		envStr  string
@@ -412,8 +428,8 @@ func getServiceFromInstall(appInstall model.AppInstall) (service *composeV2.Comp
 	return
 }
 
-func upApp(ctx context.Context, appInstall model.AppInstall) {
-	upProject := func(appInstall model.AppInstall) (err error) {
+func upApp(appInstall *model.AppInstall) {
+	upProject := func(appInstall *model.AppInstall) (err error) {
 		if err == nil {
 			var composeService *composeV2.ComposeService
 			composeService, err = getServiceFromInstall(appInstall)
@@ -437,9 +453,7 @@ func upApp(ctx context.Context, appInstall model.AppInstall) {
 	}
 	exist, _ := appInstallRepo.GetFirst(commonRepo.WithByID(appInstall.ID))
 	if exist.ID > 0 {
-		_ = appInstallRepo.Save(context.Background(), &appInstall)
-	} else {
-		_ = appInstallRepo.Save(ctx, &appInstall)
+		_ = appInstallRepo.Save(context.Background(), appInstall)
 	}
 }
 
@@ -598,7 +612,7 @@ func getAppInstallByKey(key string) (model.AppInstall, error) {
 	return appInstall, nil
 }
 
-func updateToolApp(installed model.AppInstall) {
+func updateToolApp(installed *model.AppInstall) {
 	tooKey, ok := dto.AppToolMap[installed.App.Key]
 	if !ok {
 		return

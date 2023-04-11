@@ -224,34 +224,42 @@ func (a AppService) GetAppDetailByID(id uint) (*response.AppDetailDTO, error) {
 	return res, nil
 }
 
-func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (*model.AppInstall, error) {
-	if err := docker.CreateDefaultDockerNetwork(); err != nil {
-		return nil, buserr.WithDetail(constant.Err1PanelNetworkFailed, err.Error(), nil)
+func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (appInstall *model.AppInstall, err error) {
+	if err = docker.CreateDefaultDockerNetwork(); err != nil {
+		err = buserr.WithDetail(constant.Err1PanelNetworkFailed, err.Error(), nil)
+		return
 	}
 	if list, _ := appInstallRepo.ListBy(commonRepo.WithByName(req.Name)); len(list) > 0 {
-		return nil, buserr.New(constant.ErrNameIsExist)
+		err = buserr.New(constant.ErrNameIsExist)
+		return
 	}
-	httpPort, err := checkPort("PANEL_APP_PORT_HTTP", req.Params)
+	var (
+		httpPort  int
+		httpsPort int
+		appDetail model.AppDetail
+		app       model.App
+	)
+	httpPort, err = checkPort("PANEL_APP_PORT_HTTP", req.Params)
+	if err != nil {
+		return
+	}
+	httpsPort, err = checkPort("PANEL_APP_PORT_HTTPS", req.Params)
+	if err != nil {
+		return
+	}
+	appDetail, err = appDetailRepo.GetFirst(commonRepo.WithByID(req.AppDetailId))
+	if err != nil {
+		return
+	}
+	app, err = appRepo.GetFirst(commonRepo.WithByID(appDetail.AppId))
 	if err != nil {
 		return nil, err
 	}
-	httpsPort, err := checkPort("PANEL_APP_PORT_HTTPS", req.Params)
-	if err != nil {
-		return nil, err
-	}
-	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(req.AppDetailId))
-	if err != nil {
-		return nil, err
-	}
-	app, err := appRepo.GetFirst(commonRepo.WithByID(appDetail.AppId))
-	if err != nil {
-		return nil, err
-	}
-	if err := checkRequiredAndLimit(app); err != nil {
-		return nil, err
+	if err = checkRequiredAndLimit(app); err != nil {
+		return
 	}
 
-	appInstall := model.AppInstall{
+	appInstall = &model.AppInstall{
 		Name:        req.Name,
 		AppId:       appDetail.AppId,
 		AppDetailId: appDetail.ID,
@@ -262,13 +270,14 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		App:         app,
 	}
 	composeMap := make(map[string]interface{})
-	if err := yaml.Unmarshal([]byte(appDetail.DockerCompose), &composeMap); err != nil {
-		return nil, err
+	if err = yaml.Unmarshal([]byte(appDetail.DockerCompose), &composeMap); err != nil {
+		return
 	}
 
 	value, ok := composeMap["services"]
 	if !ok {
-		return nil, buserr.New("")
+		err = buserr.New("")
+		return
 	}
 	servicesMap := value.(map[string]interface{})
 	changeKeys := make(map[string]string, len(servicesMap))
@@ -289,35 +298,50 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		servicesMap[v] = servicesMap[k]
 		delete(servicesMap, k)
 	}
-	composeByte, err := yaml.Marshal(composeMap)
+
+	var (
+		composeByte []byte
+		paramByte   []byte
+	)
+
+	composeByte, err = yaml.Marshal(composeMap)
 	if err != nil {
-		return nil, err
+		return
 	}
 	appInstall.DockerCompose = string(composeByte)
 
-	if err := copyAppData(app.Key, appDetail.Version, req.Name, req.Params, app.Resource == constant.AppResourceLocal); err != nil {
-		return nil, err
+	defer func() {
+		if err != nil {
+			hErr := handleAppInstallErr(ctx, appInstall)
+			if hErr != nil {
+				global.LOG.Errorf("delete app dir error %s", hErr.Error())
+			}
+		}
+	}()
+
+	if err = copyAppData(app.Key, appDetail.Version, req.Name, req.Params, app.Resource == constant.AppResourceLocal); err != nil {
+		return
 	}
 	fileOp := files.NewFileOp()
-	if err := fileOp.WriteFile(appInstall.GetComposePath(), strings.NewReader(string(composeByte)), 0775); err != nil {
-		return nil, err
+	if err = fileOp.WriteFile(appInstall.GetComposePath(), strings.NewReader(string(composeByte)), 0775); err != nil {
+		return
 	}
-	paramByte, err := json.Marshal(req.Params)
+	paramByte, err = json.Marshal(req.Params)
 	if err != nil {
-		return nil, err
+		return
 	}
 	appInstall.Env = string(paramByte)
 
-	if err := appInstallRepo.Create(ctx, &appInstall); err != nil {
-		return nil, err
+	if err = appInstallRepo.Create(ctx, appInstall); err != nil {
+		return
 	}
-	if err := createLink(ctx, app, &appInstall, req.Params); err != nil {
-		return nil, err
+	if err = createLink(ctx, app, appInstall, req.Params); err != nil {
+		return
 	}
-	if err := upAppPre(app, appInstall); err != nil {
-		return nil, err
+	if err = upAppPre(app, appInstall); err != nil {
+		return
 	}
-	go upApp(ctx, appInstall)
+	go upApp(appInstall)
 	go updateToolApp(appInstall)
 	ports := []int{appInstall.HttpPort}
 	if appInstall.HttpsPort > 0 {
@@ -326,7 +350,7 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	go func() {
 		_ = OperateFirewallPort(nil, ports)
 	}()
-	return &appInstall, nil
+	return
 }
 
 func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
