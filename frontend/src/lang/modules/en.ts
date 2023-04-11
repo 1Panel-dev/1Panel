@@ -831,6 +831,7 @@ const message = {
         SFTP: 'SFTP',
         COS: 'Tencent COS',
         KODO: 'Qiniu Kodo',
+        domainHelper: 'The accelerated domain name must contain http:// or https://',
         backupAlert:
             "In theory, as long as the cloud provider is compatible with the S3 protocol, existing Amazon S3 cloud storage can be used for backup. For specific configurations, please refer to the <a target=“_blank” href='https://1panel.cn/docs/user_manual/settings/#3'>official documentation.</a> ",
         domain: 'Accelerate domain',
