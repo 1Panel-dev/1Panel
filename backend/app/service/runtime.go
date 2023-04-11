@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/subosito/gotenv"
 	"path"
@@ -109,7 +110,7 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
 	if err = runtimeRepo.Create(context.Background(), runtime); err != nil {
 		return
 	}
-	go buildRuntime(runtime, composeService)
+	go buildRuntime(runtime, composeService, "")
 	return
 }
 
@@ -145,7 +146,17 @@ func (r *RuntimeService) Delete(id uint) error {
 	if website.ID > 0 {
 		return buserr.New(constant.ErrDelWithWebsite)
 	}
-	//TODO 删除镜像
+	client, err := docker.NewClient()
+	if err != nil {
+		return err
+	}
+	imageID, err := client.GetImageIDByName(runtime.Image)
+	if err != nil {
+		return err
+	}
+	if err := client.DeleteImage(imageID); err != nil {
+		return err
+	}
 	if runtime.Resource == constant.ResourceAppstore {
 		runtimeDir := path.Join(constant.RuntimeDir, runtime.Type, runtime.Name)
 		if err := files.NewFileOp().DeleteDir(runtimeDir); err != nil {
@@ -226,6 +237,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	if err != nil {
 		return err
 	}
+	oldImage := runtime.Image
 	if runtime.Resource == constant.ResourceLocal {
 		runtime.Version = req.Version
 		return runtimeRepo.Save(runtime)
@@ -248,6 +260,14 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	runtime.DockerCompose = string(composeContent)
 	runtime.Status = constant.RuntimeBuildIng
 	_ = runtimeRepo.Save(runtime)
-	go buildRuntime(runtime, composeService)
+	client, err := docker.NewClient()
+	if err != nil {
+		return err
+	}
+	imageID, err := client.GetImageIDByName(oldImage)
+	if err != nil {
+		return err
+	}
+	go buildRuntime(runtime, composeService, imageID)
 	return nil
 }
