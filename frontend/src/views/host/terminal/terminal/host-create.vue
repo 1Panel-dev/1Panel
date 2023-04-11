@@ -68,7 +68,7 @@
                     <el-button @click="submitAddHost(hostRef, 'testConn')">
                         {{ $t('terminal.testConn') }}
                     </el-button>
-                    <el-button type="primary" @click="submitAddHost(hostRef, 'saveAndConn')">
+                    <el-button type="primary" :disabled="!isOK" @click="submitAddHost(hostRef, 'saveAndConn')">
                         {{ $t('terminal.saveAndConn') }}
                     </el-button>
                 </span>
@@ -84,10 +84,11 @@ import { Rules } from '@/global/form-rules';
 import { addHost, testByInfo } from '@/api/modules/host';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import i18n from '@/lang';
-import { reactive, ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 
 const dialogVisiable = ref();
+const isOK = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
 const hostRef = ref<FormInstance>();
 
@@ -105,6 +106,14 @@ let hostInfo = reactive<Host.HostOperate>({
     rememberPassword: false,
     description: '',
 });
+
+watch(
+    () => hostInfo,
+    () => {
+        isOK.value = false;
+    },
+    { deep: true },
+);
 
 const rules = reactive({
     addr: [Rules.host],
@@ -153,8 +162,10 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
             case 'testConn':
                 await testByInfo(hostInfo).then((res) => {
                     if (res.data) {
+                        isOK.value = true;
                         MsgSuccess(i18n.global.t('terminal.connTestOk'));
                     } else {
+                        isOK.value = false;
                         MsgError(i18n.global.t('terminal.connTestFailed'));
                     }
                 });
