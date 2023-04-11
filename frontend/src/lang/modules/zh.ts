@@ -628,6 +628,8 @@ const message = {
         errRecord: '错误的日志记录',
         errHandle: '任务执行失败',
         noRecord: '当前计划任务暂未产生记录',
+        cleanData: '删除数据',
+        cleanDataHelper: '删除数据，将删除该计划任务产生的所有数据，包括备份文件、执行记录以及日志文件',
         noLogs: '暂无任务输出...',
         errPath: '备份路径 [{0}] 错误，无法下载！',
     },

@@ -15,7 +15,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cloud_storage"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/pkg/errors"
-	"github.com/robfig/cron/v3"
 )
 
 func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
@@ -121,25 +120,6 @@ func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Tim
 		}
 		return fmt.Sprintf("%s/%s/%s", cronjob.Type, cronjob.Name, fileName), nil
 	}
-}
-
-func (u *CronjobService) HandleDelete(id uint) error {
-	cronjob, _ := cronjobRepo.Get(commonRepo.WithByID(id))
-	if cronjob.ID == 0 {
-		return errors.New("find cronjob in db failed")
-	}
-	commonDir := fmt.Sprintf("%s/%s/", cronjob.Type, cronjob.Name)
-	global.Cron.Remove(cron.EntryID(cronjob.EntryID))
-	global.LOG.Infof("stop cronjob entryID: %d", cronjob.EntryID)
-	_ = cronjobRepo.DeleteRecord(cronjobRepo.WithByJobID(int(id)))
-
-	dir := fmt.Sprintf("%s/task/%s/%s", constant.DataDir, cronjob.Type, cronjob.Name)
-	if _, err := os.Stat(dir); err == nil {
-		if err := os.RemoveAll(dir); err != nil {
-			global.LOG.Errorf("rm file %s/task/%s failed, err: %v", constant.DataDir, commonDir, err)
-		}
-	}
-	return nil
 }
 
 func (u *CronjobService) HandleRmExpired(backType, localDir string, cronjob *model.Cronjob, backClient cloud_storage.CloudStorageClient) {

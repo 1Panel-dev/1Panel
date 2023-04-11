@@ -52,6 +52,16 @@ type CronjobDownload struct {
 	BackupAccountID uint `json:"backupAccountID" validate:"required"`
 }
 
+type CronjobClean struct {
+	CleanData bool `json:"cleanData"`
+	CronjobID uint `json:"cronjobID" validate:"required"`
+}
+
+type CronjobBatchDelete struct {
+	CleanData bool   `json:"cleanData"`
+	IDs       []uint `json:"ids"`
+}
+
 type CronjobInfo struct {
 	ID       uint   `json:"id"`
 	Name     string `json:"name"`
