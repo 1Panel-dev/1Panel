@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
 
@@ -40,26 +39,6 @@ func (f *Firewall) Start() error {
 		return fmt.Errorf("enable the firewall failed, err: %s", stdout)
 	}
 	return nil
-}
-
-func (f *Firewall) PingStatus() (string, error) {
-	stdout, _ := cmd.Exec("firewall-cmd --zone=public  --query-rich-rule='rule protocol value=icmp drop'")
-	if stdout == "yes\n" {
-		return constant.StatusEnable, nil
-	}
-	return constant.StatusDisable, nil
-}
-
-func (f *Firewall) UpdatePingStatus(enabel string) error {
-	operation := "add"
-	if enabel == "0" {
-		operation = "remove"
-	}
-	stdout, err := cmd.Execf("firewall-cmd --permanent --%s-rich-rule='rule protocol value=icmp drop'", operation)
-	if err != nil {
-		return fmt.Errorf("update firewall ping status failed, err: %s", stdout)
-	}
-	return f.Reload()
 }
 
 func (f *Firewall) Stop() error {

@@ -2,14 +2,10 @@ package client
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
-	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
-
-const confPath = "/etc/ufw/sysctl.conf"
 
 type Ufw struct{}
 
@@ -46,49 +42,6 @@ func (f *Ufw) Start() error {
 	if err != nil {
 		return fmt.Errorf("enable the firewall failed, err: %s", stdout)
 	}
-	return nil
-}
-
-func (f *Ufw) PingStatus() (string, error) {
-	stdout, err := cmd.Exec("cat /etc/ufw/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= ")
-	if err != nil {
-		return constant.StatusDisable, fmt.Errorf("load firewall ping status failed, err: %s", stdout)
-	}
-	if stdout == "net/ipv4/icmp_echo_ignore_all=1\n" {
-		return constant.StatusEnable, nil
-	}
-	return constant.StatusDisable, nil
-}
-
-func (f *Ufw) UpdatePingStatus(enabel string) error {
-	lineBytes, err := os.ReadFile(confPath)
-	if err != nil {
-		return err
-	}
-	files := strings.Split(string(lineBytes), "\n")
-	var newFiles []string
-	for _, line := range files {
-		if strings.Contains(line, "net/ipv4/icmp_echo_ignore_all") || strings.HasPrefix(line, "net/ipv4/icmp_echo_ignore_all") {
-			newFiles = append(newFiles, "net/ipv4/icmp_echo_ignore_all="+enabel)
-		} else {
-			newFiles = append(newFiles, line)
-		}
-	}
-	file, err := os.OpenFile(confPath, os.O_WRONLY|os.O_TRUNC, 0666)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	_, err = file.WriteString(strings.Join(newFiles, "\n"))
-	if err != nil {
-		return err
-	}
-
-	stdout, err := cmd.Exec("sudo ufw reload")
-	if err != nil {
-		return fmt.Errorf("reload ufw setting failed, err: %v", stdout)
-	}
-
 	return nil
 }
 
