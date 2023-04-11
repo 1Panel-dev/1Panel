@@ -147,6 +147,7 @@ func (u *FirewallService) OperateFirewall(operation string) error {
 		if err := client.Port(fireClient.FireInfo{Port: serverPort.Value, Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
 			return err
 		}
+		_ = client.Reload()
 		_, _ = cmd.Exec("systemctl restart docker")
 		return nil
 	case "stop":
