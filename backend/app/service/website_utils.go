@@ -105,7 +105,7 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website, 
 		if err := fileOp.CreateDir(path.Join(siteFolder, "ssl"), 0755); err != nil {
 			return err
 		}
-		if runtime.Type == constant.RuntimePHP && runtime.Resource == constant.ResourceLocal {
+		if website.Type == constant.Runtime && runtime.Type == constant.RuntimePHP && runtime.Resource == constant.ResourceLocal {
 			phpPoolDir := path.Join(siteFolder, "php-pool")
 			if err := fileOp.CreateDir(phpPoolDir, 0755); err != nil {
 				return err

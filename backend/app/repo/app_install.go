@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"encoding/json"
+	"gorm.io/gorm/clause"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -107,11 +108,11 @@ func (a *AppInstallRepo) GetFirstByCtx(ctx context.Context, opts ...DBOption) (m
 
 func (a *AppInstallRepo) Create(ctx context.Context, install *model.AppInstall) error {
 	db := getTx(ctx).Model(&model.AppInstall{})
-	return db.Create(&install).Error
+	return db.Omit(clause.Associations).Create(&install).Error
 }
 
 func (a *AppInstallRepo) Save(ctx context.Context, install *model.AppInstall) error {
-	return getTx(ctx).Save(&install).Error
+	return getTx(ctx).Omit(clause.Associations).Save(&install).Error
 }
 
 func (a *AppInstallRepo) DeleteBy(opts ...DBOption) error {

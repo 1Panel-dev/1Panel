@@ -52,6 +52,7 @@ ErrEmailIsExist: '邮箱已存在'
 #mysql
 ErrUserIsExist: "当前用户已存在，请重新输入"
 ErrDatabaseIsExist: "当前数据库已存在，请重新输入"
+ErrExecTimeOut: "SQL 执行超时，请检查{{ .detail }}容器"
 
 #redis
 ErrTypeOfRedis: "恢复文件类型与当前持久化方式不符，请修改后重试"
