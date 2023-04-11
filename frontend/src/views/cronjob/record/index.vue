@@ -70,7 +70,7 @@
                         >
                             {{ $t('commons.button.enable') }}
                         </el-button>
-                        <el-button type="primary" @click="cleanRecord()" link>
+                        <el-button type="primary" @click="deleteVisiable = true" link>
                             {{ $t('commons.button.clean') }}
                         </el-button>
                     </span>
@@ -282,6 +282,32 @@
                 </div>
             </template>
         </LayoutContent>
+
+        <el-dialog
+            v-model="deleteVisiable"
+            :title="$t('commons.button.clean')"
+            width="30%"
+            :close-on-click-modal="false"
+        >
+            <el-form ref="deleteForm" label-position="left" v-loading="delLoading">
+                <el-form-item>
+                    <el-checkbox v-model="cleanData" :label="$t('cronjob.cleanData')" />
+                    <span class="input-help">
+                        {{ $t('cronjob.cleanDataHelper') }}
+                    </span>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="deleteVisiable = false" :disabled="delLoading">
+                        {{ $t('commons.button.cancel') }}
+                    </el-button>
+                    <el-button type="primary" @click="cleanRecord">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
@@ -318,6 +344,10 @@ const records = ref<Array<Cronjob.Record>>([]);
 const currentRecord = ref<Cronjob.Record>();
 const currentRecordDetail = ref<string>('');
 const currentRecordIndex = ref();
+
+const deleteVisiable = ref();
+const delLoading = ref();
+const cleanData = ref();
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
     dialogData.value = params;
@@ -547,15 +577,18 @@ const loadRecord = async (row: Cronjob.Record) => {
     }
 };
 const cleanRecord = async () => {
-    ElMessageBox.confirm(i18n.global.t('cronjob.cleanHelper'), i18n.global.t('commons.button.clean'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(async () => {
-        await cleanRecords(dialogData.value.rowData.id);
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        search(true);
-    });
+    delLoading.value = true;
+    console.log(dialogData.value.rowData);
+    await cleanRecords(dialogData.value.rowData.id, cleanData.value)
+        .then(() => {
+            delLoading.value = false;
+            deleteVisiable.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            search(true);
+        })
+        .catch(() => {
+            delLoading.value = false;
+        });
 };
 
 function isBackup() {
