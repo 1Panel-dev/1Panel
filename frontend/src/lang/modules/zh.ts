@@ -287,6 +287,7 @@ const message = {
         logout: '退出登录',
     },
     database: {
+        database: '数据库',
         delete: '删除操作无法回滚，请输入 "',
         deleteHelper: '" 删除此数据库',
         create: '创建数据库',
@@ -595,7 +596,7 @@ const message = {
         cleanHelper: '该操作将所有任务执行记录、备份文件和日志文件，是否继续？',
         directory: '备份目录',
         sourceDir: '备份目录',
-        allOptionHelper: '当前计划任务为备份所有 {0}，暂不支持直接下载，可在 {0} 备份列表中查看',
+        allOptionHelper: '当前计划任务为备份所有【{0}】，暂不支持直接下载，可在【{0}】备份列表中查看',
         exclusionRules: '排除规则',
         saveLocal: '同时保留本地备份（和云存储保留份数一致）',
         url: 'URL 地址',

@@ -126,7 +126,7 @@
                                 >
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
-                                <el-button round :disabled="s3Data.id === 0" @click="onBatchDelete(cosData)">
+                                <el-button round :disabled="cosData.id === 0" @click="onBatchDelete(cosData)">
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </div>
