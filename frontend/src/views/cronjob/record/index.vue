@@ -163,7 +163,7 @@
                                     <template #label>
                                         <span class="status-label">{{ $t('cronjob.database') }}</span>
                                     </template>
-                                    <span v-if="dialogData.rowData!.website !== 'all'" class="status-count">
+                                    <span v-if="dialogData.rowData!.dbName !== 'all'" class="status-count">
                                         {{ dialogData.rowData!.dbName }}
                                     </span>
                                     <span v-else class="status-count">

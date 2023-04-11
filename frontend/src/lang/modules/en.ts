@@ -284,6 +284,7 @@ const message = {
         logout: 'Logout',
     },
     database: {
+        database: 'database',
         delete: 'Delete operation cannot be rolled back, please input "',
         deleteHelper: '" to delete this database',
         create: 'Create database',
@@ -594,7 +595,7 @@ const message = {
         directory: 'Backup directory',
         sourceDir: 'Backup directory',
         allOptionHelper:
-            'The current task plan is to back up all {0}. Direct download is not supported at the moment. You can check the backup list of {0} menu.',
+            'The current task plan is to back up all [{0}]. Direct download is not supported at the moment. You can check the backup list of [{0}] menu.',
         exclusionRules: 'Exclusive rule',
         saveLocal: 'Retain local backups (the same as the number of cloud storage copies)',
         url: 'URL Address',
