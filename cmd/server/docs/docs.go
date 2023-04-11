@@ -326,6 +326,40 @@ var doc = `{
                 }
             }
         },
+        "/apps/installed/conninfo/:key": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取应用连接信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "App"
+                ],
+                "summary": "Search app password by key",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "request",
+                        "name": "key",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/apps/installed/delete/check/:appInstallId": {
             "get": {
                 "security": [
@@ -355,40 +389,6 @@ var doc = `{
                         "description": "OK",
                         "schema": {
                             "type": "anrry"
-                        }
-                    }
-                }
-            }
-        },
-        "/apps/installed/loadpassword/:key": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "获取应用密码",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "App"
-                ],
-                "summary": "Search app password by key",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "request",
-                        "name": "key",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
                         }
                     }
                 }
@@ -9832,6 +9832,12 @@ var doc = `{
                         "type": "string"
                     }
                 },
+                "iptables": {
+                    "type": "boolean"
+                },
+                "isSwarm": {
+                    "type": "boolean"
+                },
                 "liveRestore": {
                     "type": "boolean"
                 },
@@ -10215,6 +10221,9 @@ var doc = `{
                         "key"
                     ]
                 },
+                "passPhrase": {
+                    "type": "string"
+                },
                 "password": {
                     "type": "string"
                 },
@@ -10258,8 +10267,20 @@ var doc = `{
                 "name": {
                     "type": "string"
                 },
+                "passPhrase": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
                 "port": {
                     "type": "integer"
+                },
+                "privateKey": {
+                    "type": "string"
+                },
+                "rememberPassword": {
+                    "type": "boolean"
                 },
                 "user": {
                     "type": "string"
@@ -10296,6 +10317,9 @@ var doc = `{
                 "name": {
                     "type": "string"
                 },
+                "passPhrase": {
+                    "type": "string"
+                },
                 "password": {
                     "type": "string"
                 },
@@ -10306,6 +10330,9 @@ var doc = `{
                 },
                 "privateKey": {
                     "type": "string"
+                },
+                "rememberPassword": {
+                    "type": "boolean"
                 },
                 "user": {
                     "type": "string"
@@ -11567,6 +11594,9 @@ var doc = `{
                     "type": "integer"
                 },
                 "required": {
+                    "type": "string"
+                },
+                "resource": {
                     "type": "string"
                 },
                 "shortDescEn": {
@@ -12939,6 +12969,9 @@ var doc = `{
                 "required": {
                     "type": "string"
                 },
+                "resource": {
+                    "type": "string"
+                },
                 "shortDescEn": {
                     "type": "string"
                 },
@@ -13268,6 +13301,9 @@ var doc = `{
                 },
                 "runtimeID": {
                     "type": "integer"
+                },
+                "runtimeName": {
+                    "type": "string"
                 },
                 "sitePath": {
                     "type": "string"

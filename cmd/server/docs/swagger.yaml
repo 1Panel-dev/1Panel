@@ -448,6 +448,10 @@ definitions:
         items:
           type: string
         type: array
+      iptables:
+        type: boolean
+      isSwarm:
+        type: boolean
       liveRestore:
         type: boolean
       registryMirrors:
@@ -701,6 +705,8 @@ definitions:
         - password
         - key
         type: string
+      passPhrase:
+        type: string
       password:
         type: string
       port:
@@ -734,8 +740,16 @@ definitions:
         type: integer
       name:
         type: string
+      passPhrase:
+        type: string
+      password:
+        type: string
       port:
         type: integer
+      privateKey:
+        type: string
+      rememberPassword:
+        type: boolean
       user:
         type: string
     type: object
@@ -756,6 +770,8 @@ definitions:
         type: integer
       name:
         type: string
+      passPhrase:
+        type: string
       password:
         type: string
       port:
@@ -764,6 +780,8 @@ definitions:
         type: integer
       privateKey:
         type: string
+      rememberPassword:
+        type: boolean
       user:
         type: string
     required:
@@ -1604,6 +1622,8 @@ definitions:
       recommend:
         type: integer
       required:
+        type: string
+      resource:
         type: string
       shortDescEn:
         type: string
@@ -2520,6 +2540,8 @@ definitions:
         type: integer
       required:
         type: string
+      resource:
+        type: string
       shortDescEn:
         type: string
       shortDescZh:
@@ -2738,6 +2760,8 @@ definitions:
         type: string
       runtimeID:
         type: integer
+      runtimeName:
+        type: string
       sitePath:
         type: string
       status:
@@ -2991,6 +3015,27 @@ paths:
       summary: Search default config by key
       tags:
       - App
+  /apps/installed/conninfo/:key:
+    get:
+      consumes:
+      - application/json
+      description: 获取应用连接信息
+      parameters:
+      - description: request
+        in: path
+        name: key
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Search app password by key
+      tags:
+      - App
   /apps/installed/delete/check/:appInstallId:
     get:
       consumes:
@@ -3010,27 +3055,6 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Check before delete
-      tags:
-      - App
-  /apps/installed/loadpassword/:key:
-    get:
-      consumes:
-      - application/json
-      description: 获取应用密码
-      parameters:
-      - description: request
-        in: path
-        name: key
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      security:
-      - ApiKeyAuth: []
-      summary: Search app password by key
       tags:
       - App
   /apps/installed/loadport/:key:

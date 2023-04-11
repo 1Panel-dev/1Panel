@@ -18,7 +18,7 @@
                             {{ $t('database.create') }}
                         </el-button>
                         <el-button @click="onChangeRootPassword" type="primary" plain>
-                            {{ $t('database.rootPassword') }}
+                            {{ $t('database.databaseConnInfo') }}
                         </el-button>
                         <el-button @click="onChangeAccess" type="primary" plain>
                             {{ $t('database.remoteAccess') }}

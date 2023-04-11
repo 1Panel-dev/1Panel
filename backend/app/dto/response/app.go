@@ -1,8 +1,9 @@
 package response
 
 import (
-	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 )
 
 type AppRes struct {
@@ -53,6 +54,11 @@ type AppInstalledDTO struct {
 	AppName   string `json:"appName"`
 	Icon      string `json:"icon"`
 	CanUpdate bool   `json:"canUpdate"`
+}
+
+type DatabaseConn struct {
+	Password    string `json:"password"`
+	ServiceName string `json:"serviceName"`
 }
 
 type AppService struct {

@@ -38,7 +38,7 @@ type IAppInstallService interface {
 	Page(req request.AppInstalledSearch) (int64, []response.AppInstalledDTO, error)
 	CheckExist(key string) (*response.AppInstalledCheck, error)
 	LoadPort(key string) (int64, error)
-	LoadPassword(key string) (string, error)
+	LoadConnInfo(key string) (response.DatabaseConn, error)
 	SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error)
 	Operate(ctx context.Context, req request.AppInstalledOperate) error
 	Update(req request.AppInstalledUpdate) error
@@ -133,12 +133,15 @@ func (a *AppInstallService) LoadPort(key string) (int64, error) {
 	return app.Port, nil
 }
 
-func (a *AppInstallService) LoadPassword(key string) (string, error) {
+func (a *AppInstallService) LoadConnInfo(key string) (response.DatabaseConn, error) {
+	var data response.DatabaseConn
 	app, err := appInstallRepo.LoadBaseInfo(key, "")
 	if err != nil {
-		return "", nil
+		return data, nil
 	}
-	return app.Password, nil
+	data.Password = app.Password
+	data.ServiceName = app.ServiceName
+	return data, nil
 }
 
 func (a *AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error) {
