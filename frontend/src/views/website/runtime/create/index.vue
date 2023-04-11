@@ -63,6 +63,9 @@
                             <el-input v-model="runtime.image"></el-input>
                         </el-form-item>
                         <div v-if="initParam">
+                            <el-form-item v-if="runtime.type === 'php'">
+                                <el-alert :title="$t('runtime.buildHelper')" type="warning" :closable="false" />
+                            </el-form-item>
                             <Params
                                 v-if="mode === 'create'"
                                 v-model:form="runtime.params"

@@ -1295,6 +1295,8 @@ const message = {
         version: 'Version',
         status: 'Status',
         versionHelper: 'PHP version, e.g. v8.0',
+        buildHelper:
+            'The more extensions you select, the more CPU will be occupied during the image making process, so avoid selecting all extensions',
     },
 };
 

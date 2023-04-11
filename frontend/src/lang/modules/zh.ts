@@ -1280,6 +1280,7 @@ const message = {
         version: '版本',
         status: '状态',
         versionHelper: 'PHP的版本,例如 v8.0',
+        buildHelper: '选择的扩展越多，制作镜像过程中占用 CPU 越多，请尽量避免选择全部扩展',
     },
 };
 export default {

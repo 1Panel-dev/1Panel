@@ -65,6 +65,28 @@ func (c Client) CreateNetwork(name string) error {
 	return err
 }
 
+func (c Client) DeleteImage(imageID string) error {
+	if _, err := c.cli.ImageRemove(context.Background(), imageID, types.ImageRemoveOptions{Force: true}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c Client) GetImageIDByName(imageName string) (string, error) {
+	filter := filters.NewArgs()
+	filter.Add("reference", imageName)
+	list, err := c.cli.ImageList(context.Background(), types.ImageListOptions{
+		Filters: filter,
+	})
+	if err != nil {
+		return "", err
+	}
+	if len(list) > 0 {
+		return list[0].ID, nil
+	}
+	return "", nil
+}
+
 func (c Client) NetworkExist(name string) bool {
 	var options types.NetworkListOptions
 	options.Filters = filters.NewArgs(filters.Arg("name", name))

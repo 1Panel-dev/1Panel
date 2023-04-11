@@ -5,6 +5,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/subosito/gotenv"
@@ -12,13 +13,26 @@ import (
 	"strings"
 )
 
-func buildRuntime(runtime *model.Runtime, service *docker.ComposeService) {
+func buildRuntime(runtime *model.Runtime, service *docker.ComposeService, imageID string) {
 	err := service.ComposeBuild()
 	if err != nil {
 		runtime.Status = constant.RuntimeError
 		runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + err.Error()
 	} else {
 		runtime.Status = constant.RuntimeNormal
+		if imageID != "" {
+			client, err := docker.NewClient()
+			global.LOG.Infof("delete imageID [%s] ", imageID)
+			if err == nil {
+				if err := client.DeleteImage(imageID); err != nil {
+					global.LOG.Errorf("delete imageID [%s] error %v", imageID, err)
+				} else {
+					global.LOG.Infof("delete old image success")
+				}
+			} else {
+				global.LOG.Errorf("delete imageID [%s] error %v", imageID, err)
+			}
+		}
 	}
 	_ = runtimeRepo.Save(runtime)
 }
