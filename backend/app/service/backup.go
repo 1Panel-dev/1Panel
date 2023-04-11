@@ -53,6 +53,7 @@ func NewIBackupService() IBackupService {
 func (u *BackupService) List() ([]dto.BackupInfo, error) {
 	ops, err := backupRepo.List(commonRepo.WithOrderBy("created_at desc"))
 	var dtobas []dto.BackupInfo
+	dtobas = append(dtobas, u.loadByType("LOCAL", ops))
 	dtobas = append(dtobas, u.loadByType("OSS", ops))
 	dtobas = append(dtobas, u.loadByType("S3", ops))
 	dtobas = append(dtobas, u.loadByType("SFTP", ops))
