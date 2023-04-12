@@ -114,8 +114,10 @@ func (u *FirewallService) SearchWithPage(req dto.RuleSearch) (int64, interface{}
 	if req.Type == "port" {
 		apps := u.loadPortByApp()
 		for i := 0; i < len(backDatas); i++ {
-			backDatas[i].IsUsed = common.ScanPortWithProtocol(backDatas[i].Port, backDatas[i].Protocol)
+			port, _ := strconv.Atoi(backDatas[i].Port)
+			backDatas[i].IsUsed = common.ScanPort(port)
 			if backDatas[i].Protocol == "udp" {
+				backDatas[i].IsUsed = common.ScanUDPPort(port)
 				continue
 			}
 			for _, app := range apps {
@@ -368,10 +370,7 @@ func (u *FirewallService) loadPortByApp() []portOfApp {
 }
 
 func (u *FirewallService) PingStatus() (string, error) {
-	stdout, err := cmd.Exec("sudo cat /etc/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= ")
-	if err != nil {
-		return constant.StatusDisable, fmt.Errorf("load firewall ping status failed, err: %s", stdout)
-	}
+	stdout, _ := cmd.Exec("sudo cat /etc/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= ")
 	if stdout == "net/ipv4/icmp_echo_ignore_all=1\n" {
 		return constant.StatusEnable, nil
 	}
