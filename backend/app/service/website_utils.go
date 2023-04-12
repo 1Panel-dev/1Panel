@@ -500,7 +500,7 @@ func checkIsLinkApp(website model.Website) bool {
 	}
 	if website.Type == constant.Runtime {
 		runtime, _ := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
-		return runtime.Resource == constant.AppResourceRemote
+		return runtime.Resource == constant.ResourceAppstore
 	}
 	return false
 }

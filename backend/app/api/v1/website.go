@@ -78,14 +78,12 @@ func (b *BaseApi) CreateWebsite(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	tx, ctx := helper.GetTxAndContext()
-	err := websiteService.CreateWebsite(ctx, req)
+
+	err := websiteService.CreateWebsite(req)
 	if err != nil {
-		tx.Rollback()
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	tx.Commit()
 	helper.SuccessWithData(c, nil)
 }
 
