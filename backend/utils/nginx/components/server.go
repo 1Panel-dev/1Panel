@@ -116,14 +116,22 @@ func (s *Server) RemoveDirective(key string, params []string) {
 	directives := s.Directives
 	var newDirectives []IDirective
 	for _, dir := range directives {
-		if dir.GetName() == key {
-			if IsRepeatKey(key) && len(params) > 0 {
-				oldParams := dir.GetParameters()
-				if oldParams[0] == params[0] {
+		if key == "location" {
+			if location, ok := dir.(*Location); ok {
+				if len(params) == 2 && location.Match == params[1] && location.Modifier == params[0] {
 					continue
 				}
-			} else {
-				continue
+			}
+		} else {
+			if dir.GetName() == key {
+				if len(params) > 0 {
+					oldParams := dir.GetParameters()
+					if oldParams[0] == params[0] {
+						continue
+					}
+				} else {
+					continue
+				}
 			}
 		}
 		newDirectives = append(newDirectives, dir)

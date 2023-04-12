@@ -251,7 +251,7 @@ var AddDefaultGroup = &gormigrate.Migration{
 var AddTableRuntime = &gormigrate.Migration{
 	ID: "20230406-add-table-runtime",
 	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(&model.Runtime{}, &model.Website{})
+		return tx.AutoMigrate(&model.Runtime{})
 	},
 }
 
@@ -272,5 +272,12 @@ var UpdateTableHost = &gormigrate.Migration{
 			return err
 		}
 		return nil
+	},
+}
+
+var UpdateTableWebsite = &gormigrate.Migration{
+	ID: "20230406-update-table-website",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.Website{})
 	},
 }
