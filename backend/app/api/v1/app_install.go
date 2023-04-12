@@ -166,13 +166,10 @@ func (b *BaseApi) OperateInstalled(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	tx, ctx := helper.GetTxAndContext()
-	if err := appInstallService.Operate(ctx, req); err != nil {
-		tx.Rollback()
+	if err := appInstallService.Operate(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	tx.Commit()
 	helper.SuccessWithData(c, nil)
 }
 

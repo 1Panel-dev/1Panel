@@ -125,14 +125,12 @@ func (b *BaseApi) DeleteWebsite(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	tx, ctx := helper.GetTxAndContext()
-	err := websiteService.DeleteWebsite(ctx, req)
+
+	err := websiteService.DeleteWebsite(req)
 	if err != nil {
-		tx.Rollback()
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	tx.Commit()
 	helper.SuccessWithData(c, nil)
 }
 

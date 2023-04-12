@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/compose-spec/compose-go/types"
 	"github.com/subosito/gotenv"
 	"math"
@@ -145,7 +146,7 @@ func handleAppInstallErr(ctx context.Context, install *model.AppInstall) error {
 	return nil
 }
 
-func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBackup bool, forceDelete bool, deleteDB bool) error {
+func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete bool, deleteDB bool) error {
 	op := files.NewFileOp()
 	appDir := install.GetPath()
 	dir, _ := os.Stat(appDir)
@@ -154,36 +155,34 @@ func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBacku
 		if err != nil && !forceDelete {
 			return handleErr(install, err, out)
 		}
-		if err := op.DeleteDir(appDir); err != nil && !forceDelete {
-			return err
-		}
 	}
+	tx, ctx := helper.GetTxAndContext()
+	defer tx.Rollback()
 	if err := appInstallRepo.Delete(ctx, install); err != nil {
 		return err
 	}
 	if err := deleteLink(ctx, &install, deleteDB, forceDelete); err != nil && !forceDelete {
 		return err
 	}
+	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), backupRepo.WithByDetailName(install.Name))
+	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(install.App.Key))
+	if install.App.Key == constant.AppMysql {
+		_ = mysqlRepo.DeleteAll(ctx)
+	}
 	uploadDir := fmt.Sprintf("%s/1panel/uploads/app/%s/%s", global.CONF.System.BaseDir, install.App.Key, install.Name)
 	if _, err := os.Stat(uploadDir); err == nil {
 		_ = os.RemoveAll(uploadDir)
 	}
 	if deleteBackup {
-		localDir, err := loadLocalDir()
-		if err != nil && !forceDelete {
-			return err
-		}
+		localDir, _ := loadLocalDir()
 		backupDir := fmt.Sprintf("%s/app/%s/%s", localDir, install.App.Key, install.Name)
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
 		global.LOG.Infof("delete app %s-%s backups successful", install.App.Key, install.Name)
 	}
-	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), backupRepo.WithByDetailName(install.Name))
-	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(install.App.Key))
-	if install.App.Key == constant.AppMysql {
-		_ = mysqlRepo.DeleteAll(ctx)
-	}
+	_ = op.DeleteDir(appDir)
+	tx.Commit()
 	return nil
 }
 
