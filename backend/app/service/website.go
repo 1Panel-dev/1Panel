@@ -166,6 +166,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			}
 		}
 	}()
+	var proxy string
 
 	switch create.Type {
 	case constant.Deployment:
@@ -184,8 +185,9 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 				return err
 			}
 			tx.Commit()
-			website.AppInstallID = install.ID
 			appInstall = install
+			website.AppInstallID = install.ID
+			website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
 		} else {
 			var install model.AppInstall
 			install, err = appInstallRepo.GetFirst(commonRepo.WithByID(create.AppInstallID))
@@ -194,6 +196,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			}
 			appInstall = &install
 			website.AppInstallID = appInstall.ID
+			website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
 		}
 	case constant.Runtime:
 		runtime, err = runtimeRepo.GetFirst(commonRepo.WithByID(create.RuntimeID))
@@ -226,23 +229,27 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			tx.Commit()
 			website.AppInstallID = install.ID
 			appInstall = install
+			website.Proxy = fmt.Sprintf("127.0.0.1:%d", appInstall.HttpPort)
+		} else {
+			website.ProxyType = create.ProxyType
+			if website.ProxyType == constant.RuntimeProxyUnix {
+				proxy = fmt.Sprintf("unix:%s", path.Join("/www/sites", website.Alias, "php-pool", "php-fpm.sock"))
+			}
+			if website.ProxyType == constant.RuntimeProxyTcp {
+				proxy = fmt.Sprintf("127.0.0.1:%d", create.Port)
+			}
+			website.Proxy = proxy
 		}
 	}
 
-	tx, ctx := helper.GetTxAndContext()
-	defer tx.Rollback()
-	if err = websiteRepo.Create(ctx, website); err != nil {
-		return err
-	}
 	var domains []model.WebsiteDomain
-	domains = append(domains, model.WebsiteDomain{Domain: website.PrimaryDomain, WebsiteID: website.ID, Port: 80})
-
+	domains = append(domains, model.WebsiteDomain{Domain: website.PrimaryDomain, Port: 80})
 	otherDomainArray := strings.Split(create.OtherDomains, "\n")
 	for _, domain := range otherDomainArray {
 		if domain == "" {
 			continue
 		}
-		domainModel, err := getDomain(domain, website.ID)
+		domainModel, err := getDomain(domain)
 		if err != nil {
 			return err
 		}
@@ -251,12 +258,18 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		}
 		domains = append(domains, domainModel)
 	}
-	if len(domains) > 0 {
-		if err = websiteDomainRepo.BatchCreate(ctx, domains); err != nil {
-			return err
-		}
+	if err != configDefaultNginx(website, domains, appInstall, runtime) {
+		return err
 	}
-	if err != configDefaultNginx(website, domains, appInstall, runtime, create.RuntimeConfig) {
+	tx, ctx := helper.GetTxAndContext()
+	defer tx.Rollback()
+	if err = websiteRepo.Create(ctx, website); err != nil {
+		return err
+	}
+	for i := range domains {
+		domains[i].WebsiteID = website.ID
+	}
+	if err = websiteDomainRepo.BatchCreate(ctx, domains); err != nil {
 		return err
 	}
 	tx.Commit()

@@ -55,6 +55,7 @@ export namespace Website {
         webSiteGroupId: number;
         otherDomains: string;
         proxy: string;
+        proxyType: string;
     }
 
     export interface WebSiteUpdateReq {

@@ -24,8 +24,8 @@ func NewLocation(directive *Directive) *Location {
 		location.Match = directive.Parameters[0]
 		return location
 	} else if len(directive.Parameters) == 2 {
-		location.Modifier = directive.Parameters[0]
 		location.Match = directive.Parameters[1]
+		location.Modifier = directive.Parameters[0]
 		return location
 	}
 	return nil
