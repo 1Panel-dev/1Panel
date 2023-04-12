@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"os"
 	"path"
 	"reflect"
@@ -33,7 +34,7 @@ type WebsiteService struct {
 type IWebsiteService interface {
 	PageWebsite(req request.WebsiteSearch) (int64, []response.WebsiteDTO, error)
 	GetWebsites() ([]response.WebsiteDTO, error)
-	CreateWebsite(ctx context.Context, create request.WebsiteCreate) error
+	CreateWebsite(create request.WebsiteCreate) error
 	OpWebsite(req request.WebsiteOp) error
 	GetWebsiteOptions() ([]string, error)
 	UpdateWebsite(req request.WebsiteUpdate) error
@@ -119,7 +120,7 @@ func (w WebsiteService) GetWebsites() ([]response.WebsiteDTO, error) {
 	return websiteDTOs, nil
 }
 
-func (w WebsiteService) CreateWebsite(ctx context.Context, create request.WebsiteCreate) (err error) {
+func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) {
 	if exist, _ := websiteRepo.GetBy(websiteRepo.WithDomain(create.PrimaryDomain)); len(exist) > 0 {
 		return buserr.New(constant.ErrDomainIsExist)
 	}
@@ -158,7 +159,7 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 					Operate:     constant.Delete,
 					ForceDelete: true,
 				}
-				if err := NewIAppInstalledService().Operate(ctx, req); err != nil {
+				if err := NewIAppInstalledService().Operate(context.Background(), req); err != nil {
 					global.LOG.Errorf(err.Error())
 				}
 			}
@@ -227,6 +228,8 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 		}
 	}
 
+	tx, ctx := helper.GetTxAndContext()
+	defer tx.Rollback()
 	if err = websiteRepo.Create(ctx, website); err != nil {
 		return err
 	}
@@ -252,7 +255,11 @@ func (w WebsiteService) CreateWebsite(ctx context.Context, create request.Websit
 			return err
 		}
 	}
-	return configDefaultNginx(website, domains, appInstall, runtime, create.RuntimeConfig)
+	if err != configDefaultNginx(website, domains, appInstall, runtime, create.RuntimeConfig) {
+		return err
+	}
+	tx.Commit()
+	return nil
 }
 
 func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {

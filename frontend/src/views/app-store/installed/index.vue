@@ -105,7 +105,7 @@
                                             round
                                             size="small"
                                             :disabled="installed.status !== 'Running'"
-                                            @click="openUploads(installed.app.name, installed.name)"
+                                            @click="openUploads(installed.app.key, installed.name)"
                                             v-if="mode === 'installed'"
                                         >
                                             {{ $t('database.loadBackup') }}
@@ -117,7 +117,7 @@
                                             round
                                             size="small"
                                             :disabled="installed.status !== 'Running'"
-                                            @click="openBackups(installed.app.name, installed.name)"
+                                            @click="openBackups(installed.app.key, installed.name)"
                                             v-if="mode === 'installed'"
                                         >
                                             {{ $t('app.backup') }}

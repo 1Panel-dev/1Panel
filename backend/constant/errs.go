@@ -60,6 +60,7 @@ var (
 	ErrDbUserNotValid      = "ErrDbUserNotValid"
 	ErrUpdateBuWebsite     = "ErrUpdateBuWebsite"
 	Err1PanelNetworkFailed = "Err1PanelNetworkFailed"
+	ErrCmdTimeout          = "ErrCmdTimeout"
 )
 
 // website
