@@ -70,7 +70,7 @@
                             {{ $t('commons.button.enable') }}
                         </el-button>
                         <el-divider direction="vertical" />
-                        <el-button type="primary" @click="deleteVisiable = true" link>
+                        <el-button :disabled="!hasRecords" type="primary" @click="onClean" link>
                             {{ $t('commons.button.clean') }}
                         </el-button>
                     </span>
@@ -576,9 +576,31 @@ const loadRecord = async (row: Cronjob.Record) => {
         currentRecordDetail.value = res.data;
     }
 };
+
+const onClean = async () => {
+    if (dialogData.value.rowData.type === 'shell' || dialogData.value.rowData.type === 'curl') {
+        ElMessageBox.confirm(i18n.global.t('commons.msg.clean'), i18n.global.t('commons.msg.deleteTitle'), {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'warning',
+        }).then(async () => {
+            await cleanRecords(dialogData.value.rowData.id, cleanData.value)
+                .then(() => {
+                    delLoading.value = false;
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    search(true);
+                })
+                .catch(() => {
+                    delLoading.value = false;
+                });
+        });
+    } else {
+        deleteVisiable.value = true;
+    }
+};
+
 const cleanRecord = async () => {
     delLoading.value = true;
-    console.log(dialogData.value.rowData);
     await cleanRecords(dialogData.value.rowData.id, cleanData.value)
         .then(() => {
             delLoading.value = false;
