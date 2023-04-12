@@ -327,6 +327,24 @@ definitions:
       shotTime:
         type: string
     type: object
+  dto.CronjobBatchDelete:
+    properties:
+      cleanData:
+        type: boolean
+      ids:
+        items:
+          type: integer
+        type: array
+    type: object
+  dto.CronjobClean:
+    properties:
+      cleanData:
+        type: boolean
+      cronjobID:
+        type: integer
+    required:
+    - cronjobID
+    type: object
   dto.CronjobCreate:
     properties:
       day:
@@ -1117,6 +1135,18 @@ definitions:
       subnet:
         type: string
     type: object
+  dto.NginxKey:
+    enum:
+    - index
+    - limit-conn
+    - ssl
+    - http-per
+    type: string
+    x-enum-varnames:
+    - Index
+    - LimitConn
+    - SSL
+    - HttpPer
   dto.OperateByID:
     properties:
       id:
@@ -2097,7 +2127,7 @@ definitions:
         type: string
       params: {}
       scope:
-        type: string
+        $ref: '#/definitions/dto.NginxKey'
       websiteId:
         type: integer
     required:
@@ -2106,7 +2136,7 @@ definitions:
   request.NginxScopeReq:
     properties:
       scope:
-        type: string
+        $ref: '#/definitions/dto.NginxKey'
       websiteId:
         type: integer
     required:
@@ -2404,6 +2434,19 @@ definitions:
     required:
     - id
     - params
+    type: object
+  request.WebsitePHPFileUpdate:
+    properties:
+      content:
+        type: string
+      id:
+        type: integer
+      type:
+        type: string
+    required:
+    - content
+    - id
+    - type
     type: object
   request.WebsiteResourceReq:
     properties:
@@ -2854,7 +2897,7 @@ paths:
       description: 获取应用更新版本
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Get app list update
@@ -3092,7 +3135,7 @@ paths:
           $ref: '#/definitions/request.AppInstalledOperate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Operate installed app
@@ -3159,7 +3202,7 @@ paths:
           $ref: '#/definitions/request.AppInstalledUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Change app params
@@ -3186,7 +3229,7 @@ paths:
           $ref: '#/definitions/request.PortUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Change app port
@@ -3215,7 +3258,7 @@ paths:
           $ref: '#/definitions/request.AppInstalledSearch'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: List app installed
@@ -3226,7 +3269,7 @@ paths:
       description: 同步已安装应用列表
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Sync app installed
@@ -3252,7 +3295,7 @@ paths:
           $ref: '#/definitions/request.AppSearch'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: List apps
@@ -3284,7 +3327,7 @@ paths:
       description: 同步应用列表
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Sync app list
@@ -3312,7 +3355,7 @@ paths:
       description: 判断是否为demo环境
       responses:
         "200":
-          description: ""
+          description: OK
       summary: Check System isDemo
       tags:
       - Auth
@@ -3330,7 +3373,7 @@ paths:
           $ref: '#/definitions/dto.InitUser'
       responses:
         "200":
-          description: ""
+          description: OK
       summary: Init user
       tags:
       - Auth
@@ -3359,7 +3402,7 @@ paths:
       description: 用户登出
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: User logout
@@ -3390,7 +3433,7 @@ paths:
       description: 判断是否为首次登录
       responses:
         "200":
-          description: ""
+          description: OK
       summary: Check is First login
       tags:
       - Auth
@@ -3408,7 +3451,7 @@ paths:
           $ref: '#/definitions/dto.ContainerCreate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create container
@@ -3436,7 +3479,7 @@ paths:
           $ref: '#/definitions/dto.ComposeCreate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create compose
@@ -3463,7 +3506,7 @@ paths:
           $ref: '#/definitions/dto.ComposeOperation'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Operate compose
@@ -3513,7 +3556,7 @@ paths:
           $ref: '#/definitions/dto.ComposeCreate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Test compose
@@ -3540,7 +3583,7 @@ paths:
           $ref: '#/definitions/dto.ComposeUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update compose
@@ -3597,7 +3640,7 @@ paths:
           $ref: '#/definitions/dto.DaemonJsonConf'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update docker daemon.json
@@ -3623,7 +3666,7 @@ paths:
           $ref: '#/definitions/dto.DaemonJsonUpdateByFile'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update docker daemon.json by upload file
@@ -3649,7 +3692,7 @@ paths:
           $ref: '#/definitions/dto.DockerOperation'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Operate docker
@@ -3735,7 +3778,7 @@ paths:
           $ref: '#/definitions/dto.ImageLoad'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Load image
@@ -3835,7 +3878,7 @@ paths:
           $ref: '#/definitions/dto.BatchDelete'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete image
@@ -3862,7 +3905,7 @@ paths:
           $ref: '#/definitions/dto.ImageSave'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Save image
@@ -3915,7 +3958,7 @@ paths:
           $ref: '#/definitions/dto.ImageTag'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Tag image
@@ -3971,7 +4014,7 @@ paths:
           $ref: '#/definitions/dto.NetworkCreat'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create network
@@ -3998,7 +4041,7 @@ paths:
           $ref: '#/definitions/dto.BatchDelete'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete network
@@ -4049,7 +4092,7 @@ paths:
           $ref: '#/definitions/dto.ContainerOperation'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Operate Container
@@ -4094,7 +4137,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create image repo
@@ -4123,7 +4166,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete image repo
@@ -4182,7 +4225,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Load repo status
@@ -4204,7 +4247,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update image repo
@@ -4316,7 +4359,7 @@ paths:
           $ref: '#/definitions/dto.ComposeTemplateCreate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create compose template
@@ -4343,7 +4386,7 @@ paths:
           $ref: '#/definitions/dto.BatchDelete'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete compose template
@@ -4400,7 +4443,7 @@ paths:
           $ref: '#/definitions/dto.ComposeTemplateUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update compose template
@@ -4433,7 +4476,7 @@ paths:
           $ref: '#/definitions/dto.VolumeCreat'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create volume
@@ -4460,7 +4503,7 @@ paths:
           $ref: '#/definitions/dto.BatchDelete'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete volume
@@ -4534,7 +4577,7 @@ paths:
           $ref: '#/definitions/dto.CronjobCreate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create cronjob
@@ -4559,10 +4602,10 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.BatchDeleteReq'
+          $ref: '#/definitions/dto.CronjobBatchDelete'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete cronjob
@@ -4595,7 +4638,7 @@ paths:
           $ref: '#/definitions/dto.CronjobDownload'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Download cronjob records
@@ -4628,7 +4671,7 @@ paths:
           $ref: '#/definitions/dto.OperateByID'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Handle cronjob once
@@ -4658,10 +4701,10 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.OperateByID'
+          $ref: '#/definitions/dto.CronjobClean'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Clean job records
@@ -4738,7 +4781,7 @@ paths:
           $ref: '#/definitions/dto.CronjobUpdateStatus'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update cronjob status
@@ -4772,7 +4815,7 @@ paths:
           $ref: '#/definitions/dto.CronjobUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update cronjob
@@ -4857,7 +4900,7 @@ paths:
           $ref: '#/definitions/dto.MysqlDBCreate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create mysql database
@@ -4897,7 +4940,7 @@ paths:
           $ref: '#/definitions/dto.ChangeDBInfo'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Change mysql access
@@ -4930,7 +4973,7 @@ paths:
           $ref: '#/definitions/dto.ChangeDBInfo'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Change mysql password
@@ -4963,7 +5006,7 @@ paths:
           $ref: '#/definitions/dto.MysqlConfUpdateByFile'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update mysql conf by upload file
@@ -4989,7 +5032,7 @@ paths:
           $ref: '#/definitions/dto.MysqlDBDelete'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete mysql database
@@ -5044,7 +5087,7 @@ paths:
           $ref: '#/definitions/dto.UpdateDescription'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update mysql database description
@@ -5135,7 +5178,7 @@ paths:
           $ref: '#/definitions/dto.RedisConfUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update redis conf
@@ -5161,7 +5204,7 @@ paths:
           $ref: '#/definitions/dto.RedisConfUpdateByFile'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update redis conf by file
@@ -5187,7 +5230,7 @@ paths:
           $ref: '#/definitions/dto.ChangeDBInfo'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Change redis password
@@ -5226,7 +5269,7 @@ paths:
           $ref: '#/definitions/dto.RedisConfPersistenceUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update redis persistence conf
@@ -5326,7 +5369,7 @@ paths:
           $ref: '#/definitions/dto.MysqlVariablesUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update mysql variables
@@ -5352,7 +5395,7 @@ paths:
           $ref: '#/definitions/request.FileCreate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create file
@@ -5379,7 +5422,7 @@ paths:
           $ref: '#/definitions/request.FileBatchDelete'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Batch delete file
@@ -5406,7 +5449,7 @@ paths:
           $ref: '#/definitions/request.FilePathCheck'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Check file exist
@@ -5430,7 +5473,7 @@ paths:
         type: file
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: ChunkUpload file
@@ -5450,7 +5493,7 @@ paths:
           $ref: '#/definitions/request.FileCompress'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Compress file
@@ -5506,7 +5549,7 @@ paths:
           $ref: '#/definitions/request.FileDeCompress'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Decompress file
@@ -5533,7 +5576,7 @@ paths:
           $ref: '#/definitions/request.FileDelete'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete file
@@ -5560,7 +5603,7 @@ paths:
           $ref: '#/definitions/request.FileDownload'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Download file
@@ -5587,7 +5630,7 @@ paths:
           $ref: '#/definitions/dto.FilePath'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Download file with path
@@ -5643,7 +5686,7 @@ paths:
           $ref: '#/definitions/request.FileCreate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Change file mode
@@ -5671,7 +5714,7 @@ paths:
           $ref: '#/definitions/request.FileMove'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Move file
@@ -5699,7 +5742,7 @@ paths:
           $ref: '#/definitions/request.FileRename'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Change file name
@@ -5727,7 +5770,7 @@ paths:
           $ref: '#/definitions/request.FileEdit'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update file content
@@ -5776,7 +5819,7 @@ paths:
           $ref: '#/definitions/request.DirSizeReq'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Load file size
@@ -5822,7 +5865,7 @@ paths:
         type: file
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Upload file
@@ -5871,7 +5914,7 @@ paths:
           $ref: '#/definitions/request.FileWget'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Wget file
@@ -5900,7 +5943,7 @@ paths:
           $ref: '#/definitions/dto.GroupCreate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create group
@@ -5928,7 +5971,7 @@ paths:
           $ref: '#/definitions/dto.OperateByID'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete group
@@ -5989,7 +6032,7 @@ paths:
           $ref: '#/definitions/dto.GroupUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update group
@@ -6017,7 +6060,7 @@ paths:
           $ref: '#/definitions/dto.HostOperate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create host
@@ -6078,7 +6121,7 @@ paths:
           $ref: '#/definitions/dto.CommandOperate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create command
@@ -6106,7 +6149,7 @@ paths:
           $ref: '#/definitions/dto.BatchDeleteReq'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete command
@@ -6161,7 +6204,7 @@ paths:
           $ref: '#/definitions/dto.CommandOperate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update command
@@ -6188,7 +6231,7 @@ paths:
           $ref: '#/definitions/dto.BatchDeleteReq'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete host
@@ -6234,7 +6277,7 @@ paths:
           $ref: '#/definitions/dto.BatchRuleOperate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create group
@@ -6283,7 +6326,7 @@ paths:
           $ref: '#/definitions/dto.PortRuleOperate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create group
@@ -6333,7 +6376,7 @@ paths:
           $ref: '#/definitions/dto.AddrRuleUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create group
@@ -6353,7 +6396,7 @@ paths:
           $ref: '#/definitions/dto.PortRuleUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create group
@@ -6416,7 +6459,7 @@ paths:
           $ref: '#/definitions/dto.HostConnTest'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Test host conn by info
@@ -6458,7 +6501,7 @@ paths:
           $ref: '#/definitions/dto.HostOperate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update host
@@ -6486,7 +6529,7 @@ paths:
           $ref: '#/definitions/dto.ChangeHostGroup'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update host group
@@ -6606,7 +6649,7 @@ paths:
           $ref: '#/definitions/request.NginxConfigFileUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update OpenResty conf by upload file
@@ -6667,7 +6710,7 @@ paths:
           $ref: '#/definitions/request.NginxConfigUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update OpenResty conf
@@ -6700,7 +6743,7 @@ paths:
           $ref: '#/definitions/request.RuntimeCreate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create runtime
@@ -6726,7 +6769,7 @@ paths:
         type: string
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Get runtime
@@ -6746,7 +6789,7 @@ paths:
           $ref: '#/definitions/request.RuntimeDelete'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete runtime
@@ -6773,7 +6816,7 @@ paths:
           $ref: '#/definitions/request.RuntimeSearch'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: List runtimes
@@ -6793,7 +6836,7 @@ paths:
           $ref: '#/definitions/request.RuntimeUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update runtime
@@ -6820,7 +6863,7 @@ paths:
           $ref: '#/definitions/dto.BackupOperate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create backup account
@@ -6847,7 +6890,7 @@ paths:
           $ref: '#/definitions/dto.CommonBackup'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Backup system data
@@ -6876,7 +6919,7 @@ paths:
           $ref: '#/definitions/dto.BatchDeleteReq'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete backup account
@@ -6909,7 +6952,7 @@ paths:
           $ref: '#/definitions/dto.BatchDeleteReq'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete backup record
@@ -6942,7 +6985,7 @@ paths:
           $ref: '#/definitions/dto.DownloadRecord'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Download backup record
@@ -6970,7 +7013,7 @@ paths:
           $ref: '#/definitions/dto.RecordSearch'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Page backup records
@@ -6990,7 +7033,7 @@ paths:
           $ref: '#/definitions/dto.CommonRecover'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Recover system data
@@ -7020,7 +7063,7 @@ paths:
           $ref: '#/definitions/dto.CommonRecover'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Recover system data by upload
@@ -7106,7 +7149,7 @@ paths:
           $ref: '#/definitions/dto.BackupOperate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update backup account
@@ -7146,7 +7189,7 @@ paths:
           $ref: '#/definitions/dto.PasswordUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Reset system password expired
@@ -7185,7 +7228,7 @@ paths:
           $ref: '#/definitions/dto.MfaCredential'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Bind mfa
@@ -7202,7 +7245,7 @@ paths:
       description: 清空监控数据
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Clean monitor datas
@@ -7228,7 +7271,7 @@ paths:
           $ref: '#/definitions/dto.PasswordUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update system password
@@ -7254,7 +7297,7 @@ paths:
           $ref: '#/definitions/dto.PortUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update system port
@@ -7285,7 +7328,7 @@ paths:
       description: 获取系统可用状态
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Load system available status
@@ -7305,7 +7348,7 @@ paths:
           $ref: '#/definitions/dto.SnapshotCreate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create system snapshot
@@ -7333,7 +7376,7 @@ paths:
           $ref: '#/definitions/dto.BatchDeleteReq'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete system backup
@@ -7366,7 +7409,7 @@ paths:
           $ref: '#/definitions/dto.UpdateDescription'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update snapshot description
@@ -7400,7 +7443,7 @@ paths:
           $ref: '#/definitions/dto.SnapshotImport'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Import system snapshot
@@ -7428,7 +7471,7 @@ paths:
           $ref: '#/definitions/dto.SnapshotRecover'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Recover system backup
@@ -7461,7 +7504,7 @@ paths:
           $ref: '#/definitions/dto.SnapshotRecover'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Rollback system backup
@@ -7535,7 +7578,7 @@ paths:
           $ref: '#/definitions/dto.SettingUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update system setting
@@ -7563,7 +7606,7 @@ paths:
           $ref: '#/definitions/dto.Upgrade'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Load release notes by version
@@ -7582,7 +7625,7 @@ paths:
           $ref: '#/definitions/dto.Upgrade'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Upgrade
@@ -7609,7 +7652,7 @@ paths:
           $ref: '#/definitions/request.WebsiteCreate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create website
@@ -7762,7 +7805,7 @@ paths:
           $ref: '#/definitions/request.WebsiteResourceReq'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete website acme account
@@ -7861,7 +7904,7 @@ paths:
           $ref: '#/definitions/request.NginxConfigUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update nginx conf
@@ -7894,7 +7937,7 @@ paths:
           $ref: '#/definitions/request.WebsiteDefaultUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Change default server
@@ -7928,7 +7971,7 @@ paths:
           $ref: '#/definitions/request.WebsiteDelete'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete website
@@ -7961,7 +8004,7 @@ paths:
           $ref: '#/definitions/request.WebsiteDnsAccountCreate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Create website dns account
@@ -7988,7 +8031,7 @@ paths:
           $ref: '#/definitions/request.WebsiteResourceReq'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete website dns account
@@ -8043,7 +8086,7 @@ paths:
           $ref: '#/definitions/request.WebsiteDnsAccountUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update website dns account
@@ -8120,7 +8163,7 @@ paths:
           $ref: '#/definitions/request.WebsiteDomainDelete'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete website domain
@@ -8202,7 +8245,7 @@ paths:
           $ref: '#/definitions/request.WebsiteNginxUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update website nginx conf
@@ -8235,7 +8278,7 @@ paths:
           $ref: '#/definitions/request.WebsiteOp'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Operate website
@@ -8268,6 +8311,39 @@ paths:
       summary: List website names
       tags:
       - Website
+  /websites/php/config:
+    post:
+      consumes:
+      - application/json
+      description: 更新 网站 PHP 配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsitePHPConfigUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update website php conf
+      tags:
+      - Website PHP
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: primary_domain
+          output_value: domain
+        bodyKeys:
+        - id
+        formatEN: '[domain] PHP conf update'
+        formatZH: '[domain] PHP 配置修改'
+        paramKeys: []
   /websites/php/config/:id:
     get:
       consumes:
@@ -8293,34 +8369,34 @@ paths:
     post:
       consumes:
       - application/json
-      description: 更新 网站 PHP 配置
+      description: 更新 php 配置
       parameters:
       - description: request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/request.WebsitePHPConfigUpdate'
+          $ref: '#/definitions/request.WebsitePHPFileUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
-      summary: Update website php conf
+      summary: Update php conf
       tags:
       - Website PHP
       x-panel-log:
         BeforeFuntions:
         - db: websites
           input_colume: id
-          input_value: id
+          input_value: websiteId
           isList: false
           output_colume: primary_domain
           output_value: domain
         bodyKeys:
-        - id
-        formatEN: '[domain] PHP conf update'
-        formatZH: '[domain] PHP 配置修改'
+        - websiteId
+        formatEN: Nginx conf update [domain]
+        formatZH: php 配置修改 [domain]
         paramKeys: []
   /websites/search:
     post:
@@ -8386,7 +8462,7 @@ paths:
         type: integer
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Search website ssl by id
@@ -8406,7 +8482,7 @@ paths:
           $ref: '#/definitions/request.WebsiteResourceReq'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Delete website ssl
@@ -8439,7 +8515,7 @@ paths:
           $ref: '#/definitions/request.WebsiteSSLRenew'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Reset website ssl
@@ -8494,7 +8570,7 @@ paths:
           $ref: '#/definitions/request.WebsiteSSLSearch'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Page website ssl
@@ -8514,7 +8590,7 @@ paths:
           $ref: '#/definitions/request.WebsiteSSLUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update ssl
@@ -8546,7 +8622,7 @@ paths:
         type: integer
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Search website ssl by website id
@@ -8566,7 +8642,7 @@ paths:
           $ref: '#/definitions/request.WebsiteUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update website
@@ -8615,7 +8691,7 @@ paths:
           $ref: '#/definitions/request.WebsiteWafUpdate'
       responses:
         "200":
-          description: ""
+          description: OK
       security:
       - ApiKeyAuth: []
       summary: Update website waf conf

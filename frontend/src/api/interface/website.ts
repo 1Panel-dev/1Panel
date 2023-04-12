@@ -271,4 +271,10 @@ export namespace Website {
         id: number;
         params: any;
     }
+
+    export interface PHPUpdate {
+        id: number;
+        content: string;
+        type: string;
+    }
 }
