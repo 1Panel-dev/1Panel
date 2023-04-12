@@ -83,6 +83,8 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		return res, err
 	}
 
+	var websiteSSL model.WebsiteSSL
+
 	switch create.Provider {
 	case constant.DNSAccount:
 		dnsAccount, err := websiteDnsRepo.GetFirst(commonRepo.WithByID(create.DnsAccountID))
@@ -92,6 +94,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		if err := client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization); err != nil {
 			return res, err
 		}
+		websiteSSL.AutoRenew = create.AutoRenew
 	case constant.Http:
 		appInstall, err := getAppInstallByKey(constant.AppOpenresty)
 		if err != nil {
@@ -100,6 +103,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		if err := client.UseHTTP(path.Join(constant.AppInstallDir, constant.AppOpenresty, appInstall.Name, "root")); err != nil {
 			return res, err
 		}
+		websiteSSL.AutoRenew = create.AutoRenew
 	case constant.DnsManual:
 		if err := client.UseManualDns(); err != nil {
 			return res, err
@@ -115,7 +119,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 	if err != nil {
 		return res, err
 	}
-	var websiteSSL model.WebsiteSSL
+
 	websiteSSL.DnsAccountID = create.DnsAccountID
 	websiteSSL.AcmeAccountID = acmeAccount.ID
 	websiteSSL.Provider = create.Provider
@@ -133,7 +137,6 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 	websiteSSL.StartDate = cert.NotBefore
 	websiteSSL.Type = cert.Issuer.CommonName
 	websiteSSL.Organization = cert.Issuer.Organization[0]
-	websiteSSL.AutoRenew = create.AutoRenew
 
 	if err := websiteSSLRepo.Create(context.TODO(), &websiteSSL); err != nil {
 		return res, err

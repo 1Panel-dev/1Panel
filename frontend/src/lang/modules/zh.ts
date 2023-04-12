@@ -1106,7 +1106,7 @@ const message = {
         primaryPath: '主目录',
         folderTitle: '网站主目录主要包含四个文件夹',
         wafFolder: '防火墙规则',
-        indexFolder: '静态网站root目录',
+        indexFolder: '网站root目录',
         logFoler: '网站日志',
         sslFolder: '网站证书',
         enableOrNot: '是否启用',

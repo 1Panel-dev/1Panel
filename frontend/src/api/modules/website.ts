@@ -100,7 +100,7 @@ export const ListSSL = (req: Website.SSLReq) => {
 };
 
 export const CreateSSL = (req: Website.SSLCreate) => {
-    return http.post<Website.SSLCreate>(`/websites/ssl`, req);
+    return http.post<Website.SSLCreate>(`/websites/ssl`, req, 60000);
 };
 
 export const DeleteSSL = (req: Website.DelReq) => {
@@ -128,7 +128,7 @@ export const UpdateSSL = (req: Website.SSLUpdate) => {
 };
 
 export const GetDnsResolve = (req: Website.DNSResolveReq) => {
-    return http.post<Website.DNSResolve[]>(`/websites/ssl/resolve`, req);
+    return http.post<Website.DNSResolve[]>(`/websites/ssl/resolve`, req, 60000);
 };
 
 export const GetHTTPSConfig = (id: number) => {

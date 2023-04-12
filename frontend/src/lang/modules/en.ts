@@ -1110,7 +1110,7 @@ const message = {
         primaryPath: 'Main directory',
         folderTitle: 'The main directory of the website mainly contains four folders',
         wafFolder: 'Firewall Rules',
-        indexFolder: 'Static website root directory',
+        indexFolder: 'Website root directory',
         logFoler: 'website log',
         sslFolder: 'Website certificate',
         enableOrNot: 'Enable',
