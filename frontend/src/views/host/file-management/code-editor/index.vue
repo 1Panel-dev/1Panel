@@ -15,7 +15,7 @@
             </el-form-item>
             <el-form-item :label="$t('file.language')">
                 <el-select v-model="config.language" @change="changeLanguage()">
-                    <el-option v-for="lang in Languages" :key="lang.label" :value="lang.value" :label="lang.label" />
+                    <el-option v-for="lang in Languages" :key="lang.label" :value="lang.label" :label="lang.label" />
                 </el-select>
             </el-form-item>
             <el-form-item :label="$t('file.eol')">

@@ -454,8 +454,8 @@ const openCodeEditor = (row: File.File) => {
     if (row.extension != '') {
         Languages.forEach((language) => {
             const ext = row.extension.substring(1);
-            if (language.value == ext) {
-                fileEdit.language = language.value;
+            if (language.value.indexOf(ext) > -1) {
+                fileEdit.language = language.label;
             }
         });
     }
