@@ -81,11 +81,11 @@ func (u *CronjobService) SearchRecords(search dto.SearchRecord) (int64, interfac
 }
 
 func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
-	if req.CleanData {
-		cronjob, err := cronjobRepo.Get(commonRepo.WithByID(req.CronjobID))
-		if err != nil {
-			return err
-		}
+	cronjob, err := cronjobRepo.Get(commonRepo.WithByID(req.CronjobID))
+	if err != nil {
+		return err
+	}
+	if req.CleanData && cronjob.Type != "shell" && cronjob.Type != "curl" {
 		cronjob.RetainCopies = 0
 		backup, err := backupRepo.Get(commonRepo.WithByID(uint(cronjob.TargetDirID)))
 		if err != nil {
