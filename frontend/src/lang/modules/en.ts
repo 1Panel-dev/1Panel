@@ -1261,7 +1261,7 @@ const message = {
         changeStrategyPortHelper1:
             'Change the port policy to [drop]. After the port policy is set, external access is denied. Do you want to continue?',
         changeStrategyPortHelper2:
-            'Change the port policy to [accept]. After the policy is set, normal port access will be restored. Do you want to continue?',
+            'Change the port policy to [accept]. After the port policy is set, normal port access will be restored. Do you want to continue?',
         stop: 'Stop',
         portFormatError: 'Please enter the correct port information!',
         portHelper1: 'Multiple ports, such as 8080 and 8081',

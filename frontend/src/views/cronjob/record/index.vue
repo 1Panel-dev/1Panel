@@ -61,7 +61,6 @@
                         >
                             {{ $t('commons.button.disable') }}
                         </el-button>
-                        <el-divider direction="vertical" />
                         <el-button
                             type="primary"
                             v-if="dialogData.rowData.status === 'Disable'"
@@ -70,6 +69,7 @@
                         >
                             {{ $t('commons.button.enable') }}
                         </el-button>
+                        <el-divider direction="vertical" />
                         <el-button type="primary" @click="deleteVisiable = true" link>
                             {{ $t('commons.button.clean') }}
                         </el-button>
