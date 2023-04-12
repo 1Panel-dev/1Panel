@@ -199,7 +199,7 @@ const loadPath = async () => {
 };
 
 const changePath = async () => {
-    composeFile.value = baseDir.value + '/docker/compose/' + form.name + '/docker-compose.yml';
+    composeFile.value = baseDir.value + '/docker/compose/' + form.name + '/xxx';
 };
 
 type FormInstance = InstanceType<typeof ElForm>;
