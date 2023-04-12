@@ -100,6 +100,7 @@ const onOperate = async (operation: string) => {
 };
 
 const onPingOperate = async (operation: string) => {
+    emit('update:maskShow', false);
     let operationHelper =
         operation === 'Enable' ? i18n.global.t('firewall.noPingHelper') : i18n.global.t('firewall.onPingHelper');
     ElMessageBox.confirm(operationHelper, i18n.global.t('firewall.noPingTitle'), {
@@ -110,6 +111,7 @@ const onPingOperate = async (operation: string) => {
             emit('update:loading', true);
             emit('update:status', 'running');
             operation = operation === 'Disable' ? 'disablePing' : 'enablePing';
+            emit('update:maskShow', true);
             await operateFire(operation)
                 .then(() => {
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -120,6 +122,7 @@ const onPingOperate = async (operation: string) => {
                 });
         })
         .catch(() => {
+            emit('update:maskShow', true);
             onPing.value = oldStatus.value;
         });
 };
