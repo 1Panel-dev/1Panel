@@ -124,6 +124,17 @@ func (f *Firewall) Port(port FireInfo, operation string) error {
 func (f *Firewall) RichRules(rule FireInfo, operation string) error {
 	ruleStr := ""
 	if strings.Contains(rule.Address, "-") {
+		std, err := cmd.Execf("firewall-cmd --permanent --new-ipset=%s --type=hash:ip", rule.Address)
+		if err != nil {
+			return fmt.Errorf("add new ipset failed, err: %s", std)
+		}
+		std2, err := cmd.Execf("firewall-cmd --permanent --ipset=%s --add-entry=%s", rule.Address, rule.Address)
+		if err != nil {
+			return fmt.Errorf("add entry to ipset failed, err: %s", std2)
+		}
+		if err := f.Reload(); err != nil {
+			return err
+		}
 		ruleStr = fmt.Sprintf("rule source ipset=%s %s", rule.Address, rule.Strategy)
 	} else {
 		ruleStr = "rule family=ipv4 "
