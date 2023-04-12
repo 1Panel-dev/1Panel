@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/subosito/gotenv"
@@ -146,18 +147,20 @@ func (r *RuntimeService) Delete(id uint) error {
 	if website.ID > 0 {
 		return buserr.New(constant.ErrDelWithWebsite)
 	}
-	client, err := docker.NewClient()
-	if err != nil {
-		return err
-	}
-	imageID, err := client.GetImageIDByName(runtime.Image)
-	if err != nil {
-		return err
-	}
-	if err := client.DeleteImage(imageID); err != nil {
-		return err
-	}
 	if runtime.Resource == constant.ResourceAppstore {
+		client, err := docker.NewClient()
+		if err != nil {
+			return err
+		}
+		imageID, err := client.GetImageIDByName(runtime.Image)
+		if err != nil {
+			return err
+		}
+		if imageID != "" {
+			if err := client.DeleteImage(imageID); err != nil {
+				global.LOG.Errorf("delete image id [%s] error %v", imageID, err)
+			}
+		}
 		runtimeDir := path.Join(constant.RuntimeDir, runtime.Type, runtime.Name)
 		if err := files.NewFileOp().DeleteDir(runtimeDir); err != nil {
 			return err
