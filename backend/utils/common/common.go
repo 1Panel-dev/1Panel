@@ -11,8 +11,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
 
 func CompareVersion(version1 string, version2 string) bool {
@@ -85,7 +83,6 @@ func RandStr(n int) string {
 }
 
 func ScanPort(port int) bool {
-
 	ln, err := net.Listen("tcp", ":"+strconv.Itoa(port))
 	if err != nil {
 		return true
@@ -94,24 +91,12 @@ func ScanPort(port int) bool {
 	return false
 }
 
-func ScanPortWithProtocol(port, Protocol string) bool {
-	command := "netstat -ntpl"
-	if Protocol == "udp" {
-		command = "netstat -nupl"
-	}
-	stdout, err := cmd.Execf("%s | awk '{print $4}' ", command)
+func ScanUDPPort(port int) bool {
+	ln, err := net.ListenUDP("udp", &net.UDPAddr{IP: net.IPv4(127, 0, 0, 1), Port: port})
 	if err != nil {
-		return false
+		return true
 	}
-	lines := strings.Split(stdout, "\n")
-	if len(lines) == 0 {
-		return false
-	}
-	for _, line := range lines {
-		if strings.HasSuffix(line, ":"+port) {
-			return true
-		}
-	}
+	defer ln.Close()
 	return false
 }
 
