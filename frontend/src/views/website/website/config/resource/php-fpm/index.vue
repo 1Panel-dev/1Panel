@@ -23,8 +23,7 @@
 <script lang="ts" setup>
 import { Codemirror } from 'vue-codemirror';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { GetWebsiteConfig } from '@/api/modules/website';
-import { InstalledOp } from '@/api/modules/app';
+import { GetWebsiteConfig, UpdatePHPFile } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import { File } from '@/api/interface/file';
 import i18n from '@/lang';
@@ -71,15 +70,14 @@ const get = () => {
 
 const submit = async () => {
     loading.value = true;
-    let operateReq = {
-        installId: props.installId,
-        operate: 'restart',
-    };
-    await InstalledOp(operateReq)
+    UpdatePHPFile({
+        id: id.value,
+        content: content.value,
+        type: props.type,
+    })
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         })
-        .catch(() => {})
         .finally(() => {
             loading.value = false;
         });

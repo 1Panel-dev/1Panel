@@ -526,7 +526,7 @@ func (b *BaseApi) GetWebsitePHPConfig(c *gin.Context) {
 // @Param request body request.WebsitePHPConfigUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /websites/php/update [post]
+// @Router /websites/php/config [post]
 // @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"[domain] PHP 配置修改","formatEN":"[domain] PHP conf update"}
 func (b *BaseApi) UpdateWebsitePHPConfig(c *gin.Context) {
 	var req request.WebsitePHPConfigUpdate
@@ -535,6 +535,28 @@ func (b *BaseApi) UpdateWebsitePHPConfig(c *gin.Context) {
 		return
 	}
 	if err := websiteService.UpdatePHPConfig(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Website PHP
+// @Summary Update php conf
+// @Description 更新 php 配置
+// @Accept json
+// @Param request body request.WebsitePHPFileUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/php/update [post]
+// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"websiteId","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"php 配置修改 [domain]","formatEN":"Nginx conf update [domain]"}
+func (b *BaseApi) UpdatePHPFile(c *gin.Context) {
+	var req request.WebsitePHPFileUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.UpdatePHPConfigFile(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

@@ -56,6 +56,7 @@ type IWebsiteService interface {
 	ChangeDefaultServer(id uint) error
 	GetPHPConfig(id uint) (*response.PHPConfig, error)
 	UpdatePHPConfig(req request.WebsitePHPConfigUpdate) error
+	UpdatePHPConfigFile(req request.WebsitePHPFileUpdate) error
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -499,14 +500,12 @@ func (w WebsiteService) GetWebsiteNginxConfig(websiteId uint, configType string)
 		if err != nil {
 			return response.FileInfo{}, err
 		}
-		runtimeInstall.GetPath()
 		configPath = path.Join(runtimeInstall.GetPath(), "conf", "php-fpm.conf")
 	case constant.ConfigPHP:
 		runtimeInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 		if err != nil {
 			return response.FileInfo{}, err
 		}
-		runtimeInstall.GetPath()
 		configPath = path.Join(runtimeInstall.GetPath(), "conf", "php.ini")
 	}
 	info, err := files.NewFileInfo(files.FileOption{
@@ -934,6 +933,37 @@ func (w WebsiteService) UpdatePHPConfig(req request.WebsitePHPConfigUpdate) (err
 	}
 	if err = NewIAppInstalledService().Operate(context.Background(), appInstallReq); err != nil {
 		_ = fileOp.WriteFile(phpConfigPath, strings.NewReader(string(contentBytes)), 0755)
+		return err
+	}
+	return nil
+}
+
+func (w WebsiteService) UpdatePHPConfigFile(req request.WebsitePHPFileUpdate) error {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	if website.Type != constant.Runtime {
+		return nil
+	}
+	runtime, err := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+	if err != nil {
+		return err
+	}
+	if runtime.Resource != constant.ResourceAppstore {
+		return nil
+	}
+	runtimeInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
+	if err != nil {
+		return err
+	}
+	configPath := ""
+	if req.Type == constant.ConfigFPM {
+		configPath = path.Join(runtimeInstall.GetPath(), "conf", "php-fpm.conf")
+	} else {
+		configPath = path.Join(runtimeInstall.GetPath(), "conf", "php.ini")
+	}
+	if err := files.NewFileOp().WriteFile(configPath, strings.NewReader(req.Content), 0755); err != nil {
 		return err
 	}
 	return nil

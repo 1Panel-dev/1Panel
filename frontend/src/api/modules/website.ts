@@ -166,3 +166,7 @@ export const GetPHPConfig = (id: number) => {
 export const UpdatePHPConfig = (req: Website.PHPConfigUpdate) => {
     return http.post<any>(`/websites/php/config/`, req);
 };
+
+export const UpdatePHPFile = (req: Website.PHPUpdate) => {
+    return http.post<any>(`/websites/php/update`, req);
+};
