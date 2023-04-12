@@ -54,11 +54,18 @@
                                 v-if="row.status === 'Enable'"
                                 @click="onChangeStatus(row.id, 'disable')"
                                 link
+                                icon="VideoPlay"
                                 type="success"
                             >
                                 {{ $t('commons.status.enabled') }}
                             </el-button>
-                            <el-button v-else link type="danger" @click="onChangeStatus(row.id, 'enable')">
+                            <el-button
+                                v-else
+                                icon="VideoPause"
+                                link
+                                type="danger"
+                                @click="onChangeStatus(row.id, 'enable')"
+                            >
                                 {{ $t('commons.status.disabled') }}
                             </el-button>
                         </template>

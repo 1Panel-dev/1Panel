@@ -1248,7 +1248,7 @@ const message = {
         changeStrategyIPHelper1: 'IP 策略修改为【屏蔽】，设置后该 IP 将禁止访问服务器，是否继续？',
         changeStrategyIPHelper2: 'IP 策略修改为【放行】，设置后该 IP 将恢复正常访问，是否继续？',
         changeStrategyPortHelper1: '端口策略修改为【拒绝】，设置后端口将拒绝外部访问，是否继续？',
-        changeStrategyPortHelper2: '端口策略为【允许】，设置后端口将恢复正常访问，是否继续？',
+        changeStrategyPortHelper2: '端口策略修改为【允许】，设置后端口将恢复正常访问，是否继续？',
         stop: '禁止',
         portFormatError: '请输入正确的端口信息！',
         portHelper1: '多个端口，如：8080,8081',
