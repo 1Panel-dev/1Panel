@@ -40,7 +40,7 @@ type IAppInstallService interface {
 	LoadPort(key string) (int64, error)
 	LoadConnInfo(key string) (response.DatabaseConn, error)
 	SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error)
-	Operate(ctx context.Context, req request.AppInstalledOperate) error
+	Operate(req request.AppInstalledOperate) error
 	Update(req request.AppInstalledUpdate) error
 	SyncAll(systemInit bool) error
 	GetServices(key string) ([]response.AppService, error)
@@ -177,8 +177,8 @@ func (a *AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]
 	return handleInstalled(installs, false)
 }
 
-func (a *AppInstallService) Operate(ctx context.Context, req request.AppInstalledOperate) error {
-	install, err := appInstallRepo.GetFirstByCtx(ctx, commonRepo.WithByID(req.InstallId))
+func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
+	install, err := appInstallRepo.GetFirstByCtx(context.Background(), commonRepo.WithByID(req.InstallId))
 	if err != nil {
 		return err
 	}
@@ -205,7 +205,7 @@ func (a *AppInstallService) Operate(ctx context.Context, req request.AppInstalle
 		}
 		return syncById(install.ID)
 	case constant.Delete:
-		if err := deleteAppInstall(ctx, install, req.DeleteBackup, req.ForceDelete, req.DeleteDB); err != nil && !req.ForceDelete {
+		if err := deleteAppInstall(install, req.DeleteBackup, req.ForceDelete, req.DeleteDB); err != nil && !req.ForceDelete {
 			return err
 		}
 		return nil

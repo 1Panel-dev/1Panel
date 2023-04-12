@@ -5,8 +5,10 @@ import (
 	"context"
 	"crypto/x509"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
+	"gorm.io/gorm"
 	"os"
 	"path"
 	"reflect"
@@ -24,8 +26,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"github.com/pkg/errors"
-	"gorm.io/gorm"
 )
 
 type WebsiteService struct {
@@ -38,7 +38,7 @@ type IWebsiteService interface {
 	OpWebsite(req request.WebsiteOp) error
 	GetWebsiteOptions() ([]string, error)
 	UpdateWebsite(req request.WebsiteUpdate) error
-	DeleteWebsite(ctx context.Context, req request.WebsiteDelete) error
+	DeleteWebsite(req request.WebsiteDelete) error
 	GetWebsite(id uint) (response.WebsiteDTO, error)
 	CreateWebsiteDomain(create request.WebsiteDomainCreate) (model.WebsiteDomain, error)
 	GetWebsiteDomain(websiteId uint) ([]model.WebsiteDomain, error)
@@ -159,7 +159,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 					Operate:     constant.Delete,
 					ForceDelete: true,
 				}
-				if err := NewIAppInstalledService().Operate(context.Background(), req); err != nil {
+				if err := NewIAppInstalledService().Operate(req); err != nil {
 					global.LOG.Errorf(err.Error())
 				}
 			}
@@ -323,12 +323,22 @@ func (w WebsiteService) GetWebsite(id uint) (response.WebsiteDTO, error) {
 	return res, nil
 }
 
-func (w WebsiteService) DeleteWebsite(ctx context.Context, req request.WebsiteDelete) error {
+func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
 	if err := delNginxConfig(website, req.ForceDelete); err != nil {
+		return err
+	}
+
+	tx, ctx := helper.GetTxAndContext()
+	defer tx.Rollback()
+	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("website"), commonRepo.WithByName(website.Alias))
+	if err := websiteRepo.DeleteBy(ctx, commonRepo.WithByID(req.ID)); err != nil {
+		return err
+	}
+	if err := websiteDomainRepo.DeleteBy(ctx, websiteDomainRepo.WithWebsiteId(req.ID)); err != nil {
 		return err
 	}
 
@@ -338,34 +348,24 @@ func (w WebsiteService) DeleteWebsite(ctx context.Context, req request.WebsiteDe
 			return err
 		}
 		if !reflect.DeepEqual(model.AppInstall{}, appInstall) {
-			if err := deleteAppInstall(ctx, appInstall, true, req.ForceDelete, true); err != nil && !req.ForceDelete {
+			if err := deleteAppInstall(appInstall, true, req.ForceDelete, true); err != nil && !req.ForceDelete {
 				return err
 			}
 		}
 	}
+	tx.Commit()
 
-	uploadDir := fmt.Sprintf("%s/1panel/uploads/website/%s", global.CONF.System.BaseDir, website.Alias)
-	if _, err := os.Stat(uploadDir); err == nil {
-		_ = os.RemoveAll(uploadDir)
-	}
 	if req.DeleteBackup {
-		localDir, err := loadLocalDir()
-		if err != nil && !req.ForceDelete {
-			return err
-		}
+		localDir, _ := loadLocalDir()
 		backupDir := fmt.Sprintf("%s/website/%s", localDir, website.Alias)
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
 		global.LOG.Infof("delete website %s backups successful", website.Alias)
 	}
-	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("website"), commonRepo.WithByName(website.Alias))
-
-	if err := websiteRepo.DeleteBy(ctx, commonRepo.WithByID(req.ID)); err != nil {
-		return err
-	}
-	if err := websiteDomainRepo.DeleteBy(ctx, websiteDomainRepo.WithWebsiteId(req.ID)); err != nil {
-		return err
+	uploadDir := fmt.Sprintf("%s/1panel/uploads/website/%s", global.CONF.System.BaseDir, website.Alias)
+	if _, err := os.Stat(uploadDir); err == nil {
+		_ = os.RemoveAll(uploadDir)
 	}
 	return nil
 }
@@ -932,7 +932,7 @@ func (w WebsiteService) UpdatePHPConfig(req request.WebsitePHPConfigUpdate) (err
 		InstallId: appInstall.ID,
 		Operate:   constant.Restart,
 	}
-	if err = NewIAppInstalledService().Operate(context.Background(), appInstallReq); err != nil {
+	if err = NewIAppInstalledService().Operate(appInstallReq); err != nil {
 		_ = fileOp.WriteFile(phpConfigPath, strings.NewReader(string(contentBytes)), 0755)
 		return err
 	}
