@@ -17,7 +17,6 @@
                             />
                             <span class="input-help">{{ $t('firewall.addressHelper1') }}</span>
                             <span class="input-help">{{ $t('firewall.addressHelper2') }}</span>
-                            <span class="input-help">{{ $t('firewall.addressHelper3') }}</span>
                         </el-form-item>
                         <el-form-item :label="$t('firewall.strategy')" prop="strategy">
                             <el-radio-group v-model="dialogData.rowData!.strategy">
@@ -92,9 +91,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         dialogData.value.rowData.operation = 'add';
         if (!dialogData.value.rowData) return;
         let ips = [];
-        if (dialogData.value.rowData.address.indexOf('-') !== -1) {
-            ips = dialogData.value.rowData.address.split('-');
-        } else if (dialogData.value.rowData.address.indexOf(',') !== -1) {
+        if (dialogData.value.rowData.address.indexOf(',') !== -1) {
             ips = dialogData.value.rowData.address.split(',');
         } else if (dialogData.value.rowData.address.indexOf('/') !== -1) {
             ips.push(dialogData.value.rowData.address.split('/')[0]);

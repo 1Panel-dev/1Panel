@@ -1280,7 +1280,6 @@ const message = {
         addressFormatError: 'Please enter a valid ip address!',
         addressHelper1: 'Multiple IP please separated with ",", such as 172.16.10.11, 172.16.10.99',
         addressHelper2: 'IP segment, such as 172.16.10.0/24',
-        addressHelper3: 'IP address range, such as 172.16.10.11-172.16.10.99',
         allIP: 'All IP',
         portRule: 'Port rule',
         ipRule: 'IP rule',

@@ -1264,7 +1264,6 @@ const message = {
         addressFormatError: '请输入合法的 ip 地址！',
         addressHelper1: '多个 IP 请用 "," 隔开：172.16.10.11,172.16.10.99',
         addressHelper2: 'IP 段：172.16.0.0/24',
-        addressHelper3: 'IP 范围：172.16.10.10-172.16.10.19（暂不支持跨网段范围）',
         allIP: '所有 IP',
         portRule: '端口规则',
         ipRule: 'IP 规则',
