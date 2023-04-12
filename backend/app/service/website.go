@@ -258,7 +258,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		}
 		domains = append(domains, domainModel)
 	}
-	if err != configDefaultNginx(website, domains, appInstall, runtime) {
+	if err = configDefaultNginx(website, domains, appInstall, runtime); err != nil {
 		return err
 	}
 	tx, ctx := helper.GetTxAndContext()

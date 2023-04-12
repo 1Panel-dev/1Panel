@@ -11,7 +11,35 @@ import (
 )
 
 func Exec(cmdStr string) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	cmd := exec.Command("bash", "-c", cmdStr)
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if ctx.Err() == context.DeadlineExceeded {
+		return "", buserr.New(constant.ErrCmdTimeout)
+	}
+	if err != nil {
+		errMsg := ""
+		if len(stderr.String()) != 0 {
+			errMsg = fmt.Sprintf("stderr: %s", stderr.String())
+		}
+		if len(stdout.String()) != 0 {
+			if len(errMsg) != 0 {
+				errMsg = fmt.Sprintf("%s; stdout: %s", errMsg, stdout.String())
+			} else {
+				errMsg = fmt.Sprintf("stdout: %s", stdout.String())
+			}
+		}
+		return errMsg, err
+	}
+	return stdout.String(), nil
+}
+
+func ExecWithTimeOut(cmdStr string, timeout time.Duration) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	cmd := exec.Command("bash", "-c", cmdStr)
 	var stdout, stderr bytes.Buffer
