@@ -394,7 +394,7 @@ const changeRuntime = (runID: number) => {
     runtimes.value.forEach((item) => {
         if (item.id === runID) {
             runtimeResource.value = item.resource;
-            if (item.type === 'appstore') {
+            if (item.resource === 'appstore') {
                 getAppDetailByID(item.appDetailId);
             }
         }

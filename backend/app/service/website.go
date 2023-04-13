@@ -346,16 +346,6 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 		return err
 	}
 
-	tx, ctx := helper.GetTxAndContext()
-	defer tx.Rollback()
-	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("website"), commonRepo.WithByName(website.Alias))
-	if err := websiteRepo.DeleteBy(ctx, commonRepo.WithByID(req.ID)); err != nil {
-		return err
-	}
-	if err := websiteDomainRepo.DeleteBy(ctx, websiteDomainRepo.WithWebsiteId(req.ID)); err != nil {
-		return err
-	}
-
 	if checkIsLinkApp(website) && req.DeleteApp {
 		appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(website.AppInstallID))
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -366,6 +356,16 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 				return err
 			}
 		}
+	}
+
+	tx, ctx := helper.GetTxAndContext()
+	defer tx.Rollback()
+	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("website"), commonRepo.WithByName(website.Alias))
+	if err := websiteRepo.DeleteBy(ctx, commonRepo.WithByID(req.ID)); err != nil {
+		return err
+	}
+	if err := websiteDomainRepo.DeleteBy(ctx, websiteDomainRepo.WithWebsiteId(req.ID)); err != nil {
+		return err
 	}
 	tx.Commit()
 
