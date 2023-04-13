@@ -17,6 +17,7 @@ export interface GlobalState {
     themeConfig: ThemeConfigProp;
     isFullScreen: boolean;
     agreeLicense: boolean;
+    hasNewVersion: boolean;
 }
 
 export interface MenuState {
