@@ -13,24 +13,27 @@ import (
 	"strings"
 )
 
-func buildRuntime(runtime *model.Runtime, service *docker.ComposeService, imageID string) {
+func buildRuntime(runtime *model.Runtime, service *docker.ComposeService, oldImageID string) {
 	err := service.ComposeBuild()
 	if err != nil {
 		runtime.Status = constant.RuntimeError
 		runtime.Message = buserr.New(constant.ErrImageBuildErr).Error() + ":" + err.Error()
 	} else {
 		runtime.Status = constant.RuntimeNormal
-		if imageID != "" {
+		if oldImageID != "" {
 			client, err := docker.NewClient()
-			global.LOG.Infof("delete imageID [%s] ", imageID)
 			if err == nil {
-				if err := client.DeleteImage(imageID); err != nil {
-					global.LOG.Errorf("delete imageID [%s] error %v", imageID, err)
-				} else {
-					global.LOG.Infof("delete old image success")
+				newImageID, err := client.GetImageIDByName(runtime.Image)
+				if err == nil && newImageID != oldImageID {
+					global.LOG.Infof("delete imageID [%s] ", oldImageID)
+					if err := client.DeleteImage(oldImageID); err != nil {
+						global.LOG.Errorf("delete imageID [%s] error %v", oldImageID, err)
+					} else {
+						global.LOG.Infof("delete old image success")
+					}
 				}
 			} else {
-				global.LOG.Errorf("delete imageID [%s] error %v", imageID, err)
+				global.LOG.Errorf("delete imageID [%s] error %v", oldImageID, err)
 			}
 		}
 	}
