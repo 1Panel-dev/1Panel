@@ -1152,7 +1152,7 @@ const message = {
         runtime: '运行环境',
         deleteRuntimeHelper: '运行环境应用需要跟网站一并删除，请谨慎处理',
         proxyType: '监听网络类型',
-        unix: 'Uinx 网络',
+        unix: 'Unix 网络',
         tcp: 'TCP/IP 网络',
         phpFPM: 'FPM 配置文件',
         phpConfig: 'PHP 配置文件',

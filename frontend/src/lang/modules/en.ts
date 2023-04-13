@@ -1157,7 +1157,7 @@ const message = {
         deleteRuntimeHelper:
             'The Runtime application needs to be deleted together with the website, please handle it with caution',
         proxyType: 'Listening Network Type',
-        unix: 'Uinx Network',
+        unix: 'Unix Network',
         tcp: 'TCP/IP Network',
         phpFPM: 'FPM Config',
         phpConfig: 'PHP Config',
