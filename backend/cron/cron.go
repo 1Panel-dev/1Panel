@@ -15,7 +15,7 @@ import (
 func Run() {
 	nyc, _ := time.LoadLocation("Asia/Shanghai")
 	Cron := cron.New(cron.WithLocation(nyc), cron.WithChain(cron.Recover(cron.DefaultLogger)), cron.WithChain(cron.DelayIfStillRunning(cron.DefaultLogger)))
-	_, err := Cron.AddJob("@every 1m", job.NewMonitorJob())
+	_, err := Cron.AddJob("@every 5m", job.NewMonitorJob())
 	if err != nil {
 		global.LOG.Errorf("can not add monitor corn job: %s", err.Error())
 	}
