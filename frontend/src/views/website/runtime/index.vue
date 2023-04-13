@@ -8,7 +8,7 @@
                 },
             ]"
         />
-        <LayoutContent :title="$t('runtime.runtime')" v-loading="loading">
+        <LayoutContent :title="$t('runtime.runtime')" v-loading="loading" :class="{ mask: !versionExist }">
             <template #toolbar>
                 <el-button type="primary" @click="openCreate">
                     {{ $t('runtime.create') }}
@@ -65,6 +65,15 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
+        <el-card width="30%" v-if="!versionExist" class="mask-prompt">
+            <span>
+                {{ $t('runtime.openrestryWarn') }}
+                <span class="open-warn" @click="goRouter()">
+                    <el-icon><Position /></el-icon>
+                    {{ $t('runtime.toupgrade') }}
+                </span>
+            </span>
+        </el-card>
         <CreateRuntime ref="createRef" @close="search" />
     </div>
 </template>
@@ -81,6 +90,8 @@ import CreateRuntime from '@/views/website/runtime/create/index.vue';
 import Status from '@/components/status/index.vue';
 import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';
+import { CheckAppInstalled } from '@/api/modules/app';
+import router from '@/routers';
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -111,6 +122,7 @@ const buttons = [
 const loading = ref(false);
 const items = ref<Runtime.RuntimeDTO[]>([]);
 const createRef = ref();
+const versionExist = ref(false);
 
 const search = async () => {
     req.page = paginationConfig.currentPage;
@@ -139,11 +151,44 @@ const openDelete = async (row: Runtime.Runtime) => {
     search();
 };
 
+const onCheck = async () => {
+    try {
+        const res = await CheckAppInstalled('openresty');
+        if (res.data && res.data.version) {
+            if (compareVersions(res.data.version, '1.21.4')) {
+                versionExist.value = true;
+            }
+        }
+    } catch (error) {}
+};
+
+function compareVersions(version1: string, version2: string): boolean {
+    const v1 = version1.split('.');
+    const v2 = version2.split('.');
+    const len = Math.max(v1.length, v2.length);
+
+    for (let i = 0; i < len; i++) {
+        const num1 = parseInt(v1[i] || '0');
+        const num2 = parseInt(v2[i] || '0');
+
+        if (num1 !== num2) {
+            return num1 > num2 ? true : false;
+        }
+    }
+
+    return false;
+}
+
+const goRouter = async () => {
+    router.push({ name: 'AppUpgrade' });
+};
+
 onMounted(() => {
     search();
     timer = setInterval(() => {
         search();
     }, 10000 * 3);
+    onCheck();
 });
 
 onUnmounted(() => {
@@ -151,3 +196,10 @@ onUnmounted(() => {
     timer = null;
 });
 </script>
+
+<style lang="scss" scoped>
+.open-warn {
+    color: $primary-color;
+    cursor: pointer;
+}
+</style>
