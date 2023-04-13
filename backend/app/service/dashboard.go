@@ -186,7 +186,10 @@ func loadDiskInfo() []dto.DiskInfo {
 	}
 
 	for i := 0; i < len(mounts); i++ {
-		state, _ := disk.Usage(mounts[i].Mount)
+		state, err := disk.Usage(mounts[i].Mount)
+		if err != nil {
+			continue
+		}
 		var itemData dto.DiskInfo
 		itemData.Path = mounts[i].Mount
 		itemData.Type = mounts[i].Type
