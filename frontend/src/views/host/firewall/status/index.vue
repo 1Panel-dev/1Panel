@@ -91,7 +91,7 @@ const onOperate = async (operation: string) => {
                     loadBaseInfo(true);
                 })
                 .catch(() => {
-                    emit('update:loading', false);
+                    loadBaseInfo(true);
                 });
         })
         .catch(() => {
