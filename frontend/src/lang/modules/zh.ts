@@ -545,7 +545,7 @@ const message = {
 
         compose: '编排',
         composeHelper: '当前内容已通过格式验证，请点击确认完成创建',
-        composePathHelper: '容器编排将保存在: {0}',
+        composePathHelper: '配置文件保存路径: {0}',
         apps: '应用商店',
         local: '本地',
         createCompose: '创建编排',

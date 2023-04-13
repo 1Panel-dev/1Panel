@@ -3,6 +3,7 @@ const message = {
     commons: {
         true: 'true',
         false: 'false',
+        example: 'Such as：',
         button: {
             create: 'Create ',
             add: 'Add ',
@@ -537,6 +538,7 @@ const message = {
         compose: 'Compose',
         composeHelper:
             'The current content has passed the format verification. Please click Submit to complete the creation',
+        composePathHelper: 'Config file save path: {0}',
         apps: 'Apps',
         local: 'Local',
         createCompose: 'Create compose',
