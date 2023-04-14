@@ -11,6 +11,7 @@ export interface GlobalState {
     isLoading: boolean;
     loadingText: string;
     isLogin: boolean;
+    entrance: string;
     csrfToken: string;
     language: string; // zh | en
     // assemblySize: string; // small | default | large

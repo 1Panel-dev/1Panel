@@ -17,7 +17,8 @@ router.beforeEach((to, from, next) => {
     const globalStore = GlobalStore();
     if (!globalStore.isLogin) {
         next({
-            path: '/login',
+            name: 'login',
+            params: { code: globalStore.entrance },
         });
         NProgress.done();
         return;

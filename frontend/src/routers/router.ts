@@ -58,7 +58,7 @@ menuList.unshift(homeRouter);
 export const routes: RouteRecordRaw[] = [
     homeRouter,
     {
-        path: '/login',
+        path: '/login/:code?',
         name: 'login',
         props: true,
         component: () => import('@/views/login/index.vue'),

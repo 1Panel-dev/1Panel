@@ -20,6 +20,33 @@
                                 </el-input>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.entrance')" required>
+                                <el-switch
+                                    @change="handleEntrance"
+                                    v-model="form.securityEntranceStatus"
+                                    active-value="enable"
+                                    inactive-value="disable"
+                                />
+                                <span class="input-help">
+                                    {{ $t('setting.entranceHelper') }}
+                                </span>
+                                <el-input
+                                    @blur="codeError = false"
+                                    v-if="isEntranceShow"
+                                    clearable
+                                    v-model.number="form.securityEntrance"
+                                >
+                                    <template #append>
+                                        <el-button style="width: 85px" @click="onSaveEntrance" icon="Collection">
+                                            {{ $t('commons.button.save') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                                <span class="input-error" v-if="codeError">
+                                    {{ $t('setting.entranceError') }}
+                                </span>
+                            </el-form-item>
+
                             <el-form-item
                                 :label="$t('setting.expirationTime')"
                                 prop="expirationTime"
@@ -142,10 +169,13 @@ import i18n from '@/lang';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { dateFormatSimple } from '@/utils/util';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const loading = ref(false);
 const form = reactive({
     serverPort: 9999,
+    securityEntranceStatus: 'disable',
     securityEntrance: '',
     expirationDays: 0,
     expirationTime: '',
@@ -163,6 +193,8 @@ const timeoutForm = reactive({
 const search = async () => {
     const res = await getSettingInfo();
     form.serverPort = Number(res.data.serverPort);
+    form.securityEntranceStatus = res.data.securityEntranceStatus;
+    isEntranceShow.value = res.data.securityEntranceStatus === 'enable';
     form.securityEntrance = res.data.securityEntrance;
     form.expirationDays = Number(res.data.expirationDays);
     form.expirationTime = res.data.expirationTime;
@@ -170,6 +202,9 @@ const search = async () => {
     form.mfaStatus = res.data.mfaStatus;
     form.mfaSecret = res.data.mfaSecret;
 };
+
+const isEntranceShow = ref(false);
+const codeError = ref(false);
 
 const isMFAShow = ref<boolean>(false);
 const otp = reactive<Setting.MFAInfo>({
@@ -257,6 +292,44 @@ const handleMFA = async () => {
                 loading.value = false;
             });
     }
+};
+
+const handleEntrance = async () => {
+    if (form.securityEntranceStatus === 'enable') {
+        isEntranceShow.value = true;
+    } else {
+        isEntranceShow.value = false;
+        loading.value = true;
+        await updateSetting({ key: 'SecurityEntranceStatus', value: 'disable' })
+            .then(() => {
+                globalStore.entrance = '';
+                loading.value = false;
+                search();
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    }
+};
+
+const onSaveEntrance = async () => {
+    const reg = /^[A-Za-z0-9]{8}$/;
+    if ((!reg.test(form.securityEntrance) && form.securityEntrance !== '') || form.securityEntrance === '') {
+        codeError.value = true;
+        return;
+    }
+    loading.value = true;
+    await updateSetting({ key: 'SecurityEntrance', value: form.securityEntrance })
+        .then(() => {
+            globalStore.entrance = form.securityEntrance;
+            loading.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            search();
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const handleClose = () => {

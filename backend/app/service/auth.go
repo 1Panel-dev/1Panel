@@ -19,11 +19,10 @@ import (
 type AuthService struct{}
 
 type IAuthService interface {
-	SafetyStatus(c *gin.Context) error
+	CheckIsSafety(code string) bool
 	CheckIsFirst() bool
 	InitUser(c *gin.Context, req dto.InitUser) error
 	VerifyCode(code string) (bool, error)
-	SafeEntrance(c *gin.Context, code string) error
 	Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error)
 	LogOut(c *gin.Context) error
 	MFALogin(c *gin.Context, info dto.MFALogin) (*dto.UserLoginInfo, error)
@@ -31,22 +30,6 @@ type IAuthService interface {
 
 func NewIAuthService() IAuthService {
 	return &AuthService{}
-}
-
-func (u *AuthService) SafeEntrance(c *gin.Context, code string) error {
-	codeWithMD5 := encrypt.Md5(code)
-	cookieValue, _ := encrypt.StringEncrypt(codeWithMD5)
-	c.SetCookie(codeWithMD5, cookieValue, 604800, "", "", false, false)
-
-	expiredSetting, err := settingRepo.Get(settingRepo.WithByKey("ExpirationDays"))
-	if err != nil {
-		return err
-	}
-	timeout, _ := strconv.Atoi(expiredSetting.Value)
-	if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006-01-02 15:04:05")); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (u *AuthService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error) {
@@ -164,23 +147,19 @@ func (u *AuthService) VerifyCode(code string) (bool, error) {
 	return setting.Value == code, nil
 }
 
-func (u *AuthService) SafetyStatus(c *gin.Context) error {
+func (u *AuthService) CheckIsSafety(code string) bool {
+	status, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntranceStatus"))
+	if err != nil {
+		return false
+	}
+	if status.Value == "disable" {
+		return true
+	}
 	setting, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntrance"))
 	if err != nil {
-		return err
+		return false
 	}
-	codeWithEcrypt, err := c.Cookie(encrypt.Md5(setting.Value))
-	if err != nil {
-		return err
-	}
-	code, err := encrypt.StringDecrypt(codeWithEcrypt)
-	if err != nil {
-		return err
-	}
-	if code != encrypt.Md5(setting.Value) {
-		return errors.New("code not match")
-	}
-	return nil
+	return setting.Value == code
 }
 
 func (u *AuthService) CheckIsFirst() bool {

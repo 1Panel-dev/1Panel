@@ -57,6 +57,16 @@ func (u *SettingService) Update(key, value string) error {
 			return err
 		}
 	}
+	if key == "SecurityEntrance" {
+		if err := settingRepo.Update("SecurityEntranceStatus", "enable"); err != nil {
+			return err
+		}
+	}
+	if key == "SecurityEntranceStatus" {
+		if err := settingRepo.Update("SecurityEntrance", ""); err != nil {
+			return err
+		}
+	}
 	if err := settingRepo.Update(key, value); err != nil {
 		return err
 	}

@@ -12,6 +12,7 @@ export const GlobalStore = defineStore({
         loadingText: '',
         isLogin: false,
         csrfToken: '',
+        entrance: '',
         language: '',
         themeConfig: {
             panelName: '',

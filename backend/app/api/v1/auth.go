@@ -1,8 +1,6 @@
 package v1
 
 import (
-	"errors"
-
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -102,44 +100,17 @@ func (b *BaseApi) Captcha(c *gin.Context) {
 // @Summary Load safety status
 // @Description 获取系统安全登录状态
 // @Success 200
-// @Failure 402
-// @Router /auth/status [get]
-func (b *BaseApi) GetSafetyStatus(c *gin.Context) {
-	if err := authService.SafetyStatus(c); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrUnSafety, constant.ErrTypeNotSafety, err)
-		return
-	}
-	helper.SuccessWithData(c, nil)
-}
-
-func (b *BaseApi) SafeEntrance(c *gin.Context) {
-	code, exist := c.Params.Get("code")
-	if !exist {
-		helper.ErrorWithDetail(c, constant.CodeErrUnSafety, constant.ErrTypeNotSafety, errors.New("missing code"))
-		return
-	}
-	ok, err := authService.VerifyCode(code)
-	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrUnSafety, constant.ErrTypeNotSafety, errors.New("missing code"))
-		return
-	}
-	if !ok {
-		helper.ErrorWithDetail(c, constant.CodeErrUnSafety, constant.ErrTypeNotSafety, errors.New("missing code"))
-		return
-	}
-	if err := authService.SafeEntrance(c, code); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrUnSafety, constant.ErrTypeNotSafety, errors.New("missing code"))
-		return
-	}
-
-	helper.SuccessWithData(c, nil)
+// @Router /auth/issafety [get]
+func (b *BaseApi) CheckIsSafety(c *gin.Context) {
+	code := c.DefaultQuery("code", "")
+	helper.SuccessWithData(c, authService.CheckIsSafety(code))
 }
 
 // @Tags Auth
 // @Summary Check is First login
 // @Description 判断是否为首次登录
 // @Success 200
-// @Router /auth/status [get]
+// @Router /auth/isfirst [get]
 func (b *BaseApi) CheckIsFirstLogin(c *gin.Context) {
 	helper.SuccessWithData(c, authService.CheckIsFirst())
 }

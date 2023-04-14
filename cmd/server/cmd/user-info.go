@@ -39,6 +39,7 @@ var userinfoCmd = &cobra.Command{
 		user := getSettingByKey(db, "UserName")
 		password := getSettingByKey(db, "Password")
 		port := getSettingByKey(db, "ServerPort")
+		entrance := getSettingByKey(db, "SecurityEntrance")
 		enptrySetting := getSettingByKey(db, "EncryptKey")
 
 		p := ""
@@ -49,6 +50,7 @@ var userinfoCmd = &cobra.Command{
 			p = password
 		}
 
+		fmt.Printf("entrance: %s\n", entrance)
 		fmt.Printf("username: %s\n", user)
 		fmt.Printf("password: %s\n", p)
 		fmt.Printf("port: %s\n", port)
