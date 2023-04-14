@@ -41,7 +41,7 @@
                 </template>
             </DrawerHeader>
         </template>
-        <el-row v-loading="loading">
+        <el-row v-loading="loading" :class="{ mask: !versionExist }">
             <el-col :span="22" :offset="1">
                 <el-alert
                     v-if="website.type == 'deployment'"
@@ -227,13 +227,25 @@
             </span>
         </template>
         <Check ref="preCheckRef"></Check>
+        <el-card width="30%" v-if="!versionExist" class="mask-prompt">
+            <span>
+                {{ $t('runtime.openrestryWarn') }}
+            </span>
+        </el-card>
     </el-drawer>
 </template>
 
 <script lang="ts" setup name="CreateWebSite">
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { App } from '@/api/interface/app';
-import { GetApp, GetAppDetail, SearchApp, GetAppInstalled, GetAppDetailByID } from '@/api/modules/app';
+import {
+    GetApp,
+    GetAppDetail,
+    SearchApp,
+    GetAppInstalled,
+    GetAppDetailByID,
+    CheckAppInstalled,
+} from '@/api/modules/app';
 import { CreateWebsite, PreCheck } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
@@ -270,7 +282,7 @@ const website = ref({
     proxyType: 'tcp',
     port: 9000,
 });
-let rules = ref<any>({
+const rules = ref<any>({
     primaryDomain: [Rules.domain],
     alias: [Rules.linuxName],
     type: [Rules.requiredInput],
@@ -288,31 +300,31 @@ let rules = ref<any>({
     port: [Rules.port],
 });
 
-let open = ref(false);
-let loading = ref(false);
-let groups = ref<Group.GroupInfo[]>([]);
+const open = ref(false);
+const loading = ref(false);
+const groups = ref<Group.GroupInfo[]>([]);
 
-let appInstalles = ref<App.AppInstalled[]>([]);
-let appReq = reactive({
+const appInstalles = ref<App.AppInstalled[]>([]);
+const appReq = reactive({
     type: 'website',
     page: 1,
     pageSize: 20,
 });
-let apps = ref<App.App[]>([]);
-let appVersions = ref<string[]>([]);
-let appDetail = ref<App.AppDetail>();
-let appParams = ref<App.AppParams>();
-let paramKey = ref(1);
-let preCheckRef = ref();
-let staticPath = ref('');
-let runtimeResource = ref('appstore');
+const apps = ref<App.App[]>([]);
+const appVersions = ref<string[]>([]);
+const appDetail = ref<App.AppDetail>();
+const appParams = ref<App.AppParams>();
+const paramKey = ref(1);
+const preCheckRef = ref();
+const staticPath = ref('');
+const runtimeResource = ref('appstore');
 const runtimeReq = ref<Runtime.RuntimeReq>({
     page: 1,
     pageSize: 100,
     status: 'normal',
 });
 const runtimes = ref<Runtime.RuntimeDTO[]>([]);
-
+const versionExist = ref(true);
 const em = defineEmits(['close']);
 
 const handleClose = () => {
@@ -326,11 +338,24 @@ const changeType = (type: string) => {
             website.value.appInstallId = appInstalles.value[0].id;
         }
     } else if (type == 'runtime') {
+        checkNginxVersion();
         getRuntimes();
     } else {
         website.value.appInstallId = undefined;
     }
     website.value.type = type;
+    versionExist.value = true;
+};
+
+const checkNginxVersion = async () => {
+    try {
+        const res = await CheckAppInstalled('openresty');
+        if (res.data && res.data.version) {
+            if (!compareVersions(res.data.version, '1.21.4')) {
+                versionExist.value = false;
+            }
+        }
+    } catch (error) {}
 };
 
 const searchAppInstalled = () => {
@@ -473,6 +498,23 @@ const submit = async (formEl: FormInstance | undefined) => {
 const changeAlias = (value: string) => {
     website.value.alias = value;
 };
+
+function compareVersions(version1: string, version2: string): boolean {
+    const v1 = version1.split('.');
+    const v2 = version2.split('.');
+    const len = Math.max(v1.length, v2.length);
+
+    for (let i = 0; i < len; i++) {
+        const num1 = parseInt(v1[i] || '0');
+        const num2 = parseInt(v2[i] || '0');
+
+        if (num1 !== num2) {
+            return num1 > num2 ? true : false;
+        }
+    }
+
+    return false;
+}
 
 defineExpose({
     acceptParams,
