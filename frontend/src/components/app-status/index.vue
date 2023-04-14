@@ -161,27 +161,3 @@ onMounted(() => {
     onCheck();
 });
 </script>
-
-<style lang="scss">
-.app-warn {
-    text-align: center;
-    margin-top: 100px;
-    span:first-child {
-        color: #bbbfc4;
-    }
-
-    span:nth-child(2) {
-        color: $primary-color;
-        cursor: pointer;
-    }
-
-    span:nth-child(2):hover {
-        color: #74a4f3;
-    }
-
-    img {
-        width: 300px;
-        height: 300px;
-    }
-}
-</style>

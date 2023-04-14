@@ -1220,6 +1220,7 @@ const message = {
         createAcme: '创建账户',
     },
     firewall: {
+        notSupport: '未检测到系统防火墙（firewalld 或者 ufw），请参考官方文档进行安装',
         ccDeny: 'CC 防护',
         ipWhiteList: 'IP 白名单',
         ipBlockList: 'IP 黑名单',

@@ -1227,6 +1227,8 @@ const message = {
             'This certificate has been associated with the following websites, and the renewal will be applied to these websites simultaneously',
     },
     firewall: {
+        notSupport:
+            'No system firewall detected (firewalld or ufw). Please refer to the official documentation for installation.',
         ccDeny: 'CC Protection',
         ipWhiteList: 'IP Whitelist',
         ipBlockList: 'IP Blacklist',
