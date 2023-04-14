@@ -48,7 +48,7 @@ func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 	if err != nil {
 		return baseInfo, err
 	}
-	baseInfo.PingStatus, err = u.PingStatus()
+	baseInfo.PingStatus, err = u.pingStatus()
 	if err != nil {
 		return baseInfo, err
 	}
@@ -142,14 +142,10 @@ func (u *FirewallService) OperateFirewall(operation string) error {
 		if err := client.Start(); err != nil {
 			return err
 		}
-		serverPort, err := settingRepo.Get(settingRepo.WithByKey("ServerPort"))
-		if err != nil {
+		if err := u.addPortsBeforeStart(client); err != nil {
+			_ = client.Stop()
 			return err
 		}
-		if err := client.Port(fireClient.FireInfo{Port: serverPort.Value, Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
-			return err
-		}
-		_ = client.Reload()
 		_, _ = cmd.Exec("systemctl restart docker")
 		return nil
 	case "stop":
@@ -159,9 +155,9 @@ func (u *FirewallService) OperateFirewall(operation string) error {
 		_, _ = cmd.Exec("systemctl restart docker")
 		return nil
 	case "disablePing":
-		return u.UpdatePingStatus("0")
+		return u.updatePingStatus("0")
 	case "enablePing":
-		return u.UpdatePingStatus("1")
+		return u.updatePingStatus("1")
 	}
 	return fmt.Errorf("not support such operation: %s", operation)
 }
@@ -369,7 +365,7 @@ func (u *FirewallService) loadPortByApp() []portOfApp {
 	return datas
 }
 
-func (u *FirewallService) PingStatus() (string, error) {
+func (u *FirewallService) pingStatus() (string, error) {
 	stdout, _ := cmd.Exec("sudo cat /etc/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= ")
 	if stdout == "net/ipv4/icmp_echo_ignore_all=1\n" {
 		return constant.StatusEnable, nil
@@ -377,7 +373,7 @@ func (u *FirewallService) PingStatus() (string, error) {
 	return constant.StatusDisable, nil
 }
 
-func (u *FirewallService) UpdatePingStatus(enabel string) error {
+func (u *FirewallService) updatePingStatus(enabel string) error {
 	lineBytes, err := os.ReadFile(confPath)
 	if err != nil {
 		return err
@@ -412,4 +408,31 @@ func (u *FirewallService) UpdatePingStatus(enabel string) error {
 	}
 
 	return nil
+}
+
+func (u *FirewallService) addPortsBeforeStart(client firewall.FirewallClient) error {
+	serverPort, err := settingRepo.Get(settingRepo.WithByKey("ServerPort"))
+	if err != nil {
+		return err
+	}
+	if err := client.Port(fireClient.FireInfo{Port: serverPort.Value, Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
+		return err
+	}
+	if err := client.Port(fireClient.FireInfo{Port: "22", Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
+		return err
+	}
+	if err := client.Port(fireClient.FireInfo{Port: "80", Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
+		return err
+	}
+	if err := client.Port(fireClient.FireInfo{Port: "443", Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
+		return err
+	}
+	apps := u.loadPortByApp()
+	for _, app := range apps {
+		if err := client.Port(fireClient.FireInfo{Port: app.HttpPort, Protocol: "tcp", Strategy: "accept"}, "add"); err != nil {
+			return err
+		}
+	}
+
+	return client.Reload()
 }
