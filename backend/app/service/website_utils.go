@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"path"
 	"strconv"
 	"strings"
@@ -58,8 +59,6 @@ func createIndexFile(website *model.Website, runtime *model.Runtime) error {
 		if runtime.Type == constant.RuntimePHP {
 			indexPath = path.Join(indexFolder, "index.php")
 			indexContent = string(nginx_conf.IndexPHP)
-		} else {
-			return nil
 		}
 	}
 
@@ -71,6 +70,11 @@ func createIndexFile(website *model.Website, runtime *model.Runtime) error {
 	}
 	if !fileOp.Stat(indexPath) {
 		if err := fileOp.CreateFile(indexPath); err != nil {
+			return err
+		}
+	}
+	if runtime.Resource == constant.ResourceAppstore {
+		if err := chownRootDir(indexFolder); err != nil {
 			return err
 		}
 	}
@@ -97,19 +101,21 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website, 
 		if err := fileOp.CreateFile(path.Join(siteFolder, "log", "error.log")); err != nil {
 			return err
 		}
-		if err := fileOp.CreateDir(path.Join(siteFolder, "index"), 0755); err != nil {
+		if err := fileOp.CreateDir(path.Join(siteFolder, "index"), 0775); err != nil {
 			return err
 		}
 		if err := fileOp.CreateDir(path.Join(siteFolder, "ssl"), 0755); err != nil {
 			return err
 		}
-		if website.Type == constant.Runtime && runtime.Type == constant.RuntimePHP && runtime.Resource == constant.ResourceLocal {
-			phpPoolDir := path.Join(siteFolder, "php-pool")
-			if err := fileOp.CreateDir(phpPoolDir, 0755); err != nil {
-				return err
-			}
-			if err := fileOp.CreateFile(path.Join(phpPoolDir, "php-fpm.sock")); err != nil {
-				return err
+		if website.Type == constant.Runtime {
+			if runtime.Type == constant.RuntimePHP && runtime.Resource == constant.ResourceLocal {
+				phpPoolDir := path.Join(siteFolder, "php-pool")
+				if err := fileOp.CreateDir(phpPoolDir, 0755); err != nil {
+					return err
+				}
+				if err := fileOp.CreateFile(path.Join(phpPoolDir, "php-fpm.sock")); err != nil {
+					return err
+				}
 			}
 		}
 		if website.Type == constant.Static || website.Type == constant.Runtime {
@@ -504,4 +510,12 @@ func checkIsLinkApp(website model.Website) bool {
 		return runtime.Resource == constant.ResourceAppstore
 	}
 	return false
+}
+
+func chownRootDir(path string) error {
+	_, err := cmd.ExecWithTimeOut(fmt.Sprintf("chown -R 1000:1000 %s", path), 1*time.Second)
+	if err != nil {
+		return err
+	}
+	return nil
 }
