@@ -191,6 +191,7 @@ const searchApp = (appId: number) => {
 const changeApp = (appId: number) => {
     for (const app of apps.value) {
         if (app.id === appId) {
+            initParam.value = false;
             getApp(app.key, mode.value);
             break;
         }

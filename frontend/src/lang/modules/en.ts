@@ -1166,6 +1166,11 @@ const message = {
         updateConfig: 'Update Config',
         isOn: 'On',
         isOff: 'Off',
+        rewrite: 'Pseudo Static',
+        rewriteMode: 'Scheme',
+        current: 'Current',
+        rewriteHelper:
+            'If the website cannot be accessed normally after setting pseudo-static, please try to set it back to default',
     },
     php: {
         short_open_tag: 'Short tag support',

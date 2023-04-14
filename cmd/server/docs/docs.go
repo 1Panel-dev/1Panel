@@ -8715,6 +8715,90 @@ const docTemplate = `{
                 }
             }
         },
+        "/websites/rewrite": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取伪静态配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website"
+                ],
+                "summary": "Get rewrite conf",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.NginxRewriteReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/websites/rewrite/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新伪静态配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website"
+                ],
+                "summary": "Update rewrite conf",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.NginxRewriteUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "websites",
+                            "input_colume": "id",
+                            "input_value": "websiteID",
+                            "isList": false,
+                            "output_colume": "primary_domain",
+                            "output_value": "domain"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "websiteID"
+                    ],
+                    "formatEN": "Nginx conf rewrite update [domain]",
+                    "formatZH": "伪静态配置修改 [domain]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/websites/search": {
             "post": {
                 "security": [
@@ -11830,7 +11914,13 @@ const docTemplate = `{
                 "proxy": {
                     "type": "string"
                 },
+                "proxyType": {
+                    "type": "string"
+                },
                 "remark": {
+                    "type": "string"
+                },
+                "rewrite": {
                     "type": "string"
                 },
                 "runtimeID": {
@@ -12398,6 +12488,40 @@ const docTemplate = `{
                 "params": {},
                 "scope": {
                     "$ref": "#/definitions/dto.NginxKey"
+                },
+                "websiteId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request.NginxRewriteReq": {
+            "type": "object",
+            "required": [
+                "name",
+                "websiteId"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "websiteId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request.NginxRewriteUpdate": {
+            "type": "object",
+            "required": [
+                "content",
+                "name",
+                "websiteId"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 },
                 "websiteId": {
                     "type": "integer"
@@ -13402,7 +13526,13 @@ const docTemplate = `{
                 "proxy": {
                     "type": "string"
                 },
+                "proxyType": {
+                    "type": "string"
+                },
                 "remark": {
+                    "type": "string"
+                },
+                "rewrite": {
                     "type": "string"
                 },
                 "runtimeID": {
