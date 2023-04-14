@@ -36,10 +36,14 @@ func NewIFirewallService() IFirewallService {
 
 func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 	var baseInfo dto.FirewallBaseInfo
+	baseInfo.PingStatus = u.pingStatus()
+	baseInfo.Status = "not running"
+	baseInfo.Version = "-"
+	baseInfo.Name = "-"
 	client, err := firewall.NewFirewallClient()
 	if err != nil {
 		if err.Error() == "no such type" {
-			return dto.FirewallBaseInfo{Name: "-", Version: "-", Status: "not running", PingStatus: "Disable"}, nil
+			return baseInfo, nil
 		}
 		return baseInfo, err
 	}
@@ -48,12 +52,7 @@ func (u *FirewallService) LoadBaseInfo() (dto.FirewallBaseInfo, error) {
 	if err != nil {
 		return baseInfo, err
 	}
-	baseInfo.PingStatus, err = u.pingStatus()
-	if err != nil {
-		return baseInfo, err
-	}
 	if baseInfo.Status == "not running" {
-		baseInfo.Version = "-"
 		return baseInfo, err
 	}
 	baseInfo.Version, err = client.Version()
@@ -365,12 +364,15 @@ func (u *FirewallService) loadPortByApp() []portOfApp {
 	return datas
 }
 
-func (u *FirewallService) pingStatus() (string, error) {
+func (u *FirewallService) pingStatus() string {
+	if _, err := os.Stat("/etc/sysctl.conf"); err != nil {
+		return constant.StatusNone
+	}
 	stdout, _ := cmd.Exec("sudo cat /etc/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= ")
 	if stdout == "net/ipv4/icmp_echo_ignore_all=1\n" {
-		return constant.StatusEnable, nil
+		return constant.StatusEnable
 	}
-	return constant.StatusDisable, nil
+	return constant.StatusDisable
 }
 
 func (u *FirewallService) updatePingStatus(enabel string) error {
