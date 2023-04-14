@@ -22,15 +22,17 @@
                             {{ $t('commons.button.start') }}
                         </el-button>
                     </span>
-                    <el-divider direction="vertical" />
-                    <el-button type="primary" link>{{ $t('firewall.noPing') }}</el-button>
-                    <el-switch
-                        style="margin-left: 10px"
-                        inactive-value="Disable"
-                        active-value="Enable"
-                        @change="onPingOperate"
-                        v-model="onPing"
-                    />
+                    <span v-if="onPing !== 'None'">
+                        <el-divider direction="vertical" />
+                        <el-button type="primary" link>{{ $t('firewall.noPing') }}</el-button>
+                        <el-switch
+                            style="margin-left: 10px"
+                            inactive-value="Disable"
+                            active-value="Enable"
+                            @change="onPingOperate"
+                            v-model="onPing"
+                        />
+                    </span>
                 </div>
             </el-card>
         </div>
