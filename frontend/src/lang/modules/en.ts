@@ -114,15 +114,8 @@ const message = {
             errorMfaInfo: 'Incorrect authentication information, please try again!',
             captchaHelper: 'Captcha',
             errorCaptcha: 'Captcha code error!',
-            safeEntrance: 'Please use the correct entry to log in to the panel',
-            reason: 'Cause of error:',
-            reasonHelper:
-                'At present, the newly installed machine has enabled the security entrance login. The newly installed machine will have a random 8-character security entrance name, which can also be modified in the panel Settings. If you do not record or do not remember, you can use the following methods to solve the problem',
-            solution: 'The solution:',
-            solutionHelper:
-                'Run the following command on the SSH terminal to solve the problem: 1. View the /etc/init.d/bt default command on the panel',
-            warnning:
-                'Note: [Closing the security entrance] will make your panel login address directly exposed to the Internet, very dangerous, please exercise caution',
+            safeEntrance:
+                'The command "1pctl user-info" can be used in SSH terminal to view the panel entrance as the secure login has been enabled in the current environment.',
             codeInput: 'Please enter the 6-digit verification code of the MFA validator',
             mfaTitle: 'MFA Certification',
             mfaCode: 'MFA verification code',

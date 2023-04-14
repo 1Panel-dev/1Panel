@@ -15,6 +15,7 @@ export namespace Setting {
         language: string;
 
         serverPort: number;
+        securityEntranceStatus: string;
         securityEntrance: string;
         expirationDays: number;
         expirationTime: string;

@@ -43,16 +43,11 @@ class RequestHttp {
                     globalStore.setCsrfToken(response.headers['x-csrf-token']);
                 }
                 if (data.code == ResultEnum.OVERDUE || data.code == ResultEnum.FORBIDDEN) {
-                    router.replace({
-                        path: '/login',
+                    router.push({
+                        name: 'login',
+                        params: { code: globalStore.entrance },
                     });
                     return Promise.reject(data);
-                }
-                if (data.code == ResultEnum.UNSAFETY) {
-                    router.replace({
-                        path: '/login',
-                    });
-                    return data;
                 }
                 if (data.code == ResultEnum.EXPIRED) {
                     router.push({ name: 'Expired' });

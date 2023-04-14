@@ -80,7 +80,7 @@ const logout = () => {
     })
         .then(() => {
             systemLogOut();
-            router.push({ name: 'login' });
+            router.push({ name: 'login', params: { code: globalStore.entrance } });
             globalStore.setLogStatus(false);
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
