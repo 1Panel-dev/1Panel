@@ -17,6 +17,7 @@ export namespace Website {
         appinstall?: NewAppInstall;
         webSiteSSL: SSL;
         runtimeID: number;
+        rewrite: string;
     }
 
     export interface WebsiteDTO extends Website {
@@ -277,5 +278,20 @@ export namespace Website {
         id: number;
         content: string;
         type: string;
+    }
+
+    export interface RewriteReq {
+        websiteID: number;
+        name: string;
+    }
+
+    export interface RewriteRes {
+        content: string;
+    }
+
+    export interface RewriteUpdate {
+        websiteID: number;
+        name: string;
+        content: string;
     }
 }

@@ -1159,6 +1159,10 @@ const message = {
         updateConfig: '配置修改',
         isOn: '开启',
         isOff: '关闭',
+        rewrite: '伪静态',
+        rewriteMode: '方案',
+        current: '当前',
+        rewriteHelper: '若设置伪静态后，网站无法正常访问，请尝试设置回default',
     },
     php: {
         short_open_tag: '短标签支持',

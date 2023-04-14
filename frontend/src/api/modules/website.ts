@@ -170,3 +170,11 @@ export const UpdatePHPConfig = (req: Website.PHPConfigUpdate) => {
 export const UpdatePHPFile = (req: Website.PHPUpdate) => {
     return http.post<any>(`/websites/php/update`, req);
 };
+
+export const GetRewriteConfig = (req: Website.RewriteReq) => {
+    return http.post<Website.RewriteRes>(`/websites/rewrite`, req);
+};
+
+export const UpdateRewriteConfig = (req: Website.RewriteUpdate) => {
+    return http.post<any>(`/websites/rewrite/update`, req);
+};

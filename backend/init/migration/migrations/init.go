@@ -276,7 +276,7 @@ var UpdateTableHost = &gormigrate.Migration{
 }
 
 var UpdateTableWebsite = &gormigrate.Migration{
-	ID: "20230406-update-table-website",
+	ID: "20230414-update-table-website",
 	Migrate: func(tx *gorm.DB) error {
 		return tx.AutoMigrate(&model.Website{})
 	},

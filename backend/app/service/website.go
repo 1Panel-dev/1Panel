@@ -2,12 +2,14 @@ package service
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
+	"github.com/1Panel-dev/1Panel/cmd/server/nginx_conf"
 	"gorm.io/gorm"
 	"os"
 	"path"
@@ -57,6 +59,8 @@ type IWebsiteService interface {
 	GetPHPConfig(id uint) (*response.PHPConfig, error)
 	UpdatePHPConfig(req request.WebsitePHPConfigUpdate) error
 	UpdatePHPConfigFile(req request.WebsitePHPFileUpdate) error
+	GetRewriteConfig(req request.NginxRewriteReq) (*response.NginxRewriteRes, error)
+	UpdateRewriteConfig(req request.NginxRewriteUpdate) error
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -980,4 +984,75 @@ func (w WebsiteService) UpdatePHPConfigFile(req request.WebsitePHPFileUpdate) er
 		return err
 	}
 	return nil
+}
+
+func (w WebsiteService) UpdateRewriteConfig(req request.NginxRewriteUpdate) error {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	nginxFull, err := getNginxFull(&website)
+	if err != nil {
+		return err
+	}
+	includePath := fmt.Sprintf("/www/sites/%s/rewrite/%s.conf", website.PrimaryDomain, website.PrimaryDomain)
+	absolutePath := path.Join(nginxFull.Install.GetPath(), includePath)
+	fileOp := files.NewFileOp()
+	var oldRewriteContent []byte
+	if !fileOp.Stat(path.Dir(absolutePath)) {
+		if err := fileOp.CreateDir(path.Dir(absolutePath), 0755); err != nil {
+			return err
+		}
+	}
+	if !fileOp.Stat(absolutePath) {
+		if err := fileOp.CreateFile(absolutePath); err != nil {
+			return err
+		}
+	} else {
+		oldRewriteContent, err = fileOp.GetContent(absolutePath)
+		if err != nil {
+			return err
+		}
+	}
+	if err := fileOp.WriteFile(absolutePath, strings.NewReader(req.Content), 0755); err != nil {
+		return err
+	}
+
+	if err := updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "include", Params: []string{includePath}}}, &website); err != nil {
+		_ = fileOp.WriteFile(absolutePath, bytes.NewReader(oldRewriteContent), 0755)
+		return err
+	}
+	website.Rewrite = req.Name
+	return websiteRepo.Save(context.Background(), &website)
+}
+
+func (w WebsiteService) GetRewriteConfig(req request.NginxRewriteReq) (*response.NginxRewriteRes, error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return nil, err
+	}
+	var contentByte []byte
+	if req.Name == "current" {
+		nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+		if err != nil {
+			return nil, err
+		}
+		rewriteConfPath := path.Join(nginxInstall.GetPath(), "www", "sites", website.PrimaryDomain, "rewrite", fmt.Sprintf("%s.conf", website.PrimaryDomain))
+		fileOp := files.NewFileOp()
+		if fileOp.Stat(rewriteConfPath) {
+			contentByte, err = fileOp.GetContent(rewriteConfPath)
+			if err != nil {
+				return nil, err
+			}
+		}
+	} else {
+		rewriteFile := fmt.Sprintf("rewrite/%s.conf", strings.ToLower(req.Name))
+		contentByte, err = nginx_conf.Rewrites.ReadFile(rewriteFile)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return &response.NginxRewriteRes{
+		Content: string(contentByte),
+	}, err
 }

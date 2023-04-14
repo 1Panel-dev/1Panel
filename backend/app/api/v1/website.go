@@ -560,3 +560,47 @@ func (b *BaseApi) UpdatePHPFile(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, nil)
 }
+
+// @Tags Website
+// @Summary Get rewrite conf
+// @Description 获取伪静态配置
+// @Accept json
+// @Param request body request.NginxRewriteReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/rewrite [post]
+func (b *BaseApi) GetRewriteConfig(c *gin.Context) {
+	var req request.NginxRewriteReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	res, err := websiteService.GetRewriteConfig(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Website
+// @Summary Update rewrite conf
+// @Description 更新伪静态配置
+// @Accept json
+// @Param request body request.NginxRewriteUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/rewrite/update [post]
+// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"websiteID","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"伪静态配置修改 [domain]","formatEN":"Nginx conf rewrite update [domain]"}
+func (b *BaseApi) UpdateRewriteConfig(c *gin.Context) {
+	var req request.NginxRewriteUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.UpdateRewriteConfig(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
