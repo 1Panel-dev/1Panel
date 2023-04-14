@@ -1,10 +1,21 @@
 <template>
     <div>
         <span class="version">{{ version }}</span>
-        <el-button v-if="version !== 'Waiting'" style="margin-top: -2px" type="primary" link @click="onLoadUpgradeInfo">
+        <el-badge is-dot class="item" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
+            <el-button style="margin-top: -8px" type="primary" link @click="onLoadUpgradeInfo">
+                {{ $t('setting.upgradeCheck') }}
+            </el-button>
+        </el-badge>
+        <el-button
+            v-if="version !== 'Waiting' && !globalStore.hasNewVersion"
+            style="margin-top: -2px"
+            type="primary"
+            link
+            @click="onLoadUpgradeInfo"
+        >
             {{ $t('setting.upgradeCheck') }}
         </el-button>
-        <el-tag v-else round style="margin-left: 10px">{{ $t('setting.upgrading') }}</el-tag>
+        <el-tag v-if="version === 'Waiting'" round style="margin-left: 10px">{{ $t('setting.upgrading') }}</el-tag>
     </div>
 
     <el-drawer :close-on-click-modal="false" :key="refresh" v-model="drawerVisiable" size="50%" append-to-body>

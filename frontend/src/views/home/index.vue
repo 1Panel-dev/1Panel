@@ -210,7 +210,10 @@ import { useRouter } from 'vue-router';
 import RouterButton from '@/components/router-button/index.vue';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
+import { loadUpgradeInfo } from '@/api/modules/setting';
+import { GlobalStore } from '@/store';
 const router = useRouter();
+const globalStore = GlobalStore();
 
 const statuRef = ref();
 const appRef = ref();
@@ -470,7 +473,17 @@ const loadData = async () => {
     }
 };
 
+const loadUpgradeStatus = async () => {
+    const res = await loadUpgradeInfo();
+    if (res.data) {
+        globalStore.hasNewVersion = true;
+    } else {
+        globalStore.hasNewVersion = false;
+    }
+};
+
 onMounted(() => {
+    loadUpgradeStatus();
     onLoadNetworkOptions();
     onLoadIOOptions();
     onLoadBaseInfo(true, 'all');
