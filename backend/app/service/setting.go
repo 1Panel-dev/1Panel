@@ -20,6 +20,7 @@ type SettingService struct{}
 type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
 	Update(key, value string) error
+	UpdateEntrance(value string) error
 	UpdatePassword(c *gin.Context, old, new string) error
 	UpdatePort(port uint) error
 	HandlePasswordExpired(c *gin.Context, old, new string) error
@@ -72,6 +73,16 @@ func (u *SettingService) Update(key, value string) error {
 	}
 	if key == "UserName" {
 		_ = global.SESSION.Clean()
+	}
+	return nil
+}
+
+func (u *SettingService) UpdateEntrance(value string) error {
+	if err := settingRepo.Update("SecurityEntranceStatus", "enable"); err != nil {
+		return err
+	}
+	if err := settingRepo.Update("SecurityEntrance", value); err != nil {
+		return err
 	}
 	return nil
 }

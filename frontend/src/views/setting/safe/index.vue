@@ -33,6 +33,8 @@
                                 <el-input
                                     @blur="codeError = false"
                                     v-if="isEntranceShow"
+                                    type="password"
+                                    show-password
                                     clearable
                                     v-model.number="form.securityEntrance"
                                 >
@@ -164,7 +166,15 @@ import { ElForm, ElMessageBox } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
 import LayoutContent from '@/layout/layout-content.vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { updateSetting, getMFA, bindMFA, getSettingInfo, updatePort, getSystemAvailable } from '@/api/modules/setting';
+import {
+    updateSetting,
+    getMFA,
+    bindMFA,
+    getSettingInfo,
+    updatePort,
+    getSystemAvailable,
+    updateEntrance,
+} from '@/api/modules/setting';
 import i18n from '@/lang';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { dateFormatSimple } from '@/utils/util';
@@ -320,7 +330,7 @@ const onSaveEntrance = async () => {
         return;
     }
     loading.value = true;
-    await updateSetting({ key: 'SecurityEntrance', value: form.securityEntrance })
+    await updateEntrance({ key: 'SecurityEntrance', value: form.securityEntrance })
         .then(() => {
             globalStore.entrance = form.securityEntrance;
             loading.value = false;

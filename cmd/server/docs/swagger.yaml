@@ -1453,6 +1453,8 @@ definitions:
         type: string
       securityEntrance:
         type: string
+      securityEntranceStatus:
+        type: string
       serverPort:
         type: string
       sessionTimeout:
@@ -3408,6 +3410,24 @@ paths:
         "200":
           description: ""
       summary: Init user
+      tags:
+      - Auth
+  /auth/isfirst:
+    get:
+      description: 判断是否为首次登录
+      responses:
+        "200":
+          description: ""
+      summary: Check is First login
+      tags:
+      - Auth
+  /auth/issafety:
+    get:
+      description: 获取系统安全登录状态
+      responses:
+        "200":
+          description: ""
+      summary: Load safety status
       tags:
       - Auth
   /auth/login:
@@ -7208,6 +7228,32 @@ paths:
       summary: Load local backup dir
       tags:
       - System Setting
+  /settings/entrance/enable:
+    post:
+      consumes:
+      - application/json
+      description: 更新系统安全入口
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SettingUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update system entrance
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys: []
+        formatEN: update system setting [SecurityEntranceStatus] => [Enable]
+        formatZH: 修改系统配置 [SecurityEntranceStatus] => [打开]
+        paramKeys: []
   /settings/expired/handle:
     post:
       consumes:
