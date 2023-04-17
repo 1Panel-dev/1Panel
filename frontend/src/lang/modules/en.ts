@@ -853,8 +853,9 @@ const message = {
 
         safe: 'Security',
         safeEntrance: 'Security entrance',
-        safeEntranceHelper:
-            'Panel management portal. You can log in to the panel only through a specified security portal, for example: onepanel',
+        entranceHelper: 'Enabling secure entry will only allow logging in to the panel through specified secure entry.',
+        entranceError:
+            'Please enter a secure login entry point of 6-10 characters, only numbers or letters are supported.',
         expirationTime: 'Expiration Time',
         unSetting: 'Not Set',
         noneSetting:

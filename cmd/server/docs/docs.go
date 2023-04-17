@@ -936,20 +936,6 @@ var doc = `{
                 }
             }
         },
-        "/auth/status": {
-            "get": {
-                "description": "判断是否为首次登录",
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Check is First login",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
         "/containers": {
             "post": {
                 "security": [
@@ -8151,6 +8137,57 @@ var doc = `{
                 }
             }
         },
+        "/websites/dir/permission": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新网站目录权限",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website"
+                ],
+                "summary": "Update Site Dir permission",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.WebsiteUpdateDirPermission"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "websites",
+                            "input_colume": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_colume": "primary_domain",
+                            "output_value": "domain"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "id"
+                    ],
+                    "formatEN": "Update  domain [domain] dir permission",
+                    "formatZH": "更新网站 [domain] 目录权限",
+                    "paramKeys": []
+                }
+            }
+        },
         "/websites/dir/update": {
             "post": {
                 "security": [
@@ -8179,7 +8216,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -12013,6 +12050,9 @@ var doc = `{
                 "expireDate": {
                     "type": "string"
                 },
+                "group": {
+                    "type": "string"
+                },
                 "httpConfig": {
                     "type": "string"
                 },
@@ -12050,6 +12090,9 @@ var doc = `{
                     "type": "string"
                 },
                 "updatedAt": {
+                    "type": "string"
+                },
+                "user": {
                     "type": "string"
                 },
                 "webSiteGroupId": {
@@ -13257,6 +13300,25 @@ var doc = `{
                 }
             }
         },
+        "request.WebsiteUpdateDirPermission": {
+            "type": "object",
+            "required": [
+                "group",
+                "id",
+                "user"
+            ],
+            "properties": {
+                "group": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "user": {
+                    "type": "string"
+                }
+            }
+        },
         "request.WebsiteWafReq": {
             "type": "object",
             "required": [
@@ -13643,6 +13705,9 @@ var doc = `{
                 "expireDate": {
                     "type": "string"
                 },
+                "group": {
+                    "type": "string"
+                },
                 "httpConfig": {
                     "type": "string"
                 },
@@ -13686,6 +13751,9 @@ var doc = `{
                     "type": "string"
                 },
                 "updatedAt": {
+                    "type": "string"
+                },
+                "user": {
                     "type": "string"
                 },
                 "webSiteGroupId": {
