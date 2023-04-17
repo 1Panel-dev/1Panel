@@ -6,7 +6,7 @@
             </template>
             <el-row type="flex" justify="center">
                 <el-col :span="22">
-                    <el-form ref="hostInfoRef" label-position="top" :model="dialogData" :rules="rules">
+                    <el-form @submit.prevent ref="hostInfoRef" label-position="top" :model="dialogData" :rules="rules">
                         <el-form-item :label="$t('commons.table.group')" prop="group">
                             <el-select filterable v-model="dialogData.groupID" clearable style="width: 100%">
                                 <div v-for="item in groupList" :key="item.id">

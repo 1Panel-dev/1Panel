@@ -3,7 +3,7 @@
         <template #header>
             <DrawerHeader :header="$t('container.imageDelete')" :back="handleClose" />
         </template>
-        <el-form :model="deleteForm" label-position="top">
+        <el-form @submit.prevent :model="deleteForm" label-position="top">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('container.tag')" prop="tagName">

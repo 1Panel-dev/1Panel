@@ -8,7 +8,7 @@
     >
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
-                <el-form ref="accountForm" label-position="top" :model="account" :rules="rules" @submit.enter.prevent>
+                <el-form @submit.prevent ref="accountForm" label-position="top" :model="account" :rules="rules">
                     <el-form-item :label="$t('website.email')" prop="email">
                         <el-input v-model.trim="account.email"></el-input>
                     </el-form-item>

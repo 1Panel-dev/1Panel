@@ -17,7 +17,7 @@
         <el-row v-else v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-alert :title="$t('app.updateHelper')" type="warning" :closable="false" />
-                <el-form ref="paramForm" :model="paramModel" label-position="top" :rules="rules">
+                <el-form @submit.prevent ref="paramForm" :model="paramModel" label-position="top" :rules="rules">
                     <div v-for="(p, index) in params" :key="index">
                         <el-form-item :prop="p.key" :label="getLabel(p)">
                             <el-input

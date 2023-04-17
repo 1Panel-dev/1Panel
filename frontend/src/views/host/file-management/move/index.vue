@@ -11,7 +11,14 @@
         </template>
         <el-row>
             <el-col :span="22" :offset="1">
-                <el-form ref="fileForm" label-position="top" :model="addForm" :rules="rules" v-loading="loading">
+                <el-form
+                    @submit.prevent
+                    ref="fileForm"
+                    label-position="top"
+                    :model="addForm"
+                    :rules="rules"
+                    v-loading="loading"
+                >
                     <el-form-item :label="$t('file.path')" prop="newPath">
                         <el-input v-model="addForm.newPath">
                             <template #prepend><FileList @choose="getPath" :dir="true"></FileList></template>
