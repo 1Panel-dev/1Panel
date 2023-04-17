@@ -13,6 +13,7 @@
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-form
+                    @submit.prevent
                     ref="paramForm"
                     label-position="top"
                     :model="form"

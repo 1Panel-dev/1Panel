@@ -3,7 +3,7 @@
         <template #header>
             <DrawerHeader :header="$t('container.importImage')" :back="handleClose" />
         </template>
-        <el-form v-loading="loading" ref="formRef" :model="form" label-position="top">
+        <el-form @submit.prevent v-loading="loading" ref="formRef" :model="form" label-position="top">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('container.path')" :rules="Rules.requiredSelect" prop="path">
