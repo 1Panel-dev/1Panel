@@ -50,7 +50,7 @@
                                 >
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
-                                <el-button round :disabled="s3Data.id === 0" @click="onBatchDelete(s3Data)">
+                                <el-button round :disabled="s3Data.id === 0" @click="onDelete(s3Data)">
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </div>
@@ -88,7 +88,7 @@
                                 >
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
-                                <el-button round :disabled="ossData.id === 0" @click="onBatchDelete(ossData)">
+                                <el-button round :disabled="ossData.id === 0" @click="onDelete(ossData)">
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </div>
@@ -126,7 +126,7 @@
                                 >
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
-                                <el-button round :disabled="cosData.id === 0" @click="onBatchDelete(cosData)">
+                                <el-button round :disabled="cosData.id === 0" @click="onDelete(cosData)">
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </div>
@@ -161,7 +161,7 @@
                                 >
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
-                                <el-button round :disabled="kodoData.id === 0" @click="onBatchDelete(kodoData)">
+                                <el-button round :disabled="kodoData.id === 0" @click="onDelete(kodoData)">
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </div>
@@ -199,7 +199,7 @@
                                 >
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
-                                <el-button :disabled="minioData.id === 0" round @click="onBatchDelete(minioData)">
+                                <el-button :disabled="minioData.id === 0" round @click="onDelete(minioData)">
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </div>
@@ -235,7 +235,7 @@
                                 >
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
-                                <el-button round :disabled="sftpData.id === 0" @click="onBatchDelete(sftpData)">
+                                <el-button round :disabled="sftpData.id === 0" @click="onDelete(sftpData)">
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </div>
@@ -401,10 +401,8 @@ const search = async () => {
     }
 };
 
-const onBatchDelete = async (row: Backup.BackupInfo | null) => {
-    let ids: Array<number> = [];
-    ids.push(row.id);
-    await useDeleteData(deleteBackup, { ids: ids }, 'commons.msg.delete');
+const onDelete = async (row: Backup.BackupInfo) => {
+    await useDeleteData(deleteBackup, { id: row.id }, 'commons.msg.delete');
     search();
 };
 

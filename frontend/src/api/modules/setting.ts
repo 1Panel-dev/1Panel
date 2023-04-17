@@ -98,7 +98,7 @@ export const editBackup = (params: Backup.BackupOperate) => {
     }
     return http.post(`/settings/backup/update`, reqest);
 };
-export const deleteBackup = (params: { ids: number[] }) => {
+export const deleteBackup = (params: { id: number }) => {
     return http.post(`/settings/backup/del`, params);
 };
 export const listBucket = (params: Backup.ForBucket) => {

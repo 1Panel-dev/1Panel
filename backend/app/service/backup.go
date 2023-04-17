@@ -9,6 +9,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cloud_storage"
@@ -26,7 +27,7 @@ type IBackupService interface {
 	Create(backupDto dto.BackupOperate) error
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
 	Update(ireq dto.BackupOperate) error
-	BatchDelete(ids []uint) error
+	Delete(id uint) error
 	BatchDeleteRecord(ids []uint) error
 	NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error)
 
@@ -159,8 +160,12 @@ func (u *BackupService) GetBuckets(backupDto dto.ForBuckets) ([]interface{}, err
 	return client.ListBuckets()
 }
 
-func (u *BackupService) BatchDelete(ids []uint) error {
-	return backupRepo.Delete(commonRepo.WithIdsIn(ids))
+func (u *BackupService) Delete(id uint) error {
+	cronjobs, _ := cronjobRepo.List(cronjobRepo.WithByBackupID(id))
+	if len(cronjobs) != 0 {
+		return buserr.New(constant.ErrBackupInUsed)
+	}
+	return backupRepo.Delete(commonRepo.WithByID(id))
 }
 
 func (u *BackupService) BatchDeleteRecord(ids []uint) error {
