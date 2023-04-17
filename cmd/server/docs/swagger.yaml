@@ -1746,6 +1746,8 @@ definitions:
         type: string
       runtimeID:
         type: integer
+      siteDir:
+        type: string
       status:
         type: string
       type:
@@ -2548,6 +2550,16 @@ definitions:
     - primaryDomain
     - webSiteGroupID
     type: object
+  request.WebsiteUpdateDir:
+    properties:
+      id:
+        type: integer
+      siteDir:
+        type: string
+    required:
+    - id
+    - siteDir
+    type: object
   request.WebsiteWafReq:
     properties:
       key:
@@ -2823,6 +2835,8 @@ definitions:
       runtimeID:
         type: integer
       runtimeName:
+        type: string
+      siteDir:
         type: string
       sitePath:
         type: string
@@ -8008,6 +8022,39 @@ paths:
         - id
         formatEN: Delete website [domain]
         formatZH: 删除网站 [domain]
+        paramKeys: []
+  /websites/dir/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新网站目录
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteUpdateDir'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update Site Dir
+      tags:
+      - Website
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: primary_domain
+          output_value: domain
+        bodyKeys:
+        - id
+        formatEN: Update  domain [domain] dir
+        formatZH: 更新网站 [domain] 目录
         paramKeys: []
   /websites/dns:
     post:

@@ -276,8 +276,14 @@ var UpdateTableHost = &gormigrate.Migration{
 }
 
 var UpdateTableWebsite = &gormigrate.Migration{
-	ID: "20230414-update-table-website",
+	ID: "20230417-update-table-website",
 	Migrate: func(tx *gorm.DB) error {
-		return tx.AutoMigrate(&model.Website{})
+		if err := tx.AutoMigrate(&model.Website{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.Website{}).Where("1 = 1").Update("site_dir", "/").Error; err != nil {
+			return err
+		}
+		return nil
 	},
 }

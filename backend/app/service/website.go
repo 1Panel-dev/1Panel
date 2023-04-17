@@ -61,6 +61,7 @@ type IWebsiteService interface {
 	UpdatePHPConfigFile(req request.WebsitePHPFileUpdate) error
 	GetRewriteConfig(req request.NginxRewriteReq) (*response.NginxRewriteRes, error)
 	UpdateRewriteConfig(req request.NginxRewriteUpdate) error
+	UpdateSiteDir(req request.WebsiteUpdateDir) error
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -147,6 +148,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		WebsiteGroupID: create.WebsiteGroupID,
 		Protocol:       constant.ProtocolHTTP,
 		Proxy:          create.Proxy,
+		SiteDir:        "/",
 		AccessLog:      true,
 		ErrorLog:       true,
 	}
@@ -1055,4 +1057,21 @@ func (w WebsiteService) GetRewriteConfig(req request.NginxRewriteReq) (*response
 	return &response.NginxRewriteRes{
 		Content: string(contentByte),
 	}, err
+}
+
+func (w WebsiteService) UpdateSiteDir(req request.WebsiteUpdateDir) error {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	runDir := req.SiteDir
+	siteDir := path.Join("/www/sites", website.Alias, "index")
+	if req.SiteDir != "/" {
+		siteDir = fmt.Sprintf("%s/%s", siteDir, req.SiteDir)
+	}
+	if err := updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "root", Params: []string{siteDir}}}, &website); err != nil {
+		return err
+	}
+	website.SiteDir = runDir
+	return websiteRepo.Save(context.Background(), &website)
 }

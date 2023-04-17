@@ -178,3 +178,7 @@ export const GetRewriteConfig = (req: Website.RewriteReq) => {
 export const UpdateRewriteConfig = (req: Website.RewriteUpdate) => {
     return http.post<any>(`/websites/rewrite/update`, req);
 };
+
+export const UpdateWebsiteDir = (req: Website.DirUpdate) => {
+    return http.post<any>(`/websites/dir/update`, req);
+};

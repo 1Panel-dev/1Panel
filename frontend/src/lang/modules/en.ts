@@ -1171,6 +1171,9 @@ const message = {
         current: 'Current',
         rewriteHelper:
             'If the website cannot be accessed normally after setting pseudo-static, please try to set it back to default',
+        runDir: 'Run Directory',
+        runDirHelper:
+            'Some programs need to specify a secondary directory as the running directory, such as ThinkPHP5, Laravel',
     },
     php: {
         short_open_tag: 'Short tag support',

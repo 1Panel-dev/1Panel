@@ -604,3 +604,25 @@ func (b *BaseApi) UpdateRewriteConfig(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, nil)
 }
+
+// @Tags Website
+// @Summary Update Site Dir
+// @Description 更新网站目录
+// @Accept json
+// @Param request body request.WebsiteUpdateDir true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/dir/update [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"更新网站 [domain] 目录","formatEN":"Update  domain [domain] dir"}
+func (b *BaseApi) UpdateSiteDir(c *gin.Context) {
+	var req request.WebsiteUpdateDir
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.UpdateSiteDir(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

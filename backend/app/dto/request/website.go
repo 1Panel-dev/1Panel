@@ -145,3 +145,8 @@ type WebsitePHPFileUpdate struct {
 	Type    string `json:"type" validate:"required"`
 	Content string `json:"content" validate:"required"`
 }
+
+type WebsiteUpdateDir struct {
+	ID      uint   `json:"id" validate:"required"`
+	SiteDir string `json:"siteDir" validate:"required"`
+}

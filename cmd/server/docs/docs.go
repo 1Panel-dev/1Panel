@@ -8083,6 +8083,57 @@ var doc = `{
                 }
             }
         },
+        "/websites/dir/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新网站目录",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website"
+                ],
+                "summary": "Update Site Dir",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.WebsiteUpdateDir"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [
+                        {
+                            "db": "websites",
+                            "input_colume": "id",
+                            "input_value": "id",
+                            "isList": false,
+                            "output_colume": "primary_domain",
+                            "output_value": "domain"
+                        }
+                    ],
+                    "bodyKeys": [
+                        "id"
+                    ],
+                    "formatEN": "Update  domain [domain] dir",
+                    "formatZH": "更新网站 [domain] 目录",
+                    "paramKeys": []
+                }
+            }
+        },
         "/websites/dns": {
             "post": {
                 "security": [
@@ -11918,6 +11969,9 @@ var doc = `{
                 "runtimeID": {
                     "type": "integer"
                 },
+                "siteDir": {
+                    "type": "string"
+                },
                 "status": {
                     "type": "string"
                 },
@@ -13117,6 +13171,21 @@ var doc = `{
                 }
             }
         },
+        "request.WebsiteUpdateDir": {
+            "type": "object",
+            "required": [
+                "id",
+                "siteDir"
+            ],
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "siteDir": {
+                    "type": "string"
+                }
+            }
+        },
         "request.WebsiteWafReq": {
             "type": "object",
             "required": [
@@ -13531,6 +13600,9 @@ var doc = `{
                     "type": "integer"
                 },
                 "runtimeName": {
+                    "type": "string"
+                },
+                "siteDir": {
                     "type": "string"
                 },
                 "sitePath": {

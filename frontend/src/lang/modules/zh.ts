@@ -1163,6 +1163,8 @@ const message = {
         rewriteMode: '方案',
         current: '当前',
         rewriteHelper: '若设置伪静态后，网站无法正常访问，请尝试设置回default',
+        runDir: '运行目录',
+        runDirHelper: '部分程序需要指定二级目录作为运行目录，如ThinkPHP5，Laravel',
     },
     php: {
         short_open_tag: '短标签支持',
