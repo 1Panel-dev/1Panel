@@ -827,6 +827,34 @@ var doc = `{
                 }
             }
         },
+        "/auth/isfirst": {
+            "get": {
+                "description": "判断是否为首次登录",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Check is First login",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/auth/issafety": {
+            "get": {
+                "description": "获取系统安全登录状态",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Load safety status",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "description": "用户登录",
@@ -6806,6 +6834,46 @@ var doc = `{
                 }
             }
         },
+        "/settings/entrance/enable": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新系统安全入口",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Update system entrance",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SettingUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [],
+                    "formatEN": "update system setting [SecurityEntranceStatus] =\u003e [Enable]",
+                    "formatZH": "修改系统配置 [SecurityEntranceStatus] =\u003e [打开]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/settings/expired/handle": {
             "post": {
                 "security": [
@@ -11522,6 +11590,9 @@ var doc = `{
                     "type": "string"
                 },
                 "securityEntrance": {
+                    "type": "string"
+                },
+                "securityEntranceStatus": {
                     "type": "string"
                 },
                 "serverPort": {
