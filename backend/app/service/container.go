@@ -198,8 +198,10 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
 	global.LOG.Infof("new container info %s has been made, now start to create", req.Name)
 
 	ctx := context.Background()
-	if err := pullImages(ctx, client, req.Image); err != nil {
-		return err
+	if !checkImageExist(client, req.Image) {
+		if err := pullImages(ctx, client, req.Image); err != nil {
+			return err
+		}
 	}
 	container, err := client.ContainerCreate(ctx, config, hostConf, &network.NetworkingConfig{}, &v1.Platform{}, req.Name)
 	if err != nil {
@@ -330,6 +332,23 @@ func calculateNetwork(network map[string]types.NetworkStats) (float64, float64) 
 		tx += float64(v.TxBytes) / 1024
 	}
 	return rx, tx
+}
+
+func checkImageExist(client *client.Client, image string) bool {
+	images, err := client.ImageList(context.Background(), types.ImageListOptions{})
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	for _, img := range images {
+		for _, tag := range img.RepoTags {
+			if tag == image || tag == image+":latest" {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func pullImages(ctx context.Context, client *client.Client, image string) error {
