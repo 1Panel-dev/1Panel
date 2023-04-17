@@ -8,6 +8,22 @@
                 },
             ]"
         />
+        <el-alert v-if="!isSafety" :closable="false" style="margin-top: 20px" type="warning">
+            <template #default>
+                <span>
+                    <span>{{ $t('home.entranceHelper') }}</span>
+                    <el-link
+                        style="font-size: 12px; margin-left: 5px"
+                        icon="Position"
+                        @click="goRouter('/settings/safe')"
+                        type="primary"
+                    >
+                        {{ $t('firewall.quickJump') }}
+                    </el-link>
+                </span>
+            </template>
+        </el-alert>
+
         <el-row :gutter="20" style="margin-top: 20px">
             <el-col :span="16">
                 <CardWithHeader :header="$t('home.overview')" height="146px">
@@ -109,7 +125,7 @@
 
                             <div v-if="chartOption === 'io'" style="margin-top: 40px">
                                 <v-charts
-                                    height="300px"
+                                    height="305px"
                                     id="ioChart"
                                     type="line"
                                     :option="chartsOption['ioChart']"
@@ -119,7 +135,7 @@
                             </div>
                             <div v-if="chartOption === 'network'" style="margin-top: 40px">
                                 <v-charts
-                                    height="300px"
+                                    height="305px"
                                     id="networkChart"
                                     type="line"
                                     :option="chartsOption['networkChart']"
@@ -210,13 +226,15 @@ import { useRouter } from 'vue-router';
 import RouterButton from '@/components/router-button/index.vue';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
-import { loadUpgradeInfo } from '@/api/modules/setting';
+import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 const router = useRouter();
 const globalStore = GlobalStore();
 
 const statuRef = ref();
 const appRef = ref();
+
+const isSafety = ref();
 
 const chartOption = ref('network');
 let timer: NodeJS.Timer | null = null;
@@ -482,7 +500,13 @@ const loadUpgradeStatus = async () => {
     }
 };
 
+const loadSafeStatus = async () => {
+    const res = await getSettingInfo();
+    isSafety.value = res.data.securityEntranceStatus === 'enable';
+};
+
 onMounted(() => {
+    loadSafeStatus();
     loadUpgradeStatus();
     onLoadNetworkOptions();
     onLoadIOOptions();
