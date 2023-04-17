@@ -1730,6 +1730,8 @@ definitions:
         type: boolean
       expireDate:
         type: string
+      group:
+        type: string
       httpConfig:
         type: string
       id:
@@ -1755,6 +1757,8 @@ definitions:
       type:
         type: string
       updatedAt:
+        type: string
+      user:
         type: string
       webSiteGroupId:
         type: integer
@@ -2562,6 +2566,19 @@ definitions:
     - id
     - siteDir
     type: object
+  request.WebsiteUpdateDirPermission:
+    properties:
+      group:
+        type: string
+      id:
+        type: integer
+      user:
+        type: string
+    required:
+    - group
+    - id
+    - user
+    type: object
   request.WebsiteWafReq:
     properties:
       key:
@@ -2818,6 +2835,8 @@ definitions:
         type: string
       expireDate:
         type: string
+      group:
+        type: string
       httpConfig:
         type: string
       id:
@@ -2847,6 +2866,8 @@ definitions:
       type:
         type: string
       updatedAt:
+        type: string
+      user:
         type: string
       webSiteGroupId:
         type: integer
@@ -3479,15 +3500,6 @@ paths:
           schema:
             $ref: '#/definitions/dto.UserLoginInfo'
       summary: User login with mfa
-      tags:
-      - Auth
-  /auth/status:
-    get:
-      description: 判断是否为首次登录
-      responses:
-        "200":
-          description: ""
-      summary: Check is First login
       tags:
       - Auth
   /containers:
@@ -8069,6 +8081,39 @@ paths:
         formatEN: Delete website [domain]
         formatZH: 删除网站 [domain]
         paramKeys: []
+  /websites/dir/permission:
+    post:
+      consumes:
+      - application/json
+      description: 更新网站目录权限
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.WebsiteUpdateDirPermission'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update Site Dir permission
+      tags:
+      - Website
+      x-panel-log:
+        BeforeFuntions:
+        - db: websites
+          input_colume: id
+          input_value: id
+          isList: false
+          output_colume: primary_domain
+          output_value: domain
+        bodyKeys:
+        - id
+        formatEN: Update  domain [domain] dir permission
+        formatZH: 更新网站 [domain] 目录权限
+        paramKeys: []
   /websites/dir/update:
     post:
       consumes:
@@ -8083,7 +8128,7 @@ paths:
           $ref: '#/definitions/request.WebsiteUpdateDir'
       responses:
         "200":
-          description: OK
+          description: ""
       security:
       - ApiKeyAuth: []
       summary: Update Site Dir

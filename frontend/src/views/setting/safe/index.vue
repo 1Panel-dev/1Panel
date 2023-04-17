@@ -36,7 +36,7 @@
                                     type="password"
                                     show-password
                                     clearable
-                                    v-model.number="form.securityEntrance"
+                                    v-model="form.securityEntrance"
                                 >
                                     <template #append>
                                         <el-button style="width: 85px" @click="onSaveEntrance" icon="Collection">
@@ -324,7 +324,7 @@ const handleEntrance = async () => {
 };
 
 const onSaveEntrance = async () => {
-    const reg = /^[A-Za-z0-9]{8}$/;
+    const reg = /^[A-Za-z0-9]{6,10}$/;
     if ((!reg.test(form.securityEntrance) && form.securityEntrance !== '') || form.securityEntrance === '') {
         codeError.value = true;
         return;

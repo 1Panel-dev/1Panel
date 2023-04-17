@@ -803,7 +803,7 @@ const message = {
         portChangeHelper: '服务端口修改需要重启服务，是否继续？',
         entrance: '安全入口',
         entranceHelper: '开启安全入口后只能通过指定安全入口登录面板',
-        entranceError: '请输入 8 位安全登录入口，仅支持输入数字或字母',
+        entranceError: '请输入 6-10 位安全登录入口，仅支持输入数字或字母',
         theme: '主题颜色',
         componentSize: '组件大小',
         dark: '暗色',
