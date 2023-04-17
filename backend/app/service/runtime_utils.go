@@ -8,7 +8,9 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"github.com/docker/cli/cli/command"
 	"github.com/subosito/gotenv"
+	"os"
 	"path"
 	"strings"
 )
@@ -87,7 +89,16 @@ func getComposeService(name, runtimeDir string, composeFile, env []byte, skipNor
 	if err != nil {
 		return nil, err
 	}
-	composeService, err := docker.NewComposeService()
+	logPath := path.Join(runtimeDir, "build.log")
+	fileOp := files.NewFileOp()
+	if fileOp.Stat(logPath) {
+		_ = fileOp.DeleteFile(logPath)
+	}
+	file, err := os.Create(logPath)
+	if err != nil {
+		return nil, err
+	}
+	composeService, err := docker.NewComposeService(command.WithOutputStream(file))
 	if err != nil {
 		return nil, err
 	}

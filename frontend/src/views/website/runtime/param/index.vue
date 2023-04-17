@@ -6,6 +6,8 @@
                 v-if="p.type == 'select'"
                 :multiple="p.multiple"
                 filterable
+                allow-create
+                default-first-option
                 @change="updateParam"
             >
                 <el-option
@@ -31,6 +33,7 @@ interface ParamObj extends App.FromField {
     disabled: false;
     childProp: string;
 }
+
 const props = defineProps({
     form: {
         type: Object,

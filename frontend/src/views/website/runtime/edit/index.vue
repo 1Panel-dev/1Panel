@@ -6,6 +6,8 @@
                 v-if="p.type == 'select'"
                 :multiple="p.multiple"
                 filterable
+                allow-create
+                default-first-option
                 @change="updateParam"
             >
                 <el-option
