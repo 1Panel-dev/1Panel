@@ -10,6 +10,7 @@ const i18n = createI18n({
         zh,
         en,
     },
+    warnHtmlMessage: false,
 });
 
 export default i18n;
