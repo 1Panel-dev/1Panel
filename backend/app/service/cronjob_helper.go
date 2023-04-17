@@ -29,7 +29,7 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 			if len(cronjob.Script) == 0 {
 				return
 			}
-			stdout, errExec := cmd.Exec(cronjob.Script)
+			stdout, errExec := cmd.ExecWithTimeOut(cronjob.Script, 5*time.Minute)
 			if errExec != nil {
 				err = errExec
 			}
@@ -48,7 +48,7 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 			if len(cronjob.URL) == 0 {
 				return
 			}
-			stdout, errCurl := cmd.Exec("curl " + cronjob.URL)
+			stdout, errCurl := cmd.ExecWithTimeOut("curl "+cronjob.URL, 5*time.Minute)
 			if err != nil {
 				err = errCurl
 			}
@@ -170,7 +170,7 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 
 	commands := fmt.Sprintf("tar zcvf %s %s %s", targetDir+"/"+name, excludeRules, path)
 	global.LOG.Debug(commands)
-	stdout, err := cmd.Exec(commands)
+	stdout, err := cmd.ExecWithTimeOut(commands, 5*time.Minute)
 	if err != nil {
 		global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
 		return errors.New(stdout)
@@ -187,7 +187,7 @@ func handleUnTar(sourceFile, targetDir string) error {
 
 	commands := fmt.Sprintf("tar zxvfC %s %s", sourceFile, targetDir)
 	global.LOG.Debug(commands)
-	stdout, err := cmd.Exec(commands)
+	stdout, err := cmd.ExecWithTimeOut(commands, 5*time.Minute)
 	if err != nil {
 		global.LOG.Errorf("do handle untar failed, stdout: %s, err: %v", stdout, err)
 		return errors.New(stdout)

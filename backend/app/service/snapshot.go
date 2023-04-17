@@ -854,7 +854,7 @@ func (u *SnapshotService) handleTar(sourceDir, targetDir, name, exclusionRules s
 
 	commands := fmt.Sprintf("tar --warning=no-file-changed -zcf %s %s -C %s .", targetDir+"/"+name, exStr, sourceDir)
 	global.LOG.Debug(commands)
-	stdout, err := cmd.Exec(commands)
+	stdout, err := cmd.ExecWithTimeOut(commands, 10*time.Minute)
 	if err != nil {
 		global.LOG.Errorf("do handle tar failed, stdout: %s, err: %v", stdout, err)
 		return errors.New(stdout)
@@ -871,7 +871,7 @@ func (u *SnapshotService) handleUnTar(sourceDir, targetDir string) error {
 
 	commands := fmt.Sprintf("tar -zxf %s -C %s .", sourceDir, targetDir)
 	global.LOG.Debug(commands)
-	stdout, err := cmd.Exec(commands)
+	stdout, err := cmd.ExecWithTimeOut(commands, 10*time.Minute)
 	if err != nil {
 		global.LOG.Errorf("do handle untar failed, stdout: %s, err: %v", stdout, err)
 		return errors.New(stdout)
