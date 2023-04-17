@@ -1,9 +1,10 @@
 package router
 
 import (
-	"github.com/gin-contrib/gzip"
 	"html/template"
 	"net/http"
+
+	"github.com/gin-contrib/gzip"
 
 	v1 "github.com/1Panel-dev/1Panel/backend/app/api/v1"
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -39,9 +40,6 @@ func setWebStatic(rootRouter *gin.Engine) {
 
 func Routers() *gin.Engine {
 	Router := gin.Default()
-
-	docs.SwaggerInfo.BasePath = "/api/v1"
-	Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	Router.Use(middleware.OperationLog())
 	// Router.Use(middleware.CSRF())
