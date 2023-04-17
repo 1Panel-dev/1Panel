@@ -8,7 +8,7 @@
                     <input type="password" class="hide" id="password" />
                     <el-form-item prop="name" class="no-border">
                         <el-input
-                            v-model="registerForm.name"
+                            v-model.trim="registerForm.name"
                             :placeholder="$t('commons.login.username')"
                             autocomplete="off"
                             type="text"
@@ -24,7 +24,7 @@
                         <el-input
                             type="password"
                             clearable
-                            v-model="registerForm.password"
+                            v-model.trim="registerForm.password"
                             show-password
                             :placeholder="$t('commons.login.password')"
                             name="passwod"
@@ -41,7 +41,7 @@
                         <el-input
                             type="password"
                             clearable
-                            v-model="registerForm.rePassword"
+                            v-model.trim="registerForm.rePassword"
                             show-password
                             :placeholder="$t('commons.login.rePassword')"
                         >
@@ -111,7 +111,7 @@
 
                     <el-form-item prop="name" class="no-border">
                         <el-input
-                            v-model="loginForm.name"
+                            v-model.trim="loginForm.name"
                             :placeholder="$t('commons.login.username')"
                             class="form-input"
                         >
@@ -126,7 +126,7 @@
                         <el-input
                             type="password"
                             clearable
-                            v-model="loginForm.password"
+                            v-model.trim="loginForm.password"
                             show-password
                             :placeholder="$t('commons.login.password')"
                         >
@@ -141,7 +141,11 @@
                         </span>
                     </el-form-item>
                     <el-form-item prop="captcha" class="login-captcha">
-                        <el-input v-model="loginForm.captcha" :placeholder="$t('commons.login.captchaHelper')" />
+                        <el-input v-model.trim="loginForm.captcha" :placeholder="$t('commons.login.captchaHelper')">
+                            <template #prefix>
+                                <svg-icon style="font-size: 7px" iconName="p-yanzhengma1"></svg-icon>
+                            </template>
+                        </el-input>
                         <img
                             v-if="captcha.imagePath"
                             :src="captcha.imagePath"
@@ -168,7 +172,10 @@
                     <el-form-item prop="agreeLicense">
                         <el-checkbox v-model="loginForm.agreeLicense">
                             <template #default>
-                                <span v-html="$t('commons.login.licenseHelper')"></span>
+                                <span
+                                    style="white-space: pre-wrap; line-height: 14px"
+                                    v-html="$t('commons.login.licenseHelper')"
+                                ></span>
                             </template>
                         </el-checkbox>
                         <span
@@ -421,6 +428,12 @@ onMounted(() => {
     }
 
     .login-captcha {
+        :deep(.el-input__wrapper) {
+            background: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            border-bottom: 1px solid #dcdfe6;
+        }
         margin-top: 10px;
         .el-input {
             width: 50%;
