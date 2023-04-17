@@ -73,7 +73,7 @@ func createIndexFile(website *model.Website, runtime *model.Runtime) error {
 			return err
 		}
 	}
-	if runtime.Resource == constant.ResourceAppstore {
+	if website.Type == constant.Runtime && runtime.Resource == constant.ResourceAppstore {
 		if err := chownRootDir(indexFolder); err != nil {
 			return err
 		}

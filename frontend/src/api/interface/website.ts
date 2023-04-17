@@ -294,4 +294,9 @@ export namespace Website {
         name: string;
         content: string;
     }
+
+    export interface DirUpdate {
+        id: number;
+        siteDir: string;
+    }
 }
