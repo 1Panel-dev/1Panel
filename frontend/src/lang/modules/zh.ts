@@ -224,6 +224,7 @@ const message = {
     },
     home: {
         overview: '概览',
+        entranceHelper: '设置安全入口有利于提高系统的安全性，如有需要，前往 面板设置-安全 中，启用安全入口',
         appInstalled: '已安装应用',
         systemInfo: '系统信息',
         hostname: '主机名称',

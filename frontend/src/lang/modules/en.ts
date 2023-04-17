@@ -221,6 +221,8 @@ const message = {
     },
     home: {
         overview: 'Overview',
+        entranceHelper:
+            'Enabling a secure entrance can help improve system security. If necessary, go to the Control Panel settings, select Security, and enable the secure entrance.',
         appInstalled: 'App installed',
         systemInfo: 'System info',
         hostname: 'Hostname',
