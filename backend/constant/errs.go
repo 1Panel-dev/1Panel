@@ -114,3 +114,7 @@ var (
 	ErrImageExist     = "ErrImageExist"
 	ErrDelWithWebsite = "ErrDelWithWebsite"
 )
+
+var (
+	ErrBackupInUsed = "ErrBackupInUsed"
+)
