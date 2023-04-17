@@ -1288,7 +1288,8 @@ const message = {
         version: '版本',
         status: '状态',
         versionHelper: 'PHP的版本,例如 v8.0',
-        buildHelper: '选择的扩展越多，制作镜像过程中占用 CPU 越多，请尽量避免选择全部扩展',
+        buildHelper:
+            '选择的扩展越多，制作镜像过程中占用 CPU 越多，请尽量避免选择全部扩展，如果没有想要的扩展，可以手动输入之后选择',
         openrestryWarn: 'PHP 需要升级  OpenResty 至 1.21.4.1 版本以上才能使用',
         toupgrade: '去升级',
     },
