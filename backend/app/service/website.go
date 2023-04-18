@@ -999,7 +999,7 @@ func (w WebsiteService) UpdateRewriteConfig(req request.NginxRewriteUpdate) erro
 	if err != nil {
 		return err
 	}
-	includePath := fmt.Sprintf("/www/sites/%s/rewrite/%s.conf", website.PrimaryDomain, website.PrimaryDomain)
+	includePath := fmt.Sprintf("/www/sites/%s/rewrite/%s.conf", website.Alias, website.PrimaryDomain)
 	absolutePath := path.Join(nginxFull.Install.GetPath(), includePath)
 	fileOp := files.NewFileOp()
 	var oldRewriteContent []byte
@@ -1041,7 +1041,7 @@ func (w WebsiteService) GetRewriteConfig(req request.NginxRewriteReq) (*response
 		if err != nil {
 			return nil, err
 		}
-		rewriteConfPath := path.Join(nginxInstall.GetPath(), "www", "sites", website.PrimaryDomain, "rewrite", fmt.Sprintf("%s.conf", website.PrimaryDomain))
+		rewriteConfPath := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "rewrite", fmt.Sprintf("%s.conf", website.PrimaryDomain))
 		fileOp := files.NewFileOp()
 		if fileOp.Stat(rewriteConfPath) {
 			contentByte, err = fileOp.GetContent(rewriteConfPath)
@@ -1087,7 +1087,7 @@ func (w WebsiteService) UpdateSitePermission(req request.WebsiteUpdateDirPermiss
 	if err != nil {
 		return err
 	}
-	absoluteIndexPath := path.Join(nginxInstall.GetPath(), "www", "sites", website.PrimaryDomain, "index")
+	absoluteIndexPath := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "index")
 	if website.SiteDir != "/" {
 		absoluteIndexPath = path.Join(absoluteIndexPath, website.SiteDir)
 	}
