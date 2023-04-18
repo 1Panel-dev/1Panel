@@ -17,6 +17,11 @@ func Init() {
 		global.LOG.Errorf("load service encrypt key from setting failed, err: %v", err)
 	}
 	global.CONF.System.EncryptKey = enptrySetting.Value
+	sslSetting, err := settingRepo.Get(settingRepo.WithByKey("SSL"))
+	if err != nil {
+		global.LOG.Errorf("load service ssl from setting failed, err: %v", err)
+	}
+	global.CONF.System.SSL = sslSetting.Value
 
 	if _, err := settingRepo.Get(settingRepo.WithByKey("SystemStatus")); err != nil {
 		_ = settingRepo.Create("SystemStatus", "Free")

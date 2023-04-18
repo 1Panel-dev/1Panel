@@ -28,6 +28,10 @@ export const updatePort = (param: Setting.PortUpdate) => {
     return http.post(`/settings/port/update`, param);
 };
 
+export const updateSSL = (param: Setting.SSLUpdate) => {
+    return http.post(`/settings/ssl/update`, param);
+};
+
 export const handleExpired = (param: Setting.PasswordUpdate) => {
     return http.post(`/settings/expired/handle`, param);
 };

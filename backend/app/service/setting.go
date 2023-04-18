@@ -2,6 +2,8 @@ package service
 
 import (
 	"encoding/json"
+	"fmt"
+	"os"
 	"strconv"
 	"time"
 
@@ -12,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,6 +26,7 @@ type ISettingService interface {
 	UpdateEntrance(value string) error
 	UpdatePassword(c *gin.Context, old, new string) error
 	UpdatePort(port uint) error
+	UpdateSSL(req dto.SSLUpdate) error
 	HandlePasswordExpired(c *gin.Context, old, new string) error
 }
 
@@ -106,6 +110,63 @@ func (u *SettingService) UpdatePort(port uint) error {
 		_, err := cmd.Exec("systemctl restart 1panel.service")
 		if err != nil {
 			global.LOG.Errorf("restart system port failed, err: %v", err)
+		}
+	}()
+	return nil
+}
+
+func (u *SettingService) UpdateSSL(req dto.SSLUpdate) error {
+	if req.SSL == "disable" {
+		if err := settingRepo.Update("SSL", "disable"); err != nil {
+			return err
+		}
+		if err := settingRepo.Update("SSLType", "self"); err != nil {
+			return err
+		}
+		_ = os.Remove(fmt.Sprintf("%s/1panel/secret/cert.pem", global.CONF.System.BaseDir))
+		_ = os.Remove(fmt.Sprintf("%s/1panel/secret/key.pem", global.CONF.System.BaseDir))
+		go func() {
+			_, err := cmd.Exec("systemctl restart 1panel.service")
+			if err != nil {
+				global.LOG.Errorf("restart system failed, err: %v", err)
+			}
+		}()
+		return nil
+	}
+
+	switch req.SSLType {
+	case "self":
+		if err := ssl.GenerateSSL(); err != nil {
+			return err
+		}
+	case "import":
+		cert, err := os.OpenFile("/opt/1panel/secret/cert.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+		if err != nil {
+			return err
+		}
+		defer cert.Close()
+		if _, err := cert.WriteString(req.Cert); err != nil {
+			return err
+		}
+		key, err := os.OpenFile("/opt/1panel/secret/cert.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+		if err != nil {
+			return err
+		}
+		if _, err := key.WriteString(req.Key); err != nil {
+			return err
+		}
+		defer key.Close()
+	}
+	if err := settingRepo.Update("SSL", req.SSL); err != nil {
+		return err
+	}
+	if err := settingRepo.Update("SSLType", req.SSLType); err != nil {
+		return err
+	}
+	go func() {
+		_, err := cmd.Exec("systemctl restart 1panel.service")
+		if err != nil {
+			global.LOG.Errorf("restart system failed, err: %v", err)
 		}
 	}()
 	return nil

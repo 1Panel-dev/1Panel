@@ -120,6 +120,33 @@ func (b *BaseApi) UpdatePassword(c *gin.Context) {
 }
 
 // @Tags System Setting
+// @Summary Update system ssl
+// @Description 修改系统 ssl 登录
+// @Accept json
+// @Param request body dto.SSLUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/ssl/update [post]
+// @x-panel-log {"bodyKeys":[ssl],"paramKeys":[],"BeforeFuntions":[],"formatZH":"修改系统 ssl => [ssl]","formatEN":"update system ssl => [ssl]"}
+func (b *BaseApi) UpdateSSL(c *gin.Context) {
+	var req dto.SSLUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := settingService.UpdateSSL(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags System Setting
 // @Summary Update system port
 // @Description 更新系统端口
 // @Accept json

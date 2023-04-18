@@ -43,22 +43,24 @@ func Start() {
 
 	rootRouter := router.Routers()
 	address := fmt.Sprintf(":%s", global.CONF.System.Port)
-	s := initServer(address, rootRouter)
-	global.LOG.Infof("server run success on %s", global.CONF.System.Port)
-	if err := s.ListenAndServe(); err != nil {
-		global.LOG.Error(err)
-		panic(err)
-	}
-}
-
-type server interface {
-	ListenAndServe() error
-}
-
-func initServer(address string, router *gin.Engine) server {
-	s := endless.NewServer(address, router)
+	s := endless.NewServer(address, rootRouter)
 	s.ReadHeaderTimeout = 20 * time.Second
 	s.WriteTimeout = 60 * time.Second
 	s.MaxHeaderBytes = 1 << 20
-	return s
+	global.LOG.Infof("server run success on %s", global.CONF.System.Port)
+
+	if global.CONF.System.SSL == "disable" {
+		if err := s.ListenAndServe(); err != nil {
+			global.LOG.Error(err)
+			panic(err)
+		}
+	} else {
+		if err := s.ListenAndServeTLS(
+			fmt.Sprintf("%s/1panel/secret/cert.pem", global.CONF.System.BaseDir),
+			fmt.Sprintf("%s/1panel/secret/key.pem", global.CONF.System.BaseDir),
+		); err != nil {
+			global.LOG.Error(err)
+			panic(err)
+		}
+	}
 }
