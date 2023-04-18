@@ -163,6 +163,7 @@ const getDirs = async () => {
     loading.value = true;
     await GetFilesList(dirReq)
         .then((res) => {
+            dirs.value = [];
             const items = res.data.items || [];
             for (const item of items) {
                 dirs.value.push(item.name);
