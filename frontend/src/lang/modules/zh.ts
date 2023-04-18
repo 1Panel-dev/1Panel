@@ -1172,7 +1172,10 @@ const message = {
         runDir: '运行目录',
         runDirHelper: '部分程序需要指定二级目录作为运行目录，如ThinkPHP5，Laravel',
         runUserHelper:
-            '通过 PHP 运行环境部署的网站，需要将 index 和子目录下的所有文件、文件夹所有者和用户组设置为 1000，命令：chown -R 1000:1000 index',
+            '通过 PHP 运行环境部署的网站，需要将 index 和子目录下的所有文件、文件夹所有者和用户组设置为 1000',
+        userGroup: '运行用户/组',
+        user: '用户',
+        uGroup: '用户组',
     },
     php: {
         short_open_tag: '短标签支持',

@@ -428,6 +428,9 @@ const message = {
         remoteConn: 'External connection address',
         remoteConnHelper2: 'Use this address for non-container or external connections',
         localIP: 'Local IP',
+        userGroup: 'User/Group',
+        user: 'User',
+        uGroup: 'Group',
     },
     container: {
         createContainer: 'Create container',

@@ -26,6 +26,9 @@ type Website struct {
 	RuntimeID      uint `gorm:"type:integer" json:"runtimeID"`
 	AppInstallID   uint `gorm:"type:integer" json:"appInstallId"`
 
+	User  string `gorm:"type:varchar;" json:"user"`
+	Group string `gorm:"type:varchar;" json:"group"`
+
 	Domains    []WebsiteDomain `json:"domains" gorm:"-:migration"`
 	WebsiteSSL WebsiteSSL      `json:"webSiteSSL" gorm:"-:migration"`
 }

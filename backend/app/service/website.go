@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/cmd/server/nginx_conf"
 	"gorm.io/gorm"
 	"os"
@@ -62,6 +63,7 @@ type IWebsiteService interface {
 	GetRewriteConfig(req request.NginxRewriteReq) (*response.NginxRewriteRes, error)
 	UpdateRewriteConfig(req request.NginxRewriteUpdate) error
 	UpdateSiteDir(req request.WebsiteUpdateDir) error
+	UpdateSitePermission(req request.WebsiteUpdateDirPermission) error
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -1073,5 +1075,27 @@ func (w WebsiteService) UpdateSiteDir(req request.WebsiteUpdateDir) error {
 		return err
 	}
 	website.SiteDir = runDir
+	return websiteRepo.Save(context.Background(), &website)
+}
+
+func (w WebsiteService) UpdateSitePermission(req request.WebsiteUpdateDirPermission) error {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	absoluteIndexPath := path.Join(nginxInstall.GetPath(), "www", "sites", website.PrimaryDomain, "index")
+	if website.SiteDir != "/" {
+		absoluteIndexPath = path.Join(absoluteIndexPath, website.SiteDir)
+	}
+	chownCmd := fmt.Sprintf("chown -R %s:%s %s", req.User, req.Group, absoluteIndexPath)
+	if _, err := cmd.ExecWithTimeOut(chownCmd, 1*time.Second); err != nil {
+		return err
+	}
+	website.User = req.User
+	website.Group = req.Group
 	return websiteRepo.Save(context.Background(), &website)
 }
