@@ -1,60 +1,70 @@
 <template>
     <div v-loading="loading">
-        <el-row :gutter="20">
-            <el-col :span="14" :offset="1">
-                <br />
-                <el-descriptions :column="1" border>
-                    <el-descriptions-item :label="$t('website.siteAlias')">{{ website.alias }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('website.primaryPath')">
+        <div class="site-form-wrapper">
+            <el-form class="site-form" ref="siteForm" :model="update" label-width="100px">
+                <el-form-item :label="$t('website.siteAlias')">
+                    {{ website.alias }}
+                </el-form-item>
+                <el-form-item :label="$t('website.primaryPath')">
+                    <el-space wrap>
                         {{ website.sitePath }}
                         <el-button type="primary" link @click="toFolder(website.sitePath)">
-                            <el-icon><FolderOpened /></el-icon>
+                            <el-icon>
+                                <FolderOpened />
+                            </el-icon>
                         </el-button>
-                    </el-descriptions-item>
-                </el-descriptions>
-                <div v-if="configDir">
-                    <br />
-                    <el-form :inline="true" ref="siteForm" :model="update">
-                        <el-form-item :label="$t('website.runDir')" prop="runDir">
-                            <el-select v-model="update.siteDir">
-                                <el-option :label="'/'" :value="'/'"></el-option>
-                                <el-option
-                                    v-for="(item, index) in dirs"
-                                    :label="item"
-                                    :value="item"
-                                    :key="index"
-                                ></el-option>
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button type="primary" @click="submit(siteForm)">
-                                {{ $t('nginx.saveAndReload') }}
-                            </el-button>
-                        </el-form-item>
-                    </el-form>
-                    <el-form-item>
-                        <el-alert :closable="false">
-                            <template #default>
-                                <span class="warnHelper">{{ $t('website.runDirHelper') }}</span>
-                            </template>
-                        </el-alert>
-                    </el-form-item>
-                </div>
-                <br />
-                <el-descriptions :title="$t('website.folderTitle')" :column="1" border>
-                    <el-descriptions-item label="waf">{{ $t('website.wafFolder') }}</el-descriptions-item>
-                    <el-descriptions-item label="ssl">{{ $t('website.sslFolder') }}</el-descriptions-item>
-                    <el-descriptions-item label="log">{{ $t('website.logFoler') }}</el-descriptions-item>
-                    <el-descriptions-item label="index">{{ $t('website.indexFolder') }}</el-descriptions-item>
-                </el-descriptions>
-                <br />
+                    </el-space>
+                </el-form-item>
+                <el-form-item v-if="configDir" :label="$t('website.runDir')" prop="runDir">
+                    <el-space wrap>
+                        <el-select v-model="update.siteDir">
+                            <el-option :label="'/'" :value="'/'"></el-option>
+                            <el-option
+                                v-for="(item, index) in dirs"
+                                :label="item"
+                                :value="item"
+                                :key="index"
+                            ></el-option>
+                        </el-select>
+                        <el-button type="primary" @click="submit(siteForm)">
+                            {{ $t('nginx.saveAndReload') }}
+                        </el-button>
+                    </el-space>
+                </el-form-item>
+                <el-form-item label="运行用户/组" prop="runDir">
+                    <el-space wrap>
+                        <el-input v-model="update.siteDir" class="user-num-input">
+                            <template #prepend>用户</template>
+                        </el-input>
+                        <el-input v-model="update.siteDir" class="user-num-input">
+                            <template #prepend>用户组</template>
+                        </el-input>
+                        <el-button type="primary" @click="submit(siteForm)">保存</el-button>
+                    </el-space>
+                </el-form-item>
+            </el-form>
+            <el-form-item>
                 <el-alert :closable="false">
                     <template #default>
-                        <span class="warnHelper">{{ $t('website.runUserHelper') }}</span>
+                        <span class="warnHelper">{{ $t('website.runDirHelper') }}</span>
                     </template>
                 </el-alert>
-            </el-col>
-        </el-row>
+            </el-form-item>
+
+            <br />
+            <el-descriptions :title="$t('website.folderTitle')" :column="1" border>
+                <el-descriptions-item label="waf">{{ $t('website.wafFolder') }}</el-descriptions-item>
+                <el-descriptions-item label="ssl">{{ $t('website.sslFolder') }}</el-descriptions-item>
+                <el-descriptions-item label="log">{{ $t('website.logFoler') }}</el-descriptions-item>
+                <el-descriptions-item label="index">{{ $t('website.indexFolder') }}</el-descriptions-item>
+            </el-descriptions>
+            <br />
+            <el-alert :closable="false">
+                <template #default>
+                    <span class="warnHelper">{{ $t('website.runUserHelper') }}</span>
+                </template>
+            </el-alert>
+        </div>
     </div>
 </template>
 <script lang="ts" setup>
@@ -160,7 +170,21 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+.site-form-wrapper {
+    min-width: 600px;
+    width: 60%;
+    padding: 20px;
+}
+.site-form {
+    :deep(.el-form-item__label) {
+        padding-right: 20px !important;
+        box-sizing: content-box;
+    }
+    .user-num-input {
+        width: 190px;
+    }
+}
 .warnHelper {
     white-space: pre-line;
     display: block;
