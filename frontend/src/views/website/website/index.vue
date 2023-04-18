@@ -314,6 +314,7 @@ const submitDate = (row: any) => {
     UpdateWebsite(req).then(() => {
         row.change = true;
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+        search();
     });
 };
 
