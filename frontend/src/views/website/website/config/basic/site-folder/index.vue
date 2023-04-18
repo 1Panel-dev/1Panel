@@ -15,7 +15,7 @@
                         </el-button>
                     </el-space>
                 </el-form-item>
-                <el-form-item v-if="configDir" :label="$t('website.runDir')" prop="runDir">
+                <el-form-item v-if="configDir" :label="$t('website.runDir')">
                     <el-space wrap>
                         <el-select v-model="update.siteDir">
                             <el-option :label="'/'" :value="'/'"></el-option>
@@ -31,26 +31,26 @@
                         </el-button>
                     </el-space>
                 </el-form-item>
-                <el-form-item label="运行用户/组" prop="runDir">
+                <el-form-item :label="$t('website.userGroup')">
                     <el-space wrap>
-                        <el-input v-model="update.siteDir" class="user-num-input">
-                            <template #prepend>用户</template>
+                        <el-input v-model="updatePermission.user" class="user-num-input">
+                            <template #prepend>{{ $t('website.user') }}</template>
                         </el-input>
-                        <el-input v-model="update.siteDir" class="user-num-input">
-                            <template #prepend>用户组</template>
+                        <el-input v-model="updatePermission.group" class="user-num-input">
+                            <template #prepend>{{ $t('website.uGroup') }}</template>
                         </el-input>
-                        <el-button type="primary" @click="submit(siteForm)">保存</el-button>
+                        <el-button type="primary" @click="submitPermission()">
+                            {{ $t('commons.button.save') }}
+                        </el-button>
                     </el-space>
                 </el-form-item>
             </el-form>
-            <el-form-item>
-                <el-alert :closable="false">
-                    <template #default>
-                        <span class="warnHelper">{{ $t('website.runDirHelper') }}</span>
-                    </template>
-                </el-alert>
-            </el-form-item>
-
+            <el-alert :closable="false">
+                <template #default>
+                    <span class="warnHelper">{{ $t('website.runDirHelper') }}</span>
+                    <span class="warnHelper">{{ $t('website.runUserHelper') }}</span>
+                </template>
+            </el-alert>
             <br />
             <el-descriptions :title="$t('website.folderTitle')" :column="1" border>
                 <el-descriptions-item label="waf">{{ $t('website.wafFolder') }}</el-descriptions-item>
@@ -58,18 +58,12 @@
                 <el-descriptions-item label="log">{{ $t('website.logFoler') }}</el-descriptions-item>
                 <el-descriptions-item label="index">{{ $t('website.indexFolder') }}</el-descriptions-item>
             </el-descriptions>
-            <br />
-            <el-alert :closable="false">
-                <template #default>
-                    <span class="warnHelper">{{ $t('website.runUserHelper') }}</span>
-                </template>
-            </el-alert>
         </div>
     </div>
 </template>
 <script lang="ts" setup>
 import { GetFilesList } from '@/api/modules/files';
-import { GetWebsite, UpdateWebsiteDir } from '@/api/modules/website';
+import { GetWebsite, UpdateWebsiteDir, UpdateWebsiteDirPermission } from '@/api/modules/website';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
@@ -93,6 +87,11 @@ const update = reactive({
     id: 0,
     siteDir: '/',
 });
+const updatePermission = reactive({
+    id: 0,
+    user: '1000',
+    group: '1000',
+});
 const siteForm = ref<FormInstance>();
 const dirReq = reactive({
     path: '/',
@@ -113,6 +112,9 @@ const search = () => {
             website.value = res.data;
             update.id = website.value.id;
             update.siteDir = website.value.siteDir;
+            updatePermission.id = website.value.id;
+            updatePermission.group = website.value.group === '' ? '1000' : website.value.group;
+            updatePermission.user = website.value.user === '' ? '1000' : website.value.user;
             if (website.value.type === 'static' || website.value.runtimeID > 0) {
                 configDir.value = true;
                 dirReq.path = website.value.sitePath + '/index';
@@ -140,6 +142,21 @@ const submit = async (formEl: FormInstance | undefined) => {
                 loading.value = false;
             });
     });
+};
+
+const submitPermission = async () => {
+    if (updatePermission.user === '' || updatePermission.group === '') {
+        return;
+    }
+    loading.value = true;
+    UpdateWebsiteDirPermission(updatePermission)
+        .then(() => {
+            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+            search();
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 const getDirs = async () => {

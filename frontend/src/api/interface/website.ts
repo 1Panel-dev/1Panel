@@ -18,6 +18,8 @@ export namespace Website {
         webSiteSSL: SSL;
         runtimeID: number;
         rewrite: string;
+        user: string;
+        group: string;
     }
 
     export interface WebsiteDTO extends Website {
@@ -298,5 +300,11 @@ export namespace Website {
     export interface DirUpdate {
         id: number;
         siteDir: string;
+    }
+
+    export interface DirPermissionUpdate {
+        id: number;
+        user: string;
+        group: string;
     }
 }

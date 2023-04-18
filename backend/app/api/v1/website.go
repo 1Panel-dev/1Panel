@@ -626,3 +626,25 @@ func (b *BaseApi) UpdateSiteDir(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Website
+// @Summary Update Site Dir permission
+// @Description 更新网站目录权限
+// @Accept json
+// @Param request body request.WebsiteUpdateDirPermission true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/dir/permission [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"更新网站 [domain] 目录权限","formatEN":"Update  domain [domain] dir permission"}
+func (b *BaseApi) UpdateSiteDirPermission(c *gin.Context) {
+	var req request.WebsiteUpdateDirPermission
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.UpdateSitePermission(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
