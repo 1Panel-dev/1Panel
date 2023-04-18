@@ -422,6 +422,12 @@ const message = {
         rdbHelper2: 'The data',
         rdbHelper3: 'Meeting either condition triggers RDB persistence',
         rdbInfo: 'Ensure that the value in the rule list ranges from 1 to 100000',
+
+        containerConn: 'Container connection address',
+        containerConnHelper: 'PHP runtime environment/container-installed applications use this connection address',
+        remoteConn: 'External connection address',
+        remoteConnHelper2: 'Use this address for non-container or external connections',
+        localIP: 'Local IP',
     },
     container: {
         createContainer: 'Create container',
@@ -1174,6 +1180,8 @@ const message = {
         runDir: 'Run Directory',
         runDirHelper:
             'Some programs need to specify a secondary directory as the running directory, such as ThinkPHP5, Laravel',
+        runUserHelper:
+            'For websites deployed through the PHP runtime environment, all files, folder owners, and user groups under the index and subdirectories need to be set to 1000, command: chown -R 1000:1000 index',
     },
     php: {
         short_open_tag: 'Short tag support',

@@ -141,6 +141,7 @@ func (a *AppInstallService) LoadConnInfo(key string) (response.DatabaseConn, err
 	}
 	data.Password = app.Password
 	data.ServiceName = app.ServiceName
+	data.Port = app.Port
 	return data, nil
 }
 

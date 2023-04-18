@@ -9,7 +9,7 @@
                     <el-form-item :label="$t('database.rootPassword')" :rules="Rules.requiredInput" prop="password">
                         <el-input type="password" show-password clearable v-model="form.password">
                             <template #append>
-                                <el-button @click="copy" icon="DocumentCopy"></el-button>
+                                <el-button @click="copy(form.password)" icon="DocumentCopy"></el-button>
                                 <el-button style="margin-left: 1px" @click="random" icon="RefreshRight"></el-button>
                             </template>
                         </el-input>
@@ -17,6 +17,19 @@
                     <el-form-item :label="$t('database.serviceName')" prop="serviceName">
                         <el-tag>{{ form.serviceName }}</el-tag>
                         <span class="input-help">{{ $t('database.serviceNameHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item :label="$t('database.containerConn')">
+                        <el-tag>
+                            {{ form.serviceName + ':3306' }}
+                        </el-tag>
+                        <el-button @click="copy(form.serviceName + ':3306')" icon="DocumentCopy" link></el-button>
+                        <span class="input-help">
+                            {{ $t('database.containerConnHelper') }}
+                        </span>
+                    </el-form-item>
+                    <el-form-item :label="$t('database.remoteConn')">
+                        <el-tag>{{ $t('database.localIP') + ':' + form.port }}</el-tag>
+                        <span class="input-help">{{ $t('database.remoteConnHelper2') }}</span>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -56,6 +69,7 @@ const dialogVisiable = ref(false);
 const form = ref<App.DatabaseConnInfo>({
     password: '',
     serviceName: '',
+    port: 0,
 });
 
 const confirmDialogRef = ref();
@@ -73,9 +87,9 @@ const random = async () => {
     form.value.password = getRandomStr(16);
 };
 
-const copy = async () => {
+const copy = async (value: string) => {
     let input = document.createElement('input');
-    input.value = form.value.password;
+    input.value = value;
     document.body.appendChild(input);
     input.select();
     document.execCommand('Copy');

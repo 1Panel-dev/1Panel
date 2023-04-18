@@ -431,6 +431,12 @@ const message = {
         rdbHelper2: '条数据',
         rdbHelper3: '符合任意一个条件将会触发RDB持久化',
         rdbInfo: '请确认规则列表中值在 1-100000 之间',
+
+        containerConn: '容器连接地址',
+        containerConnHelper: 'PHP 运行环境/容器安装的应用使用此连接地址',
+        remoteConn: '外部连接地址',
+        remoteConnHelper2: '非容器或外部连接使用此地址',
+        localIP: '本机 IP',
     },
     container: {
         createContainer: '创建容器',
@@ -1165,6 +1171,8 @@ const message = {
         rewriteHelper: '若设置伪静态后，网站无法正常访问，请尝试设置回default',
         runDir: '运行目录',
         runDirHelper: '部分程序需要指定二级目录作为运行目录，如ThinkPHP5，Laravel',
+        runUserHelper:
+            '通过 PHP 运行环境部署的网站，需要将 index 和子目录下的所有文件、文件夹所有者和用户组设置为 1000，命令：chown -R 1000:1000 index',
     },
     php: {
         short_open_tag: '短标签支持',
