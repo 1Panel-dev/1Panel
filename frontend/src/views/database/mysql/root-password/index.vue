@@ -16,6 +16,7 @@
                     </el-form-item>
                     <el-form-item :label="$t('database.serviceName')" prop="serviceName">
                         <el-tag>{{ form.serviceName }}</el-tag>
+                        <el-button @click="copy(form.serviceName)" icon="DocumentCopy" link></el-button>
                         <span class="input-help">{{ $t('database.serviceNameHelper') }}</span>
                     </el-form-item>
                     <el-form-item :label="$t('database.containerConn')">
