@@ -12,12 +12,34 @@
                         </el-button>
                     </el-descriptions-item>
                 </el-descriptions>
-                <br />
-                <el-alert :closable="false">
-                    <template #default>
-                        <span class="warnHelper">{{ $t('website.runUserHelper') }}</span>
-                    </template>
-                </el-alert>
+                <div v-if="configDir">
+                    <br />
+                    <el-form :inline="true" ref="siteForm" :model="update">
+                        <el-form-item :label="$t('website.runDir')" prop="runDir">
+                            <el-select v-model="update.siteDir">
+                                <el-option :label="'/'" :value="'/'"></el-option>
+                                <el-option
+                                    v-for="(item, index) in dirs"
+                                    :label="item"
+                                    :value="item"
+                                    :key="index"
+                                ></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="submit(siteForm)">
+                                {{ $t('nginx.saveAndReload') }}
+                            </el-button>
+                        </el-form-item>
+                    </el-form>
+                    <el-form-item>
+                        <el-alert :closable="false">
+                            <template #default>
+                                <span class="warnHelper">{{ $t('website.runDirHelper') }}</span>
+                            </template>
+                        </el-alert>
+                    </el-form-item>
+                </div>
                 <br />
                 <el-descriptions :title="$t('website.folderTitle')" :column="1" border>
                     <el-descriptions-item label="waf">{{ $t('website.wafFolder') }}</el-descriptions-item>
@@ -25,32 +47,12 @@
                     <el-descriptions-item label="log">{{ $t('website.logFoler') }}</el-descriptions-item>
                     <el-descriptions-item label="index">{{ $t('website.indexFolder') }}</el-descriptions-item>
                 </el-descriptions>
-            </el-col>
-            <el-col :span="14" :offset="1" v-if="configDir">
                 <br />
-                <el-form :inline="true" ref="siteForm" :model="update">
-                    <el-form-item :label="$t('website.runDir')" prop="runDir">
-                        <el-select v-model="update.siteDir">
-                            <el-option :label="'/'" :value="'/'"></el-option>
-                            <el-option
-                                v-for="(item, index) in dirs"
-                                :label="item"
-                                :value="item"
-                                :key="index"
-                            ></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button type="primary" @click="submit(siteForm)">{{ $t('nginx.saveAndReload') }}</el-button>
-                    </el-form-item>
-                </el-form>
-                <el-form-item>
-                    <el-alert :closable="false">
-                        <template #default>
-                            <span class="warnHelper">{{ $t('website.runDirHelper') }}</span>
-                        </template>
-                    </el-alert>
-                </el-form-item>
+                <el-alert :closable="false">
+                    <template #default>
+                        <span class="warnHelper">{{ $t('website.runUserHelper') }}</span>
+                    </template>
+                </el-alert>
             </el-col>
         </el-row>
     </div>
