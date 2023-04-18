@@ -13,7 +13,12 @@
                     </el-descriptions-item>
                 </el-descriptions>
                 <br />
-
+                <el-alert :closable="false">
+                    <template #default>
+                        <span class="warnHelper">{{ $t('website.runUserHelper') }}</span>
+                    </template>
+                </el-alert>
+                <br />
                 <el-descriptions :title="$t('website.folderTitle')" :column="1" border>
                     <el-descriptions-item label="waf">{{ $t('website.wafFolder') }}</el-descriptions-item>
                     <el-descriptions-item label="ssl">{{ $t('website.sslFolder') }}</el-descriptions-item>
@@ -42,7 +47,7 @@
                 <el-form-item>
                     <el-alert :closable="false">
                         <template #default>
-                            <span style="white-space: pre-line">{{ $t('website.runDirHelper') }}</span>
+                            <span class="warnHelper">{{ $t('website.runDirHelper') }}</span>
                         </template>
                     </el-alert>
                 </el-form-item>
@@ -152,3 +157,10 @@ onMounted(() => {
     search();
 });
 </script>
+
+<style scoped>
+.warnHelper {
+    white-space: pre-line;
+    display: block;
+}
+</style>

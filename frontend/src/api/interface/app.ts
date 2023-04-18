@@ -130,6 +130,7 @@ export namespace App {
     export interface DatabaseConnInfo {
         password: string;
         serviceName: string;
+        port: number;
     }
     export interface AppInstallResource {
         type: string;

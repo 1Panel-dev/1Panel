@@ -59,6 +59,7 @@ type AppInstalledDTO struct {
 type DatabaseConn struct {
 	Password    string `json:"password"`
 	ServiceName string `json:"serviceName"`
+	Port        int64  `json:"port"`
 }
 
 type AppService struct {
