@@ -49,6 +49,12 @@ type SSLUpdate struct {
 	Key     string `json:"key"`
 	SSLID   uint   `json:"sslID"`
 }
+type SSLInfo struct {
+	Domain   string `json:"domain"`
+	Subject  string `json:"subject"`
+	Timeout  string `json:"timeout"`
+	RootPath string `json:"rootPath"`
+}
 
 type PasswordUpdate struct {
 	OldPassword string `json:"oldPassword" validate:"required"`

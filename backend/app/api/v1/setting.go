@@ -139,11 +139,26 @@ func (b *BaseApi) UpdateSSL(c *gin.Context) {
 		return
 	}
 
-	if err := settingService.UpdateSSL(req); err != nil {
+	if err := settingService.UpdateSSL(c, req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
 	helper.SuccessWithData(c, nil)
+}
+
+// @Tags System Setting
+// @Summary Load system cert info
+// @Description 获取证书信息
+// @Success 200 {object} dto.SettingInfo
+// @Security ApiKeyAuth
+// @Router /settings/ssl/info [get]
+func (b *BaseApi) LoadFromCert(c *gin.Context) {
+	info, err := settingService.LoadFromCert()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, info)
 }
 
 // @Tags System Setting

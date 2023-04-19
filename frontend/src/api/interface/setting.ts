@@ -44,6 +44,12 @@ export namespace Setting {
         key: string;
         sslID: number;
     }
+    export interface SSLInfo {
+        domain: string;
+        subject: string;
+        timeout: string;
+        rootPath: string;
+    }
     export interface PasswordUpdate {
         oldPassword: string;
         newPassword: string;

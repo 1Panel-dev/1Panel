@@ -909,6 +909,8 @@ const message = {
         mfaHelper1: '下载两步验证手机应用 如:',
         mfaHelper2: '使用手机应用扫描以下二维码，获取 6 位验证码',
         mfaHelper3: '输入手机应用上的 6 位数字',
+        sslDisable: '禁用',
+        sslDisableHelper: '禁用 https 服务，需要重启面板才能生效，是否继续！',
 
         monitor: '监控',
         enableMonitor: '监控状态',

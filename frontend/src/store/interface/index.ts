@@ -19,6 +19,7 @@ export interface GlobalState {
     isFullScreen: boolean;
     agreeLicense: boolean;
     hasNewVersion: boolean;
+    isSSL: boolean;
 }
 
 export interface MenuState {

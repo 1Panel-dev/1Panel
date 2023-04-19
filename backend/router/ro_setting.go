@@ -25,6 +25,7 @@ func (s *SettingRouter) InitSettingRouter(Router *gin.RouterGroup) {
 		settingRouter.POST("/entrance/enable", baseApi.UpdateEntrance)
 		settingRouter.POST("/port/update", baseApi.UpdatePort)
 		settingRouter.POST("/ssl/update", baseApi.UpdateSSL)
+		settingRouter.GET("/ssl/info", baseApi.LoadFromCert)
 		settingRouter.POST("/password/update", baseApi.UpdatePassword)
 		settingRouter.POST("/time/sync", baseApi.SyncTime)
 		settingRouter.POST("/monitor/clean", baseApi.CleanMonitor)

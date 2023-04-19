@@ -12,12 +12,15 @@ import DefineOptions from 'unplugin-vue-define-options/vite';
 import AutoImport from 'unplugin-auto-import/vite';
 import Components from 'unplugin-vue-components/vite';
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
+import fs from 'fs';
 
 const prefix = `monaco-editor/esm/vs`;
 
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     const env = loadEnv(mode, process.cwd());
     const viteEnv = wrapperEnv(env);
+    const privateKey = fs.readFileSync('/opt/1panel/secret/key.pem');
+    const certificate = fs.readFileSync('/opt/1panel/secret/cert.pem');
 
     return {
         resolve: {
@@ -37,12 +40,22 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
             port: viteEnv.VITE_PORT,
             open: viteEnv.VITE_OPEN,
             host: '0.0.0.0',
+            https: {
+                key: privateKey,
+                cert: certificate,
+            },
             proxy: {
                 '/api/v1': {
-                    target: 'http://localhost:9999/',
+                    target: 'https://localhost:9999/',
                     changeOrigin: true,
                     ws: true,
+                    secure: true,
                 },
+                // '/apis/v1': {
+                //     target: 'https://localhost:9999/',
+                //     changeOrigin: true,
+                //     ws: true,
+                // },
             },
         },
         plugins: [

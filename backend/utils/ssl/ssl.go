@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func GenerateSSL() error {
+func GenerateSSL(domain []string) error {
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		return err
@@ -22,10 +22,11 @@ func GenerateSSL() error {
 		Subject: pkix.Name{
 			Country:      []string{"CN"},
 			Organization: []string{"FIT2CLOUD"},
-			CommonName:   "1panel.cn",
+			CommonName:   "1Panel",
 		},
+		DNSNames:              domain,
 		NotBefore:             time.Now(),
-		NotAfter:              time.Now().Add(365 * 24 * time.Hour),
+		NotAfter:              time.Now().AddDate(10, 0, 0),
 		BasicConstraintsValid: true,
 	}
 
