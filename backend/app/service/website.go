@@ -1092,7 +1092,13 @@ func (w WebsiteService) UpdateSitePermission(req request.WebsiteUpdateDirPermiss
 		absoluteIndexPath = path.Join(absoluteIndexPath, website.SiteDir)
 	}
 	chownCmd := fmt.Sprintf("chown -R %s:%s %s", req.User, req.Group, absoluteIndexPath)
-	if _, err := cmd.ExecWithTimeOut(chownCmd, 1*time.Second); err != nil {
+	if cmd.HasNoPasswordSudo() {
+		chownCmd = fmt.Sprintf("sudo %s", chownCmd)
+	}
+	if out, err := cmd.ExecWithTimeOut(chownCmd, 1*time.Second); err != nil {
+		if out != "" {
+			return errors.New(out)
+		}
 		return err
 	}
 	website.User = req.User
