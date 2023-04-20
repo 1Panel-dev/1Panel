@@ -369,7 +369,7 @@ func (u *FirewallService) pingStatus() string {
 		return constant.StatusNone
 	}
 	commond := "cat /etc/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= "
-	if cmd.HasSudo() {
+	if cmd.HasNoPasswordSudo() {
 		commond = "sudo cat /etc/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= "
 	}
 	stdout, _ := cmd.Exec(commond)
@@ -409,7 +409,7 @@ func (u *FirewallService) updatePingStatus(enabel string) error {
 	}
 
 	commond := "sysctl -p"
-	if cmd.HasSudo() {
+	if cmd.HasNoPasswordSudo() {
 		commond = "sudo sysctl -p"
 	}
 	stdout, err := cmd.Exec(commond)
