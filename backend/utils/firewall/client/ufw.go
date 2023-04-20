@@ -26,18 +26,19 @@ func (f *Ufw) Name() string {
 }
 
 func (f *Ufw) Status() (string, error) {
-	stdout, err := cmd.Execf("%s status | grep Status", f.CmdStr)
-	if err != nil {
-		return "", fmt.Errorf("load the firewall status failed, err: %s", stdout)
-	}
+	stdout, _ := cmd.Execf("%s status | grep Status", f.CmdStr)
 	if stdout == "Status: active\n" {
+		return "running", nil
+	}
+	stdout1, _ := cmd.Execf("%s status | grep 状态", f.CmdStr)
+	if stdout1 == "状态： 激活\n" {
 		return "running", nil
 	}
 	return "not running", nil
 }
 
 func (f *Ufw) Version() (string, error) {
-	stdout, err := cmd.Execf("%s version | grep ufw", f.CmdStr)
+	stdout, err := cmd.Execf("%s version | grep ufwHasNoPasswordSudo", f.CmdStr)
 	if err != nil {
 		return "", fmt.Errorf("load the firewall status failed, err: %s", stdout)
 	}
