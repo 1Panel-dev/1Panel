@@ -70,7 +70,7 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Host } from '@/api/interface/host';
 import { operatePortRule, updatePortRule } from '@/api/modules/host';
-import { checkPort, deepCopy } from '@/utils/util';
+import { checkIp, checkPort, deepCopy } from '@/utils/util';
 
 const loading = ref();
 const oldRule = ref<Host.RulePort>();
@@ -107,7 +107,7 @@ const handleClose = () => {
 const rules = reactive({
     protocol: [Rules.requiredSelect],
     port: [Rules.requiredInput],
-    address: [Rules.ip],
+    address: [Rules.requiredInput],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -121,6 +121,18 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (!dialogData.value.rowData) return;
         if (dialogData.value.rowData.source === 'anyWhere') {
             dialogData.value.rowData.address = '';
+        } else {
+            if (dialogData.value.rowData.address.indexOf('/') !== -1) {
+                if (checkIp(dialogData.value.rowData.address.split('/')[0])) {
+                    MsgError(i18n.global.t('firewall.addressFormatError'));
+                    return;
+                }
+            } else {
+                if (checkIp(dialogData.value.rowData.address)) {
+                    MsgError(i18n.global.t('firewall.addressFormatError'));
+                    return;
+                }
+            }
         }
         let ports = [];
         if (dialogData.value.rowData.port.indexOf('-') !== -1 && !dialogData.value.rowData.port.startsWith('-')) {

@@ -100,11 +100,3 @@ func HasNoPasswordSudo() bool {
 	err2 := cmd2.Run()
 	return err2 == nil
 }
-
-func HasSudo() bool {
-	cmd := exec.Command("sudo", "-nv")
-	if err := cmd.Run(); err != nil {
-		return false
-	}
-	return true
-}
