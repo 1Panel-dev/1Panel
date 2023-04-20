@@ -7,10 +7,18 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
 
-type Ufw struct{}
+type Ufw struct {
+	CmdStr string
+}
 
 func NewUfw() (*Ufw, error) {
-	return &Ufw{}, nil
+	var ufw Ufw
+	if cmd.HasSudo() {
+		ufw.CmdStr = "sudo ufw"
+	} else {
+		ufw.CmdStr = "ufw"
+	}
+	return &ufw, nil
 }
 
 func (f *Ufw) Name() string {
@@ -18,7 +26,7 @@ func (f *Ufw) Name() string {
 }
 
 func (f *Ufw) Status() (string, error) {
-	stdout, err := cmd.Exec("sudo ufw status | grep Status")
+	stdout, err := cmd.Execf("%s status | grep Status", f.CmdStr)
 	if err != nil {
 		return "", fmt.Errorf("load the firewall status failed, err: %s", stdout)
 	}
@@ -29,7 +37,7 @@ func (f *Ufw) Status() (string, error) {
 }
 
 func (f *Ufw) Version() (string, error) {
-	stdout, err := cmd.Exec("sudo ufw version | grep ufw")
+	stdout, err := cmd.Execf("%s version | grep ufw", f.CmdStr)
 	if err != nil {
 		return "", fmt.Errorf("load the firewall status failed, err: %s", stdout)
 	}
@@ -38,7 +46,7 @@ func (f *Ufw) Version() (string, error) {
 }
 
 func (f *Ufw) Start() error {
-	stdout, err := cmd.Exec("echo y | sudo ufw enable")
+	stdout, err := cmd.Execf("echo y | %s enable", f.CmdStr)
 	if err != nil {
 		return fmt.Errorf("enable the firewall failed, err: %s", stdout)
 	}
@@ -46,7 +54,7 @@ func (f *Ufw) Start() error {
 }
 
 func (f *Ufw) Stop() error {
-	stdout, err := cmd.Exec("sudo ufw disable")
+	stdout, err := cmd.Execf("%s disable", f.CmdStr)
 	if err != nil {
 		return fmt.Errorf("stop the firewall failed, err: %s", stdout)
 	}
@@ -58,7 +66,7 @@ func (f *Ufw) Reload() error {
 }
 
 func (f *Ufw) ListPort() ([]FireInfo, error) {
-	stdout, err := cmd.Exec("sudo ufw  status verbose")
+	stdout, err := cmd.Execf("%s status verbose", f.CmdStr)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +91,7 @@ func (f *Ufw) ListPort() ([]FireInfo, error) {
 }
 
 func (f *Ufw) ListAddress() ([]FireInfo, error) {
-	stdout, err := cmd.Exec("sudo ufw  status verbose")
+	stdout, err := cmd.Execf("%s status verbose", f.CmdStr)
 	if err != nil {
 		return nil, err
 	}
@@ -123,9 +131,9 @@ func (f *Ufw) Port(port FireInfo, operation string) error {
 		return fmt.Errorf("unsupport strategy %s", port.Strategy)
 	}
 
-	command := fmt.Sprintf("sudo ufw %s %s", port.Strategy, port.Port)
+	command := fmt.Sprintf("%s %s %s", f.CmdStr, port.Strategy, port.Port)
 	if operation == "remove" {
-		command = fmt.Sprintf("sudo ufw delete %s %s", port.Strategy, port.Port)
+		command = fmt.Sprintf("%s delete %s %s", f.CmdStr, port.Strategy, port.Port)
 	}
 	if len(port.Protocol) != 0 {
 		command += fmt.Sprintf("/%s", port.Protocol)
@@ -147,9 +155,9 @@ func (f *Ufw) RichRules(rule FireInfo, operation string) error {
 		return fmt.Errorf("unsupport strategy %s", rule.Strategy)
 	}
 
-	ruleStr := fmt.Sprintf("sudo ufw %s ", rule.Strategy)
+	ruleStr := fmt.Sprintf("%s %s ", f.CmdStr, rule.Strategy)
 	if operation == "remove" {
-		ruleStr = fmt.Sprintf("sudo ufw delete %s ", rule.Strategy)
+		ruleStr = fmt.Sprintf("%s delete %s ", f.CmdStr, rule.Strategy)
 	}
 	if len(rule.Protocol) != 0 {
 		ruleStr += fmt.Sprintf("proto %s ", rule.Protocol)
