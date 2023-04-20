@@ -62,9 +62,15 @@
                                     v-model="form.registries"
                                 />
                             </el-form-item>
+                            <el-form-item label="iptables" prop="iptables">
+                                <el-switch v-model="form.iptables"></el-switch>
+                            </el-form-item>
                             <el-form-item label="live-restore" prop="liveRestore">
-                                <el-switch v-model="form.liveRestore"></el-switch>
+                                <el-switch :disabled="form.isSwarm" v-model="form.liveRestore"></el-switch>
                                 <span class="input-help">{{ $t('container.liveHelper') }}</span>
+                                <span v-if="form.isSwarm" class="input-help">
+                                    {{ $t('container.liveWithSwarmHelper') }}
+                                </span>
                             </el-form-item>
                             <el-form-item label="cgroup-driver" prop="cgroupDriver">
                                 <el-radio-group v-model="form.cgroupDriver">
@@ -148,11 +154,13 @@ const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
 
 const form = reactive({
+    isSwarm: false,
     status: '',
     version: '',
     mirrors: '',
     registries: '',
     liveRestore: false,
+    iptables: true,
     cgroupDriver: '',
 });
 
@@ -180,7 +188,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
 const onSaveFile = async () => {
     let params = {
         header: i18n.global.t('database.confChange'),
-        operationInfo: i18n.global.t('database.restartNowHelper1'),
+        operationInfo: i18n.global.t('database.restartNowHelper'),
         submitInputInfo: i18n.global.t('database.restartNow'),
     };
     confirmDialogRef.value!.acceptParams(params);
@@ -246,6 +254,7 @@ const onSubmitSave = async () => {
     let itemMirrors = form.mirrors.split('\n');
     let itemRegistries = form.registries.split('\n');
     let param = {
+        isSwarm: form.isSwarm,
         status: form.status,
         version: '',
         registryMirrors: itemMirrors.filter(function (el) {
@@ -255,6 +264,7 @@ const onSubmitSave = async () => {
             return el !== null && el !== '' && el !== undefined;
         }),
         liveRestore: form.liveRestore,
+        iptables: form.iptables,
         cgroupDriver: form.cgroupDriver,
     };
     loading.value = true;
@@ -289,10 +299,12 @@ const changeMode = async () => {
 
 const search = async () => {
     const res = await loadDaemonJson();
+    form.isSwarm = res.data.isSwarm;
     form.status = res.data.status;
     form.version = res.data.version;
     form.cgroupDriver = res.data.cgroupDriver;
     form.liveRestore = res.data.liveRestore;
+    form.iptables = res.data.iptables;
     form.mirrors = res.data.registryMirrors ? res.data.registryMirrors.join('\n') : '';
     form.registries = res.data.insecureRegistries ? res.data.insecureRegistries.join('\n') : '';
 };

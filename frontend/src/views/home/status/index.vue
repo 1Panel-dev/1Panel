@@ -60,45 +60,48 @@
             </el-popover>
             <span class="input-help">{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
         </el-col>
-        <el-col :span="6" align="center">
-            <el-popover placement="bottom" :width="260" trigger="hover">
+        <el-col :span="6" align="center" v-for="(item, index) of currentInfo.diskData" :key="index">
+            <el-popover placement="bottom" :width="300" trigger="hover">
                 <el-row :gutter="5">
                     <el-col :span="12">
-                        <el-tag>{{ $t('home.mount') }}: /</el-tag>
-                        <div><el-tag class="tagClass">iNode</el-tag></div>
-                        <el-tag class="tagClass">{{ $t('home.total') }}: {{ currentInfo.inodesTotal }}</el-tag>
-                        <el-tag class="tagClass">{{ $t('home.used') }}: {{ currentInfo.inodesUsed }}</el-tag>
-                        <el-tag class="tagClass">{{ $t('home.free') }}: {{ currentInfo.inodesFree }}</el-tag>
+                        <el-tag style="font-weight: 500">{{ $t('home.baseInfo') }}:</el-tag>
+                        <el-tag class="tagClass">{{ $t('home.mount') }}: {{ item.path }}</el-tag>
+                        <el-tag class="tagClass">{{ $t('commons.table.type') }}: {{ item.type }}</el-tag>
+                        <el-tag class="tagClass">{{ $t('home.fileSystem') }}: {{ item.device }}</el-tag>
+                        <div><el-tag class="tagClass" style="font-weight: 500">Inode:</el-tag></div>
+                        <el-tag class="tagClass">{{ $t('home.total') }}: {{ item.inodesTotal }}</el-tag>
+                        <el-tag class="tagClass">{{ $t('home.used') }}: {{ item.inodesUsed }}</el-tag>
+                        <el-tag class="tagClass">{{ $t('home.free') }}: {{ item.inodesFree }}</el-tag>
                         <el-tag class="tagClass">
-                            {{ $t('home.percent') }}: {{ formatNumber(currentInfo.inodesUsedPercent) }}%
+                            {{ $t('home.percent') }}: {{ formatNumber(item.inodesUsedPercent) }}%
                         </el-tag>
                     </el-col>
 
                     <el-col :span="12">
                         <div>
-                            <el-tag style="margin-top: 27px">{{ $t('monitor.disk') }}</el-tag>
+                            <el-tag style="margin-top: 108px; font-weight: 500">{{ $t('monitor.disk') }}:</el-tag>
                         </div>
                         <el-tag class="tagClass">
-                            {{ $t('home.total') }}: {{ formatNumber(currentInfo.total / 1024 / 1024 / 1024) }} GB
+                            {{ $t('home.total') }}: {{ formatNumber(item.total / 1024 / 1024 / 1024) }} GB
                         </el-tag>
                         <el-tag class="tagClass">
-                            {{ $t('home.used') }}: {{ formatNumber(currentInfo.used / 1024 / 1024 / 1024) }} GB
+                            {{ $t('home.used') }}: {{ formatNumber(item.used / 1024 / 1024 / 1024) }} GB
                         </el-tag>
                         <el-tag class="tagClass">
-                            {{ $t('home.free') }}: {{ formatNumber(currentInfo.free / 1024 / 1024 / 1024) }} GB
+                            {{ $t('home.free') }}: {{ formatNumber(item.free / 1024 / 1024 / 1024) }} GB
                         </el-tag>
                         <el-tag class="tagClass">
-                            {{ $t('home.percent') }}: {{ formatNumber(currentInfo.usedPercent) }}%
+                            {{ $t('home.percent') }}: {{ formatNumber(item.usedPercent) }}%
                         </el-tag>
                     </el-col>
                 </el-row>
                 <template #reference>
-                    <div id="disk" class="chartClass"></div>
+                    <div :id="`disk${index}`" class="chartClass"></div>
                 </template>
             </el-popover>
             <span class="input-help">
-                ( {{ formatNumber(currentInfo.used / 1024 / 1024 / 1024) }} /
-                {{ formatNumber(currentInfo.total / 1024 / 1024 / 1024) }} ) GB
+                ( {{ formatNumber(item.used / 1024 / 1024 / 1024) }} /
+                {{ formatNumber(item.total / 1024 / 1024 / 1024) }} ) GB
             </span>
         </el-col>
     </el-row>
@@ -108,18 +111,11 @@
 import { Dashboard } from '@/api/interface/dashboard';
 import i18n from '@/lang';
 import * as echarts from 'echarts';
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
 const baseInfo = ref<Dashboard.BaseInfo>({
-    haloID: 0,
-    dateeaseID: 0,
-    jumpserverID: 0,
-    metersphereID: 0,
-    kubeoperatorID: 0,
-    kubepiID: 0,
-
     websiteNumber: 0,
     databaseNumber: 0,
     cronjobNumber: 0,
@@ -161,18 +157,11 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
 
     ioReadBytes: 0,
     ioWriteBytes: 0,
-    ioTime: 0,
     ioCount: 0,
+    ioReadTime: 0,
+    ioWriteTime: 0,
 
-    total: 0,
-    free: 0,
-    used: 0,
-    usedPercent: 0,
-
-    inodesTotal: 0,
-    inodesUsed: 0,
-    inodesFree: 0,
-    inodesUsedPercent: 0,
+    diskData: [],
 
     netBytesSent: 0,
     netBytesRecv: 0,
@@ -185,7 +174,15 @@ const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo):
     freshChart('cpu', 'CPU', formatNumber(currentInfo.value.cpuUsedPercent));
     freshChart('memory', i18n.global.t('monitor.memory'), formatNumber(currentInfo.value.MemoryUsedPercent));
     freshChart('load', i18n.global.t('home.load'), formatNumber(currentInfo.value.loadUsagePercent));
-    freshChart('disk', i18n.global.t('monitor.disk'), formatNumber(currentInfo.value.usedPercent));
+    nextTick(() => {
+        for (let i = 0; i < currentInfo.value.diskData.length; i++) {
+            freshChart(
+                'disk' + i,
+                currentInfo.value.diskData[i].path,
+                formatNumber(currentInfo.value.diskData[i].usedPercent),
+            );
+        }
+    });
 };
 
 const freshChart = (chartName: string, Title: string, Data: number) => {

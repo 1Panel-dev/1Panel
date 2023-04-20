@@ -5,12 +5,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
@@ -31,10 +33,12 @@ type IAppService interface {
 	PageApp(req request.AppSearch) (interface{}, error)
 	GetAppTags() ([]response.TagDTO, error)
 	GetApp(key string) (*response.AppDTO, error)
-	GetAppDetail(appId uint, version string) (response.AppDetailDTO, error)
+	GetAppDetail(appId uint, version, appType string) (response.AppDetailDTO, error)
 	Install(ctx context.Context, req request.AppInstallCreate) (*model.AppInstall, error)
-	SyncAppList() error
+	SyncAppListFromRemote() error
 	GetAppUpdate() (*response.AppUpdateRes, error)
+	GetAppDetailByID(id uint) (*response.AppDetailDTO, error)
+	SyncAppListFromLocal()
 }
 
 func NewIAppService() IAppService {
@@ -137,7 +141,7 @@ func (a AppService) GetApp(key string) (*response.AppDTO, error) {
 	return &appDTO, nil
 }
 
-func (a AppService) GetAppDetail(appId uint, version string) (response.AppDetailDTO, error) {
+func (a AppService) GetAppDetail(appId uint, version, appType string) (response.AppDetailDTO, error) {
 	var (
 		appDetailDTO response.AppDetailDTO
 		opts         []repo.DBOption
@@ -147,13 +151,54 @@ func (a AppService) GetAppDetail(appId uint, version string) (response.AppDetail
 	if err != nil {
 		return appDetailDTO, err
 	}
-	paramMap := make(map[string]interface{})
-	if err := json.Unmarshal([]byte(detail.Params), &paramMap); err != nil {
-		return appDetailDTO, err
-	}
 	appDetailDTO.AppDetail = detail
-	appDetailDTO.Params = paramMap
 	appDetailDTO.Enable = true
+
+	if appType == "runtime" {
+		app, err := appRepo.GetFirst(commonRepo.WithByID(appId))
+		if err != nil {
+			return appDetailDTO, err
+		}
+		fileOp := files.NewFileOp()
+		buildPath := path.Join(constant.AppResourceDir, app.Key, "versions", detail.Version, "build")
+		paramsPath := path.Join(buildPath, "config.json")
+		if !fileOp.Stat(paramsPath) {
+			return appDetailDTO, buserr.New(constant.ErrFileNotExist)
+		}
+		param, err := fileOp.GetContent(paramsPath)
+		if err != nil {
+			return appDetailDTO, err
+		}
+		paramMap := make(map[string]interface{})
+		if err := json.Unmarshal(param, &paramMap); err != nil {
+			return appDetailDTO, err
+		}
+		appDetailDTO.Params = paramMap
+		composePath := path.Join(buildPath, "docker-compose.yml")
+		if !fileOp.Stat(composePath) {
+			return appDetailDTO, buserr.New(constant.ErrFileNotExist)
+		}
+		compose, err := fileOp.GetContent(composePath)
+		if err != nil {
+			return appDetailDTO, err
+		}
+		composeMap := make(map[string]interface{})
+		if err := yaml.Unmarshal(compose, &composeMap); err != nil {
+			return appDetailDTO, err
+		}
+		if service, ok := composeMap["services"]; ok {
+			servicesMap := service.(map[string]interface{})
+			for k := range servicesMap {
+				appDetailDTO.Image = k
+			}
+		}
+	} else {
+		paramMap := make(map[string]interface{})
+		if err := json.Unmarshal([]byte(detail.Params), &paramMap); err != nil {
+			return appDetailDTO, err
+		}
+		appDetailDTO.Params = paramMap
+	}
 
 	app, err := appRepo.GetFirst(commonRepo.WithByID(detail.AppId))
 	if err != nil {
@@ -164,54 +209,75 @@ func (a AppService) GetAppDetail(appId uint, version string) (response.AppDetail
 	}
 	return appDetailDTO, nil
 }
+func (a AppService) GetAppDetailByID(id uint) (*response.AppDetailDTO, error) {
+	res := &response.AppDetailDTO{}
+	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return nil, err
+	}
+	res.AppDetail = appDetail
+	paramMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(appDetail.Params), &paramMap); err != nil {
+		return nil, err
+	}
+	res.Params = paramMap
+	return res, nil
+}
 
-func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (*model.AppInstall, error) {
+func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (appInstall *model.AppInstall, err error) {
+	if err = docker.CreateDefaultDockerNetwork(); err != nil {
+		err = buserr.WithDetail(constant.Err1PanelNetworkFailed, err.Error(), nil)
+		return
+	}
 	if list, _ := appInstallRepo.ListBy(commonRepo.WithByName(req.Name)); len(list) > 0 {
-		return nil, buserr.New(constant.ErrNameIsExist)
+		err = buserr.New(constant.ErrNameIsExist)
+		return
 	}
-	httpPort, err := checkPort("PANEL_APP_PORT_HTTP", req.Params)
+	var (
+		httpPort  int
+		httpsPort int
+		appDetail model.AppDetail
+		app       model.App
+	)
+	httpPort, err = checkPort("PANEL_APP_PORT_HTTP", req.Params)
+	if err != nil {
+		return
+	}
+	httpsPort, err = checkPort("PANEL_APP_PORT_HTTPS", req.Params)
+	if err != nil {
+		return
+	}
+	appDetail, err = appDetailRepo.GetFirst(commonRepo.WithByID(req.AppDetailId))
+	if err != nil {
+		return
+	}
+	app, err = appRepo.GetFirst(commonRepo.WithByID(appDetail.AppId))
 	if err != nil {
 		return nil, err
 	}
-	httpsPort, err := checkPort("PANEL_APP_PORT_HTTPS", req.Params)
-	if err != nil {
-		return nil, err
-	}
-	appDetail, err := appDetailRepo.GetFirst(commonRepo.WithByID(req.AppDetailId))
-	if err != nil {
-		return nil, err
-	}
-	app, err := appRepo.GetFirst(commonRepo.WithByID(appDetail.AppId))
-	if err != nil {
-		return nil, err
-	}
-	if err := checkRequiredAndLimit(app); err != nil {
-		return nil, err
+	if err = checkRequiredAndLimit(app); err != nil {
+		return
 	}
 
-	paramByte, err := json.Marshal(req.Params)
-	if err != nil {
-		return nil, err
-	}
-	appInstall := model.AppInstall{
+	appInstall = &model.AppInstall{
 		Name:        req.Name,
 		AppId:       appDetail.AppId,
 		AppDetailId: appDetail.ID,
 		Version:     appDetail.Version,
 		Status:      constant.Installing,
-		Env:         string(paramByte),
 		HttpPort:    httpPort,
 		HttpsPort:   httpsPort,
 		App:         app,
 	}
 	composeMap := make(map[string]interface{})
-	if err := yaml.Unmarshal([]byte(appDetail.DockerCompose), &composeMap); err != nil {
-		return nil, err
+	if err = yaml.Unmarshal([]byte(appDetail.DockerCompose), &composeMap); err != nil {
+		return
 	}
 
 	value, ok := composeMap["services"]
 	if !ok {
-		return nil, buserr.New("")
+		err = buserr.New("")
+		return
 	}
 	servicesMap := value.(map[string]interface{})
 	changeKeys := make(map[string]string, len(servicesMap))
@@ -232,30 +298,59 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		servicesMap[v] = servicesMap[k]
 		delete(servicesMap, k)
 	}
-	composeByte, err := yaml.Marshal(composeMap)
+
+	var (
+		composeByte []byte
+		paramByte   []byte
+	)
+
+	composeByte, err = yaml.Marshal(composeMap)
 	if err != nil {
-		return nil, err
+		return
 	}
 	appInstall.DockerCompose = string(composeByte)
 
-	if err := copyAppData(app.Key, appDetail.Version, req.Name, req.Params); err != nil {
-		return nil, err
-	}
+	defer func() {
+		if err != nil {
+			hErr := handleAppInstallErr(ctx, appInstall)
+			if hErr != nil {
+				global.LOG.Errorf("delete app dir error %s", hErr.Error())
+			}
+		}
+	}()
 
+	if err = copyAppData(app.Key, appDetail.Version, req.Name, req.Params, app.Resource == constant.AppResourceLocal); err != nil {
+		return
+	}
 	fileOp := files.NewFileOp()
-	if err := fileOp.WriteFile(appInstall.GetComposePath(), strings.NewReader(string(composeByte)), 0775); err != nil {
-		return nil, err
+	if err = fileOp.WriteFile(appInstall.GetComposePath(), strings.NewReader(string(composeByte)), 0775); err != nil {
+		return
 	}
+	paramByte, err = json.Marshal(req.Params)
+	if err != nil {
+		return
+	}
+	appInstall.Env = string(paramByte)
 
-	if err := appInstallRepo.Create(ctx, &appInstall); err != nil {
-		return nil, err
+	if err = appInstallRepo.Create(ctx, appInstall); err != nil {
+		return
 	}
-	if err := createLink(ctx, app, &appInstall, req.Params); err != nil {
-		return nil, err
+	if err = createLink(ctx, app, appInstall, req.Params); err != nil {
+		return
 	}
-	go upApp(appInstall.GetComposePath(), appInstall)
+	if err = upAppPre(app, appInstall); err != nil {
+		return
+	}
+	go upApp(appInstall)
 	go updateToolApp(appInstall)
-	return &appInstall, nil
+	ports := []int{appInstall.HttpPort}
+	if appInstall.HttpsPort > 0 {
+		ports = append(ports, appInstall.HttpsPort)
+	}
+	go func() {
+		_ = OperateFirewallPort(nil, ports)
+	}()
+	return
 }
 
 func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
@@ -268,12 +363,11 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 	}
 	versionUrl := fmt.Sprintf("%s/%s/%s/appstore/apps.json", global.CONF.System.RepoUrl, global.CONF.System.Mode, setting.SystemVersion)
 	versionRes, err := http.Get(versionUrl)
-	global.LOG.Infof("get current version from [%s]", versionUrl)
 	if err != nil {
 		return nil, err
 	}
 	defer versionRes.Body.Close()
-	body, err := ioutil.ReadAll(versionRes.Body)
+	body, err := io.ReadAll(versionRes.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -290,7 +384,155 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 	return res, nil
 }
 
-func (a AppService) SyncAppList() error {
+func (a AppService) SyncAppListFromLocal() {
+	fileOp := files.NewFileOp()
+	appDir := constant.LocalAppResourceDir
+	listFile := path.Join(appDir, "list.json")
+	if !fileOp.Stat(listFile) {
+		return
+	}
+	global.LOG.Infof("start sync local apps...")
+	content, err := fileOp.GetContent(listFile)
+	if err != nil {
+		global.LOG.Errorf("get list.json content failed %s", err.Error())
+		return
+	}
+	list := &dto.AppList{}
+	if err := json.Unmarshal(content, list); err != nil {
+		global.LOG.Errorf("unmarshal list.json failed %s", err.Error())
+		return
+	}
+	oldApps, _ := appRepo.GetBy(appRepo.WithResource(constant.AppResourceLocal))
+	appsMap := getApps(oldApps, list.Items, true)
+	for _, l := range list.Items {
+		localKey := "local" + l.Key
+		app := appsMap[localKey]
+		icon, err := os.ReadFile(path.Join(appDir, l.Key, "metadata", "logo.png"))
+		if err != nil {
+			global.LOG.Errorf("get [%s] icon error: %s", l.Name, err.Error())
+			continue
+		}
+		iconStr := base64.StdEncoding.EncodeToString(icon)
+		app.Icon = iconStr
+		app.TagsKey = append(l.Tags, "Local")
+		app.Recommend = 9999
+		versions := l.Versions
+		detailsMap := getAppDetails(app.Details, versions)
+
+		for _, v := range versions {
+			detail := detailsMap[v]
+			detailPath := path.Join(appDir, l.Key, "versions", v)
+			if _, err := os.Stat(detailPath); err != nil {
+				global.LOG.Errorf("get [%s] folder error: %s", detailPath, err.Error())
+				continue
+			}
+			readmeStr, err := os.ReadFile(path.Join(detailPath, "README.md"))
+			if err != nil {
+				global.LOG.Errorf("get [%s] README error: %s", detailPath, err.Error())
+			}
+			detail.Readme = string(readmeStr)
+			dockerComposeStr, err := os.ReadFile(path.Join(detailPath, "docker-compose.yml"))
+			if err != nil {
+				global.LOG.Errorf("get [%s] docker-compose.yml error: %s", detailPath, err.Error())
+				continue
+			}
+			detail.DockerCompose = string(dockerComposeStr)
+			paramStr, err := os.ReadFile(path.Join(detailPath, "config.json"))
+			if err != nil {
+				global.LOG.Errorf("get [%s] form.json error: %s", detailPath, err.Error())
+			}
+			detail.Params = string(paramStr)
+			detailsMap[v] = detail
+		}
+		var newDetails []model.AppDetail
+		for _, v := range detailsMap {
+			newDetails = append(newDetails, v)
+		}
+		app.Details = newDetails
+		appsMap[localKey] = app
+	}
+	var (
+		addAppArray []model.App
+		updateArray []model.App
+		appIds      []uint
+	)
+	for _, v := range appsMap {
+		if v.ID == 0 {
+			addAppArray = append(addAppArray, v)
+		} else {
+			updateArray = append(updateArray, v)
+			appIds = append(appIds, v.ID)
+		}
+	}
+	tx, ctx := getTxAndContext()
+	if len(addAppArray) > 0 {
+		if err := appRepo.BatchCreate(ctx, addAppArray); err != nil {
+			tx.Rollback()
+			return
+		}
+	}
+	for _, update := range updateArray {
+		if err := appRepo.Save(ctx, &update); err != nil {
+			tx.Rollback()
+			return
+		}
+	}
+	if err := appTagRepo.DeleteByAppIds(ctx, appIds); err != nil {
+		tx.Rollback()
+		return
+	}
+	apps := append(addAppArray, updateArray...)
+	var (
+		addDetails    []model.AppDetail
+		updateDetails []model.AppDetail
+		appTags       []*model.AppTag
+	)
+	tags, _ := tagRepo.All()
+	tagMap := make(map[string]uint, len(tags))
+	for _, app := range tags {
+		tagMap[app.Key] = app.ID
+	}
+	for _, a := range apps {
+		for _, t := range a.TagsKey {
+			tagId, ok := tagMap[t]
+			if ok {
+				appTags = append(appTags, &model.AppTag{
+					AppId: a.ID,
+					TagId: tagId,
+				})
+			}
+		}
+		for _, d := range a.Details {
+			d.AppId = a.ID
+			if d.ID == 0 {
+				addDetails = append(addDetails, d)
+			} else {
+				updateDetails = append(updateDetails, d)
+			}
+		}
+	}
+	if len(addDetails) > 0 {
+		if err := appDetailRepo.BatchCreate(ctx, addDetails); err != nil {
+			tx.Rollback()
+			return
+		}
+	}
+	for _, u := range updateDetails {
+		if err := appDetailRepo.Update(ctx, u); err != nil {
+			tx.Rollback()
+			return
+		}
+	}
+	if len(appTags) > 0 {
+		if err := appTagRepo.BatchCreate(ctx, appTags); err != nil {
+			tx.Rollback()
+			return
+		}
+	}
+	tx.Commit()
+	global.LOG.Infof("sync local apps success")
+}
+func (a AppService) SyncAppListFromRemote() error {
 	updateRes, err := a.GetAppUpdate()
 	if err != nil {
 		return err
@@ -323,11 +565,11 @@ func (a AppService) SyncAppList() error {
 			Name: t.Name,
 		})
 	}
-	oldApps, err := appRepo.GetBy()
+	oldApps, err := appRepo.GetBy(appRepo.WithResource(constant.AppResourceRemote))
 	if err != nil {
 		return err
 	}
-	appsMap := getApps(oldApps, list.Items)
+	appsMap := getApps(oldApps, list.Items, false)
 	for _, l := range list.Items {
 		app := appsMap[l.Key]
 		icon, err := os.ReadFile(path.Join(appDir, l.Key, "metadata", "logo.png"))
@@ -383,8 +625,9 @@ func (a AppService) SyncAppList() error {
 	var (
 		addAppArray []model.App
 		updateArray []model.App
+		tagMap      = make(map[string]uint, len(tags))
 	)
-	tagMap := make(map[string]uint, len(tags))
+
 	for _, v := range appsMap {
 		if v.ID == 0 {
 			addAppArray = append(addAppArray, v)

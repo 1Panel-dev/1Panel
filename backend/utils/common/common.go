@@ -83,8 +83,16 @@ func RandStr(n int) string {
 }
 
 func ScanPort(port int) bool {
-
 	ln, err := net.Listen("tcp", ":"+strconv.Itoa(port))
+	if err != nil {
+		return true
+	}
+	defer ln.Close()
+	return false
+}
+
+func ScanUDPPort(port int) bool {
+	ln, err := net.ListenUDP("udp", &net.UDPAddr{IP: net.IPv4(127, 0, 0, 1), Port: port})
 	if err != nil {
 		return true
 	}

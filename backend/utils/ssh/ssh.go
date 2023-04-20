@@ -127,20 +127,8 @@ func (w *wsBufferWriter) Write(p []byte) (int, error) {
 }
 
 func makePrivateKeySigner(privateKey []byte, passPhrase []byte) (gossh.Signer, error) {
-	var signer gossh.Signer
-	if passPhrase != nil {
-		s, err := gossh.ParsePrivateKeyWithPassphrase(privateKey, passPhrase)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing SSH key: '%v'", err)
-		}
-		signer = s
-	} else {
-		s, err := gossh.ParsePrivateKey(privateKey)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing SSH key: '%v'", err)
-		}
-		signer = s
+	if len(passPhrase) != 0 {
+		return gossh.ParsePrivateKeyWithPassphrase(privateKey, passPhrase)
 	}
-
-	return signer, nil
+	return gossh.ParsePrivateKey(privateKey)
 }

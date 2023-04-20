@@ -116,14 +116,22 @@ func (s *Server) RemoveDirective(key string, params []string) {
 	directives := s.Directives
 	var newDirectives []IDirective
 	for _, dir := range directives {
-		if dir.GetName() == key {
-			if IsRepeatKey(key) && len(params) > 0 {
-				oldParams := dir.GetParameters()
-				if oldParams[0] == params[0] {
+		if key == "location" {
+			if location, ok := dir.(*Location); ok {
+				if len(params) == 2 && location.Match == params[1] && location.Modifier == params[0] {
 					continue
 				}
-			} else {
-				continue
+			}
+		} else {
+			if dir.GetName() == key {
+				if len(params) > 0 {
+					oldParams := dir.GetParameters()
+					if oldParams[0] == params[0] {
+						continue
+					}
+				} else {
+					continue
+				}
 			}
 		}
 		newDirectives = append(newDirectives, dir)
@@ -235,6 +243,40 @@ func (s *Server) UpdateRootProxy(proxy []string) {
 	})
 	newDir.Block = block
 	s.UpdateDirectiveBySecondKey("location", "/", newDir)
+}
+
+func (s *Server) UpdatePHPProxy(proxy []string, localPath string) {
+	newDir := Directive{
+		Name:       "location",
+		Parameters: []string{"~ [^/]\\.php(/|$)"},
+		Block:      &Block{},
+	}
+	block := &Block{}
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "fastcgi_pass",
+		Parameters: proxy,
+	})
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "include",
+		Parameters: []string{"fastcgi-php.conf"},
+	})
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "include",
+		Parameters: []string{"fastcgi_params"},
+	})
+	if localPath == "" {
+		block.Directives = append(block.Directives, &Directive{
+			Name:       "fastcgi_param",
+			Parameters: []string{"SCRIPT_FILENAME", "$document_root$fastcgi_script_name"},
+		})
+	} else {
+		block.Directives = append(block.Directives, &Directive{
+			Name:       "fastcgi_param",
+			Parameters: []string{"SCRIPT_FILENAME", localPath},
+		})
+	}
+	newDir.Block = block
+	s.UpdateDirectiveBySecondKey("location", "~ [^/]\\.php(/|$)", newDir)
 }
 
 func (s *Server) UpdateDirectiveBySecondKey(name string, key string, directive Directive) {

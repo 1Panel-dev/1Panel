@@ -18,6 +18,10 @@ export namespace Host {
         port: number;
         user: string;
         authMode: string;
+        password: string;
+        privateKey: string;
+        passPhrase: string;
+        rememberPassword: boolean;
         description: string;
     }
     export interface HostOperate {
@@ -28,8 +32,10 @@ export namespace Host {
         port: number;
         user: string;
         authMode: string;
-        privateKey: string;
         password: string;
+        privateKey: string;
+        passPhrase: string;
+        rememberPassword: boolean;
 
         description: string;
     }
@@ -51,5 +57,50 @@ export namespace Host {
     export interface SearchWithPage extends ReqPage {
         groupID: number;
         info?: string;
+    }
+
+    export interface FirewallBase {
+        name: string;
+        status: string;
+        version: string;
+        pingStatus: string;
+    }
+    export interface RuleSearch extends ReqPage {
+        info: string;
+        type: string;
+    }
+    export interface RuleInfo extends ReqPage {
+        family: string;
+        address: string;
+        port: string;
+        protocol: string;
+        strategy: string;
+        appName: string;
+        isUsed: boolean;
+    }
+    export interface RulePort {
+        operation: string;
+        address: string;
+        port: string;
+        source: string;
+        protocol: string;
+        strategy: string;
+    }
+    export interface RuleIP {
+        operation: string;
+        address: string;
+        strategy: string;
+    }
+    export interface UpdatePortRule {
+        oldRule: RulePort;
+        newRule: RulePort;
+    }
+    export interface UpdateAddrRule {
+        oldRule: RuleIP;
+        newRule: RuleIP;
+    }
+    export interface BatchRule {
+        type: string;
+        rules: Array<RulePort>;
     }
 }

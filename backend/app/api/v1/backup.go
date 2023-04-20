@@ -104,9 +104,9 @@ func (b *BaseApi) ListBuckets(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/backup/del [post]
-// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"ids","isList":true,"db":"backup_accounts","output_colume":"type","output_value":"types"}],"formatZH":"删除备份账号 [types]","formatEN":"delete backup account [types]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":true,"db":"backup_accounts","output_colume":"type","output_value":"types"}],"formatZH":"删除备份账号 [types]","formatEN":"delete backup account [types]"}
 func (b *BaseApi) DeleteBackup(c *gin.Context) {
-	var req dto.BatchDeleteReq
+	var req dto.OperateByID
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -116,7 +116,7 @@ func (b *BaseApi) DeleteBackup(c *gin.Context) {
 		return
 	}
 
-	if err := backupService.BatchDelete(req.Ids); err != nil {
+	if err := backupService.Delete(req.ID); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
@@ -175,7 +175,7 @@ func (b *BaseApi) DownloadRecord(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	c.File(filePath)
+	helper.SuccessWithData(c, filePath)
 }
 
 // @Tags Backup Account

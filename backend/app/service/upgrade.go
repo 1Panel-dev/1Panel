@@ -1,18 +1,20 @@
 package service
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"runtime"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 )
 
@@ -20,6 +22,7 @@ type UpgradeService struct{}
 
 type IUpgradeService interface {
 	Upgrade(req dto.Upgrade) error
+	LoadNotes(req dto.Upgrade) (string, error)
 	SearchUpgrade() (*dto.UpgradeInfo, error)
 }
 
@@ -34,34 +37,48 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 		return nil, err
 	}
 
-	versionRes, err := http.Get(fmt.Sprintf("%s/%s/latest", global.CONF.System.RepoUrl, global.CONF.System.Mode))
+	latestVersion, err := u.loadVersion(true, currentVersion.Value)
 	if err != nil {
+		global.LOG.Infof("load latest version failed, err: %v", err)
 		return nil, err
 	}
-	defer versionRes.Body.Close()
-	version, err := ioutil.ReadAll(versionRes.Body)
-	if err != nil {
+	if !common.CompareVersion(string(latestVersion), currentVersion.Value) {
 		return nil, err
 	}
-	isNew, err := compareVersion(currentVersion.Value, string(version))
-	if !isNew || err != nil {
-		return nil, err
+	upgrade.LatestVersion = latestVersion
+	if latestVersion[0:4] == currentVersion.Value[0:4] {
+		upgrade.NewVersion = ""
+	} else {
+		newerVersion, err := u.loadVersion(false, currentVersion.Value)
+		if err != nil {
+			global.LOG.Infof("load newer version failed, err: %v", err)
+			return nil, err
+		}
+		if newerVersion == currentVersion.Value {
+			upgrade.NewVersion = ""
+		} else {
+			upgrade.NewVersion = newerVersion
+		}
 	}
+	itemVersion := upgrade.LatestVersion
+	if upgrade.NewVersion != "" {
+		itemVersion = upgrade.NewVersion
+	}
+	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, global.CONF.System.Mode, itemVersion, itemVersion))
 
-	upgrade.NewVersion = string(version)
-
-	releaseNotes, err := http.Get(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, global.CONF.System.Mode, upgrade.NewVersion, upgrade.NewVersion))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("load relase-notes of version %s failed, err: %v", latestVersion, err)
 	}
-	defer releaseNotes.Body.Close()
-	release, err := ioutil.ReadAll(releaseNotes.Body)
-	if err != nil {
-		return nil, err
-	}
-	upgrade.ReleaseNote = string(release)
-
+	upgrade.ReleaseNote = notes
 	return &upgrade, nil
+}
+
+func (u *UpgradeService) LoadNotes(req dto.Upgrade) (string, error) {
+	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, global.CONF.System.Mode, req.Version, req.Version))
+	if err != nil {
+		return "", fmt.Errorf("load relase-notes of version %s failed, err: %v", req.Version, err)
+	}
+	return notes, nil
 }
 
 func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
@@ -131,7 +148,7 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 		go writeLogs(req.Version)
 		_ = settingRepo.Update("SystemVersion", req.Version)
 		_ = settingRepo.Update("SystemStatus", "Free")
-		_, _ = cmd.Exec("systemctl daemon-reload && systemctl restart 1panel.service")
+		_, _ = cmd.ExecWithTimeOut("systemctl daemon-reload && systemctl restart 1panel.service", 1*time.Minute)
 	}()
 	return nil
 }
@@ -174,45 +191,49 @@ func (u *UpgradeService) handleRollback(fileOp files.FileOp, originalDir string,
 	if err := cpBinary(originalDir+"/1panel.service", "/etc/systemd/system/1panel.service"); err != nil {
 		global.LOG.Errorf("rollback 1panel failed, err: %v", err)
 	}
-
 }
 
-func compareVersion(version, newVersion string) (bool, error) {
-	if version == newVersion {
-		return false, nil
+func (u *UpgradeService) loadVersion(isLatest bool, currentVersion string) (string, error) {
+	path := fmt.Sprintf("%s/%s/latest", global.CONF.System.RepoUrl, global.CONF.System.Mode)
+	if !isLatest {
+		path = fmt.Sprintf("%s/%s/latest.current", global.CONF.System.RepoUrl, global.CONF.System.Mode)
 	}
-	if len(version) == 0 || len(newVersion) == 0 {
-		return false, fmt.Errorf("incorrect version or new version entered %v -- %v", version, newVersion)
+	latestVersionRes, err := http.Get(path)
+	if err != nil {
+		return "", err
 	}
-	versions := strings.Split(strings.ReplaceAll(version, "v", ""), ".")
-	if len(versions) != 3 {
-		return false, fmt.Errorf("incorrect version input %v", version)
+	defer latestVersionRes.Body.Close()
+	version, err := io.ReadAll(latestVersionRes.Body)
+	if err != nil {
+		return "", err
 	}
-	newVersions := strings.Split(strings.ReplaceAll(newVersion, "v", ""), ".")
-	if len(newVersions) != 3 {
-		return false, fmt.Errorf("incorrect newVersions input %v", version)
+	if isLatest {
+		return string(version), nil
 	}
-	version1, _ := strconv.Atoi(versions[0])
-	newVersion1, _ := strconv.Atoi(newVersions[0])
-	if newVersion1 > version1 {
-		return true, nil
-	} else if newVersion1 == version1 {
-		version2, _ := strconv.Atoi(versions[1])
-		newVersion2, _ := strconv.Atoi(newVersions[1])
-		if newVersion2 > version2 {
-			return true, nil
-		} else if newVersion2 == version2 {
-			version3, _ := strconv.Atoi(versions[2])
-			newVersion3, _ := strconv.Atoi(newVersions[2])
-			if newVersion3 > version3 {
-				return true, nil
-			} else {
-				return false, nil
-			}
-		} else {
-			return false, nil
-		}
-	} else {
-		return false, nil
+
+	versionMap := make(map[string]string)
+	if err := json.Unmarshal(version, &versionMap); err != nil {
+		return "", fmt.Errorf("load version map failed, err: %v", err)
 	}
+
+	if len(currentVersion) < 4 {
+		return "", fmt.Errorf("current version is error format: %s", currentVersion)
+	}
+	if version, ok := versionMap[currentVersion[0:4]]; ok {
+		return version, nil
+	}
+	return "", errors.New("load version failed in latest.current")
+}
+
+func (u *UpgradeService) loadReleaseNotes(path string) (string, error) {
+	releaseNotes, err := http.Get(path)
+	if err != nil {
+		return "", err
+	}
+	defer releaseNotes.Body.Close()
+	release, err := io.ReadAll(releaseNotes.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(release), nil
 }

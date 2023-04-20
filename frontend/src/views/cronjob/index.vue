@@ -15,7 +15,7 @@
                         <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('commons.button.create') }}{{ $t('cronjob.cronTask') }}
                         </el-button>
-                        <el-button type="primary" plain :disabled="selects.length === 0" @click="onBatchDelete(null)">
+                        <el-button plain :disabled="selects.length === 0" @click="onDelete(null)">
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </el-col>
@@ -54,11 +54,18 @@
                                 v-if="row.status === 'Enable'"
                                 @click="onChangeStatus(row.id, 'disable')"
                                 link
+                                icon="VideoPlay"
                                 type="success"
                             >
                                 {{ $t('commons.status.enabled') }}
                             </el-button>
-                            <el-button v-else link type="danger" @click="onChangeStatus(row.id, 'enable')">
+                            <el-button
+                                v-else
+                                icon="VideoPause"
+                                link
+                                type="danger"
+                                @click="onChangeStatus(row.id, 'enable')"
+                            >
                                 {{ $t('commons.status.disabled') }}
                             </el-button>
                         </template>
@@ -91,11 +98,7 @@
                             {{ $t('cronjob.handle') }}
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('cronjob.retainCopies')" :min-width="90" prop="retainCopies">
-                        <template #default="{ row }">
-                            {{ loadCopies(row) }}
-                        </template>
-                    </el-table-column>
+                    <el-table-column :label="$t('cronjob.retainCopies')" :min-width="90" prop="retainCopies" />
 
                     <el-table-column :label="$t('cronjob.lastRecrodTime')" :min-width="120" prop="lastRecrodTime">
                         <template #default="{ row }">
@@ -118,6 +121,32 @@
             </template>
         </LayoutContent>
 
+        <el-dialog
+            v-model="deleteVisiable"
+            :title="$t('commons.button.clean')"
+            width="30%"
+            :close-on-click-modal="false"
+        >
+            <el-form ref="deleteForm" label-position="left" v-loading="delLoading">
+                <el-form-item>
+                    <el-checkbox v-model="cleanData" :label="$t('cronjob.cleanData')" />
+                    <span class="input-help">
+                        {{ $t('cronjob.cleanDataHelper') }}
+                    </span>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="deleteVisiable = false" :disabled="delLoading">
+                        {{ $t('commons.button.cancel') }}
+                    </el-button>
+                    <el-button type="primary" @click="onSubmitDelete">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
+
         <OperatrDialog @search="search" ref="dialogRef" />
         <Records @search="search()" ref="dialogRecordRef" />
     </div>
@@ -136,7 +165,6 @@ import RouterButton from '@/components/router-button/index.vue';
 import { deleteCronjob, getCronjobPage, handleOnce, updateStatus } from '@/api/modules/cronjob';
 import i18n from '@/lang';
 import { Cronjob } from '@/api/interface/cronjob';
-import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
 
@@ -151,6 +179,11 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
+
+const deleteVisiable = ref();
+const deleteCronjobID = ref();
+const delLoading = ref();
+const cleanData = ref();
 
 const weekOptions = [
     { label: i18n.global.t('cronjob.monday'), value: 1 },
@@ -208,17 +241,35 @@ const onOpenDialog = async (
     dialogRef.value!.acceptParams(params);
 };
 
-const onBatchDelete = async (row: Cronjob.CronjobInfo | null) => {
-    let ids: Array<number> = [];
+const onDelete = async (row: Cronjob.CronjobInfo | null) => {
     if (row) {
-        ids.push(row.id);
+        deleteCronjobID.value = row.id;
+    } else {
+        deleteCronjobID.value = 0;
+    }
+    deleteVisiable.value = true;
+};
+
+const onSubmitDelete = async () => {
+    let ids: Array<number> = [];
+    if (deleteCronjobID.value) {
+        ids.push(deleteCronjobID.value);
     } else {
         selects.value.forEach((item: Cronjob.CronjobInfo) => {
             ids.push(item.id);
         });
     }
-    await useDeleteData(deleteCronjob, { ids: ids }, 'commons.msg.delete');
-    search();
+    delLoading.value = true;
+    await deleteCronjob(ids, cleanData.value)
+        .then(() => {
+            delLoading.value = false;
+            deleteVisiable.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            search();
+        })
+        .catch(() => {
+            delLoading.value = false;
+        });
 };
 
 const onChangeStatus = async (id: number, status: string) => {
@@ -244,14 +295,6 @@ const onHandle = async (row: Cronjob.CronjobInfo) => {
         .catch(() => {
             loading.value = false;
         });
-};
-
-const loadCopies = (item) => {
-    if (item.type === 'shell' || item.type === 'curl') {
-        return '-';
-    } else {
-        return item.retainCopies + '';
-    }
 };
 
 const loadDetail = (row: any) => {
@@ -284,7 +327,7 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.delete'),
         click: (row: Cronjob.CronjobInfo) => {
-            onBatchDelete(row);
+            onDelete(row);
         },
     },
 ];

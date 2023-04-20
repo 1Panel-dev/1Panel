@@ -14,7 +14,7 @@ type IGroupRepo interface {
 	Create(group *model.Group) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
-	CancelDefault() error
+	CancelDefault(groupType string) error
 	WithByIsDefault(isDefault bool) DBOption
 }
 
@@ -64,6 +64,6 @@ func (u *GroupRepo) Delete(opts ...DBOption) error {
 	return db.Delete(&model.Group{}).Error
 }
 
-func (w GroupRepo) CancelDefault() error {
-	return global.DB.Model(&model.Group{}).Where("`is_default` = 1").Updates(map[string]interface{}{"is_default": 0}).Error
+func (u *GroupRepo) CancelDefault(groupType string) error {
+	return global.DB.Model(&model.Group{}).Where("is_default = ? AND type = ?", 1, groupType).Updates(map[string]interface{}{"is_default": 0}).Error
 }

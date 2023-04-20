@@ -5,7 +5,14 @@
         </template>
         <el-row>
             <el-col :span="22" :offset="1">
-                <el-form ref="updateRef" :rules="rules" label-position="top" :model="operateReq" v-loading="loading">
+                <el-form
+                    @submit.prevent
+                    ref="updateRef"
+                    :rules="rules"
+                    label-position="top"
+                    :model="operateReq"
+                    v-loading="loading"
+                >
                     <el-form-item :label="$t('app.versioneSelect')" prop="detailId">
                         <el-select v-model="operateReq.detailId">
                             <el-option

@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"github.com/1Panel-dev/1Panel/backend/global"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
@@ -64,6 +65,28 @@ func (c Client) CreateNetwork(name string) error {
 	return err
 }
 
+func (c Client) DeleteImage(imageID string) error {
+	if _, err := c.cli.ImageRemove(context.Background(), imageID, types.ImageRemoveOptions{Force: true}); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c Client) GetImageIDByName(imageName string) (string, error) {
+	filter := filters.NewArgs()
+	filter.Add("reference", imageName)
+	list, err := c.cli.ImageList(context.Background(), types.ImageListOptions{
+		Filters: filter,
+	})
+	if err != nil {
+		return "", err
+	}
+	if len(list) > 0 {
+		return list[0].ID, nil
+	}
+	return "", nil
+}
+
 func (c Client) NetworkExist(name string) bool {
 	var options types.NetworkListOptions
 	options.Filters = filters.NewArgs(filters.Arg("name", name))
@@ -72,4 +95,19 @@ func (c Client) NetworkExist(name string) bool {
 		return false
 	}
 	return len(networks) > 0
+}
+
+func CreateDefaultDockerNetwork() error {
+	cli, err := NewClient()
+	if err != nil {
+		global.LOG.Errorf("init docker client error %s", err.Error())
+		return err
+	}
+	if !cli.NetworkExist("1panel-network") {
+		if err := cli.CreateNetwork("1panel-network"); err != nil {
+			global.LOG.Errorf("create default docker network  error %s", err.Error())
+			return err
+		}
+	}
+	return nil
 }

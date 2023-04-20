@@ -13,6 +13,16 @@ import (
 type WebsiteAcmeAccountService struct {
 }
 
+type IWebsiteAcmeAccountService interface {
+	Page(search dto.PageInfo) (int64, []response.WebsiteAcmeAccountDTO, error)
+	Create(create request.WebsiteAcmeAccountCreate) (response.WebsiteAcmeAccountDTO, error)
+	Delete(id uint) error
+}
+
+func NewIWebsiteAcmeAccountService() IWebsiteAcmeAccountService {
+	return &WebsiteAcmeAccountService{}
+}
+
 func (w WebsiteAcmeAccountService) Page(search dto.PageInfo) (int64, []response.WebsiteAcmeAccountDTO, error) {
 	total, accounts, err := websiteAcmeRepo.Page(search.Page, search.PageSize, commonRepo.WithOrderBy("created_at desc"))
 	var accountDTOs []response.WebsiteAcmeAccountDTO

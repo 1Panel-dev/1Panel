@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"sort"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
@@ -88,6 +89,7 @@ func (b *BaseApi) GetNetworkOptions(c *gin.Context) {
 	for _, net := range netStat {
 		options = append(options, net.Name)
 	}
+	sort.Strings(options)
 	helper.SuccessWithData(c, options)
 }
 
@@ -98,5 +100,6 @@ func (b *BaseApi) GetIOOptions(c *gin.Context) {
 	for _, net := range diskStat {
 		options = append(options, net.Name)
 	}
+	sort.Strings(options)
 	helper.SuccessWithData(c, options)
 }

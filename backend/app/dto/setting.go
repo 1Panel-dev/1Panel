@@ -49,7 +49,7 @@ type PortUpdate struct {
 }
 
 type SnapshotCreate struct {
-	From        string `json:"from" validate:"required,oneof=OSS S3 SFTP MINIO"`
+	From        string `json:"from" validate:"required,oneof=OSS S3 SFTP MINIO COS KODO"`
 	Description string `json:"description"`
 }
 type SnapshotRecover struct {
@@ -82,9 +82,11 @@ type SnapshotInfo struct {
 }
 
 type UpgradeInfo struct {
-	NewVersion  string `json:"newVersion"`
-	ReleaseNote string `json:"releaseNote"`
+	NewVersion    string `json:"newVersion"`
+	LatestVersion string `json:"latestVersion"`
+	ReleaseNote   string `json:"releaseNote"`
 }
+
 type Upgrade struct {
 	Version string `json:"version"`
 }

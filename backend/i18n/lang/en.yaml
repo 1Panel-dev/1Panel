@@ -16,6 +16,7 @@ ErrRepoNotValid: "Remote repository verification failed！"
 #common
 ErrNameIsExist: "Name is already exist"
 ErrDemoEnvironment: "Demo server, prohibit this operation!"
+ErrCmdTimeout: "Command execution timed out！"
 
 #app
 ErrPortInUsed: "{{ .detail }} port already in use"
@@ -26,6 +27,7 @@ ErrPortInOtherApp: "{{ .port }} port  already in use by  {{ .apps }}"
 ErrDbUserNotValid: "Stock database, username and password do not match！"
 ErrDockerComposeNotValid: "docker-compose file format error!"
 ErrUpdateBuWebsite: 'The application was updated successfully, but the modification of the website configuration file failed, please check the configuration!'
+Err1PanelNetworkFailed: 'Default container network creation failed! {{ .detail }}'
 
 #file
 ErrFileCanNotRead: "File can not read"
@@ -34,6 +36,7 @@ ErrPathNotFound: "Path is not found"
 ErrMovePathFailed: "The target path cannot contain the original path!"
 ErrLinkPathNotFound: "Target path does not exist!"
 ErrFileIsExit: "File already exists!"
+ErrFileUpload: "Failed to upload file"
 
 #website
 ErrDomainIsExist: "Domain is already exist"
@@ -50,6 +53,7 @@ ErrEmailIsExist: 'Email is already exist'
 #mysql
 ErrUserIsExist: "The current user already exists. Please enter a new user"
 ErrDatabaseIsExist: "The current database already exists. Please enter a new database"
+ErrExecTimeOut: "SQL execution timed out, please check the {{ .detail }} container"
 
 #redis
 ErrTypeOfRedis: "The recovery file type does not match the current persistence mode. Modify the file type and try again"
@@ -57,3 +61,13 @@ ErrTypeOfRedis: "The recovery file type does not match the current persistence m
 #container 
 ErrInUsed: "{{ .detail }} is in use and cannot be deleted"
 ErrObjectInUsed: "This object is in use and cannot be deleted"
+
+#runtime
+ErrDirNotFound: "The build folder does not exist! Please check file integrity！"
+ErrFileNotExist: "{{ .detail }} file does not exist! Please check source file integrity！"
+ErrImageBuildErr: "Image build failed"
+ErrImageExist: "Image is already exist！"
+ErrDelWithWebsite: "The operating environment has been associated with a website and cannot be deleted"
+
+#setting
+ErrBackupInUsed: "The backup account is already being used in a cronjob and cannot be deleted."

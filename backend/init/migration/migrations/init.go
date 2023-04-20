@@ -140,7 +140,6 @@ var AddTableSetting = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "SystemStatus", Value: "Free"}).Error; err != nil {
-			tx.Rollback()
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "AppStoreVersion", Value: ""}).Error; err != nil {
@@ -211,14 +210,7 @@ var AddTableDatabaseMysql = &gormigrate.Migration{
 var AddTableWebsite = &gormigrate.Migration{
 	ID: "20201009-add-table-website",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.AutoMigrate(&model.Website{}, &model.WebsiteDomain{}, &model.WebsiteGroup{}, &model.WebsiteDnsAccount{}, &model.WebsiteSSL{}, &model.WebsiteAcmeAccount{}); err != nil {
-			return err
-		}
-		item := &model.WebsiteGroup{
-			Name:    "默认",
-			Default: true,
-		}
-		if err := tx.Create(item).Error; err != nil {
+		if err := tx.AutoMigrate(&model.Website{}, &model.WebsiteDomain{}, &model.WebsiteDnsAccount{}, &model.WebsiteSSL{}, &model.WebsiteAcmeAccount{}); err != nil {
 			return err
 		}
 		return nil
@@ -229,6 +221,67 @@ var AddTableSnap = &gormigrate.Migration{
 	ID: "20230106-add-table-snap",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.Snapshot{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var AddDefaultGroup = &gormigrate.Migration{
+	ID: "2023022-change-default-group",
+	Migrate: func(tx *gorm.DB) error {
+		defaultGroup := &model.Group{
+			Name:      "默认",
+			IsDefault: true,
+			Type:      "website",
+		}
+		if err := tx.Create(defaultGroup).Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&model.Group{}).Where("name = ? AND type = ?", "default", "host").Update("name", "默认").Error; err != nil {
+			return err
+		}
+		if err := tx.Model(&model.Website{}).Where("1 = 1").Update("website_group_id", defaultGroup.ID).Error; err != nil {
+			return err
+		}
+		return tx.Migrator().DropTable("website_groups")
+	},
+}
+
+var AddTableRuntime = &gormigrate.Migration{
+	ID: "20230406-add-table-runtime",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.Runtime{})
+	},
+}
+
+var UpdateTableApp = &gormigrate.Migration{
+	ID: "20230408-update-table-app",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.App{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var UpdateTableHost = &gormigrate.Migration{
+	ID: "20230410-update-table-host",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Host{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var UpdateTableWebsite = &gormigrate.Migration{
+	ID: "20230418-update-table-website",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Website{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.Website{}).Where("1 = 1").Update("site_dir", "/").Error; err != nil {
 			return err
 		}
 		return nil

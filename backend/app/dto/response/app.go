@@ -1,8 +1,9 @@
 package response
 
 import (
-	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 )
 
 type AppRes struct {
@@ -43,6 +44,7 @@ type AppDetailDTO struct {
 	model.AppDetail
 	Enable bool        `json:"enable"`
 	Params interface{} `json:"params"`
+	Image  string      `json:"image"`
 }
 
 type AppInstalledDTO struct {
@@ -54,6 +56,12 @@ type AppInstalledDTO struct {
 	CanUpdate bool   `json:"canUpdate"`
 }
 
+type DatabaseConn struct {
+	Password    string `json:"password"`
+	ServiceName string `json:"serviceName"`
+	Port        int64  `json:"port"`
+}
+
 type AppService struct {
 	Label  string      `json:"label"`
 	Value  string      `json:"value"`
@@ -61,11 +69,15 @@ type AppService struct {
 }
 
 type AppParam struct {
-	Value   interface{} `json:"value"`
-	Edit    bool        `json:"edit"`
-	Key     string      `json:"key"`
-	Rule    string      `json:"rule"`
-	LabelZh string      `json:"labelZh"`
-	LabelEn string      `json:"labelEn"`
-	Type    string      `json:"type"`
+	Value     interface{} `json:"value"`
+	Edit      bool        `json:"edit"`
+	Key       string      `json:"key"`
+	Rule      string      `json:"rule"`
+	LabelZh   string      `json:"labelZh"`
+	LabelEn   string      `json:"labelEn"`
+	Type      string      `json:"type"`
+	Values    interface{} `json:"values"`
+	ShowValue string      `json:"showValue"`
+	Required  bool        `json:"required"`
+	Multiple  bool        `json:"multiple"`
 }

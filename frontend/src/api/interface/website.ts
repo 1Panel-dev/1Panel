@@ -16,6 +16,10 @@ export namespace Website {
         autoRenew: boolean;
         appinstall?: NewAppInstall;
         webSiteSSL: SSL;
+        runtimeID: number;
+        rewrite: string;
+        user: string;
+        group: string;
     }
 
     export interface WebsiteDTO extends Website {
@@ -23,6 +27,7 @@ export namespace Website {
         accessLogPath: string;
         sitePath: string;
         appName: string;
+        runtimeName: string;
     }
 
     export interface NewAppInstall {
@@ -53,6 +58,7 @@ export namespace Website {
         webSiteGroupId: number;
         otherDomains: string;
         proxy: string;
+        proxyType: string;
     }
 
     export interface WebSiteUpdateReq {
@@ -77,17 +83,6 @@ export namespace Website {
     export interface WebSiteLog {
         enable: boolean;
         content: string;
-    }
-
-    export interface Group extends CommonModel {
-        name: string;
-        default: boolean;
-    }
-
-    export interface GroupOp {
-        name: string;
-        id?: number;
-        default: boolean;
     }
 
     export interface Domain {
@@ -160,6 +155,7 @@ export namespace Website {
         startDate: string;
         provider: string;
         websites?: Website.Website[];
+        autoRenew: boolean;
     }
 
     export interface SSLCreate {
@@ -177,6 +173,11 @@ export namespace Website {
 
     export interface SSLRenew {
         SSLId: number;
+    }
+
+    export interface SSLUpdate {
+        id: number;
+        autoRenew: boolean;
     }
 
     export interface AcmeAccount extends CommonModel {
@@ -264,5 +265,46 @@ export namespace Website {
 
     export interface DefaultServerUpdate {
         id: number;
+    }
+
+    export interface PHPConfig {
+        params: any;
+    }
+
+    export interface PHPConfigUpdate {
+        id: number;
+        params: any;
+    }
+
+    export interface PHPUpdate {
+        id: number;
+        content: string;
+        type: string;
+    }
+
+    export interface RewriteReq {
+        websiteID: number;
+        name: string;
+    }
+
+    export interface RewriteRes {
+        content: string;
+    }
+
+    export interface RewriteUpdate {
+        websiteID: number;
+        name: string;
+        content: string;
+    }
+
+    export interface DirUpdate {
+        id: number;
+        siteDir: string;
+    }
+
+    export interface DirPermissionUpdate {
+        id: number;
+        user: string;
+        group: string;
     }
 }

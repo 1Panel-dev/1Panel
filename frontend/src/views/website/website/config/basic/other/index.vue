@@ -29,14 +29,14 @@
 </template>
 
 <script lang="ts" setup>
-import { Website } from '@/api/interface/website';
 import { GetWebsite, UpdateWebsite } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import { computed, onMounted, reactive, ref } from 'vue';
-import { ListGroups } from '@/api/modules/website';
 import { FormInstance } from 'element-plus';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { GetGroupList } from '@/api/modules/group';
+import { Group } from '@/api/interface/group';
 
 const websiteForm = ref<FormInstance>();
 const props = defineProps({
@@ -59,7 +59,7 @@ let rules = ref({
     primaryDomain: [Rules.requiredInput],
     webSiteGroupId: [Rules.requiredSelect],
 });
-let groups = ref<Website.Group[]>([]);
+let groups = ref<Group.GroupInfo[]>([]);
 
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
@@ -78,14 +78,14 @@ const submit = async (formEl: FormInstance | undefined) => {
             });
     });
 };
-const search = () => {
-    ListGroups().then((res) => {
-        groups.value = res.data;
-        GetWebsite(websiteId.value).then((res) => {
-            form.primaryDomain = res.data.primaryDomain;
-            form.remark = res.data.remark;
-            form.webSiteGroupId = res.data.webSiteGroupId;
-        });
+const search = async () => {
+    const res = await GetGroupList({ type: 'website' });
+    groups.value = res.data;
+
+    GetWebsite(websiteId.value).then((res) => {
+        form.primaryDomain = res.data.primaryDomain;
+        form.remark = res.data.remark;
+        form.webSiteGroupId = res.data.webSiteGroupId;
     });
 };
 

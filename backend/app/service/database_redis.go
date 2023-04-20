@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -215,7 +214,7 @@ type redisConfig struct {
 
 func confSet(redisName string, changeConf []redisConfig) error {
 	path := fmt.Sprintf("%s/redis/%s/conf/redis.conf", constant.AppInstallDir, redisName)
-	lineBytes, err := ioutil.ReadFile(path)
+	lineBytes, err := os.ReadFile(path)
 	if err != nil {
 		return err
 	}

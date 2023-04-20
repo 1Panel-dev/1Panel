@@ -11,13 +11,13 @@
         </template>
         <el-descriptions border :column="1" v-if="!edit">
             <el-descriptions-item v-for="(param, key) in params" :label="getLabel(param)" :key="key">
-                {{ param.value }}
+                <span>{{ param.showValue && param.showValue != '' ? param.showValue : param.value }}</span>
             </el-descriptions-item>
         </el-descriptions>
         <el-row v-else v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-alert :title="$t('app.updateHelper')" type="warning" :closable="false" />
-                <el-form ref="paramForm" :model="paramModel" label-position="top" :rules="rules">
+                <el-form @submit.prevent ref="paramForm" :model="paramModel" label-position="top" :rules="rules">
                     <div v-for="(p, index) in params" :key="index">
                         <el-form-item :prop="p.key" :label="getLabel(p)">
                             <el-input
@@ -26,6 +26,15 @@
                                 v-model.number="paramModel[p.key]"
                                 :disabled="!p.edit"
                             ></el-input>
+                            <el-select v-model="paramModel[p.key]" v-else-if="p.type == 'select'">
+                                <el-option
+                                    v-for="value in p.values"
+                                    :key="value.label"
+                                    :value="value.value"
+                                    :label="value.label"
+                                    :disabled="!p.edit"
+                                ></el-option>
+                            </el-select>
                             <el-input v-else v-model.trim="paramModel[p.key]" :disabled="!p.edit"></el-input>
                         </el-form-item>
                     </div>
@@ -116,6 +125,8 @@ const get = async () => {
                     edit: d.edit,
                     key: d.key,
                     type: d.type,
+                    values: d.values,
+                    showValue: d.showValue,
                 });
                 rules[d.key] = [Rules.requiredInput];
                 if (d.rule) {

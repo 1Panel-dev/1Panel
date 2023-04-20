@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
+	"path"
 	"sort"
 	"strings"
 	"time"
@@ -123,41 +125,49 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 	return int64(total), BackDatas, nil
 }
 
-func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
-	if req.From == "template" {
-		template, err := composeRepo.Get(commonRepo.WithByID(req.Template))
-		if err != nil {
-			return err
-		}
-		req.From = "edit"
-		req.File = template.Content
+func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
+	if err := u.loadPath(&req); err != nil {
+		return false, err
 	}
-	if req.From == "edit" {
-		dir := fmt.Sprintf("%s/docker/compose/%s", constant.DataDir, req.Name)
-		if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
-			if err = os.MkdirAll(dir, os.ModePerm); err != nil {
-				return err
-			}
-		}
+	cmd := exec.Command("docker-compose", "-f", req.Path, "config")
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return false, errors.New(string(stdout))
+	}
+	return true, nil
+}
 
-		path := fmt.Sprintf("%s/docker-compose.yml", dir)
-		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-		write := bufio.NewWriter(file)
-		_, _ = write.WriteString(string(req.File))
-		write.Flush()
-		req.Path = path
+func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) {
+	if err := u.loadPath(&req); err != nil {
+		return "", err
 	}
 	global.LOG.Infof("docker-compose.yml %s create successful, start to docker-compose up", req.Name)
-	if stdout, err := compose.Up(req.Path); err != nil {
-		return errors.New(string(stdout))
-	}
 
-	_ = composeRepo.CreateRecord(&model.Compose{Name: req.Name})
-	return nil
+	if req.From == "path" {
+		req.Name = path.Base(strings.ReplaceAll(req.Path, "/"+path.Base(req.Path), ""))
+	}
+	logName := path.Dir(req.Path) + "/compose.log"
+	file, err := os.OpenFile(logName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		return "", err
+	}
+	go func() {
+		defer file.Close()
+		cmd := exec.Command("docker-compose", "-f", req.Path, "up", "-d")
+		stdout, err := cmd.CombinedOutput()
+		_, _ = file.Write(stdout)
+		if err != nil {
+			global.LOG.Errorf("docker-compose up %s failed, err: %v", req.Name, err)
+			_, _ = compose.Down(req.Path)
+			_, _ = file.WriteString("docker-compose up failed!")
+			return
+		}
+		global.LOG.Infof("docker-compose up %s successful!", req.Name)
+		_ = composeRepo.CreateRecord(&model.Compose{Name: req.Name})
+		_, _ = file.WriteString("docker-compose up successful!")
+	}()
+
+	return logName, nil
 }
 
 func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
@@ -197,5 +207,36 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 		return errors.New(string(stdout))
 	}
 
+	return nil
+}
+
+func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {
+	if req.From == "template" {
+		template, err := composeRepo.Get(commonRepo.WithByID(req.Template))
+		if err != nil {
+			return err
+		}
+		req.From = "edit"
+		req.File = template.Content
+	}
+	if req.From == "edit" {
+		dir := fmt.Sprintf("%s/docker/compose/%s", constant.DataDir, req.Name)
+		if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
+			if err = os.MkdirAll(dir, os.ModePerm); err != nil {
+				return err
+			}
+		}
+
+		path := fmt.Sprintf("%s/docker-compose.yml", dir)
+		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		write := bufio.NewWriter(file)
+		_, _ = write.WriteString(string(req.File))
+		write.Flush()
+		req.Path = path
+	}
 	return nil
 }

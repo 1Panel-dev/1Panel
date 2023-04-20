@@ -38,12 +38,12 @@ func NewJWT() *JWT {
 	}
 }
 
-func (j *JWT) CreateClaims(baseClaims BaseClaims, ttl int) CustomClaims {
+func (j *JWT) CreateClaims(baseClaims BaseClaims) CustomClaims {
 	claims := CustomClaims{
 		BaseClaims: baseClaims,
 		BufferTime: constant.JWTBufferTime,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(ttl))),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * time.Duration(constant.JWTBufferTime))),
 			Issuer:    constant.JWTIssuer,
 		},
 	}

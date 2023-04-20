@@ -2,7 +2,7 @@
     <div>
         <el-drawer v-model="changeVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
             <template #header>
-                <DrawerHeader :header="$t('database.changePassword')" :back="handleClose" />
+                <DrawerHeader :header="title" :back="handleClose" />
             </template>
             <el-form>
                 <el-form v-loading="loading" ref="changeFormRef" :model="changeForm" label-position="top">
@@ -78,6 +78,7 @@ const loading = ref();
 const changeVisiable = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
 const changeFormRef = ref<FormInstance>();
+const title = ref();
 const changeForm = reactive({
     id: 0,
     mysqlName: '',
@@ -101,6 +102,10 @@ interface DialogProps {
     value: string;
 }
 const acceptParams = (params: DialogProps): void => {
+    title.value =
+        params.operation === 'password'
+            ? i18n.global.t('database.changePassword')
+            : i18n.global.t('database.permission');
     changeForm.id = params.id;
     changeForm.mysqlName = params.mysqlName;
     changeForm.userName = params.username;

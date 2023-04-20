@@ -1,10 +1,21 @@
 <template>
     <div>
         <span class="version">{{ version }}</span>
-        <el-button v-if="version !== 'Waiting'" type="primary" link @click="onLoadUpgradeInfo">
+        <el-badge is-dot class="item" v-if="version !== 'Waiting' && globalStore.hasNewVersion">
+            <el-button style="margin-top: -8px" type="primary" link @click="onLoadUpgradeInfo">
+                {{ $t('setting.upgradeCheck') }}
+            </el-button>
+        </el-badge>
+        <el-button
+            v-if="version !== 'Waiting' && !globalStore.hasNewVersion"
+            style="margin-top: -2px"
+            type="primary"
+            link
+            @click="onLoadUpgradeInfo"
+        >
             {{ $t('setting.upgradeCheck') }}
         </el-button>
-        <el-tag v-else round style="margin-left: 10px">{{ $t('setting.upgrading') }}</el-tag>
+        <el-tag v-if="version === 'Waiting'" round style="margin-left: 10px">{{ $t('setting.upgrading') }}</el-tag>
     </div>
 
     <el-drawer :close-on-click-modal="false" :key="refresh" v-model="drawerVisiable" size="50%" append-to-body>
@@ -12,10 +23,22 @@
             <DrawerHeader :header="$t('setting.upgrade')" :back="handleClose" />
         </template>
         <div class="panel-MdEditor">
+            <el-alert :closable="false">
+                {{ $t('setting.versionHelper') }}
+                <li>{{ $t('setting.versionHelper1') }}</li>
+                <li>{{ $t('setting.versionHelper2') }}</li>
+            </el-alert>
             <div class="default-theme">
-                <h2 class="inline-block">{{ $t('setting.newVersion') }}</h2>
-                <el-tag class="inline-block tag">{{ upgradeInfo.newVersion }}</el-tag>
+                <h2 class="inline-block">{{ $t('app.version') }}</h2>
             </div>
+            <el-radio-group class="inline-block tag" v-model="upgradeVersion" @change="changeOption">
+                <el-radio v-if="upgradeInfo.newVersion" :label="upgradeInfo.newVersion">
+                    {{ upgradeInfo.newVersion }} {{ $t('setting.newVersion') }}
+                </el-radio>
+                <el-radio :label="upgradeInfo.latestVersion">
+                    {{ upgradeInfo.latestVersion }} {{ $t('setting.latestVersion') }}
+                </el-radio>
+            </el-radio-group>
             <MdEditor v-model="upgradeInfo.releaseNote" previewOnly />
         </div>
         <template #footer>
@@ -27,13 +50,14 @@
     </el-drawer>
 </template>
 <script setup lang="ts">
-import { getSettingInfo, loadUpgradeInfo, upgrade } from '@/api/modules/setting';
+import { getSettingInfo, loadReleaseNotes, loadUpgradeInfo, upgrade } from '@/api/modules/setting';
 import MdEditor from 'md-editor-v3';
 import i18n from '@/lang';
 import 'md-editor-v3/lib/style.css';
 import { MsgSuccess } from '@/utils/message';
 import { onMounted, ref } from 'vue';
 import { GlobalStore } from '@/store';
+import { ElMessageBox } from 'element-plus';
 const globalStore = GlobalStore();
 
 const version = ref();
@@ -41,6 +65,8 @@ let loading = ref(false);
 const drawerVisiable = ref(false);
 const upgradeInfo = ref();
 const refresh = ref();
+
+const upgradeVersion = ref();
 
 const search = async () => {
     const res = await getSettingInfo();
@@ -56,17 +82,22 @@ const onLoadUpgradeInfo = async () => {
     await loadUpgradeInfo()
         .then((res) => {
             loading.value = false;
-
             if (!res.data) {
                 MsgSuccess(i18n.global.t('setting.noUpgrade'));
                 return;
             }
             upgradeInfo.value = res.data;
+            upgradeVersion.value = upgradeInfo.value.newVersion || upgradeInfo.value.latestVersion;
             drawerVisiable.value = true;
         })
         .catch(() => {
             loading.value = false;
         });
+};
+
+const changeOption = async () => {
+    const res = await loadReleaseNotes(upgradeVersion.value);
+    upgradeInfo.value.releaseNote = res.data;
 };
 
 const onUpgrade = async () => {
@@ -76,7 +107,7 @@ const onUpgrade = async () => {
         type: 'info',
     }).then(async () => {
         globalStore.isLoading = true;
-        await upgrade(upgradeInfo.value.newVersion);
+        await upgrade(upgradeVersion.value);
         drawerVisiable.value = false;
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
@@ -99,7 +130,6 @@ onMounted(() => {
     height: calc(100vh - 330px);
     margin-left: 70px;
     .tag {
-        margin-left: 20px;
         margin-top: -6px;
         vertical-align: middle;
     }

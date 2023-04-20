@@ -3,13 +3,6 @@ package dto
 import "time"
 
 type DashboardBase struct {
-	HaloID         uint `json:"haloID"`
-	DateeaseID     uint `json:"dateeaseID"`
-	JumpServerID   uint `json:"jumpserverID"`
-	MeterSphereID  uint `json:"metersphereID"`
-	KubeoperatorID uint `json:"kubeoperatorID"`
-	KubepiID       uint `json:"kubepiID"`
-
 	WebsiteNumber     int `json:"websiteNumber"`
 	DatabaseNumber    int `json:"databaseNumber"`
 	CronjobNumber     int `json:"cronjobNumber"`
@@ -55,8 +48,21 @@ type DashboardCurrent struct {
 	IOReadBytes  uint64 `json:"ioReadBytes"`
 	IOWriteBytes uint64 `json:"ioWriteBytes"`
 	IOCount      uint64 `json:"ioCount"`
-	IOTime       uint64 `json:"ioTime"`
+	IOReadTime   uint64 `json:"ioReadTime"`
+	IOWriteTime  uint64 `json:"ioWriteTime"`
 
+	DiskData []DiskInfo `json:"diskData"`
+
+	NetBytesSent uint64 `json:"netBytesSent"`
+	NetBytesRecv uint64 `json:"netBytesRecv"`
+
+	ShotTime time.Time `json:"shotTime"`
+}
+
+type DiskInfo struct {
+	Path        string  `json:"path"`
+	Type        string  `json:"type"`
+	Device      string  `json:"device"`
 	Total       uint64  `json:"total"`
 	Free        uint64  `json:"free"`
 	Used        uint64  `json:"used"`
@@ -66,9 +72,4 @@ type DashboardCurrent struct {
 	InodesUsed        uint64  `json:"inodesUsed"`
 	InodesFree        uint64  `json:"inodesFree"`
 	InodesUsedPercent float64 `json:"inodesUsedPercent"`
-
-	NetBytesSent uint64 `json:"netBytesSent"`
-	NetBytesRecv uint64 `json:"netBytesRecv"`
-
-	ShotTime time.Time `json:"shotTime"`
 }

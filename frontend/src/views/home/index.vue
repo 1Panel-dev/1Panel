@@ -104,7 +104,7 @@
                                 <el-tag>
                                     {{ $t('home.rwPerSecond') }}: {{ currentChartInfo.ioCount }} {{ $t('home.time') }}
                                 </el-tag>
-                                <el-tag>{{ $t('home.rwPerSecond') }}: {{ currentInfo.ioTime }} ms</el-tag>
+                                <el-tag>{{ $t('home.ioDelay') }}: {{ currentChartInfo.ioTime }} ms</el-tag>
                             </div>
 
                             <div v-if="chartOption === 'io'" style="margin-top: 40px">
@@ -210,7 +210,10 @@ import { useRouter } from 'vue-router';
 import RouterButton from '@/components/router-button/index.vue';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
+import { loadUpgradeInfo } from '@/api/modules/setting';
+import { GlobalStore } from '@/store';
 const router = useRouter();
+const globalStore = GlobalStore();
 
 const statuRef = ref();
 const appRef = ref();
@@ -234,13 +237,6 @@ const searchInfo = reactive({
 });
 
 const baseInfo = ref<Dashboard.BaseInfo>({
-    haloID: 0,
-    dateeaseID: 0,
-    jumpserverID: 0,
-    metersphereID: 0,
-    kubeoperatorID: 0,
-    kubepiID: 0,
-
     websiteNumber: 0,
     databaseNumber: 0,
     cronjobNumber: 0,
@@ -282,18 +278,11 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
 
     ioReadBytes: 0,
     ioWriteBytes: 0,
-    ioTime: 0,
     ioCount: 0,
+    ioReadTime: 0,
+    ioWriteTime: 0,
 
-    total: 0,
-    free: 0,
-    used: 0,
-    usedPercent: 0,
-
-    inodesTotal: 0,
-    inodesUsed: 0,
-    inodesFree: 0,
-    inodesUsedPercent: 0,
+    diskData: [],
 
     netBytesSent: 0,
     netBytesRecv: 0,
@@ -304,6 +293,7 @@ const currentChartInfo = reactive({
     ioReadBytes: 0,
     ioWriteBytes: 0,
     ioCount: 0,
+    ioTime: 0,
 
     netBytesSent: 0,
     netBytesRecv: 0,
@@ -347,7 +337,7 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     currentInfo.value = baseInfo.value.currentInfo;
     onLoadCurrentInfo();
     statuRef.value.acceptParams(currentInfo.value, baseInfo.value);
-    appRef.value.acceptParams(baseInfo.value);
+    appRef.value.acceptParams();
     if (isInit) {
         // window.addEventListener('resize', changeChartSize);
         timer = setInterval(async () => {
@@ -389,7 +379,11 @@ const onLoadCurrentInfo = async () => {
     if (ioWriteBytes.value.length > 20) {
         ioWriteBytes.value.splice(0, 1);
     }
-    currentChartInfo.ioCount = Number(((res.data.ioCount - currentInfo.value.ioCount) / 3).toFixed(2));
+    currentChartInfo.ioCount = Math.round(Number((res.data.ioCount - currentInfo.value.ioCount) / 3));
+    let ioReadTime = res.data.ioReadTime - currentInfo.value.ioReadTime;
+    let ioWriteTime = res.data.ioWriteTime - currentInfo.value.ioWriteTime;
+    let ioChoose = ioReadTime > ioWriteTime ? ioReadTime : ioWriteTime;
+    currentChartInfo.ioTime = Math.round(Number(ioChoose / 3));
 
     timeIODatas.value.push(dateFormatForSecond(res.data.shotTime));
     if (timeIODatas.value.length > 20) {
@@ -479,7 +473,17 @@ const loadData = async () => {
     }
 };
 
+const loadUpgradeStatus = async () => {
+    const res = await loadUpgradeInfo();
+    if (res.data) {
+        globalStore.hasNewVersion = true;
+    } else {
+        globalStore.hasNewVersion = false;
+    }
+};
+
 onMounted(() => {
+    loadUpgradeStatus();
     onLoadNetworkOptions();
     onLoadIOOptions();
     onLoadBaseInfo(true, 'all');

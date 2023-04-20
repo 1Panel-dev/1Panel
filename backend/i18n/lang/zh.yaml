@@ -16,6 +16,7 @@ ErrRepoNotValid: "远程仓库校验失败！"
 #common
 ErrNameIsExist: "名称已存在"
 ErrDemoEnvironment: "演示服务器，禁止此操作!"
+ErrCmdTimeout: "命令执行超时！"
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被占用！"
@@ -26,6 +27,7 @@ ErrPortInOtherApp: "{{ .port }} 端口已被 {{ .apps }}占用！"
 ErrDbUserNotValid: "存量数据库，用户名密码不匹配！"
 ErrDockerComposeNotValid: "docker-compose 文件格式错误"
 ErrUpdateBuWebsite: '应用更新成功，但是网站配置文件修改失败，请检查配置！'
+Err1PanelNetworkFailed: '默认容器网络创建失败！{{ .detail }}'
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"
@@ -34,6 +36,7 @@ ErrPathNotFound: "目录不存在"
 ErrMovePathFailed: "目标路径不能包含原路径！"
 ErrLinkPathNotFound: "目标路径不存在!"
 ErrFileIsExit: "文件已存在！"
+ErrFileUpload: "上传文件失败"
 
 #website
 ErrDomainIsExist: "域名已存在"
@@ -50,6 +53,7 @@ ErrEmailIsExist: '邮箱已存在'
 #mysql
 ErrUserIsExist: "当前用户已存在，请重新输入"
 ErrDatabaseIsExist: "当前数据库已存在，请重新输入"
+ErrExecTimeOut: "SQL 执行超时，请检查{{ .detail }}容器"
 
 #redis
 ErrTypeOfRedis: "恢复文件类型与当前持久化方式不符，请修改后重试"
@@ -57,3 +61,13 @@ ErrTypeOfRedis: "恢复文件类型与当前持久化方式不符，请修改后
 #container 
 ErrInUsed: "{{ .detail }} 正被使用，无法删除"
 ErrObjectInUsed: "该对象正被使用，无法删除"
+
+#runtime
+ErrDirNotFound: "build 文件夹不存在！请检查文件完整性！"
+ErrFileNotExist: "{{ .detail }} 文件不存在！请检查源文件完整性！"
+ErrImageBuildErr: "镜像 build 失败"
+ErrImageExist: "镜像已存在！"
+ErrDelWithWebsite: "运行环境已经关联网站，无法删除"
+
+#setting
+ErrBackupInUsed: "该备份账号已在计划任务中使用，无法删除"

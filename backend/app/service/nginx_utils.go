@@ -16,6 +16,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 )
 
 func getNginxFull(website *model.Website) (dto.NginxFull, error) {
@@ -191,7 +192,7 @@ func opNginx(containerName, operate string) error {
 	if operate == constant.NginxCheck {
 		nginxCmd = fmt.Sprintf("docker exec -i %s %s", containerName, "nginx -t")
 	}
-	if out, err := cmd.Exec(nginxCmd); err != nil {
+	if out, err := cmd.ExecWithTimeOut(nginxCmd, 2*time.Second); err != nil {
 		return errors.New(out)
 	}
 	return nil

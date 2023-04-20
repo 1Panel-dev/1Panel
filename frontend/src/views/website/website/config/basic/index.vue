@@ -15,14 +15,17 @@
         <el-tab-pane :label="'HTTPS'">
             <HTTPS :id="id" v-if="tabIndex == '4'"></HTTPS>
         </el-tab-pane>
+        <el-tab-pane :label="$t('website.rewrite')">
+            <Rewrite :id="id" v-if="tabIndex == '5'"></Rewrite>
+        </el-tab-pane>
         <el-tab-pane :label="$t('website.other')">
-            <Other :id="id" v-if="tabIndex == '5'"></Other>
+            <Other :id="id" v-if="tabIndex == '6'"></Other>
         </el-tab-pane>
     </el-tabs>
 </template>
 
 <script lang="ts" setup name="Basic">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 import Doamin from './domain/index.vue';
 import Default from './default-doc/index.vue';
@@ -30,6 +33,7 @@ import LimitConn from './limit-conn/index.vue';
 import Other from './other/index.vue';
 import HTTPS from './https/index.vue';
 import SitePath from './site-folder/index.vue';
+import Rewrite from './rewrite/index.vue';
 
 const props = defineProps({
     id: {
@@ -42,5 +46,7 @@ const id = computed(() => {
     return props.id;
 });
 
-let tabIndex = ref('0');
+const tabIndex = ref('0');
+
+onMounted(() => {});
 </script>

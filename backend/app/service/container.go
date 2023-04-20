@@ -3,8 +3,9 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os/exec"
 	"sort"
 	"strconv"
@@ -21,6 +22,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
@@ -33,7 +35,7 @@ type IContainerService interface {
 	PageVolume(req dto.SearchWithPage) (int64, interface{}, error)
 	ListVolume() ([]dto.Options, error)
 	PageCompose(req dto.SearchWithPage) (int64, interface{}, error)
-	CreateCompose(req dto.ComposeCreate) error
+	CreateCompose(req dto.ComposeCreate) (string, error)
 	ComposeOperation(req dto.ComposeOperation) error
 	ContainerCreate(req dto.ContainerCreate) error
 	ContainerOperation(req dto.ContainerOperation) error
@@ -44,6 +46,8 @@ type IContainerService interface {
 	CreateNetwork(req dto.NetworkCreat) error
 	DeleteVolume(req dto.BatchDelete) error
 	CreateVolume(req dto.VolumeCreat) error
+	TestCompose(req dto.ComposeCreate) (bool, error)
+	ComposeUpdate(req dto.ComposeUpdate) error
 }
 
 func NewIContainerService() IContainerService {
@@ -155,10 +159,12 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
 		return err
 	}
 	config := &container.Config{
-		Image:  req.Image,
-		Cmd:    req.Cmd,
-		Env:    req.Env,
-		Labels: stringsToMap(req.Labels),
+		Image:     req.Image,
+		Cmd:       req.Cmd,
+		Env:       req.Env,
+		Labels:    stringsToMap(req.Labels),
+		Tty:       true,
+		OpenStdin: true,
 	}
 	hostConf := &container.HostConfig{
 		AutoRemove:      req.AutoRemove,
@@ -190,14 +196,21 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
 	}
 
 	global.LOG.Infof("new container info %s has been made, now start to create", req.Name)
-	container, err := client.ContainerCreate(context.TODO(), config, hostConf, &network.NetworkingConfig{}, &v1.Platform{}, req.Name)
+
+	ctx := context.Background()
+	if !checkImageExist(client, req.Image) {
+		if err := pullImages(ctx, client, req.Image); err != nil {
+			return err
+		}
+	}
+	container, err := client.ContainerCreate(ctx, config, hostConf, &network.NetworkingConfig{}, &v1.Platform{}, req.Name)
 	if err != nil {
-		_ = client.ContainerRemove(context.Background(), req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
+		_ = client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 		return err
 	}
 	global.LOG.Infof("create container %s successful! now check if the container is started and delete the container information if it is not.", req.Name)
-	if err := client.ContainerStart(context.TODO(), container.ID, types.ContainerStartOptions{}); err != nil {
-		_ = client.ContainerRemove(context.Background(), req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
+	if err := client.ContainerStart(ctx, container.ID, types.ContainerStartOptions{}); err != nil {
+		_ = client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 		return fmt.Errorf("create successful but start failed, err: %v", err)
 	}
 	return nil
@@ -215,9 +228,9 @@ func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error 
 	case constant.ContainerOpStart:
 		err = client.ContainerStart(ctx, req.Name, types.ContainerStartOptions{})
 	case constant.ContainerOpStop:
-		err = client.ContainerStop(ctx, req.Name, nil)
+		err = client.ContainerStop(ctx, req.Name, container.StopOptions{})
 	case constant.ContainerOpRestart:
-		err = client.ContainerRestart(ctx, req.Name, nil)
+		err = client.ContainerRestart(ctx, req.Name, container.StopOptions{})
 	case constant.ContainerOpKill:
 		err = client.ContainerKill(ctx, req.Name, "SIGKILL")
 	case constant.ContainerOpPause:
@@ -239,7 +252,7 @@ func (u *ContainerService) ContainerLogs(req dto.ContainerLog) (string, error) {
 	}
 	stdout, err := cmd.CombinedOutput()
 	if err != nil {
-		return "", err
+		return "", errors.New(string(stdout))
 	}
 	return string(stdout), nil
 }
@@ -255,7 +268,7 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainterStats, erro
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -319,4 +332,34 @@ func calculateNetwork(network map[string]types.NetworkStats) (float64, float64) 
 		tx += float64(v.TxBytes) / 1024
 	}
 	return rx, tx
+}
+
+func checkImageExist(client *client.Client, image string) bool {
+	images, err := client.ImageList(context.Background(), types.ImageListOptions{})
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+
+	for _, img := range images {
+		for _, tag := range img.RepoTags {
+			if tag == image || tag == image+":latest" {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func pullImages(ctx context.Context, client *client.Client, image string) error {
+	out, err := client.ImagePull(ctx, image, types.ImagePullOptions{})
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+	_, err = io.Copy(io.Discard, out)
+	if err != nil {
+		return err
+	}
+	return nil
 }

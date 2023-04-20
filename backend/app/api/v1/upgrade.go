@@ -23,6 +23,28 @@ func (b *BaseApi) GetUpgradeInfo(c *gin.Context) {
 }
 
 // @Tags System Setting
+// @Summary Load release notes by version
+// @Description 获取版本 release notes
+// @Accept json
+// @Param request body dto.Upgrade true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/upgrade [get]
+func (b *BaseApi) GetNotesByVersion(c *gin.Context) {
+	var req dto.Upgrade
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	notes, err := upgradeService.LoadNotes(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, notes)
+}
+
+// @Tags System Setting
 // @Summary Upgrade
 // @Description 系统更新
 // @Accept json

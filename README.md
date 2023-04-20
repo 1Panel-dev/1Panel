@@ -1,3 +1,4 @@
+[README_EN.md](README_EN.md)
 <p align="center"><a href="https://1panel.cn"><img src="http://1panel.oss-cn-hangzhou.aliyuncs.com/img/1panel-logo.png" alt="1Panel" width="300" /></a></p>
 <p align="center"><b>现代化、开源的 Linux 服务器运维管理面板</b></p>
 <p align="center">
@@ -18,7 +19,7 @@
 
 ## UI 展示
 
-![UI展示](https://1panel.oss-cn-hangzhou.aliyuncs.com/img/overview.png)
+![UI展示](https://resource.fit2cloud.com/1panel/img/overview.png)
 
 ## 快速开始
 
@@ -47,13 +48,13 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 
 **微信交流群**
 
-<img src="http://1panel.oss-cn-hangzhou.aliyuncs.com/img/wechat-group.jpg" width="156" height="156"/>
+<img src="https://1panel.cn/img/wechat-group.jpg" width="156" height="156"/>
 
 ## 安全说明
 
 如果您在使用过程中发现任何安全问题，请通过以下方式直接联系我们：
 
-- 邮箱：support@fit2cloud.com 
+- 邮箱：support@fit2cloud.com
 - 电话：400-052-0755
 
 ## Star History
@@ -62,7 +63,7 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 
 ## License
 
-Copyright (c) 2014-2023 飞致云 FIT2CLOUD, All rights reserved.
+Copyright (c) 2014-2023 [FIT2CLOUD 飞致云](https://fit2cloud.com/), All rights reserved.
 
 Licensed under The GNU General Public License version 3 (GPLv3)  (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 

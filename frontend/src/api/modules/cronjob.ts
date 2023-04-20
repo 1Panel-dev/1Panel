@@ -14,12 +14,16 @@ export const editCronjob = (params: Cronjob.CronjobUpdate) => {
     return http.post(`/cronjobs/update`, params);
 };
 
-export const deleteCronjob = (params: { ids: number[] }) => {
-    return http.post(`/cronjobs/del`, params);
+export const deleteCronjob = (ids: number[], cleanData: boolean) => {
+    return http.post(`/cronjobs/del`, { ids: ids, cleanData: cleanData });
 };
 
 export const searchRecords = (params: Cronjob.SearchRecord) => {
     return http.post<ResPage<Cronjob.Record>>(`cronjobs/search/records`, params);
+};
+
+export const cleanRecords = (id: number, cleanData: boolean) => {
+    return http.post(`cronjobs/records/clean`, { cronjobID: id, cleanData: cleanData });
 };
 
 export const getRecordDetail = (params: string) => {
@@ -31,7 +35,7 @@ export const updateStatus = (params: Cronjob.UpdateStatus) => {
 };
 
 export const download = (params: Cronjob.Download) => {
-    return http.download<BlobPart>(`cronjobs/download`, params, { responseType: 'blob' });
+    return http.post<string>(`cronjobs/download`, params);
 };
 
 export const handleOnce = (id: number) => {

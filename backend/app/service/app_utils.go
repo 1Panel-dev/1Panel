@@ -4,8 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
+	"github.com/compose-spec/compose-go/types"
+	"github.com/subosito/gotenv"
 	"math"
 	"os"
+	"os/exec"
 	"path"
 	"reflect"
 	"strconv"
@@ -23,6 +27,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
+	composeV2 "github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
 )
@@ -125,7 +130,23 @@ func createLink(ctx context.Context, app model.App, appInstall *model.AppInstall
 	return nil
 }
 
-func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBackup bool, forceDelete bool, deleteDB bool) error {
+func handleAppInstallErr(ctx context.Context, install *model.AppInstall) error {
+	op := files.NewFileOp()
+	appDir := install.GetPath()
+	dir, _ := os.Stat(appDir)
+	if dir != nil {
+		_, _ = compose.Down(install.GetComposePath())
+		if err := op.DeleteDir(appDir); err != nil {
+			return err
+		}
+	}
+	if err := deleteLink(ctx, install, true, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func deleteAppInstall(install model.AppInstall, deleteBackup bool, forceDelete bool, deleteDB bool) error {
 	op := files.NewFileOp()
 	appDir := install.GetPath()
 	dir, _ := os.Stat(appDir)
@@ -134,36 +155,34 @@ func deleteAppInstall(ctx context.Context, install model.AppInstall, deleteBacku
 		if err != nil && !forceDelete {
 			return handleErr(install, err, out)
 		}
-		if err := op.DeleteDir(appDir); err != nil && !forceDelete {
-			return err
-		}
 	}
+	tx, ctx := helper.GetTxAndContext()
+	defer tx.Rollback()
 	if err := appInstallRepo.Delete(ctx, install); err != nil {
 		return err
 	}
 	if err := deleteLink(ctx, &install, deleteDB, forceDelete); err != nil && !forceDelete {
 		return err
 	}
+	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), backupRepo.WithByDetailName(install.Name))
+	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(install.App.Key))
+	if install.App.Key == constant.AppMysql {
+		_ = mysqlRepo.DeleteAll(ctx)
+	}
 	uploadDir := fmt.Sprintf("%s/1panel/uploads/app/%s/%s", global.CONF.System.BaseDir, install.App.Key, install.Name)
 	if _, err := os.Stat(uploadDir); err == nil {
 		_ = os.RemoveAll(uploadDir)
 	}
 	if deleteBackup {
-		localDir, err := loadLocalDir()
-		if err != nil && !forceDelete {
-			return err
-		}
+		localDir, _ := loadLocalDir()
 		backupDir := fmt.Sprintf("%s/app/%s/%s", localDir, install.App.Key, install.Name)
 		if _, err := os.Stat(backupDir); err == nil {
 			_ = os.RemoveAll(backupDir)
 		}
 		global.LOG.Infof("delete app %s-%s backups successful", install.App.Key, install.Name)
 	}
-	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType("app"), commonRepo.WithByName(install.App.Key), backupRepo.WithByDetailName(install.Name))
-	_ = backupRepo.DeleteRecord(ctx, commonRepo.WithByType(install.App.Key))
-	if install.App.Key == constant.AppMysql {
-		_ = mysqlRepo.DeleteAll(ctx)
-	}
+	_ = op.DeleteDir(appDir)
+	tx.Commit()
 	return nil
 }
 
@@ -190,7 +209,7 @@ func deleteLink(ctx context.Context, install *model.AppInstall, deleteDB bool, f
 	return appInstallResourceRepo.DeleteBy(ctx, appInstallResourceRepo.WithAppInstallId(install.ID))
 }
 
-func updateInstall(installId uint, detailId uint) error {
+func upgradeInstall(installId uint, detailId uint) error {
 	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
 	if err != nil {
 		return err
@@ -205,7 +224,21 @@ func updateInstall(installId uint, detailId uint) error {
 	if err := NewIBackupService().AppBackup(dto.CommonBackup{Name: install.App.Key, DetailName: install.Name}); err != nil {
 		return err
 	}
-	if _, err = compose.Down(install.GetComposePath()); err != nil {
+
+	detailDir := path.Join(constant.ResourceDir, "apps", install.App.Key, "versions", detail.Version)
+	cmd := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -rf %s/* %s", detailDir, install.GetPath()))
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		if stdout != nil {
+			return errors.New(string(stdout))
+		}
+		return err
+	}
+
+	if out, err := compose.Down(install.GetComposePath()); err != nil {
+		if out != "" {
+			return errors.New(out)
+		}
 		return err
 	}
 	install.DockerCompose = detail.DockerCompose
@@ -216,30 +249,49 @@ func updateInstall(installId uint, detailId uint) error {
 	if err := fileOp.WriteFile(install.GetComposePath(), strings.NewReader(install.DockerCompose), 0775); err != nil {
 		return err
 	}
-	if _, err = compose.Up(install.GetComposePath()); err != nil {
+	if out, err := compose.Up(install.GetComposePath()); err != nil {
+		if out != "" {
+			return errors.New(out)
+		}
 		return err
 	}
-	return appInstallRepo.Save(&install)
+	return appInstallRepo.Save(context.Background(), &install)
 }
 
 func getContainerNames(install model.AppInstall) ([]string, error) {
-	composeMap := install.DockerCompose
-	envMap := make(map[string]interface{})
-	_ = json.Unmarshal([]byte(install.Env), &envMap)
-	newEnvMap := make(map[string]string, len(envMap))
-	handleMap(envMap, newEnvMap)
-	project, err := compose.GetComposeProject([]byte(composeMap), newEnvMap)
+	envStr, err := coverEnvJsonToStr(install.Env)
 	if err != nil {
 		return nil, err
 	}
-	containerNames := []string{install.ContainerName}
+	project, err := composeV2.GetComposeProject(install.Name, install.GetPath(), []byte(install.DockerCompose), []byte(envStr), true)
+	if err != nil {
+		return nil, err
+	}
+	containerMap := make(map[string]struct{})
+	containerMap[install.ContainerName] = struct{}{}
 	for _, service := range project.AllServices() {
 		if service.ContainerName == "${CONTAINER_NAME}" || service.ContainerName == "" {
 			continue
 		}
-		containerNames = append(containerNames, service.ContainerName)
+		containerMap[service.ContainerName] = struct{}{}
+	}
+	var containerNames []string
+	for k := range containerMap {
+		containerNames = append(containerNames, k)
 	}
 	return containerNames, nil
+}
+
+func coverEnvJsonToStr(envJson string) (string, error) {
+	envMap := make(map[string]interface{})
+	_ = json.Unmarshal([]byte(envJson), &envMap)
+	newEnvMap := make(map[string]string, len(envMap))
+	handleMap(envMap, newEnvMap)
+	envStr, err := gotenv.Marshal(newEnvMap)
+	if err != nil {
+		return "", err
+	}
+	return envStr, nil
 }
 
 func checkLimit(app model.App) error {
@@ -256,11 +308,9 @@ func checkLimit(app model.App) error {
 }
 
 func checkRequiredAndLimit(app model.App) error {
-
 	if err := checkLimit(app); err != nil {
 		return err
 	}
-
 	if app.Required != "" {
 		var requiredArray []string
 		if err := json.Unmarshal([]byte(app.Required), &requiredArray); err != nil {
@@ -289,7 +339,6 @@ func checkRequiredAndLimit(app model.App) error {
 			}
 		}
 	}
-
 	return nil
 }
 
@@ -306,10 +355,17 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 	}
 }
 
-func copyAppData(key, version, installName string, params map[string]interface{}) (err error) {
+func copyAppData(key, version, installName string, params map[string]interface{}, isLocal bool) (err error) {
 	fileOp := files.NewFileOp()
-	resourceDir := path.Join(constant.AppResourceDir, key, "versions", version)
+	appResourceDir := constant.AppResourceDir
 	installAppDir := path.Join(constant.AppInstallDir, key)
+	appKey := key
+	if isLocal {
+		appResourceDir = constant.LocalAppResourceDir
+		appKey = strings.TrimPrefix(key, "local")
+		installAppDir = path.Join(constant.LocalAppInstallDir, appKey)
+	}
+	resourceDir := path.Join(appResourceDir, appKey, "versions", version)
 
 	if !fileOp.Stat(installAppDir) {
 		if err = fileOp.CreateDir(installAppDir, 0755); err != nil {
@@ -339,19 +395,64 @@ func copyAppData(key, version, installName string, params map[string]interface{}
 	return
 }
 
-func upApp(composeFilePath string, appInstall model.AppInstall) {
-	out, err := compose.Up(composeFilePath)
-	if err != nil {
-		if out != "" {
-			appInstall.Message = out
-		} else {
-			appInstall.Message = err.Error()
+// 处理文件夹权限等问题
+func upAppPre(app model.App, appInstall *model.AppInstall) error {
+	if app.Key == "nexus" {
+		dataPath := path.Join(appInstall.GetPath(), "data")
+		if err := files.NewFileOp().Chown(dataPath, 200, 0); err != nil {
+			return err
 		}
+	}
+	return nil
+}
+
+func getServiceFromInstall(appInstall *model.AppInstall) (service *composeV2.ComposeService, err error) {
+	var (
+		project *types.Project
+		envStr  string
+	)
+	envStr, err = coverEnvJsonToStr(appInstall.Env)
+	if err != nil {
+		return
+	}
+	project, err = composeV2.GetComposeProject(appInstall.Name, appInstall.GetPath(), []byte(appInstall.DockerCompose), []byte(envStr), true)
+	if err != nil {
+		return
+	}
+	service, err = composeV2.NewComposeService()
+	if err != nil {
+		return
+	}
+	service.SetProject(project)
+	return
+}
+
+func upApp(appInstall *model.AppInstall) {
+	upProject := func(appInstall *model.AppInstall) (err error) {
+		if err == nil {
+			var composeService *composeV2.ComposeService
+			composeService, err = getServiceFromInstall(appInstall)
+			if err != nil {
+				return err
+			}
+			err = composeService.ComposeUp()
+			if err != nil {
+				return err
+			}
+			return
+		} else {
+			return
+		}
+	}
+	if err := upProject(appInstall); err != nil {
 		appInstall.Status = constant.Error
-		_ = appInstallRepo.Save(&appInstall)
+		appInstall.Message = err.Error()
 	} else {
 		appInstall.Status = constant.Running
-		_ = appInstallRepo.Save(&appInstall)
+	}
+	exist, _ := appInstallRepo.GetFirst(commonRepo.WithByID(appInstall.ID))
+	if exist.ID > 0 {
+		_ = appInstallRepo.Save(context.Background(), appInstall)
 	}
 }
 
@@ -390,20 +491,29 @@ func getAppDetails(details []model.AppDetail, versions []string) map[string]mode
 	return appDetails
 }
 
-func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
+func getApps(oldApps []model.App, items []dto.AppDefine, isLocal bool) map[string]model.App {
 	apps := make(map[string]model.App, len(oldApps))
 	for _, old := range oldApps {
 		old.Status = constant.AppTakeDown
 		apps[old.Key] = old
 	}
 	for _, item := range items {
-		app, ok := apps[item.Key]
+		key := item.Key
+		if isLocal {
+			key = "local" + key
+		}
+		app, ok := apps[key]
 		if !ok {
 			app = model.App{}
 		}
+		if isLocal {
+			app.Resource = constant.AppResourceLocal
+		} else {
+			app.Resource = constant.AppResourceRemote
+		}
 		app.Name = item.Name
 		app.Limit = item.Limit
-		app.Key = item.Key
+		app.Key = key
 		app.ShortDescZh = item.ShortDescZh
 		app.ShortDescEn = item.ShortDescEn
 		app.Website = item.Website
@@ -413,7 +523,7 @@ func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
 		app.CrossVersionUpdate = item.CrossVersionUpdate
 		app.Required = item.GetRequired()
 		app.Status = constant.AppNormal
-		apps[item.Key] = app
+		apps[key] = app
 	}
 	return apps
 }
@@ -426,7 +536,7 @@ func handleErr(install model.AppInstall, err error, out string) error {
 		reErr = errors.New(out)
 		install.Status = constant.Error
 	}
-	_ = appInstallRepo.Save(&install)
+	_ = appInstallRepo.Save(context.Background(), &install)
 	return reErr
 }
 
@@ -501,7 +611,7 @@ func getAppInstallByKey(key string) (model.AppInstall, error) {
 	return appInstall, nil
 }
 
-func updateToolApp(installed model.AppInstall) {
+func updateToolApp(installed *model.AppInstall) {
 	tooKey, ok := dto.AppToolMap[installed.App.Key]
 	if !ok {
 		return
@@ -537,7 +647,7 @@ func updateToolApp(installed model.AppInstall) {
 		return
 	}
 	toolInstall.Env = string(contentByte)
-	if err := appInstallRepo.Save(&toolInstall); err != nil {
+	if err := appInstallRepo.Save(context.Background(), &toolInstall); err != nil {
 		global.LOG.Errorf("update tool app [%s] error : %s", toolInstall.Name, err.Error())
 		return
 	}

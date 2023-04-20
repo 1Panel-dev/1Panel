@@ -1,7 +1,6 @@
 import http from '@/api';
 import { ResPage } from '../interface';
 import { Command } from '../interface/command';
-import { Group } from '../interface/group';
 import { Host } from '../interface/host';
 import { Base64 } from 'js-base64';
 import { deepCopy } from '@/utils/util';
@@ -55,20 +54,6 @@ export const deleteHost = (params: { ids: number[] }) => {
     return http.post(`/hosts/del`, params);
 };
 
-// group
-export const GetGroupList = (params: Group.GroupSearch) => {
-    return http.post<Array<Group.GroupInfo>>(`/hosts/group/search`, params);
-};
-export const CreateGroup = (params: Group.GroupCreate) => {
-    return http.post<Group.GroupCreate>(`/hosts/group`, params);
-};
-export const UpdateGroup = (params: Group.GroupUpdate) => {
-    return http.post(`/hosts/group/update`, params);
-};
-export const DeleteGroup = (id: number) => {
-    return http.post(`/hosts/group/del`, { id: id });
-};
-
 // command
 export const getCommandList = () => {
     return http.get<Array<Command.CommandInfo>>(`/hosts/command`, {});
@@ -84,4 +69,30 @@ export const editCommand = (params: Command.CommandOperate) => {
 };
 export const deleteCommand = (params: { ids: number[] }) => {
     return http.post(`/hosts/command/del`, params);
+};
+
+// firewall
+export const loadFireBaseInfo = () => {
+    return http.get<Host.FirewallBase>(`/hosts/firewall/base`);
+};
+export const searchFireRule = (params: Host.RuleSearch) => {
+    return http.post<ResPage<Host.RuleInfo>>(`/hosts/firewall/search`, params);
+};
+export const operateFire = (operation: string) => {
+    return http.post(`/hosts/firewall/operate`, { operation: operation });
+};
+export const operatePortRule = (params: Host.RulePort) => {
+    return http.post<Host.RulePort>(`/hosts/firewall/port`, params);
+};
+export const operateIPRule = (params: Host.RuleIP) => {
+    return http.post<Host.RuleIP>(`/hosts/firewall/ip`, params);
+};
+export const updatePortRule = (params: Host.UpdatePortRule) => {
+    return http.post(`/hosts/firewall/update/port`, params);
+};
+export const updateAddrRule = (params: Host.UpdateAddrRule) => {
+    return http.post(`/hosts/firewall/update/addr`, params);
+};
+export const batchOperateRule = (params: Host.BatchRule) => {
+    return http.post(`/hosts/firewall/batch`, params);
 };

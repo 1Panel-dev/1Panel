@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -68,7 +67,7 @@ func TestSSL(t *testing.T) {
 	//	return
 	//}
 
-	key, err := ioutil.ReadFile("private.key")
+	key, err := os.ReadFile("private.key")
 	if err != nil {
 		panic(err)
 	}

@@ -6,10 +6,10 @@ export const searchContainer = (params: Container.ContainerSearch) => {
     return http.post<ResPage<Container.ContainerInfo>>(`/containers/search`, params);
 };
 export const createContainer = (params: Container.ContainerCreate) => {
-    return http.post(`/containers`, params);
+    return http.post(`/containers`, params, 3000000);
 };
 export const logContainer = (params: Container.ContainerLogSearch) => {
-    return http.post<string>(`/containers/search/log`, params);
+    return http.post<string>(`/containers/search/log`, params, 400000);
 };
 export const ContainerStats = (id: string) => {
     return http.get<Container.ContainerStats>(`/containers/stats/${id}`);
@@ -38,10 +38,10 @@ export const imagePush = (params: Container.ImagePush) => {
     return http.post<string>(`/containers/image/push`, params);
 };
 export const imageLoad = (params: Container.ImageLoad) => {
-    return http.post(`/containers/image/load`, params);
+    return http.post(`/containers/image/load`, params, 1200000);
 };
 export const imageSave = (params: Container.ImageSave) => {
-    return http.post(`/containers/image/save`, params);
+    return http.post(`/containers/image/save`, params, 1200000);
 };
 export const imageTag = (params: Container.ImageTag) => {
     return http.post(`/containers/image/tag`, params);
@@ -117,13 +117,16 @@ export const searchCompose = (params: SearchWithPage) => {
     return http.post<ResPage<Container.ComposeInfo>>(`/containers/compose/search`, params);
 };
 export const upCompose = (params: Container.ComposeCreate) => {
-    return http.post(`/containers/compose`, params);
+    return http.post<string>(`/containers/compose`, params);
+};
+export const testCompose = (params: Container.ComposeCreate) => {
+    return http.post<boolean>(`/containers/compose/test`, params);
 };
 export const composeOperator = (params: Container.ComposeOpration) => {
     return http.post(`/containers/compose/operate`, params);
 };
 export const composeUpdate = (params: Container.ComposeUpdate) => {
-    return http.post(`/containers/compose/update`, params);
+    return http.post(`/containers/compose/update`, params, 600000);
 };
 
 // docker

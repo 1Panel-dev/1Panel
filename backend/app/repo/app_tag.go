@@ -8,6 +8,18 @@ import (
 type AppTagRepo struct {
 }
 
+type IAppTagRepo interface {
+	BatchCreate(ctx context.Context, tags []*model.AppTag) error
+	DeleteByAppIds(ctx context.Context, appIds []uint) error
+	DeleteAll(ctx context.Context) error
+	GetByAppId(appId uint) ([]model.AppTag, error)
+	GetByTagIds(tagIds []uint) ([]model.AppTag, error)
+}
+
+func NewIAppTagRepo() IAppTagRepo {
+	return &AppTagRepo{}
+}
+
 func (a AppTagRepo) BatchCreate(ctx context.Context, tags []*model.AppTag) error {
 	return getTx(ctx).Create(&tags).Error
 }

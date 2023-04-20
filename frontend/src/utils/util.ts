@@ -167,6 +167,18 @@ export function checkIp(value: string): boolean {
     }
 }
 
+export function checkPort(value: string): boolean {
+    if (Number(value) <= 0) {
+        return true;
+    }
+    const reg = /^([0-9]|[1-9]\d{1,3}|[1-5]\d{4}|6[0-5]{2}[0-3][0-5])$/;
+    if (!reg.test(value) && value !== '') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 export function getProvider(provider: string): string {
     switch (provider) {
         case 'dnsAccount':
@@ -216,4 +228,8 @@ export function isJson(str: string) {
     } catch {
         return false;
     }
+}
+
+export function toLowerCase(str: string) {
+    return str.toLowerCase();
 }

@@ -1,18 +1,19 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/env"
-	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
-	"github.com/joho/godotenv"
-	"io/ioutil"
 	"math"
 	"os"
 	"path"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/env"
+	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
+	"github.com/joho/godotenv"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
@@ -33,7 +34,28 @@ import (
 type AppInstallService struct {
 }
 
-func (a AppInstallService) Page(req request.AppInstalledSearch) (int64, []response.AppInstalledDTO, error) {
+type IAppInstallService interface {
+	Page(req request.AppInstalledSearch) (int64, []response.AppInstalledDTO, error)
+	CheckExist(key string) (*response.AppInstalledCheck, error)
+	LoadPort(key string) (int64, error)
+	LoadConnInfo(key string) (response.DatabaseConn, error)
+	SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error)
+	Operate(req request.AppInstalledOperate) error
+	Update(req request.AppInstalledUpdate) error
+	SyncAll(systemInit bool) error
+	GetServices(key string) ([]response.AppService, error)
+	GetUpdateVersions(installId uint) ([]dto.AppVersion, error)
+	GetParams(id uint) ([]response.AppParam, error)
+	ChangeAppPort(req request.PortUpdate) error
+	GetDefaultConfigByKey(key string) (string, error)
+	DeleteCheck(installId uint) ([]dto.AppResource, error)
+}
+
+func NewIAppInstalledService() IAppInstallService {
+	return &AppInstallService{}
+}
+
+func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []response.AppInstalledDTO, error) {
 	var opts []repo.DBOption
 
 	if req.Name != "" {
@@ -73,7 +95,7 @@ func (a AppInstallService) Page(req request.AppInstalledSearch) (int64, []respon
 	return total, installDTOs, nil
 }
 
-func (a AppInstallService) CheckExist(key string) (*response.AppInstalledCheck, error) {
+func (a *AppInstallService) CheckExist(key string) (*response.AppInstalledCheck, error) {
 	res := &response.AppInstalledCheck{
 		IsExist: false,
 	}
@@ -103,7 +125,7 @@ func (a AppInstallService) CheckExist(key string) (*response.AppInstalledCheck, 
 	return res, nil
 }
 
-func (a AppInstallService) LoadPort(key string) (int64, error) {
+func (a *AppInstallService) LoadPort(key string) (int64, error) {
 	app, err := appInstallRepo.LoadBaseInfo(key, "")
 	if err != nil {
 		return int64(0), nil
@@ -111,15 +133,19 @@ func (a AppInstallService) LoadPort(key string) (int64, error) {
 	return app.Port, nil
 }
 
-func (a AppInstallService) LoadPassword(key string) (string, error) {
+func (a *AppInstallService) LoadConnInfo(key string) (response.DatabaseConn, error) {
+	var data response.DatabaseConn
 	app, err := appInstallRepo.LoadBaseInfo(key, "")
 	if err != nil {
-		return "", nil
+		return data, nil
 	}
-	return app.Password, nil
+	data.Password = app.Password
+	data.ServiceName = app.ServiceName
+	data.Port = app.Port
+	return data, nil
 }
 
-func (a AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error) {
+func (a *AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]response.AppInstalledDTO, error) {
 	var (
 		installs []model.AppInstall
 		err      error
@@ -152,8 +178,8 @@ func (a AppInstallService) SearchForWebsite(req request.AppInstalledSearch) ([]r
 	return handleInstalled(installs, false)
 }
 
-func (a AppInstallService) Operate(req request.AppInstalledOperate) error {
-	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallId))
+func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
+	install, err := appInstallRepo.GetFirstByCtx(context.Background(), commonRepo.WithByID(req.InstallId))
 	if err != nil {
 		return err
 	}
@@ -180,49 +206,54 @@ func (a AppInstallService) Operate(req request.AppInstalledOperate) error {
 		}
 		return syncById(install.ID)
 	case constant.Delete:
-		tx, ctx := getTxAndContext()
-		if err := deleteAppInstall(ctx, install, req.DeleteBackup, req.ForceDelete, req.DeleteDB); err != nil && !req.ForceDelete {
-			tx.Rollback()
+		if err := deleteAppInstall(install, req.DeleteBackup, req.ForceDelete, req.DeleteDB); err != nil && !req.ForceDelete {
 			return err
 		}
-		tx.Commit()
 		return nil
 	case constant.Sync:
 		return syncById(install.ID)
 	case constant.Upgrade:
-		return updateInstall(install.ID, req.DetailId)
+		return upgradeInstall(install.ID, req.DetailId)
 	default:
 		return errors.New("operate not support")
 	}
 }
 
-func (a AppInstallService) Update(req request.AppInstalledUpdate) error {
+func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	installed, err := appInstallRepo.GetFirst(commonRepo.WithByID(req.InstallId))
 	if err != nil {
 		return err
 	}
 	changePort := false
+	var (
+		oldPorts []int
+		newPorts []int
+	)
 	port, ok := req.Params["PANEL_APP_PORT_HTTP"]
 	if ok {
 		portN := int(math.Ceil(port.(float64)))
 		if portN != installed.HttpPort {
+			oldPorts = append(oldPorts, installed.HttpPort)
 			changePort = true
 			httpPort, err := checkPort("PANEL_APP_PORT_HTTP", req.Params)
 			if err != nil {
 				return err
 			}
 			installed.HttpPort = httpPort
+			newPorts = append(newPorts, httpPort)
 		}
 	}
 	ports, ok := req.Params["PANEL_APP_PORT_HTTPS"]
 	if ok {
 		portN := int(math.Ceil(ports.(float64)))
 		if portN != installed.HttpsPort {
+			oldPorts = append(oldPorts, installed.HttpsPort)
 			httpsPort, err := checkPort("PANEL_APP_PORT_HTTPS", req.Params)
 			if err != nil {
 				return err
 			}
 			installed.HttpsPort = httpsPort
+			newPorts = append(newPorts, httpsPort)
 		}
 	}
 
@@ -240,7 +271,7 @@ func (a AppInstallService) Update(req request.AppInstalledUpdate) error {
 	if err := env.Write(oldEnvMaps, envPath); err != nil {
 		return err
 	}
-	_ = appInstallRepo.Save(&installed)
+	_ = appInstallRepo.Save(context.Background(), &installed)
 
 	if err := rebuildApp(installed); err != nil {
 		return err
@@ -267,16 +298,26 @@ func (a AppInstallService) Update(req request.AppInstalledUpdate) error {
 			return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
 		}
 	}
+	if changePort {
+		go func() {
+			_ = OperateFirewallPort(oldPorts, newPorts)
+		}()
+	}
 	return nil
 }
 
-func (a AppInstallService) SyncAll() error {
+func (a *AppInstallService) SyncAll(systemInit bool) error {
 	allList, err := appInstallRepo.ListBy()
 	if err != nil {
 		return err
 	}
 	for _, i := range allList {
 		if i.Status == constant.Installing {
+			if systemInit {
+				i.Status = constant.Error
+				i.Message = "System restart causes application exception"
+				_ = appInstallRepo.Save(context.Background(), &i)
+			}
 			continue
 		}
 		if err := syncById(i.ID); err != nil {
@@ -286,7 +327,7 @@ func (a AppInstallService) SyncAll() error {
 	return nil
 }
 
-func (a AppInstallService) GetServices(key string) ([]response.AppService, error) {
+func (a *AppInstallService) GetServices(key string) ([]response.AppService, error) {
 	app, err := appRepo.GetFirst(appRepo.WithKey(key))
 	if err != nil {
 		return nil, err
@@ -310,7 +351,7 @@ func (a AppInstallService) GetServices(key string) ([]response.AppService, error
 	return res, nil
 }
 
-func (a AppInstallService) GetUpdateVersions(installId uint) ([]dto.AppVersion, error) {
+func (a *AppInstallService) GetUpdateVersions(installId uint) ([]dto.AppVersion, error) {
 	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
 	var versions []dto.AppVersion
 	if err != nil {
@@ -335,7 +376,7 @@ func (a AppInstallService) GetUpdateVersions(installId uint) ([]dto.AppVersion, 
 	return versions, nil
 }
 
-func (a AppInstallService) ChangeAppPort(req request.PortUpdate) error {
+func (a *AppInstallService) ChangeAppPort(req request.PortUpdate) error {
 	if common.ScanPort(int(req.Port)) {
 		return buserr.WithDetail(constant.ErrPortInUsed, req.Port, nil)
 	}
@@ -360,10 +401,14 @@ func (a AppInstallService) ChangeAppPort(req request.PortUpdate) error {
 		}
 	}
 
+	if err := OperateFirewallPort([]int{int(appInstall.Port)}, []int{int(req.Port)}); err != nil {
+		global.LOG.Errorf("allow firewall failed, err: %v", err)
+	}
+
 	return nil
 }
 
-func (a AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, error) {
+func (a *AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, error) {
 	var res []dto.AppResource
 	appInstall, err := appInstallRepo.GetFirst(commonRepo.WithByID(installId))
 	if err != nil {
@@ -373,14 +418,12 @@ func (a AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, error
 	if err != nil {
 		return nil, err
 	}
-	if app.Type == "website" {
-		websites, _ := websiteRepo.GetBy(websiteRepo.WithAppInstallId(appInstall.ID))
-		for _, website := range websites {
-			res = append(res, dto.AppResource{
-				Type: "website",
-				Name: website.PrimaryDomain,
-			})
-		}
+	websites, _ := websiteRepo.GetBy(websiteRepo.WithAppInstallId(appInstall.ID))
+	for _, website := range websites {
+		res = append(res, dto.AppResource{
+			Type: "website",
+			Name: website.PrimaryDomain,
+		})
 	}
 	if app.Key == constant.AppOpenresty {
 		websites, _ := websiteRepo.GetBy()
@@ -404,7 +447,7 @@ func (a AppInstallService) DeleteCheck(installId uint) ([]dto.AppResource, error
 	return res, nil
 }
 
-func (a AppInstallService) GetDefaultConfigByKey(key string) (string, error) {
+func (a *AppInstallService) GetDefaultConfigByKey(key string) (string, error) {
 	appInstall, err := getAppInstallByKey(key)
 	if err != nil {
 		return "", err
@@ -426,7 +469,7 @@ func (a AppInstallService) GetDefaultConfigByKey(key string) (string, error) {
 	return string(contentByte), nil
 }
 
-func (a AppInstallService) GetParams(id uint) ([]response.AppParam, error) {
+func (a *AppInstallService) GetParams(id uint) ([]response.AppParam, error) {
 	var (
 		res     []response.AppParam
 		appForm dto.AppForm
@@ -459,14 +502,20 @@ func (a AppInstallService) GetParams(id uint) ([]response.AppParam, error) {
 			}
 			appParam.LabelZh = form.LabelZh
 			appParam.LabelEn = form.LabelEn
+			appParam.Value = v
 			if form.Type == "service" {
 				appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithServiceName(v.(string)))
-				appParam.Value = appInstall.Name
-				res = append(res, appParam)
-			} else {
-				appParam.Value = v
-				res = append(res, appParam)
+				appParam.ShowValue = appInstall.Name
+			} else if form.Type == "select" {
+				for _, fv := range form.Values {
+					if fv.Value == v {
+						appParam.ShowValue = fv.Label
+						break
+					}
+				}
+				appParam.Values = form.Values
 			}
+			res = append(res, appParam)
 		}
 	}
 	return res, nil
@@ -534,15 +583,15 @@ func syncById(installId uint) error {
 	if containerCount == 0 {
 		appInstall.Status = constant.Error
 		appInstall.Message = "container is not found"
-		return appInstallRepo.Save(&appInstall)
+		return appInstallRepo.Save(context.Background(), &appInstall)
 	}
 	if errCount == 0 && existedCount == 0 {
 		appInstall.Status = constant.Running
-		return appInstallRepo.Save(&appInstall)
+		return appInstallRepo.Save(context.Background(), &appInstall)
 	}
 	if existedCount == normalCount {
 		appInstall.Status = constant.Stopped
-		return appInstallRepo.Save(&appInstall)
+		return appInstallRepo.Save(context.Background(), &appInstall)
 	}
 	if errCount == normalCount {
 		appInstall.Status = constant.Error
@@ -567,7 +616,7 @@ func syncById(installId uint) error {
 		errMsg.Write([]byte("\n"))
 	}
 	appInstall.Message = errMsg.String()
-	return appInstallRepo.Save(&appInstall)
+	return appInstallRepo.Save(context.Background(), &appInstall)
 }
 
 func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value interface{}) error {
@@ -579,7 +628,7 @@ func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value 
 		return nil
 	}
 	envPath := fmt.Sprintf("%s/%s/%s/.env", constant.AppInstallDir, appKey, appInstall.Name)
-	lineBytes, err := ioutil.ReadFile(envPath)
+	lineBytes, err := os.ReadFile(envPath)
 	if err != nil {
 		return err
 	}
@@ -622,7 +671,7 @@ func updateInstallInfoInDB(appKey, appName, param string, isRestart bool, value 
 		}, commonRepo.WithByID(appInstall.ID))
 	}
 	if param == "user-password" {
-		oldVal = fmt.Sprintf("\"PANEL_DB_USER_PASSWORD\":\"%v\"", appInstall.Password)
+		oldVal = fmt.Sprintf("\"PANEL_DB_USER_PASSWORD\":\"%v\"", appInstall.UserPassword)
 		newVal = fmt.Sprintf("\"PANEL_DB_USER_PASSWORD\":\"%v\"", value)
 		_ = appInstallRepo.BatchUpdateBy(map[string]interface{}{
 			"param": strings.ReplaceAll(appInstall.Param, oldVal, newVal),

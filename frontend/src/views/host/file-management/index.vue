@@ -8,19 +8,31 @@
                 </div>
             </el-col>
             <el-col :span="22">
-                <div class="path" ref="pathRef">
-                    <span ref="breadCrumbRef">
-                        <span class="root">
-                            <el-link @click="jump('/')">
-                                <el-icon :size="20"><HomeFilled /></el-icon>
-                            </el-link>
+                <div v-show="!searchableStatus" tabindex="0" @click="searchableStatus = true">
+                    <div class="path" ref="pathRef">
+                        <span ref="breadCrumbRef">
+                            <span class="root">
+                                <el-link @click.stop="jump('/')">
+                                    <el-icon :size="20"><HomeFilled /></el-icon>
+                                </el-link>
+                            </span>
+                            <span v-for="item in paths" :key="item.url" class="other">
+                                <span class="split">></span>
+                                <el-link @click.stop="jump(item.url)">{{ item.name }}</el-link>
+                            </span>
                         </span>
-                        <span v-for="item in paths" :key="item.url" class="other">
-                            <span class="split">></span>
-                            <el-link @click="jump(item.url)">{{ item.name }}</el-link>
-                        </span>
-                    </span>
+                    </div>
                 </div>
+                <el-input
+                    ref="searchableInputRef"
+                    v-show="searchableStatus"
+                    v-model="searchablePath"
+                    @blur="searchableInputBlur"
+                    @keyup.enter="
+                        jump(searchablePath);
+                        searchableStatus = false;
+                    "
+                />
             </el-col>
         </el-row>
         <LayoutContent :title="$t('file.file')" v-loading="loading">
@@ -57,6 +69,9 @@
                     </el-button>
                     <el-button plain @click="openDownload" :disabled="selects.length === 0">
                         {{ $t('file.download') }}
+                    </el-button>
+                    <el-button plain @click="batchDelFiles" :disabled="selects.length === 0">
+                        {{ $t('commons.button.delete') }}
                     </el-button>
                 </el-button-group>
                 <div class="search search-button">
@@ -170,7 +185,10 @@ import Process from './process/index.vue';
 // import Detail from './detail/index.vue';
 import { useRouter } from 'vue-router';
 import { Back, Refresh } from '@element-plus/icons-vue';
-import { MsgWarning } from '@/utils/message';
+import { MsgSuccess, MsgWarning } from '@/utils/message';
+import { ElMessageBox } from 'element-plus';
+import { useSearchable } from './hooks/searchable';
+import { ResultData } from '@/api/interface';
 
 interface FilePaths {
     url: string;
@@ -180,7 +198,9 @@ interface FilePaths {
 const router = useRouter();
 const data = ref();
 let selects = ref<any>([]);
-let req = reactive({
+
+// origin data
+const initData = () => ({
     path: '/',
     expand: true,
     showHidden: true,
@@ -189,6 +209,7 @@ let req = reactive({
     search: '',
     containSub: false,
 });
+let req = reactive(initData());
 let loading = ref(false);
 const paths = ref<FilePaths[]>([]);
 let pathWidth = ref(0);
@@ -219,6 +240,9 @@ const downloadRef = ref();
 const pathRef = ref();
 const breadCrumbRef = ref();
 
+// editablePath
+const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
+
 const paginationConfig = reactive({
     currentPage: 1,
     pageSize: 100,
@@ -231,13 +255,27 @@ const search = async () => {
     req.pageSize = paginationConfig.pageSize;
     await GetFilesList(req)
         .then((res) => {
-            paginationConfig.total = res.data.itemTotal;
-            data.value = res.data.items;
-            req.path = res.data.path;
+            handleSearchResult(res);
         })
         .finally(() => {
             loading.value = false;
         });
+};
+
+/** just search, no handleSearchResult */
+const searchFile = async () => {
+    loading.value = true;
+    try {
+        return await GetFilesList(req);
+    } finally {
+        loading.value = false;
+    }
+};
+
+const handleSearchResult = (res: ResultData<File.File>) => {
+    paginationConfig.total = res.data.itemTotal;
+    data.value = res.data.items;
+    req.path = res.data.path;
 };
 
 const open = async (row: File.File) => {
@@ -280,10 +318,18 @@ const back = () => {
 };
 
 const jump = async (url: string) => {
+    // reset search params before exec jump
+    Object.assign(req, initData());
     req.path = url;
     req.containSub = false;
     req.search = '';
-    await search();
+    let searchResult = await searchFile();
+    // check search result,the file is exists?
+    if (!searchResult.data.path) {
+        MsgWarning(i18n.global.t('commons.res.notFound'));
+        return;
+    }
+    handleSearchResult(searchResult);
     getPaths(req.path);
     nextTick(function () {
         handlePath();
@@ -321,6 +367,28 @@ const handleCreate = (commnad: string) => {
 const delFile = async (row: File.File | null) => {
     await useDeleteData(DeleteFile, row as File.FileDelete, 'commons.msg.delete');
     search();
+};
+
+const batchDelFiles = () => {
+    ElMessageBox.confirm(i18n.global.t('commons.msg.delete'), i18n.global.t('commons.msg.deleteTitle'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(() => {
+        const pros = [];
+        for (const s of selects.value) {
+            pros.push(DeleteFile({ path: s['path'], isDir: s['isDir'] }));
+        }
+        loading.value = true;
+        Promise.all(pros)
+            .then(() => {
+                MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+                search();
+            })
+            .finally(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const getFileSize = (size: number) => {
@@ -386,8 +454,8 @@ const openCodeEditor = (row: File.File) => {
     if (row.extension != '') {
         Languages.forEach((language) => {
             const ext = row.extension.substring(1);
-            if (language.value == ext) {
-                fileEdit.language = language.value;
+            if (language.value.indexOf(ext) > -1) {
+                fileEdit.language = language.label;
             }
         });
     }
@@ -528,6 +596,10 @@ onMounted(() => {
     background-color: var(--panel-path-bg);
     height: 30px;
     border-radius: 2px !important;
+    &:hover {
+        cursor: text;
+        box-shadow: var(--el-box-shadow);
+    }
 
     .root {
         vertical-align: middle;

@@ -40,7 +40,17 @@
                         <el-form-item :label="$t('terminal.key')" v-if="hostInfo.authMode === 'key'" prop="privateKey">
                             <el-input clearable type="textarea" v-model="hostInfo.privateKey" />
                         </el-form-item>
-                        <el-form-item :label="$t('terminal.port')" prop="port">
+                        <el-form-item
+                            :label="$t('terminal.keyPassword')"
+                            v-if="hostInfo.authMode === 'key'"
+                            prop="passPhrase"
+                        >
+                            <el-input type="password" show-password clearable v-model="hostInfo.passPhrase" />
+                        </el-form-item>
+                        <el-checkbox clearable v-model.number="hostInfo.rememberPassword">
+                            {{ $t('terminal.rememberPassword') }}
+                        </el-checkbox>
+                        <el-form-item style="margin-top: 10px" :label="$t('terminal.port')" prop="port">
                             <el-input clearable v-model.number="hostInfo.port" />
                         </el-form-item>
                         <el-form-item :label="$t('commons.table.title')" prop="name">
@@ -58,7 +68,7 @@
                     <el-button @click="submitAddHost(hostRef, 'testConn')">
                         {{ $t('terminal.testConn') }}
                     </el-button>
-                    <el-button type="primary" @click="submitAddHost(hostRef, 'saveAndConn')">
+                    <el-button type="primary" :disabled="!isOK" @click="submitAddHost(hostRef, 'saveAndConn')">
                         {{ $t('terminal.saveAndConn') }}
                     </el-button>
                 </span>
@@ -74,10 +84,11 @@ import { Rules } from '@/global/form-rules';
 import { addHost, testByInfo } from '@/api/modules/host';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import i18n from '@/lang';
-import { reactive, ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 
 const dialogVisiable = ref();
+const isOK = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
 const hostRef = ref<FormInstance>();
 
@@ -91,8 +102,18 @@ let hostInfo = reactive<Host.HostOperate>({
     authMode: 'password',
     password: '',
     privateKey: '',
+    passPhrase: '',
+    rememberPassword: false,
     description: '',
 });
+
+watch(
+    () => hostInfo,
+    () => {
+        isOK.value = false;
+    },
+    { deep: true },
+);
 
 const rules = reactive({
     addr: [Rules.host],
@@ -141,8 +162,10 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
             case 'testConn':
                 await testByInfo(hostInfo).then((res) => {
                     if (res.data) {
+                        isOK.value = true;
                         MsgSuccess(i18n.global.t('terminal.connTestOk'));
                     } else {
+                        isOK.value = false;
                         MsgError(i18n.global.t('terminal.connTestFailed'));
                     }
                 });

@@ -10,6 +10,23 @@ import (
 type WebsiteDomainRepo struct {
 }
 
+type IWebsiteDomainRepo interface {
+	WithWebsiteId(websiteId uint) DBOption
+	WithPort(port int) DBOption
+	WithDomain(domain string) DBOption
+	Page(page, size int, opts ...DBOption) (int64, []model.WebsiteDomain, error)
+	GetFirst(opts ...DBOption) (model.WebsiteDomain, error)
+	GetBy(opts ...DBOption) ([]model.WebsiteDomain, error)
+	BatchCreate(ctx context.Context, domains []model.WebsiteDomain) error
+	Create(ctx context.Context, app *model.WebsiteDomain) error
+	Save(ctx context.Context, app *model.WebsiteDomain) error
+	DeleteBy(ctx context.Context, opts ...DBOption) error
+}
+
+func NewIWebsiteDomainRepo() IWebsiteDomainRepo {
+	return &WebsiteDomainRepo{}
+}
+
 func (w WebsiteDomainRepo) WithWebsiteId(websiteId uint) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("website_id = ?", websiteId)

@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"regexp"
@@ -94,25 +93,28 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 	}
 
 	createSql := fmt.Sprintf("create database `%s` default character set %s collate %s", req.Name, req.Format, formatMap[req.Format])
-	if err := excuteSql(app.ContainerName, app.Password, createSql); err != nil {
+	if err := excSQL(app.ContainerName, app.Password, createSql); err != nil {
 		if strings.Contains(err.Error(), "ERROR 1007") {
 			return nil, buserr.New(constant.ErrDatabaseIsExist)
 		}
 		return nil, err
 	}
 	tmpPermission := req.Permission
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create user '%s'@'%s' identified by '%s';", req.Username, tmpPermission, req.Password)); err != nil {
-		_ = excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop database `%s`", req.Name))
+	if err := excSQL(app.ContainerName, app.Password, fmt.Sprintf("create user '%s'@'%s' identified by '%s';", req.Username, tmpPermission, req.Password)); err != nil {
+		_ = excSQL(app.ContainerName, app.Password, fmt.Sprintf("drop database `%s`", req.Name))
 		if strings.Contains(err.Error(), "ERROR 1396") {
 			return nil, buserr.New(constant.ErrUserIsExist)
 		}
 		return nil, err
 	}
 	grantStr := fmt.Sprintf("grant all privileges on `%s`.* to '%s'@'%s'", req.Name, req.Username, tmpPermission)
+	if req.Name == "*" {
+		grantStr = fmt.Sprintf("grant all privileges on *.* to '%s'@'%s'", mysql.Username, tmpPermission)
+	}
 	if app.Version == "5.7.39" {
 		grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, req.Password)
 	}
-	if err := excuteSql(app.ContainerName, app.Password, grantStr); err != nil {
+	if err := excSQL(app.ContainerName, app.Password, grantStr); err != nil {
 		return nil, err
 	}
 
@@ -161,10 +163,10 @@ func (u *MysqlService) Delete(ctx context.Context, req dto.MysqlDBDelete) error 
 		return err
 	}
 
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", db.Username, db.Permission)); err != nil && !req.ForceDelete {
+	if err := excSQL(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", db.Username, db.Permission)); err != nil && !req.ForceDelete {
 		return err
 	}
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop database if exists `%s`", db.Name)); err != nil && !req.ForceDelete {
+	if err := excSQL(app.ContainerName, app.Password, fmt.Sprintf("drop database if exists `%s`", db.Name)); err != nil && !req.ForceDelete {
 		return err
 	}
 	global.LOG.Info("execute delete database sql successful, now start to drop uploads and records")
@@ -292,7 +294,10 @@ func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
 	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create user if not exists '%s'@'%s' identified by '%s';", mysql.Username, info.Value, mysql.Password)); err != nil {
 		return err
 	}
-	grantStr := fmt.Sprintf("grant all privileges on %s.* to '%s'@'%s'", mysql.Name, mysql.Username, info.Value)
+	grantStr := fmt.Sprintf("grant all privileges on `%s`.* to '%s'@'%s'", mysql.Name, mysql.Username, info.Value)
+	if mysql.Name == "*" {
+		grantStr = fmt.Sprintf("grant all privileges on *.* to '%s'@'%s'", mysql.Username, info.Value)
+	}
 	if app.Version == "5.7.39" {
 		grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, mysql.Password)
 	}
@@ -339,7 +344,7 @@ func (u *MysqlService) UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
 	var files []string
 
 	path := fmt.Sprintf("%s/mysql/%s/conf/my.cnf", constant.AppInstallDir, app.Name)
-	lineBytes, err := ioutil.ReadFile(path)
+	lineBytes, err := os.ReadFile(path)
 	if err != nil {
 		return err
 	}
@@ -504,6 +509,21 @@ func excuteSql(containerName, password, command string) error {
 	stdout, err := cmd.CombinedOutput()
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
 	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
+		return errors.New(stdStr)
+	}
+	return nil
+}
+
+func excSQL(containerName, password, command string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "docker", "exec", containerName, "mysql", "-uroot", "-p"+password, "-e", command)
+	err := cmd.Run()
+	if ctx.Err() == context.DeadlineExceeded {
+		return buserr.WithDetail(constant.ErrExecTimeOut, containerName, nil)
+	}
+	if err != nil {
+		stdStr := strings.ReplaceAll(err.Error(), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
 		return errors.New(stdStr)
 	}
 	return nil

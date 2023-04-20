@@ -20,6 +20,11 @@ func Init() {
 		migrations.AddTableWebsite,
 		migrations.AddTableDatabaseMysql,
 		migrations.AddTableSnap,
+		migrations.AddDefaultGroup,
+		migrations.AddTableRuntime,
+		migrations.UpdateTableApp,
+		migrations.UpdateTableHost,
+		migrations.UpdateTableWebsite,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

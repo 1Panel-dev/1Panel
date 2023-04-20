@@ -39,6 +39,15 @@ const webSiteRouter = {
                 requiresAuth: false,
             },
         },
+        {
+            path: '/websites/runtime/php',
+            name: 'Runtime',
+            component: () => import('@/views/website/runtime/index.vue'),
+            meta: {
+                title: 'menu.runtime',
+                requiresAuth: false,
+            },
+        },
     ],
 };
 

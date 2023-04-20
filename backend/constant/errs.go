@@ -50,18 +50,20 @@ var (
 
 // app
 var (
-	ErrPortInUsed      = "ErrPortInUsed"
-	ErrAppLimit        = "ErrAppLimit"
-	ErrAppRequired     = "ErrAppRequired"
-	ErrFileCanNotRead  = "ErrFileCanNotRead"
-	ErrFileToLarge     = "ErrFileToLarge"
-	ErrNotInstall      = "ErrNotInstall"
-	ErrPortInOtherApp  = "ErrPortInOtherApp"
-	ErrDbUserNotValid  = "ErrDbUserNotValid"
-	ErrUpdateBuWebsite = "ErrUpdateBuWebsite"
+	ErrPortInUsed          = "ErrPortInUsed"
+	ErrAppLimit            = "ErrAppLimit"
+	ErrAppRequired         = "ErrAppRequired"
+	ErrFileCanNotRead      = "ErrFileCanNotRead"
+	ErrFileToLarge         = "ErrFileToLarge"
+	ErrNotInstall          = "ErrNotInstall"
+	ErrPortInOtherApp      = "ErrPortInOtherApp"
+	ErrDbUserNotValid      = "ErrDbUserNotValid"
+	ErrUpdateBuWebsite     = "ErrUpdateBuWebsite"
+	Err1PanelNetworkFailed = "Err1PanelNetworkFailed"
+	ErrCmdTimeout          = "ErrCmdTimeout"
 )
 
-//website
+// website
 var (
 	ErrDomainIsExist = "ErrDomainIsExist"
 	ErrAliasIsExist  = "ErrAliasIsExist"
@@ -69,7 +71,7 @@ var (
 	ErrGroupIsUsed   = "ErrGroupIsUsed"
 )
 
-//ssl
+// ssl
 var (
 	ErrSSLCannotDelete     = "ErrSSLCannotDelete"
 	ErrAccountCannotDelete = "ErrAccountCannotDelete"
@@ -77,27 +79,42 @@ var (
 	ErrEmailIsExist        = "ErrEmailIsExist"
 )
 
-//file
+// file
 var (
 	ErrPathNotFound     = "ErrPathNotFound"
 	ErrMovePathFailed   = "ErrMovePathFailed"
 	ErrLinkPathNotFound = "ErrLinkPathNotFound"
 	ErrFileIsExit       = "ErrFileIsExit"
+	ErrFileUpload       = "ErrFileUpload"
 )
 
-//mysql
+// mysql
 var (
 	ErrUserIsExist     = "ErrUserIsExist"
 	ErrDatabaseIsExist = "ErrDatabaseIsExist"
+	ErrExecTimeOut     = "ErrExecTimeOut"
 )
 
-//redis
+// redis
 var (
 	ErrTypeOfRedis = "ErrTypeOfRedis"
 )
 
-//container
+// container
 var (
 	ErrInUsed       = "ErrInUsed"
 	ErrObjectInUsed = "ErrObjectInUsed"
+)
+
+// runtime
+var (
+	ErrDirNotFound    = "ErrDirNotFound"
+	ErrFileNotExist   = "ErrFileNotExist"
+	ErrImageBuildErr  = "ErrImageBuildErr"
+	ErrImageExist     = "ErrImageExist"
+	ErrDelWithWebsite = "ErrDelWithWebsite"
+)
+
+var (
+	ErrBackupInUsed = "ErrBackupInUsed"
 )

@@ -26,6 +26,7 @@ type IAuthService interface {
 	SafeEntrance(c *gin.Context, code string) error
 	Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error)
 	LogOut(c *gin.Context) error
+	MFALogin(c *gin.Context, info dto.MFALogin) (*dto.UserLoginInfo, error)
 }
 
 func NewIAuthService() IAuthService {
@@ -86,9 +87,9 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin) (*dto.UserLogi
 	}
 	pass, err := encrypt.StringDecrypt(passwrodSetting.Value)
 	if err != nil {
-		return nil, constant.ErrAuth
+		return nil, err
 	}
-	if info.Password != pass && nameSetting.Value != info.Name {
+	if info.Password != pass || nameSetting.Value != info.Name {
 		return nil, constant.ErrAuth
 	}
 
@@ -118,7 +119,7 @@ func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (
 		j := jwt.NewJWT()
 		claims := j.CreateClaims(jwt.BaseClaims{
 			Name: name,
-		}, lifeTime)
+		})
 		token, err := j.CreateToken(claims)
 		if err != nil {
 			return nil, err

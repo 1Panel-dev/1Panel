@@ -13,6 +13,7 @@
                 <AppStatus
                     :app-key="'openresty'"
                     @setting="setting"
+                    v-model:mask-show="maskShow"
                     v-model:loading="loading"
                     @is-exist="checkExist"
                 ></AppStatus>
@@ -75,6 +76,7 @@
                         <template #default="{ row }">
                             {{ $t('website.' + row.type) }}
                             <span v-if="row.type === 'deployment'">[{{ row.appName }}]</span>
+                            <span v-if="row.type === 'runtime'">[{{ row.runtimeName }}]</span>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status">
@@ -137,7 +139,7 @@
                         fix
                     />
                 </ComplexTable>
-                <el-card width="30%" v-if="nginxStatus != 'Running'" class="mask-prompt">
+                <el-card width="30%" v-if="nginxStatus != 'Running' && maskShow" class="mask-prompt">
                     <span>{{ $t('commons.service.serviceNotStarted', ['OpenResty']) }}</span>
                 </el-card>
             </template>
@@ -145,10 +147,10 @@
         <NginxConfig v-if="openNginxConfig" v-loading="loading" :containerName="containerName" :status="nginxStatus" />
         <CreateWebSite ref="createRef" @close="search" />
         <DeleteWebsite ref="deleteRef" @close="search" />
-        <WebSiteGroup ref="groupRef" />
         <UploadDialog ref="uploadRef" />
         <Backups ref="dialogBackupRef" />
         <DefaultServer ref="defaultRef" />
+        <GroupDialog @search="listGroup" ref="groupRef" />
     </div>
 </template>
 
@@ -163,8 +165,8 @@ import ComplexTable from '@/components/complex-table/index.vue';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import CreateWebSite from './create/index.vue';
 import DeleteWebsite from './delete/index.vue';
-import WebSiteGroup from './group/index.vue';
-import { ListGroups, OpWebsite, SearchWebsites, UpdateWebsite } from '@/api/modules/website';
+import GroupDialog from '@/components/group/index.vue';
+import { OpWebsite, SearchWebsites, UpdateWebsite } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import AppStatus from '@/components/app-status/index.vue';
 import NginxConfig from './nginx/index.vue';
@@ -177,6 +179,8 @@ import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
 import MsgInfo from '@/components/msg-info/index.vue';
+import { GetGroupList } from '@/api/modules/group';
+import { Group } from '@/api/interface/group';
 
 const shortcuts = [
     {
@@ -196,30 +200,31 @@ const shortcuts = [
 ];
 
 const loading = ref(false);
+const maskShow = ref(true);
 const createRef = ref();
 const deleteRef = ref();
 const groupRef = ref();
-let openNginxConfig = ref(false);
-let nginxIsExist = ref(false);
-let containerName = ref('');
-let nginxStatus = ref('');
-let installPath = ref('');
+const openNginxConfig = ref(false);
+const nginxIsExist = ref(false);
+const containerName = ref('');
+const nginxStatus = ref('');
+const installPath = ref('');
 const uploadRef = ref();
 const dialogBackupRef = ref();
 const defaultRef = ref();
 const data = ref();
 let dateRefs: Map<number, any> = new Map();
-let groups = ref<Website.Group[]>([]);
+let groups = ref<Group.GroupInfo[]>([]);
 
 const paginationConfig = reactive({
     currentPage: 1,
-    pageSize: 15,
+    pageSize: 10,
     total: 0,
 });
 let req = reactive({
     name: '',
     page: 1,
-    pageSize: 15,
+    pageSize: 10,
     websiteGroupId: 0,
 });
 
@@ -238,9 +243,8 @@ const search = async () => {
 };
 
 const listGroup = async () => {
-    await ListGroups().then((res) => {
-        groups.value = res.data;
-    });
+    const res = await GetGroupList({ type: 'website' });
+    groups.value = res.data;
 };
 
 const setting = () => {
@@ -310,6 +314,7 @@ const submitDate = (row: any) => {
     UpdateWebsite(req).then(() => {
         row.change = true;
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+        search();
     });
 };
 
@@ -359,7 +364,7 @@ const openCreate = () => {
 };
 
 const openGroup = () => {
-    groupRef.value.acceptParams();
+    groupRef.value.acceptParams({ type: 'website' });
 };
 
 const openDefault = () => {

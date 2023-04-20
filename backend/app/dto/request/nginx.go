@@ -19,3 +19,14 @@ type NginxConfigUpdate struct {
 	WebsiteID uint         `json:"websiteId" validate:"required"`
 	Params    interface{}  `json:"params"`
 }
+
+type NginxRewriteReq struct {
+	WebsiteID uint   `json:"websiteId" validate:"required"`
+	Name      string `json:"name" validate:"required"`
+}
+
+type NginxRewriteUpdate struct {
+	WebsiteID uint   `json:"websiteId" validate:"required"`
+	Name      string `json:"name" validate:"required"`
+	Content   string `json:"content" validate:"required"`
+}

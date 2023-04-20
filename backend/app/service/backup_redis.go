@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -176,11 +175,11 @@ func handleRedisRecover(redisInfo *repo.RootInfo, recoverFile string, isRollback
 		if appendonly == "yes" && redisInfo.Version == "6.0.16" {
 			itemName = "appendonly.aof"
 		}
-		input, err := ioutil.ReadFile(recoverFile)
+		input, err := os.ReadFile(recoverFile)
 		if err != nil {
 			return err
 		}
-		if err = ioutil.WriteFile(composeDir+"/data/"+itemName, input, 0640); err != nil {
+		if err = os.WriteFile(composeDir+"/data/"+itemName, input, 0640); err != nil {
 			return err
 		}
 	}

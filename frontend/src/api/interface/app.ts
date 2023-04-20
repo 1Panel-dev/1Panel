@@ -40,6 +40,7 @@ export namespace App {
         params: AppParams;
         dockerCompose: string;
         enbale: boolean;
+        image: string;
     }
 
     export interface AppReq extends ReqPage {
@@ -64,6 +65,7 @@ export namespace App {
         values?: ServiceParam[];
         child?: FromFieldChild;
         params?: FromParam[];
+        multiple?: boolean;
     }
 
     export interface FromFieldChild extends FromField {
@@ -125,6 +127,11 @@ export namespace App {
         installPath: string;
     }
 
+    export interface DatabaseConnInfo {
+        password: string;
+        serviceName: string;
+        port: number;
+    }
     export interface AppInstallResource {
         type: string;
         name: string;
@@ -163,5 +170,9 @@ export namespace App {
         key: string;
         rule: string;
         type: string;
+        values?: any;
+        showValue?: string;
+        required?: boolean;
+        multiple?: boolean;
     }
 }

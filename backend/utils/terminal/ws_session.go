@@ -35,15 +35,17 @@ func (w *safeBuffer) Reset() {
 }
 
 const (
-	wsMsgCmd    = "cmd"
-	wsMsgResize = "resize"
+	WsMsgCmd       = "cmd"
+	WsMsgResize    = "resize"
+	WsMsgHeartbeat = "heartbeat"
 )
 
-type wsMsg struct {
-	Type string `json:"type"`
-	Cmd  string `json:"cmd"`
-	Cols int    `json:"cols"`
-	Rows int    `json:"rows"`
+type WsMsg struct {
+	Type      string `json:"type"`
+	Data      string `json:"data,omitempty"`      // WsMsgCmd
+	Cols      int    `json:"cols,omitempty"`      // WsMsgResize
+	Rows      int    `json:"rows,omitempty"`      // WsMsgResize
+	Timestamp int    `json:"timestamp,omitempty"` // WsMsgHeartbeat
 }
 
 type LogicSshWsSession struct {
@@ -125,21 +127,27 @@ func (sws *LogicSshWsSession) receiveWsMsg(exitCh chan bool) {
 			if err != nil {
 				return
 			}
-			msgObj := wsMsg{}
+			msgObj := WsMsg{}
 			_ = json.Unmarshal(wsData, &msgObj)
 			switch msgObj.Type {
-			case wsMsgResize:
+			case WsMsgResize:
 				if msgObj.Cols > 0 && msgObj.Rows > 0 {
 					if err := sws.session.WindowChange(msgObj.Rows, msgObj.Cols); err != nil {
 						global.LOG.Errorf("ssh pty change windows size failed, err: %v", err)
 					}
 				}
-			case wsMsgCmd:
-				decodeBytes, err := base64.StdEncoding.DecodeString(msgObj.Cmd)
+			case WsMsgCmd:
+				decodeBytes, err := base64.StdEncoding.DecodeString(msgObj.Data)
 				if err != nil {
 					global.LOG.Errorf("websock cmd string base64 decoding failed, err: %v", err)
 				}
 				sws.sendWebsocketInputCommandToSshSessionStdinPipe(decodeBytes)
+			case WsMsgHeartbeat:
+				// 接收到心跳包后将心跳包原样返回，可以用于网络延迟检测等情况
+				err = wsConn.WriteMessage(websocket.TextMessage, wsData)
+				if err != nil {
+					global.LOG.Errorf("ssh sending heartbeat to webSocket failed, err: %v", err)
+				}
 			}
 		}
 	}
@@ -164,8 +172,16 @@ func (sws *LogicSshWsSession) sendComboOutput(exitCh chan bool) {
 				return
 			}
 			bs := sws.comboOutput.Bytes()
-			if string(bs) == string([]byte{13, 10, 108, 111, 103, 111, 117, 116, 13, 10}) {
-				err := wsConn.WriteMessage(websocket.TextMessage, bs)
+			if len(bs) > 0 {
+				wsData, err := json.Marshal(WsMsg{
+					Type: WsMsgCmd,
+					Data: base64.StdEncoding.EncodeToString(bs),
+				})
+				if err != nil {
+					global.LOG.Errorf("encoding combo output to json failed, err: %v", err)
+					continue
+				}
+				err = wsConn.WriteMessage(websocket.TextMessage, wsData)
 				if err != nil {
 					global.LOG.Errorf("ssh sending combo output to webSocket failed, err: %v", err)
 				}
@@ -174,19 +190,10 @@ func (sws *LogicSshWsSession) sendComboOutput(exitCh chan bool) {
 					global.LOG.Errorf("combo output to log buffer failed, err: %v", err)
 				}
 				sws.comboOutput.buffer.Reset()
+			}
+			if string(bs) == string([]byte{13, 10, 108, 111, 103, 111, 117, 116, 13, 10}) {
 				sws.Close()
 				return
-			}
-			if len(bs) > 0 {
-				err := wsConn.WriteMessage(websocket.TextMessage, bs)
-				if err != nil {
-					global.LOG.Errorf("ssh sending combo output to webSocket failed, err: %v", err)
-				}
-				_, err = sws.logBuff.Write(bs)
-				if err != nil {
-					global.LOG.Errorf("combo output to log buffer failed, err: %v", err)
-				}
-				sws.comboOutput.buffer.Reset()
 			}
 
 		case <-exitCh:

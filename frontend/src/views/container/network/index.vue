@@ -1,18 +1,12 @@
 <template>
-    <div>
-        <el-card width="30%" v-if="dockerStatus != 'Running'" class="mask-prompt">
-            <span style="font-size: 14px">{{ $t('container.serviceUnavailable') }}</span>
-            <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="goSetting">
-                【 {{ $t('container.setting') }} 】
-            </el-button>
-            <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
+    <div v-loading="loading">
+        <el-card v-if="dockerStatus != 'Running'" class="mask-prompt">
+            <span>{{ $t('container.serviceUnavailable') }}</span>
+            <el-button type="primary" link class="bt" @click="goSetting">【 {{ $t('container.setting') }} 】</el-button>
+            <span>{{ $t('container.startIn') }}</span>
         </el-card>
 
-        <LayoutContent
-            v-loading="loading"
-            :title="$t('container.network')"
-            :class="{ mask: dockerStatus != 'Running' }"
-        >
+        <LayoutContent :title="$t('container.network')" :class="{ mask: dockerStatus != 'Running' }">
             <template #toolbar>
                 <el-row>
                     <el-col :span="16">
@@ -124,13 +118,21 @@ const paginationConfig = reactive({
 });
 const searchName = ref();
 
-const dockerStatus = ref();
+const dockerStatus = ref('Running');
 const loadStatus = async () => {
-    const res = await loadDockerStatus();
-    dockerStatus.value = res.data;
-    if (dockerStatus.value === 'Running') {
-        search();
-    }
+    loading.value = true;
+    await loadDockerStatus()
+        .then((res) => {
+            loading.value = false;
+            dockerStatus.value = res.data;
+            if (dockerStatus.value === 'Running') {
+                search();
+            }
+        })
+        .catch(() => {
+            dockerStatus.value = 'Failed';
+            loading.value = false;
+        });
 };
 const goSetting = async () => {
     router.push({ name: 'ContainerSetting' });

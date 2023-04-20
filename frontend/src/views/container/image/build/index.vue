@@ -2,7 +2,7 @@
     <el-drawer
         v-model="drawerVisiable"
         :destroy-on-close="true"
-        @close="onCloseLog"
+        @close="handleClose"
         :close-on-click-modal="false"
         size="50%"
     >
@@ -89,7 +89,7 @@ import FileList from '@/components/file-list/index.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { nextTick, reactive, ref, shallowRef } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, ElMessage } from 'element-plus';
@@ -116,16 +116,11 @@ const form = reactive({
     tagStr: '',
     tags: [] as Array<string>,
 });
-const varifyPath = (rule: any, value: any, callback: any) => {
-    if (value.indexOf('Dockerfile') === -1) {
-        callback(new Error(i18n.global.t('commons.rule.selectHelper', ['Dockerfile'])));
-    }
-    callback();
-};
+
 const rules = reactive({
     name: [Rules.requiredInput, Rules.imageName],
     from: [Rules.requiredSelect],
-    dockerfile: [Rules.requiredInput, { validator: varifyPath, trigger: 'change', required: true }],
+    dockerfile: [Rules.requiredInput],
 });
 const acceptParams = async () => {
     logVisiable.value = false;
@@ -141,6 +136,9 @@ const emit = defineEmits<{ (e: 'search'): void }>();
 
 const handleClose = () => {
     drawerVisiable.value = false;
+    emit('search');
+    clearInterval(Number(timer));
+    timer = null;
 };
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -181,11 +179,11 @@ const loadLogs = async (path: string) => {
         }
     }, 1000 * 3);
 };
-const onCloseLog = async () => {
-    emit('search');
+
+onBeforeUnmount(() => {
     clearInterval(Number(timer));
     timer = null;
-};
+});
 
 const loadBuildDir = async (path: string) => {
     form.dockerfile = path;

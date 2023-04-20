@@ -176,3 +176,25 @@ func (b *BaseApi) GetWebsiteSSLById(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, websiteSSL)
 }
+
+// @Tags Website SSL
+// @Summary Update ssl
+// @Description 更新 ssl
+// @Accept json
+// @Param request body request.WebsiteSSLUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/ssl/update [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"website_ssls","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"更新证书设置 [domain]","formatEN":"Update ssl config [domain]"}
+func (b *BaseApi) UpdateWebsiteSSL(c *gin.Context) {
+	var req request.WebsiteSSLUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteSSLService.Update(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}

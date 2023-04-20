@@ -17,6 +17,7 @@ type IComposeTemplateRepo interface {
 
 	CreateRecord(compose *model.Compose) error
 	DeleteRecord(opts ...DBOption) error
+	ListRecord() ([]model.Compose, error)
 }
 
 func NewIComposeTemplateRepo() IComposeTemplateRepo {

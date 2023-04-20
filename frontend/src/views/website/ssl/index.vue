@@ -50,6 +50,15 @@
                         show-overflow-tooltip
                         prop="type"
                     ></el-table-column>
+                    <el-table-column :label="$t('ssl.autoRenew')" fix>
+                        <template #default="{ row }">
+                            <el-switch
+                                :disabled="row.provider === 'dnsManual' || row.provider === 'manual'"
+                                v-model="row.autoRenew"
+                                @change="updateConfig(row)"
+                            />
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         prop="expireDate"
                         :label="$t('website.expireDate')"
@@ -79,7 +88,7 @@ import LayoutContent from '@/layout/layout-content.vue';
 import RouterButton from '@/components/router-button/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { DeleteSSL, SearchSSL } from '@/api/modules/website';
+import { DeleteSSL, SearchSSL, UpdateSSL } from '@/api/modules/website';
 import DnsAccount from './dns-account/index.vue';
 import AcmeAccount from './acme-account/index.vue';
 import Renew from './renew/index.vue';
@@ -89,10 +98,11 @@ import { dateFormat, getProvider } from '@/utils/util';
 import i18n from '@/lang';
 import { Website } from '@/api/interface/website';
 import { useDeleteData } from '@/hooks/use-delete-data';
+import { MsgSuccess } from '@/utils/message';
 
 const paginationConfig = reactive({
     currentPage: 1,
-    pageSize: 20,
+    pageSize: 10,
     total: 0,
 });
 const acmeAccountRef = ref();
@@ -144,6 +154,17 @@ const search = () => {
         .then((res) => {
             data.value = res.data.items || [];
             paginationConfig.total = res.data.total;
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+};
+
+const updateConfig = (row: Website.SSL) => {
+    loading.value = true;
+    UpdateSSL({ id: row.id, autoRenew: row.autoRenew })
+        .then(() => {
+            MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         })
         .finally(() => {
             loading.value = false;

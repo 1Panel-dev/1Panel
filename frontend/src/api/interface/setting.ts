@@ -82,6 +82,7 @@ export namespace Setting {
     }
     export interface UpgradeInfo {
         newVersion: string;
+        latestVersion: string;
         releaseNote: string;
     }
 }

@@ -9,7 +9,7 @@
         <template #header>
             <DrawerHeader :header="$t('container.monitor')" :back="handleClose" />
         </template>
-        <el-form label-position="top">
+        <el-form label-position="top" @submit.prevent>
             <el-form-item :label="$t('container.refreshTime')">
                 <el-select v-model="timeInterval" @change="changeTimer">
                     <el-option label="1s" :value="1" />

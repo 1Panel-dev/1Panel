@@ -247,11 +247,13 @@ export namespace Container {
         operation: string;
     }
     export interface DaemonJsonConf {
+        isSwarm: boolean;
         status: string;
         version: string;
         registryMirrors: Array<string>;
         insecureRegistries: Array<string>;
         liveRestore: boolean;
+        iptables: boolean;
         cgroupDriver: string;
     }
 }

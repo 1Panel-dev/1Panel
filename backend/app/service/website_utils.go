@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"path"
 	"strconv"
 	"strings"
@@ -20,10 +21,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func getDomain(domainStr string, websiteID uint) (model.WebsiteDomain, error) {
-	domain := model.WebsiteDomain{
-		WebsiteID: websiteID,
-	}
+func getDomain(domainStr string) (model.WebsiteDomain, error) {
+	domain := model.WebsiteDomain{}
 	domainArray := strings.Split(domainStr, ":")
 	if len(domainArray) == 1 {
 		domain.Domain = domainArray[0]
@@ -43,15 +42,26 @@ func getDomain(domainStr string, websiteID uint) (model.WebsiteDomain, error) {
 	return model.WebsiteDomain{}, nil
 }
 
-func createStaticHtml(website *model.Website) error {
+func createIndexFile(website *model.Website, runtime *model.Runtime) error {
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
 	}
 
 	indexFolder := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.Alias, "index")
-	indexPath := path.Join(indexFolder, "index.html")
-	indexContent := string(nginx_conf.Index)
+	indexPath := ""
+	indexContent := ""
+	switch website.Type {
+	case constant.Static:
+		indexPath = path.Join(indexFolder, "index.html")
+		indexContent = string(nginx_conf.Index)
+	case constant.Runtime:
+		if runtime.Type == constant.RuntimePHP {
+			indexPath = path.Join(indexFolder, "index.php")
+			indexContent = string(nginx_conf.IndexPHP)
+		}
+	}
+
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(indexFolder) {
 		if err := fileOp.CreateDir(indexFolder, 0755); err != nil {
@@ -63,13 +73,18 @@ func createStaticHtml(website *model.Website) error {
 			return err
 		}
 	}
+	if website.Type == constant.Runtime && runtime.Resource == constant.ResourceAppstore {
+		if err := chownRootDir(indexFolder); err != nil {
+			return err
+		}
+	}
 	if err := fileOp.WriteFile(indexPath, strings.NewReader(indexContent), 0755); err != nil {
 		return err
 	}
 	return nil
 }
 
-func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) error {
+func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website, runtime *model.Runtime) error {
 	nginxFolder := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name)
 	siteFolder := path.Join(nginxFolder, "www", "sites", website.Alias)
 	fileOp := files.NewFileOp()
@@ -86,14 +101,25 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) 
 		if err := fileOp.CreateFile(path.Join(siteFolder, "log", "error.log")); err != nil {
 			return err
 		}
-		if err := fileOp.CreateDir(path.Join(siteFolder, "index"), 0755); err != nil {
+		if err := fileOp.CreateDir(path.Join(siteFolder, "index"), 0775); err != nil {
 			return err
 		}
 		if err := fileOp.CreateDir(path.Join(siteFolder, "ssl"), 0755); err != nil {
 			return err
 		}
-		if website.Type == constant.Static {
-			if err := createStaticHtml(website); err != nil {
+		if website.Type == constant.Runtime {
+			if runtime.Type == constant.RuntimePHP && runtime.Resource == constant.ResourceLocal {
+				phpPoolDir := path.Join(siteFolder, "php-pool")
+				if err := fileOp.CreateDir(phpPoolDir, 0755); err != nil {
+					return err
+				}
+				if err := fileOp.CreateFile(path.Join(phpPoolDir, "php-fpm.sock")); err != nil {
+					return err
+				}
+			}
+		}
+		if website.Type == constant.Static || website.Type == constant.Runtime {
+			if err := createIndexFile(website, runtime); err != nil {
 				return err
 			}
 		}
@@ -101,12 +127,12 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) 
 	return fileOp.CopyDir(path.Join(nginxFolder, "www", "common", "waf", "rules"), path.Join(siteFolder, "waf"))
 }
 
-func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, appInstall *model.AppInstall) error {
+func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, appInstall *model.AppInstall, runtime *model.Runtime) error {
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
 	}
-	if err := createWebsiteFolder(nginxInstall, website); err != nil {
+	if err := createWebsiteFolder(nginxInstall, website, runtime); err != nil {
 		return err
 	}
 
@@ -134,15 +160,32 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	server.UpdateDirective("set", []string{"$RulePath", path.Join(siteFolder, "waf", "rules")})
 	server.UpdateDirective("set", []string{"$logdir", path.Join(siteFolder, "log")})
 
+	rootIndex := path.Join("/www/sites", website.Alias, "index")
 	switch website.Type {
 	case constant.Deployment:
 		proxy := fmt.Sprintf("http://127.0.0.1:%d", appInstall.HttpPort)
 		server.UpdateRootProxy([]string{proxy})
 	case constant.Static:
-		server.UpdateRoot(path.Join("/www/sites", website.Alias, "index"))
-		server.UpdateRootLocation()
+		server.UpdateRoot(rootIndex)
+		//server.UpdateRootLocation()
 	case constant.Proxy:
 		server.UpdateRootProxy([]string{website.Proxy})
+	case constant.Runtime:
+		if runtime.Resource == constant.ResourceLocal {
+			switch runtime.Type {
+			case constant.RuntimePHP:
+				server.UpdateRoot(rootIndex)
+				localPath := path.Join(nginxInstall.GetPath(), rootIndex, "index.php")
+				server.UpdatePHPProxy([]string{website.Proxy}, localPath)
+			}
+		}
+		if runtime.Resource == constant.ResourceAppstore {
+			switch runtime.Type {
+			case constant.RuntimePHP:
+				server.UpdateRoot(rootIndex)
+				server.UpdatePHPProxy([]string{website.Proxy}, "")
+			}
+		}
 	}
 
 	config.FilePath = configPath
@@ -410,8 +453,11 @@ func opWebsite(website *model.Website, operate string) error {
 	}
 	server := servers[0]
 	if operate == constant.StopWeb {
-		if website.Type != constant.Static {
-			server.RemoveDirective("location", []string{"/"})
+		if website.Type == constant.Deployment || website.Type == constant.Static || website.Type == constant.Proxy {
+			server.RemoveDirective("location", []string{"", "/"})
+		}
+		if website.Type == constant.Runtime {
+			server.RemoveDirective("location", []string{"~", "[^/]\\.php(/|$)"})
 		}
 		server.UpdateRoot("/usr/share/nginx/html/stop")
 		website.Status = constant.WebStopped
@@ -432,6 +478,14 @@ func opWebsite(website *model.Website, operate string) error {
 		case constant.Proxy:
 			server.RemoveDirective("root", nil)
 			server.UpdateRootProxy([]string{website.Proxy})
+		case constant.Runtime:
+			rootIndex := path.Join("/www/sites", website.Alias, "index")
+			server.UpdateRoot(rootIndex)
+			localPath := ""
+			if website.ProxyType == constant.RuntimeProxyUnix {
+				localPath = path.Join(nginxInstall.Install.GetPath(), rootIndex, "index.php")
+			}
+			server.UpdatePHPProxy([]string{website.Proxy}, localPath)
 		}
 		website.Status = constant.WebRunning
 		now := time.Now()
@@ -445,4 +499,23 @@ func opWebsite(website *model.Website, operate string) error {
 		return err
 	}
 	return nginxCheckAndReload(nginxInstall.SiteConfig.OldContent, config.FilePath, nginxInstall.Install.ContainerName)
+}
+
+func checkIsLinkApp(website model.Website) bool {
+	if website.Type == constant.Deployment {
+		return true
+	}
+	if website.Type == constant.Runtime {
+		runtime, _ := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+		return runtime.Resource == constant.ResourceAppstore
+	}
+	return false
+}
+
+func chownRootDir(path string) error {
+	_, err := cmd.ExecWithTimeOut(fmt.Sprintf("chown -R 1000:1000 %s", path), 1*time.Second)
+	if err != nil {
+		return err
+	}
+	return nil
 }

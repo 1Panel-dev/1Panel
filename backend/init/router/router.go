@@ -4,6 +4,8 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/gin-contrib/gzip"
+
 	v1 "github.com/1Panel-dev/1Panel/backend/app/api/v1"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
@@ -39,9 +41,6 @@ func setWebStatic(rootRouter *gin.Engine) {
 func Routers() *gin.Engine {
 	Router := gin.Default()
 
-	docs.SwaggerInfo.BasePath = "/api/v1"
-	Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-
 	Router.Use(middleware.OperationLog())
 	// Router.Use(middleware.CSRF())
 	// Router.Use(middleware.LoadCsrfToken())
@@ -50,6 +49,7 @@ func Routers() *gin.Engine {
 		Router.Use(middleware.DemoHandle())
 	}
 
+	Router.Use(gzip.Gzip(gzip.DefaultCompression))
 	setWebStatic(Router)
 
 	Router.Use(i18n.GinI18nLocalize())
@@ -62,6 +62,10 @@ func Routers() *gin.Engine {
 	Router.Use(middleware.JwtAuth())
 
 	systemRouter := rou.RouterGroupApp
+
+	swaggerRouter := Router.Group("1panel")
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	swaggerRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	PublicGroup := Router.Group("")
 	{
@@ -92,6 +96,7 @@ func Routers() *gin.Engine {
 		systemRouter.InitWebsiteSSLRouter(PrivateGroup)
 		systemRouter.InitWebsiteAcmeAccountRouter(PrivateGroup)
 		systemRouter.InitNginxRouter(PrivateGroup)
+		systemRouter.InitRuntimeRouter(PrivateGroup)
 	}
 
 	return Router

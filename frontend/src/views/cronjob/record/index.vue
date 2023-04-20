@@ -49,10 +49,6 @@
                         &nbsp;{{ $t('cronjob.handle') }}
                     </el-tag>
                     <span class="buttons">
-                        <el-button type="primary" @click="onRefresh" link>
-                            {{ $t('commons.button.refresh') }}
-                        </el-button>
-                        <el-divider direction="vertical" />
                         <el-button type="primary" @click="onHandle(dialogData.rowData)" link>
                             {{ $t('commons.button.handle') }}
                         </el-button>
@@ -73,6 +69,10 @@
                         >
                             {{ $t('commons.button.enable') }}
                         </el-button>
+                        <el-divider direction="vertical" />
+                        <el-button :disabled="!hasRecords" type="primary" @click="onClean" link>
+                            {{ $t('commons.button.clean') }}
+                        </el-button>
                     </span>
                 </div>
             </el-card>
@@ -84,7 +84,7 @@
                     <el-col :span="8">
                         <el-date-picker
                             style="width: calc(100% - 20px)"
-                            @change="search()"
+                            @change="search(true)"
                             v-model="timeRangeLoad"
                             type="datetimerange"
                             :range-separator="$t('commons.search.timeRange')"
@@ -94,7 +94,7 @@
                         ></el-date-picker>
                     </el-col>
                     <el-col :span="16">
-                        <el-select @change="search()" v-model="searchInfo.status">
+                        <el-select @change="search(true)" v-model="searchInfo.status">
                             <template #prefix>{{ $t('commons.table.status') }}</template>
                             <el-option :label="$t('commons.table.all')" value="" />
                             <el-option :label="$t('commons.status.success')" value="Success" />
@@ -130,7 +130,7 @@
                         </el-card>
                     </el-col>
                     <el-col :span="16">
-                        <el-form label-position="top">
+                        <el-form label-position="top" :v-key="refresh">
                             <el-row type="flex" justify="center">
                                 <el-form-item class="descriptionWide" v-if="isBackup()">
                                     <template #label>
@@ -152,13 +152,23 @@
                                     <template #label>
                                         <span class="status-label">{{ $t('cronjob.website') }}</span>
                                     </template>
-                                    <span class="status-count">{{ dialogData.rowData!.website }}</span>
+                                    <span v-if="dialogData.rowData!.website !== 'all'" class="status-count">
+                                        {{ dialogData.rowData!.website }}
+                                    </span>
+                                    <span v-else class="status-count">
+                                        {{ $t('commons.table.all') }}
+                                    </span>
                                 </el-form-item>
                                 <el-form-item class="description" v-if="dialogData.rowData!.type === 'database'">
                                     <template #label>
                                         <span class="status-label">{{ $t('cronjob.database') }}</span>
                                     </template>
-                                    <span class="status-count">{{ dialogData.rowData!.dbName }}</span>
+                                    <span v-if="dialogData.rowData!.dbName !== 'all'" class="status-count">
+                                        {{ dialogData.rowData!.dbName }}
+                                    </span>
+                                    <span v-else class="status-count">
+                                        {{ $t('commons.table.all') }}
+                                    </span>
                                 </el-form-item>
                                 <el-form-item class="description" v-if="dialogData.rowData!.type === 'directory'">
                                     <template #label>
@@ -272,26 +282,55 @@
                 </div>
             </template>
         </LayoutContent>
+
+        <el-dialog
+            v-model="deleteVisiable"
+            :title="$t('commons.button.clean')"
+            width="30%"
+            :close-on-click-modal="false"
+        >
+            <el-form ref="deleteForm" label-position="left" v-loading="delLoading">
+                <el-form-item>
+                    <el-checkbox v-model="cleanData" :label="$t('cronjob.cleanData')" />
+                    <span class="input-help">
+                        {{ $t('cronjob.cleanDataHelper') }}
+                    </span>
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="deleteVisiable = false" :disabled="delLoading">
+                        {{ $t('commons.button.cancel') }}
+                    </el-button>
+                    <el-button type="primary" @click="cleanRecord">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { onBeforeUnmount, reactive, ref } from 'vue';
 import { Cronjob } from '@/api/interface/cronjob';
 import { loadZero } from '@/utils/util';
-import { searchRecords, download, handleOnce, updateStatus } from '@/api/modules/cronjob';
+import { searchRecords, download, handleOnce, updateStatus, cleanRecords } from '@/api/modules/cronjob';
 import { dateFormat } from '@/utils/util';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
-import { LoadFile } from '@/api/modules/files';
+import { DownloadByPath, LoadFile } from '@/api/modules/files';
 import LayoutContent from '@/layout/layout-content.vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgError, MsgInfo, MsgSuccess } from '@/utils/message';
 
 const loading = ref();
+const refresh = ref(false);
 const hasRecords = ref();
+
+let timer: NodeJS.Timer | null = null;
 
 const mymirror = ref();
 const extensions = [javascript(), oneDark];
@@ -301,34 +340,22 @@ interface DialogProps {
 }
 const recordShow = ref(false);
 const dialogData = ref();
-const records = ref<Array<Cronjob.Record>>();
+const records = ref<Array<Cronjob.Record>>([]);
 const currentRecord = ref<Cronjob.Record>();
 const currentRecordDetail = ref<string>('');
 const currentRecordIndex = ref();
 
+const deleteVisiable = ref();
+const delLoading = ref();
+const cleanData = ref();
+
 const acceptParams = async (params: DialogProps): Promise<void> => {
     dialogData.value = params;
-    let itemSearch = {
-        page: searchInfo.page,
-        pageSize: searchInfo.pageSize,
-        cronjobID: dialogData.value.rowData!.id,
-        startTime: new Date(new Date().setHours(0, 0, 0, 0)),
-        endTime: new Date(new Date().setHours(23, 59, 59, 0)),
-        status: searchInfo.status,
-    };
-    const res = await searchRecords(itemSearch);
-    records.value = res.data.items || [];
-    if (records.value.length === 0) {
-        hasRecords.value = false;
-        recordShow.value = true;
-        return;
-    }
-    hasRecords.value = true;
-    currentRecord.value = records.value[0];
-    currentRecordIndex.value = 0;
-    loadRecord(currentRecord.value);
-    searchInfo.recordTotal = res.data.total;
     recordShow.value = true;
+    search(true);
+    timer = setInterval(() => {
+        onRefresh();
+    }, 1000 * 5);
 };
 
 const shortcuts = [
@@ -343,33 +370,36 @@ const shortcuts = [
     {
         text: i18n.global.t('monitor.yestoday'),
         value: () => {
-            const yestoday = new Date(new Date().getTime() - 3600 * 1000 * 24 * 1);
-            const end = new Date(yestoday.setHours(23, 59, 59, 999));
-            const start = new Date(yestoday.setHours(0, 0, 0, 0));
+            const itemDate = new Date(new Date().getTime() - 3600 * 1000 * 24 * 1);
+            const end = new Date(itemDate.setHours(23, 59, 59, 999));
+            const start = new Date(itemDate.setHours(0, 0, 0, 0));
             return [start, end];
         },
     },
     {
         text: i18n.global.t('monitor.lastNDay', [3]),
         value: () => {
-            const start = new Date(new Date().getTime() - 3600 * 1000 * 24 * 3);
+            const itemDate = new Date(new Date().getTime() - 3600 * 1000 * 24 * 3);
             const end = new Date(new Date().setHours(23, 59, 59, 999));
+            const start = new Date(itemDate.setHours(0, 0, 0, 0));
             return [start, end];
         },
     },
     {
         text: i18n.global.t('monitor.lastNDay', [7]),
         value: () => {
-            const start = new Date(new Date().getTime() - 3600 * 1000 * 24 * 7);
+            const itemDate = new Date(new Date().getTime() - 3600 * 1000 * 24 * 7);
             const end = new Date(new Date().setHours(23, 59, 59, 999));
+            const start = new Date(itemDate.setHours(0, 0, 0, 0));
             return [start, end];
         },
     },
     {
         text: i18n.global.t('monitor.lastNDay', [30]),
         value: () => {
-            const start = new Date(new Date().getTime() - 3600 * 1000 * 24 * 30);
+            const itemDate = new Date(new Date().getTime() - 3600 * 1000 * 24 * 30);
             const end = new Date(new Date().setHours(23, 59, 59, 999));
+            const start = new Date(itemDate.setHours(0, 0, 0, 0));
             return [start, end];
         },
     },
@@ -384,16 +414,16 @@ const weekOptions = [
     { label: i18n.global.t('cronjob.sunday'), value: 7 },
 ];
 const timeRangeLoad = ref<[Date, Date]>([
-    new Date(new Date().setHours(0, 0, 0, 0)),
+    new Date(new Date(new Date().getTime() - 3600 * 1000 * 24 * 7).setHours(0, 0, 0, 0)),
     new Date(new Date().setHours(23, 59, 59, 999)),
 ]);
 const searchInfo = reactive({
     page: 1,
-    pageSize: 8,
+    pageSize: 12,
     recordTotal: 0,
     cronjobID: 0,
-    startTime: new Date(new Date().setHours(0, 0, 0, 0)),
-    endTime: new Date(new Date().setHours(23, 59, 59, 999)),
+    startTime: new Date(),
+    endTime: new Date(),
     status: '',
 });
 
@@ -403,10 +433,7 @@ const onHandle = async (row: Cronjob.CronjobInfo) => {
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            searchInfo.pageSize = searchInfo.pageSize * searchInfo.page;
-            searchInfo.page = 1;
-            records.value = [];
-            search();
+            onRefresh();
         })
         .catch(() => {
             loading.value = false;
@@ -425,7 +452,12 @@ const onChangeStatus = async (id: number, status: string) => {
     });
 };
 
-const search = async () => {
+const search = async (isInit: boolean) => {
+    if (isInit) {
+        searchInfo.page = 1;
+        searchInfo.pageSize = 12;
+        records.value = [];
+    }
     if (timeRangeLoad.value && timeRangeLoad.value.length === 2) {
         searchInfo.startTime = timeRangeLoad.value[0];
         searchInfo.endTime = timeRangeLoad.value[1];
@@ -446,6 +478,9 @@ const search = async () => {
         hasRecords.value = false;
         return;
     }
+    if (!res.data.items) {
+        return;
+    }
     for (const item of res.data.items) {
         records.value.push(item);
     }
@@ -456,14 +491,46 @@ const search = async () => {
     searchInfo.recordTotal = res.data.total;
 };
 
-const onRefresh = () => {
+const onRefresh = async () => {
     records.value = [];
     searchInfo.pageSize = searchInfo.pageSize * searchInfo.page;
     searchInfo.page = 1;
-    search();
+    if (timeRangeLoad.value && timeRangeLoad.value.length === 2) {
+        searchInfo.startTime = timeRangeLoad.value[0];
+        searchInfo.endTime = timeRangeLoad.value[1];
+    } else {
+        searchInfo.startTime = new Date(new Date().setHours(0, 0, 0, 0));
+        searchInfo.endTime = new Date();
+    }
+    let params = {
+        page: searchInfo.page,
+        pageSize: searchInfo.pageSize,
+        cronjobID: dialogData.value.rowData!.id,
+        startTime: searchInfo.startTime,
+        endTime: searchInfo.endTime,
+        status: searchInfo.status,
+    };
+    const res = await searchRecords(params);
+    if (res.data.items) {
+        records.value = res.data.items;
+        hasRecords.value = true;
+        currentRecord.value = records.value[0];
+    } else {
+        records.value = [];
+        hasRecords.value = false;
+        refresh.value = !refresh.value;
+    }
 };
 
 const onDownload = async (record: any, backupID: number) => {
+    if (dialogData.value.rowData.dbName === 'all') {
+        MsgInfo(i18n.global.t('cronjob.allOptionHelper', [i18n.global.t('database.database')]));
+        return;
+    }
+    if (dialogData.value.rowData.website === 'all') {
+        MsgInfo(i18n.global.t('cronjob.allOptionHelper', [i18n.global.t('website.website')]));
+        return;
+    }
     if (!record.file || record.file.indexOf('/') === -1) {
         MsgError(i18n.global.t('cronjob.errPath', [record.file]));
         return;
@@ -472,17 +539,19 @@ const onDownload = async (record: any, backupID: number) => {
         recordID: record.id,
         backupAccountID: backupID,
     };
-    const res = await download(params);
-    const downloadUrl = window.URL.createObjectURL(new Blob([res]));
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = downloadUrl;
-    if (record.file && record.file.indexOf('/') !== -1) {
-        let pathItem = record.file.split('/');
-        a.download = pathItem[pathItem.length - 1];
-    }
-    const event = new MouseEvent('click');
-    a.dispatchEvent(event);
+    await download(params).then(async (res) => {
+        const file = await DownloadByPath(res.data);
+        const downloadUrl = window.URL.createObjectURL(new Blob([file]));
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = downloadUrl;
+        if (record.file && record.file.indexOf('/') !== -1) {
+            let pathItem = record.file.split('/');
+            a.download = pathItem[pathItem.length - 1];
+        }
+        const event = new MouseEvent('click');
+        a.dispatchEvent(event);
+    });
 };
 
 const nextPage = async () => {
@@ -490,7 +559,7 @@ const nextPage = async () => {
         return;
     }
     searchInfo.page = searchInfo.page + 1;
-    search();
+    search(false);
 };
 const forDetail = async (row: Cronjob.Record, index: number) => {
     currentRecord.value = row;
@@ -507,6 +576,43 @@ const loadRecord = async (row: Cronjob.Record) => {
         currentRecordDetail.value = res.data;
     }
 };
+
+const onClean = async () => {
+    if (dialogData.value.rowData.type === 'shell' || dialogData.value.rowData.type === 'curl') {
+        ElMessageBox.confirm(i18n.global.t('commons.msg.clean'), i18n.global.t('commons.msg.deleteTitle'), {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'warning',
+        }).then(async () => {
+            await cleanRecords(dialogData.value.rowData.id, cleanData.value)
+                .then(() => {
+                    delLoading.value = false;
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    search(true);
+                })
+                .catch(() => {
+                    delLoading.value = false;
+                });
+        });
+    } else {
+        deleteVisiable.value = true;
+    }
+};
+
+const cleanRecord = async () => {
+    delLoading.value = true;
+    await cleanRecords(dialogData.value.rowData.id, cleanData.value)
+        .then(() => {
+            delLoading.value = false;
+            deleteVisiable.value = false;
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            search(true);
+        })
+        .catch(() => {
+            delLoading.value = false;
+        });
+};
+
 function isBackup() {
     return (
         dialogData.value.rowData!.type === 'website' ||
@@ -522,6 +628,11 @@ function loadWeek(i: number) {
     }
     return '';
 }
+
+onBeforeUnmount(() => {
+    clearInterval(Number(timer));
+    timer = null;
+});
 
 defineExpose({
     acceptParams,

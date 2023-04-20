@@ -16,6 +16,9 @@ const (
 	AppOpenresty = "openresty"
 	AppMysql     = "mysql"
 	AppRedis     = "redis"
+
+	AppResourceLocal  = "local"
+	AppResourceRemote = "remote"
 )
 
 type AppOperate string

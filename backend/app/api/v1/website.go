@@ -78,14 +78,12 @@ func (b *BaseApi) CreateWebsite(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	tx, ctx := helper.GetTxAndContext()
-	err := websiteService.CreateWebsite(ctx, req)
+
+	err := websiteService.CreateWebsite(req)
 	if err != nil {
-		tx.Rollback()
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	tx.Commit()
 	helper.SuccessWithData(c, nil)
 }
 
@@ -127,14 +125,12 @@ func (b *BaseApi) DeleteWebsite(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	tx, ctx := helper.GetTxAndContext()
-	err := websiteService.DeleteWebsite(ctx, req)
+
+	err := websiteService.DeleteWebsite(req)
 	if err != nil {
-		tx.Rollback()
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	tx.Commit()
 	helper.SuccessWithData(c, nil)
 }
 
@@ -189,14 +185,16 @@ func (b *BaseApi) GetWebsite(c *gin.Context) {
 // @Param id path integer true "request"
 // @Success 200 {object} response.FileInfo
 // @Security ApiKeyAuth
-// @Router /websites/:id/nginx [get]
+// @Router /websites/:id/config/:type [get]
 func (b *BaseApi) GetWebsiteNginx(c *gin.Context) {
 	id, err := helper.GetParamID(c)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
 		return
 	}
-	fileInfo, err := websiteService.GetWebsiteNginxConfig(id)
+	configType := c.Param("type")
+
+	fileInfo, err := websiteService.GetWebsiteNginxConfig(id, configType)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -495,4 +493,158 @@ func (b *BaseApi) ChangeDefaultServer(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Website
+// @Summary Load websit php conf
+// @Description 获取网站 php 配置
+// @Accept json
+// @Param id path integer true "request"
+// @Success 200 {object} response.PHPConfig
+// @Security ApiKeyAuth
+// @Router /websites/php/config/:id [get]
+func (b *BaseApi) GetWebsitePHPConfig(c *gin.Context) {
+	id, err := helper.GetParamID(c)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	data, err := websiteService.GetPHPConfig(id)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
+
+// @Tags Website PHP
+// @Summary Update website php conf
+// @Description 更新 网站 PHP 配置
+// @Accept json
+// @Param request body request.WebsitePHPConfigUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/php/config [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"[domain] PHP 配置修改","formatEN":"[domain] PHP conf update"}
+func (b *BaseApi) UpdateWebsitePHPConfig(c *gin.Context) {
+	var req request.WebsitePHPConfigUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.UpdatePHPConfig(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Website PHP
+// @Summary Update php conf
+// @Description 更新 php 配置
+// @Accept json
+// @Param request body request.WebsitePHPFileUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/php/update [post]
+// @x-panel-log {"bodyKeys":["websiteId"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"websiteId","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"php 配置修改 [domain]","formatEN":"Nginx conf update [domain]"}
+func (b *BaseApi) UpdatePHPFile(c *gin.Context) {
+	var req request.WebsitePHPFileUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.UpdatePHPConfigFile(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Website
+// @Summary Get rewrite conf
+// @Description 获取伪静态配置
+// @Accept json
+// @Param request body request.NginxRewriteReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/rewrite [post]
+func (b *BaseApi) GetRewriteConfig(c *gin.Context) {
+	var req request.NginxRewriteReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	res, err := websiteService.GetRewriteConfig(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Website
+// @Summary Update rewrite conf
+// @Description 更新伪静态配置
+// @Accept json
+// @Param request body request.NginxRewriteUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/rewrite/update [post]
+// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"websiteID","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"伪静态配置修改 [domain]","formatEN":"Nginx conf rewrite update [domain]"}
+func (b *BaseApi) UpdateRewriteConfig(c *gin.Context) {
+	var req request.NginxRewriteUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.UpdateRewriteConfig(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Website
+// @Summary Update Site Dir
+// @Description 更新网站目录
+// @Accept json
+// @Param request body request.WebsiteUpdateDir true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/dir/update [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"更新网站 [domain] 目录","formatEN":"Update  domain [domain] dir"}
+func (b *BaseApi) UpdateSiteDir(c *gin.Context) {
+	var req request.WebsiteUpdateDir
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.UpdateSiteDir(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Website
+// @Summary Update Site Dir permission
+// @Description 更新网站目录权限
+// @Accept json
+// @Param request body request.WebsiteUpdateDirPermission true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/dir/permission [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"更新网站 [domain] 目录权限","formatEN":"Update  domain [domain] dir permission"}
+func (b *BaseApi) UpdateSiteDirPermission(c *gin.Context) {
+	var req request.WebsiteUpdateDirPermission
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.UpdateSitePermission(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
 }

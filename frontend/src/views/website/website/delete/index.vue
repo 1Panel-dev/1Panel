@@ -14,10 +14,17 @@
                         {{ $t('website.forceDeleteHelper') }}
                     </span>
                 </el-form-item>
-                <el-form-item v-if="type === 'deployment'">
-                    <el-checkbox v-model="deleteReq.deleteApp" :label="$t('website.deleteApp')" />
+                <el-form-item v-if="type === 'deployment' || runtimeApp">
+                    <el-checkbox
+                        v-model="deleteReq.deleteApp"
+                        :disabled="runtimeApp"
+                        :label="$t('website.deleteApp')"
+                    />
                     <span class="input-help">
                         {{ $t('website.deleteAppHelper') }}
+                    </span>
+                    <span class="input-help" style="color: red" v-if="runtimeApp">
+                        {{ $t('website.deleteRuntimeHelper') }}
                     </span>
                 </el-form-item>
                 <el-form-item>
@@ -66,6 +73,7 @@ const deleteForm = ref<FormInstance>();
 let deleteInfo = ref('');
 let websiteName = ref('');
 let deleteHelper = ref('');
+const runtimeApp = ref(false);
 
 const handleClose = () => {
     open.value = false;
@@ -79,6 +87,10 @@ const acceptParams = async (website: Website.Website) => {
         deleteBackup: false,
         forceDelete: false,
     };
+    if (website.type === 'runtime' && website.appInstallId > 0) {
+        runtimeApp.value = true;
+        deleteReq.value.deleteApp = true;
+    }
     deleteInfo.value = '';
     deleteReq.value.id = website.id;
     websiteName.value = website.primaryDomain;

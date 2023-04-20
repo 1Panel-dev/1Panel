@@ -5,6 +5,7 @@
                 <AppStatus
                     :app-key="'mysql'"
                     v-model:loading="loading"
+                    v-model:mask-show="maskShow"
                     @setting="onSetting"
                     @is-exist="checkExist"
                 ></AppStatus>
@@ -17,7 +18,7 @@
                             {{ $t('database.create') }}
                         </el-button>
                         <el-button @click="onChangeRootPassword" type="primary" plain>
-                            {{ $t('database.rootPassword') }}
+                            {{ $t('database.databaseConnInfo') }}
                         </el-button>
                         <el-button @click="onChangeAccess" type="primary" plain>
                             {{ $t('database.remoteAccess') }}
@@ -108,11 +109,10 @@
         </LayoutContent>
 
         <el-card
-            width="30%"
-            v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist && !loading"
+            v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist && !loading && maskShow"
             class="mask-prompt"
         >
-            <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['MySQL']) }}</span>
+            <span>{{ $t('commons.service.serviceNotStarted', ['MySQL']) }}</span>
         </el-card>
 
         <Setting ref="settingRef" style="margin-top: 20px" />
@@ -171,6 +171,7 @@ import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
+const maskShow = ref(true);
 
 const mysqlName = ref();
 const isOnSetting = ref<boolean>();

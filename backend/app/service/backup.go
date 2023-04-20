@@ -9,6 +9,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cloud_storage"
@@ -26,7 +27,7 @@ type IBackupService interface {
 	Create(backupDto dto.BackupOperate) error
 	GetBuckets(backupDto dto.ForBuckets) ([]interface{}, error)
 	Update(ireq dto.BackupOperate) error
-	BatchDelete(ids []uint) error
+	Delete(id uint) error
 	BatchDeleteRecord(ids []uint) error
 	NewClient(backup *model.BackupAccount) (cloud_storage.CloudStorageClient, error)
 
@@ -53,36 +54,13 @@ func NewIBackupService() IBackupService {
 func (u *BackupService) List() ([]dto.BackupInfo, error) {
 	ops, err := backupRepo.List(commonRepo.WithOrderBy("created_at desc"))
 	var dtobas []dto.BackupInfo
-	ossExist, s3Exist, sftpExist, minioExist := false, false, false, false
-	for _, group := range ops {
-		switch group.Type {
-		case "OSS":
-			ossExist = true
-		case "S3":
-			s3Exist = true
-		case "SFTP":
-			sftpExist = true
-		case "MINIO":
-			minioExist = true
-		}
-		var item dto.BackupInfo
-		if err := copier.Copy(&item, &group); err != nil {
-			return nil, errors.WithMessage(constant.ErrStructTransform, err.Error())
-		}
-		dtobas = append(dtobas, item)
-	}
-	if !ossExist {
-		dtobas = append(dtobas, dto.BackupInfo{Type: "OSS"})
-	}
-	if !s3Exist {
-		dtobas = append(dtobas, dto.BackupInfo{Type: "S3"})
-	}
-	if !sftpExist {
-		dtobas = append(dtobas, dto.BackupInfo{Type: "SFTP"})
-	}
-	if !minioExist {
-		dtobas = append(dtobas, dto.BackupInfo{Type: "MINIO"})
-	}
+	dtobas = append(dtobas, u.loadByType("LOCAL", ops))
+	dtobas = append(dtobas, u.loadByType("OSS", ops))
+	dtobas = append(dtobas, u.loadByType("S3", ops))
+	dtobas = append(dtobas, u.loadByType("SFTP", ops))
+	dtobas = append(dtobas, u.loadByType("MINIO", ops))
+	dtobas = append(dtobas, u.loadByType("COS", ops))
+	dtobas = append(dtobas, u.loadByType("KODO", ops))
 	return dtobas, err
 }
 
@@ -123,7 +101,7 @@ func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) 
 	case constant.Sftp:
 		varMap["username"] = backup.AccessKey
 		varMap["password"] = backup.Credential
-	case constant.OSS, constant.S3, constant.MinIo:
+	case constant.OSS, constant.S3, constant.MinIo, constant.Cos, constant.Kodo:
 		varMap["accessKey"] = backup.AccessKey
 		varMap["secretKey"] = backup.Credential
 	}
@@ -171,7 +149,7 @@ func (u *BackupService) GetBuckets(backupDto dto.ForBuckets) ([]interface{}, err
 	case constant.Sftp:
 		varMap["username"] = backupDto.AccessKey
 		varMap["password"] = backupDto.Credential
-	case constant.OSS, constant.S3, constant.MinIo:
+	case constant.OSS, constant.S3, constant.MinIo, constant.Cos, constant.Kodo:
 		varMap["accessKey"] = backupDto.AccessKey
 		varMap["secretKey"] = backupDto.Credential
 	}
@@ -182,8 +160,12 @@ func (u *BackupService) GetBuckets(backupDto dto.ForBuckets) ([]interface{}, err
 	return client.ListBuckets()
 }
 
-func (u *BackupService) BatchDelete(ids []uint) error {
-	return backupRepo.Delete(commonRepo.WithIdsIn(ids))
+func (u *BackupService) Delete(id uint) error {
+	cronjobs, _ := cronjobRepo.List(cronjobRepo.WithByBackupID(id))
+	if len(cronjobs) != 0 {
+		return buserr.New(constant.ErrBackupInUsed)
+	}
+	return backupRepo.Delete(commonRepo.WithByID(id))
 }
 
 func (u *BackupService) BatchDeleteRecord(ids []uint) error {
@@ -277,7 +259,7 @@ func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.Cl
 	case constant.Sftp:
 		varMap["username"] = backup.AccessKey
 		varMap["password"] = backup.Credential
-	case constant.OSS, constant.S3, constant.MinIo:
+	case constant.OSS, constant.S3, constant.MinIo, constant.Cos, constant.Kodo:
 		varMap["accessKey"] = backup.AccessKey
 		varMap["secretKey"] = backup.Credential
 	}
@@ -288,6 +270,19 @@ func (u *BackupService) NewClient(backup *model.BackupAccount) (cloud_storage.Cl
 	}
 
 	return backClient, nil
+}
+
+func (u *BackupService) loadByType(accountType string, accounts []model.BackupAccount) dto.BackupInfo {
+	for _, account := range accounts {
+		if account.Type == accountType {
+			var item dto.BackupInfo
+			if err := copier.Copy(&item, &account); err != nil {
+				global.LOG.Errorf("copy backup account to dto backup info failed, err: %v", err)
+			}
+			return item
+		}
+	}
+	return dto.BackupInfo{Type: accountType}
 }
 
 func loadLocalDir() (string, error) {

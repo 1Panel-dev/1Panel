@@ -54,16 +54,16 @@ export const loadBaseDir = () => {
 
 // backup
 export const handleBackup = (params: Backup.Backup) => {
-    return http.post(`/settings/backup/backup`, params, 400000);
+    return http.post(`/settings/backup/backup`, params, 600000);
 };
 export const handleRecover = (params: Backup.Recover) => {
-    return http.post(`/settings/backup/recover`, params, 400000);
+    return http.post(`/settings/backup/recover`, params, 600000);
 };
 export const handleRecoverByUpload = (params: Backup.Recover) => {
-    return http.post(`/settings/backup/recover/byupload`, params, 400000);
+    return http.post(`/settings/backup/recover/byupload`, params, 600000);
 };
 export const downloadBackupRecord = (params: Backup.RecordDownload) => {
-    return http.download<BlobPart>(`/settings/backup/record/download`, params, { responseType: 'blob' });
+    return http.post<string>(`/settings/backup/record/download`, params, 600000);
 };
 export const deleteBackupRecord = (params: { ids: number[] }) => {
     return http.post(`/settings/backup/record/del`, params);
@@ -98,7 +98,7 @@ export const editBackup = (params: Backup.BackupOperate) => {
     }
     return http.post(`/settings/backup/update`, reqest);
 };
-export const deleteBackup = (params: { ids: number[] }) => {
+export const deleteBackup = (params: { id: number }) => {
     return http.post(`/settings/backup/del`, params);
 };
 export const listBucket = (params: Backup.ForBucket) => {
@@ -138,6 +138,9 @@ export const searchSnapshotPage = (param: SearchWithPage) => {
 // upgrade
 export const loadUpgradeInfo = () => {
     return http.get<Setting.UpgradeInfo>(`/settings/upgrade`);
+};
+export const loadReleaseNotes = (version: string) => {
+    return http.post<string>(`/settings/upgrade/notes`, { version: version });
 };
 export const upgrade = (version: string) => {
     return http.post(`/settings/upgrade`, { version: version });
