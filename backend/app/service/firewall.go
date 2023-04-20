@@ -368,7 +368,11 @@ func (u *FirewallService) pingStatus() string {
 	if _, err := os.Stat("/etc/sysctl.conf"); err != nil {
 		return constant.StatusNone
 	}
-	stdout, _ := cmd.Exec("sudo cat /etc/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= ")
+	commond := "cat /etc/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= "
+	if cmd.HasSudo() {
+		commond = "sudo cat /etc/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= "
+	}
+	stdout, _ := cmd.Exec(commond)
 	if stdout == "net/ipv4/icmp_echo_ignore_all=1\n" {
 		return constant.StatusEnable
 	}
@@ -404,7 +408,11 @@ func (u *FirewallService) updatePingStatus(enabel string) error {
 		return err
 	}
 
-	stdout, err := cmd.Exec("sudo sysctl -p")
+	commond := "sysctl -p"
+	if cmd.HasSudo() {
+		commond = "sudo sysctl -p"
+	}
+	stdout, err := cmd.Exec(commond)
 	if err != nil {
 		return fmt.Errorf("update ping status failed, err: %v", stdout)
 	}

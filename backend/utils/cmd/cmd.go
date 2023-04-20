@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
-	"github.com/1Panel-dev/1Panel/backend/constant"
 	"os/exec"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 )
 
 func Exec(cmdStr string) (string, error) {
@@ -98,4 +99,12 @@ func HasNoPasswordSudo() bool {
 	cmd2 := exec.Command("sudo", "-n", "ls")
 	err2 := cmd2.Run()
 	return err2 == nil
+}
+
+func HasSudo() bool {
+	cmd := exec.Command("sudo", "-nv")
+	if err := cmd.Run(); err != nil {
+		return false
+	}
+	return true
 }
