@@ -303,6 +303,7 @@ const login = (formEl: FormInstance | undefined) => {
             const res = await loginApi(requestLoginForm);
             if (res.code === 406) {
                 if (res.message === 'ErrCaptchaCode') {
+                    loginForm.captcha = '';
                     errCaptcha.value = true;
                     errAuthInfo.value = false;
                 }
