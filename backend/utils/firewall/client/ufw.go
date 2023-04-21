@@ -38,7 +38,7 @@ func (f *Ufw) Status() (string, error) {
 }
 
 func (f *Ufw) Version() (string, error) {
-	stdout, err := cmd.Execf("%s version | grep ufwHasNoPasswordSudo", f.CmdStr)
+	stdout, err := cmd.Execf("%s version | grep ufw", f.CmdStr)
 	if err != nil {
 		return "", fmt.Errorf("load the firewall status failed, err: %s", stdout)
 	}
