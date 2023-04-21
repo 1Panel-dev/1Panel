@@ -75,7 +75,7 @@ func (f *Ufw) ListPort() ([]FireInfo, error) {
 	var datas []FireInfo
 	isStart := false
 	for _, line := range portInfos {
-		if strings.HasPrefix(line, "--") {
+		if strings.HasPrefix(line, "-") {
 			isStart = true
 			continue
 		}
@@ -100,7 +100,7 @@ func (f *Ufw) ListAddress() ([]FireInfo, error) {
 	var datas []FireInfo
 	isStart := false
 	for _, line := range portInfos {
-		if strings.HasPrefix(line, "--") {
+		if strings.HasPrefix(line, "-") {
 			isStart = true
 			continue
 		}
