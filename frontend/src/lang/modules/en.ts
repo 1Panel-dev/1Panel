@@ -797,6 +797,7 @@ const message = {
         theme: 'Theme',
         language: 'Language',
         eol: 'End Of Line',
+        copyDir: 'Copy Dir',
     },
     setting: {
         all: 'All',
