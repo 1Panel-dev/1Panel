@@ -872,6 +872,18 @@ const message = {
         mfaHelper2: 'Scan the following QR code using the mobile app to obtain the 6-digit verification code',
         mfaHelper3: 'Enter six digits from the app',
 
+        https: 'Setting up HTTPS protocol access for the panel can enhance the security of panel access.',
+        selfSigned: 'Self signed',
+        selfSignedHelper:
+            'It is normal for self-signed certificates to be not trusted by browsers and display a security warning as the certificate is not issued by a trusted third party.',
+        import: 'Import',
+        select: 'Select',
+        domainOrIP: 'Domain/IP：',
+        timeOut: 'Timeout',
+        rootCrtDownload: 'Root certificate download',
+        primaryKey: 'Primary key',
+        certificate: 'Certificate',
+
         snapshot: 'Snapshot',
         thirdPartySupport: 'Only third-party accounts are supported',
         recoverDetail: 'Recover detail',

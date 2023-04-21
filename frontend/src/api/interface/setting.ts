@@ -39,6 +39,7 @@ export namespace Setting {
     }
     export interface SSLUpdate {
         ssl: string;
+        domain: string;
         sslType: string;
         cert: string;
         key: string;
@@ -46,9 +47,11 @@ export namespace Setting {
     }
     export interface SSLInfo {
         domain: string;
-        subject: string;
         timeout: string;
         rootPath: string;
+        cert: string;
+        key: string;
+        sslID: number;
     }
     export interface PasswordUpdate {
         oldPassword: string;

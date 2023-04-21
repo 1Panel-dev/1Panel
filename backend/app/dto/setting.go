@@ -44,16 +44,19 @@ type SettingUpdate struct {
 
 type SSLUpdate struct {
 	SSLType string `json:"sslType"`
+	Domain  string `json:"domain"`
 	SSL     string `json:"ssl" validate:"required,oneof=enable disable"`
-	Cert    string `json:"cret"`
+	Cert    string `json:"cert"`
 	Key     string `json:"key"`
 	SSLID   uint   `json:"sslID"`
 }
 type SSLInfo struct {
 	Domain   string `json:"domain"`
-	Subject  string `json:"subject"`
 	Timeout  string `json:"timeout"`
 	RootPath string `json:"rootPath"`
+	Cert     string `json:"cert"`
+	Key      string `json:"key"`
+	SSLID    uint   `json:"sslID"`
 }
 
 type PasswordUpdate struct {

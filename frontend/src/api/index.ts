@@ -20,9 +20,6 @@ class RequestHttp {
         this.service = axios.create(config);
         this.service.interceptors.request.use(
             (config: AxiosRequestConfig) => {
-                // if (globalStore.isSSL) {
-                //     config.baseURL = config.baseURL.replaceAll('/api/v1', '/apis/v1');
-                // }
                 if (config.method != 'get') {
                     config.headers = {
                         'X-CSRF-TOKEN': globalStore.csrfToken,

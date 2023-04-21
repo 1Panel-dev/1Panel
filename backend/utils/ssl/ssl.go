@@ -7,53 +7,105 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"math/big"
+	"net"
 	"os"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/global"
 )
 
-func GenerateSSL(domain []string) error {
-	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
-	if err != nil {
-		return err
+func GenerateSSL(domain string) error {
+	global.CONF.System.BaseDir = "/opt"
+	rootPrivateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
+	ipItem := net.ParseIP(domain)
+	isIP := false
+	if len(ipItem) != 0 {
+		isIP = true
 	}
 
-	template := x509.Certificate{
-		SerialNumber: big.NewInt(time.Now().Unix()),
-		Subject: pkix.Name{
-			Country:      []string{"CN"},
-			Organization: []string{"FIT2CLOUD"},
-			CommonName:   "1Panel",
-		},
-		DNSNames:              domain,
+	rootTemplate := x509.Certificate{
+		SerialNumber:          big.NewInt(1),
+		Subject:               pkix.Name{CommonName: "1Panel Root CA"},
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().AddDate(10, 0, 0),
 		BasicConstraintsValid: true,
+		IsCA:                  true,
+		KeyUsage:              x509.KeyUsageCertSign,
+	}
+	if isIP {
+		rootTemplate.IPAddresses = []net.IP{ipItem}
+	} else {
+		rootTemplate.DNSNames = []string{domain}
 	}
 
-	if _, err := os.Stat("/opt/1panel/secret"); err != nil && os.IsNotExist(err) {
-		_ = os.MkdirAll("/opt/1panel/secret", os.ModePerm)
+	rootCertBytes, _ := x509.CreateCertificate(rand.Reader, &rootTemplate, &rootTemplate, &rootPrivateKey.PublicKey, rootPrivateKey)
+	rootCertBlock := &pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: rootCertBytes,
 	}
 
-	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
-	if err != nil {
-		return err
+	interPrivateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
+	interTemplate := x509.Certificate{
+		SerialNumber:          big.NewInt(2),
+		Subject:               pkix.Name{CommonName: "1Panel Intermediate CA"},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().AddDate(10, 0, 0),
+		BasicConstraintsValid: true,
+		IsCA:                  true,
+		KeyUsage:              x509.KeyUsageCertSign,
+	}
+	if isIP {
+		interTemplate.IPAddresses = []net.IP{ipItem}
+	} else {
+		interTemplate.DNSNames = []string{domain}
 	}
 
-	certOut, err := os.OpenFile("/opt/1panel/secret/cert.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	interCertBytes, _ := x509.CreateCertificate(rand.Reader, &interTemplate, &rootTemplate, &interPrivateKey.PublicKey, rootPrivateKey)
+	interCertBlock := &pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: interCertBytes,
+	}
+
+	clientPrivateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
+	clientTemplate := x509.Certificate{
+		SerialNumber: big.NewInt(3),
+		Subject:      pkix.Name{CommonName: domain},
+		NotBefore:    time.Now(),
+		NotAfter:     time.Now().AddDate(10, 0, 0),
+		KeyUsage:     x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
+	}
+	if isIP {
+		clientTemplate.IPAddresses = []net.IP{ipItem}
+	} else {
+		clientTemplate.DNSNames = []string{domain}
+	}
+
+	clientCertBytes, _ := x509.CreateCertificate(rand.Reader, &clientTemplate, &interTemplate, &clientPrivateKey.PublicKey, interPrivateKey)
+	clientCertBlock := &pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: clientCertBytes,
+	}
+
+	pemBytes := []byte{}
+	pemBytes = append(pemBytes, pem.EncodeToMemory(clientCertBlock)...)
+	pemBytes = append(pemBytes, pem.EncodeToMemory(interCertBlock)...)
+	pemBytes = append(pemBytes, pem.EncodeToMemory(rootCertBlock)...)
+	certOut, err := os.OpenFile(global.CONF.System.BaseDir+"/1panel/secret/server.crt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}
 	defer certOut.Close()
-	if err := pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes}); err != nil {
+	if _, err := certOut.Write(pemBytes); err != nil {
 		return err
 	}
 
-	keyOut, err := os.OpenFile("/opt/1panel/secret/key.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	keyOut, err := os.OpenFile(global.CONF.System.BaseDir+"/1panel/secret/server.key", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}
 	defer keyOut.Close()
-	if err := pem.Encode(keyOut, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(privateKey)}); err != nil {
+	if err := pem.Encode(keyOut, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(clientPrivateKey)}); err != nil {
 		return err
 	}
 

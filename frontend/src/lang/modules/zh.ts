@@ -857,6 +857,17 @@ const message = {
         password: '密码',
         path: '路径',
 
+        https: '为面板设置 https 协议访问，提升面板访问安全性',
+        selfSigned: '自签名',
+        selfSignedHelper: '自签证书，不被浏览器信任，显示不安全是正常现象',
+        import: '导入',
+        select: '选择已有',
+        domainOrIP: '域名/IP：',
+        timeOut: '过期时间：',
+        rootCrtDownload: '根证书下载',
+        primaryKey: '密钥',
+        certificate: '证书',
+
         snapshot: '快照',
         thirdPartySupport: '仅支持第三方账号',
         recoverDetail: '恢复详情',

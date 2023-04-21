@@ -288,8 +288,8 @@ var UpdateTableWebsite = &gormigrate.Migration{
 	},
 }
 
-var AddEntranceStatus = &gormigrate.Migration{
-	ID: "20230414-add-entrance-status",
+var AddEntranceAndSSL = &gormigrate.Migration{
+	ID: "20230414-add-entrance-and-ssl",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.Create(&model.Setting{Key: "SecurityEntranceStatus", Value: "disable"}).Error; err != nil {
 			return err
@@ -297,16 +297,15 @@ var AddEntranceStatus = &gormigrate.Migration{
 		if err := tx.Model(&model.Setting{}).Where("key = ?", "SecurityEntrance").Updates(map[string]interface{}{"value": ""}).Error; err != nil {
 			return err
 		}
-		return tx.AutoMigrate(&model.Website{})
-	},
-}
-
-var AddSSLSetting = &gormigrate.Migration{
-	ID: "20230418-add-ssl-setting",
-	Migrate: func(tx *gorm.DB) error {
 		if err := tx.Create(&model.Setting{Key: "SSLType", Value: "self"}).Error; err != nil {
 			return err
 		}
-		return tx.Create(&model.Setting{Key: "SSL", Value: "enable"}).Error
+		if err := tx.Create(&model.Setting{Key: "SSLID", Value: "0"}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "SSL", Value: "disable"}).Error; err != nil {
+			return err
+		}
+		return tx.AutoMigrate(&model.Website{})
 	},
 }

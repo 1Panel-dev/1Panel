@@ -1,8 +1,11 @@
 package server
 
 import (
+	"crypto/tls"
 	"encoding/gob"
 	"fmt"
+	"net/http"
+	"os"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/init/app"
@@ -47,18 +50,36 @@ func Start() {
 	s.ReadHeaderTimeout = 20 * time.Second
 	s.WriteTimeout = 60 * time.Second
 	s.MaxHeaderBytes = 1 << 20
-	global.LOG.Infof("server run success on %s", global.CONF.System.Port)
 
 	if global.CONF.System.SSL == "disable" {
+		global.LOG.Infof("server run success on %s with http", global.CONF.System.Port)
 		if err := s.ListenAndServe(); err != nil {
 			global.LOG.Error(err)
 			panic(err)
 		}
 	} else {
-		if err := s.ListenAndServeTLS(
-			fmt.Sprintf("%s/1panel/secret/cert.pem", global.CONF.System.BaseDir),
-			fmt.Sprintf("%s/1panel/secret/key.pem", global.CONF.System.BaseDir),
-		); err != nil {
+		certificate, err := os.ReadFile(global.CONF.System.BaseDir + "/1panel/secret/server.crt")
+		if err != nil {
+			panic(err)
+		}
+		key, err := os.ReadFile(global.CONF.System.BaseDir + "/1panel/secret/server.key")
+		if err != nil {
+			panic(err)
+		}
+		cert, err := tls.X509KeyPair(certificate, key)
+		if err != nil {
+			panic(err)
+		}
+		s := &http.Server{
+			Addr:    address,
+			Handler: rootRouter,
+			TLSConfig: &tls.Config{
+				Certificates: []tls.Certificate{cert},
+			},
+		}
+
+		global.LOG.Infof("server run success on %s with https", global.CONF.System.Port)
+		if err := s.ListenAndServeTLS("", ""); err != nil {
 			global.LOG.Error(err)
 			panic(err)
 		}

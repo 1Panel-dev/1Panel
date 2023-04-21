@@ -127,8 +127,8 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		if err := settingRepo.Update("SSLType", "self"); err != nil {
 			return err
 		}
-		_ = os.Remove(fmt.Sprintf("%s/1panel/secret/cert.pem", global.CONF.System.BaseDir))
-		_ = os.Remove(fmt.Sprintf("%s/1panel/secret/key.pem", global.CONF.System.BaseDir))
+		_ = os.Remove(global.CONF.System.BaseDir + "/1panel/secret/server.crt")
+		_ = os.Remove(global.CONF.System.BaseDir + "/1panel/secret/server.key")
 		go func() {
 			_, err := cmd.Exec("systemctl restart 1panel.service")
 			if err != nil {
@@ -138,14 +138,31 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		return nil
 	}
 
-	switch req.SSLType {
-	case "self":
-		domains := loadDomain(c)
-		if err := ssl.GenerateSSL(domains); err != nil {
+	if err := settingRepo.Update("SSLType", req.SSLType); err != nil {
+		return err
+	}
+	if req.SSLType == "self" {
+		if len(req.Domain) == 0 {
+			return fmt.Errorf("load domain failed")
+		}
+		if err := ssl.GenerateSSL(req.Domain); err != nil {
 			return err
 		}
-	case "import":
-		cert, err := os.OpenFile("/opt/1panel/secret/cert.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	}
+	if req.SSLType == "select" {
+		sslInfo, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(req.SSLID))
+		if err != nil {
+			return err
+		}
+		req.Cert = sslInfo.Pem
+		req.Key = sslInfo.PrivateKey
+		req.SSLType = "import"
+		if err := settingRepo.Update("SSLID", strconv.Itoa(int(req.SSLID))); err != nil {
+			return err
+		}
+	}
+	if req.SSLType == "import" {
+		cert, err := os.OpenFile("/opt/1panel/secret/server.crt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 		if err != nil {
 			return err
 		}
@@ -153,7 +170,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		if _, err := cert.WriteString(req.Cert); err != nil {
 			return err
 		}
-		key, err := os.OpenFile("/opt/1panel/secret/cert.pem", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+		key, err := os.OpenFile("/opt/1panel/secret/server.key", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 		if err != nil {
 			return err
 		}
@@ -163,9 +180,6 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		defer key.Close()
 	}
 	if err := settingRepo.Update("SSL", req.SSL); err != nil {
-		return err
-	}
-	if err := settingRepo.Update("SSLType", req.SSLType); err != nil {
 		return err
 	}
 	go func() {
@@ -178,25 +192,43 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 }
 
 func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
-	certFile := global.CONF.System.BaseDir + "/1panel/secret/user.crt"
-	certData, err := os.ReadFile(certFile)
+	ssl, err := settingRepo.Get(settingRepo.WithByKey("SSL"))
 	if err != nil {
 		return nil, err
 	}
-	certBlock, _ := pem.Decode(certData)
-	if certBlock == nil {
-		return nil, err
+	if ssl.Value == "disable" {
+		return &dto.SSLInfo{}, nil
 	}
-	certObj, err := x509.ParseCertificate(certBlock.Bytes)
+	sslType, err := settingRepo.Get(settingRepo.WithByKey("SSLType"))
 	if err != nil {
 		return nil, err
 	}
-	return &dto.SSLInfo{
-		Domain:   strings.Join(certObj.DNSNames, ","),
-		Subject:  certObj.Subject.CommonName,
-		Timeout:  certObj.NotAfter.Format("2006-01-02 15:04:05"),
-		RootPath: global.CONF.System.BaseDir + "/1panel/secret/root.crt",
-	}, nil
+	data, err := loadInfoFromCert()
+	if err != nil {
+		return nil, err
+	}
+	switch sslType.Value {
+	case "import":
+		if _, err := os.Stat(global.CONF.System.BaseDir + "/1panel/secret/server.crt"); err != nil {
+			return nil, fmt.Errorf("load server.crt file failed, err: %v", err)
+		}
+		certFile, _ := os.ReadFile(global.CONF.System.BaseDir + "/1panel/secret/server.crt")
+		data.Cert = string(certFile)
+
+		if _, err := os.Stat(global.CONF.System.BaseDir + "/1panel/secret/server.key"); err != nil {
+			return nil, fmt.Errorf("load server.key file failed, err: %v", err)
+		}
+		keyFile, _ := os.ReadFile(global.CONF.System.BaseDir + "/1panel/secret/server.key")
+		data.Key = string(keyFile)
+	case "select":
+		sslID, err := settingRepo.Get(settingRepo.WithByKey("SSLID"))
+		if err != nil {
+			return nil, err
+		}
+		id, _ := strconv.Atoi(sslID.Value)
+		data.SSLID = uint(id)
+	}
+	return data, nil
 }
 
 func (u *SettingService) HandlePasswordExpired(c *gin.Context, old, new string) error {
@@ -238,19 +270,36 @@ func (u *SettingService) UpdatePassword(c *gin.Context, old, new string) error {
 	return nil
 }
 
-func loadDomain(c *gin.Context) []string {
-	var domain []string
-	ip := c.Request.RemoteAddr
-	if idx := strings.Index(ip, ":"); idx != -1 {
-		ip = ip[:idx]
-		if ip != "localhost" && ip != "127.0.0.1" && ip != "::1" {
-			domain = append(domain, ip)
+func loadInfoFromCert() (*dto.SSLInfo, error) {
+	var info dto.SSLInfo
+	certFile := global.CONF.System.BaseDir + "/1panel/secret/server.crt"
+	if _, err := os.Stat(certFile); err != nil {
+		return &info, err
+	}
+	certData, err := os.ReadFile(certFile)
+	if err != nil {
+		return &info, err
+	}
+	certBlock, _ := pem.Decode(certData)
+	if certBlock == nil {
+		return &info, err
+	}
+	certObj, err := x509.ParseCertificate(certBlock.Bytes)
+	if err != nil {
+		return &info, err
+	}
+	var domains []string
+	if len(certObj.IPAddresses) != 0 {
+		for _, ip := range certObj.IPAddresses {
+			domains = append(domains, ip.String())
 		}
 	}
-	if host := c.Request.Header.Get("X-Forwarded-Host"); len(host) > 0 {
-		domain = append(domain, host)
-	} else if host := c.Request.Header.Get("Host"); len(host) > 0 {
-		domain = append(domain, host)
+	if len(certObj.DNSNames) != 0 {
+		domains = append(domains, certObj.DNSNames...)
 	}
-	return domain
+	return &dto.SSLInfo{
+		Domain:   strings.Join(domains, ","),
+		Timeout:  certObj.NotAfter.Format("2006-01-02 15:04:05"),
+		RootPath: global.CONF.System.BaseDir + "/1panel/secret/server.crt",
+	}, nil
 }
