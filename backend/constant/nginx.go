@@ -5,8 +5,9 @@ const (
 	NginxScopeHttp   = "http"
 	NginxScopeOut    = "out"
 
-	NginxReload = "reload"
-	NginxCheck  = "check"
+	NginxReload  = "reload"
+	NginxCheck   = "check"
+	NginxRestart = "restart"
 
 	ConfigNew    = "add"
 	ConfigUpdate = "update"

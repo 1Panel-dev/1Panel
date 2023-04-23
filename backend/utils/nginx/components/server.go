@@ -5,8 +5,9 @@ import (
 )
 
 type Server struct {
-	Comment    string
-	Listens    []*ServerListen
+	Comment string
+	Listens []*ServerListen
+	//Locations  []*Location
 	Directives []IDirective
 	Line       int
 }
@@ -21,6 +22,15 @@ func NewServer(directive IDirective) (*Server, error) {
 			switch dir.GetName() {
 			case "listen":
 				server.Listens = append(server.Listens, NewServerListen(dir.GetParameters(), dir.GetLine()))
+			//case "location":
+			//	locationDirective := &Directive{
+			//		Name:       "location",
+			//		Parameters: dir.GetParameters(),
+			//		Block:      dir.GetBlock(),
+			//		Line:       dir.GetLine(),
+			//		Comment:    dir.GetComment(),
+			//	}
+			//	server.Locations = append(server.Locations, NewLocation(locationDirective))
 			default:
 				server.Directives = append(server.Directives, dir)
 			}
@@ -51,6 +61,9 @@ func (s *Server) GetDirectives() []IDirective {
 	for _, ls := range s.Listens {
 		directives = append(directives, ls)
 	}
+	//for _, la := range s.Locations {
+	//	directives = append(directives, la)
+	//}
 	directives = append(directives, s.Directives...)
 	return directives
 }
@@ -116,22 +129,14 @@ func (s *Server) RemoveDirective(key string, params []string) {
 	directives := s.Directives
 	var newDirectives []IDirective
 	for _, dir := range directives {
-		if key == "location" {
-			if location, ok := dir.(*Location); ok {
-				if len(params) == 2 && location.Match == params[1] && location.Modifier == params[0] {
+		if dir.GetName() == key {
+			if len(params) > 0 {
+				oldParams := dir.GetParameters()
+				if oldParams[0] == params[0] {
 					continue
 				}
-			}
-		} else {
-			if dir.GetName() == key {
-				if len(params) > 0 {
-					oldParams := dir.GetParameters()
-					if oldParams[0] == params[0] {
-						continue
-					}
-				} else {
-					continue
-				}
+			} else {
+				continue
 			}
 		}
 		newDirectives = append(newDirectives, dir)

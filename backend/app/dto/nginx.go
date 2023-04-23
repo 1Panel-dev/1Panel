@@ -31,10 +31,12 @@ type NginxParam struct {
 type NginxKey string
 
 const (
-	Index     NginxKey = "index"
-	LimitConn NginxKey = "limit-conn"
-	SSL       NginxKey = "ssl"
-	HttpPer   NginxKey = "http-per"
+	Index      NginxKey = "index"
+	LimitConn  NginxKey = "limit-conn"
+	SSL        NginxKey = "ssl"
+	CACHE      NginxKey = "cache"
+	HttpPer    NginxKey = "http-per"
+	ProxyCache NginxKey = "proxy-cache"
 )
 
 var ScopeKeyMap = map[NginxKey][]string{
@@ -46,5 +48,7 @@ var ScopeKeyMap = map[NginxKey][]string{
 
 var StaticFileKeyMap = map[NginxKey]struct {
 }{
-	SSL: {},
+	SSL:        {},
+	CACHE:      {},
+	ProxyCache: {},
 }

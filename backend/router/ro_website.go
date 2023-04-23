@@ -51,5 +51,8 @@ func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 
 		groupRouter.POST("/dir/update", baseApi.UpdateSiteDir)
 		groupRouter.POST("/dir/permission", baseApi.UpdateSiteDirPermission)
+
+		groupRouter.POST("/proxies", baseApi.GetProxyConfig)
+		groupRouter.POST("/proxies/update", baseApi.UpdateProxyConfig)
 	}
 }

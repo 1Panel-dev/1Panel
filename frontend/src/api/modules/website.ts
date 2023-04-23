@@ -1,6 +1,6 @@
 import http from '@/api';
 import { ReqPage, ResPage } from '../interface';
-import { Website } from '../interface/Website';
+import { Website } from '../interface/website';
 import { File } from '../interface/file';
 
 export const SearchWebsites = (req: Website.WebSiteSearch) => {
@@ -185,4 +185,12 @@ export const UpdateWebsiteDir = (req: Website.DirUpdate) => {
 
 export const UpdateWebsiteDirPermission = (req: Website.DirPermissionUpdate) => {
     return http.post<any>(`/websites/dir/permission`, req);
+};
+
+export const GetProxyConfig = (req: Website.ProxyReq) => {
+    return http.post<Website.ProxyConfig[]>(`/websites/proxies`, req);
+};
+
+export const CreateProxyConfig = (req: Website.ProxyReq) => {
+    return http.post<any>(`/websites/proxies/update`, req);
 };

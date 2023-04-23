@@ -1,4 +1,5 @@
 import { CompressType } from '@/enums/files';
+import i18n from '@/lang';
 
 export const Mimetypes = new Map([
     ['application/zip', CompressType.Zip],
@@ -109,4 +110,14 @@ export const Rewrites = [
     'seacms',
     'shopex',
     'zblog',
+];
+
+export const Units = [
+    { label: i18n.global.t('commons.units.second'), value: 's' },
+    { label: i18n.global.t('commons.units.miniute'), value: 'm' },
+    { label: i18n.global.t('commons.units.hour'), value: 'h' },
+    { label: i18n.global.t('commons.units.day'), value: 'd' },
+    { label: i18n.global.t('commons.units.week'), value: 'w' },
+    { label: i18n.global.t('commons.units.month'), value: 'M' },
+    { label: i18n.global.t('commons.units.year'), value: 'Y' },
 ];

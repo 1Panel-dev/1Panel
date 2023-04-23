@@ -84,7 +84,6 @@ func (p *Parser) Parse() *components.Config {
 }
 
 func (p *Parser) parseBlock() *components.Block {
-
 	context := &components.Block{
 		Comment:    "",
 		Directives: make([]components.IDirective, 0),
