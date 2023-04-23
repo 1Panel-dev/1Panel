@@ -307,4 +307,28 @@ export namespace Website {
         user: string;
         group: string;
     }
+
+    export interface ProxyReq {
+        id: number;
+    }
+
+    export interface ProxyConfig {
+        id: number;
+        operate: string;
+        enable: boolean;
+        cache: boolean;
+        cacheTime: number;
+        cacheUnit: string;
+        name: string;
+        modifier: string;
+        match: string;
+        proxyPass: string;
+        proxyHost: string;
+        filePath?: string;
+        replaces?: ProxReplace;
+    }
+
+    interface ProxReplace {
+        [key: string]: string;
+    }
 }

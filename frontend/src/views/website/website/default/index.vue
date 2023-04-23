@@ -38,7 +38,7 @@
 </template>
 <script lang="ts" setup>
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { Website } from '@/api/interface/Website';
+import { Website } from '@/api/interface/website';
 import { ChangeDefaultServer, ListWebsites } from '@/api/modules/website';
 import i18n from '@/lang';
 import { ref } from 'vue';

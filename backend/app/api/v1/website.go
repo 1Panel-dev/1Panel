@@ -648,3 +648,47 @@ func (b *BaseApi) UpdateSiteDirPermission(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Website
+// @Summary Get proxy conf
+// @Description 获取反向代理配置
+// @Accept json
+// @Param request body request.WebsiteProxyReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/proxies [post]
+func (b *BaseApi) GetProxyConfig(c *gin.Context) {
+	var req request.WebsiteProxyReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	res, err := websiteService.GetProxies(req.ID)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Website
+// @Summary Update proxy conf
+// @Description 修改反向代理配置
+// @Accept json
+// @Param request body request.WebsiteProxyConfig true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/proxies/update [post]
+func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
+	var req request.WebsiteProxyConfig
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	err := websiteService.OperateProxy(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}

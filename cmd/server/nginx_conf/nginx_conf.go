@@ -19,3 +19,12 @@ var IndexPHP []byte
 
 //go:embed rewrite/*
 var Rewrites embed.FS
+
+//go:embed cache.conf
+var Cache []byte
+
+//go:embed proxy.conf
+var Proxy []byte
+
+//go:embed proxy_cache.conf
+var ProxyCache []byte

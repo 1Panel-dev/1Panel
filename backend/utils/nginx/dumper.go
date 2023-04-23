@@ -74,7 +74,6 @@ func DumpBlock(b components.IBlock, style *Style, startLine int) string {
 	}
 
 	directives := b.GetDirectives()
-
 	for i, directive := range directives {
 
 		if directive.GetLine() > line {

@@ -10,12 +10,16 @@ import (
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
+	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
+	"github.com/1Panel-dev/1Panel/backend/utils/nginx/parser"
 	"github.com/1Panel-dev/1Panel/cmd/server/nginx_conf"
 	"gorm.io/gorm"
 	"os"
 	"path"
 	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -64,6 +68,8 @@ type IWebsiteService interface {
 	UpdateRewriteConfig(req request.NginxRewriteUpdate) error
 	UpdateSiteDir(req request.WebsiteUpdateDir) error
 	UpdateSitePermission(req request.WebsiteUpdateDirPermission) error
+	OperateProxy(req request.WebsiteProxyConfig) (err error)
+	GetProxies(id uint) (res []request.WebsiteProxyConfig, err error)
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -1104,4 +1110,170 @@ func (w WebsiteService) UpdateSitePermission(req request.WebsiteUpdateDirPermiss
 	website.User = req.User
 	website.Group = req.Group
 	return websiteRepo.Save(context.Background(), &website)
+}
+
+func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error) {
+	var (
+		website      model.Website
+		params       []response.NginxParam
+		nginxInstall model.AppInstall
+		par          *parser.Parser
+		oldContent   []byte
+	)
+
+	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.ID))
+	if err != nil {
+		return
+	}
+	params, err = getNginxParamsByKeys(constant.NginxScopeHttp, []string{"proxy_cache"}, &website)
+	if err != nil {
+		return
+	}
+	nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return
+	}
+	fileOp := files.NewFileOp()
+	if len(params) == 0 || len(params[0].Params) == 0 {
+		commonDir := path.Join(nginxInstall.GetPath(), "www", "common", "proxy")
+		proxyTempPath := path.Join(commonDir, "proxy_temp_dir")
+		if !fileOp.Stat(proxyTempPath) {
+			_ = fileOp.CreateDir(proxyTempPath, 0755)
+		}
+		proxyCacheDir := path.Join(commonDir, "proxy_temp_dir")
+		if !fileOp.Stat(proxyCacheDir) {
+			_ = fileOp.CreateDir(proxyCacheDir, 0755)
+		}
+		nginxParams := getNginxParamsFromStaticFile(dto.CACHE, nil)
+		if err = updateNginxConfig(constant.NginxScopeHttp, nginxParams, &website); err != nil {
+			return
+		}
+	}
+	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "proxy")
+	if !fileOp.Stat(includeDir) {
+		_ = fileOp.CreateDir(includeDir, 0755)
+	}
+	fileName := fmt.Sprintf("%s.conf", req.Name)
+	includePath := path.Join(includeDir, fileName)
+	if !fileOp.Stat(includePath) {
+		_ = fileOp.CreateFile(includePath)
+	}
+
+	defer func() {
+		if err != nil {
+			switch req.Operate {
+			case "create":
+				_ = fileOp.DeleteFile(includePath)
+			case "update":
+				_ = fileOp.WriteFile(includePath, bytes.NewReader(oldContent), 0755)
+			}
+		}
+	}()
+
+	var config *components.Config
+
+	switch req.Operate {
+	case "create":
+		config = parser.NewStringParser(string(nginx_conf.Proxy)).Parse()
+	case "update":
+		par, err = parser.NewParser(includePath)
+		if err != nil {
+			return
+		}
+		config = par.Parse()
+		oldContent, err = fileOp.GetContent(includePath)
+		if err != nil {
+			return
+		}
+	case "delete":
+		_ = fileOp.DeleteFile(includePath)
+		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
+	case "disable":
+		backName := fmt.Sprintf("%s.bak", req.Name)
+		backPath := path.Join(includeDir, backName)
+		_ = fileOp.Rename(includePath, backPath)
+		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
+	}
+	config.FilePath = includePath
+	directives := config.Directives
+	location, ok := directives[0].(*components.Location)
+	if !ok {
+		err = errors.New("error")
+		return
+	}
+	location.UpdateDirective("proxy_pass", []string{req.ProxyPass})
+	location.UpdateDirective("proxy_set_header", []string{"Host", req.ProxyHost})
+	location.ChangePath(req.Modifier, req.Match)
+	if req.Cache {
+		location.AddCache(strconv.Itoa(req.CacheTime) + req.CacheUnit)
+	} else {
+		location.RemoveCache()
+	}
+
+	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+	}
+	nginxInclude := path.Join("www", "sites", website.Alias, "proxy", "*.conf")
+	if err = updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "include", Params: []string{nginxInclude}}}, &website); err != nil {
+		return
+	}
+	return
+}
+
+func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, err error) {
+	var (
+		website      model.Website
+		nginxInstall model.AppInstall
+		fileList     response.FileInfo
+	)
+	website, err = websiteRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return
+	}
+	nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return
+	}
+	includeDir := path.Join(nginxInstall.GetPath(), "www", "sites", website.Alias, "proxy")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(includeDir) {
+		return
+	}
+	fileList, err = NewIFileService().GetFileList(request.FileOption{FileOption: files.FileOption{Path: includeDir, Expand: true, Page: 1, PageSize: 100}})
+	if len(fileList.Items) == 0 {
+		return
+	}
+	var (
+		content []byte
+		config  *components.Config
+	)
+	for _, configFile := range fileList.Items {
+		proxyConfig := request.WebsiteProxyConfig{}
+		parts := strings.Split(configFile.Name, ".")
+		proxyConfig.Name = parts[0]
+		if parts[1] == "conf" {
+			proxyConfig.Enable = true
+		} else {
+			proxyConfig.Enable = false
+		}
+		proxyConfig.FilePath = configFile.Path
+		content, err = fileOp.GetContent(configFile.Path)
+		if err != nil {
+			return
+		}
+		config = parser.NewStringParser(string(content)).Parse()
+		directives := config.GetDirectives()
+
+		location, ok := directives[0].(*components.Location)
+		if !ok {
+			err = errors.New("error")
+			return
+		}
+		proxyConfig.ProxyPass = location.ProxyPass
+		proxyConfig.Cache = location.Cache
+		//proxyConfig.CacheTime = location.CacheTime
+		proxyConfig.Match = location.Match
+		res = append(res, proxyConfig)
+	}
+	return
 }
