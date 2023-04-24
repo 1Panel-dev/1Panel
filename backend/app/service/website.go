@@ -69,6 +69,7 @@ type IWebsiteService interface {
 	UpdateSitePermission(req request.WebsiteUpdateDirPermission) error
 	OperateProxy(req request.WebsiteProxyConfig) (err error)
 	GetProxies(id uint) (res []request.WebsiteProxyConfig, err error)
+	UpdateProxyFile(req request.NginxProxyUpdate) (err error)
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -1213,6 +1214,11 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	} else {
 		location.RemoveCache()
 	}
+	if len(req.Replaces) > 0 {
+		location.AddSubFilter(req.Replaces)
+	} else {
+		location.RemoveSubFilter()
+	}
 	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
 	}
@@ -1266,6 +1272,7 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 		if err != nil {
 			return
 		}
+		proxyConfig.Content = string(content)
 		config = parser.NewStringParser(string(content)).Parse()
 		directives := config.GetDirectives()
 
@@ -1283,7 +1290,40 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 		proxyConfig.Match = location.Match
 		proxyConfig.Modifier = location.Modifier
 		proxyConfig.ProxyHost = location.Host
+		proxyConfig.Replaces = location.Replaces
 		res = append(res, proxyConfig)
 	}
 	return
+}
+
+func (w WebsiteService) UpdateProxyFile(req request.NginxProxyUpdate) (err error) {
+	var (
+		website           model.Website
+		nginxFull         dto.NginxFull
+		oldRewriteContent []byte
+	)
+	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	nginxFull, err = getNginxFull(&website)
+	if err != nil {
+		return err
+	}
+	includePath := fmt.Sprintf("/www/sites/%s/proxy/%s.conf", website.Alias, req.Name)
+	absolutePath := path.Join(nginxFull.Install.GetPath(), includePath)
+	fileOp := files.NewFileOp()
+	oldRewriteContent, err = fileOp.GetContent(absolutePath)
+	if err != nil {
+		return err
+	}
+	if err = fileOp.WriteFile(absolutePath, strings.NewReader(req.Content), 0755); err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			_ = fileOp.WriteFile(absolutePath, bytes.NewReader(oldRewriteContent), 0755)
+		}
+	}()
+	return updateNginxConfig(constant.NginxScopeServer, nil, &website)
 }

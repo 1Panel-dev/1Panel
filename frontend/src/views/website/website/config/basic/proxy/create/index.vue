@@ -9,6 +9,9 @@
                     <el-form-item :label="$t('commons.table.name')" prop="name">
                         <el-input v-model.trim="proxy.name" :disabled="proxy.operate === 'edit'"></el-input>
                     </el-form-item>
+                    <el-form-item :label="$t('website.modifier')" prop="modifier">
+                        <el-input v-model.trim="proxy.modifier"></el-input>
+                    </el-form-item>
                     <el-form-item :label="$t('website.proxyPath')" prop="match">
                         <el-input v-model.trim="proxy.match"></el-input>
                     </el-form-item>
@@ -41,7 +44,40 @@
                             </el-form-item>
                         </el-col>
                     </el-row>
+                    <el-form-item :label="$t('website.replace')">
+                        <div style="width: 100%" v-for="(replace, index) in replaces" :key="index">
+                            <el-row :gutter="10">
+                                <el-col :span="10">
+                                    <el-input
+                                        v-model.trim="replace.key"
+                                        :placeholder="$t('website.replaced')"
+                                    ></el-input>
+                                </el-col>
+                                <el-col :span="10">
+                                    <el-input
+                                        v-model.trim="replace.value"
+                                        :placeholder="$t('website.replaceText')"
+                                    ></el-input>
+                                </el-col>
+                                <el-col :span="2">
+                                    <el-button link @click="removeReplace(index)" type="danger">
+                                        {{ $t('commons.button.delete') }}
+                                    </el-button>
+                                </el-col>
+                            </el-row>
+                        </div>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="addReplaces" :disabled="replaces.length >= 3">
+                            {{ $t('website.addReplace') }}
+                        </el-button>
+                    </el-form-item>
                 </el-form>
+                <el-alert :title="$t('website.modifierHelper')" type="info" :closable="false" />
+                <el-alert :title="$t('website.proxyHelper1')" type="info" :closable="false" />
+                <el-alert :title="$t('website.proxyPassHelper')" type="info" :closable="false" />
+                <el-alert :title="$t('website.proxyHostHelper')" type="info" :closable="false" />
+                <el-alert :title="$t('website.replacementHelper')" type="info" :closable="false" />
             </el-col>
         </el-row>
         <template #footer>
@@ -57,12 +93,12 @@
 
 <script lang="ts" setup>
 import DrawerHeader from '@/components/drawer-header/index.vue';
-import { CreateProxyConfig } from '@/api/modules/website';
+import { OperateProxyConfig } from '@/api/modules/website';
 import { checkNumberRange, Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { Website } from '@/api/interface/website';
 import { Units } from '@/global/mimetype';
 
@@ -70,6 +106,7 @@ const proxyForm = ref<FormInstance>();
 const rules = ref({
     name: [Rules.requiredInput, Rules.appName],
     match: [Rules.requiredInput],
+    modifier: [Rules.requiredInput],
     cacheTime: [Rules.requiredInput, checkNumberRange(1, 65535)],
     proxyPass: [Rules.requiredInput],
     proxyHost: [Rules.requiredInput],
@@ -90,9 +127,10 @@ const initData = (): Website.ProxyConfig => ({
     proxyPass: 'http://',
     proxyHost: '$host',
     filePath: '',
+    replaces: {},
 });
 let proxy = ref(initData());
-
+const replaces = ref<any>([]);
 const em = defineEmits(['close']);
 const handleClose = () => {
     proxyForm.value?.resetFields();
@@ -100,10 +138,15 @@ const handleClose = () => {
     em('close', false);
 };
 
-const acceptParams = async (proxyParam: Website.ProxyConfig) => {
+const acceptParams = (proxyParam: Website.ProxyConfig) => {
+    replaces.value = [];
     proxy.value = proxyParam;
-    console.log(proxy.value);
     open.value = true;
+    if (proxy.value.replaces) {
+        for (const key in proxy.value.replaces) {
+            replaces.value.push({ key: key, value: proxy.value.replaces[key] });
+        }
+    }
 };
 
 const changeCache = (cache: boolean) => {
@@ -116,14 +159,39 @@ const changeCache = (cache: boolean) => {
     }
 };
 
+const addReplaces = () => {
+    replaces.value.push({ key: '', value: '' });
+};
+
+const removeReplace = (index: number) => {
+    replaces.value.splice(index, 1);
+};
+
 const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     await formEl.validate((valid) => {
         if (!valid) {
             return;
         }
+
+        proxy.value.replaces = {};
+        if (replaces.value.length > 0) {
+            let keyMap = new Map();
+            for (const rep of replaces.value) {
+                if (keyMap.get(rep.key) != undefined) {
+                    MsgError(i18n.global.t('website.replacedErr2'));
+                    return;
+                }
+                keyMap.set(rep.key, '');
+                if (rep.key === '') {
+                    MsgError(i18n.global.t('website.replacedErr'));
+                    return;
+                }
+                proxy.value.replaces[rep.key] = rep.value;
+            }
+        }
         loading.value = true;
-        CreateProxyConfig(proxy.value)
+        OperateProxyConfig(proxy.value)
             .then(() => {
                 if (proxy.value.operate == 'create') {
                     MsgSuccess(i18n.global.t('commons.msg.createSuccess'));

@@ -158,19 +158,20 @@ type WebsiteUpdateDirPermission struct {
 }
 
 type WebsiteProxyConfig struct {
-	ID        uint                `json:"id" validate:"required"`
-	Operate   string              `json:"operate" validate:"required"`
-	Enable    bool                `json:"enable"  validate:"required"`
-	Cache     bool                `json:"cache"  validate:"required"`
-	CacheTime int                 `json:"cacheTime"  validate:"required"`
-	CacheUnit string              `json:"cacheUnit" validate:"required"`
-	Name      string              `json:"name" validate:"required"`
-	Modifier  string              `json:"modifier" validate:"required"`
-	Match     string              `json:"match" validate:"required"`
-	ProxyPass string              `json:"proxyPass" validate:"required"`
-	ProxyHost string              `json:"proxyHost" validate:"required"`
-	FilePath  string              `json:"filePath"`
-	Replaces  []map[string]string `json:"replaces"`
+	ID        uint              `json:"id" validate:"required"`
+	Operate   string            `json:"operate" validate:"required"`
+	Enable    bool              `json:"enable"  validate:"required"`
+	Cache     bool              `json:"cache"  validate:"required"`
+	CacheTime int               `json:"cacheTime"  validate:"required"`
+	CacheUnit string            `json:"cacheUnit" validate:"required"`
+	Name      string            `json:"name" validate:"required"`
+	Modifier  string            `json:"modifier" validate:"required"`
+	Match     string            `json:"match" validate:"required"`
+	ProxyPass string            `json:"proxyPass" validate:"required"`
+	ProxyHost string            `json:"proxyHost" validate:"required"`
+	Content   string            `json:"content"`
+	FilePath  string            `json:"filePath"`
+	Replaces  map[string]string `json:"replaces"`
 }
 
 type WebsiteProxyReq struct {
