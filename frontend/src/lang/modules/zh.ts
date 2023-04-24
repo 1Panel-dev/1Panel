@@ -1183,7 +1183,6 @@ const message = {
         userGroup: '运行用户/组',
         user: '用户',
         uGroup: '用户组',
-        addProxy: '添加反向代理',
         proxyPath: '代理目录',
         proxyPass: '目标URL',
         cache: '缓存',
@@ -1194,6 +1193,8 @@ const message = {
         enableCache: '开启缓存',
         proxyHost: '发送域名',
         disabled: '已停止',
+        startProxy: '开启反向代理',
+        stopProxy: '关闭反向代理',
     },
     php: {
         short_open_tag: '短标签支持',

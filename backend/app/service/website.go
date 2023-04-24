@@ -19,7 +19,6 @@ import (
 	"path"
 	"reflect"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -1164,7 +1163,7 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 			switch req.Operate {
 			case "create":
 				_ = fileOp.DeleteFile(includePath)
-			case "update":
+			case "edit":
 				_ = fileOp.WriteFile(includePath, bytes.NewReader(oldContent), 0755)
 			}
 		}
@@ -1175,7 +1174,7 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	switch req.Operate {
 	case "create":
 		config = parser.NewStringParser(string(nginx_conf.Proxy)).Parse()
-	case "update":
+	case "edit":
 		par, err = parser.NewParser(includePath)
 		if err != nil {
 			return
@@ -1193,6 +1192,11 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		backPath := path.Join(includeDir, backName)
 		_ = fileOp.Rename(includePath, backPath)
 		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
+	case "enable":
+		backName := fmt.Sprintf("%s.bak", req.Name)
+		backPath := path.Join(includeDir, backName)
+		_ = fileOp.Rename(backPath, includePath)
+		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
 	}
 	config.FilePath = includePath
 	directives := config.Directives
@@ -1205,15 +1209,14 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	location.UpdateDirective("proxy_set_header", []string{"Host", req.ProxyHost})
 	location.ChangePath(req.Modifier, req.Match)
 	if req.Cache {
-		location.AddCache(strconv.Itoa(req.CacheTime) + req.CacheUnit)
+		location.AddCache(req.CacheTime, req.CacheUnit)
 	} else {
 		location.RemoveCache()
 	}
-
 	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
 	}
-	nginxInclude := path.Join("www", "sites", website.Alias, "proxy", "*.conf")
+	nginxInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
 	if err = updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "include", Params: []string{nginxInclude}}}, &website); err != nil {
 		return
 	}
@@ -1248,7 +1251,9 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 		config  *components.Config
 	)
 	for _, configFile := range fileList.Items {
-		proxyConfig := request.WebsiteProxyConfig{}
+		proxyConfig := request.WebsiteProxyConfig{
+			ID: website.ID,
+		}
 		parts := strings.Split(configFile.Name, ".")
 		proxyConfig.Name = parts[0]
 		if parts[1] == "conf" {
@@ -1271,8 +1276,13 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 		}
 		proxyConfig.ProxyPass = location.ProxyPass
 		proxyConfig.Cache = location.Cache
-		//proxyConfig.CacheTime = location.CacheTime
+		if location.CacheTime > 0 {
+			proxyConfig.CacheTime = location.CacheTime
+			proxyConfig.CacheUnit = location.CacheUint
+		}
 		proxyConfig.Match = location.Match
+		proxyConfig.Modifier = location.Modifier
+		proxyConfig.ProxyHost = location.Host
 		res = append(res, proxyConfig)
 	}
 	return

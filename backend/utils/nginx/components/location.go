@@ -1,13 +1,18 @@
 package components
 
-type Location struct {
-	Modifier  string
-	Match     string
-	Cache     bool
-	ProxyPass string
-	Host      string
-	CacheTime string
+import (
+	"regexp"
+	"strconv"
+)
 
+type Location struct {
+	Modifier   string
+	Match      string
+	Cache      bool
+	ProxyPass  string
+	Host       string
+	CacheTime  int
+	CacheUint  string
 	Comment    string
 	Directives []IDirective
 	Line       int
@@ -40,7 +45,18 @@ func NewLocation(directive IDirective) *Location {
 				dirs := dir.GetBlock().GetDirectives()
 				for _, di := range dirs {
 					if di.GetName() == "expires" {
-						location.CacheTime = di.GetParameters()[0]
+						re := regexp.MustCompile(`^(\d+)(\w+)$`)
+						matches := re.FindStringSubmatch(di.GetParameters()[0])
+						if matches == nil {
+							continue
+						}
+						cacheTime, err := strconv.Atoi(matches[1])
+						if err != nil {
+							continue
+						}
+						unit := matches[2]
+						location.CacheUint = unit
+						location.CacheTime = cacheTime
 					}
 				}
 			}
@@ -158,7 +174,7 @@ func (l *Location) ChangePath(Modifier string, Match string) {
 	l.Match = Match
 }
 
-func (l *Location) AddCache(cacheTime string) {
+func (l *Location) AddCache(cacheTime int, cacheUint string) {
 	l.RemoveDirective("add_header", []string{"Cache-Control", "no-cache"})
 	directives := l.GetDirectives()
 	newDir := &Directive{
@@ -169,7 +185,7 @@ func (l *Location) AddCache(cacheTime string) {
 	block := &Block{}
 	block.Directives = append(block.Directives, &Directive{
 		Name:       "expires",
-		Parameters: []string{cacheTime},
+		Parameters: []string{strconv.Itoa(cacheTime) + cacheUint},
 	})
 	newDir.Block = block
 	directives = append(directives, newDir)
@@ -180,6 +196,7 @@ func (l *Location) AddCache(cacheTime string) {
 	l.UpdateDirective("proxy_cache_valid", []string{"200", "304", "301", "302", "10m"})
 	l.Cache = true
 	l.CacheTime = cacheTime
+	l.CacheUint = cacheUint
 }
 
 func (l *Location) RemoveCache() {
@@ -191,6 +208,7 @@ func (l *Location) RemoveCache() {
 
 	l.UpdateDirective("add_header", []string{"Cache-Control", "no-cache"})
 
-	l.CacheTime = ""
+	l.CacheTime = 0
+	l.CacheUint = ""
 	l.Cache = false
 }

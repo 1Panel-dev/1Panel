@@ -1,24 +1,24 @@
 <template>
     <el-drawer v-model="open" :close-on-click-modal="false" size="40%" :before-close="handleClose">
         <template #header>
-            <DrawerHeader :header="$t('website.createProxy')" :back="handleClose" />
+            <DrawerHeader :header="$t('website.' + proxy.operate + 'Proxy')" :back="handleClose" />
         </template>
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-form ref="proxyForm" label-position="top" :model="proxy" :rules="rules">
                     <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input v-model.trim="proxy.name"></el-input>
+                        <el-input v-model.trim="proxy.name" :disabled="proxy.operate === 'edit'"></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('website.proxyPath')" prop="match">
                         <el-input v-model.trim="proxy.match"></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('website.enableCache')" prop="cache">
-                        <el-switch v-model="proxy.cache"></el-switch>
+                        <el-switch v-model="proxy.cache" @change="changeCache(proxy.cache)"></el-switch>
                     </el-form-item>
                     <el-form-item :label="$t('website.cacheTime')" prop="cacheTime" v-if="proxy.cache">
                         <el-input v-model.number="proxy.cacheTime" maxlength="15">
                             <template #append>
-                                <el-select v-model="proxy.cacheUnit" style="width: 80px">
+                                <el-select v-model="proxy.cacheUnit" style="width: 100px">
                                     <el-option
                                         v-for="(unit, index) in Units"
                                         :key="index"
@@ -65,7 +65,6 @@ import { ref } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { Website } from '@/api/interface/website';
 import { Units } from '@/global/mimetype';
-// import { Website } from '@/api/interface/website';
 
 const proxyForm = ref<FormInstance>();
 const rules = ref({
@@ -103,7 +102,18 @@ const handleClose = () => {
 
 const acceptParams = async (proxyParam: Website.ProxyConfig) => {
     proxy.value = proxyParam;
+    console.log(proxy.value);
     open.value = true;
+};
+
+const changeCache = (cache: boolean) => {
+    if (cache) {
+        proxy.value.cacheTime = 1;
+        proxy.value.cacheUnit = 'm';
+    } else {
+        proxy.value.cacheTime = 0;
+        proxy.value.cacheUnit = '';
+    }
 };
 
 const submit = async (formEl: FormInstance | undefined) => {
@@ -115,7 +125,11 @@ const submit = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         CreateProxyConfig(proxy.value)
             .then(() => {
-                MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+                if (proxy.value.operate == 'create') {
+                    MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+                } else {
+                    MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+                }
                 handleClose();
             })
             .finally(() => {
