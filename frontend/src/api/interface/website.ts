@@ -326,9 +326,16 @@ export namespace Website {
         proxyHost: string;
         filePath?: string;
         replaces?: ProxReplace;
+        content?: string;
     }
 
-    interface ProxReplace {
+    export interface ProxReplace {
         [key: string]: string;
+    }
+
+    export interface ProxyFileUpdate {
+        websiteID: number;
+        name: string;
+        content: string;
     }
 }

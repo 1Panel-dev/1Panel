@@ -1193,6 +1193,24 @@ const message = {
         disabled: 'Stopped',
         startProxy: 'Start Reverse proxy',
         stopProxy: 'Stop the Reverse proxy',
+        proxyFile: 'Source',
+        proxyHelper1:
+            'Proxy directory: when accessing this directory, the content of the target URL will be returned and displayed',
+        proxyPassHelper:
+            'Target URL: You can fill in the site you need to proxy, the target URL must be a URL that can be accessed normally, otherwise an error will be returned',
+        proxyHostHelper:
+            'Send domain name: Add the domain name to the request header and pass it to the proxy server. The default is the target URL domain name. If it is not set properly, the proxy may not work properly',
+        replacementHelper:
+            'Content replacement: you can add up to 3 replacement content, if you do not need to replace, please leave blank',
+        modifier: 'Path Match',
+        modifierHelper:
+            'Path matching: Example: = exact match, ~ regular match, ^~ match the beginning of the path, etc',
+        replace: 'Content Replacement',
+        addReplace: 'Add content to replace',
+        replaced: 'The replaced text cannot be empty',
+        replaceText: 'Replacement text, can be empty',
+        replacedErr: 'The replaced text cannot be empty',
+        replacedErr2: 'The replaced text cannot be repeated',
     },
     php: {
         short_open_tag: 'Short tag support',

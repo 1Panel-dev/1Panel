@@ -679,6 +679,7 @@ func (b *BaseApi) GetProxyConfig(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/proxies/update [post]
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"修改网站 [domain] 反向代理配置 ","formatEN":"Update domain [domain] proxy config"}
 func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
 	var req request.WebsiteProxyConfig
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -690,5 +691,27 @@ func (b *BaseApi) UpdateProxyConfig(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags Website
+// @Summary Update proxy file
+// @Description 更新反向代理文件
+// @Accept json
+// @Param request body request.NginxProxyUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/proxy/file [post]
+// @x-panel-log {"bodyKeys":["websiteID"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"websiteID","isList":false,"db":"websites","output_colume":"primary_domain","output_value":"domain"}],"formatZH":"更新反向代理文件 [domain]","formatEN":"Nginx conf proxy file update [domain]"}
+func (b *BaseApi) UpdateProxyConfigFile(c *gin.Context) {
+	var req request.NginxProxyUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.UpdateProxyFile(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
 }

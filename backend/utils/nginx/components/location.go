@@ -1,8 +1,10 @@
 package components
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 type Location struct {
@@ -17,6 +19,7 @@ type Location struct {
 	Directives []IDirective
 	Line       int
 	Parameters []string
+	Replaces   map[string]string
 }
 
 func NewLocation(directive IDirective) *Location {
@@ -60,6 +63,11 @@ func NewLocation(directive IDirective) *Location {
 					}
 				}
 			}
+		case "sub_filter":
+			if location.Replaces == nil {
+				location.Replaces = make(map[string]string, 0)
+			}
+			location.Replaces[strings.Trim(params[0], "\"")] = strings.Trim(params[1], "\"")
 		}
 	}
 
@@ -176,6 +184,7 @@ func (l *Location) ChangePath(Modifier string, Match string) {
 
 func (l *Location) AddCache(cacheTime int, cacheUint string) {
 	l.RemoveDirective("add_header", []string{"Cache-Control", "no-cache"})
+	l.RemoveDirective("if", []string{"(", "$uri", "~*", `"\.(gif|png|jpg|css|js|woff|woff2)$"`, ")"})
 	directives := l.GetDirectives()
 	newDir := &Directive{
 		Name:       "if",
@@ -211,4 +220,21 @@ func (l *Location) RemoveCache() {
 	l.CacheTime = 0
 	l.CacheUint = ""
 	l.Cache = false
+}
+
+func (l *Location) AddSubFilter(subFilters map[string]string) {
+	l.RemoveDirective("sub_filter", []string{})
+	l.Replaces = subFilters
+	for k, v := range subFilters {
+		l.UpdateDirective("sub_filter", []string{fmt.Sprintf(`"%s"`, k), fmt.Sprintf(`"%s"`, v)})
+	}
+	l.UpdateDirective("proxy_set_header", []string{"Accept-Encoding", `""`})
+	l.UpdateDirective("sub_filter_once", []string{"off"})
+}
+
+func (l *Location) RemoveSubFilter() {
+	l.RemoveDirective("sub_filter", []string{})
+	l.RemoveDirective("proxy_set_header", []string{"Accept-Encoding", `""`})
+	l.RemoveDirective("sub_filter_once", []string{"off"})
+	l.Replaces = nil
 }

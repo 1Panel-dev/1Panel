@@ -8,7 +8,7 @@
         <el-table-column :label="$t('website.proxyPass')" prop="proxyPass"></el-table-column>
         <el-table-column :label="$t('website.cache')" prop="cache">
             <template #default="{ row }">
-                <el-switch v-model="row.cache" @change="changeCache(row)"></el-switch>
+                <el-switch v-model="row.cache" @change="changeCache(row)" :disabled="!row.enable"></el-switch>
             </template>
         </el-table-column>
         <el-table-column :label="$t('commons.table.status')" prop="enable">
@@ -31,16 +31,20 @@
         />
     </ComplexTable>
     <Create ref="createRef" @close="search()" />
+    <File ref="fileRef" @close="search()" />
 </template>
 
 <script lang="ts" setup name="proxy">
 import { Website } from '@/api/interface/website';
-import { CreateProxyConfig, GetProxyConfig } from '@/api/modules/website';
+import { OperateProxyConfig, GetProxyConfig } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import Create from './create/index.vue';
+import File from './file/index.vue';
 import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { useDeleteData } from '@/hooks/use-delete-data';
+import { ElMessageBox } from 'element-plus';
 
 const props = defineProps({
     id: {
@@ -54,12 +58,31 @@ const id = computed(() => {
 const loading = ref(false);
 const data = ref();
 const createRef = ref();
+const fileRef = ref();
 
 const buttons = [
+    {
+        label: i18n.global.t('website.proxyFile'),
+        click: function (row: Website.ProxyConfig) {
+            openEditFile(row);
+        },
+        disabled: (row: Website.ProxyConfig) => {
+            return !row.enable;
+        },
+    },
     {
         label: i18n.global.t('commons.button.edit'),
         click: function (row: Website.ProxyConfig) {
             openEdit(row);
+        },
+        disabled: (row: Website.ProxyConfig) => {
+            return !row.enable;
+        },
+    },
+    {
+        label: i18n.global.t('commons.button.delete'),
+        click: function (row: Website.ProxyConfig) {
+            deleteProxy(row);
         },
     },
 ];
@@ -76,6 +99,7 @@ const initData = (id: number): Website.ProxyConfig => ({
     match: '/',
     proxyPass: 'http://',
     proxyHost: '$host',
+    replaces: {},
 });
 
 const openCreate = () => {
@@ -85,7 +109,20 @@ const openCreate = () => {
 const openEdit = (proxyConfig: Website.ProxyConfig) => {
     let proxy = JSON.parse(JSON.stringify(proxyConfig));
     proxy.operate = 'edit';
+    if (proxy.replaces == null) {
+        proxy.replaces = {};
+    }
     createRef.value.acceptParams(proxy);
+};
+
+const openEditFile = (proxyConfig: Website.ProxyConfig) => {
+    fileRef.value.acceptParams({ name: proxyConfig.name, content: proxyConfig.content, websiteID: proxyConfig.id });
+};
+
+const deleteProxy = async (proxyConfig: Website.ProxyConfig) => {
+    proxyConfig.operate = 'delete';
+    await useDeleteData(OperateProxyConfig, proxyConfig, 'commons.msg.delete');
+    search();
 };
 
 const changeCache = (proxyConfig: Website.ProxyConfig) => {
@@ -99,7 +136,7 @@ const changeCache = (proxyConfig: Website.ProxyConfig) => {
 
 const submit = async (proxyConfig: Website.ProxyConfig) => {
     loading.value = true;
-    CreateProxyConfig(proxyConfig)
+    OperateProxyConfig(proxyConfig)
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             search();
