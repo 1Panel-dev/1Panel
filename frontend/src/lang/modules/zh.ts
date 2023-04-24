@@ -796,6 +796,7 @@ const message = {
         theme: '主题',
         language: '语言',
         eol: '行尾符',
+        copyDir: '复制路径',
     },
     setting: {
         all: '全部',

@@ -297,6 +297,18 @@ const open = async (row: File.File) => {
     }
 };
 
+const copyDir = (row: File.File) => {
+    if (row?.path) {
+        const input = document.createElement('textarea');
+        input.value = row?.path;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        MsgSuccess('复制成功');
+    }
+};
+
 const handlePath = () => {
     if (breadCrumbRef.value.offsetWidth > pathWidth.value) {
         paths.value.splice(0, 1);
@@ -548,6 +560,10 @@ const buttons = [
     {
         label: i18n.global.t('file.open'),
         click: open,
+    },
+    {
+        label: i18n.global.t('file.copyDir'),
+        click: copyDir,
     },
     {
         label: i18n.global.t('file.mode'),
