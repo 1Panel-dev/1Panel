@@ -98,7 +98,7 @@
                     :data="data"
                     @search="search"
                 >
-                    <el-table-column type="selection" width="55" />
+                    <el-table-column type="selection" width="30" />
                     <el-table-column :label="$t('commons.table.name')" min-width="250" fix show-overflow-tooltip>
                         <template #default="{ row }">
                             <svg-icon v-if="row.isDir" className="table-icon" iconName="p-file-folder"></svg-icon>
@@ -107,14 +107,14 @@
                             <span v-if="row.isSymlink">-> {{ row.linkPath }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('file.mode')" prop="mode">
+                    <el-table-column :label="$t('file.mode')" prop="mode" max-width="50">
                         <template #default="{ row }">
                             <el-link :underline="false" @click="openMode(row)" type="primary">{{ row.mode }}</el-link>
                         </template>
                     </el-table-column>
                     <!-- <el-table-column :label="$t('file.user')" prop="user" show-overflow-tooltip></el-table-column>
                     <el-table-column :label="$t('file.group')" prop="group"></el-table-column> -->
-                    <el-table-column :label="$t('file.size')" prop="size">
+                    <el-table-column :label="$t('file.size')" prop="size" max-width="50">
                         <template #default="{ row }">
                             <span v-if="row.isDir">
                                 <el-button type="primary" link small @click="getDirSize(row)">
@@ -130,15 +130,15 @@
                     <el-table-column
                         :label="$t('file.updateTime')"
                         prop="modTime"
-                        :formatter="dateFormat"
                         min-width="150"
+                        :formatter="dateFormat"
                         show-overflow-tooltip
                     ></el-table-column>
-
                     <fu-table-operations
-                        :ellipsis="1"
+                        :ellipsis="2"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
+                        min-width="200"
                         fixed="right"
                         fix
                     />
@@ -305,7 +305,7 @@ const copyDir = (row: File.File) => {
         input.select();
         document.execCommand('copy');
         document.body.removeChild(input);
-        MsgSuccess('复制成功');
+        MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
     }
 };
 
@@ -562,8 +562,11 @@ const buttons = [
         click: open,
     },
     {
-        label: i18n.global.t('file.copyDir'),
-        click: copyDir,
+        label: i18n.global.t('file.deCompress'),
+        click: openDeCompress,
+        disabled: (row: File.File) => {
+            return row.isDir;
+        },
     },
     {
         label: i18n.global.t('file.mode'),
@@ -576,15 +579,12 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('file.deCompress'),
-        click: openDeCompress,
-        disabled: (row: File.File) => {
-            return row.isDir;
-        },
-    },
-    {
         label: i18n.global.t('file.rename'),
         click: openRename,
+    },
+    {
+        label: i18n.global.t('file.copyDir'),
+        click: copyDir,
     },
     {
         label: i18n.global.t('commons.button.delete'),
