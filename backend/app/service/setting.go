@@ -326,7 +326,11 @@ func checkCertValid(domain string) error {
 	if _, err = tls.X509KeyPair(certificate, key); err != nil {
 		return err
 	}
-	certObj, err := x509.ParseCertificate(certificate)
+	certBlock, _ := pem.Decode(certificate)
+	if certBlock == nil {
+		return err
+	}
+	certObj, err := x509.ParseCertificate(certBlock.Bytes)
 	if err != nil {
 		return err
 	}
