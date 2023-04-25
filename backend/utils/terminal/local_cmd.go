@@ -21,9 +21,8 @@ type LocalCommand struct {
 	closeSignal  syscall.Signal
 	closeTimeout time.Duration
 
-	cmd       *exec.Cmd
-	pty       *os.File
-	ptyClosed chan struct{}
+	cmd *exec.Cmd
+	pty *os.File
 }
 
 func NewCommand(commands string) (*LocalCommand, error) {
@@ -33,15 +32,13 @@ func NewCommand(commands string) (*LocalCommand, error) {
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to start command")
 	}
-	ptyClosed := make(chan struct{})
 
 	lcmd := &LocalCommand{
 		closeSignal:  DefaultCloseSignal,
 		closeTimeout: DefaultCloseTimeout,
 
-		cmd:       cmd,
-		pty:       pty,
-		ptyClosed: ptyClosed,
+		cmd: cmd,
+		pty: pty,
 	}
 
 	return lcmd, nil
@@ -57,16 +54,10 @@ func (lcmd *LocalCommand) Write(p []byte) (n int, err error) {
 
 func (lcmd *LocalCommand) Close() error {
 	if lcmd.cmd != nil && lcmd.cmd.Process != nil {
-		_ = lcmd.cmd.Process.Signal(lcmd.closeSignal)
+		_ = lcmd.cmd.Process.Kill()
 	}
-	for {
-		select {
-		case <-lcmd.ptyClosed:
-			return nil
-		case <-lcmd.closeTimeoutC():
-			_ = lcmd.cmd.Process.Signal(syscall.SIGKILL)
-		}
-	}
+	_ = lcmd.pty.Close()
+	return nil
 }
 
 func (lcmd *LocalCommand) ResizeTerminal(width int, height int) error {
@@ -99,12 +90,4 @@ func (lcmd *LocalCommand) Wait(quitChan chan bool) {
 		global.LOG.Errorf("ssh session wait failed, err: %v", err)
 		setQuit(quitChan)
 	}
-}
-
-func (lcmd *LocalCommand) closeTimeoutC() <-chan time.Time {
-	if lcmd.closeTimeout >= 0 {
-		return time.After(lcmd.closeTimeout)
-	}
-
-	return make(chan time.Time)
 }

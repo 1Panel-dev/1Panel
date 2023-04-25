@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os/exec"
 	"strconv"
 	"time"
 
@@ -107,14 +108,15 @@ func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 		return
 	}
 	defer wsConn.Close()
-	commands := fmt.Sprintf("docker exec -it %s redis-cli", redisConf.ContainerName)
+	commands := "redis-cli"
 	if len(redisConf.Requirepass) != 0 {
-		commands = fmt.Sprintf("docker exec -it %s redis-cli -a %s --no-auth-warning", redisConf.ContainerName, redisConf.Requirepass)
+		commands = fmt.Sprintf("redis-cli -a %s --no-auth-warning", redisConf.Requirepass)
 	}
-	slave, err := terminal.NewCommand(commands)
+	slave, err := terminal.NewCommand(fmt.Sprintf("docker exec -it %s %s", redisConf.ContainerName, commands))
 	if wshandleError(wsConn, err) {
 		return
 	}
+	defer killBash(redisConf.ContainerName, commands)
 	defer slave.Close()
 
 	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave)
@@ -177,6 +179,7 @@ func (b *BaseApi) ContainerWsSsh(c *gin.Context) {
 	if wshandleError(wsConn, err) {
 		return
 	}
+	defer killBash(containerID, command)
 	defer slave.Close()
 
 	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave)
@@ -214,6 +217,15 @@ func wshandleError(ws *websocket.Conn, err error) bool {
 		return true
 	}
 	return false
+}
+
+func killBash(containerID, comm string) {
+	sudo := ""
+	if cmd.HasNoPasswordSudo() {
+		sudo = "sudo"
+	}
+	command := exec.Command("sh", "-c", fmt.Sprintf("%s kill -9 $(docker top %s -eo pid,command | grep '%s' | awk '{print $1}')", sudo, containerID, comm))
+	_, _ = command.CombinedOutput()
 }
 
 var upGrader = websocket.Upgrader{
