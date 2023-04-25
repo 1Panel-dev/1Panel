@@ -1,6 +1,7 @@
 package service
 
 import (
+	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
@@ -19,6 +20,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 )
 
 type SettingService struct{}
@@ -138,6 +140,11 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		return nil
 	}
 
+	if _, err := os.Stat(global.CONF.System.BaseDir + "/1panel/secret"); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(global.CONF.System.BaseDir+"/1panel/secret", os.ModePerm); err != nil {
+			return err
+		}
+	}
 	if err := settingRepo.Update("SSLType", req.SSLType); err != nil {
 		return err
 	}
@@ -178,6 +185,9 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 			return err
 		}
 		defer key.Close()
+	}
+	if err := checkCertValid(req.Domain); err != nil {
+		return err
 	}
 	if err := settingRepo.Update("SSL", req.SSL); err != nil {
 		return err
@@ -302,4 +312,38 @@ func loadInfoFromCert() (*dto.SSLInfo, error) {
 		Timeout:  certObj.NotAfter.Format("2006-01-02 15:04:05"),
 		RootPath: global.CONF.System.BaseDir + "/1panel/secret/server.crt",
 	}, nil
+}
+
+func checkCertValid(domain string) error {
+	certificate, err := os.ReadFile(global.CONF.System.BaseDir + "/1panel/secret/server.crt")
+	if err != nil {
+		return err
+	}
+	key, err := os.ReadFile(global.CONF.System.BaseDir + "/1panel/secret/server.key")
+	if err != nil {
+		return err
+	}
+	if _, err = tls.X509KeyPair(certificate, key); err != nil {
+		return err
+	}
+	certObj, err := x509.ParseCertificate(certificate)
+	if err != nil {
+		return err
+	}
+
+	if len(certObj.IPAddresses) != 0 {
+		for _, ip := range certObj.IPAddresses {
+			if ip.String() == domain {
+				return nil
+			}
+		}
+	}
+	if len(certObj.DNSNames) != 0 {
+		for _, ip := range certObj.DNSNames {
+			if ip == domain {
+				return nil
+			}
+		}
+	}
+	return errors.New("The domain name or ip address does not match")
 }

@@ -15,7 +15,6 @@ import (
 )
 
 func GenerateSSL(domain string) error {
-	global.CONF.System.BaseDir = "/opt"
 	rootPrivateKey, _ := rsa.GenerateKey(rand.Reader, 2048)
 	ipItem := net.ParseIP(domain)
 	isIP := false
