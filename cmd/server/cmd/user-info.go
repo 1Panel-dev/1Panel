@@ -39,6 +39,7 @@ var userinfoCmd = &cobra.Command{
 		user := getSettingByKey(db, "UserName")
 		password := getSettingByKey(db, "Password")
 		port := getSettingByKey(db, "ServerPort")
+		ssl := getSettingByKey(db, "SSL")
 		entrance := getSettingByKey(db, "SecurityEntrance")
 		enptrySetting := getSettingByKey(db, "EncryptKey")
 
@@ -50,10 +51,16 @@ var userinfoCmd = &cobra.Command{
 			p = password
 		}
 
-		fmt.Printf("entrance: %s\n", entrance)
+		protocol := "http"
+		if ssl == "enable" {
+			protocol = "https"
+		}
+
 		fmt.Printf("username: %s\n", user)
 		fmt.Printf("password: %s\n", p)
 		fmt.Printf("port: %s\n", port)
+		fmt.Printf("protocol: %s\n", protocol)
+		fmt.Printf("entrance: %s\n", entrance)
 		return nil
 	},
 }

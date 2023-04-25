@@ -78,7 +78,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { Website } from '@/api/interface/Website';
+import { Website } from '@/api/interface/website';
 import { loadSSLInfo } from '@/api/modules/setting';
 import { dateFormatSimple, getProvider } from '@/utils/util';
 import { ListSSL } from '@/api/modules/website';
