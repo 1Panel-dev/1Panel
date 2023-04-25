@@ -3,7 +3,7 @@ import { ResPage, SearchWithPage } from '../interface';
 import { Container } from '../interface/container';
 
 export const searchContainer = (params: Container.ContainerSearch) => {
-    return http.post<ResPage<Container.ContainerInfo>>(`/containers/search`, params);
+    return http.post<ResPage<Container.ContainerInfo>>(`/containers/search`, params, 400000);
 };
 export const createContainer = (params: Container.ContainerCreate) => {
     return http.post(`/containers`, params, 3000000);
