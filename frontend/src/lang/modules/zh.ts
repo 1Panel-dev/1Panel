@@ -1210,6 +1210,9 @@ const message = {
         replaceText: '替换的文本，可为空',
         replacedErr: '被替换的文本不能为空',
         replacedErr2: '被替换的文本不能重复',
+        basicAuth: '密码访问',
+        editBasicAuthHelper: '密码为非对称加密，无法回显，编辑需要重新设置密码',
+        createPassword: '生成密码',
     },
     php: {
         short_open_tag: '短标签支持',

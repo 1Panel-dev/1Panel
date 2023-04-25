@@ -43,6 +43,8 @@ ErrDomainIsExist: "域名已存在"
 ErrAliasIsExist: "代号已存在"
 ErrAppDelete: '其他网站使用此应用,无法删除'
 ErrGroupIsUsed: '分组正在使用中，无法删除'
+ErrUsernameIsExist: '用户名已存在'
+ErrUsernameIsNotExist: '用户不存在'
 
 #ssl
 ErrSSLCannotDelete: "证书正在被网站使用，无法删除"

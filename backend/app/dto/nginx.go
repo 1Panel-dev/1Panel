@@ -28,6 +28,11 @@ type NginxParam struct {
 	Params      []string
 }
 
+type NginxAuth struct {
+	Username string `json:"username"`
+	Remark   string `json:"remark"`
+}
+
 type NginxKey string
 
 const (

@@ -1212,6 +1212,10 @@ const message = {
         replaceText: 'Replacement text, can be empty',
         replacedErr: 'The replaced text cannot be empty',
         replacedErr2: 'The replaced text cannot be repeated',
+        basicAuth: 'Password Access',
+        editBasicAuthHelper:
+            'The password is asymmetrically encrypted and cannot be echoed. Editing needs to reset the password',
+        createPassword: 'Generate password',
     },
     php: {
         short_open_tag: 'Short tag support',

@@ -2124,6 +2124,31 @@ definitions:
         additionalProperties: true
         type: object
     type: object
+  request.NginxAuthReq:
+    properties:
+      websiteID:
+        type: integer
+    required:
+    - websiteID
+    type: object
+  request.NginxAuthUpdate:
+    properties:
+      operate:
+        type: string
+      password:
+        type: string
+      remark:
+        type: string
+      username:
+        type: string
+      websiteID:
+        type: integer
+    required:
+    - operate
+    - password
+    - username
+    - websiteID
+    type: object
   request.NginxConfigFileUpdate:
     properties:
       backup:
@@ -8018,6 +8043,46 @@ paths:
       summary: Page website acme accounts
       tags:
       - Website Acme
+  /websites/auths:
+    post:
+      consumes:
+      - application/json
+      description: 获取密码访问配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.NginxAuthReq'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Get AuthBasic conf
+      tags:
+      - Website
+  /websites/auths/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新密码访问配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.NginxAuthUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Get AuthBasic conf
+      tags:
+      - Website
   /websites/check:
     post:
       consumes:
