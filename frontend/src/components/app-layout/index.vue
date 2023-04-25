@@ -41,6 +41,10 @@ watch(
 const loadDataFromDB = async () => {
     const res = await getSettingInfo();
     document.title = res.data.panelName;
+    // insert css block
+    const style = document.createElement('style');
+    style.innerText = res.data.customizedCss;
+    document.head.appendChild(style);
     i18n.locale.value = res.data.language;
     i18n.warnHtmlMessage = false;
     globalStore.updateLanguage(res.data.language);

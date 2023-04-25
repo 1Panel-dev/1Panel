@@ -806,6 +806,7 @@ const message = {
         portChange: 'Port change',
         portChangeHelper: 'Modify the service port and restart the service. Do you want to continue?',
         theme: 'Theme',
+        customizedCss: 'Customized CSS',
         dark: 'Dark',
         light: 'Light',
         language: 'Language',

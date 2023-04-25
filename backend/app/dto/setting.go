@@ -10,10 +10,11 @@ type SettingInfo struct {
 	SessionTimeout string `json:"sessionTimeout"`
 	LocalTime      string `json:"localTime"`
 
-	Port      string `json:"port"`
-	PanelName string `json:"panelName"`
-	Theme     string `json:"theme"`
-	Language  string `json:"language"`
+	Port          string `json:"port"`
+	PanelName     string `json:"panelName"`
+	Theme         string `json:"theme"`
+	CustomizedCss string `json:"customizedCss"`
+	Language      string `json:"language"`
 
 	ServerPort             string `json:"serverPort"`
 	SecurityEntranceStatus string `json:"securityEntranceStatus"`

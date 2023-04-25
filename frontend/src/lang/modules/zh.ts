@@ -815,6 +815,7 @@ const message = {
         entranceHelper: '开启安全入口后只能通过指定安全入口登录面板',
         entranceError: '请输入 6-10 位安全登录入口，仅支持输入数字或字母',
         theme: '主题颜色',
+        customizedCss: '自定义 CSS',
         componentSize: '组件大小',
         dark: '暗色',
         light: '亮色',

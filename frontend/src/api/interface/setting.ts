@@ -12,6 +12,7 @@ export namespace Setting {
 
         panelName: string;
         theme: string;
+        customizedCss: string;
         language: string;
 
         serverPort: number;

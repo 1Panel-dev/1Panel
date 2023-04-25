@@ -46,18 +46,15 @@
                                 </el-radio-group>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.title')" :rules="Rules.requiredInput" prop="panelName">
-                                <el-input clearable v-model="form.panelName">
-                                    <template #append>
-                                        <el-button
-                                            style="width: 85px"
-                                            @click="onSave(panelFormRef, 'PanelName', form.panelName)"
-                                            icon="Collection"
-                                        >
-                                            {{ $t('commons.button.save') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
+                            <el-form-item :label="$t('setting.customizedCss')" prop="customizedCss">
+                                <el-input type="textarea" :rows="5" v-model="form.customizedCss"></el-input>
+                                <el-button
+                                    style="width: 85px"
+                                    @click="onSave(panelFormRef, 'CustomizedCss', form.customizedCss)"
+                                    icon="Collection"
+                                >
+                                    {{ $t('commons.button.save') }}
+                                </el-button>
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.language')" :rules="Rules.requiredSelect" prop="language">
@@ -150,6 +147,7 @@ const form = reactive({
     localTime: '',
     panelName: '',
     theme: '',
+    customizedCss: '',
     language: '',
     complexityVerification: '',
 });
@@ -169,6 +167,7 @@ const search = async () => {
     form.localTime = res.data.localTime;
     form.panelName = res.data.panelName;
     form.theme = res.data.theme;
+    form.customizedCss = res.data.customizedCss;
     form.language = res.data.language;
     form.complexityVerification = res.data.complexityVerification;
 };
