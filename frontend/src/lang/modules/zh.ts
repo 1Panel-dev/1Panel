@@ -463,6 +463,7 @@ const message = {
         lastHour: '最近 1 小时',
         last10Min: '最近 10 分钟',
         newName: '新名称',
+        source: '资源使用率',
 
         user: '用户',
         command: '命令',

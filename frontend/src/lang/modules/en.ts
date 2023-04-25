@@ -446,6 +446,7 @@ const message = {
         lastHour: 'Last Hour',
         last10Min: 'Last 10 Minutes',
         newName: 'New name',
+        source: 'Resource rate',
 
         user: 'User',
         command: 'Command',

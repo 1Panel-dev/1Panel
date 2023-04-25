@@ -22,6 +22,10 @@ type ContainerInfo struct {
 	State       string `json:"state"`
 	RunTime     string `json:"runTime"`
 
+	CPUPercent    float64  `json:"cpuPercent"`
+	MemoryPercent float64  `json:"memoryPercent"`
+	Ports         []string `json:"ports"`
+
 	IsFromApp     bool `json:"isFromApp"`
 	IsFromCompose bool `json:"isFromCompose"`
 }

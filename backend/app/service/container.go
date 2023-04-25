@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -97,27 +98,45 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 		records = list[start:end]
 	}
 
+	var wg sync.WaitGroup
+	wg.Add(len(records))
 	for _, container := range records {
-		IsFromCompose := false
-		if _, ok := container.Labels[composeProjectLabel]; ok {
-			IsFromCompose = true
-		}
-		IsFromApp := false
-		if created, ok := container.Labels[composeCreatedBy]; ok && created == "Apps" {
-			IsFromApp = true
-		}
-		backDatas = append(backDatas, dto.ContainerInfo{
-			ContainerID:   container.ID,
-			CreateTime:    time.Unix(container.Created, 0).Format("2006-01-02 15:04:05"),
-			Name:          container.Names[0][1:],
-			ImageId:       strings.Split(container.ImageID, ":")[1],
-			ImageName:     container.Image,
-			State:         container.State,
-			RunTime:       container.Status,
-			IsFromApp:     IsFromApp,
-			IsFromCompose: IsFromCompose,
-		})
+		go func(item types.Container) {
+			IsFromCompose := false
+			if _, ok := item.Labels[composeProjectLabel]; ok {
+				IsFromCompose = true
+			}
+			IsFromApp := false
+			if created, ok := item.Labels[composeCreatedBy]; ok && created == "Apps" {
+				IsFromApp = true
+			}
+
+			var ports []string
+			for _, port := range item.Ports {
+				if port.IP == "::" || port.PublicPort == 0 {
+					continue
+				}
+				ports = append(ports, fmt.Sprintf("%v:%v/%s", port.PublicPort, port.PrivatePort, port.Type))
+			}
+			cpu, mem := loadCpuAndMem(client, item.ID)
+			backDatas = append(backDatas, dto.ContainerInfo{
+				ContainerID:   item.ID,
+				CreateTime:    time.Unix(item.Created, 0).Format("2006-01-02 15:04:05"),
+				Name:          item.Names[0][1:],
+				ImageId:       strings.Split(item.ImageID, ":")[1],
+				ImageName:     item.Image,
+				State:         item.State,
+				RunTime:       item.Status,
+				CPUPercent:    cpu,
+				MemoryPercent: mem,
+				Ports:         ports,
+				IsFromApp:     IsFromApp,
+				IsFromCompose: IsFromCompose,
+			})
+			wg.Done()
+		}(container)
 	}
+	wg.Wait()
 
 	return int64(total), backDatas, nil
 }
@@ -270,16 +289,16 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainterStats, erro
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
+		res.Body.Close()
 		return nil, err
 	}
+	res.Body.Close()
 	var stats *types.StatsJSON
 	if err := json.Unmarshal(body, &stats); err != nil {
 		return nil, err
 	}
 	var data dto.ContainterStats
-	previousCPU := stats.PreCPUStats.CPUUsage.TotalUsage
-	previousSystem := stats.PreCPUStats.SystemUsage
-	data.CPUPercent = calculateCPUPercentUnix(previousCPU, previousSystem, stats)
+	data.CPUPercent = calculateCPUPercentUnix(stats)
 	data.IORead, data.IOWrite = calculateBlockIO(stats.BlkioStats)
 	data.Memory = float64(stats.MemoryStats.Usage) / 1024 / 1024
 	if cache, ok := stats.MemoryStats.Stats["cache"]; ok {
@@ -301,17 +320,25 @@ func stringsToMap(list []string) map[string]string {
 	}
 	return lableMap
 }
-func calculateCPUPercentUnix(previousCPU, previousSystem uint64, v *types.StatsJSON) float64 {
-	var (
-		cpuPercent  = 0.0
-		cpuDelta    = float64(v.CPUStats.CPUUsage.TotalUsage) - float64(previousCPU)
-		systemDelta = float64(v.CPUStats.SystemUsage) - float64(previousSystem)
-	)
+
+func calculateCPUPercentUnix(stats *types.StatsJSON) float64 {
+	cpuPercent := 0.0
+	cpuDelta := float64(stats.CPUStats.CPUUsage.TotalUsage) - float64(stats.PreCPUStats.CPUUsage.TotalUsage)
+	systemDelta := float64(stats.CPUStats.SystemUsage) - float64(stats.PreCPUStats.SystemUsage)
 
 	if systemDelta > 0.0 && cpuDelta > 0.0 {
-		cpuPercent = (cpuDelta / systemDelta) * float64(len(v.CPUStats.CPUUsage.PercpuUsage)) * 100.0
+		cpuPercent = (cpuDelta / systemDelta) * float64(len(stats.CPUStats.CPUUsage.PercpuUsage)) * 100.0
 	}
 	return cpuPercent
+}
+func calculateMemPercentUnix(memStats types.MemoryStats) float64 {
+	memPercent := 0.0
+	memUsage := float64(memStats.Usage - memStats.Stats["cache"])
+	memLimit := float64(memStats.Limit)
+	if memUsage > 0.0 && memLimit > 0.0 {
+		memPercent = (memUsage / memLimit) * 100.0
+	}
+	return memPercent
 }
 func calculateBlockIO(blkio types.BlkioStats) (blkRead float64, blkWrite float64) {
 	for _, bioEntry := range blkio.IoServiceBytesRecursive {
@@ -362,4 +389,26 @@ func pullImages(ctx context.Context, client *client.Client, image string) error 
 		return err
 	}
 	return nil
+}
+
+func loadCpuAndMem(client *client.Client, container string) (float64, float64) {
+	res, err := client.ContainerStats(context.Background(), container, false)
+	if err != nil {
+		return 0, 0
+	}
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		res.Body.Close()
+		return 0, 0
+	}
+	res.Body.Close()
+	var stats *types.StatsJSON
+	if err := json.Unmarshal(body, &stats); err != nil {
+		return 0, 0
+	}
+
+	CPUPercent := calculateCPUPercentUnix(stats)
+	MemPercent := calculateMemPercentUnix(stats.MemoryStats)
+	return CPUPercent, MemPercent
 }

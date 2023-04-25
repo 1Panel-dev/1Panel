@@ -42,7 +42,9 @@ export namespace Container {
         createTime: string;
         state: string;
         runTime: string;
-
+        cpuPercent: number;
+        memoryPercent: number;
+        ports: Array<string>;
         isFromApp: boolean;
         isFromCompose: boolean;
     }
