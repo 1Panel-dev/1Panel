@@ -5,7 +5,7 @@
                 <el-form :model="form" ref="panelFormRef" v-loading="loading" label-position="left" label-width="180px">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
-                        <el-col :span="10">
+                        <el-col :span="16">
                             <el-form-item :label="$t('setting.panelPort')" :rules="Rules.port" prop="serverPort">
                                 <el-input clearable v-model.number="form.serverPort">
                                     <template #append>
@@ -133,6 +133,22 @@
                                     </ul>
                                 </el-card>
                             </el-form-item>
+
+                            <el-form-item label="https" required prop="ssl">
+                                <el-switch
+                                    @change="handleSSL"
+                                    v-model="form.ssl"
+                                    active-value="enable"
+                                    inactive-value="disable"
+                                />
+                                <span class="input-help">{{ $t('setting.https') }}</span>
+                                <SSLSetting
+                                    :type="form.sslType"
+                                    :status="form.ssl"
+                                    v-if="sslShow"
+                                    style="width: 100%"
+                                />
+                            </el-form-item>
                         </el-col>
                     </el-row>
                 </el-form>
@@ -165,6 +181,7 @@ import { ref, reactive, onMounted } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
 import LayoutContent from '@/layout/layout-content.vue';
+import SSLSetting from '@/views/setting/safe/ssl/index.vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import {
     updateSetting,
@@ -174,6 +191,7 @@ import {
     updatePort,
     getSystemAvailable,
     updateEntrance,
+    updateSSL,
 } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { Rules, checkNumberRange } from '@/global/form-rules';
@@ -183,9 +201,12 @@ import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
 const loading = ref(false);
+
 const form = reactive({
     serverPort: 9999,
     securityEntranceStatus: 'disable',
+    ssl: 'disable',
+    sslType: 'self',
     securityEntrance: '',
     expirationDays: 0,
     expirationTime: '',
@@ -200,11 +221,20 @@ const timeoutForm = reactive({
     days: 0,
 });
 
+const sslShow = ref();
+const oldSSLStatus = ref();
+
 const search = async () => {
     const res = await getSettingInfo();
     form.serverPort = Number(res.data.serverPort);
     form.securityEntranceStatus = res.data.securityEntranceStatus;
     isEntranceShow.value = res.data.securityEntranceStatus === 'enable';
+    form.ssl = res.data.ssl;
+    oldSSLStatus.value = res.data.ssl;
+    form.sslType = res.data.sslType;
+    if (form.ssl === 'enable') {
+        sslShow.value = true;
+    }
     form.securityEntrance = res.data.securityEntrance;
     form.expirationDays = Number(res.data.expirationDays);
     form.expirationTime = res.data.expirationTime;
@@ -321,6 +351,33 @@ const handleEntrance = async () => {
                 loading.value = false;
             });
     }
+};
+
+const handleSSL = async () => {
+    if (form.ssl === 'enable') {
+        sslShow.value = true;
+        return;
+    }
+    if (form.ssl === oldSSLStatus.value) {
+        sslShow.value = false;
+        return;
+    }
+    ElMessageBox.confirm(i18n.global.t('setting.sslDisableHelper'), i18n.global.t('setting.sslDisable'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    })
+        .then(async () => {
+            sslShow.value = false;
+            await updateSSL({ ssl: 'disable', domain: '', sslType: '', key: '', cert: '', sslID: 0 });
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            let href = window.location.href;
+            let address = href.split('://')[1];
+            window.open(`http://${address}/`, '_self');
+        })
+        .catch(() => {
+            form.ssl = 'enable';
+        });
 };
 
 const onSaveEntrance = async () => {

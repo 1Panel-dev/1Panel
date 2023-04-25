@@ -2,6 +2,7 @@ package configs
 
 type System struct {
 	Port       string `mapstructure:"port"`
+	SSL        string `mapstructure:"ssl"`
 	DbFile     string `mapstructure:"db_file"`
 	DbPath     string `mapstructure:"db_path"`
 	LogPath    string `mapstructure:"log_path"`

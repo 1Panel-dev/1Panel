@@ -26,7 +26,6 @@ class RequestHttp {
                         ...config.headers,
                     };
                 }
-
                 return {
                     ...config,
                 };
