@@ -36,3 +36,15 @@ type NginxProxyUpdate struct {
 	Content   string `json:"content" validate:"required"`
 	Name      string `json:"name" validate:"required"`
 }
+
+type NginxAuthUpdate struct {
+	WebsiteID uint   `json:"websiteID" validate:"required"`
+	Operate   string `json:"operate" validate:"required"`
+	Username  string `json:"username"  validate:"required"`
+	Password  string `json:"password" validate:"required"`
+	Remark    string `json:"remark"`
+}
+
+type NginxAuthReq struct {
+	WebsiteID uint `json:"websiteID" validate:"required"`
+}

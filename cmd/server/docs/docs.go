@@ -7904,6 +7904,72 @@ const docTemplate = `{
                 }
             }
         },
+        "/websites/auths": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取密码访问配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website"
+                ],
+                "summary": "Get AuthBasic conf",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.NginxAuthReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/websites/auths/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新密码访问配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website"
+                ],
+                "summary": "Get AuthBasic conf",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.NginxAuthUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/websites/check": {
             "post": {
                 "security": [
@@ -12761,6 +12827,43 @@ const docTemplate = `{
                 "params": {
                     "type": "object",
                     "additionalProperties": true
+                }
+            }
+        },
+        "request.NginxAuthReq": {
+            "type": "object",
+            "required": [
+                "websiteID"
+            ],
+            "properties": {
+                "websiteID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request.NginxAuthUpdate": {
+            "type": "object",
+            "required": [
+                "operate",
+                "password",
+                "username",
+                "websiteID"
+            ],
+            "properties": {
+                "operate": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "remark": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "websiteID": {
+                    "type": "integer"
                 }
             }
         },

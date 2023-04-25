@@ -14,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/parser"
 	"github.com/1Panel-dev/1Panel/cmd/server/nginx_conf"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"os"
 	"path"
@@ -70,6 +71,8 @@ type IWebsiteService interface {
 	OperateProxy(req request.WebsiteProxyConfig) (err error)
 	GetProxies(id uint) (res []request.WebsiteProxyConfig, err error)
 	UpdateProxyFile(req request.NginxProxyUpdate) (err error)
+	GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error)
+	UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -1326,4 +1329,171 @@ func (w WebsiteService) UpdateProxyFile(req request.NginxProxyUpdate) (err error
 		}
 	}()
 	return updateNginxConfig(constant.NginxScopeServer, nil, &website)
+}
+
+func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error) {
+	var (
+		website      model.Website
+		nginxInstall model.AppInstall
+		params       []dto.NginxParam
+		authContent  []byte
+		authArray    []string
+	)
+	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return err
+	}
+	nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return
+	}
+	authPath := fmt.Sprintf("/www/sites/%s/auth_basic/auth.pass", website.Alias)
+	absoluteAuthPath := path.Join(nginxInstall.GetPath(), authPath)
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(path.Dir(absoluteAuthPath)) {
+		_ = fileOp.CreateDir(path.Dir(absoluteAuthPath), 755)
+	}
+	if !fileOp.Stat(absoluteAuthPath) {
+		_ = fileOp.CreateFile(absoluteAuthPath)
+	}
+	defer func() {
+		if err != nil {
+			switch req.Operate {
+			case "create":
+
+			}
+		}
+	}()
+
+	params = append(params, dto.NginxParam{Name: "auth_basic", Params: []string{`"Authentication"`}})
+	params = append(params, dto.NginxParam{Name: "auth_basic_user_file", Params: []string{authPath}})
+	authContent, err = fileOp.GetContent(absoluteAuthPath)
+	if err != nil {
+		return
+	}
+	authArray = strings.Split(string(authContent), "\n")
+	switch req.Operate {
+	case "disable":
+		return deleteNginxConfig(constant.NginxScopeServer, params, &website)
+	case "enable":
+		return updateNginxConfig(constant.NginxScopeServer, params, &website)
+	case "create":
+		for _, line := range authArray {
+			authParams := strings.Split(line, ":")
+			username := authParams[0]
+			if username == req.Username {
+				err = buserr.New(constant.ErrUsernameIsExist)
+				return
+			}
+		}
+		var passwdHash []byte
+		passwdHash, err = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return
+		}
+		line := fmt.Sprintf("%s:%s\n", req.Username, passwdHash)
+		if req.Remark != "" {
+			line = fmt.Sprintf("%s:%s:%s\n", req.Username, passwdHash, req.Remark)
+		}
+		authArray = append(authArray, line)
+	case "edit":
+		userExist := false
+		for index, line := range authArray {
+			authParams := strings.Split(line, ":")
+			username := authParams[0]
+			if username == req.Username {
+				userExist = true
+				var passwdHash []byte
+				passwdHash, err = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+				if err != nil {
+					return
+				}
+				userPasswd := fmt.Sprintf("%s:%s\n", req.Username, passwdHash)
+				if req.Remark != "" {
+					userPasswd = fmt.Sprintf("%s:%s:%s\n", req.Username, passwdHash, req.Remark)
+				}
+				authArray[index] = userPasswd
+			}
+		}
+		if !userExist {
+			err = buserr.New(constant.ErrUsernameIsNotExist)
+			return
+		}
+	case "delete":
+		deleteIndex := -1
+		for index, line := range authArray {
+			authParams := strings.Split(line, ":")
+			username := authParams[0]
+			if username == req.Username {
+				deleteIndex = index
+			}
+		}
+		if deleteIndex < 0 {
+			return
+		}
+		authArray = append(authArray[:deleteIndex], authArray[deleteIndex+1:]...)
+	}
+
+	var passFile *os.File
+	passFile, err = os.Create(absoluteAuthPath)
+	if err != nil {
+		return
+	}
+	defer passFile.Close()
+	writer := bufio.NewWriter(passFile)
+	for _, line := range authArray {
+		_, err = writer.WriteString(line + "\n")
+		if err != nil {
+			return
+		}
+	}
+	err = writer.Flush()
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (w WebsiteService) GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error) {
+	var (
+		website      model.Website
+		nginxInstall model.AppInstall
+		authContent  []byte
+		nginxParams  []response.NginxParam
+	)
+	website, err = websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return
+	}
+	nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return
+	}
+	authPath := fmt.Sprintf("/www/sites/%s/auth_basic/auth.pass", website.Alias)
+	absoluteAuthPath := path.Join(nginxInstall.GetPath(), authPath)
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(absoluteAuthPath) {
+		return
+	}
+	nginxParams, err = getNginxParamsByKeys(constant.NginxScopeServer, []string{"auth_basic"}, &website)
+	if err != nil {
+		return
+	}
+	res.Enable = len(nginxParams[0].Params) > 0
+	authContent, err = fileOp.GetContent(absoluteAuthPath)
+	authArray := strings.Split(string(authContent), "\n")
+	for _, line := range authArray {
+		if line == "" {
+			continue
+		}
+		params := strings.Split(line, ":")
+		auth := dto.NginxAuth{
+			Username: params[0],
+		}
+		if len(params) == 3 {
+			auth.Remark = params[2]
+		}
+		res.Items = append(res.Items, auth)
+	}
+	return
 }

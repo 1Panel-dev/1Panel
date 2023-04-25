@@ -65,10 +65,12 @@ var (
 
 // website
 var (
-	ErrDomainIsExist = "ErrDomainIsExist"
-	ErrAliasIsExist  = "ErrAliasIsExist"
-	ErrAppDelete     = "ErrAppDelete"
-	ErrGroupIsUsed   = "ErrGroupIsUsed"
+	ErrDomainIsExist      = "ErrDomainIsExist"
+	ErrAliasIsExist       = "ErrAliasIsExist"
+	ErrAppDelete          = "ErrAppDelete"
+	ErrGroupIsUsed        = "ErrGroupIsUsed"
+	ErrUsernameIsExist    = "ErrUsernameIsExist"
+	ErrUsernameIsNotExist = "ErrUsernameIsNotExist"
 )
 
 // ssl
