@@ -22,7 +22,7 @@
         </template>
 
         <div class="complex-table__body">
-            <fu-table v-bind="$attrs" @selection-change="handleSelectionChange">
+            <fu-table v-bind="$attrs" ref="tableRef" @selection-change="handleSelectionChange">
                 <slot></slot>
             </fu-table>
         </div>
@@ -52,6 +52,7 @@ defineProps({
 });
 const emit = defineEmits(['search', 'update:selects']);
 const condition = ref({});
+const tableRef = ref();
 function search(conditions: any, e: any) {
     if (conditions) {
         condition.value = conditions;
@@ -62,6 +63,13 @@ function search(conditions: any, e: any) {
 function handleSelectionChange(row: any) {
     emit('update:selects', row);
 }
+
+function clearSelects() {
+    tableRef.value.refElTable.clearSelection();
+}
+defineExpose({
+    clearSelects,
+});
 </script>
 
 <style lang="scss">

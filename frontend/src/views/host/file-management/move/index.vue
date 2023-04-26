@@ -1,11 +1,5 @@
 <template>
-    <el-drawer
-        v-model="open"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :before-close="handleClose"
-        size="40%"
-    >
+    <el-drawer v-model="open" :destroy-on-close="true" :close-on-click-modal="false" size="40%">
         <template #header>
             <DrawerHeader :header="title" :back="handleClose" />
         </template>
@@ -29,7 +23,7 @@
         </el-row>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button @click="handleClose(false)" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button type="primary" @click="submit(fileForm)" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
@@ -51,6 +45,7 @@ import { MsgSuccess } from '@/utils/message';
 interface MoveProps {
     oldPaths: Array<string>;
     type: string;
+    path: string;
 }
 
 const fileForm = ref<FormInstance>();
@@ -78,12 +73,12 @@ const rules = reactive<FormRules>({
 
 const em = defineEmits(['close']);
 
-const handleClose = () => {
+const handleClose = (search: boolean) => {
     open.value = false;
     if (fileForm.value) {
         fileForm.value.resetFields();
     }
-    em('close', open);
+    em('close', search);
 };
 
 const getPath = (path: string) => {
@@ -104,8 +99,7 @@ const submit = async (formEl: FormInstance | undefined) => {
                 } else {
                     MsgSuccess(i18n.global.t('file.copySuccess'));
                 }
-
-                handleClose();
+                handleClose(true);
             })
             .finally(() => {
                 loading.value = false;
@@ -116,6 +110,7 @@ const submit = async (formEl: FormInstance | undefined) => {
 const acceptParams = (props: MoveProps) => {
     addForm.oldPaths = props.oldPaths;
     addForm.type = props.type;
+    addForm.newPath = props.path;
     type.value = props.type;
     open.value = true;
 };
