@@ -183,6 +183,7 @@ const saveContent = (closePage: boolean) => {
         loading.value = false;
         open.value = !closePage;
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+        handleClose();
     });
 };
 
