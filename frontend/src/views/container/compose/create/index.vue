@@ -14,7 +14,7 @@
                 <el-col :span="22">
                     <el-form ref="formRef" label-position="top" :model="form" :rules="rules" label-width="80px">
                         <el-form-item :label="$t('container.from')">
-                            <el-radio-group v-model="form.from" @change="hasChecked = false">
+                            <el-radio-group v-model="form.from" @change="changeFrom">
                                 <el-radio label="edit">{{ $t('commons.button.edit') }}</el-radio>
                                 <el-radio label="path">{{ $t('container.pathSelect') }}</el-radio>
                                 <el-radio label="template">{{ $t('container.composeTemplate') }}</el-radio>
@@ -30,71 +30,71 @@
                                 </template>
                             </el-input>
                         </el-form-item>
-                        <el-form-item v-if="form.from === 'edit' || form.from === 'template'" prop="name">
-                            <el-input @input="changePath" v-model.trim="form.name">
-                                <template #prepend>{{ $t('file.dir') }}</template>
-                            </el-input>
-                            <span class="input-help">{{ $t('container.composePathHelper', [composeFile]) }}</span>
-                        </el-form-item>
-                        <el-form-item v-if="form.from === 'template'" prop="template">
-                            <el-select v-model="form.template" @change="hasChecked = false">
-                                <el-option
-                                    v-for="item in templateOptions"
-                                    :key="item.id"
-                                    :value="item.id"
-                                    :label="item.name"
+                        <el-row :gutter="20">
+                            <el-col :span="12">
+                                <el-form-item v-if="form.from === 'edit' || form.from === 'template'" prop="name">
+                                    <el-input @input="changePath" v-model.trim="form.name">
+                                        <template #prepend>{{ $t('file.dir') }}</template>
+                                    </el-input>
+                                    <span class="input-help">
+                                        {{ $t('container.composePathHelper', [composeFile]) }}
+                                    </span>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item v-if="form.from === 'template'" prop="template">
+                                    <el-select v-model="form.template" @change="changeTemplate">
+                                        <el-option
+                                            v-for="item in templateOptions"
+                                            :key="item.id"
+                                            :value="item.id"
+                                            :label="item.name"
+                                        />
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-form-item>
+                            <div v-if="form.from === 'edit' || form.from === 'template'" style="width: 100%">
+                                <el-radio-group v-model="mode" size="small">
+                                    <el-radio-button label="edit">{{ $t('commons.button.edit') }}</el-radio-button>
+                                    <el-radio-button label="log">{{ $t('commons.button.log') }}</el-radio-button>
+                                </el-radio-group>
+                                <codemirror
+                                    v-if="mode === 'edit'"
+                                    :autofocus="true"
+                                    placeholder="#Define or paste the content of your docker-compose file here"
+                                    :indent-with-tab="true"
+                                    :tabSize="4"
+                                    style="width: 100%; height: calc(100vh - 375px)"
+                                    :lineWrapping="true"
+                                    :matchBrackets="true"
+                                    theme="cobalt"
+                                    @change="hasChecked = false"
+                                    :styleActiveLine="true"
+                                    :extensions="extensions"
+                                    v-model="form.file"
+                                    :disabled="onCreating"
                                 />
-                            </el-select>
-                        </el-form-item>
-                        <el-form-item v-if="form.from === 'edit'">
+                            </div>
                             <codemirror
+                                v-if="mode === 'log'"
                                 :autofocus="true"
-                                placeholder="#Define or paste the content of your docker-compose file here"
+                                placeholder="Waiting for docker-compose up output..."
                                 :indent-with-tab="true"
                                 :tabSize="4"
-                                style="width: 100%; height: 250px"
+                                style="width: 100%; height: calc(100vh - 375px)"
                                 :lineWrapping="true"
                                 :matchBrackets="true"
                                 theme="cobalt"
-                                @change="hasChecked = false"
                                 :styleActiveLine="true"
                                 :extensions="extensions"
-                                v-model="form.file"
+                                @ready="handleReady"
+                                v-model="logInfo"
+                                :disabled="true"
                             />
                         </el-form-item>
                     </el-form>
-                    <codemirror
-                        v-if="logVisiable && form.from !== 'edit'"
-                        :autofocus="true"
-                        placeholder="Waiting for docker-compose up output..."
-                        :indent-with-tab="true"
-                        :tabSize="4"
-                        style="height: calc(100vh - 370px)"
-                        :lineWrapping="true"
-                        :matchBrackets="true"
-                        theme="cobalt"
-                        :styleActiveLine="true"
-                        :extensions="extensions"
-                        @ready="handleReady"
-                        v-model="logInfo"
-                        :readOnly="true"
-                    />
-                    <codemirror
-                        v-if="logVisiable && form.from === 'edit'"
-                        :autofocus="true"
-                        placeholder="Waiting for docker-compose up output..."
-                        :indent-with-tab="true"
-                        :tabSize="4"
-                        style="height: calc(100vh - 590px)"
-                        :lineWrapping="true"
-                        :matchBrackets="true"
-                        theme="cobalt"
-                        :styleActiveLine="true"
-                        :extensions="extensions"
-                        @ready="handleReady"
-                        v-model="logInfo"
-                        :readOnly="true"
-                    />
                 </el-col>
             </el-row>
         </div>
@@ -122,7 +122,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { ElForm } from 'element-plus';
+import { ElForm, ElMessageBox } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { listComposeTemplate, testCompose, upCompose } from '@/api/modules/container';
 import { loadBaseDir } from '@/api/modules/setting';
@@ -132,12 +132,15 @@ import { MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 
+const mode = ref('edit');
+const onCreating = ref();
+const oldFrom = ref('edit');
+
 const extensions = [javascript(), oneDark];
 const view = shallowRef();
 const handleReady = (payload) => {
     view.value = payload.view;
 };
-const logVisiable = ref();
 const logInfo = ref();
 
 const drawerVisiable = ref(false);
@@ -161,14 +164,12 @@ const form = reactive({
 const rules = reactive({
     name: [Rules.requiredInput, Rules.imageName],
     path: [Rules.requiredSelect],
+    template: [Rules.requiredSelect],
 });
 
 const loadTemplates = async () => {
     const res = await listComposeTemplate();
     templateOptions.value = res.data;
-    if (templateOptions.value && templateOptions.value.length !== 0) {
-        form.template = templateOptions.value[0].id;
-    }
 };
 
 const acceptParams = (): void => {
@@ -177,13 +178,50 @@ const acceptParams = (): void => {
     form.from = 'edit';
     form.path = '';
     form.file = '';
-    logVisiable.value = false;
     hasChecked.value = false;
     logInfo.value = '';
     loadTemplates();
     loadPath();
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
+
+const changeTemplate = () => {
+    hasChecked.value = false;
+    for (const item of templateOptions.value) {
+        if (form.template === item.id) {
+            form.file = item.content;
+            break;
+        }
+    }
+};
+
+const changeFrom = () => {
+    if ((oldFrom.value === 'edit' || oldFrom.value === 'template') && form.file) {
+        ElMessageBox.confirm(i18n.global.t('container.fromChangeHelper'), i18n.global.t('container.from'), {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        })
+            .then(() => {
+                hasChecked.value = false;
+                if (form.from === 'template') {
+                    if (!form.template && templateOptions.value && templateOptions.value.length !== 0) {
+                        form.template = templateOptions.value[0].id;
+                    }
+                    changeTemplate();
+                }
+                if (form.from === 'edit') {
+                    form.file = '';
+                }
+                oldFrom.value = form.from;
+            })
+            .catch(() => {
+                form.from = oldFrom.value;
+            });
+    } else {
+        oldFrom.value = form.from;
+    }
+};
 
 const handleClose = () => {
     emit('search');
@@ -210,6 +248,7 @@ const onTest = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
+        logInfo.value = '';
         await testCompose(form)
             .then((res) => {
                 loading.value = false;
@@ -228,34 +267,34 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
+        onCreating.value = true;
+        mode.value = 'log';
         const res = await upCompose(form);
         logInfo.value = '';
         buttonDisabled.value = true;
-        logVisiable.value = true;
         loadLogs(res.data);
     });
 };
 
 const loadLogs = async (path: string) => {
     timer = setInterval(async () => {
-        if (logVisiable.value) {
-            const res = await LoadFile({ path: path });
-            logInfo.value = formatImageStdout(res.data);
-            nextTick(() => {
-                const state = view.value.state;
-                view.value.dispatch({
-                    selection: { anchor: state.doc.length, head: state.doc.length },
-                    scrollIntoView: true,
-                });
+        const res = await LoadFile({ path: path });
+        logInfo.value = formatImageStdout(res.data);
+        nextTick(() => {
+            const state = view.value.state;
+            view.value.dispatch({
+                selection: { anchor: state.doc.length, head: state.doc.length },
+                scrollIntoView: true,
             });
-            if (
-                logInfo.value.endsWith('docker-compose up failed!') ||
-                logInfo.value.endsWith('docker-compose up successful!')
-            ) {
-                clearInterval(Number(timer));
-                timer = null;
-                buttonDisabled.value = false;
-            }
+        });
+        if (
+            logInfo.value.endsWith('docker-compose up failed!') ||
+            logInfo.value.endsWith('docker-compose up successful!')
+        ) {
+            onCreating.value = false;
+            clearInterval(Number(timer));
+            timer = null;
+            buttonDisabled.value = false;
         }
     }, 1000 * 3);
 };
