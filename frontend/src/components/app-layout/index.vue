@@ -17,6 +17,7 @@ import { useI18n } from 'vue-i18n';
 import { GlobalStore } from '@/store';
 import { useTheme } from '@/hooks/use-theme';
 import { getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
+import { createStyleElement } from '@/utils/domUtil';
 
 const i18n = useI18n();
 const loading = ref(false);
@@ -42,9 +43,8 @@ const loadDataFromDB = async () => {
     const res = await getSettingInfo();
     document.title = res.data.panelName;
     // insert css block
-    const style = document.createElement('style');
-    style.innerText = res.data.customizedCss;
-    document.head.appendChild(style);
+    const styleNode = createStyleElement(res.data.customizedCss);
+    document.head.appendChild(styleNode);
     i18n.locale.value = res.data.language;
     i18n.warnHtmlMessage = false;
     globalStore.updateLanguage(res.data.language);

@@ -300,3 +300,13 @@ var AddEntranceStatus = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.Website{})
 	},
 }
+
+var AddCustomizedCss = &gormigrate.Migration{
+	ID: "20230426-add-customized-css",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "CustomizedCss", Value: ""}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}

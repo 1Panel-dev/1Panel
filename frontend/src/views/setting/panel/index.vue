@@ -47,14 +47,21 @@
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.customizedCss')" prop="customizedCss">
-                                <el-input type="textarea" :rows="5" v-model="form.customizedCss"></el-input>
-                                <el-button
-                                    style="width: 85px"
-                                    @click="onSave(panelFormRef, 'CustomizedCss', form.customizedCss)"
-                                    icon="Collection"
-                                >
-                                    {{ $t('commons.button.save') }}
-                                </el-button>
+                                <div class="input-button-wrapper">
+                                    <el-input
+                                        type="textarea"
+                                        :autosize="{ minRows: 2, maxRows: 10 }"
+                                        v-model="form.customizedCss"
+                                    />
+                                    <el-button
+                                        class="input-button"
+                                        style="width: 85px"
+                                        @click="onSave(panelFormRef, 'CustomizedCss', form.customizedCss)"
+                                        icon="Collection"
+                                    >
+                                        {{ $t('commons.button.save') }}
+                                    </el-button>
+                                </div>
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.language')" :rules="Rules.requiredSelect" prop="language">
@@ -305,3 +312,10 @@ onMounted(() => {
     search();
 });
 </script>
+<style scoped lang="scss">
+.input-button-wrapper {
+    display: flex;
+    flex: auto;
+    align-items: flex-end;
+}
+</style>
