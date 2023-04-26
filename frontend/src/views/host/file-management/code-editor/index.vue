@@ -82,10 +82,10 @@ interface EditorConfig {
     eol: number;
 }
 
-let open = ref(false);
-let loading = ref(false);
+const open = ref(false);
+const loading = ref(false);
 
-let config = reactive<EditorConfig>({
+const config = reactive<EditorConfig>({
     theme: 'vs-dark',
     language: 'plaintext',
     eol: monaco.editor.EndOfLineSequence.LF,
@@ -129,7 +129,7 @@ const handleClose = () => {
     if (editor) {
         editor.dispose();
     }
-    em('close', false);
+    em('close', open.value);
 };
 const changeLanguage = () => {
     monaco.editor.setModelLanguage(editor.getModel(), config.language);

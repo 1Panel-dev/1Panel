@@ -322,17 +322,21 @@ func (f FileOp) CopyFile(src, dst string) error {
 	}
 	defer srcFile.Close()
 
+	srcInfo, err := f.Fs.Stat(src)
+	if err != nil {
+		return err
+	}
+	dstPath := path.Join(dst, srcInfo.Name())
+	if src == dstPath {
+		return nil
+	}
+
 	err = f.Fs.MkdirAll(filepath.Dir(dst), 0666)
 	if err != nil {
 		return err
 	}
 
-	srcInfo, err := f.Fs.Stat(src)
-	if err != nil {
-		return err
-	}
-
-	dstFile, err := f.Fs.OpenFile(path.Join(dst, srcInfo.Name()), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775)
+	dstFile, err := f.Fs.OpenFile(dstPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775)
 	if err != nil {
 		return err
 	}
