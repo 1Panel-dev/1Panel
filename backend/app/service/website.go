@@ -1351,7 +1351,7 @@ func (w WebsiteService) UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
 	absoluteAuthPath := path.Join(nginxInstall.GetPath(), authPath)
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(path.Dir(absoluteAuthPath)) {
-		_ = fileOp.CreateDir(path.Dir(absoluteAuthPath), 755)
+		_ = fileOp.CreateDir(path.Dir(absoluteAuthPath), 0755)
 	}
 	if !fileOp.Stat(absoluteAuthPath) {
 		_ = fileOp.CreateFile(absoluteAuthPath)

@@ -11,6 +11,9 @@
                     </el-form-item>
                     <el-form-item :label="$t('website.modifier')" prop="modifier">
                         <el-input v-model.trim="proxy.modifier"></el-input>
+                        <div>
+                            <span class="input-help">{{ $t('website.modifierHelper') }}</span>
+                        </div>
                     </el-form-item>
                     <el-form-item :label="$t('website.proxyPath')" prop="match">
                         <el-input v-model.trim="proxy.match"></el-input>
@@ -36,11 +39,17 @@
                         <el-col :span="12">
                             <el-form-item :label="$t('website.proxyPass')" prop="proxyPass">
                                 <el-input v-model.trim="proxy.proxyPass"></el-input>
+                                <div>
+                                    <span class="input-help">{{ $t('website.proxyPassHelper') }}</span>
+                                </div>
                             </el-form-item>
                         </el-col>
                         <el-col :span="12">
                             <el-form-item :label="$t('website.proxyHost')" prop="proxyHost">
                                 <el-input v-model.trim="proxy.proxyHost"></el-input>
+                                <div>
+                                    <span class="input-help">{{ $t('website.proxyHostHelper') }}</span>
+                                </div>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -68,16 +77,14 @@
                         </div>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="addReplaces" :disabled="replaces.length >= 3">
+                        <el-button type="primary" @click="addReplaces" :disabled="replaces.length >= 5">
                             {{ $t('website.addReplace') }}
                         </el-button>
+                        <div>
+                            <span class="input-help">{{ $t('website.replacementHelper') }}</span>
+                        </div>
                     </el-form-item>
                 </el-form>
-                <el-alert :title="$t('website.modifierHelper')" type="info" :closable="false" />
-                <el-alert :title="$t('website.proxyHelper1')" type="info" :closable="false" />
-                <el-alert :title="$t('website.proxyPassHelper')" type="info" :closable="false" />
-                <el-alert :title="$t('website.proxyHostHelper')" type="info" :closable="false" />
-                <el-alert :title="$t('website.replacementHelper')" type="info" :closable="false" />
             </el-col>
         </el-row>
         <template #footer>
