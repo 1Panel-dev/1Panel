@@ -715,3 +715,46 @@ func (b *BaseApi) UpdateProxyConfigFile(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Website
+// @Summary Get AuthBasic conf
+// @Description 获取密码访问配置
+// @Accept json
+// @Param request body request.NginxAuthReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/auths [post]
+func (b *BaseApi) GetAuthConfig(c *gin.Context) {
+	var req request.NginxAuthReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	res, err := websiteService.GetAuthBasics(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Website
+// @Summary Get AuthBasic conf
+// @Description 更新密码访问配置
+// @Accept json
+// @Param request body request.NginxAuthUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/auths/update [post]
+func (b *BaseApi) UpdateAuthConfig(c *gin.Context) {
+	var req request.NginxAuthUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.UpdateAuthBasic(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

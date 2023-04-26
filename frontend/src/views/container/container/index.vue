@@ -71,20 +71,42 @@
                         min-width="80"
                         prop="imageName"
                     />
-                    <el-table-column :label="$t('commons.table.status')" min-width="50" prop="state" fix>
+                    <el-table-column :label="$t('commons.table.status')" min-width="60" prop="state" fix>
                         <template #default="{ row }">
                             <Status :key="row.state" :status="row.state"></Status>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.upTime')" min-width="80" prop="runTime" fix />
+                    <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="125" fix>
+                        <template #default="{ row }">
+                            cpu: {{ row.cpuPercent.toFixed(2) }}% {{ $t('monitor.memory') }}:
+                            {{ row.memoryPercent.toFixed(2) }}%
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('container.port')" min-width="80" prop="ports" fix>
+                        <template #default="{ row }">
+                            <div v-if="row.ports">
+                                <div v-for="(item, index) in row.ports" :key="index">
+                                    <div v-if="row.expand || (!row.expand && index < 3)">
+                                        <el-tag class="tagMargin">{{ item }}</el-tag>
+                                    </div>
+                                </div>
+                                <div v-if="!row.expand && row.ports.length > 3">
+                                    <el-button type="primary" link @click="row.expand = true">
+                                        {{ $t('commons.button.expand') }}...
+                                    </el-button>
+                                </div>
+                            </div>
+                        </template>
+                    </el-table-column>
                     <el-table-column
-                        prop="createTime"
-                        :label="$t('commons.table.date')"
-                        :formatter="dateFormat"
+                        :label="$t('container.upTime')"
+                        min-width="70"
                         show-overflow-tooltip
+                        prop="runTime"
+                        fix
                     />
                     <fu-table-operations
-                        width="370px"
+                        width="300px"
                         :ellipsis="10"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
@@ -117,7 +139,6 @@ import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
 import Status from '@/components/status/index.vue';
 import { reactive, onMounted, ref } from 'vue';
-import { dateFormat } from '@/utils/util';
 import { ContainerOperator, inspect, loadDockerStatus, searchContainer } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { ElMessageBox } from 'element-plus';
@@ -324,3 +345,9 @@ onMounted(() => {
     loadStatus();
 });
 </script>
+
+<style scoped lang="scss">
+.tagMargin {
+    margin-top: 2px;
+}
+</style>

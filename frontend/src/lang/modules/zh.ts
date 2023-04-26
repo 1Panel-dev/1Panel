@@ -463,6 +463,7 @@ const message = {
         lastHour: '最近 1 小时',
         last10Min: '最近 10 分钟',
         newName: '新名称',
+        source: '资源使用率',
 
         user: '用户',
         command: '命令',
@@ -858,6 +859,17 @@ const message = {
         password: '密码',
         path: '路径',
 
+        https: '为面板设置 https 协议访问，提升面板访问安全性',
+        selfSigned: '自签名',
+        selfSignedHelper: '自签证书，不被浏览器信任，显示不安全是正常现象',
+        import: '导入',
+        select: '选择已有',
+        domainOrIP: '域名/IP：',
+        timeOut: '过期时间：',
+        rootCrtDownload: '根证书下载',
+        primaryKey: '密钥',
+        certificate: '证书',
+
         snapshot: '快照',
         thirdPartySupport: '仅支持第三方账号',
         recoverDetail: '恢复详情',
@@ -910,6 +922,8 @@ const message = {
         mfaHelper1: '下载两步验证手机应用 如:',
         mfaHelper2: '使用手机应用扫描以下二维码，获取 6 位验证码',
         mfaHelper3: '输入手机应用上的 6 位数字',
+        sslDisable: '禁用',
+        sslDisableHelper: '禁用 https 服务，需要重启面板才能生效，是否继续！',
 
         monitor: '监控',
         enableMonitor: '监控状态',
@@ -1211,6 +1225,9 @@ const message = {
         replaceText: '替换的文本，可为空',
         replacedErr: '被替换的文本不能为空',
         replacedErr2: '被替换的文本不能重复',
+        basicAuth: '密码访问',
+        editBasicAuthHelper: '密码为非对称加密，无法回显，编辑需要重新设置密码',
+        createPassword: '生成密码',
     },
     php: {
         short_open_tag: '短标签支持',

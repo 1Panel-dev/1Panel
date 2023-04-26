@@ -338,4 +338,26 @@ export namespace Website {
         name: string;
         content: string;
     }
+
+    export interface AuthReq {
+        websiteID: number;
+    }
+
+    export interface NginxAuth {
+        username: string;
+        remark: string;
+    }
+
+    export interface AuthConfig {
+        enable: boolean;
+        items: NginxAuth[];
+    }
+
+    export interface NginxAuthConfig {
+        websiteID: number;
+        operate: string;
+        username: string;
+        password: string;
+        remark: string;
+    }
 }

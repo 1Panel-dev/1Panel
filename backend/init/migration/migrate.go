@@ -25,7 +25,7 @@ func Init() {
 		migrations.UpdateTableApp,
 		migrations.UpdateTableHost,
 		migrations.UpdateTableWebsite,
-		migrations.AddEntranceStatus,
+		migrations.AddEntranceAndSSL,
 		migrations.AddCustomizedCss,
 	})
 	if err := m.Migrate(); err != nil {

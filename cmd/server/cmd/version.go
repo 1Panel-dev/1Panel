@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/configs"
+	"github.com/1Panel-dev/1Panel/cmd/server/conf"
+	"gopkg.in/yaml.v3"
 	"strings"
 
 	cmdUtils "github.com/1Panel-dev/1Panel/backend/utils/cmd"
@@ -39,6 +42,11 @@ var versionCmd = &cobra.Command{
 
 		fmt.Printf("1panel version: %s\n", version)
 		fmt.Printf("appstore version: %s\n", appStoreVersion)
+		config := configs.ServerConfig{}
+		if err := yaml.Unmarshal(conf.AppYaml, &config); err != nil {
+			panic(err)
+		}
+		fmt.Printf("mode: %s\n", config.System.Mode)
 		return nil
 	},
 }

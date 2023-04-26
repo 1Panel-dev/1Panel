@@ -198,3 +198,11 @@ export const OperateProxyConfig = (req: Website.ProxyReq) => {
 export const UpdateProxyConfigFile = (req: Website.ProxyFileUpdate) => {
     return http.post<any>(`/websites/proxies/file`, req);
 };
+
+export const GetAuthConfig = (req: Website.AuthReq) => {
+    return http.post<Website.AuthConfig>(`/websites/auths`, req);
+};
+
+export const OperateAuthConfig = (req: Website.NginxAuthConfig) => {
+    return http.post<any>(`/websites/auths/update`, req);
+};
