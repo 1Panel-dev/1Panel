@@ -56,7 +56,7 @@
                                     <el-button
                                         class="input-button"
                                         style="width: 85px"
-                                        @click="onSave(panelFormRef, 'CustomizedCss', form.customizedCss)"
+                                        @click="onSave(panelFormRef, 'CustomizedCss', form.customizedCss || ' ')"
                                         icon="Collection"
                                     >
                                         {{ $t('commons.button.save') }}
