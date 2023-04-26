@@ -40,7 +40,7 @@
                 <el-dropdown @command="handleCreate">
                     <el-button type="primary">
                         {{ $t('commons.button.create') }}
-                        <el-icon class="el-icon--right"><arrow-down /></el-icon>
+                        <el-icon><arrow-down /></el-icon>
                     </el-button>
                     <template #dropdown>
                         <el-dropdown-menu>
@@ -74,6 +74,16 @@
                         {{ $t('commons.button.delete') }}
                     </el-button>
                 </el-button-group>
+                <el-button-group class="copy-button" v-if="moveOpen">
+                    <el-tooltip class="box-item" effect="dark" :content="$t('file.paste')" placement="bottom">
+                        <el-button plain @click="openPaste">{{ $t('file.paste') }}</el-button>
+                    </el-tooltip>
+                    <el-tooltip class="box-item" effect="dark" :content="$t('file.cancel')" placement="bottom">
+                        <el-button plain class="close" @click="closeMove">
+                            <el-icon class="close-icon"><Close /></el-icon>
+                        </el-button>
+                    </el-tooltip>
+                </el-button-group>
                 <div class="search search-button">
                     <el-input
                         v-model="req.search"
@@ -95,6 +105,7 @@
                 <ComplexTable
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
+                    ref="tableRef"
                     :data="data"
                     @search="search"
                 >
@@ -153,7 +164,7 @@
             <FileRename ref="renameRef" @close="search" />
             <Upload ref="uploadRef" @close="search" />
             <Wget ref="wgetRef" @close="closeWget" />
-            <Move ref="moveRef" @close="search" />
+            <Move ref="moveRef" @close="closeMovePage" />
             <Download ref="downloadRef" @close="search" />
             <Process :open="processPage.open" @close="closeProcess" />
             <!-- <Detail ref="detailRef" /> -->
@@ -197,6 +208,7 @@ interface FilePaths {
 
 const router = useRouter();
 const data = ref();
+const tableRef = ref();
 let selects = ref<any>([]);
 
 // origin data
@@ -222,7 +234,7 @@ const codeReq = reactive({ path: '', expand: false, page: 1, pageSize: 100 });
 const fileUpload = reactive({ path: '' });
 const fileRename = reactive({ path: '', oldName: '' });
 const fileWget = reactive({ path: '' });
-const fileMove = reactive({ oldPaths: [''], type: '' });
+const fileMove = reactive({ oldPaths: [''], type: '', path: '' });
 const fileDownload = reactive({ paths: [''], name: '' });
 const processPage = reactive({ open: false });
 
@@ -239,6 +251,8 @@ const moveRef = ref();
 const downloadRef = ref();
 const pathRef = ref();
 const breadCrumbRef = ref();
+
+const moveOpen = ref(false);
 
 // editablePath
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchable(paths);
@@ -500,6 +514,13 @@ const closeWget = (submit: Boolean) => {
     }
 };
 
+const closeMovePage = (submit: Boolean) => {
+    if (submit) {
+        search();
+        closeMove();
+    }
+};
+
 const openProcess = () => {
     processPage.open = true;
 };
@@ -521,6 +542,18 @@ const openMove = (type: string) => {
         oldpaths.push(s['path']);
     }
     fileMove.oldPaths = oldpaths;
+    moveOpen.value = true;
+};
+
+const closeMove = () => {
+    selects.value = [];
+    tableRef.value.clearSelects();
+    fileMove.oldPaths = [];
+    moveOpen.value = false;
+};
+
+const openPaste = () => {
+    fileMove.path = req.path;
     moveRef.value.acceptParams(fileMove);
 };
 
@@ -634,5 +667,15 @@ onMounted(() => {
     float: right;
     display: inline;
     width: 20%;
+}
+
+.copy-button {
+    margin-left: 10px;
+    .close {
+        width: 10px;
+        .close-icon {
+            color: red;
+        }
+    }
 }
 </style>

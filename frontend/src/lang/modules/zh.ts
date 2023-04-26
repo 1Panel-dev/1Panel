@@ -799,6 +799,8 @@ const message = {
         language: '语言',
         eol: '行尾符',
         copyDir: '复制路径',
+        paste: '粘贴',
+        cancel: '取消',
     },
     setting: {
         all: '全部',

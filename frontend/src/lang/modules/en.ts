@@ -792,6 +792,8 @@ const message = {
         language: 'Language',
         eol: 'End Of Line',
         copyDir: 'Copy Dir',
+        paste: 'Paste',
+        cancel: 'Cancel',
     },
     setting: {
         all: 'All',
