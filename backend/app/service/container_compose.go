@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path"
@@ -154,9 +155,10 @@ func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) 
 	go func() {
 		defer file.Close()
 		cmd := exec.Command("docker-compose", "-f", req.Path, "up", "-d")
-		stdout, err := cmd.CombinedOutput()
-		_, _ = file.Write(stdout)
-		if err != nil {
+		multiWriter := io.MultiWriter(os.Stdout, file)
+		cmd.Stdout = multiWriter
+		cmd.Stderr = multiWriter
+		if err := cmd.Run(); err != nil {
 			global.LOG.Errorf("docker-compose up %s failed, err: %v", req.Name, err)
 			_, _ = compose.Down(req.Path)
 			_, _ = file.WriteString("docker-compose up failed!")

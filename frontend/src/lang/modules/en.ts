@@ -539,6 +539,7 @@ const message = {
         registrieHelper: 'One in a row, for example:\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: 'Compose',
+        fromChangeHelper: 'Switching the source will clear the current edited content. Do you want to continue?',
         composeHelper:
             'The current content has passed the format verification. Please click Submit to complete the creation',
         composePathHelper: 'Config file save path: {0}',

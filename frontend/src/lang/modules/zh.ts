@@ -556,6 +556,7 @@ const message = {
         registrieHelper: '一行一个，例：\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: '编排',
+        fromChangeHelper: '切换来源将清空当前已编辑内容，是否继续？',
         composeHelper: '当前内容已通过格式验证，请点击确认完成创建',
         composePathHelper: '配置文件保存路径: {0}',
         apps: '应用商店',
