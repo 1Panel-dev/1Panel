@@ -917,6 +917,7 @@ const message = {
         upgradeNotes: 'Release note',
         upgradeNow: 'Upgrade now',
         source: 'Download source',
+        hasNewVersion: 'New version Available',
 
         monitor: 'Monitor',
         enableMonitor: 'Enable',
@@ -940,6 +941,9 @@ const message = {
         doc: 'Official document',
         star: 'Star',
         description: '1Panel, Modern, open source Linux server operation and maintenance management panel.',
+        forum: 'Forum',
+        doc2: 'Document',
+        currentVersion: 'Version',
     },
     app: {
         app: 'Application',

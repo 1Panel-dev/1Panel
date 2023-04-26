@@ -903,6 +903,7 @@ const message = {
         upgradeNotes: '更新内容',
         upgradeNow: '立即更新',
         source: '下载源',
+        hasNewVersion: '有新版本',
 
         safe: '安全',
         safeEntrance: '安全入口',
@@ -946,6 +947,9 @@ const message = {
         doc: '官方文档',
         star: '点亮 Star',
         description: '1Panel，现代化、开源的 Linux 服务器运维管理面板。',
+        forum: '论坛',
+        doc2: '文档',
+        currentVersion: '当前运行版本：',
     },
     app: {
         app: '应用',
