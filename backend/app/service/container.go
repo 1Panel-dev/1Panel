@@ -168,8 +168,19 @@ func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
 func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
 	if len(req.ExposedPorts) != 0 {
 		for _, port := range req.ExposedPorts {
-			if common.ScanPort(port.HostPort) {
-				return buserr.WithDetail(constant.ErrPortInUsed, port.HostPort, nil)
+			if strings.Contains(port.HostPort, "-") {
+				portStart, _ := strconv.Atoi(strings.Split(port.HostPort, "-")[0])
+				portEnd, _ := strconv.Atoi(strings.Split(port.HostPort, "-")[1])
+				for i := portStart; i <= portEnd; i++ {
+					if common.ScanPort(i) {
+						return buserr.WithDetail(constant.ErrPortInUsed, i, nil)
+					}
+				}
+			} else {
+				portItem, _ := strconv.Atoi(port.HostPort)
+				if common.ScanPort(portItem) {
+					return buserr.WithDetail(constant.ErrPortInUsed, portItem, nil)
+				}
 			}
 		}
 	}
@@ -202,8 +213,8 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
 	if len(req.ExposedPorts) != 0 {
 		hostConf.PortBindings = make(nat.PortMap)
 		for _, port := range req.ExposedPorts {
-			bindItem := nat.PortBinding{HostPort: strconv.Itoa(port.HostPort)}
-			hostConf.PortBindings[nat.Port(fmt.Sprintf("%d/tcp", port.ContainerPort))] = []nat.PortBinding{bindItem}
+			bindItem := nat.PortBinding{HostPort: port.HostPort, HostIP: port.HostIP}
+			hostConf.PortBindings[nat.Port(fmt.Sprintf("%s/%s", port.ContainerPort, port.Protocol))] = []nat.PortBinding{bindItem}
 		}
 	}
 	if len(req.Volumes) != 0 {

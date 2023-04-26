@@ -472,10 +472,11 @@ const message = {
         emptyUser: '为空时，将使用容器默认的用户登录',
 
         port: '端口',
+        server: '服务器',
+        serverExample: '例如： 80, 80-88, ip:80 或者 ip:80-88',
+        contianerExample: '例如： 80 或者 80-88',
         exposePort: '暴露端口',
         exposeAll: '暴露所有',
-        containerPort: '容器端口',
-        serverPort: '服务器端口',
         cmd: '启动命令',
         cmdHelper: '例：echo "hello"',
         autoRemove: '容器退出后自动删除容器',
