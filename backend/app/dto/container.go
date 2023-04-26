@@ -63,8 +63,10 @@ type VolumeHelper struct {
 	Mode         string `json:"mode"`
 }
 type PortHelper struct {
-	ContainerPort int `json:"containerPort"`
-	HostPort      int `json:"hostPort"`
+	HostIP        string `json:"hostIP"`
+	HostPort      string `json:"hostPort"`
+	ContainerPort string `json:"containerPort"`
+	Protocol      string `json:"protocol"`
 }
 
 type ContainerLog struct {

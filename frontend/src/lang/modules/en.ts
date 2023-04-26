@@ -455,10 +455,11 @@ const message = {
         containerTerminal: 'Terminal',
 
         port: 'Port',
+        server: 'Host',
+        serverExample: 'e.g. 80, 80-88, ip:80 or ip:80-88',
+        contianerExample: 'e.g. 80 or 80-88',
         exposePort: 'Expose port',
         exposeAll: 'Expose all',
-        containerPort: 'Container port',
-        serverPort: 'Host port',
         cmd: 'Command',
         cmdHelper: 'Example: echo "hello"',
         autoRemove: 'Auto remove',

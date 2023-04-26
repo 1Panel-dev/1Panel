@@ -27,8 +27,11 @@ export namespace Container {
         restartPolicy: string;
     }
     export interface Port {
-        containerPort: number;
-        hostPort: number;
+        host: string;
+        hostIP: string;
+        containerPort: string;
+        hostPort: string;
+        protocol: string;
     }
     export interface Volume {
         sourceDir: string;
