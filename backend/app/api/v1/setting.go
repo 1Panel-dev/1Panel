@@ -127,7 +127,7 @@ func (b *BaseApi) UpdatePassword(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/ssl/update [post]
-// @x-panel-log {"bodyKeys":[ssl],"paramKeys":[],"BeforeFuntions":[],"formatZH":"修改系统 ssl => [ssl]","formatEN":"update system ssl => [ssl]"}
+// @x-panel-log {"bodyKeys":["ssl"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"修改系统 ssl => [ssl]","formatEN":"update system ssl => [ssl]"}
 func (b *BaseApi) UpdateSSL(c *gin.Context) {
 	var req dto.SSLUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {

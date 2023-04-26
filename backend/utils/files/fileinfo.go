@@ -9,6 +9,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/spf13/afero"
@@ -73,6 +74,8 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 		Extension: filepath.Ext(info.Name()),
 		IsHidden:  IsHidden(op.Path),
 		Mode:      fmt.Sprintf("%04o", info.Mode().Perm()),
+		User:      GetUsername(info.Sys().(*syscall.Stat_t).Uid),
+		Group:     GetGroup(info.Sys().(*syscall.Stat_t).Gid),
 		MimeType:  GetMimeType(op.Path),
 	}
 	if file.IsSymlink {
@@ -202,6 +205,8 @@ func (f *FileInfo) listChildren(dir, showHidden, containSub bool, search string,
 			Path:      fPath,
 			Mode:      fmt.Sprintf("%04o", df.Mode().Perm()),
 			MimeType:  GetMimeType(fPath),
+			User:      GetUsername(df.Sys().(*syscall.Stat_t).Uid),
+			Group:     GetGroup(df.Sys().(*syscall.Stat_t).Gid),
 		}
 
 		if isSymlink {

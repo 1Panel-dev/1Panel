@@ -4529,6 +4529,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/files/owner": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改文件用户/组",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "File"
+                ],
+                "summary": "Change file owner",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.FileRoleUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "path",
+                        "user",
+                        "group"
+                    ],
+                    "formatEN": "Change owner [paths] =\u003e [user]/[group]",
+                    "formatZH": "修改用户/组 [paths] =\u003e [user]/[group]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/files/rename": {
             "post": {
                 "security": [
@@ -7428,6 +7472,70 @@ const docTemplate = `{
                             "$ref": "#/definitions/dto.PageResult"
                         }
                     }
+                }
+            }
+        },
+        "/settings/ssl/info": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取证书信息",
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Load system cert info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SettingInfo"
+                        }
+                    }
+                }
+            }
+        },
+        "/settings/ssl/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改系统 ssl 登录",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Update system ssl",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SSLUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "ssl"
+                    ],
+                    "formatEN": "update system ssl =\u003e [ssl]",
+                    "formatZH": "修改系统 ssl =\u003e [ssl]",
+                    "paramKeys": []
                 }
             }
         },
@@ -11440,10 +11548,16 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "containerPort": {
-                    "type": "integer"
+                    "type": "string"
+                },
+                "hostIP": {
+                    "type": "string"
                 },
                 "hostPort": {
-                    "type": "integer"
+                    "type": "string"
+                },
+                "protocol": {
+                    "type": "string"
                 }
             }
         },
@@ -11669,6 +11783,36 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.SSLUpdate": {
+            "type": "object",
+            "required": [
+                "ssl"
+            ],
+            "properties": {
+                "cert": {
+                    "type": "string"
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "ssl": {
+                    "type": "string",
+                    "enum": [
+                        "enable",
+                        "disable"
+                    ]
+                },
+                "sslID": {
+                    "type": "integer"
+                },
+                "sslType": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.SearchForTree": {
             "type": "object",
             "properties": {
@@ -11849,6 +11993,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "sessionTimeout": {
+                    "type": "string"
+                },
+                "ssl": {
+                    "type": "string"
+                },
+                "sslType": {
                     "type": "string"
                 },
                 "systemVersion": {
@@ -12792,6 +12942,29 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "oldName": {
+                    "type": "string"
+                }
+            }
+        },
+        "request.FileRoleUpdate": {
+            "type": "object",
+            "required": [
+                "group",
+                "path",
+                "sub",
+                "user"
+            ],
+            "properties": {
+                "group": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "sub": {
+                    "type": "boolean"
+                },
+                "user": {
                     "type": "string"
                 }
             }

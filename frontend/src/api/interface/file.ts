@@ -90,6 +90,13 @@ export namespace File {
         newName: string;
     }
 
+    export interface FileOwner {
+        path: string;
+        user: string;
+        group: string;
+        sub: boolean;
+    }
+
     export interface FileWget {
         path: string;
         name: string;

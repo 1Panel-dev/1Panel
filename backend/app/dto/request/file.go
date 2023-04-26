@@ -88,3 +88,10 @@ type DirSizeReq struct {
 type FileProcessReq struct {
 	Key string `json:"key"`
 }
+
+type FileRoleUpdate struct {
+	Path  string `json:"path" validate:"required"`
+	User  string `json:"user" validate:"required"`
+	Group string `json:"group" validate:"required"`
+	Sub   bool   `json:"sub" validate:"required"`
+}

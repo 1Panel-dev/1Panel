@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"io"
 	"io/fs"
 	"net/http"
@@ -106,7 +107,7 @@ func (f FileOp) SaveFile(dst string, content string, mode fs.FileMode) error {
 	}
 	defer file.Close()
 	write := bufio.NewWriter(file)
-	_, _ = write.WriteString(string(content))
+	_, _ = write.WriteString(content)
 	write.Flush()
 	return nil
 }
@@ -117,6 +118,34 @@ func (f FileOp) Chmod(dst string, mode fs.FileMode) error {
 
 func (f FileOp) Chown(dst string, uid int, gid int) error {
 	return f.Fs.Chown(dst, uid, gid)
+}
+
+func (f FileOp) ChownR(dst string, uid string, gid string, sub bool) error {
+	cmdStr := fmt.Sprintf("sudo chown %s:%s %s", uid, gid, dst)
+	if sub {
+		cmdStr = fmt.Sprintf("sudo chown -R %s:%s %s", uid, gid, dst)
+	}
+	if msg, err := cmd.ExecWithTimeOut(cmdStr, 2*time.Second); err != nil {
+		if msg != "" {
+			return errors.New(msg)
+		}
+		return err
+	}
+	return nil
+}
+
+func (f FileOp) ChmodR(dst string, mode fs.FileMode) error {
+	cmdStr := fmt.Sprintf("chmod -R %v %s", mode, dst)
+	if cmd.HasNoPasswordSudo() {
+		cmdStr = fmt.Sprintf("sudo %s", cmdStr)
+	}
+	if msg, err := cmd.ExecWithTimeOut(cmdStr, 2*time.Second); err != nil {
+		if msg != "" {
+			return errors.New(msg)
+		}
+		return err
+	}
+	return nil
 }
 
 func (f FileOp) Rename(oldName string, newName string) error {

@@ -800,6 +800,10 @@ const message = {
         copyDir: 'Copy Dir',
         paste: 'Paste',
         cancel: 'Cancel',
+        changeOwner: 'Modify user and user group',
+        containSub: 'Modify sub-file attributes at the same time',
+        ownerHelper:
+            'The default user of the PHP operating environment: the user group is 1000:1000, it is normal that the users inside and outside the container show inconsistencies',
     },
     setting: {
         all: 'All',
