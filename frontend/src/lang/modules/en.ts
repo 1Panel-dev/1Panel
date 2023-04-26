@@ -3,7 +3,7 @@ const message = {
     commons: {
         true: 'true',
         false: 'false',
-        example: 'Such as：',
+        example: 'e.g.:',
         button: {
             create: 'Create ',
             add: 'Add ',
@@ -521,7 +521,12 @@ const message = {
 
         volume: 'Volume',
         volumeName: 'Name',
+        nfsEnable: 'Enable NFS storage',
+        nfsAddress: 'Address',
+        nfsAddressHelper: 'Support input of IP address or domain',
         mountpoint: 'Mountpoint',
+        mountpointNFSHerlper: 'e.g. /nfs, /nfs-share',
+        options: 'Options',
         createVolume: 'Create volume',
 
         repo: 'Repo',
@@ -871,7 +876,7 @@ const message = {
             'The password must contain at least eight characters and contain at least three uppercase letters, lowercase letters, digits, and special characters',
         mfa: 'MFA',
         mfaHelper: 'After this function is enabled, the mobile application verification code will be verified',
-        mfaHelper1: 'Download a MFA verification mobile app such as:',
+        mfaHelper1: 'Download a MFA verification mobile app e.g.:',
         mfaHelper2: 'Scan the following QR code using the mobile app to obtain the 6-digit verification code',
         mfaHelper3: 'Enter six digits from the app',
 
@@ -1195,7 +1200,7 @@ const message = {
             'If the website cannot be accessed normally after setting pseudo-static, please try to set it back to default',
         runDir: 'Run Directory',
         runDirHelper:
-            'Some programs need to specify a secondary directory as the running directory, such as ThinkPHP5, Laravel',
+            'Some programs need to specify a secondary directory as the running directory, e.g. ThinkPHP5, Laravel',
         runUserHelper:
             'For websites deployed through the PHP runtime environment, all files, folder owners, and user groups under the index and subdirectories need to be set to 1000, command: chown -R 1000:1000 index',
         userGroup: 'User/Group',
@@ -1332,11 +1337,11 @@ const message = {
             'Change the port policy to [accept]. After the port policy is set, normal port access will be restored. Do you want to continue?',
         stop: 'Stop',
         portFormatError: 'Please enter the correct port information!',
-        portHelper1: 'Multiple ports, such as 8080 and 8081',
-        portHelper2: 'Range port, such as 8080-8089',
+        portHelper1: 'Multiple ports, e.g. 8080 and 8081',
+        portHelper2: 'Range port, e.g. 8080-8089',
         changeStrategyHelper:
             'Change [{1}] {0} strategy to [{2}]. After setting, {0} will access {2} externally. Do you want to continue?',
-        portHelper: 'Multiple ports can be entered, such as 80,81, or range ports, such as 80-88',
+        portHelper: 'Multiple ports can be entered, e.g. 80,81, or range ports, e.g. 80-88',
         strategy: 'Strategy',
         accept: 'Accept',
         drop: 'Drop',
@@ -1346,8 +1351,8 @@ const message = {
         allow: 'Allow',
         deny: 'Deny',
         addressFormatError: 'Please enter a valid ip address!',
-        addressHelper1: 'Multiple IP please separated with ",", such as 172.16.10.11, 172.16.10.99',
-        addressHelper2: 'IP segment, such as 172.16.10.0/24',
+        addressHelper1: 'Multiple IP please separated with ",", e.g. 172.16.10.11, 172.16.10.99',
+        addressHelper2: 'IP segment, e.g. 172.16.10.0/24',
         allIP: 'All IP',
         portRule: 'Port rule',
         ipRule: 'IP rule',

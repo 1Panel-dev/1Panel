@@ -324,8 +324,8 @@ func (u *ContainerService) ContainerStats(id string) (*dto.ContainterStats, erro
 func stringsToMap(list []string) map[string]string {
 	var lableMap = make(map[string]string)
 	for _, label := range list {
-		sps := strings.Split(label, "=")
-		if len(sps) > 1 {
+		if strings.Contains(label, "=") {
+			sps := strings.SplitN(label, "=", 2)
 			lableMap[sps[0]] = sps[1]
 		}
 	}
