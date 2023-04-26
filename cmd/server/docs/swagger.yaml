@@ -1201,9 +1201,13 @@ definitions:
   dto.PortHelper:
     properties:
       containerPort:
-        type: integer
+        type: string
+      hostIP:
+        type: string
       hostPort:
-        type: integer
+        type: string
+      protocol:
+        type: string
     type: object
   dto.PortRuleOperate:
     properties:
@@ -1354,6 +1358,26 @@ definitions:
       used_memory_rss:
         type: string
     type: object
+  dto.SSLUpdate:
+    properties:
+      cert:
+        type: string
+      domain:
+        type: string
+      key:
+        type: string
+      ssl:
+        enum:
+        - enable
+        - disable
+        type: string
+      sslID:
+        type: integer
+      sslType:
+        type: string
+    required:
+    - ssl
+    type: object
   dto.SearchForTree:
     properties:
       info:
@@ -1474,6 +1498,10 @@ definitions:
       serverPort:
         type: string
       sessionTimeout:
+        type: string
+      ssl:
+        type: string
+      sslType:
         type: string
       systemVersion:
         type: string
@@ -2100,6 +2128,22 @@ definitions:
     required:
     - newName
     - oldName
+    type: object
+  request.FileRoleUpdate:
+    properties:
+      group:
+        type: string
+      path:
+        type: string
+      sub:
+        type: boolean
+      user:
+        type: string
+    required:
+    - group
+    - path
+    - sub
+    - user
     type: object
   request.FileWget:
     properties:
@@ -5899,6 +5943,35 @@ paths:
         formatEN: Move [oldPaths] => [newPath]
         formatZH: 移动文件 [oldPaths] => [newPath]
         paramKeys: []
+  /files/owner:
+    post:
+      consumes:
+      - application/json
+      description: 修改文件用户/组
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileRoleUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Change file owner
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - path
+        - user
+        - group
+        formatEN: Change owner [paths] => [user]/[group]
+        formatZH: 修改用户/组 [paths] => [user]/[group]
+        paramKeys: []
   /files/rename:
     post:
       consumes:
@@ -7742,6 +7815,46 @@ paths:
       summary: Page system snapshot
       tags:
       - System Setting
+  /settings/ssl/info:
+    get:
+      description: 获取证书信息
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SettingInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Load system cert info
+      tags:
+      - System Setting
+  /settings/ssl/update:
+    post:
+      consumes:
+      - application/json
+      description: 修改系统 ssl 登录
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SSLUpdate'
+      responses:
+        "200":
+          description: OK
+      security:
+      - ApiKeyAuth: []
+      summary: Update system ssl
+      tags:
+      - System Setting
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - ssl
+        formatEN: update system ssl => [ssl]
+        formatZH: 修改系统 ssl => [ssl]
+        paramKeys: []
   /settings/time/sync:
     post:
       description: 系统时间同步

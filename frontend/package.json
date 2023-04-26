@@ -29,7 +29,7 @@
         "axios": "^0.27.2",
         "echarts": "^5.3.0",
         "echarts-liquidfill": "^3.1.0",
-        "element-plus": "^2.2.32",
+        "element-plus": "^2.3.4",
         "fit2cloud-ui-plus": "^1.0.7",
         "js-base64": "^3.7.2",
         "js-md5": "^0.7.3",

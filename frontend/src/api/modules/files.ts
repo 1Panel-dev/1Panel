@@ -67,6 +67,10 @@ export const RenameRile = (params: File.FileRename) => {
     return http.post<File.File>('files/rename', params);
 };
 
+export const ChangeOwner = (params: File.FileOwner) => {
+    return http.post<File.File>('files/owner', params);
+};
+
 export const WgetFile = (params: File.FileWget) => {
     return http.post<File.FileWgetRes>('files/wget', params);
 };

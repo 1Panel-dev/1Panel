@@ -186,7 +186,29 @@ func (b *BaseApi) ChangeFileMode(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags File
+// @Summary Change file owner
+// @Description 修改文件用户/组
+// @Accept json
+// @Param request body request.FileRoleUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /files/owner [post]
+// @x-panel-log {"bodyKeys":["path","user","group"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"修改用户/组 [paths] => [user]/[group]","formatEN":"Change owner [paths] => [user]/[group]"}
+func (b *BaseApi) ChangeFileOwner(c *gin.Context) {
+	var req request.FileRoleUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := fileService.ChangeOwner(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
 }
 
 // @Tags File

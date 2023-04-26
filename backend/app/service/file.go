@@ -39,6 +39,7 @@ type IFileService interface {
 	ChangeName(req request.FileRename) error
 	Wget(w request.FileWget) (string, error)
 	MvFile(m request.FileMove) error
+	ChangeOwner(req request.FileRoleUpdate) error
 }
 
 func NewIFileService() IFileService {
@@ -160,6 +161,11 @@ func (f *FileService) BatchDelete(op request.FileBatchDelete) error {
 func (f *FileService) ChangeMode(op request.FileCreate) error {
 	fo := files.NewFileOp()
 	return fo.Chmod(op.Path, fs.FileMode(op.Mode))
+}
+
+func (f *FileService) ChangeOwner(req request.FileRoleUpdate) error {
+	fo := files.NewFileOp()
+	return fo.ChownR(req.Path, req.User, req.Group, req.Sub)
 }
 
 func (f *FileService) Compress(c request.FileCompress) error {

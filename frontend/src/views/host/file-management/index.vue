@@ -123,8 +123,16 @@
                             <el-link :underline="false" @click="openMode(row)" type="primary">{{ row.mode }}</el-link>
                         </template>
                     </el-table-column>
-                    <!-- <el-table-column :label="$t('file.user')" prop="user" show-overflow-tooltip></el-table-column>
-                    <el-table-column :label="$t('file.group')" prop="group"></el-table-column> -->
+                    <el-table-column :label="$t('file.user')" prop="user" show-overflow-tooltip>
+                        <template #default="{ row }">
+                            <el-link :underline="false" @click="openChown(row)" type="primary">{{ row.user }}</el-link>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('file.group')" prop="group">
+                        <template #default="{ row }">
+                            <el-link :underline="false" @click="openChown(row)" type="primary">{{ row.group }}</el-link>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('file.size')" prop="size" max-width="50">
                         <template #default="{ row }">
                             <span v-if="row.isDir">
@@ -167,6 +175,7 @@
             <Move ref="moveRef" @close="closeMovePage" />
             <Download ref="downloadRef" @close="search" />
             <Process :open="processPage.open" @close="closeProcess" />
+            <Owner ref="chownRef" @close="search"></Owner>
             <!-- <Detail ref="detailRef" /> -->
         </LayoutContent>
     </div>
@@ -191,6 +200,7 @@ import CodeEditor from './code-editor/index.vue';
 import Wget from './wget/index.vue';
 import Move from './move/index.vue';
 import Download from './download/index.vue';
+import Owner from './chown/index.vue';
 import { Mimetypes, Languages } from '@/global/mimetype';
 import Process from './process/index.vue';
 // import Detail from './detail/index.vue';
@@ -251,7 +261,7 @@ const moveRef = ref();
 const downloadRef = ref();
 const pathRef = ref();
 const breadCrumbRef = ref();
-
+const chownRef = ref();
 const moveOpen = ref(false);
 
 // editablePath
@@ -441,6 +451,10 @@ const getIconName = (extension: string) => {
 
 const openMode = (item: File.File) => {
     roleRef.value.acceptParams(item);
+};
+
+const openChown = (item: File.File) => {
+    chownRef.value.acceptParams(item);
 };
 
 const openCompress = (items: File.File[]) => {
