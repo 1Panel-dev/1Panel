@@ -2,7 +2,9 @@ package service
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
 	"path"
 	"strconv"
 	"strings"
@@ -84,6 +86,40 @@ func createIndexFile(website *model.Website, runtime *model.Runtime) error {
 	return nil
 }
 
+func createProxyFile(website *model.Website, runtime *model.Runtime) error {
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	proxyFolder := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.Alias, "proxy")
+	filePath := path.Join(proxyFolder, "root.conf")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(proxyFolder) {
+		if err := fileOp.CreateDir(proxyFolder, 0755); err != nil {
+			return err
+		}
+	}
+	if !fileOp.Stat(filePath) {
+		if err := fileOp.CreateFile(filePath); err != nil {
+			return err
+		}
+	}
+	config := parser.NewStringParser(string(nginx_conf.Proxy)).Parse()
+	config.FilePath = filePath
+	directives := config.Directives
+	location, ok := directives[0].(*components.Location)
+	if !ok {
+		return errors.New("error")
+	}
+	location.ChangePath("^~", "/")
+	location.UpdateDirective("proxy_pass", []string{website.Proxy})
+	location.UpdateDirective("proxy_set_header", []string{"Host", "$host"})
+	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+	}
+	return nil
+}
+
 func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website, runtime *model.Runtime) error {
 	nginxFolder := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name)
 	siteFolder := path.Join(nginxFolder, "www", "sites", website.Alias)
@@ -120,6 +156,11 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website, 
 		}
 		if website.Type == constant.Static || website.Type == constant.Runtime {
 			if err := createIndexFile(website, runtime); err != nil {
+				return err
+			}
+		}
+		if website.Type == constant.Proxy {
+			if err := createProxyFile(website, runtime); err != nil {
 				return err
 			}
 		}
@@ -167,9 +208,9 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		server.UpdateRootProxy([]string{proxy})
 	case constant.Static:
 		server.UpdateRoot(rootIndex)
-		//server.UpdateRootLocation()
 	case constant.Proxy:
-		server.UpdateRootProxy([]string{website.Proxy})
+		nginxInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
+		server.UpdateDirective("include", []string{nginxInclude})
 	case constant.Runtime:
 		if runtime.Resource == constant.ResourceLocal {
 			switch runtime.Type {
@@ -192,7 +233,6 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
-
 	if err := opNginx(nginxInstall.ContainerName, constant.NginxCheck); err != nil {
 		_ = deleteWebsiteFolder(nginxInstall, website)
 		return err
