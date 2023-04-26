@@ -479,11 +479,11 @@ const loadData = async () => {
             yDatas: [
                 {
                     name: i18n.global.t('monitor.up'),
-                    data: netBytesRecvs.value,
+                    data: netBytesSents.value,
                 },
                 {
                     name: i18n.global.t('monitor.down'),
-                    data: netBytesSents.value,
+                    data: netBytesRecvs.value,
                 },
             ],
             formatStr: 'KB/s',
