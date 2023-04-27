@@ -34,7 +34,9 @@
                             <el-col :span="12">
                                 <el-form-item v-if="form.from === 'edit' || form.from === 'template'" prop="name">
                                     <el-input @input="changePath" v-model.trim="form.name">
-                                        <template #prepend>{{ $t('file.dir') }}</template>
+                                        <template #prefix>
+                                            <span style="margin-right: 8px">{{ $t('file.dir') }}</span>
+                                        </template>
                                     </el-input>
                                     <span class="input-help">
                                         {{ $t('container.composePathHelper', [composeFile]) }}
@@ -44,6 +46,7 @@
                             <el-col :span="12">
                                 <el-form-item v-if="form.from === 'template'" prop="template">
                                     <el-select v-model="form.template" @change="changeTemplate">
+                                        <template #prefix>{{ $t('container.template') }}</template>
                                         <el-option
                                             v-for="item in templateOptions"
                                             :key="item.id"
@@ -70,11 +73,9 @@
                                     :lineWrapping="true"
                                     :matchBrackets="true"
                                     theme="cobalt"
-                                    @change="hasChecked = false"
                                     :styleActiveLine="true"
                                     :extensions="extensions"
                                     v-model="form.file"
-                                    :disabled="onCreating"
                                 />
                             </div>
                             <codemirror
@@ -103,10 +104,7 @@
                 <el-button @click="drawerVisiable = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button :disabled="buttonDisabled" @click="onTest(formRef)">
-                    {{ $t('commons.button.verify') }}
-                </el-button>
-                <el-button type="primary" :disabled="buttonDisabled || !hasChecked" @click="onSubmit(formRef)">
+                <el-button type="primary" :disabled="onCreating" @click="onSubmit(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -128,7 +126,6 @@ import { listComposeTemplate, testCompose, upCompose } from '@/api/modules/conta
 import { loadBaseDir } from '@/api/modules/setting';
 import { LoadFile } from '@/api/modules/files';
 import { formatImageStdout } from '@/utils/docker';
-import { MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 
@@ -145,12 +142,9 @@ const logInfo = ref();
 
 const drawerVisiable = ref(false);
 const templateOptions = ref();
-const buttonDisabled = ref(false);
 
 const baseDir = ref();
 const composeFile = ref();
-
-const hasChecked = ref();
 
 let timer: NodeJS.Timer | null = null;
 
@@ -178,7 +172,6 @@ const acceptParams = (): void => {
     form.from = 'edit';
     form.path = '';
     form.file = '';
-    hasChecked.value = false;
     logInfo.value = '';
     loadTemplates();
     loadPath();
@@ -186,7 +179,6 @@ const acceptParams = (): void => {
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const changeTemplate = () => {
-    hasChecked.value = false;
     for (const item of templateOptions.value) {
         if (form.template === item.id) {
             form.file = item.content;
@@ -203,14 +195,11 @@ const changeFrom = () => {
             type: 'info',
         })
             .then(() => {
-                hasChecked.value = false;
-                if (form.from === 'template') {
-                    if (!form.template && templateOptions.value && templateOptions.value.length !== 0) {
-                        form.template = templateOptions.value[0].id;
-                    }
-                    changeTemplate();
+                if (oldFrom.value === 'template') {
+                    form.template = null;
+                    form.file = '';
                 }
-                if (form.from === 'edit') {
+                if (oldFrom.value === 'edit') {
                     form.file = '';
                 }
                 oldFrom.value = form.from;
@@ -243,36 +232,26 @@ const changePath = async () => {
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
-const onTest = async (formEl: FormInstance | undefined) => {
+const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
         logInfo.value = '';
         await testCompose(form)
-            .then((res) => {
+            .then(async (res) => {
                 loading.value = false;
                 if (res.data) {
-                    MsgSuccess(i18n.global.t('container.composeHelper'));
-                    hasChecked.value = true;
+                    onCreating.value = true;
+                    mode.value = 'log';
+                    const res = await upCompose(form);
+                    logInfo.value = '';
+                    loadLogs(res.data);
                 }
             })
             .catch(() => {
                 loading.value = false;
             });
-    });
-};
-
-const onSubmit = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        onCreating.value = true;
-        mode.value = 'log';
-        const res = await upCompose(form);
-        logInfo.value = '';
-        buttonDisabled.value = true;
-        loadLogs(res.data);
     });
 };
 
@@ -294,14 +273,12 @@ const loadLogs = async (path: string) => {
             onCreating.value = false;
             clearInterval(Number(timer));
             timer = null;
-            buttonDisabled.value = false;
         }
     }, 1000 * 3);
 };
 
 const loadDir = async (path: string) => {
     form.path = path;
-    hasChecked.value = false;
 };
 
 onBeforeUnmount(() => {
@@ -313,3 +290,5 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style scoped lang="scss"></style>
