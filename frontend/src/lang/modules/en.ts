@@ -546,6 +546,11 @@ const message = {
         compose: 'Compose',
         fromChangeHelper: 'Switching the source will clear the current edited content. Do you want to continue?',
         composePathHelper: 'Config file save path: {0}',
+        composeHelper:
+            'The composition created through 1Panel editor or template will be saved in the {0}/docker/compose directory.',
+        deleteFile: 'Delete file',
+        deleteComposeHelper: 'Delete the corresponding composition file.',
+        deleteCompose: '" Delete this composition.',
         apps: 'Apps',
         local: 'Local',
         createCompose: 'Create compose',

@@ -182,7 +182,9 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 	global.LOG.Infof("docker-compose %s %s successful", req.Operation, req.Name)
 	if req.Operation == "down" {
 		_ = composeRepo.DeleteRecord(commonRepo.WithByName(req.Name))
-		_ = os.RemoveAll(strings.ReplaceAll(req.Path, "/docker-compose.yml", ""))
+		if req.WithFile {
+			_ = os.RemoveAll(path.Dir(req.Path))
+		}
 	}
 
 	return nil
