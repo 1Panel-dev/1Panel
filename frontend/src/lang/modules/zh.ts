@@ -563,7 +563,7 @@ const message = {
         compose: '编排',
         fromChangeHelper: '切换来源将清空当前已编辑内容，是否继续？',
         composePathHelper: '配置文件保存路径: {0}',
-        composeHelper: '通过 1panel 编辑或者模版创建的编排，将保存在 {0}/docker/compose 路径下',
+        composeHelper: '通过 1Panel 编辑或者模版创建的编排，将保存在 {0}/docker/compose 路径下',
         deleteFile: '删除文件',
         deleteComposeHelper: '删除对应的编排文件',
         deleteCompose: '" 删除此编排',
