@@ -89,15 +89,17 @@
                         v-model="req.search"
                         clearable
                         @clear="search()"
-                        suffix-icon="Search"
-                        @blur="search()"
+                        @keydown.enter="search()"
                         :placeholder="$t('file.search')"
                     >
-                        <!-- <template #prepend>
-                            <el-checkbox :disabled="req.path == '/'" v-model="req.containSub">
+                        <template #prepend>
+                            <el-checkbox v-model="req.containSub">
                                 {{ $t('file.sub') }}
                             </el-checkbox>
-                        </template> -->
+                        </template>
+                        <template #append>
+                            <el-button icon="Search" @click="search" />
+                        </template>
                     </el-input>
                 </div>
             </template>

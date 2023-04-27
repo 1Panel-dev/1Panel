@@ -14,7 +14,6 @@ require (
 	github.com/docker/go-connections v0.4.0
 	github.com/fsnotify/fsnotify v1.6.0
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
-	github.com/gabriel-vasile/mimetype v1.4.1
 	github.com/gin-contrib/gzip v0.0.6
 	github.com/gin-contrib/i18n v0.0.1
 	github.com/gin-gonic/gin v1.8.1

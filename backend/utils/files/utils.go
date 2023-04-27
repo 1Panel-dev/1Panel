@@ -1,8 +1,8 @@
 package files
 
 import (
-	"github.com/gabriel-vasile/mimetype"
 	"github.com/spf13/afero"
+	"net/http"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -15,11 +15,19 @@ func IsSymlink(mode os.FileMode) bool {
 }
 
 func GetMimeType(path string) string {
-	mime, err := mimetype.DetectFile(path)
+	file, err := os.Open(path)
 	if err != nil {
 		return ""
 	}
-	return mime.String()
+	defer file.Close()
+
+	buffer := make([]byte, 512)
+	_, err = file.Read(buffer)
+	if err != nil {
+		return ""
+	}
+	mimeType := http.DetectContentType(buffer)
+	return mimeType
 }
 
 func GetSymlink(path string) string {
