@@ -172,6 +172,7 @@ const acceptParams = (): void => {
     form.from = 'edit';
     form.path = '';
     form.file = '';
+    form.template = null;
     logInfo.value = '';
     loadTemplates();
     loadPath();
