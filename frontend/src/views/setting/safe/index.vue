@@ -20,7 +20,7 @@
                                 </el-input>
                             </el-form-item>
 
-                            <el-form-item :label="$t('setting.entrance')" required>
+                            <el-form-item :label="$t('setting.entrance')">
                                 <el-switch
                                     @change="handleEntrance"
                                     v-model="form.securityEntranceStatus"
@@ -49,11 +49,7 @@
                                 </span>
                             </el-form-item>
 
-                            <el-form-item
-                                :label="$t('setting.expirationTime')"
-                                prop="expirationTime"
-                                :rules="Rules.requiredInput"
-                            >
+                            <el-form-item :label="$t('setting.expirationTime')" prop="expirationTime">
                                 <el-input disabled v-model="form.expirationTime">
                                     <template #append>
                                         <el-button style="width: 85px" @click="onChangeExpirationTime" icon="Setting">
@@ -70,11 +66,7 @@
                                     </span>
                                 </div>
                             </el-form-item>
-                            <el-form-item
-                                :label="$t('setting.complexity')"
-                                prop="complexityVerification"
-                                :rules="Rules.requiredSelect"
-                            >
+                            <el-form-item :label="$t('setting.complexity')" prop="complexityVerification">
                                 <el-switch
                                     @change="
                                         onSave(panelFormRef, 'ComplexityVerification', form.complexityVerification)
@@ -87,11 +79,7 @@
                                     {{ $t('setting.complexityHelper') }}
                                 </span>
                             </el-form-item>
-                            <el-form-item
-                                :label="$t('setting.mfa')"
-                                prop="securityEntrance"
-                                :rules="Rules.requiredSelect"
-                            >
+                            <el-form-item :label="$t('setting.mfa')" prop="securityEntrance">
                                 <el-switch
                                     @change="handleMFA"
                                     v-model="form.mfaStatus"
@@ -134,7 +122,7 @@
                                 </el-card>
                             </el-form-item>
 
-                            <el-form-item label="https" required prop="ssl">
+                            <el-form-item label="https" prop="ssl">
                                 <el-switch
                                     @change="handleSSL"
                                     v-model="form.ssl"
