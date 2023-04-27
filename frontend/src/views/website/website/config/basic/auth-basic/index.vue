@@ -8,7 +8,7 @@
                 {{ $t('commons.button.create') + $t('website.basicAuth') }}
             </el-button>
         </template>
-        <el-table-column :label="$t('commons.table.name')" prop="username"></el-table-column>
+        <el-table-column :label="$t('commons.login.username')" prop="username"></el-table-column>
         <el-table-column :label="$t('website.remark')" prop="remark"></el-table-column>
         <fu-table-operations
             :ellipsis="10"
