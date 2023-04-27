@@ -91,11 +91,6 @@ func Execf(cmdStr string, a ...interface{}) (string, error) {
 }
 
 func HasNoPasswordSudo() bool {
-	cmd := exec.Command("sudo", "-v")
-	err := cmd.Run()
-	if err != nil {
-		return false
-	}
 	cmd2 := exec.Command("sudo", "-n", "ls")
 	err2 := cmd2.Run()
 	return err2 == nil

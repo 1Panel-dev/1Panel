@@ -121,9 +121,12 @@ func (f FileOp) Chown(dst string, uid int, gid int) error {
 }
 
 func (f FileOp) ChownR(dst string, uid string, gid string, sub bool) error {
-	cmdStr := fmt.Sprintf("sudo chown %s:%s %s", uid, gid, dst)
+	cmdStr := fmt.Sprintf("chown %s:%s %s", uid, gid, dst)
 	if sub {
-		cmdStr = fmt.Sprintf("sudo chown -R %s:%s %s", uid, gid, dst)
+		cmdStr = fmt.Sprintf("chown -R %s:%s %s", uid, gid, dst)
+	}
+	if cmd.HasNoPasswordSudo() {
+		cmdStr = fmt.Sprintf("sudo %s", cmdStr)
 	}
 	if msg, err := cmd.ExecWithTimeOut(cmdStr, 2*time.Second); err != nil {
 		if msg != "" {
@@ -134,8 +137,8 @@ func (f FileOp) ChownR(dst string, uid string, gid string, sub bool) error {
 	return nil
 }
 
-func (f FileOp) ChmodR(dst string, mode fs.FileMode) error {
-	cmdStr := fmt.Sprintf("chmod -R %v %s", mode, dst)
+func (f FileOp) ChmodR(dst string, mode int64) error {
+	cmdStr := fmt.Sprintf("chmod -R %v %s", fmt.Sprintf("%04o", mode), dst)
 	if cmd.HasNoPasswordSudo() {
 		cmdStr = fmt.Sprintf("sudo %s", cmdStr)
 	}

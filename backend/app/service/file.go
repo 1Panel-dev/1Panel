@@ -160,7 +160,11 @@ func (f *FileService) BatchDelete(op request.FileBatchDelete) error {
 
 func (f *FileService) ChangeMode(op request.FileCreate) error {
 	fo := files.NewFileOp()
-	return fo.Chmod(op.Path, fs.FileMode(op.Mode))
+	if op.Sub {
+		return fo.ChmodR(op.Path, op.Mode)
+	} else {
+		return fo.Chmod(op.Path, fs.FileMode(op.Mode))
+	}
 }
 
 func (f *FileService) ChangeOwner(req request.FileRoleUpdate) error {

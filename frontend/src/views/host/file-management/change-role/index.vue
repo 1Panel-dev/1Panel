@@ -7,6 +7,9 @@
         <el-row>
             <el-col :span="22" :offset="1">
                 <FileRole v-loading="loading" :mode="mode" @get-mode="getMode"></FileRole>
+                <el-form-item v-if="form.isDir">
+                    <el-checkbox v-model="form.sub">{{ $t('file.containSub') }}</el-checkbox>
+                </el-form-item>
             </el-col>
         </el-row>
         <template #footer>
@@ -43,6 +46,7 @@ const acceptParams = (create: File.FileCreate) => {
     form.value.isDir = create.isDir;
     form.value.path = create.path;
     form.value.isLink = false;
+    form.value.sub = false;
 
     mode.value = String(create.mode);
 };

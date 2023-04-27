@@ -54,6 +54,7 @@ export namespace File {
         isLink?: boolean;
         isSymlink?: boolean;
         linkPath?: boolean;
+        sub?: boolean;
     }
 
     export interface FileDelete {

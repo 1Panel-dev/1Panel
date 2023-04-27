@@ -22,6 +22,7 @@ type FileCreate struct {
 	IsLink    bool   `json:"isLink"`
 	IsSymlink bool   `json:"isSymlink"`
 	LinkPath  string `json:"linkPath"`
+	Sub       bool   `json:"sub"`
 }
 
 type FileDelete struct {
