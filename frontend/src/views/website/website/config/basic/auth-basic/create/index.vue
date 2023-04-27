@@ -17,7 +17,7 @@
                     />
                 </el-form-item>
                 <el-form ref="proxyForm" label-position="top" :model="authBasic" :rules="rules">
-                    <el-form-item :label="$t('commons.table.name')" prop="username">
+                    <el-form-item :label="$t('commons.login.username')" prop="username">
                         <el-input v-model.trim="authBasic.username" :disabled="authBasic.operate === 'edit'"></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('commons.login.password')" prop="password">
