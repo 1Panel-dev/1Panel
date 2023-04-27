@@ -90,6 +90,7 @@ declare module 'vue' {
     TableSetting: typeof import('./src/components/table-setting/index.vue')['default']
     Terminal: typeof import('./src/components/terminal/index.vue')['default']
     Tooltip: typeof import('./src/components/tooltip/index.vue')['default']
+    Unsafe: typeof import('./src/components/error-message/unsafe.vue')['default']
     Upload: typeof import('./src/components/upload/index.vue')['default']
     VCharts: typeof import('./src/components/v-charts/index.vue')['default']
   }
