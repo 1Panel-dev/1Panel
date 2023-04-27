@@ -545,12 +545,11 @@ const message = {
 
         compose: 'Compose',
         fromChangeHelper: 'Switching the source will clear the current edited content. Do you want to continue?',
-        composeHelper:
-            'The current content has passed the format verification. Please click Submit to complete the creation',
         composePathHelper: 'Config file save path: {0}',
         apps: 'Apps',
         local: 'Local',
         createCompose: 'Create compose',
+        template: 'Template',
         composeTemplate: 'Compose template',
         createComposeTemplate: 'Create compose template',
         description: 'Description',
@@ -994,7 +993,7 @@ const message = {
         update: 'update',
         upgrade: 'upgrade',
         versioneSelect: 'Please select a version',
-        operatorHelper: 'Operation {0} will be performed on the selected application, continue? ',
+        operatorHelper: 'Operation {0} will be performed on the selected application, Do you want to continue? ',
         checkInstalledWarn: '{0} is not detected, please enter the app store and click to install!',
         gotoInstalled: 'Go to install',
         search: 'Search',
@@ -1023,7 +1022,7 @@ const message = {
         updatePrompt: 'The current application is the latest version',
         installPrompt: 'No apps installed yet',
         updateHelper: 'Updating parameters may cause the application to fail to start, please operate with caution',
-        updateWarn: 'Update parameters need to rebuild the application, continue? ',
+        updateWarn: 'Update parameters need to rebuild the application, Do you want to continue? ',
         busPort: 'Service Port',
     },
     website: {
@@ -1161,7 +1160,8 @@ const message = {
         HTTPAlso: 'HTTP can be accessed directly',
         sslConfig: 'SSL options',
         disbaleHTTTPS: 'Disable HTTPS',
-        disbaleHTTTPSHelper: 'Disabling HTTPS will delete the certificate related configuration, whether to continue',
+        disbaleHTTTPSHelper:
+            'Disabling HTTPS will delete the certificate related configuration, Do you want to continue?',
         SSLHelper:
             'Note: Do not use SSL certificates for illegal websites \n If HTTPS access cannot be used after opening, please check whether the security group has correctly released port 443',
         SSLConfig: 'Certificate Settings',

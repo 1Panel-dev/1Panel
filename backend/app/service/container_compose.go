@@ -213,15 +213,7 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 }
 
 func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {
-	if req.From == "template" {
-		template, err := composeRepo.Get(commonRepo.WithByID(req.Template))
-		if err != nil {
-			return err
-		}
-		req.From = "edit"
-		req.File = template.Content
-	}
-	if req.From == "edit" {
+	if req.From == "template" || req.From == "edit" {
 		dir := fmt.Sprintf("%s/docker/compose/%s", constant.DataDir, req.Name)
 		if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
 			if err = os.MkdirAll(dir, os.ModePerm); err != nil {
