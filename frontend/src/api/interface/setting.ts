@@ -15,7 +15,6 @@ export namespace Setting {
         language: string;
 
         serverPort: number;
-        securityEntranceStatus: string;
         ssl: string;
         sslType: string;
         securityEntrance: string;

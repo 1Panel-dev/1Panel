@@ -148,18 +148,14 @@ func (u *AuthService) VerifyCode(code string) (bool, error) {
 }
 
 func (u *AuthService) CheckIsSafety(code string) bool {
-	status, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntranceStatus"))
+	status, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntrance"))
 	if err != nil {
 		return false
 	}
-	if status.Value == "disable" {
+	if len(status.Value) == 0 {
 		return true
 	}
-	setting, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntrance"))
-	if err != nil {
-		return false
-	}
-	return setting.Value == code
+	return status.Value == code
 }
 
 func (u *AuthService) CheckIsFirst() bool {

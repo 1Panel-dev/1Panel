@@ -24,7 +24,7 @@ var resetMFACmd = &cobra.Command{
 }
 
 var resetSSLCmd = &cobra.Command{
-	Use:   "reset-ssl",
+	Use:   "reset-https",
 	Short: "取消 1Panel  https 方式登录",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		db, err := loadDBConn()
@@ -44,6 +44,6 @@ var resetEntranceCmd = &cobra.Command{
 			return err
 		}
 
-		return setSettingByKey(db, "SecurityEntranceStatus", "disable")
+		return setSettingByKey(db, "SecurityEntrance", "")
 	},
 }

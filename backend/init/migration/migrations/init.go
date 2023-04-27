@@ -61,10 +61,10 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.AutoMigrate(&model.Setting{}); err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "UserName", Value: ""}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "UserName", Value: global.CONF.System.Username}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "Password", Value: ""}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "Password", Value: global.CONF.System.Password}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "Email", Value: ""}).Error; err != nil {
@@ -91,7 +91,7 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "ServerPort", Value: global.CONF.System.Port}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "SecurityEntrance", Value: "onepanel"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "SecurityEntrance", Value: global.CONF.System.Entrance}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "JWTSigningKey", Value: common.RandStr(16)}).Error; err != nil {
@@ -291,10 +291,9 @@ var UpdateTableWebsite = &gormigrate.Migration{
 var AddEntranceAndSSL = &gormigrate.Migration{
 	ID: "20230414-add-entrance-and-ssl",
 	Migrate: func(tx *gorm.DB) error {
-		if err := tx.Create(&model.Setting{Key: "SecurityEntranceStatus", Value: "disable"}).Error; err != nil {
-			return err
-		}
-		if err := tx.Model(&model.Setting{}).Where("key = ?", "SecurityEntrance").Updates(map[string]interface{}{"value": ""}).Error; err != nil {
+		if err := tx.Model(&model.Setting{}).
+			Where("key = ? AND value = ?", "SecurityEntrance", "onepanel").
+			Updates(map[string]interface{}{"value": ""}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "SSLType", Value: "self"}).Error; err != nil {

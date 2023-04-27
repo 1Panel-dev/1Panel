@@ -16,10 +16,6 @@ export const updateSetting = (param: Setting.SettingUpdate) => {
     return http.post(`/settings/update`, param);
 };
 
-export const updateEntrance = (param: Setting.SettingUpdate) => {
-    return http.post(`/settings/entrance/enable`, param);
-};
-
 export const updatePassword = (param: Setting.PasswordUpdate) => {
     return http.post(`/settings/password/update`, param);
 };
