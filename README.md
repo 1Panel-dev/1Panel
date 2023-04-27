@@ -41,12 +41,9 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 
 - [在线文档](https://1panel.cn/docs/)
 - [教学视频](https://space.bilibili.com/510493147/channel/collectiondetail?sid=1199760)
+- [社区论坛](https://bbs.fit2cloud.com/c/1p/7)
 
-## 社区
-
-如果您在使用过程中有任何疑问或对建议，欢迎提交 GitHub Issue 或加入到我们微信交流群进行交流沟通。
-
-**微信交流群**
+## 微信交流群
 
 <img src="https://1panel.cn/img/wechat-group.jpg" width="156" height="156"/>
 
