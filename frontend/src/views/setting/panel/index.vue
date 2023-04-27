@@ -21,7 +21,7 @@
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.passwd')" :rules="Rules.requiredInput" prop="password">
-                                <el-input type="password" clearable disabled v-model="form.password">
+                                <el-input type="password" disabled v-model="form.password">
                                     <template #append>
                                         <el-button style="width: 85px" icon="Setting" @click="onChangePassword">
                                             {{ $t('commons.button.set') }}

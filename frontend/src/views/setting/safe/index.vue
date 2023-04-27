@@ -21,32 +21,26 @@
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.entrance')">
-                                <el-switch
-                                    @change="handleEntrance"
-                                    v-model="form.securityEntranceStatus"
-                                    active-value="enable"
-                                    inactive-value="disable"
-                                />
-                                <span class="input-help">
-                                    {{ $t('setting.entranceHelper') }}
-                                </span>
                                 <el-input
-                                    @blur="codeError = false"
-                                    v-if="isEntranceShow"
                                     type="password"
-                                    show-password
-                                    clearable
+                                    disabled
+                                    v-if="form.securityEntrance"
                                     v-model="form.securityEntrance"
                                 >
                                     <template #append>
-                                        <el-button style="width: 85px" @click="onSaveEntrance" icon="Collection">
-                                            {{ $t('commons.button.save') }}
+                                        <el-button style="width: 85px" @click="onChangeEntrance" icon="Setting">
+                                            {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
                                 </el-input>
-                                <span class="input-error" v-if="codeError">
-                                    {{ $t('setting.entranceError') }}
-                                </span>
+                                <el-input disabled v-if="!form.securityEntrance" v-model="unset">
+                                    <template #append>
+                                        <el-button style="width: 85px" @click="onChangeEntrance" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                                <span class="input-help">{{ $t('setting.entranceHelper') }}</span>
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.expirationTime')" prop="expirationTime">
@@ -142,25 +136,9 @@
                 </el-form>
             </template>
         </LayoutContent>
-        <el-drawer v-model="timeoutVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
-            <template #header>
-                <DrawerHeader :header="$t('setting.expirationTime')" :back="handleClose" />
-            </template>
-            <el-form ref="timeoutFormRef" label-position="top" :model="timeoutForm">
-                <el-form-item :label="$t('setting.days')" prop="days" :rules="[Rules.number, checkNumberRange(0, 60)]">
-                    <el-input clearable v-model.number="timeoutForm.days" />
-                    <span class="input-help">{{ $t('setting.expirationHelper') }}</span>
-                </el-form-item>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="timeoutVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button type="primary" @click="submitTimeout(timeoutFormRef)">
-                        {{ $t('commons.button.confirm') }}
-                    </el-button>
-                </span>
-            </template>
-        </el-drawer>
+
+        <EntranceSetting ref="entranceRef" @search="search" />
+        <TimeoutSetting ref="timeoutref" @search="search" />
     </div>
 </template>
 
@@ -170,7 +148,8 @@ import { ElForm, ElMessageBox } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
 import LayoutContent from '@/layout/layout-content.vue';
 import SSLSetting from '@/views/setting/safe/ssl/index.vue';
-import DrawerHeader from '@/components/drawer-header/index.vue';
+import TimeoutSetting from '@/views/setting/safe/timeout/index.vue';
+import EntranceSetting from '@/views/setting/safe/entrance/index.vue';
 import {
     updateSetting,
     getMFA,
@@ -178,21 +157,18 @@ import {
     getSettingInfo,
     updatePort,
     getSystemAvailable,
-    updateEntrance,
     updateSSL,
 } from '@/api/modules/setting';
 import i18n from '@/lang';
-import { Rules, checkNumberRange } from '@/global/form-rules';
-import { dateFormatSimple } from '@/utils/util';
+import { Rules } from '@/global/form-rules';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { GlobalStore } from '@/store';
-const globalStore = GlobalStore();
 
 const loading = ref(false);
+const entranceRef = ref();
+const timeoutref = ref();
 
 const form = reactive({
     serverPort: 9999,
-    securityEntranceStatus: 'disable',
     ssl: 'disable',
     sslType: 'self',
     securityEntrance: '',
@@ -203,20 +179,15 @@ const form = reactive({
     mfaSecret: 'disable',
 });
 type FormInstance = InstanceType<typeof ElForm>;
-const timeoutFormRef = ref<FormInstance>();
-const timeoutVisiable = ref<boolean>(false);
-const timeoutForm = reactive({
-    days: 0,
-});
 
 const sslShow = ref();
 const oldSSLStatus = ref();
 
+const unset = ref(i18n.global.t('setting.unSetting'));
+
 const search = async () => {
     const res = await getSettingInfo();
     form.serverPort = Number(res.data.serverPort);
-    form.securityEntranceStatus = res.data.securityEntranceStatus;
-    isEntranceShow.value = res.data.securityEntranceStatus === 'enable';
     form.ssl = res.data.ssl;
     oldSSLStatus.value = res.data.ssl;
     form.sslType = res.data.sslType;
@@ -230,9 +201,6 @@ const search = async () => {
     form.mfaStatus = res.data.mfaStatus;
     form.mfaSecret = res.data.mfaSecret;
 };
-
-const isEntranceShow = ref(false);
-const codeError = ref(false);
 
 const isMFAShow = ref<boolean>(false);
 const otp = reactive<Setting.MFAInfo>({
@@ -322,23 +290,8 @@ const handleMFA = async () => {
     }
 };
 
-const handleEntrance = async () => {
-    if (form.securityEntranceStatus === 'enable') {
-        isEntranceShow.value = true;
-    } else {
-        isEntranceShow.value = false;
-        loading.value = true;
-        await updateSetting({ key: 'SecurityEntranceStatus', value: 'disable' })
-            .then(() => {
-                globalStore.entrance = '';
-                loading.value = false;
-                search();
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    }
+const onChangeEntrance = async () => {
+    entranceRef.value.acceptParams({ securityEntrance: form.securityEntrance });
 };
 
 const handleSSL = async () => {
@@ -368,29 +321,6 @@ const handleSSL = async () => {
         });
 };
 
-const onSaveEntrance = async () => {
-    const reg = /^[A-Za-z0-9]{6,10}$/;
-    if ((!reg.test(form.securityEntrance) && form.securityEntrance !== '') || form.securityEntrance === '') {
-        codeError.value = true;
-        return;
-    }
-    loading.value = true;
-    await updateEntrance({ key: 'SecurityEntrance', value: form.securityEntrance })
-        .then(() => {
-            globalStore.entrance = form.securityEntrance;
-            loading.value = false;
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            search();
-        })
-        .catch(() => {
-            loading.value = false;
-        });
-};
-
-const handleClose = () => {
-    timeoutVisiable.value = false;
-};
-
 const onBind = async () => {
     if (!mfaCode.value) {
         MsgError(i18n.global.t('commons.msg.comfimNoNull', ['code']));
@@ -415,28 +345,7 @@ const onCancelMfaBind = async () => {
 };
 
 const onChangeExpirationTime = async () => {
-    timeoutForm.days = form.expirationDays;
-    timeoutVisiable.value = true;
-};
-
-const submitTimeout = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        let time = new Date(new Date().getTime() + 3600 * 1000 * 24 * timeoutForm.days);
-        loading.value = true;
-        await updateSetting({ key: 'ExpirationDays', value: timeoutForm.days + '' })
-            .then(() => {
-                loading.value = false;
-                search();
-                loadTimeOut();
-                form.expirationTime = dateFormatSimple(time);
-                timeoutVisiable.value = false;
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    });
+    timeoutref.value.acceptParams({ expirationDays: form.expirationDays });
 };
 
 function loadTimeOut() {

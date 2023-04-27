@@ -62,7 +62,7 @@
                 "summary": "Get app list update",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -442,7 +442,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -544,7 +544,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -586,7 +586,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -630,7 +630,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -649,7 +649,7 @@
                 "summary": "Sync app installed",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -689,7 +689,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -742,7 +742,7 @@
                 "summary": "Sync app list",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -780,7 +780,7 @@
                 "summary": "Check System isDemo",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -808,7 +808,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -822,7 +822,7 @@
                 "summary": "Check is First login",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -836,7 +836,7 @@
                 "summary": "Load safety status",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -886,7 +886,7 @@
                 "summary": "User logout",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -950,7 +950,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -993,7 +993,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -1035,7 +1035,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -1114,7 +1114,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -1156,7 +1156,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -1248,7 +1248,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -1288,7 +1288,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -1328,7 +1328,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -1465,7 +1465,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -1618,7 +1618,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -1660,7 +1660,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -1743,7 +1743,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -1831,7 +1831,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -1873,7 +1873,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -1954,7 +1954,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -2024,7 +2024,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -2069,7 +2069,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -2162,7 +2162,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -2198,7 +2198,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -2378,7 +2378,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -2420,7 +2420,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -2510,7 +2510,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -2561,7 +2561,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -2603,7 +2603,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -2721,7 +2721,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -2764,7 +2764,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -2815,7 +2815,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -2866,7 +2866,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -2917,7 +2917,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -3040,7 +3040,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -3092,7 +3092,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -3225,7 +3225,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -3289,7 +3289,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -3340,7 +3340,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -3391,7 +3391,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -3431,7 +3431,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -3518,7 +3518,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -3664,7 +3664,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -3704,7 +3704,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -3744,7 +3744,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -3806,7 +3806,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -3970,7 +3970,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4010,7 +4010,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4052,7 +4052,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4094,7 +4094,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4131,7 +4131,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -4164,7 +4164,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4251,7 +4251,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4293,7 +4293,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4335,7 +4335,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4377,7 +4377,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4464,7 +4464,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4507,7 +4507,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4550,7 +4550,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4594,7 +4594,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4637,7 +4637,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4715,7 +4715,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4788,7 +4788,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4866,7 +4866,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4910,7 +4910,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -4953,7 +4953,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -5048,7 +5048,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -5091,7 +5091,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -5188,7 +5188,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -5231,7 +5231,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -5318,7 +5318,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -5360,7 +5360,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -5433,7 +5433,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -5511,7 +5511,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -5590,7 +5590,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -5623,7 +5623,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -5726,7 +5726,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -5795,7 +5795,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -5838,7 +5838,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -6029,7 +6029,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -6127,7 +6127,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -6178,7 +6178,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -6218,7 +6218,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -6251,7 +6251,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -6293,7 +6293,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -6326,7 +6326,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -6368,7 +6368,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -6410,7 +6410,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -6454,7 +6454,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -6505,7 +6505,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -6556,7 +6556,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -6599,7 +6599,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -6632,7 +6632,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -6677,7 +6677,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -6814,7 +6814,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -6850,46 +6850,6 @@
                 }
             }
         },
-        "/settings/entrance/enable": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "更新系统安全入口",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "System Setting"
-                ],
-                "summary": "Update system entrance",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.SettingUpdate"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK"
-                    }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [],
-                    "formatEN": "update system setting [SecurityEntranceStatus] =\u003e [Enable]",
-                    "formatZH": "修改系统配置 [SecurityEntranceStatus] =\u003e [打开]",
-                    "paramKeys": []
-                }
-            }
-        },
         "/settings/expired/handle": {
             "post": {
                 "security": [
@@ -6918,7 +6878,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -6980,7 +6940,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -7006,7 +6966,7 @@
                 "summary": "Clean monitor datas",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -7046,7 +7006,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -7086,7 +7046,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -7136,7 +7096,7 @@
                 "summary": "Load system available status",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -7169,7 +7129,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -7212,7 +7172,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -7263,7 +7223,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -7315,7 +7275,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -7358,7 +7318,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -7409,7 +7369,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -7518,7 +7478,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -7589,7 +7549,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -7632,7 +7592,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             },
@@ -7663,7 +7623,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -7705,7 +7665,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -7946,7 +7906,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -8033,7 +7993,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -8066,7 +8026,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -8171,7 +8131,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -8222,7 +8182,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -8274,7 +8234,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -8325,7 +8285,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -8376,7 +8336,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -8427,7 +8387,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -8469,7 +8429,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -8556,7 +8516,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -8677,7 +8637,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -8805,7 +8765,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -8856,7 +8816,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -8930,7 +8890,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -9015,7 +8975,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -9066,7 +9026,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -9099,7 +9059,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -9150,7 +9110,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -9201,7 +9161,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -9234,7 +9194,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -9364,7 +9324,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -9397,7 +9357,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -9448,7 +9408,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -9535,7 +9495,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -9568,7 +9528,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -9617,7 +9577,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 }
             }
@@ -9650,7 +9610,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -9728,7 +9688,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     }
                 },
                 "x-panel-log": {
@@ -10059,6 +10019,9 @@
                 },
                 "path": {
                     "type": "string"
+                },
+                "withFile": {
+                    "type": "boolean"
                 }
             }
         },
@@ -11447,25 +11410,6 @@
                 }
             }
         },
-        "dto.NginxKey": {
-            "type": "string",
-            "enum": [
-                "index",
-                "limit-conn",
-                "ssl",
-                "cache",
-                "http-per",
-                "proxy-cache"
-            ],
-            "x-enum-varnames": [
-                "Index",
-                "LimitConn",
-                "SSL",
-                "CACHE",
-                "HttpPer",
-                "ProxyCache"
-            ]
-        },
         "dto.OperateByID": {
             "type": "object",
             "required": [
@@ -11977,9 +11921,6 @@
                     "type": "string"
                 },
                 "securityEntrance": {
-                    "type": "string"
-                },
-                "securityEntranceStatus": {
                     "type": "string"
                 },
                 "serverPort": {
@@ -12785,6 +12726,9 @@
                 },
                 "path": {
                     "type": "string"
+                },
+                "sub": {
+                    "type": "boolean"
                 }
             }
         },
@@ -13063,7 +13007,7 @@
                 },
                 "params": {},
                 "scope": {
-                    "$ref": "#/definitions/dto.NginxKey"
+                    "type": "string"
                 },
                 "websiteId": {
                     "type": "integer"
@@ -13130,7 +13074,7 @@
             ],
             "properties": {
                 "scope": {
-                    "$ref": "#/definitions/dto.NginxKey"
+                    "type": "string"
                 },
                 "websiteId": {
                     "type": "integer"

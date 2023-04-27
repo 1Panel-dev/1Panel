@@ -66,33 +66,6 @@ func (b *BaseApi) UpdateSetting(c *gin.Context) {
 }
 
 // @Tags System Setting
-// @Summary Update system entrance
-// @Description 更新系统安全入口
-// @Accept json
-// @Param request body dto.SettingUpdate true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Router /settings/entrance/enable [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"修改系统配置 [SecurityEntranceStatus] => [打开]","formatEN":"update system setting [SecurityEntranceStatus] => [Enable]"}
-func (b *BaseApi) UpdateEntrance(c *gin.Context) {
-	var req dto.SettingUpdate
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-
-	if err := settingService.UpdateEntrance(req.Value); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, nil)
-}
-
-// @Tags System Setting
 // @Summary Update system password
 // @Description 更新系统登录密码
 // @Accept json

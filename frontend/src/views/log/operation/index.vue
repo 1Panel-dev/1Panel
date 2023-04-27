@@ -183,9 +183,6 @@ const loadDetail = (log: string) => {
     if (log.indexOf('[SessionTimeout]') !== -1) {
         return log.replace('[SessionTimeout]', '[' + i18n.global.t('setting.sessionTimeout') + ']');
     }
-    if (log.indexOf('SecurityEntranceStatus') !== -1) {
-        return log.replace('[SecurityEntranceStatus]', '[' + i18n.global.t('setting.entrance') + ']');
-    }
     if (log.indexOf('SecurityEntrance') !== -1) {
         return log.replace('[SecurityEntrance]', '[' + i18n.global.t('setting.entrance') + ']');
     }

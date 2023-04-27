@@ -28,7 +28,6 @@ type SettingService struct{}
 type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
 	Update(key, value string) error
-	UpdateEntrance(value string) error
 	UpdatePassword(c *gin.Context, old, new string) error
 	UpdatePort(port uint) error
 	UpdateSSL(c *gin.Context, req dto.SSLUpdate) error
@@ -68,31 +67,11 @@ func (u *SettingService) Update(key, value string) error {
 			return err
 		}
 	}
-	if key == "SecurityEntrance" {
-		if err := settingRepo.Update("SecurityEntranceStatus", "enable"); err != nil {
-			return err
-		}
-	}
-	if key == "SecurityEntranceStatus" {
-		if err := settingRepo.Update("SecurityEntrance", ""); err != nil {
-			return err
-		}
-	}
 	if err := settingRepo.Update(key, value); err != nil {
 		return err
 	}
 	if key == "UserName" {
 		_ = global.SESSION.Clean()
-	}
-	return nil
-}
-
-func (u *SettingService) UpdateEntrance(value string) error {
-	if err := settingRepo.Update("SecurityEntranceStatus", "enable"); err != nil {
-		return err
-	}
-	if err := settingRepo.Update("SecurityEntrance", value); err != nil {
-		return err
 	}
 	return nil
 }

@@ -502,7 +502,7 @@ const loadUpgradeStatus = async () => {
 
 const loadSafeStatus = async () => {
     const res = await getSettingInfo();
-    isSafety.value = res.data.securityEntranceStatus === 'enable';
+    isSafety.value = res.data.securityEntrance;
 };
 
 onMounted(() => {

@@ -15,5 +15,8 @@ type System struct {
 	Mode       string `mapstructure:"mode"`
 	RepoUrl    string `mapstructure:"repo_url"`
 	Version    string `mapstructure:"version"`
+	Username   string `mapstructure:"username"`
+	Password   string `mapstructure:"password"`
+	Entrance   string `mapstructure:"entrance"`
 	IsDemo     bool   `mapstructure:"is_demo"`
 }

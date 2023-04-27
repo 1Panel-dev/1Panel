@@ -16,7 +16,6 @@ type SettingInfo struct {
 	Language  string `json:"language"`
 
 	ServerPort             string `json:"serverPort"`
-	SecurityEntranceStatus string `json:"securityEntranceStatus"`
 	SSL                    string `json:"ssl"`
 	SSLType                string `json:"sslType"`
 	SecurityEntrance       string `json:"securityEntrance"`

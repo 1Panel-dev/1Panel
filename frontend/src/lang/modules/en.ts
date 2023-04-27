@@ -869,10 +869,11 @@ const message = {
         path: 'Path',
 
         safe: 'Security',
-        safeEntrance: 'Security entrance',
+        entrance: 'Entrance',
         entranceHelper: 'Enabling secure entry will only allow logging in to the panel through specified secure entry.',
         entranceError:
             'Please enter a secure login entry point of 6-10 characters, only numbers or letters are supported.',
+        entranceInputHelper: 'When the security entry is set to blank, the security entry is cancelled.',
         expirationTime: 'Expiration Time',
         unSetting: 'Not Set',
         noneSetting:
