@@ -1387,6 +1387,11 @@ const message = {
             'The more extensions you select, the more CPU will be occupied during the image making process, so avoid selecting all extensions,If there is no extension you want, you can manually enter it and select it',
         openrestryWarn: 'PHP needs to be upgraded to OpenResty to version 1.21.4.1 or later to use',
         toupgrade: 'To Upgrade',
+        edit: 'Edit runtime',
+        extendHelper:
+            'Extensions that do not exist in the list can be selected after manual input, for example: input sockets, and then select the first one in the drop-down list',
+        rebuildHelper:
+            'After editing the extension, you need to go to the [App Store-Installed] page to rebuild the PHP application to take effect',
     },
 };
 

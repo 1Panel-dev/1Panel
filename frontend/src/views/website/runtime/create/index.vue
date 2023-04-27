@@ -1,7 +1,7 @@
 <template>
     <el-drawer :close-on-click-modal="false" v-model="open" size="50%">
         <template #header>
-            <DrawerHeader :header="$t('runtime.create')" :back="handleClose" />
+            <DrawerHeader :header="$t('runtime.' + mode)" :back="handleClose" />
         </template>
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
@@ -78,6 +78,15 @@
                                 v-model:params="editParams"
                                 v-model:rules="rules"
                             ></EditParams>
+                            <el-form-item v-if="runtime.type === 'php'">
+                                <el-alert :title="$t('runtime.extendHelper')" type="info" :closable="false" />
+                                <el-alert
+                                    v-if="mode == 'edit'"
+                                    :title="$t('runtime.rebuildHelper')"
+                                    type="info"
+                                    :closable="false"
+                                />
+                            </el-form-item>
                         </div>
                     </div>
                     <div v-else>
