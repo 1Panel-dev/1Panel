@@ -15,11 +15,8 @@
                 </div>
             </div>
         </div>
-        <div style="margin-left: 50px" v-if="!isSafety">
-            <div class="not-found">
-                <h1>404 NOT FOUND</h1>
-                <p>{{ $t('commons.login.safeEntrance') }}</p>
-            </div>
+        <div v-if="!isSafety">
+            <UnSafe />
         </div>
     </div>
 </template>
@@ -27,11 +24,12 @@
 <script setup lang="ts" name="login">
 import { checkIsSafety } from '@/api/modules/auth';
 import LoginForm from './components/login-form.vue';
+import UnSafe from '@/components/error-message/unsafe.vue';
 import { ref, onMounted } from 'vue';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
-const isSafety = ref(false);
+const isSafety = ref(true);
 const screenWidth = ref(null);
 
 interface Props {
@@ -136,25 +134,6 @@ onMounted(() => {
         @media only screen and (max-width: 1110px) {
             margin: 60px auto 0;
         }
-    }
-}
-
-.not-found {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    .h1 {
-        font-size: 5rem;
-        margin: 0 0 1rem;
-    }
-
-    .p {
-        font-size: 1.2rem;
-        max-width: 500px;
-        text-align: center;
-        margin: 0 0 2rem;
     }
 }
 </style>

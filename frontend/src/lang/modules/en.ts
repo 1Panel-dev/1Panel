@@ -114,8 +114,9 @@ const message = {
             errorMfaInfo: 'Incorrect authentication information, please try again!',
             captchaHelper: 'Captcha',
             errorCaptcha: 'Captcha code error!',
-            safeEntrance:
-                'The command "1pctl user-info" can be used in SSH terminal to view the panel entrance as the secure login has been enabled in the current environment.',
+            notSafe: 'Access Denied',
+            safeEntrance1: 'The secure login has been enabled in the current environment',
+            safeEntrance2: 'Enter the following command on the SSH terminal to view the panel entry: 1pctl user-info',
             codeInput: 'Please enter the 6-digit verification code of the MFA validator',
             mfaTitle: 'MFA Certification',
             mfaCode: 'MFA verification code',
