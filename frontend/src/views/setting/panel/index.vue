@@ -5,7 +5,7 @@
                 <el-form :model="form" ref="panelFormRef" label-position="left" label-width="160px">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
-                        <el-col :span="10">
+                        <el-col :span="16">
                             <el-form-item :label="$t('setting.user')" :rules="Rules.userName" prop="userName">
                                 <el-input clearable v-model="form.userName">
                                     <template #append>
@@ -124,7 +124,7 @@
 import { ref, reactive, onMounted, computed } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
 import LayoutContent from '@/layout/layout-content.vue';
-import { syncTime, getSettingInfo, updateSetting } from '@/api/modules/setting';
+import { syncTime, getSettingInfo, updateSetting, getSystemAvailable } from '@/api/modules/setting';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { GlobalStore } from '@/store';
 import { useI18n } from 'vue-i18n';
@@ -304,5 +304,6 @@ const onSyncTime = async () => {
 
 onMounted(() => {
     search();
+    getSystemAvailable();
 });
 </script>
