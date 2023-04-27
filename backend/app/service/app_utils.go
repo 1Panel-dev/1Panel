@@ -226,6 +226,10 @@ func upgradeInstall(installId uint, detailId uint) error {
 	}
 
 	detailDir := path.Join(constant.ResourceDir, "apps", install.App.Key, "versions", detail.Version)
+	if install.App.Resource == constant.AppResourceLocal {
+		detailDir = path.Join(constant.ResourceDir, "localApps", strings.TrimPrefix(install.App.Key, "local"), "versions", detail.Version)
+	}
+
 	cmd := exec.Command("/bin/bash", "-c", fmt.Sprintf("cp -rf %s/* %s", detailDir, install.GetPath()))
 	stdout, err := cmd.CombinedOutput()
 	if err != nil {
