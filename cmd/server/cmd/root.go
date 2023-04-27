@@ -1,10 +1,14 @@
 package cmd
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/server"
+	cmdUtils "github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/spf13/cobra"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -28,8 +32,32 @@ type setting struct {
 	About     string    `json:"about" gorm:"type:longText"`
 }
 
+func loadDBConn() (*gorm.DB, error) {
+	stdout, err := cmdUtils.Exec("grep '^BASE_DIR=' /usr/bin/1pctl | cut -d'=' -f2")
+	if err != nil {
+		return nil, fmt.Errorf("handle load `BASE_DIR` failed, err: %v", err)
+	}
+	baseDir := strings.ReplaceAll(stdout, "\n", "")
+	if len(baseDir) == 0 {
+		return nil, fmt.Errorf("error `BASE_DIR` find in /usr/bin/1pctl \n")
+	}
+	if strings.HasSuffix(baseDir, "/") {
+		baseDir = baseDir[:strings.LastIndex(baseDir, "/")]
+	}
+
+	db, err := gorm.Open(sqlite.Open(baseDir+"/1panel/db/1Panel.db"), &gorm.Config{})
+	if err != nil {
+		return nil, fmt.Errorf("init my db conn failed, err: %v \n", err)
+	}
+	return db, nil
+}
+
 func getSettingByKey(db *gorm.DB, key string) string {
 	var setting setting
 	_ = db.Where("key = ?", key).First(&setting).Error
 	return setting.Value
+}
+
+func setSettingByKey(db *gorm.DB, key, value string) error {
+	return db.Model(&setting{}).Where("key = ?", key).Updates(map[string]interface{}{"value": value}).Error
 }
