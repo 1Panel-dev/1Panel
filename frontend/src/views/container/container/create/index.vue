@@ -364,7 +364,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     });
 };
 
-const checkPortValid = async () => {
+const checkPortValid = () => {
     if (form.exposedPorts.length === 0) {
         return true;
     }
