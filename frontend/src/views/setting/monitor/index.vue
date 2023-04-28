@@ -5,7 +5,7 @@
                 <el-form :model="form" ref="panelFormRef" label-position="left" label-width="160px">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
-                        <el-col :span="16">
+                        <el-col :span="12">
                             <el-form-item
                                 :label="$t('setting.enableMonitor')"
                                 :rules="Rules.requiredInput"

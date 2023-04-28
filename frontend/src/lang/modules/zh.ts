@@ -937,11 +937,12 @@ const message = {
         sslDisableHelper: '禁用 https 服务，需要重启面板才能生效，是否继续？',
 
         https: '为面板设置 https 协议访问，提升面板访问安全性',
+        certType: '证书类型',
         selfSigned: '自签名',
         selfSignedHelper: '自签证书，不被浏览器信任，显示不安全是正常现象',
         import: '导入',
         select: '选择已有',
-        domainOrIP: '域名/IP：',
+        domainOrIP: '域名或 IP：',
         timeOut: '过期时间：',
         rootCrtDownload: '根证书下载',
         primaryKey: '密钥',
