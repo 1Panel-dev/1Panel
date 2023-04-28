@@ -2,7 +2,7 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('setting.monitor')" :divider="true">
             <template #main>
-                <el-form :model="form" ref="panelFormRef" label-position="left" label-width="160px">
+                <el-form :model="form" @submit.prevent ref="panelFormRef" label-position="left" label-width="160px">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :span="12">
