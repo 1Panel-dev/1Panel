@@ -73,7 +73,8 @@
                                     {{ $t('setting.complexityHelper') }}
                                 </span>
                             </el-form-item>
-                            <el-form-item :label="$t('setting.mfa')" prop="securityEntrance">
+
+                            <el-form-item :label="$t('setting.mfa')">
                                 <el-switch
                                     @change="handleMFA"
                                     v-model="form.mfaStatus"
@@ -83,37 +84,6 @@
                                 <span class="input-help">
                                     {{ $t('setting.mfaHelper') }}
                                 </span>
-                            </el-form-item>
-                            <el-form-item v-if="isMFAShow">
-                                <el-card style="width: 100%">
-                                    <ul style="line-height: 24px">
-                                        <li>
-                                            {{ $t('setting.mfaHelper1') }}
-                                            <ul>
-                                                <li>Google Authenticator</li>
-                                                <li>Microsoft Authenticator</li>
-                                                <li>1Password</li>
-                                                <li>LastPass</li>
-                                                <li>Authenticator</li>
-                                            </ul>
-                                        </li>
-                                        <li>{{ $t('setting.mfaHelper2') }}</li>
-                                        <el-image
-                                            style="margin-left: 15px; width: 100px; height: 100px"
-                                            :src="otp.qrImage"
-                                        />
-                                        <li>{{ $t('setting.mfaHelper3') }}</li>
-                                        <el-input v-model="mfaCode"></el-input>
-                                        <div style="margin-top: 10px; margin-bottom: 10px; float: right">
-                                            <el-button @click="onCancelMfaBind">
-                                                {{ $t('commons.button.cancel') }}
-                                            </el-button>
-                                            <el-button type="primary" @click="onBind">
-                                                {{ $t('commons.button.saveAndEnable') }}
-                                            </el-button>
-                                        </div>
-                                    </ul>
-                                </el-card>
                             </el-form-item>
 
                             <el-form-item label="https" prop="ssl">
@@ -137,6 +107,7 @@
             </template>
         </LayoutContent>
 
+        <MfaSetting ref="mfaRef" @search="search" />
         <EntranceSetting ref="entranceRef" @search="search" />
         <TimeoutSetting ref="timeoutref" @search="search" />
     </div>
@@ -145,27 +116,20 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
-import { Setting } from '@/api/interface/setting';
 import LayoutContent from '@/layout/layout-content.vue';
 import SSLSetting from '@/views/setting/safe/ssl/index.vue';
+import MfaSetting from '@/views/setting/safe/mfa/index.vue';
 import TimeoutSetting from '@/views/setting/safe/timeout/index.vue';
 import EntranceSetting from '@/views/setting/safe/entrance/index.vue';
-import {
-    updateSetting,
-    getMFA,
-    bindMFA,
-    getSettingInfo,
-    updatePort,
-    getSystemAvailable,
-    updateSSL,
-} from '@/api/modules/setting';
+import { updateSetting, getSettingInfo, updatePort, getSystemAvailable, updateSSL } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref(false);
 const entranceRef = ref();
 const timeoutref = ref();
+const mfaRef = ref();
 
 const form = reactive({
     serverPort: 9999,
@@ -176,7 +140,6 @@ const form = reactive({
     expirationTime: '',
     complexityVerification: '',
     mfaStatus: 'disable',
-    mfaSecret: 'disable',
 });
 type FormInstance = InstanceType<typeof ElForm>;
 
@@ -199,15 +162,7 @@ const search = async () => {
     form.expirationTime = res.data.expirationTime;
     form.complexityVerification = res.data.complexityVerification;
     form.mfaStatus = res.data.mfaStatus;
-    form.mfaSecret = res.data.mfaSecret;
 };
-
-const isMFAShow = ref<boolean>(false);
-const otp = reactive<Setting.MFAInfo>({
-    secret: '',
-    qrImage: '',
-});
-const mfaCode = ref();
 const panelFormRef = ref<FormInstance>();
 
 const onSave = async (formEl: FormInstance | undefined, key: string, val: any) => {
@@ -271,12 +226,8 @@ const onSavePort = async (formEl: FormInstance | undefined, key: string, val: an
 };
 const handleMFA = async () => {
     if (form.mfaStatus === 'enable') {
-        const res = await getMFA();
-        otp.secret = res.data.secret;
-        otp.qrImage = res.data.qrImage;
-        isMFAShow.value = true;
+        mfaRef.value.acceptParams();
     } else {
-        isMFAShow.value = false;
         loading.value = true;
         await updateSetting({ key: 'MFAStatus', value: 'disable' })
             .then(() => {
@@ -319,29 +270,6 @@ const handleSSL = async () => {
         .catch(() => {
             form.ssl = 'enable';
         });
-};
-
-const onBind = async () => {
-    if (!mfaCode.value) {
-        MsgError(i18n.global.t('commons.msg.comfimNoNull', ['code']));
-        return;
-    }
-    loading.value = true;
-    await bindMFA({ code: mfaCode.value, secret: otp.secret })
-        .then(() => {
-            loading.value = false;
-            search();
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            isMFAShow.value = false;
-        })
-        .catch(() => {
-            loading.value = false;
-        });
-};
-
-const onCancelMfaBind = async () => {
-    form.mfaStatus = 'disable';
-    isMFAShow.value = false;
 };
 
 const onChangeExpirationTime = async () => {
