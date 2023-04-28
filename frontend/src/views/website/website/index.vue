@@ -79,7 +79,7 @@
                             <span v-if="row.type === 'runtime'">[{{ row.runtimeName }}]</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" prop="status">
+                    <el-table-column :label="$t('commons.table.status')" prop="status" width="100px">
                         <template #default="{ row }">
                             <el-button
                                 v-if="row.status === 'Running'"
@@ -95,12 +95,12 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.remark')" fix prop="remark">
+                    <el-table-column :label="$t('website.remark')" prop="remark">
                         <template #default="{ row }">
-                            <MsgInfo :info="row.remark" width="120" />
+                            <MsgInfo :info="row.remark" />
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.protocol')" prop="protocol"></el-table-column>
+                    <el-table-column :label="$t('website.protocol')" prop="protocol" width="90px"></el-table-column>
                     <el-table-column :label="$t('website.expireDate')">
                         <template #default="{ row, $index }">
                             <div v-show="row.showdate">
@@ -132,7 +132,7 @@
                     </el-table-column>
                     <fu-table-operations
                         :ellipsis="10"
-                        width="260px"
+                        width="400px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
@@ -255,6 +255,10 @@ const openConfig = (id: number) => {
     router.push({ name: 'WebsiteConfig', params: { id: id, tab: 'basic' } });
 };
 
+const openWAF = (id: number) => {
+    router.push({ name: 'WebsiteConfig', params: { id: id, tab: 'safety' } });
+};
+
 const isEver = (time: string) => {
     const expireDate = new Date(time);
     return expireDate < new Date('1970-01-02');
@@ -323,6 +327,12 @@ const buttons = [
         label: i18n.global.t('website.config'),
         click: function (row: Website.Website) {
             openConfig(row.id);
+        },
+    },
+    {
+        label: 'WAF',
+        click: function (row: Website.Website) {
+            openWAF(row.id);
         },
     },
     {
