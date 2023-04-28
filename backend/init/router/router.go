@@ -39,37 +39,29 @@ func setWebStatic(rootRouter *gin.Engine) {
 
 func Routers() *gin.Engine {
 	Router := gin.Default()
-
 	Router.Use(middleware.OperationLog())
 	// Router.Use(middleware.CSRF())
 	// Router.Use(middleware.LoadCsrfToken())
-
 	if global.CONF.System.IsDemo {
 		Router.Use(middleware.DemoHandle())
 	}
-
 	Router.Use(gzip.Gzip(gzip.DefaultCompression))
 	setWebStatic(Router)
-
 	Router.Use(i18n.GinI18nLocalize())
-
 	Router.SetFuncMap(template.FuncMap{
 		"Localize": ginI18n.GetMessage,
 	})
 
 	systemRouter := rou.RouterGroupApp
-
 	swaggerRouter := Router.Group("1panel")
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	swaggerRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-
 	PublicGroup := Router.Group("")
 	{
 		PublicGroup.GET("/health", func(c *gin.Context) {
 			c.JSON(200, "ok")
 		})
 	}
-
 	PrivateGroup := Router.Group("/api/v1")
 	PrivateGroup.Use(middleware.GlobalLoading())
 	{
