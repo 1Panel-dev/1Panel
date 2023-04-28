@@ -166,35 +166,27 @@ func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
 }
 
 func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
-	if len(req.ExposedPorts) != 0 {
-		for _, port := range req.ExposedPorts {
-			if strings.Contains(port.HostPort, "-") {
-				portStart, _ := strconv.Atoi(strings.Split(port.HostPort, "-")[0])
-				portEnd, _ := strconv.Atoi(strings.Split(port.HostPort, "-")[1])
-				for i := portStart; i <= portEnd; i++ {
-					if common.ScanPort(i) {
-						return buserr.WithDetail(constant.ErrPortInUsed, i, nil)
-					}
-				}
-			} else {
-				portItem, _ := strconv.Atoi(port.HostPort)
-				if common.ScanPort(portItem) {
-					return buserr.WithDetail(constant.ErrPortInUsed, portItem, nil)
-				}
-			}
-		}
+	portMap, err := checkPortStats(req.ExposedPorts)
+	if err != nil {
+		return err
 	}
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return err
 	}
+
+	exposeds := make(nat.PortSet)
+	for port := range portMap {
+		exposeds[port] = struct{}{}
+	}
 	config := &container.Config{
-		Image:     req.Image,
-		Cmd:       req.Cmd,
-		Env:       req.Env,
-		Labels:    stringsToMap(req.Labels),
-		Tty:       true,
-		OpenStdin: true,
+		Image:        req.Image,
+		Cmd:          req.Cmd,
+		Env:          req.Env,
+		Labels:       stringsToMap(req.Labels),
+		Tty:          true,
+		OpenStdin:    true,
+		ExposedPorts: exposeds,
 	}
 	hostConf := &container.HostConfig{
 		AutoRemove:      req.AutoRemove,
@@ -211,11 +203,7 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
 		hostConf.Memory = req.Memory
 	}
 	if len(req.ExposedPorts) != 0 {
-		hostConf.PortBindings = make(nat.PortMap)
-		for _, port := range req.ExposedPorts {
-			bindItem := nat.PortBinding{HostPort: port.HostPort, HostIP: port.HostIP}
-			hostConf.PortBindings[nat.Port(fmt.Sprintf("%s/%s", port.ContainerPort, port.Protocol))] = []nat.PortBinding{bindItem}
-		}
+		hostConf.PortBindings = portMap
 	}
 	if len(req.Volumes) != 0 {
 		config.Volumes = make(map[string]struct{})
@@ -422,4 +410,45 @@ func loadCpuAndMem(client *client.Client, container string) (float64, float64) {
 	CPUPercent := calculateCPUPercentUnix(stats)
 	MemPercent := calculateMemPercentUnix(stats.MemoryStats)
 	return CPUPercent, MemPercent
+}
+
+func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
+	portMap := make(nat.PortMap)
+	if len(ports) == 0 {
+		return portMap, nil
+	}
+	for _, port := range ports {
+		if strings.Contains(port.HostPort, "-") {
+			if !strings.Contains(port.ContainerPort, "-") {
+				return portMap, buserr.New(constant.ErrPortRules)
+			}
+			hostStart, _ := strconv.Atoi(strings.Split(port.HostPort, "-")[0])
+			hostEnd, _ := strconv.Atoi(strings.Split(port.HostPort, "-")[1])
+			containerStart, _ := strconv.Atoi(strings.Split(port.ContainerPort, "-")[0])
+			containerEnd, _ := strconv.Atoi(strings.Split(port.ContainerPort, "-")[1])
+			if (hostEnd-hostStart) <= 0 || (containerEnd-containerStart) <= 0 {
+				return portMap, buserr.New(constant.ErrPortRules)
+			}
+			if (containerEnd - containerStart) != (hostEnd - hostStart) {
+				return portMap, buserr.New(constant.ErrPortRules)
+			}
+			for i := 0; i <= hostEnd-hostStart; i++ {
+				bindItem := nat.PortBinding{HostPort: strconv.Itoa(hostStart + i), HostIP: port.HostIP}
+				portMap[nat.Port(fmt.Sprintf("%d/%s", containerStart+i, port.Protocol))] = []nat.PortBinding{bindItem}
+			}
+			for i := hostStart; i <= hostEnd; i++ {
+				if common.ScanPort(i) {
+					return portMap, buserr.WithDetail(constant.ErrPortInUsed, i, nil)
+				}
+			}
+		} else {
+			portItem, _ := strconv.Atoi(port.HostPort)
+			if common.ScanPort(portItem) {
+				return portMap, buserr.WithDetail(constant.ErrPortInUsed, portItem, nil)
+			}
+			bindItem := nat.PortBinding{HostPort: strconv.Itoa(portItem), HostIP: port.HostIP}
+			portMap[nat.Port(fmt.Sprintf("%s/%s", port.ContainerPort, port.Protocol))] = []nat.PortBinding{bindItem}
+		}
+	}
+	return portMap, nil
 }
