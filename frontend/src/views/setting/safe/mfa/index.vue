@@ -22,28 +22,23 @@
                                 <li>Authenticator</li>
                             </ul>
                         </el-form-item>
-                        <el-form-item :label="$t('setting.mfaTypeOption')">
-                            <el-radio-group v-model="mode" @change="form.secret = ''">
-                                <el-radio label="scan">{{ $t('setting.qrCode') }}</el-radio>
-                                <el-radio label="input">{{ $t('setting.manualInput') }}</el-radio>
-                            </el-radio-group>
-                        </el-form-item>
-                        <el-form-item :label="$t('setting.mfaHelper2')" v-if="mode === 'scan'">
+                        <el-form-item :label="$t('setting.mfaHelper2')">
                             <el-image style="width: 120px; height: 120px" :src="qrImage" />
+                            <span class="input-help">
+                                <span style="float: left">{{ $t('setting.secret') }}: {{ form.secret }}</span>
+                                <div style="float: left; margin-top: 2px">
+                                    <el-icon
+                                        color="#409EFC"
+                                        style="cursor: pointer; margin-left: 10px"
+                                        :size="18"
+                                        @click="onCopy()"
+                                    >
+                                        <DocumentCopy />
+                                    </el-icon>
+                                </div>
+                            </span>
                         </el-form-item>
-                        <el-form-item
-                            :label="$t('setting.mfaSecret')"
-                            v-if="mode === 'input'"
-                            prop="secret"
-                            :rules="Rules.requiredInput"
-                        >
-                            <el-input v-model="form.secret"></el-input>
-                        </el-form-item>
-                        <el-form-item
-                            :label="mode === 'scan' ? $t('setting.mfaHelper3') : $t('setting.mfaCode')"
-                            prop="code"
-                            :rules="Rules.requiredInput"
-                        >
+                        <el-form-item :label="$t('setting.mfaCode')" prop="code" :rules="Rules.requiredInput">
                             <el-input v-model="form.code"></el-input>
                         </el-form-item>
                     </el-col>
@@ -70,7 +65,6 @@ import { FormInstance } from 'element-plus';
 
 const loading = ref();
 const qrImage = ref();
-const mode = ref('scan');
 const drawerVisiable = ref();
 const formRef = ref();
 
@@ -83,6 +77,16 @@ const emit = defineEmits<{ (e: 'search'): void }>();
 const acceptParams = (): void => {
     loadMfaCode();
     drawerVisiable.value = true;
+};
+
+const onCopy = () => {
+    let input = document.createElement('input');
+    input.value = form.secret;
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('Copy');
+    document.body.removeChild(input);
+    MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
 };
 
 const loadMfaCode = async () => {

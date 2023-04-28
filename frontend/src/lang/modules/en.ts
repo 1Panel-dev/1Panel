@@ -891,10 +891,6 @@ const message = {
         mfaHelper1: 'Download a MFA verification mobile app e.g.:',
         mfaHelper2: 'Scan the following QR code using the mobile app to obtain the 6-digit verification code',
         mfaHelper3: 'Enter six digits from the app',
-        mfaSecret: 'Secret',
-        mfaTypeOption: 'Select the method of obtaining the secret',
-        qrCode: 'QR code',
-        manualInput: 'Manual input',
         mfaCode: 'Code',
         sslDisable: 'Disable',
         sslDisableHelper:
