@@ -30,7 +30,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit()" :disabled="loading">
+                <el-button type="primary" @click="submit()" :disabled="loading || uploaderFiles.length == 0">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -54,8 +54,8 @@ const uploadRef = ref<UploadInstance>();
 
 const loading = ref(false);
 let uploadPrecent = ref(0);
-let open = ref(false);
-let path = ref();
+const open = ref(false);
+const path = ref();
 
 const em = defineEmits(['close']);
 const handleClose = () => {
@@ -115,6 +115,7 @@ const submit = async () => {
         if (uploadedChunkCount == chunkCount) {
             loading.value = false;
             uploadRef.value!.clearFiles();
+            uploaderFiles.value = [];
             MsgSuccess(i18n.global.t('file.uploadSuccess'));
         }
     }
