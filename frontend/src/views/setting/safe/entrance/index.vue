@@ -4,7 +4,7 @@
             <template #header>
                 <DrawerHeader :header="$t('setting.entrance')" :back="handleClose" />
             </template>
-            <el-form label-position="top" v-loading="loading">
+            <el-form label-position="top" @submit.prevent v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
                         <el-form-item :label="$t('setting.entrance')" prop="days">

@@ -4,7 +4,7 @@
             <template #header>
                 <DrawerHeader :header="$t('setting.expirationTime')" :back="handleClose" />
             </template>
-            <el-form ref="timeoutFormRef" label-position="top" :model="form">
+            <el-form ref="timeoutFormRef" @submit.prevent label-position="top" :model="form">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
                         <el-form-item

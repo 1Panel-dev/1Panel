@@ -10,7 +10,7 @@
             <template #header>
                 <DrawerHeader :header="$t('setting.mfa')" :back="handleClose" />
             </template>
-            <el-form :model="form" ref="formRef" v-loading="loading" label-position="top">
+            <el-form :model="form" ref="formRef" @submit.prevent v-loading="loading" label-position="top">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
                         <el-form-item :label="$t('setting.mfaHelper1')">
@@ -39,7 +39,6 @@
                         >
                             <el-input v-model="form.secret"></el-input>
                         </el-form-item>
-
                         <el-form-item
                             :label="mode === 'scan' ? $t('setting.mfaHelper3') : $t('setting.mfaCode')"
                             prop="code"

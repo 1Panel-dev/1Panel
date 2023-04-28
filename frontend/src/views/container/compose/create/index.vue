@@ -12,7 +12,7 @@
         <div v-loading="loading">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
-                    <el-form ref="formRef" label-position="top" :model="form" :rules="rules" label-width="80px">
+                    <el-form ref="formRef" @submit.prevent label-position="top" :model="form" :rules="rules">
                         <el-form-item :label="$t('container.from')">
                             <el-radio-group v-model="form.from" @change="changeFrom">
                                 <el-radio label="edit">{{ $t('commons.button.edit') }}</el-radio>

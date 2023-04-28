@@ -5,6 +5,7 @@
                 <DrawerHeader :header="title + $t('setting.backupAccount')" :back="handleClose" />
             </template>
             <el-form
+                @submit.prevent
                 ref="formRef"
                 v-loading="loading"
                 label-position="top"
