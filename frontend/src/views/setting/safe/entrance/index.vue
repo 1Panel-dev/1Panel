@@ -5,19 +5,23 @@
                 <DrawerHeader :header="$t('setting.entrance')" :back="handleClose" />
             </template>
             <el-form label-position="top" v-loading="loading">
-                <el-form-item :label="$t('setting.entrance')" prop="days">
-                    <el-input clearable v-model="securityEntrance">
-                        <template #append>
-                            <el-button @click="random" icon="RefreshRight"></el-button>
-                        </template>
-                    </el-input>
-                    <span class="input-help">
-                        {{ $t('setting.entranceInputHelper') }}
-                    </span>
-                    <span class="input-error" v-if="codeError">
-                        {{ $t('setting.entranceError') }}
-                    </span>
-                </el-form-item>
+                <el-row type="flex" justify="center">
+                    <el-col :span="22">
+                        <el-form-item :label="$t('setting.entrance')" prop="days">
+                            <el-input clearable v-model="securityEntrance">
+                                <template #append>
+                                    <el-button @click="random" icon="RefreshRight"></el-button>
+                                </template>
+                            </el-input>
+                            <span class="input-help">
+                                {{ $t('setting.entranceInputHelper') }}
+                            </span>
+                            <span class="input-error" v-if="codeError">
+                                {{ $t('setting.entranceError') }}
+                            </span>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
             </el-form>
             <template #footer>
                 <span class="dialog-footer">

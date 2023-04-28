@@ -56,7 +56,6 @@ func Routers() *gin.Engine {
 	Router.SetFuncMap(template.FuncMap{
 		"Localize": ginI18n.GetMessage,
 	})
-	Router.Use(middleware.JwtAuth())
 
 	systemRouter := rou.RouterGroupApp
 
@@ -73,7 +72,6 @@ func Routers() *gin.Engine {
 
 	PrivateGroup := Router.Group("/api/v1")
 	PrivateGroup.Use(middleware.GlobalLoading())
-	//PrivateGroup.Use(middleware.SafetyAuth())
 	{
 		systemRouter.InitBaseRouter(PrivateGroup)
 		systemRouter.InitDashboardRouter(PrivateGroup)

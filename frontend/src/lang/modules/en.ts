@@ -901,12 +901,13 @@ const message = {
             'If the https service is disabled, you need to restart the panel for it to take effect. Do you want to continue?',
 
         https: 'Setting up HTTPS protocol access for the panel can enhance the security of panel access.',
+        certType: 'Certificate type',
         selfSigned: 'Self signed',
         selfSignedHelper:
             'It is normal for self-signed certificates to be not trusted by browsers and display a security warning as the certificate is not issued by a trusted third party.',
         import: 'Import',
         select: 'Select',
-        domainOrIP: 'Domain/IP：',
+        domainOrIP: 'Domain or IP：',
         timeOut: 'Timeout',
         rootCrtDownload: 'Root certificate download',
         primaryKey: 'Primary key',

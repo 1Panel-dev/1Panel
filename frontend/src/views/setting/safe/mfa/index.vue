@@ -11,40 +11,44 @@
                 <DrawerHeader :header="$t('setting.mfa')" :back="handleClose" />
             </template>
             <el-form :model="form" ref="formRef" v-loading="loading" label-position="top">
-                <el-form-item :label="$t('setting.mfaHelper1')">
-                    <ul>
-                        <li>Google Authenticator</li>
-                        <li>Microsoft Authenticator</li>
-                        <li>1Password</li>
-                        <li>LastPass</li>
-                        <li>Authenticator</li>
-                    </ul>
-                </el-form-item>
-                <el-form-item :label="$t('setting.mfaTypeOption')">
-                    <el-radio-group v-model="mode" @change="form.secret = ''">
-                        <el-radio label="scan">{{ $t('setting.qrCode') }}</el-radio>
-                        <el-radio label="input">{{ $t('setting.manualInput') }}</el-radio>
-                    </el-radio-group>
-                </el-form-item>
-                <el-form-item :label="$t('setting.mfaHelper2')" v-if="mode === 'scan'">
-                    <el-image style="width: 120px; height: 120px" :src="qrImage" />
-                </el-form-item>
-                <el-form-item
-                    :label="$t('setting.mfaSecret')"
-                    v-if="mode === 'input'"
-                    prop="secret"
-                    :rules="Rules.requiredInput"
-                >
-                    <el-input v-model="form.secret"></el-input>
-                </el-form-item>
+                <el-row type="flex" justify="center">
+                    <el-col :span="22">
+                        <el-form-item :label="$t('setting.mfaHelper1')">
+                            <ul>
+                                <li>Google Authenticator</li>
+                                <li>Microsoft Authenticator</li>
+                                <li>1Password</li>
+                                <li>LastPass</li>
+                                <li>Authenticator</li>
+                            </ul>
+                        </el-form-item>
+                        <el-form-item :label="$t('setting.mfaTypeOption')">
+                            <el-radio-group v-model="mode" @change="form.secret = ''">
+                                <el-radio label="scan">{{ $t('setting.qrCode') }}</el-radio>
+                                <el-radio label="input">{{ $t('setting.manualInput') }}</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                        <el-form-item :label="$t('setting.mfaHelper2')" v-if="mode === 'scan'">
+                            <el-image style="width: 120px; height: 120px" :src="qrImage" />
+                        </el-form-item>
+                        <el-form-item
+                            :label="$t('setting.mfaSecret')"
+                            v-if="mode === 'input'"
+                            prop="secret"
+                            :rules="Rules.requiredInput"
+                        >
+                            <el-input v-model="form.secret"></el-input>
+                        </el-form-item>
 
-                <el-form-item
-                    :label="mode === 'scan' ? $t('setting.mfaHelper3') : $t('setting.mfaCode')"
-                    prop="code"
-                    :rules="Rules.requiredInput"
-                >
-                    <el-input v-model="form.code"></el-input>
-                </el-form-item>
+                        <el-form-item
+                            :label="mode === 'scan' ? $t('setting.mfaHelper3') : $t('setting.mfaCode')"
+                            prop="code"
+                            :rules="Rules.requiredInput"
+                        >
+                            <el-input v-model="form.code"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
             </el-form>
             <template #footer>
                 <span class="dialog-footer">

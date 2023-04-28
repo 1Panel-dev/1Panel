@@ -5,7 +5,7 @@
                 <el-form :model="form" ref="panelFormRef" v-loading="loading" label-position="left" label-width="180px">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
-                        <el-col :span="16">
+                        <el-col :span="12">
                             <el-form-item :label="$t('setting.panelPort')" :rules="Rules.port" prop="serverPort">
                                 <el-input clearable v-model.number="form.serverPort">
                                     <template #append>
@@ -94,12 +94,17 @@
                                     inactive-value="disable"
                                 />
                                 <span class="input-help">{{ $t('setting.https') }}</span>
-                                <SSLSetting
-                                    :type="form.sslType"
-                                    :status="form.ssl"
-                                    v-if="sslShow"
-                                    style="width: 100%"
-                                />
+                                <div v-if="form.ssl === 'enable' && sslInfo">
+                                    <el-tag>{{ $t('setting.domainOrIP') }} {{ sslInfo.domain }}</el-tag>
+                                    <el-tag style="margin-left: 5px">
+                                        {{ $t('setting.timeOut') }} {{ sslInfo.timeout }}
+                                    </el-tag>
+                                    <div>
+                                        <el-button link type="primary" @click="handleSSL">
+                                            {{ $t('commons.button.view') }}
+                                        </el-button>
+                                    </div>
+                                </div>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -108,6 +113,7 @@
         </LayoutContent>
 
         <MfaSetting ref="mfaRef" @search="search" />
+        <SSLSetting ref="sslRef" @search="search" />
         <EntranceSetting ref="entranceRef" @search="search" />
         <TimeoutSetting ref="timeoutref" @search="search" />
     </div>
@@ -121,15 +127,26 @@ import SSLSetting from '@/views/setting/safe/ssl/index.vue';
 import MfaSetting from '@/views/setting/safe/mfa/index.vue';
 import TimeoutSetting from '@/views/setting/safe/timeout/index.vue';
 import EntranceSetting from '@/views/setting/safe/entrance/index.vue';
-import { updateSetting, getSettingInfo, updatePort, getSystemAvailable, updateSSL } from '@/api/modules/setting';
+import {
+    updateSetting,
+    getSettingInfo,
+    updatePort,
+    getSystemAvailable,
+    updateSSL,
+    loadSSLInfo,
+} from '@/api/modules/setting';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
+import { Setting } from '@/api/interface/setting';
 
 const loading = ref(false);
 const entranceRef = ref();
 const timeoutref = ref();
 const mfaRef = ref();
+
+const sslRef = ref();
+const sslInfo = ref<Setting.SSLInfo>();
 
 const form = reactive({
     serverPort: 9999,
@@ -143,19 +160,15 @@ const form = reactive({
 });
 type FormInstance = InstanceType<typeof ElForm>;
 
-const sslShow = ref();
-const oldSSLStatus = ref();
-
 const unset = ref(i18n.global.t('setting.unSetting'));
 
 const search = async () => {
     const res = await getSettingInfo();
     form.serverPort = Number(res.data.serverPort);
     form.ssl = res.data.ssl;
-    oldSSLStatus.value = res.data.ssl;
     form.sslType = res.data.sslType;
     if (form.ssl === 'enable') {
-        sslShow.value = true;
+        loadInfo();
     }
     form.securityEntrance = res.data.securityEntrance;
     form.expirationDays = Number(res.data.expirationDays);
@@ -227,31 +240,31 @@ const onSavePort = async (formEl: FormInstance | undefined, key: string, val: an
 const handleMFA = async () => {
     if (form.mfaStatus === 'enable') {
         mfaRef.value.acceptParams();
-    } else {
-        loading.value = true;
-        await updateSetting({ key: 'MFAStatus', value: 'disable' })
-            .then(() => {
-                loading.value = false;
-                search();
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            })
-            .catch(() => {
-                loading.value = false;
-            });
+        return;
     }
+    loading.value = true;
+    await updateSetting({ key: 'MFAStatus', value: 'disable' })
+        .then(() => {
+            loading.value = false;
+            search();
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        })
+        .catch(() => {
+            loading.value = false;
+        });
 };
 
 const onChangeEntrance = async () => {
     entranceRef.value.acceptParams({ securityEntrance: form.securityEntrance });
 };
-
 const handleSSL = async () => {
     if (form.ssl === 'enable') {
-        sslShow.value = true;
-        return;
-    }
-    if (form.ssl === oldSSLStatus.value) {
-        sslShow.value = false;
+        let params = {
+            ssl: form.ssl,
+            sslType: form.sslType,
+            sslInfo: sslInfo.value,
+        };
+        sslRef.value!.acceptParams(params);
         return;
     }
     ElMessageBox.confirm(i18n.global.t('setting.sslDisableHelper'), i18n.global.t('setting.sslDisable'), {
@@ -260,7 +273,6 @@ const handleSSL = async () => {
         type: 'info',
     })
         .then(async () => {
-            sslShow.value = false;
             await updateSSL({ ssl: 'disable', domain: '', sslType: '', key: '', cert: '', sslID: 0 });
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             let href = window.location.href;
@@ -270,6 +282,12 @@ const handleSSL = async () => {
         .catch(() => {
             form.ssl = 'enable';
         });
+};
+
+const loadInfo = async () => {
+    await loadSSLInfo().then(async (res) => {
+        sslInfo.value = res.data;
+    });
 };
 
 const onChangeExpirationTime = async () => {
