@@ -1,0 +1,34 @@
+on:
+  pull_request:
+    branches:
+      - dev
+  push:
+    branches:
+      - dev
+
+name: Build Test
+
+jobs:
+  build-linux-binary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install cross-compilers for linux/arm64
+        run: sudo apt-get update && sudo apt-get -y install gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.14'
+      - name: Build Web
+        id: build_frontend
+        run: |
+          cd frontend && npm install && npm run build:dev
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.20.x'
+      - name: Build Server
+        uses: goreleaser/goreleaser-action@v4
+        with:
+          args: release --snapshot --clean

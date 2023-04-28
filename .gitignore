@@ -23,3 +23,8 @@ cmd/server/web/assets
 cmd/server/web/monacoeditorwork
 cmd/server/web/index.html
 frontend/auto-imports.d.ts
+
+.history/
+dist/
+1pctl
+1panel.service
