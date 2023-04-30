@@ -140,7 +140,7 @@
                             {{ $t('commons.login.errorAuthInfo') }}
                         </span>
                     </el-form-item>
-                    <el-form-item prop="captcha" class="login-captcha">
+                    <el-form-item v-if="!globalStore.ignoreCaptcha" prop="captcha" class="login-captcha">
                         <el-input v-model.trim="loginForm.captcha" :placeholder="$t('commons.login.captchaHelper')">
                             <template #prefix>
                                 <svg-icon style="font-size: 7px" iconName="p-yanzhengma1"></svg-icon>
@@ -239,6 +239,7 @@ const loginFormRef = ref<FormInstance>();
 const loginForm = reactive({
     name: '',
     password: '',
+    ignoreCaptcha: true,
     captcha: '',
     captchaID: '',
     authMethod: '',
@@ -286,11 +287,12 @@ const login = (formEl: FormInstance | undefined) => {
         let requestLoginForm = {
             name: loginForm.name,
             password: loginForm.password,
+            ignoreCaptcha: globalStore.ignoreCaptcha,
             captcha: loginForm.captcha,
             captchaID: captcha.captchaID,
             authMethod: '',
         };
-        if (requestLoginForm.captcha == '') {
+        if (!globalStore.ignoreCaptcha && requestLoginForm.captcha == '') {
             errCaptcha.value = true;
             return;
         }
@@ -308,12 +310,14 @@ const login = (formEl: FormInstance | undefined) => {
                     errAuthInfo.value = false;
                 }
                 if (res.message === 'ErrAuth') {
+                    globalStore.ignoreCaptcha = false;
                     errCaptcha.value = false;
                     errAuthInfo.value = true;
                 }
                 loginVerify();
                 return;
             }
+            globalStore.ignoreCaptcha = true;
             if (res.data.mfaStatus === 'enable') {
                 mfaShow.value = true;
                 errMfaInfo.value = false;

@@ -929,6 +929,8 @@ definitions:
         type: string
       captchaID:
         type: string
+      ignoreCaptcha:
+        type: boolean
       name:
         type: string
       password:
