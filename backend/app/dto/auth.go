@@ -17,11 +17,12 @@ type MfaCredential struct {
 }
 
 type Login struct {
-	Name       string `json:"name"`
-	Password   string `json:"password"`
-	Captcha    string `json:"captcha"`
-	CaptchaID  string `json:"captchaID"`
-	AuthMethod string `json:"authMethod"`
+	Name          string `json:"name"`
+	Password      string `json:"password"`
+	IgnoreCaptcha bool   `json:"ignoreCaptcha"`
+	Captcha       string `json:"captcha"`
+	CaptchaID     string `json:"captchaID"`
+	AuthMethod    string `json:"authMethod"`
 }
 
 type MFALogin struct {

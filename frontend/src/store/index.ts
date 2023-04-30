@@ -23,6 +23,7 @@ export const GlobalStore = defineStore({
         isFullScreen: false,
         agreeLicense: false,
         hasNewVersion: false,
+        ignoreCaptcha: true,
     }),
     getters: {},
     actions: {

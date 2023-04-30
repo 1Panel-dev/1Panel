@@ -11111,6 +11111,9 @@ var doc = `{
                 "captchaID": {
                     "type": "string"
                 },
+                "ignoreCaptcha": {
+                    "type": "boolean"
+                },
                 "name": {
                     "type": "string"
                 },

@@ -2,6 +2,7 @@ export namespace Login {
     export interface ReqLoginForm {
         name: string;
         password: string;
+        ignoreCaptcha: boolean;
         captcha: string;
         captchaID: string;
         authMethod: string;
