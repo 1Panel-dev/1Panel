@@ -194,7 +194,7 @@ const onSaveUserName = async (formEl: FormInstance | undefined, key: string, val
                 await logOutApi();
                 loading.value = false;
                 MsgSuccess(i18n.t('commons.msg.operationSuccess'));
-                router.push({ name: 'login', params: { code: globalStore.entrance } });
+                router.push({ name: 'entrance', params: { code: globalStore.entrance } });
                 globalStore.setLogStatus(false);
                 return;
             })
@@ -250,7 +250,7 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
                 await logOutApi();
                 loading.value = false;
                 MsgSuccess(i18n.t('commons.msg.operationSuccess'));
-                router.push({ name: 'login', params: { code: globalStore.entrance } });
+                router.push({ name: 'entrance', params: { code: globalStore.entrance } });
                 globalStore.setLogStatus(false);
                 return;
             }
