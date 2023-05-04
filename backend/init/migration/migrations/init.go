@@ -8,6 +8,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
@@ -61,10 +62,13 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.AutoMigrate(&model.Setting{}); err != nil {
 			return err
 		}
+		encryptKey := common.RandStr(16)
 		if err := tx.Create(&model.Setting{Key: "UserName", Value: global.CONF.System.Username}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "Password", Value: global.CONF.System.Password}).Error; err != nil {
+		global.CONF.System.EncryptKey = encryptKey
+		pass, _ := encrypt.StringEncrypt(global.CONF.System.Password)
+		if err := tx.Create(&model.Setting{Key: "Password", Value: pass}).Error; err != nil {
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "Email", Value: ""}).Error; err != nil {
@@ -97,7 +101,7 @@ var AddTableSetting = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "JWTSigningKey", Value: common.RandStr(16)}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "EncryptKey", Value: common.RandStr(16)}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "EncryptKey", Value: encryptKey}).Error; err != nil {
 			return err
 		}
 

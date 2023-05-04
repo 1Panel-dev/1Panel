@@ -107,9 +107,9 @@ func loadParams(param string) string {
 	if err != nil {
 		panic(err)
 	}
-	baseDir := strings.ReplaceAll(stdout, "\n", "")
-	if len(baseDir) == 0 {
+	info := strings.ReplaceAll(stdout, "\n", "")
+	if len(info) == 0 || info == `""` {
 		panic(fmt.Sprintf("error `%s` find in /usr/bin/1pctl", param))
 	}
-	return baseDir
+	return info
 }
