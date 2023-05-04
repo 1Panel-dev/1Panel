@@ -12,7 +12,7 @@ type PageInfo struct {
 
 type UpdateDescription struct {
 	ID          uint   `json:"id" validate:"required"`
-	Description string `json:"description"`
+	Description string `json:"description" validate:"max=256"`
 }
 
 type OperationWithName struct {

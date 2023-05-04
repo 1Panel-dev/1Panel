@@ -69,7 +69,7 @@ type PortUpdate struct {
 
 type SnapshotCreate struct {
 	From        string `json:"from" validate:"required,oneof=OSS S3 SFTP MINIO COS KODO"`
-	Description string `json:"description"`
+	Description string `json:"description" validate:"max=256"`
 }
 type SnapshotRecover struct {
 	IsNew      bool `json:"isNew"`
@@ -79,12 +79,12 @@ type SnapshotRecover struct {
 type SnapshotImport struct {
 	From        string   `json:"from"`
 	Names       []string `json:"names"`
-	Description string   `json:"description"`
+	Description string   `json:"description" validate:"max=256"`
 }
 type SnapshotInfo struct {
 	ID          uint      `json:"id"`
 	Name        string    `json:"name"`
-	Description string    `json:"description"`
+	Description string    `json:"description" validate:"max=256"`
 	From        string    `json:"from"`
 	Status      string    `json:"status"`
 	Message     string    `json:"message"`
