@@ -23,7 +23,7 @@
                         <el-button @click="onChangeAccess" type="primary" plain>
                             {{ $t('database.remoteAccess') }}
                         </el-button>
-                        <el-button @click="goDashboard" type="primary" plain>phpMyAdmin</el-button>
+                        <el-button @click="goDashboard" icon="Position" type="primary" plain>phpMyAdmin</el-button>
                     </el-col>
                     <el-col :span="4">
                         <div class="search-button">

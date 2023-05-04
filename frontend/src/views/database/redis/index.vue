@@ -13,10 +13,10 @@
             </template>
             <template #toolbar v-if="!isOnSetting && redisIsExist">
                 <div :class="{ mask: redisStatus != 'Running' }">
-                    <el-button type="primary" plain @click="goDashboard" icon="Position">Redis-Commander</el-button>
                     <el-button type="primary" plain @click="onChangePassword">
                         {{ $t('database.databaseConnInfo') }}
                     </el-button>
+                    <el-button type="primary" plain @click="goDashboard" icon="Position">Redis-Commander</el-button>
                 </div>
             </template>
             <template #main v-if="redisIsExist && !isOnSetting">
