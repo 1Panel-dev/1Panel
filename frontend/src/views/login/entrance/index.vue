@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="login-backgroud">
+        <div class="login-backgroud" v-if="isSafety">
             <div class="login-wrapper">
                 <div :class="screenWidth > 1110 ? 'left inline-block' : ''">
                     <div class="login-title">
@@ -15,24 +15,36 @@
                 </div>
             </div>
         </div>
+        <div v-if="!isSafety">
+            <UnSafe />
+        </div>
     </div>
 </template>
 
 <script setup lang="ts" name="login">
 import { checkIsSafety } from '@/api/modules/auth';
-import LoginForm from './components/login-form.vue';
+import LoginForm from '../components/login-form.vue';
+import UnSafe from '@/components/error-message/unsafe.vue';
 import { ref, onMounted } from 'vue';
-import router from '@/routers';
 import { GlobalStore } from '@/store';
-
 const globalStore = GlobalStore();
 
+const isSafety = ref(true);
 const screenWidth = ref(null);
 
+const mySafetyCode = defineProps({
+    code: {
+        type: String,
+        required: true,
+        default: '',
+    },
+});
+
 const getStatus = async () => {
-    const res = await checkIsSafety(globalStore.entrance);
-    if (!res.data) {
-        router.replace({ name: 'entrance' });
+    const res = await checkIsSafety(mySafetyCode.code);
+    isSafety.value = res.data;
+    if (isSafety.value) {
+        globalStore.entrance = mySafetyCode.code;
     }
 };
 

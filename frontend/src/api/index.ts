@@ -43,7 +43,7 @@ class RequestHttp {
                 }
                 if (data.code == ResultEnum.OVERDUE || data.code == ResultEnum.FORBIDDEN) {
                     router.push({
-                        name: 'login',
+                        name: 'entrance',
                         params: { code: globalStore.entrance },
                     });
                     return Promise.reject(data);

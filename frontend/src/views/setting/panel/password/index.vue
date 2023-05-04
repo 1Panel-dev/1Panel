@@ -119,7 +119,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
                 passwordVisiable.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 await logOutApi();
-                router.push({ name: 'login', params: { code: globalStore.entrance } });
+                router.push({ name: 'entrance', params: { code: globalStore.entrance } });
                 globalStore.setLogStatus(false);
             })
             .catch(() => {

@@ -59,7 +59,7 @@ const acceptParams = (params: DialogProps): void => {
 };
 
 const random = async () => {
-    securityEntrance.value = getRandomStr(8);
+    securityEntrance.value = getRandomStr(10);
 };
 
 const submitEntrance = async () => {
