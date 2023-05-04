@@ -63,7 +63,7 @@ export const GetAppInstalled = (search: App.AppInstalledSearch) => {
 };
 
 export const InstalledOp = (op: App.AppInstalledOp) => {
-    return http.post<any>('apps/installed/op', op);
+    return http.post<any>('apps/installed/op', op, 40000);
 };
 
 export const SyncInstalledApp = () => {
