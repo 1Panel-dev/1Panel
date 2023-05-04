@@ -22,7 +22,7 @@ import { MsgSuccess } from '@/utils/message';
 
 const onCopy = () => {
     let input = document.createElement('input');
-    input.value = '1pcth user-info';
+    input.value = '1pctl user-info';
     document.body.appendChild(input);
     input.select();
     document.execCommand('Copy');
