@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func CompareVersion(version1 string, version2 string) bool {
@@ -133,4 +134,12 @@ func LoadSizeUnit(value float64) string {
 		return fmt.Sprintf("%vK", value/1024)
 	}
 	return fmt.Sprintf("%v", value)
+}
+
+func LoadTimeZone() string {
+	loc := time.Now().Location()
+	if _, err := time.LoadLocation(loc.String()); err != nil {
+		return "Asia/Shanghai"
+	}
+	return loc.String()
 }
