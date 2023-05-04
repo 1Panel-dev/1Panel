@@ -9,6 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/gin-gonic/gin"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/net"
@@ -24,8 +25,9 @@ func (b *BaseApi) LoadMonitor(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	req.StartTime = req.StartTime.Add(8 * time.Hour)
-	req.EndTime = req.EndTime.Add(8 * time.Hour)
+	loc, _ := time.LoadLocation(common.LoadTimeZone())
+	req.StartTime = req.StartTime.In(loc)
+	req.EndTime = req.EndTime.In(loc)
 
 	var backdatas []dto.MonitorData
 	if req.Param == "all" || req.Param == "cpu" || req.Param == "memory" || req.Param == "load" {
