@@ -20,6 +20,7 @@ import (
 	"path"
 	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -452,7 +453,11 @@ func (w WebsiteService) DeleteWebsiteDomain(domainId uint) error {
 		domains = append(domains, webSiteDomain.Domain)
 	}
 	if len(ports) > 0 || len(domains) > 0 {
-		if err := deleteListenAndServerName(website, ports, domains); err != nil {
+		stringBinds := make([]string, len(ports))
+		for i := 0; i < len(ports); i++ {
+			stringBinds[i] = strconv.Itoa(ports[i])
+		}
+		if err := deleteListenAndServerName(website, stringBinds, domains); err != nil {
 			return err
 		}
 	}
@@ -599,14 +604,29 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 	if !req.Enable {
 		website.Protocol = constant.ProtocolHTTP
 		website.WebsiteSSLID = 0
-		if err := deleteListenAndServerName(website, []int{443}, []string{}); err != nil {
+		if err := deleteListenAndServerName(website, []string{"443", "[::]:443"}, []string{}); err != nil {
 			return response.WebsiteHTTPS{}, err
 		}
 		nginxParams := getNginxParamsFromStaticFile(dto.SSL, nil)
-		nginxParams = append(nginxParams, dto.NginxParam{
-			Name:   "if",
-			Params: []string{"($scheme", "=", "http)"},
-		})
+		nginxParams = append(nginxParams,
+			dto.NginxParam{
+				Name:   "if",
+				Params: []string{"($scheme", "=", "http)"},
+			},
+			dto.NginxParam{
+				Name: "ssl_certificate",
+			},
+			dto.NginxParam{
+				Name: "ssl_certificate_key",
+			},
+			dto.NginxParam{
+				Name: "ssl_protocols",
+			},
+			dto.NginxParam{
+				Name: "ssl_ciphers",
+			},
+		)
+		nginxParams = append(nginxParams)
 		if err := deleteNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
 			return response.WebsiteHTTPS{}, err
 		}
