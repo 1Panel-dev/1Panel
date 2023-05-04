@@ -1351,6 +1351,7 @@ const message = {
         source: '来源',
         anyWhere: '所有 IP',
         address: '指定 IP',
+        addressHelper: '支持输入 IP 或 IP 段',
         allow: '放行',
         deny: '屏蔽',
         addressFormatError: '请输入合法的 ip 地址！',

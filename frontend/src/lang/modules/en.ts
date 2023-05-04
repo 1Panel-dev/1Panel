@@ -1366,6 +1366,7 @@ const message = {
         source: 'Source',
         anyWhere: 'AnyWhere',
         address: 'Specified IP',
+        addressHelper: 'Support IP address or IP segment',
         allow: 'Allow',
         deny: 'Deny',
         addressFormatError: 'Please enter a valid ip address!',

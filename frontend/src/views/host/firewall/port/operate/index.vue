@@ -37,7 +37,10 @@
                             v-if="dialogData.rowData!.source === 'address'"
                             prop="address"
                         >
-                            <el-input v-model="dialogData.rowData!.address" />
+                            <el-input
+                                :placeholder="$t('firewall.addressHelper')"
+                                v-model="dialogData.rowData!.address"
+                            />
                         </el-form-item>
 
                         <el-form-item :label="$t('firewall.strategy')" prop="strategy">
