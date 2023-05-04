@@ -301,7 +301,7 @@ func addListenAndServerName(website model.Website, ports []int, domains []string
 	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxFull.Install.ContainerName)
 }
 
-func deleteListenAndServerName(website model.Website, ports []int, domains []string) error {
+func deleteListenAndServerName(website model.Website, binds []string, domains []string) error {
 	nginxFull, err := getNginxFull(&website)
 	if err != nil {
 		return nil
@@ -309,8 +309,8 @@ func deleteListenAndServerName(website model.Website, ports []int, domains []str
 	nginxConfig := nginxFull.SiteConfig
 	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
-	for _, port := range ports {
-		server.DeleteListen(strconv.Itoa(port))
+	for _, bind := range binds {
+		server.DeleteListen(bind)
 	}
 	for _, domain := range domains {
 		server.DeleteServerName(domain)
@@ -372,16 +372,20 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
 	server.UpdateListen("443", false, "ssl")
+	server.UpdateListen("[::]:443", false, "ssl")
 
 	switch req.HttpConfig {
 	case constant.HTTPSOnly:
 		server.RemoveListenByBind("80")
+		server.RemoveListenByBind("[::]:80")
 		server.RemoveDirective("if", []string{"($scheme"})
 	case constant.HTTPToHTTPS:
 		server.UpdateListen("80", website.DefaultServer)
+		server.UpdateListen("[::]:80", false)
 		server.AddHTTP2HTTPS()
 	case constant.HTTPAlso:
 		server.UpdateListen("80", website.DefaultServer)
+		server.UpdateListen("[::]:80", false)
 		server.RemoveDirective("if", []string{"($scheme"})
 	}
 
