@@ -21,10 +21,21 @@ const hostRouter = {
             },
         },
         {
-            path: '/hosts/monitor',
+            path: '/hosts/monitor/monitor',
             name: 'Monitorx',
-            component: () => import('@/views/host/monitor/index.vue'),
+            component: () => import('@/views/host/monitor/monitor/index.vue'),
             meta: {
+                title: 'menu.monitor',
+                requiresAuth: false,
+            },
+        },
+        {
+            path: '/hosts/monitor/setting',
+            name: 'MonitorSetting',
+            component: () => import('@/views/host/monitor/setting/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/hosts/monitor/monitor',
                 title: 'menu.monitor',
                 requiresAuth: false,
             },
@@ -54,7 +65,7 @@ const hostRouter = {
             component: () => import('@/views/host/firewall/ip/index.vue'),
             hidden: true,
             meta: {
-                title: 'menu.toolbox',
+                activeMenu: '/hosts/firewall/port',
                 requiresAuth: false,
             },
         },

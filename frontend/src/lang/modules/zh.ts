@@ -657,6 +657,8 @@ const message = {
         errPath: '备份路径 [{0}] 错误，无法下载！',
     },
     monitor: {
+        monitor: '监控',
+        setting: '设置',
         avgLoad: '平均负载',
         loadDetail: '负载详情',
         resourceUsage: '资源使用率',

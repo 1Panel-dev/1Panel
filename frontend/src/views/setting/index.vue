@@ -26,10 +26,6 @@ const buttons = [
         path: '/settings/backupaccount',
     },
     {
-        label: i18n.global.t('setting.monitor'),
-        path: '/settings/monitor',
-    },
-    {
         label: i18n.global.t('setting.snapshot'),
         path: '/settings/snapshot',
     },
