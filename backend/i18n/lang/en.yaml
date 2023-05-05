@@ -17,6 +17,7 @@ ErrRepoNotValid: "Remote repository verification failed！"
 ErrNameIsExist: "Name is already exist"
 ErrDemoEnvironment: "Demo server, prohibit this operation!"
 ErrCmdTimeout: "Command execution timed out！"
+ErrInitUser: "The user initialization has been completed by the system. Please do not repeat the operation!"
 
 #app
 ErrPortInUsed: "{{ .detail }} port already in use"

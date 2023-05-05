@@ -17,6 +17,7 @@ ErrRepoNotValid: "远程仓库校验失败！"
 ErrNameIsExist: "名称已存在"
 ErrDemoEnvironment: "演示服务器，禁止此操作!"
 ErrCmdTimeout: "命令执行超时！"
+ErrInitUser: "系统已完成用户初始化，请勿重复操作!"
 
 #app
 ErrPortInUsed: "{{ .detail }} 端口已被占用！"
