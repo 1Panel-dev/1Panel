@@ -18,9 +18,9 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
 	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 )
 
 type SettingService struct{}
@@ -101,6 +101,7 @@ func (u *SettingService) UpdatePort(port uint) error {
 }
 
 func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
+	secretDir := global.CONF.System.BaseDir + "/1panel/secret/"
 	if req.SSL == "disable" {
 		if err := settingRepo.Update("SSL", "disable"); err != nil {
 			return err
@@ -108,8 +109,8 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		if err := settingRepo.Update("SSLType", "self"); err != nil {
 			return err
 		}
-		_ = os.Remove(global.CONF.System.BaseDir + "/1panel/secret/server.crt")
-		_ = os.Remove(global.CONF.System.BaseDir + "/1panel/secret/server.key")
+		_ = os.Remove(secretDir + "server.crt")
+		_ = os.Remove(secretDir + "server.key")
 		go func() {
 			_, err := cmd.Exec("systemctl restart 1panel.service")
 			if err != nil {
@@ -119,8 +120,8 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		return nil
 	}
 
-	if _, err := os.Stat(global.CONF.System.BaseDir + "/1panel/secret"); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(global.CONF.System.BaseDir+"/1panel/secret", os.ModePerm); err != nil {
+	if _, err := os.Stat(secretDir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(secretDir, os.ModePerm); err != nil {
 			return err
 		}
 	}
@@ -148,7 +149,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		}
 	}
 	if req.SSLType == "import" {
-		cert, err := os.OpenFile("/opt/1panel/secret/server.crt", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+		cert, err := os.OpenFile(secretDir+"server.crt.tmp", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 		if err != nil {
 			return err
 		}
@@ -156,7 +157,7 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		if _, err := cert.WriteString(req.Cert); err != nil {
 			return err
 		}
-		key, err := os.OpenFile("/opt/1panel/secret/server.key", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+		key, err := os.OpenFile(secretDir+"server.key.tmp", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 		if err != nil {
 			return err
 		}
@@ -166,6 +167,14 @@ func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
 		defer key.Close()
 	}
 	if err := checkCertValid(req.Domain); err != nil {
+		return err
+	}
+
+	fileOp := files.NewFileOp()
+	if err := fileOp.Rename(secretDir+"server.crt.tmp", secretDir+"server.crt"); err != nil {
+		return err
+	}
+	if err := fileOp.Rename(secretDir+"server.key.tmp", secretDir+"server.key"); err != nil {
 		return err
 	}
 	if err := settingRepo.Update("SSL", req.SSL); err != nil {
@@ -294,11 +303,11 @@ func loadInfoFromCert() (*dto.SSLInfo, error) {
 }
 
 func checkCertValid(domain string) error {
-	certificate, err := os.ReadFile(global.CONF.System.BaseDir + "/1panel/secret/server.crt")
+	certificate, err := os.ReadFile(global.CONF.System.BaseDir + "/1panel/secret/server.crt.tmp")
 	if err != nil {
 		return err
 	}
-	key, err := os.ReadFile(global.CONF.System.BaseDir + "/1panel/secret/server.key")
+	key, err := os.ReadFile(global.CONF.System.BaseDir + "/1panel/secret/server.key.tmp")
 	if err != nil {
 		return err
 	}
@@ -309,24 +318,9 @@ func checkCertValid(domain string) error {
 	if certBlock == nil {
 		return err
 	}
-	certObj, err := x509.ParseCertificate(certBlock.Bytes)
-	if err != nil {
+	if _, err := x509.ParseCertificate(certBlock.Bytes); err != nil {
 		return err
 	}
 
-	if len(certObj.IPAddresses) != 0 {
-		for _, ip := range certObj.IPAddresses {
-			if ip.String() == domain {
-				return nil
-			}
-		}
-	}
-	if len(certObj.DNSNames) != 0 {
-		for _, ip := range certObj.DNSNames {
-			if ip == domain {
-				return nil
-			}
-		}
-	}
-	return errors.New("The domain name or ip address does not match")
+	return nil
 }
