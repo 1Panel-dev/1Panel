@@ -58,7 +58,7 @@
                                     <td width="20%">
                                         <el-select v-model="row.protocol" style="width: 100%">
                                             <el-option label="tcp" value="tcp" />
-                                            <el-option label="upd" value="upd" />
+                                            <el-option label="udp" value="udp" />
                                         </el-select>
                                     </td>
                                     <td>

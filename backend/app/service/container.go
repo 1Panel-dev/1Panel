@@ -418,8 +418,8 @@ func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
 		return portMap, nil
 	}
 	for _, port := range ports {
-		if strings.Contains(port.HostPort, "-") {
-			if !strings.Contains(port.ContainerPort, "-") {
+		if strings.Contains(port.ContainerPort, "-") {
+			if !strings.Contains(port.HostPort, "-") {
 				return portMap, buserr.New(constant.ErrPortRules)
 			}
 			hostStart, _ := strconv.Atoi(strings.Split(port.HostPort, "-")[0])
@@ -442,7 +442,12 @@ func checkPortStats(ports []dto.PortHelper) (nat.PortMap, error) {
 				}
 			}
 		} else {
-			portItem, _ := strconv.Atoi(port.HostPort)
+			portItem := 0
+			if strings.Contains(port.HostPort, "-") {
+				portItem, _ = strconv.Atoi(strings.Split(port.HostPort, "-")[0])
+			} else {
+				portItem, _ = strconv.Atoi(port.HostPort)
+			}
 			if common.ScanPort(portItem) {
 				return portMap, buserr.WithDetail(constant.ErrPortInUsed, portItem, nil)
 			}
