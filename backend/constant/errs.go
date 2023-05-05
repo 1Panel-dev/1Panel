@@ -46,6 +46,7 @@ var (
 	ErrTypeNotSafety       = "ErrNotSafety"
 	ErrNameIsExist         = "ErrNameIsExist"
 	ErrDemoEnvironment     = "ErrDemoEnvironment"
+	ErrInitUser            = "ErrInitUser"
 )
 
 // app

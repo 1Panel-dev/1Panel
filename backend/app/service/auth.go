@@ -1,11 +1,11 @@
 package service
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
@@ -191,5 +191,5 @@ func (u *AuthService) InitUser(c *gin.Context, req dto.InitUser) error {
 		return nil
 	}
 
-	return fmt.Errorf("can't init user because user %s is in system", user.Value)
+	return buserr.New(constant.ErrInitUser)
 }
