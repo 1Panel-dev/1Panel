@@ -2,18 +2,20 @@
     <div>
         <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
-                <DrawerHeader :header="$t('setting.expirationTime')" :back="handleClose" />
+                <DrawerHeader :header="$t('setting.sessionTimeout')" :back="handleClose" />
             </template>
-            <el-form ref="timeoutFormRef" @submit.prevent label-position="top" :model="form">
+            <el-form
+                ref="formRef"
+                label-position="top"
+                :rules="rules"
+                :model="form"
+                @submit.prevent
+                v-loading="loading"
+            >
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item
-                            :label="$t('setting.days')"
-                            prop="days"
-                            :rules="[Rules.number, checkNumberRange(0, 60)]"
-                        >
-                            <el-input clearable v-model.number="form.days" />
-                            <span class="input-help">{{ $t('setting.expirationHelper') }}</span>
+                        <el-form-item :label="$t('setting.sessionTimeout')" prop="sessionTimeout">
+                            <el-input clearable v-model.number="form.sessionTimeout" />
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -21,7 +23,7 @@
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button type="primary" @click="submitTimeout(timeoutFormRef)">
+                    <el-button :disabled="loading" type="primary" @click="onSaveTimeout(formRef)">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>
@@ -31,41 +33,46 @@
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
+import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { updateSetting } from '@/api/modules/setting';
 import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
-import i18n from '@/lang';
+import { updateSetting } from '@/api/modules/setting';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 interface DialogProps {
-    expirationDays: number;
+    sessionTimeout: number;
 }
 const drawerVisiable = ref();
 const loading = ref();
 
-const timeoutFormRef = ref();
 const form = reactive({
-    days: 0,
+    sessionTimeout: 86400,
 });
 
+const rules = reactive({
+    sessionTimeout: [Rules.integerNumber, checkNumberRange(300, 864000)],
+});
+
+const formRef = ref<FormInstance>();
+
 const acceptParams = (params: DialogProps): void => {
-    form.days = params.expirationDays;
+    form.sessionTimeout = params.sessionTimeout;
     drawerVisiable.value = true;
 };
 
-const submitTimeout = async (formEl: FormInstance | undefined) => {
+const onSaveTimeout = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        loading.value = true;
-        await updateSetting({ key: 'ExpirationDays', value: form.days + '' })
-            .then(() => {
-                loading.value = false;
+        await updateSetting({ key: 'SessionTimeout', value: form.sessionTimeout + '' })
+            .then(async () => {
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                emit('search');
+                loading.value = false;
                 drawerVisiable.value = false;
+                emit('search');
+                return;
             })
             .catch(() => {
                 loading.value = false;
