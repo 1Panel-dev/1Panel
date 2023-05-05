@@ -482,6 +482,9 @@ func (f FileOp) Decompress(srcFile string, dst string, cType CompressType) error
 
 	handler := func(ctx context.Context, archFile archiver.File) error {
 		info := archFile.FileInfo
+		if strings.HasPrefix(archFile.NameInArchive, "__MACOSX") {
+			return nil
+		}
 		filePath := filepath.Join(dst, archFile.NameInArchive)
 		if archFile.FileInfo.IsDir() {
 			if err := f.Fs.MkdirAll(filePath, info.Mode()); err != nil {
