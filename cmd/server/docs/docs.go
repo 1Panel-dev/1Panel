@@ -799,48 +799,6 @@ var doc = `{
                 }
             }
         },
-        "/auth/init": {
-            "post": {
-                "description": "初始化用户",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Init user",
-                "parameters": [
-                    {
-                        "description": "request",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.InitUser"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/auth/isfirst": {
-            "get": {
-                "description": "判断是否为首次登录",
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Check is First login",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    }
-                }
-            }
-        },
         "/auth/issafety": {
             "get": {
                 "description": "获取系统安全登录状态",
@@ -11073,21 +11031,6 @@ var doc = `{
                 }
             }
         },
-        "dto.InitUser": {
-            "type": "object",
-            "required": [
-                "name",
-                "password"
-            ],
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
         "dto.InspectReq": {
             "type": "object",
             "properties": {
@@ -11987,7 +11930,8 @@ var doc = `{
             ],
             "properties": {
                 "description": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 256
                 },
                 "from": {
                     "type": "string",
@@ -12006,7 +11950,8 @@ var doc = `{
             "type": "object",
             "properties": {
                 "description": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 256
                 },
                 "from": {
                     "type": "string"
@@ -12043,7 +11988,8 @@ var doc = `{
             ],
             "properties": {
                 "description": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 256
                 },
                 "id": {
                     "type": "integer"

@@ -105,10 +105,8 @@ const message = {
             comfimNoNull: 'Make sure the value {0} is not empty',
         },
         login: {
-            firstLogin: 'First login, please create an initial administrator user!',
             username: 'UserName',
             password: 'Password',
-            rePassword: 'Confirm Password',
             welcome: 'Welcome back, please enter your username and password to log in!',
             errorAuthInfo: 'The user name or password you entered is incorrect, please re-enter!',
             errorMfaInfo: 'Incorrect authentication information, please try again!',

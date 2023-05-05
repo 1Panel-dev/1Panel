@@ -2,10 +2,8 @@ package service
 
 import (
 	"strconv"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
@@ -20,8 +18,6 @@ type AuthService struct{}
 
 type IAuthService interface {
 	CheckIsSafety(code string) bool
-	CheckIsFirst() bool
-	InitUser(c *gin.Context, req dto.InitUser) error
 	VerifyCode(code string) (bool, error)
 	Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error)
 	LogOut(c *gin.Context) error
@@ -156,40 +152,4 @@ func (u *AuthService) CheckIsSafety(code string) bool {
 		return true
 	}
 	return status.Value == code
-}
-
-func (u *AuthService) CheckIsFirst() bool {
-	user, _ := settingRepo.Get(settingRepo.WithByKey("UserName"))
-	pass, _ := settingRepo.Get(settingRepo.WithByKey("Password"))
-	return len(user.Value) == 0 || len(pass.Value) == 0
-}
-
-func (u *AuthService) InitUser(c *gin.Context, req dto.InitUser) error {
-	user, _ := settingRepo.Get(settingRepo.WithByKey("UserName"))
-	pass, _ := settingRepo.Get(settingRepo.WithByKey("Password"))
-	if len(user.Value) == 0 || len(pass.Value) == 0 {
-		newPass, err := encrypt.StringEncrypt(req.Password)
-		if err != nil {
-			return err
-		}
-		if err := settingRepo.Update("UserName", req.Name); err != nil {
-			return err
-		}
-		if err := settingRepo.Update("Password", newPass); err != nil {
-			return err
-		}
-		expiredSetting, err := settingRepo.Get(settingRepo.WithByKey("ExpirationDays"))
-		if err != nil {
-			return err
-		}
-		timeout, _ := strconv.Atoi(expiredSetting.Value)
-		if timeout != 0 {
-			if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006-01-02 15:04:05")); err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-
-	return buserr.New(constant.ErrInitUser)
 }
