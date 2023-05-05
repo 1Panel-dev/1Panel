@@ -626,7 +626,6 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 				Name: "ssl_ciphers",
 			},
 		)
-		nginxParams = append(nginxParams)
 		if err := deleteNginxConfig(constant.NginxScopeServer, nginxParams, &website); err != nil {
 			return response.WebsiteHTTPS{}, err
 		}
@@ -1181,6 +1180,8 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	if !fileOp.Stat(includePath) {
 		_ = fileOp.CreateFile(includePath)
 	}
+	backName := fmt.Sprintf("%s.bak", req.Name)
+	backPath := path.Join(includeDir, backName)
 
 	defer func() {
 		if err != nil {
@@ -1210,15 +1211,12 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 		}
 	case "delete":
 		_ = fileOp.DeleteFile(includePath)
+		_ = fileOp.DeleteFile(backPath)
 		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
 	case "disable":
-		backName := fmt.Sprintf("%s.bak", req.Name)
-		backPath := path.Join(includeDir, backName)
 		_ = fileOp.Rename(includePath, backPath)
 		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
 	case "enable":
-		backName := fmt.Sprintf("%s.bak", req.Name)
-		backPath := path.Join(includeDir, backName)
 		_ = fileOp.Rename(backPath, includePath)
 		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
 	}
