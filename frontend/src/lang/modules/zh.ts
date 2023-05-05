@@ -109,10 +109,8 @@ const message = {
             comfimNoNull: '请确认 {0} 值不为空',
         },
         login: {
-            firstLogin: '首次登录，请创建初始管理员用户！',
             username: '用户名',
             password: '密码',
-            rePassword: '确认密码',
             welcome: '欢迎回来，请输入用户名和密码登录！',
             errorAuthInfo: '您输入的用户名或密码不正确，请重新输入！',
             errorMfaInfo: '错误的验证信息，请重试！',

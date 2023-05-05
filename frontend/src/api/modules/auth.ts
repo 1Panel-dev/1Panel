@@ -25,16 +25,8 @@ export const loginStatus = () => {
     return http.get<any>('/info');
 };
 
-export const checkIsFirst = () => {
-    return http.get<boolean>('/auth/isfirst');
-};
-
 export const checkIsSafety = (code: string) => {
     return http.get<boolean>(`/auth/issafety?code=${code}`);
-};
-
-export const initUser = (params: Login.InitUser) => {
-    return http.post(`/auth/init`, params);
 };
 
 export const checkIsDemo = () => {

@@ -31,8 +31,3 @@ type MFALogin struct {
 	Code       string `json:"code"`
 	AuthMethod string `json:"authMethod"`
 }
-
-type InitUser struct {
-	Name     string `json:"name" validate:"required"`
-	Password string `json:"password" validate:"required"`
-}

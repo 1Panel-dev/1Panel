@@ -904,16 +904,6 @@ definitions:
     - sourceID
     - targetName
     type: object
-  dto.InitUser:
-    properties:
-      name:
-        type: string
-      password:
-        type: string
-    required:
-    - name
-    - password
-    type: object
   dto.InspectReq:
     properties:
       id:
@@ -1510,6 +1500,7 @@ definitions:
   dto.SnapshotCreate:
     properties:
       description:
+        maxLength: 256
         type: string
       from:
         enum:
@@ -1526,6 +1517,7 @@ definitions:
   dto.SnapshotImport:
     properties:
       description:
+        maxLength: 256
         type: string
       from:
         type: string
@@ -1548,6 +1540,7 @@ definitions:
   dto.UpdateDescription:
     properties:
       description:
+        maxLength: 256
         type: string
       id:
         type: integer
@@ -3551,33 +3544,6 @@ paths:
         "200":
           description: ""
       summary: Check System isDemo
-      tags:
-      - Auth
-  /auth/init:
-    post:
-      consumes:
-      - application/json
-      description: 初始化用户
-      parameters:
-      - description: request
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/dto.InitUser'
-      responses:
-        "200":
-          description: ""
-      summary: Init user
-      tags:
-      - Auth
-  /auth/isfirst:
-    get:
-      description: 判断是否为首次登录
-      responses:
-        "200":
-          description: ""
-      summary: Check is First login
       tags:
       - Auth
   /auth/issafety:

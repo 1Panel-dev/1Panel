@@ -18,10 +18,6 @@ export namespace Login {
         token: string;
         mfaStatus: string;
     }
-    export interface InitUser {
-        name: string;
-        password: string;
-    }
     export interface ResCaptcha {
         imagePath: string;
         captchaID: string;

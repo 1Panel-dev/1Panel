@@ -1,74 +1,6 @@
 <template>
     <div v-loading="loading">
-        <div v-if="isFirst">
-            <div class="login-form">
-                <el-form ref="registerFormRef" :model="registerForm" size="default" :rules="registerRules">
-                    <div class="login-title">{{ $t('commons.button.init') }}</div>
-                    <input type="text" class="hide" id="name" />
-                    <input type="password" class="hide" id="password" />
-                    <el-form-item prop="name" class="no-border">
-                        <el-input
-                            v-model.trim="registerForm.name"
-                            :placeholder="$t('commons.login.username')"
-                            autocomplete="off"
-                            type="text"
-                        >
-                            <template #prefix>
-                                <el-icon class="el-input__icon">
-                                    <user />
-                                </el-icon>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item prop="password" class="no-border">
-                        <el-input
-                            type="password"
-                            clearable
-                            v-model.trim="registerForm.password"
-                            show-password
-                            :placeholder="$t('commons.login.password')"
-                            name="passwod"
-                            autocomplete="new-password"
-                        >
-                            <template #prefix>
-                                <el-icon class="el-input__icon">
-                                    <lock />
-                                </el-icon>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item prop="rePassword" class="no-border">
-                        <el-input
-                            type="password"
-                            clearable
-                            v-model.trim="registerForm.rePassword"
-                            show-password
-                            :placeholder="$t('commons.login.rePassword')"
-                        >
-                            <template #prefix>
-                                <el-icon class="el-input__icon">
-                                    <lock />
-                                </el-icon>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button
-                            @focus="registerButtonFocused = true"
-                            @blur="registerButtonFocused = false"
-                            @click="register(registerFormRef)"
-                            class="login-button"
-                            type="primary"
-                            size="default"
-                            round
-                        >
-                            {{ $t('commons.button.init') }}
-                        </el-button>
-                    </el-form-item>
-                </el-form>
-            </div>
-        </div>
-        <div v-else-if="mfaShow">
+        <div v-if="mfaShow">
             <div class="login-form">
                 <el-form @submit.prevent>
                     <div class="login-title">{{ $t('commons.login.mfaTitle') }}</div>
@@ -201,11 +133,10 @@
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import type { ElForm } from 'element-plus';
-import { loginApi, getCaptcha, mfaLoginApi, checkIsFirst, initUser, checkIsDemo } from '@/api/modules/auth';
+import { loginApi, getCaptcha, mfaLoginApi, checkIsDemo } from '@/api/modules/auth';
 import { GlobalStore } from '@/store';
 import { MenuStore } from '@/store/modules/menu';
 import i18n from '@/lang';
-import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 
 const globalStore = GlobalStore();
@@ -217,22 +148,7 @@ const errMfaInfo = ref(false);
 const isDemo = ref(false);
 const errAgree = ref(false);
 
-const isFirst = ref();
-
 type FormInstance = InstanceType<typeof ElForm>;
-
-const registerButtonFocused = ref(false);
-const registerFormRef = ref<FormInstance>();
-const registerForm = reactive({
-    name: '',
-    password: '',
-    rePassword: '',
-});
-const registerRules = reactive({
-    name: [Rules.requiredInput, Rules.userName],
-    password: [Rules.requiredInput, Rules.password],
-    rePassword: [Rules.requiredInput, { validator: checkPassword, trigger: 'blur' }],
-});
 
 const loginButtonFocused = ref();
 const loginFormRef = ref<FormInstance>();
@@ -269,16 +185,6 @@ const loading = ref<boolean>(false);
 const mfaShow = ref<boolean>(false);
 
 const router = useRouter();
-
-const register = (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        await initUser(registerForm);
-        checkStatus();
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    });
-};
 
 const login = (formEl: FormInstance | undefined) => {
     if (!formEl) return;
@@ -358,39 +264,20 @@ const loginVerify = async () => {
     captcha.captchaLength = res.data.captchaLength ? res.data.captchaLength : 0;
 };
 
-const checkStatus = async () => {
-    const res = await checkIsFirst();
-    isFirst.value = res.data;
-    if (!isFirst.value) {
-        loginVerify();
-    }
-};
-
 const checkIsSystemDemo = async () => {
     const res = await checkIsDemo();
     isDemo.value = res.data;
 };
 
-function checkPassword(rule: any, value: any, callback: any) {
-    if (registerForm.password !== registerForm.rePassword) {
-        return callback(new Error(i18n.global.t('commons.rule.rePassword')));
-    }
-    callback();
-}
-
 onMounted(() => {
     document.title = globalStore.themeConfig.panelName;
     loginForm.agreeLicense = globalStore.agreeLicense;
-    checkStatus();
     checkIsSystemDemo();
     document.onkeydown = (e: any) => {
         e = window.event || e;
         if (e.keyCode === 13) {
             if (!mfaShow.value) {
-                if (isFirst.value && !registerButtonFocused.value) {
-                    register(registerFormRef.value);
-                }
-                if (!isFirst.value && !loginButtonFocused.value) {
+                if (!loginButtonFocused.value) {
                     login(loginFormRef.value);
                 }
             }

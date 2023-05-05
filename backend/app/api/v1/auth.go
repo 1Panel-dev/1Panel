@@ -107,40 +107,6 @@ func (b *BaseApi) CheckIsSafety(c *gin.Context) {
 }
 
 // @Tags Auth
-// @Summary Check is First login
-// @Description 判断是否为首次登录
-// @Success 200
-// @Router /auth/isfirst [get]
-func (b *BaseApi) CheckIsFirstLogin(c *gin.Context) {
-	helper.SuccessWithData(c, authService.CheckIsFirst())
-}
-
-// @Tags Auth
-// @Summary Init user
-// @Description 初始化用户
-// @Accept json
-// @Param request body dto.InitUser true "request"
-// @Success 200
-// @Router /auth/init [post]
-func (b *BaseApi) InitUserInfo(c *gin.Context) {
-	var req dto.InitUser
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-
-	if err := authService.InitUser(c, req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	helper.SuccessWithData(c, nil)
-}
-
-// @Tags Auth
 // @Summary Check System isDemo
 // @Description 判断是否为demo环境
 // @Success 200
