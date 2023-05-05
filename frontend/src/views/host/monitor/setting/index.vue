@@ -1,6 +1,8 @@
 <template>
     <div>
-        <LayoutContent v-loading="loading" :title="$t('setting.monitor')" :divider="true">
+        <MonitorRouter />
+
+        <LayoutContent v-loading="loading" :title="$t('monitor.setting')" :divider="true">
             <template #main>
                 <el-form :model="form" @submit.prevent ref="panelFormRef" label-position="left" label-width="160px">
                     <el-row>
@@ -50,6 +52,7 @@ import { onMounted, reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import LayoutContent from '@/layout/layout-content.vue';
 import { cleanMonitors, getSettingInfo, getSystemAvailable, updateSetting } from '@/api/modules/setting';
+import MonitorRouter from '@/views/host/monitor/index.vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';

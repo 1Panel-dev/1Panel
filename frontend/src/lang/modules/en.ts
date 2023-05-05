@@ -648,6 +648,8 @@ const message = {
         errPath: 'Backup path [{0}] error, cannot download!',
     },
     monitor: {
+        monitor: 'Monitor',
+        setting: 'Setting',
         avgLoad: 'Average load',
         loadDetail: 'Load detail',
         resourceUsage: 'Resource utilization rate',
