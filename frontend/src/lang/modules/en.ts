@@ -809,6 +809,7 @@ const message = {
         containSub: 'Modify sub-file attributes at the same time',
         ownerHelper:
             'The default user of the PHP operating environment: the user group is 1000:1000, it is normal that the users inside and outside the container show inconsistencies',
+        searchHelper: 'Support wildcards such as *',
     },
     setting: {
         all: 'All',
