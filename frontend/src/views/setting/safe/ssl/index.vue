@@ -186,7 +186,6 @@ const onDownload = async () => {
 };
 
 const onSaveSSL = async (formEl: FormInstance | undefined) => {
-    onDownload();
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;

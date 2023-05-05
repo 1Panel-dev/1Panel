@@ -2,19 +2,15 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('setting.safe')" :divider="true">
             <template #main>
-                <el-form :model="form" ref="panelFormRef" v-loading="loading" label-position="left" label-width="180px">
+                <el-form :model="form" v-loading="loading" label-position="left" label-width="180px">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
                         <el-col :span="12">
-                            <el-form-item :label="$t('setting.panelPort')" :rules="Rules.port" prop="serverPort">
-                                <el-input clearable v-model.number="form.serverPort">
+                            <el-form-item :label="$t('setting.panelPort')" prop="serverPort">
+                                <el-input disabled v-model.number="form.serverPort">
                                     <template #append>
-                                        <el-button
-                                            style="width: 85px"
-                                            @click="onSavePort(panelFormRef, 'ServerPort', form.serverPort)"
-                                            icon="Collection"
-                                        >
-                                            {{ $t('commons.button.save') }}
+                                        <el-button @click="onChangePort" icon="Setting">
+                                            {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
                                 </el-input>
@@ -28,14 +24,14 @@
                                     v-model="form.securityEntrance"
                                 >
                                     <template #append>
-                                        <el-button style="width: 85px" @click="onChangeEntrance" icon="Setting">
+                                        <el-button @click="onChangeEntrance" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
                                 </el-input>
                                 <el-input disabled v-if="!form.securityEntrance" v-model="unset">
                                     <template #append>
-                                        <el-button style="width: 85px" @click="onChangeEntrance" icon="Setting">
+                                        <el-button @click="onChangeEntrance" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -46,7 +42,7 @@
                             <el-form-item :label="$t('setting.expirationTime')" prop="expirationTime">
                                 <el-input disabled v-model="form.expirationTime">
                                     <template #append>
-                                        <el-button style="width: 85px" @click="onChangeExpirationTime" icon="Setting">
+                                        <el-button @click="onChangeExpirationTime" icon="Setting">
                                             {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
@@ -62,9 +58,7 @@
                             </el-form-item>
                             <el-form-item :label="$t('setting.complexity')" prop="complexityVerification">
                                 <el-switch
-                                    @change="
-                                        onSave(panelFormRef, 'ComplexityVerification', form.complexityVerification)
-                                    "
+                                    @change="onSaveComplexity"
                                     v-model="form.complexityVerification"
                                     active-value="enable"
                                     inactive-value="disable"
@@ -112,6 +106,7 @@
             </template>
         </LayoutContent>
 
+        <PortSetting ref="portRef" />
         <MfaSetting ref="mfaRef" @search="search" />
         <SSLSetting ref="sslRef" @search="search" />
         <EntranceSetting ref="entranceRef" @search="search" />
@@ -123,25 +118,19 @@
 import { ref, reactive, onMounted } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
 import LayoutContent from '@/layout/layout-content.vue';
+import PortSetting from '@/views/setting/safe/port/index.vue';
 import SSLSetting from '@/views/setting/safe/ssl/index.vue';
 import MfaSetting from '@/views/setting/safe/mfa/index.vue';
 import TimeoutSetting from '@/views/setting/safe/timeout/index.vue';
 import EntranceSetting from '@/views/setting/safe/entrance/index.vue';
-import {
-    updateSetting,
-    getSettingInfo,
-    updatePort,
-    getSystemAvailable,
-    updateSSL,
-    loadSSLInfo,
-} from '@/api/modules/setting';
+import { updateSetting, getSettingInfo, getSystemAvailable, updateSSL, loadSSLInfo } from '@/api/modules/setting';
 import i18n from '@/lang';
-import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 import { Setting } from '@/api/interface/setting';
 
 const loading = ref(false);
 const entranceRef = ref();
+const portRef = ref();
 const timeoutref = ref();
 const mfaRef = ref();
 
@@ -155,10 +144,9 @@ const form = reactive({
     securityEntrance: '',
     expirationDays: 0,
     expirationTime: '',
-    complexityVerification: '',
+    complexityVerification: 'disable',
     mfaStatus: 'disable',
 });
-type FormInstance = InstanceType<typeof ElForm>;
 
 const unset = ref(i18n.global.t('setting.unSetting'));
 
@@ -176,20 +164,11 @@ const search = async () => {
     form.complexityVerification = res.data.complexityVerification;
     form.mfaStatus = res.data.mfaStatus;
 };
-const panelFormRef = ref<FormInstance>();
 
-const onSave = async (formEl: FormInstance | undefined, key: string, val: any) => {
-    if (!formEl) return;
-    const result = await formEl.validateField(key.replace(key[0], key[0].toLowerCase()), callback);
-    if (!result) {
-        return;
-    }
-    if (val === '') {
-        return;
-    }
+const onSaveComplexity = async () => {
     let param = {
-        key: key,
-        value: val + '',
+        key: 'ComplexityVerification',
+        value: form.complexityVerification,
     };
     loading.value = true;
     await updateSetting(param)
@@ -202,41 +181,7 @@ const onSave = async (formEl: FormInstance | undefined, key: string, val: any) =
             loading.value = false;
         });
 };
-function callback(error: any) {
-    if (error) {
-        return error.message;
-    } else {
-        return;
-    }
-}
-const onSavePort = async (formEl: FormInstance | undefined, key: string, val: any) => {
-    if (!formEl) return;
-    const result = await formEl.validateField(key.replace(key[0], key[0].toLowerCase()), callback);
-    if (!result) {
-        return;
-    }
-    ElMessageBox.confirm(i18n.global.t('setting.portChangeHelper'), i18n.global.t('setting.portChange'), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(async () => {
-        loading.value = true;
-        let param = {
-            serverPort: val,
-        };
-        await updatePort(param)
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                let href = window.location.href;
-                let ip = href.split('//')[1].split(':')[0];
-                window.open(`${href.split('//')[0]}//${ip}:${val}/`, '_self');
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    });
-};
+
 const handleMFA = async () => {
     if (form.mfaStatus === 'enable') {
         mfaRef.value.acceptParams();
@@ -256,6 +201,9 @@ const handleMFA = async () => {
 
 const onChangeEntrance = async () => {
     entranceRef.value.acceptParams({ securityEntrance: form.securityEntrance });
+};
+const onChangePort = async () => {
+    portRef.value.acceptParams({ serverPort: form.serverPort });
 };
 const handleSSL = async () => {
     if (form.ssl === 'enable') {

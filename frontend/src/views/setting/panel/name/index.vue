@@ -2,18 +2,13 @@
     <div>
         <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
-                <DrawerHeader :header="$t('setting.expirationTime')" :back="handleClose" />
+                <DrawerHeader :header="$t('setting.title')" :back="handleClose" />
             </template>
-            <el-form ref="timeoutFormRef" @submit.prevent label-position="top" :model="form">
+            <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item
-                            :label="$t('setting.days')"
-                            prop="days"
-                            :rules="[Rules.number, checkNumberRange(0, 60)]"
-                        >
-                            <el-input clearable v-model.number="form.days" />
-                            <span class="input-help">{{ $t('setting.expirationHelper') }}</span>
+                        <el-form-item :label="$t('setting.title')" prop="panelName" :rules="Rules.requiredInput">
+                            <el-input clearable v-model="form.panelName" />
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -21,7 +16,7 @@
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button type="primary" @click="submitTimeout(timeoutFormRef)">
+                    <el-button :disabled="loading" type="primary" @click="onSavePanelName(formRef)">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>
@@ -30,42 +25,48 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
+import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { updateSetting } from '@/api/modules/setting';
 import { FormInstance } from 'element-plus';
-import { Rules, checkNumberRange } from '@/global/form-rules';
-import i18n from '@/lang';
+import { Rules } from '@/global/form-rules';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
+const themeConfig = computed(() => globalStore.themeConfig);
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 interface DialogProps {
-    expirationDays: number;
+    panelName: string;
 }
 const drawerVisiable = ref();
 const loading = ref();
 
-const timeoutFormRef = ref();
 const form = reactive({
-    days: 0,
+    panelName: '',
 });
 
+const formRef = ref<FormInstance>();
+
 const acceptParams = (params: DialogProps): void => {
-    form.days = params.expirationDays;
+    form.panelName = params.panelName;
     drawerVisiable.value = true;
 };
 
-const submitTimeout = async (formEl: FormInstance | undefined) => {
+const onSavePanelName = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        loading.value = true;
-        await updateSetting({ key: 'ExpirationDays', value: form.days + '' })
-            .then(() => {
-                loading.value = false;
+        await updateSetting({ key: 'PanelName', value: form.panelName })
+            .then(async () => {
+                globalStore.setThemeConfig({ ...themeConfig.value, panelName: form.panelName });
+                document.title = form.panelName;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                emit('search');
+                loading.value = false;
                 drawerVisiable.value = false;
+                emit('search');
+                return;
             })
             .catch(() => {
                 loading.value = false;
