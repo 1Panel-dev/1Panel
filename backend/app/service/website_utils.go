@@ -497,16 +497,32 @@ func opWebsite(website *model.Website, operate string) error {
 	}
 	server := servers[0]
 	if operate == constant.StopWeb {
-		if website.Type == constant.Deployment || website.Type == constant.Static || website.Type == constant.Proxy {
+		proxyInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
+		server.RemoveDirective("include", []string{proxyInclude})
+		rewriteInclude := fmt.Sprintf("/www/sites/%s/rewrite/%s.conf", website.Alias, website.Alias)
+		server.RemoveDirective("include", []string{rewriteInclude})
+
+		switch website.Type {
+		case constant.Deployment:
 			server.RemoveDirective("location", []string{"", "/"})
-		}
-		if website.Type == constant.Runtime {
+		case constant.Runtime:
 			server.RemoveDirective("location", []string{"~", "[^/]\\.php(/|$)"})
 		}
 		server.UpdateRoot("/usr/share/nginx/html/stop")
 		website.Status = constant.WebStopped
 	}
 	if operate == constant.StartWeb {
+		proxyInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
+		absoluteIncludeDir := path.Join(nginxInstall.Install.GetPath(), fmt.Sprintf("/www/sites/%s/proxy", website.Alias))
+		if files.NewFileOp().Stat(absoluteIncludeDir) {
+			server.UpdateDirective("include", []string{proxyInclude})
+		}
+		server.UpdateDirective("include", []string{proxyInclude})
+		rewriteInclude := fmt.Sprintf("/www/sites/%s/rewrite/%s.conf", website.Alias, website.Alias)
+		absoluteRewritePath := path.Join(nginxInstall.Install.GetPath(), rewriteInclude)
+		if files.NewFileOp().Stat(absoluteRewritePath) {
+			server.UpdateDirective("include", []string{rewriteInclude})
+		}
 		switch website.Type {
 		case constant.Deployment:
 			server.RemoveDirective("root", nil)
@@ -521,7 +537,6 @@ func opWebsite(website *model.Website, operate string) error {
 			server.UpdateRootLocation()
 		case constant.Proxy:
 			server.RemoveDirective("root", nil)
-			server.UpdateRootProxy([]string{website.Proxy})
 		case constant.Runtime:
 			rootIndex := path.Join("/www/sites", website.Alias, "index")
 			server.UpdateRoot(rootIndex)
