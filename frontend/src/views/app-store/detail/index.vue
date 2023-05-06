@@ -149,7 +149,6 @@ const openInstall = () => {
         params: appDetail.value.params,
         appDetailId: appDetail.value.id,
     };
-    console.log(app.value);
     if (app.value.type === 'php') {
         router.push({ path: '/websites/runtime/php' });
     } else {
