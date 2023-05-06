@@ -1195,11 +1195,13 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	}
 	fileName := fmt.Sprintf("%s.conf", req.Name)
 	includePath := path.Join(includeDir, fileName)
-	if !fileOp.Stat(includePath) {
-		_ = fileOp.CreateFile(includePath)
-	}
 	backName := fmt.Sprintf("%s.bak", req.Name)
 	backPath := path.Join(includeDir, backName)
+
+	if req.Operate == "create" && (fileOp.Stat(includePath) || fileOp.Stat(backPath)) {
+		err = buserr.New(constant.ErrNameIsExist)
+		return
+	}
 
 	defer func() {
 		if err != nil {
