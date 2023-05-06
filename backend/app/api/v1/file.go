@@ -520,7 +520,6 @@ func (b *BaseApi) Size(c *gin.Context) {
 // @Success 200 {string} content
 // @Security ApiKeyAuth
 // @Router /files/loadfile [post]
-// @x-panel-log {"bodyKeys":["path"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"读取文件 [path]","formatEN":"Read file [path]"}
 func (b *BaseApi) LoadFromFile(c *gin.Context) {
 	var req dto.FilePath
 	if err := c.ShouldBindJSON(&req); err != nil {

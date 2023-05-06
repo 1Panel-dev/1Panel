@@ -67,6 +67,32 @@ func ExecWithTimeOut(cmdStr string, timeout time.Duration) (string, error) {
 	return stdout.String(), nil
 }
 
+func ExecCronjobWithTimeOut(cmdStr string, timeout time.Duration) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+	cmd := exec.Command("bash", "-c", cmdStr)
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if ctx.Err() == context.DeadlineExceeded {
+		return "", buserr.New(constant.ErrCmdTimeout)
+	}
+
+	errMsg := ""
+	if len(stderr.String()) != 0 {
+		errMsg = fmt.Sprintf("stderr:\n %s", stderr.String())
+	}
+	if len(stdout.String()) != 0 {
+		if len(errMsg) != 0 {
+			errMsg = fmt.Sprintf("%s \n\n; stdout:\n %s", errMsg, stdout.String())
+		} else {
+			errMsg = fmt.Sprintf("stdout\n: %s", stdout.String())
+		}
+	}
+	return errMsg, err
+}
+
 func Execf(cmdStr string, a ...interface{}) (string, error) {
 	cmd := exec.Command("bash", "-c", fmt.Sprintf(cmdStr, a...))
 	var stdout, stderr bytes.Buffer
