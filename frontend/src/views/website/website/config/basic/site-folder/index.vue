@@ -31,7 +31,7 @@
                         </el-button>
                     </el-space>
                 </el-form-item>
-                <el-form-item :label="$t('website.userGroup')">
+                <el-form-item v-if="configDir" :label="$t('website.userGroup')">
                     <el-space wrap>
                         <el-input v-model="updatePermission.user" class="user-num-input">
                             <template #prepend>{{ $t('website.user') }}</template>
@@ -45,7 +45,7 @@
                     </el-space>
                 </el-form-item>
             </el-form>
-            <el-alert :closable="false">
+            <el-alert :closable="false" v-if="configDir">
                 <template #default>
                     <span class="warnHelper">{{ $t('website.runDirHelper') }}</span>
                     <span class="warnHelper">{{ $t('website.runUserHelper') }}</span>
