@@ -515,6 +515,7 @@ const onRefresh = async () => {
         records.value = res.data.items;
         hasRecords.value = true;
         currentRecord.value = records.value[0];
+        loadRecord(currentRecord.value);
     } else {
         records.value = [];
         hasRecords.value = false;

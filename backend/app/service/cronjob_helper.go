@@ -29,7 +29,7 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 			if len(cronjob.Script) == 0 {
 				return
 			}
-			stdout, errExec := cmd.ExecWithTimeOut(cronjob.Script, 5*time.Minute)
+			stdout, errExec := cmd.ExecCronjobWithTimeOut(cronjob.Script, 5*time.Minute)
 			if errExec != nil {
 				err = errExec
 			}
