@@ -96,6 +96,10 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 	if err != nil {
 		return 0, nil, err
 	}
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return 0, nil, err
+	}
 	for _, web := range websites {
 		var (
 			appName     string
@@ -115,10 +119,12 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 			}
 			runtimeName = runtime.Name
 		}
+		sitePath := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", web.Alias)
 		websiteDTOs = append(websiteDTOs, response.WebsiteDTO{
 			Website:     web,
 			AppName:     appName,
 			RuntimeName: runtimeName,
+			SitePath:    sitePath,
 		})
 	}
 	return total, websiteDTOs, nil
