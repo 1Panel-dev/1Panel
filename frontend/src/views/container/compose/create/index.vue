@@ -167,6 +167,7 @@ const loadTemplates = async () => {
 };
 
 const acceptParams = (): void => {
+    mode.value = 'edit';
     drawerVisiable.value = true;
     form.name = '';
     form.from = 'edit';
