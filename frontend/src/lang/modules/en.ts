@@ -896,6 +896,7 @@ const message = {
         mfaHelper2: 'Scan the following QR code using the mobile app to obtain the 6-digit verification code',
         mfaHelper3: 'Enter six digits from the app',
         mfaCode: 'Code',
+        sslChangeHelper: 'Modify the https setting and restart the service. Do you want to continue?',
         sslDisable: 'Disable',
         sslDisableHelper:
             'If the https service is disabled, you need to restart the panel for it to take effect. Do you want to continue?',
