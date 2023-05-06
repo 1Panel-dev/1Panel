@@ -79,6 +79,15 @@
                             <span v-if="row.type === 'runtime'">[{{ row.runtimeName }}]</span>
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('website.sitePath')" prop="sitePath">
+                        <template #default="{ row }">
+                            <el-button type="primary" link @click="toFolder(row.sitePath)">
+                                <el-icon>
+                                    <FolderOpened />
+                                </el-icon>
+                            </el-button>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" prop="status" width="100px">
                         <template #default="{ row }">
                             <el-button
@@ -402,6 +411,10 @@ const opWebsite = (op: string, id: number) => {
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
     });
+};
+
+const toFolder = (folder: string) => {
+    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 onMounted(() => {
