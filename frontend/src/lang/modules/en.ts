@@ -888,6 +888,8 @@ const message = {
         complexityHelper:
             'The password must contain at least eight characters and contain at least three uppercase letters, lowercase letters, digits, and special characters',
         mfa: 'MFA',
+        mfaAlert:
+            'MFA password is generated based on the current time. Please ensure that the server time is synchronized.',
         mfaHelper: 'After this function is enabled, the mobile application verification code will be verified',
         mfaHelper1: 'Download a MFA verification mobile app e.g.:',
         mfaHelper2: 'Scan the following QR code using the mobile app to obtain the 6-digit verification code',

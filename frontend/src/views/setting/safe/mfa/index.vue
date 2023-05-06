@@ -10,7 +10,21 @@
             <template #header>
                 <DrawerHeader :header="$t('setting.mfa')" :back="handleClose" />
             </template>
-            <el-form :model="form" ref="formRef" @submit.prevent v-loading="loading" label-position="top">
+            <el-alert :closable="false" type="warning">
+                <template #default>
+                    <span>
+                        <span>{{ $t('setting.mfaAlert') }}</span>
+                    </span>
+                </template>
+            </el-alert>
+            <el-form
+                :model="form"
+                style="margin-top: 20px"
+                ref="formRef"
+                @submit.prevent
+                v-loading="loading"
+                label-position="top"
+            >
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
                         <el-form-item :label="$t('setting.mfaHelper1')">

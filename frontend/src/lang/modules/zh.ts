@@ -925,6 +925,7 @@ const message = {
         complexity: '密码复杂度验证',
         complexityHelper: '开启后密码必须满足密码长度大于 8 位且包含字母、数字及特殊字符',
         mfa: '两步验证',
+        mfaAlert: '两步验证密码是基于当前时间生成，请确保服务器时间已同步',
         mfaHelper: '开启后会验证手机应用验证码',
         mfaHelper1: '下载两步验证手机应用 如:',
         mfaHelper2: '使用手机应用扫描以下二维码，获取 6 位验证码',
