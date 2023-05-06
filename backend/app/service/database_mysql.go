@@ -518,12 +518,12 @@ func excSQL(containerName, password, command string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "docker", "exec", containerName, "mysql", "-uroot", "-p"+password, "-e", command)
-	err := cmd.Run()
+	stdout, err := cmd.CombinedOutput()
 	if ctx.Err() == context.DeadlineExceeded {
 		return buserr.WithDetail(constant.ErrExecTimeOut, containerName, nil)
 	}
-	if err != nil {
-		stdStr := strings.ReplaceAll(err.Error(), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
+	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
+	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
 		return errors.New(stdStr)
 	}
 	return nil
