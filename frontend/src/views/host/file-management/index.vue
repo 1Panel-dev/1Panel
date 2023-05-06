@@ -356,6 +356,7 @@ const back = () => {
 };
 
 const jump = async (url: string) => {
+    const oldUrl = req.path;
     // reset search params before exec jump
     Object.assign(req, initData());
     req.path = url;
@@ -364,6 +365,7 @@ const jump = async (url: string) => {
     let searchResult = await searchFile();
     // check search result,the file is exists?
     if (!searchResult.data.path) {
+        req.path = oldUrl;
         MsgWarning(i18n.global.t('commons.res.notFound'));
         return;
     }
