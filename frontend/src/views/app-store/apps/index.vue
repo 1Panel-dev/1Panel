@@ -31,8 +31,7 @@
                             clearable
                             @clear="searchByName('')"
                             suffix-icon="Search"
-                            @keyup.enter="searchByName(req.name)"
-                            @blur="searchByName(req.name)"
+                            @change="searchByName(req.name)"
                             :placeholder="$t('commons.button.search')"
                         ></el-input>
                     </div>
