@@ -343,13 +343,6 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	}
 	go upApp(appInstall)
 	go updateToolApp(appInstall)
-	ports := []int{appInstall.HttpPort}
-	if appInstall.HttpsPort > 0 {
-		ports = append(ports, appInstall.HttpsPort)
-	}
-	go func() {
-		_ = OperateFirewallPort(nil, ports)
-	}()
 	return
 }
 

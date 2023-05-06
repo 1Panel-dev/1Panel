@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/parser"
@@ -409,10 +410,16 @@ func (w WebsiteService) DeleteWebsite(req request.WebsiteDelete) error {
 }
 
 func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) (model.WebsiteDomain, error) {
-	var domainModel model.WebsiteDomain
-	var ports []int
-	var domains []string
-
+	var (
+		domainModel model.WebsiteDomain
+		ports       []int
+		domains     []string
+	)
+	if create.Port != 80 {
+		if common.ScanPort(create.Port) {
+			return domainModel, buserr.WithDetail(constant.ErrPortInUsed, create.Port, nil)
+		}
+	}
 	website, err := websiteRepo.GetFirst(commonRepo.WithByID(create.WebsiteID))
 	if err != nil {
 		return domainModel, err
@@ -428,6 +435,11 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 		Domain:    create.Domain,
 		Port:      create.Port,
 		WebsiteID: create.WebsiteID,
+	}
+	if create.Port != 80 {
+		go func() {
+			_ = OperateFirewallPort(nil, []int{create.Port})
+		}()
 	}
 	return domainModel, websiteDomainRepo.Create(context.TODO(), &domainModel)
 }
