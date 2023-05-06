@@ -110,7 +110,7 @@ import { MsgSuccess } from '@/utils/message';
 import { updateSSL } from '@/api/modules/setting';
 import { DownloadByPath } from '@/api/modules/files';
 import { Rules } from '@/global/form-rules';
-import { FormInstance } from 'element-plus';
+import { ElMessageBox, FormInstance } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
 
 const loading = ref();
@@ -189,21 +189,27 @@ const onSaveSSL = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        let param = {
-            ssl: 'enable',
-            sslType: form.sslType,
-            domain: '',
-            sslID: form.sslID,
-            cert: form.cert,
-            key: form.key,
-        };
-        let href = window.location.href;
-        param.domain = href.split('//')[1].split(':')[0];
-        await updateSSL(param).then(() => {
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        ElMessageBox.confirm(i18n.global.t('setting.sslChangeHelper'), 'https', {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        }).then(async () => {
+            let param = {
+                ssl: 'enable',
+                sslType: form.sslType,
+                domain: '',
+                sslID: form.sslID,
+                cert: form.cert,
+                key: form.key,
+            };
             let href = window.location.href;
-            let address = href.split('://')[1];
-            window.open(`https://${address}/`, '_self');
+            param.domain = href.split('//')[1].split(':')[0];
+            await updateSSL(param).then(() => {
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                let href = window.location.href;
+                let address = href.split('://')[1];
+                window.open(`https://${address}/`, '_self');
+            });
         });
     });
 };
