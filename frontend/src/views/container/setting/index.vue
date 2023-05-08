@@ -63,7 +63,7 @@
                                 />
                             </el-form-item>
                             <el-form-item label="iptables" prop="iptables">
-                                <el-switch v-model="form.iptables"></el-switch>
+                                <el-switch v-model="form.iptables" @change="onChangeIptables"></el-switch>
                             </el-form-item>
                             <el-form-item label="live-restore" prop="liveRestore">
                                 <el-switch :disabled="form.isSwarm" v-model="form.liveRestore"></el-switch>
@@ -126,6 +126,28 @@
             </template>
         </el-dialog>
 
+        <el-dialog
+            v-model="iptablesVisiable"
+            :title="$t('container.iptablesDisable')"
+            width="30%"
+            :destroy-on-close="true"
+            :close-on-click-modal="false"
+            :close-on-press-escape="false"
+            :show-close="false"
+        >
+            <span>{{ $t('container.iptablesHelper1') }}</span>
+            <span style="color: red; font-weight: 500">{{ $t('container.iptablesHelper2') }}</span>
+            !
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="onSaveIptables(true)">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button type="primary" @click="onSaveIptables(false)">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </span>
+            </template>
+        </el-dialog>
+
         <ConfirmDialog ref="confirmDialogRef" @confirm="onSubmitSave"></ConfirmDialog>
     </div>
 </template>
@@ -172,6 +194,8 @@ const stopVisiable = ref();
 const stopSocket = ref();
 const stopService = ref();
 
+const iptablesVisiable = ref();
+
 const onSave = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
@@ -192,6 +216,17 @@ const onSaveFile = async () => {
         submitInputInfo: i18n.global.t('database.restartNow'),
     };
     confirmDialogRef.value!.acceptParams(params);
+};
+
+const onChangeIptables = () => {
+    if (!form.iptables) {
+        iptablesVisiable.value = true;
+    }
+};
+
+const onSaveIptables = (status: boolean) => {
+    form.iptables = status;
+    iptablesVisiable.value = false;
 };
 
 const onOperator = async (operation: string) => {
