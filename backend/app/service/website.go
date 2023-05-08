@@ -86,6 +86,13 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 		websiteDTOs []response.WebsiteDTO
 		opts        []repo.DBOption
 	)
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return 0, nil, nil
+		}
+		return 0, nil, err
+	}
 	opts = append(opts, commonRepo.WithOrderBy("created_at desc"))
 	if req.Name != "" {
 		opts = append(opts, websiteRepo.WithDomainLike(req.Name))
@@ -94,10 +101,6 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 		opts = append(opts, websiteRepo.WithGroupID(req.WebsiteGroupID))
 	}
 	total, websites, err := websiteRepo.Page(req.Page, req.PageSize, opts...)
-	if err != nil {
-		return 0, nil, err
-	}
-	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return 0, nil, err
 	}
