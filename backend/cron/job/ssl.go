@@ -4,6 +4,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/app/service"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"time"
 )
 
@@ -18,13 +19,14 @@ func (ssl *ssl) Run() {
 	sslRepo := repo.NewISSLRepo()
 	sslService := service.NewIWebsiteSSLService()
 	sslList, _ := sslRepo.List()
+	nyc, _ := time.LoadLocation(common.LoadTimeZone())
 	global.LOG.Info("The scheduled certificate update task is currently in progress ...")
 	now := time.Now().Add(10 * time.Second)
 	for _, s := range sslList {
 		if !s.AutoRenew || s.Provider == "manual" || s.Provider == "dnsManual" {
 			continue
 		}
-		expireDate := s.ExpireDate.In(time.Now().Location())
+		expireDate := s.ExpireDate.In(nyc)
 		sub := expireDate.Sub(now)
 		if sub.Hours() < 720 {
 			global.LOG.Errorf("Update the SSL certificate for the [%s] domain", s.PrimaryDomain)
