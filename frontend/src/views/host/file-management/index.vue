@@ -682,9 +682,9 @@ onMounted(() => {
 }
 
 .search {
-    float: right;
     display: inline;
-    width: 20%;
+    width: 300px;
+    float: right;
 }
 
 .copy-button {
