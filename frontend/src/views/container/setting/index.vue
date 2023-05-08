@@ -136,8 +136,9 @@
             :show-close="false"
         >
             <span>{{ $t('container.iptablesHelper1') }}</span>
-            <span style="color: red; font-weight: 500">{{ $t('container.iptablesHelper2') }}</span>
-            !
+            <div style="margin-top: 10px">
+                <span style="color: red; font-weight: 500">{{ $t('container.iptablesHelper2') }}</span>
+            </div>
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="onSaveIptables(true)">{{ $t('commons.button.cancel') }}</el-button>
