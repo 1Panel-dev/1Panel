@@ -5,9 +5,8 @@ import (
 )
 
 type Server struct {
-	Comment string
-	Listens []*ServerListen
-	//Locations  []*Location
+	Comment    string
+	Listens    []*ServerListen
 	Directives []IDirective
 	Line       int
 }
@@ -22,15 +21,6 @@ func NewServer(directive IDirective) (*Server, error) {
 			switch dir.GetName() {
 			case "listen":
 				server.Listens = append(server.Listens, NewServerListen(dir.GetParameters(), dir.GetLine()))
-			//case "location":
-			//	locationDirective := &Directive{
-			//		Name:       "location",
-			//		Parameters: dir.GetParameters(),
-			//		Block:      dir.GetBlock(),
-			//		Line:       dir.GetLine(),
-			//		Comment:    dir.GetComment(),
-			//	}
-			//	server.Locations = append(server.Locations, NewLocation(locationDirective))
 			default:
 				server.Directives = append(server.Directives, dir)
 			}
@@ -61,9 +51,6 @@ func (s *Server) GetDirectives() []IDirective {
 	for _, ls := range s.Listens {
 		directives = append(directives, ls)
 	}
-	//for _, la := range s.Locations {
-	//	directives = append(directives, la)
-	//}
 	directives = append(directives, s.Directives...)
 	return directives
 }
