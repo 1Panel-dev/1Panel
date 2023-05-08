@@ -22,7 +22,7 @@ func (w *website) Run() {
 	nyc, _ := time.LoadLocation(common.LoadTimeZone())
 	websites, _ := repo.NewIWebsiteRepo().List()
 	global.LOG.Info("Website scheduled task in progress ...")
-	now := time.Now().Add(10 * time.Second)
+	now := time.Now().Add(10 * time.Minute)
 	if len(websites) > 0 {
 		neverExpireDate, _ := time.Parse(constant.DateLayout, constant.DefaultDate)
 		var wg sync.WaitGroup
@@ -30,7 +30,11 @@ func (w *website) Run() {
 			if site.Status != constant.WebRunning || neverExpireDate.Equal(site.ExpireDate) {
 				continue
 			}
-			expireDate, _ := time.ParseInLocation(constant.DateTimeLayout, site.ExpireDate.String(), nyc)
+			expireDate, err := time.ParseInLocation(constant.DateLayout, site.ExpireDate.Format(constant.DateLayout), nyc)
+			if err != nil {
+				global.LOG.Errorf("time parse err %v", err)
+				continue
+			}
 			if expireDate.Before(now) {
 				wg.Add(1)
 				go func(ws model.Website) {
