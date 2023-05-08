@@ -504,7 +504,7 @@ func opWebsite(website *model.Website, operate string) error {
 
 		switch website.Type {
 		case constant.Deployment:
-			server.RemoveDirective("location", []string{"", "/"})
+			server.RemoveDirective("location", []string{"/"})
 		case constant.Runtime:
 			server.RemoveDirective("location", []string{"~", "[^/]\\.php(/|$)"})
 		}
