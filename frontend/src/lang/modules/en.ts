@@ -580,6 +580,9 @@ const message = {
         liveHelper:
             'Allows the running container state to be preserved in case of unexpected shutdown or crash of the Docker daemon',
         liveWithSwarmHelper: 'live-restore daemon configuration is incompatible with swarm mode.',
+        iptablesDisable: 'Close iptables',
+        iptablesHelper1: 'This setting will disable Docker automatic configuration of iptables rules, which may cause ',
+        iptablesHelper2: 'the container is unable to communicate with the external network',
         daemonJsonPath: 'Conf Path',
         serviceUnavailable: 'Docker service is not started at present, please click',
         startIn: ' to start',
