@@ -75,13 +75,13 @@ func Init() {
 			version = serverConfig.System.Version
 		}
 		if serverConfig.System.Username != "" {
-			version = serverConfig.System.Username
+			username = serverConfig.System.Username
 		}
 		if serverConfig.System.Password != "" {
-			version = serverConfig.System.Password
+			password = serverConfig.System.Password
 		}
 		if serverConfig.System.Entrance != "" {
-			version = serverConfig.System.Entrance
+			entrance = serverConfig.System.Entrance
 		}
 	}
 
