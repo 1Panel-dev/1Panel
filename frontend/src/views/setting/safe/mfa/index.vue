@@ -28,7 +28,7 @@
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
                         <el-form-item :label="$t('setting.mfaHelper1')">
-                            <ul>
+                            <ul class="help-ul">
                                 <li>Google Authenticator</li>
                                 <li>Microsoft Authenticator</li>
                                 <li>1Password</li>
@@ -136,3 +136,8 @@ defineExpose({
     acceptParams,
 });
 </script>
+<style scoped>
+.help-ul {
+    color: #8f959e;
+}
+</style>
