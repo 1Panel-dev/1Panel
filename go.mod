@@ -7,7 +7,7 @@ require (
 	github.com/aws/aws-sdk-go v1.44.99
 	github.com/compose-spec/compose-go v1.13.2
 	github.com/creack/pty v1.1.18
-	github.com/dgraph-io/badger/v3 v3.2103.5
+	github.com/dgraph-io/badger/v4 v4.1.0
 	github.com/docker/cli v23.0.1+incompatible
 	github.com/docker/compose/v2 v2.17.2
 	github.com/docker/docker v23.0.3+incompatible
@@ -81,7 +81,6 @@ require (
 	github.com/buger/goterm v1.0.4 // indirect
 	github.com/bytedance/sonic v1.8.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
-	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/clbanning/mxj v1.8.5-0.20200714211355-ff02cfb8ea28 // indirect
