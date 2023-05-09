@@ -1048,6 +1048,7 @@ const message = {
         updateHelper: '更新参数可能导致应用无法启动，请提前备份并谨慎操作',
         updateWarn: '更新参数需要重建应用，是否继续？',
         busPort: '服务端口',
+        syncStart: '开始同步！请稍后刷新应用商店',
     },
     website: {
         website: '网站',

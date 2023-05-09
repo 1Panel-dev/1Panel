@@ -147,7 +147,7 @@ const sync = () => {
     loading.value = true;
     SyncApp()
         .then(() => {
-            MsgSuccess(i18n.global.t('app.syncSuccess'));
+            MsgSuccess(i18n.global.t('app.syncStart'));
             canUpdate.value = false;
             search(req);
         })

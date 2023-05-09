@@ -1045,6 +1045,7 @@ const message = {
         updateHelper: 'Updating parameters may cause the application to fail to start, please operate with caution',
         updateWarn: 'Update parameters need to rebuild the application, Do you want to continue? ',
         busPort: 'Service Port',
+        syncStart: 'Start syncing! Please refresh the app store later',
     },
     website: {
         website: 'Website',
