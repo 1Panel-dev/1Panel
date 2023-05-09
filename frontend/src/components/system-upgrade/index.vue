@@ -53,7 +53,11 @@
                     {{ upgradeInfo.latestVersion }} {{ $t('setting.latestVersion') }}
                 </el-radio>
             </el-radio-group>
-            <MdEditor v-model="upgradeInfo.releaseNote" previewOnly />
+            <MdEditor
+                v-model="upgradeInfo.releaseNote"
+                previewOnly
+                :theme="globalStore.$state.themeConfig.theme || 'light'"
+            />
         </div>
         <template #footer>
             <span class="dialog-footer">

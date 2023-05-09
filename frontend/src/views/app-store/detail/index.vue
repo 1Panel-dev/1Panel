@@ -83,7 +83,11 @@
                 </div>
             </div>
             <div v-loading="loadingDetail" style="margin-left: 10px">
-                <MdEditor v-model="appDetail.readme" previewOnly />
+                <MdEditor
+                    v-model="appDetail.readme"
+                    previewOnly
+                    :theme="globalStore.$state.themeConfig.theme || 'light'"
+                />
             </div>
         </template>
     </LayoutContent>
@@ -98,6 +102,8 @@ import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Install from './install/index.vue';
 import router from '@/routers';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const language = useI18n().locale.value;
 
