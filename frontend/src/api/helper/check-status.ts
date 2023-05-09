@@ -13,6 +13,7 @@ export const checkStatus = (status: number, msg: string): void => {
             MsgError(msg ? msg : i18n.global.t('commons.res.notFound'));
             break;
         case 403:
+            globalStore.setLogStatus(false);
             router.replace({ name: 'entrance', params: { code: globalStore.entrance } });
             MsgError(msg ? msg : i18n.global.t('commons.res.forbidden'));
             break;

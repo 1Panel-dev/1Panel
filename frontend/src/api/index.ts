@@ -42,6 +42,7 @@ class RequestHttp {
                     globalStore.setCsrfToken(response.headers['x-csrf-token']);
                 }
                 if (data.code == ResultEnum.OVERDUE || data.code == ResultEnum.FORBIDDEN) {
+                    globalStore.setLogStatus(false);
                     router.push({
                         name: 'entrance',
                         params: { code: globalStore.entrance },
@@ -49,6 +50,7 @@ class RequestHttp {
                     return Promise.reject(data);
                 }
                 if (data.code == ResultEnum.EXPIRED) {
+                    globalStore.setLogStatus(false);
                     router.push({ name: 'Expired' });
                     return data;
                 }

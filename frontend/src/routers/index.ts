@@ -11,10 +11,23 @@ const axiosCanceler = new AxiosCanceler();
 router.beforeEach((to, from, next) => {
     NProgress.start();
     axiosCanceler.removeAllPending();
+    const globalStore = GlobalStore();
+
+    if (to.name === 'entrance' && globalStore.isLogin) {
+        if (to.params.code === globalStore.entrance) {
+            next({
+                name: 'entrance',
+                params: { code: globalStore.entrance },
+            });
+            NProgress.done();
+            return;
+        }
+        next({ name: '404' });
+        NProgress.done();
+        return;
+    }
 
     if (!to.matched.some((record) => record.meta.requiresAuth)) return next();
-
-    const globalStore = GlobalStore();
     if (!globalStore.isLogin) {
         next({
             name: 'entrance',
@@ -23,6 +36,7 @@ router.beforeEach((to, from, next) => {
         NProgress.done();
         return;
     }
+
     return next();
 });
 
