@@ -14,7 +14,7 @@ func Init() {
 	options := badger.Options{
 		Dir:                c,
 		ValueDir:           c,
-		ValueLogFileSize:   102400000,
+		ValueLogFileSize:   128 << 20,
 		ValueLogMaxEntries: 100000,
 		VLogPercentile:     0.1,
 
@@ -26,10 +26,10 @@ func Init() {
 		MaxLevels:                     7,
 		NumGoroutines:                 8,
 		MetricsEnabled:                true,
-		NumCompactors:                 4,
+		NumCompactors:                 2,
 		NumLevelZeroTables:            5,
 		NumLevelZeroTablesStall:       15,
-		NumMemtables:                  5,
+		NumMemtables:                  1,
 		BloomFalsePositive:            0.01,
 		BlockSize:                     4 * 1024,
 		SyncWrites:                    false,
