@@ -5,6 +5,8 @@ system:
   repo_url: https://resource.fit2cloud.com/1panel/package
   is_demo: false
   port: 9999
+  username: admin
+  password: admin123
 
 log:
   level: debug
