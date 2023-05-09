@@ -113,7 +113,6 @@ func (f *FileInfo) search(search string, count int) (files []FileSearchInfo, tot
 	scanner := bufio.NewScanner(output)
 	for scanner.Scan() {
 		line := scanner.Text()
-		fmt.Println(line)
 		info, err := os.Stat(line)
 		if err != nil {
 			continue
@@ -158,8 +157,6 @@ func (f *FileInfo) listChildren(dir, showHidden, containSub bool, search string,
 			})
 		}
 	}
-
-	f.ItemTotal = 0
 
 	var items []*FileInfo
 	for _, df := range files {
@@ -222,7 +219,9 @@ func (f *FileInfo) listChildren(dir, showHidden, containSub bool, search string,
 		}
 		items = append(items, file)
 	}
-	f.ItemTotal = total
+	if containSub {
+		f.ItemTotal = total
+	}
 	start := (page - 1) * pageSize
 	end := pageSize + start
 	var result []*FileInfo
