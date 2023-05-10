@@ -1,7 +1,7 @@
 <template>
     <el-drawer v-model="open" size="40%">
         <template #header>
-            <DrawerHeader :header="$t('file.changeOwner')" :back="handleClose" />
+            <DrawerHeader :header="$t('file.changeOwner')" :resource="name" :back="handleClose" />
         </template>
         <el-row>
             <el-col :span="22" :offset="1">
@@ -50,12 +50,14 @@ interface OwnerProps {
     user: string;
     group: string;
     isDir: boolean;
+    name: string;
 }
 
 const fileForm = ref<FormInstance>();
 const loading = ref(false);
 const open = ref(false);
 const isDir = ref(false);
+const name = ref('');
 
 const addForm = reactive({
     path: '',
@@ -101,6 +103,7 @@ const acceptParams = (props: OwnerProps) => {
     addForm.path = props.path;
     addForm.group = props.group;
     isDir.value = props.isDir;
+    name.value = props.name;
     open.value = true;
 };
 

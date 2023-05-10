@@ -1,7 +1,7 @@
 <template>
     <el-dialog
         v-model="open"
-        :title="$t('commons.button.edit')"
+        :title="$t('commons.button.edit') + ' - ' + fileName"
         :before-close="handleClose"
         destroy-on-close
         width="70%"
@@ -84,6 +84,7 @@ interface EditorConfig {
 
 const open = ref(false);
 const loading = ref(false);
+const fileName = ref('');
 
 const config = reactive<EditorConfig>({
     theme: 'vs-dark',
@@ -193,6 +194,7 @@ const acceptParams = (props: EditProps) => {
     form.value.content = props.content;
     form.value.path = props.path;
     config.language = props.language;
+    fileName.value = props.name;
     // TODO Now,1panel only support liunux,so we can use LF.
     // better,We should rely on the actual line feed character of the file returned from the background
     config.eol = monaco.editor.EndOfLineSequence.LF;

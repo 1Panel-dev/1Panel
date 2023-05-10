@@ -7,14 +7,14 @@
             <el-col>
                 <el-descriptions :column="1" border>
                     <el-descriptions-item :label="$t('file.fileName')">{{ data.name }}</el-descriptions-item>
-                    <!-- <el-descriptions-item :label="$t('file.type')">{{ data.type }}</el-descriptions-item> -->
+                    <el-descriptions-item :label="$t('file.type')">{{ data.type }}</el-descriptions-item>
                     <el-descriptions-item :label="$t('file.path')">{{ data.path }}</el-descriptions-item>
                     <el-descriptions-item :label="$t('file.size')">
                         {{ computeSize(data.size) }}
                     </el-descriptions-item>
                     <el-descriptions-item :label="$t('file.role')">{{ data.mode }}</el-descriptions-item>
-                    <!-- <el-descriptions-item :label="$t('file.user')">{{ data.user }}</el-descriptions-item>
-                    <el-descriptions-item :label="$t('file.group')">{{ data.group }}</el-descriptions-item> -->
+                    <el-descriptions-item :label="$t('file.user')">{{ data.user }}</el-descriptions-item>
+                    <el-descriptions-item :label="$t('file.group')">{{ data.group }}</el-descriptions-item>
                     <el-descriptions-item :label="$t('commons.table.updatedAt')">
                         {{ dateFormatSimple(data.modTime) }}
                     </el-descriptions-item>
