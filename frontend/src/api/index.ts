@@ -50,7 +50,6 @@ class RequestHttp {
                     return Promise.reject(data);
                 }
                 if (data.code == ResultEnum.EXPIRED) {
-                    globalStore.setLogStatus(false);
                     router.push({ name: 'Expired' });
                     return data;
                 }
