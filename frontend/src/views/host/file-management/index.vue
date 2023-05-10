@@ -178,7 +178,7 @@
             <Download ref="downloadRef" @close="search" />
             <Process :open="processPage.open" @close="closeProcess" />
             <Owner ref="chownRef" @close="search"></Owner>
-            <!-- <Detail ref="detailRef" /> -->
+            <Detail ref="detailRef" />
         </LayoutContent>
     </div>
 </template>
@@ -205,7 +205,7 @@ import Download from './download/index.vue';
 import Owner from './chown/index.vue';
 import { Mimetypes, Languages } from '@/global/mimetype';
 import Process from './process/index.vue';
-// import Detail from './detail/index.vue';
+import Detail from './detail/index.vue';
 import { useRouter } from 'vue-router';
 import { Back, Refresh } from '@element-plus/icons-vue';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
@@ -252,7 +252,7 @@ const processPage = reactive({ open: false });
 
 const createRef = ref();
 const roleRef = ref();
-// const detailRef = ref();
+const detailRef = ref();
 const compressRef = ref();
 const deCompressRef = ref();
 const codeEditorRef = ref();
@@ -603,9 +603,9 @@ const openDownload = () => {
     }
 };
 
-// const openDetail = (row: File.File) => {
-//     detailRef.value.acceptParams({ path: row.path });
-// };
+const openDetail = (row: File.File) => {
+    detailRef.value.acceptParams({ path: row.path });
+};
 
 const buttons = [
     {
@@ -641,10 +641,10 @@ const buttons = [
         label: i18n.global.t('commons.button.delete'),
         click: delFile,
     },
-    // {
-    //     label: i18n.global.t('file.info'),
-    //     click: openDetail,
-    // },
+    {
+        label: i18n.global.t('file.info'),
+        click: openDetail,
+    },
 ];
 
 onMounted(() => {

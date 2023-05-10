@@ -75,12 +75,12 @@ const rules = reactive<FormRules>({
 });
 
 const fileForm = ref<FormInstance>();
-let loading = ref(false);
-let form = ref<File.FileCompress>({ files: [], type: 'zip', dst: '', name: '', replace: false });
-let options = ref<string[]>([]);
-let open = ref(false);
-let title = ref('');
-let operate = ref('compress');
+const loading = ref(false);
+const form = ref<File.FileCompress>({ files: [], type: 'zip', dst: '', name: '', replace: false });
+const options = ref<string[]>([]);
+const open = ref(false);
+const title = ref('');
+const operate = ref('compress');
 
 const em = defineEmits(['close']);
 
