@@ -1,7 +1,7 @@
 <template>
     <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <DrawerHeader :header="$t('cronjob.cronTask')" :back="handleClose" />
+            <DrawerHeader :header="$t('cronjob.cronTask')" :resource="dialogData.rowData?.name" :back="handleClose" />
         </template>
         <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules">
             <el-row type="flex" justify="center">

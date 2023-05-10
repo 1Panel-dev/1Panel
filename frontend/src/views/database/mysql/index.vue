@@ -315,6 +315,7 @@ const buttons = [
         click: (row: Database.MysqlDBInfo) => {
             let param = {
                 id: row.id,
+                mysqlName: row.name,
                 operation: 'password',
                 username: row.username,
                 password: row.password,
@@ -327,6 +328,7 @@ const buttons = [
         click: (row: Database.MysqlDBInfo) => {
             let param = {
                 id: row.id,
+                mysqlName: row.name,
                 operation: 'privilege',
                 privilege: '',
                 privilegeIPs: '',

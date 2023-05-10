@@ -269,6 +269,7 @@ const onComposeOperate = async (operation: string) => {
             name: composeName.value,
             path: composePath.value,
             operation: operation,
+            withFile: false,
         };
         loading.value = true;
         await composeOperator(params)
@@ -288,13 +289,13 @@ const onComposeOperate = async (operation: string) => {
 };
 
 const dialogMonitorRef = ref();
-const onMonitor = (containerID: string) => {
-    dialogMonitorRef.value!.acceptParams({ containerID: containerID });
+const onMonitor = (row: any) => {
+    dialogMonitorRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
 };
 
 const dialogTerminalRef = ref();
-const onTerminal = (containerID: string) => {
-    dialogTerminalRef.value!.acceptParams({ containerID: containerID });
+const onTerminal = (row: any) => {
+    dialogTerminalRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
 };
 
 const dialogContainerLogRef = ref();
@@ -306,7 +307,7 @@ const buttons = [
             return row.state !== 'running';
         },
         click: (row: Container.ContainerInfo) => {
-            onTerminal(row.containerID);
+            onTerminal(row);
         },
     },
     {
@@ -315,13 +316,13 @@ const buttons = [
             return row.state !== 'running';
         },
         click: (row: Container.ContainerInfo) => {
-            onMonitor(row.containerID);
+            onMonitor(row);
         },
     },
     {
         label: i18n.global.t('commons.button.log'),
         click: (row: Container.ContainerInfo) => {
-            dialogContainerLogRef.value!.acceptParams({ containerID: row.containerID });
+            dialogContainerLogRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
         },
     },
 ];
