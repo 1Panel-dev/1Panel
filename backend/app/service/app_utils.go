@@ -570,7 +570,7 @@ func getAppFromRepo(downloadPath, version string) error {
 func handleInstalled(appInstallList []model.AppInstall, updated bool) ([]response.AppInstalledDTO, error) {
 	var res []response.AppInstalledDTO
 	for _, installed := range appInstallList {
-		if installed.App.Type == "php" {
+		if updated && installed.App.Type == "php" {
 			continue
 		}
 		installDTO := response.AppInstalledDTO{
