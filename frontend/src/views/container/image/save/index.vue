@@ -79,8 +79,8 @@ const dialogData = ref<DialogProps>({
 const acceptParams = async (params: DialogProps): Promise<void> => {
     drawerVisiable.value = true;
     form.tags = params.tags;
+    form.tagName = form.tags.length !== 0 ? form.tags[0] : '';
     form.path = '';
-    form.tagName = '';
     form.name = '';
     dialogData.value.repos = params.repos;
 };

@@ -493,6 +493,7 @@ const message = {
         imageBuild: 'Image build',
         pathSelect: 'Path',
         label: 'Label',
+        imageTag: 'Image Tag',
         push: 'Push',
         fileName: 'FileName',
         export: 'Export',

@@ -173,6 +173,7 @@ const buttons = [
         label: i18n.global.t('container.tag'),
         click: (row: Container.ImageInfo) => {
             let params = {
+                itemName: row.tags.length !== 0 ? row.tags[0].split(':')[0] : '',
                 repos: repos.value,
                 sourceID: row.id,
             };
