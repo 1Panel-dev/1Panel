@@ -1,7 +1,7 @@
 <template>
     <el-drawer :close-on-click-modal="false" v-model="open" size="50%">
         <template #header>
-            <DrawerHeader :header="$t('runtime.' + mode)" :back="handleClose" />
+            <DrawerHeader :header="$t('runtime.' + mode)" :resource="runtime.name" :back="handleClose" />
         </template>
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
@@ -48,7 +48,11 @@
                                     </el-select>
                                 </el-col>
                                 <el-col :span="12">
-                                    <el-select v-model="runtime.version" :disabled="mode === 'edit'">
+                                    <el-select
+                                        v-model="runtime.version"
+                                        :disabled="mode === 'edit'"
+                                        @change="changeVersion()"
+                                    >
                                         <el-option
                                             v-for="(version, index) in appVersions"
                                             :key="index"
@@ -205,6 +209,16 @@ const changeApp = (appId: number) => {
             break;
         }
     }
+};
+
+const changeVersion = () => {
+    initParam.value = false;
+    GetAppDetail(runtime.value.appId, runtime.value.version, 'runtime').then((res) => {
+        runtime.value.appDetailId = res.data.id;
+        runtime.value.image = res.data.image + ':' + runtime.value.version;
+        appParams.value = res.data.params;
+        initParam.value = true;
+    });
 };
 
 const getApp = (appkey: string, mode: string) => {
