@@ -518,6 +518,7 @@ const message = {
         build: '构建镜像',
         pathSelect: '路径选择',
         label: '标签',
+        imageTag: '镜像标签',
         push: '推送',
         fileName: '文件名',
         export: '导出',
