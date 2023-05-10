@@ -13,7 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cloud_storage"
-	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	fileUtils "github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 )
@@ -223,7 +223,7 @@ func (u *BackupService) Update(req dto.BackupOperate) error {
 				if strings.HasSuffix(dirStr, "/") {
 					dirStr = dirStr[:strings.LastIndex(dirStr, "/")]
 				}
-				if err := updateBackupDir(dirStr, oldDir); err != nil {
+				if err := copyDir(oldDir, dirStr); err != nil {
 					_ = backupRepo.Update(req.ID, (map[string]interface{}{"vars": oldVars}))
 					return err
 				}
@@ -309,18 +309,33 @@ func loadLocalDir() (string, error) {
 	return "", fmt.Errorf("error type dir: %T", varMap["dir"])
 }
 
-func updateBackupDir(dir, oldDir string) error {
-	if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(dir, os.ModePerm); err != nil {
-			return err
+func copyDir(src, dst string) error {
+	srcInfo, err := os.Stat(src)
+	if err != nil {
+		return err
+	}
+	if err = os.MkdirAll(dst, srcInfo.Mode()); err != nil {
+		return err
+	}
+	files, err := os.ReadDir(src)
+	if err != nil {
+		return err
+	}
+
+	fileOP := fileUtils.NewFileOp()
+	for _, file := range files {
+		srcPath := fmt.Sprintf("%s/%s", src, file.Name())
+		dstPath := fmt.Sprintf("%s/%s", dst, file.Name())
+		if file.IsDir() {
+			if err = copyDir(srcPath, dstPath); err != nil {
+				global.LOG.Errorf("copy dir %s to %s failed, err: %v", srcPath, dstPath, err)
+			}
+		} else {
+			if err := fileOP.CopyFile(srcPath, dst); err != nil {
+				global.LOG.Errorf("copy file %s to %s failed, err: %v", srcPath, dstPath, err)
+			}
 		}
 	}
-	if strings.HasSuffix(oldDir, "/") {
-		oldDir = oldDir[:strings.LastIndex(oldDir, "/")]
-	}
-	stdout, err := cmd.Execf("cp -r %s/* %s", oldDir, dir)
-	if err != nil {
-		return errors.New(string(stdout))
-	}
+
 	return nil
 }
