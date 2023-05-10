@@ -15,6 +15,7 @@ router.beforeEach((to, from, next) => {
 
     if (to.name === 'entrance' && globalStore.isLogin) {
         if (to.params.code === globalStore.entrance) {
+            globalStore.setLogStatus(false);
             next({
                 name: 'entrance',
                 params: { code: globalStore.entrance },
