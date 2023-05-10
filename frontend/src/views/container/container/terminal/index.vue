@@ -7,7 +7,7 @@
         size="50%"
     >
         <template #header>
-            <DrawerHeader :header="$t('container.containerTerminal')" :back="handleClose" />
+            <DrawerHeader :header="$t('container.containerTerminal')" :resource="title" :back="handleClose" />
         </template>
         <el-form ref="formRef" :model="form" label-position="top">
             <el-form-item :label="$t('container.user')" prop="user">
@@ -56,6 +56,7 @@ import { Rules } from '@/global/form-rules';
 import Terminal from '@/components/terminal/index.vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 
+const title = ref();
 const terminalVisiable = ref(false);
 const terminalOpen = ref(false);
 const form = reactive({
@@ -64,16 +65,17 @@ const form = reactive({
     user: '',
     containerID: '',
 });
-type FormInstance = InstanceType<typeof ElForm>;
-const formRef = ref<FormInstance>();
+const formRef = ref();
 const terminalRef = ref<InstanceType<typeof Terminal> | null>(null);
 
 interface DialogProps {
     containerID: string;
+    container: string;
 }
 const acceptParams = async (params: DialogProps): Promise<void> => {
     terminalVisiable.value = true;
     form.containerID = params.containerID;
+    title.value = params.container;
     form.isCustom = false;
     form.user = '';
     form.command = '/bin/bash';

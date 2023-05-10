@@ -7,7 +7,7 @@
         size="50%"
     >
         <template #header>
-            <DrawerHeader :header="$t('container.monitor')" :back="handleClose" />
+            <DrawerHeader :header="$t('container.monitor')" :resource="title" :back="handleClose" />
         </template>
         <el-form label-position="top" @submit.prevent>
             <el-form-item :label="$t('container.refreshTime')">
@@ -68,20 +68,24 @@ import VCharts from '@/components/v-charts/index.vue';
 import i18n from '@/lang';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 
+const title = ref();
 const monitorVisiable = ref(false);
 const timeInterval = ref();
 let timer: NodeJS.Timer | null = null;
 let isInit = ref<boolean>(true);
 interface DialogProps {
     containerID: string;
+    container: string;
 }
 const dialogData = ref<DialogProps>({
     containerID: '',
+    container: '',
 });
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
     monitorVisiable.value = true;
     dialogData.value.containerID = params.containerID;
+    title.value = params.container;
     cpuDatas.value = [];
     memDatas.value = [];
     cacheDatas.value = [];

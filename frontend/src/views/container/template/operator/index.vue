@@ -1,7 +1,11 @@
 <template>
     <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <DrawerHeader :header="title + $t('container.composeTemplate')" :back="handleClose" />
+            <DrawerHeader
+                :header="title + $t('container.composeTemplate')"
+                :resource="dialogData.rowData?.name"
+                :back="handleClose"
+            />
         </template>
         <el-form
             v-loading="loading"

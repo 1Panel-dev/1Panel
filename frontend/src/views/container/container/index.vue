@@ -215,13 +215,13 @@ const onCreate = () => {
 };
 
 const dialogMonitorRef = ref();
-const onMonitor = (containerID: string) => {
-    dialogMonitorRef.value!.acceptParams({ containerID: containerID });
+const onMonitor = (row: any) => {
+    dialogMonitorRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
 };
 
 const dialogTerminalRef = ref();
-const onTerminal = (containerID: string) => {
-    dialogTerminalRef.value!.acceptParams({ containerID: containerID });
+const onTerminal = (row: any) => {
+    dialogTerminalRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
 };
 
 const onInspect = async (id: string) => {
@@ -312,7 +312,7 @@ const buttons = [
             return row.state !== 'running';
         },
         click: (row: Container.ContainerInfo) => {
-            onTerminal(row.containerID);
+            onTerminal(row);
         },
     },
     {
@@ -321,7 +321,7 @@ const buttons = [
             return row.state !== 'running';
         },
         click: (row: Container.ContainerInfo) => {
-            onMonitor(row.containerID);
+            onMonitor(row);
         },
     },
     {

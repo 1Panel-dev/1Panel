@@ -2,7 +2,7 @@
     <div>
         <el-drawer v-model="logVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
-                <DrawerHeader :header="$t('commons.button.log')" :back="handleClose" />
+                <DrawerHeader :header="$t('commons.button.log')" :resource="logSearch.container" :back="handleClose" />
             </template>
             <div>
                 <el-select @change="searchLogs" style="width: 30%; float: left" v-model="logSearch.mode">

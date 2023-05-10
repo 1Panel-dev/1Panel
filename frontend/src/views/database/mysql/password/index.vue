@@ -2,7 +2,7 @@
     <div>
         <el-drawer v-model="changeVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
             <template #header>
-                <DrawerHeader :header="title" :back="handleClose" />
+                <DrawerHeader :header="title" :resource="changeForm.mysqlName" :back="handleClose" />
             </template>
             <el-form>
                 <el-form v-loading="loading" ref="changeFormRef" :model="changeForm" label-position="top">
