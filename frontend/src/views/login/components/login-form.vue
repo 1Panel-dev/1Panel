@@ -270,6 +270,7 @@ const checkIsSystemDemo = async () => {
 };
 
 onMounted(() => {
+    loginVerify();
     document.title = globalStore.themeConfig.panelName;
     loginForm.agreeLicense = globalStore.agreeLicense;
     checkIsSystemDemo();
