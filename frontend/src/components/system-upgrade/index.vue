@@ -139,6 +139,7 @@ const onUpgrade = async () => {
         type: 'info',
     }).then(async () => {
         globalStore.isLoading = true;
+        globalStore.setLogStatus(false);
         await upgrade(upgradeVersion.value);
         drawerVisiable.value = false;
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
