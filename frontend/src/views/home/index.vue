@@ -368,31 +368,37 @@ const onLoadCurrentInfo = async () => {
     const res = await loadCurrentInfo(searchInfo.ioOption, searchInfo.netOption);
     currentInfo.value.timeSinceUptime = res.data.timeSinceUptime;
 
-    currentChartInfo.netBytesSent = Number(
-        ((res.data.netBytesSent - currentInfo.value.netBytesSent) / 1024 / 3).toFixed(2),
-    );
+    currentChartInfo.netBytesSent =
+        res.data.netBytesSent - currentInfo.value.netBytesSent > 0
+            ? Number(((res.data.netBytesSent - currentInfo.value.netBytesSent) / 1024 / 3).toFixed(2))
+            : 0;
     netBytesSents.value.push(currentChartInfo.netBytesSent);
     if (netBytesSents.value.length > 20) {
         netBytesSents.value.splice(0, 1);
     }
-    currentChartInfo.netBytesRecv = Number(
-        ((res.data.netBytesRecv - currentInfo.value.netBytesRecv) / 1024 / 3).toFixed(2),
-    );
+
+    currentChartInfo.netBytesRecv =
+        res.data.netBytesRecv - currentInfo.value.netBytesRecv > 0
+            ? Number(((res.data.netBytesRecv - currentInfo.value.netBytesRecv) / 1024 / 3).toFixed(2))
+            : 0;
     netBytesRecvs.value.push(currentChartInfo.netBytesRecv);
     if (netBytesRecvs.value.length > 20) {
         netBytesRecvs.value.splice(0, 1);
     }
 
-    currentChartInfo.ioReadBytes = Number(
-        ((res.data.ioReadBytes - currentInfo.value.ioReadBytes) / 1024 / 1024 / 3).toFixed(2),
-    );
+    currentChartInfo.ioReadBytes =
+        res.data.ioReadBytes - currentInfo.value.ioReadBytes > 0
+            ? Number(((res.data.ioReadBytes - currentInfo.value.ioReadBytes) / 1024 / 1024 / 3).toFixed(2))
+            : 0;
     ioReadBytes.value.push(currentChartInfo.ioReadBytes);
     if (ioReadBytes.value.length > 20) {
         ioReadBytes.value.splice(0, 1);
     }
-    currentChartInfo.ioWriteBytes = Number(
-        ((res.data.ioWriteBytes - currentInfo.value.ioWriteBytes) / 1024 / 1024 / 3).toFixed(2),
-    );
+
+    currentChartInfo.ioWriteBytes =
+        res.data.ioWriteBytes - currentInfo.value.ioWriteBytes > 0
+            ? Number(((res.data.ioWriteBytes - currentInfo.value.ioWriteBytes) / 1024 / 1024 / 3).toFixed(2))
+            : 0;
     ioWriteBytes.value.push(currentChartInfo.ioWriteBytes);
     if (ioWriteBytes.value.length > 20) {
         ioWriteBytes.value.splice(0, 1);
