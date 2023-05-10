@@ -326,7 +326,10 @@ func calculateCPUPercentUnix(stats *types.StatsJSON) float64 {
 	systemDelta := float64(stats.CPUStats.SystemUsage) - float64(stats.PreCPUStats.SystemUsage)
 
 	if systemDelta > 0.0 && cpuDelta > 0.0 {
-		cpuPercent = (cpuDelta / systemDelta) * float64(len(stats.CPUStats.CPUUsage.PercpuUsage)) * 100.0
+		cpuPercent = (cpuDelta / systemDelta) * 100.0
+		if len(stats.CPUStats.CPUUsage.PercpuUsage) != 0 {
+			cpuPercent = cpuPercent * float64(len(stats.CPUStats.CPUUsage.PercpuUsage))
+		}
 	}
 	return cpuPercent
 }
