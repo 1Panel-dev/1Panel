@@ -196,7 +196,7 @@ func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
 // @Router /settings/time/sync [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"系统时间同步","formatEN":"sync system time"}
 func (b *BaseApi) SyncTime(c *gin.Context) {
-	ntime, err := ntp.Getremotetime()
+	ntime, err := ntp.GetRemoteTime()
 	if err != nil {
 		helper.SuccessWithData(c, time.Now().Format("2006-01-02 15:04:05 MST -0700"))
 		return
