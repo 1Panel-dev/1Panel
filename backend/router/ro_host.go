@@ -35,6 +35,9 @@ func (s *HostRouter) InitHostRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/firewall/update/port", baseApi.UpdatePortRule)
 		hostRouter.POST("/firewall/update/addr", baseApi.UpdateAddrRule)
 
+		hostRouter.POST("/ssh/search", baseApi.GetSSHInfo)
+		hostRouter.POST("/ssh/update", baseApi.UpdateSSH)
+
 		hostRouter.GET("/command", baseApi.ListCommand)
 		hostRouter.POST("/command", baseApi.CreateCommand)
 		hostRouter.POST("/command/del", baseApi.DeleteCommand)

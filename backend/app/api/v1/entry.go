@@ -26,9 +26,10 @@ var (
 
 	cronjobService = service.NewICronjobService()
 
-	hostService  = service.NewIHostService()
-	groupService = service.NewIGroupService()
-	fileService  = service.NewIFileService()
+	hostService     = service.NewIHostService()
+	groupService    = service.NewIGroupService()
+	fileService     = service.NewIFileService()
+	sshService      = service.NewISSHService()
 	firewallService = service.NewIFirewallService()
 
 	settingService = service.NewISettingService()

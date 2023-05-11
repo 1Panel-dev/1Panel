@@ -51,6 +51,16 @@ const hostRouter = {
             },
         },
         {
+            path: '/hosts/ssh',
+            name: 'SSH',
+            component: () => import('@/views/host/ssh/index.vue'),
+            meta: {
+                title: 'menu.ssh',
+                keepAlive: true,
+                requiresAuth: false,
+            },
+        },
+        {
             path: '/hosts/firewall/port',
             name: 'FirewallPort',
             component: () => import('@/views/host/firewall/port/index.vue'),
