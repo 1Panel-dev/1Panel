@@ -96,3 +96,14 @@ export const updateAddrRule = (params: Host.UpdateAddrRule) => {
 export const batchOperateRule = (params: Host.BatchRule) => {
     return http.post(`/hosts/firewall/batch`, params);
 };
+
+// ssh
+export const getSSHInfo = () => {
+    return http.post<Host.SSHInfo>(`/hosts/ssh/search`);
+};
+export const updateSSH = (key: string, value: string) => {
+    return http.post(`/hosts/ssh/update`, { key: key, value: value });
+};
+export const generatePubKey = (encryptionMode: string) => {
+    return http.post(`/hosts/ssh/generate`, { encryptionMode: encryptionMode });
+};

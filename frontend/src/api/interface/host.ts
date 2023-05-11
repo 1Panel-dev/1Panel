@@ -103,4 +103,15 @@ export namespace Host {
         type: string;
         rules: Array<RulePort>;
     }
+
+    export interface SSHInfo {
+        port: string;
+        listenAddress: string;
+        passwordAuthentication: string;
+        pubkeyAuthentication: string;
+        encryptionMode: string;
+        primaryKey: string;
+        permitRootLogin: string;
+        useDNS: string;
+    }
 }
