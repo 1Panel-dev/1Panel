@@ -17,9 +17,6 @@
 - **安全可靠**：基于容器来管理和部署应用，最小漏洞暴露面，提供防火墙和日志审计等功能；
 - **一键备份**：支持一键备份和恢复，备份数据到各类云端存储，永不丢失。
 
-
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2F1Panel-dev%2F1Panel.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2F1Panel-dev%2F1Panel?ref=badge_large)
-
 ## UI 展示
 
 ![UI展示](https://resource.fit2cloud.com/1panel/img/overview.png)
@@ -61,6 +58,10 @@ curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/1Panel&type=Date)](https://star-history.com/#1Panel-dev/1Panel&Date)
+
+## FOSSA Status
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2F1Panel-dev%2F1Panel.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2F1Panel-dev%2F1Panel?ref=badge_large)
 
 ## License
 
