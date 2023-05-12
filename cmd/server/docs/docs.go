@@ -5377,7 +5377,7 @@ var doc = `{
                 }
             }
         },
-        "/hosts/firewall/ip": {
+        "/hosts/firewall/batch": {
             "post": {
                 "security": [
                     {
@@ -5407,6 +5407,49 @@ var doc = `{
                     "200": {
                         "description": ""
                     }
+                }
+            }
+        },
+        "/hosts/firewall/ip": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "创建防火墙 IP 规则",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Firewall"
+                ],
+                "summary": "Create group",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.AddrRuleOperate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "strategy",
+                        "address"
+                    ],
+                    "formatEN": "create address rules [strategy][address]",
+                    "formatZH": "添加 ip 规则 [strategy] [address]",
+                    "paramKeys": []
                 }
             }
         },
@@ -5534,7 +5577,7 @@ var doc = `{
                 }
             }
         },
-        "/hosts/firewall/update/ip": {
+        "/hosts/firewall/update/addr": {
             "post": {
                 "security": [
                     {
