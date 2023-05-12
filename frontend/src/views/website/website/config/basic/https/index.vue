@@ -184,7 +184,7 @@ const get = () => {
             if (res.data.httpConfig != '') {
                 form.httpConfig = res.data.httpConfig;
             }
-            if (res.data.SSLProtocol.length > 0) {
+            if (res.data.SSLProtocol && res.data.SSLProtocol.length > 0) {
                 form.SSLProtocol = res.data.SSLProtocol;
             }
             if (res.data.algorithm != '') {
