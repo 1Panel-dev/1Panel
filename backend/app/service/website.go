@@ -863,7 +863,7 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 			return nil, buserr.New(constant.ErrFileTooLarge)
 		}
 		fileInfo.Size()
-		content, err := os.ReadFile(path.Join(sitePath, "log", req.LogType))
+		content, err := os.ReadFile(filePath)
 		if err != nil {
 			return nil, err
 		}
