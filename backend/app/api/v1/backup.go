@@ -2,6 +2,8 @@ package v1
 
 import (
 	"encoding/base64"
+	"fmt"
+	"path"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -356,6 +358,14 @@ func (b *BaseApi) Recover(c *gin.Context) {
 		return
 	}
 
+	if req.Source != "LOCAL" {
+		downloadPath, err := backupService.DownloadRecord(dto.DownloadRecord{Source: req.Source, FileDir: path.Dir(req.File), FileName: path.Base(req.File)})
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, fmt.Errorf("download file failed, err: %v", err))
+			return
+		}
+		req.File = downloadPath
+	}
 	switch req.Type {
 	case "mysql":
 		if err := backupService.MysqlRecover(req); err != nil {

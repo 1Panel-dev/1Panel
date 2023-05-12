@@ -36,6 +36,7 @@ type CommonBackup struct {
 	DetailName string `json:"detailName"`
 }
 type CommonRecover struct {
+	Source     string `json:"source" validate:"required,oneof=OSS S3 SFTP MINIO LOCAL COS KODO"`
 	Type       string `json:"type" validate:"required,oneof=app mysql redis website"`
 	Name       string `json:"name"`
 	DetailName string `json:"detailName"`

@@ -124,6 +124,7 @@ const onBackup = async () => {
 
 const onRecover = async (row: Backup.RecordInfo) => {
     let params = {
+        source: row.source,
         type: type.value,
         name: name.value,
         detailName: detailName.value,
