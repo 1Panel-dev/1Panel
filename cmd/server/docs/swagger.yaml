@@ -6461,7 +6461,7 @@ paths:
       summary: Load firewall base info
       tags:
       - Firewall
-  /hosts/firewall/ip:
+  /hosts/firewall/batch:
     post:
       consumes:
       - application/json
@@ -6481,6 +6481,34 @@ paths:
       summary: Create group
       tags:
       - Firewall
+  /hosts/firewall/ip:
+    post:
+      consumes:
+      - application/json
+      description: 创建防火墙 IP 规则
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.AddrRuleOperate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Create group
+      tags:
+      - Firewall
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - strategy
+        - address
+        formatEN: create address rules [strategy][address]
+        formatZH: 添加 ip 规则 [strategy] [address]
+        paramKeys: []
   /hosts/firewall/operate:
     post:
       consumes:
@@ -6560,7 +6588,7 @@ paths:
       summary: Page firewall rules
       tags:
       - Firewall
-  /hosts/firewall/update/ip:
+  /hosts/firewall/update/addr:
     post:
       consumes:
       - application/json

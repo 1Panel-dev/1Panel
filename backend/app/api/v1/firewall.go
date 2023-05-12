@@ -138,7 +138,7 @@ func (b *BaseApi) OperateIPRule(c *gin.Context) {
 // @Param request body dto.BatchRuleOperate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /hosts/firewall/ip [post]
+// @Router /hosts/firewall/batch [post]
 func (b *BaseApi) BatchOperateRule(c *gin.Context) {
 	var req dto.BatchRuleOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -188,7 +188,7 @@ func (b *BaseApi) UpdatePortRule(c *gin.Context) {
 // @Param request body dto.AddrRuleUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /hosts/firewall/update/ip [post]
+// @Router /hosts/firewall/update/addr [post]
 func (b *BaseApi) UpdateAddrRule(c *gin.Context) {
 	var req dto.AddrRuleUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
