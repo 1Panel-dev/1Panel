@@ -347,7 +347,7 @@ const buttons = [
             openOperate(row, 'start');
         },
         disabled: (row: any) => {
-            return row.status === 'Running';
+            return row.status === 'Running' || row.status === 'Error';
         },
     },
     {
