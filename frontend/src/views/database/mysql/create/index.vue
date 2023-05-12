@@ -37,7 +37,13 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item v-if="form.permission === 'ip'" prop="permissionIPs">
-                            <el-input clearable v-model="form.permissionIPs" />
+                            <el-input
+                                clearable
+                                :autosize="{ minRows: 2, maxRows: 5 }"
+                                type="textarea"
+                                v-model="form.permissionIPs"
+                            />
+                            <span class="input-help">{{ $t('database.remoteHelper') }}</span>
                         </el-form-item>
                         <el-form-item :label="$t('commons.table.description')" prop="description">
                             <el-input type="textarea" clearable v-model="form.description" />
@@ -131,6 +137,10 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 createVisiable.value = false;
             })
             .catch(() => {
+                if (form.permission != '%') {
+                    form.permissionIPs = form.permission;
+                    form.permission = 'ip';
+                }
                 loading.value = false;
             });
     });

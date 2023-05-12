@@ -14,6 +14,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
+	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -99,22 +100,7 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 		}
 		return nil, err
 	}
-	tmpPermission := req.Permission
-	if err := excSQL(app.ContainerName, app.Password, fmt.Sprintf("create user '%s'@'%s' identified by '%s';", req.Username, tmpPermission, req.Password)); err != nil {
-		_ = excSQL(app.ContainerName, app.Password, fmt.Sprintf("drop database `%s`", req.Name))
-		if strings.Contains(err.Error(), "ERROR 1396") {
-			return nil, buserr.New(constant.ErrUserIsExist)
-		}
-		return nil, err
-	}
-	grantStr := fmt.Sprintf("grant all privileges on `%s`.* to '%s'@'%s'", req.Name, req.Username, tmpPermission)
-	if req.Name == "*" {
-		grantStr = fmt.Sprintf("grant all privileges on *.* to '%s'@'%s'", mysql.Username, tmpPermission)
-	}
-	if app.Version == "5.7.39" {
-		grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, req.Password)
-	}
-	if err := excSQL(app.ContainerName, app.Password, grantStr); err != nil {
+	if err := u.createUser(app, req); err != nil {
 		return nil, err
 	}
 
@@ -284,24 +270,30 @@ func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
 	}
 
 	if info.Value != mysql.Permission {
-		if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", mysql.Username, mysql.Permission)); err != nil {
-			return err
+		var userlist []string
+		if strings.Contains(mysql.Permission, ",") {
+			userlist = strings.Split(mysql.Permission, ",")
+		} else {
+			userlist = append(userlist, mysql.Permission)
+		}
+		for _, user := range userlist {
+			if len(user) != 0 {
+				if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists '%s'@'%s'", mysql.Username, user)); err != nil {
+					return err
+				}
+			}
 		}
 		if info.ID == 0 {
 			return nil
 		}
 	}
-	if err := excuteSql(app.ContainerName, app.Password, fmt.Sprintf("create user if not exists '%s'@'%s' identified by '%s';", mysql.Username, info.Value, mysql.Password)); err != nil {
-		return err
-	}
-	grantStr := fmt.Sprintf("grant all privileges on `%s`.* to '%s'@'%s'", mysql.Name, mysql.Username, info.Value)
-	if mysql.Name == "*" {
-		grantStr = fmt.Sprintf("grant all privileges on *.* to '%s'@'%s'", mysql.Username, info.Value)
-	}
-	if app.Version == "5.7.39" {
-		grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, mysql.Password)
-	}
-	if err := excuteSql(app.ContainerName, app.Password, grantStr); err != nil {
+
+	if err := u.createUser(app, dto.MysqlDBCreate{
+		Username:   mysql.Username,
+		Name:       mysql.Name,
+		Permission: info.Value,
+		Password:   mysql.Password,
+	}); err != nil {
 		return err
 	}
 	if err := excuteSql(app.ContainerName, app.Password, "flush privileges"); err != nil {
@@ -473,6 +465,50 @@ func (u *MysqlService) LoadStatus() (*dto.MysqlStatus, error) {
 	}
 
 	return &info, nil
+}
+
+func (u *MysqlService) createUser(app *repo.RootInfo, req dto.MysqlDBCreate) error {
+	var userlist []string
+	if strings.Contains(req.Permission, ",") {
+		ips := strings.Split(req.Permission, ",")
+		for _, ip := range ips {
+			if len(ip) != 0 {
+				userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", req.Username, ip))
+			}
+		}
+	} else {
+		userlist = append(userlist, fmt.Sprintf("'%s'@'%s'", req.Username, req.Permission))
+	}
+
+	for _, user := range userlist {
+		if err := excSQL(app.ContainerName, app.Password, fmt.Sprintf("create user %s identified by '%s';", user, req.Password)); err != nil {
+			handleCreateError(req.Name, userlist, app)
+			if strings.Contains(err.Error(), "ERROR 1396") {
+				return buserr.New(constant.ErrUserIsExist)
+			}
+			return err
+		}
+		grantStr := fmt.Sprintf("grant all privileges on `%s`.* to %s", req.Name, user)
+		if req.Name == "*" {
+			grantStr = fmt.Sprintf("grant all privileges on *.* to %s", user)
+		}
+		if app.Version == "5.7.39" {
+			grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, req.Password)
+		}
+		if err := excSQL(app.ContainerName, app.Password, grantStr); err != nil {
+			handleCreateError(req.Name, userlist, app)
+			return err
+		}
+	}
+	return nil
+}
+func handleCreateError(dbName string, userlist []string, app *repo.RootInfo) {
+	_ = excSQL(app.ContainerName, app.Password, fmt.Sprintf("drop database `%s`", dbName))
+	for _, user := range userlist {
+		if err := excSQL(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists %s", user)); err != nil {
+			global.LOG.Errorf("drop user failed, err: %v", err)
+		}
+	}
 }
 
 func excuteSqlForMaps(containerName, password, command string) (map[string]string, error) {
