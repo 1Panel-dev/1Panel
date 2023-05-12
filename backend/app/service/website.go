@@ -912,7 +912,23 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 func (w WebsiteService) ChangeDefaultServer(id uint) error {
 	defaultWebsite, _ := websiteRepo.GetFirst(websiteRepo.WithDefaultServer())
 	if defaultWebsite.ID > 0 {
-		if err := updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "listen", Params: []string{"80"}}}, &defaultWebsite); err != nil {
+		params, err := getNginxParamsByKeys(constant.NginxScopeServer, []string{"listen"}, &defaultWebsite)
+		if err != nil {
+			return err
+		}
+		var changeParams []dto.NginxParam
+		for _, param := range params {
+			paramLen := len(param.Params)
+			var newParam []string
+			if paramLen > 1 && param.Params[paramLen-1] == components.DefaultServer {
+				newParam = param.Params[:paramLen-1]
+			}
+			changeParams = append(changeParams, dto.NginxParam{
+				Name:   param.Name,
+				Params: newParam,
+			})
+		}
+		if err := updateNginxConfig(constant.NginxScopeServer, changeParams, &defaultWebsite); err != nil {
 			return err
 		}
 		defaultWebsite.DefaultServer = false
@@ -925,7 +941,28 @@ func (w WebsiteService) ChangeDefaultServer(id uint) error {
 		if err != nil {
 			return err
 		}
-		if err := updateNginxConfig(constant.NginxScopeServer, []dto.NginxParam{{Name: "listen", Params: []string{"80", "default_server"}}}, &website); err != nil {
+		params, err := getNginxParamsByKeys(constant.NginxScopeServer, []string{"listen"}, &website)
+		if err != nil {
+			return err
+		}
+		var changeParams []dto.NginxParam
+		for _, param := range params {
+			paramLen := len(param.Params)
+			bind := param.Params[0]
+			var newParam []string
+			if bind == "80" || bind == "443" || bind == "[::]:80" || bind == "[::]:443" {
+				if param.Params[paramLen-1] == components.DefaultServer {
+					newParam = param.Params
+				} else {
+					newParam = append(param.Params, components.DefaultServer)
+				}
+			}
+			changeParams = append(changeParams, dto.NginxParam{
+				Name:   param.Name,
+				Params: newParam,
+			})
+		}
+		if err := updateNginxConfig(constant.NginxScopeServer, changeParams, &website); err != nil {
 			return err
 		}
 		website.DefaultServer = true

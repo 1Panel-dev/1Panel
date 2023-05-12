@@ -52,8 +52,8 @@ func (sl *ServerListen) GetBlock() IBlock {
 
 func (sl *ServerListen) GetParameters() []string {
 	params := []string{sl.Bind}
-	params = append(params, sl.DefaultServer)
 	params = append(params, sl.Parameters...)
+	params = append(params, sl.DefaultServer)
 	return params
 }
 
