@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -109,15 +110,15 @@ func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) 
 	if err != nil {
 		return "", fmt.Errorf("new cloud storage client failed, err: %v", err)
 	}
-	tempPath := fmt.Sprintf("%sdownload%s", constant.DataDir, info.FileDir)
-	if _, err := os.Stat(tempPath); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(tempPath, os.ModePerm); err != nil {
-			global.LOG.Errorf("mkdir %s failed, err: %v", tempPath, err)
+	targetPath := fmt.Sprintf("%s/download/%s/%s", constant.DataDir, info.FileDir, info.FileName)
+	if _, err := os.Stat(path.Base(targetPath)); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(path.Base(targetPath), os.ModePerm); err != nil {
+			global.LOG.Errorf("mkdir %s failed, err: %v", path.Base(targetPath), err)
 		}
 	}
-	targetPath := tempPath + info.FileName
-	if _, err = os.Stat(targetPath); err != nil && os.IsNotExist(err) {
-		isOK, err := backClient.Download(info.FileName, targetPath)
+	srcPath := fmt.Sprintf("%s/%s", info.FileDir, info.FileName)
+	if exist, _ := backClient.Exist(srcPath); exist {
+		isOK, err := backClient.Download(srcPath, targetPath)
 		if !isOK {
 			return "", fmt.Errorf("cloud storage download failed, err: %v", err)
 		}
@@ -179,7 +180,7 @@ func (u *BackupService) BatchDeleteRecord(ids []uint) error {
 				global.LOG.Errorf("remove file %s failed, err: %v", record.FileDir+record.FileName, err)
 			}
 		} else {
-			backupAccount, err := backupRepo.Get(commonRepo.WithByName(record.Source))
+			backupAccount, err := backupRepo.Get(commonRepo.WithByType(record.Source))
 			if err != nil {
 				return err
 			}

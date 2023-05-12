@@ -59,9 +59,9 @@ func (kodo kodoClient) Exist(path string) (bool, error) {
 		return false, err
 	}
 	if _, err := kodo.client.Stat(bucket, path); err != nil {
-		return true, err
+		return false, err
 	}
-	return false, nil
+	return true, nil
 }
 
 func (kodo kodoClient) Delete(path string) (bool, error) {

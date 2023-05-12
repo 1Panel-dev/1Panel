@@ -49,6 +49,7 @@ export namespace Backup {
         detailName: string;
     }
     export interface Recover {
+        source: string;
         type: string;
         name: string;
         detailName: string;

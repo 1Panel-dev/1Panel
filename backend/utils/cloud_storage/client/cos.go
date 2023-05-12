@@ -67,10 +67,11 @@ func (cos cosClient) Exist(path string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	if _, err := client.Object.IsExist(context.Background(), path); err != nil {
-		return true, err
+	exist, err := client.Object.IsExist(context.Background(), path)
+	if err != nil {
+		return false, err
 	}
-	return false, nil
+	return exist, nil
 }
 
 func (cos cosClient) Delete(path string) (bool, error) {

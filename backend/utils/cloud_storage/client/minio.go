@@ -81,9 +81,9 @@ func (minIo minIoClient) Exist(path string) (bool, error) {
 	if _, ok := minIo.Vars["bucket"]; ok {
 		_, err := minIo.client.GetObject(context.Background(), minIo.Vars["bucket"].(string), path, minio.GetObjectOptions{})
 		if err != nil {
-			return true, err
+			return false, err
 		}
-		return false, nil
+		return true, nil
 	} else {
 		return false, constant.ErrInvalidParams
 	}
