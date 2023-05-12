@@ -65,7 +65,19 @@ func (s *Server) FindDirectives(directiveName string) []IDirective {
 			directives = append(directives, directive.GetBlock().FindDirectives(directiveName)...)
 		}
 	}
-
+	if directiveName == "listen" {
+		for _, listen := range s.Listens {
+			params := []string{listen.Bind}
+			params = append(params, listen.Parameters...)
+			if listen.DefaultServer != "" {
+				params = append(params, DefaultServer)
+			}
+			directives = append(directives, &Directive{
+				Name:       "listen",
+				Parameters: params,
+			})
+		}
+	}
 	return directives
 }
 
@@ -75,14 +87,12 @@ func (s *Server) UpdateDirective(key string, params []string) {
 	}
 	if key == "listen" {
 		defaultServer := false
-		if len(params) > 1 && params[1] == "default_server" {
+		paramLen := len(params)
+		if paramLen > 0 && params[paramLen-1] == "default_server" {
+			params = params[:paramLen-1]
 			defaultServer = true
 		}
-		if len(params) > 2 {
-			s.UpdateListen(params[0], defaultServer, params[2:]...)
-		} else {
-			s.UpdateListen(params[0], defaultServer)
-		}
+		s.UpdateListen(params[0], defaultServer, params[1:]...)
 		return
 	}
 
