@@ -854,7 +854,16 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 				return res, nil
 			}
 		}
-		content, err := os.ReadFile(path.Join(sitePath, "log", req.LogType))
+		filePath := path.Join(sitePath, "log", req.LogType)
+		fileInfo, err := os.Stat(filePath)
+		if err != nil {
+			return nil, err
+		}
+		if fileInfo.Size() > 10*1024*1024 {
+			return nil, buserr.New(constant.ErrFileTooLarge)
+		}
+		fileInfo.Size()
+		content, err := os.ReadFile(filePath)
 		if err != nil {
 			return nil, err
 		}
