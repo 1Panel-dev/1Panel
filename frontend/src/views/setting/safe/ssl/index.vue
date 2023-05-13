@@ -112,6 +112,8 @@ import { DownloadByPath } from '@/api/modules/files';
 import { Rules } from '@/global/form-rules';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const loading = ref();
 const drawerVisiable = ref();
@@ -207,8 +209,10 @@ const onSaveSSL = async (formEl: FormInstance | undefined) => {
             await updateSSL(param).then(() => {
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 let href = window.location.href;
+                globalStore.isLogin = false;
                 let address = href.split('://')[1];
-                window.open(`https://${address}/`, '_self');
+                address = address.replaceAll('settings/safe', globalStore.entrance);
+                window.open(`https://${address}`, '_self');
             });
         });
     });

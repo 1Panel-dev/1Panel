@@ -31,6 +31,8 @@ import { MsgSuccess } from '@/utils/message';
 import { updatePort } from '@/api/modules/setting';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 interface DialogProps {
     serverPort: number;
@@ -66,9 +68,10 @@ const onSavePort = async (formEl: FormInstance | undefined) => {
                 .then(() => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    globalStore.isLogin = false;
                     let href = window.location.href;
                     let ip = href.split('//')[1].split(':')[0];
-                    window.open(`${href.split('//')[0]}//${ip}:${form.serverPort}/`, '_self');
+                    window.open(`${href.split('//')[0]}//${ip}:${form.serverPort}/${globalStore.entrance}`, '_self');
                 })
                 .catch(() => {
                     loading.value = false;
