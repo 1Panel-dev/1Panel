@@ -99,6 +99,7 @@ func Init() {
 	global.CONF.System.Username = username
 	global.CONF.System.Password = password
 	global.CONF.System.Entrance = entrance
+	global.CONF.System.ChangeUserInfo = loadChange()
 	global.Viper = v
 }
 
@@ -112,4 +113,12 @@ func loadParams(param string) string {
 		panic(fmt.Sprintf("error `%s` find in /usr/bin/1pctl", param))
 	}
 	return info
+}
+
+func loadChange() bool {
+	stdout, err := cmd.Exec("grep '^CHANGE_USER_INFO=' /usr/bin/1pctl | cut -d'=' -f2")
+	if err != nil {
+		return false
+	}
+	return stdout == "true\n"
 }

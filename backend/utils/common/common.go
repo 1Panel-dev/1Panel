@@ -83,6 +83,16 @@ func RandStr(n int) string {
 	return string(b)
 }
 
+func RandStrAndNum(n int) string {
+	mathRand.Seed(time.Now().UnixNano())
+	const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
+	b := make([]byte, 10)
+	for i := range b {
+		b[i] = charset[mathRand.Int63()%int64(len(charset))]
+	}
+	return (string(b))
+}
+
 func ScanPort(port int) bool {
 	ln, err := net.Listen("tcp", ":"+strconv.Itoa(port))
 	if err != nil {
