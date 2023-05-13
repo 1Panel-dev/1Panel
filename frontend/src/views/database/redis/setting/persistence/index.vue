@@ -201,6 +201,7 @@ const onBackup = async () => {
 };
 const onRecover = async () => {
     let param = {
+        source: currentRow.value.source,
         type: 'redis',
         name: '',
         detailName: '',

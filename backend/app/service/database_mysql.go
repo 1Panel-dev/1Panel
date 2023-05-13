@@ -257,6 +257,9 @@ func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
 		if err != nil {
 			return err
 		}
+		if info.Value == mysql.Permission {
+			return nil
+		}
 	}
 	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {

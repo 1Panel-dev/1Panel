@@ -111,9 +111,9 @@ func (u *BackupService) DownloadRecord(info dto.DownloadRecord) (string, error) 
 		return "", fmt.Errorf("new cloud storage client failed, err: %v", err)
 	}
 	targetPath := fmt.Sprintf("%s/download/%s/%s", constant.DataDir, info.FileDir, info.FileName)
-	if _, err := os.Stat(path.Base(targetPath)); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(path.Base(targetPath), os.ModePerm); err != nil {
-			global.LOG.Errorf("mkdir %s failed, err: %v", path.Base(targetPath), err)
+	if _, err := os.Stat(path.Dir(targetPath)); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(path.Dir(targetPath), os.ModePerm); err != nil {
+			global.LOG.Errorf("mkdir %s failed, err: %v", path.Dir(targetPath), err)
 		}
 	}
 	srcPath := fmt.Sprintf("%s/%s", info.FileDir, info.FileName)

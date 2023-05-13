@@ -149,6 +149,7 @@ const search = async () => {
 
 const onRecover = async (row: File.File) => {
     let params = {
+        source: 'LOCAL',
         type: type.value,
         name: name.value,
         detailName: detailName.value,
