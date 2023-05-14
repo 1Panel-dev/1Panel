@@ -371,8 +371,8 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 	}
 	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
-	server.UpdateListen("443", false, "ssl")
-	server.UpdateListen("[::]:443", false, "ssl")
+	server.UpdateListen("443", website.DefaultServer, "ssl")
+	server.UpdateListen("[::]:443", website.DefaultServer, "ssl")
 
 	switch req.HttpConfig {
 	case constant.HTTPSOnly:
@@ -381,11 +381,11 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 		server.RemoveDirective("if", []string{"($scheme"})
 	case constant.HTTPToHTTPS:
 		server.UpdateListen("80", website.DefaultServer)
-		server.UpdateListen("[::]:80", false)
+		server.UpdateListen("[::]:80", website.DefaultServer)
 		server.AddHTTP2HTTPS()
 	case constant.HTTPAlso:
 		server.UpdateListen("80", website.DefaultServer)
-		server.UpdateListen("[::]:80", false)
+		server.UpdateListen("[::]:80", website.DefaultServer)
 		server.RemoveDirective("if", []string{"($scheme"})
 	}
 
