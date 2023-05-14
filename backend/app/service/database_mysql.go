@@ -554,7 +554,7 @@ func excuteSql(containerName, password, command string) error {
 }
 
 func excSQL(containerName, password, command string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "docker", "exec", containerName, "mysql", "-uroot", "-p"+password, "-e", command)
 	stdout, err := cmd.CombinedOutput()
