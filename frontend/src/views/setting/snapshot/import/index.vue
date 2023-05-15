@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <el-drawer v-model="drawerVisiable" size="50%">
+        <el-drawer v-model="drawerVisiable" size="30%">
             <template #header>
                 <DrawerHeader :header="$t('setting.importSnapshot')" :back="handleClose" />
             </template>
