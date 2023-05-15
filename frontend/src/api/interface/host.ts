@@ -114,4 +114,8 @@ export namespace Host {
         permitRootLogin: string;
         useDNS: string;
     }
+    export interface SSHGenerate {
+        encryptionMode: string;
+        password: string;
+    }
 }

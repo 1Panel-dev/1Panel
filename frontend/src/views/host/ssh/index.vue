@@ -147,7 +147,7 @@ const form = reactive({
 
 const onSaveFile = async () => {
     loading.value = true;
-    await SaveFileContent({ path: '/Users/slooop/Downloads/sshd_config', content: sshConf.value })
+    await SaveFileContent({ path: '/etc/ssh/sshd_config', content: sshConf.value })
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -202,7 +202,7 @@ function callback(error: any) {
 }
 
 const loadSSHConf = async () => {
-    const res = await LoadFile({ path: '/Users/slooop/Downloads/sshd_config' });
+    const res = await LoadFile({ path: '/etc/ssh/sshd_config' });
     sshConf.value = res.data || '';
 };
 

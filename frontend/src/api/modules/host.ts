@@ -104,6 +104,9 @@ export const getSSHInfo = () => {
 export const updateSSH = (key: string, value: string) => {
     return http.post(`/hosts/ssh/update`, { key: key, value: value });
 };
-export const generatePubKey = (encryptionMode: string) => {
-    return http.post(`/hosts/ssh/generate`, { encryptionMode: encryptionMode });
+export const generateSecret = (params: Host.SSHGenerate) => {
+    return http.post(`/hosts/ssh/generate`, params);
+};
+export const loadSecret = (mode: string) => {
+    return http.post<string>(`/hosts/ssh/secret`, { encryptionMode: mode });
 };

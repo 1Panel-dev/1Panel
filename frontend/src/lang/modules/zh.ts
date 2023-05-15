@@ -839,6 +839,7 @@ const message = {
         key: '密钥',
         pubkey: '密钥信息',
         encryptionMode: '加密方式',
+        passwordHelper: '请输入 6-10 位加密密码',
         generate: '生成密钥',
         reGenerate: '重新生成密钥',
         keyAuthHelper: '是否启用密钥认证，默认启用。',
