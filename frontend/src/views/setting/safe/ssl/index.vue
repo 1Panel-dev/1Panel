@@ -5,7 +5,7 @@
             :destroy-on-close="true"
             @close="handleClose"
             :close-on-click-modal="false"
-            size="50%"
+            size="30%"
         >
             <template #header>
                 <DrawerHeader header="https" :back="handleClose" />

@@ -174,6 +174,9 @@ const onCheckConn = async (row: Container.RepoInfo) => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.sync'),
+        disabled: (row: Container.RepoInfo) => {
+            return row.downloadUrl === 'docker.io';
+        },
         click: (row: Container.RepoInfo) => {
             onCheckConn(row);
         },
