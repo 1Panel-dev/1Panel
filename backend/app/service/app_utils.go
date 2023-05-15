@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/compose-spec/compose-go/types"
 	"github.com/subosito/gotenv"
 	"math"
@@ -225,7 +226,7 @@ func upgradeInstall(installId uint, detailId uint) error {
 		return err
 	}
 
-	detailDir := path.Join(constant.ResourceDir, "apps", install.App.Key, "versions", detail.Version)
+	detailDir := path.Join(constant.ResourceDir, "apps", install.App.Resource, install.App.Key, detail.Version)
 	if install.App.Resource == constant.AppResourceLocal {
 		detailDir = path.Join(constant.ResourceDir, "localApps", strings.TrimPrefix(install.App.Key, "local"), "versions", detail.Version)
 	}
@@ -359,24 +360,48 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 	}
 }
 
-func copyAppData(key, version, installName string, params map[string]interface{}, isLocal bool) (err error) {
+func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.AppInstall, req request.AppInstallCreate) (err error) {
 	fileOp := files.NewFileOp()
-	appResourceDir := constant.AppResourceDir
-	installAppDir := path.Join(constant.AppInstallDir, key)
-	appKey := key
-	if isLocal {
+	appResourceDir := path.Join(constant.AppResourceDir, app.Resource)
+
+	if app.Resource == constant.AppResourceRemote && appDetail.Update {
+		appDownloadDir := path.Join(appResourceDir, app.Key)
+		if !fileOp.Stat(appDownloadDir) {
+			_ = fileOp.CreateDir(appDownloadDir, 0755)
+		}
+		appVersionDir := path.Join(appDownloadDir, appDetail.Version)
+		if !fileOp.Stat(appVersionDir) {
+			_ = fileOp.CreateDir(appVersionDir, 0755)
+		}
+		global.LOG.Infof("download app[%s] from %s", app.Name, appDetail.DownloadUrl)
+		filePath := path.Join(appVersionDir, appDetail.Version+".tar.gz")
+		if err = fileOp.DownloadFile(appDetail.DownloadUrl, filePath); err != nil {
+			appInstall.Status = constant.DownloadErr
+			global.LOG.Errorf("download app[%s] error %v", app.Name, err)
+			return
+		}
+		if err = fileOp.Decompress(filePath, appVersionDir, files.TarGz); err != nil {
+			global.LOG.Errorf("decompress app[%s] error %v", app.Name, err)
+			appInstall.Status = constant.DownloadErr
+			return
+		}
+		_ = fileOp.DeleteFile(filePath)
+	}
+	appKey := app.Key
+	installAppDir := path.Join(constant.AppInstallDir, app.Key)
+	if app.Resource == constant.AppResourceLocal {
 		appResourceDir = constant.LocalAppResourceDir
-		appKey = strings.TrimPrefix(key, "local")
+		appKey = strings.TrimPrefix(app.Resource, "local")
 		installAppDir = path.Join(constant.LocalAppInstallDir, appKey)
 	}
-	resourceDir := path.Join(appResourceDir, appKey, "versions", version)
+	resourceDir := path.Join(appResourceDir, appKey, appDetail.Version)
 
 	if !fileOp.Stat(installAppDir) {
 		if err = fileOp.CreateDir(installAppDir, 0755); err != nil {
 			return
 		}
 	}
-	appDir := path.Join(installAppDir, installName)
+	appDir := path.Join(installAppDir, req.Name)
 	if fileOp.Stat(appDir) {
 		if err = fileOp.DeleteDir(appDir); err != nil {
 			return
@@ -385,14 +410,14 @@ func copyAppData(key, version, installName string, params map[string]interface{}
 	if err = fileOp.Copy(resourceDir, installAppDir); err != nil {
 		return
 	}
-	versionDir := path.Join(installAppDir, version)
+	versionDir := path.Join(installAppDir, appDetail.Version)
 	if err = fileOp.Rename(versionDir, appDir); err != nil {
 		return
 	}
 	envPath := path.Join(appDir, ".env")
 
-	envParams := make(map[string]string, len(params))
-	handleMap(params, envParams)
+	envParams := make(map[string]string, len(req.Params))
+	handleMap(req.Params, envParams)
 	if err = env.Write(envParams, envPath); err != nil {
 		return
 	}
@@ -473,21 +498,21 @@ func rebuildApp(appInstall model.AppInstall) error {
 	return syncById(appInstall.ID)
 }
 
-func getAppDetails(details []model.AppDetail, versions []string) map[string]model.AppDetail {
+func getAppDetails(details []model.AppDetail, versions []dto.AppConfigVersion) map[string]model.AppDetail {
 	appDetails := make(map[string]model.AppDetail, len(details))
 	for _, old := range details {
 		old.Status = constant.AppTakeDown
 		appDetails[old.Version] = old
 	}
-
 	for _, v := range versions {
-		detail, ok := appDetails[v]
+		version := v.Name
+		detail, ok := appDetails[version]
 		if ok {
 			detail.Status = constant.AppNormal
-			appDetails[v] = detail
+			appDetails[version] = detail
 		} else {
-			appDetails[v] = model.AppDetail{
-				Version: v,
+			appDetails[version] = model.AppDetail{
+				Version: version,
 				Status:  constant.AppNormal,
 			}
 		}
@@ -502,7 +527,8 @@ func getApps(oldApps []model.App, items []dto.AppDefine, isLocal bool) map[strin
 		apps[old.Key] = old
 	}
 	for _, item := range items {
-		key := item.Key
+		config := item.AppProperty
+		key := config.Key
 		if isLocal {
 			key = "local" + key
 		}
@@ -516,17 +542,19 @@ func getApps(oldApps []model.App, items []dto.AppDefine, isLocal bool) map[strin
 			app.Resource = constant.AppResourceRemote
 		}
 		app.Name = item.Name
-		app.Limit = item.Limit
+		app.Limit = config.Limit
 		app.Key = key
-		app.ShortDescZh = item.ShortDescZh
-		app.ShortDescEn = item.ShortDescEn
-		app.Website = item.Website
-		app.Document = item.Document
-		app.Github = item.Github
-		app.Type = item.Type
-		app.CrossVersionUpdate = item.CrossVersionUpdate
-		app.Required = item.GetRequired()
+		app.ShortDescZh = config.ShortDescZh
+		app.ShortDescEn = config.ShortDescEn
+		app.Website = config.Website
+		app.Document = config.Document
+		app.Github = config.Github
+		app.Type = config.Type
+		app.CrossVersionUpdate = config.CrossVersionUpdate
+		app.Required = config.GetRequired()
 		app.Status = constant.AppNormal
+		app.LastModified = item.LastModified
+		app.ReadMe = item.ReadMe
 		apps[key] = app
 	}
 	return apps

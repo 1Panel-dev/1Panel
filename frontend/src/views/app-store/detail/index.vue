@@ -82,12 +82,8 @@
                     </el-row>
                 </div>
             </div>
-            <div v-loading="loadingDetail" style="margin-left: 10px">
-                <MdEditor
-                    v-model="appDetail.readme"
-                    previewOnly
-                    :theme="globalStore.$state.themeConfig.theme || 'light'"
-                />
+            <div style="margin-left: 10px">
+                <MdEditor v-model="app.readMe" previewOnly :theme="globalStore.$state.themeConfig.theme || 'light'" />
             </div>
         </template>
     </LayoutContent>

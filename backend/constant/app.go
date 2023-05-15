@@ -1,12 +1,14 @@
 package constant
 
 const (
-	Running    = "Running"
-	UnHealthy  = "UnHealthy"
-	Error      = "Error"
-	Stopped    = "Stopped"
-	Installing = "Installing"
-	Syncing    = "Syncing"
+	Running     = "Running"
+	UnHealthy   = "UnHealthy"
+	Error       = "Error"
+	Stopped     = "Stopped"
+	Installing  = "Installing"
+	Syncing     = "Syncing"
+	DownloadErr = "DownloadErr"
+	DirNotFound = "DirNotFound"
 
 	ContainerPrefix = "1Panel-"
 

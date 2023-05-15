@@ -29,6 +29,8 @@ ErrDbUserNotValid: "Stock database, username and password do not match！"
 ErrDockerComposeNotValid: "docker-compose file format error!"
 ErrUpdateBuWebsite: 'The application was updated successfully, but the modification of the website configuration file failed, please check the configuration!'
 Err1PanelNetworkFailed: 'Default container network creation failed! {{ .detail }}'
+ErrFileParse: 'Application docker-compose file parsing failed!'
+ErrInstallDirNotFound: 'installation directory does not exist'
 
 #file
 ErrFileCanNotRead: "File can not read"

@@ -84,6 +84,9 @@
                                                     {{ language == 'zh' ? tag.name : tag.key }}
                                                 </span>
                                             </el-tag>
+                                            <el-tag v-if="app.status === 'TakeDown'" style="margin-right: 5px">
+                                                <span style="color: red">已废弃</span>
+                                            </el-tag>
                                         </div>
                                     </div>
                                 </el-col>
