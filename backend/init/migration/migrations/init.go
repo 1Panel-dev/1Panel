@@ -312,3 +312,26 @@ var AddEntranceAndSSL = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.Website{})
 	},
 }
+
+var UpdateTableSetting = &gormigrate.Migration{
+	ID: "20200511-update-table-setting",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.App{}); err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "AppStoreLastModified", Value: ""}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var UpdateTableAppDetail = &gormigrate.Migration{
+	ID: "20200513-update-table-app-detail",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.AppDetail{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

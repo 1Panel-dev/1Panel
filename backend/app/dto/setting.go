@@ -33,7 +33,8 @@ type SettingInfo struct {
 	WeChatVars  string `json:"weChatVars"`
 	DingVars    string `json:"dingVars"`
 
-	AppStoreVersion string `json:"appStoreVersion"`
+	AppStoreVersion      string `json:"appStoreVersion"`
+	AppStoreLastModified string `json:"appStoreLastModified"`
 }
 
 type SettingUpdate struct {

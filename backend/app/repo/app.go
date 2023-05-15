@@ -24,6 +24,7 @@ type IAppRepo interface {
 	GetByKey(ctx context.Context, key string) (model.App, error)
 	Create(ctx context.Context, app *model.App) error
 	Save(ctx context.Context, app *model.App) error
+	BatchDelete(ctx context.Context, apps []model.App) error
 }
 
 func NewIAppRepo() IAppRepo {
@@ -105,4 +106,8 @@ func (a AppRepo) Create(ctx context.Context, app *model.App) error {
 
 func (a AppRepo) Save(ctx context.Context, app *model.App) error {
 	return getTx(ctx).Omit(clause.Associations).Save(app).Error
+}
+
+func (a AppRepo) BatchDelete(ctx context.Context, apps []model.App) error {
+	return getTx(ctx).Omit(clause.Associations).Delete(&apps).Error
 }

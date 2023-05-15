@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"math"
 	"os"
 	"path"
@@ -182,6 +183,9 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 	install, err := appInstallRepo.GetFirstByCtx(context.Background(), commonRepo.WithByID(req.InstallId))
 	if err != nil {
 		return err
+	}
+	if !req.ForceDelete && !files.NewFileOp().Stat(install.GetPath()) {
+		return buserr.New(constant.ErrInstallDirNotFound)
 	}
 	dockerComposePath := install.GetComposePath()
 	switch req.Operate {

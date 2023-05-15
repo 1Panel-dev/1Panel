@@ -11,6 +11,7 @@ export namespace App {
         author: string;
         source: string;
         type: string;
+        status: string;
     }
 
     export interface AppDTO extends App {

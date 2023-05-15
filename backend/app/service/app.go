@@ -5,14 +5,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"os"
-	"path"
-	"strings"
-
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
+	"io"
+	"net/http"
+	"path"
+	"strconv"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
@@ -253,7 +251,7 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	}
 	app, err = appRepo.GetFirst(commonRepo.WithByID(appDetail.AppId))
 	if err != nil {
-		return nil, err
+		return
 	}
 	if err = checkRequiredAndLimit(app); err != nil {
 		return
@@ -276,7 +274,7 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 
 	value, ok := composeMap["services"]
 	if !ok {
-		err = buserr.New("")
+		err = buserr.New(constant.ErrFileParse)
 		return
 	}
 	servicesMap := value.(map[string]interface{})
@@ -318,20 +316,11 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 			}
 		}
 	}()
-
-	if err = copyAppData(app.Key, appDetail.Version, req.Name, req.Params, app.Resource == constant.AppResourceLocal); err != nil {
-		return
-	}
-	fileOp := files.NewFileOp()
-	if err = fileOp.WriteFile(appInstall.GetComposePath(), strings.NewReader(string(composeByte)), 0775); err != nil {
-		return
-	}
 	paramByte, err = json.Marshal(req.Params)
 	if err != nil {
 		return
 	}
 	appInstall.Env = string(paramByte)
-
 	if err = appInstallRepo.Create(ctx, appInstall); err != nil {
 		return
 	}
@@ -341,7 +330,13 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	if err = upAppPre(app, appInstall); err != nil {
 		return
 	}
-	go upApp(appInstall)
+	go func() {
+		if err = downloadApp(app, appDetail, appInstall, req); err != nil {
+			_ = appInstallRepo.Save(ctx, appInstall)
+			return
+		}
+		upApp(appInstall)
+	}()
 	go updateToolApp(appInstall)
 	return
 }
@@ -354,7 +349,7 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 	if err != nil {
 		return nil, err
 	}
-	versionUrl := fmt.Sprintf("%s/%s/%s/appstore/apps.json", global.CONF.System.RepoUrl, global.CONF.System.Mode, setting.SystemVersion)
+	versionUrl := fmt.Sprintf("%s/%s/1panel.json", global.CONF.System.AppRepo, global.CONF.System.Mode)
 	versionRes, err := http.Get(versionUrl)
 	if err != nil {
 		return nil, err
@@ -368,162 +363,165 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 	if err = json.Unmarshal(body, list); err != nil {
 		return nil, err
 	}
-	res.Version = list.Version
-	if setting.AppStoreVersion == "" || common.CompareVersion(list.Version, setting.AppStoreVersion) {
+	res.AppStoreLastModified = list.LastModified
+	res.List = *list
+
+	appStoreLastModified, _ := strconv.Atoi(setting.AppStoreLastModified)
+	if setting.AppStoreLastModified == "" || list.LastModified > appStoreLastModified {
 		res.CanUpdate = true
-		res.DownloadPath = fmt.Sprintf("%s/%s/%s/appstore/apps-%s.tar.gz", global.CONF.System.RepoUrl, global.CONF.System.Mode, setting.SystemVersion, list.Version)
 		return res, err
 	}
+	res.CanUpdate = true
 	return res, nil
 }
 
 func (a AppService) SyncAppListFromLocal() {
-	fileOp := files.NewFileOp()
-	appDir := constant.LocalAppResourceDir
-	listFile := path.Join(appDir, "list.json")
-	if !fileOp.Stat(listFile) {
-		return
-	}
-	global.LOG.Infof("start sync local apps...")
-	content, err := fileOp.GetContent(listFile)
-	if err != nil {
-		global.LOG.Errorf("get list.json content failed %s", err.Error())
-		return
-	}
-	list := &dto.AppList{}
-	if err := json.Unmarshal(content, list); err != nil {
-		global.LOG.Errorf("unmarshal list.json failed %s", err.Error())
-		return
-	}
-	oldApps, _ := appRepo.GetBy(appRepo.WithResource(constant.AppResourceLocal))
-	appsMap := getApps(oldApps, list.Items, true)
-	for _, l := range list.Items {
-		localKey := "local" + l.Key
-		app := appsMap[localKey]
-		icon, err := os.ReadFile(path.Join(appDir, l.Key, "metadata", "logo.png"))
-		if err != nil {
-			global.LOG.Errorf("get [%s] icon error: %s", l.Name, err.Error())
-			continue
-		}
-		iconStr := base64.StdEncoding.EncodeToString(icon)
-		app.Icon = iconStr
-		app.TagsKey = append(l.Tags, "Local")
-		app.Recommend = 9999
-		versions := l.Versions
-		detailsMap := getAppDetails(app.Details, versions)
-
-		for _, v := range versions {
-			detail := detailsMap[v]
-			detailPath := path.Join(appDir, l.Key, "versions", v)
-			if _, err := os.Stat(detailPath); err != nil {
-				global.LOG.Errorf("get [%s] folder error: %s", detailPath, err.Error())
-				continue
-			}
-			readmeStr, err := os.ReadFile(path.Join(detailPath, "README.md"))
-			if err != nil {
-				global.LOG.Errorf("get [%s] README error: %s", detailPath, err.Error())
-			}
-			detail.Readme = string(readmeStr)
-			dockerComposeStr, err := os.ReadFile(path.Join(detailPath, "docker-compose.yml"))
-			if err != nil {
-				global.LOG.Errorf("get [%s] docker-compose.yml error: %s", detailPath, err.Error())
-				continue
-			}
-			detail.DockerCompose = string(dockerComposeStr)
-			paramStr, err := os.ReadFile(path.Join(detailPath, "config.json"))
-			if err != nil {
-				global.LOG.Errorf("get [%s] form.json error: %s", detailPath, err.Error())
-			}
-			detail.Params = string(paramStr)
-			detailsMap[v] = detail
-		}
-		var newDetails []model.AppDetail
-		for _, v := range detailsMap {
-			newDetails = append(newDetails, v)
-		}
-		app.Details = newDetails
-		appsMap[localKey] = app
-	}
-	var (
-		addAppArray []model.App
-		updateArray []model.App
-		appIds      []uint
-	)
-	for _, v := range appsMap {
-		if v.ID == 0 {
-			addAppArray = append(addAppArray, v)
-		} else {
-			updateArray = append(updateArray, v)
-			appIds = append(appIds, v.ID)
-		}
-	}
-	tx, ctx := getTxAndContext()
-	if len(addAppArray) > 0 {
-		if err := appRepo.BatchCreate(ctx, addAppArray); err != nil {
-			tx.Rollback()
-			return
-		}
-	}
-	for _, update := range updateArray {
-		if err := appRepo.Save(ctx, &update); err != nil {
-			tx.Rollback()
-			return
-		}
-	}
-	if err := appTagRepo.DeleteByAppIds(ctx, appIds); err != nil {
-		tx.Rollback()
-		return
-	}
-	apps := append(addAppArray, updateArray...)
-	var (
-		addDetails    []model.AppDetail
-		updateDetails []model.AppDetail
-		appTags       []*model.AppTag
-	)
-	tags, _ := tagRepo.All()
-	tagMap := make(map[string]uint, len(tags))
-	for _, app := range tags {
-		tagMap[app.Key] = app.ID
-	}
-	for _, a := range apps {
-		for _, t := range a.TagsKey {
-			tagId, ok := tagMap[t]
-			if ok {
-				appTags = append(appTags, &model.AppTag{
-					AppId: a.ID,
-					TagId: tagId,
-				})
-			}
-		}
-		for _, d := range a.Details {
-			d.AppId = a.ID
-			if d.ID == 0 {
-				addDetails = append(addDetails, d)
-			} else {
-				updateDetails = append(updateDetails, d)
-			}
-		}
-	}
-	if len(addDetails) > 0 {
-		if err := appDetailRepo.BatchCreate(ctx, addDetails); err != nil {
-			tx.Rollback()
-			return
-		}
-	}
-	for _, u := range updateDetails {
-		if err := appDetailRepo.Update(ctx, u); err != nil {
-			tx.Rollback()
-			return
-		}
-	}
-	if len(appTags) > 0 {
-		if err := appTagRepo.BatchCreate(ctx, appTags); err != nil {
-			tx.Rollback()
-			return
-		}
-	}
-	tx.Commit()
-	global.LOG.Infof("sync local apps success")
+	//fileOp := files.NewFileOp()
+	//appDir := constant.LocalAppResourceDir
+	//listFile := path.Join(appDir, "list.json")
+	//if !fileOp.Stat(listFile) {
+	//	return
+	//}
+	//global.LOG.Infof("start sync local apps...")
+	//content, err := fileOp.GetContent(listFile)
+	//if err != nil {
+	//	global.LOG.Errorf("get list.json content failed %s", err.Error())
+	//	return
+	//}
+	//list := &dto.AppList{}
+	//if err := json.Unmarshal(content, list); err != nil {
+	//	global.LOG.Errorf("unmarshal list.json failed %s", err.Error())
+	//	return
+	//}
+	//oldApps, _ := appRepo.GetBy(appRepo.WithResource(constant.AppResourceLocal))
+	//appsMap := getApps(oldApps, list.Apps, true)
+	//for _, l := range list.Apps {
+	//	localKey := "local" + l.Config.Key
+	//	app := appsMap[localKey]
+	//	icon, err := os.ReadFile(path.Join(appDir, l.Config.Key, "metadata", "logo.png"))
+	//	if err != nil {
+	//		global.LOG.Errorf("get [%s] icon error: %s", l.Name, err.Error())
+	//		continue
+	//	}
+	//	iconStr := base64.StdEncoding.EncodeToString(icon)
+	//	app.Icon = iconStr
+	//	app.TagsKey = append(l.Tags, "Local")
+	//	app.Recommend = 9999
+	//	versions := l.Versions
+	//	detailsMap := getAppDetails(app.Details, versions)
+	//
+	//	for _, v := range versions {
+	//		detail := detailsMap[v]
+	//		detailPath := path.Join(appDir, l.Key, "versions", v)
+	//		if _, err := os.Stat(detailPath); err != nil {
+	//			global.LOG.Errorf("get [%s] folder error: %s", detailPath, err.Error())
+	//			continue
+	//		}
+	//		readmeStr, err := os.ReadFile(path.Join(detailPath, "README.md"))
+	//		if err != nil {
+	//			global.LOG.Errorf("get [%s] README error: %s", detailPath, err.Error())
+	//		}
+	//		detail.Readme = string(readmeStr)
+	//		dockerComposeStr, err := os.ReadFile(path.Join(detailPath, "docker-compose.yml"))
+	//		if err != nil {
+	//			global.LOG.Errorf("get [%s] docker-compose.yml error: %s", detailPath, err.Error())
+	//			continue
+	//		}
+	//		detail.DockerCompose = string(dockerComposeStr)
+	//		paramStr, err := os.ReadFile(path.Join(detailPath, "config.json"))
+	//		if err != nil {
+	//			global.LOG.Errorf("get [%s] form.json error: %s", detailPath, err.Error())
+	//		}
+	//		detail.Params = string(paramStr)
+	//		detailsMap[v] = detail
+	//	}
+	//	var newDetails []model.AppDetail
+	//	for _, v := range detailsMap {
+	//		newDetails = append(newDetails, v)
+	//	}
+	//	app.Details = newDetails
+	//	appsMap[localKey] = app
+	//}
+	//var (
+	//	addAppArray []model.App
+	//	updateArray []model.App
+	//	appIds      []uint
+	//)
+	//for _, v := range appsMap {
+	//	if v.ID == 0 {
+	//		addAppArray = append(addAppArray, v)
+	//	} else {
+	//		updateArray = append(updateArray, v)
+	//		appIds = append(appIds, v.ID)
+	//	}
+	//}
+	//tx, ctx := getTxAndContext()
+	//if len(addAppArray) > 0 {
+	//	if err := appRepo.BatchCreate(ctx, addAppArray); err != nil {
+	//		tx.Rollback()
+	//		return
+	//	}
+	//}
+	//for _, update := range updateArray {
+	//	if err := appRepo.Save(ctx, &update); err != nil {
+	//		tx.Rollback()
+	//		return
+	//	}
+	//}
+	//if err := appTagRepo.DeleteByAppIds(ctx, appIds); err != nil {
+	//	tx.Rollback()
+	//	return
+	//}
+	//apps := append(addAppArray, updateArray...)
+	//var (
+	//	addDetails    []model.AppDetail
+	//	updateDetails []model.AppDetail
+	//	appTags       []*model.AppTag
+	//)
+	//tags, _ := tagRepo.All()
+	//tagMap := make(map[string]uint, len(tags))
+	//for _, app := range tags {
+	//	tagMap[app.Key] = app.ID
+	//}
+	//for _, a := range apps {
+	//	for _, t := range a.TagsKey {
+	//		tagId, ok := tagMap[t]
+	//		if ok {
+	//			appTags = append(appTags, &model.AppTag{
+	//				AppId: a.ID,
+	//				TagId: tagId,
+	//			})
+	//		}
+	//	}
+	//	for _, d := range a.Details {
+	//		d.AppId = a.ID
+	//		if d.ID == 0 {
+	//			addDetails = append(addDetails, d)
+	//		} else {
+	//			updateDetails = append(updateDetails, d)
+	//		}
+	//	}
+	//}
+	//if len(addDetails) > 0 {
+	//	if err := appDetailRepo.BatchCreate(ctx, addDetails); err != nil {
+	//		tx.Rollback()
+	//		return
+	//	}
+	//}
+	//for _, u := range updateDetails {
+	//	if err := appDetailRepo.Update(ctx, u); err != nil {
+	//		tx.Rollback()
+	//		return
+	//	}
+	//}
+	//if len(appTags) > 0 {
+	//	if err := appTagRepo.BatchCreate(ctx, appTags); err != nil {
+	//		tx.Rollback()
+	//		return
+	//	}
+	//}
+	//tx.Commit()
+	//global.LOG.Infof("sync local apps success")
 }
 func (a AppService) SyncAppListFromRemote() error {
 	updateRes, err := a.GetAppUpdate()
@@ -531,28 +529,15 @@ func (a AppService) SyncAppListFromRemote() error {
 		return err
 	}
 	if !updateRes.CanUpdate {
-		global.LOG.Infof("The latest version is [%s] The app store is already up to date", updateRes.Version)
+		//global.LOG.Infof("The latest version is [%s] The app store is already up to date", updateRes.Version)
 		return nil
-	}
-	if err := getAppFromRepo(updateRes.DownloadPath, updateRes.Version); err != nil {
-		global.LOG.Errorf("get app from oss  error: %s", err.Error())
-		return err
-	}
-	appDir := constant.AppResourceDir
-	listFile := path.Join(appDir, "list.json")
-	content, err := os.ReadFile(listFile)
-	if err != nil {
-		return err
-	}
-	list := &dto.AppList{}
-	if err := json.Unmarshal(content, list); err != nil {
-		return err
 	}
 	var (
 		tags    []*model.Tag
 		appTags []*model.AppTag
+		list    = updateRes.List
 	)
-	for _, t := range list.Tags {
+	for _, t := range list.Extra.Tags {
 		tags = append(tags, &model.Tag{
 			Key:  t.Key,
 			Name: t.Name,
@@ -562,75 +547,101 @@ func (a AppService) SyncAppListFromRemote() error {
 	if err != nil {
 		return err
 	}
-	appsMap := getApps(oldApps, list.Items, false)
-	for _, l := range list.Items {
-		app := appsMap[l.Key]
-		icon, err := os.ReadFile(path.Join(appDir, l.Key, "metadata", "logo.png"))
+	baseRemoteUrl := fmt.Sprintf("%s/%s/1panel", global.CONF.System.AppRepo, global.CONF.System.Mode)
+	appsMap := getApps(oldApps, list.Apps, false)
+	for _, l := range list.Apps {
+		app := appsMap[l.AppProperty.Key]
+		iconRes, err := http.Get(l.Icon)
 		if err != nil {
-			global.LOG.Errorf("get [%s] icon error: %s", l.Name, err.Error())
-			continue
+			return err
 		}
-		iconStr := base64.StdEncoding.EncodeToString(icon)
+		body, err := io.ReadAll(iconRes.Body)
+		if err != nil {
+			return err
+		}
+		iconStr := base64.StdEncoding.EncodeToString(body)
 		app.Icon = iconStr
-		app.TagsKey = l.Tags
-		if l.Recommend > 0 {
-			app.Recommend = l.Recommend
+		app.TagsKey = l.AppProperty.Tags
+		if l.AppProperty.Recommend > 0 {
+			app.Recommend = l.AppProperty.Recommend
 		} else {
 			app.Recommend = 9999
 		}
-
+		app.ReadMe = l.ReadMe
+		app.LastModified = l.LastModified
 		versions := l.Versions
 		detailsMap := getAppDetails(app.Details, versions)
-
 		for _, v := range versions {
-			detail := detailsMap[v]
-			detailPath := path.Join(appDir, l.Key, "versions", v)
-			if _, err := os.Stat(detailPath); err != nil {
-				global.LOG.Errorf("get [%s] folder error: %s", detailPath, err.Error())
-				continue
-			}
-			readmeStr, err := os.ReadFile(path.Join(detailPath, "README.md"))
+			version := v.Name
+			detail := detailsMap[version]
+
+			dockerComposeUrl := fmt.Sprintf("%s/%s/%s/%s", baseRemoteUrl, app.Key, version, "docker-compose.yml")
+			composeRes, err := http.Get(dockerComposeUrl)
 			if err != nil {
-				global.LOG.Errorf("get [%s] README error: %s", detailPath, err.Error())
+				return err
 			}
-			detail.Readme = string(readmeStr)
-			dockerComposeStr, err := os.ReadFile(path.Join(detailPath, "docker-compose.yml"))
+			bodyContent, err := io.ReadAll(composeRes.Body)
 			if err != nil {
-				global.LOG.Errorf("get [%s] docker-compose.yml error: %s", detailPath, err.Error())
-				continue
+				return err
 			}
-			detail.DockerCompose = string(dockerComposeStr)
-			paramStr, err := os.ReadFile(path.Join(detailPath, "config.json"))
-			if err != nil {
-				global.LOG.Errorf("get [%s] form.json error: %s", detailPath, err.Error())
+			detail.DockerCompose = string(bodyContent)
+
+			paramByte, _ := json.Marshal(v.AppForm)
+			detail.Params = string(paramByte)
+			detail.DownloadUrl = v.DownloadUrl
+			detail.DownloadCallBackUrl = v.DownloadCallBackUrl
+			if v.LastModified > detail.LastModified {
+				detail.Update = true
+				detail.LastModified = v.LastModified
 			}
-			detail.Params = string(paramStr)
-			detailsMap[v] = detail
+			detailsMap[version] = detail
 		}
 		var newDetails []model.AppDetail
-		for _, v := range detailsMap {
-			newDetails = append(newDetails, v)
+		for _, detail := range detailsMap {
+			newDetails = append(newDetails, detail)
 		}
 		app.Details = newDetails
-		appsMap[l.Key] = app
+		appsMap[l.AppProperty.Key] = app
 	}
 
 	var (
-		addAppArray []model.App
-		updateArray []model.App
-		tagMap      = make(map[string]uint, len(tags))
+		addAppArray    []model.App
+		updateAppArray []model.App
+		deleteAppArray []model.App
+		deleteIds      []uint
+		tagMap         = make(map[string]uint, len(tags))
 	)
 
 	for _, v := range appsMap {
 		if v.ID == 0 {
 			addAppArray = append(addAppArray, v)
 		} else {
-			updateArray = append(updateArray, v)
+			if v.Status == constant.AppTakeDown {
+				installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(v.ID))
+				if len(installs) > 0 {
+					updateAppArray = append(updateAppArray, v)
+					continue
+				}
+				deleteAppArray = append(deleteAppArray, v)
+				deleteIds = append(deleteIds, v.ID)
+			} else {
+				updateAppArray = append(updateAppArray, v)
+			}
 		}
 	}
 	tx, ctx := getTxAndContext()
 	if len(addAppArray) > 0 {
 		if err := appRepo.BatchCreate(ctx, addAppArray); err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+	if len(deleteAppArray) > 0 {
+		if err := appRepo.BatchDelete(ctx, deleteAppArray); err != nil {
+			tx.Rollback()
+			return err
+		}
+		if err := appDetailRepo.DeleteByAppIds(ctx, deleteIds); err != nil {
 			tx.Rollback()
 			return err
 		}
@@ -648,34 +659,39 @@ func (a AppService) SyncAppListFromRemote() error {
 			tagMap[t.Key] = t.ID
 		}
 	}
-	for _, update := range updateArray {
+	for _, update := range updateAppArray {
 		if err := appRepo.Save(ctx, &update); err != nil {
 			tx.Rollback()
 			return err
 		}
 	}
-	apps := append(addAppArray, updateArray...)
+	apps := append(addAppArray, updateAppArray...)
 
 	var (
 		addDetails    []model.AppDetail
 		updateDetails []model.AppDetail
+		deleteDetails []model.AppDetail
 	)
-	for _, a := range apps {
-		for _, t := range a.TagsKey {
+	for _, app := range apps {
+		for _, t := range app.TagsKey {
 			tagId, ok := tagMap[t]
 			if ok {
 				appTags = append(appTags, &model.AppTag{
-					AppId: a.ID,
+					AppId: app.ID,
 					TagId: tagId,
 				})
 			}
 		}
-		for _, d := range a.Details {
-			d.AppId = a.ID
+		for _, d := range app.Details {
+			d.AppId = app.ID
 			if d.ID == 0 {
 				addDetails = append(addDetails, d)
 			} else {
-				updateDetails = append(updateDetails, d)
+				if d.Status == constant.AppTakeDown {
+					deleteDetails = append(deleteDetails, d)
+				} else {
+					updateDetails = append(updateDetails, d)
+				}
 			}
 		}
 	}
@@ -691,6 +707,7 @@ func (a AppService) SyncAppListFromRemote() error {
 			return err
 		}
 	}
+
 	if err := appTagRepo.DeleteAll(ctx); err != nil {
 		tx.Rollback()
 		return err
@@ -702,5 +719,8 @@ func (a AppService) SyncAppListFromRemote() error {
 		}
 	}
 	tx.Commit()
+	if err := NewISettingService().Update("AppStoreLastModified", strconv.Itoa(list.LastModified)); err != nil {
+		return err
+	}
 	return nil
 }

@@ -29,6 +29,8 @@ ErrDbUserNotValid: "存量数据库，用户名密码不匹配！"
 ErrDockerComposeNotValid: "docker-compose 文件格式错误"
 ErrUpdateBuWebsite: '应用更新成功，但是网站配置文件修改失败，请检查配置！'
 Err1PanelNetworkFailed: '默认容器网络创建失败！{{ .detail }}'
+ErrFileParse: '应用 docker-compose 文件解析失败!'
+ErrInstallDirNotFound: '安装目录不存在'
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"

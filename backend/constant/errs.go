@@ -30,23 +30,16 @@ var (
 	ErrInvalidParams   = errors.New("ErrInvalidParams")
 
 	ErrTokenParse = errors.New("ErrTokenParse")
-
-	ErrPageGenerate = errors.New("generate page info failed")
-	ErrRepoNotValid = "ErrRepoNotValid"
 )
 
 // api
 var (
 	ErrTypeInternalServer  = "ErrInternalServer"
 	ErrTypeInvalidParams   = "ErrInvalidParams"
-	ErrTypeToken           = "ErrToken"
-	ErrTypeTokenTimeOut    = "ErrTokenTimeOut"
 	ErrTypeNotLogin        = "ErrNotLogin"
 	ErrTypePasswordExpired = "ErrPasswordExpired"
-	ErrTypeNotSafety       = "ErrNotSafety"
 	ErrNameIsExist         = "ErrNameIsExist"
 	ErrDemoEnvironment     = "ErrDemoEnvironment"
-	ErrInitUser            = "ErrInitUser"
 )
 
 // app
@@ -55,20 +48,20 @@ var (
 	ErrAppLimit            = "ErrAppLimit"
 	ErrAppRequired         = "ErrAppRequired"
 	ErrFileCanNotRead      = "ErrFileCanNotRead"
-	ErrFileToLarge         = "ErrFileToLarge"
 	ErrNotInstall          = "ErrNotInstall"
 	ErrPortInOtherApp      = "ErrPortInOtherApp"
 	ErrDbUserNotValid      = "ErrDbUserNotValid"
 	ErrUpdateBuWebsite     = "ErrUpdateBuWebsite"
 	Err1PanelNetworkFailed = "Err1PanelNetworkFailed"
 	ErrCmdTimeout          = "ErrCmdTimeout"
+	ErrFileParse           = "ErrFileParse"
+	ErrInstallDirNotFound  = "ErrInstallDirNotFound"
 )
 
 // website
 var (
 	ErrDomainIsExist      = "ErrDomainIsExist"
 	ErrAliasIsExist       = "ErrAliasIsExist"
-	ErrAppDelete          = "ErrAppDelete"
 	ErrGroupIsUsed        = "ErrGroupIsUsed"
 	ErrUsernameIsExist    = "ErrUsernameIsExist"
 	ErrUsernameIsNotExist = "ErrUsernameIsNotExist"
