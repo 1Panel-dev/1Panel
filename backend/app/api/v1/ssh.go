@@ -49,3 +49,57 @@ func (b *BaseApi) UpdateSSH(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, nil)
 }
+
+// @Tags SSH
+// @Summary Generate host ssh secret
+// @Description 生成 ssh 密钥
+// @Accept json
+// @Param request body dto.GenerateSSH true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /host/ssh/generate [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"生成 SSH 密钥 ","formatEN":"generate SSH secret"}
+func (b *BaseApi) GenerateSSH(c *gin.Context) {
+	var req dto.GenerateSSH
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := sshService.GenerateSSH(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags SSH
+// @Summary Load host ssh secret
+// @Description 获取 ssh 密钥
+// @Accept json
+// @Param request body dto.GenerateLoad true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /host/ssh/secret [post]
+func (b *BaseApi) LoadSSHSecret(c *gin.Context) {
+	var req dto.GenerateLoad
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	data, err := sshService.LoadSSHSecret(req.EncryptionMode)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}
