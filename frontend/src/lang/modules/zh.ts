@@ -558,8 +558,9 @@ const message = {
         imageRepo: '镜像仓库',
         repoHelper: '是否包含镜像仓库/组织/项目?',
         auth: '认证',
-        mirrorHelper: '一行一个，例：\nhttps://hub-mirror.c.163.com \nhttps://reg-mirror.qiniu.com',
-        registrieHelper: '一行一个，例：\n172.16.10.111:8081 \n172.16.10.112:8081',
+        mirrorHelper:
+            '当存在多个加速器时，需要换行显示，例： \nhttp://xxxxxx.m.daocloud.io \nhttps://xxxxxx.mirror.aliyuncs.com',
+        registrieHelper: '当存在多个私有仓库时，需要换行显示，例：\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: '编排',
         fromChangeHelper: '切换来源将清空当前已编辑内容，是否继续？',
@@ -590,7 +591,8 @@ const message = {
         dockerStatus: 'Docker 服务',
         daemonJsonPathHelper: '请保证配置路径与 docker.service 中指定的配置路径保持一致。',
         mirrors: '镜像加速',
-        mirrorsHelper: '将 Docker 镜像库的请求重定向到指定的镜像加速器，从而提高镜像的下载速度',
+        mirrorsHelper: '优先使用加速 URL 执行操作，设置为空则取消镜像加速。',
+        mirrorsHelper2: '具体操作配置请参照官方文档，',
         registries: '私有仓库',
         liveHelper: '允许在 Docker 守护进程发生意外停机或崩溃时保留正在运行的容器状态',
         liveWithSwarmHelper: 'live-restore 守护进程配置与 Swarm 模式不兼容',

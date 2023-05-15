@@ -44,7 +44,7 @@
                 <el-row style="margin-top: 20px" v-if="confShowType === 'base'">
                     <el-col :span="1"><br /></el-col>
                     <el-col :span="10">
-                        <el-form :model="form" label-position="left" ref="formRef" label-width="120px">
+                        <el-form :model="form" label-position="left" ref="formRef" label-width="150px">
                             <el-form-item :label="$t('container.mirrors')" prop="mirrors">
                                 <el-input
                                     type="textarea"
@@ -53,6 +53,17 @@
                                     v-model="form.mirrors"
                                 />
                                 <span class="input-help">{{ $t('container.mirrorsHelper') }}</span>
+                                <span class="input-help">
+                                    {{ $t('container.mirrorsHelper2') }}
+                                    <el-link
+                                        style="font-size: 12px; margin-left: 5px"
+                                        icon="Position"
+                                        @click="toDoc()"
+                                        type="primary"
+                                    >
+                                        {{ $t('firewall.quickJump') }}
+                                    </el-link>
+                                </span>
                             </el-form-item>
                             <el-form-item :label="$t('container.registries')" prop="registries">
                                 <el-input
@@ -217,6 +228,10 @@ const onSaveFile = async () => {
         submitInputInfo: i18n.global.t('database.restartNow'),
     };
     confirmDialogRef.value!.acceptParams(params);
+};
+
+const toDoc = () => {
+    window.open('https://1panel.cn/docs/user_manual/containers/setting/', '_blank');
 };
 
 const onChangeIptables = () => {

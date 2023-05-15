@@ -540,8 +540,10 @@ const message = {
         imageRepo: 'Image repo',
         repoHelper: 'Does it include a mirror repository/organization/project?',
         auth: 'Auth',
-        mirrorHelper: 'One in a row, for example:\nhttps://hub-mirror.c.163.com \nhttps://reg-mirror.qiniu.com',
-        registrieHelper: 'One in a row, for example:\n172.16.10.111:8081 \n172.16.10.112:8081',
+        mirrorHelper:
+            'If there are multiple mirrors, newlines must be displayed, for example:\nhttps://hub-mirror.c.163.com \nhttps://reg-mirror.qiniu.com',
+        registrieHelper:
+            'If multiple private repositories exist, newlines must be displayed, for example:\n172.16.10.111:8081 \n172.16.10.112:8081',
 
         compose: 'Compose',
         fromChangeHelper: 'Switching the source will clear the current edited content. Do you want to continue?',
@@ -576,7 +578,8 @@ const message = {
         daemonJsonPathHelper: 'Ensure that the configuration path is the same as that specified in docker.service.',
         mirrors: 'Registry mirrors',
         mirrorsHelper:
-            'Redirecting requests for a Docker image repository to a specified image accelerator can improve the download speed of the image',
+            'The acceleration URL is preferred to perform operations. If this parameter is set to empty, mirror acceleration is disabled.',
+        mirrorsHelper2: 'For details, see the official documents, ',
         registries: 'Insecure registries',
         liveHelper:
             'Allows the running container state to be preserved in case of unexpected shutdown or crash of the Docker daemon',
