@@ -4,9 +4,14 @@ import (
 	"fmt"
 	"os"
 	"os/user"
+	"path"
+	"path/filepath"
+	"sort"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 )
@@ -20,6 +25,7 @@ type ISSHService interface {
 	Update(key, value string) error
 	GenerateSSH(req dto.GenerateSSH) error
 	LoadSSHSecret(mode string) (string, error)
+	LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error)
 }
 
 func NewISSHService() ISSHService {
@@ -141,6 +147,76 @@ func (u *SSHService) LoadSSHSecret(mode string) (string, error) {
 	return string(file), err
 }
 
+func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
+	var fileList []string
+	var data dto.SSHLog
+	baseDir := "/var/log"
+	if err := filepath.Walk(baseDir, func(pathItem string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && strings.HasPrefix(info.Name(), "secure") || strings.HasPrefix(info.Name(), "auth") {
+			if strings.HasSuffix(info.Name(), ".gz") {
+				if err := handleGunzip(pathItem); err == nil {
+					fileList = append(fileList, strings.ReplaceAll(pathItem, ".gz", ""))
+				}
+			} else {
+				fileList = append(fileList, pathItem)
+			}
+		}
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+
+	command := ""
+	if len(req.Info) != 0 {
+		command = fmt.Sprintf(" | grep '%s'", req.Info)
+	}
+	for i := 0; i < len(fileList); i++ {
+		if strings.HasPrefix(path.Base(fileList[i]), "secure") {
+			dataItem := loadFailedSecureDatas(fmt.Sprintf("cat %s | grep -a 'Failed password for' | grep -v 'invalid' %s", fileList[i], command))
+			data.FailedCount += len(dataItem)
+			data.TotalCount += len(dataItem)
+			if req.Status != constant.StatusSuccess {
+				data.Logs = append(data.Logs, dataItem...)
+			}
+		}
+		if strings.HasPrefix(path.Base(fileList[i]), "auth.log") {
+			dataItem := loadFailedAuthDatas(fmt.Sprintf("cat %s | grep -a 'Connection closed by authenticating user' | grep -a 'preauth' %s", fileList[i], command))
+			data.FailedCount += len(dataItem)
+			data.TotalCount += len(dataItem)
+			if req.Status != constant.StatusSuccess {
+				data.Logs = append(data.Logs, dataItem...)
+			}
+		}
+		dataItem := loadSuccessDatas(fmt.Sprintf("cat %s | grep Accepted %s", fileList[i], command))
+		data.TotalCount += len(dataItem)
+		if req.Status != constant.StatusFailed {
+			data.Logs = append(data.Logs, dataItem...)
+		}
+	}
+	data.SuccessfulCount = data.TotalCount - data.FailedCount
+
+	sort.Slice(data.Logs, func(i, j int) bool {
+		return data.Logs[i].Date.After(data.Logs[j].Date)
+	})
+
+	var itemDatas []dto.SSHHistory
+	total, start, end := len(data.Logs), (req.Page-1)*req.PageSize, req.Page*req.PageSize
+	if start > total {
+		itemDatas = make([]dto.SSHHistory, 0)
+	} else {
+		if end >= total {
+			end = total
+		}
+		itemDatas = data.Logs[start:end]
+	}
+	data.Logs = itemDatas
+
+	return &data, nil
+}
+
 func updateSSHConf(oldFiles []string, param string, value interface{}) []string {
 	hasKey := false
 	var newFiles []string
@@ -169,4 +245,104 @@ func updateSSHConf(oldFiles []string, param string, value interface{}) []string 
 		newFiles = append(newFiles, fmt.Sprintf("%s %v", param, value))
 	}
 	return newFiles
+}
+
+func loadSuccessDatas(command string) []dto.SSHHistory {
+	var datas []dto.SSHHistory
+	timeNow := time.Now()
+	stdout2, err := cmd.Exec(command)
+	if err == nil {
+		lines := strings.Split(string(stdout2), "\n")
+		for _, line := range lines {
+			parts := strings.Fields(line)
+			if len(parts) != 14 {
+				continue
+			}
+			historyItem := dto.SSHHistory{
+				Belong:   parts[3],
+				AuthMode: parts[6],
+				User:     parts[8],
+				Address:  parts[10],
+				Port:     parts[12],
+				Status:   constant.StatusSuccess,
+			}
+			historyItem.Date, _ = time.Parse("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s %s %s", timeNow.Year(), parts[0], parts[1], parts[2]))
+			if historyItem.Date.After(timeNow) {
+				historyItem.Date = historyItem.Date.AddDate(-1, 0, 0)
+			}
+			datas = append(datas, historyItem)
+		}
+	}
+	return datas
+}
+
+func loadFailedAuthDatas(command string) []dto.SSHHistory {
+	var datas []dto.SSHHistory
+	timeNow := time.Now()
+	stdout2, err := cmd.Exec(command)
+	if err == nil {
+		lines := strings.Split(string(stdout2), "\n")
+		for _, line := range lines {
+			parts := strings.Fields(line)
+			if len(parts) != 15 {
+				continue
+			}
+			historyItem := dto.SSHHistory{
+				Belong:   parts[3],
+				AuthMode: parts[8],
+				User:     parts[10],
+				Address:  parts[11],
+				Port:     parts[13],
+				Status:   constant.StatusFailed,
+			}
+			historyItem.Date, _ = time.Parse("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s %s %s", timeNow.Year(), parts[0], parts[1], parts[2]))
+			if historyItem.Date.After(timeNow) {
+				historyItem.Date = historyItem.Date.AddDate(-1, 0, 0)
+			}
+			if strings.Contains(line, ": ") {
+				historyItem.Message = strings.Split(line, ": ")[0]
+			}
+			datas = append(datas, historyItem)
+		}
+	}
+	return datas
+}
+
+func loadFailedSecureDatas(command string) []dto.SSHHistory {
+	var datas []dto.SSHHistory
+	timeNow := time.Now()
+	stdout2, err := cmd.Exec(command)
+	if err == nil {
+		lines := strings.Split(string(stdout2), "\n")
+		for _, line := range lines {
+			parts := strings.Fields(line)
+			if len(parts) != 14 {
+				continue
+			}
+			historyItem := dto.SSHHistory{
+				Belong:   parts[3],
+				AuthMode: parts[6],
+				User:     parts[8],
+				Address:  parts[10],
+				Port:     parts[12],
+				Status:   constant.StatusFailed,
+			}
+			historyItem.Date, _ = time.Parse("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s %s %s", timeNow.Year(), parts[0], parts[1], parts[2]))
+			if historyItem.Date.After(timeNow) {
+				historyItem.Date = historyItem.Date.AddDate(-1, 0, 0)
+			}
+			if strings.Contains(line, ": ") {
+				historyItem.Message = strings.Split(line, ": ")[0]
+			}
+			datas = append(datas, historyItem)
+		}
+	}
+	return datas
+}
+
+func handleGunzip(path string) error {
+	if _, err := cmd.Execf("gunzip %s", path); err != nil {
+		return err
+	}
+	return nil
 }

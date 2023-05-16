@@ -103,3 +103,30 @@ func (b *BaseApi) LoadSSHSecret(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, data)
 }
+
+// @Tags SSH
+// @Summary Load host ssh logs
+// @Description 获取 ssh 登录日志
+// @Accept json
+// @Param request body dto.SearchSSHLog true "request"
+// @Success 200 {object} dto.SSHLog
+// @Security ApiKeyAuth
+// @Router /host/ssh/logs [post]
+func (b *BaseApi) LoadSSHLogs(c *gin.Context) {
+	var req dto.SearchSSHLog
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	data, err := sshService.LoadLog(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, data)
+}

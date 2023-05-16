@@ -110,3 +110,6 @@ export const generateSecret = (params: Host.SSHGenerate) => {
 export const loadSecret = (mode: string) => {
     return http.post<string>(`/hosts/ssh/secret`, { encryptionMode: mode });
 };
+export const loadSSHLogs = (params: Host.searchSSHLog) => {
+    return http.post<Host.sshLog>(`/hosts/ssh/log`, params);
+};

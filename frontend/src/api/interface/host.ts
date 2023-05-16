@@ -118,4 +118,23 @@ export namespace Host {
         encryptionMode: string;
         password: string;
     }
+    export interface searchSSHLog extends ReqPage {
+        info: string;
+        status: string;
+    }
+    export interface sshLog {
+        logs: Array<sshHistory>;
+        successfulCount: number;
+        failedCount: number;
+    }
+    export interface sshHistory {
+        date: Date;
+        belong: string;
+        user: string;
+        authMode: string;
+        address: string;
+        port: string;
+        status: string;
+        message: string;
+    }
 }

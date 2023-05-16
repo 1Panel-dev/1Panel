@@ -39,6 +39,7 @@ func (s *HostRouter) InitHostRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/ssh/update", baseApi.UpdateSSH)
 		hostRouter.POST("/ssh/generate", baseApi.GenerateSSH)
 		hostRouter.POST("/ssh/secret", baseApi.LoadSSHSecret)
+		hostRouter.POST("/ssh/log", baseApi.LoadSSHLogs)
 
 		hostRouter.GET("/command", baseApi.ListCommand)
 		hostRouter.POST("/command", baseApi.CreateCommand)
