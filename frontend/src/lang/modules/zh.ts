@@ -845,6 +845,11 @@ const message = {
         keyAuthHelper: '是否启用密钥认证，默认启用。',
         useDNS: '反向解析',
         dnsHelper: '控制 SSH 服务器是否启用 DNS 解析功能，从而验证连接方的身份。',
+        loginLogs: 'SSH 登录日志',
+        loginUser: '用户',
+        loginMode: '登录方式',
+        authenticating: '密钥',
+        password: '密码',
     },
     setting: {
         all: '全部',

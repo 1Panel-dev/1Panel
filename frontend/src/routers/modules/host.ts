@@ -51,12 +51,23 @@ const hostRouter = {
             },
         },
         {
-            path: '/hosts/ssh',
+            path: '/hosts/ssh/ssh',
             name: 'SSH',
-            component: () => import('@/views/host/ssh/index.vue'),
+            component: () => import('@/views/host/ssh/ssh/index.vue'),
             meta: {
                 title: 'menu.ssh',
+                activeMenu: '/hosts/ssh/ssh',
                 keepAlive: true,
+                requiresAuth: false,
+            },
+        },
+        {
+            path: '/hosts/ssh/log',
+            name: 'SSHLog',
+            component: () => import('@/views/host/ssh/log/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/hosts/ssh/ssh',
                 requiresAuth: false,
             },
         },
