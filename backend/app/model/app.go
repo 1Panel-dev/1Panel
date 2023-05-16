@@ -3,13 +3,13 @@ package model
 type App struct {
 	BaseModel
 	Name               string `json:"name" gorm:"type:varchar(64);not null"`
-	Key                string `json:"key" gorm:"type:varchar(64);not null;uniqueIndex"`
-	ShortDescZh        string `json:"shortDescZh" gorm:"type:longtext;"`
-	ShortDescEn        string `json:"shortDescEn" gorm:"type:longtext;"`
+	Key                string `json:"key" gorm:"type:varchar(64);not null;"`
+	ShortDescZh        string `json:"shortDescZh" yaml:"shortDescZh" gorm:"type:longtext;"`
+	ShortDescEn        string `json:"shortDescEn" yaml:"shortDescEn" gorm:"type:longtext;"`
 	Icon               string `json:"icon" gorm:"type:longtext;"`
 	Type               string `json:"type" gorm:"type:varchar(64);not null"`
 	Status             string `json:"status" gorm:"type:varchar(64);not null"`
-	Required           string `json:"required" gorm:"type:varchar(64);not null"`
+	Required           string `json:"required" gorm:"type:varchar(64);"`
 	CrossVersionUpdate bool   `json:"crossVersionUpdate"`
 	Limit              int    `json:"limit" gorm:"type:Integer;not null"`
 	Website            string `json:"website" gorm:"type:varchar(64);not null"`
@@ -21,6 +21,6 @@ type App struct {
 	LastModified       int    `json:"lastModified" gorm:"type:Integer;"`
 
 	Details []AppDetail `json:"-" gorm:"-:migration"`
-	TagsKey []string    `json:"-" gorm:"-"`
+	TagsKey []string    `json:"tags" yaml:"tags" gorm:"-"`
 	AppTags []AppTag    `json:"-" gorm:"-:migration"`
 }
