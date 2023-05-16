@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"encoding/json"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 )
 
 type AppDatabase struct {
@@ -31,12 +31,6 @@ type AppVersion struct {
 	DetailId uint   `json:"detailId"`
 }
 
-//type AppList struct {
-//	Version string      `json:"version"`
-//	Tags    []Tag       `json:"tags"`
-//	Items   []AppDefine `json:"items"`
-//}
-
 type AppList struct {
 	Valid        bool     `json:"valid"`
 	Violations   []string `json:"violations"`
@@ -54,6 +48,18 @@ type AppDefine struct {
 
 	AppProperty AppProperty        `json:"additionalProperties"`
 	Versions    []AppConfigVersion `json:"versions"`
+}
+
+type LocalAppAppDefine struct {
+	AppProperty model.App `json:"additionalProperties" yaml:"additionalProperties"`
+}
+
+type LocalAppParam struct {
+	AppParams LocalAppInstallDefine `json:"additionalProperties" yaml:"additionalProperties"`
+}
+
+type LocalAppInstallDefine struct {
+	FormFields interface{} `json:"formFields" yaml:"formFields"`
 }
 
 type ExtraProperties struct {
@@ -82,11 +88,6 @@ type AppConfigVersion struct {
 	DownloadUrl         string      `json:"downloadUrl"`
 	DownloadCallBackUrl string      `json:"downloadCallBackUrl"`
 	AppForm             interface{} `json:"additionalProperties"`
-}
-
-func (config AppProperty) GetRequired() string {
-	by, _ := json.Marshal(config.Required)
-	return string(by)
 }
 
 type Tag struct {

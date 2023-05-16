@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type AppDetailRepo struct {
@@ -18,6 +19,7 @@ type IAppDetailRepo interface {
 	DeleteByAppIds(ctx context.Context, appIds []uint) error
 	GetBy(opts ...DBOption) ([]model.AppDetail, error)
 	BatchUpdateBy(maps map[string]interface{}, opts ...DBOption) error
+	BatchDelete(ctx context.Context, appDetails []model.AppDetail) error
 }
 
 func NewIAppDetailRepo() IAppDetailRepo {
@@ -65,4 +67,8 @@ func (a AppDetailRepo) BatchUpdateBy(maps map[string]interface{}, opts ...DBOpti
 		db = db.Where("1=1")
 	}
 	return db.Updates(&maps).Error
+}
+
+func (a AppDetailRepo) BatchDelete(ctx context.Context, appDetails []model.AppDetail) error {
+	return getTx(ctx).Omit(clause.Associations).Delete(&appDetails).Error
 }

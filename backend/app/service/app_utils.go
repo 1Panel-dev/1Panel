@@ -316,34 +316,6 @@ func checkRequiredAndLimit(app model.App) error {
 	if err := checkLimit(app); err != nil {
 		return err
 	}
-	if app.Required != "" {
-		var requiredArray []string
-		if err := json.Unmarshal([]byte(app.Required), &requiredArray); err != nil {
-			return err
-		}
-		for _, key := range requiredArray {
-			if key == "" {
-				continue
-			}
-			requireApp, err := appRepo.GetFirst(appRepo.WithKey(key))
-			if err != nil {
-				return err
-			}
-			details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(requireApp.ID))
-			if err != nil {
-				return err
-			}
-			var detailIds []uint
-			for _, d := range details {
-				detailIds = append(detailIds, d.ID)
-			}
-
-			_, err = appInstallRepo.GetFirst(appInstallRepo.WithDetailIdsIn(detailIds))
-			if err != nil {
-				return buserr.WithDetail(constant.ErrAppRequired, requireApp.Name, nil)
-			}
-		}
-	}
 	return nil
 }
 
@@ -391,7 +363,7 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 	installAppDir := path.Join(constant.AppInstallDir, app.Key)
 	if app.Resource == constant.AppResourceLocal {
 		appResourceDir = constant.LocalAppResourceDir
-		appKey = strings.TrimPrefix(app.Resource, "local")
+		appKey = strings.TrimPrefix(app.Key, "local")
 		installAppDir = path.Join(constant.LocalAppInstallDir, appKey)
 	}
 	resourceDir := path.Join(appResourceDir, appKey, appDetail.Version)
@@ -520,7 +492,7 @@ func getAppDetails(details []model.AppDetail, versions []dto.AppConfigVersion) m
 	return appDetails
 }
 
-func getApps(oldApps []model.App, items []dto.AppDefine, isLocal bool) map[string]model.App {
+func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
 	apps := make(map[string]model.App, len(oldApps))
 	for _, old := range oldApps {
 		old.Status = constant.AppTakeDown
@@ -529,18 +501,11 @@ func getApps(oldApps []model.App, items []dto.AppDefine, isLocal bool) map[strin
 	for _, item := range items {
 		config := item.AppProperty
 		key := config.Key
-		if isLocal {
-			key = "local" + key
-		}
 		app, ok := apps[key]
 		if !ok {
 			app = model.App{}
 		}
-		if isLocal {
-			app.Resource = constant.AppResourceLocal
-		} else {
-			app.Resource = constant.AppResourceRemote
-		}
+		app.Resource = constant.AppResourceRemote
 		app.Name = item.Name
 		app.Limit = config.Limit
 		app.Key = key
@@ -551,7 +516,6 @@ func getApps(oldApps []model.App, items []dto.AppDefine, isLocal bool) map[strin
 		app.Github = config.Github
 		app.Type = config.Type
 		app.CrossVersionUpdate = config.CrossVersionUpdate
-		app.Required = config.GetRequired()
 		app.Status = constant.AppNormal
 		app.LastModified = item.LastModified
 		app.ReadMe = item.ReadMe
@@ -570,29 +534,6 @@ func handleErr(install model.AppInstall, err error, out string) error {
 	}
 	_ = appInstallRepo.Save(context.Background(), &install)
 	return reErr
-}
-
-func getAppFromRepo(downloadPath, version string) error {
-	downloadUrl := downloadPath
-	appDir := constant.AppResourceDir
-
-	global.LOG.Infof("download file from %s", downloadUrl)
-	fileOp := files.NewFileOp()
-	if _, err := fileOp.CopyAndBackup(appDir); err != nil {
-		return err
-	}
-	packagePath := path.Join(constant.ResourceDir, path.Base(downloadUrl))
-	if err := fileOp.DownloadFile(downloadUrl, packagePath); err != nil {
-		return err
-	}
-	if err := fileOp.Decompress(packagePath, constant.ResourceDir, files.TarGz); err != nil {
-		return err
-	}
-	_ = NewISettingService().Update("AppStoreVersion", version)
-	defer func() {
-		_ = fileOp.DeleteFile(packagePath)
-	}()
-	return nil
 }
 
 func handleInstalled(appInstallList []model.AppInstall, updated bool) ([]response.AppInstalledDTO, error) {
