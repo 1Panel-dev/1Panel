@@ -292,7 +292,7 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		if index > 0 {
 			continue
 		}
-		req.Params["CONTAINER_NAME"] = containerName
+		req.Params[constant.ContainerName] = containerName
 		appInstall.ServiceName = serviceName
 		appInstall.ContainerName = containerName
 		index++
@@ -311,13 +311,13 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 				},
 			},
 		}
-		req.Params["CPUS"] = "0"
+		req.Params[constant.CPUS] = "0"
 		if req.CpuQuota > 0 {
-			req.Params["CPUS"] = req.CpuQuota
+			req.Params[constant.CPUS] = req.CpuQuota
 		}
-		req.Params["MEMORY_LIMIT"] = "0"
+		req.Params[constant.MemoryLimit] = "0"
 		if req.MemoryLimit > 0 {
-			req.Params["MEMORY_LIMIT"] = strconv.FormatFloat(req.MemoryLimit, 'f', -1, 32) + req.MemoryUnit
+			req.Params[constant.MemoryLimit] = strconv.FormatFloat(req.MemoryLimit, 'f', -1, 32) + req.MemoryUnit
 		}
 		serviceValue["deploy"] = deploy
 	}
@@ -328,7 +328,7 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		if req.AllowPort {
 			allowHost = "0.0.0.0"
 		}
-		req.Params["HOST_IP"] = allowHost
+		req.Params[constant.HostIP] = allowHost
 		for i, port := range ports {
 			portStr, portOK := port.(string)
 			if !portOK {

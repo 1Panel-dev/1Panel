@@ -13,8 +13,6 @@ type AppRes struct {
 }
 
 type AppUpdateRes struct {
-	//Version              string `json:"version"`
-	//DownloadPath         string `json:"downloadPath"`
 	CanUpdate            bool        `json:"canUpdate"`
 	AppStoreLastModified int         `json:"appStoreLastModified"`
 	List                 dto.AppList `json:"list"`
@@ -83,4 +81,13 @@ type AppParam struct {
 	ShowValue string      `json:"showValue"`
 	Required  bool        `json:"required"`
 	Multiple  bool        `json:"multiple"`
+}
+
+type AppConfig struct {
+	Params        []AppParam `json:"params"`
+	CpuQuota      float64    `json:"cpuQuota"`
+	MemoryLimit   float64    `json:"memoryLimit"`
+	MemoryUnit    string     `json:"memoryUnit"`
+	ContainerName string     `json:"containerName"`
+	AllowPort     bool       `json:"allowPort"`
 }

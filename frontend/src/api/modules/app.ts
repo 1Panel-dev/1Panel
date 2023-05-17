@@ -83,7 +83,7 @@ export const GetAppDefaultConfig = (key: string) => {
 };
 
 export const GetAppInstallParams = (id: number) => {
-    return http.get<App.InstallParams[]>(`apps/installed/params/${id}`);
+    return http.get<App.AppConfig>(`apps/installed/params/${id}`);
 };
 
 export const UpdateAppInstallParams = (req: any) => {

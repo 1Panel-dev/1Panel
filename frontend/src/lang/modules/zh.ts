@@ -272,12 +272,6 @@ const message = {
         free: '可用',
         percent: '使用率',
         app: '推荐应用',
-        haloInfo: '好用又强大的开源建站工具',
-        deInfo: '人人可用的开源数据可视化分析工具',
-        jsInfo: '广受欢迎的开源堡垒机',
-        msInfo: '一站式开源持续测试平台',
-        koInfo: '开源的轻量级 Kubernetes 发行版',
-        kubepiInfo: '现代化的开源 Kubernetes 面板',
         goInstall: '去安装',
 
         networkCard: '网卡',
@@ -1059,6 +1053,7 @@ const message = {
         conatinerNameHelper: '可以为空，为空自动生成',
         allowPort: '端口外部访问',
         allowPortHelper: '允许外部端口访问会放开防火墙端口，php运行环境请勿放开',
+        appInstallWarn: '应用默认不放开外部访问端口，可以在高级设置中选择放开',
     },
     website: {
         website: '网站',

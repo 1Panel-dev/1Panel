@@ -21,6 +21,11 @@ const (
 
 	AppResourceLocal  = "local"
 	AppResourceRemote = "remote"
+
+	CPUS          = "CPUS"
+	MemoryLimit   = "MEMORY_LIMIT"
+	HostIP        = "HOST_IP"
+	ContainerName = "CONTAINER_NAME"
 )
 
 type AppOperate string
