@@ -37,6 +37,8 @@ type NewAppInstall struct {
 	Name        string                 `json:"name"`
 	AppDetailId uint                   `json:"appDetailID"`
 	Params      map[string]interface{} `json:"params"`
+
+	AppContainerConfig
 }
 
 type WebsiteInstallCheckReq struct {

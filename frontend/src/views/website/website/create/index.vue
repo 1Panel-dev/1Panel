@@ -186,6 +186,58 @@
                             </el-form-item>
                         </div>
                     </div>
+                    <el-form-item
+                        prop="advanced"
+                        v-if="
+                            website.type === 'runtime' || (website.type === 'deployment' && website.appType === 'new')
+                        "
+                    >
+                        <el-checkbox v-model="website.appinstall.advanced" :label="$t('app.advanced')" size="large" />
+                    </el-form-item>
+
+                    <div v-if="website.appinstall.advanced">
+                        <el-form-item :label="$t('app.containerName')" prop="containerName">
+                            <el-input
+                                v-model.trim="website.appinstall.containerName"
+                                :placeholder="$t('app.conatinerNameHelper')"
+                            ></el-input>
+                        </el-form-item>
+                        <el-form-item :label="$t('container.cpuQuota')" prop="cpuQuota">
+                            <el-input
+                                type="number"
+                                style="width: 40%"
+                                v-model.number="website.appinstall.cpuQuota"
+                                maxlength="5"
+                            >
+                                <template #append>{{ $t('app.cpuCore') }}</template>
+                            </el-input>
+                            <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                        </el-form-item>
+                        <el-form-item :label="$t('container.memoryLimit')" prop="memoryLimit">
+                            <el-input style="width: 40%" v-model.number="website.appinstall.memoryLimit" maxlength="10">
+                                <template #append>
+                                    <el-select
+                                        v-model="website.appinstall.memoryUnit"
+                                        placeholder="Select"
+                                        style="width: 85px"
+                                    >
+                                        <el-option label="KB" value="K" />
+                                        <el-option label="MB" value="M" />
+                                        <el-option label="GB" value="G" />
+                                    </el-select>
+                                </template>
+                            </el-input>
+                            <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                        </el-form-item>
+                        <el-form-item prop="allowPort">
+                            <el-checkbox
+                                v-model="website.appinstall.allowPort"
+                                :label="$t('app.allowPort')"
+                                size="large"
+                            />
+                            <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
+                        </el-form-item>
+                    </div>
                     <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
                         <el-input
                             v-model.trim="website.primaryDomain"
@@ -278,6 +330,13 @@ const website = ref({
         params: {},
         version: '',
         appkey: '',
+
+        advanced: false,
+        cpuQuota: 0,
+        memoryLimit: 0,
+        memoryUnit: 'MB',
+        containerName: '',
+        allowPort: false,
     },
     proxyType: 'tcp',
     port: 9000,
