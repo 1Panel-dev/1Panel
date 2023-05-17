@@ -51,6 +51,33 @@ func (b *BaseApi) UpdateSSH(c *gin.Context) {
 }
 
 // @Tags SSH
+// @Summary Update host ssh setting by file
+// @Description 上传文件更新 SSH 配置
+// @Accept json
+// @Param request body dto.SSHConf true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /host/conffile/update [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"修改 SSH 配置文件","formatEN":"update SSH conf"}
+func (b *BaseApi) UpdateSSHByfile(c *gin.Context) {
+	var req dto.SSHConf
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := sshService.UpdateByFile(req.File); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags SSH
 // @Summary Generate host ssh secret
 // @Description 生成 ssh 密钥
 // @Accept json

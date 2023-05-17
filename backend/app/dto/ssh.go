@@ -20,6 +20,9 @@ type GenerateLoad struct {
 	EncryptionMode string `json:"encryptionMode" validate:"required,oneof=rsa ed25519 ecdsa dsa"`
 }
 
+type SSHConf struct {
+	File string `json:"file"`
+}
 type SearchSSHLog struct {
 	PageInfo
 	Info   string `json:"info"`
@@ -33,7 +36,8 @@ type SSHLog struct {
 }
 type SSHHistory struct {
 	Date     time.Time `json:"date"`
-	Belong   string    `json:"belong"`
+	DateStr  string    `json:"dateStr"`
+	IsLocal  bool      `json:"isLocal"`
 	User     string    `json:"user"`
 	AuthMode string    `json:"authMode"`
 	Address  string    `json:"address"`

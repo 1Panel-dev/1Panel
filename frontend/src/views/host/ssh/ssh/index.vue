@@ -117,8 +117,8 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import PubKey from '@/views/host/ssh/ssh/pubkey/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { getSSHInfo, updateSSH } from '@/api/modules/host';
-import { LoadFile, SaveFileContent } from '@/api/modules/files';
+import { getSSHInfo, updateSSH, updateSSHByfile } from '@/api/modules/host';
+import { LoadFile } from '@/api/modules/files';
 import { Rules } from '@/global/form-rules';
 import { ElMessageBox, FormInstance } from 'element-plus';
 
@@ -141,15 +141,21 @@ const form = reactive({
 });
 
 const onSaveFile = async () => {
-    loading.value = true;
-    await SaveFileContent({ path: '/etc/ssh/sshd_config', content: sshConf.value })
-        .then(() => {
-            loading.value = false;
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    ElMessageBox.confirm(i18n.global.t('ssh.sshFileChangeHelper'), i18n.global.t('ssh.sshChange'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        loading.value = true;
+        await updateSSHByfile(sshConf.value)
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const onOpenDrawer = () => {
@@ -165,7 +171,7 @@ const onSave = async (formEl: FormInstance | undefined, key: string, value: stri
     }
 
     ElMessageBox.confirm(
-        i18n.global.t('ssh.sshChangeHelper', [i18n.global.t('ssh.' + itemKey), value]),
+        i18n.global.t('ssh.sshChangeHelper', [i18n.global.t('ssh.' + itemKey), changei18n(value)]),
         i18n.global.t('ssh.sshChange'),
         {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -195,6 +201,23 @@ function callback(error: any) {
         return;
     }
 }
+
+const changei18n = (value: string) => {
+    switch (value) {
+        case 'yes':
+            return i18n.global.t('commons.button.enable');
+        case 'no':
+            return i18n.global.t('commons.button.disable');
+        case 'without-password':
+            return i18n.global.t('ssh.rootHelper3');
+        case 'forced-commands-only':
+            return i18n.global.t('ssh.rootHelper4');
+        case 'yes':
+            return i18n.global.t('commons.button.enable');
+        default:
+            return value;
+    }
+};
 
 const loadSSHConf = async () => {
     const res = await LoadFile({ path: '/etc/ssh/sshd_config' });

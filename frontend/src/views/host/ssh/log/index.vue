@@ -6,8 +6,10 @@
             <template #toolbar>
                 <el-row>
                     <el-col :span="16">
-                        <el-tag type="success">{{ $t('commons.status.success') }}： {{ successfulCount }}</el-tag>
-                        <el-tag type="danger" style="margin-left: 5px">
+                        <el-tag type="success" class="tagClass" @click="onSearch('Success')">
+                            {{ $t('commons.status.success') }}： {{ successfulCount }}
+                        </el-tag>
+                        <el-tag type="danger" class="tagClass" @click="onSearch('Failed')" style="margin-left: 5px">
                             {{ $t('commons.status.failed') }}： {{ faliedCount }}
                         </el-tag>
                     </el-col>
@@ -16,8 +18,8 @@
                         <div class="search-button">
                             <el-input
                                 v-model="searchInfo"
-                                clearable
                                 @clear="search()"
+                                clearable
                                 suffix-icon="Search"
                                 @keyup.enter="search()"
                                 @change="search()"
@@ -29,7 +31,7 @@
             </template>
 
             <template #search>
-                <el-select v-model="searchStatus" @change="search()" clearable>
+                <el-select v-model="searchStatus" @change="search()">
                     <template #prefix>{{ $t('commons.table.status') }}</template>
                     <el-option :label="$t('commons.table.all')" value="All"></el-option>
                     <el-option :label="$t('commons.status.success')" value="Success"></el-option>
@@ -38,9 +40,11 @@
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
-                    <el-table-column min-width="40" :label="$t('logs.loginIP')" prop="ip">
-                        <template #default="{ row }">{{ row.address }}:{{ row.port }}</template>
+                    <el-table-column min-width="60" :label="$t('logs.loginIP')" prop="address" />
+                    <el-table-column min-width="30" :label="$t('ssh.belong')" prop="isLocal">
+                        <template #default="{ row }">{{ row.isLocal ? $t('ssh.local') : $t('ssh.remote') }}</template>
                     </el-table-column>
+                    <el-table-column min-width="40" :label="$t('firewall.port')" prop="port" />
                     <el-table-column min-width="40" :label="$t('ssh.loginMode')" prop="authMode">
                         <template #default="{ row }">{{ $t('ssh.' + row.authMode) }}</template>
                     </el-table-column>
@@ -104,14 +108,33 @@ const search = async () => {
             data.value = res.data.logs || [];
             faliedCount.value = res.data.failedCount;
             successfulCount.value = res.data.successfulCount;
-            paginationConfig.total = res.data.failedCount + res.data.successfulCount;
+            if (searchStatus.value === 'Success') {
+                paginationConfig.total = res.data.successfulCount;
+            }
+            if (searchStatus.value === 'Failed') {
+                paginationConfig.total = res.data.failedCount;
+            }
+            if (searchStatus.value === 'All') {
+                paginationConfig.total = res.data.failedCount + res.data.successfulCount;
+            }
         })
         .catch(() => {
             loading.value = false;
         });
 };
 
+const onSearch = (status: string) => {
+    searchStatus.value = status;
+    search();
+};
+
 onMounted(() => {
     search();
 });
 </script>
+
+<style scoped lang="scss">
+.tagClass {
+    cursor: pointer;
+}
+</style>
