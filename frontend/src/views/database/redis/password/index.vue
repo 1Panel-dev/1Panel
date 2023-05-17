@@ -9,21 +9,21 @@
                     <el-form-item :label="$t('database.requirepass')" :rules="Rules.requiredInput" prop="password">
                         <el-input type="password" show-password clearable v-model="form.password">
                             <template #append>
-                                <el-button @click="copy(form.password)" icon="DocumentCopy"></el-button>
+                                <el-button @click="onCopy(form.password)" icon="DocumentCopy"></el-button>
                                 <el-button style="margin-left: 1px" @click="random" icon="RefreshRight"></el-button>
                             </template>
                         </el-input>
                     </el-form-item>
                     <el-form-item :label="$t('database.serviceName')" prop="serviceName">
                         <el-tag>{{ form.serviceName }}</el-tag>
-                        <el-button @click="copy(form.serviceName)" icon="DocumentCopy" link></el-button>
+                        <el-button @click="onCopy(form.serviceName)" icon="DocumentCopy" link></el-button>
                         <span class="input-help">{{ $t('database.serviceNameHelper') }}</span>
                     </el-form-item>
                     <el-form-item :label="$t('database.containerConn')">
                         <el-tag>
                             {{ form.serviceName + ':6379' }}
                         </el-tag>
-                        <el-button @click="copy(form.serviceName + ':6379')" icon="DocumentCopy" link></el-button>
+                        <el-button @click="onCopy(form.serviceName + ':6379')" icon="DocumentCopy" link></el-button>
                         <span class="input-help">
                             {{ $t('database.containerConnHelper') }}
                         </span>
@@ -59,10 +59,12 @@ import { ElForm } from 'element-plus';
 import { changeRedisPassword } from '@/api/modules/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { GetAppConnInfo } from '@/api/modules/app';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { App } from '@/api/interface/app';
 import { getRandomStr } from '@/utils/util';
+import useClipboard from 'vue-clipboard3';
+const { toClipboard } = useClipboard();
 
 const loading = ref(false);
 
@@ -93,14 +95,13 @@ const random = async () => {
     form.value.password = getRandomStr(16);
 };
 
-const copy = async (value: string) => {
-    let input = document.createElement('input');
-    input.value = value;
-    document.body.appendChild(input);
-    input.select();
-    document.execCommand('Copy');
-    document.body.removeChild(input);
-    MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
+const onCopy = async (value: string) => {
+    try {
+        await toClipboard(value);
+        MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
+    } catch (e) {
+        MsgError(i18n.global.t('commons.msg.copyfailed'));
+    }
 };
 
 const loadPassword = async () => {

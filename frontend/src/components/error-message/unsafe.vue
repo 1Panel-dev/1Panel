@@ -18,16 +18,17 @@
 
 <script setup lang="ts" name="404">
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
+import useClipboard from 'vue-clipboard3';
+const { toClipboard } = useClipboard();
 
-const onCopy = () => {
-    let input = document.createElement('input');
-    input.value = '1pctl user-info';
-    document.body.appendChild(input);
-    input.select();
-    document.execCommand('Copy');
-    document.body.removeChild(input);
-    MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
+const onCopy = async () => {
+    try {
+        await toClipboard('1pctl user-info');
+        MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
+    } catch (e) {
+        MsgError(i18n.global.t('commons.msg.copyfailed'));
+    }
 };
 </script>
 

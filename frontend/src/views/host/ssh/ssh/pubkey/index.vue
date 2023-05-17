@@ -28,28 +28,19 @@
                                     <el-button style="margin-left: 1px" @click="random" icon="RefreshRight"></el-button>
                                 </template>
                             </el-input>
-                            <el-button link @click="onGenerate(formRef)" type="primary" class="margintop">
-                                {{ form.primaryKey ? $t('ssh.reGenerate') : $t('ssh.generate') }}
-                            </el-button>
                         </el-form-item>
 
                         <el-form-item :label="$t('ssh.key')" prop="primaryKey" v-if="form.encryptionMode">
                             <el-input
                                 v-model="form.primaryKey"
-                                :autosize="{ minRows: 5, maxRows: 15 }"
+                                :autosize="{ minRows: 5, maxRows: 10 }"
                                 type="textarea"
                             />
                             <div v-if="form.primaryKey">
-                                <el-button
-                                    link
-                                    type="primary"
-                                    icon="CopyDocument"
-                                    class="margintop"
-                                    @click="onCopy(form.primaryKey)"
-                                >
+                                <el-button icon="CopyDocument" class="margintop" @click="onCopy(form.primaryKey)">
                                     {{ $t('file.copy') }}
                                 </el-button>
-                                <el-button link type="primary" icon="Download" class="margintop" @click="onDownload">
+                                <el-button icon="Download" class="margintop" @click="onDownload">
                                     {{ $t('commons.button.download') }}
                                 </el-button>
                             </div>
@@ -60,6 +51,9 @@
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button @click="onGenerate(formRef)" type="primary">
+                        {{ $t('ssh.generate') }}
+                    </el-button>
                 </span>
             </template>
         </el-drawer>
@@ -69,10 +63,12 @@
 import { generateSecret, loadSecret } from '@/api/modules/host';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { dateFormatForName, getRandomStr } from '@/utils/util';
+import useClipboard from 'vue-clipboard3';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
+const { toClipboard } = useClipboard();
 
 const loading = ref();
 const drawerVisiable = ref();
@@ -117,10 +113,10 @@ const onLoadSecret = async () => {
 
 const onCopy = async (str: string) => {
     try {
-        await navigator.clipboard.writeText(str);
+        await toClipboard(str);
         MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
-    } catch (err) {
-        MsgSuccess(i18n.global.t('commons.msg.copyfailed'));
+    } catch (e) {
+        MsgError(i18n.global.t('commons.msg.copyfailed'));
     }
 };
 

@@ -74,8 +74,10 @@ import { bindMFA, getMFA } from '@/api/modules/setting';
 import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
+import useClipboard from 'vue-clipboard3';
+const { toClipboard } = useClipboard();
 
 const loading = ref();
 const qrImage = ref();
@@ -93,14 +95,13 @@ const acceptParams = (): void => {
     drawerVisiable.value = true;
 };
 
-const onCopy = () => {
-    let input = document.createElement('input');
-    input.value = form.secret;
-    document.body.appendChild(input);
-    input.select();
-    document.execCommand('Copy');
-    document.body.removeChild(input);
-    MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
+const onCopy = async () => {
+    try {
+        await toClipboard(form.secret);
+        MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
+    } catch (e) {
+        MsgError(i18n.global.t('commons.msg.copyfailed'));
+    }
 };
 
 const loadMfaCode = async () => {

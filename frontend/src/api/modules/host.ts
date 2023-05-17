@@ -101,6 +101,9 @@ export const batchOperateRule = (params: Host.BatchRule) => {
 export const getSSHInfo = () => {
     return http.post<Host.SSHInfo>(`/hosts/ssh/search`);
 };
+export const operateSSH = (operation: string) => {
+    return http.post(`/hosts/ssh/operate`, { operation: operation });
+};
 export const updateSSH = (key: string, value: string) => {
     return http.post(`/hosts/ssh/update`, { key: key, value: value });
 };

@@ -105,6 +105,7 @@ export namespace Host {
     }
 
     export interface SSHInfo {
+        status: string;
         port: string;
         listenAddress: string;
         passwordAuthentication: string;
