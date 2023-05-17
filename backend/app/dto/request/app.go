@@ -14,16 +14,20 @@ type AppSearch struct {
 }
 
 type AppInstallCreate struct {
-	AppDetailId   uint                   `json:"appDetailId" validate:"required"`
-	Params        map[string]interface{} `json:"params"`
-	Name          string                 `json:"name" validate:"required"`
-	Services      map[string]string      `json:"services"`
-	Advanced      bool                   `json:"advanced"`
-	CpuQuota      float64                `json:"cpuQuota"`
-	MemoryLimit   float64                `json:"memoryLimit"`
-	MemoryUnit    string                 `json:"memoryUnit"`
-	ContainerName string                 `json:"containerName"`
-	AllowPort     bool                   `json:"allowPort"`
+	AppDetailId uint                   `json:"appDetailId" validate:"required"`
+	Params      map[string]interface{} `json:"params"`
+	Name        string                 `json:"name" validate:"required"`
+	Services    map[string]string      `json:"services"`
+	AppContainerConfig
+}
+
+type AppContainerConfig struct {
+	Advanced      bool    `json:"advanced"`
+	CpuQuota      float64 `json:"cpuQuota"`
+	MemoryLimit   float64 `json:"memoryLimit"`
+	MemoryUnit    string  `json:"memoryUnit"`
+	ContainerName string  `json:"containerName"`
+	AllowPort     bool    `json:"allowPort"`
 }
 
 type AppInstalledSearch struct {

@@ -206,6 +206,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			req.Name = create.AppInstall.Name
 			req.AppDetailId = create.AppInstall.AppDetailId
 			req.Params = create.AppInstall.Params
+			req.AppContainerConfig = create.AppInstall.AppContainerConfig
 			tx, installCtx := getTxAndContext()
 			install, err = NewIAppService().Install(installCtx, req)
 			if err != nil {
@@ -243,6 +244,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			req.AppDetailId = create.AppInstall.AppDetailId
 			req.Params = create.AppInstall.Params
 			req.Params["IMAGE_NAME"] = runtime.Image
+			req.AppContainerConfig = create.AppInstall.AppContainerConfig
 			nginxInstall, err = getAppInstallByKey(constant.AppOpenresty)
 			if err != nil {
 				return err
