@@ -12,6 +12,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
@@ -285,6 +286,9 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		serviceName := k + "-" + common.RandStr(4)
 		changeKeys[k] = serviceName
 		containerName := constant.ContainerPrefix + k + "-" + common.RandStr(4)
+		if req.Advanced && req.ContainerName != "" {
+			containerName = req.ContainerName
+		}
 		if index > 0 {
 			continue
 		}
@@ -297,6 +301,49 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		servicesMap[v] = servicesMap[k]
 		delete(servicesMap, k)
 	}
+	serviceValue := servicesMap[appInstall.ServiceName].(map[string]interface{})
+	if req.Advanced && (req.CpuQuota > 0 || req.MemoryLimit > 0) {
+		deploy := map[string]interface{}{
+			"resources": map[string]interface{}{
+				"limits": map[string]interface{}{
+					"cpus":   "${CPUS}",
+					"memory": "${MEMORY_LIMIT}",
+				},
+			},
+		}
+		req.Params["CPUS"] = "0"
+		if req.CpuQuota > 0 {
+			req.Params["CPUS"] = req.CpuQuota
+		}
+		req.Params["MEMORY_LIMIT"] = "0"
+		if req.MemoryLimit > 0 {
+			req.Params["MEMORY_LIMIT"] = strconv.FormatFloat(req.MemoryLimit, 'f', -1, 32) + req.MemoryUnit
+		}
+		serviceValue["deploy"] = deploy
+	}
+
+	ports, ok := serviceValue["ports"].([]interface{})
+	if ok {
+		allowHost := "127.0.0.1"
+		if req.AllowPort {
+			allowHost = "0.0.0.0"
+		}
+		req.Params["HOST_IP"] = allowHost
+		for i, port := range ports {
+			portStr, portOK := port.(string)
+			if !portOK {
+				continue
+			}
+			portArray := strings.Split(portStr, ":")
+			if len(portArray) == 2 {
+				portArray = append([]string{"${HOST_IP}"}, portArray...)
+			}
+			ports[i] = strings.Join(portArray, ":")
+		}
+		serviceValue["ports"] = ports
+	}
+
+	servicesMap[appInstall.ServiceName] = serviceValue
 
 	var (
 		composeByte []byte

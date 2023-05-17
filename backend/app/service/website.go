@@ -859,7 +859,7 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 		if err != nil {
 			return nil, err
 		}
-		if fileInfo.Size() > 10<<20 {
+		if fileInfo.Size() > 20<<20 {
 			return nil, buserr.New(constant.ErrFileToLarge)
 		}
 		fileInfo.Size()
