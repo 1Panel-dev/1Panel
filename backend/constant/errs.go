@@ -46,7 +46,7 @@ var (
 var (
 	ErrPortInUsed          = "ErrPortInUsed"
 	ErrAppLimit            = "ErrAppLimit"
-	ErrAppRequired         = "ErrAppRequired"
+	ErrFileToLarge         = "ErrFileToLarge"
 	ErrFileCanNotRead      = "ErrFileCanNotRead"
 	ErrNotInstall          = "ErrNotInstall"
 	ErrPortInOtherApp      = "ErrPortInOtherApp"

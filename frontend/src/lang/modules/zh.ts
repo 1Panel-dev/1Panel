@@ -158,6 +158,7 @@ const message = {
             paramUrlAndPort: '格式为 http(s)://(域名/ip):(端口)',
             nginxDoc: '仅支持英文大小写，数字，和.',
             appName: '支持英文、数字、-和_,长度2-30,并且不能以-_开头和结尾',
+            conatinerName: '支持字母、数字、下划线、连字符和点,不能以连字符-或点.结尾',
         },
         res: {
             paramError: '请求失败,请稍后重试!',
@@ -1052,6 +1053,12 @@ const message = {
         updateWarn: '更新参数需要重建应用，是否继续？',
         busPort: '服务端口',
         syncStart: '开始同步！请稍后刷新应用商店',
+        advanced: '高级设置',
+        cpuCore: '核心数',
+        containerName: '容器名称',
+        conatinerNameHelper: '可以为空，为空自动生成',
+        allowPort: '端口外部访问',
+        allowPortHelper: '允许外部端口访问会放开防火墙端口，php运行环境请勿放开',
     },
     website: {
         website: '网站',

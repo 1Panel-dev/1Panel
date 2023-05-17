@@ -393,6 +393,9 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 	if err = env.Write(envParams, envPath); err != nil {
 		return
 	}
+	if err := fileOp.WriteFile(appInstall.GetComposePath(), strings.NewReader(appInstall.DockerCompose), 0755); err != nil {
+		return err
+	}
 	return
 }
 
