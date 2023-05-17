@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"net"
 	"os"
 	"os/user"
 	"path"
@@ -13,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 )
 
@@ -22,6 +24,7 @@ type SSHService struct{}
 
 type ISSHService interface {
 	GetSSHInfo() (*dto.SSHInfo, error)
+	UpdateByFile(value string) error
 	Update(key, value string) error
 	GenerateSSH(req dto.GenerateSSH) error
 	LoadSSHSecret(mode string) (string, error)
@@ -87,6 +90,36 @@ func (u *SSHService) Update(key, value string) error {
 	if _, err = file.WriteString(strings.Join(newFiles, "\n")); err != nil {
 		return err
 	}
+	sudo := ""
+	hasSudo := cmd.HasNoPasswordSudo()
+	if hasSudo {
+		sudo = "sudo"
+	}
+	if key == "Port" {
+		stdout, _ := cmd.Exec("getenforce")
+		if stdout == "Enforcing\n" {
+			_, _ = cmd.Execf("%s semanage port -a -t ssh_port_t -p tcp %s", sudo, value)
+		}
+	}
+	_, _ = cmd.Execf("%s systemctl restart sshd", sudo)
+	return nil
+}
+
+func (u *SSHService) UpdateByFile(value string) error {
+	file, err := os.OpenFile(sshPath, os.O_WRONLY|os.O_TRUNC, 0666)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	if _, err = file.WriteString(value); err != nil {
+		return err
+	}
+	sudo := ""
+	hasSudo := cmd.HasNoPasswordSudo()
+	if hasSudo {
+		sudo = "sudo"
+	}
+	_, _ = cmd.Execf("%s systemctl restart sshd", sudo)
 	return nil
 }
 
@@ -198,6 +231,15 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 	}
 	data.SuccessfulCount = data.TotalCount - data.FailedCount
 
+	timeNow := time.Now()
+	nyc, _ := time.LoadLocation(common.LoadTimeZone())
+	for i := 0; i < len(data.Logs); i++ {
+		data.Logs[i].IsLocal = isPrivateIP(net.ParseIP(data.Logs[i].Address))
+		data.Logs[i].Date, _ = time.ParseInLocation("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s", timeNow.Year(), data.Logs[i].DateStr), nyc)
+		if data.Logs[i].Date.After(timeNow) {
+			data.Logs[i].Date = data.Logs[i].Date.AddDate(-1, 0, 0)
+		}
+	}
 	sort.Slice(data.Logs, func(i, j int) bool {
 		return data.Logs[i].Date.After(data.Logs[j].Date)
 	})
@@ -249,26 +291,21 @@ func updateSSHConf(oldFiles []string, param string, value interface{}) []string 
 
 func loadSuccessDatas(command string) []dto.SSHHistory {
 	var datas []dto.SSHHistory
-	timeNow := time.Now()
 	stdout2, err := cmd.Exec(command)
 	if err == nil {
 		lines := strings.Split(string(stdout2), "\n")
 		for _, line := range lines {
 			parts := strings.Fields(line)
-			if len(parts) != 14 {
+			if len(parts) < 14 {
 				continue
 			}
 			historyItem := dto.SSHHistory{
-				Belong:   parts[3],
+				DateStr:  fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2]),
 				AuthMode: parts[6],
 				User:     parts[8],
 				Address:  parts[10],
 				Port:     parts[12],
 				Status:   constant.StatusSuccess,
-			}
-			historyItem.Date, _ = time.Parse("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s %s %s", timeNow.Year(), parts[0], parts[1], parts[2]))
-			if historyItem.Date.After(timeNow) {
-				historyItem.Date = historyItem.Date.AddDate(-1, 0, 0)
 			}
 			datas = append(datas, historyItem)
 		}
@@ -278,29 +315,24 @@ func loadSuccessDatas(command string) []dto.SSHHistory {
 
 func loadFailedAuthDatas(command string) []dto.SSHHistory {
 	var datas []dto.SSHHistory
-	timeNow := time.Now()
 	stdout2, err := cmd.Exec(command)
 	if err == nil {
 		lines := strings.Split(string(stdout2), "\n")
 		for _, line := range lines {
 			parts := strings.Fields(line)
-			if len(parts) != 15 {
+			if len(parts) < 14 {
 				continue
 			}
 			historyItem := dto.SSHHistory{
-				Belong:   parts[3],
+				DateStr:  fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2]),
 				AuthMode: parts[8],
 				User:     parts[10],
 				Address:  parts[11],
 				Port:     parts[13],
 				Status:   constant.StatusFailed,
 			}
-			historyItem.Date, _ = time.Parse("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s %s %s", timeNow.Year(), parts[0], parts[1], parts[2]))
-			if historyItem.Date.After(timeNow) {
-				historyItem.Date = historyItem.Date.AddDate(-1, 0, 0)
-			}
 			if strings.Contains(line, ": ") {
-				historyItem.Message = strings.Split(line, ": ")[0]
+				historyItem.Message = strings.Split(line, ": ")[1]
 			}
 			datas = append(datas, historyItem)
 		}
@@ -310,29 +342,24 @@ func loadFailedAuthDatas(command string) []dto.SSHHistory {
 
 func loadFailedSecureDatas(command string) []dto.SSHHistory {
 	var datas []dto.SSHHistory
-	timeNow := time.Now()
 	stdout2, err := cmd.Exec(command)
 	if err == nil {
 		lines := strings.Split(string(stdout2), "\n")
 		for _, line := range lines {
 			parts := strings.Fields(line)
-			if len(parts) != 14 {
+			if len(parts) < 14 {
 				continue
 			}
 			historyItem := dto.SSHHistory{
-				Belong:   parts[3],
+				DateStr:  fmt.Sprintf("%s %s %s", parts[0], parts[1], parts[2]),
 				AuthMode: parts[6],
 				User:     parts[8],
 				Address:  parts[10],
 				Port:     parts[12],
 				Status:   constant.StatusFailed,
 			}
-			historyItem.Date, _ = time.Parse("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s %s %s", timeNow.Year(), parts[0], parts[1], parts[2]))
-			if historyItem.Date.After(timeNow) {
-				historyItem.Date = historyItem.Date.AddDate(-1, 0, 0)
-			}
 			if strings.Contains(line, ": ") {
-				historyItem.Message = strings.Split(line, ": ")[0]
+				historyItem.Message = strings.Split(line, ": ")[1]
 			}
 			datas = append(datas, historyItem)
 		}
@@ -345,4 +372,17 @@ func handleGunzip(path string) error {
 		return err
 	}
 	return nil
+}
+func isPrivateIP(ip net.IP) bool {
+	if ip4 := ip.To4(); ip4 != nil {
+		switch true {
+		case ip4[0] == 10:
+			return true
+		case ip4[0] == 172 && ip4[1] >= 16 && ip4[1] <= 31:
+			return true
+		case ip4[0] == 192 && ip4[1] == 168:
+			return true
+		}
+	}
+	return false
 }

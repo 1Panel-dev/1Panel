@@ -823,6 +823,7 @@ const message = {
     ssh: {
         sshChange: 'SSH 配置修改',
         sshChangeHelper: '确认将 SSH {0} 配置修改为 {1} 吗？',
+        sshFileChangeHelper: '直接修改配置文件可能会导致服务不可用，请谨慎操作，是否继续？',
         port: '连接端口',
         portHelper: '指定 SSH 服务监听的端口号，默认为 22。',
         listenAddress: '监听地址',
@@ -832,7 +833,7 @@ const message = {
         rootHelper1: '允许 SSH 登录',
         rootHelper2: '禁止 SSH 登录',
         rootHelper3: '仅允许密钥登录',
-        rootHelper4: '仅允许带密码的密钥登录',
+        rootHelper4: '仅允许执行预先定义的命令，不能进行其他操作。',
         passwordAuthentication: '密码认证',
         pwdAuthHelper: '是否启用密码认证，默认启用。',
         pubkeyAuthentication: '密钥认证',
@@ -849,7 +850,11 @@ const message = {
         loginUser: '用户',
         loginMode: '登录方式',
         authenticating: '密钥',
+        publickey: '密钥',
         password: '密码',
+        belong: '归属地',
+        local: '内网',
+        remote: '外网',
     },
     setting: {
         all: '全部',

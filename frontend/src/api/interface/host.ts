@@ -129,7 +129,7 @@ export namespace Host {
     }
     export interface sshHistory {
         date: Date;
-        belong: string;
+        isLocal: boolean;
         user: string;
         authMode: string;
         address: string;

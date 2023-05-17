@@ -104,6 +104,9 @@ export const getSSHInfo = () => {
 export const updateSSH = (key: string, value: string) => {
     return http.post(`/hosts/ssh/update`, { key: key, value: value });
 };
+export const updateSSHByfile = (file: string) => {
+    return http.post(`/hosts/ssh/conffile/update`, { file: file });
+};
 export const generateSecret = (params: Host.SSHGenerate) => {
     return http.post(`/hosts/ssh/generate`, params);
 };
