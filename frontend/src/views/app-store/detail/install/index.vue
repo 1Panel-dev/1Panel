@@ -12,6 +12,9 @@
 
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
+                <el-alert type="info" :closable="false">
+                    <p>{{ $t('app.appInstallWarn') }}</p>
+                </el-alert>
                 <el-form
                     @submit.prevent
                     ref="paramForm"

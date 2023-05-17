@@ -155,6 +155,7 @@ const message = {
             paramUrlAndPort: 'The format is http(s)://(domain name/ip):(port)',
             nginxDoc: 'Only supports English case, numbers, and .',
             appName: 'Support English, numbers, - and _, length 2-30, and cannot start and end with -_',
+            conatinerName: 'Supports letters, numbers, underscores, hyphens and dots, cannot end with hyphen- or dot.',
         },
         res: {
             paramError: 'The request failed, please try again later!',
@@ -259,12 +260,6 @@ const message = {
         free: 'Free',
         percent: 'Percent',
         app: 'Recommended Apps',
-        haloInfo: 'Easy to use and powerful open source website tools',
-        deInfo: 'Open source data visualization tool available to everyone',
-        jsInfo: 'The popular Open source fortress machine',
-        msInfo: 'One-stop open source continuous testing platform',
-        koInfo: 'Open source lightweight Kubernetes distribution',
-        kubepiInfo: 'Modern open source Kubernetes panel',
         goInstall: 'Go install',
 
         networkCard: 'NetworkCard',
@@ -1050,6 +1045,15 @@ const message = {
         updateWarn: 'Update parameters need to rebuild the application, Do you want to continue? ',
         busPort: 'Service Port',
         syncStart: 'Start syncing! Please refresh the app store later',
+        advanced: 'Advanced Settings',
+        cpuCore: 'Number of cores',
+        containerName: 'Container Name',
+        conatinerNameHelper: 'can be empty, it will be automatically generated',
+        allowPort: 'Port external access',
+        allowPortHelper:
+            'Allowing external port access will release the firewall port, please do not release the php operating environment',
+        appInstallWarn:
+            'The application does not release the external access port by default, you can choose to release it in the advanced settings',
     },
     website: {
         website: 'Website',

@@ -176,4 +176,13 @@ export namespace App {
         required?: boolean;
         multiple?: boolean;
     }
+
+    export interface AppConfig {
+        params: InstallParams[];
+        cpuQuota: number;
+        memoryLimit: number;
+        memoryUnit: string;
+        containerName: string;
+        allowPort: boolean;
+    }
 }

@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -46,7 +47,7 @@ type IAppInstallService interface {
 	SyncAll(systemInit bool) error
 	GetServices(key string) ([]response.AppService, error)
 	GetUpdateVersions(installId uint) ([]dto.AppVersion, error)
-	GetParams(id uint) ([]response.AppParam, error)
+	GetParams(id uint) (*response.AppConfig, error)
 	ChangeAppPort(req request.PortUpdate) error
 	GetDefaultConfigByKey(key string) (string, error)
 	DeleteCheck(installId uint) ([]dto.AppResource, error)
@@ -261,6 +262,25 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 		}
 	}
 
+	if req.Advanced {
+		if req.ContainerName != "" {
+			req.Params[constant.ContainerName] = req.ContainerName
+		}
+		req.Params[constant.CPUS] = "0"
+		if req.CpuQuota > 0 {
+			req.Params[constant.CPUS] = req.CpuQuota
+		}
+		req.Params[constant.MemoryLimit] = "0"
+		if req.MemoryLimit > 0 {
+			req.Params[constant.MemoryLimit] = strconv.FormatFloat(req.MemoryLimit, 'f', -1, 32) + req.MemoryUnit
+		}
+		allowHost := "127.0.0.1"
+		if req.AllowPort {
+			allowHost = "0.0.0.0"
+		}
+		req.Params[constant.HostIP] = allowHost
+	}
+
 	envPath := path.Join(installed.GetPath(), ".env")
 	oldEnvMaps, err := godotenv.Read(envPath)
 	if err != nil {
@@ -473,11 +493,12 @@ func (a *AppInstallService) GetDefaultConfigByKey(key string) (string, error) {
 	return string(contentByte), nil
 }
 
-func (a *AppInstallService) GetParams(id uint) ([]response.AppParam, error) {
+func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	var (
-		res     []response.AppParam
+		params  []response.AppParam
 		appForm dto.AppForm
 		envs    = make(map[string]interface{})
+		res     response.AppConfig
 	)
 	install, err := appInstallRepo.GetFirst(commonRepo.WithByID(id))
 	if err != nil {
@@ -519,10 +540,35 @@ func (a *AppInstallService) GetParams(id uint) ([]response.AppParam, error) {
 				}
 				appParam.Values = form.Values
 			}
-			res = append(res, appParam)
+			params = append(params, appParam)
 		}
 	}
-	return res, nil
+	res.ContainerName = envs[constant.ContainerName].(string)
+	res.AllowPort = envs[constant.HostIP].(string) == "0.0.0.0"
+	numStr, ok := envs[constant.CPUS].(string)
+	if ok {
+		num, err := strconv.ParseFloat(numStr, 64)
+		if err == nil {
+			res.CpuQuota = num
+		}
+	}
+	num64, ok := envs[constant.CPUS].(float64)
+	if ok {
+		res.CpuQuota = num64
+	}
+
+	re := regexp.MustCompile(`(\d+(?:\.\d+)?)\s*([KMGT]?B)`)
+	matches := re.FindStringSubmatch(envs[constant.MemoryLimit].(string))
+	if len(matches) == 3 {
+		num, err := strconv.ParseFloat(matches[1], 64)
+		if err == nil {
+			unit := matches[2]
+			res.MemoryLimit = num
+			res.MemoryUnit = unit
+		}
+	}
+	res.Params = params
+	return &res, nil
 }
 
 func syncById(installId uint) error {
