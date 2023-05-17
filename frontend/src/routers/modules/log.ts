@@ -47,6 +47,16 @@ const logsRouter = {
                         requiresAuth: false,
                     },
                 },
+                {
+                    path: 'ssh',
+                    name: 'SSHLog2',
+                    component: () => import('@/views/host/ssh/log/log.vue'),
+                    hidden: true,
+                    meta: {
+                        activeMenu: '/logs',
+                        requiresAuth: false,
+                    },
+                },
             ],
         },
     ],
