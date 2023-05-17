@@ -24,6 +24,32 @@ func (b *BaseApi) GetSSHInfo(c *gin.Context) {
 }
 
 // @Tags SSH
+// @Summary Operate ssh
+// @Description 修改 SSH 服务状态
+// @Accept json
+// @Param request body dto.Operate true "request"
+// @Security ApiKeyAuth
+// @Router /host/ssh/operate [post]
+// @x-panel-log {"bodyKeys":["operation"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"[operation] SSH ","formatEN":"[operation] SSH"}
+func (b *BaseApi) OperateSSH(c *gin.Context) {
+	var req dto.Operate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := sshService.OperateSSH(req.Operation); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags SSH
 // @Summary Update host ssh setting
 // @Description 更新 SSH 配置
 // @Accept json

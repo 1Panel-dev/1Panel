@@ -10,10 +10,10 @@
                             <el-option :label="$t('commons.status.success')" value="Success"></el-option>
                             <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
                         </el-select>
-                        <el-button type="success" plain @click="onSearch('Success')" style="margin-left: 25px">
+                        <el-button type="success" plain style="margin-left: 25px">
                             {{ $t('commons.status.success') }}： {{ successfulCount }}
                         </el-button>
-                        <el-button type="danger" plain @click="onSearch('Failed')" style="margin-left: 5px">
+                        <el-button type="danger" plain style="margin-left: 5px">
                             {{ $t('commons.status.failed') }}： {{ faliedCount }}
                         </el-button>
                     </el-col>
@@ -118,11 +118,6 @@ const search = async () => {
         .catch(() => {
             loading.value = false;
         });
-};
-
-const onSearch = (status: string) => {
-    searchStatus.value = status;
-    search();
 };
 
 onMounted(() => {

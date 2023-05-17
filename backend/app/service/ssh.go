@@ -24,6 +24,7 @@ type SSHService struct{}
 
 type ISSHService interface {
 	GetSSHInfo() (*dto.SSHInfo, error)
+	OperateSSH(operation string) error
 	UpdateByFile(value string) error
 	Update(key, value string) error
 	GenerateSSH(req dto.GenerateSSH) error
@@ -37,12 +38,32 @@ func NewISSHService() ISSHService {
 
 func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 	data := dto.SSHInfo{
+		Status:                 constant.StatusDisable,
 		Port:                   "22",
 		ListenAddress:          "0.0.0.0",
 		PasswordAuthentication: "yes",
 		PubkeyAuthentication:   "yes",
 		PermitRootLogin:        "yes",
 		UseDNS:                 "yes",
+	}
+	sudo := ""
+	hasSudo := cmd.HasNoPasswordSudo()
+	if hasSudo {
+		sudo = "sudo"
+	}
+	stdout, err := cmd.Execf("%s systemctl status sshd", sudo)
+	if err != nil {
+		return &data, nil
+	}
+	stdLines := strings.Split(stdout, "\n")
+	for _, stdline := range stdLines {
+		if strings.Contains(stdline, "active (running)") {
+			data.Status = constant.StatusEnable
+			break
+		}
+	}
+	if data.Status == constant.StatusDisable {
+		return &data, nil
 	}
 	sshConf, err := os.ReadFile(sshPath)
 	if err != nil {
@@ -72,6 +93,22 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 	return &data, err
 }
 
+func (u *SSHService) OperateSSH(operation string) error {
+	if operation == "start" || operation == "stop" || operation == "restart" {
+		sudo := ""
+		hasSudo := cmd.HasNoPasswordSudo()
+		if hasSudo {
+			sudo = "sudo"
+		}
+		stdout, err := cmd.Execf("%s systemctl %s sshd", sudo, operation)
+		if err != nil {
+			return fmt.Errorf("%s sshd failed, stdout: %s, err: %v", operation, stdout, err)
+		}
+		return nil
+	}
+	return fmt.Errorf("not support such operation: %s", operation)
+}
+
 func (u *SSHService) Update(key, value string) error {
 	sshConf, err := os.ReadFile(sshPath)
 	if err != nil {
@@ -96,7 +133,7 @@ func (u *SSHService) Update(key, value string) error {
 		sudo = "sudo"
 	}
 	if key == "Port" {
-		stdout, _ := cmd.Exec("getenforce")
+		stdout, _ := cmd.Execf("%s getenforce", sudo)
 		if stdout == "Enforcing\n" {
 			_, _ = cmd.Execf("%s semanage port -a -t ssh_port_t -p tcp %s", sudo, value)
 		}

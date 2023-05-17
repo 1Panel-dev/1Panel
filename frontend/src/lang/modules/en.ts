@@ -816,8 +816,9 @@ const message = {
         searchHelper: 'Support wildcards such as *',
     },
     ssh: {
+        sshOperate: 'Operation [{0}] on the SSH service is performed. Do you want to continue?',
         sshChange: 'SSH Setting',
-        sshChangeHelper: 'Are you sure to change the SSH {0} configuration to {1}?',
+        sshChangeHelper: 'This action changed {0} to [{1}]. Do you want to continue?',
         sshFileChangeHelper:
             'Modifying the configuration file may cause service availability. Exercise caution when performing this operation. Do you want to continue?',
         port: 'Port',
@@ -837,7 +838,7 @@ const message = {
         key: 'Key',
         pubkey: 'Key info',
         encryptionMode: 'Encryption mode',
-        passwordHelper: 'Please enter a 6-10 digit encryption password',
+        passwordHelper: 'Can contain 6 to 10 digits and English cases',
         generate: 'Generate key',
         reGenerate: 'Regenerate key',
         keyAuthHelper: 'Whether to enable key authentication. This parameter is enabled by default.',

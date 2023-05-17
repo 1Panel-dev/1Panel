@@ -73,11 +73,7 @@
                                     </el-icon>
                                 </div>
                                 <div style="cursor: pointer; float: left">
-                                    <el-icon
-                                        style="margin-left: 5px; margin-top: 3px"
-                                        :size="16"
-                                        @click="onCopyPassword(row)"
-                                    >
+                                    <el-icon style="margin-left: 5px; margin-top: 3px" :size="16" @click="onCopy(row)">
                                         <DocumentCopy />
                                     </el-icon>
                                 </div>
@@ -168,7 +164,9 @@ import { Database } from '@/api/interface/database';
 import { App } from '@/api/interface/app';
 import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
+import useClipboard from 'vue-clipboard3';
+const { toClipboard } = useClipboard();
 
 const loading = ref(false);
 const maskShow = ref(true);
@@ -290,14 +288,13 @@ const checkExist = (data: App.CheckInstalled) => {
     }
 };
 
-const onCopyPassword = (row: Database.MysqlDBInfo) => {
-    let input = document.createElement('input');
-    input.value = row.password;
-    document.body.appendChild(input);
-    input.select();
-    document.execCommand('Copy');
-    document.body.removeChild(input);
-    MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
+const onCopy = async (row: any) => {
+    try {
+        await toClipboard(row.password);
+        MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
+    } catch (e) {
+        MsgError(i18n.global.t('commons.msg.copyfailed'));
+    }
 };
 
 const onDelete = async (row: Database.MysqlDBInfo) => {

@@ -51,6 +51,25 @@ const hostRouter = {
             },
         },
         {
+            path: '/hosts/firewall/port',
+            name: 'FirewallPort',
+            component: () => import('@/views/host/firewall/port/index.vue'),
+            meta: {
+                title: 'menu.firewall',
+                requiresAuth: false,
+            },
+        },
+        {
+            path: '/hosts/firewall/ip',
+            name: 'FirewallIP',
+            component: () => import('@/views/host/firewall/ip/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/hosts/firewall/port',
+                requiresAuth: false,
+            },
+        },
+        {
             path: '/hosts/ssh/ssh',
             name: 'SSH',
             component: () => import('@/views/host/ssh/ssh/index.vue'),
@@ -68,25 +87,6 @@ const hostRouter = {
             hidden: true,
             meta: {
                 activeMenu: '/hosts/ssh/ssh',
-                requiresAuth: false,
-            },
-        },
-        {
-            path: '/hosts/firewall/port',
-            name: 'FirewallPort',
-            component: () => import('@/views/host/firewall/port/index.vue'),
-            meta: {
-                title: 'menu.firewall',
-                requiresAuth: false,
-            },
-        },
-        {
-            path: '/hosts/firewall/ip',
-            name: 'FirewallIP',
-            component: () => import('@/views/host/firewall/ip/index.vue'),
-            hidden: true,
-            meta: {
-                activeMenu: '/hosts/firewall/port',
                 requiresAuth: false,
             },
         },

@@ -2,6 +2,38 @@
     <div v-loading="loading">
         <FireRouter />
 
+        <div class="a-card" style="margin-top: 20px">
+            <el-card>
+                <div>
+                    <el-tag style="float: left" effect="dark" type="success">SSH</el-tag>
+                    <el-tag round class="status-content" v-if="form.status === 'Enable'" type="success">
+                        {{ $t('commons.status.running') }}
+                    </el-tag>
+                    <el-tag round class="status-content" v-if="form.status === 'Disable'" type="info">
+                        {{ $t('commons.status.stopped') }}
+                    </el-tag>
+                    <span v-if="form.status === 'Enable'" class="buttons">
+                        <el-button type="primary" @click="onOperate('stop')" link>
+                            {{ $t('commons.button.stop') }}
+                        </el-button>
+                        <el-divider direction="vertical" />
+                        <el-button type="primary" @click="onOperate('restart')" link>
+                            {{ $t('container.restart') }}
+                        </el-button>
+                    </span>
+                    <span v-if="form.status === 'Disable'" class="buttons">
+                        <el-button type="primary" @click="onOperate('start')" link>
+                            {{ $t('commons.button.start') }}
+                        </el-button>
+                        <el-divider direction="vertical" />
+                        <el-button type="primary" @click="onOperate('restart')" link>
+                            {{ $t('container.restart') }}
+                        </el-button>
+                    </span>
+                </div>
+            </el-card>
+        </div>
+
         <LayoutContent style="margin-top: 20px" :title="$t('menu.ssh')" :divider="true">
             <template #main>
                 <el-radio-group v-model="confShowType" @change="changeMode">
@@ -12,40 +44,34 @@
                     <el-col :span="1"><br /></el-col>
                     <el-col :span="10">
                         <el-form :model="form" label-position="left" ref="formRef" label-width="120px">
-                            <el-form-item :label="$t('ssh.port')" prop="port" :rules="Rules.port">
-                                <el-input v-model.number="form.port">
+                            <el-form-item :label="$t('ssh.port')" prop="port">
+                                <el-input disabled v-model.number="form.port">
                                     <template #append>
-                                        <el-button icon="Collection" @click="onSave(formRef, 'Port', form.port + '')">
-                                            {{ $t('commons.button.save') }}
+                                        <el-button @click="onChangePort" icon="Setting">
+                                            {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
                                 </el-input>
                                 <span class="input-help">{{ $t('ssh.portHelper') }}</span>
                             </el-form-item>
                             <el-form-item :label="$t('ssh.listenAddress')" prop="listenAddress">
-                                <el-input v-model="form.listenAddress">
+                                <el-input disabled v-model="form.listenAddress">
                                     <template #append>
-                                        <el-button
-                                            icon="Collection"
-                                            @click="onSave(formRef, 'ListenAddress', form.listenAddress)"
-                                        >
-                                            {{ $t('commons.button.save') }}
+                                        <el-button @click="onChangeAddress" icon="Setting">
+                                            {{ $t('commons.button.set') }}
                                         </el-button>
                                     </template>
                                 </el-input>
                                 <span class="input-help">{{ $t('ssh.addressHelper') }}</span>
                             </el-form-item>
-                            <el-form-item :label="$t('ssh.permitRootLogin')" prop="permitRootLogin">
-                                <el-select
-                                    v-model="form.permitRootLogin"
-                                    @change="onSave(formRef, 'PermitRootLogin', form.permitRootLogin)"
-                                    style="width: 100%"
-                                >
-                                    <el-option :label="$t('ssh.rootHelper1')" value="yes" />
-                                    <el-option :label="$t('ssh.rootHelper2')" value="no" />
-                                    <el-option :label="$t('ssh.rootHelper3')" value="without-password" />
-                                    <el-option :label="$t('ssh.rootHelper4')" value="forced-commands-only" />
-                                </el-select>
+                            <el-form-item :label="$t('ssh.permitRootLogin')" prop="permitRootLoginItem">
+                                <el-input disabled v-model="form.permitRootLoginItem">
+                                    <template #append>
+                                        <el-button @click="onChangeRoot" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
                                 <span class="input-help">{{ $t('ssh.rootSettingHelper') }}</span>
                             </el-form-item>
                             <el-form-item :label="$t('ssh.passwordAuthentication')" prop="passwordAuthentication">
@@ -103,7 +129,10 @@
             </template>
         </LayoutContent>
 
-        <PubKey ref="pubKeyRef" />
+        <PubKey ref="pubKeyRef" @search="search" />
+        <Port ref="portRef" @search="search" />
+        <Address ref="addressRef" @search="search" />
+        <Root ref="rootsRef" @search="search" />
     </div>
 </template>
 
@@ -115,11 +144,13 @@ import LayoutContent from '@/layout/layout-content.vue';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import PubKey from '@/views/host/ssh/ssh/pubkey/index.vue';
+import Root from '@/views/host/ssh/ssh/root/index.vue';
+import Port from '@/views/host/ssh/ssh/port/index.vue';
+import Address from '@/views/host/ssh/ssh/address/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { getSSHInfo, updateSSH, updateSSHByfile } from '@/api/modules/host';
+import { getSSHInfo, operateSSH, updateSSH, updateSSHByfile } from '@/api/modules/host';
 import { LoadFile } from '@/api/modules/files';
-import { Rules } from '@/global/form-rules';
 import { ElMessageBox, FormInstance } from 'element-plus';
 
 const loading = ref(false);
@@ -127,9 +158,13 @@ const formRef = ref();
 const extensions = [javascript(), oneDark];
 const confShowType = ref('base');
 const pubKeyRef = ref();
+const portRef = ref();
+const addressRef = ref();
+const rootsRef = ref();
 
 const sshConf = ref();
 const form = reactive({
+    status: 'enable',
     port: 22,
     listenAddress: '',
     passwordAuthentication: 'yes',
@@ -137,6 +172,7 @@ const form = reactive({
     encryptionMode: '',
     primaryKey: '',
     permitRootLogin: 'yes',
+    permitRootLoginItem: 'yes',
     useDNS: 'no',
 });
 
@@ -160,6 +196,35 @@ const onSaveFile = async () => {
 
 const onOpenDrawer = () => {
     pubKeyRef.value.acceptParams();
+};
+
+const onChangePort = () => {
+    portRef.value.acceptParams({ port: form.port });
+};
+const onChangeRoot = () => {
+    rootsRef.value.acceptParams({ permitRootLogin: form.permitRootLogin });
+};
+const onChangeAddress = () => {
+    addressRef.value.acceptParams({ address: form.listenAddress });
+};
+
+const onOperate = async (operation: string) => {
+    ElMessageBox.confirm(i18n.global.t('ssh.sshOperate', [i18n.global.t('commons.button.' + operation)]), 'SSH', {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        loading.value = true;
+        await operateSSH(operation)
+            .then(() => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const onSave = async (formEl: FormInstance | undefined, key: string, value: string) => {
@@ -208,12 +273,6 @@ const changei18n = (value: string) => {
             return i18n.global.t('commons.button.enable');
         case 'no':
             return i18n.global.t('commons.button.disable');
-        case 'without-password':
-            return i18n.global.t('ssh.rootHelper3');
-        case 'forced-commands-only':
-            return i18n.global.t('ssh.rootHelper4');
-        case 'yes':
-            return i18n.global.t('commons.button.enable');
         default:
             return value;
     }
@@ -234,15 +293,46 @@ const changeMode = async () => {
 
 const search = async () => {
     const res = await getSSHInfo();
+    form.status = res.data.status;
     form.port = Number(res.data.port);
     form.listenAddress = res.data.listenAddress;
     form.passwordAuthentication = res.data.passwordAuthentication;
     form.pubkeyAuthentication = res.data.pubkeyAuthentication;
     form.permitRootLogin = res.data.permitRootLogin;
+    form.permitRootLoginItem = loadPermitLabel(res.data.permitRootLogin);
     form.useDNS = res.data.useDNS;
+};
+
+const loadPermitLabel = (value: string) => {
+    switch (value) {
+        case 'yes':
+            return i18n.global.t('ssh.rootHelper1');
+        case 'no':
+            return i18n.global.t('ssh.rootHelper2');
+        case 'without-password':
+            return i18n.global.t('ssh.rootHelper3');
+        case 'forced-commands-only':
+            return i18n.global.t('ssh.rootHelper4');
+    }
 };
 
 onMounted(() => {
     search();
 });
 </script>
+
+<style lang="scss" scoped>
+.a-card {
+    font-size: 17px;
+    .el-card {
+        --el-card-padding: 12px;
+        .buttons {
+            margin-left: 100px;
+        }
+    }
+}
+.status-content {
+    float: left;
+    margin-left: 50px;
+}
+</style>
