@@ -78,7 +78,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="125" fix>
                         <template #default="{ row }">
-                            cpu: {{ row.cpuPercent.toFixed(2) }}% {{ $t('monitor.memory') }}:
+                            CPU: {{ row.cpuPercent.toFixed(2) }}% {{ $t('monitor.memory') }}:
                             {{ row.memoryPercent.toFixed(2) }}%
                         </template>
                     </el-table-column>

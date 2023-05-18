@@ -13,6 +13,9 @@ type DaemonJsonConf struct {
 	LiveRestore  bool     `json:"liveRestore"`
 	IPTables     bool     `json:"iptables"`
 	CgroupDriver string   `json:"cgroupDriver"`
+
+	LogMaxSize string `json:"logMaxSize"`
+	LogMaxFile string `json:"logMaxFile"`
 }
 
 type DockerOperation struct {
