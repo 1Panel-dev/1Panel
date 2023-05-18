@@ -87,8 +87,10 @@ defineExpose({
 .h-app-card {
     cursor: pointer;
     padding: 10px 15px;
+    margin-right: 10px;
 
     .h-app-content {
+        padding-left: 15px;
         .h-app-title {
             font-weight: 500;
             font-size: 15px;
