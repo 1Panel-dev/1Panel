@@ -64,7 +64,13 @@ func (r *RuntimeService) Create(create request.RuntimeCreate) (err error) {
 		return err
 	}
 	fileOp := files.NewFileOp()
-	buildDir := path.Join(constant.AppResourceDir, app.Key, "versions", appDetail.Version, "build")
+	appVersionDir := path.Join(constant.AppResourceDir, app.Resource, app.Key, appDetail.Version)
+	if !fileOp.Stat(appVersionDir) {
+		if err := downloadApp(app, appDetail, nil); err != nil {
+			return err
+		}
+	}
+	buildDir := path.Join(appVersionDir, "build")
 	if !fileOp.Stat(buildDir) {
 		return buserr.New(constant.ErrDirNotFound)
 	}

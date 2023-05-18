@@ -236,7 +236,7 @@ func upgradeInstall(installId uint, detailId uint) error {
 		defer func() {
 			if upErr != nil {
 				install.Status = constant.UpgradeErr
-				install.Message = err.Error()
+				install.Message = upErr.Error()
 				_ = appInstallRepo.Save(context.Background(), &install)
 			}
 		}()
@@ -318,6 +318,11 @@ func upgradeInstall(installId uint, detailId uint) error {
 			return
 		}
 		fileOp := files.NewFileOp()
+		envParams := make(map[string]string, len(envs))
+		handleMap(envs, envParams)
+		if err = env.Write(envParams, install.GetEnvPath()); err != nil {
+			return
+		}
 		if upErr = fileOp.WriteFile(install.GetComposePath(), strings.NewReader(install.DockerCompose), 0775); upErr != nil {
 			return
 		}
@@ -424,8 +429,10 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 
 	defer func() {
 		if err != nil {
-			appInstall.Status = constant.DownloadErr
-			appInstall.Message = err.Error()
+			if appInstall != nil {
+				appInstall.Status = constant.DownloadErr
+				appInstall.Message = err.Error()
+			}
 		}
 	}()
 
