@@ -477,12 +477,16 @@ func (f FileOp) Compress(srcRiles []string, dst string, name string, cType Compr
 	return nil
 }
 
+func isIgnoreFile(name string) bool {
+	return strings.HasPrefix(name, "__MACOSX") || strings.HasSuffix(name, ".DS_Store") || strings.HasPrefix(name, "._")
+}
+
 func (f FileOp) Decompress(srcFile string, dst string, cType CompressType) error {
 	format := getFormat(cType)
 
 	handler := func(ctx context.Context, archFile archiver.File) error {
 		info := archFile.FileInfo
-		if strings.HasPrefix(archFile.NameInArchive, "__MACOSX") {
+		if isIgnoreFile(archFile.Name()) {
 			return nil
 		}
 		filePath := filepath.Join(dst, archFile.NameInArchive)

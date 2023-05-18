@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"gopkg.in/yaml.v3"
 	"math"
 	"os"
 	"path"
 	"reflect"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -262,23 +262,17 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 		}
 	}
 
+	backupDockerCompose := installed.DockerCompose
 	if req.Advanced {
-		if req.ContainerName != "" {
-			req.Params[constant.ContainerName] = req.ContainerName
+		composeMap := make(map[string]interface{})
+		if err := addDockerComposeCommonParam(composeMap, installed.ServiceName, req.AppContainerConfig, req.Params); err != nil {
+			return err
 		}
-		req.Params[constant.CPUS] = "0"
-		if req.CpuQuota > 0 {
-			req.Params[constant.CPUS] = req.CpuQuota
+		composeByte, err := yaml.Marshal(composeMap)
+		if err != nil {
+			return err
 		}
-		req.Params[constant.MemoryLimit] = "0"
-		if req.MemoryLimit > 0 {
-			req.Params[constant.MemoryLimit] = strconv.FormatFloat(req.MemoryLimit, 'f', -1, 32) + req.MemoryUnit
-		}
-		allowHost := "127.0.0.1"
-		if req.AllowPort {
-			allowHost = "0.0.0.0"
-		}
-		req.Params[constant.HostIP] = allowHost
+		installed.DockerCompose = string(composeByte)
 	}
 
 	envPath := path.Join(installed.GetPath(), ".env")
@@ -286,6 +280,7 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	if err != nil {
 		return err
 	}
+	backupEnvMaps := oldEnvMaps
 	handleMap(req.Params, oldEnvMaps)
 	paramByte, err := json.Marshal(oldEnvMaps)
 	if err != nil {
@@ -295,36 +290,42 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	if err := env.Write(oldEnvMaps, envPath); err != nil {
 		return err
 	}
-	_ = appInstallRepo.Save(context.Background(), &installed)
-
+	fileOp := files.NewFileOp()
+	_ = fileOp.WriteFile(installed.GetComposePath(), strings.NewReader(installed.DockerCompose), 0755)
 	if err := rebuildApp(installed); err != nil {
+		_ = env.Write(backupEnvMaps, envPath)
+		_ = fileOp.WriteFile(installed.GetComposePath(), strings.NewReader(backupDockerCompose), 0755)
 		return err
 	}
+	installed.Status = constant.Running
+	_ = appInstallRepo.Save(context.Background(), &installed)
+
 	website, _ := websiteRepo.GetFirst(websiteRepo.WithAppInstallId(installed.ID))
 	if changePort && website.ID != 0 && website.Status == constant.Running {
-		nginxInstall, err := getNginxFull(&website)
-		if err != nil {
-			return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
-		}
-		config := nginxInstall.SiteConfig.Config
-		servers := config.FindServers()
-		if len(servers) == 0 {
-			return buserr.WithErr(constant.ErrUpdateBuWebsite, errors.New("nginx config is not valid"))
-		}
-		server := servers[0]
-		proxy := fmt.Sprintf("http://127.0.0.1:%d", installed.HttpPort)
-		server.UpdateRootProxy([]string{proxy})
-
-		if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
-			return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
-		}
-		if err := nginxCheckAndReload(nginxInstall.SiteConfig.OldContent, config.FilePath, nginxInstall.Install.ContainerName); err != nil {
-			return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
-		}
-	}
-	if changePort {
 		go func() {
-			_ = OperateFirewallPort(oldPorts, newPorts)
+			nginxInstall, err := getNginxFull(&website)
+			if err != nil {
+				global.LOG.Errorf(buserr.WithErr(constant.ErrUpdateBuWebsite, err).Error())
+				return
+			}
+			config := nginxInstall.SiteConfig.Config
+			servers := config.FindServers()
+			if len(servers) == 0 {
+				global.LOG.Errorf(buserr.WithErr(constant.ErrUpdateBuWebsite, errors.New("nginx config is not valid")).Error())
+				return
+			}
+			server := servers[0]
+			proxy := fmt.Sprintf("http://127.0.0.1:%d", installed.HttpPort)
+			server.UpdateRootProxy([]string{proxy})
+
+			if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+				global.LOG.Errorf(buserr.WithErr(constant.ErrUpdateBuWebsite, err).Error())
+				return
+			}
+			if err := nginxCheckAndReload(nginxInstall.SiteConfig.OldContent, config.FilePath, nginxInstall.Install.ContainerName); err != nil {
+				global.LOG.Errorf(buserr.WithErr(constant.ErrUpdateBuWebsite, err).Error())
+				return
+			}
 		}()
 	}
 	return nil
@@ -543,31 +544,10 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 			params = append(params, appParam)
 		}
 	}
-	res.ContainerName = envs[constant.ContainerName].(string)
-	res.AllowPort = envs[constant.HostIP].(string) == "0.0.0.0"
-	numStr, ok := envs[constant.CPUS].(string)
-	if ok {
-		num, err := strconv.ParseFloat(numStr, 64)
-		if err == nil {
-			res.CpuQuota = num
-		}
-	}
-	num64, ok := envs[constant.CPUS].(float64)
-	if ok {
-		res.CpuQuota = num64
-	}
 
-	re := regexp.MustCompile(`(\d+(?:\.\d+)?)\s*([KMGT]?B)`)
-	matches := re.FindStringSubmatch(envs[constant.MemoryLimit].(string))
-	if len(matches) == 3 {
-		num, err := strconv.ParseFloat(matches[1], 64)
-		if err == nil {
-			unit := matches[2]
-			res.MemoryLimit = num
-			res.MemoryUnit = unit
-		}
-	}
+	config := getAppCommonConfig(envs)
 	res.Params = params
+	res.AppContainerConfig = config
 	return &res, nil
 }
 

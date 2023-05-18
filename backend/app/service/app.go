@@ -5,25 +5,23 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/buserr"
-	"github.com/1Panel-dev/1Panel/backend/utils/docker"
-	"io"
-	"net/http"
-	"os"
-	"path"
-	"strconv"
-	"strings"
-
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/response"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/app/repo"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
+	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"gopkg.in/yaml.v3"
+	"io"
+	"net/http"
+	"os"
+	"path"
+	"strconv"
 )
 
 type AppService struct {
@@ -301,49 +299,10 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		servicesMap[v] = servicesMap[k]
 		delete(servicesMap, k)
 	}
-	serviceValue := servicesMap[appInstall.ServiceName].(map[string]interface{})
-	if req.Advanced && (req.CpuQuota > 0 || req.MemoryLimit > 0) {
-		deploy := map[string]interface{}{
-			"resources": map[string]interface{}{
-				"limits": map[string]interface{}{
-					"cpus":   "${CPUS}",
-					"memory": "${MEMORY_LIMIT}",
-				},
-			},
-		}
-		req.Params[constant.CPUS] = "0"
-		if req.CpuQuota > 0 {
-			req.Params[constant.CPUS] = req.CpuQuota
-		}
-		req.Params[constant.MemoryLimit] = "0"
-		if req.MemoryLimit > 0 {
-			req.Params[constant.MemoryLimit] = strconv.FormatFloat(req.MemoryLimit, 'f', -1, 32) + req.MemoryUnit
-		}
-		serviceValue["deploy"] = deploy
-	}
 
-	ports, ok := serviceValue["ports"].([]interface{})
-	if ok {
-		allowHost := "127.0.0.1"
-		if req.AllowPort {
-			allowHost = "0.0.0.0"
-		}
-		req.Params[constant.HostIP] = allowHost
-		for i, port := range ports {
-			portStr, portOK := port.(string)
-			if !portOK {
-				continue
-			}
-			portArray := strings.Split(portStr, ":")
-			if len(portArray) == 2 {
-				portArray = append([]string{"${HOST_IP}"}, portArray...)
-			}
-			ports[i] = strings.Join(portArray, ":")
-		}
-		serviceValue["ports"] = ports
+	if err = addDockerComposeCommonParam(composeMap, appInstall.ServiceName, req.AppContainerConfig, req.Params); err != nil {
+		return
 	}
-
-	servicesMap[appInstall.ServiceName] = serviceValue
 
 	var (
 		composeByte []byte
@@ -379,14 +338,17 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		return
 	}
 	go func() {
-		if err = downloadApp(app, appDetail, appInstall, req); err != nil {
+		if err = copyData(app, appDetail, appInstall, req); err != nil {
 			if appInstall.Status == constant.Installing {
 				appInstall.Status = constant.Error
 				appInstall.Message = err.Error()
 			}
-			_ = appInstallRepo.Save(ctx, appInstall)
+			_ = appInstallRepo.Save(context.Background(), appInstall)
 			return
 		}
+		go func() {
+			_, _ = http.Get(appDetail.DownloadCallBackUrl)
+		}()
 		upApp(appInstall)
 	}()
 	go updateToolApp(appInstall)

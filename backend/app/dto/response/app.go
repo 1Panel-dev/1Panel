@@ -2,6 +2,7 @@ package response
 
 import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -84,10 +85,6 @@ type AppParam struct {
 }
 
 type AppConfig struct {
-	Params        []AppParam `json:"params"`
-	CpuQuota      float64    `json:"cpuQuota"`
-	MemoryLimit   float64    `json:"memoryLimit"`
-	MemoryUnit    string     `json:"memoryUnit"`
-	ContainerName string     `json:"containerName"`
-	AllowPort     bool       `json:"allowPort"`
+	Params []AppParam `json:"params"`
+	request.AppContainerConfig
 }

@@ -81,25 +81,25 @@
                                 <el-col :xs="21" :sm="21" :md="21" :lg="20" :xl="20">
                                     <div class="a-detail">
                                         <div class="d-name">
-                                            <span class="name">{{ installed.name }}</span>
+                                            <el-button link type="info">
+                                                <span class="name">{{ installed.name }}</span>
+                                            </el-button>
+
                                             <span class="status">
+                                                <Status :key="installed.status" :status="installed.status"></Status>
+                                            </span>
+                                            <span class="msg">
                                                 <el-popover
-                                                    v-if="installed.status === 'Error'"
+                                                    v-if="isAppErr(installed)"
                                                     placement="bottom"
                                                     :width="400"
                                                     trigger="hover"
                                                     :content="installed.message"
                                                 >
                                                     <template #reference>
-                                                        <Status
-                                                            :key="installed.status"
-                                                            :status="installed.status"
-                                                        ></Status>
+                                                        <el-button link type="primary">详情</el-button>
                                                     </template>
                                                 </el-popover>
-                                                <span v-else>
-                                                    <Status :key="installed.status" :status="installed.status"></Status>
-                                                </span>
                                             </span>
 
                                             <el-button
@@ -132,6 +132,7 @@
                                                 plain
                                                 round
                                                 size="small"
+                                                :disabled="installed.status === 'Upgrading'"
                                                 @click="openOperate(installed, 'upgrade')"
                                                 v-if="mode === 'upgrade'"
                                             >
@@ -337,17 +338,26 @@ const buttons = [
         click: (row: any) => {
             openOperate(row, 'sync');
         },
+        disabled: (row: any) => {
+            return row.status === 'DownloadErr' || row.status === 'Upgrading';
+        },
     },
     {
         label: i18n.global.t('app.rebuild'),
         click: (row: any) => {
             openOperate(row, 'rebuild');
         },
+        disabled: (row: any) => {
+            return row.status === 'DownloadErr' || row.status === 'Upgrading';
+        },
     },
     {
         label: i18n.global.t('app.restart'),
         click: (row: any) => {
             openOperate(row, 'restart');
+        },
+        disabled: (row: any) => {
+            return row.status === 'DownloadErr' || row.status === 'Upgrading';
         },
     },
     {
@@ -356,7 +366,12 @@ const buttons = [
             openOperate(row, 'start');
         },
         disabled: (row: any) => {
-            return row.status === 'Running' || row.status === 'Error';
+            return (
+                row.status === 'Running' ||
+                row.status === 'Error' ||
+                row.status === 'DownloadErr' ||
+                row.status === 'Upgrading'
+            );
         },
     },
     {
@@ -365,7 +380,7 @@ const buttons = [
             openOperate(row, 'stop');
         },
         disabled: (row: any) => {
-            return row.status !== 'Running';
+            return row.status !== 'Running' || row.status === 'DownloadErr' || row.status === 'Upgrading';
         },
     },
     {
@@ -378,6 +393,9 @@ const buttons = [
         label: i18n.global.t('app.params'),
         click: (row: any) => {
             openParam(row.id);
+        },
+        disabled: (row: any) => {
+            return row.status === 'DownloadErr' || row.status === 'Upgrading';
         },
     },
 ];
@@ -402,6 +420,10 @@ const openUploads = (key: string, name: string) => {
 
 const openParam = (installId: number) => {
     appParamRef.value.acceptParams({ id: installId });
+};
+
+const isAppErr = (row: any) => {
+    return row.status.includes('Err') || row.status.includes('Error');
 };
 
 onMounted(() => {
