@@ -161,6 +161,16 @@ definitions:
         type: string
       name:
         type: string
+      source:
+        enum:
+        - OSS
+        - S3
+        - SFTP
+        - MINIO
+        - LOCAL
+        - COS
+        - KODO
+        type: string
       type:
         enum:
         - app
@@ -169,6 +179,7 @@ definitions:
         - website
         type: string
     required:
+    - source
     - type
     type: object
   dto.ComposeCreate:
@@ -684,6 +695,32 @@ definitions:
     - type
     - vars
     type: object
+  dto.GenerateLoad:
+    properties:
+      encryptionMode:
+        enum:
+        - rsa
+        - ed25519
+        - ecdsa
+        - dsa
+        type: string
+    required:
+    - encryptionMode
+    type: object
+  dto.GenerateSSH:
+    properties:
+      encryptionMode:
+        enum:
+        - rsa
+        - ed25519
+        - ecdsa
+        - dsa
+        type: string
+      password:
+        type: string
+    required:
+    - encryptionMode
+    type: object
   dto.GroupCreate:
     properties:
       id:
@@ -1129,6 +1166,13 @@ definitions:
       subnet:
         type: string
     type: object
+  dto.Operate:
+    properties:
+      operation:
+        type: string
+    required:
+    - operation
+    type: object
   dto.OperateByID:
     properties:
       id:
@@ -1336,6 +1380,62 @@ definitions:
       used_memory_rss:
         type: string
     type: object
+  dto.SSHConf:
+    properties:
+      file:
+        type: string
+    type: object
+  dto.SSHHistory:
+    properties:
+      address:
+        type: string
+      authMode:
+        type: string
+      date:
+        type: string
+      dateStr:
+        type: string
+      isLocal:
+        type: boolean
+      message:
+        type: string
+      port:
+        type: string
+      status:
+        type: string
+      user:
+        type: string
+    type: object
+  dto.SSHInfo:
+    properties:
+      listenAddress:
+        type: string
+      passwordAuthentication:
+        type: string
+      permitRootLogin:
+        type: string
+      port:
+        type: string
+      pubkeyAuthentication:
+        type: string
+      status:
+        type: string
+      useDNS:
+        type: string
+    type: object
+  dto.SSHLog:
+    properties:
+      failedCount:
+        type: integer
+      logs:
+        items:
+          $ref: '#/definitions/dto.SSHHistory'
+        type: array
+      successfulCount:
+        type: integer
+      totalCount:
+        type: integer
+    type: object
   dto.SSLUpdate:
     properties:
       cert:
@@ -1423,6 +1523,25 @@ definitions:
     - page
     - pageSize
     type: object
+  dto.SearchSSHLog:
+    properties:
+      Status:
+        enum:
+        - Success
+        - Failed
+        - All
+        type: string
+      info:
+        type: string
+      page:
+        type: integer
+      pageSize:
+        type: integer
+    required:
+    - Status
+    - page
+    - pageSize
+    type: object
   dto.SearchWithPage:
     properties:
       info:
@@ -1437,6 +1556,8 @@ definitions:
     type: object
   dto.SettingInfo:
     properties:
+      appStoreLastModified:
+        type: string
       appStoreVersion:
         type: string
       complexityVerification:
@@ -1658,9 +1779,13 @@ definitions:
         type: integer
       key:
         type: string
+      lastModified:
+        type: integer
       limit:
         type: integer
       name:
+        type: string
+      readMe:
         type: string
       recommend:
         type: integer
@@ -1674,6 +1799,10 @@ definitions:
         type: string
       status:
         type: string
+      tags:
+        items:
+          type: string
+        type: array
       type:
         type: string
       updatedAt:
@@ -1861,8 +1990,20 @@ definitions:
     type: object
   request.AppInstallCreate:
     properties:
+      advanced:
+        type: boolean
+      allowPort:
+        type: boolean
       appDetailId:
         type: integer
+      containerName:
+        type: string
+      cpuQuota:
+        type: number
+      memoryLimit:
+        type: number
+      memoryUnit:
+        type: string
       name:
         type: string
       params:
@@ -1920,8 +2061,20 @@ definitions:
     type: object
   request.AppInstalledUpdate:
     properties:
+      advanced:
+        type: boolean
+      allowPort:
+        type: boolean
+      containerName:
+        type: string
+      cpuQuota:
+        type: number
       installId:
         type: integer
+      memoryLimit:
+        type: number
+      memoryUnit:
+        type: string
       params:
         additionalProperties: true
         type: object
@@ -2141,8 +2294,20 @@ definitions:
     type: object
   request.NewAppInstall:
     properties:
+      advanced:
+        type: boolean
+      allowPort:
+        type: boolean
       appDetailID:
         type: integer
+      containerName:
+        type: string
+      cpuQuota:
+        type: number
+      memoryLimit:
+        type: number
+      memoryUnit:
+        type: string
       name:
         type: string
       params:
@@ -2752,9 +2917,13 @@ definitions:
         type: integer
       key:
         type: string
+      lastModified:
+        type: integer
       limit:
         type: integer
       name:
+        type: string
+      readMe:
         type: string
       recommend:
         type: integer
@@ -2789,19 +2958,25 @@ definitions:
         type: integer
       createdAt:
         type: string
+      downloadCallBackUrl:
+        type: string
+      downloadUrl:
+        type: string
       enable:
         type: boolean
       id:
         type: integer
       image:
         type: string
+      lastModified:
+        type: integer
       lastVersion:
         type: string
       params: {}
-      readme:
-        type: string
       status:
         type: string
+      update:
+        type: boolean
       updatedAt:
         type: string
       version:
@@ -5834,13 +6009,6 @@ paths:
       summary: Read file
       tags:
       - File
-      x-panel-log:
-        BeforeFuntions: []
-        bodyKeys:
-        - path
-        formatEN: Read file [path]
-        formatZH: 读取文件 [path]
-        paramKeys: []
   /files/mode:
     post:
       consumes:
@@ -6243,6 +6411,166 @@ paths:
         - type
         formatEN: update group [name][type]
         formatZH: 更新组 [name][type]
+        paramKeys: []
+  /host/conffile/update:
+    post:
+      consumes:
+      - application/json
+      description: 上传文件更新 SSH 配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SSHConf'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update host ssh setting by file
+      tags:
+      - SSH
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys: []
+        formatEN: update SSH conf
+        formatZH: 修改 SSH 配置文件
+        paramKeys: []
+  /host/ssh/generate:
+    post:
+      consumes:
+      - application/json
+      description: 生成 ssh 密钥
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GenerateSSH'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Generate host ssh secret
+      tags:
+      - SSH
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys: []
+        formatEN: generate SSH secret
+        formatZH: '生成 SSH 密钥 '
+        paramKeys: []
+  /host/ssh/logs:
+    post:
+      consumes:
+      - application/json
+      description: 获取 ssh 登录日志
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SearchSSHLog'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SSHLog'
+      security:
+      - ApiKeyAuth: []
+      summary: Load host ssh logs
+      tags:
+      - SSH
+  /host/ssh/operate:
+    post:
+      consumes:
+      - application/json
+      description: 修改 SSH 服务状态
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Operate'
+      responses: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Operate ssh
+      tags:
+      - SSH
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - operation
+        formatEN: '[operation] SSH'
+        formatZH: '[operation] SSH '
+        paramKeys: []
+  /host/ssh/search:
+    post:
+      description: 加载 SSH 配置信息
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SSHInfo'
+      security:
+      - ApiKeyAuth: []
+      summary: Load host ssh setting info
+      tags:
+      - SSH
+  /host/ssh/secret:
+    post:
+      consumes:
+      - application/json
+      description: 获取 ssh 密钥
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.GenerateLoad'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Load host ssh secret
+      tags:
+      - SSH
+  /host/ssh/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新 SSH 配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SettingUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update host ssh setting
+      tags:
+      - SSH
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - key
+        - value
+        formatEN: update SSH setting [key] => [value]
+        formatZH: 修改 SSH 配置 [key] => [value]
         paramKeys: []
   /hosts:
     post:
