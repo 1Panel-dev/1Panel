@@ -59,14 +59,9 @@ type AppInstalledOperate struct {
 }
 
 type AppInstalledUpdate struct {
-	InstallId     uint                   `json:"installId" validate:"required"`
-	Params        map[string]interface{} `json:"params" validate:"required"`
-	Advanced      bool                   `json:"advanced"`
-	CpuQuota      float64                `json:"cpuQuota"`
-	MemoryLimit   float64                `json:"memoryLimit"`
-	MemoryUnit    string                 `json:"memoryUnit"`
-	ContainerName string                 `json:"containerName"`
-	AllowPort     bool                   `json:"allowPort"`
+	InstallId uint                   `json:"installId" validate:"required"`
+	Params    map[string]interface{} `json:"params" validate:"required"`
+	AppContainerConfig
 }
 
 type PortUpdate struct {

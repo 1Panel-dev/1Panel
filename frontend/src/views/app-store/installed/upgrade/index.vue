@@ -83,7 +83,7 @@ const operate = async () => {
     loading.value = true;
     await InstalledOp(operateReq)
         .then(() => {
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            MsgSuccess(i18n.global.t('app.upgradeStart'));
             bus.emit('upgrade', true);
             handleClose();
         })

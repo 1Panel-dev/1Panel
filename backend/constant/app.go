@@ -9,6 +9,8 @@ const (
 	Syncing     = "Syncing"
 	DownloadErr = "DownloadErr"
 	DirNotFound = "DirNotFound"
+	Upgrading   = "Upgrading"
+	UpgradeErr  = "UpgradeErr"
 
 	ContainerPrefix = "1Panel-"
 

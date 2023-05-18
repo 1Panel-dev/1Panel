@@ -196,6 +196,8 @@ const message = {
             disabled: 'Disabled',
             normal: 'Normal',
             building: 'Building',
+            downloaderr: 'Download Error',
+            upgrading: 'Upgrading',
         },
     },
     menu: {
@@ -1054,6 +1056,7 @@ const message = {
             'Allowing external port access will release the firewall port, please do not release the php operating environment',
         appInstallWarn:
             'The application does not release the external access port by default, you can choose to release it in the advanced settings',
+        upgradeStart: 'Start upgrading! Please refresh the page later',
     },
     website: {
         website: 'Website',

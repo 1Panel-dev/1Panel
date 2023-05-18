@@ -5,31 +5,31 @@ import (
 )
 
 func Up(filePath string) (string, error) {
-	stdout, err := cmd.Execf("docker-compose -f %s up -d", filePath)
+	stdout, err := cmd.Execf("docker compose -f %s up -d", filePath)
 	return stdout, err
 }
 
 func Down(filePath string) (string, error) {
-	stdout, err := cmd.Execf("docker-compose -f %s down --remove-orphans", filePath)
+	stdout, err := cmd.Execf("docker compose -f %s down --remove-orphans", filePath)
 	return stdout, err
 }
 
 func Start(filePath string) (string, error) {
-	stdout, err := cmd.Execf("docker-compose -f %s start", filePath)
+	stdout, err := cmd.Execf("docker compose -f %s start", filePath)
 	return stdout, err
 }
 
 func Stop(filePath string) (string, error) {
-	stdout, err := cmd.Execf("docker-compose -f %s stop", filePath)
+	stdout, err := cmd.Execf("docker compose -f %s stop", filePath)
 	return stdout, err
 }
 
 func Restart(filePath string) (string, error) {
-	stdout, err := cmd.Execf("docker-compose -f %s restart", filePath)
+	stdout, err := cmd.Execf("docker compose -f %s restart", filePath)
 	return stdout, err
 }
 
 func Operate(filePath, operation string) (string, error) {
-	stdout, err := cmd.Execf("docker-compose -f %s %s", filePath, operation)
+	stdout, err := cmd.Execf("docker compose -f %s %s", filePath, operation)
 	return stdout, err
 }

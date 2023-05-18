@@ -19,11 +19,12 @@ const props = defineProps({
 let status = ref('running');
 
 const getType = (status: string) => {
+    if (status.includes('error') || status.includes('err')) {
+        return 'danger';
+    }
     switch (status) {
         case 'running':
             return 'success';
-        case 'error':
-            return 'danger';
         case 'stopped':
             return 'danger';
         default:
@@ -31,7 +32,7 @@ const getType = (status: string) => {
     }
 };
 
-const loadingStatus = ['installing', 'building', 'restarting'];
+const loadingStatus = ['installing', 'building', 'restarting', 'upgrading'];
 
 const loadingIcon = (status: string): boolean => {
     return loadingStatus.indexOf(status) > -1;
