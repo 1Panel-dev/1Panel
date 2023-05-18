@@ -119,24 +119,6 @@
             </template>
         </LayoutContent>
 
-        <el-dialog v-model="stopVisiable" :title="$t('app.checkTitle')" width="50%" :destroy-on-close="true">
-            <el-alert :closable="false">
-                {{ $t('container.stopHelper') }}
-                <li>{{ $t('container.stopHelper2') }}</li>
-                <li>{{ $t('container.stopHelper3') }}</li>
-            </el-alert>
-            <div style="margin-top: 10px">
-                <el-checkbox v-model="stopService" label="docker.service" />
-            </div>
-            <div class="stopCheckbox"><el-checkbox v-model="stopSocket" label="docker.socket" /></div>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button @click="stopVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button type="primary" @click="submitStop">{{ $t('commons.button.confirm') }}</el-button>
-                </span>
-            </template>
-        </el-dialog>
-
         <el-dialog
             v-model="iptablesVisiable"
             :title="$t('container.iptablesDisable')"
@@ -165,7 +147,7 @@
 </template>
 
 <script lang="ts" setup>
-import { FormInstance } from 'element-plus';
+import { ElMessageBox, FormInstance } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import LayoutContent from '@/layout/layout-content.vue';
@@ -201,10 +183,6 @@ const form = reactive({
 const formRef = ref<FormInstance>();
 const dockerConf = ref();
 const confirmDialogRef = ref();
-
-const stopVisiable = ref();
-const stopSocket = ref();
-const stopService = ref();
 
 const iptablesVisiable = ref();
 
@@ -246,46 +224,27 @@ const onSaveIptables = (status: boolean) => {
 };
 
 const onOperator = async (operation: string) => {
-    if (operation === 'stop') {
-        stopVisiable.value = true;
-        return;
-    }
-    let param = {
-        stopService: false,
-        stopSocket: false,
-        operation: operation,
-    };
-    loading.value = true;
-    await dockerOperate(param)
-        .then(() => {
-            loading.value = false;
-            search();
-            changeMode();
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        })
-        .catch(() => {
-            loading.value = false;
-        });
-};
-
-const submitStop = async () => {
-    let param = {
-        stopService: stopService.value,
-        stopSocket: stopSocket.value,
-        operation: 'stop',
-    };
-    loading.value = true;
-    await dockerOperate(param)
-        .then(() => {
-            loading.value = false;
-            stopVisiable.value = false;
-            search();
-            changeMode();
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    ElMessageBox.confirm(
+        i18n.global.t('container.operatorStatusHelper', [i18n.global.t('commons.button.' + operation)]),
+        i18n.global.t('commons.table.operate'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        },
+    ).then(async () => {
+        loading.value = true;
+        await dockerOperate(operation)
+            .then(() => {
+                loading.value = false;
+                search();
+                changeMode();
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const onSubmitSave = async () => {
