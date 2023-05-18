@@ -44,7 +44,7 @@
                 <el-row style="margin-top: 20px" v-if="confShowType === 'base'">
                     <el-col :span="1"><br /></el-col>
                     <el-col :span="10">
-                        <el-form :model="form" label-position="left" ref="formRef" label-width="150px">
+                        <el-form :model="form" label-position="left" :rules="rules" ref="formRef" label-width="150px">
                             <el-form-item :label="$t('container.mirrors')" prop="mirrors">
                                 <el-input
                                     type="textarea"
@@ -73,6 +73,32 @@
                                     v-model="form.registries"
                                 />
                             </el-form-item>
+
+                            <el-form-item :label="$t('container.cutLog')" prop="hasLogOption">
+                                <el-switch v-model="form.logOptionShow"></el-switch>
+                            </el-form-item>
+                            <div v-if="form.logOptionShow">
+                                <el-form-item prop="logMaxSize">
+                                    <el-input v-model.number="form.logMaxSize">
+                                        <template #prepend>{{ $t('container.maxSize') }}</template>
+                                        <template #append>
+                                            <el-select v-model="form.sizeUnit" style="width: 70px">
+                                                <el-option label="b" value="b"></el-option>
+                                                <el-option label="k" value="k"></el-option>
+                                                <el-option label="m" value="m"></el-option>
+                                                <el-option label="g" value="g"></el-option>
+                                                <el-option label="t" value="t"></el-option>
+                                            </el-select>
+                                        </template>
+                                    </el-input>
+                                </el-form-item>
+                                <el-form-item prop="logMaxFile">
+                                    <el-input v-model.number="form.logMaxFile">
+                                        <template #prepend>{{ $t('container.maxFile') }}</template>
+                                    </el-input>
+                                </el-form-item>
+                            </div>
+
                             <el-form-item label="iptables" prop="iptables">
                                 <el-switch v-model="form.iptables" @change="onChangeIptables"></el-switch>
                             </el-form-item>
@@ -163,6 +189,7 @@ import {
     updateDaemonJsonByfile,
 } from '@/api/modules/container';
 import { MsgSuccess } from '@/utils/message';
+import { checkNumberRange } from '@/global/form-rules';
 
 const loading = ref(false);
 const showDaemonJsonAlert = ref(false);
@@ -178,6 +205,14 @@ const form = reactive({
     liveRestore: false,
     iptables: true,
     cgroupDriver: '',
+    logOptionShow: false,
+    logMaxSize: 10,
+    sizeUnit: 'm',
+    logMaxFile: 3,
+});
+const rules = reactive({
+    logMaxSize: [checkNumberRange(1, 1024000)],
+    logMaxFile: [checkNumberRange(1, 100)],
 });
 
 const formRef = ref<FormInstance>();
@@ -276,7 +311,14 @@ const onSubmitSave = async () => {
         liveRestore: form.liveRestore,
         iptables: form.iptables,
         cgroupDriver: form.cgroupDriver,
+        logMaxSize: form.logMaxSize + form.sizeUnit,
+        logMaxFile: form.logMaxFile + '',
     };
+    if (!form.logOptionShow) {
+        param.logMaxFile = '';
+        param.logMaxSize = '';
+    }
+
     loading.value = true;
     await updateDaemonJson(param)
         .then(() => {
@@ -308,15 +350,50 @@ const changeMode = async () => {
 };
 
 const search = async () => {
-    const res = await loadDaemonJson();
-    form.isSwarm = res.data.isSwarm;
-    form.status = res.data.status;
-    form.version = res.data.version;
-    form.cgroupDriver = res.data.cgroupDriver;
-    form.liveRestore = res.data.liveRestore;
-    form.iptables = res.data.iptables;
-    form.mirrors = res.data.registryMirrors ? res.data.registryMirrors.join('\n') : '';
-    form.registries = res.data.insecureRegistries ? res.data.insecureRegistries.join('\n') : '';
+    loading.value = true;
+    await loadDaemonJson()
+        .then((res) => {
+            loading.value = false;
+            form.isSwarm = res.data.isSwarm;
+            form.status = res.data.status;
+            form.version = res.data.version;
+            form.cgroupDriver = res.data.cgroupDriver;
+            form.liveRestore = res.data.liveRestore;
+            form.iptables = res.data.iptables;
+            form.mirrors = res.data.registryMirrors ? res.data.registryMirrors.join('\n') : '';
+            form.registries = res.data.insecureRegistries ? res.data.insecureRegistries.join('\n') : '';
+            if (res.data.logMaxFile || res.data.logMaxSize) {
+                form.logOptionShow = true;
+            }
+            form.logMaxFile = Number(res.data.logMaxFile);
+            form.logMaxSize = loadSize(res.data.logMaxSize);
+        })
+        .catch(() => {
+            loading.value = false;
+        });
+};
+
+const loadSize = (value: string) => {
+    if (value.indexOf('b') !== -1 || value.indexOf('B') !== -1) {
+        form.sizeUnit = 'b';
+        return Number(value.replaceAll('b', '').replaceAll('B', ''));
+    }
+    if (value.indexOf('k') !== -1 || value.indexOf('K') !== -1) {
+        form.sizeUnit = 'k';
+        return Number(value.replaceAll('k', '').replaceAll('K', ''));
+    }
+    if (value.indexOf('m') !== -1 || value.indexOf('M') !== -1) {
+        form.sizeUnit = 'm';
+        return Number(value.replaceAll('m', '').replaceAll('M', ''));
+    }
+    if (value.indexOf('g') !== -1 || value.indexOf('G') !== -1) {
+        form.sizeUnit = 'g';
+        return Number(value.replaceAll('g', '').replaceAll('G', ''));
+    }
+    if (value.indexOf('t') !== -1 || value.indexOf('T') !== -1) {
+        form.sizeUnit = 't';
+        return Number(value.replaceAll('t', '').replaceAll('T', ''));
+    }
 };
 
 onMounted(() => {

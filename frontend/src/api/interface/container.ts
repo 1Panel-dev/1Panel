@@ -256,5 +256,7 @@ export namespace Container {
         liveRestore: boolean;
         iptables: boolean;
         cgroupDriver: string;
+        logMaxSize: string;
+        logMaxFile: string;
     }
 }

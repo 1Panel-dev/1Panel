@@ -30,12 +30,17 @@ func NewIDockerService() IDockerService {
 }
 
 type daemonJsonItem struct {
-	Status      string   `json:"status"`
-	Mirrors     []string `json:"registry-mirrors"`
-	Registries  []string `json:"insecure-registries"`
-	LiveRestore bool     `json:"live-restore"`
-	IPTables    bool     `json:"iptables"`
-	ExecOpts    []string `json:"exec-opts"`
+	Status      string    `json:"status"`
+	Mirrors     []string  `json:"registry-mirrors"`
+	Registries  []string  `json:"insecure-registries"`
+	LiveRestore bool      `json:"live-restore"`
+	IPTables    bool      `json:"iptables"`
+	ExecOpts    []string  `json:"exec-opts"`
+	LogOption   logOption `json:"log-opts"`
+}
+type logOption struct {
+	LogMaxSize string `json:"max-size"`
+	LogMaxFile string `json:"max-file"`
 }
 
 func (u *DockerService) LoadDockerStatus() string {
@@ -102,6 +107,8 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 			break
 		}
 	}
+	data.LogMaxSize = conf.LogOption.LogMaxSize
+	data.LogMaxFile = conf.LogOption.LogMaxFile
 	data.Mirrors = conf.Mirrors
 	data.Registries = conf.Registries
 	data.IPTables = conf.IPTables
@@ -134,6 +141,9 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 	} else {
 		deamonMap["registry-mirrors"] = req.Mirrors
 	}
+
+	changeLogOption(deamonMap, req.LogMaxFile, req.LogMaxSize)
+
 	if !req.LiveRestore {
 		delete(deamonMap, "live-restore")
 	} else {
@@ -216,4 +226,53 @@ func (u *DockerService) OperateDocker(req dto.DockerOperation) error {
 		return errors.New(string(stdout))
 	}
 	return nil
+}
+
+func changeLogOption(deamonMap map[string]interface{}, logMaxFile, logMaxSize string) {
+	if opts, ok := deamonMap["log-opts"]; ok {
+		if len(logMaxFile) != 0 || len(logMaxSize) != 0 {
+			deamonMap["log-driver"] = "json-file"
+		}
+		optsMap, isMap := opts.(map[string]interface{})
+		if isMap {
+			if len(logMaxFile) != 0 {
+				optsMap["max-file"] = logMaxFile
+			} else {
+				delete(optsMap, "max-file")
+			}
+			if len(logMaxSize) != 0 {
+				optsMap["max-size"] = logMaxSize
+			} else {
+				delete(optsMap, "max-size")
+			}
+			if len(optsMap) == 0 {
+				delete(deamonMap, "log-opts")
+			}
+		} else {
+			optsMap := make(map[string]interface{})
+			if len(logMaxFile) != 0 {
+				optsMap["max-file"] = logMaxFile
+			}
+			if len(logMaxSize) != 0 {
+				optsMap["max-size"] = logMaxSize
+			}
+			if len(optsMap) != 0 {
+				deamonMap["log-opts"] = optsMap
+			}
+		}
+	} else {
+		if len(logMaxFile) != 0 || len(logMaxSize) != 0 {
+			deamonMap["log-driver"] = "json-file"
+		}
+		optsMap := make(map[string]interface{})
+		if len(logMaxFile) != 0 {
+			optsMap["max-file"] = logMaxFile
+		}
+		if len(logMaxSize) != 0 {
+			optsMap["max-size"] = logMaxSize
+		}
+		if len(optsMap) != 0 {
+			deamonMap["log-opts"] = optsMap
+		}
+	}
 }

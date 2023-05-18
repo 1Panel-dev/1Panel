@@ -575,6 +575,9 @@ const message = {
             'The acceleration URL is preferred to perform operations. If this parameter is set to empty, mirror acceleration is disabled.',
         mirrorsHelper2: 'For details, see the official documents, ',
         registries: 'Insecure registries',
+        cutLog: 'Log option',
+        maxSize: 'Max-Size',
+        maxFile: 'Max-File',
         liveHelper:
             'Allows the running container state to be preserved in case of unexpected shutdown or crash of the Docker daemon',
         liveWithSwarmHelper: 'live-restore daemon configuration is incompatible with swarm mode.',
