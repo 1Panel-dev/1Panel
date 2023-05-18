@@ -4396,15 +4396,6 @@ var doc = `{
                             "type": "string"
                         }
                     }
-                },
-                "x-panel-log": {
-                    "BeforeFuntions": [],
-                    "bodyKeys": [
-                        "path"
-                    ],
-                    "formatEN": "Read file [path]",
-                    "formatZH": "读取文件 [path]",
-                    "paramKeys": []
                 }
             }
         },
@@ -5031,6 +5022,258 @@ var doc = `{
                     ],
                     "formatEN": "update group [name][type]",
                     "formatZH": "更新组 [name][type]",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/host/conffile/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "上传文件更新 SSH 配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Update host ssh setting by file",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SSHConf"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [],
+                    "formatEN": "update SSH conf",
+                    "formatZH": "修改 SSH 配置文件",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/host/ssh/generate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "生成 ssh 密钥",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Generate host ssh secret",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GenerateSSH"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [],
+                    "formatEN": "generate SSH secret",
+                    "formatZH": "生成 SSH 密钥 ",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/host/ssh/logs": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 ssh 登录日志",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Load host ssh logs",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SearchSSHLog"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SSHLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/host/ssh/operate": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "修改 SSH 服务状态",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Operate ssh",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Operate"
+                        }
+                    }
+                ],
+                "responses": {},
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "operation"
+                    ],
+                    "formatEN": "[operation] SSH",
+                    "formatZH": "[operation] SSH ",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/host/ssh/search": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "加载 SSH 配置信息",
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Load host ssh setting info",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.SSHInfo"
+                        }
+                    }
+                }
+            }
+        },
+        "/host/ssh/secret": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取 ssh 密钥",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Load host ssh secret",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.GenerateLoad"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/host/ssh/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新 SSH 配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SSH"
+                ],
+                "summary": "Update host ssh setting",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SettingUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "key",
+                        "value"
+                    ],
+                    "formatEN": "update SSH setting [key] =\u003e [value]",
+                    "formatZH": "修改 SSH 配置 [key] =\u003e [value]",
                     "paramKeys": []
                 }
             }
@@ -9962,6 +10205,7 @@ var doc = `{
         "dto.CommonRecover": {
             "type": "object",
             "required": [
+                "source",
                 "type"
             ],
             "properties": {
@@ -9973,6 +10217,18 @@ var doc = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "source": {
+                    "type": "string",
+                    "enum": [
+                        "OSS",
+                        "S3",
+                        "SFTP",
+                        "MINIO",
+                        "LOCAL",
+                        "COS",
+                        "KODO"
+                    ]
                 },
                 "type": {
                     "type": "string",
@@ -10746,6 +11002,43 @@ var doc = `{
                 }
             }
         },
+        "dto.GenerateLoad": {
+            "type": "object",
+            "required": [
+                "encryptionMode"
+            ],
+            "properties": {
+                "encryptionMode": {
+                    "type": "string",
+                    "enum": [
+                        "rsa",
+                        "ed25519",
+                        "ecdsa",
+                        "dsa"
+                    ]
+                }
+            }
+        },
+        "dto.GenerateSSH": {
+            "type": "object",
+            "required": [
+                "encryptionMode"
+            ],
+            "properties": {
+                "encryptionMode": {
+                    "type": "string",
+                    "enum": [
+                        "rsa",
+                        "ed25519",
+                        "ecdsa",
+                        "dsa"
+                    ]
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.GroupCreate": {
             "type": "object",
             "required": [
@@ -11413,6 +11706,17 @@ var doc = `{
                 }
             }
         },
+        "dto.Operate": {
+            "type": "object",
+            "required": [
+                "operation"
+            ],
+            "properties": {
+                "operation": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.OperateByID": {
             "type": "object",
             "required": [
@@ -11723,6 +12027,92 @@ var doc = `{
                 }
             }
         },
+        "dto.SSHConf": {
+            "type": "object",
+            "properties": {
+                "file": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SSHHistory": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "authMode": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "dateStr": {
+                    "type": "string"
+                },
+                "isLocal": {
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SSHInfo": {
+            "type": "object",
+            "properties": {
+                "listenAddress": {
+                    "type": "string"
+                },
+                "passwordAuthentication": {
+                    "type": "string"
+                },
+                "permitRootLogin": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "string"
+                },
+                "pubkeyAuthentication": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "useDNS": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.SSHLog": {
+            "type": "object",
+            "properties": {
+                "failedCount": {
+                    "type": "integer"
+                },
+                "logs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.SSHHistory"
+                    }
+                },
+                "successfulCount": {
+                    "type": "integer"
+                },
+                "totalCount": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.SSLUpdate": {
             "type": "object",
             "required": [
@@ -11854,6 +12244,33 @@ var doc = `{
                 }
             }
         },
+        "dto.SearchSSHLog": {
+            "type": "object",
+            "required": [
+                "Status",
+                "page",
+                "pageSize"
+            ],
+            "properties": {
+                "Status": {
+                    "type": "string",
+                    "enum": [
+                        "Success",
+                        "Failed",
+                        "All"
+                    ]
+                },
+                "info": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.SearchWithPage": {
             "type": "object",
             "required": [
@@ -11875,6 +12292,9 @@ var doc = `{
         "dto.SettingInfo": {
             "type": "object",
             "properties": {
+                "appStoreLastModified": {
+                    "type": "string"
+                },
                 "appStoreVersion": {
                     "type": "string"
                 },
@@ -12209,10 +12629,16 @@ var doc = `{
                 "key": {
                     "type": "string"
                 },
+                "lastModified": {
+                    "type": "integer"
+                },
                 "limit": {
                     "type": "integer"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "readMe": {
                     "type": "string"
                 },
                 "recommend": {
@@ -12232,6 +12658,12 @@ var doc = `{
                 },
                 "status": {
                     "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "type": {
                     "type": "string"
@@ -12521,8 +12953,26 @@ var doc = `{
                 "name"
             ],
             "properties": {
+                "advanced": {
+                    "type": "boolean"
+                },
+                "allowPort": {
+                    "type": "boolean"
+                },
                 "appDetailId": {
                     "type": "integer"
+                },
+                "containerName": {
+                    "type": "string"
+                },
+                "cpuQuota": {
+                    "type": "number"
+                },
+                "memoryLimit": {
+                    "type": "number"
+                },
+                "memoryUnit": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
@@ -12609,8 +13059,26 @@ var doc = `{
                 "params"
             ],
             "properties": {
+                "advanced": {
+                    "type": "boolean"
+                },
+                "allowPort": {
+                    "type": "boolean"
+                },
+                "containerName": {
+                    "type": "string"
+                },
+                "cpuQuota": {
+                    "type": "number"
+                },
                 "installId": {
                     "type": "integer"
+                },
+                "memoryLimit": {
+                    "type": "number"
+                },
+                "memoryUnit": {
+                    "type": "string"
                 },
                 "params": {
                     "type": "object",
@@ -12934,8 +13402,26 @@ var doc = `{
         "request.NewAppInstall": {
             "type": "object",
             "properties": {
+                "advanced": {
+                    "type": "boolean"
+                },
+                "allowPort": {
+                    "type": "boolean"
+                },
                 "appDetailID": {
                     "type": "integer"
+                },
+                "containerName": {
+                    "type": "string"
+                },
+                "cpuQuota": {
+                    "type": "number"
+                },
+                "memoryLimit": {
+                    "type": "number"
+                },
+                "memoryUnit": {
+                    "type": "string"
                 },
                 "name": {
                     "type": "string"
@@ -13840,10 +14326,16 @@ var doc = `{
                 "key": {
                     "type": "string"
                 },
+                "lastModified": {
+                    "type": "integer"
+                },
                 "limit": {
                     "type": "integer"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "readMe": {
                     "type": "string"
                 },
                 "recommend": {
@@ -13896,6 +14388,12 @@ var doc = `{
                 "createdAt": {
                     "type": "string"
                 },
+                "downloadCallBackUrl": {
+                    "type": "string"
+                },
+                "downloadUrl": {
+                    "type": "string"
+                },
                 "enable": {
                     "type": "boolean"
                 },
@@ -13905,15 +14403,18 @@ var doc = `{
                 "image": {
                     "type": "string"
                 },
+                "lastModified": {
+                    "type": "integer"
+                },
                 "lastVersion": {
                     "type": "string"
                 },
                 "params": {},
-                "readme": {
-                    "type": "string"
-                },
                 "status": {
                     "type": "string"
+                },
+                "update": {
+                    "type": "boolean"
                 },
                 "updatedAt": {
                     "type": "string"
