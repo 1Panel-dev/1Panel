@@ -247,11 +247,6 @@ export namespace Container {
     export interface DaemonJsonUpdateByFile {
         file: string;
     }
-    export interface DockerOperate {
-        stopSocket: boolean;
-        stopService: boolean;
-        operation: string;
-    }
     export interface DaemonJsonConf {
         isSwarm: boolean;
         status: string;

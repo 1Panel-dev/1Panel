@@ -579,10 +579,7 @@ const message = {
         composeOperatorHelper: '将对 {0} 进行 {1} 操作，是否继续？',
 
         setting: '配置',
-        stopHelper: 'docker 服务包括 docker.service 和 docker.socket 两部分: ',
-        stopHelper2:
-            '停止 docker.service 时 docker.socket 将保持监听状态，当监听到 docker 命令请求时，会将 docker.service 重新拉起。',
-        stopHelper3: '停止 docker.socket 将导致 docker.service 服务不可用',
+        operatorStatusHelper: '此操作将{0}Docker 服务，是否继续？',
         dockerStatus: 'Docker 服务',
         daemonJsonPathHelper: '请保证配置路径与 docker.service 中指定的配置路径保持一致。',
         mirrors: '镜像加速',

@@ -16,7 +16,5 @@ type DaemonJsonConf struct {
 }
 
 type DockerOperation struct {
-	StopSocket  bool   `json:"stopSocket"`
-	StopService bool   `json:"stopService"`
-	Operation   string `json:"operation" validate:"required,oneof=start restart stop"`
+	Operation string `json:"operation" validate:"required,oneof=start restart stop"`
 }

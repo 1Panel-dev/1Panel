@@ -39,36 +39,39 @@ type daemonJsonItem struct {
 }
 
 func (u *DockerService) LoadDockerStatus() string {
-	status := constant.StatusRunning
-	stdout, err := cmd.Exec("systemctl is-active docker")
-	if string(stdout) != "active\n" || err != nil {
-		status = constant.Stopped
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return constant.Stopped
+	}
+	if _, err := client.Ping(context.Background()); err != nil {
+		return constant.Stopped
 	}
 
-	return status
+	return constant.StatusRunning
 }
 
 func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
+	ctx := context.Background()
 	var data dto.DaemonJsonConf
 	data.IPTables = true
 	data.Status = constant.StatusRunning
-	stdout, err := cmd.Exec("systemctl is-active docker")
-	if string(stdout) != "active\n" || err != nil {
+	data.Version = "-"
+	client, err := docker.NewDockerClient()
+	if err != nil {
 		data.Status = constant.Stopped
+	} else {
+		if _, err := client.Ping(ctx); err != nil {
+			data.Status = constant.Stopped
+		}
+		itemVersion, err := client.ServerVersion(ctx)
+		if err == nil {
+			data.Version = itemVersion.Version
+		}
 	}
 	data.IsSwarm = false
 	stdout2, _ := cmd.Exec("docker info  | grep Swarm")
 	if string(stdout2) == " Swarm: active\n" {
 		data.IsSwarm = true
-	}
-	data.Version = "-"
-	client, err := docker.NewDockerClient()
-	if err == nil {
-		ctx := context.Background()
-		itemVersion, err := client.ServerVersion(ctx)
-		if err == nil {
-			data.Version = itemVersion.Version
-		}
 	}
 	if _, err := os.Stat(constant.DaemonJsonPath); err != nil {
 		return &data
@@ -206,10 +209,7 @@ func (u *DockerService) UpdateConfByFile(req dto.DaemonJsonUpdateByFile) error {
 func (u *DockerService) OperateDocker(req dto.DockerOperation) error {
 	service := "docker"
 	if req.Operation == "stop" {
-		service = "docker.service"
-		if req.StopSocket {
-			service = "docker.socket"
-		}
+		service = "docker.socket"
 	}
 	stdout, err := cmd.Execf("systemctl %s %s ", req.Operation, service)
 	if err != nil {
