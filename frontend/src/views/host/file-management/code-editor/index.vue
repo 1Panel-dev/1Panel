@@ -6,6 +6,7 @@
         destroy-on-close
         width="70%"
         @opened="onOpen"
+        :top="'5vh'"
     >
         <el-form :inline="true" :model="config">
             <el-form-item :label="$t('file.theme')">
@@ -24,8 +25,8 @@
                 </el-select>
             </el-form-item>
         </el-form>
-        <div class="coder-editor" v-loading="loading">
-            <div id="codeBox" style="height: 60vh"></div>
+        <div v-loading="loading">
+            <div id="codeBox" style="height: 55vh"></div>
         </div>
         <template #footer>
             <span class="dialog-footer">
@@ -214,8 +215,8 @@ onBeforeUnmount(() => {
 defineExpose({ acceptParams });
 </script>
 
-<style lang="scss">
-.coder-editor {
-    margin-top: 10px;
+<style>
+.dialog-top {
+    top: 0;
 }
 </style>
