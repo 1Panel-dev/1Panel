@@ -17,6 +17,8 @@ export namespace Setting {
         serverPort: number;
         ssl: string;
         sslType: string;
+        allowIPs: string;
+        bindDomain: string;
         securityEntrance: string;
         expirationDays: number;
         expirationTime: string;

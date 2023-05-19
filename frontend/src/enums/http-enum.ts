@@ -7,6 +7,8 @@ export enum ResultEnum {
     EXPIRED = 405,
     ERRAUTH = 406,
     ERRGLOBALLOADDING = 407,
+    ERRIP = 408,
+    ERRDOMAIN = 409,
     TIMEOUT = 20000,
     TYPE = 'success',
 }

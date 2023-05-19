@@ -39,6 +39,42 @@
                                 <span class="input-help">{{ $t('setting.entranceHelper') }}</span>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.allowIPs')">
+                                <el-input v-if="form.allowIPs" disabled v-model="form.allowIPs">
+                                    <template #append>
+                                        <el-button @click="onChangeAllowIPs" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                                <el-input disabled v-if="!form.allowIPs" v-model="unset">
+                                    <template #append>
+                                        <el-button @click="onChangeAllowIPs" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                                <span class="input-help">{{ $t('setting.allowIPsHelper') }}</span>
+                            </el-form-item>
+
+                            <el-form-item :label="$t('setting.bindDomain')">
+                                <el-input disabled v-if="form.bindDomain" v-model="form.bindDomain">
+                                    <template #append>
+                                        <el-button @click="onChangeBindDomain" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                                <el-input disabled v-if="!form.bindDomain" v-model="unset">
+                                    <template #append>
+                                        <el-button @click="onChangeBindDomain" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                                <span class="input-help">{{ $t('setting.bindDomainHelper') }}</span>
+                            </el-form-item>
+
                             <el-form-item :label="$t('setting.expirationTime')" prop="expirationTime">
                                 <el-input disabled v-model="form.expirationTime">
                                     <template #append>
@@ -111,6 +147,8 @@
         <SSLSetting ref="sslRef" @search="search" />
         <EntranceSetting ref="entranceRef" @search="search" />
         <TimeoutSetting ref="timeoutref" @search="search" />
+        <DomainSetting ref="domainRef" @search="search" />
+        <AllowIPsSetting ref="allowIPsRef" @search="search" />
     </div>
 </template>
 
@@ -123,6 +161,8 @@ import SSLSetting from '@/views/setting/safe/ssl/index.vue';
 import MfaSetting from '@/views/setting/safe/mfa/index.vue';
 import TimeoutSetting from '@/views/setting/safe/timeout/index.vue';
 import EntranceSetting from '@/views/setting/safe/entrance/index.vue';
+import DomainSetting from '@/views/setting/safe/domain/index.vue';
+import AllowIPsSetting from '@/views/setting/safe/allowips/index.vue';
 import { updateSetting, getSettingInfo, getSystemAvailable, updateSSL, loadSSLInfo } from '@/api/modules/setting';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -136,6 +176,8 @@ const mfaRef = ref();
 
 const sslRef = ref();
 const sslInfo = ref<Setting.SSLInfo>();
+const domainRef = ref();
+const allowIPsRef = ref();
 
 const form = reactive({
     serverPort: 9999,
@@ -146,6 +188,8 @@ const form = reactive({
     expirationTime: '',
     complexityVerification: 'disable',
     mfaStatus: 'disable',
+    allowIPs: '',
+    bindDomain: '',
 });
 
 const unset = ref(i18n.global.t('setting.unSetting'));
@@ -163,6 +207,8 @@ const search = async () => {
     form.expirationTime = res.data.expirationTime;
     form.complexityVerification = res.data.complexityVerification;
     form.mfaStatus = res.data.mfaStatus;
+    form.allowIPs = res.data.allowIPs || '';
+    form.bindDomain = res.data.bindDomain;
 };
 
 const onSaveComplexity = async () => {
@@ -199,11 +245,17 @@ const handleMFA = async () => {
         });
 };
 
-const onChangeEntrance = async () => {
+const onChangeEntrance = () => {
     entranceRef.value.acceptParams({ securityEntrance: form.securityEntrance });
 };
-const onChangePort = async () => {
+const onChangePort = () => {
     portRef.value.acceptParams({ serverPort: form.serverPort });
+};
+const onChangeBindDomain = () => {
+    domainRef.value.acceptParams({ bindDomain: form.bindDomain });
+};
+const onChangeAllowIPs = () => {
+    allowIPsRef.value.acceptParams({ allowIPs: form.allowIPs });
 };
 const handleSSL = async () => {
     if (form.ssl === 'enable') {

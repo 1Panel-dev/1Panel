@@ -115,6 +115,9 @@ const message = {
             notSafe: 'Access Denied',
             safeEntrance1: 'The secure login has been enabled in the current environment',
             safeEntrance2: 'Enter the following command on the SSH terminal to view the panel entry: 1pctl user-info',
+            errIP1: 'Authorized IP address access is enabled in the current environment',
+            errDomain1: 'Access domain name binding is enabled in the current environment',
+            errHelper: 'To reset the binding information, run the following command on the SSH terminal: ',
             codeInput: 'Please enter the 6-digit verification code of the MFA validator',
             mfaTitle: 'MFA Certification',
             mfaCode: 'MFA verification code',
@@ -933,6 +936,19 @@ const message = {
         complexity: 'Complexity verification',
         complexityHelper:
             'The password must contain at least eight characters and contain at least three uppercase letters, lowercase letters, digits, and special characters',
+
+        bindDomain: 'Bind domain',
+        bindDomainHelper:
+            'After the domain binding, only the domain in the setting can be used to access 1Panel service',
+        bindDomainHelper1: 'If the binding domain is empty, the binding of the domain is cancelled',
+        bindDomainWarnning:
+            'If the binding domain is empty, the binding of the domain is cancelled. Do you want to continue?',
+        allowIPs: 'Authorized IP',
+        allowIPsHelper:
+            'After setting the authorized IP address, only the IP address in the setting can access the 1Panel service',
+        allowIPsWarnning:
+            '设After setting the authorized IP address, only the IP address in the setting can access the 1Panel service. Do you want to continue?',
+        allowIPsHelper1: 'If the authorized IP address is empty, the authorized IP address is canceled',
         mfa: 'MFA',
         mfaAlert:
             'MFA password is generated based on the current time. Please ensure that the server time is synchronized.',

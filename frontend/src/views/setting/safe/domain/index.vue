@@ -1,0 +1,106 @@
+<template>
+    <div>
+        <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
+            <template #header>
+                <DrawerHeader :header="$t('setting.bindDomain')" :back="handleClose" />
+            </template>
+            <el-form
+                ref="formRef"
+                label-position="top"
+                :rules="rules"
+                :model="form"
+                @submit.prevent
+                v-loading="loading"
+            >
+                <el-row type="flex" justify="center">
+                    <el-col :span="22">
+                        <el-form-item :label="$t('setting.bindDomain')" prop="bindDomain">
+                            <el-input clearable v-model="form.bindDomain" />
+                            <span class="input-help">{{ $t('setting.bindDomainHelper1') }}</span>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
+                    <el-button :disabled="loading" type="primary" @click="onSavePort(formRef)">
+                        {{ $t('commons.button.confirm') }}
+                    </el-button>
+                </span>
+            </template>
+        </el-drawer>
+    </div>
+</template>
+<script lang="ts" setup>
+import { reactive, ref } from 'vue';
+import i18n from '@/lang';
+import { MsgSuccess } from '@/utils/message';
+import { updateSetting } from '@/api/modules/setting';
+import { ElMessageBox, FormInstance } from 'element-plus';
+
+const emit = defineEmits<{ (e: 'search'): void }>();
+
+interface DialogProps {
+    bindDomain: string;
+}
+const drawerVisiable = ref();
+const loading = ref();
+
+const form = reactive({
+    bindDomain: '',
+});
+const rules = reactive({
+    bindDomain: [{ validator: checkSecurityEntrance, trigger: 'blur' }],
+});
+
+function checkSecurityEntrance(rule: any, value: any, callback: any) {
+    if (form.bindDomain !== '') {
+        const reg =
+            /^([\w\u4e00-\u9fa5\-\*]{1,100}\.){1,10}([\w\u4e00-\u9fa5\-]{1,24}|[\w\u4e00-\u9fa5\-]{1,24}\.[\w\u4e00-\u9fa5\-]{1,24})$/;
+        if (!reg.test(form.bindDomain)) {
+            return callback(new Error(i18n.global.t('commons.rule.domain')));
+        }
+    }
+    callback();
+}
+
+const formRef = ref<FormInstance>();
+
+const acceptParams = (params: DialogProps): void => {
+    form.bindDomain = params.bindDomain;
+    drawerVisiable.value = true;
+};
+
+const onSavePort = async (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    formEl.validate(async (valid) => {
+        if (!valid) return;
+        ElMessageBox.confirm(i18n.global.t('setting.bindDomainWarnning'), i18n.global.t('setting.bindDomain'), {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        }).then(async () => {
+            loading.value = true;
+            await updateSetting({ key: 'BindDomain', value: form.bindDomain })
+                .then(() => {
+                    loading.value = false;
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                    emit('search');
+                    handleClose();
+                })
+                .catch(() => {
+                    loading.value = false;
+                });
+        });
+    });
+};
+
+const handleClose = () => {
+    drawerVisiable.value = false;
+};
+
+defineExpose({
+    acceptParams,
+});
+</script>

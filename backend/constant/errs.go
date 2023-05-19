@@ -14,6 +14,8 @@ const (
 	CodePasswordExpired   = 405
 	CodeAuth              = 406
 	CodeGlobalLoading     = 407
+	CodeErrIP             = 408
+	CodeErrDomain         = 409
 	CodeErrInternalServer = 500
 	CodeErrHeader         = 406
 )

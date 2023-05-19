@@ -158,6 +158,9 @@ export function getIcon(extention: string): string {
 }
 
 export function checkIp(value: string): boolean {
+    if (value === '') {
+        return true;
+    }
     const reg =
         /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
     if (!reg.test(value) && value !== '') {

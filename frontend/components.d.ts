@@ -71,6 +71,8 @@ declare module 'vue' {
     ElTag: typeof import('element-plus/es')['ElTag']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
+    Err_domain: typeof import('./src/components/error-message/err_domain.vue')['default']
+    Err_ip: typeof import('./src/components/error-message/err_ip.vue')['default']
     FileList: typeof import('./src/components/file-list/index.vue')['default']
     FileRole: typeof import('./src/components/file-role/index.vue')['default']
     Footer: typeof import('./src/components/app-layout/footer/index.vue')['default']

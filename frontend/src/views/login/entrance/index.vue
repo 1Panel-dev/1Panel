@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="login-backgroud" v-if="isSafety">
+        <div class="login-backgroud" v-if="isSafety && !isErr">
             <div class="login-wrapper">
                 <div :class="screenWidth > 1110 ? 'left inline-block' : ''">
                     <div class="login-title">
@@ -15,8 +15,14 @@
                 </div>
             </div>
         </div>
-        <div v-if="!isSafety">
+        <div v-if="!isSafety && !isErr">
             <UnSafe />
+        </div>
+        <div v-if="isErr && mySafetyCode.code === 'err-ip'">
+            <ErrIP />
+        </div>
+        <div v-if="isErr && mySafetyCode.code === 'err-domain'">
+            <ErrDomain />
         </div>
     </div>
 </template>
@@ -25,12 +31,15 @@
 import { checkIsSafety } from '@/api/modules/auth';
 import LoginForm from '../components/login-form.vue';
 import UnSafe from '@/components/error-message/unsafe.vue';
+import ErrIP from '@/components/error-message/err_ip.vue';
+import ErrDomain from '@/components/error-message/err_domain.vue';
 import { ref, onMounted } from 'vue';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 
 const isSafety = ref(true);
 const screenWidth = ref(null);
+const isErr = ref();
 
 const mySafetyCode = defineProps({
     code: {
@@ -41,7 +50,13 @@ const mySafetyCode = defineProps({
 });
 
 const getStatus = async () => {
+    if (mySafetyCode.code === 'err-ip' || mySafetyCode.code === 'err-domain') {
+        isErr.value = true;
+    }
     const res = await checkIsSafety(mySafetyCode.code);
+    if (mySafetyCode.code === 'err-ip' || mySafetyCode.code === 'err-domain') {
+        isErr.value = false;
+    }
     isSafety.value = res.data;
     if (isSafety.value) {
         globalStore.entrance = mySafetyCode.code;

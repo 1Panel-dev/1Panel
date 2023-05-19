@@ -26,6 +26,18 @@ func Init() {
 	}
 	global.CONF.System.SSL = sslSetting.Value
 
+	ipsSetting, err := settingRepo.Get(settingRepo.WithByKey("AllowIPs"))
+	if err != nil {
+		global.LOG.Errorf("load allow ips from setting failed, err: %v", err)
+	}
+	global.CONF.System.AllowIPs = ipsSetting.Value
+
+	domainSetting, err := settingRepo.Get(settingRepo.WithByKey("BindDomain"))
+	if err != nil {
+		global.LOG.Errorf("load bind domain from setting failed, err: %v", err)
+	}
+	global.CONF.System.BindDomain = domainSetting.Value
+
 	if _, err := settingRepo.Get(settingRepo.WithByKey("SystemStatus")); err != nil {
 		_ = settingRepo.Create("SystemStatus", "Free")
 	}
