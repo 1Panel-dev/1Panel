@@ -290,7 +290,9 @@ const freshChart = (chartName: string, Title: string, Data: number) => {
             },
         ],
     };
-    myChart.setOption(option, true);
+    nextTick(function () {
+        myChart.setOption(option, true);
+    });
 };
 
 function loadStatus(val: number) {
