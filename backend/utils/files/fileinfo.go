@@ -99,7 +99,7 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 }
 
 func (f *FileInfo) search(search string, count int) (files []FileSearchInfo, total int, err error) {
-	cmd := exec.Command("find", f.Path, "-name", search)
+	cmd := exec.Command("find", f.Path, "-name", fmt.Sprintf("*%s*", search))
 	output, err := cmd.StdoutPipe()
 	if err != nil {
 		return
