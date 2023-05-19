@@ -90,7 +90,7 @@
                         clearable
                         @clear="search()"
                         @keydown.enter="search()"
-                        :placeholder="req.containSub ? $t('file.searchHelper') : $t('file.search')"
+                        :placeholder="$t('file.search')"
                     >
                         <template #prepend>
                             <el-checkbox v-model="req.containSub">
