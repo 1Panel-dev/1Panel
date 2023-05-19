@@ -5,7 +5,7 @@ const (
 	SessionName       = "psession"
 
 	AuthMethodJWT = "jwt"
-	JWTHeaderName = "Authorization"
+	JWTHeaderName = "PanelAuthorization"
 	JWTBufferTime = 3600
 	JWTIssuer     = "1Panel"
 
