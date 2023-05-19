@@ -1,5 +1,5 @@
 <template>
-    <div v-loading="loading">
+    <div>
         <el-form-item :label="$t('website.rewriteMode')">
             <el-select v-model="req.name" filterable @change="getRewriteConfig(req.name)">
                 <el-option :label="$t('website.current')" :value="'current'"></el-option>
@@ -11,8 +11,9 @@
                 ></el-option>
             </el-select>
         </el-form-item>
-
-        <codemirror
+        <Codemirror
+            ref="codeRef"
+            v-loading="loading"
             :autofocus="true"
             placeholder=""
             :indent-with-tab="true"
@@ -37,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, nextTick, onMounted, reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { StreamLanguage } from '@codemirror/language';
@@ -48,8 +49,9 @@ import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 
 const loading = ref(false);
-const content = ref('');
+const content = ref(' ');
 const extensions = [StreamLanguage.define(nginx), oneDark];
+const codeRef = ref();
 
 const props = defineProps({
     id: {
@@ -69,7 +71,7 @@ const req = reactive({
 
 const update = reactive({
     websiteID: id.value,
-    content: '',
+    content: 'd',
     name: '',
 });
 
@@ -80,10 +82,22 @@ const getRewriteConfig = async (rewrite: string) => {
     try {
         const res = await GetRewriteConfig(req);
         content.value = res.data.content;
+        if (res.data.content == '') {
+            content.value = ' ';
+        }
+
+        setCursorPosition();
     } catch (error) {
     } finally {
         loading.value = false;
     }
+};
+
+const setCursorPosition = () => {
+    nextTick(() => {
+        const codeMirrorInstance = codeRef.value?.codemirror;
+        codeMirrorInstance?.setCursor(0, 0);
+    });
 };
 
 const submit = async () => {
