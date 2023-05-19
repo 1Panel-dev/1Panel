@@ -9,11 +9,15 @@
                 </template>
             </Header>
         </template>
-        <el-descriptions border :column="1" v-if="!edit">
-            <el-descriptions-item v-for="(param, key) in params" :label="getLabel(param)" :key="key">
-                <span>{{ param.showValue && param.showValue != '' ? param.showValue : param.value }}</span>
-            </el-descriptions-item>
-        </el-descriptions>
+        <el-row v-if="!edit">
+            <el-col :span="22" :offset="1">
+                <el-descriptions border :column="1">
+                    <el-descriptions-item v-for="(param, key) in params" :label="getLabel(param)" :key="key">
+                        <span>{{ param.showValue && param.showValue != '' ? param.showValue : param.value }}</span>
+                    </el-descriptions-item>
+                </el-descriptions>
+            </el-col>
+        </el-row>
         <el-row v-else v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-alert :title="$t('app.updateHelper')" type="warning" :closable="false" />
