@@ -49,9 +49,21 @@ class RequestHttp {
                     });
                     return Promise.reject(data);
                 }
-                if (data.code == ResultEnum.EXPIRED) {
-                    router.push({ name: 'Expired' });
-                    return data;
+                if (data.code == ResultEnum.ERRIP) {
+                    globalStore.setLogStatus(false);
+                    router.push({
+                        name: 'entrance',
+                        params: { code: 'err-ip' },
+                    });
+                    return Promise.reject(data);
+                }
+                if (data.code == ResultEnum.ERRDOMAIN) {
+                    globalStore.setLogStatus(false);
+                    router.push({
+                        name: 'entrance',
+                        params: { code: 'err-domain' },
+                    });
+                    return Promise.reject(data);
                 }
                 if (data.code == ResultEnum.ERRGLOBALLOADDING) {
                     globalStore.setGlobalLoading(true);

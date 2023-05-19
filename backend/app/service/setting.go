@@ -67,6 +67,12 @@ func (u *SettingService) Update(key, value string) error {
 			return err
 		}
 	}
+	if key == "BindDomain" {
+		global.CONF.System.BindDomain = value
+	}
+	if key == "AllowIPs" {
+		global.CONF.System.AllowIPs = value
+	}
 	if err := settingRepo.Update(key, value); err != nil {
 		return err
 	}

@@ -18,6 +18,8 @@ type SettingInfo struct {
 	ServerPort             string `json:"serverPort"`
 	SSL                    string `json:"ssl"`
 	SSLType                string `json:"sslType"`
+	BindDomain             string `json:"bindDomain"`
+	AllowIPs               string `json:"allowIPs"`
 	SecurityEntrance       string `json:"securityEntrance"`
 	ExpirationDays         string `json:"expirationDays"`
 	ExpirationTime         string `json:"expirationTime"`

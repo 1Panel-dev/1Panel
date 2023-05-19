@@ -335,3 +335,16 @@ var UpdateTableAppDetail = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddBindAndAllowIPs = &gormigrate.Migration{
+	ID: "20230414-add-bind-and-allow",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Create(&model.Setting{Key: "BindDomain", Value: ""}).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(&model.Setting{Key: "AllowIPs", Value: ""}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
