@@ -10,7 +10,7 @@ jobs:
   create-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Install cross-compilers for linux/arm64
+      - name: Install cross-compilers
         run: sudo apt-get update && sudo apt-get -y install gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf
       - name: Checkout code
         uses: actions/checkout@v2

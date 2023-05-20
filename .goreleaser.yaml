@@ -48,6 +48,8 @@ archives:
     files:
       - 1pctl
       - 1panel.service
+      - install.sh
+      - README.md
       - LICENSE
     
 checksum:

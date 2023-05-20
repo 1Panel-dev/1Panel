@@ -28,3 +28,4 @@ frontend/auto-imports.d.ts
 dist/
 1pctl
 1panel.service
+install.sh
