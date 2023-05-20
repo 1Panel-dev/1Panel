@@ -71,6 +71,34 @@ func (b *BaseApi) SearchCompose(c *gin.Context) {
 }
 
 // @Tags Container Compose
+// @Summary Test compose
+// @Description 测试 compose 是否可用
+// @Accept json
+// @Param request body dto.ComposeCreate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/compose/test [post]
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"检测 compose [name] 格式","formatEN":"check compose [name]"}
+func (b *BaseApi) TestCompose(c *gin.Context) {
+	var req dto.ComposeCreate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	isOK, err := containerService.TestCompose(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, isOK)
+}
+
+// @Tags Container Compose
 // @Summary Create compose
 // @Description 创建容器编排
 // @Accept json
@@ -90,11 +118,12 @@ func (b *BaseApi) CreateCompose(c *gin.Context) {
 		return
 	}
 
-	if err := containerService.CreateCompose(req); err != nil {
+	log, err := containerService.CreateCompose(req)
+	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithData(c, log)
 }
 
 // @Tags Container Compose

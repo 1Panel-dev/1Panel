@@ -22,7 +22,7 @@ func NewIGroupService() IGroupService {
 }
 
 func (u *GroupService) List(req dto.GroupSearch) ([]dto.GroupInfo, error) {
-	groups, err := groupRepo.GetList(commonRepo.WithByType(req.Type))
+	groups, err := groupRepo.GetList(commonRepo.WithByType(req.Type), commonRepo.WithOrderBy("is_default desc"), commonRepo.WithOrderBy("created_at desc"))
 	if err != nil {
 		return nil, constant.ErrRecordNotFound
 	}
@@ -38,7 +38,7 @@ func (u *GroupService) List(req dto.GroupSearch) ([]dto.GroupInfo, error) {
 }
 
 func (u *GroupService) Create(req dto.GroupCreate) error {
-	group, _ := groupRepo.Get(commonRepo.WithByName(req.Name), commonRepo.WithByName(req.Name))
+	group, _ := groupRepo.Get(commonRepo.WithByName(req.Name), commonRepo.WithByType(req.Type))
 	if group.ID != 0 {
 		return constant.ErrRecordExist
 	}
@@ -58,7 +58,7 @@ func (u *GroupService) Delete(id uint) error {
 	}
 	switch group.Type {
 	case "website":
-		websites, _ := websiteRepo.GetBy(commonRepo.WithByGroupID(id))
+		websites, _ := websiteRepo.GetBy(websiteRepo.WithGroupID(id))
 		if len(websites) > 0 {
 			return buserr.New(constant.ErrGroupIsUsed)
 		}
@@ -73,7 +73,7 @@ func (u *GroupService) Delete(id uint) error {
 
 func (u *GroupService) Update(req dto.GroupUpdate) error {
 	if req.IsDefault {
-		if err := groupRepo.CancelDefault(); err != nil {
+		if err := groupRepo.CancelDefault(req.Type); err != nil {
 			return err
 		}
 	}

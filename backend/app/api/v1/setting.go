@@ -93,6 +93,48 @@ func (b *BaseApi) UpdatePassword(c *gin.Context) {
 }
 
 // @Tags System Setting
+// @Summary Update system ssl
+// @Description 修改系统 ssl 登录
+// @Accept json
+// @Param request body dto.SSLUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /settings/ssl/update [post]
+// @x-panel-log {"bodyKeys":["ssl"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"修改系统 ssl => [ssl]","formatEN":"update system ssl => [ssl]"}
+func (b *BaseApi) UpdateSSL(c *gin.Context) {
+	var req dto.SSLUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := settingService.UpdateSSL(c, req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags System Setting
+// @Summary Load system cert info
+// @Description 获取证书信息
+// @Success 200 {object} dto.SettingInfo
+// @Security ApiKeyAuth
+// @Router /settings/ssl/info [get]
+func (b *BaseApi) LoadFromCert(c *gin.Context) {
+	info, err := settingService.LoadFromCert()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, info)
+}
+
+// @Tags System Setting
 // @Summary Update system port
 // @Description 更新系统端口
 // @Accept json
@@ -154,7 +196,7 @@ func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
 // @Router /settings/time/sync [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"系统时间同步","formatEN":"sync system time"}
 func (b *BaseApi) SyncTime(c *gin.Context) {
-	ntime, err := ntp.Getremotetime()
+	ntime, err := ntp.GetRemoteTime()
 	if err != nil {
 		helper.SuccessWithData(c, time.Now().Format("2006-01-02 15:04:05 MST -0700"))
 		return

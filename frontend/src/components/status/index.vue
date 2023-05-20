@@ -1,7 +1,7 @@
 <template>
     <el-tag :type="getType(status)" round effect="light">
         {{ $t('commons.status.' + status) }}
-        <el-icon v-if="status === 'installing'" class="is-loading">
+        <el-icon v-if="loadingIcon(status)" class="is-loading">
             <Loading />
         </el-icon>
     </el-tag>
@@ -19,16 +19,23 @@ const props = defineProps({
 let status = ref('running');
 
 const getType = (status: string) => {
+    if (status.includes('error') || status.includes('err')) {
+        return 'danger';
+    }
     switch (status) {
         case 'running':
             return 'success';
-        case 'error':
-            return 'danger';
         case 'stopped':
             return 'danger';
         default:
             return '';
     }
+};
+
+const loadingStatus = ['installing', 'building', 'restarting', 'upgrading'];
+
+const loadingIcon = (status: string): boolean => {
+    return loadingStatus.indexOf(status) > -1;
 };
 
 onMounted(() => {

@@ -9,7 +9,6 @@ type UserLoginInfo struct {
 	Name      string `json:"name"`
 	Token     string `json:"token"`
 	MfaStatus string `json:"mfaStatus"`
-	MfaSecret string `json:"mfaSecret"`
 }
 
 type MfaCredential struct {
@@ -18,22 +17,17 @@ type MfaCredential struct {
 }
 
 type Login struct {
-	Name       string `json:"name"`
-	Password   string `json:"password"`
-	Captcha    string `json:"captcha"`
-	CaptchaID  string `json:"captchaID"`
-	AuthMethod string `json:"authMethod"`
+	Name          string `json:"name"`
+	Password      string `json:"password"`
+	IgnoreCaptcha bool   `json:"ignoreCaptcha"`
+	Captcha       string `json:"captcha"`
+	CaptchaID     string `json:"captchaID"`
+	AuthMethod    string `json:"authMethod"`
 }
 
 type MFALogin struct {
 	Name       string `json:"name"`
 	Password   string `json:"password"`
-	Secret     string `json:"secret"`
 	Code       string `json:"code"`
 	AuthMethod string `json:"authMethod"`
-}
-
-type InitUser struct {
-	Name     string `json:"name" validate:"required"`
-	Password string `json:"password" validate:"required"`
 }

@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="createVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer v-model="createVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
             <DrawerHeader :header="$t('database.create')" :back="handleClose" />
         </template>
@@ -23,7 +23,11 @@
                             <el-input clearable v-model.trim="form.username" />
                         </el-form-item>
                         <el-form-item :label="$t('commons.login.password')" prop="password">
-                            <el-input type="password" clearable show-password v-model.trim="form.password" />
+                            <el-input type="password" clearable show-password v-model.trim="form.password">
+                                <template #append>
+                                    <el-button @click="random" icon="RefreshRight"></el-button>
+                                </template>
+                            </el-input>
                         </el-form-item>
 
                         <el-form-item :label="$t('database.permission')" prop="permission">
@@ -33,7 +37,13 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item v-if="form.permission === 'ip'" prop="permissionIPs">
-                            <el-input clearable v-model="form.permissionIPs" />
+                            <el-input
+                                clearable
+                                :autosize="{ minRows: 2, maxRows: 5 }"
+                                type="textarea"
+                                v-model="form.permissionIPs"
+                            />
+                            <span class="input-help">{{ $t('database.remoteHelper') }}</span>
                         </el-form-item>
                         <el-form-item :label="$t('commons.table.description')" prop="description">
                             <el-input type="textarea" clearable v-model="form.description" />
@@ -64,6 +74,7 @@ import { ElForm } from 'element-plus';
 import { addMysqlDB } from '@/api/modules/database';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';
+import { getRandomStr } from '@/utils/util';
 
 const loading = ref();
 const createVisiable = ref(false);
@@ -95,14 +106,18 @@ const acceptParams = (params: DialogProps): void => {
     form.mysqlName = params.mysqlName;
     form.format = 'utf8mb4';
     form.username = '';
-    form.password = '';
     form.permission = '%';
     form.permissionIPs = '';
     form.description = '';
+    random();
     createVisiable.value = true;
 };
 const handleClose = () => {
     createVisiable.value = false;
+};
+
+const random = async () => {
+    form.password = getRandomStr(16);
 };
 
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -122,6 +137,10 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                 createVisiable.value = false;
             })
             .catch(() => {
+                if (form.permission != '%') {
+                    form.permissionIPs = form.permission;
+                    form.permission = 'ip';
+                }
                 loading.value = false;
             });
     });

@@ -1,14 +1,17 @@
 package files
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/spf13/afero"
@@ -73,6 +76,8 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 		Extension: filepath.Ext(info.Name()),
 		IsHidden:  IsHidden(op.Path),
 		Mode:      fmt.Sprintf("%04o", info.Mode().Perm()),
+		User:      GetUsername(info.Sys().(*syscall.Stat_t).Uid),
+		Group:     GetGroup(info.Sys().(*syscall.Stat_t).Gid),
 		MimeType:  GetMimeType(op.Path),
 	}
 	if file.IsSymlink {
@@ -93,35 +98,38 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 	return file, nil
 }
 
-func (f *FileInfo) search(dir, showHidden bool, af afero.Afero, search string, count int) ([]FileSearchInfo, error) {
-	var files []FileSearchInfo
-	if err := afero.Walk(af, f.Path, func(path string, info fs.FileInfo, err error) error {
-		if info != nil {
-
-			if dir && !info.IsDir() {
-				return nil
-			}
-			if !showHidden && IsHidden(info.Name()) {
-				return nil
-			}
-
-			lowerName := strings.ToLower(info.Name())
-			lowerSearch := strings.ToLower(search)
-			if strings.Contains(lowerName, lowerSearch) {
-				files = append(files, FileSearchInfo{
-					Path:     path,
-					FileInfo: info,
-				})
-				if len(files) > count {
-					return nil
-				}
-			}
-		}
-		return nil
-	}); err != nil {
-		return nil, err
+func (f *FileInfo) search(search string, count int) (files []FileSearchInfo, total int, err error) {
+	cmd := exec.Command("find", f.Path, "-name", fmt.Sprintf("*%s*", search))
+	output, err := cmd.StdoutPipe()
+	if err != nil {
+		return
 	}
-	return files, nil
+	if err = cmd.Start(); err != nil {
+		return
+	}
+	defer cmd.Wait()
+	defer cmd.Process.Kill()
+
+	scanner := bufio.NewScanner(output)
+	for scanner.Scan() {
+		line := scanner.Text()
+		info, err := os.Stat(line)
+		if err != nil {
+			continue
+		}
+		total++
+		if total > count {
+			continue
+		}
+		files = append(files, FileSearchInfo{
+			Path:     line,
+			FileInfo: info,
+		})
+	}
+	if err = scanner.Err(); err != nil {
+		return
+	}
+	return
 }
 
 func (f *FileInfo) listChildren(dir, showHidden, containSub bool, search string, page, pageSize int) error {
@@ -129,10 +137,11 @@ func (f *FileInfo) listChildren(dir, showHidden, containSub bool, search string,
 	var (
 		files []FileSearchInfo
 		err   error
+		total int
 	)
 
 	if search != "" && containSub {
-		files, err = f.search(dir, showHidden, *afs, search, page*pageSize)
+		files, total, err = f.search(search, page*pageSize)
 		if err != nil {
 			return err
 		}
@@ -149,17 +158,13 @@ func (f *FileInfo) listChildren(dir, showHidden, containSub bool, search string,
 		}
 	}
 
-	f.ItemTotal = 0
-
 	var items []*FileInfo
 	for _, df := range files {
 		if dir && !df.IsDir() {
 			continue
 		}
-
 		name := df.Name()
 		fPath := path.Join(df.Path, df.Name())
-
 		if search != "" {
 			if containSub {
 				fPath = df.Path
@@ -172,12 +177,10 @@ func (f *FileInfo) listChildren(dir, showHidden, containSub bool, search string,
 				}
 			}
 		}
-
 		if !showHidden && IsHidden(name) {
 			continue
 		}
 		f.ItemTotal++
-
 		isSymlink, isInvalidLink := false, false
 		if IsSymlink(df.Mode()) {
 			isSymlink = true
@@ -201,19 +204,24 @@ func (f *FileInfo) listChildren(dir, showHidden, containSub bool, search string,
 			Extension: filepath.Ext(name),
 			Path:      fPath,
 			Mode:      fmt.Sprintf("%04o", df.Mode().Perm()),
-			MimeType:  GetMimeType(fPath),
+			User:      GetUsername(df.Sys().(*syscall.Stat_t).Uid),
+			Group:     GetGroup(df.Sys().(*syscall.Stat_t).Gid),
 		}
 
 		if isSymlink {
 			file.LinkPath = GetSymlink(fPath)
 		}
-
+		if df.Size() > 0 {
+			file.MimeType = GetMimeType(fPath)
+		}
 		if isInvalidLink {
 			file.Type = "invalid_link"
 		}
 		items = append(items, file)
 	}
-
+	if containSub {
+		f.ItemTotal = total
+	}
 	start := (page - 1) * pageSize
 	end := pageSize + start
 	var result []*FileInfo

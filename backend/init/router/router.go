@@ -4,7 +4,8 @@ import (
 	"html/template"
 	"net/http"
 
-	v1 "github.com/1Panel-dev/1Panel/backend/app/api/v1"
+	"github.com/gin-contrib/gzip"
+
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/1Panel-dev/1Panel/backend/middleware"
@@ -38,41 +39,33 @@ func setWebStatic(rootRouter *gin.Engine) {
 
 func Routers() *gin.Engine {
 	Router := gin.Default()
-
-	docs.SwaggerInfo.BasePath = "/api/v1"
-	Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-
 	Router.Use(middleware.OperationLog())
 	// Router.Use(middleware.CSRF())
 	// Router.Use(middleware.LoadCsrfToken())
-
 	if global.CONF.System.IsDemo {
 		Router.Use(middleware.DemoHandle())
 	}
-
+	Router.Use(gzip.Gzip(gzip.DefaultCompression))
 	setWebStatic(Router)
-
 	Router.Use(i18n.GinI18nLocalize())
-	Router.GET("/api/v1/info", v1.ApiGroupApp.BaseApi.GetSafetyStatus)
-	Router.GET("/api/v1/:code", v1.ApiGroupApp.BaseApi.SafeEntrance)
-
 	Router.SetFuncMap(template.FuncMap{
 		"Localize": ginI18n.GetMessage,
 	})
-	Router.Use(middleware.JwtAuth())
 
 	systemRouter := rou.RouterGroupApp
-
+	swaggerRouter := Router.Group("1panel")
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	swaggerRouter.Use(middleware.JwtAuth()).Use(middleware.SessionAuth()).GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	PublicGroup := Router.Group("")
 	{
 		PublicGroup.GET("/health", func(c *gin.Context) {
 			c.JSON(200, "ok")
 		})
 	}
-
 	PrivateGroup := Router.Group("/api/v1")
+	PrivateGroup.Use(middleware.WhiteAllow())
+	PrivateGroup.Use(middleware.BindDomain())
 	PrivateGroup.Use(middleware.GlobalLoading())
-	//PrivateGroup.Use(middleware.SafetyAuth())
 	{
 		systemRouter.InitBaseRouter(PrivateGroup)
 		systemRouter.InitDashboardRouter(PrivateGroup)
@@ -92,6 +85,7 @@ func Routers() *gin.Engine {
 		systemRouter.InitWebsiteSSLRouter(PrivateGroup)
 		systemRouter.InitWebsiteAcmeAccountRouter(PrivateGroup)
 		systemRouter.InitNginxRouter(PrivateGroup)
+		systemRouter.InitRuntimeRouter(PrivateGroup)
 	}
 
 	return Router

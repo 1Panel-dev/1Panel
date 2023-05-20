@@ -52,11 +52,17 @@ func (sws *LocalWsSession) handleSlaveEvent(exitCh chan bool) {
 func (sws *LocalWsSession) masterWrite(data []byte) error {
 	sws.writeMutex.Lock()
 	defer sws.writeMutex.Unlock()
-	err := sws.wsConn.WriteMessage(websocket.TextMessage, data)
+	wsData, err := json.Marshal(WsMsg{
+		Type: WsMsgCmd,
+		Data: base64.StdEncoding.EncodeToString(data),
+	})
+	if err != nil {
+		return errors.Wrapf(err, "failed to encoding to json")
+	}
+	err = sws.wsConn.WriteMessage(websocket.TextMessage, wsData)
 	if err != nil {
 		return errors.Wrapf(err, "failed to write to master")
 	}
-
 	return nil
 }
 
@@ -74,21 +80,27 @@ func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 				global.LOG.Errorf("reading webSocket message failed, err: %v", err)
 				return
 			}
-			msgObj := wsMsg{}
+			msgObj := WsMsg{}
 			_ = json.Unmarshal(wsData, &msgObj)
 			switch msgObj.Type {
-			case wsMsgResize:
+			case WsMsgResize:
 				if msgObj.Cols > 0 && msgObj.Rows > 0 {
 					if err := sws.slave.ResizeTerminal(msgObj.Cols, msgObj.Rows); err != nil {
 						global.LOG.Errorf("ssh pty change windows size failed, err: %v", err)
 					}
 				}
-			case wsMsgCmd:
-				decodeBytes, err := base64.StdEncoding.DecodeString(msgObj.Cmd)
+			case WsMsgCmd:
+				decodeBytes, err := base64.StdEncoding.DecodeString(msgObj.Data)
 				if err != nil {
 					global.LOG.Errorf("websock cmd string base64 decoding failed, err: %v", err)
 				}
 				sws.sendWebsocketInputCommandToSshSessionStdinPipe(decodeBytes)
+			case WsMsgHeartbeat:
+				// 接收到心跳包后将心跳包原样返回，可以用于网络延迟检测等情况
+				err = wsConn.WriteMessage(websocket.TextMessage, wsData)
+				if err != nil {
+					global.LOG.Errorf("ssh sending heartbeat to webSocket failed, err: %v", err)
+				}
 			}
 		}
 	}

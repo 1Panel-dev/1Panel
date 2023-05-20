@@ -1,8 +1,14 @@
 package service
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
+	"fmt"
+	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -12,6 +18,8 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,6 +30,8 @@ type ISettingService interface {
 	Update(key, value string) error
 	UpdatePassword(c *gin.Context, old, new string) error
 	UpdatePort(port uint) error
+	UpdateSSL(c *gin.Context, req dto.SSLUpdate) error
+	LoadFromCert() (*dto.SSLInfo, error)
 	HandlePasswordExpired(c *gin.Context, old, new string) error
 }
 
@@ -57,6 +67,12 @@ func (u *SettingService) Update(key, value string) error {
 			return err
 		}
 	}
+	if key == "BindDomain" {
+		global.CONF.System.BindDomain = value
+	}
+	if key == "AllowIPs" {
+		global.CONF.System.AllowIPs = value
+	}
 	if err := settingRepo.Update(key, value); err != nil {
 		return err
 	}
@@ -70,7 +86,14 @@ func (u *SettingService) UpdatePort(port uint) error {
 	if common.ScanPort(int(port)) {
 		return buserr.WithDetail(constant.ErrPortInUsed, port, nil)
 	}
-
+	serverPort, err := settingRepo.Get(settingRepo.WithByKey("ServerPort"))
+	if err != nil {
+		return err
+	}
+	portValue, _ := strconv.Atoi(serverPort.Value)
+	if err := OperateFirewallPort([]int{portValue}, []int{int(port)}); err != nil {
+		global.LOG.Errorf("set system firewall ports failed, err: %v", err)
+	}
 	if err := settingRepo.Update("ServerPort", strconv.Itoa(int(port))); err != nil {
 		return err
 	}
@@ -81,6 +104,135 @@ func (u *SettingService) UpdatePort(port uint) error {
 		}
 	}()
 	return nil
+}
+
+func (u *SettingService) UpdateSSL(c *gin.Context, req dto.SSLUpdate) error {
+	secretDir := global.CONF.System.BaseDir + "/1panel/secret/"
+	if req.SSL == "disable" {
+		if err := settingRepo.Update("SSL", "disable"); err != nil {
+			return err
+		}
+		if err := settingRepo.Update("SSLType", "self"); err != nil {
+			return err
+		}
+		_ = os.Remove(secretDir + "server.crt")
+		_ = os.Remove(secretDir + "server.key")
+		go func() {
+			_, err := cmd.Exec("systemctl restart 1panel.service")
+			if err != nil {
+				global.LOG.Errorf("restart system failed, err: %v", err)
+			}
+		}()
+		return nil
+	}
+
+	if _, err := os.Stat(secretDir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(secretDir, os.ModePerm); err != nil {
+			return err
+		}
+	}
+	if err := settingRepo.Update("SSLType", req.SSLType); err != nil {
+		return err
+	}
+	if req.SSLType == "self" {
+		if len(req.Domain) == 0 {
+			return fmt.Errorf("load domain failed")
+		}
+		if err := ssl.GenerateSSL(req.Domain); err != nil {
+			return err
+		}
+	}
+	if req.SSLType == "select" {
+		sslInfo, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(req.SSLID))
+		if err != nil {
+			return err
+		}
+		req.Cert = sslInfo.Pem
+		req.Key = sslInfo.PrivateKey
+		req.SSLType = "import"
+		if err := settingRepo.Update("SSLID", strconv.Itoa(int(req.SSLID))); err != nil {
+			return err
+		}
+	}
+	if req.SSLType == "import" {
+		cert, err := os.OpenFile(secretDir+"server.crt.tmp", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+		if err != nil {
+			return err
+		}
+		defer cert.Close()
+		if _, err := cert.WriteString(req.Cert); err != nil {
+			return err
+		}
+		key, err := os.OpenFile(secretDir+"server.key.tmp", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+		if err != nil {
+			return err
+		}
+		if _, err := key.WriteString(req.Key); err != nil {
+			return err
+		}
+		defer key.Close()
+	}
+	if err := checkCertValid(req.Domain); err != nil {
+		return err
+	}
+
+	fileOp := files.NewFileOp()
+	if err := fileOp.Rename(secretDir+"server.crt.tmp", secretDir+"server.crt"); err != nil {
+		return err
+	}
+	if err := fileOp.Rename(secretDir+"server.key.tmp", secretDir+"server.key"); err != nil {
+		return err
+	}
+	if err := settingRepo.Update("SSL", req.SSL); err != nil {
+		return err
+	}
+	go func() {
+		_, err := cmd.Exec("systemctl restart 1panel.service")
+		if err != nil {
+			global.LOG.Errorf("restart system failed, err: %v", err)
+		}
+	}()
+	return nil
+}
+
+func (u *SettingService) LoadFromCert() (*dto.SSLInfo, error) {
+	ssl, err := settingRepo.Get(settingRepo.WithByKey("SSL"))
+	if err != nil {
+		return nil, err
+	}
+	if ssl.Value == "disable" {
+		return &dto.SSLInfo{}, nil
+	}
+	sslType, err := settingRepo.Get(settingRepo.WithByKey("SSLType"))
+	if err != nil {
+		return nil, err
+	}
+	data, err := loadInfoFromCert()
+	if err != nil {
+		return nil, err
+	}
+	switch sslType.Value {
+	case "import":
+		if _, err := os.Stat(global.CONF.System.BaseDir + "/1panel/secret/server.crt"); err != nil {
+			return nil, fmt.Errorf("load server.crt file failed, err: %v", err)
+		}
+		certFile, _ := os.ReadFile(global.CONF.System.BaseDir + "/1panel/secret/server.crt")
+		data.Cert = string(certFile)
+
+		if _, err := os.Stat(global.CONF.System.BaseDir + "/1panel/secret/server.key"); err != nil {
+			return nil, fmt.Errorf("load server.key file failed, err: %v", err)
+		}
+		keyFile, _ := os.ReadFile(global.CONF.System.BaseDir + "/1panel/secret/server.key")
+		data.Key = string(keyFile)
+	case "select":
+		sslID, err := settingRepo.Get(settingRepo.WithByKey("SSLID"))
+		if err != nil {
+			return nil, err
+		}
+		id, _ := strconv.Atoi(sslID.Value)
+		data.SSLID = uint(id)
+	}
+	return data, nil
 }
 
 func (u *SettingService) HandlePasswordExpired(c *gin.Context, old, new string) error {
@@ -119,5 +271,62 @@ func (u *SettingService) UpdatePassword(c *gin.Context, old, new string) error {
 		return err
 	}
 	_ = global.SESSION.Clean()
+	return nil
+}
+
+func loadInfoFromCert() (*dto.SSLInfo, error) {
+	var info dto.SSLInfo
+	certFile := global.CONF.System.BaseDir + "/1panel/secret/server.crt"
+	if _, err := os.Stat(certFile); err != nil {
+		return &info, err
+	}
+	certData, err := os.ReadFile(certFile)
+	if err != nil {
+		return &info, err
+	}
+	certBlock, _ := pem.Decode(certData)
+	if certBlock == nil {
+		return &info, err
+	}
+	certObj, err := x509.ParseCertificate(certBlock.Bytes)
+	if err != nil {
+		return &info, err
+	}
+	var domains []string
+	if len(certObj.IPAddresses) != 0 {
+		for _, ip := range certObj.IPAddresses {
+			domains = append(domains, ip.String())
+		}
+	}
+	if len(certObj.DNSNames) != 0 {
+		domains = append(domains, certObj.DNSNames...)
+	}
+	return &dto.SSLInfo{
+		Domain:   strings.Join(domains, ","),
+		Timeout:  certObj.NotAfter.Format("2006-01-02 15:04:05"),
+		RootPath: global.CONF.System.BaseDir + "/1panel/secret/server.crt",
+	}, nil
+}
+
+func checkCertValid(domain string) error {
+	certificate, err := os.ReadFile(global.CONF.System.BaseDir + "/1panel/secret/server.crt.tmp")
+	if err != nil {
+		return err
+	}
+	key, err := os.ReadFile(global.CONF.System.BaseDir + "/1panel/secret/server.key.tmp")
+	if err != nil {
+		return err
+	}
+	if _, err = tls.X509KeyPair(certificate, key); err != nil {
+		return err
+	}
+	certBlock, _ := pem.Decode(certificate)
+	if certBlock == nil {
+		return err
+	}
+	if _, err := x509.ParseCertificate(certBlock.Bytes); err != nil {
+		return err
+	}
+
 	return nil
 }

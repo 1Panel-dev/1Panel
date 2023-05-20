@@ -24,6 +24,9 @@
                 float: right;
                 margin-right: 10px;
             }
+            .msg {
+                margin-left: 10px;
+            }
         }
 
         .d-description {
@@ -46,8 +49,13 @@
             min-width: 440px;
         }
     }
-    &:hover {
-        background-color: rgba(0, 94, 235, 0.03);
+
+    .e-card {
+        border: var(--panel-border) !important;
+        &:hover {
+            cursor: pointer;
+            border: 1px solid var(--el-color-primary) !important;
+        }
     }
 }
 

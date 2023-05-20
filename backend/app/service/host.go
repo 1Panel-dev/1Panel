@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/base64"
 	"fmt"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -15,6 +16,7 @@ type HostService struct{}
 
 type IHostService interface {
 	TestLocalConn(id uint) bool
+	TestByInfo(req dto.HostConnTest) bool
 	GetHostInfo(id uint) (*model.Host, error)
 	SearchForTree(search dto.SearchForTree) ([]dto.HostTree, error)
 	SearchWithPage(search dto.SearchHostWithPage) (int64, interface{}, error)
@@ -25,6 +27,46 @@ type IHostService interface {
 
 func NewIHostService() IHostService {
 	return &HostService{}
+}
+
+func (u *HostService) TestByInfo(req dto.HostConnTest) bool {
+	if req.AuthMode == "password" && len(req.Password) != 0 {
+		password, err := base64.StdEncoding.DecodeString(req.Password)
+		if err != nil {
+			return false
+		}
+		req.Password = string(password)
+	}
+	if req.AuthMode == "key" && len(req.PrivateKey) != 0 {
+		privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
+		if err != nil {
+			return false
+		}
+		req.PrivateKey = string(privateKey)
+	}
+	if len(req.Password) == 0 && len(req.PrivateKey) == 0 {
+		host, err := hostRepo.Get(hostRepo.WithByAddr(req.Addr))
+		if err != nil {
+			return false
+		}
+		req.Password = host.Password
+		req.AuthMode = host.AuthMode
+		req.PrivateKey = host.PrivateKey
+		req.PassPhrase = host.PassPhrase
+	}
+
+	var connInfo ssh.ConnInfo
+	_ = copier.Copy(&connInfo, &req)
+	connInfo.PrivateKey = []byte(req.PrivateKey)
+	if len(req.PassPhrase) != 0 {
+		connInfo.PassPhrase = []byte(req.PassPhrase)
+	}
+	client, err := connInfo.NewClient()
+	if err != nil {
+		return false
+	}
+	defer client.Close()
+	return true
 }
 
 func (u *HostService) TestLocalConn(id uint) bool {
@@ -46,6 +88,10 @@ func (u *HostService) TestLocalConn(id uint) bool {
 	var connInfo ssh.ConnInfo
 	if err := copier.Copy(&connInfo, &host); err != nil {
 		return false
+	}
+	connInfo.PrivateKey = []byte(host.PrivateKey)
+	if len(host.PassPhrase) != 0 {
+		connInfo.PassPhrase = []byte(host.PassPhrase)
 	}
 	client, err := connInfo.NewClient()
 	if err != nil {
@@ -77,6 +123,11 @@ func (u *HostService) SearchWithPage(search dto.SearchHostWithPage) (int64, inte
 		}
 		group, _ := groupRepo.Get(commonRepo.WithByID(host.GroupID))
 		item.GroupBelong = group.Name
+		if !item.RememberPassword {
+			item.Password = ""
+			item.PrivateKey = ""
+			item.PassPhrase = ""
+		}
 		dtoHosts = append(dtoHosts, item)
 	}
 	return total, dtoHosts, err
@@ -144,6 +195,8 @@ func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 		upMap["auth_mode"] = req.AuthMode
 		upMap["password"] = req.Password
 		upMap["private_key"] = req.PrivateKey
+		upMap["pass_phrase"] = req.PassPhrase
+		upMap["remember_password"] = req.RememberPassword
 		upMap["description"] = req.Description
 		if err := hostRepo.Update(sameHostID, upMap); err != nil {
 			return nil, err

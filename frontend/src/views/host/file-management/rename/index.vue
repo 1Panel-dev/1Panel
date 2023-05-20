@@ -1,7 +1,7 @@
 <template>
     <el-drawer v-model="open" size="40%">
         <template #header>
-            <DrawerHeader :header="$t('file.rename')" :back="handleClose" />
+            <DrawerHeader :header="$t('file.rename')" :resource="oldName" :back="handleClose" />
         </template>
         <el-row>
             <el-col :span="22" :offset="1">
@@ -47,7 +47,7 @@ interface RenameProps {
 
 const fileForm = ref<FormInstance>();
 const loading = ref(false);
-let open = ref(false);
+const open = ref(false);
 const oldName = ref('');
 
 const addForm = reactive({

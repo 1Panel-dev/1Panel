@@ -22,8 +22,12 @@ export const GetAppTags = () => {
     return http.get<App.Tag[]>('apps/tags');
 };
 
-export const GetAppDetail = (id: number, version: string) => {
-    return http.get<App.AppDetail>(`apps/detail/${id}/${version}`);
+export const GetAppDetail = (appID: number, version: string, type: string) => {
+    return http.get<App.AppDetail>(`apps/detail/${appID}/${version}/${type}`);
+};
+
+export const GetAppDetailByID = (id: number) => {
+    return http.get<App.AppDetail>(`apps/details/${id}`);
 };
 
 export const InstallApp = (install: App.AppInstall) => {
@@ -42,8 +46,8 @@ export const GetAppPort = (key: string) => {
     return http.get<number>(`apps/installed/loadport/${key}`);
 };
 
-export const GetAppPassword = (key: string) => {
-    return http.get<string>(`apps/installed/loadpassword/${key}`);
+export const GetAppConnInfo = (key: string) => {
+    return http.get<App.DatabaseConnInfo>(`apps/installed/conninfo/${key}`);
 };
 
 export const CheckAppInstalled = (key: string) => {
@@ -59,7 +63,7 @@ export const GetAppInstalled = (search: App.AppInstalledSearch) => {
 };
 
 export const InstalledOp = (op: App.AppInstalledOp) => {
-    return http.post<any>('apps/installed/op', op);
+    return http.post<any>('apps/installed/op', op, 40000);
 };
 
 export const SyncInstalledApp = () => {
@@ -79,7 +83,7 @@ export const GetAppDefaultConfig = (key: string) => {
 };
 
 export const GetAppInstallParams = (id: number) => {
-    return http.get<App.InstallParams[]>(`apps/installed/params/${id}`);
+    return http.get<App.AppConfig>(`apps/installed/params/${id}`);
 };
 
 export const UpdateAppInstallParams = (req: any) => {

@@ -26,7 +26,6 @@ class RequestHttp {
                         ...config.headers,
                     };
                 }
-
                 return {
                     ...config,
                 };
@@ -43,20 +42,28 @@ class RequestHttp {
                     globalStore.setCsrfToken(response.headers['x-csrf-token']);
                 }
                 if (data.code == ResultEnum.OVERDUE || data.code == ResultEnum.FORBIDDEN) {
-                    router.replace({
-                        path: '/login',
+                    globalStore.setLogStatus(false);
+                    router.push({
+                        name: 'entrance',
+                        params: { code: globalStore.entrance },
                     });
                     return Promise.reject(data);
                 }
-                if (data.code == ResultEnum.UNSAFETY) {
-                    router.replace({
-                        path: '/login',
+                if (data.code == ResultEnum.ERRIP) {
+                    globalStore.setLogStatus(false);
+                    router.push({
+                        name: 'entrance',
+                        params: { code: 'err-ip' },
                     });
-                    return data;
+                    return Promise.reject(data);
                 }
-                if (data.code == ResultEnum.EXPIRED) {
-                    router.push({ name: 'Expired' });
-                    return data;
+                if (data.code == ResultEnum.ERRDOMAIN) {
+                    globalStore.setLogStatus(false);
+                    router.push({
+                        name: 'entrance',
+                        params: { code: 'err-domain' },
+                    });
+                    return Promise.reject(data);
                 }
                 if (data.code == ResultEnum.ERRGLOBALLOADDING) {
                     globalStore.setGlobalLoading(true);

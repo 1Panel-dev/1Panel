@@ -23,12 +23,22 @@ type WebsiteCreate struct {
 	AppInstall   NewAppInstall `json:"appInstall"`
 	AppID        uint          `json:"appID"`
 	AppInstallID uint          `json:"appInstallID"`
+
+	RuntimeID uint `json:"runtimeID"`
+	RuntimeConfig
+}
+
+type RuntimeConfig struct {
+	ProxyType string `json:"proxyType"`
+	Port      int    `json:"port"`
 }
 
 type NewAppInstall struct {
 	Name        string                 `json:"name"`
 	AppDetailId uint                   `json:"appDetailID"`
 	Params      map[string]interface{} `json:"params"`
+
+	AppContainerConfig
 }
 
 type WebsiteInstallCheckReq struct {
@@ -124,5 +134,48 @@ type WebsiteLogReq struct {
 }
 
 type WebsiteDefaultUpdate struct {
+	ID uint `json:"id" validate:"required"`
+}
+
+type WebsitePHPConfigUpdate struct {
+	ID     uint              `json:"id" validate:"required"`
+	Params map[string]string `json:"params" validate:"required"`
+}
+
+type WebsitePHPFileUpdate struct {
+	ID      uint   `json:"id" validate:"required"`
+	Type    string `json:"type" validate:"required"`
+	Content string `json:"content" validate:"required"`
+}
+
+type WebsiteUpdateDir struct {
+	ID      uint   `json:"id" validate:"required"`
+	SiteDir string `json:"siteDir" validate:"required"`
+}
+
+type WebsiteUpdateDirPermission struct {
+	ID    uint   `json:"id" validate:"required"`
+	User  string `json:"user" validate:"required"`
+	Group string `json:"group" validate:"required"`
+}
+
+type WebsiteProxyConfig struct {
+	ID        uint              `json:"id" validate:"required"`
+	Operate   string            `json:"operate" validate:"required"`
+	Enable    bool              `json:"enable"  validate:"required"`
+	Cache     bool              `json:"cache"  validate:"required"`
+	CacheTime int               `json:"cacheTime"  validate:"required"`
+	CacheUnit string            `json:"cacheUnit" validate:"required"`
+	Name      string            `json:"name" validate:"required"`
+	Modifier  string            `json:"modifier" validate:"required"`
+	Match     string            `json:"match" validate:"required"`
+	ProxyPass string            `json:"proxyPass" validate:"required"`
+	ProxyHost string            `json:"proxyHost" validate:"required"`
+	Content   string            `json:"content"`
+	FilePath  string            `json:"filePath"`
+	Replaces  map[string]string `json:"replaces"`
+}
+
+type WebsiteProxyReq struct {
 	ID uint `json:"id" validate:"required"`
 }

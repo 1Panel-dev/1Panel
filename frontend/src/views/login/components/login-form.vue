@@ -1,82 +1,14 @@
 <template>
-    <div>
-        <div v-if="isFirst">
+    <div v-loading="loading">
+        <div v-if="mfaShow">
             <div class="login-form">
-                <el-form ref="registerFormRef" :model="registerForm" size="default" :rules="registerRules">
-                    <div class="login-title">{{ $t('commons.button.init') }}</div>
-                    <input type="text" class="hide" id="name" />
-                    <input type="password" class="hide" id="password" />
-                    <el-form-item prop="name" class="no-border">
-                        <el-input
-                            v-model="registerForm.name"
-                            :placeholder="$t('commons.login.username')"
-                            autocomplete="off"
-                            type="text"
-                        >
-                            <template #prefix>
-                                <el-icon class="el-input__icon">
-                                    <user />
-                                </el-icon>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item prop="password" class="no-border">
-                        <el-input
-                            type="password"
-                            clearable
-                            v-model="registerForm.password"
-                            show-password
-                            :placeholder="$t('commons.login.password')"
-                            name="passwod"
-                            autocomplete="new-password"
-                        >
-                            <template #prefix>
-                                <el-icon class="el-input__icon">
-                                    <lock />
-                                </el-icon>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item prop="rePassword" class="no-border">
-                        <el-input
-                            type="password"
-                            clearable
-                            v-model="registerForm.rePassword"
-                            show-password
-                            :placeholder="$t('commons.login.rePassword')"
-                        >
-                            <template #prefix>
-                                <el-icon class="el-input__icon">
-                                    <lock />
-                                </el-icon>
-                            </template>
-                        </el-input>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button
-                            @focus="registerButtonFocused = true"
-                            @blur="registerButtonFocused = false"
-                            @click="register(registerFormRef)"
-                            class="login-button"
-                            type="primary"
-                            size="default"
-                            round
-                        >
-                            {{ $t('commons.button.init') }}
-                        </el-button>
-                    </el-form-item>
-                </el-form>
-            </div>
-        </div>
-        <div v-else-if="mfaShow">
-            <div class="login-form">
-                <el-form>
+                <el-form @submit.prevent>
                     <div class="login-title">{{ $t('commons.login.mfaTitle') }}</div>
                     <el-form-item class="no-border">
                         <el-input
                             size="default"
-                            :placeholder="$t('commons.login.captchaHelper')"
-                            v-model="mfaLoginForm.code"
+                            :placeholder="$t('commons.login.mfaCode')"
+                            v-model.trim="mfaLoginForm.code"
                         >
                             <template #prefix>
                                 <el-icon class="el-input__icon">
@@ -89,7 +21,15 @@
                         </span>
                     </el-form-item>
                     <el-form-item>
-                        <el-button class="login-button" type="primary" size="default" round @click="mfaLogin()">
+                        <el-button
+                            @focus="mfaButtonFocused = true"
+                            @blur="mfaButtonFocused = false"
+                            class="login-button"
+                            type="primary"
+                            size="default"
+                            round
+                            @click="mfaLogin()"
+                        >
                             {{ $t('commons.button.verify') }}
                         </el-button>
                     </el-form-item>
@@ -103,7 +43,7 @@
 
                     <el-form-item prop="name" class="no-border">
                         <el-input
-                            v-model="loginForm.name"
+                            v-model.trim="loginForm.name"
                             :placeholder="$t('commons.login.username')"
                             class="form-input"
                         >
@@ -118,7 +58,7 @@
                         <el-input
                             type="password"
                             clearable
-                            v-model="loginForm.password"
+                            v-model.trim="loginForm.password"
                             show-password
                             :placeholder="$t('commons.login.password')"
                         >
@@ -132,8 +72,12 @@
                             {{ $t('commons.login.errorAuthInfo') }}
                         </span>
                     </el-form-item>
-                    <el-form-item prop="captcha" class="login-captcha">
-                        <el-input v-model="loginForm.captcha" :placeholder="$t('commons.login.captchaHelper')" />
+                    <el-form-item v-if="!globalStore.ignoreCaptcha" prop="captcha" class="login-captcha">
+                        <el-input v-model.trim="loginForm.captcha" :placeholder="$t('commons.login.captchaHelper')">
+                            <template #prefix>
+                                <svg-icon style="font-size: 7px" iconName="p-yanzhengma1"></svg-icon>
+                            </template>
+                        </el-input>
                         <img
                             v-if="captcha.imagePath"
                             :src="captcha.imagePath"
@@ -157,6 +101,23 @@
                             {{ $t('commons.button.login') }}
                         </el-button>
                     </el-form-item>
+                    <el-form-item prop="agreeLicense">
+                        <el-checkbox v-model="loginForm.agreeLicense">
+                            <template #default>
+                                <span
+                                    style="white-space: pre-wrap; line-height: 14px"
+                                    v-html="$t('commons.login.licenseHelper')"
+                                ></span>
+                            </template>
+                        </el-checkbox>
+                        <span
+                            v-if="errAgree && loginForm.agreeLicense === false"
+                            class="input-error"
+                            style="line-height: 14px"
+                        >
+                            {{ $t('commons.login.errorAgree') }}
+                        </span>
+                    </el-form-item>
                 </el-form>
                 <div class="demo">
                     <span v-if="isDemo">
@@ -172,11 +133,10 @@
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import type { ElForm } from 'element-plus';
-import { loginApi, getCaptcha, mfaLoginApi, checkIsFirst, initUser, checkIsDemo } from '@/api/modules/auth';
+import { loginApi, getCaptcha, mfaLoginApi, checkIsDemo } from '@/api/modules/auth';
 import { GlobalStore } from '@/store';
 import { MenuStore } from '@/store/modules/menu';
 import i18n from '@/lang';
-import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 
 const globalStore = GlobalStore();
@@ -186,37 +146,27 @@ const errAuthInfo = ref(false);
 const errCaptcha = ref(false);
 const errMfaInfo = ref(false);
 const isDemo = ref(false);
-
-const isFirst = ref();
+const errAgree = ref(false);
 
 type FormInstance = InstanceType<typeof ElForm>;
-
-const registerButtonFocused = ref(false);
-const registerFormRef = ref<FormInstance>();
-const registerForm = reactive({
-    name: '',
-    password: '',
-    rePassword: '',
-});
-const registerRules = reactive({
-    name: [Rules.requiredInput, Rules.userName],
-    password: [Rules.requiredInput, Rules.password],
-    rePassword: [Rules.requiredInput, { validator: checkPassword, trigger: 'blur' }],
-});
 
 const loginButtonFocused = ref();
 const loginFormRef = ref<FormInstance>();
 const loginForm = reactive({
     name: '',
     password: '',
+    ignoreCaptcha: true,
     captcha: '',
     captchaID: '',
     authMethod: '',
+    agreeLicense: false,
 });
 const loginRules = reactive({
     name: [{ required: true, message: i18n.global.t('commons.rule.username'), trigger: 'blur' }],
     password: [{ required: true, message: i18n.global.t('commons.rule.password'), trigger: 'blur' }],
 });
+
+const mfaButtonFocused = ref();
 const mfaLoginForm = reactive({
     name: '',
     password: '',
@@ -236,50 +186,51 @@ const mfaShow = ref<boolean>(false);
 
 const router = useRouter();
 
-const register = (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        await initUser(registerForm);
-        checkStatus();
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    });
-};
-
 const login = (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        loading.value = true;
+        let requestLoginForm = {
+            name: loginForm.name,
+            password: loginForm.password,
+            ignoreCaptcha: globalStore.ignoreCaptcha,
+            captcha: loginForm.captcha,
+            captchaID: captcha.captchaID,
+            authMethod: '',
+        };
+        if (!globalStore.ignoreCaptcha && requestLoginForm.captcha == '') {
+            errCaptcha.value = true;
+            return;
+        }
+        if (loginForm.agreeLicense == false) {
+            errAgree.value = true;
+            return;
+        }
         try {
-            let requestLoginForm = {
-                name: loginForm.name,
-                password: loginForm.password,
-                captcha: loginForm.captcha,
-                captchaID: captcha.captchaID,
-                authMethod: '',
-            };
+            loading.value = true;
             const res = await loginApi(requestLoginForm);
             if (res.code === 406) {
                 if (res.message === 'ErrCaptchaCode') {
+                    loginForm.captcha = '';
                     errCaptcha.value = true;
                     errAuthInfo.value = false;
-                    loginVerify();
                 }
                 if (res.message === 'ErrAuth') {
+                    globalStore.ignoreCaptcha = false;
                     errCaptcha.value = false;
                     errAuthInfo.value = true;
-                    loginVerify();
                 }
+                loginVerify();
                 return;
             }
+            globalStore.ignoreCaptcha = true;
             if (res.data.mfaStatus === 'enable') {
                 mfaShow.value = true;
                 errMfaInfo.value = false;
-                mfaLoginForm.secret = res.data.mfaSecret;
                 return;
             }
             globalStore.setLogStatus(true);
+            globalStore.setAgreeLicense(true);
             menuStore.setMenuList([]);
             MsgSuccess(i18n.global.t('commons.msg.loginSuccess'));
             router.push({ name: 'home' });
@@ -313,39 +264,26 @@ const loginVerify = async () => {
     captcha.captchaLength = res.data.captchaLength ? res.data.captchaLength : 0;
 };
 
-const checkStatus = async () => {
-    const res = await checkIsFirst();
-    isFirst.value = res.data;
-    if (!isFirst.value) {
-        loginVerify();
-    }
-};
-
 const checkIsSystemDemo = async () => {
     const res = await checkIsDemo();
     isDemo.value = res.data;
 };
 
-function checkPassword(rule: any, value: any, callback: any) {
-    if (registerForm.password !== registerForm.rePassword) {
-        return callback(new Error(i18n.global.t('commons.rule.rePassword')));
-    }
-    callback();
-}
-
 onMounted(() => {
+    loginVerify();
     document.title = globalStore.themeConfig.panelName;
-    checkStatus();
+    loginForm.agreeLicense = globalStore.agreeLicense;
     checkIsSystemDemo();
     document.onkeydown = (e: any) => {
         e = window.event || e;
         if (e.keyCode === 13) {
-            if (loading.value) return;
-            if (isFirst.value && !registerButtonFocused.value) {
-                register(registerFormRef.value);
+            if (!mfaShow.value) {
+                if (!loginButtonFocused.value) {
+                    login(loginFormRef.value);
+                }
             }
-            if (!isFirst.value && !loginButtonFocused.value) {
-                login(loginFormRef.value);
+            if (mfaShow.value && !mfaButtonFocused.value) {
+                mfaLogin();
             }
         }
     };
@@ -383,6 +321,12 @@ onMounted(() => {
     }
 
     .login-captcha {
+        :deep(.el-input__wrapper) {
+            background: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            border-bottom: 1px solid #dcdfe6;
+        }
         margin-top: 10px;
         .el-input {
             width: 50%;

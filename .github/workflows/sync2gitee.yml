@@ -1,0 +1,16 @@
+name: sync2gitee
+on: [push]
+
+jobs:
+  repo-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mirror the Github organization repos to Gitee.
+        uses: Yikun/hub-mirror-action@master
+        with:
+          src: 'github/1Panel-dev'
+          dst: 'gitee/fit2cloud-xlab'
+          dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
+          dst_token:  ${{ secrets.GITEE_TOKEN }}
+          static_list: "1Panel"
+          force_update: true

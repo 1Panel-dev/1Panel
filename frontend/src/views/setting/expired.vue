@@ -20,14 +20,14 @@
                             <el-input type="password" show-password clearable v-model="passForm.oldPassword" />
                         </el-form-item>
                         <el-form-item
-                            v-if="settingForm.complexityVerification === 'disable'"
+                            v-if="settingForm?.complexityVerification === 'disable'"
                             :label="$t('setting.newPassword')"
                             prop="newPassword"
                         >
                             <el-input type="password" show-password clearable v-model="passForm.newPassword" />
                         </el-form-item>
                         <el-form-item
-                            v-if="settingForm.complexityVerification === 'enable'"
+                            v-if="settingForm?.complexityVerification === 'enable'"
                             :label="$t('setting.newPassword')"
                             prop="newPasswordComplexity"
                         >
@@ -55,37 +55,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue';
-import { Setting } from '@/api/interface/setting';
 import { getSettingInfo, handleExpired } from '@/api/modules/setting';
 import { ElForm } from 'element-plus';
 import i18n from '@/lang';
 import { Rules } from '@/global/form-rules';
 import router from '@/routers';
 import { MsgError, MsgSuccess } from '@/utils/message';
-let settingForm = reactive<Setting.SettingInfo>({
-    userName: '',
-    password: '',
-    email: '',
-    sessionTimeout: 86400,
-    localTime: '',
-    panelName: '',
-    theme: '',
-    language: '',
-    serverPort: 8888,
-    securityEntrance: '',
-    systemVersion: '',
-    expirationDays: 0,
-    expirationTime: '',
-    complexityVerification: 'enable',
-    mfaStatus: '',
-    mfaSecret: '',
-    monitorStatus: '',
-    monitorStoreDays: 30,
-    messageType: '',
-    emailVars: '',
-    weChatVars: '',
-    dingVars: '',
-});
+let settingForm = ref();
+
 type FormInstance = InstanceType<typeof ElForm>;
 const passFormRef = ref<FormInstance>();
 const passRules = reactive({
@@ -106,7 +83,7 @@ const passForm = reactive({
 
 function checkPassword(rule: any, value: any, callback: any) {
     let password =
-        settingForm.complexityVerification === 'disable' ? passForm.newPassword : passForm.newPasswordComplexity;
+        settingForm.value.complexityVerification === 'disable' ? passForm.newPassword : passForm.newPasswordComplexity;
     if (password !== passForm.retryPassword) {
         return callback(new Error(i18n.global.t('commons.rule.rePassword')));
     }
@@ -118,7 +95,9 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         let password =
-            settingForm.complexityVerification === 'disable' ? passForm.newPassword : passForm.newPasswordComplexity;
+            settingForm.value.complexityVerification === 'disable'
+                ? passForm.newPassword
+                : passForm.newPasswordComplexity;
         if (password === passForm.oldPassword) {
             MsgError(i18n.global.t('setting.duplicatePassword'));
             return;
@@ -130,7 +109,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
 };
 const search = async () => {
     const res = await getSettingInfo();
-    settingForm = res.data;
+    settingForm.value = res.data;
 };
 
 onMounted(() => {

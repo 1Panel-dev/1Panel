@@ -2,6 +2,9 @@ package service
 
 import (
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/nginx/components"
 	"path"
 	"strconv"
 	"strings"
@@ -20,10 +23,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func getDomain(domainStr string, websiteID uint) (model.WebsiteDomain, error) {
-	domain := model.WebsiteDomain{
-		WebsiteID: websiteID,
-	}
+func getDomain(domainStr string) (model.WebsiteDomain, error) {
+	domain := model.WebsiteDomain{}
 	domainArray := strings.Split(domainStr, ":")
 	if len(domainArray) == 1 {
 		domain.Domain = domainArray[0]
@@ -43,15 +44,26 @@ func getDomain(domainStr string, websiteID uint) (model.WebsiteDomain, error) {
 	return model.WebsiteDomain{}, nil
 }
 
-func createStaticHtml(website *model.Website) error {
+func createIndexFile(website *model.Website, runtime *model.Runtime) error {
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
 	}
 
 	indexFolder := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.Alias, "index")
-	indexPath := path.Join(indexFolder, "index.html")
-	indexContent := string(nginx_conf.Index)
+	indexPath := ""
+	indexContent := ""
+	switch website.Type {
+	case constant.Static:
+		indexPath = path.Join(indexFolder, "index.html")
+		indexContent = string(nginx_conf.Index)
+	case constant.Runtime:
+		if runtime.Type == constant.RuntimePHP {
+			indexPath = path.Join(indexFolder, "index.php")
+			indexContent = string(nginx_conf.IndexPHP)
+		}
+	}
+
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(indexFolder) {
 		if err := fileOp.CreateDir(indexFolder, 0755); err != nil {
@@ -63,13 +75,52 @@ func createStaticHtml(website *model.Website) error {
 			return err
 		}
 	}
+	if website.Type == constant.Runtime && runtime.Resource == constant.ResourceAppstore {
+		if err := chownRootDir(indexFolder); err != nil {
+			return err
+		}
+	}
 	if err := fileOp.WriteFile(indexPath, strings.NewReader(indexContent), 0755); err != nil {
 		return err
 	}
 	return nil
 }
 
-func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) error {
+func createProxyFile(website *model.Website, runtime *model.Runtime) error {
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	proxyFolder := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name, "www", "sites", website.Alias, "proxy")
+	filePath := path.Join(proxyFolder, "root.conf")
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(proxyFolder) {
+		if err := fileOp.CreateDir(proxyFolder, 0755); err != nil {
+			return err
+		}
+	}
+	if !fileOp.Stat(filePath) {
+		if err := fileOp.CreateFile(filePath); err != nil {
+			return err
+		}
+	}
+	config := parser.NewStringParser(string(nginx_conf.Proxy)).Parse()
+	config.FilePath = filePath
+	directives := config.Directives
+	location, ok := directives[0].(*components.Location)
+	if !ok {
+		return errors.New("error")
+	}
+	location.ChangePath("^~", "/")
+	location.UpdateDirective("proxy_pass", []string{website.Proxy})
+	location.UpdateDirective("proxy_set_header", []string{"Host", "$host"})
+	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+		return buserr.WithErr(constant.ErrUpdateBuWebsite, err)
+	}
+	return nil
+}
+
+func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website, runtime *model.Runtime) error {
 	nginxFolder := path.Join(constant.AppInstallDir, constant.AppOpenresty, nginxInstall.Name)
 	siteFolder := path.Join(nginxFolder, "www", "sites", website.Alias)
 	fileOp := files.NewFileOp()
@@ -86,14 +137,30 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) 
 		if err := fileOp.CreateFile(path.Join(siteFolder, "log", "error.log")); err != nil {
 			return err
 		}
-		if err := fileOp.CreateDir(path.Join(siteFolder, "index"), 0755); err != nil {
+		if err := fileOp.CreateDir(path.Join(siteFolder, "index"), 0775); err != nil {
 			return err
 		}
 		if err := fileOp.CreateDir(path.Join(siteFolder, "ssl"), 0755); err != nil {
 			return err
 		}
-		if website.Type == constant.Static {
-			if err := createStaticHtml(website); err != nil {
+		if website.Type == constant.Runtime {
+			if runtime.Type == constant.RuntimePHP && runtime.Resource == constant.ResourceLocal {
+				phpPoolDir := path.Join(siteFolder, "php-pool")
+				if err := fileOp.CreateDir(phpPoolDir, 0755); err != nil {
+					return err
+				}
+				if err := fileOp.CreateFile(path.Join(phpPoolDir, "php-fpm.sock")); err != nil {
+					return err
+				}
+			}
+		}
+		if website.Type == constant.Static || website.Type == constant.Runtime {
+			if err := createIndexFile(website, runtime); err != nil {
+				return err
+			}
+		}
+		if website.Type == constant.Proxy {
+			if err := createProxyFile(website, runtime); err != nil {
 				return err
 			}
 		}
@@ -101,12 +168,12 @@ func createWebsiteFolder(nginxInstall model.AppInstall, website *model.Website) 
 	return fileOp.CopyDir(path.Join(nginxFolder, "www", "common", "waf", "rules"), path.Join(siteFolder, "waf"))
 }
 
-func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, appInstall *model.AppInstall) error {
+func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, appInstall *model.AppInstall, runtime *model.Runtime) error {
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
 	}
-	if err := createWebsiteFolder(nginxInstall, website); err != nil {
+	if err := createWebsiteFolder(nginxInstall, website, runtime); err != nil {
 		return err
 	}
 
@@ -134,22 +201,38 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	server.UpdateDirective("set", []string{"$RulePath", path.Join(siteFolder, "waf", "rules")})
 	server.UpdateDirective("set", []string{"$logdir", path.Join(siteFolder, "log")})
 
+	rootIndex := path.Join("/www/sites", website.Alias, "index")
 	switch website.Type {
 	case constant.Deployment:
 		proxy := fmt.Sprintf("http://127.0.0.1:%d", appInstall.HttpPort)
 		server.UpdateRootProxy([]string{proxy})
 	case constant.Static:
-		server.UpdateRoot(path.Join("/www/sites", website.Alias, "index"))
-		server.UpdateRootLocation()
+		server.UpdateRoot(rootIndex)
 	case constant.Proxy:
-		server.UpdateRootProxy([]string{website.Proxy})
+		nginxInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
+		server.UpdateDirective("include", []string{nginxInclude})
+	case constant.Runtime:
+		if runtime.Resource == constant.ResourceLocal {
+			switch runtime.Type {
+			case constant.RuntimePHP:
+				server.UpdateRoot(rootIndex)
+				localPath := path.Join(nginxInstall.GetPath(), rootIndex, "index.php")
+				server.UpdatePHPProxy([]string{website.Proxy}, localPath)
+			}
+		}
+		if runtime.Resource == constant.ResourceAppstore {
+			switch runtime.Type {
+			case constant.RuntimePHP:
+				server.UpdateRoot(rootIndex)
+				server.UpdatePHPProxy([]string{website.Proxy}, "")
+			}
+		}
 	}
 
 	config.FilePath = configPath
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
-
 	if err := opNginx(nginxInstall.ContainerName, constant.NginxCheck); err != nil {
 		_ = deleteWebsiteFolder(nginxInstall, website)
 		return err
@@ -218,7 +301,7 @@ func addListenAndServerName(website model.Website, ports []int, domains []string
 	return nginxCheckAndReload(nginxConfig.OldContent, nginxConfig.FilePath, nginxFull.Install.ContainerName)
 }
 
-func deleteListenAndServerName(website model.Website, ports []int, domains []string) error {
+func deleteListenAndServerName(website model.Website, binds []string, domains []string) error {
 	nginxFull, err := getNginxFull(&website)
 	if err != nil {
 		return nil
@@ -226,8 +309,8 @@ func deleteListenAndServerName(website model.Website, ports []int, domains []str
 	nginxConfig := nginxFull.SiteConfig
 	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
-	for _, port := range ports {
-		server.DeleteListen(strconv.Itoa(port))
+	for _, bind := range binds {
+		server.DeleteListen(bind)
 	}
 	for _, domain := range domains {
 		server.DeleteServerName(domain)
@@ -288,17 +371,21 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 	}
 	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
-	server.UpdateListen("443", false, "ssl")
+	server.UpdateListen("443", website.DefaultServer, "ssl")
+	server.UpdateListen("[::]:443", website.DefaultServer, "ssl")
 
 	switch req.HttpConfig {
 	case constant.HTTPSOnly:
 		server.RemoveListenByBind("80")
+		server.RemoveListenByBind("[::]:80")
 		server.RemoveDirective("if", []string{"($scheme"})
 	case constant.HTTPToHTTPS:
 		server.UpdateListen("80", website.DefaultServer)
+		server.UpdateListen("[::]:80", website.DefaultServer)
 		server.AddHTTP2HTTPS()
 	case constant.HTTPAlso:
 		server.UpdateListen("80", website.DefaultServer)
+		server.UpdateListen("[::]:80", website.DefaultServer)
 		server.RemoveDirective("if", []string{"($scheme"})
 	}
 
@@ -410,13 +497,32 @@ func opWebsite(website *model.Website, operate string) error {
 	}
 	server := servers[0]
 	if operate == constant.StopWeb {
-		if website.Type != constant.Static {
+		proxyInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
+		server.RemoveDirective("include", []string{proxyInclude})
+		rewriteInclude := fmt.Sprintf("/www/sites/%s/rewrite/%s.conf", website.Alias, website.Alias)
+		server.RemoveDirective("include", []string{rewriteInclude})
+
+		switch website.Type {
+		case constant.Deployment:
 			server.RemoveDirective("location", []string{"/"})
+		case constant.Runtime:
+			server.RemoveDirective("location", []string{"~", "[^/]\\.php(/|$)"})
 		}
 		server.UpdateRoot("/usr/share/nginx/html/stop")
 		website.Status = constant.WebStopped
 	}
 	if operate == constant.StartWeb {
+		proxyInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
+		absoluteIncludeDir := path.Join(nginxInstall.Install.GetPath(), fmt.Sprintf("/www/sites/%s/proxy", website.Alias))
+		if files.NewFileOp().Stat(absoluteIncludeDir) {
+			server.UpdateDirective("include", []string{proxyInclude})
+		}
+		server.UpdateDirective("include", []string{proxyInclude})
+		rewriteInclude := fmt.Sprintf("/www/sites/%s/rewrite/%s.conf", website.Alias, website.Alias)
+		absoluteRewritePath := path.Join(nginxInstall.Install.GetPath(), rewriteInclude)
+		if files.NewFileOp().Stat(absoluteRewritePath) {
+			server.UpdateDirective("include", []string{rewriteInclude})
+		}
 		switch website.Type {
 		case constant.Deployment:
 			server.RemoveDirective("root", nil)
@@ -431,7 +537,14 @@ func opWebsite(website *model.Website, operate string) error {
 			server.UpdateRootLocation()
 		case constant.Proxy:
 			server.RemoveDirective("root", nil)
-			server.UpdateRootProxy([]string{website.Proxy})
+		case constant.Runtime:
+			rootIndex := path.Join("/www/sites", website.Alias, "index")
+			server.UpdateRoot(rootIndex)
+			localPath := ""
+			if website.ProxyType == constant.RuntimeProxyUnix {
+				localPath = path.Join(nginxInstall.Install.GetPath(), rootIndex, "index.php")
+			}
+			server.UpdatePHPProxy([]string{website.Proxy}, localPath)
 		}
 		website.Status = constant.WebRunning
 		now := time.Now()
@@ -445,4 +558,23 @@ func opWebsite(website *model.Website, operate string) error {
 		return err
 	}
 	return nginxCheckAndReload(nginxInstall.SiteConfig.OldContent, config.FilePath, nginxInstall.Install.ContainerName)
+}
+
+func checkIsLinkApp(website model.Website) bool {
+	if website.Type == constant.Deployment {
+		return true
+	}
+	if website.Type == constant.Runtime {
+		runtime, _ := runtimeRepo.GetFirst(commonRepo.WithByID(website.RuntimeID))
+		return runtime.Resource == constant.ResourceAppstore
+	}
+	return false
+}
+
+func chownRootDir(path string) error {
+	_, err := cmd.ExecWithTimeOut(fmt.Sprintf("chown -R 1000:1000 %s", path), 1*time.Second)
+	if err != nil {
+		return err
+	}
+	return nil
 }

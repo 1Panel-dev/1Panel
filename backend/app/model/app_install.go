@@ -2,6 +2,7 @@ package model
 
 import (
 	"path"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/backend/constant"
 )
@@ -26,9 +27,21 @@ type AppInstall struct {
 }
 
 func (i *AppInstall) GetPath() string {
-	return path.Join(constant.AppInstallDir, i.App.Key, i.Name)
+	return path.Join(i.getAppPath(), i.Name)
 }
 
 func (i *AppInstall) GetComposePath() string {
-	return path.Join(constant.AppInstallDir, i.App.Key, i.Name, "docker-compose.yml")
+	return path.Join(i.getAppPath(), i.Name, "docker-compose.yml")
+}
+
+func (i *AppInstall) GetEnvPath() string {
+	return path.Join(i.getAppPath(), i.Name, ".env")
+}
+
+func (i *AppInstall) getAppPath() string {
+	if i.App.Resource == constant.AppResourceLocal {
+		return path.Join(constant.LocalAppInstallDir, strings.TrimPrefix(i.App.Key, constant.AppResourceLocal))
+	} else {
+		return path.Join(constant.AppInstallDir, i.App.Key)
+	}
 }

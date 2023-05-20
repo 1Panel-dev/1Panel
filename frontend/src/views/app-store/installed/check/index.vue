@@ -15,7 +15,9 @@
                         <template #label>
                             <a href="javascript:void(0);" @click="toPage(item[0])">{{ $t('app.' + item[0]) }}</a>
                         </template>
-                        {{ map.get(item[0]).toString() }}
+                        <span style="word-break: break-all">
+                            {{ map.get(item[0]).toString() }}
+                        </span>
                     </el-descriptions-item>
                 </el-descriptions>
             </el-col>

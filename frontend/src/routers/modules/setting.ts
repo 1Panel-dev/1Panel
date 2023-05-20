@@ -48,16 +48,6 @@ const settingRouter = {
                     },
                 },
                 {
-                    path: 'monitor',
-                    name: 'Monitor',
-                    component: () => import('@/views/setting/monitor/index.vue'),
-                    hidden: true,
-                    meta: {
-                        requiresAuth: true,
-                        activeMenu: 'Setting',
-                    },
-                },
-                {
                     path: 'safe',
                     name: 'Safe',
                     component: () => import('@/views/setting/safe/index.vue'),

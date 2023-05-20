@@ -26,6 +26,7 @@ html.dark {
     --panel-popup-color: #060708;
     --panel-alert-bg: #2f3030;
     --panel-path-bg: #2f3030;
+    --panel-button-disabled: #5a5a5a;
 
     .el-tag.el-tag--info {
         --el-tag-bg-color: rgb(49, 51, 51);
@@ -78,6 +79,10 @@ html.dark {
     // * wangEditor
     --w-e-textarea-bg-color: #1b1b1b;
     --w-e-textarea-color: #eeeeee;
+
+    .md-editor-dark {
+        --md-bk-color: #111417;
+    }
 
     // * 以下为自定义暗黑模式内容
     // login
@@ -202,8 +207,12 @@ html.dark {
         background: #1d2023;
         border-color: #303438;
     }
+    .el-button.is-link.is-disabled {
+        color: var(--panel-button-disabled) !important;
+    }
     .el-button.is-disabled {
         border-color: #303438;
+        color: var(--panel-button-disabled);
     }
     .el-popper.is-dark {
         color: rgb(171 173 173);

@@ -2,7 +2,7 @@
     <div>
         <el-drawer v-model="logVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
             <template #header>
-                <DrawerHeader :header="$t('commons.button.log')" :back="handleClose" />
+                <DrawerHeader :header="$t('commons.button.log')" :resource="logSearch.container" :back="handleClose" />
             </template>
             <div>
                 <el-select @change="searchLogs" style="width: 30%; float: left" v-model="logSearch.mode">
@@ -44,7 +44,7 @@
 import { logContainer } from '@/api/modules/container';
 import i18n from '@/lang';
 import { dateFormatForName } from '@/utils/util';
-import { nextTick, reactive, ref, shallowRef } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -134,6 +134,11 @@ const acceptParams = (props: DialogProps): void => {
         }
     }, 1000 * 5);
 };
+
+onBeforeUnmount(() => {
+    clearInterval(Number(timer));
+    timer = null;
+});
 
 defineExpose({
     acceptParams,

@@ -31,7 +31,7 @@ func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/domains/del", baseApi.DeleteWebDomain)
 		groupRouter.POST("/domains", baseApi.CreateWebDomain)
 
-		groupRouter.GET("/:id/nginx", baseApi.GetWebsiteNginx)
+		groupRouter.GET("/:id/config/:type", baseApi.GetWebsiteNginx)
 		groupRouter.POST("/config", baseApi.GetNginxConfig)
 		groupRouter.POST("/config/update", baseApi.UpdateNginxConfig)
 		groupRouter.POST("/nginx/update", baseApi.UpdateWebsiteNginxConfig)
@@ -41,5 +41,22 @@ func (a *WebsiteRouter) InitWebsiteRouter(Router *gin.RouterGroup) {
 
 		groupRouter.POST("/waf/config", baseApi.GetWebsiteWafConfig)
 		groupRouter.POST("/waf/update", baseApi.UpdateWebsiteWafConfig)
+
+		groupRouter.GET("/php/config/:id", baseApi.GetWebsitePHPConfig)
+		groupRouter.POST("/php/config", baseApi.UpdateWebsitePHPConfig)
+		groupRouter.POST("/php/update", baseApi.UpdatePHPFile)
+
+		groupRouter.POST("/rewrite", baseApi.GetRewriteConfig)
+		groupRouter.POST("/rewrite/update", baseApi.UpdateRewriteConfig)
+
+		groupRouter.POST("/dir/update", baseApi.UpdateSiteDir)
+		groupRouter.POST("/dir/permission", baseApi.UpdateSiteDirPermission)
+
+		groupRouter.POST("/proxies", baseApi.GetProxyConfig)
+		groupRouter.POST("/proxies/update", baseApi.UpdateProxyConfig)
+		groupRouter.POST("/proxies/file", baseApi.UpdateProxyConfigFile)
+
+		groupRouter.POST("/auths", baseApi.GetAuthConfig)
+		groupRouter.POST("/auths/update", baseApi.UpdateAuthConfig)
 	}
 }

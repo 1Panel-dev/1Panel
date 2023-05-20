@@ -7,7 +7,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/gogf/gf/os/gproc"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
 
 const ntpEpochOffset = 2208988800
@@ -30,7 +30,7 @@ type packet struct {
 	TxTimeFrac     uint32
 }
 
-func Getremotetime() (time.Time, error) {
+func GetRemoteTime() (time.Time, error) {
 	conn, err := net.Dial("udp", "pool.ntp.org:123")
 	if err != nil {
 		return time.Time{}, fmt.Errorf("failed to connect: %v", err)
@@ -62,10 +62,10 @@ func Getremotetime() (time.Time, error) {
 func UpdateSystemDate(dateTime string) error {
 	system := runtime.GOOS
 	if system == "linux" {
-		if _, err := gproc.ShellExec(`date -s  "` + dateTime + `"`); err != nil {
+		if _, err := cmd.Execf(`date -s  "` + dateTime + `"`); err != nil {
 			return fmt.Errorf("update system date failed, err: %v", err)
 		}
 		return nil
 	}
-	return fmt.Errorf("The current system architecture does not support synchronization")
+	return fmt.Errorf("the current system architecture %v does not support synchronization", system)
 }

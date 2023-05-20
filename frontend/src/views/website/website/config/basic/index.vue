@@ -12,17 +12,26 @@
         <el-tab-pane :label="$t('website.rate')">
             <LimitConn :id="id" v-if="tabIndex == '3'"></LimitConn>
         </el-tab-pane>
+        <el-tab-pane :label="$t('website.proxy')">
+            <Proxy :id="id" v-if="tabIndex == '4'"></Proxy>
+        </el-tab-pane>
+        <el-tab-pane :label="$t('website.basicAuth')">
+            <AuthBasic :id="id" v-if="tabIndex == '5'"></AuthBasic>
+        </el-tab-pane>
         <el-tab-pane :label="'HTTPS'">
-            <HTTPS :id="id" v-if="tabIndex == '4'"></HTTPS>
+            <HTTPS :id="id" v-if="tabIndex == '6'"></HTTPS>
+        </el-tab-pane>
+        <el-tab-pane :label="$t('website.rewrite')">
+            <Rewrite :id="id" v-if="tabIndex == '7'"></Rewrite>
         </el-tab-pane>
         <el-tab-pane :label="$t('website.other')">
-            <Other :id="id" v-if="tabIndex == '5'"></Other>
+            <Other :id="id" v-if="tabIndex == '8'"></Other>
         </el-tab-pane>
     </el-tabs>
 </template>
 
 <script lang="ts" setup name="Basic">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 import Doamin from './domain/index.vue';
 import Default from './default-doc/index.vue';
@@ -30,6 +39,9 @@ import LimitConn from './limit-conn/index.vue';
 import Other from './other/index.vue';
 import HTTPS from './https/index.vue';
 import SitePath from './site-folder/index.vue';
+import Rewrite from './rewrite/index.vue';
+import Proxy from './proxy/index.vue';
+import AuthBasic from './auth-basic/index.vue';
 
 const props = defineProps({
     id: {
@@ -37,10 +49,10 @@ const props = defineProps({
         default: -1,
     },
 });
-
 const id = computed(() => {
     return props.id;
 });
+const tabIndex = ref('0');
 
-let tabIndex = ref('0');
+onMounted(() => {});
 </script>

@@ -54,6 +54,8 @@ export namespace File {
         isLink?: boolean;
         isSymlink?: boolean;
         linkPath?: boolean;
+        sub?: boolean;
+        name?: string;
     }
 
     export interface FileDelete {
@@ -88,6 +90,13 @@ export namespace File {
     export interface FileRename {
         oldName: string;
         newName: string;
+    }
+
+    export interface FileOwner {
+        path: string;
+        user: string;
+        group: string;
+        sub: boolean;
     }
 
     export interface FileWget {

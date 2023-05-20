@@ -36,7 +36,22 @@
                         >
                             <el-input clearable type="textarea" v-model="dialogData.rowData!.privateKey" />
                         </el-form-item>
-                        <el-form-item :label="$t('terminal.port')" prop="port">
+                        <el-form-item
+                            :label="$t('terminal.keyPassword')"
+                            v-if="dialogData.rowData!.authMode === 'key'"
+                            prop="passPhrase"
+                        >
+                            <el-input
+                                type="password"
+                                show-password
+                                clearable
+                                v-model="dialogData.rowData!.passPhrase"
+                            />
+                        </el-form-item>
+                        <el-checkbox clearable v-model.number="dialogData.rowData!.rememberPassword">
+                            {{ $t('terminal.rememberPassword') }}
+                        </el-checkbox>
+                        <el-form-item style="margin-top: 10px" :label="$t('terminal.port')" prop="port">
                             <el-input clearable v-model.number="dialogData.rowData!.port" />
                         </el-form-item>
                         <el-form-item :label="$t('commons.table.group')" prop="groupID">
@@ -64,7 +79,7 @@
                     <el-button @click="submitAddHost(hostInfoRef, 'testconn')">
                         {{ $t('terminal.testConn') }}
                     </el-button>
-                    <el-button type="primary" @click="submitAddHost(hostInfoRef, dialogData.title)">
+                    <el-button type="primary" :disabled="!isOK" @click="submitAddHost(hostInfoRef, dialogData.title)">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>
@@ -74,15 +89,16 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, watch } from 'vue';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
-import { addHost, editHost, testByInfo, GetGroupList } from '@/api/modules/host';
+import { addHost, editHost, testByInfo } from '@/api/modules/host';
+import { GetGroupList } from '@/api/modules/group';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 
 const loading = ref();
-
+const isOK = ref(false);
 interface DialogProps {
     title: string;
     rowData?: any;
@@ -93,6 +109,15 @@ const drawerVisiable = ref(false);
 const dialogData = ref<DialogProps>({
     title: '',
 });
+
+watch(
+    () => dialogData.value.rowData,
+    () => {
+        isOK.value = false;
+    },
+    { deep: true },
+);
+
 const groupList = ref();
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
@@ -163,8 +188,10 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
             await testByInfo(dialogData.value.rowData).then((res) => {
                 loading.value = false;
                 if (res.data) {
+                    isOK.value = true;
                     MsgSuccess(i18n.global.t('terminal.connTestOk'));
                 } else {
+                    isOK.value = false;
                     MsgError(i18n.global.t('terminal.connTestFailed'));
                 }
             });

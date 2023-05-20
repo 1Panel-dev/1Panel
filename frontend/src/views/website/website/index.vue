@@ -13,6 +13,7 @@
                 <AppStatus
                     :app-key="'openresty'"
                     @setting="setting"
+                    v-model:mask-show="maskShow"
                     v-model:loading="loading"
                     @is-exist="checkExist"
                 ></AppStatus>
@@ -38,7 +39,7 @@
                                 @clear="search()"
                                 suffix-icon="Search"
                                 @keyup.enter="search()"
-                                @blur="search()"
+                                @change="search()"
                                 :placeholder="$t('commons.button.search')"
                             ></el-input>
                         </div>
@@ -75,9 +76,19 @@
                         <template #default="{ row }">
                             {{ $t('website.' + row.type) }}
                             <span v-if="row.type === 'deployment'">[{{ row.appName }}]</span>
+                            <span v-if="row.type === 'runtime'">[{{ row.runtimeName }}]</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" prop="status">
+                    <el-table-column :label="$t('website.sitePath')" prop="sitePath">
+                        <template #default="{ row }">
+                            <el-button type="primary" link @click="toFolder(row.sitePath)">
+                                <el-icon>
+                                    <FolderOpened />
+                                </el-icon>
+                            </el-button>
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('commons.table.status')" prop="status" width="100px">
                         <template #default="{ row }">
                             <el-button
                                 v-if="row.status === 'Running'"
@@ -93,12 +104,12 @@
                             </el-button>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.remark')" fix prop="remark">
+                    <el-table-column :label="$t('website.remark')" prop="remark">
                         <template #default="{ row }">
-                            <MsgInfo :info="row.remark" width="120" />
+                            <MsgInfo :info="row.remark" />
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('website.protocol')" prop="protocol"></el-table-column>
+                    <el-table-column :label="$t('website.protocol')" prop="protocol" width="90px"></el-table-column>
                     <el-table-column :label="$t('website.expireDate')">
                         <template #default="{ row, $index }">
                             <div v-show="row.showdate">
@@ -130,14 +141,14 @@
                     </el-table-column>
                     <fu-table-operations
                         :ellipsis="10"
-                        width="260px"
+                        width="400px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         fixed="right"
                         fix
                     />
                 </ComplexTable>
-                <el-card width="30%" v-if="nginxStatus != 'Running'" class="mask-prompt">
+                <el-card width="30%" v-if="nginxStatus != 'Running' && maskShow" class="mask-prompt">
                     <span>{{ $t('commons.service.serviceNotStarted', ['OpenResty']) }}</span>
                 </el-card>
             </template>
@@ -145,10 +156,10 @@
         <NginxConfig v-if="openNginxConfig" v-loading="loading" :containerName="containerName" :status="nginxStatus" />
         <CreateWebSite ref="createRef" @close="search" />
         <DeleteWebsite ref="deleteRef" @close="search" />
-        <WebSiteGroup ref="groupRef" />
         <UploadDialog ref="uploadRef" />
         <Backups ref="dialogBackupRef" />
         <DefaultServer ref="defaultRef" />
+        <GroupDialog @search="listGroup" ref="groupRef" />
     </div>
 </template>
 
@@ -163,8 +174,8 @@ import ComplexTable from '@/components/complex-table/index.vue';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import CreateWebSite from './create/index.vue';
 import DeleteWebsite from './delete/index.vue';
-import WebSiteGroup from './group/index.vue';
-import { ListGroups, OpWebsite, SearchWebsites, UpdateWebsite } from '@/api/modules/website';
+import GroupDialog from '@/components/group/index.vue';
+import { OpWebsite, SearchWebsites, UpdateWebsite } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import AppStatus from '@/components/app-status/index.vue';
 import NginxConfig from './nginx/index.vue';
@@ -177,6 +188,8 @@ import { MsgSuccess } from '@/utils/message';
 import { useI18n } from 'vue-i18n';
 import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
 import MsgInfo from '@/components/msg-info/index.vue';
+import { GetGroupList } from '@/api/modules/group';
+import { Group } from '@/api/interface/group';
 
 const shortcuts = [
     {
@@ -196,30 +209,31 @@ const shortcuts = [
 ];
 
 const loading = ref(false);
+const maskShow = ref(true);
 const createRef = ref();
 const deleteRef = ref();
 const groupRef = ref();
-let openNginxConfig = ref(false);
-let nginxIsExist = ref(false);
-let containerName = ref('');
-let nginxStatus = ref('');
-let installPath = ref('');
+const openNginxConfig = ref(false);
+const nginxIsExist = ref(false);
+const containerName = ref('');
+const nginxStatus = ref('');
+const installPath = ref('');
 const uploadRef = ref();
 const dialogBackupRef = ref();
 const defaultRef = ref();
 const data = ref();
 let dateRefs: Map<number, any> = new Map();
-let groups = ref<Website.Group[]>([]);
+let groups = ref<Group.GroupInfo[]>([]);
 
 const paginationConfig = reactive({
     currentPage: 1,
-    pageSize: 15,
+    pageSize: 10,
     total: 0,
 });
 let req = reactive({
     name: '',
     page: 1,
-    pageSize: 15,
+    pageSize: 10,
     websiteGroupId: 0,
 });
 
@@ -238,9 +252,8 @@ const search = async () => {
 };
 
 const listGroup = async () => {
-    await ListGroups().then((res) => {
-        groups.value = res.data;
-    });
+    const res = await GetGroupList({ type: 'website' });
+    groups.value = res.data;
 };
 
 const setting = () => {
@@ -249,6 +262,10 @@ const setting = () => {
 
 const openConfig = (id: number) => {
     router.push({ name: 'WebsiteConfig', params: { id: id, tab: 'basic' } });
+};
+
+const openWAF = (id: number) => {
+    router.push({ name: 'WebsiteConfig', params: { id: id, tab: 'safety' } });
 };
 
 const isEver = (time: string) => {
@@ -310,6 +327,7 @@ const submitDate = (row: any) => {
     UpdateWebsite(req).then(() => {
         row.change = true;
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+        search();
     });
 };
 
@@ -318,6 +336,12 @@ const buttons = [
         label: i18n.global.t('website.config'),
         click: function (row: Website.Website) {
             openConfig(row.id);
+        },
+    },
+    {
+        label: 'WAF',
+        click: function (row: Website.Website) {
+            openWAF(row.id);
         },
     },
     {
@@ -359,7 +383,7 @@ const openCreate = () => {
 };
 
 const openGroup = () => {
-    groupRef.value.acceptParams();
+    groupRef.value.acceptParams({ type: 'website' });
 };
 
 const openDefault = () => {
@@ -387,6 +411,10 @@ const opWebsite = (op: string, id: number) => {
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
     });
+};
+
+const toFolder = (folder: string) => {
+    router.push({ path: '/hosts/files', query: { path: folder } });
 };
 
 onMounted(() => {

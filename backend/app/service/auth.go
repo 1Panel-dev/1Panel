@@ -1,9 +1,7 @@
 package service
 
 import (
-	"fmt"
 	"strconv"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
@@ -19,33 +17,15 @@ import (
 type AuthService struct{}
 
 type IAuthService interface {
-	SafetyStatus(c *gin.Context) error
-	CheckIsFirst() bool
-	InitUser(c *gin.Context, req dto.InitUser) error
+	CheckIsSafety(code string) bool
 	VerifyCode(code string) (bool, error)
-	SafeEntrance(c *gin.Context, code string) error
 	Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error)
 	LogOut(c *gin.Context) error
+	MFALogin(c *gin.Context, info dto.MFALogin) (*dto.UserLoginInfo, error)
 }
 
 func NewIAuthService() IAuthService {
 	return &AuthService{}
-}
-
-func (u *AuthService) SafeEntrance(c *gin.Context, code string) error {
-	codeWithMD5 := encrypt.Md5(code)
-	cookieValue, _ := encrypt.StringEncrypt(codeWithMD5)
-	c.SetCookie(codeWithMD5, cookieValue, 604800, "", "", false, false)
-
-	expiredSetting, err := settingRepo.Get(settingRepo.WithByKey("ExpirationDays"))
-	if err != nil {
-		return err
-	}
-	timeout, _ := strconv.Atoi(expiredSetting.Value)
-	if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006-01-02 15:04:05")); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (u *AuthService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error) {
@@ -86,9 +66,9 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin) (*dto.UserLogi
 	}
 	pass, err := encrypt.StringDecrypt(passwrodSetting.Value)
 	if err != nil {
-		return nil, constant.ErrAuth
+		return nil, err
 	}
-	if info.Password != pass && nameSetting.Value != info.Name {
+	if info.Password != pass || nameSetting.Value != info.Name {
 		return nil, constant.ErrAuth
 	}
 
@@ -118,7 +98,7 @@ func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (
 		j := jwt.NewJWT()
 		claims := j.CreateClaims(jwt.BaseClaims{
 			Name: name,
-		}, lifeTime)
+		})
 		token, err := j.CreateToken(claims)
 		if err != nil {
 			return nil, err
@@ -163,57 +143,13 @@ func (u *AuthService) VerifyCode(code string) (bool, error) {
 	return setting.Value == code, nil
 }
 
-func (u *AuthService) SafetyStatus(c *gin.Context) error {
-	setting, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntrance"))
+func (u *AuthService) CheckIsSafety(code string) bool {
+	status, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntrance"))
 	if err != nil {
-		return err
+		return false
 	}
-	codeWithEcrypt, err := c.Cookie(encrypt.Md5(setting.Value))
-	if err != nil {
-		return err
+	if len(status.Value) == 0 {
+		return true
 	}
-	code, err := encrypt.StringDecrypt(codeWithEcrypt)
-	if err != nil {
-		return err
-	}
-	if code != encrypt.Md5(setting.Value) {
-		return errors.New("code not match")
-	}
-	return nil
-}
-
-func (u *AuthService) CheckIsFirst() bool {
-	user, _ := settingRepo.Get(settingRepo.WithByKey("UserName"))
-	pass, _ := settingRepo.Get(settingRepo.WithByKey("Password"))
-	return len(user.Value) == 0 || len(pass.Value) == 0
-}
-
-func (u *AuthService) InitUser(c *gin.Context, req dto.InitUser) error {
-	user, _ := settingRepo.Get(settingRepo.WithByKey("UserName"))
-	pass, _ := settingRepo.Get(settingRepo.WithByKey("Password"))
-	if len(user.Value) == 0 || len(pass.Value) == 0 {
-		newPass, err := encrypt.StringEncrypt(req.Password)
-		if err != nil {
-			return err
-		}
-		if err := settingRepo.Update("UserName", req.Name); err != nil {
-			return err
-		}
-		if err := settingRepo.Update("Password", newPass); err != nil {
-			return err
-		}
-		expiredSetting, err := settingRepo.Get(settingRepo.WithByKey("ExpirationDays"))
-		if err != nil {
-			return err
-		}
-		timeout, _ := strconv.Atoi(expiredSetting.Value)
-		if timeout != 0 {
-			if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006-01-02 15:04:05")); err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-
-	return fmt.Errorf("can't init user because user %s is in system", user.Value)
+	return status.Value == code
 }

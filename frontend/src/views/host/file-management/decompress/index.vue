@@ -7,7 +7,7 @@
         size="40%"
     >
         <template #header>
-            <DrawerHeader :header="$t('file.deCompress')" :back="handleClose" />
+            <DrawerHeader :header="$t('file.deCompress')" :resource="name" :back="handleClose" />
         </template>
         <el-row>
             <el-col :span="22" :offset="1">

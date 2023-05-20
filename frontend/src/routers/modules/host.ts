@@ -21,10 +21,21 @@ const hostRouter = {
             },
         },
         {
-            path: '/hosts/monitor',
+            path: '/hosts/monitor/monitor',
             name: 'Monitorx',
-            component: () => import('@/views/host/monitor/index.vue'),
+            component: () => import('@/views/host/monitor/monitor/index.vue'),
             meta: {
+                title: 'menu.monitor',
+                requiresAuth: false,
+            },
+        },
+        {
+            path: '/hosts/monitor/setting',
+            name: 'MonitorSetting',
+            component: () => import('@/views/host/monitor/setting/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/hosts/monitor/monitor',
                 title: 'menu.monitor',
                 requiresAuth: false,
             },
@@ -36,6 +47,46 @@ const hostRouter = {
             meta: {
                 title: 'menu.terminal',
                 keepAlive: true,
+                requiresAuth: false,
+            },
+        },
+        {
+            path: '/hosts/firewall/port',
+            name: 'FirewallPort',
+            component: () => import('@/views/host/firewall/port/index.vue'),
+            meta: {
+                title: 'menu.firewall',
+                requiresAuth: false,
+            },
+        },
+        {
+            path: '/hosts/firewall/ip',
+            name: 'FirewallIP',
+            component: () => import('@/views/host/firewall/ip/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/hosts/firewall/port',
+                requiresAuth: false,
+            },
+        },
+        {
+            path: '/hosts/ssh/ssh',
+            name: 'SSH',
+            component: () => import('@/views/host/ssh/ssh/index.vue'),
+            meta: {
+                title: 'menu.ssh',
+                activeMenu: '/hosts/ssh/ssh',
+                keepAlive: true,
+                requiresAuth: false,
+            },
+        },
+        {
+            path: '/hosts/ssh/log',
+            name: 'SSHLog',
+            component: () => import('@/views/host/ssh/log/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/hosts/ssh/ssh',
                 requiresAuth: false,
             },
         },

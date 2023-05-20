@@ -3,7 +3,7 @@ package v1
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"path"
@@ -186,7 +186,29 @@ func (b *BaseApi) ChangeFileMode(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, nil)
+	helper.SuccessWithOutData(c)
+}
+
+// @Tags File
+// @Summary Change file owner
+// @Description 修改文件用户/组
+// @Accept json
+// @Param request body request.FileRoleUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /files/owner [post]
+// @x-panel-log {"bodyKeys":["path","user","group"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"修改用户/组 [paths] => [user]/[group]","formatEN":"Change owner [paths] => [user]/[group]"}
+func (b *BaseApi) ChangeFileOwner(c *gin.Context) {
+	var req request.FileRoleUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := fileService.ChangeOwner(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
 }
 
 // @Tags File
@@ -449,7 +471,7 @@ func (b *BaseApi) Download(c *gin.Context) {
 // @Summary Download file with path
 // @Description 下载指定文件
 // @Accept json
-// @Param request body request.FilePath true "request"
+// @Param request body dto.FilePath true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /files/download/bypath [post]
@@ -498,7 +520,6 @@ func (b *BaseApi) Size(c *gin.Context) {
 // @Success 200 {string} content
 // @Security ApiKeyAuth
 // @Router /files/loadfile [post]
-// @x-panel-log {"bodyKeys":["path"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"读取文件 [path]","formatEN":"Read file [path]"}
 func (b *BaseApi) LoadFromFile(c *gin.Context) {
 	var req dto.FilePath
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -510,7 +531,7 @@ func (b *BaseApi) LoadFromFile(c *gin.Context) {
 		return
 	}
 
-	content, err := ioutil.ReadFile(req.Path)
+	content, err := os.ReadFile(req.Path)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
@@ -519,6 +540,12 @@ func (b *BaseApi) LoadFromFile(c *gin.Context) {
 }
 
 func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int) error {
+	if _, err := os.Stat(path.Dir(dstDir)); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(path.Dir(dstDir), os.ModePerm); err != nil {
+			return err
+		}
+	}
+
 	targetFile, err := os.Create(filepath.Join(dstDir, fileName))
 	if err != nil {
 		return err
@@ -527,7 +554,7 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int)
 
 	for i := 0; i < chunkCount; i++ {
 		chunkPath := filepath.Join(fileDir, fmt.Sprintf("%s.%d", fileName, i))
-		chunkData, err := ioutil.ReadFile(chunkPath)
+		chunkData, err := os.ReadFile(chunkPath)
 		if err != nil {
 			return err
 		}
@@ -547,7 +574,6 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int)
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /files/chunkupload [post]
-// @x-panel-log {"bodyKeys":["path"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"上传文件 [path]","formatEN":"Upload file [path]"}
 func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 	fileForm, err := c.FormFile("chunk")
 	if err != nil {
@@ -573,13 +599,16 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 	}
 
 	fileOp := files.NewFileOp()
-	if err := fileOp.CreateDir("uploads", 0755); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
+	tmpDir := path.Join(global.CONF.System.TmpDir, "upload")
+	if !fileOp.Stat(tmpDir) {
+		if err := fileOp.CreateDir(tmpDir, 0755); err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+			return
+		}
 	}
-	//fileID := uuid.New().String()
+
 	filename := c.PostForm("filename")
-	fileDir := filepath.Join(global.CONF.System.DataDir, "upload", filename)
+	fileDir := filepath.Join(tmpDir, filename)
 
 	_ = os.MkdirAll(fileDir, 0755)
 	filePath := filepath.Join(fileDir, filename)
@@ -589,25 +618,25 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	emptyFile.Close()
+	defer emptyFile.Close()
 
-	chunkData, err := ioutil.ReadAll(uploadFile)
+	chunkData, err := io.ReadAll(uploadFile)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrFileUpload, err)
 		return
 	}
 
 	chunkPath := filepath.Join(fileDir, fmt.Sprintf("%s.%d", filename, chunkIndex))
-	err = ioutil.WriteFile(chunkPath, chunkData, 0644)
+	err = os.WriteFile(chunkPath, chunkData, 0644)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrFileUpload, err)
 		return
 	}
 
 	if chunkIndex+1 == chunkCount {
 		err = mergeChunks(filename, fileDir, c.PostForm("path"), chunkCount)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrAppDelete, err)
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrFileUpload, err)
 			return
 		}
 		helper.SuccessWithData(c, true)

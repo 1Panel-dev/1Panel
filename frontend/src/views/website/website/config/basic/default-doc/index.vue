@@ -1,7 +1,7 @@
 <template>
     <el-row :gutter="20" v-loading="loading">
         <el-col :span="8" :offset="1">
-            <el-form ref="defaultForm" label-position="top" :model="defaultModel" :rules="rules">
+            <el-form @submit.prevent ref="defaultForm" label-position="top" :model="defaultModel" :rules="rules">
                 <el-form-item :label="$t('website.defaultDoc')" prop="index">
                     <el-input
                         v-model="defaultModel.index"

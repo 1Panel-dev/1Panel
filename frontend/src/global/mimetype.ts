@@ -1,4 +1,5 @@
 import { CompressType } from '@/enums/files';
+import i18n from '@/lang';
 
 export const Mimetypes = new Map([
     ['application/zip', CompressType.Zip],
@@ -19,62 +20,104 @@ export const Mimetypes = new Map([
 export const Languages = [
     {
         label: 'plaintext',
-        value: 'plaintext',
+        value: ['txt'],
     },
     {
         label: 'json',
-        value: 'json',
-    },
-    {
-        label: 'go',
-        value: 'go',
-    },
-    {
-        label: 'html',
-        value: 'html',
-    },
-    {
-        label: 'javascript',
-        value: 'javascript',
-    },
-    {
-        label: 'java',
-        value: 'java',
-    },
-    {
-        label: 'kotlin',
-        value: 'kotlin',
+        value: ['json'],
     },
     {
         label: 'markdown',
-        value: 'markdown',
-    },
-    {
-        label: 'mysql',
-        value: 'mysql',
-    },
-    {
-        label: 'php',
-        value: 'php',
-    },
-    {
-        label: 'redis',
-        value: 'redis',
-    },
-    {
-        label: 'shell',
-        value: 'shell',
-    },
-    {
-        label: 'sql',
-        value: 'sql',
+        value: ['md'],
     },
     {
         label: 'yaml',
-        value: 'yaml',
+        value: ['yml', 'yaml'],
+    },
+    {
+        label: 'php',
+        value: ['php'],
+    },
+    {
+        label: 'sql',
+        value: ['sql'],
+    },
+    {
+        label: 'go',
+        value: ['go'],
+    },
+    {
+        label: 'html',
+        value: ['html'],
+    },
+    {
+        label: 'javascript',
+        value: ['js'],
+    },
+    {
+        label: 'java',
+        value: ['java'],
+    },
+    {
+        label: 'kotlin',
+        value: ['kt'],
+    },
+    {
+        label: 'python',
+        value: ['py'],
+    },
+    {
+        label: 'redis',
+        value: ['redis'],
+    },
+    {
+        label: 'shell',
+        value: ['sh'],
     },
     {
         label: 'css',
-        value: 'css',
+        value: ['css'],
     },
+];
+
+export const Rewrites = [
+    'default',
+    'wordpress',
+    'wp2',
+    'typecho',
+    'typecho2',
+    'thinkphp',
+    'laravel5',
+    'discuz',
+    'discuzx',
+    'discuzx2',
+    'discuzx3',
+    'EduSoho',
+    'EmpireCMS',
+    'ShopWind',
+    'crmeb',
+    'dabr',
+    'dbshop',
+    'dedecms',
+    'drupal',
+    'ecshop',
+    'emlog',
+    'maccms',
+    'mvc',
+    'niushop',
+    'phpcms',
+    'sablog',
+    'seacms',
+    'shopex',
+    'zblog',
+];
+
+export const Units = [
+    { label: i18n.global.t('commons.units.second'), value: 's' },
+    { label: i18n.global.t('commons.units.miniute'), value: 'm' },
+    { label: i18n.global.t('commons.units.hour'), value: 'h' },
+    { label: i18n.global.t('commons.units.day'), value: 'd' },
+    { label: i18n.global.t('commons.units.week'), value: 'w' },
+    { label: i18n.global.t('commons.units.month'), value: 'M' },
+    { label: i18n.global.t('commons.units.year'), value: 'Y' },
 ];

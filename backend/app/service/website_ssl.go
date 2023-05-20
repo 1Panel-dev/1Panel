@@ -27,6 +27,7 @@ type IWebsiteSSLService interface {
 	GetDNSResolve(req request.WebsiteDNSReq) ([]response.WebsiteDNSRes, error)
 	GetWebsiteSSL(websiteId uint) (response.WebsiteSSLDTO, error)
 	Delete(id uint) error
+	Update(update request.WebsiteSSLUpdate) error
 }
 
 func NewIWebsiteSSLService() IWebsiteSSLService {
@@ -82,6 +83,8 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		return res, err
 	}
 
+	var websiteSSL model.WebsiteSSL
+
 	switch create.Provider {
 	case constant.DNSAccount:
 		dnsAccount, err := websiteDnsRepo.GetFirst(commonRepo.WithByID(create.DnsAccountID))
@@ -91,6 +94,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		if err := client.UseDns(ssl.DnsType(dnsAccount.Type), dnsAccount.Authorization); err != nil {
 			return res, err
 		}
+		websiteSSL.AutoRenew = create.AutoRenew
 	case constant.Http:
 		appInstall, err := getAppInstallByKey(constant.AppOpenresty)
 		if err != nil {
@@ -99,6 +103,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		if err := client.UseHTTP(path.Join(constant.AppInstallDir, constant.AppOpenresty, appInstall.Name, "root")); err != nil {
 			return res, err
 		}
+		websiteSSL.AutoRenew = create.AutoRenew
 	case constant.DnsManual:
 		if err := client.UseManualDns(); err != nil {
 			return res, err
@@ -114,7 +119,7 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 	if err != nil {
 		return res, err
 	}
-	var websiteSSL model.WebsiteSSL
+
 	websiteSSL.DnsAccountID = create.DnsAccountID
 	websiteSSL.AcmeAccountID = acmeAccount.ID
 	websiteSSL.Provider = create.Provider
@@ -257,4 +262,13 @@ func (w WebsiteSSLService) Delete(id uint) error {
 		return buserr.New(constant.ErrSSLCannotDelete)
 	}
 	return websiteSSLRepo.DeleteBy(commonRepo.WithByID(id))
+}
+
+func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
+	websiteSSL, err := websiteSSLRepo.GetFirst(commonRepo.WithByID(update.ID))
+	if err != nil {
+		return err
+	}
+	websiteSSL.AutoRenew = update.AutoRenew
+	return websiteSSLRepo.Save(websiteSSL)
 }

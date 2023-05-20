@@ -15,7 +15,6 @@
             :auto-upload="false"
             ref="uploadRef"
             :on-change="fileOnChange"
-            v-loading="loading"
             :limit="1"
             :on-exceed="handleExceed"
         >
@@ -24,12 +23,14 @@
                 {{ $t('database.dropHelper') }}
                 <em>{{ $t('database.clickHelper') }}</em>
             </div>
+            <template #tip>
+                <el-progress v-if="loading" text-inside :stroke-width="12" :percentage="uploadPrecent"></el-progress>
+            </template>
         </el-upload>
-        <el-progress v-if="loading" :text-inside="true" :stroke-width="26" :percentage="uploadPrecent"></el-progress>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit()" :disabled="loading">
+                <el-button type="primary" @click="submit()" :disabled="loading || uploaderFiles.length == 0">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -53,8 +54,8 @@ const uploadRef = ref<UploadInstance>();
 
 const loading = ref(false);
 let uploadPrecent = ref(0);
-let open = ref(false);
-let path = ref();
+const open = ref(false);
+const path = ref();
 
 const em = defineEmits(['close']);
 const handleClose = () => {
@@ -109,10 +110,12 @@ const submit = async () => {
             uploadedChunkCount++;
         } catch (error) {
             loading.value = false;
+            break;
         }
         if (uploadedChunkCount == chunkCount) {
             loading.value = false;
             uploadRef.value!.clearFiles();
+            uploaderFiles.value = [];
             MsgSuccess(i18n.global.t('file.uploadSuccess'));
         }
     }

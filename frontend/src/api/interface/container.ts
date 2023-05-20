@@ -27,8 +27,11 @@ export namespace Container {
         restartPolicy: string;
     }
     export interface Port {
-        containerPort: number;
-        hostPort: number;
+        host: string;
+        hostIP: string;
+        containerPort: string;
+        hostPort: string;
+        protocol: string;
     }
     export interface Volume {
         sourceDir: string;
@@ -42,7 +45,9 @@ export namespace Container {
         createTime: string;
         state: string;
         runTime: string;
-
+        cpuPercent: number;
+        memoryPercent: number;
+        ports: Array<string>;
         isFromApp: boolean;
         isFromCompose: boolean;
     }
@@ -203,6 +208,7 @@ export namespace Container {
         name: string;
         operation: string;
         path: string;
+        withFile: boolean;
     }
     export interface ComposeUpdate {
         name: string;
@@ -241,17 +247,16 @@ export namespace Container {
     export interface DaemonJsonUpdateByFile {
         file: string;
     }
-    export interface DockerOperate {
-        stopSocket: boolean;
-        stopService: boolean;
-        operation: string;
-    }
     export interface DaemonJsonConf {
+        isSwarm: boolean;
         status: string;
         version: string;
         registryMirrors: Array<string>;
         insecureRegistries: Array<string>;
         liveRestore: boolean;
+        iptables: boolean;
         cgroupDriver: string;
+        logMaxSize: string;
+        logMaxFile: string;
     }
 }

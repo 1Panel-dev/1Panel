@@ -8,7 +8,6 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/copier"
-	"github.com/1Panel-dev/1Panel/backend/utils/ssh"
 	"github.com/gin-gonic/gin"
 )
 
@@ -74,33 +73,9 @@ func (b *BaseApi) TestByInfo(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if req.AuthMode == "password" && len(req.Password) != 0 {
-		password, err := base64.StdEncoding.DecodeString(req.Password)
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		req.Password = string(password)
-	}
-	if req.AuthMode == "key" && len(req.PrivateKey) != 0 {
-		privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
-		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-			return
-		}
-		req.PrivateKey = string(privateKey)
-	}
 
-	var connInfo ssh.ConnInfo
-	_ = copier.Copy(&connInfo, &req)
-	connInfo.PrivateKey = []byte(req.PrivateKey)
-	client, err := connInfo.NewClient()
-	if err != nil {
-		helper.SuccessWithData(c, false)
-		return
-	}
-	defer client.Close()
-	helper.SuccessWithData(c, true)
+	connStatus := hostService.TestByInfo(req)
+	helper.SuccessWithData(c, connStatus)
 }
 
 // @Tags Host
@@ -270,11 +245,13 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 	upMap["port"] = req.Port
 	upMap["user"] = req.User
 	upMap["auth_mode"] = req.AuthMode
+	upMap["remember_password"] = req.RememberPassword
 	if len(req.Password) != 0 {
 		upMap["password"] = req.Password
 	}
 	if len(req.PrivateKey) != 0 {
 		upMap["private_key"] = req.PrivateKey
+		upMap["pass_phrase"] = req.PassPhrase
 	}
 	upMap["description"] = req.Description
 	if err := hostService.Update(req.ID, upMap); err != nil {
@@ -291,7 +268,7 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 // @Param request body dto.ChangeHostGroup true "request"
 // @Success 200
 // @Security ApiKeyAuth
-// @Router /hosts/update [post]
+// @Router /hosts/update/group [post]
 // @x-panel-log {"bodyKeys":["id","group"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"hosts","output_colume":"addr","output_value":"addr"}],"formatZH":"切换主机[addr]分组 => [group]","formatEN":"change host [addr] group => [group]"}
 func (b *BaseApi) UpdateHostGroup(c *gin.Context) {
 	var req dto.ChangeHostGroup

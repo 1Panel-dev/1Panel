@@ -1,5 +1,5 @@
 <template>
-    <LayoutContent v-loading="loading" v-if="!showDetail" :title="$t('app.app')" :divider="true">
+    <LayoutContent v-loading="loading" v-if="!showDetail" :title="$t('app.app')">
         <template #toolbar>
             <el-row :gutter="5">
                 <el-col :span="20">
@@ -31,8 +31,7 @@
                             clearable
                             @clear="searchByName('')"
                             suffix-icon="Search"
-                            @keyup.enter="searchByName(req.name)"
-                            @blur="searchByName(req.name)"
+                            @change="searchByName(req.name)"
                             :placeholder="$t('commons.button.search')"
                         ></el-input>
                     </div>
@@ -48,41 +47,51 @@
             <el-row :gutter="5">
                 <el-col v-for="(app, index) in apps" :key="index" :xs="12" :sm="12" :md="8" :lg="8" :xl="8">
                     <div class="app-card">
-                        <el-row :gutter="24">
-                            <el-col :xs="5" :sm="5" :md="6" :lg="6" :xl="5">
-                                <div class="app-icon">
-                                    <el-avatar shape="square" :size="60" :src="'data:image/png;base64,' + app.icon" />
-                                </div>
-                            </el-col>
-                            <el-col :xs="19" :sm="19" :md="18" :lg="18" :xl="19">
-                                <div class="app-content">
-                                    <div class="app-header">
-                                        <span class="app-title">{{ app.name }}</span>
-                                        <el-button
-                                            class="app-button"
-                                            type="primary"
-                                            plain
-                                            round
-                                            size="small"
-                                            @click="getAppDetail(app.key)"
-                                        >
-                                            {{ $t('app.install') }}
-                                        </el-button>
+                        <el-card class="e-card">
+                            <el-row :gutter="24">
+                                <el-col :xs="5" :sm="5" :md="6" :lg="6" :xl="5">
+                                    <div class="app-icon">
+                                        <el-avatar
+                                            shape="square"
+                                            :size="60"
+                                            :src="'data:image/png;base64,' + app.icon"
+                                        />
                                     </div>
-                                    <div class="app-desc">
-                                        <span class="desc">
-                                            {{ language == 'zh' ? app.shortDescZh : app.shortDescEn }}
-                                        </span>
+                                </el-col>
+                                <el-col :xs="19" :sm="19" :md="18" :lg="18" :xl="19">
+                                    <div class="app-content">
+                                        <div class="app-header">
+                                            <span class="app-title">{{ app.name }}</span>
+                                            <el-button
+                                                class="app-button"
+                                                type="primary"
+                                                plain
+                                                round
+                                                size="small"
+                                                @click="getAppDetail(app.key)"
+                                            >
+                                                {{ $t('app.install') }}
+                                            </el-button>
+                                        </div>
+                                        <div class="app-desc">
+                                            <span class="desc">
+                                                {{ language == 'zh' ? app.shortDescZh : app.shortDescEn }}
+                                            </span>
+                                        </div>
+                                        <div class="app-tag">
+                                            <el-tag v-for="(tag, ind) in app.tags" :key="ind" style="margin-right: 5px">
+                                                <span :style="{ color: getColor(ind) }">
+                                                    {{ language == 'zh' ? tag.name : tag.key }}
+                                                </span>
+                                            </el-tag>
+                                            <el-tag v-if="app.status === 'TakeDown'" style="margin-right: 5px">
+                                                <span style="color: red">已废弃</span>
+                                            </el-tag>
+                                        </div>
                                     </div>
-                                    <div class="app-tag">
-                                        <el-tag v-for="(tag, ind) in app.tags" :key="ind" :colr="getColor(ind)">
-                                            {{ language == 'zh' ? tag.name : tag.key }}
-                                        </el-tag>
-                                    </div>
-                                    <div class="divider"></div>
-                                </div>
-                            </el-col>
-                        </el-row>
+                                </el-col>
+                            </el-row>
+                        </el-card>
                     </div>
                 </el-col>
             </el-row>
@@ -113,7 +122,7 @@ let req = reactive({
 
 let apps = ref<App.App[]>([]);
 let tags = ref<App.Tag[]>([]);
-const colorArr = ['#6495ED', '#54FF9F', '#BEBEBE', '#FFF68F', '#FFFF00', '#8B0000'];
+const colorArr = ['#005eeb', '#008B45', '#BEBEBE', '#FFF68F', '#FFFF00', '#8B0000'];
 let loading = ref(false);
 let activeTag = ref('all');
 let showDetail = ref(false);
@@ -146,7 +155,7 @@ const sync = () => {
     loading.value = true;
     SyncApp()
         .then(() => {
-            MsgSuccess(i18n.global.t('app.syncSuccess'));
+            MsgSuccess(i18n.global.t('app.syncStart'));
             canUpdate.value = false;
             search(req);
         })
@@ -233,8 +242,13 @@ onMounted(() => {
             margin-top: 5px;
         }
     }
-    &:hover {
-        background-color: rgba(0, 94, 235, 0.03);
+
+    .e-card {
+        border: var(--panel-border) !important;
+        &:hover {
+            cursor: pointer;
+            border: 1px solid var(--el-color-primary) !important;
+        }
     }
 }
 

@@ -16,6 +16,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 )
 
 func getNginxFull(website *model.Website) (dto.NginxFull, error) {
@@ -160,6 +161,10 @@ func getNginxParamsFromStaticFile(scope dto.NginxKey, newParams []dto.NginxParam
 	switch scope {
 	case dto.SSL:
 		newConfig = parser.NewStringParser(string(nginx_conf.SSL)).Parse()
+	case dto.CACHE:
+		newConfig = parser.NewStringParser(string(nginx_conf.Cache)).Parse()
+	case dto.ProxyCache:
+		newConfig = parser.NewStringParser(string(nginx_conf.ProxyCache)).Parse()
 	}
 	for _, dir := range newConfig.GetDirectives() {
 		addParam := dto.NginxParam{
@@ -191,7 +196,7 @@ func opNginx(containerName, operate string) error {
 	if operate == constant.NginxCheck {
 		nginxCmd = fmt.Sprintf("docker exec -i %s %s", containerName, "nginx -t")
 	}
-	if out, err := cmd.Exec(nginxCmd); err != nil {
+	if out, err := cmd.ExecWithTimeOut(nginxCmd, 2*time.Second); err != nil {
 		return errors.New(out)
 	}
 	return nil

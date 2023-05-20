@@ -4,10 +4,10 @@
     </div>
     <div class="footer flx-justify-between">
         <div class="footer-left">
-            <a href="https://fit2cloud.com/" target="_blank">Copyright @2014-2023 FIT2CLOUND 飞致云</a>
+            <a href="https://fit2cloud.com/" target="_blank">Copyright © 2014-2023 FIT2CLOUD 飞致云</a>
         </div>
         <div class="footer-right">
-            <SystemUpgrade />
+            <SystemUpgrade :footer="true" />
         </div>
     </div>
 </template>

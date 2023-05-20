@@ -38,13 +38,15 @@ func (b *BaseApi) SearchApp(c *gin.Context) {
 // @Router /apps/sync [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"应用商店同步","formatEN":"App store synchronization"}
 func (b *BaseApi) SyncApp(c *gin.Context) {
-	global.LOG.Infof("sync app list start ...")
-	if err := appService.SyncAppList(); err != nil {
-		global.LOG.Errorf("sync app list error [%s]", err.Error())
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
-		return
-	}
-	global.LOG.Infof("sync app list success!")
+	go appService.SyncAppListFromLocal()
+	go func() {
+		global.LOG.Infof("sync app list start ...")
+		if err := appService.SyncAppListFromRemote(); err != nil {
+			global.LOG.Errorf("sync app list error [%s]", err.Error())
+		} else {
+			global.LOG.Infof("sync app list success!")
+		}
+	}()
 	helper.SuccessWithData(c, "")
 }
 
@@ -71,14 +73,15 @@ func (b *BaseApi) GetApp(c *gin.Context) {
 }
 
 // @Tags App
-// @Summary Search app detail by id
-// @Description 通过 id 获取应用详情
+// @Summary Search app detail by appid
+// @Description 通过 appid 获取应用详情
 // @Accept json
 // @Param appId path integer true "app id"
 // @Param version path string true "app 版本"
+// @Param version path string true "app 类型"
 // @Success 200 {object} response.AppDetailDTO
 // @Security ApiKeyAuth
-// @Router /apps/detail/:appId/:version [get]
+// @Router /apps/detail/:appId/:version/:type [get]
 func (b *BaseApi) GetAppDetail(c *gin.Context) {
 	appId, err := helper.GetIntParamByKey(c, "appId")
 	if err != nil {
@@ -86,7 +89,30 @@ func (b *BaseApi) GetAppDetail(c *gin.Context) {
 		return
 	}
 	version := c.Param("version")
-	appDetailDTO, err := appService.GetAppDetail(appId, version)
+	appType := c.Param("type")
+	appDetailDTO, err := appService.GetAppDetail(appId, version, appType)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, appDetailDTO)
+}
+
+// @Tags App
+// @Summary Get app detail by id
+// @Description 通过 id 获取应用详情
+// @Accept json
+// @Param appId path integer true "id"
+// @Success 200 {object} response.AppDetailDTO
+// @Security ApiKeyAuth
+// @Router /apps/details/:id [get]
+func (b *BaseApi) GetAppDetailByID(c *gin.Context) {
+	appDetailID, err := helper.GetIntParamByKey(c, "id")
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInternalServer, nil)
+		return
+	}
+	appDetailDTO, err := appService.GetAppDetailByID(appDetailID)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return

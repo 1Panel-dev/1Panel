@@ -1,11 +1,12 @@
 <template>
     <el-dialog
         v-model="open"
-        :title="$t('commons.button.edit')"
+        :title="$t('commons.button.edit') + ' - ' + fileName"
         :before-close="handleClose"
         destroy-on-close
         width="70%"
         @opened="onOpen"
+        :top="'5vh'"
     >
         <el-form :inline="true" :model="config">
             <el-form-item :label="$t('file.theme')">
@@ -15,12 +16,17 @@
             </el-form-item>
             <el-form-item :label="$t('file.language')">
                 <el-select v-model="config.language" @change="changeLanguage()">
-                    <el-option v-for="lang in Languages" :key="lang.label" :value="lang.value" :label="lang.label" />
+                    <el-option v-for="lang in Languages" :key="lang.label" :value="lang.label" :label="lang.label" />
+                </el-select>
+            </el-form-item>
+            <el-form-item :label="$t('file.eol')">
+                <el-select v-model="config.eol" @change="changeEOL()">
+                    <el-option v-for="eol in eols" :key="eol.label" :value="eol.value" :label="eol.label" />
                 </el-select>
             </el-form-item>
         </el-form>
-        <div class="coder-editor" v-loading="loading">
-            <div id="codeBox" style="height: 60vh"></div>
+        <div v-loading="loading">
+            <div id="codeBox" style="height: 55vh"></div>
         </div>
         <template #footer>
             <span class="dialog-footer">
@@ -74,15 +80,29 @@ interface EditProps {
 interface EditorConfig {
     theme: string;
     language: string;
+    eol: number;
 }
 
-let open = ref(false);
-let loading = ref(false);
+const open = ref(false);
+const loading = ref(false);
+const fileName = ref('');
 
-let config = reactive<EditorConfig>({
+const config = reactive<EditorConfig>({
     theme: 'vs-dark',
     language: 'plaintext',
+    eol: monaco.editor.EndOfLineSequence.LF,
 });
+
+const eols = [
+    {
+        label: 'LF (Linux)',
+        value: monaco.editor.EndOfLineSequence.LF,
+    },
+    {
+        label: 'CRLF (Windows)',
+        value: monaco.editor.EndOfLineSequence.CRLF,
+    },
+];
 
 const themes = [
     {
@@ -111,7 +131,7 @@ const handleClose = () => {
     if (editor) {
         editor.dispose();
     }
-    em('close', false);
+    em('close', open.value);
 };
 const changeLanguage = () => {
     monaco.editor.setModelLanguage(editor.getModel(), config.language);
@@ -119,6 +139,10 @@ const changeLanguage = () => {
 
 const changeTheme = () => {
     monaco.editor.setTheme(config.theme);
+};
+
+const changeEOL = () => {
+    editor.getModel().pushEOL(config.eol);
 };
 
 const initEditor = () => {
@@ -144,6 +168,9 @@ const initEditor = () => {
             }
         });
 
+        // After onDidChangeModelContent
+        editor.getModel().pushEOL(config.eol);
+
         editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, quickSave);
     });
 };
@@ -158,6 +185,9 @@ const saveContent = (closePage: boolean) => {
         loading.value = false;
         open.value = !closePage;
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
+        if (closePage) {
+            handleClose();
+        }
     });
 };
 
@@ -165,6 +195,10 @@ const acceptParams = (props: EditProps) => {
     form.value.content = props.content;
     form.value.path = props.path;
     config.language = props.language;
+    fileName.value = props.name;
+    // TODO Now,1panel only support liunux,so we can use LF.
+    // better,We should rely on the actual line feed character of the file returned from the background
+    config.eol = monaco.editor.EndOfLineSequence.LF;
     open.value = true;
 };
 
@@ -181,8 +215,8 @@ onBeforeUnmount(() => {
 defineExpose({ acceptParams });
 </script>
 
-<style lang="scss">
-.coder-editor {
-    margin-top: 10px;
+<style>
+.dialog-top {
+    top: 0;
 }
 </style>

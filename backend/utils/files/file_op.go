@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"io"
 	"io/fs"
 	"net/http"
@@ -35,6 +36,15 @@ func NewFileOp() FileOp {
 
 func (f FileOp) OpenFile(dst string) (fs.File, error) {
 	return f.Fs.Open(dst)
+}
+
+func (f FileOp) GetContent(dst string) ([]byte, error) {
+	afs := &afero.Afero{Fs: f.Fs}
+	cByte, err := afs.ReadFile(dst)
+	if err != nil {
+		return nil, err
+	}
+	return cByte, nil
 }
 
 func (f FileOp) CreateDir(dst string, mode fs.FileMode) error {
@@ -97,13 +107,48 @@ func (f FileOp) SaveFile(dst string, content string, mode fs.FileMode) error {
 	}
 	defer file.Close()
 	write := bufio.NewWriter(file)
-	_, _ = write.WriteString(string(content))
+	_, _ = write.WriteString(content)
 	write.Flush()
 	return nil
 }
 
 func (f FileOp) Chmod(dst string, mode fs.FileMode) error {
 	return f.Fs.Chmod(dst, mode)
+}
+
+func (f FileOp) Chown(dst string, uid int, gid int) error {
+	return f.Fs.Chown(dst, uid, gid)
+}
+
+func (f FileOp) ChownR(dst string, uid string, gid string, sub bool) error {
+	cmdStr := fmt.Sprintf("chown %s:%s %s", uid, gid, dst)
+	if sub {
+		cmdStr = fmt.Sprintf("chown -R %s:%s %s", uid, gid, dst)
+	}
+	if cmd.HasNoPasswordSudo() {
+		cmdStr = fmt.Sprintf("sudo %s", cmdStr)
+	}
+	if msg, err := cmd.ExecWithTimeOut(cmdStr, 2*time.Second); err != nil {
+		if msg != "" {
+			return errors.New(msg)
+		}
+		return err
+	}
+	return nil
+}
+
+func (f FileOp) ChmodR(dst string, mode int64) error {
+	cmdStr := fmt.Sprintf("chmod -R %v %s", fmt.Sprintf("%04o", mode), dst)
+	if cmd.HasNoPasswordSudo() {
+		cmdStr = fmt.Sprintf("sudo %s", cmdStr)
+	}
+	if msg, err := cmd.ExecWithTimeOut(cmdStr, 2*time.Second); err != nil {
+		if msg != "" {
+			return errors.New(msg)
+		}
+		return err
+	}
+	return nil
 }
 
 func (f FileOp) Rename(oldName string, newName string) error {
@@ -239,19 +284,15 @@ func (f FileOp) Copy(src, dst string) error {
 	if src = path.Clean("/" + src); src == "" {
 		return os.ErrNotExist
 	}
-
 	if dst = path.Clean("/" + dst); dst == "" {
 		return os.ErrNotExist
 	}
-
 	if src == "/" || dst == "/" {
 		return os.ErrInvalid
 	}
-
 	if dst == src {
 		return os.ErrInvalid
 	}
-
 	info, err := f.Fs.Stat(src)
 	if err != nil {
 		return err
@@ -259,7 +300,6 @@ func (f FileOp) Copy(src, dst string) error {
 	if info.IsDir() {
 		return f.CopyDir(src, dst)
 	}
-
 	return f.CopyFile(src, dst)
 }
 
@@ -314,17 +354,21 @@ func (f FileOp) CopyFile(src, dst string) error {
 	}
 	defer srcFile.Close()
 
+	srcInfo, err := f.Fs.Stat(src)
+	if err != nil {
+		return err
+	}
+	dstPath := path.Join(dst, srcInfo.Name())
+	if src == dstPath {
+		return nil
+	}
+
 	err = f.Fs.MkdirAll(filepath.Dir(dst), 0666)
 	if err != nil {
 		return err
 	}
 
-	srcInfo, err := f.Fs.Stat(src)
-	if err != nil {
-		return err
-	}
-
-	dstFile, err := f.Fs.OpenFile(path.Join(dst, srcInfo.Name()), os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775)
+	dstFile, err := f.Fs.OpenFile(dstPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0775)
 	if err != nil {
 		return err
 	}
@@ -429,9 +473,12 @@ func (f FileOp) Compress(srcRiles []string, dst string, name string, cType Compr
 			_ = f.DeleteFile(dstFile)
 			return err
 		}
-		break
 	}
 	return nil
+}
+
+func isIgnoreFile(name string) bool {
+	return strings.HasPrefix(name, "__MACOSX") || strings.HasSuffix(name, ".DS_Store") || strings.HasPrefix(name, "._")
 }
 
 func (f FileOp) Decompress(srcFile string, dst string, cType CompressType) error {
@@ -439,6 +486,9 @@ func (f FileOp) Decompress(srcFile string, dst string, cType CompressType) error
 
 	handler := func(ctx context.Context, archFile archiver.File) error {
 		info := archFile.FileInfo
+		if isIgnoreFile(archFile.Name()) {
+			return nil
+		}
 		filePath := filepath.Join(dst, archFile.NameInArchive)
 		if archFile.FileInfo.IsDir() {
 			if err := f.Fs.MkdirAll(filePath, info.Mode()); err != nil {

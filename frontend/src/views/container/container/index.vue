@@ -1,17 +1,11 @@
 <template>
-    <div>
-        <el-card width="30%" v-if="dockerStatus != 'Running'" class="mask-prompt">
-            <span style="font-size: 14px">{{ $t('container.serviceUnavailable') }}</span>
-            <el-button type="primary" link style="font-size: 14px; margin-bottom: 5px" @click="goSetting">
-                【 {{ $t('container.setting') }} 】
-            </el-button>
-            <span style="font-size: 14px">{{ $t('container.startIn') }}</span>
+    <div v-loading="loading">
+        <el-card v-if="dockerStatus != 'Running'" class="mask-prompt">
+            <span>{{ $t('container.serviceUnavailable') }}</span>
+            <el-button type="primary" class="bt" link @click="goSetting">【 {{ $t('container.setting') }} 】</el-button>
+            <span>{{ $t('container.startIn') }}</span>
         </el-card>
-        <LayoutContent
-            v-loading="loading"
-            :title="$t('container.container')"
-            :class="{ mask: dockerStatus != 'Running' }"
-        >
+        <LayoutContent :title="$t('container.container')" :class="{ mask: dockerStatus != 'Running' }">
             <template #toolbar>
                 <el-row>
                     <el-col :span="16">
@@ -51,7 +45,7 @@
                                 @clear="search()"
                                 suffix-icon="Search"
                                 @keyup.enter="search()"
-                                @blur="search()"
+                                @change="search()"
                                 :placeholder="$t('commons.button.search')"
                             ></el-input>
                         </div>
@@ -77,20 +71,42 @@
                         min-width="80"
                         prop="imageName"
                     />
-                    <el-table-column :label="$t('commons.table.status')" min-width="50" prop="state" fix>
+                    <el-table-column :label="$t('commons.table.status')" min-width="60" prop="state" fix>
                         <template #default="{ row }">
                             <Status :key="row.state" :status="row.state"></Status>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('container.upTime')" min-width="80" prop="runTime" fix />
+                    <el-table-column :label="$t('container.source')" show-overflow-tooltip min-width="125" fix>
+                        <template #default="{ row }">
+                            CPU: {{ row.cpuPercent.toFixed(2) }}% {{ $t('monitor.memory') }}:
+                            {{ row.memoryPercent.toFixed(2) }}%
+                        </template>
+                    </el-table-column>
+                    <el-table-column :label="$t('container.port')" min-width="80" prop="ports" fix>
+                        <template #default="{ row }">
+                            <div v-if="row.ports">
+                                <div v-for="(item, index) in row.ports" :key="index">
+                                    <div v-if="row.expand || (!row.expand && index < 3)">
+                                        <el-tag class="tagMargin">{{ item }}</el-tag>
+                                    </div>
+                                </div>
+                                <div v-if="!row.expand && row.ports.length > 3">
+                                    <el-button type="primary" link @click="row.expand = true">
+                                        {{ $t('commons.button.expand') }}...
+                                    </el-button>
+                                </div>
+                            </div>
+                        </template>
+                    </el-table-column>
                     <el-table-column
-                        prop="createTime"
-                        :label="$t('commons.table.date')"
-                        :formatter="dateFormat"
+                        :label="$t('container.upTime')"
+                        min-width="70"
                         show-overflow-tooltip
+                        prop="runTime"
+                        fix
                     />
                     <fu-table-operations
-                        width="370px"
+                        width="300px"
                         :ellipsis="10"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
@@ -123,7 +139,6 @@ import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
 import Status from '@/components/status/index.vue';
 import { reactive, onMounted, ref } from 'vue';
-import { dateFormat } from '@/utils/util';
 import { ContainerOperator, inspect, loadDockerStatus, searchContainer } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { ElMessageBox } from 'element-plus';
@@ -141,13 +156,21 @@ const paginationConfig = reactive({
 });
 const searchName = ref();
 
-const dockerStatus = ref();
+const dockerStatus = ref('Running');
 const loadStatus = async () => {
-    const res = await loadDockerStatus();
-    dockerStatus.value = res.data;
-    if (dockerStatus.value === 'Running') {
-        search();
-    }
+    loading.value = true;
+    await loadDockerStatus()
+        .then((res) => {
+            loading.value = false;
+            dockerStatus.value = res.data;
+            if (dockerStatus.value === 'Running') {
+                search();
+            }
+        })
+        .catch(() => {
+            dockerStatus.value = 'Failed';
+            loading.value = false;
+        });
 };
 const goSetting = async () => {
     router.push({ name: 'ContainerSetting' });
@@ -192,13 +215,13 @@ const onCreate = () => {
 };
 
 const dialogMonitorRef = ref();
-const onMonitor = (containerID: string) => {
-    dialogMonitorRef.value!.acceptParams({ containerID: containerID });
+const onMonitor = (row: any) => {
+    dialogMonitorRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
 };
 
 const dialogTerminalRef = ref();
-const onTerminal = (containerID: string) => {
-    dialogTerminalRef.value!.acceptParams({ containerID: containerID });
+const onTerminal = (row: any) => {
+    dialogTerminalRef.value!.acceptParams({ containerID: row.containerID, container: row.name });
 };
 
 const onInspect = async (id: string) => {
@@ -289,7 +312,7 @@ const buttons = [
             return row.state !== 'running';
         },
         click: (row: Container.ContainerInfo) => {
-            onTerminal(row.containerID);
+            onTerminal(row);
         },
     },
     {
@@ -298,7 +321,7 @@ const buttons = [
             return row.state !== 'running';
         },
         click: (row: Container.ContainerInfo) => {
-            onMonitor(row.containerID);
+            onMonitor(row);
         },
     },
     {
@@ -322,3 +345,9 @@ onMounted(() => {
     loadStatus();
 });
 </script>
+
+<style scoped lang="scss">
+.tagMargin {
+    margin-top: 2px;
+}
+</style>

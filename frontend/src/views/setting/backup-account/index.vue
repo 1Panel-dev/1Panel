@@ -27,10 +27,17 @@
                     </el-row>
                 </el-form>
 
-                <div style="margin-top: 20px">
+                <div class="common-div">
                     <span style="font-size: 14px; font-weight: 500">{{ $t('setting.thirdParty') }}</span>
                 </div>
-                <el-row :gutter="20" style="margin-top: 20px">
+
+                <el-alert type="info" :closable="false" class="common-div">
+                    <template #default>
+                        <div style="margin-bottom: 3px"><span v-html="$t('setting.backupAlert')"></span></div>
+                    </template>
+                </el-alert>
+
+                <el-row :gutter="20" class="common-div">
                     <el-col :span="12">
                         <div>
                             <svg-icon style="font-size: 7px" iconName="p-aws"></svg-icon>
@@ -43,7 +50,7 @@
                                 >
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
-                                <el-button round :disabled="s3Data.id === 0" @click="onBatchDelete(s3Data)">
+                                <el-button round :disabled="s3Data.id === 0" @click="onDelete(s3Data)">
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </div>
@@ -65,7 +72,7 @@
                         </div>
                         <el-alert v-else center class="alert" style="height: 167px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'S3')">
-                                {{ $t('setting.createBackupAccount', ['S3']) }}
+                                {{ $t('setting.createBackupAccount', [$t('setting.S3')]) }}
                             </el-button>
                         </el-alert>
                     </el-col>
@@ -81,7 +88,7 @@
                                 >
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
-                                <el-button round :disabled="ossData.id === 0" @click="onBatchDelete(ossData)">
+                                <el-button round :disabled="ossData.id === 0" @click="onDelete(ossData)">
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </div>
@@ -101,7 +108,80 @@
                         </div>
                         <el-alert v-else center class="alert" style="height: 167px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'OSS')">
-                                {{ $t('setting.createBackupAccount', ['OSS']) }}
+                                {{ $t('setting.createBackupAccount', [$t('setting.OSS')]) }}
+                            </el-button>
+                        </el-alert>
+                    </el-col>
+                </el-row>
+                <el-row :gutter="20" class="common-div">
+                    <el-col :span="12">
+                        <div>
+                            <svg-icon style="font-size: 7px" iconName="p-tengxunyun1"></svg-icon>
+                            <span style="font-size: 14px; font-weight: 500">&nbsp;{{ $t('setting.COS') }}</span>
+                            <div style="float: right">
+                                <el-button
+                                    round
+                                    :disabled="cosData.id === 0"
+                                    @click="onOpenDialog('edit', 'COS', cosData)"
+                                >
+                                    {{ $t('commons.button.edit') }}
+                                </el-button>
+                                <el-button round :disabled="cosData.id === 0" @click="onDelete(cosData)">
+                                    {{ $t('commons.button.delete') }}
+                                </el-button>
+                            </div>
+                            <el-divider class="devider" />
+                        </div>
+                        <div v-if="cosData.id !== 0" style="margin-left: 20px">
+                            <el-form-item label="Region">
+                                {{ cosData.varsJson['region'] }}
+                            </el-form-item>
+                            <el-form-item label="Bucket">
+                                {{ cosData.bucket }}
+                            </el-form-item>
+                            <el-form-item :label="$t('commons.table.createdAt')">
+                                {{ dateFormat(0, 0, cosData.createdAt) }}
+                            </el-form-item>
+                        </div>
+                        <el-alert v-else center class="alert" style="height: 167px" :closable="false">
+                            <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'COS')">
+                                {{ $t('setting.createBackupAccount', [$t('setting.COS')]) }}
+                            </el-button>
+                        </el-alert>
+                    </el-col>
+                    <el-col :span="12">
+                        <div>
+                            <svg-icon style="font-size: 7px" iconName="p-qiniuyun"></svg-icon>
+                            <span style="font-size: 14px; font-weight: 500">&nbsp;{{ $t('setting.KODO') }}</span>
+                            <div style="float: right">
+                                <el-button
+                                    round
+                                    :disabled="kodoData.id === 0"
+                                    @click="onOpenDialog('edit', 'KODO', kodoData)"
+                                >
+                                    {{ $t('commons.button.edit') }}
+                                </el-button>
+                                <el-button round :disabled="kodoData.id === 0" @click="onDelete(kodoData)">
+                                    {{ $t('commons.button.delete') }}
+                                </el-button>
+                            </div>
+                        </div>
+
+                        <el-divider class="devider" />
+                        <div v-if="kodoData.id !== 0" style="margin-left: 20px">
+                            <el-form-item :label="$t('setting.domain')">
+                                {{ kodoData.varsJson['domain'] }}
+                            </el-form-item>
+                            <el-form-item label="Bucket">
+                                {{ kodoData.bucket }}
+                            </el-form-item>
+                            <el-form-item :label="$t('commons.table.createdAt')">
+                                {{ dateFormat(0, 0, kodoData.createdAt) }}
+                            </el-form-item>
+                        </div>
+                        <el-alert v-else center class="alert" style="height: 167px" :closable="false">
+                            <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'KODO')">
+                                {{ $t('setting.createBackupAccount', [$t('setting.KODO')]) }}
                             </el-button>
                         </el-alert>
                     </el-col>
@@ -119,7 +199,7 @@
                                 >
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
-                                <el-button :disabled="minioData.id === 0" round @click="onBatchDelete(minioData)">
+                                <el-button :disabled="minioData.id === 0" round @click="onDelete(minioData)">
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </div>
@@ -138,7 +218,7 @@
                         </div>
                         <el-alert v-else center class="alert" style="height: 167px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'MINIO')">
-                                {{ $t('setting.createBackupAccount', ['MINIO']) }}
+                                {{ $t('setting.createBackupAccount', [$t('setting.MINIO')]) }}
                             </el-button>
                         </el-alert>
                     </el-col>
@@ -155,7 +235,7 @@
                                 >
                                     {{ $t('commons.button.edit') }}
                                 </el-button>
-                                <el-button round :disabled="sftpData.id === 0" @click="onBatchDelete(sftpData)">
+                                <el-button round :disabled="sftpData.id === 0" @click="onDelete(sftpData)">
                                     {{ $t('commons.button.delete') }}
                                 </el-button>
                             </div>
@@ -177,7 +257,7 @@
                         </div>
                         <el-alert v-else center class="alert" style="height: 167px" :closable="false">
                             <el-button size="large" round plain type="primary" @click="onOpenDialog('create', 'SFTP')">
-                                {{ $t('setting.createBackupAccount', ['SFTP']) }}
+                                {{ $t('setting.createBackupAccount', [$t('setting.SFTP')]) }}
                             </el-button>
                         </el-alert>
                     </el-col>
@@ -263,6 +343,30 @@ const s3Data = ref<Backup.BackupInfo>({
     },
     createdAt: new Date(),
 });
+const cosData = ref<Backup.BackupInfo>({
+    id: 0,
+    type: 'COS',
+    accessKey: '',
+    bucket: '',
+    credential: '',
+    vars: '',
+    varsJson: {
+        region: '',
+    },
+    createdAt: new Date(),
+});
+const kodoData = ref<Backup.BackupInfo>({
+    id: 0,
+    type: 'KODO',
+    accessKey: '',
+    bucket: '',
+    credential: '',
+    vars: '',
+    varsJson: {
+        domain: '',
+    },
+    createdAt: new Date(),
+});
 
 const search = async () => {
     const res = await getBackupList();
@@ -287,14 +391,18 @@ const search = async () => {
             case 'SFTP':
                 sftpData.value = bac;
                 break;
+            case 'COS':
+                cosData.value = bac;
+                break;
+            case 'KODO':
+                kodoData.value = bac;
+                break;
         }
     }
 };
 
-const onBatchDelete = async (row: Backup.BackupInfo | null) => {
-    let ids: Array<number> = [];
-    ids.push(row.id);
-    await useDeleteData(deleteBackup, { ids: ids }, 'commons.msg.delete');
+const onDelete = async (row: Backup.BackupInfo) => {
+    await useDeleteData(deleteBackup, { id: row.id }, 'commons.msg.delete');
     search();
 };
 
@@ -330,5 +438,9 @@ onMounted(() => {
 }
 .alert {
     background-color: rgba(0, 94, 235, 0.03);
+}
+
+.common-div {
+    margin-top: 20px;
 }
 </style>

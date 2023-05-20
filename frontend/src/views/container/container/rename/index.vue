@@ -1,9 +1,9 @@
 <template>
     <el-drawer v-model="newNameVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
-            <DrawerHeader :header="$t('container.rename')" :back="handleClose" />
+            <DrawerHeader :header="$t('container.rename')" :resource="renameForm.name" :back="handleClose" />
         </template>
-        <el-form ref="newNameRef" v-loading="loading" :model="renameForm" label-position="top">
+        <el-form @submit.prevent ref="newNameRef" v-loading="loading" :model="renameForm" label-position="top">
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form-item :label="$t('container.newName')" :rules="Rules.volumeName" prop="newName">

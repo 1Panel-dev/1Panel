@@ -10,6 +10,7 @@ type WebsiteDTO struct {
 	AccessLogPath string `json:"accessLogPath"`
 	SitePath      string `json:"sitePath"`
 	AppName       string `json:"appName"`
+	RuntimeName   string `json:"runtimeName"`
 }
 
 type WebsitePreInstallCheck struct {
@@ -40,5 +41,13 @@ type WebsiteHTTPS struct {
 
 type WebsiteLog struct {
 	Enable  bool   `json:"enable"`
+	Content string `json:"content"`
+}
+
+type PHPConfig struct {
+	Params map[string]string `json:"params"`
+}
+
+type NginxRewriteRes struct {
 	Content string `json:"content"`
 }

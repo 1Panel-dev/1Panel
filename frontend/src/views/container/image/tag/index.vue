@@ -1,7 +1,7 @@
 <template>
-    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
-            <DrawerHeader :header="$t('container.image') + ' Tag'" :back="handleClose" />
+            <DrawerHeader :header="$t('container.imageTag')" :resource="form.itemName" :back="handleClose" />
         </template>
         <el-form v-loading="loading" label-position="top" ref="formRef" :model="form" label-width="80px">
             <el-row type="flex" justify="center">
@@ -56,6 +56,7 @@ const loading = ref(false);
 const drawerVisiable = ref(false);
 const repos = ref();
 const form = reactive({
+    itemName: '',
     sourceID: '',
     fromRepo: true,
     repoID: 1,
@@ -63,6 +64,7 @@ const form = reactive({
 });
 
 interface DialogProps {
+    itemName: string;
     repos: Array<Container.RepoOptions>;
     sourceID: string;
 }
@@ -70,6 +72,7 @@ interface DialogProps {
 const acceptParams = async (params: DialogProps): Promise<void> => {
     drawerVisiable.value = true;
     form.repoID = 1;
+    form.itemName = params.itemName;
     form.sourceID = params.sourceID;
     form.targetName = '';
     form.fromRepo = true;

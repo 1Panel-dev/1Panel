@@ -42,7 +42,14 @@
                     {{ $t('app.toInstall') }}
                 </el-link>
             </span>
-
+            <el-select v-model="form[p.envKey]" v-if="p.type == 'select'">
+                <el-option
+                    v-for="service in p.values"
+                    :key="service.label"
+                    :value="service.value"
+                    :label="service.label"
+                ></el-option>
+            </el-select>
             <el-row :gutter="10" v-if="p.type == 'apps'">
                 <el-col :span="12">
                     <el-form-item :prop="p.prop">

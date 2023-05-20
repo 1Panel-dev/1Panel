@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
@@ -24,7 +25,10 @@ type ICronjobService interface {
 	HandleOnce(id uint) error
 	Update(id uint, req dto.CronjobUpdate) error
 	UpdateStatus(id uint, status string) error
-	Delete(ids []uint) error
+	Delete(req dto.CronjobBatchDelete) error
+	Download(down dto.CronjobDownload) (string, error)
+	StartJob(cronjob *model.Cronjob) (int, error)
+	CleanRecord(req dto.CronjobClean) error
 }
 
 func NewICronjobService() ICronjobService {
@@ -76,6 +80,44 @@ func (u *CronjobService) SearchRecords(search dto.SearchRecord) (int64, interfac
 	return total, dtoCronjobs, err
 }
 
+func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
+	cronjob, err := cronjobRepo.Get(commonRepo.WithByID(req.CronjobID))
+	if err != nil {
+		return err
+	}
+	if req.CleanData && cronjob.Type != "shell" && cronjob.Type != "curl" {
+		cronjob.RetainCopies = 0
+		backup, err := backupRepo.Get(commonRepo.WithByID(uint(cronjob.TargetDirID)))
+		if err != nil {
+			return err
+		}
+		if backup.Type != "LOCAL" {
+			localDir, err := loadLocalDir()
+			if err != nil {
+				return err
+			}
+			client, err := NewIBackupService().NewClient(&backup)
+			if err != nil {
+				return err
+			}
+			u.HandleRmExpired(backup.Type, localDir, &cronjob, client)
+		} else {
+			u.HandleRmExpired(backup.Type, "", &cronjob, nil)
+		}
+	}
+	delRecords, err := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(req.CronjobID)))
+	if err != nil {
+		return err
+	}
+	for _, del := range delRecords {
+		_ = os.RemoveAll(del.Records)
+	}
+	if err := cronjobRepo.DeleteRecord(cronjobRepo.WithByJobID(int(req.CronjobID))); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 	record, _ := cronjobRepo.GetRecord(commonRepo.WithByID(down.RecordID))
 	if record.ID == 0 {
@@ -89,24 +131,19 @@ func (u *CronjobService) Download(down dto.CronjobDownload) (string, error) {
 	if cronjob.ID == 0 {
 		return "", constant.ErrRecordNotFound
 	}
-	if backup.Type == "LOCAL" {
+	if backup.Type == "LOCAL" || record.FromLocal {
 		if _, err := os.Stat(record.File); err != nil && os.IsNotExist(err) {
 			return "", constant.ErrRecordNotFound
 		}
 		return record.File, nil
-	}
-	if record.FromLocal {
-		local, _ := loadLocalDir()
-		if _, err := os.Stat(local + "/" + record.File); err == nil {
-			return local + "/" + record.File, nil
-		}
 	}
 	client, err := NewIBackupService().NewClient(&backup)
 	if err != nil {
 		return "", err
 	}
 	tempPath := fmt.Sprintf("%s/download/%s", constant.DataDir, record.File)
-	isOK, _ := client.Download(record.File, tempPath)
+	_ = os.MkdirAll(path.Dir(tempPath), os.ModePerm)
+	isOK, err := client.Download(record.File, tempPath)
 	if !isOK || err != nil {
 		return "", constant.ErrRecordNotFound
 	}
@@ -157,21 +194,23 @@ func (u *CronjobService) StartJob(cronjob *model.Cronjob) (int, error) {
 	return entryID, nil
 }
 
-func (u *CronjobService) Delete(ids []uint) error {
-	if len(ids) == 1 {
-		if err := u.HandleDelete(ids[0]); err != nil {
+func (u *CronjobService) Delete(req dto.CronjobBatchDelete) error {
+	for _, id := range req.IDs {
+		cronjob, _ := cronjobRepo.Get(commonRepo.WithByID(id))
+		if cronjob.ID == 0 {
+			return errors.New("find cronjob in db failed")
+		}
+		global.Cron.Remove(cron.EntryID(cronjob.EntryID))
+		global.LOG.Infof("stop cronjob entryID: %d", cronjob.EntryID)
+		if err := u.CleanRecord(dto.CronjobClean{CronjobID: id, CleanData: req.CleanData}); err != nil {
 			return err
 		}
-		return cronjobRepo.Delete(commonRepo.WithByID(ids[0]))
+		if err := cronjobRepo.Delete(commonRepo.WithByID(id)); err != nil {
+			return err
+		}
 	}
-	cronjobs, err := cronjobRepo.List(commonRepo.WithIdsIn(ids))
-	if err != nil {
-		return err
-	}
-	for i := range cronjobs {
-		_ = u.HandleDelete(ids[i])
-	}
-	return cronjobRepo.Delete(commonRepo.WithIdsIn(ids))
+
+	return nil
 }
 
 func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
@@ -194,6 +233,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	upMap := make(map[string]interface{})
 	upMap["entry_id"] = newEntryID
 	upMap["name"] = req.Name
+	upMap["spec"] = cronjob.Spec
 	upMap["script"] = req.Script
 	upMap["spec_type"] = req.SpecType
 	upMap["week"] = req.Week

@@ -5,6 +5,7 @@
                 <AppStatus
                     :app-key="'mysql'"
                     v-model:loading="loading"
+                    v-model:mask-show="maskShow"
                     @setting="onSetting"
                     @is-exist="checkExist"
                 ></AppStatus>
@@ -17,12 +18,12 @@
                             {{ $t('database.create') }}
                         </el-button>
                         <el-button @click="onChangeRootPassword" type="primary" plain>
-                            {{ $t('database.rootPassword') }}
+                            {{ $t('database.databaseConnInfo') }}
                         </el-button>
                         <el-button @click="onChangeAccess" type="primary" plain>
                             {{ $t('database.remoteAccess') }}
                         </el-button>
-                        <el-button @click="goDashboard" type="primary" plain>phpMyAdmin</el-button>
+                        <el-button @click="goDashboard" icon="Position" type="primary" plain>phpMyAdmin</el-button>
                     </el-col>
                     <el-col :span="4">
                         <div class="search-button">
@@ -32,7 +33,7 @@
                                 @clear="search()"
                                 suffix-icon="Search"
                                 @keyup.enter="search()"
-                                @blur="search()"
+                                @change="search()"
                                 :placeholder="$t('commons.button.search')"
                             ></el-input>
                         </div>
@@ -72,11 +73,7 @@
                                     </el-icon>
                                 </div>
                                 <div style="cursor: pointer; float: left">
-                                    <el-icon
-                                        style="margin-left: 5px; margin-top: 3px"
-                                        :size="16"
-                                        @click="onCopyPassword(row)"
-                                    >
+                                    <el-icon style="margin-left: 5px; margin-top: 3px" :size="16" @click="onCopy(row)">
                                         <DocumentCopy />
                                     </el-icon>
                                 </div>
@@ -108,11 +105,10 @@
         </LayoutContent>
 
         <el-card
-            width="30%"
-            v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist && !loading"
+            v-if="mysqlStatus != 'Running' && !isOnSetting && mysqlIsExist && !loading && maskShow"
             class="mask-prompt"
         >
-            <span style="font-size: 14px">{{ $t('commons.service.serviceNotStarted', ['MySQL']) }}</span>
+            <span>{{ $t('commons.service.serviceNotStarted', ['MySQL']) }}</span>
         </el-card>
 
         <Setting ref="settingRef" style="margin-top: 20px" />
@@ -168,9 +164,12 @@ import { Database } from '@/api/interface/database';
 import { App } from '@/api/interface/app';
 import { GetAppPort } from '@/api/modules/app';
 import router from '@/routers';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
+import useClipboard from 'vue-clipboard3';
+const { toClipboard } = useClipboard();
 
 const loading = ref(false);
+const maskShow = ref(true);
 
 const mysqlName = ref();
 const isOnSetting = ref<boolean>();
@@ -289,14 +288,13 @@ const checkExist = (data: App.CheckInstalled) => {
     }
 };
 
-const onCopyPassword = (row: Database.MysqlDBInfo) => {
-    let input = document.createElement('input');
-    input.value = row.password;
-    document.body.appendChild(input);
-    input.select();
-    document.execCommand('Copy');
-    document.body.removeChild(input);
-    MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
+const onCopy = async (row: any) => {
+    try {
+        await toClipboard(row.password);
+        MsgSuccess(i18n.global.t('commons.msg.copySuccess'));
+    } catch (e) {
+        MsgError(i18n.global.t('commons.msg.copyfailed'));
+    }
 };
 
 const onDelete = async (row: Database.MysqlDBInfo) => {
@@ -314,6 +312,7 @@ const buttons = [
         click: (row: Database.MysqlDBInfo) => {
             let param = {
                 id: row.id,
+                mysqlName: row.name,
                 operation: 'password',
                 username: row.username,
                 password: row.password,
@@ -326,6 +325,7 @@ const buttons = [
         click: (row: Database.MysqlDBInfo) => {
             let param = {
                 id: row.id,
+                mysqlName: row.name,
                 operation: 'privilege',
                 privilege: '',
                 privilegeIPs: '',

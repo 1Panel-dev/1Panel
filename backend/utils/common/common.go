@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func CompareVersion(version1 string, version2 string) bool {
@@ -82,9 +83,27 @@ func RandStr(n int) string {
 	return string(b)
 }
 
-func ScanPort(port int) bool {
+func RandStrAndNum(n int) string {
+	mathRand.Seed(time.Now().UnixNano())
+	const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
+	b := make([]byte, 10)
+	for i := range b {
+		b[i] = charset[mathRand.Int63()%int64(len(charset))]
+	}
+	return (string(b))
+}
 
+func ScanPort(port int) bool {
 	ln, err := net.Listen("tcp", ":"+strconv.Itoa(port))
+	if err != nil {
+		return true
+	}
+	defer ln.Close()
+	return false
+}
+
+func ScanUDPPort(port int) bool {
+	ln, err := net.ListenUDP("udp", &net.UDPAddr{IP: net.IPv4(127, 0, 0, 1), Port: port})
 	if err != nil {
 		return true
 	}
@@ -125,4 +144,12 @@ func LoadSizeUnit(value float64) string {
 		return fmt.Sprintf("%vK", value/1024)
 	}
 	return fmt.Sprintf("%v", value)
+}
+
+func LoadTimeZone() string {
+	loc := time.Now().Location()
+	if _, err := time.LoadLocation(loc.String()); err != nil {
+		return "Asia/Shanghai"
+	}
+	return loc.String()
 }

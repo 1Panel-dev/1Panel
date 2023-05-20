@@ -1,12 +1,5 @@
 export namespace Dashboard {
     export interface BaseInfo {
-        haloID: number;
-        dateeaseID: number;
-        jumpserverID: number;
-        metersphereID: number;
-        kubeoperatorID: number;
-        kubepiID: number;
-
         websiteNumber: number;
         databaseNumber: number;
         cronjobNumber: number;
@@ -49,9 +42,21 @@ export namespace Dashboard {
 
         ioReadBytes: number;
         ioWriteBytes: number;
-        ioTime: number;
         ioCount: number;
+        ioReadTime: number;
+        ioWriteTime: number;
 
+        diskData: Array<DiskInfo>;
+
+        netBytesSent: number;
+        netBytesRecv: number;
+
+        shotTime: Date;
+    }
+    export interface DiskInfo {
+        path: string;
+        type: string;
+        device: string;
         total: number;
         free: number;
         used: number;
@@ -61,10 +66,5 @@ export namespace Dashboard {
         inodesUsed: number;
         inodesFree: number;
         inodesUsedPercent: number;
-
-        netBytesSent: number;
-        netBytesRecv: number;
-
-        shotTime: Date;
     }
 }

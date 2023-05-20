@@ -29,32 +29,37 @@
                         <el-card style="width: 100%">
                             <table style="width: 100%" class="tab-table">
                                 <tr v-if="form.exposedPorts.length !== 0">
-                                    <th scope="col" width="48%" align="left">
-                                        <label>{{ $t('container.serverPort') }}</label>
+                                    <th scope="col" width="45%" align="left">
+                                        <label>{{ $t('container.server') }}</label>
                                     </th>
-                                    <th scope="col" width="48%" align="left">
-                                        <label>{{ $t('container.containerPort') }}</label>
+                                    <th scope="col" width="35%" align="left">
+                                        <label>{{ $t('container.container') }}</label>
+                                    </th>
+                                    <th scope="col" width="20%" align="left">
+                                        <label>{{ $t('container.protocol') }}</label>
                                     </th>
                                     <th align="left"></th>
                                 </tr>
                                 <tr v-for="(row, index) in form.exposedPorts" :key="index">
-                                    <td width="48%">
-                                        <el-input-number
-                                            :min="0"
-                                            :max="65535"
+                                    <td width="45%">
+                                        <el-input
+                                            :placeholder="$t('container.serverExample')"
                                             style="width: 100%"
-                                            controls-position="right"
-                                            v-model.number="row.hostPort"
+                                            v-model="row.host"
                                         />
                                     </td>
-                                    <td width="48%">
-                                        <el-input-number
-                                            :min="0"
-                                            :max="65535"
+                                    <td width="35%">
+                                        <el-input
+                                            :placeholder="$t('container.contianerExample')"
                                             style="width: 100%"
-                                            controls-position="right"
-                                            v-model.number="row.containerPort"
+                                            v-model="row.containerPort"
                                         />
+                                    </td>
+                                    <td width="20%">
+                                        <el-select v-model="row.protocol" style="width: 100%">
+                                            <el-option label="tcp" value="tcp" />
+                                            <el-option label="udp" value="udp" />
+                                        </el-select>
                                     </td>
                                     <td>
                                         <el-button link style="font-size: 10px" @click="handlePortsDelete(index)">
@@ -71,12 +76,7 @@
                         </el-card>
                     </el-form-item>
                     <el-form-item :label="$t('container.cmd')" prop="cmdStr">
-                        <el-input
-                            type="textarea"
-                            :placeholder="$t('container.cmdHelper')"
-                            :autosize="{ minRows: 2, maxRows: 4 }"
-                            v-model="form.cmdStr"
-                        />
+                        <el-input :placeholder="$t('container.cmdHelper')" v-model="form.cmdStr" />
                     </el-form-item>
                     <el-form-item prop="autoRemove">
                         <el-checkbox v-model="form.autoRemove">{{ $t('container.autoRemove') }}</el-checkbox>
@@ -209,6 +209,7 @@ import DrawerHeader from '@/components/drawer-header/index.vue';
 import { listImage, listVolume, createContainer } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import { checkIp, checkPort } from '@/utils/util';
 
 const loading = ref(false);
 
@@ -282,8 +283,11 @@ const formRef = ref<FormInstance>();
 
 const handlePortsAdd = () => {
     let item = {
-        containerPort: null,
-        hostPort: null,
+        host: '',
+        hostIP: '',
+        containerPort: '',
+        hostPort: '',
+        protocol: 'tcp',
     };
     form.exposedPorts.push(item);
 };
@@ -330,7 +334,10 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
             form.labels = form.labelsStr.split('\n');
         }
         if (form.cmdStr.length !== 0) {
-            form.cmd = form.cmdStr.split('\n');
+            form.cmd = form.cmdStr.split(' ');
+        }
+        if (!checkPortValid()) {
+            return;
         }
         switch (form.memoryUnit) {
             case 'KB':
@@ -357,6 +364,54 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     });
 };
 
+const checkPortValid = () => {
+    if (form.exposedPorts.length === 0) {
+        return true;
+    }
+    for (const port of form.exposedPorts) {
+        if (port.host.indexOf(':') !== -1) {
+            port.hostIP = port.host.split(':')[0];
+            if (checkIp(port.hostIP)) {
+                MsgError(i18n.global.t('firewall.addressFormatError'));
+                return false;
+            }
+            port.hostPort = port.host.split(':')[1];
+        } else {
+            port.hostPort = port.host;
+        }
+        if (port.hostPort.indexOf('-') !== -1) {
+            if (checkPort(port.hostPort.split('-')[0])) {
+                MsgError(i18n.global.t('firewall.portFormatError'));
+                return false;
+            }
+            if (checkPort(port.hostPort.split('-')[1])) {
+                MsgError(i18n.global.t('firewall.portFormatError'));
+                return false;
+            }
+        } else {
+            if (checkPort(port.hostPort)) {
+                MsgError(i18n.global.t('firewall.portFormatError'));
+                return false;
+            }
+        }
+        if (port.containerPort.indexOf('-') !== -1) {
+            if (checkPort(port.containerPort.split('-')[0])) {
+                MsgError(i18n.global.t('firewall.portFormatError'));
+                return false;
+            }
+            if (checkPort(port.containerPort.split('-')[1])) {
+                MsgError(i18n.global.t('firewall.portFormatError'));
+                return false;
+            }
+        } else {
+            if (checkPort(port.containerPort)) {
+                MsgError(i18n.global.t('firewall.portFormatError'));
+                return false;
+            }
+        }
+    }
+    return true;
+};
 defineExpose({
     acceptParams,
 });

@@ -20,7 +20,8 @@ func Init() {
 	baseDir := "/opt"
 	port := "9999"
 	mode := ""
-	version := ""
+	version := "v1.0.0"
+	username, password, entrance := "", "", ""
 	fileOp := files.NewFileOp()
 	v := viper.NewWithOptions()
 	v.SetConfigType("yaml")
@@ -40,8 +41,11 @@ func Init() {
 		}
 	} else {
 		baseDir = loadParams("BASE_DIR")
-		port = loadParams("PANEL_PORT")
-		version = loadParams("ORIGINAL_INSTALLED_VERSION")
+		port = loadParams("ORIGINAL_PORT")
+		version = loadParams("ORIGINAL_VERSION")
+		username = loadParams("ORIGINAL_USERNAME")
+		password = loadParams("ORIGINAL_PASSWORD")
+		entrance = loadParams("ORIGINAL_ENTRANCE")
 
 		if strings.HasSuffix(baseDir, "/") {
 			baseDir = baseDir[:strings.LastIndex(baseDir, "/")]
@@ -60,14 +64,25 @@ func Init() {
 	if err := v.Unmarshal(&serverConfig); err != nil {
 		panic(err)
 	}
-	if mode == "dev" && fileOp.Stat("/opt/1panel/conf/app.yaml") && serverConfig.System.BaseDir != "" {
-		baseDir = serverConfig.System.BaseDir
-	}
-	if mode == "dev" && fileOp.Stat("/opt/1panel/conf/app.yaml") && serverConfig.System.Port != "" {
-		port = serverConfig.System.Port
-	}
-	if mode == "dev" && fileOp.Stat("/opt/1panel/conf/app.yaml") && serverConfig.System.Version != "" {
-		version = serverConfig.System.Version
+	if mode == "dev" && fileOp.Stat("/opt/1panel/conf/app.yaml") {
+		if serverConfig.System.BaseDir != "" {
+			baseDir = serverConfig.System.BaseDir
+		}
+		if serverConfig.System.Port != "" {
+			port = serverConfig.System.Port
+		}
+		if serverConfig.System.Version != "" {
+			version = serverConfig.System.Version
+		}
+		if serverConfig.System.Username != "" {
+			username = serverConfig.System.Username
+		}
+		if serverConfig.System.Password != "" {
+			password = serverConfig.System.Password
+		}
+		if serverConfig.System.Entrance != "" {
+			entrance = serverConfig.System.Entrance
+		}
 	}
 
 	global.CONF = serverConfig
@@ -81,6 +96,10 @@ func Init() {
 	global.CONF.System.TmpDir = global.CONF.System.DataDir + "/tmp"
 	global.CONF.System.Port = port
 	global.CONF.System.Version = version
+	global.CONF.System.Username = username
+	global.CONF.System.Password = password
+	global.CONF.System.Entrance = entrance
+	global.CONF.System.ChangeUserInfo = loadChange()
 	global.Viper = v
 }
 
@@ -89,9 +108,17 @@ func loadParams(param string) string {
 	if err != nil {
 		panic(err)
 	}
-	baseDir := strings.ReplaceAll(stdout, "\n", "")
-	if len(baseDir) == 0 {
+	info := strings.ReplaceAll(stdout, "\n", "")
+	if len(info) == 0 || info == `""` {
 		panic(fmt.Sprintf("error `%s` find in /usr/bin/1pctl", param))
 	}
-	return baseDir
+	return info
+}
+
+func loadChange() bool {
+	stdout, err := cmd.Exec("grep '^CHANGE_USER_INFO=' /usr/bin/1pctl | cut -d'=' -f2")
+	if err != nil {
+		return false
+	}
+	return stdout == "true\n"
 }

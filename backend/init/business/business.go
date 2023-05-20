@@ -6,18 +6,30 @@ import (
 )
 
 func Init() {
+	syncApp()
+	syncInstalledApp()
+}
+
+func syncApp() {
 	setting, err := service.NewISettingService().GetSettingInfo()
 	if err != nil {
 		global.LOG.Errorf("sync app error: %s", err.Error())
 		return
 	}
 	if setting.AppStoreVersion != "" {
-		global.LOG.Info("do not sync")
+		global.LOG.Info("no need to sync")
 		return
 	}
 	global.LOG.Info("sync app start...")
-	if err := service.NewIAppService().SyncAppList(); err != nil {
+	if err := service.NewIAppService().SyncAppListFromRemote(); err != nil {
 		global.LOG.Errorf("sync app error: %s", err.Error())
+		return
 	}
-	global.LOG.Info("sync app success")
+	global.LOG.Info("sync app successful")
+}
+
+func syncInstalledApp() {
+	if err := service.NewIAppInstalledService().SyncAll(true); err != nil {
+		global.LOG.Errorf("sync instaled app error: %s", err.Error())
+	}
 }

@@ -1,7 +1,7 @@
 <template>
     <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <DrawerHeader :header="$t('cronjob.cronTask')" :back="handleClose" />
+            <DrawerHeader :header="$t('cronjob.cronTask')" :resource="dialogData.rowData?.name" :back="handleClose" />
         </template>
         <el-form ref="formRef" label-position="top" :model="dialogData.rowData" :rules="rules">
             <el-row type="flex" justify="center">
@@ -23,7 +23,12 @@
                     </el-form-item>
 
                     <el-form-item :label="$t('cronjob.taskName')" prop="name">
-                        <el-input style="width: 100%" clearable v-model.trim="dialogData.rowData!.name" />
+                        <el-input
+                            :disabled="dialogData.title === 'edit'"
+                            style="width: 100%"
+                            clearable
+                            v-model.trim="dialogData.rowData!.name"
+                        />
                     </el-form-item>
 
                     <el-form-item :label="$t('cronjob.cronSpec')" prop="spec">
@@ -82,6 +87,7 @@
                         prop="website"
                     >
                         <el-select style="width: 100%" v-model="dialogData.rowData!.website">
+                            <el-option :label="$t('commons.table.all')" value="all" />
                             <el-option v-for="item in websiteOptions" :key="item" :value="item" :label="item" />
                         </el-select>
                     </el-form-item>
@@ -89,6 +95,7 @@
                     <div v-if="dialogData.rowData!.type === 'database'">
                         <el-form-item :label="$t('cronjob.database')" prop="dbName">
                             <el-select style="width: 100%" clearable v-model="dialogData.rowData!.dbName">
+                                <el-option :label="$t('commons.table.all')" value="all" />
                                 <el-option v-for="item in mysqlInfo.dbNames" :key="item" :label="item" :value="item" />
                             </el-select>
                         </el-form-item>
@@ -122,16 +129,18 @@
                                 {{ $t('cronjob.saveLocal') }}
                             </el-checkbox>
                         </el-form-item>
-                        <el-form-item :label="$t('cronjob.retainCopies')" prop="retainCopies">
-                            <el-input-number
-                                :min="1"
-                                :max="30"
-                                step-strictly
-                                :step="1"
-                                v-model.number="dialogData.rowData!.retainCopies"
-                            ></el-input-number>
-                        </el-form-item>
                     </div>
+
+                    <el-form-item :label="$t('cronjob.retainCopies')" prop="retainCopies">
+                        <el-input-number
+                            :min="1"
+                            :max="300"
+                            step-strictly
+                            :step="1"
+                            v-model.number="dialogData.rowData!.retainCopies"
+                        ></el-input-number>
+                        <span class="input-help">{{ $t('cronjob.retainCopiesHelper') }}</span>
+                    </el-form-item>
 
                     <el-form-item v-if="dialogData.rowData!.type === 'curl'" :label="$t('cronjob.url')" prop="url">
                         <el-input style="width: 100%" clearable v-model.trim="dialogData.rowData!.url" />

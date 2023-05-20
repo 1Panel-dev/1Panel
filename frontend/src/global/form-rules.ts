@@ -47,7 +47,7 @@ const checkName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.commonName')));
     } else {
-        const reg = /^[a-zA-Z0-9\u4e00-\u9fa5]{1}[a-zA-Z0-9_.\u4e00-\u9fa5-]{0,30}$/;
+        const reg = /^[a-zA-Z0-9\u4e00-\u9fa5]{1}[a-zA-Z0-9_.\u4e00-\u9fa5-]{1,29}$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.commonName')));
         } else {
@@ -255,7 +255,7 @@ const checkDoc = (rule: any, value: any, callback: any) => {
 
 export function checkNumberRange(min: number, max: number): FormItemRule {
     return {
-        required: true,
+        required: false,
         trigger: 'blur',
         min: min,
         max: max,
@@ -263,6 +263,19 @@ export function checkNumberRange(min: number, max: number): FormItemRule {
         message: i18n.global.t('commons.rule.numberRange', [min, max]),
     };
 }
+
+const checkConatinerName = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback();
+    } else {
+        const reg = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{1,127}$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.conatinerName')));
+        } else {
+            callback();
+        }
+    }
+};
 
 interface CommonRule {
     requiredInput: FormItemRule;
@@ -286,6 +299,7 @@ interface CommonRule {
     databaseName: FormItemRule;
     nginxDoc: FormItemRule;
     appName: FormItemRule;
+    containerName: FormItemRule;
 
     paramCommon: FormItemRule;
     paramComplexity: FormItemRule;
@@ -426,5 +440,10 @@ export const Rules: CommonRule = {
         required: true,
         trigger: 'blur',
         validator: checkAppName,
+    },
+    containerName: {
+        required: false,
+        trigger: 'blur',
+        validator: checkConatinerName,
     },
 };

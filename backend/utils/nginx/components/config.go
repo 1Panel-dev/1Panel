@@ -44,6 +44,9 @@ var repeatKeys = map[string]struct {
 	"set":              {},
 	"if":               {},
 	"proxy_set_header": {},
+	"location":         {},
+	"include":          {},
+	"sub_filter":       {},
 }
 
 func IsRepeatKey(key string) bool {

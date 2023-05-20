@@ -23,7 +23,7 @@
 <script lang="ts" setup>
 import { Codemirror } from 'vue-codemirror';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { GetWebsiteNginx, UpdateNginxFile } from '@/api/modules/website';
+import { GetWebsiteConfig, UpdateNginxFile } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import { File } from '@/api/interface/file';
 import i18n from '@/lang';
@@ -50,7 +50,7 @@ let content = ref('');
 
 const get = () => {
     loading.value = true;
-    GetWebsiteNginx(id.value)
+    GetWebsiteConfig(id.value, 'openresty')
         .then((res) => {
             data.value = res.data;
             content.value = data.value.content;

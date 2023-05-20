@@ -2,9 +2,11 @@ package service
 
 import (
 	"encoding/json"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/host"
@@ -38,27 +40,6 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 	baseInfo.KernelVersion = hostInfo.KernelVersion
 	ss, _ := json.Marshal(hostInfo)
 	baseInfo.VirtualizationSystem = string(ss)
-
-	apps, err := appRepo.GetBy()
-	if err != nil {
-		return nil, err
-	}
-	for _, app := range apps {
-		switch app.Key {
-		case "dateease":
-			baseInfo.DateeaseID = app.ID
-		case "halo":
-			baseInfo.HaloID = app.ID
-		case "metersphere":
-			baseInfo.MeterSphereID = app.ID
-		case "jumpserver":
-			baseInfo.JumpServerID = app.ID
-		case "kubeoperator":
-			baseInfo.KubeoperatorID = app.ID
-		case "kubepi":
-			baseInfo.KubepiID = app.ID
-		}
-	}
 
 	appInstall, err := appInstallRepo.ListBy()
 	if err != nil {
@@ -120,15 +101,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	currentInfo.MemoryUsed = memoryInfo.Used
 	currentInfo.MemoryUsedPercent = memoryInfo.UsedPercent
 
-	state, _ := disk.Usage("/")
-	currentInfo.Total = state.Total
-	currentInfo.Free = state.Free
-	currentInfo.Used = state.Used
-	currentInfo.UsedPercent = state.UsedPercent
-	currentInfo.InodesTotal = state.InodesTotal
-	currentInfo.InodesUsed = state.InodesUsed
-	currentInfo.InodesFree = state.InodesFree
-	currentInfo.InodesUsedPercent = state.InodesUsedPercent
+	currentInfo.DiskData = loadDiskInfo()
 
 	if ioOption == "all" {
 		diskInfo, _ := disk.IOCounters()
@@ -136,20 +109,17 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 			currentInfo.IOReadBytes += state.ReadBytes
 			currentInfo.IOWriteBytes += state.WriteBytes
 			currentInfo.IOCount += (state.ReadCount + state.WriteCount)
-			currentInfo.IOTime += state.ReadTime / 1000 / 1000
-			if state.WriteTime > state.ReadTime {
-				currentInfo.IOTime += state.WriteTime / 1000 / 1000
-			}
+			currentInfo.IOReadTime += state.ReadTime
+			currentInfo.IOWriteTime += state.WriteTime
 		}
 	} else {
 		diskInfo, _ := disk.IOCounters(ioOption)
 		for _, state := range diskInfo {
 			currentInfo.IOReadBytes += state.ReadBytes
 			currentInfo.IOWriteBytes += state.WriteBytes
-			currentInfo.IOTime += state.ReadTime / 1000 / 1000
-			if state.WriteTime > state.ReadTime {
-				currentInfo.IOTime += state.WriteTime / 1000 / 1000
-			}
+			currentInfo.IOCount += (state.ReadCount + state.WriteCount)
+			currentInfo.IOReadTime += state.ReadTime
+			currentInfo.IOWriteTime += state.WriteTime
 		}
 	}
 
@@ -171,4 +141,68 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 
 	currentInfo.ShotTime = time.Now()
 	return &currentInfo
+}
+
+type diskInfo struct {
+	Type   string
+	Mount  string
+	Device string
+}
+
+func loadDiskInfo() []dto.DiskInfo {
+	var datas []dto.DiskInfo
+	stdout, err := cmd.Exec("df -hT -P|grep '/'|grep -v tmpfs|grep -v 'snap/core'|grep -v udev")
+	if err != nil {
+		return datas
+	}
+	lines := strings.Split(stdout, "\n")
+
+	var mounts []diskInfo
+	var excludes = []string{"/mnt/cdrom", "/boot", "/boot/efi", "/dev", "/dev/shm", "/run/lock", "/run", "/run/shm", "/run/user"}
+	for _, line := range lines {
+		fields := strings.Fields(line)
+		if len(fields) < 7 {
+			continue
+		}
+		if fields[1] == "tmpfs" {
+			continue
+		}
+		if strings.Contains(fields[2], "M") || strings.Contains(fields[2], "K") {
+			continue
+		}
+		if strings.Contains(fields[6], "docker") {
+			continue
+		}
+		isExclude := false
+		for _, exclude := range excludes {
+			if exclude == fields[6] {
+				isExclude = true
+			}
+		}
+		if isExclude {
+			continue
+		}
+		mounts = append(mounts, diskInfo{Type: fields[1], Device: fields[0], Mount: fields[6]})
+	}
+
+	for i := 0; i < len(mounts); i++ {
+		state, err := disk.Usage(mounts[i].Mount)
+		if err != nil {
+			continue
+		}
+		var itemData dto.DiskInfo
+		itemData.Path = mounts[i].Mount
+		itemData.Type = mounts[i].Type
+		itemData.Device = mounts[i].Device
+		itemData.Total = state.Total
+		itemData.Free = state.Free
+		itemData.Used = state.Used
+		itemData.UsedPercent = state.UsedPercent
+		itemData.InodesTotal = state.InodesTotal
+		itemData.InodesUsed = state.InodesUsed
+		itemData.InodesFree = state.InodesFree
+		itemData.InodesUsedPercent = state.InodesUsedPercent
+		datas = append(datas, itemData)
+	}
+	return datas
 }

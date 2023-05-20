@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"os"
+	"os/exec"
 	"path"
 	"sort"
 	"strings"
@@ -124,46 +126,50 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 	return int64(total), BackDatas, nil
 }
 
-func (u *ContainerService) CreateCompose(req dto.ComposeCreate) error {
-	if req.From == "template" {
-		template, err := composeRepo.Get(commonRepo.WithByID(req.Template))
-		if err != nil {
-			return err
-		}
-		req.From = "edit"
-		req.File = template.Content
+func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
+	if err := u.loadPath(&req); err != nil {
+		return false, err
 	}
-	if req.From == "edit" {
-		dir := fmt.Sprintf("%s/docker/compose/%s", constant.DataDir, req.Name)
-		if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
-			if err = os.MkdirAll(dir, os.ModePerm); err != nil {
-				return err
-			}
-		}
+	cmd := exec.Command("docker-compose", "-f", req.Path, "config")
+	stdout, err := cmd.CombinedOutput()
+	if err != nil {
+		return false, errors.New(string(stdout))
+	}
+	return true, nil
+}
 
-		path := fmt.Sprintf("%s/docker-compose.yml", dir)
-		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-		write := bufio.NewWriter(file)
-		_, _ = write.WriteString(string(req.File))
-		write.Flush()
-		req.Path = path
+func (u *ContainerService) CreateCompose(req dto.ComposeCreate) (string, error) {
+	if err := u.loadPath(&req); err != nil {
+		return "", err
 	}
 	global.LOG.Infof("docker-compose.yml %s create successful, start to docker-compose up", req.Name)
 
 	if req.From == "path" {
-		req.Name = path.Base(strings.ReplaceAll(req.Path, "/docker-compose.yml", ""))
+		req.Name = path.Base(strings.ReplaceAll(req.Path, "/"+path.Base(req.Path), ""))
 	}
-	if stdout, err := compose.Up(req.Path); err != nil {
-		_, _ = compose.Down(req.Path)
-		return errors.New(stdout)
+	logName := path.Dir(req.Path) + "/compose.log"
+	file, err := os.OpenFile(logName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		return "", err
 	}
-	_ = composeRepo.CreateRecord(&model.Compose{Name: req.Name})
+	go func() {
+		defer file.Close()
+		cmd := exec.Command("docker-compose", "-f", req.Path, "up", "-d")
+		multiWriter := io.MultiWriter(os.Stdout, file)
+		cmd.Stdout = multiWriter
+		cmd.Stderr = multiWriter
+		if err := cmd.Run(); err != nil {
+			global.LOG.Errorf("docker-compose up %s failed, err: %v", req.Name, err)
+			_, _ = compose.Down(req.Path)
+			_, _ = file.WriteString("docker-compose up failed!")
+			return
+		}
+		global.LOG.Infof("docker-compose up %s successful!", req.Name)
+		_ = composeRepo.CreateRecord(&model.Compose{Name: req.Name})
+		_, _ = file.WriteString("docker-compose up successful!")
+	}()
 
-	return nil
+	return logName, nil
 }
 
 func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
@@ -176,7 +182,9 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 	global.LOG.Infof("docker-compose %s %s successful", req.Operation, req.Name)
 	if req.Operation == "down" {
 		_ = composeRepo.DeleteRecord(commonRepo.WithByName(req.Name))
-		_ = os.RemoveAll(strings.ReplaceAll(req.Path, "/docker-compose.yml", ""))
+		if req.WithFile {
+			_ = os.RemoveAll(path.Dir(req.Path))
+		}
 	}
 
 	return nil
@@ -203,5 +211,28 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 		return errors.New(string(stdout))
 	}
 
+	return nil
+}
+
+func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {
+	if req.From == "template" || req.From == "edit" {
+		dir := fmt.Sprintf("%s/docker/compose/%s", constant.DataDir, req.Name)
+		if _, err := os.Stat(dir); err != nil && os.IsNotExist(err) {
+			if err = os.MkdirAll(dir, os.ModePerm); err != nil {
+				return err
+			}
+		}
+
+		path := fmt.Sprintf("%s/docker-compose.yml", dir)
+		file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		write := bufio.NewWriter(file)
+		_, _ = write.WriteString(string(req.File))
+		write.Flush()
+		req.Path = path
+	}
 	return nil
 }

@@ -1,7 +1,7 @@
 <template>
     <el-drawer v-model="composeVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
         <template #header>
-            <DrawerHeader :header="$t('commons.button.edit')" :back="handleClose" />
+            <DrawerHeader :header="$t('commons.button.edit')" :resource="name" :back="handleClose" />
         </template>
         <div v-loading="loading">
             <codemirror

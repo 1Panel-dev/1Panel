@@ -22,6 +22,10 @@ type ContainerInfo struct {
 	State       string `json:"state"`
 	RunTime     string `json:"runTime"`
 
+	CPUPercent    float64  `json:"cpuPercent"`
+	MemoryPercent float64  `json:"memoryPercent"`
+	Ports         []string `json:"ports"`
+
 	IsFromApp     bool `json:"isFromApp"`
 	IsFromCompose bool `json:"isFromCompose"`
 }
@@ -59,8 +63,10 @@ type VolumeHelper struct {
 	Mode         string `json:"mode"`
 }
 type PortHelper struct {
-	ContainerPort int `json:"containerPort"`
-	HostPort      int `json:"hostPort"`
+	HostIP        string `json:"hostIP"`
+	HostPort      string `json:"hostPort"`
+	ContainerPort string `json:"containerPort"`
+	Protocol      string `json:"protocol"`
 }
 
 type ContainerLog struct {
@@ -140,6 +146,7 @@ type ComposeOperation struct {
 	Name      string `json:"name" validate:"required"`
 	Path      string `json:"path" validate:"required"`
 	Operation string `json:"operation" validate:"required,oneof=start stop down"`
+	WithFile  bool   `json:"withFile"`
 }
 type ComposeUpdate struct {
 	Name    string `json:"name" validate:"required"`

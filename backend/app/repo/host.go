@@ -25,7 +25,7 @@ func NewIHostRepo() IHostRepo {
 	return &HostRepo{}
 }
 
-func (u *HostRepo) Get(opts ...DBOption) (model.Host, error) {
+func (h *HostRepo) Get(opts ...DBOption) (model.Host, error) {
 	var host model.Host
 	db := global.DB
 	for _, opt := range opts {
@@ -35,7 +35,7 @@ func (u *HostRepo) Get(opts ...DBOption) (model.Host, error) {
 	return host, err
 }
 
-func (u *HostRepo) GetList(opts ...DBOption) ([]model.Host, error) {
+func (h *HostRepo) GetList(opts ...DBOption) ([]model.Host, error) {
 	var hosts []model.Host
 	db := global.DB.Model(&model.Host{})
 	for _, opt := range opts {
@@ -45,7 +45,7 @@ func (u *HostRepo) GetList(opts ...DBOption) ([]model.Host, error) {
 	return hosts, err
 }
 
-func (u *HostRepo) Page(page, size int, opts ...DBOption) (int64, []model.Host, error) {
+func (h *HostRepo) Page(page, size int, opts ...DBOption) (int64, []model.Host, error) {
 	var users []model.Host
 	db := global.DB.Model(&model.Host{})
 	for _, opt := range opts {
@@ -57,7 +57,7 @@ func (u *HostRepo) Page(page, size int, opts ...DBOption) (int64, []model.Host, 
 	return count, users, err
 }
 
-func (c *HostRepo) WithByInfo(info string) DBOption {
+func (h *HostRepo) WithByInfo(info string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		if len(info) == 0 {
 			return g
@@ -67,22 +67,22 @@ func (c *HostRepo) WithByInfo(info string) DBOption {
 	}
 }
 
-func (u *HostRepo) WithByPort(port uint) DBOption {
+func (h *HostRepo) WithByPort(port uint) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("port = ?", port)
 	}
 }
-func (u *HostRepo) WithByUser(user string) DBOption {
+func (h *HostRepo) WithByUser(user string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("user = ?", user)
 	}
 }
-func (u *HostRepo) WithByAddr(addr string) DBOption {
+func (h *HostRepo) WithByAddr(addr string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("addr = ?", addr)
 	}
 }
-func (u *HostRepo) WithByGroup(group string) DBOption {
+func (h *HostRepo) WithByGroup(group string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		if len(group) == 0 {
 			return g
@@ -91,15 +91,15 @@ func (u *HostRepo) WithByGroup(group string) DBOption {
 	}
 }
 
-func (u *HostRepo) Create(host *model.Host) error {
+func (h *HostRepo) Create(host *model.Host) error {
 	return global.DB.Create(host).Error
 }
 
-func (u *HostRepo) Update(id uint, vars map[string]interface{}) error {
+func (h *HostRepo) Update(id uint, vars map[string]interface{}) error {
 	return global.DB.Model(&model.Host{}).Where("id = ?", id).Updates(vars).Error
 }
 
-func (u *HostRepo) Delete(opts ...DBOption) error {
+func (h *HostRepo) Delete(opts ...DBOption) error {
 	db := global.DB
 	for _, opt := range opts {
 		db = opt(db)

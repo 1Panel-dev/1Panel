@@ -82,8 +82,8 @@
                     </el-row>
                 </div>
             </div>
-            <div v-loading="loadingDetail" style="margin-left: 10px">
-                <MdEditor v-model="appDetail.readme" previewOnly />
+            <div style="margin-left: 10px">
+                <MdEditor v-model="app.readMe" previewOnly :themes="globalStore.$state.themeConfig.theme || 'light'" />
             </div>
         </template>
     </LayoutContent>
@@ -97,6 +97,10 @@ import MdEditor from 'md-editor-v3';
 import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import Install from './install/index.vue';
+import router from '@/routers';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
+
 const language = useI18n().locale.value;
 
 interface OperateProps {
@@ -131,7 +135,7 @@ const getApp = async () => {
 const getDetail = async (id: number, version: string) => {
     loadingDetail.value = true;
     try {
-        const res = await GetAppDetail(id, version);
+        const res = await GetAppDetail(id, version, 'app');
         appDetail.value = res.data;
     } finally {
         loadingDetail.value = false;
@@ -147,7 +151,11 @@ const openInstall = () => {
         params: appDetail.value.params,
         appDetailId: appDetail.value.id,
     };
-    installRef.value.acceptParams(params);
+    if (app.value.type === 'php') {
+        router.push({ path: '/websites/runtime/php' });
+    } else {
+        installRef.value.acceptParams(params);
+    }
 };
 
 onMounted(() => {

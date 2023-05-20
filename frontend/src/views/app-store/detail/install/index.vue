@@ -12,23 +12,61 @@
 
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
+                <el-alert type="info" :closable="false">
+                    <p>{{ $t('app.appInstallWarn') }}</p>
+                </el-alert>
                 <el-form
+                    @submit.prevent
                     ref="paramForm"
                     label-position="top"
-                    :model="form"
+                    :model="req"
                     label-width="150px"
                     :rules="rules"
                     :validate-on-rule-change="false"
                 >
-                    <el-form-item :label="$t('app.name')" prop="NAME">
-                        <el-input v-model.trim="form['NAME']"></el-input>
+                    <el-form-item :label="$t('app.name')" prop="name">
+                        <el-input v-model.trim="req.name"></el-input>
                     </el-form-item>
                     <Params
                         v-if="open"
-                        v-model:form="form"
+                        v-model:form="req.params"
                         v-model:params="installData.params"
-                        v-model:rules="rules"
+                        v-model:rules="rules.params"
+                        :propStart="'params.'"
                     ></Params>
+                    <el-form-item prop="advanced">
+                        <el-checkbox v-model="req.advanced" :label="$t('app.advanced')" size="large" />
+                    </el-form-item>
+                    <div v-if="req.advanced">
+                        <el-form-item :label="$t('app.containerName')" prop="containerName">
+                            <el-input
+                                v-model.trim="req.containerName"
+                                :placeholder="$t('app.conatinerNameHelper')"
+                            ></el-input>
+                        </el-form-item>
+                        <el-form-item :label="$t('container.cpuQuota')" prop="cpuQuota">
+                            <el-input type="number" style="width: 40%" v-model.number="req.cpuQuota" maxlength="5">
+                                <template #append>{{ $t('app.cpuCore') }}</template>
+                            </el-input>
+                            <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                        </el-form-item>
+                        <el-form-item :label="$t('container.memoryLimit')" prop="memoryLimit">
+                            <el-input style="width: 40%" v-model.number="req.memoryLimit" maxlength="10">
+                                <template #append>
+                                    <el-select v-model="req.memoryUnit" placeholder="Select" style="width: 85px">
+                                        <el-option label="KB" value="K" />
+                                        <el-option label="MB" value="M" />
+                                        <el-option label="GB" value="G" />
+                                    </el-select>
+                                </template>
+                            </el-input>
+                            <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                        </el-form-item>
+                        <el-form-item prop="allowPort">
+                            <el-checkbox v-model="req.allowPort" :label="$t('app.allowPort')" size="large" />
+                            <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
+                        </el-form-item>
+                    </div>
                 </el-form>
             </el-col>
         </el-row>
@@ -47,7 +85,7 @@
 <script lang="ts" setup name="appInstall">
 import { App } from '@/api/interface/app';
 import { InstallApp } from '@/api/modules/app';
-import { Rules } from '@/global/form-rules';
+import { Rules, checkNumberRange } from '@/global/form-rules';
 import { FormInstance, FormRules } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -64,18 +102,32 @@ interface InstallRrops {
 const installData = ref<InstallRrops>({
     appDetailId: 0,
 });
-let open = ref(false);
-let form = ref<{ [key: string]: any }>({});
-let rules = ref<FormRules>({
-    NAME: [Rules.appName],
+const open = ref(false);
+const rules = ref<FormRules>({
+    name: [Rules.appName],
+    params: [],
+    containerName: [Rules.containerName],
+    cpuQuota: [checkNumberRange(0, 99999)],
+    memoryLimit: [checkNumberRange(0, 9999999999)],
 });
-let loading = ref(false);
+const loading = ref(false);
 const paramForm = ref<FormInstance>();
-const req = reactive({
+
+const form = ref<{ [key: string]: any }>({});
+
+const initData = () => ({
     appDetailId: 0,
-    params: {},
+    params: form.value,
     name: '',
+    advanced: false,
+    cpuQuota: 0,
+    memoryLimit: 0,
+    memoryUnit: 'MB',
+    containerName: '',
+    allowPort: false,
 });
+
+const req = reactive(initData());
 
 const handleClose = () => {
     open.value = false;
@@ -87,6 +139,7 @@ const resetForm = () => {
         paramForm.value.clearValidate();
         paramForm.value.resetFields();
     }
+    Object.assign(req, initData());
 };
 
 const acceptParams = (props: InstallRrops): void => {
@@ -102,8 +155,6 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         req.appDetailId = installData.value.appDetailId;
-        req.params = form.value;
-        req.name = form.value['NAME'];
         loading.value = true;
         InstallApp(req)
             .then(() => {

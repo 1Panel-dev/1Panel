@@ -1,5 +1,5 @@
 <template>
-    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+    <el-drawer v-model="drawerVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
         <template #header>
             <DrawerHeader :header="$t('container.createNetwork')" :back="handleClose" />
         </template>

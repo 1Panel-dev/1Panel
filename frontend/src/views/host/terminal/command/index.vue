@@ -44,6 +44,7 @@
             <el-row type="flex" justify="center">
                 <el-col :span="22">
                     <el-form
+                        @submit.prevent
                         ref="commandInfoRef"
                         label-width="100px"
                         label-position="top"

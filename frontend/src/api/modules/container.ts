@@ -3,13 +3,13 @@ import { ResPage, SearchWithPage } from '../interface';
 import { Container } from '../interface/container';
 
 export const searchContainer = (params: Container.ContainerSearch) => {
-    return http.post<ResPage<Container.ContainerInfo>>(`/containers/search`, params);
+    return http.post<ResPage<Container.ContainerInfo>>(`/containers/search`, params, 400000);
 };
 export const createContainer = (params: Container.ContainerCreate) => {
-    return http.post(`/containers`, params, 1200000);
+    return http.post(`/containers`, params, 3000000);
 };
 export const logContainer = (params: Container.ContainerLogSearch) => {
-    return http.post<string>(`/containers/search/log`, params);
+    return http.post<string>(`/containers/search/log`, params, 400000);
 };
 export const ContainerStats = (id: string) => {
     return http.get<Container.ContainerStats>(`/containers/stats/${id}`);
@@ -117,7 +117,10 @@ export const searchCompose = (params: SearchWithPage) => {
     return http.post<ResPage<Container.ComposeInfo>>(`/containers/compose/search`, params);
 };
 export const upCompose = (params: Container.ComposeCreate) => {
-    return http.post(`/containers/compose`, params, 600000);
+    return http.post<string>(`/containers/compose`, params);
+};
+export const testCompose = (params: Container.ComposeCreate) => {
+    return http.post<boolean>(`/containers/compose/test`, params);
 };
 export const composeOperator = (params: Container.ComposeOpration) => {
     return http.post(`/containers/compose/operate`, params);
@@ -127,8 +130,8 @@ export const composeUpdate = (params: Container.ComposeUpdate) => {
 };
 
 // docker
-export const dockerOperate = (params: Container.DockerOperate) => {
-    return http.post(`/containers/docker/operate`, params);
+export const dockerOperate = (operation: string) => {
+    return http.post(`/containers/docker/operate`, { operation: operation });
 };
 export const loadDaemonJson = () => {
     return http.get<Container.DaemonJsonConf>(`/containers/daemonjson`);

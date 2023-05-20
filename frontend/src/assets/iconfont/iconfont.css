@@ -1,9 +1,9 @@
 @font-face {
   font-family: "panel"; /* Project id 3575356 */
-  src: url('iconfont.woff2?t=1673865903517') format('woff2'),
-       url('iconfont.woff?t=1673865903517') format('woff'),
-       url('iconfont.ttf?t=1673865903517') format('truetype'),
-       url('iconfont.svg?t=1673865903517#panel') format('svg');
+  src: url('iconfont.woff2?t=1681715760705') format('woff2'),
+       url('iconfont.woff?t=1681715760705') format('woff'),
+       url('iconfont.ttf?t=1681715760705') format('truetype'),
+       url('iconfont.svg?t=1681715760705#panel') format('svg');
 }
 
 .panel {
@@ -12,6 +12,22 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.p-yanzhengma1:before {
+  content: "\e744";
+}
+
+.p-tengxunyun1:before {
+  content: "\e651";
+}
+
+.p-qiniuyun:before {
+  content: "\e62c";
+}
+
+.p-file-png:before {
+  content: "\e7ae";
 }
 
 .p-file-ppt:before {

@@ -22,7 +22,7 @@
                                 @clear="search()"
                                 suffix-icon="Search"
                                 @keyup.enter="search()"
-                                @blur="search()"
+                                @change="search()"
                                 :placeholder="$t('commons.button.search')"
                             ></el-input>
                         </div>
@@ -34,8 +34,7 @@
                     <template #prefix>{{ $t('terminal.group') }}</template>
                     <el-option :label="$t('commons.table.all')" value=""></el-option>
                     <div v-for="item in groupList" :key="item.name">
-                        <el-option v-if="item.name === 'default'" :label="$t('website.default')" :value="item.id" />
-                        <el-option v-else :value="item.id" :label="item.name" />
+                        <el-option :value="item.id" :label="item.name" />
                     </div>
                 </el-select>
             </template>
@@ -84,7 +83,8 @@ import GroupDialog from '@/components/group/index.vue';
 import GroupChangeDialog from '@/views/host/terminal/host/change-group/index.vue';
 import OperateDialog from '@/views/host/terminal/host/operate/index.vue';
 import ComplexTable from '@/components/complex-table/index.vue';
-import { deleteHost, GetGroupList, searchHosts } from '@/api/modules/host';
+import { deleteHost, searchHosts } from '@/api/modules/host';
+import { GetGroupList } from '@/api/modules/group';
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { Host } from '@/api/interface/host';

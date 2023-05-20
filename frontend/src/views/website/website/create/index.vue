@@ -11,12 +11,17 @@
                                     value: 'deployment',
                                 },
                                 {
-                                    label: i18n.global.t('website.static'),
-                                    value: 'static',
+                                    label: i18n.global.t('runtime.runtime'),
+                                    value: 'runtime',
                                 },
+
                                 {
                                     label: i18n.global.t('website.proxy'),
                                     value: 'proxy',
+                                },
+                                {
+                                    label: i18n.global.t('website.static'),
+                                    value: 'static',
                                 },
                             ]"
                             :key="item.value"
@@ -36,7 +41,7 @@
                 </template>
             </DrawerHeader>
         </template>
-        <el-row v-loading="loading">
+        <el-row v-loading="loading" :class="{ mask: !versionExist }">
             <el-col :span="22" :offset="1">
                 <el-alert
                     v-if="website.type == 'deployment'"
@@ -53,6 +58,12 @@
                 <el-alert
                     v-if="website.type == 'proxy'"
                     :title="$t('website.websiteProxyHelper')"
+                    type="info"
+                    :closable="false"
+                />
+                <el-alert
+                    v-if="website.type == 'runtime'"
+                    :title="$t('website.runtimeProxyHelper')"
                     type="info"
                     :closable="false"
                 />
@@ -129,7 +140,7 @@
                                 </el-row>
                             </el-form-item>
                             <el-form-item :label="$t('app.name')" prop="appinstall.name">
-                                <el-input v-model="website.appinstall.name"></el-input>
+                                <el-input v-model.trim="website.appinstall.name"></el-input>
                             </el-form-item>
                             <Params
                                 :key="paramKey"
@@ -139,6 +150,93 @@
                                 :propStart="'appinstall.params.'"
                             ></Params>
                         </div>
+                    </div>
+                    <div v-if="website.type === 'runtime'">
+                        <el-form-item :label="$t('runtime.runtime')" prop="runtimeID">
+                            <el-select
+                                v-model="website.runtimeID"
+                                @change="changeRuntime(website.runtimeID)"
+                                filterable
+                            >
+                                <el-option
+                                    v-for="run in runtimes"
+                                    :key="run.name"
+                                    :label="run.name + '(' + $t('runtime.' + run.resource) + ')'"
+                                    :value="run.id"
+                                ></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <Params
+                            v-if="runtimeResource === 'appstore'"
+                            :key="paramKey"
+                            v-model:form="website.appinstall.params"
+                            v-model:rules="rules.appinstall.params"
+                            :params="appParams"
+                            :propStart="'appinstall.params.'"
+                        ></Params>
+                        <div v-else>
+                            <el-form-item :label="$t('website.proxyType')" prop="proxyType">
+                                <el-select v-model="website.proxyType">
+                                    <el-option :label="$t('website.tcp')" :value="'tcp'"></el-option>
+                                    <el-option :label="$t('website.unix')" :value="'unix'"></el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item v-if="website.proxyType === 'tcp'" :label="$t('website.port')" prop="port">
+                                <el-input v-model.number="website.port"></el-input>
+                            </el-form-item>
+                        </div>
+                    </div>
+                    <el-form-item
+                        prop="advanced"
+                        v-if="
+                            website.type === 'runtime' || (website.type === 'deployment' && website.appType === 'new')
+                        "
+                    >
+                        <el-checkbox v-model="website.appinstall.advanced" :label="$t('app.advanced')" size="large" />
+                    </el-form-item>
+
+                    <div v-if="website.appinstall.advanced">
+                        <el-form-item :label="$t('app.containerName')" prop="containerName">
+                            <el-input
+                                v-model.trim="website.appinstall.containerName"
+                                :placeholder="$t('app.conatinerNameHelper')"
+                            ></el-input>
+                        </el-form-item>
+                        <el-form-item :label="$t('container.cpuQuota')" prop="cpuQuota">
+                            <el-input
+                                type="number"
+                                style="width: 40%"
+                                v-model.number="website.appinstall.cpuQuota"
+                                maxlength="5"
+                            >
+                                <template #append>{{ $t('app.cpuCore') }}</template>
+                            </el-input>
+                            <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                        </el-form-item>
+                        <el-form-item :label="$t('container.memoryLimit')" prop="memoryLimit">
+                            <el-input style="width: 40%" v-model.number="website.appinstall.memoryLimit" maxlength="10">
+                                <template #append>
+                                    <el-select
+                                        v-model="website.appinstall.memoryUnit"
+                                        placeholder="Select"
+                                        style="width: 85px"
+                                    >
+                                        <el-option label="KB" value="K" />
+                                        <el-option label="MB" value="M" />
+                                        <el-option label="GB" value="G" />
+                                    </el-select>
+                                </template>
+                            </el-input>
+                            <span class="input-help">{{ $t('container.limitHelper') }}</span>
+                        </el-form-item>
+                        <el-form-item prop="allowPort">
+                            <el-checkbox
+                                v-model="website.appinstall.allowPort"
+                                :label="$t('app.allowPort')"
+                                size="large"
+                            />
+                            <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
+                        </el-form-item>
                     </div>
                     <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
                         <el-input
@@ -181,15 +279,26 @@
             </span>
         </template>
         <Check ref="preCheckRef"></Check>
+        <el-card width="30%" v-if="!versionExist" class="mask-prompt">
+            <span>
+                {{ $t('runtime.openrestryWarn') }}
+            </span>
+        </el-card>
     </el-drawer>
 </template>
 
 <script lang="ts" setup name="CreateWebSite">
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { App } from '@/api/interface/app';
-import { Website } from '@/api/interface/website';
-import { GetApp, GetAppDetail, SearchApp, GetAppInstalled } from '@/api/modules/app';
-import { CreateWebsite, ListGroups, PreCheck } from '@/api/modules/website';
+import {
+    GetApp,
+    GetAppDetail,
+    SearchApp,
+    GetAppInstalled,
+    GetAppDetailByID,
+    CheckAppInstalled,
+} from '@/api/modules/app';
+import { CreateWebsite, PreCheck } from '@/api/modules/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, FormInstance } from 'element-plus';
@@ -197,6 +306,10 @@ import { reactive, ref } from 'vue';
 import Params from '@/views/app-store/detail/params/index.vue';
 import Check from '../check/index.vue';
 import { MsgSuccess } from '@/utils/message';
+import { GetGroupList } from '@/api/modules/group';
+import { Group } from '@/api/interface/group';
+import { SearchRuntimes } from '@/api/modules/runtime';
+import { Runtime } from '@/api/interface/runtime';
 
 const websiteForm = ref<FormInstance>();
 const website = ref({
@@ -209,6 +322,7 @@ const website = ref({
     webSiteGroupId: 1,
     otherDomains: '',
     proxy: '',
+    runtimeID: undefined,
     appinstall: {
         appId: 0,
         name: '',
@@ -216,9 +330,18 @@ const website = ref({
         params: {},
         version: '',
         appkey: '',
+
+        advanced: false,
+        cpuQuota: 0,
+        memoryLimit: 0,
+        memoryUnit: 'MB',
+        containerName: '',
+        allowPort: false,
     },
+    proxyType: 'tcp',
+    port: 9000,
 });
-let rules = ref<any>({
+const rules = ref<any>({
     primaryDomain: [Rules.domain],
     alias: [Rules.linuxName],
     type: [Rules.requiredInput],
@@ -226,30 +349,41 @@ let rules = ref<any>({
     appInstallId: [Rules.requiredSelectBusiness],
     appType: [Rules.requiredInput],
     proxy: [Rules.requiredInput],
+    runtimeID: [Rules.requiredSelectBusiness],
     appinstall: {
         name: [Rules.appName],
         appId: [Rules.requiredSelectBusiness],
         params: {},
     },
+    proxyType: [Rules.requiredSelect],
+    port: [Rules.port],
 });
 
-let open = ref(false);
-let loading = ref(false);
-let groups = ref<Website.Group[]>([]);
-let appInstalles = ref<App.AppInstalled[]>([]);
-let appReq = reactive({
+const open = ref(false);
+const loading = ref(false);
+const groups = ref<Group.GroupInfo[]>([]);
+
+const appInstalles = ref<App.AppInstalled[]>([]);
+const appReq = reactive({
     type: 'website',
     page: 1,
     pageSize: 20,
 });
-let apps = ref<App.App[]>([]);
-let appVersions = ref<string[]>([]);
-let appDetail = ref<App.AppDetail>();
-let appParams = ref<App.AppParams>();
-let paramKey = ref(1);
-let preCheckRef = ref();
-let staticPath = ref('');
-
+const apps = ref<App.App[]>([]);
+const appVersions = ref<string[]>([]);
+const appDetail = ref<App.AppDetail>();
+const appParams = ref<App.AppParams>();
+const paramKey = ref(1);
+const preCheckRef = ref();
+const staticPath = ref('');
+const runtimeResource = ref('appstore');
+const runtimeReq = ref<Runtime.RuntimeReq>({
+    page: 1,
+    pageSize: 100,
+    status: 'normal',
+});
+const runtimes = ref<Runtime.RuntimeDTO[]>([]);
+const versionExist = ref(true);
 const em = defineEmits(['close']);
 
 const handleClose = () => {
@@ -262,16 +396,31 @@ const changeType = (type: string) => {
         if (appInstalles.value && appInstalles.value.length > 0) {
             website.value.appInstallId = appInstalles.value[0].id;
         }
+    } else if (type == 'runtime') {
+        checkNginxVersion();
+        getRuntimes();
     } else {
         website.value.appInstallId = undefined;
     }
     website.value.type = type;
+    versionExist.value = true;
+};
+
+const checkNginxVersion = async () => {
+    try {
+        const res = await CheckAppInstalled('openresty');
+        if (res.data && res.data.version) {
+            if (!compareVersions(res.data.version, '1.21.4')) {
+                versionExist.value = false;
+            }
+        }
+    } catch (error) {}
 };
 
 const searchAppInstalled = () => {
     GetAppInstalled({ type: 'website', unused: true }).then((res) => {
         appInstalles.value = res.data;
-        if (res.data.length > 0) {
+        if (res.data && res.data.length > 0) {
             website.value.appInstallId = res.data[0].id;
         }
     });
@@ -308,7 +457,7 @@ const getApp = () => {
 };
 
 const getAppDetail = (version: string) => {
-    GetAppDetail(website.value.appinstall.appId, version).then((res) => {
+    GetAppDetail(website.value.appinstall.appId, version, 'app').then((res) => {
         website.value.appinstall.appDetailId = res.data.id;
         appDetail.value = res.data;
         appParams.value = res.data.params;
@@ -316,17 +465,56 @@ const getAppDetail = (version: string) => {
     });
 };
 
+const getAppDetailByID = (id: number) => {
+    GetAppDetailByID(id).then((res) => {
+        website.value.appinstall.appDetailId = res.data.id;
+        appDetail.value = res.data;
+        appParams.value = res.data.params;
+        paramKey.value++;
+    });
+};
+
+const changeRuntime = (runID: number) => {
+    runtimes.value.forEach((item) => {
+        if (item.id === runID) {
+            runtimeResource.value = item.resource;
+            if (item.resource === 'appstore') {
+                getAppDetailByID(item.appDetailId);
+            }
+        }
+    });
+};
+
+const getRuntimes = async () => {
+    try {
+        const res = await SearchRuntimes(runtimeReq.value);
+        runtimes.value = res.data.items || [];
+        if (runtimes.value.length > 0) {
+            const first = runtimes.value[0];
+            website.value.runtimeID = first.id;
+            runtimeResource.value = first.resource;
+            if (first.resource === 'appstore') {
+                getAppDetailByID(first.appDetailId);
+            }
+        }
+    } catch (error) {}
+};
+
 const acceptParams = async (installPath: string) => {
     if (websiteForm.value) {
         websiteForm.value.resetFields();
     }
     staticPath.value = installPath + '/www/sites/';
-    await ListGroups().then((res) => {
-        groups.value = res.data;
-        website.value.webSiteGroupId = res.data[0].id;
-        open.value = true;
-    });
+
+    const res = await GetGroupList({ type: 'website' });
+    groups.value = res.data;
+    website.value.webSiteGroupId = res.data[0].id;
+    website.value.type = 'deployment';
+    runtimeResource.value = 'appstore';
+
     searchAppInstalled();
+
+    open.value = true;
 };
 
 const changeAppType = (type: string) => {
@@ -369,6 +557,23 @@ const submit = async (formEl: FormInstance | undefined) => {
 const changeAlias = (value: string) => {
     website.value.alias = value;
 };
+
+function compareVersions(version1: string, version2: string): boolean {
+    const v1 = version1.split('.');
+    const v2 = version2.split('.');
+    const len = Math.max(v1.length, v2.length);
+
+    for (let i = 0; i < len; i++) {
+        const num1 = parseInt(v1[i] || '0');
+        const num2 = parseInt(v2[i] || '0');
+
+        if (num1 !== num2) {
+            return num1 > num2 ? true : false;
+        }
+    }
+
+    return false;
+}
 
 defineExpose({
     acceptParams,

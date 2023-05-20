@@ -1,12 +1,15 @@
 <template>
     <el-drawer v-model="open" :before-close="handleClose" :close-on-click-modal="false" width="50%">
         <template #header>
-            <DrawerHeader :header="$t('file.setRole')" :back="handleClose" />
+            <DrawerHeader :header="$t('file.setRole')" :resource="name" :back="handleClose" />
         </template>
 
         <el-row>
             <el-col :span="22" :offset="1">
                 <FileRole v-loading="loading" :mode="mode" @get-mode="getMode"></FileRole>
+                <el-form-item v-if="form.isDir">
+                    <el-checkbox v-model="form.sub">{{ $t('file.containSub') }}</el-checkbox>
+                </el-form-item>
             </el-col>
         </el-row>
         <template #footer>
@@ -27,10 +30,11 @@ import i18n from '@/lang';
 import FileRole from '@/components/file-role/index.vue';
 import { MsgSuccess } from '@/utils/message';
 
-let open = ref(false);
-let form = ref<File.FileCreate>({ path: '', isDir: false, mode: 0o755 });
-let loading = ref<Boolean>(false);
-let mode = ref('0755');
+const open = ref(false);
+const form = ref<File.FileCreate>({ path: '', isDir: false, mode: 0o755 });
+const loading = ref<Boolean>(false);
+const mode = ref('0755');
+const name = ref('');
 
 const em = defineEmits(['close']);
 const handleClose = () => {
@@ -43,6 +47,8 @@ const acceptParams = (create: File.FileCreate) => {
     form.value.isDir = create.isDir;
     form.value.path = create.path;
     form.value.isLink = false;
+    form.value.sub = false;
+    name.value = create.name;
 
     mode.value = String(create.mode);
 };

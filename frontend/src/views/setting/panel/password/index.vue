@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <el-drawer v-model="passwordVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+        <el-drawer v-model="passwordVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="30%">
             <template #header>
                 <DrawerHeader :header="$t('setting.changePassword')" :back="handleClose" />
             </template>
@@ -119,7 +119,7 @@ const submitChangePassword = async (formEl: FormInstance | undefined) => {
                 passwordVisiable.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 await logOutApi();
-                router.push({ name: 'login', params: { code: '' } });
+                router.push({ name: 'entrance', params: { code: globalStore.entrance } });
                 globalStore.setLogStatus(false);
             })
             .catch(() => {

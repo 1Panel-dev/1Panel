@@ -15,6 +15,10 @@ export namespace Setting {
         language: string;
 
         serverPort: number;
+        ssl: string;
+        sslType: string;
+        allowIPs: string;
+        bindDomain: string;
         securityEntrance: string;
         expirationDays: number;
         expirationTime: string;
@@ -33,6 +37,22 @@ export namespace Setting {
     export interface SettingUpdate {
         key: string;
         value: string;
+    }
+    export interface SSLUpdate {
+        ssl: string;
+        domain: string;
+        sslType: string;
+        cert: string;
+        key: string;
+        sslID: number;
+    }
+    export interface SSLInfo {
+        domain: string;
+        timeout: string;
+        rootPath: string;
+        cert: string;
+        key: string;
+        sslID: number;
     }
     export interface PasswordUpdate {
         oldPassword: string;
@@ -82,6 +102,7 @@ export namespace Setting {
     }
     export interface UpgradeInfo {
         newVersion: string;
+        latestVersion: string;
         releaseNote: string;
     }
 }

@@ -2,7 +2,7 @@
     <div>
         <el-drawer v-model="changeVisiable" :destroy-on-close="true" :close-on-click-modal="false" width="30%">
             <template #header>
-                <DrawerHeader :header="title" :back="handleClose" />
+                <DrawerHeader :header="title" :resource="changeForm.mysqlName" :back="handleClose" />
             </template>
             <el-form>
                 <el-form v-loading="loading" ref="changeFormRef" :model="changeForm" label-position="top">
@@ -38,12 +38,12 @@
                                     :rules="Rules.requiredInput"
                                 >
                                     <el-input
-                                        :placeholder="$t('database.remoteHelper')"
                                         clearable
                                         :autosize="{ minRows: 2, maxRows: 5 }"
                                         type="textarea"
                                         v-model="changeForm.privilegeIPs"
                                     />
+                                    <span class="input-help">{{ $t('database.remoteHelper') }}</span>
                                 </el-form-item>
                             </div>
                         </el-col>
@@ -158,7 +158,7 @@ const submitChangeInfo = async (formEl: FormInstance | undefined) => {
         if (changeForm.privilege !== 'ip') {
             param.value = changeForm.privilege;
         } else {
-            param.value = changeForm.privilegeIPs.replaceAll('/n', ',');
+            param.value = changeForm.privilegeIPs;
         }
         loading.value = true;
         await updateMysqlAccess(param)

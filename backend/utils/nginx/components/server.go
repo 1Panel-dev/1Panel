@@ -65,7 +65,19 @@ func (s *Server) FindDirectives(directiveName string) []IDirective {
 			directives = append(directives, directive.GetBlock().FindDirectives(directiveName)...)
 		}
 	}
-
+	if directiveName == "listen" {
+		for _, listen := range s.Listens {
+			params := []string{listen.Bind}
+			params = append(params, listen.Parameters...)
+			if listen.DefaultServer != "" {
+				params = append(params, DefaultServer)
+			}
+			directives = append(directives, &Directive{
+				Name:       "listen",
+				Parameters: params,
+			})
+		}
+	}
 	return directives
 }
 
@@ -75,14 +87,12 @@ func (s *Server) UpdateDirective(key string, params []string) {
 	}
 	if key == "listen" {
 		defaultServer := false
-		if len(params) > 1 && params[1] == "default_server" {
+		paramLen := len(params)
+		if paramLen > 0 && params[paramLen-1] == "default_server" {
+			params = params[:paramLen-1]
 			defaultServer = true
 		}
-		if len(params) > 2 {
-			s.UpdateListen(params[0], defaultServer, params[2:]...)
-		} else {
-			s.UpdateListen(params[0], defaultServer)
-		}
+		s.UpdateListen(params[0], defaultServer, params[1:]...)
 		return
 	}
 
@@ -117,7 +127,7 @@ func (s *Server) RemoveDirective(key string, params []string) {
 	var newDirectives []IDirective
 	for _, dir := range directives {
 		if dir.GetName() == key {
-			if IsRepeatKey(key) && len(params) > 0 {
+			if len(params) > 0 {
 				oldParams := dir.GetParameters()
 				if oldParams[0] == params[0] {
 					continue
@@ -237,6 +247,40 @@ func (s *Server) UpdateRootProxy(proxy []string) {
 	s.UpdateDirectiveBySecondKey("location", "/", newDir)
 }
 
+func (s *Server) UpdatePHPProxy(proxy []string, localPath string) {
+	newDir := Directive{
+		Name:       "location",
+		Parameters: []string{"~ [^/]\\.php(/|$)"},
+		Block:      &Block{},
+	}
+	block := &Block{}
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "fastcgi_pass",
+		Parameters: proxy,
+	})
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "include",
+		Parameters: []string{"fastcgi-php.conf"},
+	})
+	block.Directives = append(block.Directives, &Directive{
+		Name:       "include",
+		Parameters: []string{"fastcgi_params"},
+	})
+	if localPath == "" {
+		block.Directives = append(block.Directives, &Directive{
+			Name:       "fastcgi_param",
+			Parameters: []string{"SCRIPT_FILENAME", "$document_root$fastcgi_script_name"},
+		})
+	} else {
+		block.Directives = append(block.Directives, &Directive{
+			Name:       "fastcgi_param",
+			Parameters: []string{"SCRIPT_FILENAME", localPath},
+		})
+	}
+	newDir.Block = block
+	s.UpdateDirectiveBySecondKey("location", "~ [^/]\\.php(/|$)", newDir)
+}
+
 func (s *Server) UpdateDirectiveBySecondKey(name string, key string, directive Directive) {
 	directives := s.Directives
 	index := -1
@@ -277,5 +321,4 @@ func (s *Server) AddHTTP2HTTPS() {
 	})
 	newDir.Block = block
 	s.UpdateDirectiveBySecondKey("if", "($scheme", newDir)
-
 }

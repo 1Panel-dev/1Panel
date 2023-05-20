@@ -1,13 +1,17 @@
 package ssl
 
 import (
+	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
+	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"gopkg.in/yaml.v3"
 	"os"
+	"path"
 	"testing"
 	"time"
 
@@ -19,6 +23,129 @@ import (
 	"github.com/go-acme/lego/v4/lego"
 	"github.com/go-acme/lego/v4/registration"
 )
+
+type AppList struct {
+	Version string      `json:"version"`
+	Tags    []Tag       `json:"tags"`
+	Items   []AppDefine `json:"items"`
+}
+
+type NewAppDefine struct {
+	Name                 string    `yaml:"name"`
+	Tags                 []string  `yaml:"tags"`
+	Title                string    `yaml:"title"`
+	Type                 string    `yaml:"type"`
+	Description          string    `yaml:"description"`
+	AdditionalProperties AppDefine `yaml:"additionalProperties"`
+}
+
+type NewAppConfig struct {
+	AdditionalProperties map[string]interface{} `yaml:"additionalProperties"`
+}
+
+type AppDefine struct {
+	Key                string   `json:"key" yaml:"key"`
+	Name               string   `json:"name" yaml:"name"`
+	Tags               []string `json:"tags" yaml:"tags"`
+	Versions           []string `json:"versions" yaml:"-"`
+	ShortDescZh        string   `json:"shortDescZh" yaml:"shortDescZh"`
+	ShortDescEn        string   `json:"shortDescEn" yaml:"shortDescEn"`
+	Type               string   `json:"type" yaml:"type"`
+	CrossVersionUpdate bool     `json:"crossVersionUpdate" yaml:"crossVersionUpdate"`
+	Limit              int      `json:"limit" yaml:"limit"`
+	Recommend          int      `json:"recommend" yaml:"recommend"`
+	Website            string   `json:"website" yaml:"website"`
+	Github             string   `json:"github" yaml:"github"`
+	Document           string   `json:"document" yaml:"document"`
+}
+
+type Tag struct {
+	Key  string `json:"key" yaml:"key"`
+	Name string `json:"name" yaml:"name"`
+}
+
+func getTagName(key string, tags []Tag) string {
+	result := "应用"
+	for _, tag := range tags {
+		if tag.Key == key {
+			return tag.Name
+		}
+	}
+	return result
+}
+
+func TestAppToV2(t *testing.T) {
+	oldDir := "/Users/wangzhengkun/projects/github.com/1Panel-dev/appstore/apps"
+	newDir := "/Users/wangzhengkun/projects/github.com/1Panel-dev/appstore/apps_new"
+	listJsonDir := path.Join(oldDir, "list.json")
+	fileOp := files.NewFileOp()
+	content, err := fileOp.GetContent(listJsonDir)
+	if err != nil {
+		panic(err)
+	}
+	appList := &AppList{}
+	if err = json.Unmarshal(content, appList); err != nil {
+		panic(err)
+	}
+
+	for _, appDefine := range appList.Items {
+		newAppDefine := &NewAppDefine{
+			Name:                 appDefine.Name,
+			Tags:                 []string{getTagName(appDefine.Tags[0], appList.Tags)},
+			Type:                 getTagName(appDefine.Tags[0], appList.Tags),
+			Title:                appDefine.ShortDescZh,
+			Description:          appDefine.ShortDescZh,
+			AdditionalProperties: appDefine,
+		}
+
+		yamlContent, err := yaml.Marshal(newAppDefine)
+		if err != nil {
+			panic(err)
+		}
+		oldAppDir := oldDir + "/" + appDefine.Key
+		newAppDir := newDir + "/" + appDefine.Key
+		if !fileOp.Stat(newAppDir) {
+			fileOp.CreateDir(newAppDir, 0755)
+		}
+		// logo
+		oldLogoPath := oldAppDir + "/metadata/logo.png"
+		if err := fileOp.CopyFile(oldLogoPath, newAppDir); err != nil {
+			panic(err)
+		}
+		for _, version := range appDefine.Versions {
+			oldVersionDir := oldAppDir + "/versions/" + version
+			if err := fileOp.CopyDir(oldVersionDir, newAppDir); err != nil {
+				panic(err)
+			}
+			oldConfigPath := oldVersionDir + "/config.json"
+			configContent, err := fileOp.GetContent(oldConfigPath)
+			if err != nil {
+				panic(err)
+			}
+			var result map[string]interface{}
+			if err := json.Unmarshal(configContent, &result); err != nil {
+				panic(err)
+			}
+			newConfigD := &NewAppConfig{}
+			newConfigD.AdditionalProperties = result
+			configYamlByte, err := yaml.Marshal(newConfigD)
+			if err != nil {
+				panic(err)
+			}
+			newVersionDir := newAppDir + "/" + version
+			if err := fileOp.WriteFile(newVersionDir+"/data.yml", bytes.NewReader(configYamlByte), 0755); err != nil {
+				panic(err)
+			}
+			if err := fileOp.WriteFile(newAppDir+"/data.yml", bytes.NewReader(yamlContent), 0755); err != nil {
+				panic(err)
+			}
+			_ = fileOp.DeleteFile(newVersionDir + "/config.json")
+			oldReadMefile := newVersionDir + "/README.md"
+			_ = fileOp.Cut([]string{oldReadMefile}, newAppDir)
+			_ = fileOp.DeleteFile(oldReadMefile)
+		}
+	}
+}
 
 func TestCreatePrivate(t *testing.T) {
 	priKey, err := rsa.GenerateKey(rand.Reader, 2048)
@@ -68,7 +195,7 @@ func TestSSL(t *testing.T) {
 	//	return
 	//}
 
-	key, err := ioutil.ReadFile("private.key")
+	key, err := os.ReadFile("private.key")
 	if err != nil {
 		panic(err)
 	}

@@ -1,6 +1,6 @@
 <template>
     <div v-loading="loading">
-        <el-drawer v-model="drawerVisiable" size="50%">
+        <el-drawer v-model="drawerVisiable" size="30%">
             <template #header>
                 <DrawerHeader :header="$t('setting.importSnapshot')" :back="handleClose" />
             </template>
@@ -105,7 +105,7 @@ const loadBackups = async () => {
     backupOptions.value = [];
     for (const item of res.data) {
         if (item.type !== 'LOCAL' && item.id !== 0) {
-            backupOptions.value.push({ label: i18n.global.t('setting' + item.type), value: item.type });
+            backupOptions.value.push({ label: i18n.global.t('setting.' + item.type), value: item.type });
         }
     }
 };

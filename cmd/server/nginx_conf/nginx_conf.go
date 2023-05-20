@@ -1,6 +1,7 @@
 package nginx_conf
 
 import (
+	"embed"
 	_ "embed"
 )
 
@@ -12,3 +13,18 @@ var WebsiteDefault []byte
 
 //go:embed index.html
 var Index []byte
+
+//go:embed index.php
+var IndexPHP []byte
+
+//go:embed rewrite/*
+var Rewrites embed.FS
+
+//go:embed cache.conf
+var Cache []byte
+
+//go:embed proxy.conf
+var Proxy []byte
+
+//go:embed proxy_cache.conf
+var ProxyCache []byte

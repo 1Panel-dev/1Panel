@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/fs"
@@ -32,6 +33,7 @@ func (u *BackupService) AppBackup(req dto.CommonBackup) error {
 		return err
 	}
 	timeNow := time.Now().Format("20060102150405")
+
 	backupDir := fmt.Sprintf("%s/app/%s/%s", localDir, req.Name, req.DetailName)
 
 	fileName := fmt.Sprintf("%s_%s.tar.gz", req.DetailName, timeNow)
@@ -97,7 +99,7 @@ func handleAppBackup(install *model.AppInstall, backupDir, fileName string) erro
 		return err
 	}
 
-	appPath := fmt.Sprintf("%s/%s/%s", constant.AppInstallDir, install.App.Key, install.Name)
+	appPath := fmt.Sprintf("%s/%s", install.GetPath(), install.Name)
 	if err := handleTar(appPath, tmpDir, "app.tar.gz", ""); err != nil {
 		return err
 	}
@@ -192,7 +194,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 	}
 
 	oldInstall.Status = constant.Running
-	if err := appInstallRepo.Save(install); err != nil {
+	if err := appInstallRepo.Save(context.Background(), install); err != nil {
 		global.LOG.Errorf("save db app install failed, err: %v", err)
 		return err
 	}

@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"encoding/json"
+	"github.com/1Panel-dev/1Panel/backend/app/model"
 )
 
 type AppDatabase struct {
@@ -32,19 +32,47 @@ type AppVersion struct {
 }
 
 type AppList struct {
-	Version string      `json:"version"`
-	Tags    []Tag       `json:"tags"`
-	Items   []AppDefine `json:"items"`
+	Valid        bool     `json:"valid"`
+	Violations   []string `json:"violations"`
+	LastModified int      `json:"lastModified"`
+
+	Apps  []AppDefine     `json:"apps"`
+	Extra ExtraProperties `json:"additionalProperties"`
 }
 
 type AppDefine struct {
-	Key                string   `json:"key"`
+	Icon         string `json:"icon"`
+	Name         string `json:"name"`
+	ReadMe       string `json:"readMe"`
+	LastModified int    `json:"lastModified"`
+
+	AppProperty AppProperty        `json:"additionalProperties"`
+	Versions    []AppConfigVersion `json:"versions"`
+}
+
+type LocalAppAppDefine struct {
+	AppProperty model.App `json:"additionalProperties" yaml:"additionalProperties"`
+}
+
+type LocalAppParam struct {
+	AppParams LocalAppInstallDefine `json:"additionalProperties" yaml:"additionalProperties"`
+}
+
+type LocalAppInstallDefine struct {
+	FormFields interface{} `json:"formFields" yaml:"formFields"`
+}
+
+type ExtraProperties struct {
+	Tags []Tag `json:"tags"`
+}
+
+type AppProperty struct {
 	Name               string   `json:"name"`
+	Type               string   `json:"type"`
 	Tags               []string `json:"tags"`
-	Versions           []string `json:"versions"`
 	ShortDescZh        string   `json:"shortDescZh"`
 	ShortDescEn        string   `json:"shortDescEn"`
-	Type               string   `json:"type"`
+	Key                string   `json:"key"`
 	Required           []string `json:"Required"`
 	CrossVersionUpdate bool     `json:"crossVersionUpdate"`
 	Limit              int      `json:"limit"`
@@ -54,9 +82,12 @@ type AppDefine struct {
 	Document           string   `json:"document"`
 }
 
-func (define AppDefine) GetRequired() string {
-	by, _ := json.Marshal(define.Required)
-	return string(by)
+type AppConfigVersion struct {
+	Name                string      `json:"name"`
+	LastModified        int         `json:"lastModified"`
+	DownloadUrl         string      `json:"downloadUrl"`
+	DownloadCallBackUrl string      `json:"downloadCallBackUrl"`
+	AppForm             interface{} `json:"additionalProperties"`
 }
 
 type Tag struct {
@@ -69,15 +100,23 @@ type AppForm struct {
 }
 
 type AppFormFields struct {
-	Type     string      `json:"type"`
-	LabelZh  string      `json:"labelZh"`
-	LabelEn  string      `json:"labelEn"`
-	Required bool        `json:"required"`
-	Default  interface{} `json:"default"`
-	EnvKey   string      `json:"envKey"`
-	Disabled bool        `json:"disabled"`
-	Edit     bool        `json:"edit"`
-	Rule     string      `json:"rule"`
+	Type     string         `json:"type"`
+	LabelZh  string         `json:"labelZh"`
+	LabelEn  string         `json:"labelEn"`
+	Required bool           `json:"required"`
+	Default  interface{}    `json:"default"`
+	EnvKey   string         `json:"envKey"`
+	Disabled bool           `json:"disabled"`
+	Edit     bool           `json:"edit"`
+	Rule     string         `json:"rule"`
+	Multiple bool           `json:"multiple"`
+	Child    interface{}    `json:"child"`
+	Values   []AppFormValue `json:"values"`
+}
+
+type AppFormValue struct {
+	Label string `json:"label"`
+	Value string `json:"value"`
 }
 
 type AppResource struct {

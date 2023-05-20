@@ -179,9 +179,12 @@
     top: 220px;
     left: 45%;
     transform: translate(-50%, -50%);
-    width: 300px;
+    width: 400px;
     text-align: center;
     font-size: 14px;
+    .bt {
+        margin-top: -2px;
+    }
 }
 
 .table-button {
@@ -298,4 +301,26 @@
 
 .table-link:hover {
     opacity: 0.6;
+}
+
+.app-warn {
+    text-align: center;
+    margin-top: 100px;
+    span:first-child {
+        color: #bbbfc4;
+    }
+
+    span:nth-child(2) {
+        color: $primary-color;
+        cursor: pointer;
+    }
+
+    span:nth-child(2):hover {
+        color: #74a4f3;
+    }
+
+    img {
+        width: 300px;
+        height: 300px;
+    }
 }

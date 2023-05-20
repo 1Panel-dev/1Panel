@@ -158,8 +158,23 @@ export function getIcon(extention: string): string {
 }
 
 export function checkIp(value: string): boolean {
+    if (value === '') {
+        return true;
+    }
     const reg =
         /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+    if (!reg.test(value) && value !== '') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+export function checkPort(value: string): boolean {
+    if (Number(value) <= 0) {
+        return true;
+    }
+    const reg = /^([1-9](\d{0,3}))$|^([1-5]\d{4})$|^(6[0-4]\d{3})$|^(65[0-4]\d{2})$|^(655[0-2]\d)$|^(6553[0-5])$/;
     if (!reg.test(value) && value !== '') {
         return true;
     } else {
@@ -216,4 +231,8 @@ export function isJson(str: string) {
     } catch {
         return false;
     }
+}
+
+export function toLowerCase(str: string) {
+    return str.toLowerCase();
 }

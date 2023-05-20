@@ -11,35 +11,35 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func GetMsgWithMap(msg string, maps map[string]interface{}) string {
+func GetMsgWithMap(key string, maps map[string]interface{}) string {
 	content := ""
 	if maps == nil {
 		content = ginI18n.MustGetMessage(&i18n.LocalizeConfig{
-			MessageID: msg,
+			MessageID: key,
 		})
 	} else {
 		content = ginI18n.MustGetMessage(&i18n.LocalizeConfig{
-			MessageID:    msg,
+			MessageID:    key,
 			TemplateData: maps,
 		})
 	}
 	content = strings.ReplaceAll(content, ": <no value>", "")
 	if content == "" {
-		return msg
+		return key
 	} else {
 		return content
 	}
 }
 
-func GetErrMsg(msg string, maps map[string]interface{}) string {
+func GetErrMsg(key string, maps map[string]interface{}) string {
 	content := ""
 	if maps == nil {
 		content = ginI18n.MustGetMessage(&i18n.LocalizeConfig{
-			MessageID: msg,
+			MessageID: key,
 		})
 	} else {
 		content = ginI18n.MustGetMessage(&i18n.LocalizeConfig{
-			MessageID:    msg,
+			MessageID:    key,
 			TemplateData: maps,
 		})
 	}

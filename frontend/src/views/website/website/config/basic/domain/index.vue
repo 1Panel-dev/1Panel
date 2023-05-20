@@ -5,7 +5,7 @@
         </template>
         <el-table-column width="30px">
             <template #default="{ row }">
-                <el-button link :icon="Promotion" @click="openUrl(row.domain)"></el-button>
+                <el-button link :icon="Promotion" @click="openUrl(row.domain, row.port)"></el-button>
             </template>
         </el-table-column>
         <el-table-column :label="$t('website.domain')" prop="domain"></el-table-column>
@@ -55,8 +55,11 @@ const openCreate = () => {
     domainRef.value.acceptParams(id.value);
 };
 
-const openUrl = (domain: string) => {
-    const url = website.value.protocol.toLowerCase() + '://' + domain;
+const openUrl = (domain: string, port: string) => {
+    let url = website.value.protocol.toLowerCase() + '://' + domain;
+    if (port != '80') {
+        url = url + ':' + port;
+    }
     window.open(url);
 };
 

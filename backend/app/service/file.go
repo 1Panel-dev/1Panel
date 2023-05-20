@@ -22,7 +22,31 @@ import (
 type FileService struct {
 }
 
-func (f FileService) GetFileList(op request.FileOption) (response.FileInfo, error) {
+type IFileService interface {
+	GetFileList(op request.FileOption) (response.FileInfo, error)
+	SearchUploadWithPage(req request.SearchUploadWithPage) (int64, interface{}, error)
+	GetFileTree(op request.FileOption) ([]response.FileTree, error)
+	Create(op request.FileCreate) error
+	Delete(op request.FileDelete) error
+	BatchDelete(op request.FileBatchDelete) error
+	ChangeMode(op request.FileCreate) error
+	Compress(c request.FileCompress) error
+	DeCompress(c request.FileDeCompress) error
+	GetContent(op request.FileOption) (response.FileInfo, error)
+	SaveContent(edit request.FileEdit) error
+	FileDownload(d request.FileDownload) (string, error)
+	DirSize(req request.DirSizeReq) (response.DirSizeRes, error)
+	ChangeName(req request.FileRename) error
+	Wget(w request.FileWget) (string, error)
+	MvFile(m request.FileMove) error
+	ChangeOwner(req request.FileRoleUpdate) error
+}
+
+func NewIFileService() IFileService {
+	return &FileService{}
+}
+
+func (f *FileService) GetFileList(op request.FileOption) (response.FileInfo, error) {
 	var fileInfo response.FileInfo
 	if _, err := os.Stat(op.Path); err != nil && os.IsNotExist(err) {
 		return fileInfo, nil
@@ -35,7 +59,7 @@ func (f FileService) GetFileList(op request.FileOption) (response.FileInfo, erro
 	return fileInfo, nil
 }
 
-func (f FileService) SearchUploadWithPage(req request.SearchUploadWithPage) (int64, interface{}, error) {
+func (f *FileService) SearchUploadWithPage(req request.SearchUploadWithPage) (int64, interface{}, error) {
 	var (
 		files    []response.UploadInfo
 		backData []response.UploadInfo
@@ -65,7 +89,7 @@ func (f FileService) SearchUploadWithPage(req request.SearchUploadWithPage) (int
 	return int64(total), backData, nil
 }
 
-func (f FileService) GetFileTree(op request.FileOption) ([]response.FileTree, error) {
+func (f *FileService) GetFileTree(op request.FileOption) ([]response.FileTree, error) {
 	var treeArray []response.FileTree
 	info, err := files.NewFileInfo(op.FileOption)
 	if err != nil {
@@ -88,7 +112,7 @@ func (f FileService) GetFileTree(op request.FileOption) ([]response.FileTree, er
 	return append(treeArray, node), nil
 }
 
-func (f FileService) Create(op request.FileCreate) error {
+func (f *FileService) Create(op request.FileCreate) error {
 	fo := files.NewFileOp()
 	if fo.Stat(op.Path) {
 		return buserr.New(constant.ErrFileIsExit)
@@ -107,7 +131,7 @@ func (f FileService) Create(op request.FileCreate) error {
 	}
 }
 
-func (f FileService) Delete(op request.FileDelete) error {
+func (f *FileService) Delete(op request.FileDelete) error {
 	fo := files.NewFileOp()
 	if op.IsDir {
 		return fo.DeleteDir(op.Path)
@@ -116,7 +140,7 @@ func (f FileService) Delete(op request.FileDelete) error {
 	}
 }
 
-func (f FileService) BatchDelete(op request.FileBatchDelete) error {
+func (f *FileService) BatchDelete(op request.FileBatchDelete) error {
 	fo := files.NewFileOp()
 	if op.IsDir {
 		for _, file := range op.Paths {
@@ -134,12 +158,21 @@ func (f FileService) BatchDelete(op request.FileBatchDelete) error {
 	return nil
 }
 
-func (f FileService) ChangeMode(op request.FileCreate) error {
+func (f *FileService) ChangeMode(op request.FileCreate) error {
 	fo := files.NewFileOp()
-	return fo.Chmod(op.Path, fs.FileMode(op.Mode))
+	if op.Sub {
+		return fo.ChmodR(op.Path, op.Mode)
+	} else {
+		return fo.Chmod(op.Path, fs.FileMode(op.Mode))
+	}
 }
 
-func (f FileService) Compress(c request.FileCompress) error {
+func (f *FileService) ChangeOwner(req request.FileRoleUpdate) error {
+	fo := files.NewFileOp()
+	return fo.ChownR(req.Path, req.User, req.Group, req.Sub)
+}
+
+func (f *FileService) Compress(c request.FileCompress) error {
 	fo := files.NewFileOp()
 	if !c.Replace && fo.Stat(filepath.Join(c.Dst, c.Name)) {
 		return buserr.New(constant.ErrFileIsExit)
@@ -147,12 +180,12 @@ func (f FileService) Compress(c request.FileCompress) error {
 	return fo.Compress(c.Files, c.Dst, c.Name, files.CompressType(c.Type))
 }
 
-func (f FileService) DeCompress(c request.FileDeCompress) error {
+func (f *FileService) DeCompress(c request.FileDeCompress) error {
 	fo := files.NewFileOp()
 	return fo.Decompress(c.Path, c.Dst, files.CompressType(c.Type))
 }
 
-func (f FileService) GetContent(op request.FileOption) (response.FileInfo, error) {
+func (f *FileService) GetContent(op request.FileOption) (response.FileInfo, error) {
 	info, err := files.NewFileInfo(op.FileOption)
 	if err != nil {
 		return response.FileInfo{}, err
@@ -160,7 +193,7 @@ func (f FileService) GetContent(op request.FileOption) (response.FileInfo, error
 	return response.FileInfo{FileInfo: *info}, nil
 }
 
-func (f FileService) SaveContent(edit request.FileEdit) error {
+func (f *FileService) SaveContent(edit request.FileEdit) error {
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:   edit.Path,
 		Expand: false,
@@ -173,18 +206,18 @@ func (f FileService) SaveContent(edit request.FileEdit) error {
 	return fo.WriteFile(edit.Path, strings.NewReader(edit.Content), info.FileMode)
 }
 
-func (f FileService) ChangeName(req request.FileRename) error {
+func (f *FileService) ChangeName(req request.FileRename) error {
 	fo := files.NewFileOp()
 	return fo.Rename(req.OldName, req.NewName)
 }
 
-func (f FileService) Wget(w request.FileWget) (string, error) {
+func (f *FileService) Wget(w request.FileWget) (string, error) {
 	fo := files.NewFileOp()
 	key := "file-wget-" + common.GetUuid()
 	return key, fo.DownloadFileWithProcess(w.Url, filepath.Join(w.Path, w.Name), key)
 }
 
-func (f FileService) MvFile(m request.FileMove) error {
+func (f *FileService) MvFile(m request.FileMove) error {
 	fo := files.NewFileOp()
 	if !fo.Stat(m.NewPath) {
 		return buserr.New(constant.ErrPathNotFound)
@@ -217,7 +250,7 @@ func (f FileService) MvFile(m request.FileMove) error {
 	return nil
 }
 
-func (f FileService) FileDownload(d request.FileDownload) (string, error) {
+func (f *FileService) FileDownload(d request.FileDownload) (string, error) {
 	filePath := d.Paths[0]
 	if d.Compress {
 		tempPath := filepath.Join(os.TempDir(), fmt.Sprintf("%d", time.Now().UnixNano()))
@@ -233,7 +266,7 @@ func (f FileService) FileDownload(d request.FileDownload) (string, error) {
 	return filePath, nil
 }
 
-func (f FileService) DirSize(req request.DirSizeReq) (response.DirSizeRes, error) {
+func (f *FileService) DirSize(req request.DirSizeReq) (response.DirSizeRes, error) {
 	fo := files.NewFileOp()
 	size, err := fo.GetDirSize(req.Path)
 	if err != nil {

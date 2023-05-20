@@ -1,8 +1,11 @@
 package v1
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net/http"
+	"os/exec"
 	"strconv"
 	"time"
 
@@ -42,6 +45,9 @@ func (b *BaseApi) WsSsh(c *gin.Context) {
 	var connInfo ssh.ConnInfo
 	_ = copier.Copy(&connInfo, &host)
 	connInfo.PrivateKey = []byte(host.PrivateKey)
+	if len(host.PassPhrase) != 0 {
+		connInfo.PassPhrase = []byte(host.PassPhrase)
+	}
 
 	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
@@ -102,14 +108,15 @@ func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 		return
 	}
 	defer wsConn.Close()
-	commands := fmt.Sprintf("docker exec -it %s redis-cli", redisConf.ContainerName)
+	commands := "redis-cli"
 	if len(redisConf.Requirepass) != 0 {
-		commands = fmt.Sprintf("docker exec -it %s redis-cli -a %s --no-auth-warning", redisConf.ContainerName, redisConf.Requirepass)
+		commands = fmt.Sprintf("redis-cli -a %s --no-auth-warning", redisConf.Requirepass)
 	}
-	slave, err := terminal.NewCommand(commands)
+	slave, err := terminal.NewCommand(fmt.Sprintf("docker exec -it %s %s", redisConf.ContainerName, commands))
 	if wshandleError(wsConn, err) {
 		return
 	}
+	defer killBash(redisConf.ContainerName, commands)
 	defer slave.Close()
 
 	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave)
@@ -172,6 +179,7 @@ func (b *BaseApi) ContainerWsSsh(c *gin.Context) {
 	if wshandleError(wsConn, err) {
 		return
 	}
+	defer killBash(containerID, command)
 	defer slave.Close()
 
 	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave)
@@ -196,11 +204,28 @@ func wshandleError(ws *websocket.Conn, err error) bool {
 		global.LOG.Errorf("handler ws faled:, err: %v", err)
 		dt := time.Now().Add(time.Second)
 		if ctlerr := ws.WriteControl(websocket.CloseMessage, []byte(err.Error()), dt); ctlerr != nil {
-			_ = ws.WriteMessage(websocket.TextMessage, []byte(err.Error()))
+			wsData, err := json.Marshal(terminal.WsMsg{
+				Type: terminal.WsMsgCmd,
+				Data: base64.StdEncoding.EncodeToString([]byte(err.Error())),
+			})
+			if err != nil {
+				_ = ws.WriteMessage(websocket.TextMessage, []byte("{\"type\":\"cmd\",\"data\":\"failed to encoding to json\"}"))
+			} else {
+				_ = ws.WriteMessage(websocket.TextMessage, wsData)
+			}
 		}
 		return true
 	}
 	return false
+}
+
+func killBash(containerID, comm string) {
+	sudo := ""
+	if cmd.HasNoPasswordSudo() {
+		sudo = "sudo"
+	}
+	command := exec.Command("sh", "-c", fmt.Sprintf("%s kill -9 $(docker top %s -eo pid,command | grep '%s' | awk '{print $1}')", sudo, containerID, comm))
+	_, _ = command.CombinedOutput()
 }
 
 var upGrader = websocket.Upgrader{
