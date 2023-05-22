@@ -62,6 +62,9 @@
                                     <div class="app-content">
                                         <div class="app-header">
                                             <span class="app-title">{{ app.name }}</span>
+                                            <el-text type="success" style="margin-left: 10px" v-if="app.installed">
+                                                {{ $t('app.allReadyInstalled') }}
+                                            </el-text>
                                             <el-button
                                                 class="app-button"
                                                 type="primary"
@@ -85,7 +88,7 @@
                                                 </span>
                                             </el-tag>
                                             <el-tag v-if="app.status === 'TakeDown'" style="margin-right: 5px">
-                                                <span style="color: red">已废弃</span>
+                                                <span style="color: red">{{ $t('app.takeDown') }}</span>
                                             </el-tag>
                                         </div>
                                     </div>
@@ -113,21 +116,21 @@ import { useI18n } from 'vue-i18n';
 
 const language = useI18n().locale.value;
 
-let req = reactive({
+const req = reactive({
     name: '',
     tags: [],
     page: 1,
     pageSize: 50,
 });
 
-let apps = ref<App.App[]>([]);
-let tags = ref<App.Tag[]>([]);
+const apps = ref<App.AppDTO[]>([]);
+const tags = ref<App.Tag[]>([]);
 const colorArr = ['#005eeb', '#008B45', '#BEBEBE', '#FFF68F', '#FFFF00', '#8B0000'];
-let loading = ref(false);
-let activeTag = ref('all');
-let showDetail = ref(false);
-let appId = ref(0);
-let canUpdate = ref(false);
+const loading = ref(false);
+const activeTag = ref('all');
+const showDetail = ref(false);
+const appId = ref(0);
+const canUpdate = ref(false);
 
 const getColor = (index: number) => {
     return colorArr[index];

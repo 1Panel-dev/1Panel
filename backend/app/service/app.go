@@ -98,6 +98,8 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 			continue
 		}
 		appDTO.Tags = tags
+		installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(a.ID))
+		appDTO.Installed = len(installs) > 0
 	}
 	res.Items = appDTOs
 	res.Total = total

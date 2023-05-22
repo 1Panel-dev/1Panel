@@ -21,8 +21,9 @@ type AppUpdateRes struct {
 
 type AppDTO struct {
 	model.App
-	Versions []string    `json:"versions"`
-	Tags     []model.Tag `json:"tags"`
+	Installed bool        `json:"installed"`
+	Versions  []string    `json:"versions"`
+	Tags      []model.Tag `json:"tags"`
 }
 
 type TagDTO struct {

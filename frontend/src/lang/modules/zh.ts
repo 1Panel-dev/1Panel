@@ -1117,6 +1117,8 @@ const message = {
         editCompose: '编辑 compose 文件',
         editComposeHelper: '编辑 compose 文件可能导致软件安装失败',
         composeNullErr: 'compose 不能为空',
+        takeDown: '已废弃',
+        allReadyInstalled: '已安装',
     },
     website: {
         website: '网站',
