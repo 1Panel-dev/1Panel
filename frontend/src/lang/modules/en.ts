@@ -1124,6 +1124,7 @@ const message = {
         editCompose: 'Edit compose file',
         editComposeHelper: 'Editing the compose file may cause the software installation to fail',
         composeNullErr: 'compose cannot be empty',
+        takeDown: 'TakeDown',
     },
     website: {
         website: 'Website',
