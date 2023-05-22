@@ -46,6 +46,13 @@ func GetErrMsg(key string, maps map[string]interface{}) string {
 	return content
 }
 
+func GetMsgByKey(key string) string {
+	content := ginI18n.MustGetMessage(&i18n.LocalizeConfig{
+		MessageID: key,
+	})
+	return content
+}
+
 //go:embed lang/*
 var fs embed.FS
 

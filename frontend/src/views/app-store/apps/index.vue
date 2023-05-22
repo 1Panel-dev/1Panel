@@ -154,8 +154,12 @@ const getAppDetail = (key: string) => {
 const sync = () => {
     loading.value = true;
     SyncApp()
-        .then(() => {
-            MsgSuccess(i18n.global.t('app.syncStart'));
+        .then((res) => {
+            if (res.message != '') {
+                MsgSuccess(res.message);
+            } else {
+                MsgSuccess(i18n.global.t('app.syncStart'));
+            }
             canUpdate.value = false;
             search(req);
         })

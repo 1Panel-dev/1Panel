@@ -17,7 +17,6 @@ ErrRepoNotValid: "Remote repository verification failed！"
 ErrNameIsExist: "Name is already exist"
 ErrDemoEnvironment: "Demo server, prohibit this operation!"
 ErrCmdTimeout: "Command execution timed out！"
-ErrInitUser: "The user initialization has been completed by the system. Please do not repeat the operation!"
 
 #app
 ErrPortInUsed: "{{ .detail }} port already in use"
@@ -31,6 +30,7 @@ ErrUpdateBuWebsite: 'The application was updated successfully, but the modificat
 Err1PanelNetworkFailed: 'Default container network creation failed! {{ .detail }}'
 ErrFileParse: 'Application docker-compose file parsing failed!'
 ErrInstallDirNotFound: 'installation directory does not exist'
+AppStoreIsUpToDate: 'The app store is already up to date！'
 
 #file
 ErrFileCanNotRead: "File can not read"
@@ -46,8 +46,6 @@ ErrDomainIsExist: "Domain is already exist"
 ErrAliasIsExist: "Alias is already exist"
 ErrAppDelete: 'Other Website use this App'
 ErrGroupIsUsed: 'The group is in use and cannot be deleted'
-ErrUsernameIsExist: 'Username is already exist'
-ErrUsernameIsNotExist: 'Username is not exist'
 
 #ssl
 ErrSSLCannotDelete: "The certificate is being used by the website and cannot be removed"
@@ -66,7 +64,6 @@ ErrTypeOfRedis: "The recovery file type does not match the current persistence m
 #container 
 ErrInUsed: "{{ .detail }} is in use and cannot be deleted"
 ErrObjectInUsed: "This object is in use and cannot be deleted"
-ErrPortRules: "Invalid port specification"
 
 #runtime
 ErrDirNotFound: "The build folder does not exist! Please check file integrity！"

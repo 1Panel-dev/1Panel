@@ -1106,6 +1106,7 @@ const message = {
         allowPortHelper: '允许外部端口访问会放开防火墙端口，php运行环境请勿放开',
         appInstallWarn: '应用默认不放开外部访问端口，可以在高级设置中选择放开',
         upgradeStart: '开始升级！请稍后刷新页面',
+        toFolder: '打开安装目录',
     },
     website: {
         website: '网站',

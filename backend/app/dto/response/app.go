@@ -56,6 +56,7 @@ type AppInstalledDTO struct {
 	AppName   string `json:"appName"`
 	Icon      string `json:"icon"`
 	CanUpdate bool   `json:"canUpdate"`
+	Path      string `json:"path"`
 }
 
 type DatabaseConn struct {
