@@ -720,6 +720,7 @@ const message = {
         emptyTerminal: '暂无终端连接',
     },
     logs: {
+        panelLog: '面板日志',
         operation: '操作日志',
         login: '登录日志',
         loginIP: '登录 IP',

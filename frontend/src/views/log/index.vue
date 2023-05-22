@@ -14,16 +14,8 @@ import RouterButton from '@/components/router-button/index.vue';
 
 const buttons = [
     {
-        label: i18n.global.t('logs.operation'),
+        label: i18n.global.t('logs.panelLog'),
         path: '/logs/operation',
-    },
-    {
-        label: i18n.global.t('logs.login'),
-        path: '/logs/login',
-    },
-    {
-        label: i18n.global.t('logs.system'),
-        path: '/logs/system',
     },
     {
         label: i18n.global.t('ssh.loginLogs'),
