@@ -19,6 +19,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"github.com/1Panel-dev/1Panel/backend/utils/ntp"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
 	"github.com/gin-gonic/gin"
 )
@@ -27,12 +28,14 @@ type SettingService struct{}
 
 type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
+	LoadTimeZone() ([]string, error)
 	Update(key, value string) error
 	UpdatePassword(c *gin.Context, old, new string) error
 	UpdatePort(port uint) error
 	UpdateSSL(c *gin.Context, req dto.SSLUpdate) error
 	LoadFromCert() (*dto.SSLInfo, error)
 	HandlePasswordExpired(c *gin.Context, old, new string) error
+	SyncTime(req dto.SyncTimeZone) (time.Time, error)
 }
 
 func NewISettingService() ISettingService {
@@ -60,6 +63,14 @@ func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {
 	return &info, err
 }
 
+func (u *SettingService) LoadTimeZone() ([]string, error) {
+	std, err := cmd.Exec("timedatectl list-timezones")
+	if err != nil {
+		return []string{}, nil
+	}
+	return strings.Split(std, "\n"), err
+}
+
 func (u *SettingService) Update(key, value string) error {
 	if key == "ExpirationDays" {
 		timeout, _ := strconv.Atoi(value)
@@ -80,6 +91,27 @@ func (u *SettingService) Update(key, value string) error {
 		_ = global.SESSION.Clean()
 	}
 	return nil
+}
+
+func (u *SettingService) SyncTime(req dto.SyncTimeZone) (time.Time, error) {
+	ntime, err := ntp.GetRemoteTime(req.NtpSite)
+	if err != nil {
+		return ntime, err
+	}
+
+	ts := ntime.Format("2006-01-02 15:04:05")
+	if err := ntp.UpdateSystemTime(ts, req.TimeZone); err != nil {
+		return ntime, err
+	}
+
+	if err := settingRepo.Update("TimeZone", req.TimeZone); err != nil {
+		return ntime, err
+	}
+	if err := settingRepo.Update("NtpSite", req.NtpSite); err != nil {
+		return ntime, err
+	}
+
+	return ntime, nil
 }
 
 func (u *SettingService) UpdatePort(port uint) error {

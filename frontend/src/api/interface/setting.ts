@@ -9,6 +9,8 @@ export namespace Setting {
 
         sessionTimeout: number;
         localTime: string;
+        timeZone: string;
+        ntpSite: string;
 
         panelName: string;
         theme: string;

@@ -11,14 +11,14 @@
                             <table style="width: 100%" class="tab-table">
                                 <tr v-if="allowIPs.length !== 0">
                                     <th scope="col" width="90%" align="left">
-                                        <label>IP</label>
+                                        <label>{{ $t('setting.allowIPs') }}</label>
                                     </th>
                                     <th align="left"></th>
                                 </tr>
                                 <tr v-for="(row, index) in allowIPs" :key="index">
                                     <td width="90%">
                                         <el-input
-                                            :placeholder="$t('container.serverExample')"
+                                            :placeholder="$t('setting.allowIPEgs')"
                                             style="width: 100%"
                                             v-model="row.value"
                                         />

@@ -885,7 +885,12 @@ const message = {
         sessionTimeoutHelper:
             'If you do not operate the panel for more than {0} seconds, the panel automatically logs out',
         syncTime: 'Server time',
-        second: ' S',
+        timeZone: 'Time Zone',
+        timeZoneHelper: 'Timezone modification depends on the system timedatectl service.',
+        timeZoneCN: 'Bei Jing',
+        timeZoneAM: 'Los Angeles',
+        timeZoneNY: 'New York',
+        syncSite: 'Ntp Server',
         changePassword: 'Password change',
         oldPassword: 'Original password',
         newPassword: 'New password',
@@ -949,6 +954,7 @@ const message = {
         allowIPsWarnning:
             '设After setting the authorized IP address, only the IP address in the setting can access the 1Panel service. Do you want to continue?',
         allowIPsHelper1: 'If the authorized IP address is empty, the authorized IP address is canceled',
+        allowIPEgs: 'e.g. 172.16.10.111',
         mfa: 'MFA',
         mfaAlert:
             'MFA password is generated based on the current time. Please ensure that the server time is synchronized.',

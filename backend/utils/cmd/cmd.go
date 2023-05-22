@@ -121,3 +121,11 @@ func HasNoPasswordSudo() bool {
 	err2 := cmd2.Run()
 	return err2 == nil
 }
+
+func SudoHandleCmd() string {
+	cmd := exec.Command("sudo", "-n", "ls")
+	if err := cmd.Run(); err == nil {
+		return "sudo "
+	}
+	return ""
+}
