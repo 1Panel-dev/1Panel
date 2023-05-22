@@ -76,12 +76,9 @@
                             <el-form-item :label="$t('setting.syncTime')">
                                 <el-input disabled v-model="form.localTime">
                                     <template #append>
-                                        <el-button v-show="!show" @click="onSyncTime" icon="Refresh">
-                                            {{ $t('commons.button.sync') }}
+                                        <el-button v-show="!show" @click="onChangeNtp" icon="Setting">
+                                            {{ $t('commons.button.set') }}
                                         </el-button>
-                                        <div style="width: 45px" v-show="show">
-                                            <span>{{ count }} {{ $t('setting.second') }}</span>
-                                        </div>
                                     </template>
                                 </el-input>
                             </el-form-item>
@@ -95,6 +92,7 @@
         <UserName ref="userNameRef" />
         <PanelName ref="panelNameRef" @search="search()" />
         <Timeout ref="timeoutRef" @search="search()" />
+        <Ntp ref="ntpRef" @search="search()" />
     </div>
 </template>
 
@@ -102,7 +100,7 @@
 import { ref, reactive, onMounted, computed } from 'vue';
 import { ElForm } from 'element-plus';
 import LayoutContent from '@/layout/layout-content.vue';
-import { syncTime, getSettingInfo, updateSetting, getSystemAvailable } from '@/api/modules/setting';
+import { getSettingInfo, updateSetting, getSystemAvailable } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
@@ -111,6 +109,7 @@ import Password from '@/views/setting/panel/password/index.vue';
 import UserName from '@/views/setting/panel/username/index.vue';
 import Timeout from '@/views/setting/panel/timeout/index.vue';
 import PanelName from '@/views/setting/panel/name/index.vue';
+import Ntp from '@/views/setting/panel/ntp/index.vue';
 
 const loading = ref(false);
 const i18n = useI18n();
@@ -124,21 +123,21 @@ const form = reactive({
     email: '',
     sessionTimeout: 0,
     localTime: '',
+    timeZone: '',
+    ntpSite: '',
     panelName: '',
     theme: '',
     language: '',
     complexityVerification: '',
 });
 
-const timer = ref();
-const TIME_COUNT = ref(10);
-const count = ref();
 const show = ref();
 
 const userNameRef = ref();
 const passwordRef = ref();
 const panelNameRef = ref();
 const timeoutRef = ref();
+const ntpRef = ref();
 
 const search = async () => {
     const res = await getSettingInfo();
@@ -146,6 +145,8 @@ const search = async () => {
     form.password = '******';
     form.sessionTimeout = Number(res.data.sessionTimeout);
     form.localTime = res.data.localTime;
+    form.timeZone = res.data.timeZone;
+    form.ntpSite = res.data.ntpSite;
     form.panelName = res.data.panelName;
     form.theme = res.data.theme;
     form.language = res.data.language;
@@ -163,6 +164,9 @@ const onChangeTitle = () => {
 };
 const onChangeTimeout = () => {
     timeoutRef.value.acceptParams({ sessionTimeout: form.sessionTimeout });
+};
+const onChangeNtp = () => {
+    ntpRef.value.acceptParams({ localTime: form.localTime, timeZone: form.timeZone, ntpSite: form.ntpSite });
 };
 
 const onSave = async (key: string, val: any) => {
@@ -187,34 +191,6 @@ const onSave = async (key: string, val: any) => {
             loading.value = false;
             MsgSuccess(i18n.t('commons.msg.operationSuccess'));
             search();
-        })
-        .catch(() => {
-            loading.value = false;
-        });
-};
-
-function countdown() {
-    count.value = TIME_COUNT.value;
-    show.value = true;
-    timer.value = setInterval(() => {
-        if (count.value > 0 && count.value <= TIME_COUNT.value) {
-            count.value--;
-        } else {
-            show.value = false;
-            clearInterval(timer.value);
-            timer.value = null;
-        }
-    }, 1000);
-}
-
-const onSyncTime = async () => {
-    loading.value = true;
-    await syncTime()
-        .then((res) => {
-            loading.value = false;
-            form.localTime = res.data;
-            countdown();
-            MsgSuccess(i18n.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = false;

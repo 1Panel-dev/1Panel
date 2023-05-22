@@ -30,8 +30,8 @@ type packet struct {
 	TxTimeFrac     uint32
 }
 
-func GetRemoteTime() (time.Time, error) {
-	conn, err := net.Dial("udp", "pool.ntp.org:123")
+func GetRemoteTime(site string) (time.Time, error) {
+	conn, err := net.Dial("udp", site)
 	if err != nil {
 		return time.Time{}, fmt.Errorf("failed to connect: %v", err)
 	}
@@ -59,11 +59,17 @@ func GetRemoteTime() (time.Time, error) {
 	return showtime, nil
 }
 
-func UpdateSystemDate(dateTime string) error {
+func UpdateSystemTime(dateTime, timezone string) error {
 	system := runtime.GOOS
 	if system == "linux" {
-		if _, err := cmd.Execf(`date -s  "` + dateTime + `"`); err != nil {
-			return fmt.Errorf("update system date failed, err: %v", err)
+		stdout, err := cmd.Execf(`%s timedatectl set-timezone "%s"`, cmd.SudoHandleCmd(), timezone)
+		if err != nil {
+			return fmt.Errorf("update system time zone failed, stdout: %s, err: %v", stdout, err)
+		}
+
+		stdout2, err := cmd.Execf(`%s timedatectl set-time "%s"`, cmd.SudoHandleCmd(), dateTime)
+		if err != nil {
+			return fmt.Errorf("update system time failed,stdout: %s, err: %v", stdout2, err)
 		}
 		return nil
 	}
