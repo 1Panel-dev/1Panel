@@ -715,6 +715,7 @@ const message = {
         emptyTerminal: 'No terminal is currently connected',
     },
     logs: {
+        panelLog: 'Panel logs',
         operation: 'Operation logs',
         login: 'Login logs',
         system: 'System logs',
