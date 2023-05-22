@@ -7,9 +7,8 @@
         :before-close="handleClose"
     >
         <template #header>
-            <Header :header="$t('app.install')" :back="handleClose" />
+            <Header :header="$t('app.install')" :back="handleClose"></Header>
         </template>
-
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-alert type="info" :closable="false">
@@ -66,6 +65,25 @@
                             <el-checkbox v-model="req.allowPort" :label="$t('app.allowPort')" size="large" />
                             <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
                         </el-form-item>
+                        <el-form-item prop="editCompose">
+                            <el-checkbox v-model="req.editCompose" :label="$t('app.editCompose')" size="large" />
+                            <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
+                        </el-form-item>
+                        <div v-if="req.editCompose">
+                            <codemirror
+                                :autofocus="true"
+                                placeholder=""
+                                :indent-with-tab="true"
+                                :tabSize="4"
+                                style="height: 400px"
+                                :lineWrapping="true"
+                                :matchBrackets="true"
+                                theme="cobalt"
+                                :styleActiveLine="true"
+                                :extensions="extensions"
+                                v-model="req.dockerCompose"
+                            />
+                        </div>
                     </div>
                 </el-form>
             </el-col>
@@ -92,18 +110,26 @@ import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Params from '../params/index.vue';
 import Header from '@/components/drawer-header/index.vue';
+import { Codemirror } from 'vue-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { oneDark } from '@codemirror/theme-one-dark';
+import i18n from '@/lang';
+import { MsgError } from '@/utils/message';
 
+const extensions = [javascript(), oneDark];
 const router = useRouter();
 
 interface InstallRrops {
     appDetailId: number;
     params?: App.AppParams;
     app: any;
+    compose: string;
 }
 
 const installData = ref<InstallRrops>({
     appDetailId: 0,
     app: {},
+    compose: '',
 });
 const open = ref(false);
 const rules = ref<FormRules>({
@@ -126,6 +152,8 @@ const initData = () => ({
     memoryUnit: 'MB',
     containerName: '',
     allowPort: false,
+    editCompose: false,
+    dockerCompose: '',
 });
 const req = reactive(initData());
 
@@ -140,6 +168,7 @@ const resetForm = () => {
         paramForm.value.resetFields();
     }
     Object.assign(req, initData());
+    req.dockerCompose = installData.value.compose;
 };
 
 const acceptParams = (props: InstallRrops): void => {
@@ -152,6 +181,10 @@ const submit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     await formEl.validate((valid) => {
         if (!valid) {
+            return;
+        }
+        if (req.editCompose && req.dockerCompose == '') {
+            MsgError(i18n.global.t('app.composeNullErr'));
             return;
         }
         req.appDetailId = installData.value.appDetailId;

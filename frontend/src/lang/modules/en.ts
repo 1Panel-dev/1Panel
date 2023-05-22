@@ -1120,6 +1120,9 @@ const message = {
             'The application does not release the external access port by default, you can choose to release it in the advanced settings',
         upgradeStart: 'Start upgrading! Please refresh the page later',
         toFolder: 'Open the installation directory',
+        editCompose: 'Edit compose file',
+        editComposeHelper: 'Editing the compose file may cause the software installation to fail',
+        composeNullErr: 'compose cannot be empty',
     },
     website: {
         website: 'Website',
