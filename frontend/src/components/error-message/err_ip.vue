@@ -5,7 +5,7 @@
             <h2>{{ $t('commons.login.notSafe') }}</h2>
             <h4>{{ $t('commons.login.errIP1') }}</h4>
             <div>
-                <h4>{{ $t('commons.login.errHelper') }} 1pctl reset-ips</h4>
+                <h4>{{ $t('commons.login.errHelper') }} 1pctl reset ips</h4>
                 <div style="cursor: pointer; float: left">
                     <el-icon color="#409EFC" style="margin-left: 5px; margin-top: 33px" :size="18" @click="onCopy()">
                         <DocumentCopy />
@@ -22,7 +22,7 @@ import { MsgSuccess } from '@/utils/message';
 
 const onCopy = () => {
     let input = document.createElement('input');
-    input.value = '1pctl reset-ips';
+    input.value = '1pctl reset ips';
     document.body.appendChild(input);
     input.select();
     document.execCommand('Copy');
