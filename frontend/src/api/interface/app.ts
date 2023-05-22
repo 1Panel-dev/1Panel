@@ -112,6 +112,7 @@ export namespace App {
         message: string;
         icon: string;
         canUpdate: boolean;
+        path: string;
         app: App;
     }
 

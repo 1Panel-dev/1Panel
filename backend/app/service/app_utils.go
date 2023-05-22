@@ -646,6 +646,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool) ([]respons
 		}
 		installDTO := response.AppInstalledDTO{
 			AppInstall: installed,
+			Path:       installed.GetPath(),
 		}
 		app, err := appRepo.GetFirst(commonRepo.WithByID(installed.AppId))
 		if err != nil {

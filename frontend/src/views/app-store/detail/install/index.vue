@@ -62,7 +62,7 @@
                             </el-input>
                             <span class="input-help">{{ $t('container.limitHelper') }}</span>
                         </el-form-item>
-                        <el-form-item prop="allowPort">
+                        <el-form-item prop="allowPort" v-if="canEditPort(installData.app)">
                             <el-checkbox v-model="req.allowPort" :label="$t('app.allowPort')" size="large" />
                             <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
                         </el-form-item>
@@ -86,6 +86,7 @@
 import { App } from '@/api/interface/app';
 import { InstallApp } from '@/api/modules/app';
 import { Rules, checkNumberRange } from '@/global/form-rules';
+import { canEditPort } from '@/global/business';
 import { FormInstance, FormRules } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -97,10 +98,12 @@ const router = useRouter();
 interface InstallRrops {
     appDetailId: number;
     params?: App.AppParams;
+    app: any;
 }
 
 const installData = ref<InstallRrops>({
     appDetailId: 0,
+    app: {},
 });
 const open = ref(false);
 const rules = ref<FormRules>({
@@ -112,9 +115,7 @@ const rules = ref<FormRules>({
 });
 const loading = ref(false);
 const paramForm = ref<FormInstance>();
-
 const form = ref<{ [key: string]: any }>({});
-
 const initData = () => ({
     appDetailId: 0,
     params: form.value,
@@ -126,7 +127,6 @@ const initData = () => ({
     containerName: '',
     allowPort: false,
 });
-
 const req = reactive(initData());
 
 const handleClose = () => {

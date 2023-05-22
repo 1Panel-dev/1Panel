@@ -111,12 +111,11 @@ const props = withDefaults(defineProps<OperateProps>(), {
     // id: 0,
     appKey: '',
 });
-let app = ref<any>({});
-let appDetail = ref<any>({});
-let version = ref('');
-let loadingDetail = ref(false);
-let loadingApp = ref(false);
-// let appKey = ref();
+const app = ref<any>({});
+const appDetail = ref<any>({});
+const version = ref('');
+const loadingDetail = ref(false);
+const loadingApp = ref(false);
 const installRef = ref();
 
 const getApp = async () => {
@@ -150,6 +149,7 @@ const openInstall = () => {
     let params = {
         params: appDetail.value.params,
         appDetailId: appDetail.value.id,
+        app: app.value,
     };
     if (app.value.type === 'php') {
         router.push({ path: '/websites/runtime/php' });

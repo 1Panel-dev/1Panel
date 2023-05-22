@@ -1113,6 +1113,7 @@ const message = {
         appInstallWarn:
             'The application does not release the external access port by default, you can choose to release it in the advanced settings',
         upgradeStart: 'Start upgrading! Please refresh the page later',
+        toFolder: 'Open the installation directory',
     },
     website: {
         website: 'Website',

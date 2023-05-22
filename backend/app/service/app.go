@@ -385,7 +385,6 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 		res.CanUpdate = true
 		return res, err
 	}
-	res.CanUpdate = true
 	return res, nil
 }
 
@@ -665,7 +664,6 @@ func (a AppService) SyncAppListFromRemote() error {
 		return err
 	}
 	if !updateRes.CanUpdate {
-		//global.LOG.Infof("The latest version is [%s] The app store is already up to date", updateRes.Version)
 		return nil
 	}
 	var (
@@ -833,6 +831,11 @@ func (a AppService) SyncAppListFromRemote() error {
 	}
 	if len(addDetails) > 0 {
 		if err := appDetailRepo.BatchCreate(ctx, addDetails); err != nil {
+			return err
+		}
+	}
+	if len(deleteDetails) > 0 {
+		if err := appDetailRepo.BatchDelete(ctx, addDetails); err != nil {
 			return err
 		}
 	}
