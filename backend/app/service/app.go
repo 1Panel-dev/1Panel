@@ -268,8 +268,14 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		App:         app,
 	}
 	composeMap := make(map[string]interface{})
-	if err = yaml.Unmarshal([]byte(appDetail.DockerCompose), &composeMap); err != nil {
-		return
+	if req.EditCompose {
+		if err = yaml.Unmarshal([]byte(req.DockerCompose), &composeMap); err != nil {
+			return
+		}
+	} else {
+		if err = yaml.Unmarshal([]byte(appDetail.DockerCompose), &composeMap); err != nil {
+			return
+		}
 	}
 
 	value, ok := composeMap["services"]

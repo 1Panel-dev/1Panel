@@ -150,6 +150,7 @@ const openInstall = () => {
         params: appDetail.value.params,
         appDetailId: appDetail.value.id,
         app: app.value,
+        compose: appDetail.value.dockerCompose,
     };
     if (app.value.type === 'php') {
         router.push({ path: '/websites/runtime/php' });
