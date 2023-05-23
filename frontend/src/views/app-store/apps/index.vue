@@ -2,7 +2,7 @@
     <LayoutContent v-loading="loading" v-if="!showDetail" :title="$t('app.app')">
         <template #toolbar>
             <el-row :gutter="5">
-                <el-col :span="20">
+                <el-col :xs="24" :sm="24" :md="20" :lg="20" :xl="20">
                     <el-button
                         class="tag-button"
                         :class="activeTag === 'all' ? '' : 'no-active'"
@@ -24,7 +24,7 @@
                         </el-button>
                     </div>
                 </el-col>
-                <el-col :span="4">
+                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
                     <div class="search-button">
                         <el-input
                             v-model="req.name"
@@ -45,11 +45,11 @@
         </template>
         <template #main>
             <el-row :gutter="5">
-                <el-col v-for="(app, index) in apps" :key="index" :xs="12" :sm="12" :md="8" :lg="8" :xl="8">
+                <el-col v-for="(app, index) in apps" :key="index" :xs="24" :sm="12" :md="8" :lg="8" :xl="8">
                     <div class="app-card">
                         <el-card class="e-card">
-                            <el-row :gutter="24">
-                                <el-col :xs="5" :sm="5" :md="6" :lg="6" :xl="5">
+                            <el-row :gutter="20">
+                                <el-col :xs="8" :sm="5" :md="6" :lg="6" :xl="5">
                                     <div class="app-icon">
                                         <el-avatar
                                             shape="square"
@@ -58,7 +58,7 @@
                                         />
                                     </div>
                                 </el-col>
-                                <el-col :xs="19" :sm="19" :md="18" :lg="18" :xl="19">
+                                <el-col :xs="16" :sm="19" :md="18" :lg="18" :xl="19">
                                     <div class="app-content">
                                         <div class="app-header">
                                             <span class="app-title">{{ app.name }}</span>

@@ -20,7 +20,7 @@
             </template>
             <template v-if="nginxIsExist && !openNginxConfig" #toolbar>
                 <el-row :class="{ mask: nginxStatus != 'Running' }">
-                    <el-col :span="20">
+                    <el-col :xs="24" :sm="24" :md="20" :lg="20" :xl="20">
                         <el-button type="primary" @click="openCreate">
                             {{ $t('website.create') }}
                         </el-button>
@@ -31,7 +31,7 @@
                             {{ $t('website.defaultServer') }}
                         </el-button>
                     </el-col>
-                    <el-col :span="4">
+                    <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
                         <div class="search-button">
                             <el-input
                                 v-model="req.name"
