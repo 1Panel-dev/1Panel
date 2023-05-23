@@ -286,32 +286,25 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		return
 	}
 	servicesMap := value.(map[string]interface{})
-	changeKeys := make(map[string]string, len(servicesMap))
+	containerName := constant.ContainerPrefix + app.Key + "-" + common.RandStr(4)
+	if req.Advanced && req.ContainerName != "" {
+		containerName = req.ContainerName
+	}
+	req.Params[constant.ContainerName] = containerName
+	appInstall.ContainerName = containerName
+
 	index := 0
 	for k := range servicesMap {
-		serviceName := k + "-" + common.RandStr(4)
-		changeKeys[k] = serviceName
-		containerName := constant.ContainerPrefix + k + "-" + common.RandStr(4)
-		if req.Advanced && req.ContainerName != "" {
-			containerName = req.ContainerName
-		}
+		appInstall.ServiceName = k
 		if index > 0 {
 			continue
 		}
-		req.Params[constant.ContainerName] = containerName
-		appInstall.ServiceName = serviceName
-		appInstall.ContainerName = containerName
 		index++
-	}
-	for k, v := range changeKeys {
-		servicesMap[v] = servicesMap[k]
-		delete(servicesMap, k)
 	}
 
 	if err = addDockerComposeCommonParam(composeMap, appInstall.ServiceName, req.AppContainerConfig, req.Params); err != nil {
 		return
 	}
-
 	var (
 		composeByte []byte
 		paramByte   []byte
