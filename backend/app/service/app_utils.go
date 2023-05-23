@@ -412,15 +412,15 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 
 func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.AppInstall) (err error) {
 	appResourceDir := path.Join(constant.AppResourceDir, app.Resource)
-	if !appDetail.Update {
+	appDownloadDir := path.Join(appResourceDir, app.Key)
+	appVersionDir := path.Join(appDownloadDir, appDetail.Version)
+	fileOp := files.NewFileOp()
+	if !appDetail.Update && fileOp.Stat(appVersionDir) {
 		return
 	}
-	fileOp := files.NewFileOp()
-	appDownloadDir := path.Join(appResourceDir, app.Key)
 	if !fileOp.Stat(appDownloadDir) {
 		_ = fileOp.CreateDir(appDownloadDir, 0755)
 	}
-	appVersionDir := path.Join(appDownloadDir, appDetail.Version)
 	if !fileOp.Stat(appVersionDir) {
 		_ = fileOp.CreateDir(appVersionDir, 0755)
 	}
@@ -445,6 +445,8 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 		return
 	}
 	_ = fileOp.DeleteFile(filePath)
+	appDetail.Update = false
+	_ = appDetailRepo.Update(context.Background(), appDetail)
 	return
 }
 
