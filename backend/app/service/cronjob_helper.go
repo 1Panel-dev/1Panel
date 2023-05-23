@@ -3,9 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"os"
 	"path"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -54,6 +56,11 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 			}
 			message = []byte(stdout)
 			u.HandleRmExpired("LOCAL", "", cronjob, nil)
+		case "cutWebsiteLog":
+			record.File, err = u.handleCutWebsiteLog(cronjob, record.StartTime)
+			if err != nil {
+				global.LOG.Errorf("cut website log file failed, err: %v", err)
+			}
 		}
 		if err != nil {
 			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), string(message))
@@ -157,7 +164,7 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 		if len(exclude) == 0 {
 			continue
 		}
-		excludeRules += (" --exclude " + exclude)
+		excludeRules += " --exclude " + exclude
 	}
 	path := ""
 	if strings.Contains(sourceDir, "/") {
@@ -260,6 +267,72 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, app *repo.RootInf
 	}
 	u.HandleRmExpired(backup.Type, localDir, &cronjob, client)
 	return paths, nil
+}
+
+func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime time.Time) (string, error) {
+	var (
+		websites  []string
+		err       error
+		filePaths []string
+	)
+	if cronjob.Website == "all" {
+		websites, _ = NewIWebsiteService().GetWebsiteOptions()
+		if len(websites) == 0 {
+			return "", nil
+		}
+	} else {
+		websites = append(websites, cronjob.Website)
+	}
+
+	nginx, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return "", nil
+	}
+	baseDir := path.Join(nginx.GetPath(), "www", "sites")
+	fileOp := files.NewFileOp()
+	var wg sync.WaitGroup
+	wg.Add(len(websites))
+	for _, websiteName := range websites {
+		name := websiteName
+		go func() {
+			website, _ := websiteRepo.GetFirst(websiteRepo.WithDomain(name))
+			if website.ID == 0 {
+				wg.Done()
+				return
+			}
+			websiteLogDir := path.Join(baseDir, website.PrimaryDomain, "log")
+			srcAccessLogPath := path.Join(websiteLogDir, "access.log")
+			srcErrorLogPath := path.Join(websiteLogDir, "error.log")
+			dstLogDir := path.Join(global.CONF.System.Backup, "log", "website", website.PrimaryDomain)
+			if !fileOp.Stat(dstLogDir) {
+				_ = os.MkdirAll(dstLogDir, 0755)
+			}
+
+			dstName := fmt.Sprintf("%s_log_%s.gz", website.PrimaryDomain, startTime.Format("20060102150405"))
+			filePaths = append(filePaths, path.Join(dstLogDir, dstName))
+			if err = fileOp.Compress([]string{srcAccessLogPath, srcErrorLogPath}, dstLogDir, dstName, files.Gz); err != nil {
+				global.LOG.Errorf("There was an error in compressing the website[%s] access.log", website.PrimaryDomain)
+			} else {
+				_ = fileOp.WriteFile(srcAccessLogPath, strings.NewReader(""), 0755)
+				_ = fileOp.WriteFile(srcErrorLogPath, strings.NewReader(""), 0755)
+			}
+			global.LOG.Infof("The website[%s] log file was successfully rotated in the directory [%s]", website.PrimaryDomain, dstLogDir)
+			var record model.BackupRecord
+			record.Type = "cutWebsiteLog"
+			record.Name = cronjob.Website
+			record.Source = "LOCAL"
+			record.BackupType = "LOCAL"
+			record.FileDir = dstLogDir
+			record.FileName = dstName
+			if err = backupRepo.CreateRecord(&record); err != nil {
+				global.LOG.Errorf("save backup record failed, err: %v", err)
+			}
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+	u.HandleRmExpired("LOCAL", "", cronjob, nil)
+	return strings.Join(filePaths, ","), nil
 }
 
 func (u *CronjobService) handleWebsite(cronjob model.Cronjob, backup model.BackupAccount, startTime time.Time) ([]string, error) {

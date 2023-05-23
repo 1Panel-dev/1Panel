@@ -663,6 +663,8 @@ const message = {
         cleanDataHelper: '删除该任务执行过程中产生的备份文件',
         noLogs: '暂无任务输出...',
         errPath: '备份路径 [{0}] 错误，无法下载！',
+        cutWebsiteLog: '切割网站日志',
+        cutWebsiteLogHelper: '切割的日志文件会备份到 1Panel 的 backup 目录下',
     },
     monitor: {
         monitor: '监控',
