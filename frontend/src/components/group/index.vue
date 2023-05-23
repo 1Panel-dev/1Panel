@@ -58,7 +58,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import i18n from '@/lang';
-import ComplexTable from '@/components/complex-table/index.vue';
 import { CreateGroup, DeleteGroup, GetGroupList, UpdateGroup } from '@/api/modules/group';
 import Header from '@/components/drawer-header/index.vue';
 import { MsgSuccess } from '@/utils/message';

@@ -105,11 +105,9 @@
 </template>
 
 <script setup lang="ts">
-import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { dateFormat } from '@/utils/util';
-import LayoutContent from '@/layout/layout-content.vue';
 import { cleanLogs, getOperationLogs } from '@/api/modules/log';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import i18n from '@/lang';

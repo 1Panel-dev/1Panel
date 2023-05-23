@@ -84,9 +84,6 @@
 </template>
 
 <script lang="ts" setup>
-import LayoutContent from '@/layout/layout-content.vue';
-import RouterButton from '@/components/router-button/index.vue';
-import ComplexTable from '@/components/complex-table/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { DeleteSSL, SearchSSL, UpdateSSL } from '@/api/modules/website';
 import DnsAccount from './dns-account/index.vue';

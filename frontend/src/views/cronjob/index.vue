@@ -153,15 +153,12 @@
 </template>
 
 <script lang="ts" setup>
-import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import Tooltip from '@/components/tooltip/index.vue';
 import OperatrDialog from '@/views/cronjob/operate/index.vue';
 import Records from '@/views/cronjob/record/index.vue';
-import LayoutContent from '@/layout/layout-content.vue';
 import { loadZero } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
-import RouterButton from '@/components/router-button/index.vue';
 import { deleteCronjob, getCronjobPage, handleOnce, updateStatus } from '@/api/modules/cronjob';
 import i18n from '@/lang';
 import { Cronjob } from '@/api/interface/cronjob';

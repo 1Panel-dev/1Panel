@@ -57,7 +57,6 @@
 </template>
 
 <script lang="ts" setup>
-import LayoutContent from '@/layout/layout-content.vue';
 import Setting from '@/views/database/redis/setting/index.vue';
 import Password from '@/views/database/redis/password/index.vue';
 import Terminal from '@/components/terminal/index.vue';

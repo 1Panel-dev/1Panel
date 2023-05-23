@@ -39,7 +39,6 @@
 
 <script setup lang="ts">
 import { Codemirror } from 'vue-codemirror';
-import LayoutContent from '@/layout/layout-content.vue';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { nextTick, onMounted, ref, shallowRef } from 'vue';

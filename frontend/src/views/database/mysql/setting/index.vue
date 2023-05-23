@@ -110,7 +110,6 @@
 
 <script lang="ts" setup>
 import { FormInstance } from 'element-plus';
-import LayoutContent from '@/layout/layout-content.vue';
 import ContainerLog from '@/components/container-log/index.vue';
 import Status from '@/views/database/mysql/setting/status/index.vue';
 import Variables from '@/views/database/mysql/setting/variables/index.vue';

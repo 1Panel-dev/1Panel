@@ -3,6 +3,7 @@ import { GlobalState, ThemeConfigProp } from './interface';
 import { createPinia } from 'pinia';
 import piniaPersistConfig from '@/config/pinia-persist';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
+import { DeviceType } from '@/enums/app';
 import i18n from '@/lang';
 
 export const GlobalStore = defineStore({
@@ -24,6 +25,7 @@ export const GlobalStore = defineStore({
         agreeLicense: false,
         hasNewVersion: false,
         ignoreCaptcha: true,
+        device: DeviceType.Desktop,
     }),
     getters: {},
     actions: {
@@ -51,6 +53,9 @@ export const GlobalStore = defineStore({
         },
         setAgreeLicense(agree: boolean) {
             this.agreeLicense = agree;
+        },
+        toggleDevice(value: DeviceType) {
+            this.device = value;
         },
     },
     persist: piniaPersistConfig('GlobalState'),

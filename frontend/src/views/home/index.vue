@@ -25,7 +25,7 @@
         </el-alert>
 
         <el-row :gutter="20" style="margin-top: 20px">
-            <el-col :span="16">
+            <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
                 <CardWithHeader :header="$t('home.overview')" height="146px">
                     <template #body>
                         <div class="h-overview">
@@ -67,7 +67,7 @@
                         <Status ref="statuRef" style="margin-top: -7px" />
                     </template>
                 </CardWithHeader>
-                <CardWithHeader :header="$t('menu.monitor')" style="margin-top: 20px">
+                <CardWithHeader :header="$t('menu.monitor')" style="margin-top: 20px; margin-bottom: 20px">
                     <template #header-r>
                         <el-radio-group
                             style="float: right; margin-left: 5px"
@@ -118,12 +118,13 @@
                                 <el-tag>{{ $t('monitor.read') }}: {{ currentChartInfo.ioReadBytes }} MB</el-tag>
                                 <el-tag>{{ $t('monitor.write') }}: {{ currentChartInfo.ioWriteBytes }} MB</el-tag>
                                 <el-tag>
-                                    {{ $t('home.rwPerSecond') }}: {{ currentChartInfo.ioCount }} {{ $t('home.time') }}
+                                    {{ $t('home.rwPerSecond') }}: {{ currentChartInfo.ioCount }}
+                                    {{ $t('home.time') }}
                                 </el-tag>
                                 <el-tag>{{ $t('home.ioDelay') }}: {{ currentChartInfo.ioTime }} ms</el-tag>
                             </div>
 
-                            <div v-if="chartOption === 'io'" style="margin-top: 40px">
+                            <div v-if="chartOption === 'io'" style="margin-top: 40px" class="mobile-monitor-chart">
                                 <v-charts
                                     height="305px"
                                     id="ioChart"
@@ -133,7 +134,7 @@
                                     :dataZoom="true"
                                 />
                             </div>
-                            <div v-if="chartOption === 'network'" style="margin-top: 40px">
+                            <div v-if="chartOption === 'network'" style="margin-top: 40px" class="mobile-monitor-chart">
                                 <v-charts
                                     height="305px"
                                     id="networkChart"
@@ -147,7 +148,7 @@
                     </template>
                 </CardWithHeader>
             </el-col>
-            <el-col :span="8">
+            <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
                 <CardWithHeader :header="$t('home.systemInfo')">
                     <template #body>
                         <el-descriptions :column="1" class="h-systemInfo">
@@ -223,7 +224,6 @@ import i18n from '@/lang';
 import { Dashboard } from '@/api/interface/dashboard';
 import { dateFormatForSecond, computeSize } from '@/utils/util';
 import { useRouter } from 'vue-router';
-import RouterButton from '@/components/router-button/index.vue';
 import { loadBaseInfo, loadCurrentInfo } from '@/api/modules/dashboard';
 import { getIOOptions, getNetworkOptions } from '@/api/modules/monitor';
 import { getSettingInfo, loadUpgradeInfo } from '@/api/modules/setting';

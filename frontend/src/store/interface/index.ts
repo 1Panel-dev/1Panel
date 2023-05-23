@@ -1,5 +1,5 @@
 import { RouteRecordRaw } from 'vue-router';
-
+import { DeviceType } from '@/enums/app';
 export interface ThemeConfigProp {
     panelName: string;
     primary: string;
@@ -20,11 +20,13 @@ export interface GlobalState {
     agreeLicense: boolean;
     hasNewVersion: boolean;
     ignoreCaptcha: boolean;
+    device: DeviceType;
 }
 
 export interface MenuState {
     isCollapse: boolean;
     menuList: RouteRecordRaw[];
+    withoutAnimation: boolean;
 }
 
 export interface AuthState {

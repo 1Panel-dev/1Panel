@@ -189,8 +189,6 @@ import { GetFilesList, DeleteFile, GetFileContent, ComputeDirSize, DownloadFile 
 import { computeSize, dateFormat, getIcon, getRandomStr } from '@/utils/util';
 import { File } from '@/api/interface/file';
 import { useDeleteData } from '@/hooks/use-delete-data';
-import LayoutContent from '@/layout/layout-content.vue';
-import ComplexTable from '@/components/complex-table/index.vue';
 import i18n from '@/lang';
 import CreateFile from './create/index.vue';
 import ChangeRole from './change-role/index.vue';

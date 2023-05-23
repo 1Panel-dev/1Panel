@@ -155,7 +155,6 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
-import LayoutContent from '@/layout/layout-content.vue';
 import PortSetting from '@/views/setting/safe/port/index.vue';
 import SSLSetting from '@/views/setting/safe/ssl/index.vue';
 import MfaSetting from '@/views/setting/safe/mfa/index.vue';

@@ -16,7 +16,6 @@
 </template>
 
 <script lang="ts" setup>
-import ComplexTable from '@/components/complex-table/index.vue';
 import Domain from './create/index.vue';
 import { Website } from '@/api/interface/website';
 import { DeleteDomain, GetWebsite, ListDomains } from '@/api/modules/website';

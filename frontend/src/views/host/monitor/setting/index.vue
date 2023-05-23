@@ -50,7 +50,6 @@
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
-import LayoutContent from '@/layout/layout-content.vue';
 import { cleanMonitors, getSettingInfo, getSystemAvailable, updateSetting } from '@/api/modules/setting';
 import MonitorRouter from '@/views/host/monitor/index.vue';
 import { useDeleteData } from '@/hooks/use-delete-data';

@@ -111,14 +111,14 @@ html.dark {
     ::-webkit-scrollbar-thumb {
         background-color: var(--el-border-color-darker);
     }
-    // menu
-    .menu-popper {
+    // sidebar
+    .sidebar-container-popper {
         border: 1px solid #66686c;
         .el-menu--popup-container {
             border: none;
         }
     }
-    .menu {
+    .sidebar-container {
         border-right: 1px solid var(--el-border-color-light);
     }
     .el-menu {
@@ -157,13 +157,18 @@ html.dark {
     }
 
     // layout
-    .el-container {
-        .el-main {
+    .app-wrapper {
+        .main-container {
             background-color: var(--panel-main-bg-color) !important;
         }
-        .footer {
+        .app-footer {
             background-color: var(--panel-main-bg-color) !important;
             border-top: var(--panel-border);
+        }
+        .mobile-header {
+            background-color: var(--panel-main-bg-color) !important;
+            border-bottom: var(--panel-border);
+						color: #ffffff;
         }
     }
     .system-label {
