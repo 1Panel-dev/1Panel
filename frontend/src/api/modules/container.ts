@@ -20,6 +20,9 @@ export const ContainerStats = (id: string) => {
 export const ContainerOperator = (params: Container.ContainerOperate) => {
     return http.post(`/containers/operate`, params);
 };
+export const containerPrune = (params: Container.ContainerPrune) => {
+    return http.post<Container.ContainerPruneReport>(`/containers/prune`, params);
+};
 export const inspect = (params: Container.ContainerInspect) => {
     return http.post<string>(`/containers/inspect`, params);
 };

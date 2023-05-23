@@ -42,7 +42,7 @@
                             <el-input type="password" show-password clearable v-model="passForm.retryPassword" />
                         </el-form-item>
                         <el-form-item>
-                            <el-button @click="submitChangePassword(passFormRef)">
+                            <el-button type="primary" @click="submitChangePassword(passFormRef)">
                                 {{ $t('commons.button.confirm') }}
                             </el-button>
                         </el-form-item>

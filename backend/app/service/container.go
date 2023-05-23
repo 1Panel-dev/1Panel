@@ -51,6 +51,7 @@ type IContainerService interface {
 	CreateVolume(req dto.VolumeCreat) error
 	TestCompose(req dto.ComposeCreate) (bool, error)
 	ComposeUpdate(req dto.ComposeUpdate) error
+	Prune(req dto.ContainerPrune) (dto.ContainerPruneReport, error)
 }
 
 func NewIContainerService() IContainerService {
@@ -165,6 +166,51 @@ func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
 		return "", err
 	}
 	return string(bytes), nil
+}
+
+func (u *ContainerService) Prune(req dto.ContainerPrune) (dto.ContainerPruneReport, error) {
+	report := dto.ContainerPruneReport{}
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return report, err
+	}
+	pruneFilters := filters.NewArgs()
+	if req.WithTagAll {
+		pruneFilters.Add("dangling", "false")
+		if req.PruneType != "image" {
+			pruneFilters.Add("until", "24h")
+		}
+	}
+	switch req.PruneType {
+	case "container":
+		rep, err := client.ContainersPrune(context.Background(), pruneFilters)
+		if err != nil {
+			return report, err
+		}
+		report.DeletedNumber = len(rep.ContainersDeleted)
+		report.SpaceReclaimed = int(rep.SpaceReclaimed)
+	case "image":
+		rep, err := client.ImagesPrune(context.Background(), pruneFilters)
+		if err != nil {
+			return report, err
+		}
+		report.DeletedNumber = len(rep.ImagesDeleted)
+		report.SpaceReclaimed = int(rep.SpaceReclaimed)
+	case "network":
+		rep, err := client.NetworksPrune(context.Background(), pruneFilters)
+		if err != nil {
+			return report, err
+		}
+		report.DeletedNumber = len(rep.NetworksDeleted)
+	case "volume":
+		rep, err := client.VolumesPrune(context.Background(), pruneFilters)
+		if err != nil {
+			return report, err
+		}
+		report.DeletedNumber = len(rep.VolumesDeleted)
+		report.SpaceReclaimed = int(rep.SpaceReclaimed)
+	}
+	return report, nil
 }
 
 func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {

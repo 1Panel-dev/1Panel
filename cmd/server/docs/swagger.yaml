@@ -321,6 +321,27 @@ definitions:
     - name
     - operation
     type: object
+  dto.ContainerPrune:
+    properties:
+      pruneType:
+        enum:
+        - container
+        - image
+        - volume
+        - network
+        type: string
+      withTagAll:
+        type: boolean
+    required:
+    - pruneType
+    type: object
+  dto.ContainerPruneReport:
+    properties:
+      deletedNumber:
+        type: integer
+      spaceReclaimed:
+        type: integer
+    type: object
   dto.ContainterStats:
     properties:
       cache:
@@ -4515,6 +4536,35 @@ paths:
         - newName
         formatEN: container [operation] [name] [newName]
         formatZH: 容器 [name] 执行 [operation] [newName]
+        paramKeys: []
+  /containers/prune:
+    post:
+      consumes:
+      - application/json
+      description: 容器清理
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ContainerPrune'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.ContainerPruneReport'
+      security:
+      - ApiKeyAuth: []
+      summary: Clean container
+      tags:
+      - Container
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - pruneType
+        formatEN: clean container [pruneType]
+        formatZH: 清理容器 [pruneType]
         paramKeys: []
   /containers/repo:
     get:
