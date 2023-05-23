@@ -69,6 +69,14 @@ export namespace Container {
         id: string;
         type: string;
     }
+    export interface ContainerPrune {
+        pruneType: string;
+        withTagAll: boolean;
+    }
+    export interface ContainerPruneReport {
+        deletedNumber: number;
+        spaceReclaimed: number;
+    }
     export interface Options {
         option: string;
     }

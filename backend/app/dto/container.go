@@ -80,6 +80,16 @@ type ContainerOperation struct {
 	NewName   string `json:"newName"`
 }
 
+type ContainerPrune struct {
+	PruneType  string `json:"pruneType" validate:"required,oneof=container image volume network"`
+	WithTagAll bool   `josn:"withTagAll"`
+}
+
+type ContainerPruneReport struct {
+	DeletedNumber  int `json:"deletedNumber"`
+	SpaceReclaimed int `json:"spaceReclaimed"`
+}
+
 type Network struct {
 	ID         string    `json:"id"`
 	Name       string    `json:"name"`

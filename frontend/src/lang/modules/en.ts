@@ -437,6 +437,20 @@ const message = {
         unpause: 'Unpause',
         rename: 'Rename',
         remove: 'Remove',
+        containerPrune: 'Container prune',
+        containerPruneHelper: 'Remove all stopped containers. Do you want to continue?',
+        imagePrune: 'Image prune',
+        imagePruneSome: 'Clean unlabeled',
+        imagePruneSomeHelper: 'Remove all unused and unlabeled container images。',
+        imagePruneAll: 'Clean unused',
+        imagePruneAllHelper: 'Remove all unused images, not just unlabeled',
+        networkPrune: 'Network prune',
+        networkPruneHelper: 'Remove all unused networks. Do you want to continue?',
+        volumePrune: 'Volue prune',
+        volumePruneHelper: 'Remove all unused local volumes. Do you want to continue?',
+        cleanSuccess: 'The operation is successful, the number of this cleanup: {0}!',
+        cleanSuccessWithSpace:
+            'The operation is successful. The number of disks cleared this time is {0}. The disk space freed is {1}!',
         container: 'Container',
         upTime: 'UpTime',
         all: 'All',
@@ -542,7 +556,7 @@ const message = {
         repoHelper: 'Does it include a mirror repository/organization/project?',
         auth: 'Auth',
         mirrorHelper:
-            'If there are multiple mirrors, newlines must be displayed, for example:\nhttps://hub-mirror.c.163.com \nhttps://reg-mirror.qiniu.com',
+            'If there are multiple mirrors, newlines must be displayed, for example:\nhttp://xxxxxx.m.daocloud.io \nhttps://xxxxxx.mirror.aliyuncs.com',
         registrieHelper:
             'If multiple private repositories exist, newlines must be displayed, for example:\n172.16.10.111:8081 \n172.16.10.112:8081',
 

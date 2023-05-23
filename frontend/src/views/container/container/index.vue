@@ -12,6 +12,9 @@
                         <el-button type="primary" @click="onCreate()">
                             {{ $t('container.createContainer') }}
                         </el-button>
+                        <el-button type="primary" plain @click="onClean()">
+                            {{ $t('container.containerPrune') }}
+                        </el-button>
                         <el-button-group style="margin-left: 10px">
                             <el-button :disabled="checkStatus('start')" @click="onOperate('start')">
                                 {{ $t('container.start') }}
@@ -137,12 +140,13 @@ import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
 import Status from '@/components/status/index.vue';
 import { reactive, onMounted, ref } from 'vue';
-import { ContainerOperator, inspect, loadDockerStatus, searchContainer } from '@/api/modules/container';
+import { ContainerOperator, containerPrune, inspect, loadDockerStatus, searchContainer } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
+import { computeSize } from '@/utils/util';
 
 const loading = ref();
 const data = ref();
@@ -230,6 +234,34 @@ const onInspect = async (id: string) => {
         detailInfo: detailInfo.value,
     };
     mydetail.value!.acceptParams(param);
+};
+
+const onClean = () => {
+    ElMessageBox.confirm(i18n.global.t('container.containerPruneHelper'), i18n.global.t('container.containerPrune'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        loading.value = true;
+        let params = {
+            pruneType: 'container',
+            withTagAll: false,
+        };
+        await containerPrune(params)
+            .then((res) => {
+                loading.value = false;
+                MsgSuccess(
+                    i18n.global.t('container.cleanSuccessWithSpace', [
+                        res.data.deletedNumber,
+                        computeSize(res.data.spaceReclaimed),
+                    ]),
+                );
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 const checkStatus = (operation: string) => {

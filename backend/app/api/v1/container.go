@@ -180,6 +180,33 @@ func (b *BaseApi) ContainerCreate(c *gin.Context) {
 }
 
 // @Tags Container
+// @Summary Clean container
+// @Description 容器清理
+// @Accept json
+// @Param request body dto.ContainerPrune true "request"
+// @Success 200 {object} dto.ContainerPruneReport
+// @Security ApiKeyAuth
+// @Router /containers/prune [post]
+// @x-panel-log {"bodyKeys":["pruneType"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"清理容器 [pruneType]","formatEN":"clean container [pruneType]"}
+func (b *BaseApi) ContainerPrune(c *gin.Context) {
+	var req dto.ContainerPrune
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	report, err := containerService.Prune(req)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, report)
+}
+
+// @Tags Container
 // @Summary Clean container log
 // @Description 清理容器日志
 // @Accept json

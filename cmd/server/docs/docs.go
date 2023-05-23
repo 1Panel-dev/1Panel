@@ -1984,6 +1984,51 @@ var doc = `{
                 }
             }
         },
+        "/containers/prune": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "容器清理",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container"
+                ],
+                "summary": "Clean container",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.ContainerPrune"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ContainerPruneReport"
+                        }
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "pruneType"
+                    ],
+                    "formatEN": "clean container [pruneType]",
+                    "formatZH": "清理容器 [pruneType]",
+                    "paramKeys": []
+                }
+            }
+        },
         "/containers/repo": {
             "get": {
                 "security": [
@@ -10520,6 +10565,37 @@ var doc = `{
                         "rename",
                         "remove"
                     ]
+                }
+            }
+        },
+        "dto.ContainerPrune": {
+            "type": "object",
+            "required": [
+                "pruneType"
+            ],
+            "properties": {
+                "pruneType": {
+                    "type": "string",
+                    "enum": [
+                        "container",
+                        "image",
+                        "volume",
+                        "network"
+                    ]
+                },
+                "withTagAll": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "dto.ContainerPruneReport": {
+            "type": "object",
+            "properties": {
+                "deletedNumber": {
+                    "type": "integer"
+                },
+                "spaceReclaimed": {
+                    "type": "integer"
                 }
             }
         },
