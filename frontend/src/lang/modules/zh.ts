@@ -463,6 +463,7 @@ const message = {
         last4Hour: '最近 4 小时',
         lastHour: '最近 1 小时',
         last10Min: '最近 10 分钟',
+        cleanLog: '清空日志',
         newName: '新名称',
         source: '资源使用率',
 

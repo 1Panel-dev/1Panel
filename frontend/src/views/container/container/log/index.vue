@@ -8,11 +8,14 @@
                 <el-select @change="searchLogs" style="width: 30%; float: left" v-model="logSearch.mode">
                     <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
                 </el-select>
-                <div style="margin-left: 20px; float: left">
+                <div class="margin-button" style="float: left">
                     <el-checkbox border v-model="logSearch.isWatch">{{ $t('commons.button.watch') }}</el-checkbox>
                 </div>
-                <el-button style="margin-left: 20px" @click="onDownload" icon="Download">
+                <el-button class="margin-button" @click="onDownload" icon="Download">
                     {{ $t('file.download') }}
+                </el-button>
+                <el-button class="margin-button" @click="onClean" icon="Delete">
+                    {{ $t('commons.button.clean') }}
                 </el-button>
             </div>
 
@@ -41,7 +44,7 @@
 </template>
 
 <script lang="ts" setup>
-import { logContainer } from '@/api/modules/container';
+import { cleanContainerLog, logContainer } from '@/api/modules/container';
 import i18n from '@/lang';
 import { dateFormatForName } from '@/utils/util';
 import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
@@ -49,6 +52,8 @@ import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import DrawerHeader from '@/components/drawer-header/index.vue';
+import { ElMessageBox } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
 
 const extensions = [javascript(), oneDark];
 
@@ -116,6 +121,18 @@ const onDownload = async () => {
     a.dispatchEvent(event);
 };
 
+const onClean = async () => {
+    ElMessageBox.confirm(i18n.global.t('commons.msg.clean'), i18n.global.t('container.cleanLog'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        await cleanContainerLog(logSearch.container);
+        searchLogs();
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    });
+};
+
 interface DialogProps {
     container: string;
     containerID: string;
@@ -144,3 +161,9 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style scoped lang="scss">
+.margin-button {
+    margin-left: 20px;
+}
+</style>

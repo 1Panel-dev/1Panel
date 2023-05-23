@@ -485,6 +485,10 @@ definitions:
         type: boolean
       liveRestore:
         type: boolean
+      logMaxFile:
+        type: string
+      logMaxSize:
+        type: string
       registryMirrors:
         items:
           type: string
@@ -622,10 +626,6 @@ definitions:
         - restart
         - stop
         type: string
-      stopService:
-        type: boolean
-      stopSocket:
-        type: boolean
     required:
     - operation
     type: object
@@ -1180,6 +1180,13 @@ definitions:
     required:
     - id
     type: object
+  dto.OperationWithName:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
   dto.PageContainer:
     properties:
       filters:
@@ -1556,9 +1563,13 @@ definitions:
     type: object
   dto.SettingInfo:
     properties:
+      allowIPs:
+        type: string
       appStoreLastModified:
         type: string
       appStoreVersion:
+        type: string
+      bindDomain:
         type: string
       complexityVerification:
         type: string
@@ -1586,6 +1597,8 @@ definitions:
         type: string
       monitorStoreDays:
         type: string
+      ntpSite:
+        type: string
       panelName:
         type: string
       port:
@@ -1603,6 +1616,8 @@ definitions:
       systemVersion:
         type: string
       theme:
+        type: string
+      timeZone:
         type: string
       userName:
         type: string
@@ -1657,6 +1672,13 @@ definitions:
         type: boolean
     required:
     - id
+    type: object
+  dto.SyncTimeZone:
+    properties:
+      ntpSite:
+        type: string
+      timeZone:
+        type: string
     type: object
   dto.UpdateDescription:
     properties:
@@ -2000,6 +2022,10 @@ definitions:
         type: string
       cpuQuota:
         type: number
+      dockerCompose:
+        type: string
+      editCompose:
+        type: boolean
       memoryLimit:
         type: number
       memoryUnit:
@@ -2069,6 +2095,10 @@ definitions:
         type: string
       cpuQuota:
         type: number
+      dockerCompose:
+        type: string
+      editCompose:
+        type: boolean
       installId:
         type: integer
       memoryLimit:
@@ -2304,6 +2334,10 @@ definitions:
         type: string
       cpuQuota:
         type: number
+      dockerCompose:
+        type: string
+      editCompose:
+        type: boolean
       memoryLimit:
         type: number
       memoryUnit:
@@ -2915,6 +2949,8 @@ definitions:
         type: string
       id:
         type: integer
+      installed:
+        type: boolean
       key:
         type: string
       lastModified:
@@ -2957,6 +2993,8 @@ definitions:
       appId:
         type: integer
       createdAt:
+        type: string
+      dockerCompose:
         type: string
       downloadCallBackUrl:
         type: string
@@ -3808,6 +3846,33 @@ paths:
         - image
         formatEN: create container [name][image]
         formatZH: 创建容器 [name][image]
+        paramKeys: []
+  /containers/clean/log:
+    post:
+      consumes:
+      - application/json
+      description: 清理容器日志
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.OperationWithName'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Clean container log
+      tags:
+      - Container
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        formatEN: clean container [name] logs
+        formatZH: 清理容器 [name] 日志
         paramKeys: []
   /containers/compose:
     post:
@@ -8139,9 +8204,29 @@ paths:
         formatEN: update system ssl => [ssl]
         formatZH: 修改系统 ssl => [ssl]
         paramKeys: []
+  /settings/time/option:
+    get:
+      description: 加载系统可用时区
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Load time zone options
+      tags:
+      - System Setting
   /settings/time/sync:
     post:
+      consumes:
+      - application/json
       description: 系统时间同步
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.SyncTimeZone'
       responses:
         "200":
           description: OK
@@ -8154,9 +8239,11 @@ paths:
       - System Setting
       x-panel-log:
         BeforeFuntions: []
-        bodyKeys: []
-        formatEN: sync system time
-        formatZH: 系统时间同步
+        bodyKeys:
+        - ntpSite
+        - timeZone
+        formatEN: sync system time [ntpSite]-[timeZone]
+        formatZH: 系统时间同步[ntpSite]-[timeZone]
         paramKeys: []
   /settings/update:
     post:

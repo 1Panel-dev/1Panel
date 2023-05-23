@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"sort"
 	"strconv"
@@ -39,6 +40,7 @@ type IContainerService interface {
 	CreateCompose(req dto.ComposeCreate) (string, error)
 	ComposeOperation(req dto.ComposeOperation) error
 	ContainerCreate(req dto.ContainerCreate) error
+	ContainerLogClean(req dto.OperationWithName) error
 	ContainerOperation(req dto.ContainerOperation) error
 	ContainerLogs(param dto.ContainerLog) (string, error)
 	ContainerStats(id string) (*dto.ContainterStats, error)
@@ -261,6 +263,27 @@ func (u *ContainerService) ContainerOperation(req dto.ContainerOperation) error 
 		err = client.ContainerRemove(ctx, req.Name, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 	}
 	return err
+}
+
+func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+	container, err := client.ContainerInspect(context.Background(), req.Name)
+	if err != nil {
+		return err
+	}
+	file, err := os.OpenFile(container.LogPath, os.O_RDWR|os.O_CREATE, 0666)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	if err = file.Truncate(0); err != nil {
+		return err
+	}
+	_, _ = file.Seek(0, 0)
+	return nil
 }
 
 func (u *ContainerService) ContainerLogs(req dto.ContainerLog) (string, error) {
