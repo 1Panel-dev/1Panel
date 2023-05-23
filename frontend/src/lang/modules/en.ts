@@ -746,6 +746,9 @@ const message = {
             logout: ' logout',
         },
         status: 'status',
+        websiteLog: 'Website Log',
+        runLog: 'Run Log',
+        errLog: 'Err Log',
     },
     file: {
         dir: 'Folder',

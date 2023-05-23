@@ -907,6 +907,11 @@ func (w WebsiteService) OpWebsiteLog(req request.WebsiteLogReq) (*response.Websi
 		if err := websiteRepo.Save(context.Background(), &website); err != nil {
 			return nil, err
 		}
+	case constant.DeleteLog:
+		logPath := path.Join(nginx.Install.GetPath(), "www", "sites", website.Alias, "log", req.LogType)
+		if err := files.NewFileOp().WriteFile(logPath, strings.NewReader(""), 0755); err != nil {
+			return nil, err
+		}
 	}
 	return res, nil
 }

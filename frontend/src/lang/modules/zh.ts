@@ -751,6 +751,9 @@ const message = {
             logout: '退出',
         },
         status: '状态',
+        websiteLog: '网站日志',
+        runLog: '运行日志',
+        errLog: '错误日志',
     },
     file: {
         dir: '文件夹',
