@@ -79,7 +79,6 @@
 </template>
 
 <script lang="ts" setup>
-import ComplexTable from '@/components/complex-table/index.vue';
 import { reactive, ref } from 'vue';
 import { computeSize } from '@/utils/util';
 import { useDeleteData } from '@/hooks/use-delete-data';

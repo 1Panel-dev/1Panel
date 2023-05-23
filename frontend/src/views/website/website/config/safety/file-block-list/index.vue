@@ -34,7 +34,6 @@
 import { Website } from '@/api/interface/website';
 import { GetWafConfig, UpdateWafEnable } from '@/api/modules/website';
 import { computed, onMounted, reactive, ref } from 'vue';
-import ComplexTable from '@/components/complex-table/index.vue';
 import { SaveFileContent } from '@/api/modules/files';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';

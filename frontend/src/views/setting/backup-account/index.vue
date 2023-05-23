@@ -270,7 +270,6 @@
 <script setup lang="ts">
 import { dateFormat } from '@/utils/util';
 import { onMounted, ref } from 'vue';
-import LayoutContent from '@/layout/layout-content.vue';
 import { getBackupList, deleteBackup } from '@/api/modules/setting';
 import DialogOperate from '@/views/setting/backup-account/operate/index.vue';
 import { Backup } from '@/api/interface/backup';

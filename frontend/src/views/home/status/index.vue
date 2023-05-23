@@ -1,6 +1,6 @@
 <template>
     <el-row :gutter="10">
-        <el-col :span="6" align="center">
+        <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
             <el-popover placement="bottom" :width="300" trigger="hover">
                 <div>
                     <el-tooltip
@@ -36,14 +36,14 @@
                 ( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} ) Core
             </span>
         </el-col>
-        <el-col :span="6" align="center">
+        <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
             <div id="memory" class="chartClass"></div>
             <span class="input-help">
                 ( {{ formatNumber(currentInfo.memoryUsed / 1024 / 1024) }} /
                 {{ formatNumber(currentInfo.memoryTotal / 1024 / 1024) }} ) MB
             </span>
         </el-col>
-        <el-col :span="6" align="center">
+        <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
             <el-popover placement="bottom" :width="200" trigger="hover">
                 <el-tag class="tagClass">
                     {{ $t('home.loadAverage', [1]) }}: {{ formatNumber(currentInfo.load1) }}
@@ -60,7 +60,16 @@
             </el-popover>
             <span class="input-help">{{ loadStatus(currentInfo.loadUsagePercent) }}</span>
         </el-col>
-        <el-col :span="6" align="center" v-for="(item, index) of currentInfo.diskData" :key="index">
+        <el-col
+            :xs="12"
+            :sm="12"
+            :md="6"
+            :lg="6"
+            :xl="6"
+            align="center"
+            v-for="(item, index) of currentInfo.diskData"
+            :key="index"
+        >
             <el-popover placement="bottom" :width="300" trigger="hover">
                 <el-row :gutter="5">
                     <el-col :span="12">

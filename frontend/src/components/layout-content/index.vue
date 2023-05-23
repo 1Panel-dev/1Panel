@@ -132,8 +132,19 @@ const showBack = computed(() => {
 
 .main-box {
     position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    padding: 5px;
+    overflow: auto;
+    overflow-x: hidden !important;
+    // background-color: #f0f2f5;
+    border-radius: 4px;
+    // box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+    &::-webkit-scrollbar {
+        background-color: white;
+    }
 }
-
 .main-content {
     margin-top: 20px;
 }

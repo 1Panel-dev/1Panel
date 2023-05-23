@@ -176,7 +176,6 @@
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
-import LayoutContent from '@/layout/layout-content.vue';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';

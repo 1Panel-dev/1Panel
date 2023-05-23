@@ -104,7 +104,6 @@
 </template>
 
 <script lang="ts" setup>
-import LayoutContent from '@/layout/layout-content.vue';
 import { App } from '@/api/interface/app';
 import { onMounted, reactive, ref } from 'vue';
 import { GetAppListUpdate, GetAppTags, SearchApp, SyncApp } from '@/api/modules/app';

@@ -78,11 +78,9 @@
 </template>
 
 <script setup lang="ts">
-import LayoutContent from '@/layout/layout-content.vue';
 import GroupDialog from '@/components/group/index.vue';
 import GroupChangeDialog from '@/views/host/terminal/host/change-group/index.vue';
 import OperateDialog from '@/views/host/terminal/host/operate/index.vue';
-import ComplexTable from '@/components/complex-table/index.vue';
 import { deleteHost, searchHosts } from '@/api/modules/host';
 import { GetGroupList } from '@/api/modules/group';
 import { reactive, ref } from 'vue';

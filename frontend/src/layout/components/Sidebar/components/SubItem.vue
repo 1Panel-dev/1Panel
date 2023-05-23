@@ -3,7 +3,7 @@
         <el-sub-menu
             v-if="subItem.children && subItem.children.length > 1"
             :index="subItem.path"
-            popper-class="menu-popper"
+            popper-class="sidebar-container-popper"
         >
             <template #title>
                 <el-icon class="sub-icon">

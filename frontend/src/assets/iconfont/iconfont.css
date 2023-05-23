@@ -1,9 +1,9 @@
 @font-face {
   font-family: "panel"; /* Project id 3575356 */
-  src: url('iconfont.woff2?t=1681715760705') format('woff2'),
-       url('iconfont.woff?t=1681715760705') format('woff'),
-       url('iconfont.ttf?t=1681715760705') format('truetype'),
-       url('iconfont.svg?t=1681715760705#panel') format('svg');
+  src: url('iconfont.woff2?t=1684465849452') format('woff2'),
+       url('iconfont.woff?t=1684465849452') format('woff'),
+       url('iconfont.ttf?t=1684465849452') format('truetype'),
+       url('iconfont.svg?t=1684465849452#panel') format('svg');
 }
 
 .panel {
@@ -12,6 +12,10 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.p-caidan:before {
+  content: "\e61d";
 }
 
 .p-yanzhengma1:before {

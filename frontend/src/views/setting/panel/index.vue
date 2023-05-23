@@ -99,7 +99,6 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { ElForm } from 'element-plus';
-import LayoutContent from '@/layout/layout-content.vue';
 import { getSettingInfo, updateSetting, getSystemAvailable } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { useI18n } from 'vue-i18n';

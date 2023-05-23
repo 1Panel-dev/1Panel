@@ -146,7 +146,6 @@
 </template>
 
 <script setup lang="ts">
-import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { snapshotCreate, searchSnapshotPage, snapshotDelete, updateSnapshotDescription } from '@/api/modules/setting';
@@ -157,7 +156,6 @@ import { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { Setting } from '@/api/interface/setting';
-import LayoutContent from '@/layout/layout-content.vue';
 import RecoverStatus from '@/views/setting/snapshot/status/index.vue';
 import SnapshotImport from '@/views/setting/snapshot/import/index.vue';
 import { getBackupList } from '@/api/modules/setting';

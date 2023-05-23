@@ -9,8 +9,6 @@
 
 <script lang="ts" setup>
 import i18n from '@/lang';
-import LayoutContent from '@/layout/layout-content.vue';
-import RouterButton from '@/components/router-button/index.vue';
 
 const buttons = [
     {

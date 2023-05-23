@@ -205,7 +205,6 @@ import {
     AppInstalledDeleteCheck,
     GetAppTags,
 } from '@/api/modules/app';
-import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';

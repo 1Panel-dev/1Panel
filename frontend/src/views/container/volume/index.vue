@@ -75,9 +75,7 @@
 </template>
 
 <script lang="ts" setup>
-import LayoutContent from '@/layout/layout-content.vue';
 import Tooltip from '@/components/tooltip/index.vue';
-import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import CreateDialog from '@/views/container/volume/create/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
