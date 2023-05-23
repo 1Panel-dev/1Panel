@@ -656,6 +656,8 @@ const message = {
         cleanDataHelper: 'Delete the backup file generated during this task.',
         noLogs: 'No task output yet...',
         errPath: 'Backup path [{0}] error, cannot download!',
+        cutWebsiteLog: 'cut website log',
+        cutWebsiteLogHelper: 'The cut log files will be backed up to the backup directory of 1Panel',
     },
     monitor: {
         monitor: 'Monitor',
