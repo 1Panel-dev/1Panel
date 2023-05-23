@@ -180,6 +180,32 @@ func (b *BaseApi) ContainerCreate(c *gin.Context) {
 }
 
 // @Tags Container
+// @Summary Clean container log
+// @Description 清理容器日志
+// @Accept json
+// @Param request body dto.OperationWithName true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/clean/log [post]
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"清理容器 [name] 日志","formatEN":"clean container [name] logs"}
+func (b *BaseApi) CleanContainerLog(c *gin.Context) {
+	var req dto.OperationWithName
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := global.VALID.Struct(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := containerService.ContainerLogClean(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Container
 // @Summary Operate Container
 // @Description 容器操作
 // @Accept json

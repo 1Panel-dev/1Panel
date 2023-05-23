@@ -444,6 +444,7 @@ const message = {
         last4Hour: 'Last 4 Hours',
         lastHour: 'Last Hour',
         last10Min: 'Last 10 Minutes',
+        cleanLog: 'Clean log',
         newName: 'New name',
         source: 'Resource rate',
 

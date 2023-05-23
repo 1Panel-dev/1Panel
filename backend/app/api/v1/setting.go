@@ -189,7 +189,7 @@ func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
 // @Tags System Setting
 // @Summary Load time zone options
 // @Description 加载系统可用时区
-// @Success 200 {string}
+// @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/time/option [get]
 func (b *BaseApi) LoadTimeZone(c *gin.Context) {

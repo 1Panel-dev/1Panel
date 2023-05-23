@@ -937,6 +937,48 @@ var doc = `{
                 }
             }
         },
+        "/containers/clean/log": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "清理容器日志",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Container"
+                ],
+                "summary": "Clean container log",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.OperationWithName"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name"
+                    ],
+                    "formatEN": "clean container [name] logs",
+                    "formatZH": "清理容器 [name] 日志",
+                    "paramKeys": []
+                }
+            }
+        },
         "/containers/compose": {
             "post": {
                 "security": [
@@ -7750,6 +7792,25 @@ var doc = `{
                 }
             }
         },
+        "/settings/time/option": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "加载系统可用时区",
+                "tags": [
+                    "System Setting"
+                ],
+                "summary": "Load time zone options",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/settings/time/sync": {
             "post": {
                 "security": [
@@ -7758,10 +7819,24 @@ var doc = `{
                     }
                 ],
                 "description": "系统时间同步",
+                "consumes": [
+                    "application/json"
+                ],
                 "tags": [
                     "System Setting"
                 ],
                 "summary": "Sync system time",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.SyncTimeZone"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -7772,9 +7847,12 @@ var doc = `{
                 },
                 "x-panel-log": {
                     "BeforeFuntions": [],
-                    "bodyKeys": [],
-                    "formatEN": "sync system time",
-                    "formatZH": "系统时间同步",
+                    "bodyKeys": [
+                        "ntpSite",
+                        "timeZone"
+                    ],
+                    "formatEN": "sync system time [ntpSite]-[timeZone]",
+                    "formatZH": "系统时间同步[ntpSite]-[timeZone]",
                     "paramKeys": []
                 }
             }
@@ -10689,6 +10767,12 @@ var doc = `{
                 "liveRestore": {
                     "type": "boolean"
                 },
+                "logMaxFile": {
+                    "type": "string"
+                },
+                "logMaxSize": {
+                    "type": "string"
+                },
                 "registryMirrors": {
                     "type": "array",
                     "items": {
@@ -10898,12 +10982,6 @@ var doc = `{
                         "restart",
                         "stop"
                     ]
-                },
-                "stopService": {
-                    "type": "boolean"
-                },
-                "stopSocket": {
-                    "type": "boolean"
                 }
             }
         },
@@ -11728,6 +11806,17 @@ var doc = `{
                 }
             }
         },
+        "dto.OperationWithName": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.PageContainer": {
             "type": "object",
             "required": [
@@ -12292,10 +12381,16 @@ var doc = `{
         "dto.SettingInfo": {
             "type": "object",
             "properties": {
+                "allowIPs": {
+                    "type": "string"
+                },
                 "appStoreLastModified": {
                     "type": "string"
                 },
                 "appStoreVersion": {
+                    "type": "string"
+                },
+                "bindDomain": {
                     "type": "string"
                 },
                 "complexityVerification": {
@@ -12337,6 +12432,9 @@ var doc = `{
                 "monitorStoreDays": {
                     "type": "string"
                 },
+                "ntpSite": {
+                    "type": "string"
+                },
                 "panelName": {
                     "type": "string"
                 },
@@ -12362,6 +12460,9 @@ var doc = `{
                     "type": "string"
                 },
                 "theme": {
+                    "type": "string"
+                },
+                "timeZone": {
                     "type": "string"
                 },
                 "userName": {
@@ -12441,6 +12542,17 @@ var doc = `{
                 },
                 "reDownload": {
                     "type": "boolean"
+                }
+            }
+        },
+        "dto.SyncTimeZone": {
+            "type": "object",
+            "properties": {
+                "ntpSite": {
+                    "type": "string"
+                },
+                "timeZone": {
+                    "type": "string"
                 }
             }
         },
@@ -12968,6 +13080,12 @@ var doc = `{
                 "cpuQuota": {
                     "type": "number"
                 },
+                "dockerCompose": {
+                    "type": "string"
+                },
+                "editCompose": {
+                    "type": "boolean"
+                },
                 "memoryLimit": {
                     "type": "number"
                 },
@@ -13070,6 +13188,12 @@ var doc = `{
                 },
                 "cpuQuota": {
                     "type": "number"
+                },
+                "dockerCompose": {
+                    "type": "string"
+                },
+                "editCompose": {
+                    "type": "boolean"
                 },
                 "installId": {
                     "type": "integer"
@@ -13416,6 +13540,12 @@ var doc = `{
                 },
                 "cpuQuota": {
                     "type": "number"
+                },
+                "dockerCompose": {
+                    "type": "string"
+                },
+                "editCompose": {
+                    "type": "boolean"
                 },
                 "memoryLimit": {
                     "type": "number"
@@ -14323,6 +14453,9 @@ var doc = `{
                 "id": {
                     "type": "integer"
                 },
+                "installed": {
+                    "type": "boolean"
+                },
                 "key": {
                     "type": "string"
                 },
@@ -14386,6 +14519,9 @@ var doc = `{
                     "type": "integer"
                 },
                 "createdAt": {
+                    "type": "string"
+                },
+                "dockerCompose": {
                     "type": "string"
                 },
                 "downloadCallBackUrl": {
