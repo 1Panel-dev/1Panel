@@ -140,7 +140,6 @@
 import { onMounted, reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import FireRouter from '@/views/host/ssh/index.vue';
-import LayoutContent from '@/layout/layout-content.vue';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import PubKey from '@/views/host/ssh/ssh/pubkey/index.vue';

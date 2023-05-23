@@ -72,9 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
-import LayoutContent from '@/layout/layout-content.vue';
 import { dateFormat } from '@/utils/util';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import { loadSSHLogs } from '@/api/modules/host';
