@@ -1,7 +1,7 @@
 <template>
-    <div :class="classObj" class="app-wrapper">
+    <div :class="classObj" class="app-wrapper" v-loading="loading" :element-loading-text="loadinText" fullscreen>
         <div v-if="classObj.mobile && classObj.openSidebar" class="drawer-bg" @click="handleClickOutside" />
-        <div class="app-sidebar">
+        <div class="app-sidebar" v-if="!globalStore.isFullScreen">
             <Sidebar />
         </div>
 
@@ -9,22 +9,33 @@
             <mobile-header v-if="classObj.mobile" />
             <app-main class="app-main" />
 
-            <Footer class="app-footer" />
+            <Footer class="app-footer" v-if="!globalStore.isFullScreen" />
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { onMounted, computed, ref, watch, onBeforeUnmount } from 'vue';
 import { Sidebar, Footer, AppMain, MobileHeader } from './components';
 import useResize from './hooks/useResize';
 import { GlobalStore } from '@/store';
 import { MenuStore } from '@/store/modules/menu';
 import { DeviceType } from '@/enums/app';
+import { useI18n } from 'vue-i18n';
+import { useTheme } from '@/hooks/use-theme';
+import { getSettingInfo, getSystemAvailable } from '@/api/modules/setting';
 useResize();
 
 const menuStore = MenuStore();
 const globalStore = GlobalStore();
+
+const i18n = useI18n();
+const loading = ref(false);
+const loadinText = ref();
+const themeConfig = computed(() => globalStore.themeConfig);
+const { switchDark } = useTheme();
+
+let timer: NodeJS.Timer | null = null;
 
 const classObj = computed(() => {
     return {
@@ -37,6 +48,58 @@ const classObj = computed(() => {
 const handleClickOutside = () => {
     menuStore.closeSidebar(false);
 };
+
+watch(
+    () => globalStore.isLoading,
+    () => {
+        if (globalStore.isLoading) {
+            loadStatus();
+        } else {
+            loading.value = globalStore.isLoading;
+        }
+    },
+);
+
+const loadDataFromDB = async () => {
+    const res = await getSettingInfo();
+    document.title = res.data.panelName;
+    i18n.locale.value = res.data.language;
+    i18n.warnHtmlMessage = false;
+    globalStore.updateLanguage(res.data.language);
+    globalStore.setThemeConfig({ ...themeConfig.value, theme: res.data.theme });
+    globalStore.setThemeConfig({ ...themeConfig.value, panelName: res.data.panelName });
+    switchDark();
+};
+
+const loadStatus = async () => {
+    loading.value = globalStore.isLoading;
+    loadinText.value = globalStore.loadingText;
+    if (loading.value) {
+        timer = setInterval(async () => {
+            await getSystemAvailable()
+                .then((res) => {
+                    if (res) {
+                        location.reload();
+                        clearInterval(Number(timer));
+                        timer = null;
+                    }
+                })
+                .catch(() => {
+                    location.reload();
+                    clearInterval(Number(timer));
+                    timer = null;
+                });
+        }, 1000 * 10);
+    }
+};
+onBeforeUnmount(() => {
+    clearInterval(Number(timer));
+    timer = null;
+});
+onMounted(() => {
+    loadStatus();
+    loadDataFromDB();
+});
 </script>
 
 <style scoped lang="scss">
