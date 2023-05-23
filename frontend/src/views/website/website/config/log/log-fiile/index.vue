@@ -61,12 +61,12 @@ const logType = computed(() => {
 const id = computed(() => {
     return props.id;
 });
-let loading = ref(false);
-let data = ref({
+const loading = ref(false);
+const data = ref({
     enable: false,
     content: '',
 });
-let tailLog = ref(false);
+const tailLog = ref(false);
 let timer: NodeJS.Timer | null = null;
 
 const view = shallowRef();
