@@ -159,8 +159,8 @@
         <Backups ref="dialogBackupRef" />
         <DefaultServer ref="defaultRef" />
         <GroupDialog @search="listGroup" ref="groupRef" />
+        <NginxConfig v-if="openNginxConfig" v-loading="loading" :containerName="containerName" :status="nginxStatus" />
     </div>
-    <NginxConfig v-if="openNginxConfig" v-loading="loading" :containerName="containerName" :status="nginxStatus" />
 </template>
 
 <script lang="ts" setup>
