@@ -627,6 +627,7 @@ const message = {
         taskType: '任务类型',
         record: '报告',
         shell: 'Shell 脚本',
+        ntp: '时间同步',
         website: '备份网站',
         rulesHelper: '压缩排除规则(以 ; 号为分隔符)，例： \n*.log;*.sql',
         lastRecrodTime: '上次执行时间',

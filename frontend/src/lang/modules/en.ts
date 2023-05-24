@@ -616,6 +616,7 @@ const message = {
         taskType: 'Task type',
         record: 'Records',
         shell: 'Shell script',
+        ntp: 'Time synchronization',
         website: 'Backup website',
         rulesHelper: 'Compression exclusion rules (with; Is a delimiter), for example: \n*.log; *.sql',
         lastRecrodTime: 'Last execution time',

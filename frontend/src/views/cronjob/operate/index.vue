@@ -18,6 +18,7 @@
                             <el-option value="database" :label="$t('cronjob.database')" />
                             <el-option value="directory" :label="$t('cronjob.directory')" />
                             <el-option value="curl" :label="$t('cronjob.curl')" />
+                            <el-option value="ntp" :label="$t('cronjob.ntp')" />
                             <el-option value="cutWebsiteLog" :label="$t('cronjob.cutWebsiteLog')" />
                         </el-select>
                         <el-tag v-else>{{ dialogData.rowData!.type }}</el-tag>
