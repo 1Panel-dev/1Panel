@@ -3,6 +3,9 @@
         <el-tab-pane :label="$t('website.updateConfig')" name="0">
             <Config :id="id"></Config>
         </el-tab-pane>
+        <el-tab-pane :label="$t('php.disableFunction')" name="1">
+            <Function :id="id"></Function>
+        </el-tab-pane>
     </el-tabs>
 </template>
 
@@ -11,6 +14,7 @@ import { GetRuntime } from '@/api/modules/runtime';
 import { GetWebsite } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import Config from './config/index.vue';
+import Function from './function/index.vue';
 
 const props = defineProps({
     id: {
@@ -23,9 +27,9 @@ const id = computed(() => {
     return props.id;
 });
 
-let index = ref('0');
-let configPHP = ref(false);
-let installId = ref(0);
+const index = ref('0');
+const configPHP = ref(false);
+const installId = ref(0);
 
 const getWebsiteDetail = async () => {
     const res = await GetWebsite(props.id);

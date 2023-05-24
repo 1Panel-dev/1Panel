@@ -16,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx/parser"
 	"github.com/1Panel-dev/1Panel/cmd/server/nginx_conf"
 	"golang.org/x/crypto/bcrypt"
+	"gopkg.in/ini.v1"
 	"gorm.io/gorm"
 	"os"
 	"path"
@@ -1009,7 +1010,23 @@ func (w WebsiteService) GetPHPConfig(id uint) (*response.PHPConfig, error) {
 			params[matches[1]] = matches[2]
 		}
 	}
-	return &response.PHPConfig{Params: params}, nil
+	cfg, err := ini.Load(phpConfigPath)
+	if err != nil {
+		return nil, err
+	}
+	phpConfig, err := cfg.GetSection("PHP")
+	if err != nil {
+		return nil, err
+	}
+	disableFunctionStr := phpConfig.Key("disable_functions").Value()
+	res := &response.PHPConfig{Params: params}
+	if disableFunctionStr != "" {
+		disableFunctions := strings.Split(disableFunctionStr, ",")
+		if len(disableFunctions) > 0 {
+			res.DisableFunctions = disableFunctions
+		}
+	}
+	return res, nil
 }
 
 func (w WebsiteService) UpdatePHPConfig(req request.WebsitePHPConfigUpdate) (err error) {
@@ -1033,23 +1050,50 @@ func (w WebsiteService) UpdatePHPConfig(req request.WebsitePHPConfigUpdate) (err
 	defer configFile.Close()
 
 	contentBytes, err := fileOp.GetContent(phpConfigPath)
-	content := string(contentBytes)
-	lines := strings.Split(content, "\n")
-	for i, line := range lines {
-		if strings.HasPrefix(line, ";") {
-			continue
-		}
-		for key, value := range req.Params {
-			pattern := "^" + regexp.QuoteMeta(key) + "\\s*=\\s*.*$"
-			if matched, _ := regexp.MatchString(pattern, line); matched {
-				lines[i] = key + " = " + value
-			}
-		}
-	}
-	updatedContent := strings.Join(lines, "\n")
-	if err := fileOp.WriteFile(phpConfigPath, strings.NewReader(updatedContent), 0755); err != nil {
+	if err != nil {
 		return err
 	}
+
+	if req.Scope == "params" {
+		content := string(contentBytes)
+		lines := strings.Split(content, "\n")
+		for i, line := range lines {
+			if strings.HasPrefix(line, ";") {
+				continue
+			}
+			for key, value := range req.Params {
+				pattern := "^" + regexp.QuoteMeta(key) + "\\s*=\\s*.*$"
+				if matched, _ := regexp.MatchString(pattern, line); matched {
+					lines[i] = key + " = " + value
+				}
+			}
+		}
+		updatedContent := strings.Join(lines, "\n")
+		if err := fileOp.WriteFile(phpConfigPath, strings.NewReader(updatedContent), 0755); err != nil {
+			return err
+		}
+	}
+
+	cfg, err := ini.Load(phpConfigPath)
+	if err != nil {
+		return err
+	}
+	phpConfig, err := cfg.GetSection("PHP")
+	if err != nil {
+		return err
+	}
+	if req.Scope == "disable_functions" {
+		disable := phpConfig.Key("disable_functions")
+		disable.SetValue(strings.Join(req.DisableFunctions, ","))
+		if err = cfg.SaveTo(phpConfigPath); err != nil {
+			return err
+		}
+	}
+	if req.Scope == "uploadSize" {
+		postMaxSize := phpConfig.Key("post_max_size")
+		postMaxSize.SetValue("")
+	}
+
 	appInstallReq := request.AppInstalledOperate{
 		InstallId: appInstall.ID,
 		Operate:   constant.Restart,
@@ -1058,6 +1102,7 @@ func (w WebsiteService) UpdatePHPConfig(req request.WebsitePHPConfigUpdate) (err
 		_ = fileOp.WriteFile(phpConfigPath, strings.NewReader(string(contentBytes)), 0755)
 		return err
 	}
+
 	return nil
 }
 

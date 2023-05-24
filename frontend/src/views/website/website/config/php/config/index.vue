@@ -184,7 +184,7 @@ const submit = async () => {
         display_errors: form.display_errors,
     };
     loading.value = true;
-    UpdatePHPConfig({ id: id.value, params: params })
+    UpdatePHPConfig({ id: id.value, params: params, scope: 'params' })
         .then(() => {
             MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         })

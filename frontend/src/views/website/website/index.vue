@@ -153,7 +153,6 @@
                 </el-card>
             </template>
         </LayoutContent>
-        <NginxConfig v-if="openNginxConfig" v-loading="loading" :containerName="containerName" :status="nginxStatus" />
         <CreateWebSite ref="createRef" @close="search" />
         <DeleteWebsite ref="deleteRef" @close="search" />
         <UploadDialog ref="uploadRef" />
@@ -161,6 +160,7 @@
         <DefaultServer ref="defaultRef" />
         <GroupDialog @search="listGroup" ref="groupRef" />
     </div>
+    <NginxConfig v-if="openNginxConfig" v-loading="loading" :containerName="containerName" :status="nginxStatus" />
 </template>
 
 <script lang="ts" setup>

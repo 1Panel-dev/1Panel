@@ -277,6 +277,19 @@ const checkConatinerName = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkDisableFunctions = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.disableFunction')));
+    } else {
+        const reg = /^[a-zA-Z,]+$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.disableFunction')));
+        } else {
+            callback();
+        }
+    }
+};
+
 interface CommonRule {
     requiredInput: FormItemRule;
     requiredSelect: FormItemRule;
@@ -300,6 +313,7 @@ interface CommonRule {
     nginxDoc: FormItemRule;
     appName: FormItemRule;
     containerName: FormItemRule;
+    disabledFunctions: FormItemRule;
 
     paramCommon: FormItemRule;
     paramComplexity: FormItemRule;
@@ -445,5 +459,10 @@ export const Rules: CommonRule = {
         required: false,
         trigger: 'blur',
         validator: checkConatinerName,
+    },
+    disabledFunctions: {
+        required: true,
+        trigger: 'blur',
+        validator: checkDisableFunctions,
     },
 };

@@ -159,6 +159,7 @@ const message = {
             nginxDoc: 'Only supports English case, numbers, and .',
             appName: 'Support English, numbers, - and _, length 2-30, and cannot start and end with -_',
             conatinerName: 'Supports letters, numbers, underscores, hyphens and dots, cannot end with hyphen- or dot.',
+            disableFunction: 'Only support letters and,',
         },
         res: {
             paramError: 'The request failed, please try again later!',
@@ -1384,6 +1385,8 @@ const message = {
         cgi_fix_pathinfo: 'Whether to open pathinfo',
         date_timezone: 'Time zone',
         second: 'Second',
+        disableFunction: 'Disable function',
+        disableFunctionHelper: 'Enter the function to be disabled, such as exec, please use multiple, split',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'The hash table size of the server name',
