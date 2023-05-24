@@ -5,6 +5,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/gin-gonic/gin"
 )
 
@@ -39,6 +40,15 @@ func (b *BaseApi) SearchApp(c *gin.Context) {
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"应用商店同步","formatEN":"App store synchronization"}
 func (b *BaseApi) SyncApp(c *gin.Context) {
 	go appService.SyncAppListFromLocal()
+	res, err := appService.GetAppUpdate()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	if !res.CanUpdate {
+		helper.SuccessWithMsg(c, i18n.GetMsgByKey("AppStoreIsUpToDate"))
+		return
+	}
 	go func() {
 		global.LOG.Infof("sync app list start ...")
 		if err := appService.SyncAppListFromRemote(); err != nil {

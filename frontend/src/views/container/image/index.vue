@@ -19,6 +19,9 @@
                         <el-button type="primary" plain @click="onOpenBuild">
                             {{ $t('container.imageBuild') }}
                         </el-button>
+                        <el-button type="primary" plain @click="onOpenPrune()">
+                            {{ $t('container.imagePrune') }}
+                        </el-button>
                     </el-col>
                     <el-col :span="8">
                         <TableSetting @search="search()" />
@@ -74,17 +77,16 @@
         <Load ref="dialogLoadRef" @search="search" />
         <Build ref="dialogBuildRef" @search="search" />
         <Delete ref="dialogDeleteRef" @search="search" />
+        <Prune ref="dialogPruneRef" @search="search" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import Tooltip from '@/components/tooltip/index.vue';
-import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
 import { Container } from '@/api/interface/container';
-import LayoutContent from '@/layout/layout-content.vue';
 import Pull from '@/views/container/image/pull/index.vue';
 import Tag from '@/views/container/image/tag/index.vue';
 import Push from '@/views/container/image/push/index.vue';
@@ -92,6 +94,7 @@ import Save from '@/views/container/image/save/index.vue';
 import Load from '@/views/container/image/load/index.vue';
 import Build from '@/views/container/image/build/index.vue';
 import Delete from '@/views/container/image/delete/index.vue';
+import Prune from '@/views/container/image/prune/index.vue';
 import { searchImage, listImageRepo, loadDockerStatus, imageRemove } from '@/api/modules/container';
 import i18n from '@/lang';
 import router from '@/routers';
@@ -136,6 +139,7 @@ const dialogLoadRef = ref();
 const dialogSaveRef = ref();
 const dialogBuildRef = ref();
 const dialogDeleteRef = ref();
+const dialogPruneRef = ref();
 
 const search = async () => {
     const repoSearch = {
@@ -162,6 +166,10 @@ const onOpenPull = () => {
 
 const onOpenBuild = () => {
     dialogBuildRef.value!.acceptParams();
+};
+
+const onOpenPrune = () => {
+    dialogPruneRef.value!.acceptParams();
 };
 
 const onOpenload = () => {

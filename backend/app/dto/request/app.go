@@ -28,6 +28,8 @@ type AppContainerConfig struct {
 	MemoryUnit    string  `json:"memoryUnit"`
 	ContainerName string  `json:"containerName"`
 	AllowPort     bool    `json:"allowPort"`
+	EditCompose   bool    `json:"editCompose"`
+	DockerCompose string  `json:"dockerCompose"`
 }
 
 type AppInstalledSearch struct {

@@ -2,10 +2,10 @@
     <div>
         <LayoutContent v-loading="loading" :title="$t('setting.safe')" :divider="true">
             <template #main>
-                <el-form :model="form" v-loading="loading" label-position="left" label-width="180px">
+                <el-form :model="form" v-loading="loading" label-position="left" label-width="150px">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
-                        <el-col :span="12">
+                        <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
                             <el-form-item :label="$t('setting.panelPort')" prop="serverPort">
                                 <el-input disabled v-model.number="form.serverPort">
                                     <template #append>
@@ -155,7 +155,6 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue';
 import { ElForm, ElMessageBox } from 'element-plus';
-import LayoutContent from '@/layout/layout-content.vue';
 import PortSetting from '@/views/setting/safe/port/index.vue';
 import SSLSetting from '@/views/setting/safe/ssl/index.vue';
 import MfaSetting from '@/views/setting/safe/mfa/index.vue';

@@ -11,7 +11,7 @@
         <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('cronjob.cronTask')">
             <template #toolbar>
                 <el-row>
-                    <el-col :span="16">
+                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
                         <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('commons.button.create') }}{{ $t('cronjob.cronTask') }}
                         </el-button>
@@ -19,7 +19,7 @@
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
                         <TableSetting @search="search()" />
                         <div class="search-button">
                             <el-input
@@ -153,15 +153,12 @@
 </template>
 
 <script lang="ts" setup>
-import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import Tooltip from '@/components/tooltip/index.vue';
 import OperatrDialog from '@/views/cronjob/operate/index.vue';
 import Records from '@/views/cronjob/record/index.vue';
-import LayoutContent from '@/layout/layout-content.vue';
 import { loadZero } from '@/utils/util';
 import { onMounted, reactive, ref } from 'vue';
-import RouterButton from '@/components/router-button/index.vue';
 import { deleteCronjob, getCronjobPage, handleOnce, updateStatus } from '@/api/modules/cronjob';
 import i18n from '@/lang';
 import { Cronjob } from '@/api/interface/cronjob';

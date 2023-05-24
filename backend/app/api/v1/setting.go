@@ -2,14 +2,12 @@ package v1
 
 import (
 	"errors"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/mfa"
-	"github.com/1Panel-dev/1Panel/backend/utils/ntp"
 	"github.com/gin-gonic/gin"
 )
 
@@ -189,26 +187,40 @@ func (b *BaseApi) HandlePasswordExpired(c *gin.Context) {
 }
 
 // @Tags System Setting
-// @Summary Sync system time
-// @Description 系统时间同步
-// @Success 200 {string} ntime
+// @Summary Load time zone options
+// @Description 加载系统可用时区
+// @Success 200
 // @Security ApiKeyAuth
-// @Router /settings/time/sync [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"系统时间同步","formatEN":"sync system time"}
-func (b *BaseApi) SyncTime(c *gin.Context) {
-	ntime, err := ntp.GetRemoteTime()
+// @Router /settings/time/option [get]
+func (b *BaseApi) LoadTimeZone(c *gin.Context) {
+	zones, err := settingService.LoadTimeZone()
 	if err != nil {
-		helper.SuccessWithData(c, time.Now().Format("2006-01-02 15:04:05 MST -0700"))
-		return
-	}
-
-	ts := ntime.Format("2006-01-02 15:04:05")
-	if err := ntp.UpdateSystemDate(ts); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
+	helper.SuccessWithData(c, zones)
+}
 
-	helper.SuccessWithData(c, ntime.Format("2006-01-02 15:04:05 MST -0700"))
+// @Tags System Setting
+// @Summary Sync system time
+// @Description 系统时间同步
+// @Accept json
+// @Param request body dto.SyncTime true "request"
+// @Success 200 {string} ntime
+// @Security ApiKeyAuth
+// @Router /settings/time/sync [post]
+// @x-panel-log {"bodyKeys":["ntpSite"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"系统时间同步[ntpSite]","formatEN":"sync system time [ntpSite]"}
+func (b *BaseApi) SyncTime(c *gin.Context) {
+	var req dto.SyncTime
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := settingService.SyncTime(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
 }
 
 // @Tags System Setting

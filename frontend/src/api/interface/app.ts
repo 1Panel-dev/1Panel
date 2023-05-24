@@ -16,6 +16,7 @@ export namespace App {
 
     export interface AppDTO extends App {
         versions: string[];
+        installed: boolean;
     }
 
     export interface Tag {
@@ -25,7 +26,7 @@ export namespace App {
 
     export interface AppResPage {
         total: number;
-        items: App.App[];
+        items: App.AppDTO[];
     }
 
     export interface AppUpdateRes {
@@ -112,6 +113,7 @@ export namespace App {
         message: string;
         icon: string;
         canUpdate: boolean;
+        path: string;
         app: App;
     }
 

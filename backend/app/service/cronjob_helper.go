@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -14,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cloud_storage"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
 )
 
@@ -29,31 +31,28 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 			if len(cronjob.Script) == 0 {
 				return
 			}
-			stdout, errExec := cmd.ExecCronjobWithTimeOut(cronjob.Script, 5*time.Minute)
-			if errExec != nil {
-				err = errExec
-			}
-			message = []byte(stdout)
+			message, err = u.handleShell(cronjob.Type, cronjob.Name, cronjob.Script)
 			u.HandleRmExpired("LOCAL", "", cronjob, nil)
-		case "website":
-			record.File, err = u.HandleBackup(cronjob, record.StartTime)
-		case "database":
-			record.File, err = u.HandleBackup(cronjob, record.StartTime)
-		case "directory":
-			if len(cronjob.SourceDir) == 0 {
-				return
-			}
-			record.File, err = u.HandleBackup(cronjob, record.StartTime)
 		case "curl":
 			if len(cronjob.URL) == 0 {
 				return
 			}
-			stdout, errCurl := cmd.ExecWithTimeOut("curl "+cronjob.URL, 5*time.Minute)
-			if err != nil {
-				err = errCurl
-			}
-			message = []byte(stdout)
+			message, err = u.handleShell(cronjob.Type, cronjob.Name, fmt.Sprintf("curl '%s'", cronjob.URL))
 			u.HandleRmExpired("LOCAL", "", cronjob, nil)
+		case "website":
+			record.File, err = u.handleBackup(cronjob, record.StartTime)
+		case "database":
+			record.File, err = u.handleBackup(cronjob, record.StartTime)
+		case "directory":
+			if len(cronjob.SourceDir) == 0 {
+				return
+			}
+			record.File, err = u.handleBackup(cronjob, record.StartTime)
+		case "cutWebsiteLog":
+			record.File, err = u.handleCutWebsiteLog(cronjob, record.StartTime)
+			if err != nil {
+				global.LOG.Errorf("cut website log file failed, err: %v", err)
+			}
 		}
 		if err != nil {
 			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), string(message))
@@ -69,7 +68,31 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 	}()
 }
 
-func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Time) (string, error) {
+func (u *CronjobService) handleShell(cronType, cornName, script string) ([]byte, error) {
+	handleDir := fmt.Sprintf("%s/task/%s/%s", constant.DataDir, cronType, cornName)
+	if _, err := os.Stat(handleDir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(handleDir, os.ModePerm); err != nil {
+			return nil, err
+		}
+	}
+	oldDir, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+	if err := os.Chdir(handleDir); err != nil {
+		return nil, err
+	}
+	stdout, err := cmd.ExecCronjobWithTimeOut(script, 24*time.Hour)
+	if err != nil {
+		return nil, err
+	}
+	if err := os.Chdir(oldDir); err != nil {
+		return nil, err
+	}
+	return []byte(stdout), nil
+}
+
+func (u *CronjobService) handleBackup(cronjob *model.Cronjob, startTime time.Time) (string, error) {
 	backup, err := backupRepo.Get(commonRepo.WithByID(uint(cronjob.TargetDirID)))
 	if err != nil {
 		return "", err
@@ -157,7 +180,7 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 		if len(exclude) == 0 {
 			continue
 		}
-		excludeRules += (" --exclude " + exclude)
+		excludeRules += " --exclude " + exclude
 	}
 	path := ""
 	if strings.Contains(sourceDir, "/") {
@@ -260,6 +283,72 @@ func (u *CronjobService) handleDatabase(cronjob model.Cronjob, app *repo.RootInf
 	}
 	u.HandleRmExpired(backup.Type, localDir, &cronjob, client)
 	return paths, nil
+}
+
+func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime time.Time) (string, error) {
+	var (
+		websites  []string
+		err       error
+		filePaths []string
+	)
+	if cronjob.Website == "all" {
+		websites, _ = NewIWebsiteService().GetWebsiteOptions()
+		if len(websites) == 0 {
+			return "", nil
+		}
+	} else {
+		websites = append(websites, cronjob.Website)
+	}
+
+	nginx, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return "", nil
+	}
+	baseDir := path.Join(nginx.GetPath(), "www", "sites")
+	fileOp := files.NewFileOp()
+	var wg sync.WaitGroup
+	wg.Add(len(websites))
+	for _, websiteName := range websites {
+		name := websiteName
+		go func() {
+			website, _ := websiteRepo.GetFirst(websiteRepo.WithDomain(name))
+			if website.ID == 0 {
+				wg.Done()
+				return
+			}
+			websiteLogDir := path.Join(baseDir, website.PrimaryDomain, "log")
+			srcAccessLogPath := path.Join(websiteLogDir, "access.log")
+			srcErrorLogPath := path.Join(websiteLogDir, "error.log")
+			dstLogDir := path.Join(global.CONF.System.Backup, "log", "website", website.PrimaryDomain)
+			if !fileOp.Stat(dstLogDir) {
+				_ = os.MkdirAll(dstLogDir, 0755)
+			}
+
+			dstName := fmt.Sprintf("%s_log_%s.gz", website.PrimaryDomain, startTime.Format("20060102150405"))
+			filePaths = append(filePaths, path.Join(dstLogDir, dstName))
+			if err = fileOp.Compress([]string{srcAccessLogPath, srcErrorLogPath}, dstLogDir, dstName, files.Gz); err != nil {
+				global.LOG.Errorf("There was an error in compressing the website[%s] access.log", website.PrimaryDomain)
+			} else {
+				_ = fileOp.WriteFile(srcAccessLogPath, strings.NewReader(""), 0755)
+				_ = fileOp.WriteFile(srcErrorLogPath, strings.NewReader(""), 0755)
+			}
+			global.LOG.Infof("The website[%s] log file was successfully rotated in the directory [%s]", website.PrimaryDomain, dstLogDir)
+			var record model.BackupRecord
+			record.Type = "cutWebsiteLog"
+			record.Name = cronjob.Website
+			record.Source = "LOCAL"
+			record.BackupType = "LOCAL"
+			record.FileDir = dstLogDir
+			record.FileName = dstName
+			if err = backupRepo.CreateRecord(&record); err != nil {
+				global.LOG.Errorf("save backup record failed, err: %v", err)
+			}
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+	u.HandleRmExpired("LOCAL", "", cronjob, nil)
+	return strings.Join(filePaths, ","), nil
 }
 
 func (u *CronjobService) handleWebsite(cronjob model.Cronjob, backup model.BackupAccount, startTime time.Time) ([]string, error) {

@@ -138,8 +138,10 @@ type WebsiteDefaultUpdate struct {
 }
 
 type WebsitePHPConfigUpdate struct {
-	ID     uint              `json:"id" validate:"required"`
-	Params map[string]string `json:"params" validate:"required"`
+	ID               uint              `json:"id" validate:"required"`
+	Params           map[string]string `json:"params"`
+	Scope            string            `json:"scope" validate:"required"`
+	DisableFunctions []string          `json:"disableFunctions"`
 }
 
 type WebsitePHPFileUpdate struct {

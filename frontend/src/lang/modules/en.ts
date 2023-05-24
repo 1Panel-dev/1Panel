@@ -159,6 +159,7 @@ const message = {
             nginxDoc: 'Only supports English case, numbers, and .',
             appName: 'Support English, numbers, - and _, length 2-30, and cannot start and end with -_',
             conatinerName: 'Supports letters, numbers, underscores, hyphens and dots, cannot end with hyphen- or dot.',
+            disableFunction: 'Only support letters and,',
         },
         res: {
             paramError: 'The request failed, please try again later!',
@@ -437,6 +438,20 @@ const message = {
         unpause: 'Unpause',
         rename: 'Rename',
         remove: 'Remove',
+        containerPrune: 'Container prune',
+        containerPruneHelper: 'Remove all stopped containers. Do you want to continue?',
+        imagePrune: 'Image prune',
+        imagePruneSome: 'Clean unlabeled',
+        imagePruneSomeHelper: 'Remove all unused and unlabeled container images。',
+        imagePruneAll: 'Clean unused',
+        imagePruneAllHelper: 'Remove all unused images, not just unlabeled',
+        networkPrune: 'Network prune',
+        networkPruneHelper: 'Remove all unused networks. Do you want to continue?',
+        volumePrune: 'Volue prune',
+        volumePruneHelper: 'Remove all unused local volumes. Do you want to continue?',
+        cleanSuccess: 'The operation is successful, the number of this cleanup: {0}!',
+        cleanSuccessWithSpace:
+            'The operation is successful. The number of disks cleared this time is {0}. The disk space freed is {1}!',
         container: 'Container',
         upTime: 'UpTime',
         all: 'All',
@@ -444,6 +459,7 @@ const message = {
         last4Hour: 'Last 4 Hours',
         lastHour: 'Last Hour',
         last10Min: 'Last 10 Minutes',
+        cleanLog: 'Clean log',
         newName: 'New name',
         source: 'Resource rate',
 
@@ -541,7 +557,7 @@ const message = {
         repoHelper: 'Does it include a mirror repository/organization/project?',
         auth: 'Auth',
         mirrorHelper:
-            'If there are multiple mirrors, newlines must be displayed, for example:\nhttps://hub-mirror.c.163.com \nhttps://reg-mirror.qiniu.com',
+            'If there are multiple mirrors, newlines must be displayed, for example:\nhttp://xxxxxx.m.daocloud.io \nhttps://xxxxxx.mirror.aliyuncs.com',
         registrieHelper:
             'If multiple private repositories exist, newlines must be displayed, for example:\n172.16.10.111:8081 \n172.16.10.112:8081',
 
@@ -655,6 +671,8 @@ const message = {
         cleanDataHelper: 'Delete the backup file generated during this task.',
         noLogs: 'No task output yet...',
         errPath: 'Backup path [{0}] error, cannot download!',
+        cutWebsiteLog: 'cut website log',
+        cutWebsiteLogHelper: 'The cut log files will be backed up to the backup directory of 1Panel',
     },
     monitor: {
         monitor: 'Monitor',
@@ -715,6 +733,7 @@ const message = {
         emptyTerminal: 'No terminal is currently connected',
     },
     logs: {
+        panelLog: 'Panel logs',
         operation: 'Operation logs',
         login: 'Login logs',
         system: 'System logs',
@@ -745,6 +764,9 @@ const message = {
             logout: ' logout',
         },
         status: 'status',
+        websiteLog: 'Website Log',
+        runLog: 'Run Log',
+        errLog: 'Err Log',
     },
     file: {
         dir: 'Folder',
@@ -885,7 +907,18 @@ const message = {
         sessionTimeoutHelper:
             'If you do not operate the panel for more than {0} seconds, the panel automatically logs out',
         syncTime: 'Server time',
-        second: ' S',
+        timeZone: 'Time Zone',
+        timeZoneChangeHelper: 'Changing the time zone requires restarting the service. Do you want to continue?',
+        timeZoneHelper:
+            'Timezone modification depends on the system timedatectl service. take effect after restart the 1Panel service.',
+        timeZoneCN: 'Bei Jing',
+        timeZoneAM: 'Los Angeles',
+        timeZoneNY: 'New York',
+        ntpALi: 'Alibaba',
+        ntpGoogle: 'Google',
+        syncSite: 'Ntp Server',
+        syncSiteHelper:
+            'This operation will use {0} as the source for system time synchronization. Do you want to continue?',
         changePassword: 'Password change',
         oldPassword: 'Original password',
         newPassword: 'New password',
@@ -949,6 +982,7 @@ const message = {
         allowIPsWarnning:
             '设After setting the authorized IP address, only the IP address in the setting can access the 1Panel service. Do you want to continue?',
         allowIPsHelper1: 'If the authorized IP address is empty, the authorized IP address is canceled',
+        allowIPEgs: 'e.g. 172.16.10.111',
         mfa: 'MFA',
         mfaAlert:
             'MFA password is generated based on the current time. Please ensure that the server time is synchronized.',
@@ -1113,6 +1147,11 @@ const message = {
         appInstallWarn:
             'The application does not release the external access port by default, you can choose to release it in the advanced settings',
         upgradeStart: 'Start upgrading! Please refresh the page later',
+        toFolder: 'Open the installation directory',
+        editCompose: 'Edit compose file',
+        editComposeHelper: 'Editing the compose file may cause the software installation to fail',
+        composeNullErr: 'compose cannot be empty',
+        takeDown: 'TakeDown',
     },
     website: {
         website: 'Website',
@@ -1346,6 +1385,8 @@ const message = {
         cgi_fix_pathinfo: 'Whether to open pathinfo',
         date_timezone: 'Time zone',
         second: 'Second',
+        disableFunction: 'Disable function',
+        disableFunctionHelper: 'Enter the function to be disabled, such as exec, please use multiple, split',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'The hash table size of the server name',

@@ -2,7 +2,7 @@
     <LayoutContent v-loading="loading || syncLoading" :title="activeName">
         <template #toolbar>
             <el-row :gutter="5">
-                <el-col :span="20">
+                <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
                     <div>
                         <el-button
                             class="tag-button"
@@ -26,7 +26,7 @@
                         </div>
                     </div>
                 </el-col>
-                <el-col :span="4">
+                <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
                     <div class="search-button">
                         <el-input
                             class="table-button"
@@ -68,7 +68,7 @@
                 >
                     <div class="install-card">
                         <el-card class="e-card">
-                            <el-row :gutter="24">
+                            <el-row :gutter="20">
                                 <el-col :xs="3" :sm="3" :md="3" :lg="4" :xl="4">
                                     <div class="icon">
                                         <el-avatar
@@ -78,7 +78,7 @@
                                         />
                                     </div>
                                 </el-col>
-                                <el-col :xs="21" :sm="21" :md="21" :lg="20" :xl="20">
+                                <el-col :xs="24" :sm="21" :md="21" :lg="20" :xl="20">
                                     <div class="a-detail">
                                         <div class="d-name">
                                             <el-button link type="info">
@@ -97,10 +97,20 @@
                                                     :content="installed.message"
                                                 >
                                                     <template #reference>
-                                                        <el-button link type="primary">详情</el-button>
+                                                        <el-button link type="primary">
+                                                            {{ $t('app.detail') }}
+                                                        </el-button>
                                                     </template>
                                                 </el-popover>
                                             </span>
+
+                                            <el-tooltip effect="dark" :content="$t('app.toFolder')" placement="top">
+                                                <el-button type="primary" link @click="toFolder(installed.path)">
+                                                    <el-icon>
+                                                        <FolderOpened />
+                                                    </el-icon>
+                                                </el-button>
+                                            </el-tooltip>
 
                                             <el-button
                                                 class="h-button"
@@ -132,7 +142,7 @@
                                                 plain
                                                 round
                                                 size="small"
-                                                :disabled="installed.status === 'Upgrading'"
+                                                :disabled="installed.status === 'Running'"
                                                 @click="openOperate(installed, 'upgrade')"
                                                 v-if="mode === 'upgrade'"
                                             >
@@ -195,7 +205,6 @@ import {
     AppInstalledDeleteCheck,
     GetAppTags,
 } from '@/api/modules/app';
-import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, onUnmounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
@@ -210,6 +219,7 @@ import Status from '@/components/status/index.vue';
 import { getAge } from '@/utils/util';
 import { useRouter } from 'vue-router';
 import { MsgSuccess } from '@/utils/message';
+import { toFolder } from '@/global/business';
 
 const data = ref<any>();
 const loading = ref(false);
@@ -392,7 +402,7 @@ const buttons = [
     {
         label: i18n.global.t('app.params'),
         click: (row: any) => {
-            openParam(row.id);
+            openParam(row);
         },
         disabled: (row: any) => {
             return row.status === 'DownloadErr' || row.status === 'Upgrading';
@@ -418,8 +428,8 @@ const openUploads = (key: string, name: string) => {
     uploadRef.value.acceptParams(params);
 };
 
-const openParam = (installId: number) => {
-    appParamRef.value.acceptParams({ id: installId });
+const openParam = (row: any) => {
+    appParamRef.value.acceptParams({ app: row.app, id: row.id });
 };
 
 const isAppErr = (row: any) => {

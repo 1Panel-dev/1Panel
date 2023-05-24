@@ -21,8 +21,9 @@ type AppUpdateRes struct {
 
 type AppDTO struct {
 	model.App
-	Versions []string    `json:"versions"`
-	Tags     []model.Tag `json:"tags"`
+	Installed bool        `json:"installed"`
+	Versions  []string    `json:"versions"`
+	Tags      []model.Tag `json:"tags"`
 }
 
 type TagDTO struct {
@@ -56,6 +57,7 @@ type AppInstalledDTO struct {
 	AppName   string `json:"appName"`
 	Icon      string `json:"icon"`
 	CanUpdate bool   `json:"canUpdate"`
+	Path      string `json:"path"`
 }
 
 type DatabaseConn struct {

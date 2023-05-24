@@ -3,7 +3,7 @@
         <LayoutContent v-loading="loading" :title="$t('ssh.loginLogs')">
             <template #toolbar>
                 <el-row>
-                    <el-col :span="16">
+                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
                         <el-select v-model="searchStatus" @change="search()">
                             <template #prefix>{{ $t('commons.table.status') }}</template>
                             <el-option :label="$t('commons.table.all')" value="All"></el-option>
@@ -17,7 +17,7 @@
                             {{ $t('commons.status.failed') }}： {{ faliedCount }}
                         </el-button>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
                         <TableSetting @search="search()" />
                         <div class="search-button">
                             <el-input
@@ -36,18 +36,18 @@
 
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
-                    <el-table-column min-width="60" :label="$t('logs.loginIP')" prop="address" />
-                    <el-table-column min-width="30" :label="$t('ssh.belong')" prop="isLocal">
+                    <el-table-column min-width="80" :label="$t('logs.loginIP')" prop="address" />
+                    <el-table-column min-width="60" :label="$t('ssh.belong')" prop="isLocal">
                         <template #default="{ row }">{{ row.isLocal ? $t('ssh.local') : $t('ssh.remote') }}</template>
                     </el-table-column>
-                    <el-table-column min-width="40" :label="$t('firewall.port')" prop="port" />
-                    <el-table-column min-width="40" :label="$t('ssh.loginMode')" prop="authMode">
+                    <el-table-column min-width="60" :label="$t('firewall.port')" prop="port" />
+                    <el-table-column min-width="60" :label="$t('ssh.loginMode')" prop="authMode">
                         <template #default="{ row }">
                             <span v-if="row.authMode">{{ $t('ssh.' + row.authMode) }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column min-width="40" :label="$t('ssh.loginUser')" prop="user" />
-                    <el-table-column min-width="40" :label="$t('logs.loginStatus')" prop="status">
+                    <el-table-column min-width="60" :label="$t('ssh.loginUser')" prop="user" />
+                    <el-table-column min-width="60" :label="$t('logs.loginStatus')" prop="status">
                         <template #default="{ row }">
                             <div v-if="row.status === 'Success'">
                                 <el-tag type="success">{{ $t('commons.status.success') }}</el-tag>
@@ -72,9 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
-import LayoutContent from '@/layout/layout-content.vue';
 import { dateFormat } from '@/utils/util';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import { loadSSHLogs } from '@/api/modules/host';

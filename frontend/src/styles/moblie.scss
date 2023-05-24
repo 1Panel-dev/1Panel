@@ -1,0 +1,43 @@
+.mobile {
+    .monitor-tags {
+        position: inherit;
+        top: 13px;
+    }
+    .mobile-monitor-chart {
+        margin-top: 20px !important;
+    }
+    .search-button {
+        float: none !important;
+        .table-button {
+            display: inline-flex !important;
+        }
+    }
+
+    .app-card {
+        .app-button {
+            margin-right: 0 !important;
+        }
+    }
+    .install-card .a-detail {
+        .d-name {
+            height: auto !important;
+            .h-button {
+                float: none !important;
+                margin: 5px;
+            }
+        }
+        .d-button {
+            min-width: auto !important;
+        }
+        .d-description {
+            display: block !important;
+            overflow: inherit !important;
+        }
+    }
+    .router_card_button {
+        padding: 2px 0;
+    }
+    .el-drawer.rtl {
+        width: 80% !important;
+    }
+}

@@ -69,7 +69,7 @@
                         :ellipsis="3"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
-                        fixed="right"
+                        :fixed="mobile ? false : 'right'"
                         fix
                     />
                 </ComplexTable>
@@ -84,10 +84,7 @@
 </template>
 
 <script lang="ts" setup>
-import LayoutContent from '@/layout/layout-content.vue';
-import RouterButton from '@/components/router-button/index.vue';
-import ComplexTable from '@/components/complex-table/index.vue';
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, computed } from 'vue';
 import { DeleteSSL, SearchSSL, UpdateSSL } from '@/api/modules/website';
 import DnsAccount from './dns-account/index.vue';
 import AcmeAccount from './acme-account/index.vue';
@@ -99,6 +96,8 @@ import i18n from '@/lang';
 import { Website } from '@/api/interface/website';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -143,6 +142,10 @@ const buttons = [
         },
     },
 ];
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 const search = () => {
     const req = {

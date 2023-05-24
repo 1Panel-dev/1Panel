@@ -18,6 +18,7 @@
                             <el-option value="database" :label="$t('cronjob.database')" />
                             <el-option value="directory" :label="$t('cronjob.directory')" />
                             <el-option value="curl" :label="$t('cronjob.curl')" />
+                            <el-option value="cutWebsiteLog" :label="$t('cronjob.cutWebsiteLog')" />
                         </el-select>
                         <el-tag v-else>{{ dialogData.rowData!.type }}</el-tag>
                     </el-form-item>
@@ -82,14 +83,17 @@
                     </el-form-item>
 
                     <el-form-item
-                        v-if="dialogData.rowData!.type === 'website'"
-                        :label="$t('cronjob.website')"
+                        v-if="dialogData.rowData!.type === 'website' || dialogData.rowData!.type === 'cutWebsiteLog'"
+                        :label="dialogData.rowData!.type === 'website' ? $t('cronjob.website'):$t('website.website')"
                         prop="website"
                     >
                         <el-select style="width: 100%" v-model="dialogData.rowData!.website">
                             <el-option :label="$t('commons.table.all')" value="all" />
                             <el-option v-for="item in websiteOptions" :key="item" :value="item" :label="item" />
                         </el-select>
+                        <span class="input-help" v-if="dialogData.rowData!.type === 'cutWebsiteLog'">
+                            {{ $t('cronjob.cutWebsiteLogHelper') }}
+                        </span>
                     </el-form-item>
 
                     <div v-if="dialogData.rowData!.type === 'database'">

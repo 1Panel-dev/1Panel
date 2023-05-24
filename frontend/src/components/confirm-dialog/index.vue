@@ -18,7 +18,7 @@
                 <el-button @click="onCancle">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button :disabled="submitInput !== submitInputInfo" @click="onConfirm">
+                <el-button type="primary" :disabled="submitInput !== submitInputInfo" @click="onConfirm">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>

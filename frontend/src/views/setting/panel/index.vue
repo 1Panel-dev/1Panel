@@ -2,10 +2,10 @@
     <div v-loading="loading">
         <LayoutContent :title="$t('setting.panel')" :divider="true">
             <template #main>
-                <el-form :model="form" label-position="left" label-width="180px">
+                <el-form :model="form" label-position="left" label-width="150px">
                     <el-row>
                         <el-col :span="1"><br /></el-col>
-                        <el-col :span="12">
+                        <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
                             <el-form-item :label="$t('setting.user')" prop="userName">
                                 <el-input disabled v-model="form.userName">
                                     <template #append>
@@ -73,15 +73,21 @@
                                 </span>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.timeZone')" prop="timeZone">
+                                <el-input disabled v-model.number="form.timeZone">
+                                    <template #append>
+                                        <el-button @click="onChangeTimeZone" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
                             <el-form-item :label="$t('setting.syncTime')">
                                 <el-input disabled v-model="form.localTime">
                                     <template #append>
-                                        <el-button v-show="!show" @click="onSyncTime" icon="Refresh">
-                                            {{ $t('commons.button.sync') }}
+                                        <el-button v-show="!show" @click="onChangeNtp" icon="Setting">
+                                            {{ $t('commons.button.set') }}
                                         </el-button>
-                                        <div style="width: 45px" v-show="show">
-                                            <span>{{ count }} {{ $t('setting.second') }}</span>
-                                        </div>
                                     </template>
                                 </el-input>
                             </el-form-item>
@@ -95,14 +101,15 @@
         <UserName ref="userNameRef" />
         <PanelName ref="panelNameRef" @search="search()" />
         <Timeout ref="timeoutRef" @search="search()" />
+        <TimeZone ref="timezoneRef" @search="search()" />
+        <Ntp ref="ntpRef" @search="search()" />
     </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted, computed } from 'vue';
 import { ElForm } from 'element-plus';
-import LayoutContent from '@/layout/layout-content.vue';
-import { syncTime, getSettingInfo, updateSetting, getSystemAvailable } from '@/api/modules/setting';
+import { getSettingInfo, updateSetting, getSystemAvailable } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { useI18n } from 'vue-i18n';
 import { useTheme } from '@/hooks/use-theme';
@@ -111,6 +118,8 @@ import Password from '@/views/setting/panel/password/index.vue';
 import UserName from '@/views/setting/panel/username/index.vue';
 import Timeout from '@/views/setting/panel/timeout/index.vue';
 import PanelName from '@/views/setting/panel/name/index.vue';
+import TimeZone from '@/views/setting/panel/timezone/index.vue';
+import Ntp from '@/views/setting/panel/ntp/index.vue';
 
 const loading = ref(false);
 const i18n = useI18n();
@@ -124,21 +133,22 @@ const form = reactive({
     email: '',
     sessionTimeout: 0,
     localTime: '',
+    timeZone: '',
+    ntpSite: '',
     panelName: '',
     theme: '',
     language: '',
     complexityVerification: '',
 });
 
-const timer = ref();
-const TIME_COUNT = ref(10);
-const count = ref();
 const show = ref();
 
 const userNameRef = ref();
 const passwordRef = ref();
 const panelNameRef = ref();
 const timeoutRef = ref();
+const ntpRef = ref();
+const timezoneRef = ref();
 
 const search = async () => {
     const res = await getSettingInfo();
@@ -146,6 +156,8 @@ const search = async () => {
     form.password = '******';
     form.sessionTimeout = Number(res.data.sessionTimeout);
     form.localTime = res.data.localTime;
+    form.timeZone = res.data.timeZone;
+    form.ntpSite = res.data.ntpSite;
     form.panelName = res.data.panelName;
     form.theme = res.data.theme;
     form.language = res.data.language;
@@ -163,6 +175,12 @@ const onChangeTitle = () => {
 };
 const onChangeTimeout = () => {
     timeoutRef.value.acceptParams({ sessionTimeout: form.sessionTimeout });
+};
+const onChangeTimeZone = () => {
+    timezoneRef.value.acceptParams({ timeZone: form.timeZone });
+};
+const onChangeNtp = () => {
+    ntpRef.value.acceptParams({ localTime: form.localTime, ntpSite: form.ntpSite });
 };
 
 const onSave = async (key: string, val: any) => {
@@ -187,34 +205,6 @@ const onSave = async (key: string, val: any) => {
             loading.value = false;
             MsgSuccess(i18n.t('commons.msg.operationSuccess'));
             search();
-        })
-        .catch(() => {
-            loading.value = false;
-        });
-};
-
-function countdown() {
-    count.value = TIME_COUNT.value;
-    show.value = true;
-    timer.value = setInterval(() => {
-        if (count.value > 0 && count.value <= TIME_COUNT.value) {
-            count.value--;
-        } else {
-            show.value = false;
-            clearInterval(timer.value);
-            timer.value = null;
-        }
-    }, 1000);
-}
-
-const onSyncTime = async () => {
-    loading.value = true;
-    await syncTime()
-        .then((res) => {
-            loading.value = false;
-            form.localTime = res.data;
-            countdown();
-            MsgSuccess(i18n.t('commons.msg.operationSuccess'));
         })
         .catch(() => {
             loading.value = false;

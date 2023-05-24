@@ -131,7 +131,6 @@ import { FormInstance } from 'element-plus';
 import { nextTick, reactive, ref, shallowRef } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
-import LayoutContent from '@/layout/layout-content.vue';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { LoadFile } from '@/api/modules/files';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';

@@ -13,7 +13,10 @@
                         <el-button type="primary" @click="onCreate()">
                             {{ $t('container.createNetwork') }}
                         </el-button>
-                        <el-button type="primary" plain :disabled="selects.length === 0" @click="batchDelete(null)">
+                        <el-button type="primary" plain @click="onClean()">
+                            {{ $t('container.networkPrune') }}
+                        </el-button>
+                        <el-button :disabled="selects.length === 0" @click="batchDelete(null)">
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </el-col>
@@ -90,19 +93,19 @@
 </template>
 
 <script lang="ts" setup>
-import LayoutContent from '@/layout/layout-content.vue';
 import Tooltip from '@/components/tooltip/index.vue';
-import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import CreateDialog from '@/views/container/network/create/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
-import { deleteNetwork, searchNetwork, inspect, loadDockerStatus } from '@/api/modules/container';
+import { deleteNetwork, searchNetwork, inspect, loadDockerStatus, containerPrune } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import router from '@/routers';
+import { ElMessageBox } from 'element-plus';
+import { MsgSuccess } from '@/utils/message';
 
 const loading = ref();
 
@@ -145,6 +148,29 @@ interface DialogExpose {
 }
 const onCreate = async () => {
     dialogCreateRef.value!.acceptParams();
+};
+
+const onClean = () => {
+    ElMessageBox.confirm(i18n.global.t('container.networkPruneHelper'), i18n.global.t('container.networkPrune'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        loading.value = true;
+        let params = {
+            pruneType: 'network',
+            withTagAll: false,
+        };
+        await containerPrune(params)
+            .then((res) => {
+                loading.value = false;
+                MsgSuccess(i18n.global.t('container.cleanSuccess', [res.data.deletedNumber]));
+                search();
+            })
+            .catch(() => {
+                loading.value = false;
+            });
+    });
 };
 
 function selectable(row) {

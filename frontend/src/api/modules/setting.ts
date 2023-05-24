@@ -35,8 +35,11 @@ export const handleExpired = (param: Setting.PasswordUpdate) => {
     return http.post(`/settings/expired/handle`, param);
 };
 
-export const syncTime = () => {
-    return http.post<string>(`/settings/time/sync`, {});
+export const loadTimeZone = () => {
+    return http.get<Array<string>>(`/settings/time/option`);
+};
+export const syncTime = (ntpSite: string) => {
+    return http.post<string>(`/settings/time/sync`, { ntpSite: ntpSite });
 };
 
 export const cleanMonitors = () => {

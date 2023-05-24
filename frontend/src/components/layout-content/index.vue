@@ -133,7 +133,6 @@ const showBack = computed(() => {
 .main-box {
     position: relative;
 }
-
 .main-content {
     margin-top: 20px;
 }

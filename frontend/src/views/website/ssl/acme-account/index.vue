@@ -24,7 +24,6 @@
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { Website } from '@/api/interface/website';
 import { DeleteAcmeAccount, SearchAcmeAccount } from '@/api/modules/website';
-import ComplexTable from '@/components/complex-table/index.vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';

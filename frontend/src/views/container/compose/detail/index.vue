@@ -115,13 +115,11 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import Tooltip from '@/components/tooltip/index.vue';
-import LayoutContent from '@/layout/layout-content.vue';
 import CreateDialog from '@/views/container/container/create/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
-import ComplexTable from '@/components/complex-table/index.vue';
 import Status from '@/components/status/index.vue';
 import { dateFormat } from '@/utils/util';
 import { composeOperator, ContainerOperator, inspect, searchContainer } from '@/api/modules/container';

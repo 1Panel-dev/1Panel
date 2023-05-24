@@ -11,11 +11,17 @@ export const createContainer = (params: Container.ContainerCreate) => {
 export const logContainer = (params: Container.ContainerLogSearch) => {
     return http.post<string>(`/containers/search/log`, params, 400000);
 };
+export const cleanContainerLog = (containerName: string) => {
+    return http.post(`/containers/clean/log`, { name: containerName });
+};
 export const ContainerStats = (id: string) => {
     return http.get<Container.ContainerStats>(`/containers/stats/${id}`);
 };
 export const ContainerOperator = (params: Container.ContainerOperate) => {
     return http.post(`/containers/operate`, params);
+};
+export const containerPrune = (params: Container.ContainerPrune) => {
+    return http.post<Container.ContainerPruneReport>(`/containers/prune`, params);
 };
 export const inspect = (params: Container.ContainerInspect) => {
     return http.post<string>(`/containers/inspect`, params);

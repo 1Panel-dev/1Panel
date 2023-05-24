@@ -269,11 +269,14 @@ export namespace Website {
 
     export interface PHPConfig {
         params: any;
+        disableFunctions: string[];
     }
 
     export interface PHPConfigUpdate {
         id: number;
-        params: any;
+        params?: any;
+        disableFunctions?: string[];
+        scope: string;
     }
 
     export interface PHPUpdate {

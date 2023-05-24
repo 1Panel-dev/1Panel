@@ -111,12 +111,10 @@
 </template>
 
 <script lang="ts" setup>
-import ComplexTable from '@/components/complex-table/index.vue';
 import OperatrDialog from '@/views/host/firewall/ip/operate/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
-import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { batchOperateRule, searchFireRule, updateAddrRule } from '@/api/modules/host';
 import { Host } from '@/api/interface/host';

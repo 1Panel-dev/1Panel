@@ -38,6 +38,7 @@ const (
 	GetLog     = "get"
 	DisableLog = "disable"
 	EnableLog  = "enable"
+	DeleteLog  = "delete"
 
 	AccessLog = "access.log"
 	ErrorLog  = "error.log"

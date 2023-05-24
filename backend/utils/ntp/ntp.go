@@ -30,8 +30,8 @@ type packet struct {
 	TxTimeFrac     uint32
 }
 
-func GetRemoteTime() (time.Time, error) {
-	conn, err := net.Dial("udp", "pool.ntp.org:123")
+func GetRemoteTime(site string) (time.Time, error) {
+	conn, err := net.Dial("udp", site+":123")
 	if err != nil {
 		return time.Time{}, fmt.Errorf("failed to connect: %v", err)
 	}
@@ -59,11 +59,24 @@ func GetRemoteTime() (time.Time, error) {
 	return showtime, nil
 }
 
-func UpdateSystemDate(dateTime string) error {
+func UpdateSystemTime(dateTime string) error {
 	system := runtime.GOOS
 	if system == "linux" {
-		if _, err := cmd.Execf(`date -s  "` + dateTime + `"`); err != nil {
-			return fmt.Errorf("update system date failed, err: %v", err)
+		stdout2, err := cmd.Execf(`%s date -s "%s"`, cmd.SudoHandleCmd(), dateTime)
+		if err != nil {
+			return fmt.Errorf("update system time failed,stdout: %s, err: %v", stdout2, err)
+		}
+		return nil
+	}
+	return fmt.Errorf("the current system architecture %v does not support synchronization", system)
+}
+
+func UpdateSystemTimeZone(timezone string) error {
+	system := runtime.GOOS
+	if system == "linux" {
+		stdout, err := cmd.Execf(`%s timedatectl set-timezone "%s"`, cmd.SudoHandleCmd(), timezone)
+		if err != nil {
+			return fmt.Errorf("update system time zone failed, stdout: %s, err: %v", stdout, err)
 		}
 		return nil
 	}

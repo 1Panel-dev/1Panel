@@ -71,7 +71,6 @@ import { onMounted, reactive, ref } from 'vue';
 import Status from '@/components/status/index.vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
-import LayoutContent from '@/layout/layout-content.vue';
 import { MsgSuccess } from '@/utils/message';
 
 const props = defineProps({

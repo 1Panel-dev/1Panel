@@ -1,6 +1,21 @@
 <template>
     <div>
         <LayoutContent v-loading="loading" :title="$t('logs.system')">
+            <template #toolbar>
+                <el-row>
+                    <el-col :span="16">
+                        <el-button class="no-active-button" @click="onChangeRoute('OperationLog')">
+                            {{ $t('logs.operation') }}
+                        </el-button>
+                        <el-button class="no-active-button" @click="onChangeRoute('LoginLog')">
+                            {{ $t('logs.login') }}
+                        </el-button>
+                        <el-button type="primary" @click="onChangeRoute('SystemLog')">
+                            {{ $t('logs.system') }}
+                        </el-button>
+                    </el-col>
+                </el-row>
+            </template>
             <template #main>
                 <codemirror
                     :autofocus="true"
@@ -24,12 +39,13 @@
 
 <script setup lang="ts">
 import { Codemirror } from 'vue-codemirror';
-import LayoutContent from '@/layout/layout-content.vue';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { nextTick, onMounted, ref, shallowRef } from 'vue';
 import { LoadFile } from '@/api/modules/files';
 import { loadBaseDir } from '@/api/modules/setting';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const loading = ref();
 const extensions = [javascript(), oneDark];
@@ -57,6 +73,10 @@ const loadSystemlogs = async () => {
         .catch(() => {
             loading.value = false;
         });
+};
+
+const onChangeRoute = async (addr: string) => {
+    router.push({ name: addr });
 };
 
 onMounted(() => {

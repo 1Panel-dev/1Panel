@@ -46,7 +46,6 @@
 </template>
 
 <script setup lang="ts">
-import LayoutContent from '@/layout/layout-content.vue';
 import { onMounted, ref, watch } from 'vue';
 import Basic from './basic/index.vue';
 import Safety from './safety/index.vue';

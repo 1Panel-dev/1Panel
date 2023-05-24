@@ -9,6 +9,8 @@ type SettingInfo struct {
 
 	SessionTimeout string `json:"sessionTimeout"`
 	LocalTime      string `json:"localTime"`
+	TimeZone       string `json:"timeZone"`
+	NtpSite        string `json:"ntpSite"`
 
 	Port      string `json:"port"`
 	PanelName string `json:"panelName"`
@@ -107,6 +109,10 @@ type UpgradeInfo struct {
 	NewVersion    string `json:"newVersion"`
 	LatestVersion string `json:"latestVersion"`
 	ReleaseNote   string `json:"releaseNote"`
+}
+
+type SyncTime struct {
+	NtpSite string `json:"ntpSite"`
 }
 
 type Upgrade struct {

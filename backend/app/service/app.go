@@ -98,6 +98,8 @@ func (a AppService) PageApp(req request.AppSearch) (interface{}, error) {
 			continue
 		}
 		appDTO.Tags = tags
+		installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(a.ID))
+		appDTO.Installed = len(installs) > 0
 	}
 	res.Items = appDTOs
 	res.Total = total
@@ -268,8 +270,14 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		App:         app,
 	}
 	composeMap := make(map[string]interface{})
-	if err = yaml.Unmarshal([]byte(appDetail.DockerCompose), &composeMap); err != nil {
-		return
+	if req.EditCompose {
+		if err = yaml.Unmarshal([]byte(req.DockerCompose), &composeMap); err != nil {
+			return
+		}
+	} else {
+		if err = yaml.Unmarshal([]byte(appDetail.DockerCompose), &composeMap); err != nil {
+			return
+		}
 	}
 
 	value, ok := composeMap["services"]
@@ -278,32 +286,25 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		return
 	}
 	servicesMap := value.(map[string]interface{})
-	changeKeys := make(map[string]string, len(servicesMap))
+	containerName := constant.ContainerPrefix + app.Key + "-" + common.RandStr(4)
+	if req.Advanced && req.ContainerName != "" {
+		containerName = req.ContainerName
+	}
+	req.Params[constant.ContainerName] = containerName
+	appInstall.ContainerName = containerName
+
 	index := 0
 	for k := range servicesMap {
-		serviceName := k + "-" + common.RandStr(4)
-		changeKeys[k] = serviceName
-		containerName := constant.ContainerPrefix + k + "-" + common.RandStr(4)
-		if req.Advanced && req.ContainerName != "" {
-			containerName = req.ContainerName
-		}
+		appInstall.ServiceName = k
 		if index > 0 {
 			continue
 		}
-		req.Params[constant.ContainerName] = containerName
-		appInstall.ServiceName = serviceName
-		appInstall.ContainerName = containerName
 		index++
-	}
-	for k, v := range changeKeys {
-		servicesMap[v] = servicesMap[k]
-		delete(servicesMap, k)
 	}
 
 	if err = addDockerComposeCommonParam(composeMap, appInstall.ServiceName, req.AppContainerConfig, req.Params); err != nil {
 		return
 	}
-
 	var (
 		composeByte []byte
 		paramByte   []byte
@@ -385,7 +386,6 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 		res.CanUpdate = true
 		return res, err
 	}
-	res.CanUpdate = true
 	return res, nil
 }
 
@@ -665,7 +665,6 @@ func (a AppService) SyncAppListFromRemote() error {
 		return err
 	}
 	if !updateRes.CanUpdate {
-		//global.LOG.Infof("The latest version is [%s] The app store is already up to date", updateRes.Version)
 		return nil
 	}
 	var (
@@ -833,6 +832,11 @@ func (a AppService) SyncAppListFromRemote() error {
 	}
 	if len(addDetails) > 0 {
 		if err := appDetailRepo.BatchCreate(ctx, addDetails); err != nil {
+			return err
+		}
+	}
+	if len(deleteDetails) > 0 {
+		if err := appDetailRepo.BatchDelete(ctx, deleteDetails); err != nil {
 			return err
 		}
 	}

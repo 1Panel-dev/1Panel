@@ -2,7 +2,7 @@
     <el-drawer :close-on-click-modal="false" v-model="open" size="40%">
         <template #header>
             <Header :header="$t('app.param')" :back="handleClose">
-                <template #buttons v-if="canEdit">
+                <template #buttons>
                     <el-button type="primary" plain @click="editParam" :disabled="loading">
                         {{ edit ? $t('app.detail') : $t('commons.button.edit') }}
                     </el-button>
@@ -75,7 +75,7 @@
                             </el-input>
                             <span class="input-help">{{ $t('container.limitHelper') }}</span>
                         </el-form-item>
-                        <el-form-item prop="allowPort">
+                        <el-form-item prop="allowPort" v-if="canEditPort(paramData.app)">
                             <el-checkbox v-model="paramModel.allowPort" :label="$t('app.allowPort')" size="large" />
                             <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
                         </el-form-item>
@@ -103,12 +103,15 @@ import { FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
+import { canEditPort } from '@/global/business';
 
 interface ParamProps {
     id: Number;
+    app: any;
 }
 const paramData = ref<ParamProps>({
     id: 0,
+    app: {},
 });
 
 interface EditForm extends App.InstallParams {
@@ -127,13 +130,12 @@ const rules = reactive({
     params: {},
 });
 const submitModel = ref<any>({});
-const canEdit = ref(false);
 
 const acceptParams = async (props: ParamProps) => {
-    canEdit.value = true;
     submitModel.value.installId = props.id;
     params.value = [];
     paramData.value.id = props.id;
+    paramData.value.app = props.app;
     edit.value = false;
     await get();
     open.value = true;
@@ -156,9 +158,6 @@ const get = async () => {
         const configParams = res.data.params || [];
         if (configParams && configParams.length > 0) {
             configParams.forEach((d) => {
-                if (d.edit) {
-                    canEdit.value = true;
-                }
                 let value = d.value;
                 if (d.type === 'number') {
                     value = Number(value);

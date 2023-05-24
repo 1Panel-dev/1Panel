@@ -230,7 +230,7 @@
     }
 }
 
-.menu-popper {
+.sidebar-container-popper {
     .el-menu--popup-right-start {
         background-color: rgba(0, 94, 235, 0.1);
     }
@@ -323,4 +323,9 @@
         width: 300px;
         height: 300px;
     }
+}
+
+.no-active-button {
+    background: none;
+    border: none;
 }

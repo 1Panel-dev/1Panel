@@ -1,7 +1,6 @@
 <template>
     <div
-        class="menu"
-        :style="{ width: isCollapse ? '75px' : '180px' }"
+        class="sidebar-container"
         element-loading-text="Loading..."
         :element-loading-spinner="loadingSvg"
         element-loading-svg-view-box="-10, -10, 50, 50"
@@ -15,7 +14,7 @@
                 :collapse="isCollapse"
                 :collapse-transition="false"
                 :unique-opened="true"
-                popper-class="menu-popper"
+                popper-class="sidebar-container-popper"
             >
                 <SubItem :menuList="routerMenus"></SubItem>
                 <el-menu-item :index="''">
@@ -39,7 +38,7 @@ import { MenuStore } from '@/store/modules/menu';
 import { loadingSvg } from '@/utils/svg';
 import Logo from './components/Logo.vue';
 import Collapse from './components/Collapse.vue';
-import SubItem from './components/sub-item.vue';
+import SubItem from './components/SubItem.vue';
 import router, { menuList } from '@/routers/router';
 import { logOutApi } from '@/api/modules/auth';
 import i18n from '@/lang';
@@ -97,7 +96,7 @@ onMounted(async () => {
 
 <style lang="scss">
 @import './index.scss';
-.menu {
+.sidebar-container {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -114,7 +113,7 @@ onMounted(async () => {
             border-right: none;
         }
     }
-    .menu-footer {
+    .sidebar-container-footer {
         height: 30px;
         background-color: #c0c0c0;
         text-align: center;

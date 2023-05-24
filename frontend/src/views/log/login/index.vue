@@ -3,12 +3,18 @@
         <LayoutContent v-loading="loading" :title="$t('logs.login')">
             <template #toolbar>
                 <el-row>
-                    <el-col :span="16">
-                        <el-button type="primary" plain @click="onClean()">
-                            {{ $t('logs.deleteLogs') }}
+                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
+                        <el-button class="no-active-button" @click="onChangeRoute('OperationLog')">
+                            {{ $t('logs.operation') }}
+                        </el-button>
+                        <el-button type="primary" @click="onChangeRoute('LoginLog')">
+                            {{ $t('logs.login') }}
+                        </el-button>
+                        <el-button class="no-active-button" @click="onChangeRoute('SystemLog')">
+                            {{ $t('logs.system') }}
                         </el-button>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
                         <TableSetting @search="search()" />
                         <div class="search-button">
                             <el-input
@@ -32,6 +38,9 @@
                     <el-option :label="$t('commons.status.success')" value="Success"></el-option>
                     <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
                 </el-select>
+                <el-button type="primary" plain @click="onClean()" style="margin-left: 10px">
+                    {{ $t('logs.deleteLogs') }}
+                </el-button>
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
@@ -64,15 +73,15 @@
 </template>
 
 <script setup lang="ts">
-import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import LayoutContent from '@/layout/layout-content.vue';
 import { dateFormat } from '@/utils/util';
 import { cleanLogs, getLoginLogs } from '@/api/modules/log';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 const loading = ref();
 const data = ref();
@@ -104,6 +113,10 @@ const search = async () => {
         });
 };
 
+const onChangeRoute = async (addr: string) => {
+    router.push({ name: addr });
+};
+
 const onClean = async () => {
     let params = {
         header: i18n.global.t('logs.deleteLogs'),
@@ -123,13 +136,3 @@ onMounted(() => {
     search();
 });
 </script>
-
-<style scoped lang="scss">
-.pre {
-    white-space: pre-wrap;
-    white-space: -moz-pre-wrap;
-    white-space: -pre-wrap;
-    white-space: -o-pre-wrap;
-    word-wrap: break-word;
-}
-</style>

@@ -24,7 +24,6 @@
 </template>
 
 <script lang="ts" setup>
-import LayoutContent from '@/layout/layout-content.vue';
 import Source from './source/index.vue';
 import { nextTick, ref } from 'vue';
 import ContainerLog from '@/components/container-log/index.vue';

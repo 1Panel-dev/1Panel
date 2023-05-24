@@ -3,7 +3,7 @@
         <LayoutContent v-loading="loading" v-if="!isRecordShow" :title="$t('setting.snapshot')">
             <template #toolbar>
                 <el-row>
-                    <el-col :span="16">
+                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
                         <el-button type="primary" @click="onCreate()">
                             {{ $t('setting.createSnapshot') }}
                         </el-button>
@@ -14,7 +14,7 @@
                             {{ $t('commons.button.delete') }}
                         </el-button>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
                         <TableSetting ref="timerRef" @search="search()" />
                         <div class="search-button">
                             <el-input
@@ -146,7 +146,6 @@
 </template>
 
 <script setup lang="ts">
-import ComplexTable from '@/components/complex-table/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { snapshotCreate, searchSnapshotPage, snapshotDelete, updateSnapshotDescription } from '@/api/modules/setting';
@@ -157,7 +156,6 @@ import { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { Setting } from '@/api/interface/setting';
-import LayoutContent from '@/layout/layout-content.vue';
 import RecoverStatus from '@/views/setting/snapshot/status/index.vue';
 import SnapshotImport from '@/views/setting/snapshot/import/index.vue';
 import { getBackupList } from '@/api/modules/setting';

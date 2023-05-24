@@ -42,7 +42,7 @@
                 </el-radio-group>
                 <el-row style="margin-top: 20px" v-if="confShowType === 'base'">
                     <el-col :span="1"><br /></el-col>
-                    <el-col :span="10">
+                    <el-col :xs="24" :sm="20" :md="20" :lg="10" :xl="10">
                         <el-form :model="form" label-position="left" ref="formRef" label-width="120px">
                             <el-form-item :label="$t('ssh.port')" prop="port">
                                 <el-input disabled v-model.number="form.port">
@@ -140,7 +140,6 @@
 import { onMounted, reactive, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import FireRouter from '@/views/host/ssh/index.vue';
-import LayoutContent from '@/layout/layout-content.vue';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import PubKey from '@/views/host/ssh/ssh/pubkey/index.vue';

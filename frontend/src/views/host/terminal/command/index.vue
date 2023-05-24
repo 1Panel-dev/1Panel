@@ -73,8 +73,6 @@
 </template>
 
 <script setup lang="ts">
-import LayoutContent from '@/layout/layout-content.vue';
-import ComplexTable from '@/components/complex-table/index.vue';
 import { Command } from '@/api/interface/command';
 import { addCommand, editCommand, deleteCommand, getCommandPage } from '@/api/modules/host';
 import { reactive, ref } from 'vue';
