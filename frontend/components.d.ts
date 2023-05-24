@@ -44,7 +44,7 @@ declare module 'vue' {
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElImage: typeof import('element-plus/es')['ElImage'];
     ElInput: typeof import('element-plus/es')['ElInput']
-    ElInputNumber: typeof import('element-plus/es')['ElInputNumber'];
+    ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
     ElLink: typeof import('element-plus/es')['ElLink']
     ElMain: typeof import('element-plus/es')['ElMain'];
     ElMenu: typeof import('element-plus/es')['ElMenu']
@@ -76,7 +76,7 @@ declare module 'vue' {
     FileRole: typeof import('./src/components/file-role/index.vue')['default']
     FormButton: typeof import('./src/components/layout-content/form-button.vue')['default']
     Group: typeof import('./src/components/group/index.vue')['default']
-    InfiniteScroll: typeof import('element-plus/es')['ElInfiniteScroll'];
+    InfiniteScroll: typeof import('element-plus/es')['ElInfiniteScroll']
     LayoutContent: typeof import('./src/components/layout-content/index.vue')['default']
     Line: typeof import('./src/components/v-charts/components/Line.vue')['default']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']

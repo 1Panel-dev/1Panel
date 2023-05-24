@@ -45,7 +45,8 @@ type WebsiteLog struct {
 }
 
 type PHPConfig struct {
-	Params map[string]string `json:"params"`
+	Params           map[string]string `json:"params"`
+	DisableFunctions []string          `json:"disableFunctions"`
 }
 
 type NginxRewriteRes struct {

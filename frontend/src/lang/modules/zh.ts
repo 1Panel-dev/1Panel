@@ -162,6 +162,7 @@ const message = {
             nginxDoc: '仅支持英文大小写，数字，和.',
             appName: '支持英文、数字、-和_,长度2-30,并且不能以-_开头和结尾',
             conatinerName: '支持字母、数字、下划线、连字符和点,不能以连字符-或点.结尾',
+            disableFunction: '仅支持字母和,',
         },
         res: {
             paramError: '请求失败,请稍后重试!',
@@ -1365,6 +1366,8 @@ const message = {
         cgi_fix_pathinfo: '是否开启pathinfo',
         date_timezone: '时区',
         second: '秒',
+        disableFunction: '禁用函数',
+        disableFunctionHelper: '输入要禁用的函数，例如exec，多个请用,分割',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',
