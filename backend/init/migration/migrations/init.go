@@ -337,7 +337,7 @@ var UpdateTableAppDetail = &gormigrate.Migration{
 }
 
 var AddBindAndAllowIPs = &gormigrate.Migration{
-	ID: "20230414-add-bind-and-allow",
+	ID: "20230517-add-bind-and-allow",
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.Create(&model.Setting{Key: "BindDomain", Value: ""}).Error; err != nil {
 			return err
@@ -349,6 +349,16 @@ var AddBindAndAllowIPs = &gormigrate.Migration{
 			return err
 		}
 		if err := tx.Create(&model.Setting{Key: "NtpSite", Value: "pool.ntp.org"}).Error; err != nil {
+			return err
+		}
+		return nil
+	},
+}
+
+var UpdateCronjobWithSecond = &gormigrate.Migration{
+	ID: "20200524-update-table-cronjob",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Cronjob{}); err != nil {
 			return err
 		}
 		return nil

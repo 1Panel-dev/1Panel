@@ -10,6 +10,7 @@ type CronjobCreate struct {
 	Day      int    `json:"day" validate:"number"`
 	Hour     int    `json:"hour" validate:"number"`
 	Minute   int    `json:"minute" validate:"number"`
+	Second   int    `json:"second" validate:"number"`
 
 	Script         string `json:"script"`
 	Website        string `json:"website"`
@@ -30,6 +31,7 @@ type CronjobUpdate struct {
 	Day      int    `json:"day" validate:"number"`
 	Hour     int    `json:"hour" validate:"number"`
 	Minute   int    `json:"minute" validate:"number"`
+	Second   int    `json:"second" validate:"number"`
 
 	Script         string `json:"script"`
 	Website        string `json:"website"`
@@ -71,6 +73,7 @@ type CronjobInfo struct {
 	Day      int    `json:"day"`
 	Hour     int    `json:"hour"`
 	Minute   int    `json:"minute"`
+	Second   int    `json:"second"`
 
 	Script         string `json:"script"`
 	Website        string `json:"website"`

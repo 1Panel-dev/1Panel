@@ -322,6 +322,8 @@ func loadSpec(cronjob model.Cronjob) string {
 		return fmt.Sprintf("%v * * * *", cronjob.Minute)
 	case "perNMinute":
 		return fmt.Sprintf("@every %vm", cronjob.Minute)
+	case "perNSecond":
+		return fmt.Sprintf("@every %vs", cronjob.Second)
 	default:
 		return ""
 	}
