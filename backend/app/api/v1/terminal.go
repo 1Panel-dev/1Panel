@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os/exec"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
@@ -112,11 +112,12 @@ func (b *BaseApi) RedisWsSsh(c *gin.Context) {
 	if len(redisConf.Requirepass) != 0 {
 		commands = fmt.Sprintf("redis-cli -a %s --no-auth-warning", redisConf.Requirepass)
 	}
+	pidMap := loadMapFromDockerTop(redisConf.ContainerName)
 	slave, err := terminal.NewCommand(fmt.Sprintf("docker exec -it %s %s", redisConf.ContainerName, commands))
 	if wshandleError(wsConn, err) {
 		return
 	}
-	defer killBash(redisConf.ContainerName, commands)
+	defer killBash(redisConf.ContainerName, commands, pidMap)
 	defer slave.Close()
 
 	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave)
@@ -175,11 +176,12 @@ func (b *BaseApi) ContainerWsSsh(c *gin.Context) {
 	if len(user) != 0 {
 		commands = fmt.Sprintf("docker exec -it -u %s %s %s", user, containerID, command)
 	}
+	pidMap := loadMapFromDockerTop(containerID)
 	slave, err := terminal.NewCommand(commands)
 	if wshandleError(wsConn, err) {
 		return
 	}
-	defer killBash(containerID, command)
+	defer killBash(containerID, command, pidMap)
 	defer slave.Close()
 
 	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave)
@@ -219,13 +221,40 @@ func wshandleError(ws *websocket.Conn, err error) bool {
 	return false
 }
 
-func killBash(containerID, comm string) {
-	sudo := ""
-	if cmd.HasNoPasswordSudo() {
-		sudo = "sudo"
+func loadMapFromDockerTop(containerID string) map[string]string {
+	pidMap := make(map[string]string)
+	sudo := cmd.SudoHandleCmd()
+
+	stdout, err := cmd.Execf("%s docker top %s -eo pid,command ", sudo, containerID)
+	if err != nil {
+		return pidMap
 	}
-	command := exec.Command("sh", "-c", fmt.Sprintf("%s kill -9 $(docker top %s -eo pid,command | grep '%s' | awk '{print $1}')", sudo, containerID, comm))
-	_, _ = command.CombinedOutput()
+	lines := strings.Split(stdout, "\n")
+	for _, line := range lines {
+		parts := strings.Fields(line)
+		if len(parts) != 2 {
+			continue
+		}
+		pidMap[parts[0]] = parts[1]
+	}
+	return pidMap
+}
+
+func killBash(containerID, comm string, pidMap map[string]string) {
+	sudo := cmd.SudoHandleCmd()
+	newPidMap := loadMapFromDockerTop(containerID)
+	for pid, command := range newPidMap {
+		isOld := false
+		for pid2 := range pidMap {
+			if pid == pid2 {
+				isOld = true
+				break
+			}
+		}
+		if !isOld && command == comm {
+			_, _ = cmd.Execf("%s kill -9 %s", sudo, pid)
+		}
+	}
 }
 
 var upGrader = websocket.Upgrader{
