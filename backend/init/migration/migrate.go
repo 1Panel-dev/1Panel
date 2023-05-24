@@ -29,6 +29,7 @@ func Init() {
 		migrations.UpdateTableSetting,
 		migrations.UpdateTableAppDetail,
 		migrations.AddBindAndAllowIPs,
+		migrations.UpdateCronjobWithSecond,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

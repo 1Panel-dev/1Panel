@@ -13,6 +13,7 @@ type Cronjob struct {
 	Day      uint64 `gorm:"type:decimal" json:"day"`
 	Hour     uint64 `gorm:"type:decimal" json:"hour"`
 	Minute   uint64 `gorm:"type:decimal" json:"minute"`
+	Second   uint64 `gorm:"type:decimal" json:"second"`
 
 	Script         string `gorm:"longtext" json:"script"`
 	Website        string `gorm:"type:varchar(64)" json:"website"`

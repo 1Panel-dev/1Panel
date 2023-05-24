@@ -95,6 +95,7 @@
                             </span>
                             <span v-if="row.specType === 'perHour'">{{ loadZero(row.minute) }}</span>
                             <span v-if="row.specType === 'perNMinute'">{{ row.minute }}{{ $t('cronjob.minute') }}</span>
+                            <span v-if="row.specType === 'perNSecond'">{{ row.second }}{{ $t('cronjob.second') }}</span>
                             {{ $t('cronjob.handle') }}
                         </template>
                     </el-table-column>
@@ -227,6 +228,7 @@ const onOpenDialog = async (
         day: 3,
         hour: 1,
         minute: 30,
+        second: 30,
         keepLocal: true,
         retainCopies: 7,
     },
