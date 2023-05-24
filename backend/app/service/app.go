@@ -836,7 +836,7 @@ func (a AppService) SyncAppListFromRemote() error {
 		}
 	}
 	if len(deleteDetails) > 0 {
-		if err := appDetailRepo.BatchDelete(ctx, addDetails); err != nil {
+		if err := appDetailRepo.BatchDelete(ctx, deleteDetails); err != nil {
 			return err
 		}
 	}

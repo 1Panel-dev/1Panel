@@ -1,6 +1,6 @@
 <template>
     <el-form-item prop="enable" :label="$t('website.enableOrNot')">
-        <el-switch v-model="enable" @change="changeEnable"></el-switch>
+        <el-switch v-model="enable" @change="changeEnable" :disabled="data.length === 0"></el-switch>
     </el-form-item>
     <ComplexTable :data="data" @search="search" v-loading="loading">
         <template #toolbar>
@@ -41,7 +41,7 @@ const id = computed(() => {
     return props.id;
 });
 const loading = ref(false);
-const data = ref();
+const data = ref([]);
 const createRef = ref();
 const enable = ref(false);
 
