@@ -1026,6 +1026,10 @@ func (w WebsiteService) GetPHPConfig(id uint) (*response.PHPConfig, error) {
 			res.DisableFunctions = disableFunctions
 		}
 	}
+	uploadMaxSize := phpConfig.Key("upload_max_filesize").Value()
+	if uploadMaxSize != "" {
+		res.UploadMaxSize = uploadMaxSize
+	}
 	return res, nil
 }
 
@@ -1089,9 +1093,14 @@ func (w WebsiteService) UpdatePHPConfig(req request.WebsitePHPConfigUpdate) (err
 			return err
 		}
 	}
-	if req.Scope == "uploadSize" {
+	if req.Scope == "upload_max_filesize" {
 		postMaxSize := phpConfig.Key("post_max_size")
-		postMaxSize.SetValue("")
+		postMaxSize.SetValue(req.UploadMaxSize)
+		uploadMaxFileSize := phpConfig.Key("upload_max_filesize")
+		uploadMaxFileSize.SetValue(req.UploadMaxSize)
+		if err = cfg.SaveTo(phpConfigPath); err != nil {
+			return err
+		}
 	}
 
 	appInstallReq := request.AppInstalledOperate{

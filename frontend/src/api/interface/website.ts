@@ -270,6 +270,7 @@ export namespace Website {
     export interface PHPConfig {
         params: any;
         disableFunctions: string[];
+        uploadMaxSize: string;
     }
 
     export interface PHPConfigUpdate {
@@ -277,6 +278,7 @@ export namespace Website {
         params?: any;
         disableFunctions?: string[];
         scope: string;
+        uploadMaxSize?: string;
     }
 
     export interface PHPUpdate {

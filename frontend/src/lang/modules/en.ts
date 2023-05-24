@@ -1390,6 +1390,7 @@ const message = {
         second: 'Second',
         disableFunction: 'Disable function',
         disableFunctionHelper: 'Enter the function to be disabled, such as exec, please use multiple, split',
+        uploadMaxSize: 'Upload limit',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: 'The hash table size of the server name',

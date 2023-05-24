@@ -1,10 +1,13 @@
 <template>
     <el-tabs tab-position="left" v-model="index">
         <el-tab-pane :label="$t('website.updateConfig')" name="0">
-            <Config :id="id"></Config>
+            <Config :id="id" v-if="index == '0'"></Config>
         </el-tab-pane>
         <el-tab-pane :label="$t('php.disableFunction')" name="1">
-            <Function :id="id"></Function>
+            <Function :id="id" v-if="index == '1'"></Function>
+        </el-tab-pane>
+        <el-tab-pane :label="$t('php.uploadMaxSize')" name="2">
+            <Upload :id="id" v-if="index == '2'"></Upload>
         </el-tab-pane>
     </el-tabs>
 </template>
@@ -15,6 +18,7 @@ import { GetWebsite } from '@/api/modules/website';
 import { computed, onMounted, ref } from 'vue';
 import Config from './config/index.vue';
 import Function from './function/index.vue';
+import Upload from './upload/index.vue';
 
 const props = defineProps({
     id: {

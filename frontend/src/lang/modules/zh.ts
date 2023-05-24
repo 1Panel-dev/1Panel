@@ -1371,6 +1371,7 @@ const message = {
         second: '秒',
         disableFunction: '禁用函数',
         disableFunctionHelper: '输入要禁用的函数，例如exec，多个请用,分割',
+        uploadMaxSize: '上传限制',
     },
     nginx: {
         serverNamesHashBucketSizeHelper: '服务器名字的hash表大小',
