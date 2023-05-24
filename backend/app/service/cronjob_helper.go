@@ -16,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/cloud_storage"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"github.com/1Panel-dev/1Panel/backend/utils/ntp"
 	"github.com/pkg/errors"
 )
 
@@ -38,6 +39,9 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 				return
 			}
 			message, err = u.handleShell(cronjob.Type, cronjob.Name, fmt.Sprintf("curl '%s'", cronjob.URL))
+			u.HandleRmExpired("LOCAL", "", cronjob, nil)
+		case "ntp":
+			err = u.handleNtpSync()
 			u.HandleRmExpired("LOCAL", "", cronjob, nil)
 		case "website":
 			record.File, err = u.handleBackup(cronjob, record.StartTime)
@@ -90,6 +94,21 @@ func (u *CronjobService) handleShell(cronType, cornName, script string) ([]byte,
 		return nil, err
 	}
 	return []byte(stdout), nil
+}
+
+func (u *CronjobService) handleNtpSync() error {
+	ntpServer, err := settingRepo.Get(settingRepo.WithByKey("NtpSite"))
+	if err != nil {
+		return err
+	}
+	ntime, err := ntp.GetRemoteTime(ntpServer.Value)
+	if err != nil {
+		return err
+	}
+	if err := ntp.UpdateSystemTime(ntime.Format("2006-01-02 15:04:05")); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *CronjobService) handleBackup(cronjob *model.Cronjob, startTime time.Time) (string, error) {
@@ -150,15 +169,17 @@ func (u *CronjobService) HandleRmExpired(backType, localDir string, cronjob *mod
 	records, _ := cronjobRepo.ListRecord(cronjobRepo.WithByJobID(int(cronjob.ID)), commonRepo.WithOrderBy("created_at desc"))
 	if len(records) > int(cronjob.RetainCopies) {
 		for i := int(cronjob.RetainCopies); i < len(records); i++ {
-			files := strings.Split(records[i].File, ",")
-			for _, file := range files {
-				if backType != "LOCAL" {
-					_, _ = backClient.Delete(strings.ReplaceAll(file, localDir+"/", ""))
-					_ = os.Remove(file)
-				} else {
-					_ = os.Remove(file)
+			if len(records[i].File) != 0 {
+				files := strings.Split(records[i].File, ",")
+				for _, file := range files {
+					if backType != "LOCAL" {
+						_, _ = backClient.Delete(strings.ReplaceAll(file, localDir+"/", ""))
+						_ = os.Remove(file)
+					} else {
+						_ = os.Remove(file)
+					}
+					_ = backupRepo.DeleteRecord(context.TODO(), backupRepo.WithByFileName(path.Base(file)))
 				}
-				_ = backupRepo.DeleteRecord(context.TODO(), backupRepo.WithByFileName(path.Base(file)))
 			}
 
 			_ = cronjobRepo.DeleteRecord(commonRepo.WithByID(uint(records[i].ID)))
