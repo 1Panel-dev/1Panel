@@ -17,6 +17,7 @@ declare module 'vue' {
     ContainerLog: typeof import('./src/components/container-log/index.vue')['default']
     DrawerHeader: typeof import('./src/components/drawer-header/index.vue')['default']
     ElAlert: typeof import('element-plus/es')['ElAlert']
+    ElAside: typeof import('element-plus/es')['ElAside'];
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElBadge: typeof import('element-plus/es')['ElBadge']
     ElButton: typeof import('element-plus/es')['ElButton']
@@ -26,6 +27,7 @@ declare module 'vue' {
     ElCheckboxGroup: typeof import('element-plus/es')['ElCheckboxGroup']
     ElCol: typeof import('element-plus/es')['ElCol']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
+    ElContainer: typeof import('element-plus/es')['ElContainer'];
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
     ElDescriptions: typeof import('element-plus/es')['ElDescriptions']
     ElDescriptionsItem: typeof import('element-plus/es')['ElDescriptionsItem']
@@ -35,14 +37,16 @@ declare module 'vue' {
     ElDropdown: typeof import('element-plus/es')['ElDropdown']
     ElDropdownItem: typeof import('element-plus/es')['ElDropdownItem']
     ElDropdownMenu: typeof import('element-plus/es')['ElDropdownMenu']
-    ElEmpty: typeof import('element-plus/es')['ElEmpty']
+    ElEmpty: typeof import('element-plus/es')['ElEmpty'];
+    ElFooter: typeof import('element-plus/es')['ElFooter'];
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElIcon: typeof import('element-plus/es')['ElIcon']
-    ElImage: typeof import('element-plus/es')['ElImage']
+    ElImage: typeof import('element-plus/es')['ElImage'];
     ElInput: typeof import('element-plus/es')['ElInput']
-    ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
+    ElInputNumber: typeof import('element-plus/es')['ElInputNumber'];
     ElLink: typeof import('element-plus/es')['ElLink']
+    ElMain: typeof import('element-plus/es')['ElMain'];
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
     ElOption: typeof import('element-plus/es')['ElOption']
@@ -72,12 +76,12 @@ declare module 'vue' {
     FileRole: typeof import('./src/components/file-role/index.vue')['default']
     FormButton: typeof import('./src/components/layout-content/form-button.vue')['default']
     Group: typeof import('./src/components/group/index.vue')['default']
-    InfiniteScroll: typeof import('element-plus/es')['ElInfiniteScroll']
+    InfiniteScroll: typeof import('element-plus/es')['ElInfiniteScroll'];
     LayoutContent: typeof import('./src/components/layout-content/index.vue')['default']
     Line: typeof import('./src/components/v-charts/components/Line.vue')['default']
     Loading: typeof import('element-plus/es')['ElLoadingDirective']
     MsgInfo: typeof import('./src/components/msg-info/index.vue')['default']
-    Popover: typeof import('element-plus/es')['ElPopoverDirective']
+    Popover: typeof import('element-plus/es')['ElPopoverDirective'];
     RouterButton: typeof import('./src/components/router-button/index.vue')['default']
     Status: typeof import('./src/components/status/index.vue')['default']
     SvgIcon: typeof import('./src/components/svg-icon/svg-icon.vue')['default']
