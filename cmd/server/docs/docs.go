@@ -7878,7 +7878,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.SyncTimeZone"
+                            "$ref": "#/definitions/dto.SyncTime"
                         }
                     }
                 ],
@@ -7893,11 +7893,10 @@ var doc = `{
                 "x-panel-log": {
                     "BeforeFuntions": [],
                     "bodyKeys": [
-                        "ntpSite",
-                        "timeZone"
+                        "ntpSite"
                     ],
-                    "formatEN": "sync system time [ntpSite]-[timeZone]",
-                    "formatZH": "系统时间同步[ntpSite]-[timeZone]",
+                    "formatEN": "sync system time [ntpSite]",
+                    "formatZH": "系统时间同步[ntpSite]",
                     "paramKeys": []
                 }
             }
@@ -12621,13 +12620,10 @@ var doc = `{
                 }
             }
         },
-        "dto.SyncTimeZone": {
+        "dto.SyncTime": {
             "type": "object",
             "properties": {
                 "ntpSite": {
-                    "type": "string"
-                },
-                "timeZone": {
                     "type": "string"
                 }
             }

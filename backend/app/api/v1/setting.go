@@ -205,23 +205,22 @@ func (b *BaseApi) LoadTimeZone(c *gin.Context) {
 // @Summary Sync system time
 // @Description 系统时间同步
 // @Accept json
-// @Param request body dto.SyncTimeZone true "request"
+// @Param request body dto.SyncTime true "request"
 // @Success 200 {string} ntime
 // @Security ApiKeyAuth
 // @Router /settings/time/sync [post]
-// @x-panel-log {"bodyKeys":["ntpSite", "timeZone"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"系统时间同步[ntpSite]-[timeZone]","formatEN":"sync system time [ntpSite]-[timeZone]"}
+// @x-panel-log {"bodyKeys":["ntpSite"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"系统时间同步[ntpSite]","formatEN":"sync system time [ntpSite]"}
 func (b *BaseApi) SyncTime(c *gin.Context) {
-	var req dto.SyncTimeZone
+	var req dto.SyncTime
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	ntime, err := settingService.SyncTime(req)
-	if err != nil {
+	if err := settingService.SyncTime(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	helper.SuccessWithData(c, ntime.Format("2006-01-02 15:04:05 MST -0700"))
+	helper.SuccessWithData(c, nil)
 }
 
 // @Tags System Setting

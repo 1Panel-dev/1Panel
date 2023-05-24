@@ -1694,11 +1694,9 @@ definitions:
     required:
     - id
     type: object
-  dto.SyncTimeZone:
+  dto.SyncTime:
     properties:
       ntpSite:
-        type: string
-      timeZone:
         type: string
     type: object
   dto.UpdateDescription:
@@ -8276,7 +8274,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.SyncTimeZone'
+          $ref: '#/definitions/dto.SyncTime'
       responses:
         "200":
           description: OK
@@ -8291,9 +8289,8 @@ paths:
         BeforeFuntions: []
         bodyKeys:
         - ntpSite
-        - timeZone
-        formatEN: sync system time [ntpSite]-[timeZone]
-        formatZH: 系统时间同步[ntpSite]-[timeZone]
+        formatEN: sync system time [ntpSite]
+        formatZH: 系统时间同步[ntpSite]
         paramKeys: []
   /settings/update:
     post:

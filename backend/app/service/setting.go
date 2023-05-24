@@ -35,7 +35,7 @@ type ISettingService interface {
 	UpdateSSL(c *gin.Context, req dto.SSLUpdate) error
 	LoadFromCert() (*dto.SSLInfo, error)
 	HandlePasswordExpired(c *gin.Context, old, new string) error
-	SyncTime(req dto.SyncTimeZone) (time.Time, error)
+	SyncTime(req dto.SyncTime) error
 }
 
 func NewISettingService() ISettingService {
@@ -72,46 +72,49 @@ func (u *SettingService) LoadTimeZone() ([]string, error) {
 }
 
 func (u *SettingService) Update(key, value string) error {
-	if key == "ExpirationDays" {
+	if err := settingRepo.Update(key, value); err != nil {
+		return err
+	}
+	switch key {
+	case "ExpirationDays":
 		timeout, _ := strconv.Atoi(value)
 		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006-01-02 15:04:05")); err != nil {
 			return err
 		}
-	}
-	if key == "BindDomain" {
+	case "BindDomain":
 		global.CONF.System.BindDomain = value
-	}
-	if key == "AllowIPs" {
+	case "AllowIPs":
 		global.CONF.System.AllowIPs = value
-	}
-	if err := settingRepo.Update(key, value); err != nil {
-		return err
-	}
-	if key == "UserName" {
+	case "TimeZone":
+		if err := ntp.UpdateSystemTimeZone(value); err != nil {
+			return err
+		}
+		go func() {
+			_, err := cmd.Exec("systemctl restart 1panel.service")
+			if err != nil {
+				global.LOG.Errorf("restart system for new time zone failed, err: %v", err)
+			}
+		}()
+	case "UserName", "Password":
 		_ = global.SESSION.Clean()
 	}
+
 	return nil
 }
 
-func (u *SettingService) SyncTime(req dto.SyncTimeZone) (time.Time, error) {
+func (u *SettingService) SyncTime(req dto.SyncTime) error {
+	if err := settingRepo.Update("NtpSite", req.NtpSite); err != nil {
+		return err
+	}
 	ntime, err := ntp.GetRemoteTime(req.NtpSite)
 	if err != nil {
-		return ntime, err
+		return err
 	}
-
 	ts := ntime.Format("2006-01-02 15:04:05")
-	if err := ntp.UpdateSystemTime(ts, req.TimeZone); err != nil {
-		return ntime, err
+	if err := ntp.UpdateSystemTime(ts); err != nil {
+		return err
 	}
-
-	if err := settingRepo.Update("TimeZone", req.TimeZone); err != nil {
-		return ntime, err
-	}
-	if err := settingRepo.Update("NtpSite", req.NtpSite); err != nil {
-		return ntime, err
-	}
-
-	return ntime, nil
+	return nil
 }
 
 func (u *SettingService) UpdatePort(port uint) error {

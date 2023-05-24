@@ -907,11 +907,17 @@ const message = {
             'If you do not operate the panel for more than {0} seconds, the panel automatically logs out',
         syncTime: 'Server time',
         timeZone: 'Time Zone',
-        timeZoneHelper: 'Timezone modification depends on the system timedatectl service.',
+        timeZoneChangeHelper: 'Changing the time zone requires restarting the service. Do you want to continue?',
+        timeZoneHelper:
+            'Timezone modification depends on the system timedatectl service. take effect after restart the 1Panel service.',
         timeZoneCN: 'Bei Jing',
         timeZoneAM: 'Los Angeles',
         timeZoneNY: 'New York',
+        ntpALi: 'Alibaba',
+        ntpGoogle: 'Google',
         syncSite: 'Ntp Server',
+        syncSiteHelper:
+            'This operation will use {0} as the source for system time synchronization. Do you want to continue?',
         changePassword: 'Password change',
         oldPassword: 'Original password',
         newPassword: 'New password',
