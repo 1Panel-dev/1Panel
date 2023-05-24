@@ -348,7 +348,7 @@ var AddBindAndAllowIPs = &gormigrate.Migration{
 		if err := tx.Create(&model.Setting{Key: "TimeZone", Value: common.LoadTimeZone()}).Error; err != nil {
 			return err
 		}
-		if err := tx.Create(&model.Setting{Key: "NtpSite", Value: "pool.ntp.org:123"}).Error; err != nil {
+		if err := tx.Create(&model.Setting{Key: "NtpSite", Value: "pool.ntp.org"}).Error; err != nil {
 			return err
 		}
 		return nil

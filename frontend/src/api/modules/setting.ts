@@ -38,8 +38,8 @@ export const handleExpired = (param: Setting.PasswordUpdate) => {
 export const loadTimeZone = () => {
     return http.get<Array<string>>(`/settings/time/option`);
 };
-export const syncTime = (timeZone: string, ntpSite: string) => {
-    return http.post<string>(`/settings/time/sync`, { timeZone: timeZone, ntpSite: ntpSite });
+export const syncTime = (ntpSite: string) => {
+    return http.post<string>(`/settings/time/sync`, { ntpSite: ntpSite });
 };
 
 export const cleanMonitors = () => {

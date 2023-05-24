@@ -111,9 +111,8 @@ type UpgradeInfo struct {
 	ReleaseNote   string `json:"releaseNote"`
 }
 
-type SyncTimeZone struct {
-	NtpSite  string `json:"ntpSite"`
-	TimeZone string `json:"timeZone"`
+type SyncTime struct {
+	NtpSite string `json:"ntpSite"`
 }
 
 type Upgrade struct {

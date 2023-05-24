@@ -73,6 +73,15 @@
                                 </span>
                             </el-form-item>
 
+                            <el-form-item :label="$t('setting.timeZone')" prop="timeZone">
+                                <el-input disabled v-model.number="form.timeZone">
+                                    <template #append>
+                                        <el-button @click="onChangeTimeZone" icon="Setting">
+                                            {{ $t('commons.button.set') }}
+                                        </el-button>
+                                    </template>
+                                </el-input>
+                            </el-form-item>
                             <el-form-item :label="$t('setting.syncTime')">
                                 <el-input disabled v-model="form.localTime">
                                     <template #append>
@@ -92,6 +101,7 @@
         <UserName ref="userNameRef" />
         <PanelName ref="panelNameRef" @search="search()" />
         <Timeout ref="timeoutRef" @search="search()" />
+        <TimeZone ref="timezoneRef" @search="search()" />
         <Ntp ref="ntpRef" @search="search()" />
     </div>
 </template>
@@ -108,6 +118,7 @@ import Password from '@/views/setting/panel/password/index.vue';
 import UserName from '@/views/setting/panel/username/index.vue';
 import Timeout from '@/views/setting/panel/timeout/index.vue';
 import PanelName from '@/views/setting/panel/name/index.vue';
+import TimeZone from '@/views/setting/panel/timezone/index.vue';
 import Ntp from '@/views/setting/panel/ntp/index.vue';
 
 const loading = ref(false);
@@ -137,6 +148,7 @@ const passwordRef = ref();
 const panelNameRef = ref();
 const timeoutRef = ref();
 const ntpRef = ref();
+const timezoneRef = ref();
 
 const search = async () => {
     const res = await getSettingInfo();
@@ -164,8 +176,11 @@ const onChangeTitle = () => {
 const onChangeTimeout = () => {
     timeoutRef.value.acceptParams({ sessionTimeout: form.sessionTimeout });
 };
+const onChangeTimeZone = () => {
+    timezoneRef.value.acceptParams({ timeZone: form.timeZone });
+};
 const onChangeNtp = () => {
-    ntpRef.value.acceptParams({ localTime: form.localTime, timeZone: form.timeZone, ntpSite: form.ntpSite });
+    ntpRef.value.acceptParams({ localTime: form.localTime, ntpSite: form.ntpSite });
 };
 
 const onSave = async (key: string, val: any) => {
