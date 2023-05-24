@@ -1,0 +1,70 @@
+# This is an example .goreleaser.yml file with some sensible defaults.
+# Make sure to check the documentation at https://goreleaser.com
+before:
+  hooks:
+    # - export NODE_OPTIONS="--max-old-space-size=8192"
+    # - make build_web
+    - chmod +x ./script.sh
+    - ./script.sh
+    - sed -i 's@ORIGINAL_VERSION=.*@ORIGINAL_VERSION=v{{ .Version }}@g' 1pctl
+    - go mod tidy
+    
+builds:
+  - main: ./cmd/server/main.go
+    binary: 1panel
+    flags:
+      - -trimpath
+    ldflags:
+      - -w -s
+      - --extldflags "-static -fpic"
+    tags:
+      - osusergo
+    env:
+      - CGO_ENABLED=1
+      - >-
+        {{- if eq .Arch "amd64"}}CC=x86_64-linux-gnu-gcc{{- end }}
+        {{- if eq .Arch "arm64"}}CC=aarch64-linux-gnu-gcc{{- end }}
+        {{- if eq .Arch "loong64"}}CC=loongarch64-linux-gnu-gcc{{- end }}
+        {{- if eq .Arch "arm"}}CC=arm-linux-gnueabihf-gcc{{- end }}
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+      - arm
+    goarm:
+      - 6
+      - 7
+    ignore:
+      - goos: linux
+        goarch: arm
+      - goos: linux
+        goarch: loong64
+
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}-v{{ .Version }}-{{ .Os }}-{{ .Arch }}{{- if .Arm }}v{{ .Arm }}{{ end }}"
+    wrap_in_directory: true
+    files:
+      - 1pctl
+      - 1panel.service
+      - install.sh
+      - README.md
+      - LICENSE
+    
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+release:
+  draft: true
+  mode: append
+  extra_files:
+    - glob: dist/*.tar.gz
+    - glob: dist/checksums.txt
+  name_template: "Release {{.Tag}}"
+
+# The lines beneath this are called `modelines`. See `:help modeline`
+# Feel free to remove those if you don't want/use them.
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
