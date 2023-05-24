@@ -16,6 +16,9 @@
                 >
                     {{ $t('file.download') }}
                 </el-button>
+                <el-button style="margin-left: 20px" @click="cleanLog" icon="Delete" :disabled="data.content === ''">
+                    {{ $t('commons.button.clean') }}
+                </el-button>
             </div>
         </div>
         <br />
@@ -43,6 +46,7 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef } from 'vue';
 import { OpWebsiteLog } from '@/api/modules/website';
 import { dateFormatForName } from '@/utils/util';
+import { useDeleteData } from '@/hooks/use-delete-data';
 
 const extensions = [javascript(), oneDark];
 const props = defineProps({
@@ -122,6 +126,20 @@ const updateEnable = () => {
         .finally(() => {
             loading.value = false;
         });
+};
+
+const cleanLog = async () => {
+    const req = {
+        id: id.value,
+        operate: 'delete',
+        logType: logType.value,
+    };
+    try {
+        await useDeleteData(OpWebsiteLog, req, 'commons.msg.delete');
+        getContent();
+    } catch (error) {
+    } finally {
+    }
 };
 
 const onDownload = async () => {
