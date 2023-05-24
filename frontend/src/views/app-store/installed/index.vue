@@ -2,7 +2,7 @@
     <LayoutContent v-loading="loading || syncLoading" :title="activeName">
         <template #toolbar>
             <el-row :gutter="5">
-                <el-col :xs="24" :sm="24" :md="20" :lg="20" :xl="20">
+                <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
                     <div>
                         <el-button
                             class="tag-button"
@@ -26,7 +26,7 @@
                         </div>
                     </div>
                 </el-col>
-                <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
                     <div class="search-button">
                         <el-input
                             class="table-button"

@@ -8,7 +8,7 @@
         <LayoutContent :title="$t('container.container')" :class="{ mask: dockerStatus != 'Running' }">
             <template #toolbar>
                 <el-row>
-                    <el-col :span="16">
+                    <el-col :xs="24" :sm="16" :md="16" :lg="16" :xl="16">
                         <el-button type="primary" @click="onCreate()">
                             {{ $t('container.createContainer') }}
                         </el-button>
@@ -39,7 +39,7 @@
                             </el-button>
                         </el-button-group>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
                         <TableSetting @search="search()" />
                         <div class="search-button">
                             <el-input

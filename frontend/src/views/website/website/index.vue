@@ -20,7 +20,7 @@
             </template>
             <template v-if="nginxIsExist && !openNginxConfig" #toolbar>
                 <el-row :class="{ mask: nginxStatus != 'Running' }">
-                    <el-col :xs="24" :sm="24" :md="20" :lg="20" :xl="20">
+                    <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
                         <el-button type="primary" @click="openCreate">
                             {{ $t('website.create') }}
                         </el-button>
@@ -31,7 +31,7 @@
                             {{ $t('website.defaultServer') }}
                         </el-button>
                     </el-col>
-                    <el-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4">
+                    <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
                         <div class="search-button">
                             <el-input
                                 v-model="req.name"
@@ -144,7 +144,7 @@
                         width="400px"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
-                        fixed="right"
+                        :fixed="mobile ? false : 'right'"
                         fix
                     />
                 </ComplexTable>
@@ -168,7 +168,7 @@ import Tooltip from '@/components/tooltip/index.vue';
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
 import DefaultServer from '@/views/website/website/default/index.vue';
-import { onMounted, reactive, ref } from '@vue/runtime-core';
+import { onMounted, reactive, ref, computed } from '@vue/runtime-core';
 import CreateWebSite from './create/index.vue';
 import DeleteWebsite from './delete/index.vue';
 import GroupDialog from '@/components/group/index.vue';
@@ -187,6 +187,8 @@ import { VideoPlay, VideoPause } from '@element-plus/icons-vue';
 import MsgInfo from '@/components/msg-info/index.vue';
 import { GetGroupList } from '@/api/modules/group';
 import { Group } from '@/api/interface/group';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const shortcuts = [
     {
@@ -233,7 +235,9 @@ let req = reactive({
     pageSize: 10,
     websiteGroupId: 0,
 });
-
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 const search = async () => {
     req.page = paginationConfig.currentPage;
     req.pageSize = paginationConfig.pageSize;

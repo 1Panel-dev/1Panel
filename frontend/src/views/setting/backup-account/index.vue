@@ -38,7 +38,7 @@
                 </el-alert>
 
                 <el-row :gutter="20" class="common-div">
-                    <el-col :span="12">
+                    <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                         <div>
                             <svg-icon style="font-size: 7px" iconName="p-aws"></svg-icon>
                             <span style="font-size: 14px; font-weight: 500">&nbsp;{{ $t('setting.S3') }}</span>
@@ -76,7 +76,7 @@
                             </el-button>
                         </el-alert>
                     </el-col>
-                    <el-col :span="12">
+                    <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                         <div>
                             <svg-icon style="font-size: 7px" iconName="p-oss"></svg-icon>
                             <span style="font-size: 14px; font-weight: 500">&nbsp;{{ $t('setting.OSS') }}</span>
@@ -114,7 +114,7 @@
                     </el-col>
                 </el-row>
                 <el-row :gutter="20" class="common-div">
-                    <el-col :span="12">
+                    <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                         <div>
                             <svg-icon style="font-size: 7px" iconName="p-tengxunyun1"></svg-icon>
                             <span style="font-size: 14px; font-weight: 500">&nbsp;{{ $t('setting.COS') }}</span>
@@ -149,7 +149,7 @@
                             </el-button>
                         </el-alert>
                     </el-col>
-                    <el-col :span="12">
+                    <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                         <div>
                             <svg-icon style="font-size: 7px" iconName="p-qiniuyun"></svg-icon>
                             <span style="font-size: 14px; font-weight: 500">&nbsp;{{ $t('setting.KODO') }}</span>
@@ -187,7 +187,7 @@
                     </el-col>
                 </el-row>
                 <el-row :gutter="20" style="margin-top: 20px">
-                    <el-col :span="12">
+                    <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                         <div>
                             <svg-icon style="font-size: 7px" iconName="p-minio"></svg-icon>
                             <span style="font-size: 14px; font-weight: 500">&nbsp;MINIO</span>
@@ -222,7 +222,7 @@
                             </el-button>
                         </el-alert>
                     </el-col>
-                    <el-col :span="12">
+                    <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                         <div>
                             <svg-icon style="font-size: 7px" iconName="p-SFTP"></svg-icon>
                             <span style="font-size: 14px; font-weight: 500">&nbsp;SFTP</span>
