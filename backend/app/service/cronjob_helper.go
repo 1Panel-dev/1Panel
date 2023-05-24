@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"os"
 	"path"
 	"strings"
@@ -16,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cloud_storage"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"github.com/pkg/errors"
 )
 
@@ -31,31 +31,23 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 			if len(cronjob.Script) == 0 {
 				return
 			}
-			stdout, errExec := cmd.ExecCronjobWithTimeOut(cronjob.Script, 5*time.Minute)
-			if errExec != nil {
-				err = errExec
-			}
-			message = []byte(stdout)
+			message, err = u.handleShell(cronjob.Type, cronjob.Name, cronjob.Script)
 			u.HandleRmExpired("LOCAL", "", cronjob, nil)
-		case "website":
-			record.File, err = u.HandleBackup(cronjob, record.StartTime)
-		case "database":
-			record.File, err = u.HandleBackup(cronjob, record.StartTime)
-		case "directory":
-			if len(cronjob.SourceDir) == 0 {
-				return
-			}
-			record.File, err = u.HandleBackup(cronjob, record.StartTime)
 		case "curl":
 			if len(cronjob.URL) == 0 {
 				return
 			}
-			stdout, errCurl := cmd.ExecWithTimeOut("curl "+cronjob.URL, 5*time.Minute)
-			if err != nil {
-				err = errCurl
-			}
-			message = []byte(stdout)
+			message, err = u.handleShell(cronjob.Type, cronjob.Name, fmt.Sprintf("curl '%s'", cronjob.URL))
 			u.HandleRmExpired("LOCAL", "", cronjob, nil)
+		case "website":
+			record.File, err = u.handleBackup(cronjob, record.StartTime)
+		case "database":
+			record.File, err = u.handleBackup(cronjob, record.StartTime)
+		case "directory":
+			if len(cronjob.SourceDir) == 0 {
+				return
+			}
+			record.File, err = u.handleBackup(cronjob, record.StartTime)
 		case "cutWebsiteLog":
 			record.File, err = u.handleCutWebsiteLog(cronjob, record.StartTime)
 			if err != nil {
@@ -76,7 +68,31 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 	}()
 }
 
-func (u *CronjobService) HandleBackup(cronjob *model.Cronjob, startTime time.Time) (string, error) {
+func (u *CronjobService) handleShell(cronType, cornName, script string) ([]byte, error) {
+	handleDir := fmt.Sprintf("%s/task/%s/%s", constant.DataDir, cronType, cornName)
+	if _, err := os.Stat(handleDir); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(handleDir, os.ModePerm); err != nil {
+			return nil, err
+		}
+	}
+	oldDir, err := os.Getwd()
+	if err != nil {
+		return nil, err
+	}
+	if err := os.Chdir(handleDir); err != nil {
+		return nil, err
+	}
+	stdout, err := cmd.ExecCronjobWithTimeOut(script, 24*time.Hour)
+	if err != nil {
+		return nil, err
+	}
+	if err := os.Chdir(oldDir); err != nil {
+		return nil, err
+	}
+	return []byte(stdout), nil
+}
+
+func (u *CronjobService) handleBackup(cronjob *model.Cronjob, startTime time.Time) (string, error) {
 	backup, err := backupRepo.Get(commonRepo.WithByID(uint(cronjob.TargetDirID)))
 	if err != nil {
 		return "", err
