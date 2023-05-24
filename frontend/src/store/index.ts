@@ -57,6 +57,9 @@ export const GlobalStore = defineStore({
         toggleDevice(value: DeviceType) {
             this.device = value;
         },
+        isMobile() {
+            return this.device === DeviceType.Mobile;
+        },
     },
     persist: piniaPersistConfig('GlobalState'),
 });

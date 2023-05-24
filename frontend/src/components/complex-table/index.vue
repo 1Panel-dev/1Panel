@@ -34,13 +34,17 @@
                     v-model:page-size="paginationConfig.pageSize"
                     v-bind="paginationConfig"
                     @change="search"
+                    :small="mobile"
+                    :layout="mobile ? 'total, prev, pager, next' : 'total, sizes, prev, pager, next, jumper'"
                 />
             </slot>
         </div>
     </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { GlobalStore } from '@/store';
+
 defineOptions({ name: 'ComplexTable' });
 defineProps({
     header: String,
@@ -51,6 +55,13 @@ defineProps({
     },
 });
 const emit = defineEmits(['search', 'update:selects']);
+
+const globalStore = GlobalStore();
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
+
 const condition = ref({});
 const tableRef = ref();
 function search(conditions: any, e: any) {

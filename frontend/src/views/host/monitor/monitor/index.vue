@@ -23,7 +23,7 @@
             </el-col>
         </el-row>
         <el-row :gutter="20" style="margin-top: 20px">
-            <el-col :span="12">
+            <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
                         <span class="title">CPU</span>
@@ -41,7 +41,7 @@
                     <div id="loadCPUChart" class="chart"></div>
                 </el-card>
             </el-col>
-            <el-col :span="12">
+            <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
                         <span class="title">{{ $t('monitor.memory') }}</span>
@@ -61,7 +61,7 @@
             </el-col>
         </el-row>
         <el-row :gutter="20" style="margin-top: 20px">
-            <el-col :span="12">
+            <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
                         <span class="title">{{ $t('monitor.disk') }} IO</span>
@@ -79,7 +79,7 @@
                     <div id="loadIOChart" class="chart"></div>
                 </el-card>
             </el-col>
-            <el-col :span="12">
+            <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
                         <span class="title">{{ $t('monitor.network') }} IO:</span>

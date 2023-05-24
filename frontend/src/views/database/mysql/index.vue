@@ -13,7 +13,7 @@
 
             <template #toolbar v-if="mysqlIsExist && !isOnSetting">
                 <el-row :class="{ mask: mysqlStatus != 'Running' }">
-                    <el-col :span="20">
+                    <el-col :xs="24" :sm="20" :md="20" :lg="20" :xl="20">
                         <el-button type="primary" @click="onOpenDialog()">
                             {{ $t('database.create') }}
                         </el-button>
@@ -25,7 +25,7 @@
                         </el-button>
                         <el-button @click="goDashboard" icon="Position" type="primary" plain>phpMyAdmin</el-button>
                     </el-col>
-                    <el-col :span="4">
+                    <el-col :xs="24" :sm="4" :md="4" :lg="4" :xl="4">
                         <div class="search-button">
                             <el-input
                                 v-model="searchName"

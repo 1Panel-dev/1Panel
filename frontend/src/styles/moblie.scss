@@ -34,4 +34,10 @@
             overflow: inherit !important;
         }
     }
+    .router_card_button {
+        padding: 2px 0;
+    }
+    .el-drawer.rtl {
+        width: 80% !important;
+    }
 }
