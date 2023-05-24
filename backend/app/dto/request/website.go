@@ -142,6 +142,7 @@ type WebsitePHPConfigUpdate struct {
 	Params           map[string]string `json:"params"`
 	Scope            string            `json:"scope" validate:"required"`
 	DisableFunctions []string          `json:"disableFunctions"`
+	UploadMaxSize    string            `json:"uploadMaxSize"`
 }
 
 type WebsitePHPFileUpdate struct {
