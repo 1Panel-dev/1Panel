@@ -55,6 +55,21 @@
                     <img src="@/assets/images/no_update_app.svg" />
                 </div>
             </div>
+            <el-alert type="info" :closable="false" v-if="mode === 'installed'">
+                <template #default>
+                    <span>
+                        <span>{{ $t('app.installHelper') }}</span>
+                        <el-link
+                            style="font-size: 12px; margin-left: 5px"
+                            icon="Position"
+                            @click="quickJump()"
+                            type="primary"
+                        >
+                            {{ $t('firewall.quickJump') }}
+                        </el-link>
+                    </span>
+                </template>
+            </el-alert>
             <el-row :gutter="5">
                 <el-col
                     v-for="(installed, index) in data"
@@ -434,6 +449,10 @@ const openParam = (row: any) => {
 
 const isAppErr = (row: any) => {
     return row.status.includes('Err') || row.status.includes('Error');
+};
+
+const quickJump = () => {
+    router.push({ name: 'ContainerSetting' });
 };
 
 onMounted(() => {
