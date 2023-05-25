@@ -31,6 +31,8 @@ builds:
         {{- if eq .Arch "loong64"}}CC=loongarch64-linux-gnu-gcc{{- end }}
     goos:
       - linux
+    goarm:
+      - 7
     goarch:
       - amd64
       - arm64
