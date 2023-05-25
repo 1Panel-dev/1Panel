@@ -1,6 +1,6 @@
 <template>
     <el-row :gutter="20" v-loading="loading">
-        <el-col :span="8" :offset="1">
+        <el-col :xs="24" :sm="18" :md="8" :lg="8" :xl="8">
             <el-form ref="websiteForm" label-position="left" label-width="80px" :model="form" :rules="rules">
                 <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
                     <el-input v-model="form.primaryDomain" disabled></el-input>

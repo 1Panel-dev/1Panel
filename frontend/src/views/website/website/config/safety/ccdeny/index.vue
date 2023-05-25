@@ -1,6 +1,6 @@
 <template>
     <el-row :gutter="20" v-loading="loading">
-        <el-col :span="10" :offset="1">
+        <el-col :xs="24" :sm="18" :md="10" :lg="10" :xl="10">
             <el-form ref="wafForm" label-position="left" label-width="auto" :model="form" :rules="rules">
                 <el-form-item prop="enable" :label="$t('website.enable')">
                     <el-switch v-model="form.enable" @change="updateEnable"></el-switch>

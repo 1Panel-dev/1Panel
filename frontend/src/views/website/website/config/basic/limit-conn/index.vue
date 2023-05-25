@@ -1,6 +1,6 @@
 <template>
     <el-row :gutter="20" v-loading="loading">
-        <el-col :span="8" :offset="1">
+        <el-col :xs="24" :sm="18" :md="8" :lg="8" :xl="8">
             <el-form-item prop="enable" :label="$t('website.enableOrNot')">
                 <el-switch v-model="enable" @change="changeEnable"></el-switch>
             </el-form-item>

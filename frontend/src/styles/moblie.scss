@@ -40,4 +40,11 @@
     .el-drawer.rtl {
         width: 80% !important;
     }
+		.site-form-wrapper {
+			width: 90% !important;
+			min-width: auto !important;
+			.el-form-item__label {
+				width: auto !important;
+			}
+		}
 }

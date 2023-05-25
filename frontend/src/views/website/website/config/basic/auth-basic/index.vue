@@ -15,7 +15,7 @@
             width="260px"
             :buttons="buttons"
             :label="$t('commons.table.operate')"
-            fixed="right"
+            :fixed="mobile ? false : 'right'"
             fix
         />
     </ComplexTable>
@@ -30,6 +30,8 @@ import i18n from '@/lang';
 import Create from './create/index.vue';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { MsgSuccess } from '@/utils/message';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const props = defineProps({
     id: {
@@ -39,6 +41,9 @@ const props = defineProps({
 });
 const id = computed(() => {
     return props.id;
+});
+const mobile = computed(() => {
+    return globalStore.isMobile();
 });
 const loading = ref(false);
 const data = ref([]);
