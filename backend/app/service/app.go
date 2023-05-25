@@ -356,39 +356,6 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	return
 }
 
-func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
-	res := &response.AppUpdateRes{
-		CanUpdate: false,
-	}
-	setting, err := NewISettingService().GetSettingInfo()
-	if err != nil {
-		return nil, err
-	}
-	versionUrl := fmt.Sprintf("%s/%s/1panel.json", global.CONF.System.AppRepo, global.CONF.System.Mode)
-	versionRes, err := http.Get(versionUrl)
-	if err != nil {
-		return nil, err
-	}
-	defer versionRes.Body.Close()
-	body, err := io.ReadAll(versionRes.Body)
-	if err != nil {
-		return nil, err
-	}
-	list := &dto.AppList{}
-	if err = json.Unmarshal(body, list); err != nil {
-		return nil, err
-	}
-	res.AppStoreLastModified = list.LastModified
-	res.List = *list
-
-	appStoreLastModified, _ := strconv.Atoi(setting.AppStoreLastModified)
-	if setting.AppStoreLastModified == "" || list.LastModified > appStoreLastModified {
-		res.CanUpdate = true
-		return res, err
-	}
-	return res, nil
-}
-
 func (a AppService) SyncAppListFromLocal() {
 	fileOp := files.NewFileOp()
 	localAppDir := constant.LocalAppResourceDir
@@ -659,6 +626,56 @@ func (a AppService) SyncAppListFromLocal() {
 	tx.Commit()
 	global.LOG.Infof("sync local apps success")
 }
+
+func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
+	res := &response.AppUpdateRes{
+		CanUpdate: false,
+	}
+	setting, err := NewISettingService().GetSettingInfo()
+	if err != nil {
+		return nil, err
+	}
+	versionUrl := fmt.Sprintf("%s/%s/1panel.json.version.txt", global.CONF.System.AppRepo, global.CONF.System.Mode)
+	versionRes, err := http.Get(versionUrl)
+	if err != nil {
+		return nil, err
+	}
+	defer versionRes.Body.Close()
+	body, err := io.ReadAll(versionRes.Body)
+	if err != nil {
+		return nil, err
+	}
+	lastModifiedStr := string(body)
+
+	lastModified, err := strconv.Atoi(lastModifiedStr)
+	if err != nil {
+		return nil, err
+	}
+	appStoreLastModified, _ := strconv.Atoi(setting.AppStoreLastModified)
+	if setting.AppStoreLastModified == "" || lastModified != appStoreLastModified {
+		res.CanUpdate = true
+		return res, err
+	}
+	return res, nil
+}
+
+func getAppFromRepo(downloadPath string) error {
+	downloadUrl := downloadPath
+	global.LOG.Infof("download file from %s", downloadUrl)
+	fileOp := files.NewFileOp()
+	packagePath := path.Join(constant.ResourceDir, path.Base(downloadUrl))
+	if err := fileOp.DownloadFile(downloadUrl, packagePath); err != nil {
+		return err
+	}
+	if err := fileOp.Decompress(packagePath, constant.ResourceDir, files.Zip); err != nil {
+		return err
+	}
+	defer func() {
+		_ = fileOp.DeleteFile(packagePath)
+	}()
+	return nil
+}
+
 func (a AppService) SyncAppListFromRemote() error {
 	updateRes, err := a.GetAppUpdate()
 	if err != nil {
@@ -667,10 +684,22 @@ func (a AppService) SyncAppListFromRemote() error {
 	if !updateRes.CanUpdate {
 		return nil
 	}
+	if err = getAppFromRepo(fmt.Sprintf("%s/%s/1panel.json.zip", global.CONF.System.AppRepo, global.CONF.System.Mode)); err != nil {
+		return err
+	}
+	listFile := path.Join(constant.ResourceDir, "1panel.json")
+	content, err := os.ReadFile(listFile)
+	if err != nil {
+		return err
+	}
+	list := &dto.AppList{}
+	if err := json.Unmarshal(content, list); err != nil {
+		return err
+	}
+
 	var (
 		tags      []*model.Tag
 		appTags   []*model.AppTag
-		list      = updateRes.List
 		oldAppIds []uint
 	)
 	for _, t := range list.Extra.Tags {

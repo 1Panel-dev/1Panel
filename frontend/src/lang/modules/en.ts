@@ -1155,6 +1155,8 @@ const message = {
         editComposeHelper: 'Editing the compose file may cause the software installation to fail',
         composeNullErr: 'compose cannot be empty',
         takeDown: 'TakeDown',
+        allReadyInstalled: 'Installed',
+        installHelper: 'Configuring image acceleration can solve the problem of image pull failure',
     },
     website: {
         website: 'Website',
