@@ -85,7 +85,7 @@ func (u *CronjobService) CleanRecord(req dto.CronjobClean) error {
 	if err != nil {
 		return err
 	}
-	if req.CleanData && cronjob.Type != "shell" && cronjob.Type != "curl" {
+	if req.CleanData && (cronjob.Type == "database" || cronjob.Type == "website" || cronjob.Type == "directory") {
 		cronjob.RetainCopies = 0
 		backup, err := backupRepo.Get(commonRepo.WithByID(uint(cronjob.TargetDirID)))
 		if err != nil {

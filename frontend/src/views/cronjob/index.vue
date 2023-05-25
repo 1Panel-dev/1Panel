@@ -243,10 +243,47 @@ const onOpenDialog = async (
 const onDelete = async (row: Cronjob.CronjobInfo | null) => {
     if (row) {
         deleteCronjobID.value = row.id;
+        if (row.type !== 'database' && row.type !== 'website' && row.type !== 'directory') {
+            deleteMessageBox();
+            return;
+        }
+        deleteVisiable.value = true;
     } else {
         deleteCronjobID.value = 0;
+        for (const item of selects.value) {
+            if (item.type === 'database' || item.type === 'website' || item.type === 'directory') {
+                deleteVisiable.value = true;
+                return;
+            }
+        }
+        deleteMessageBox();
     }
-    deleteVisiable.value = true;
+};
+
+const deleteMessageBox = async () => {
+    let ids: Array<number> = [];
+    if (deleteCronjobID.value) {
+        ids.push(deleteCronjobID.value);
+    } else {
+        selects.value.forEach((item: Cronjob.CronjobInfo) => {
+            ids.push(item.id);
+        });
+    }
+    ElMessageBox.confirm(i18n.global.t('commons.msg.delete'), i18n.global.t('commons.msg.deleteTitle'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+        type: 'info',
+    }).then(async () => {
+        await deleteCronjob(ids, false)
+            .then(() => {
+                delLoading.value = false;
+                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+                search();
+            })
+            .catch(() => {
+                delLoading.value = false;
+            });
+    });
 };
 
 const onSubmitDelete = async () => {
