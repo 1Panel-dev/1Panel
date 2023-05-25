@@ -87,7 +87,7 @@ func ExecCronjobWithTimeOut(cmdStr string, timeout time.Duration) (string, error
 		if len(errMsg) != 0 {
 			errMsg = fmt.Sprintf("%s \n\n; stdout:\n %s", errMsg, stdout.String())
 		} else {
-			errMsg = fmt.Sprintf("stdout\n: %s", stdout.String())
+			errMsg = fmt.Sprintf("stdout:\n %s", stdout.String())
 		}
 	}
 	return errMsg, err
