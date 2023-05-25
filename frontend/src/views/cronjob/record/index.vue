@@ -84,7 +84,7 @@
                     <el-col :span="8">
                         <el-date-picker
                             style="width: calc(100% - 20px)"
-                            @change="search(true)"
+                            @change="search()"
                             v-model="timeRangeLoad"
                             type="datetimerange"
                             :range-separator="$t('commons.search.timeRange')"
@@ -94,7 +94,7 @@
                         ></el-date-picker>
                     </el-col>
                     <el-col :span="16">
-                        <el-select @change="search(true)" v-model="searchInfo.status">
+                        <el-select @change="search()" v-model="searchInfo.status">
                             <template #prefix>{{ $t('commons.table.status') }}</template>
                             <el-option :label="$t('commons.table.all')" value="" />
                             <el-option :label="$t('commons.status.success')" value="Success" />
@@ -105,29 +105,39 @@
                 </el-row>
             </template>
             <template #main>
-                <el-row :gutter="20" v-if="hasRecords">
+                <el-row :gutter="20" v-show="hasRecords">
                     <el-col :span="8">
-                        <el-card>
-                            <ul v-infinite-scroll="nextPage" class="infinite-list" style="overflow: auto">
+                        <div>
+                            <ul class="infinite-list" style="overflow: auto">
                                 <li
                                     v-for="(item, index) in records"
                                     :key="index"
-                                    @click="forDetail(item, index)"
+                                    @click="forDetail(item)"
                                     class="infinite-list-item"
                                 >
                                     <el-icon v-if="item.status === 'Success'"><Select /></el-icon>
                                     <el-icon v-if="item.status === 'Waiting'"><Loading /></el-icon>
                                     <el-icon v-if="item.status === 'Failed'"><CloseBold /></el-icon>
-                                    <span v-if="index === currentRecordIndex" style="color: red">
+                                    <span v-if="item.id === currentRecord.id" style="color: red">
                                         {{ dateFormat(0, 0, item.startTime) }}
                                     </span>
                                     <span v-else>{{ dateFormat(0, 0, item.startTime) }}</span>
                                 </li>
                             </ul>
-                            <div style="margin-top: 10px; margin-bottom: 5px; font-size: 12px; float: right">
-                                <span>{{ $t('commons.table.total', [searchInfo.recordTotal]) }}</span>
+                            <div style="margin-top: 10px; font-size: 12px; float: right">
+                                <el-pagination
+                                    :page-size="searchInfo.pageSize"
+                                    :current-page="searchInfo.page"
+                                    @current-change="handleCurrentChange"
+                                    @size-change="handleSizeChange"
+                                    :pager-count="5"
+                                    :page-sizes="[6, 8, 10, 12, 14]"
+                                    small
+                                    layout="total, sizes, prev, pager, next"
+                                    :total="searchInfo.recordTotal"
+                                />
                             </div>
-                        </el-card>
+                        </div>
                     </el-col>
                     <el-col :span="16">
                         <el-form label-position="top" :v-key="refresh">
@@ -272,7 +282,7 @@
                         </el-form>
                     </el-col>
                 </el-row>
-                <div class="app-warn" v-if="!hasRecords">
+                <div class="app-warn" v-show="!hasRecords">
                     <div>
                         <span>{{ $t('cronjob.noRecord') }}</span>
                         <div>
@@ -342,19 +352,27 @@ const dialogData = ref();
 const records = ref<Array<Cronjob.Record>>([]);
 const currentRecord = ref<Cronjob.Record>();
 const currentRecordDetail = ref<string>('');
-const currentRecordIndex = ref();
 
 const deleteVisiable = ref();
 const delLoading = ref();
 const cleanData = ref();
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
-    dialogData.value = params;
     recordShow.value = true;
-    search(true);
+    dialogData.value = params;
+    search();
     timer = setInterval(() => {
-        onRefresh();
+        search();
     }, 1000 * 5);
+};
+
+const handleSizeChange = (val: number) => {
+    searchInfo.pageSize = val;
+    search();
+};
+const handleCurrentChange = (val: number) => {
+    searchInfo.page = val;
+    search();
 };
 
 const shortcuts = [
@@ -418,7 +436,7 @@ const timeRangeLoad = ref<[Date, Date]>([
 ]);
 const searchInfo = reactive({
     page: 1,
-    pageSize: 12,
+    pageSize: 8,
     recordTotal: 0,
     cronjobID: 0,
     startTime: new Date(),
@@ -432,7 +450,7 @@ const onHandle = async (row: Cronjob.CronjobInfo) => {
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            onRefresh();
+            search();
         })
         .catch(() => {
             loading.value = false;
@@ -451,12 +469,7 @@ const onChangeStatus = async (id: number, status: string) => {
     });
 };
 
-const search = async (isInit: boolean) => {
-    if (isInit) {
-        searchInfo.page = 1;
-        searchInfo.pageSize = 12;
-        records.value = [];
-    }
+const search = async () => {
     if (timeRangeLoad.value && timeRangeLoad.value.length === 2) {
         searchInfo.startTime = timeRangeLoad.value[0];
         searchInfo.endTime = timeRangeLoad.value[1];
@@ -473,52 +486,24 @@ const search = async (isInit: boolean) => {
         status: searchInfo.status,
     };
     const res = await searchRecords(params);
-    if (searchInfo.page === 1 && !res.data.items) {
-        hasRecords.value = false;
-        return;
-    }
-    if (!res.data.items) {
-        return;
-    }
-    for (const item of res.data.items) {
-        records.value.push(item);
-    }
-    hasRecords.value = true;
-    currentRecord.value = records.value[0];
-    currentRecordIndex.value = 0;
-    loadRecord(currentRecord.value);
+    records.value = res.data.items;
     searchInfo.recordTotal = res.data.total;
-};
-
-const onRefresh = async () => {
-    records.value = [];
-    searchInfo.pageSize = searchInfo.pageSize * searchInfo.page;
-    searchInfo.page = 1;
-    if (timeRangeLoad.value && timeRangeLoad.value.length === 2) {
-        searchInfo.startTime = timeRangeLoad.value[0];
-        searchInfo.endTime = timeRangeLoad.value[1];
-    } else {
-        searchInfo.startTime = new Date(new Date().setHours(0, 0, 0, 0));
-        searchInfo.endTime = new Date();
+    hasRecords.value = searchInfo.recordTotal !== 0;
+    if (!hasRecords.value) {
+        return;
     }
-    let params = {
-        page: searchInfo.page,
-        pageSize: searchInfo.pageSize,
-        cronjobID: dialogData.value.rowData!.id,
-        startTime: searchInfo.startTime,
-        endTime: searchInfo.endTime,
-        status: searchInfo.status,
-    };
-    const res = await searchRecords(params);
-    if (res.data.items) {
-        records.value = res.data.items;
-        hasRecords.value = true;
+    if (!currentRecord.value) {
         currentRecord.value = records.value[0];
-        loadRecord(currentRecord.value);
     } else {
-        records.value = [];
-        hasRecords.value = false;
-        refresh.value = !refresh.value;
+        for (const item of records.value) {
+            if (item.id === currentRecord.value.id) {
+                currentRecord.value = item;
+                break;
+            }
+        }
+    }
+    if (currentRecord.value?.records) {
+        loadRecord(currentRecord.value);
     }
 };
 
@@ -554,16 +539,8 @@ const onDownload = async (record: any, backupID: number) => {
     });
 };
 
-const nextPage = async () => {
-    if (searchInfo.pageSize >= searchInfo.recordTotal) {
-        return;
-    }
-    searchInfo.page = searchInfo.page + 1;
-    search(false);
-};
-const forDetail = async (row: Cronjob.Record, index: number) => {
+const forDetail = async (row: Cronjob.Record) => {
     currentRecord.value = row;
-    currentRecordIndex.value = index;
     loadRecord(row);
 };
 const loadRecord = async (row: Cronjob.Record) => {
@@ -578,7 +555,7 @@ const loadRecord = async (row: Cronjob.Record) => {
 };
 
 const onClean = async () => {
-    if (dialogData.value.rowData.type === 'shell' || dialogData.value.rowData.type === 'curl') {
+    if (!isBackup()) {
         ElMessageBox.confirm(i18n.global.t('commons.msg.clean'), i18n.global.t('commons.msg.deleteTitle'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
@@ -588,7 +565,7 @@ const onClean = async () => {
                 .then(() => {
                     delLoading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    search(true);
+                    search();
                 })
                 .catch(() => {
                     delLoading.value = false;
@@ -606,7 +583,7 @@ const cleanRecord = async () => {
             delLoading.value = false;
             deleteVisiable.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            search(true);
+            search();
         })
         .catch(() => {
             delLoading.value = false;
