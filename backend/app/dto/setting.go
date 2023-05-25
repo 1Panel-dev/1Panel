@@ -30,6 +30,7 @@ type SettingInfo struct {
 	MFASecret              string `json:"mfaSecret"`
 
 	MonitorStatus    string `json:"monitorStatus"`
+	MonitorInterval  string `json:"monitorInterval"`
 	MonitorStoreDays string `json:"monitorStoreDays"`
 
 	MessageType string `json:"messageType"`

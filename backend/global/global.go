@@ -20,5 +20,6 @@ var (
 	CACHE   *badger_db.Cache
 	Viper   *viper.Viper
 
-	Cron *cron.Cron
+	Cron          *cron.Cron
+	MonitorCronID int
 )

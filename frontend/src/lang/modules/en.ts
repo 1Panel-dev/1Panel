@@ -699,6 +699,7 @@ const message = {
         network: 'Network',
         up: 'Up',
         down: 'Down',
+        interval: 'Interval(min)',
     },
     terminal: {
         conn: 'connection',

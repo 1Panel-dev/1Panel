@@ -29,6 +29,7 @@ export namespace Setting {
         mfaSecret: string;
 
         monitorStatus: string;
+        monitorInterval: number;
         monitorStoreDays: number;
 
         messageType: string;

@@ -1,12 +1,13 @@
-package job
+package service
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
-	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/robfig/cron/v3"
 	"github.com/shirou/gopsutil/v3/cpu"
 	"github.com/shirou/gopsutil/v3/disk"
 	"github.com/shirou/gopsutil/v3/load"
@@ -14,14 +15,18 @@ import (
 	"github.com/shirou/gopsutil/v3/net"
 )
 
-type monitor struct{}
+type MonitorService struct{}
 
-func NewMonitorJob() *monitor {
-	return &monitor{}
+type IMonitorService interface {
+	Run()
 }
 
-func (m *monitor) Run() {
-	settingRepo := repo.NewISettingRepo()
+func NewIMonitorService() IMonitorService {
+	return &MonitorService{}
+}
+
+func (m *MonitorService) Run() {
+	fmt.Printf("开始采集数据了啊我 %s \n", time.Now().Format("2006-01-02 15:04:05"))
 	monitorStatus, _ := settingRepo.Get(settingRepo.WithByKey("MonitorStatus"))
 	if monitorStatus.Value == "disable" {
 		return
@@ -42,7 +47,7 @@ func (m *monitor) Run() {
 	memoryInfo, _ := mem.VirtualMemory()
 	itemModel.Memory = memoryInfo.UsedPercent
 
-	if err := global.DB.Create(&itemModel).Error; err != nil {
+	if err := settingRepo.CreateMonitorBase(itemModel); err != nil {
 		global.LOG.Errorf("Insert basic monitoring data failed, err: %v", err)
 	}
 
@@ -55,9 +60,9 @@ func (m *monitor) Run() {
 	}
 	storeDays, _ := strconv.Atoi(MonitorStoreDays.Value)
 	timeForDelete := time.Now().AddDate(0, 0, -storeDays)
-	_ = global.DB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorBase{}).Error
-	_ = global.DB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorIO{}).Error
-	_ = global.DB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorNetwork{}).Error
+	_ = settingRepo.DelMonitorBase(timeForDelete)
+	_ = settingRepo.DelMonitorIO(timeForDelete)
+	_ = settingRepo.DelMonitorNet(timeForDelete)
 }
 
 func loadDiskIO() {
@@ -91,7 +96,7 @@ func loadDiskIO() {
 			}
 		}
 	}
-	if err := global.DB.CreateInBatches(ioList, len(ioList)).Error; err != nil {
+	if err := settingRepo.BatchCreateMonitorIO(ioList); err != nil {
 		global.LOG.Errorf("Insert io monitoring data failed, err: %v", err)
 	}
 }
@@ -133,7 +138,19 @@ func loadNetIO() {
 		}
 	}
 
-	if err := global.DB.CreateInBatches(netList, len(netList)).Error; err != nil {
+	if err := settingRepo.BatchCreateMonitorNet(netList); err != nil {
 		global.LOG.Errorf("Insert network monitoring data failed, err: %v", err)
 	}
+}
+
+func StartMonitor(removeBefore bool, interval string) error {
+	if removeBefore {
+		global.Cron.Remove(cron.EntryID(global.MonitorCronID))
+	}
+	monitorID, err := global.Cron.AddJob(fmt.Sprintf("@every %sm", interval), NewIMonitorService())
+	if err != nil {
+		return err
+	}
+	global.MonitorCronID = int(monitorID)
+	return nil
 }

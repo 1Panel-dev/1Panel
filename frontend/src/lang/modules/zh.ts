@@ -705,6 +705,7 @@ const message = {
         network: '网络',
         up: '上行',
         down: '下行',
+        interval: '采集间隔（分钟）',
     },
     terminal: {
         conn: '连接',
