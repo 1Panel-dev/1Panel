@@ -10,7 +10,13 @@
         </el-table-column>
         <el-table-column :label="$t('website.domain')" prop="domain"></el-table-column>
         <el-table-column :label="$t('website.port')" prop="port"></el-table-column>
-        <fu-table-operations :ellipsis="1" :buttons="buttons" :label="$t('commons.table.operate')" fixed="right" fix />
+        <fu-table-operations
+            :ellipsis="1"
+            :buttons="buttons"
+            :label="$t('commons.table.operate')"
+            :fixed="mobile ? false : 'right'"
+            fix
+        />
     </ComplexTable>
     <Domain ref="domainRef" @close="search(id)"></Domain>
 </template>
@@ -23,6 +29,8 @@ import { computed, onMounted, ref } from 'vue';
 import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { Promotion } from '@element-plus/icons-vue';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const props = defineProps({
     id: {
@@ -32,6 +40,9 @@ const props = defineProps({
 });
 const id = computed(() => {
     return props.id;
+});
+const mobile = computed(() => {
+    return globalStore.isMobile();
 });
 let loading = ref(false);
 const data = ref<Website.Domain[]>([]);

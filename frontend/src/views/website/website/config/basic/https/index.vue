@@ -1,6 +1,6 @@
 <template>
     <el-row :gutter="20" v-loading="loading">
-        <el-col :span="14" :offset="1">
+        <el-col :xs="24" :sm="18" :md="14" :lg="14" :xl="14">
             <el-form ref="httpsForm" label-position="left" label-width="auto" :model="form" :rules="rules">
                 <el-form-item prop="enable" :label="$t('website.enableHTTPS')">
                     <el-switch v-model="form.enable" @change="changeEnable"></el-switch>

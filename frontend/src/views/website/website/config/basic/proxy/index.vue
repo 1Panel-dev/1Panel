@@ -26,7 +26,7 @@
             width="260px"
             :buttons="buttons"
             :label="$t('commons.table.operate')"
-            fixed="right"
+            :fixed="mobile ? false : 'right'"
             fix
         />
     </ComplexTable>
@@ -45,12 +45,18 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import { ElMessageBox } from 'element-plus';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const props = defineProps({
     id: {
         type: Number,
         default: 0,
     },
+});
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
 });
 const id = computed(() => {
     return props.id;
