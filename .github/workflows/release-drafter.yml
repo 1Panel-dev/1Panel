@@ -11,8 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install cross-compilers
-        run: sudo apt-get update && sudo apt-get -y install gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf
-      - name: Checkout code
+        run: sudo apt-get update && sudo apt-get -y install gcc-x86-64-linux-gnu gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf gcc-powerpc64le-linux-gnu gcc-s390x-linux-gnu
         uses: actions/checkout@v2
       - uses: actions/setup-node@v3
         with:

@@ -24,26 +24,26 @@ builds:
       - >-
         {{- if eq .Arch "amd64"}}CC=x86_64-linux-gnu-gcc{{- end }}
         {{- if eq .Arch "arm64"}}CC=aarch64-linux-gnu-gcc{{- end }}
-        {{- if eq .Arch "loong64"}}CC=loongarch64-linux-gnu-gcc{{- end }}
         {{- if eq .Arch "arm"}}CC=arm-linux-gnueabihf-gcc{{- end }}
+        {{- if eq .Arch "loong64"}}CC=loongarch64-linux-gnu-gcc{{- end }}
+        {{- if eq .Arch "ppc64le"}}CC=powerpc64le-linux-gnu-gcc{{- end }}
+        {{- if eq .Arch "s390x"}}CC=s390x-linux-gnu-gcc{{- end }}
+        {{- if eq .Arch "loong64"}}CC=loongarch64-linux-gnu-gcc{{- end }}
     goos:
       - linux
     goarch:
       - amd64
       - arm64
       - arm
-    goarm:
-      - 6
-      - 7
+      - ppc64le
+      - s390x
     ignore:
-      - goos: linux
-        goarch: arm
       - goos: linux
         goarch: loong64
 
 archives:
   - format: tar.gz
-    name_template: "{{ .ProjectName }}-v{{ .Version }}-{{ .Os }}-{{ .Arch }}{{- if .Arm }}v{{ .Arm }}{{ end }}"
+    name_template: "{{ .ProjectName }}-v{{ .Version }}-{{ .Os }}-{{ .Arch }}"
     wrap_in_directory: true
     files:
       - 1pctl
