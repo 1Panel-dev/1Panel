@@ -16,7 +16,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get -y install gcc-x86-64-linux-gnu gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf gcc-powerpc64le-linux-gnu gcc-s390x-linux-gnu
       - name: Checkout code
         uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
         with:
           node-version: '18.14'
       - name: Build Web
@@ -25,7 +26,8 @@ jobs:
           cd frontend && npm install && npm run build:dev
         env:
           NODE_OPTIONS: --max-old-space-size=8192
-      - uses: actions/setup-go@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
         with:
           go-version: '1.20.x'
       - name: Build Server
