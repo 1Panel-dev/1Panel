@@ -26,7 +26,6 @@ func NewIMonitorService() IMonitorService {
 }
 
 func (m *MonitorService) Run() {
-	fmt.Printf("开始采集数据了啊我 %s \n", time.Now().Format("2006-01-02 15:04:05"))
 	monitorStatus, _ := settingRepo.Get(settingRepo.WithByKey("MonitorStatus"))
 	if monitorStatus.Value == "disable" {
 		return

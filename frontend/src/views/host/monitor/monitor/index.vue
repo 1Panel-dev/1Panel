@@ -220,13 +220,15 @@ const search = async (param: string) => {
         }
         switch (item.param) {
             case 'base':
-                let baseDate = item.date.map(function (item: any) {
+                let baseDate = item.date.length === 0 ? loadEmptyDate() : item.date;
+                baseDate = baseDate.map(function (item: any) {
                     return dateFormatWithoutYear(item);
                 });
                 if (param === 'cpu' || param === 'all') {
                     let cpuData = item.value.map(function (item: any) {
                         return item.cpu.toFixed(2);
                     });
+                    cpuData = cpuData.length === 0 ? loadEmptyData() : cpuData;
                     let yDatasOfCpu = {
                         name: 'CPU',
                         type: 'line',
@@ -251,6 +253,7 @@ const search = async (param: string) => {
                     let memoryData = item.value.map(function (item: any) {
                         return item.memory.toFixed(2);
                     });
+                    memoryData = memoryData.length === 0 ? loadEmptyData() : memoryData;
                     let yDatasOfMem = {
                         name: i18n.global.t('monitor.memory'),
                         type: 'line',
@@ -279,12 +282,14 @@ const search = async (param: string) => {
                 initIOCharts(item);
                 break;
             case 'network':
-                let networkDate = item.date.map(function (item: any) {
+                let networkDate = item.date.length === 0 ? loadEmptyDate() : item.date;
+                networkDate = networkDate.map(function (item: any) {
                     return dateFormatWithoutYear(item);
                 });
                 let networkUp = item.value.map(function (item: any) {
                     return item.up.toFixed(2);
                 });
+                networkUp = networkUp.length === 0 ? loadEmptyData() : networkUp;
                 let yDatasOfUp = {
                     name: i18n.global.t('monitor.up'),
                     type: 'line',
@@ -306,6 +311,7 @@ const search = async (param: string) => {
                 let networkOut = item.value.map(function (item: any) {
                     return item.down.toFixed(2);
                 });
+                networkOut = networkOut.length === 0 ? loadEmptyData() : networkOut;
                 let yDatasOfDown = {
                     name: i18n.global.t('monitor.down'),
                     type: 'line',
@@ -365,6 +371,27 @@ function initCharts(chartName: string, xDatas: any, yDatas: any, yTitle: string,
 }
 
 function initLoadCharts(item: Monitor.MonitorData) {
+    let itemLoadDate = item.date.length === 0 ? loadEmptyDate() : item.date;
+    let loadDate = itemLoadDate.map(function (item: any) {
+        return dateFormatWithoutYear(item);
+    });
+    let load1Data = item.value.map(function (item: any) {
+        return item.cpuLoad1.toFixed(2);
+    });
+    load1Data = load1Data.length === 0 ? loadEmptyData() : load1Data;
+    let load5Data = item.value.map(function (item: any) {
+        return item.cpuLoad5.toFixed(2);
+    });
+    load5Data = load5Data.length === 0 ? loadEmptyData() : load5Data;
+    let load15Data = item.value.map(function (item: any) {
+        return item.cpuLoad15.toFixed(2);
+    });
+    load15Data = load15Data.length === 0 ? loadEmptyData() : load15Data;
+    let loadUsage = item.value.map(function (item: any) {
+        return item.loadUsage.toFixed(2);
+    });
+    loadUsage = loadUsage.length === 0 ? loadEmptyData() : loadUsage;
+
     const lineChart = echarts.init(document.getElementById('loadLoadChart') as HTMLElement);
     const option = {
         zlevel: 1,
@@ -389,9 +416,7 @@ function initLoadCharts(item: Monitor.MonitorData) {
         },
         grid: { left: '7%', right: '7%', bottom: '20%' },
         xAxis: {
-            data: item.date.map(function (item: any) {
-                return dateFormatWithoutYear(item);
-            }),
+            data: loadDate,
         },
         yAxis: [
             { type: 'value', name: i18n.global.t('monitor.loadDetail') + ' ( % )' },
@@ -420,9 +445,7 @@ function initLoadCharts(item: Monitor.MonitorData) {
                     ]),
                 },
                 showSymbol: false,
-                data: item.value.map(function (item: any) {
-                    return item.cpuLoad1.toFixed(2);
-                }),
+                data: load1Data,
             },
             {
                 name: '5 ' + i18n.global.t('monitor.min'),
@@ -440,9 +463,7 @@ function initLoadCharts(item: Monitor.MonitorData) {
                     ]),
                 },
                 showSymbol: false,
-                data: item.value.map(function (item: any) {
-                    return item.cpuLoad5.toFixed(2);
-                }),
+                data: load5Data,
             },
             {
                 name: '15 ' + i18n.global.t('monitor.min'),
@@ -460,9 +481,7 @@ function initLoadCharts(item: Monitor.MonitorData) {
                     ]),
                 },
                 showSymbol: false,
-                data: item.value.map(function (item: any) {
-                    return item.cpuLoad15.toFixed(2);
-                }),
+                data: load15Data,
             },
             {
                 name: i18n.global.t('monitor.resourceUsage'),
@@ -480,9 +499,7 @@ function initLoadCharts(item: Monitor.MonitorData) {
                     ]),
                 },
                 showSymbol: false,
-                data: item.value.map(function (item: any) {
-                    return item.loadUsage.toFixed(2);
-                }),
+                data: loadUsage,
                 yAxisIndex: 1,
             },
         ],
@@ -491,6 +508,27 @@ function initLoadCharts(item: Monitor.MonitorData) {
 }
 
 function initIOCharts(item: Monitor.MonitorData) {
+    let itemIODate = item.date.length === 0 ? loadEmptyDate() : item.date;
+    let ioDate = itemIODate.map(function (item: any) {
+        return dateFormatWithoutYear(item);
+    });
+    let ioRead = item.value.map(function (item: any) {
+        return Number((item.read / 1024).toFixed(2));
+    });
+    ioRead = ioRead.length === 0 ? loadEmptyData() : ioRead;
+    let ioWrite = item.value.map(function (item: any) {
+        return Number((item.write / 1024).toFixed(2));
+    });
+    ioWrite = ioWrite.length === 0 ? loadEmptyData() : ioWrite;
+    let ioCount = item.value.map(function (item: any) {
+        return item.count;
+    });
+    ioCount = ioCount.length === 0 ? loadEmptyData() : ioCount;
+    let ioTime = item.value.map(function (item: any) {
+        return item.time;
+    });
+    ioTime = ioTime.length === 0 ? loadEmptyData() : ioTime;
+
     const lineChart = echarts.init(document.getElementById('loadIOChart') as HTMLElement);
     const option = {
         zlevel: 1,
@@ -535,9 +573,7 @@ function initIOCharts(item: Monitor.MonitorData) {
         },
         grid: { left: '7%', right: '7%', bottom: '20%' },
         xAxis: {
-            data: item.date.map(function (item: any) {
-                return dateFormatWithoutYear(item);
-            }),
+            data: ioDate,
         },
         yAxis: [
             { type: 'value', name: '( KB/s )' },
@@ -561,9 +597,7 @@ function initIOCharts(item: Monitor.MonitorData) {
                     ]),
                 },
                 showSymbol: false,
-                data: item.value.map(function (item: any) {
-                    return (item.read / 1024).toFixed(2);
-                }),
+                data: ioRead,
             },
             {
                 name: i18n.global.t('monitor.write'),
@@ -581,9 +615,7 @@ function initIOCharts(item: Monitor.MonitorData) {
                     ]),
                 },
                 showSymbol: false,
-                data: item.value.map(function (item: any) {
-                    return (item.write / 1024).toFixed(2);
-                }),
+                data: ioWrite,
             },
             {
                 name: i18n.global.t('monitor.readWriteCount'),
@@ -601,9 +633,7 @@ function initIOCharts(item: Monitor.MonitorData) {
                     ]),
                 },
                 showSymbol: false,
-                data: item.value.map(function (item: any) {
-                    return item.count;
-                }),
+                data: ioCount,
                 yAxisIndex: 1,
             },
             {
@@ -622,14 +652,25 @@ function initIOCharts(item: Monitor.MonitorData) {
                     ]),
                 },
                 showSymbol: false,
-                data: item.value.map(function (item: any) {
-                    return item.time;
-                }),
+                data: ioTime,
                 yAxisIndex: 1,
             },
         ],
     };
     lineChart.setOption(option, true);
+}
+
+function loadEmptyDate() {
+    let dateNow = new Date();
+    let date1 = new Date(dateNow.getTime() - 3600 * 1000 * 4);
+    let date2 = new Date(dateNow.getTime() - 3600 * 1000 * 3);
+    let date3 = new Date(dateNow.getTime() - 3600 * 1000 * 2);
+    let date4 = new Date(dateNow.getTime() - 3600 * 1000 * 1);
+    let date5 = dateNow;
+    return [date1, date2, date3, date4, date5];
+}
+function loadEmptyData() {
+    return [0, 0, 0, 0, 0];
 }
 
 function changeChartSize() {
