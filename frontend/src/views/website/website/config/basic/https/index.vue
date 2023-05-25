@@ -129,7 +129,7 @@ const id = computed(() => {
     return props.id;
 });
 const httpsForm = ref<FormInstance>();
-let form = reactive({
+const form = reactive({
     enable: false,
     websiteId: id.value,
     websiteSSLId: undefined,
@@ -141,10 +141,10 @@ let form = reactive({
         'EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5',
     SSLProtocol: ['TLSv1.3', 'TLSv1.2', 'TLSv1.1', 'TLSv1'],
 });
-let loading = ref(false);
+const loading = ref(false);
 const ssls = ref();
-let websiteSSL = ref();
-let rules = ref({
+const websiteSSL = ref();
+const rules = ref({
     type: [Rules.requiredSelect],
     privateKey: [Rules.requiredInput],
     certificate: [Rules.requiredInput],

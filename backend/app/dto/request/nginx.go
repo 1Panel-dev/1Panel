@@ -48,3 +48,21 @@ type NginxAuthUpdate struct {
 type NginxAuthReq struct {
 	WebsiteID uint `json:"websiteID" validate:"required"`
 }
+
+type NginxCommonReq struct {
+	WebsiteID uint `json:"websiteID" validate:"required"`
+}
+
+type NginxAntiLeechUpdate struct {
+	WebsiteID   uint     `json:"websiteID" validate:"required"`
+	Extends     string   `json:"extends" validate:"required"`
+	Return      string   `json:"return" validate:"required"`
+	Enable      bool     `json:"enable"  validate:"required"`
+	ServerNames []string `json:"serverNames"`
+	Cache       bool     `json:"cache"`
+	CacheTime   int      `json:"cacheTime"`
+	CacheUint   string   `json:"cacheUint"`
+	NoneRef     bool     `json:"noneRef"`
+	LogEnable   bool     `json:"logEnable"`
+	Blocked     bool     `json:"blocked"`
+}
