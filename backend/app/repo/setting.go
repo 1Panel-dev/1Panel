@@ -1,6 +1,8 @@
 package repo
 
 import (
+	"time"
+
 	"github.com/1Panel-dev/1Panel/backend/app/model"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"gorm.io/gorm"
@@ -14,6 +16,13 @@ type ISettingRepo interface {
 	Create(key, value string) error
 	Update(key, value string) error
 	WithByKey(key string) DBOption
+
+	CreateMonitorBase(model model.MonitorBase) error
+	BatchCreateMonitorIO(ioList []model.MonitorIO) error
+	BatchCreateMonitorNet(ioList []model.MonitorNetwork) error
+	DelMonitorBase(timeForDelete time.Time) error
+	DelMonitorIO(timeForDelete time.Time) error
+	DelMonitorNet(timeForDelete time.Time) error
 }
 
 func NewISettingRepo() ISettingRepo {
@@ -56,4 +65,23 @@ func (c *SettingRepo) WithByKey(key string) DBOption {
 
 func (u *SettingRepo) Update(key, value string) error {
 	return global.DB.Model(&model.Setting{}).Where("key = ?", key).Updates(map[string]interface{}{"value": value}).Error
+}
+
+func (u *SettingRepo) CreateMonitorBase(model model.MonitorBase) error {
+	return global.DB.Create(&model).Error
+}
+func (u *SettingRepo) BatchCreateMonitorIO(ioList []model.MonitorIO) error {
+	return global.DB.CreateInBatches(ioList, len(ioList)).Error
+}
+func (u *SettingRepo) BatchCreateMonitorNet(ioList []model.MonitorNetwork) error {
+	return global.DB.CreateInBatches(ioList, len(ioList)).Error
+}
+func (u *SettingRepo) DelMonitorBase(timeForDelete time.Time) error {
+	return global.DB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorBase{}).Error
+}
+func (u *SettingRepo) DelMonitorIO(timeForDelete time.Time) error {
+	return global.DB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorIO{}).Error
+}
+func (u *SettingRepo) DelMonitorNet(timeForDelete time.Time) error {
+	return global.DB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorNetwork{}).Error
 }

@@ -15,19 +15,31 @@ import (
 
 func Run() {
 	nyc, _ := time.LoadLocation(common.LoadTimeZone())
-	Cron := cron.New(cron.WithLocation(nyc), cron.WithChain(cron.Recover(cron.DefaultLogger)), cron.WithChain(cron.DelayIfStillRunning(cron.DefaultLogger)))
-	if _, err := Cron.AddJob("@every 5m", job.NewMonitorJob()); err != nil {
-		global.LOG.Errorf("can not add monitor corn job: %s", err.Error())
+	global.Cron = cron.New(cron.WithLocation(nyc), cron.WithChain(cron.Recover(cron.DefaultLogger)), cron.WithChain(cron.DelayIfStillRunning(cron.DefaultLogger)))
+
+	var (
+		interval model.Setting
+		status   model.Setting
+	)
+	if err := global.DB.Where("key = ?", "MonitorStatus").Find(&status).Error; err != nil {
+		global.LOG.Errorf("load monitor status from db failed, err: %v", err)
 	}
-	if _, err := Cron.AddJob("@daily", job.NewWebsiteJob()); err != nil {
+	if status.Value == "enable" {
+		if err := global.DB.Where("key = ?", "MonitorInterval").Find(&interval).Error; err != nil {
+			global.LOG.Errorf("load monitor interval from db failed, err: %v", err)
+		}
+		if err := service.StartMonitor(false, interval.Value); err != nil {
+			global.LOG.Errorf("can not add monitor corn job: %s", err.Error())
+		}
+	}
+
+	if _, err := global.Cron.AddJob("@daily", job.NewWebsiteJob()); err != nil {
 		global.LOG.Errorf("can not add  website corn job: %s", err.Error())
 	}
-	if _, err := Cron.AddJob("@daily", job.NewSSLJob()); err != nil {
+	if _, err := global.Cron.AddJob("@daily", job.NewSSLJob()); err != nil {
 		global.LOG.Errorf("can not add  ssl corn job: %s", err.Error())
 	}
-	Cron.Start()
-
-	global.Cron = Cron
+	global.Cron.Start()
 
 	var cronJobs []model.Cronjob
 	if err := global.DB.Where("status = ?", constant.StatusEnable).Find(&cronJobs).Error; err != nil {

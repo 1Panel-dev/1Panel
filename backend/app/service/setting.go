@@ -22,6 +22,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/ntp"
 	"github.com/1Panel-dev/1Panel/backend/utils/ssl"
 	"github.com/gin-gonic/gin"
+	"github.com/robfig/cron/v3"
 )
 
 type SettingService struct{}
@@ -72,9 +73,41 @@ func (u *SettingService) LoadTimeZone() ([]string, error) {
 }
 
 func (u *SettingService) Update(key, value string) error {
+	switch key {
+	case "MonitorStatus":
+		if value == "enable" && global.MonitorCronID == 0 {
+			interval, err := settingRepo.Get(settingRepo.WithByKey("MonitorInterval"))
+			if err != nil {
+				return err
+			}
+			if err := StartMonitor(false, interval.Value); err != nil {
+				return err
+			}
+		}
+		if value == "disable" && global.MonitorCronID != 0 {
+			global.Cron.Remove(cron.EntryID(global.MonitorCronID))
+			global.MonitorCronID = 0
+		}
+	case "MonitorInterval":
+		status, err := settingRepo.Get(settingRepo.WithByKey("MonitorStatus"))
+		if err != nil {
+			return err
+		}
+		if status.Value == "enable" && global.MonitorCronID != 0 {
+			if err := StartMonitor(true, value); err != nil {
+				return err
+			}
+		}
+	case "TimeZone":
+		if err := ntp.UpdateSystemTimeZone(value); err != nil {
+			return err
+		}
+	}
+
 	if err := settingRepo.Update(key, value); err != nil {
 		return err
 	}
+
 	switch key {
 	case "ExpirationDays":
 		timeout, _ := strconv.Atoi(value)
@@ -86,9 +119,6 @@ func (u *SettingService) Update(key, value string) error {
 	case "AllowIPs":
 		global.CONF.System.AllowIPs = value
 	case "TimeZone":
-		if err := ntp.UpdateSystemTimeZone(value); err != nil {
-			return err
-		}
 		go func() {
 			_, err := cmd.Exec("systemctl restart 1panel.service")
 			if err != nil {
