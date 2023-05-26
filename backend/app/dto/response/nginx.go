@@ -21,3 +21,16 @@ type NginxAuthRes struct {
 	Enable bool            `json:"enable"`
 	Items  []dto.NginxAuth `json:"items"`
 }
+
+type NginxAntiLeechRes struct {
+	Enable      bool     `json:"enable"`
+	Extends     string   `json:"extends"`
+	Return      string   `json:"return"`
+	ServerNames []string `json:"serverNames"`
+	Cache       bool     `json:"cache"`
+	CacheTime   int      `json:"cacheTime"`
+	CacheUint   string   `json:"cacheUint"`
+	NoneRef     bool     `json:"noneRef"`
+	LogEnable   bool     `json:"logEnable"`
+	Blocked     bool     `json:"blocked"`
+}

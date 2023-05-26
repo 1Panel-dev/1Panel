@@ -290,6 +290,19 @@ const checkDisableFunctions = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkLeechExts = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback(new Error(i18n.global.t('commons.rule.leechExts')));
+    } else {
+        const reg = /^[a-zA-Z0-9,]+$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.leechExts')));
+        } else {
+            callback();
+        }
+    }
+};
+
 interface CommonRule {
     requiredInput: FormItemRule;
     requiredSelect: FormItemRule;
@@ -314,6 +327,7 @@ interface CommonRule {
     appName: FormItemRule;
     containerName: FormItemRule;
     disabledFunctions: FormItemRule;
+    leechExts: FormItemRule;
 
     paramCommon: FormItemRule;
     paramComplexity: FormItemRule;
@@ -464,5 +478,10 @@ export const Rules: CommonRule = {
         required: true,
         trigger: 'blur',
         validator: checkDisableFunctions,
+    },
+    leechExts: {
+        required: true,
+        trigger: 'blur',
+        validator: checkLeechExts,
     },
 };

@@ -160,6 +160,7 @@ const message = {
             appName: 'Support English, numbers, - and _, length 2-30, and cannot start and end with -_',
             conatinerName: 'Supports letters, numbers, underscores, hyphens and dots, cannot end with hyphen- or dot.',
             disableFunction: 'Only support letters and,',
+            leechExts: 'Only support letters, numbers and,',
         },
         res: {
             paramError: 'The request failed, please try again later!',
@@ -1375,6 +1376,16 @@ const message = {
         editBasicAuthHelper:
             'The password is asymmetrically encrypted and cannot be echoed. Editing needs to reset the password',
         createPassword: 'Generate password',
+        antiLeech: 'Anti-leech',
+        extends: 'Extension',
+        browserCache: 'browser cache',
+        leechLog: 'Record anti-leech log',
+        accessDomain: 'Allowed domain names',
+        leechReturn: 'Response resource',
+        noneRef: 'Allow the source to be empty',
+        disable: 'not enabled',
+        disableLeechHelper: 'Whether to disable the anti-leech',
+        disableLeech: 'Disable anti-leech',
     },
     php: {
         short_open_tag: 'Short tag support',

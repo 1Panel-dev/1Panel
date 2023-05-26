@@ -24,8 +24,11 @@
         <el-tab-pane :label="$t('website.rewrite')">
             <Rewrite :id="id" v-if="tabIndex == '7'"></Rewrite>
         </el-tab-pane>
+        <el-tab-pane :label="$t('website.antiLeech')">
+            <AntiLeech :id="id" v-if="tabIndex == '8'"></AntiLeech>
+        </el-tab-pane>
         <el-tab-pane :label="$t('website.other')">
-            <Other :id="id" v-if="tabIndex == '8'"></Other>
+            <Other :id="id" v-if="tabIndex == '9'"></Other>
         </el-tab-pane>
     </el-tabs>
 </template>
@@ -42,6 +45,7 @@ import SitePath from './site-folder/index.vue';
 import Rewrite from './rewrite/index.vue';
 import Proxy from './proxy/index.vue';
 import AuthBasic from './auth-basic/index.vue';
+import AntiLeech from './anti-Leech/index.vue';
 
 const props = defineProps({
     id: {

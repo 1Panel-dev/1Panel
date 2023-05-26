@@ -365,4 +365,22 @@ export namespace Website {
         password: string;
         remark: string;
     }
+
+    export interface LeechConfig {
+        enable: boolean;
+        cache: boolean;
+        cacheTime: number;
+        cacheUint: string;
+        extends: string;
+        return: string;
+        serverNames: string[];
+        noneRef: boolean;
+        logEnable: boolean;
+        blocked: boolean;
+        websiteID?: number;
+    }
+
+    export interface LeechReq {
+        websiteID: number;
+    }
 }

@@ -758,3 +758,46 @@ func (b *BaseApi) UpdateAuthConfig(c *gin.Context) {
 	}
 	helper.SuccessWithOutData(c)
 }
+
+// @Tags Website
+// @Summary Get AntiLeech conf
+// @Description 获取防盗链配置
+// @Accept json
+// @Param request body request.NginxCommonReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/leech [post]
+func (b *BaseApi) GetAntiLeech(c *gin.Context) {
+	var req request.NginxCommonReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	res, err := websiteService.GetAntiLeech(req.WebsiteID)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, res)
+}
+
+// @Tags Website
+// @Summary Update AntiLeech
+// @Description 更新防盗链配置
+// @Accept json
+// @Param request body request.NginxAntiLeechUpdate true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /websites/leech/update [post]
+func (b *BaseApi) UpdateAntiLeech(c *gin.Context) {
+	var req request.NginxAntiLeechUpdate
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+	if err := websiteService.UpdateAntiLeech(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithOutData(c)
+}

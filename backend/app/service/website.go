@@ -76,6 +76,8 @@ type IWebsiteService interface {
 	UpdateProxyFile(req request.NginxProxyUpdate) (err error)
 	GetAuthBasics(req request.NginxAuthReq) (res response.NginxAuthRes, err error)
 	UpdateAuthBasic(req request.NginxAuthUpdate) (err error)
+	GetAntiLeech(id uint) (*response.NginxAntiLeechRes, error)
+	UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err error)
 }
 
 func NewIWebsiteService() IWebsiteService {
@@ -1644,4 +1646,173 @@ func (w WebsiteService) GetAuthBasics(req request.NginxAuthReq) (res response.Ng
 		res.Items = append(res.Items, auth)
 	}
 	return
+}
+
+func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(req.WebsiteID))
+	if err != nil {
+		return
+	}
+	nginxFull, err := getNginxFull(&website)
+	if err != nil {
+		return
+	}
+	fileOp := files.NewFileOp()
+	backpContent, err := fileOp.GetContent(nginxFull.SiteConfig.Config.FilePath)
+	if err != nil {
+		return
+	}
+	block := nginxFull.SiteConfig.Config.FindServers()[0]
+	locations := block.FindDirectives("location")
+	for _, location := range locations {
+		loParams := location.GetParameters()
+		if len(loParams) > 1 || loParams[0] == "~" {
+			extendStr := loParams[1]
+			if strings.HasPrefix(extendStr, `.*\.(`) && strings.HasSuffix(extendStr, `)$`) {
+				block.RemoveDirective("location", loParams)
+			}
+		}
+	}
+	if req.Enable {
+		exts := strings.Split(req.Extends, ",")
+		newDirective := components.Directive{
+			Name:       "location",
+			Parameters: []string{"~", fmt.Sprintf(`.*\.(%s)$`, strings.Join(exts, "|"))},
+		}
+
+		newBlock := &components.Block{}
+		newBlock.Directives = make([]components.IDirective, 0)
+		if req.Cache {
+			newBlock.Directives = append(newBlock.Directives, &components.Directive{
+				Name:       "expires",
+				Parameters: []string{strconv.Itoa(req.CacheTime) + req.CacheUint},
+			})
+		}
+		newBlock.Directives = append(newBlock.Directives, &components.Directive{
+			Name:       "log_not_found",
+			Parameters: []string{"off"},
+		})
+		validDir := &components.Directive{
+			Name:       "valid_referers",
+			Parameters: []string{},
+		}
+		if req.NoneRef {
+			validDir.Parameters = append(validDir.Parameters, "none")
+		}
+		if len(req.ServerNames) > 0 {
+			validDir.Parameters = append(validDir.Parameters, "server_names", strings.Join(req.ServerNames, " "))
+		}
+		newBlock.Directives = append(newBlock.Directives, validDir)
+
+		ifDir := &components.Directive{
+			Name:       "if",
+			Parameters: []string{"($invalid_referer)"},
+		}
+		ifDir.Block = &components.Block{
+			Directives: []components.IDirective{
+				&components.Directive{
+					Name:       "return",
+					Parameters: []string{req.Return},
+				},
+				&components.Directive{
+					Name:       "access_log",
+					Parameters: []string{"off"},
+				},
+			},
+		}
+		newBlock.Directives = append(newBlock.Directives, ifDir)
+		newDirective.Block = newBlock
+		block.Directives = append(block.Directives, &newDirective)
+	}
+
+	if err = nginx.WriteConfig(nginxFull.SiteConfig.Config, nginx.IndentedStyle); err != nil {
+		return
+	}
+	if err = updateNginxConfig(constant.NginxScopeServer, nil, &website); err != nil {
+		_ = fileOp.WriteFile(nginxFull.SiteConfig.Config.FilePath, bytes.NewReader(backpContent), 0755)
+		return
+	}
+	return
+}
+
+func (w WebsiteService) GetAntiLeech(id uint) (*response.NginxAntiLeechRes, error) {
+	website, err := websiteRepo.GetFirst(commonRepo.WithByID(id))
+	if err != nil {
+		return nil, err
+	}
+	nginxFull, err := getNginxFull(&website)
+	if err != nil {
+		return nil, err
+	}
+	res := &response.NginxAntiLeechRes{
+		LogEnable:   true,
+		ServerNames: []string{},
+	}
+	block := nginxFull.SiteConfig.Config.FindServers()[0]
+	locations := block.FindDirectives("location")
+	for _, location := range locations {
+		loParams := location.GetParameters()
+		if len(loParams) > 1 || loParams[0] == "~" {
+			extendStr := loParams[1]
+			if strings.HasPrefix(extendStr, `.*\.(`) && strings.HasSuffix(extendStr, `)$`) {
+				str1 := strings.TrimPrefix(extendStr, `.*\.(`)
+				str2 := strings.TrimSuffix(str1, ")$")
+				res.Extends = strings.Join(strings.Split(str2, "|"), ",")
+			}
+		}
+		lDirectives := location.GetBlock().GetDirectives()
+		for _, lDir := range lDirectives {
+			if lDir.GetName() == "valid_referers" {
+				res.Enable = true
+				params := lDir.GetParameters()
+				serverIndex := 0
+				serverNameExist := false
+				for i, param := range params {
+					if param == "none" {
+						res.NoneRef = true
+					}
+					if param == "blocked" {
+						res.Blocked = true
+					}
+					if param == "server_names" {
+						serverIndex = i
+						serverNameExist = true
+					}
+				}
+				if serverNameExist {
+					serverNames := params[serverIndex+1:]
+					res.ServerNames = serverNames
+				}
+			}
+			if lDir.GetName() == "if" && lDir.GetParameters()[0] == "($invalid_referer)" {
+				directives := lDir.GetBlock().GetDirectives()
+				for _, dir := range directives {
+					if dir.GetName() == "return" {
+						res.Return = strings.Join(dir.GetParameters(), " ")
+					}
+					if dir.GetName() == "access_log" {
+						if strings.Join(dir.GetParameters(), "") == "off" {
+							res.LogEnable = false
+						}
+					}
+				}
+			}
+			if lDir.GetName() == "expires" {
+				res.Cache = true
+				re := regexp.MustCompile(`^(\d+)(\w+)$`)
+				matches := re.FindStringSubmatch(lDir.GetParameters()[0])
+				if matches == nil {
+					continue
+				}
+				cacheTime, err := strconv.Atoi(matches[1])
+				if err != nil {
+					continue
+				}
+				unit := matches[2]
+				res.CacheUint = unit
+				res.CacheTime = cacheTime
+			}
+		}
+	}
+	return res, nil
 }
