@@ -257,6 +257,7 @@ const message = {
         runJam: 'Run Blockaged',
 
         core: 'Physical core',
+        coreUnit: 'Core',
         logicCore: 'Logic core',
         loadAverage: 'Average load in the last {0} minutes',
         load: 'Load',
@@ -274,6 +275,7 @@ const message = {
     },
     tabs: {
         more: 'More',
+        hide: 'Hide',
         closeCurrent: 'Close current',
         closeOther: 'Close other',
         closeAll: 'Close All',
