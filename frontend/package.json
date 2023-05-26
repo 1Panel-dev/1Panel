@@ -94,6 +94,9 @@
         "vite-plugin-vue-setup-extend": "^0.4.0",
         "vue-tsc": "^0.29.8"
     },
+    "overrides": {
+        "esbuild":"npm:esbuild-wasm@latest"
+    },
     "config": {
         "commitizen": {
             "path": "node_modules/cz-git"
