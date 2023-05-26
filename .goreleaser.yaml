@@ -28,7 +28,6 @@ builds:
         {{- if eq .Arch "loong64"}}CC=loongarch64-linux-gnu-gcc{{- end }}
         {{- if eq .Arch "ppc64le"}}CC=powerpc64le-linux-gnu-gcc{{- end }}
         {{- if eq .Arch "s390x"}}CC=s390x-linux-gnu-gcc{{- end }}
-        {{- if eq .Arch "loong64"}}CC=loongarch64-linux-gnu-gcc{{- end }}
     goos:
       - linux
     goarm:
@@ -39,9 +38,6 @@ builds:
       - arm
       - ppc64le
       - s390x
-    ignore:
-      - goos: linux
-        goarch: loong64
 
 archives:
   - format: tar.gz
