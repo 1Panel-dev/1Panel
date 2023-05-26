@@ -270,6 +270,7 @@ const message = {
         runJam: '运行堵塞',
 
         core: '物理核心',
+        coreUnit: '核',
         logicCore: '逻辑核心',
         loadAverage: '最近 {0} 分钟平均负载',
         load: '负载',
@@ -287,6 +288,7 @@ const message = {
     },
     tabs: {
         more: '更多',
+        hide: '收起',
         closeCurrent: '关闭当前',
         closeOther: '关闭其它',
         closeAll: '关闭所有',

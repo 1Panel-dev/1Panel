@@ -33,7 +33,7 @@
                 </template>
             </el-popover>
             <span class="input-help">
-                ( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} ) Core
+                ( {{ formatNumber(currentInfo.cpuUsed) }} / {{ currentInfo.cpuTotal }} ) {{ $t('home.coreUnit') }}
             </span>
         </el-col>
         <el-col :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
@@ -69,14 +69,23 @@
             align="center"
             v-for="(item, index) of currentInfo.diskData"
             :key="index"
+            v-show="showMore || index < 4"
         >
             <el-popover placement="bottom" :width="300" trigger="hover">
                 <el-row :gutter="5">
+                    <el-tag style="font-weight: 500">{{ $t('home.baseInfo') }}:</el-tag>
+                </el-row>
+                <el-row :gutter="5">
+                    <el-tag class="nameTag">{{ $t('home.mount') }}: {{ item.path }}</el-tag>
+                </el-row>
+                <el-row :gutter="5">
+                    <el-tag class="tagClass">{{ $t('commons.table.type') }}: {{ item.type }}</el-tag>
+                </el-row>
+                <el-row :gutter="5">
+                    <el-tag class="tagClass">{{ $t('home.fileSystem') }}: {{ item.device }}</el-tag>
+                </el-row>
+                <el-row :gutter="5">
                     <el-col :span="12">
-                        <el-tag style="font-weight: 500">{{ $t('home.baseInfo') }}:</el-tag>
-                        <el-tag class="tagClass">{{ $t('home.mount') }}: {{ item.path }}</el-tag>
-                        <el-tag class="tagClass">{{ $t('commons.table.type') }}: {{ item.type }}</el-tag>
-                        <el-tag class="tagClass">{{ $t('home.fileSystem') }}: {{ item.device }}</el-tag>
                         <div><el-tag class="tagClass" style="font-weight: 500">Inode:</el-tag></div>
                         <el-tag class="tagClass">{{ $t('home.total') }}: {{ item.inodesTotal }}</el-tag>
                         <el-tag class="tagClass">{{ $t('home.used') }}: {{ item.inodesUsed }}</el-tag>
@@ -88,17 +97,11 @@
 
                     <el-col :span="12">
                         <div>
-                            <el-tag style="margin-top: 108px; font-weight: 500">{{ $t('monitor.disk') }}:</el-tag>
+                            <el-tag style="margin-top: 3px; font-weight: 500">{{ $t('monitor.disk') }}:</el-tag>
                         </div>
-                        <el-tag class="tagClass">
-                            {{ $t('home.total') }}: {{ formatNumber(item.total / 1024 / 1024 / 1024) }} GB
-                        </el-tag>
-                        <el-tag class="tagClass">
-                            {{ $t('home.used') }}: {{ formatNumber(item.used / 1024 / 1024 / 1024) }} GB
-                        </el-tag>
-                        <el-tag class="tagClass">
-                            {{ $t('home.free') }}: {{ formatNumber(item.free / 1024 / 1024 / 1024) }} GB
-                        </el-tag>
+                        <el-tag class="tagClass">{{ $t('home.total') }}: {{ computeSize(item.total) }}</el-tag>
+                        <el-tag class="tagClass">{{ $t('home.used') }}: {{ computeSize(item.used) }}</el-tag>
+                        <el-tag class="tagClass">{{ $t('home.free') }}: {{ computeSize(item.free) }}</el-tag>
                         <el-tag class="tagClass">
                             {{ $t('home.percent') }}: {{ formatNumber(item.usedPercent) }}%
                         </el-tag>
@@ -108,21 +111,42 @@
                     <div :id="`disk${index}`" class="chartClass"></div>
                 </template>
             </el-popover>
-            <span class="input-help">
-                ( {{ formatNumber(item.used / 1024 / 1024 / 1024) }} /
-                {{ formatNumber(item.total / 1024 / 1024 / 1024) }} ) GB
-            </span>
+            <span class="input-help">{{ computeSize(item.used) }} / {{ computeSize(item.total) }}</span>
+        </el-col>
+        <el-col v-if="!showMore" :xs="12" :sm="12" :md="6" :lg="6" :xl="6" align="center">
+            <el-button link type="primary" @click="showMore = true" class="buttonClass">
+                {{ $t('tabs.more') }}
+                <el-icon><Bottom /></el-icon>
+            </el-button>
+        </el-col>
+        <el-col
+            v-if="showMore && currentInfo.diskData.length > 5"
+            :xs="12"
+            :sm="12"
+            :md="6"
+            :lg="6"
+            :xl="6"
+            align="center"
+            style="float: right"
+        >
+            <el-button type="primary" link @click="showMore = false" class="buttonClass">
+                {{ $t('tabs.hide') }}
+                <el-icon><Top /></el-icon>
+            </el-button>
         </el-col>
     </el-row>
 </template>
 
 <script setup lang="ts">
 import { Dashboard } from '@/api/interface/dashboard';
+import { computeSize } from '@/utils/util';
 import i18n from '@/lang';
 import * as echarts from 'echarts';
 import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
+
+const showMore = ref(true);
 
 const baseInfo = ref<Dashboard.BaseInfo>({
     websiteNumber: 0,
@@ -185,11 +209,12 @@ const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo):
     freshChart('load', i18n.global.t('home.load'), formatNumber(currentInfo.value.loadUsagePercent));
     nextTick(() => {
         for (let i = 0; i < currentInfo.value.diskData.length; i++) {
-            freshChart(
-                'disk' + i,
-                currentInfo.value.diskData[i].path,
-                formatNumber(currentInfo.value.diskData[i].usedPercent),
-            );
+            let itemPath = currentInfo.value.diskData[i].path;
+            itemPath = itemPath.length > 12 ? itemPath.substring(0, 9) + '...' : itemPath;
+            freshChart('disk' + i, itemPath, formatNumber(currentInfo.value.diskData[i].usedPercent));
+        }
+        if (currentInfo.value.diskData.length > 5) {
+            showMore.value = false;
         }
     });
 };
@@ -348,5 +373,16 @@ defineExpose({
 .chartClass {
     width: 100%;
     height: 160px;
+}
+.buttonClass {
+    margin-top: 28%;
+    font-size: 14px;
+}
+.nameTag {
+    margin-top: 3px;
+    height: auto;
+    display: inline-block;
+    white-space: normal;
+    line-height: 1.8;
 }
 </style>
