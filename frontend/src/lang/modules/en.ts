@@ -849,6 +849,8 @@ const message = {
         ownerHelper:
             'The default user of the PHP operating environment: the user group is 1000:1000, it is normal that the users inside and outside the container show inconsistencies',
         searchHelper: 'Support wildcards such as *',
+        uploadFailed: '[{0}] File Upload file',
+        fileUploadStart: 'Uploading [{0}]....',
     },
     ssh: {
         sshOperate: 'Operation [{0}] on the SSH service is performed. Do you want to continue?',

@@ -852,6 +852,8 @@ const message = {
         containSub: '同时修改子文件属性',
         ownerHelper: 'PHP 运行环境默认用户:用户组为 1000:1000, 容器内外用户显示不一致为正常现象',
         searchHelper: '支持 * 等通配符',
+        uploadFailed: '[{0}] 文件上传失败',
+        fileUploadStart: '正在上传[{0}]....',
     },
     ssh: {
         sshOperate: '对 SSH 服务进行 [{0}] 操作，是否继续？',
