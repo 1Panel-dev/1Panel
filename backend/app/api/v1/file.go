@@ -575,6 +575,7 @@ func mergeChunks(fileName string, fileDir string, dstDir string, chunkCount int)
 // @Security ApiKeyAuth
 // @Router /files/chunkupload [post]
 func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
+	var err error
 	fileForm, err := c.FormFile("chunk")
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
@@ -585,19 +586,16 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-
 	chunkIndex, err := strconv.Atoi(c.PostForm("chunkIndex"))
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-
 	chunkCount, err := strconv.Atoi(c.PostForm("chunkCount"))
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-
 	fileOp := files.NewFileOp()
 	tmpDir := path.Join(global.CONF.System.TmpDir, "upload")
 	if !fileOp.Stat(tmpDir) {
@@ -606,37 +604,45 @@ func (b *BaseApi) UploadChunkFiles(c *gin.Context) {
 			return
 		}
 	}
-
 	filename := c.PostForm("filename")
 	fileDir := filepath.Join(tmpDir, filename)
-
 	_ = os.MkdirAll(fileDir, 0755)
 	filePath := filepath.Join(fileDir, filename)
 
-	emptyFile, err := os.Create(filePath)
+	defer func() {
+		if err != nil {
+			_ = os.Remove(fileDir)
+		}
+	}()
+	var (
+		emptyFile *os.File
+		chunkData []byte
+	)
+
+	emptyFile, err = os.Create(filePath)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 	defer emptyFile.Close()
 
-	chunkData, err := io.ReadAll(uploadFile)
+	chunkData, err = io.ReadAll(uploadFile)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrFileUpload, err)
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, buserr.WithMap(constant.ErrFileUpload, map[string]interface{}{"name": filename, "detail": err.Error()}, err))
 		return
 	}
 
 	chunkPath := filepath.Join(fileDir, fmt.Sprintf("%s.%d", filename, chunkIndex))
 	err = os.WriteFile(chunkPath, chunkData, 0644)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrFileUpload, err)
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, buserr.WithMap(constant.ErrFileUpload, map[string]interface{}{"name": filename, "detail": err.Error()}, err))
 		return
 	}
 
 	if chunkIndex+1 == chunkCount {
 		err = mergeChunks(filename, fileDir, c.PostForm("path"), chunkCount)
 		if err != nil {
-			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrFileUpload, err)
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, buserr.WithMap(constant.ErrFileUpload, map[string]interface{}{"name": filename, "detail": err.Error()}, err))
 			return
 		}
 		helper.SuccessWithData(c, true)

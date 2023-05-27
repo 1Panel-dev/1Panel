@@ -39,7 +39,7 @@ ErrPathNotFound: "目录不存在"
 ErrMovePathFailed: "目标路径不能包含原路径！"
 ErrLinkPathNotFound: "目标路径不存在!"
 ErrFileIsExit: "文件已存在！"
-ErrFileUpload: "上传文件失败"
+ErrFileUpload: "{{ .name }} 上传文件失败 {{ .detail}}"
 
 #website
 ErrDomainIsExist: "域名已存在"
