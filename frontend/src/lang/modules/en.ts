@@ -158,7 +158,8 @@ const message = {
             paramUrlAndPort: 'The format is http(s)://(domain name/ip):(port)',
             nginxDoc: 'Only supports English case, numbers, and .',
             appName: 'Support English, numbers, - and _, length 2-30, and cannot start and end with -_',
-            conatinerName: 'Supports letters, numbers, underscores, hyphens and dots, cannot end with hyphen- or dot.',
+            conatinerName:
+                'Supports letters, numbers, underscores, hyphens and dots, cannot end with hyphen- or dot.1-127',
             disableFunction: 'Only support letters and,',
             leechExts: 'Only support letters, numbers and,',
         },
