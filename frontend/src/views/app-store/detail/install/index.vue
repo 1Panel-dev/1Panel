@@ -136,8 +136,8 @@ const rules = ref<FormRules>({
     name: [Rules.appName],
     params: [],
     containerName: [Rules.containerName],
-    cpuQuota: [checkNumberRange(0, 99999)],
-    memoryLimit: [checkNumberRange(0, 9999999999)],
+    cpuQuota: [Rules.requiredInput, checkNumberRange(0, 99999)],
+    memoryLimit: [Rules.requiredInput, checkNumberRange(0, 9999999999)],
 });
 const loading = ref(false);
 const paramForm = ref<FormInstance>();
@@ -188,6 +188,12 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         req.appDetailId = installData.value.appDetailId;
+        if (req.cpuQuota < 0) {
+            req.cpuQuota = 0;
+        }
+        if (req.memoryLimit < 0) {
+            req.memoryLimit = 0;
+        }
         loading.value = true;
         InstallApp(req)
             .then(() => {

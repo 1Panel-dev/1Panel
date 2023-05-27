@@ -161,7 +161,7 @@ const message = {
             paramUrlAndPort: '格式为 http(s)://(域名/ip):(端口)',
             nginxDoc: '仅支持英文大小写，数字，和.',
             appName: '支持英文、数字、-和_,长度2-30,并且不能以-_开头和结尾',
-            conatinerName: '支持字母、数字、下划线、连字符和点,不能以连字符-或点.结尾',
+            conatinerName: '支持字母、数字、下划线、连字符和点,不能以连字符-或点.结尾,长度1-127',
             disableFunction: '仅支持字母和,',
             leechExts: '件支持字母数字和,',
         },
