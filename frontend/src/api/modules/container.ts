@@ -148,8 +148,11 @@ export const loadDaemonJsonFile = () => {
 export const loadDockerStatus = () => {
     return http.get<string>(`/containers/docker/status`);
 };
-export const updateDaemonJson = (params: Container.DaemonJsonConf) => {
-    return http.post(`/containers/daemonjson/update`, params);
+export const updateDaemonJson = (key: string, value: string) => {
+    return http.post(`/containers/daemonjson/update`, { key: key, value: value }, 60000);
+};
+export const updateLogOption = (maxSize: string, maxFile: string) => {
+    return http.post(`/containers/logoption/update`, { maxSize: maxSize, maxFile: maxFile }, 60000);
 };
 export const updateDaemonJsonByfile = (params: Container.DaemonJsonUpdateByFile) => {
     return http.post(`/containers/daemonjson/update/byfile`, params);

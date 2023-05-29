@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -18,7 +19,8 @@ import (
 type DockerService struct{}
 
 type IDockerService interface {
-	UpdateConf(req dto.DaemonJsonConf) error
+	UpdateConf(req dto.SettingUpdate) error
+	UpdateLogOption(req dto.LogOption) error
 	UpdateConfByFile(info dto.DaemonJsonUpdateByFile) error
 	LoadDockerStatus() string
 	LoadDockerConf() *dto.DaemonJsonConf
@@ -95,6 +97,7 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 		return &data
 	}
 	if err := json.Unmarshal(arr, &conf); err != nil {
+		fmt.Println(err)
 		return &data
 	}
 	if _, ok := deamonMap["iptables"]; !ok {
@@ -116,7 +119,7 @@ func (u *DockerService) LoadDockerConf() *dto.DaemonJsonConf {
 	return &data
 }
 
-func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
+func (u *DockerService) UpdateConf(req dto.SettingUpdate) error {
 	if _, err := os.Stat(constant.DaemonJsonPath); err != nil && os.IsNotExist(err) {
 		if err = os.MkdirAll(path.Dir(constant.DaemonJsonPath), os.ModePerm); err != nil {
 			return err
@@ -131,45 +134,88 @@ func (u *DockerService) UpdateConf(req dto.DaemonJsonConf) error {
 	deamonMap := make(map[string]interface{})
 	_ = json.Unmarshal(file, &deamonMap)
 
-	if len(req.Registries) == 0 {
-		delete(deamonMap, "insecure-registries")
-	} else {
-		deamonMap["insecure-registries"] = req.Registries
-	}
-	if len(req.Mirrors) == 0 {
-		delete(deamonMap, "registry-mirrors")
-	} else {
-		deamonMap["registry-mirrors"] = req.Mirrors
-	}
-
-	changeLogOption(deamonMap, req.LogMaxFile, req.LogMaxSize)
-
-	if !req.LiveRestore {
-		delete(deamonMap, "live-restore")
-	} else {
-		deamonMap["live-restore"] = req.LiveRestore
-	}
-	if req.IPTables {
-		delete(deamonMap, "iptables")
-	} else {
-		deamonMap["iptables"] = false
-	}
-	if opts, ok := deamonMap["exec-opts"]; ok {
-		if optsValue, isArray := opts.([]interface{}); isArray {
-			for i := 0; i < len(optsValue); i++ {
-				if opt, isStr := optsValue[i].(string); isStr {
-					if strings.HasPrefix(opt, "native.cgroupdriver=") {
-						optsValue[i] = "native.cgroupdriver=" + req.CgroupDriver
-						break
+	switch req.Key {
+	case "Registries":
+		if len(req.Value) == 0 {
+			delete(deamonMap, "insecure-registries")
+		} else {
+			deamonMap["insecure-registries"] = strings.Split(req.Value, ",")
+		}
+	case "Mirrors":
+		if len(req.Value) == 0 {
+			delete(deamonMap, "registry-mirrors")
+		} else {
+			deamonMap["registry-mirrors"] = strings.Split(req.Value, ",")
+		}
+	case "LogOption":
+		if req.Value == "disable" {
+			delete(deamonMap, "log-opts")
+		}
+	case "LiveRestore":
+		if req.Value == "disable" {
+			delete(deamonMap, "live-restore")
+		} else {
+			deamonMap["live-restore"] = true
+		}
+	case "IPtables":
+		if req.Value == "enable" {
+			delete(deamonMap, "iptables")
+		} else {
+			deamonMap["iptables"] = false
+		}
+	case "Dirver":
+		if opts, ok := deamonMap["exec-opts"]; ok {
+			if optsValue, isArray := opts.([]interface{}); isArray {
+				for i := 0; i < len(optsValue); i++ {
+					if opt, isStr := optsValue[i].(string); isStr {
+						if strings.HasPrefix(opt, "native.cgroupdriver=") {
+							optsValue[i] = "native.cgroupdriver=" + req.Value
+							break
+						}
 					}
 				}
 			}
-		}
-	} else {
-		if req.CgroupDriver == "systemd" {
-			deamonMap["exec-opts"] = []string{"native.cgroupdriver=systemd"}
+		} else {
+			if req.Value == "systemd" {
+				deamonMap["exec-opts"] = []string{"native.cgroupdriver=systemd"}
+			}
 		}
 	}
+	if len(deamonMap) == 0 {
+		_ = os.Remove(constant.DaemonJsonPath)
+		return nil
+	}
+	newJson, err := json.MarshalIndent(deamonMap, "", "\t")
+	if err != nil {
+		return err
+	}
+	if err := os.WriteFile(constant.DaemonJsonPath, newJson, 0640); err != nil {
+		return err
+	}
+
+	stdout, err := cmd.Exec("systemctl restart docker")
+	if err != nil {
+		return errors.New(string(stdout))
+	}
+	return nil
+}
+
+func (u *DockerService) UpdateLogOption(req dto.LogOption) error {
+	if _, err := os.Stat(constant.DaemonJsonPath); err != nil && os.IsNotExist(err) {
+		if err = os.MkdirAll(path.Dir(constant.DaemonJsonPath), os.ModePerm); err != nil {
+			return err
+		}
+		_, _ = os.Create(constant.DaemonJsonPath)
+	}
+
+	file, err := os.ReadFile(constant.DaemonJsonPath)
+	if err != nil {
+		return err
+	}
+	deamonMap := make(map[string]interface{})
+	_ = json.Unmarshal(file, &deamonMap)
+
+	changeLogOption(deamonMap, req.LogMaxFile, req.LogMaxSize)
 	if len(deamonMap) == 0 {
 		_ = os.Remove(constant.DaemonJsonPath)
 		return nil

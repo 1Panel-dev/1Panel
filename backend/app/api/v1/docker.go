@@ -58,19 +58,43 @@ func (b *BaseApi) LoadDaemonJson(c *gin.Context) {
 // @Summary Update docker daemon.json
 // @Description 修改 docker 配置信息
 // @Accept json
-// @Param request body dto.DaemonJsonConf true "request"
+// @Param request body dto.SettingUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/daemonjson/update [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新 docker daemon.json 配置","formatEN":"Updated the docker daemon.json configuration"}
+// @x-panel-log {"bodyKeys":["key", "value"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新 docker daemon.json 配置 [key]=>[value]","formatEN":"Updated the docker daemon.json configuration [key]=>[value]"}
 func (b *BaseApi) UpdateDaemonJson(c *gin.Context) {
-	var req dto.DaemonJsonConf
+	var req dto.SettingUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
 
 	if err := dockerService.UpdateConf(req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+
+	helper.SuccessWithData(c, nil)
+}
+
+// @Tags Container Docker
+// @Summary Update docker daemon.json log option
+// @Description 修改 docker 日志配置
+// @Accept json
+// @Param request body dto.LogOption true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /containers/daemonjson/update [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFuntions":[],"formatZH":"更新 docker daemon.json 日志配置","formatEN":"Updated the docker daemon.json log option"}
+func (b *BaseApi) UpdateLogOption(c *gin.Context) {
+	var req dto.LogOption
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
+		return
+	}
+
+	if err := dockerService.UpdateLogOption(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
