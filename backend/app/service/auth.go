@@ -109,7 +109,7 @@ func (u *AuthService) generateSession(c *gin.Context, name, authMethod string) (
 	sessionUser, err := global.SESSION.Get(sID)
 	if err != nil {
 		sID = uuid.New().String()
-		c.SetCookie(constant.SessionName, sID, 604800, "", "", false, false)
+		c.SetCookie(constant.SessionName, sID, 0, "", "", false, false)
 		err := global.SESSION.Set(sID, sessionUser, lifeTime)
 		if err != nil {
 			return nil, err
