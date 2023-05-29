@@ -38,6 +38,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { updateSetting } from '@/api/modules/setting';
 import { ElMessageBox, FormInstance } from 'element-plus';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 

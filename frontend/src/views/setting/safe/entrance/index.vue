@@ -46,6 +46,7 @@ import { updateSetting } from '@/api/modules/setting';
 import { GlobalStore } from '@/store';
 import { getRandomStr } from '@/utils/util';
 import { FormInstance } from 'element-plus';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 const globalStore = GlobalStore();
 
 const emit = defineEmits<{ (e: 'search'): void }>();

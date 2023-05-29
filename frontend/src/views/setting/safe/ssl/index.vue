@@ -112,6 +112,7 @@ import { DownloadByPath } from '@/api/modules/files';
 import { Rules } from '@/global/form-rules';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Setting } from '@/api/interface/setting';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 

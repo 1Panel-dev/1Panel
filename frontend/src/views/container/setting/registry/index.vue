@@ -37,6 +37,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { updateDaemonJson } from '@/api/modules/container';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 

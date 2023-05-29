@@ -32,6 +32,7 @@ import { updatePort } from '@/api/modules/setting';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { GlobalStore } from '@/store';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 const globalStore = GlobalStore();
 
 interface DialogProps {

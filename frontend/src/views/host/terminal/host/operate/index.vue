@@ -93,6 +93,7 @@ import { ref, reactive, watch } from 'vue';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { addHost, editHost, testByInfo } from '@/api/modules/host';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import { GetGroupList } from '@/api/modules/group';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';

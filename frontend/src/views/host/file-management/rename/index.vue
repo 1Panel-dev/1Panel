@@ -39,6 +39,7 @@ import { reactive, ref } from 'vue';
 import { File } from '@/api/interface/file';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 interface RenameProps {
     path: string;

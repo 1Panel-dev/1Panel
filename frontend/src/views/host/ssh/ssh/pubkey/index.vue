@@ -67,6 +67,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { dateFormatForName, getRandomStr } from '@/utils/util';
 import useClipboard from 'vue-clipboard3';
 import { FormInstance } from 'element-plus';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import { reactive, ref } from 'vue';
 const { toClipboard } = useClipboard();
 

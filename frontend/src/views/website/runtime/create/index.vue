@@ -127,6 +127,7 @@ import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import Params from '../param/index.vue';
 import EditParams from '../edit/index.vue';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 interface OperateRrops {
     id?: number;

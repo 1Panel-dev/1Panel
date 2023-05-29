@@ -36,6 +36,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { updateSetting } from '@/api/modules/setting';
 import { ElMessageBox } from 'element-plus';
 import { checkIp } from '@/utils/util';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 

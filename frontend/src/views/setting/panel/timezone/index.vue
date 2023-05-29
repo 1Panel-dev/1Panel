@@ -69,6 +69,7 @@ import { ElMessageBox, FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import router from '@/routers';
 import { GlobalStore } from '@/store';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 const globalStore = GlobalStore();
 
 interface DialogProps {
