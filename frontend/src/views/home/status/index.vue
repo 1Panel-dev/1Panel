@@ -207,6 +207,7 @@ const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo):
     freshChart('cpu', 'CPU', formatNumber(currentInfo.value.cpuUsedPercent));
     freshChart('memory', i18n.global.t('monitor.memory'), formatNumber(currentInfo.value.MemoryUsedPercent));
     freshChart('load', i18n.global.t('home.load'), formatNumber(currentInfo.value.loadUsagePercent));
+    currentInfo.value.diskData = currentInfo.value.diskData || [];
     nextTick(() => {
         for (let i = 0; i < currentInfo.value.diskData.length; i++) {
             let itemPath = currentInfo.value.diskData[i].path;
