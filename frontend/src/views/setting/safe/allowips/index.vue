@@ -7,35 +7,13 @@
             <el-form label-position="top" @submit.prevent v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item>
-                            <table style="width: 100%" class="tab-table">
-                                <tr v-if="allowIPs.length !== 0">
-                                    <th scope="col" width="90%" align="left">
-                                        <label>{{ $t('setting.allowIPs') }}</label>
-                                    </th>
-                                    <th align="left"></th>
-                                </tr>
-                                <tr v-for="(row, index) in allowIPs" :key="index">
-                                    <td width="90%">
-                                        <el-input
-                                            :placeholder="$t('setting.allowIPEgs')"
-                                            style="width: 100%"
-                                            v-model="row.value"
-                                        />
-                                    </td>
-                                    <td>
-                                        <el-button link style="font-size: 10px" @click="handlePortsDelete(index)">
-                                            {{ $t('commons.button.delete') }}
-                                        </el-button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td align="left">
-                                        <el-button @click="handlePortsAdd()">{{ $t('commons.button.add') }}</el-button>
-                                    </td>
-                                </tr>
-                            </table>
-                            <span class="input-help">{{ $t('setting.allowIPsHelper1') }}</span>
+                        <el-form-item :label="$t('setting.allowIPs')">
+                            <el-input
+                                type="textarea"
+                                :placeholder="$t('setting.allowIPEgs')"
+                                :autosize="{ minRows: 8, maxRows: 10 }"
+                                v-model="allowIPs"
+                            />
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -69,40 +47,22 @@ const drawerVisiable = ref();
 const loading = ref();
 
 const acceptParams = (params: DialogProps): void => {
-    allowIPs.value = [];
-    if (params.allowIPs) {
-        for (const ip of params.allowIPs.split(',')) {
-            if (ip) {
-                allowIPs.value.push({ value: ip });
-            }
-        }
-    }
+    allowIPs.value = params.allowIPs;
     drawerVisiable.value = true;
 };
 
-const handlePortsAdd = () => {
-    let item = {
-        value: '',
-    };
-    allowIPs.value.push(item);
-};
-const handlePortsDelete = (index: number) => {
-    allowIPs.value.splice(index, 1);
-};
-
 const onSavePort = async () => {
-    let allows = '';
-    if (allowIPs.value.length !== 0) {
-        for (const ip of allowIPs.value) {
-            if (checkIp(ip.value)) {
-                MsgError(i18n.global.t('firewall.addressFormatError'));
-                return false;
+    if (allowIPs.value) {
+        let ips = allowIPs.value.split('\n');
+        for (const ip of ips) {
+            if (ip) {
+                if (checkIp(ip)) {
+                    MsgError(i18n.global.t('firewall.addressFormatError'));
+                    return false;
+                }
             }
-            allows += ip.value + ',';
         }
-        allows = allows.substring(0, allows.length - 1);
     }
-
     ElMessageBox.confirm(i18n.global.t('setting.allowIPsHelper'), i18n.global.t('setting.allowIPs'), {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
@@ -110,7 +70,7 @@ const onSavePort = async () => {
     }).then(async () => {
         loading.value = true;
 
-        await updateSetting({ key: 'AllowIPs', value: allows })
+        await updateSetting({ key: 'AllowIPs', value: allowIPs.value.replaceAll('\n', ',') })
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

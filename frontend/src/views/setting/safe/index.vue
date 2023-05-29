@@ -40,13 +40,18 @@
                             </el-form-item>
 
                             <el-form-item :label="$t('setting.allowIPs')">
-                                <el-input v-if="form.allowIPs" disabled v-model="form.allowIPs">
-                                    <template #append>
-                                        <el-button @click="onChangeAllowIPs" icon="Setting">
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
+                                <div style="width: 100%" v-if="form.allowIPs">
+                                    <el-input
+                                        type="textarea"
+                                        :autosize="{ minRows: 3, maxRows: 5 }"
+                                        disabled
+                                        v-model="form.allowIPs"
+                                        style="width: calc(100% - 80px)"
+                                    />
+                                    <el-button class="append-button" @click="onChangeAllowIPs" icon="Setting">
+                                        {{ $t('commons.button.set') }}
+                                    </el-button>
+                                </div>
                                 <el-input disabled v-if="!form.allowIPs" v-model="unset">
                                     <template #append>
                                         <el-button @click="onChangeAllowIPs" icon="Setting">
@@ -206,7 +211,7 @@ const search = async () => {
     form.expirationTime = res.data.expirationTime;
     form.complexityVerification = res.data.complexityVerification;
     form.mfaStatus = res.data.mfaStatus;
-    form.allowIPs = res.data.allowIPs || '';
+    form.allowIPs = res.data.allowIPs.replaceAll(',', '\n');
     form.bindDomain = res.data.bindDomain;
 };
 
@@ -311,3 +316,11 @@ onMounted(() => {
     getSystemAvailable();
 });
 </script>
+
+<style lang="scss" scoped>
+.append-button {
+    width: 80px;
+    background-color: var(--el-fill-color-light);
+    color: var(--el-color-info);
+}
+</style>
