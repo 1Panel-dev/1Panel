@@ -40,6 +40,7 @@ ErrMovePathFailed: "目标路径不能包含原路径！"
 ErrLinkPathNotFound: "目标路径不存在!"
 ErrFileIsExit: "文件已存在！"
 ErrFileUpload: "{{ .name }} 上传文件失败 {{ .detail}}"
+ErrFileDownloadDir: "不支持下载文件夹"
 
 #website
 ErrDomainIsExist: "域名已存在"

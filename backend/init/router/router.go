@@ -1,10 +1,9 @@
 package router
 
 import (
+	"github.com/gin-contrib/gzip"
 	"html/template"
 	"net/http"
-
-	"github.com/gin-contrib/gzip"
 
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/i18n"
@@ -18,22 +17,15 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func setWebStatic(rootRouter *gin.Engine) {
+func setWebStatic(rootRouter *gin.RouterGroup) {
 	rootRouter.StaticFS("/fav", http.FS(web.Favicon))
 	rootRouter.GET("/assets/*filepath", func(c *gin.Context) {
 		staticServer := http.FileServer(http.FS(web.Assets))
 		staticServer.ServeHTTP(c.Writer, c.Request)
 	})
-
 	rootRouter.GET("/", func(c *gin.Context) {
 		staticServer := http.FileServer(http.FS(web.IndexHtml))
 		staticServer.ServeHTTP(c.Writer, c.Request)
-	})
-	rootRouter.NoRoute(func(c *gin.Context) {
-		c.Writer.WriteHeader(http.StatusOK)
-		_, _ = c.Writer.Write(web.IndexByte)
-		c.Writer.Header().Add("Accept", "text/html")
-		c.Writer.Flush()
 	})
 }
 
@@ -45,8 +37,14 @@ func Routers() *gin.Engine {
 	if global.CONF.System.IsDemo {
 		Router.Use(middleware.DemoHandle())
 	}
-	Router.Use(gzip.Gzip(gzip.DefaultCompression))
-	setWebStatic(Router)
+
+	Router.NoRoute(func(c *gin.Context) {
+		c.Writer.WriteHeader(http.StatusOK)
+		_, _ = c.Writer.Write(web.IndexByte)
+		c.Writer.Header().Add("Accept", "text/html")
+		c.Writer.Flush()
+	})
+
 	Router.Use(i18n.GinI18nLocalize())
 	Router.SetFuncMap(template.FuncMap{
 		"Localize": ginI18n.GetMessage,
@@ -61,6 +59,8 @@ func Routers() *gin.Engine {
 		PublicGroup.GET("/health", func(c *gin.Context) {
 			c.JSON(200, "ok")
 		})
+		PublicGroup.Use(gzip.Gzip(gzip.DefaultCompression))
+		setWebStatic(PublicGroup)
 	}
 	PrivateGroup := Router.Group("/api/v1")
 	PrivateGroup.Use(middleware.WhiteAllow())

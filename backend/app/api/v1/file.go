@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -454,17 +455,98 @@ func (b *BaseApi) MoveFile(c *gin.Context) {
 // @Router /files/download [post]
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"下载文件 [name]","formatEN":"Download file [name]"}
 func (b *BaseApi) Download(c *gin.Context) {
-	var req request.FileDownload
+	filePath := c.Query("path")
+
+	file, err := os.Open(filePath)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+	}
+
+	info, _ := file.Stat()
+
+	c.Header("Content-Length", strconv.FormatInt(info.Size(), 10))
+	c.Header("Content-Disposition", "attachment; filename*=utf-8''"+url.PathEscape(info.Name()))
+
+	http.ServeContent(c.Writer, c.Request, info.Name(), info.ModTime(), file)
+	return
+}
+
+// @Tags File
+// @Summary Chunk Download file
+// @Description 分片下载下载文件
+// @Accept json
+// @Param request body request.FileDownload true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Router /files/chunkdownload [post]
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"下载文件 [name]","formatEN":"Download file [name]"}
+func (b *BaseApi) DownloadChunkFiles(c *gin.Context) {
+	var req request.FileChunkDownload
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	filePath, err := fileService.FileDownload(req)
+	fileOp := files.NewFileOp()
+	if !fileOp.Stat(req.Path) {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrPathNotFound, nil)
+		return
+	}
+	filePath := req.Path
+	fstFile, err := fileOp.OpenFile(filePath)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}
-	c.File(filePath)
+	info, err := fstFile.Stat()
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	if info.IsDir() {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrFileDownloadDir, err)
+		return
+	}
+
+	c.Writer.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", req.Name))
+	c.Writer.Header().Set("Content-Type", "application/octet-stream")
+	c.Writer.Header().Set("Content-Length", strconv.FormatInt(info.Size(), 10))
+	c.Writer.Header().Set("Accept-Ranges", "bytes")
+
+	if c.Request.Header.Get("Range") != "" {
+		rangeHeader := c.Request.Header.Get("Range")
+		rangeArr := strings.Split(rangeHeader, "=")[1]
+		rangeParts := strings.Split(rangeArr, "-")
+
+		startPos, _ := strconv.ParseInt(rangeParts[0], 10, 64)
+
+		var endPos int64
+		if rangeParts[1] == "" {
+			endPos = info.Size() - 1
+		} else {
+			endPos, _ = strconv.ParseInt(rangeParts[1], 10, 64)
+		}
+
+		c.Writer.Header().Set("Content-Range", fmt.Sprintf("bytes %d-%d/%d", startPos, endPos, info.Size()))
+		c.Writer.WriteHeader(http.StatusPartialContent)
+
+		buffer := make([]byte, 1024*1024)
+		file, err := os.Open(filePath)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+		defer file.Close()
+
+		file.Seek(startPos, 0)
+		reader := io.LimitReader(file, endPos-startPos+1)
+		_, err = io.CopyBuffer(c.Writer, reader, buffer)
+		if err != nil {
+			helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+			return
+		}
+	} else {
+		c.File(filePath)
+	}
 }
 
 // @Tags File
