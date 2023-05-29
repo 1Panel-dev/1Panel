@@ -46,21 +46,15 @@
                     <el-col :span="10">
                         <el-form :model="form" label-position="left" :rules="rules" ref="formRef" label-width="150px">
                             <el-form-item :label="$t('container.mirrors')" prop="mirrors">
-                                <div style="width: 100%">
+                                <div style="width: 100%" v-if="form.mirrors">
                                     <el-input
                                         type="textarea"
                                         :autosize="{ minRows: 3, maxRows: 5 }"
                                         disabled
-                                        v-if="form.mirrors"
                                         v-model="form.mirrors"
                                         style="width: calc(100% - 80px)"
                                     />
-                                    <el-button
-                                        v-if="form.mirrors"
-                                        style="width: 80px"
-                                        @click="onChangeMirrors"
-                                        icon="Setting"
-                                    >
+                                    <el-button class="append-button" @click="onChangeMirrors" icon="Setting">
                                         {{ $t('commons.button.set') }}
                                     </el-button>
                                 </div>
@@ -85,21 +79,15 @@
                                 </span>
                             </el-form-item>
                             <el-form-item :label="$t('container.registries')" prop="registries">
-                                <div style="width: 100%">
+                                <div style="width: 100%" v-if="form.registries">
                                     <el-input
-                                        v-if="form.registries"
                                         type="textarea"
                                         :autosize="{ minRows: 3, maxRows: 5 }"
                                         disabled
                                         v-model="form.registries"
                                         style="width: calc(100% - 80px)"
                                     />
-                                    <el-button
-                                        v-if="form.mirrors"
-                                        style="width: 80px"
-                                        @click="onChangeRegistries"
-                                        icon="Setting"
-                                    >
+                                    <el-button class="append-button" @click="onChangeRegistries" icon="Setting">
                                         {{ $t('commons.button.set') }}
                                     </el-button>
                                 </div>
@@ -464,5 +452,11 @@ onMounted(() => {
 }
 body {
     margin: 0;
+}
+
+.append-button {
+    width: 80px;
+    background-color: var(--el-fill-color-light);
+    color: var(--el-color-info);
 }
 </style>
