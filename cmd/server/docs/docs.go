@@ -1241,14 +1241,14 @@ var doc = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "修改 docker 配置信息",
+                "description": "修改 docker 日志配置",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Container Docker"
                 ],
-                "summary": "Update docker daemon.json",
+                "summary": "Update docker daemon.json log option",
                 "parameters": [
                     {
                         "description": "request",
@@ -1256,7 +1256,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.DaemonJsonConf"
+                            "$ref": "#/definitions/dto.LogOption"
                         }
                     }
                 ],
@@ -1268,8 +1268,8 @@ var doc = `{
                 "x-panel-log": {
                     "BeforeFuntions": [],
                     "bodyKeys": [],
-                    "formatEN": "Updated the docker daemon.json configuration",
-                    "formatZH": "更新 docker daemon.json 配置",
+                    "formatEN": "Updated the docker daemon.json log option",
+                    "formatZH": "更新 docker daemon.json 日志配置",
                     "paramKeys": []
                 }
             }
@@ -9040,6 +9040,72 @@ var doc = `{
                 }
             }
         },
+        "/websites/leech": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "获取防盗链配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website"
+                ],
+                "summary": "Get AntiLeech conf",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.NginxCommonReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/websites/leech/update": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "更新防盗链配置",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Website"
+                ],
+                "summary": "Update AntiLeech",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.NginxAntiLeechUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/websites/list": {
             "get": {
                 "security": [
@@ -10691,6 +10757,9 @@ var doc = `{
                 "script": {
                     "type": "string"
                 },
+                "second": {
+                    "type": "integer"
+                },
                 "sourceDir": {
                     "type": "string"
                 },
@@ -10769,6 +10838,9 @@ var doc = `{
                 },
                 "script": {
                     "type": "string"
+                },
+                "second": {
+                    "type": "integer"
                 },
                 "sourceDir": {
                     "type": "string"
@@ -11527,6 +11599,17 @@ var doc = `{
                     "type": "string"
                 },
                 "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.LogOption": {
+            "type": "object",
+            "properties": {
+                "logMaxFile": {
+                    "type": "string"
+                },
+                "logMaxSize": {
                     "type": "string"
                 }
             }
@@ -12499,6 +12582,9 @@ var doc = `{
                     "type": "string"
                 },
                 "mfaStatus": {
+                    "type": "string"
+                },
+                "monitorInterval": {
                     "type": "string"
                 },
                 "monitorStatus": {
@@ -13634,6 +13720,53 @@ var doc = `{
                 }
             }
         },
+        "request.NginxAntiLeechUpdate": {
+            "type": "object",
+            "required": [
+                "enable",
+                "extends",
+                "return",
+                "websiteID"
+            ],
+            "properties": {
+                "blocked": {
+                    "type": "boolean"
+                },
+                "cache": {
+                    "type": "boolean"
+                },
+                "cacheTime": {
+                    "type": "integer"
+                },
+                "cacheUint": {
+                    "type": "string"
+                },
+                "enable": {
+                    "type": "boolean"
+                },
+                "extends": {
+                    "type": "string"
+                },
+                "logEnable": {
+                    "type": "boolean"
+                },
+                "noneRef": {
+                    "type": "boolean"
+                },
+                "return": {
+                    "type": "string"
+                },
+                "serverNames": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "websiteID": {
+                    "type": "integer"
+                }
+            }
+        },
         "request.NginxAuthReq": {
             "type": "object",
             "required": [
@@ -13666,6 +13799,17 @@ var doc = `{
                 "username": {
                     "type": "string"
                 },
+                "websiteID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request.NginxCommonReq": {
+            "type": "object",
+            "required": [
+                "websiteID"
+            ],
+            "properties": {
                 "websiteID": {
                     "type": "integer"
                 }
@@ -14198,9 +14342,15 @@ var doc = `{
             "type": "object",
             "required": [
                 "id",
-                "params"
+                "scope"
             ],
             "properties": {
+                "disableFunctions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -14209,6 +14359,12 @@ var doc = `{
                     "additionalProperties": {
                         "type": "string"
                     }
+                },
+                "scope": {
+                    "type": "string"
+                },
+                "uploadMaxSize": {
+                    "type": "string"
                 }
             }
         },
@@ -14806,11 +14962,20 @@ var doc = `{
         "response.PHPConfig": {
             "type": "object",
             "properties": {
+                "disableFunctions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
                 "params": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"
                     }
+                },
+                "uploadMaxSize": {
+                    "type": "string"
                 }
             }
         },

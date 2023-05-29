@@ -10,7 +10,7 @@
                         <el-input clearable v-model.trim="form.name" />
                     </el-form-item>
                     <el-form-item :label="$t('container.image')" prop="image">
-                        <el-select style="width: 100%" allow-create filterable v-model="form.image">
+                        <el-select class="widthClass" allow-create filterable v-model="form.image">
                             <el-option
                                 v-for="(item, index) of images"
                                 :key="index"
@@ -26,7 +26,7 @@
                         </el-radio-group>
                     </el-form-item>
                     <el-form-item v-if="!form.publishAllPorts">
-                        <el-card style="width: 100%">
+                        <el-card class="widthClass">
                             <table style="width: 100%" class="tab-table">
                                 <tr v-if="form.exposedPorts.length !== 0">
                                     <th scope="col" width="45%" align="left">
@@ -107,21 +107,21 @@
                         <el-card style="width: 100%">
                             <table style="width: 100%" class="tab-table">
                                 <tr v-if="form.volumes.length !== 0">
-                                    <th scope="col" width="42%" align="left">
+                                    <th scope="col" width="39%" align="left">
                                         <label>{{ $t('container.serverPath') }}</label>
                                     </th>
-                                    <th scope="col" width="12%" align="left">
+                                    <th scope="col" width="18%" align="left">
                                         <label>{{ $t('container.mode') }}</label>
                                     </th>
-                                    <th scope="col" width="42%" align="left">
+                                    <th scope="col" width="39%" align="left">
                                         <label>{{ $t('container.containerDir') }}</label>
                                     </th>
                                     <th align="left"></th>
                                 </tr>
                                 <tr v-for="(row, index) in form.volumes" :key="index">
-                                    <td width="42%">
+                                    <td width="39%">
                                         <el-select
-                                            style="width: 100%"
+                                            class="widthClass"
                                             allow-create
                                             clearable
                                             :placeholder="$t('commons.msg.inputOrSelect')"
@@ -136,13 +136,13 @@
                                             />
                                         </el-select>
                                     </td>
-                                    <td width="12%">
-                                        <el-select style="width: 100%" filterable v-model="row.mode">
+                                    <td width="18%">
+                                        <el-select class="widthClass" filterable v-model="row.mode">
                                             <el-option value="rw" :label="$t('container.modeRW')" />
                                             <el-option value="ro" :label="$t('container.modeR')" />
                                         </el-select>
                                     </td>
-                                    <td width="42%">
+                                    <td width="39%">
                                         <el-input v-model="row.containerDir" />
                                     </td>
                                     <td>
@@ -416,3 +416,9 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style lang="scss" scoped>
+.widthClass {
+    width: 100%;
+}
+</style>

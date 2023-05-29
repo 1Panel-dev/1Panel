@@ -400,6 +400,8 @@ definitions:
         type: integer
       script:
         type: string
+      second:
+        type: integer
       sourceDir:
         type: string
       specType:
@@ -454,6 +456,8 @@ definitions:
         type: integer
       script:
         type: string
+      second:
+        type: integer
       sourceDir:
         type: string
       specType:
@@ -967,6 +971,13 @@ definitions:
       id:
         type: string
       type:
+        type: string
+    type: object
+  dto.LogOption:
+    properties:
+      logMaxFile:
+        type: string
+      logMaxSize:
         type: string
     type: object
   dto.Login:
@@ -1613,6 +1624,8 @@ definitions:
       mfaSecret:
         type: string
       mfaStatus:
+        type: string
+      monitorInterval:
         type: string
       monitorStatus:
         type: string
@@ -2367,6 +2380,38 @@ definitions:
         additionalProperties: true
         type: object
     type: object
+  request.NginxAntiLeechUpdate:
+    properties:
+      blocked:
+        type: boolean
+      cache:
+        type: boolean
+      cacheTime:
+        type: integer
+      cacheUint:
+        type: string
+      enable:
+        type: boolean
+      extends:
+        type: string
+      logEnable:
+        type: boolean
+      noneRef:
+        type: boolean
+      return:
+        type: string
+      serverNames:
+        items:
+          type: string
+        type: array
+      websiteID:
+        type: integer
+    required:
+    - enable
+    - extends
+    - return
+    - websiteID
+    type: object
   request.NginxAuthReq:
     properties:
       websiteID:
@@ -2390,6 +2435,13 @@ definitions:
     - operate
     - password
     - username
+    - websiteID
+    type: object
+  request.NginxCommonReq:
+    properties:
+      websiteID:
+        type: integer
+    required:
     - websiteID
     type: object
   request.NginxConfigFileUpdate:
@@ -2745,15 +2797,23 @@ definitions:
     type: object
   request.WebsitePHPConfigUpdate:
     properties:
+      disableFunctions:
+        items:
+          type: string
+        type: array
       id:
         type: integer
       params:
         additionalProperties:
           type: string
         type: object
+      scope:
+        type: string
+      uploadMaxSize:
+        type: string
     required:
     - id
-    - params
+    - scope
     type: object
   request.WebsitePHPFileUpdate:
     properties:
@@ -3154,10 +3214,16 @@ definitions:
     type: object
   response.PHPConfig:
     properties:
+      disableFunctions:
+        items:
+          type: string
+        type: array
       params:
         additionalProperties:
           type: string
         type: object
+      uploadMaxSize:
+        type: string
     type: object
   response.WebsiteAcmeAccountDTO:
     properties:
@@ -4058,27 +4124,27 @@ paths:
     post:
       consumes:
       - application/json
-      description: 修改 docker 配置信息
+      description: 修改 docker 日志配置
       parameters:
       - description: request
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.DaemonJsonConf'
+          $ref: '#/definitions/dto.LogOption'
       responses:
         "200":
           description: ""
       security:
       - ApiKeyAuth: []
-      summary: Update docker daemon.json
+      summary: Update docker daemon.json log option
       tags:
       - Container Docker
       x-panel-log:
         BeforeFuntions: []
         bodyKeys: []
-        formatEN: Updated the docker daemon.json configuration
-        formatZH: 更新 docker daemon.json 配置
+        formatEN: Updated the docker daemon.json log option
+        formatZH: 更新 docker daemon.json 日志配置
         paramKeys: []
   /containers/daemonjson/update/byfile:
     post:
@@ -9016,6 +9082,46 @@ paths:
         formatEN: Delete domain [domain]
         formatZH: 删除域名 [domain]
         paramKeys: []
+  /websites/leech:
+    post:
+      consumes:
+      - application/json
+      description: 获取防盗链配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.NginxCommonReq'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Get AntiLeech conf
+      tags:
+      - Website
+  /websites/leech/update:
+    post:
+      consumes:
+      - application/json
+      description: 更新防盗链配置
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.NginxAntiLeechUpdate'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Update AntiLeech
+      tags:
+      - Website
   /websites/list:
     get:
       description: 获取网站列表

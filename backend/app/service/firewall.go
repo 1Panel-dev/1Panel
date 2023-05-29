@@ -379,7 +379,7 @@ func (u *FirewallService) pingStatus() string {
 	return constant.StatusDisable
 }
 
-func (u *FirewallService) updatePingStatus(enabel string) error {
+func (u *FirewallService) updatePingStatus(enable string) error {
 	lineBytes, err := os.ReadFile(confPath)
 	if err != nil {
 		return err
@@ -389,14 +389,14 @@ func (u *FirewallService) updatePingStatus(enabel string) error {
 	hasLine := false
 	for _, line := range files {
 		if strings.Contains(line, "net/ipv4/icmp_echo_ignore_all") || strings.HasPrefix(line, "net/ipv4/icmp_echo_ignore_all") {
-			newFiles = append(newFiles, "net/ipv4/icmp_echo_ignore_all="+enabel)
+			newFiles = append(newFiles, "net/ipv4/icmp_echo_ignore_all="+enable)
 			hasLine = true
 		} else {
 			newFiles = append(newFiles, line)
 		}
 	}
 	if !hasLine {
-		newFiles = append(newFiles, "net/ipv4/icmp_echo_ignore_all="+enabel)
+		newFiles = append(newFiles, "net/ipv4/icmp_echo_ignore_all="+enable)
 	}
 	file, err := os.OpenFile(confPath, os.O_WRONLY|os.O_TRUNC, 0666)
 	if err != nil {
