@@ -67,9 +67,6 @@
                     <el-button plain @click="openCompress(selects)" :disabled="selects.length === 0">
                         {{ $t('file.compress') }}
                     </el-button>
-                    <el-button plain @click="openDownload" :disabled="selects.length === 0">
-                        {{ $t('file.download') }}
-                    </el-button>
                     <el-button plain @click="batchDelFiles" :disabled="selects.length === 0">
                         {{ $t('commons.button.delete') }}
                     </el-button>
@@ -156,7 +153,7 @@
                         show-overflow-tooltip
                     ></el-table-column>
                     <fu-table-operations
-                        :ellipsis="2"
+                        :ellipsis="3"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
                         min-width="200"
@@ -185,7 +182,7 @@
 
 <script setup lang="ts">
 import { nextTick, onMounted, reactive, ref } from '@vue/runtime-core';
-import { GetFilesList, DeleteFile, GetFileContent, ComputeDirSize, DownloadFile } from '@/api/modules/files';
+import { GetFilesList, DeleteFile, GetFileContent, ComputeDirSize } from '@/api/modules/files';
 import { computeSize, dateFormat, getIcon, getRandomStr } from '@/utils/util';
 import { File } from '@/api/interface/file';
 import { useDeleteData } from '@/hooks/use-delete-data';
@@ -210,6 +207,8 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { useSearchable } from './hooks/searchable';
 import { ResultData } from '@/api/interface';
+// import streamSaver from 'streamsaver';
+// import axios from 'axios';
 
 interface FilePaths {
     url: string;
@@ -245,8 +244,8 @@ const fileUpload = reactive({ path: '' });
 const fileRename = reactive({ path: '', oldName: '' });
 const fileWget = reactive({ path: '' });
 const fileMove = reactive({ oldPaths: [''], type: '', path: '' });
-const fileDownload = reactive({ paths: [''], name: '' });
 const processPage = reactive({ open: false });
+// const fileDownload = reactive({ path: '', name: '' });
 
 const createRef = ref();
 const roleRef = ref();
@@ -573,32 +572,9 @@ const openPaste = () => {
     moveRef.value.acceptParams(fileMove);
 };
 
-const openDownload = () => {
-    const paths = [];
-    for (const s of selects.value) {
-        paths.push(s['path']);
-    }
-    fileDownload.paths = paths;
-    if (selects.value.length > 1 || selects.value[0].isDir) {
-        fileDownload.name = selects.value.length > 1 ? getRandomStr(6) : selects.value[0].name;
-        downloadRef.value.acceptParams(fileDownload);
-    } else {
-        loading.value = true;
-        fileDownload.name = selects.value[0].name;
-        DownloadFile(fileDownload as File.FileDownload)
-            .then((res) => {
-                const downloadUrl = window.URL.createObjectURL(new Blob([res], { type: 'application/octet-stream' }));
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = downloadUrl;
-                a.download = fileDownload.name;
-                const event = new MouseEvent('click');
-                a.dispatchEvent(event);
-            })
-            .finally(() => {
-                loading.value = false;
-            });
-    }
+const openDownload = (file: File.File) => {
+    let url = `${import.meta.env.VITE_API_URL as string}/files/download?`;
+    window.open(url + 'path=' + file.path, '_blank');
 };
 
 const openDetail = (row: File.File) => {
@@ -609,6 +585,15 @@ const buttons = [
     {
         label: i18n.global.t('file.open'),
         click: open,
+    },
+    {
+        label: i18n.global.t('file.download'),
+        click: (row: File.File) => {
+            openDownload(row);
+        },
+        disabled: (row: File.File) => {
+            return row.isDir;
+        },
     },
     {
         label: i18n.global.t('file.deCompress'),

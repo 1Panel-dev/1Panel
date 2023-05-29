@@ -40,6 +40,7 @@ ErrMovePathFailed: "The target path cannot contain the original path!"
 ErrLinkPathNotFound: "Target path does not exist!"
 ErrFileIsExit: "File already exists!"
 ErrFileUpload: "Failed to upload file {{.name}}  {{.detail}}"
+ErrFileDownloadDir: "Download folder not supported"
 
 #website
 ErrDomainIsExist: "Domain is already exist"

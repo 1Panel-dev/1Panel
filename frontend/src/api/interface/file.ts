@@ -125,6 +125,11 @@ export namespace File {
         url: string;
     }
 
+    export interface FileChunkDownload {
+        name: string;
+        path: string;
+    }
+
     export interface DirSizeReq {
         path: string;
     }
