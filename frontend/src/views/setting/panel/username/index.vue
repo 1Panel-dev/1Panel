@@ -33,6 +33,7 @@ import { ElMessageBox, FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { logOutApi } from '@/api/modules/auth';
 import router from '@/routers';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import { GlobalStore } from '@/store';
 const globalStore = GlobalStore();
 

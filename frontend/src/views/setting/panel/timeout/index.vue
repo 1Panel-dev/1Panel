@@ -37,6 +37,7 @@ import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import { updateSetting } from '@/api/modules/setting';
 
 const emit = defineEmits<{ (e: 'search'): void }>();

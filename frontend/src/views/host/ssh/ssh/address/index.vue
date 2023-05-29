@@ -41,6 +41,7 @@ import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { updateSSH } from '@/api/modules/host';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 

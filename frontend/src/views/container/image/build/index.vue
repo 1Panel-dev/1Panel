@@ -96,6 +96,7 @@ import { ElForm, ElMessage } from 'element-plus';
 import { imageBuild } from '@/api/modules/container';
 import { LoadFile } from '@/api/modules/files';
 import { formatImageStdout } from '@/utils/docker';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 
 const logVisiable = ref<boolean>(false);
 const logInfo = ref();

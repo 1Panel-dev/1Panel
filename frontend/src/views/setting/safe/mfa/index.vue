@@ -69,6 +69,7 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 import useClipboard from 'vue-clipboard3';
 const { toClipboard } = useClipboard();
 

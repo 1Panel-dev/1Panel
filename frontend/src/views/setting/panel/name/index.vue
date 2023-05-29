@@ -32,6 +32,7 @@ import { updateSetting } from '@/api/modules/setting';
 import { FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { GlobalStore } from '@/store';
+import DrawerHeader from '@/components/drawer-header/index.vue';
 const globalStore = GlobalStore();
 const themeConfig = computed(() => globalStore.themeConfig);
 
