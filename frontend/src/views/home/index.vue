@@ -357,7 +357,6 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     statuRef.value.acceptParams(currentInfo.value, baseInfo.value);
     appRef.value.acceptParams();
     if (isInit) {
-        // window.addEventListener('resize', changeChartSize);
         timer = setInterval(async () => {
             onLoadCurrentInfo();
         }, 3000);
