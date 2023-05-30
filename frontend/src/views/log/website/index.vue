@@ -4,14 +4,22 @@
             <template #toolbar>
                 <el-row>
                     <el-col :span="16">
-                        <el-radio-group v-model="logReq.logType" @change="search()">
-                            <el-radio-button :label="'access.log'">
-                                {{ $t('logs.runLog') }}
-                            </el-radio-button>
-                            <el-radio-button :label="'error.log'" style="margin-left: 10px">
-                                {{ $t('logs.errLog') }}
-                            </el-radio-button>
-                        </el-radio-group>
+                        <el-button
+                            class="tag-button"
+                            :label="'access.log'"
+                            :type="logReq.logType === 'access.log' ? 'primary' : ''"
+                            @click="changeType('access.log')"
+                        >
+                            {{ $t('logs.runLog') }}
+                        </el-button>
+                        <el-button
+                            class="tag-button"
+                            :label="'error.log'"
+                            :type="logReq.logType === 'error.log' ? 'primary' : ''"
+                            @click="changeType('error.log')"
+                        >
+                            {{ $t('logs.errLog') }}
+                        </el-button>
                     </el-col>
                 </el-row>
             </template>
@@ -72,7 +80,7 @@ const extensions = [javascript(), oneDark];
 const loading = ref(false);
 const websites = ref();
 const logReq = reactive({
-    id: 0,
+    id: undefined,
     operate: 'get',
     logType: 'access.log',
 });
@@ -100,6 +108,13 @@ const getWebsites = async () => {
 const view = shallowRef();
 const handleReady = (payload) => {
     view.value = payload.view;
+};
+
+const changeType = (type: string) => {
+    logReq.logType = type;
+    if (logReq.id != undefined) {
+        search();
+    }
 };
 
 const search = () => {

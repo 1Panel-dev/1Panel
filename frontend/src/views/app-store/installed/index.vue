@@ -49,12 +49,6 @@
         </template>
 
         <template #main>
-            <div class="update-prompt" v-if="data == null">
-                <span>{{ mode === 'upgrade' ? $t('app.updatePrompt') : $t('app.installPrompt') }}</span>
-                <div>
-                    <img src="@/assets/images/no_update_app.svg" />
-                </div>
-            </div>
             <el-alert type="info" :closable="false" v-if="mode === 'installed'">
                 <template #default>
                     <span>
@@ -70,6 +64,12 @@
                     </span>
                 </template>
             </el-alert>
+            <div class="update-prompt" v-if="data == null">
+                <span>{{ mode === 'upgrade' ? $t('app.updatePrompt') : $t('app.installPrompt') }}</span>
+                <div>
+                    <img src="@/assets/images/no_update_app.svg" />
+                </div>
+            </div>
             <el-row :gutter="5">
                 <el-col
                     v-for="(installed, index) in data"
