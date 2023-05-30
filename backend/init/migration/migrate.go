@@ -30,6 +30,7 @@ func Init() {
 		migrations.UpdateTableAppDetail,
 		migrations.AddBindAndAllowIPs,
 		migrations.UpdateCronjobWithSecond,
+		migrations.UpdateWebsite,
 	})
 	if err := m.Migrate(); err != nil {
 		global.LOG.Error(err)

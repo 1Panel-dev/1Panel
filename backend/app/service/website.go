@@ -176,6 +176,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		SiteDir:        "/",
 		AccessLog:      true,
 		ErrorLog:       true,
+		IPV6:           create.IPV6,
 	}
 
 	var (
@@ -340,6 +341,8 @@ func (w WebsiteService) UpdateWebsite(req request.WebsiteUpdate) error {
 	website.PrimaryDomain = req.PrimaryDomain
 	website.WebsiteGroupID = req.WebsiteGroupID
 	website.Remark = req.Remark
+	website.IPV6 = req.IPV6
+
 	if req.ExpireDate != "" {
 		expireDate, err := time.Parse(constant.DateLayout, req.ExpireDate)
 		if err != nil {

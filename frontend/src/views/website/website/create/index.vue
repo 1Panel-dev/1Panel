@@ -252,6 +252,9 @@
                             :placeholder="$t('website.domainHelper')"
                         ></el-input>
                     </el-form-item>
+                    <el-form-item prop="IPV6">
+                        <el-checkbox v-model="website.IPV6" :label="$t('website.ipv6')" size="large" />
+                    </el-form-item>
                     <el-form-item :label="$t('website.alias')" prop="alias">
                         <el-input v-model.trim="website.alias" :placeholder="$t('website.aliasHelper')"></el-input>
                         <div>
@@ -338,6 +341,7 @@ const website = ref({
         containerName: '',
         allowPort: false,
     },
+    IPV6: false,
     proxyType: 'tcp',
     port: 9000,
 });

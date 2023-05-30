@@ -367,3 +367,13 @@ var UpdateCronjobWithSecond = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var UpdateWebsite = &gormigrate.Migration{
+	ID: "20200530-update-table-website",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.Website{}); err != nil {
+			return err
+		}
+		return nil
+	},
+}

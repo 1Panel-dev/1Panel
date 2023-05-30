@@ -1391,6 +1391,7 @@ const message = {
         disable: 'not enabled',
         disableLeechHelper: 'Whether to disable the anti-leech',
         disableLeech: 'Disable anti-leech',
+        ipv6: 'Listen IPV6',
     },
     php: {
         short_open_tag: 'Short tag support',
