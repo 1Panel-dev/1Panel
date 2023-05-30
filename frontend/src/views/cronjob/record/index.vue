@@ -385,7 +385,7 @@ const shortcuts = [
         },
     },
     {
-        text: i18n.global.t('monitor.yestoday'),
+        text: i18n.global.t('monitor.yesterday'),
         value: () => {
             const itemDate = new Date(new Date().getTime() - 3600 * 1000 * 24 * 1);
             const end = new Date(itemDate.setHours(23, 59, 59, 999));

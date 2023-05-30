@@ -67,7 +67,7 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, global.CONF.System.Mode, itemVersion, itemVersion))
 
 	if err != nil {
-		return nil, fmt.Errorf("load relase-notes of version %s failed, err: %v", latestVersion, err)
+		return nil, fmt.Errorf("load releases-notes of version %s failed, err: %v", latestVersion, err)
 	}
 	upgrade.ReleaseNote = notes
 	return &upgrade, nil
@@ -76,7 +76,7 @@ func (u *UpgradeService) SearchUpgrade() (*dto.UpgradeInfo, error) {
 func (u *UpgradeService) LoadNotes(req dto.Upgrade) (string, error) {
 	notes, err := u.loadReleaseNotes(fmt.Sprintf("%s/%s/%s/release/1panel-%s-release-notes", global.CONF.System.RepoUrl, global.CONF.System.Mode, req.Version, req.Version))
 	if err != nil {
-		return "", fmt.Errorf("load relase-notes of version %s failed, err: %v", req.Version, err)
+		return "", fmt.Errorf("load releases-notes of version %s failed, err: %v", req.Version, err)
 	}
 	return notes, nil
 }

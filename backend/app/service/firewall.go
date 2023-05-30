@@ -27,7 +27,7 @@ type IFirewallService interface {
 	OperateAddressRule(req dto.AddrRuleOperate, reload bool) error
 	UpdatePortRule(req dto.PortRuleUpdate) error
 	UpdateAddrRule(req dto.AddrRuleUpdate) error
-	BacthOperateRule(req dto.BatchRuleOperate) error
+	BatchOperateRule(req dto.BatchRuleOperate) error
 }
 
 func NewIFirewallService() IFirewallService {
@@ -276,7 +276,7 @@ func (u *FirewallService) UpdateAddrRule(req dto.AddrRuleUpdate) error {
 	return client.Reload()
 }
 
-func (u *FirewallService) BacthOperateRule(req dto.BatchRuleOperate) error {
+func (u *FirewallService) BatchOperateRule(req dto.BatchRuleOperate) error {
 	client, err := firewall.NewFirewallClient()
 	if err != nil {
 		return err
@@ -368,11 +368,9 @@ func (u *FirewallService) pingStatus() string {
 	if _, err := os.Stat("/etc/sysctl.conf"); err != nil {
 		return constant.StatusNone
 	}
-	commond := "cat /etc/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= "
-	if cmd.HasNoPasswordSudo() {
-		commond = "sudo cat /etc/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= "
-	}
-	stdout, _ := cmd.Exec(commond)
+	sudo := cmd.SudoHandleCmd()
+	command := fmt.Sprintf("%s cat /etc/sysctl.conf | grep net/ipv4/icmp_echo_ignore_all= ", sudo)
+	stdout, _ := cmd.Exec(command)
 	if stdout == "net/ipv4/icmp_echo_ignore_all=1\n" {
 		return constant.StatusEnable
 	}
@@ -408,11 +406,9 @@ func (u *FirewallService) updatePingStatus(enable string) error {
 		return err
 	}
 
-	commond := "sysctl -p"
-	if cmd.HasNoPasswordSudo() {
-		commond = "sudo sysctl -p"
-	}
-	stdout, err := cmd.Exec(commond)
+	sudo := cmd.SudoHandleCmd()
+	command := fmt.Sprintf("%s sysctl -p", sudo)
+	stdout, err := cmd.Exec(command)
 	if err != nil {
 		return fmt.Errorf("update ping status failed, err: %v", stdout)
 	}

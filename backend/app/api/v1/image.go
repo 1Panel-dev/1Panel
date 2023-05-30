@@ -93,7 +93,7 @@ func (b *BaseApi) ImageBuild(c *gin.Context) {
 // @Success 200 {string} log
 // @Security ApiKeyAuth
 // @Router /containers/image/pull [post]
-// @x-panel-log {"bodyKeys":["repoID","imageName"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"repoID","isList":false,"db":"image_repos","output_colume":"name","output_value":"reponame"}],"formatZH":"镜像拉取 [reponame][imageName]","formatEN":"image pull [reponame][imageName]"}
+// @x-panel-log {"bodyKeys":["repoID","imageName"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"repoID","isList":false,"db":"image_repos","output_column":"name","output_value":"reponame"}],"formatZH":"镜像拉取 [reponame][imageName]","formatEN":"image pull [reponame][imageName]"}
 func (b *BaseApi) ImagePull(c *gin.Context) {
 	var req dto.ImagePull
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -122,7 +122,7 @@ func (b *BaseApi) ImagePull(c *gin.Context) {
 // @Success 200 {string} log
 // @Security ApiKeyAuth
 // @Router /containers/image/push [post]
-// @x-panel-log {"bodyKeys":["repoID","tagName","name"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"repoID","isList":false,"db":"image_repos","output_colume":"name","output_value":"reponame"}],"formatZH":"[tagName] 推送到 [reponame][name]","formatEN":"push [tagName] to [reponame][name]"}
+// @x-panel-log {"bodyKeys":["repoID","tagName","name"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"repoID","isList":false,"db":"image_repos","output_column":"name","output_value":"reponame"}],"formatZH":"[tagName] 推送到 [reponame][name]","formatEN":"push [tagName] to [reponame][name]"}
 func (b *BaseApi) ImagePush(c *gin.Context) {
 	var req dto.ImagePush
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -207,7 +207,7 @@ func (b *BaseApi) ImageSave(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/image/tag [post]
-// @x-panel-log {"bodyKeys":["repoID","targetName"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"repoID","isList":false,"db":"image_repos","output_colume":"name","output_value":"reponame"}],"formatZH":"tag 镜像 [reponame][targetName]","formatEN":"tag image [reponame][targetName]"}
+// @x-panel-log {"bodyKeys":["repoID","targetName"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"repoID","isList":false,"db":"image_repos","output_column":"name","output_value":"reponame"}],"formatZH":"tag 镜像 [reponame][targetName]","formatEN":"tag image [reponame][targetName]"}
 func (b *BaseApi) ImageTag(c *gin.Context) {
 	var req dto.ImageTag
 	if err := c.ShouldBindJSON(&req); err != nil {

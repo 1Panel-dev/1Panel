@@ -42,7 +42,7 @@ func (b *BaseApi) CreateGroup(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /groups/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"groups","output_colume":"name","output_value":"name"},{"input_colume":"id","input_value":"id","isList":false,"db":"groups","output_colume":"type","output_value":"type"}],"formatZH":"删除组 [type][name]","formatEN":"delete group [type][name]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"groups","output_column":"name","output_value":"name"},{"input_column":"id","input_value":"id","isList":false,"db":"groups","output_column":"type","output_value":"type"}],"formatZH":"删除组 [type][name]","formatEN":"delete group [type][name]"}
 func (b *BaseApi) DeleteGroup(c *gin.Context) {
 	var req dto.OperateByID
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -92,7 +92,7 @@ func (b *BaseApi) UpdateGroup(c *gin.Context) {
 // @Description 查询系统组
 // @Accept json
 // @Param request body dto.GroupSearch true "request"
-// @Success 200 {anrry} dto.GroupInfo
+// @Success 200 {array} dto.GroupInfo
 // @Security ApiKeyAuth
 // @Router /groups/search [post]
 func (b *BaseApi) ListGroup(c *gin.Context) {

@@ -24,11 +24,11 @@ func (u *ContainerService) PageNetwork(req dto.SearchWithPage) (int64, interface
 		return 0, nil, err
 	}
 	if len(req.Info) != 0 {
-		lenth, count := len(list), 0
-		for count < lenth {
+		length, count := len(list), 0
+		for count < length {
 			if !strings.Contains(list[count].Name, req.Info) {
 				list = append(list[:count], list[(count+1):]...)
-				lenth--
+				length--
 			} else {
 				count++
 			}
@@ -90,7 +90,7 @@ func (u *ContainerService) DeleteNetwork(req dto.BatchDelete) error {
 	}
 	return nil
 }
-func (u *ContainerService) CreateNetwork(req dto.NetworkCreat) error {
+func (u *ContainerService) CreateNetwork(req dto.NetworkCreate) error {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return err

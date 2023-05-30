@@ -264,13 +264,13 @@ export function checkNumberRange(min: number, max: number): FormItemRule {
     };
 }
 
-const checkConatinerName = (rule: any, value: any, callback: any) => {
+const checkContainerName = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback();
     } else {
         const reg = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{1,127}$/;
         if (!reg.test(value) && value !== '') {
-            callback(new Error(i18n.global.t('commons.rule.conatinerName')));
+            callback(new Error(i18n.global.t('commons.rule.containerName')));
         } else {
             callback();
         }
@@ -486,7 +486,7 @@ export const Rules: CommonRule = {
     containerName: {
         required: false,
         trigger: 'blur',
-        validator: checkConatinerName,
+        validator: checkContainerName,
     },
     disabledFunctions: {
         required: true,

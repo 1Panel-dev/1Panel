@@ -64,7 +64,7 @@ func (b *BaseApi) CreateWebsiteAcmeAccount(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/acme/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"website_acme_accounts","output_colume":"email","output_value":"email"}],"formatZH":"删除网站 acme [email]","formatEN":"Delete website acme [email]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_acme_accounts","output_column":"email","output_value":"email"}],"formatZH":"删除网站 acme [email]","formatEN":"Delete website acme [email]"}
 func (b *BaseApi) DeleteWebsiteAcmeAccount(c *gin.Context) {
 	var req request.WebsiteResourceReq
 	if err := c.ShouldBindJSON(&req); err != nil {

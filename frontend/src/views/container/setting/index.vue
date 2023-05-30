@@ -194,12 +194,12 @@
         <Mirror ref="mirrorRef" @search="search" />
         <Registry ref="registriesRef" @search="search" />
         <LogOption ref="logOptionRef" @search="search" />
-        <ConfirmDialog ref="confirmDialogRefIptable" @confirm="onSubmitOpenIPtable" @cancle="search" />
-        <ConfirmDialog ref="confirmDialogRefLog" @confirm="onSubmitSaveLog" @cancle="search" />
-        <ConfirmDialog ref="confirmDialogRefLive" @confirm="onSubmitSaveLive" @cancle="search" />
-        <ConfirmDialog ref="confirmDialogRefCgroup" @confirm="onSubmitSaveCgroup" @cancle="search" />
+        <ConfirmDialog ref="confirmDialogRefIptable" @confirm="onSubmitOpenIPtable" @cancel="search" />
+        <ConfirmDialog ref="confirmDialogRefLog" @confirm="onSubmitSaveLog" @cancel="search" />
+        <ConfirmDialog ref="confirmDialogRefLive" @confirm="onSubmitSaveLive" @cancel="search" />
+        <ConfirmDialog ref="confirmDialogRefCgroup" @confirm="onSubmitSaveCgroup" @cancel="search" />
 
-        <ConfirmDialog ref="confirmDialogRefFile" @confirm="onSubmitSaveFile" @cancle="search" />
+        <ConfirmDialog ref="confirmDialogRefFile" @confirm="onSubmitSaveFile" @cancel="search" />
     </div>
 </template>
 

@@ -395,13 +395,13 @@ func (b *BaseApi) DeleteNetwork(c *gin.Context) {
 // @Summary Create network
 // @Description 创建容器网络
 // @Accept json
-// @Param request body dto.NetworkCreat true "request"
+// @Param request body dto.NetworkCreate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/network [post]
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建容器网络 name","formatEN":"create container network [name]"}
 func (b *BaseApi) CreateNetwork(c *gin.Context) {
-	var req dto.NetworkCreat
+	var req dto.NetworkCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
@@ -498,13 +498,13 @@ func (b *BaseApi) DeleteVolume(c *gin.Context) {
 // @Summary Create volume
 // @Description 创建容器存储卷
 // @Accept json
-// @Param request body dto.VolumeCreat true "request"
+// @Param request body dto.VolumeCreate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/volume [post]
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"创建容器存储卷 [name]","formatEN":"create container volume [name]"}
 func (b *BaseApi) CreateVolume(c *gin.Context) {
-	var req dto.VolumeCreat
+	var req dto.VolumeCreate
 	if err := c.ShouldBindJSON(&req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return

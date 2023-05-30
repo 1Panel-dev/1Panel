@@ -758,6 +758,17 @@ definitions:
     - name
     - type
     type: object
+  dto.GroupInfo:
+    properties:
+      id:
+        type: integer
+      isDefault:
+        type: boolean
+      name:
+        type: string
+      type:
+        type: string
+    type: object
   dto.GroupSearch:
     properties:
       type:
@@ -1177,7 +1188,7 @@ definitions:
         type: string
       value: {}
     type: object
-  dto.NetworkCreat:
+  dto.NetworkCreate:
     properties:
       driver:
         type: string
@@ -1745,7 +1756,7 @@ definitions:
       token:
         type: string
     type: object
-  dto.VolumeCreat:
+  dto.VolumeCreate:
     properties:
       driver:
         type: string
@@ -1918,6 +1929,8 @@ definitions:
     type: object
   model.Website:
     properties:
+      IPV6:
+        type: boolean
       accessLog:
         type: boolean
       alias:
@@ -2598,6 +2611,8 @@ definitions:
     type: object
   request.WebsiteCreate:
     properties:
+      IPV6:
+        type: boolean
       alias:
         type: string
       appID:
@@ -2950,6 +2965,8 @@ definitions:
     type: object
   request.WebsiteUpdate:
     properties:
+      IPV6:
+        type: boolean
       expireDate:
         type: string
       id:
@@ -3240,6 +3257,8 @@ definitions:
     type: object
   response.WebsiteDTO:
     properties:
+      IPV6:
+        type: boolean
       accessLog:
         type: boolean
       accessLogPath:
@@ -3465,15 +3484,15 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: app_installs
-          input_colume: name
+          input_column: name
           input_value: name
           isList: false
-          output_colume: app_id
+          output_column: app_id
           output_value: appId
         - db: apps
           info: appId
           isList: false
-          output_colume: key
+          output_column: key
           output_value: appKey
         bodyKeys:
         - name
@@ -3629,22 +3648,22 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: app_installs
-          input_colume: id
+          input_column: id
           input_value: installId
           isList: false
-          output_colume: app_id
+          output_column: app_id
           output_value: appId
         - db: app_installs
-          input_colume: id
+          input_column: id
           input_value: installId
           isList: false
-          output_colume: name
+          output_column: name
           output_value: appName
         - db: apps
-          input_colume: id
+          input_column: id
           input_value: appId
           isList: false
-          output_colume: key
+          output_column: key
           output_value: appKey
         bodyKeys:
         - installId
@@ -4310,10 +4329,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: image_repos
-          input_colume: id
+          input_column: id
           input_value: repoID
           isList: false
-          output_colume: name
+          output_column: name
           output_value: reponame
         bodyKeys:
         - repoID
@@ -4346,10 +4365,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: image_repos
-          input_colume: id
+          input_column: id
           input_value: repoID
           isList: false
-          output_colume: name
+          output_column: name
           output_value: reponame
         bodyKeys:
         - repoID
@@ -4461,10 +4480,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: image_repos
-          input_colume: id
+          input_column: id
           input_value: repoID
           isList: false
-          output_colume: name
+          output_column: name
           output_value: reponame
         bodyKeys:
         - repoID
@@ -4505,7 +4524,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.NetworkCreat'
+          $ref: '#/definitions/dto.NetworkCreate'
       responses:
         "200":
           description: ""
@@ -4698,10 +4717,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: image_repos
-          input_colume: id
+          input_column: id
           input_value: ids
           isList: true
-          output_colume: name
+          output_column: name
           output_value: names
         bodyKeys:
         - ids
@@ -4782,7 +4801,7 @@ paths:
           input_column: id
           input_value: id
           isList: false
-          output_colume: name
+          output_column: name
           output_value: name
         bodyKeys:
         - id
@@ -4918,10 +4937,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: compose_templates
-          input_colume: id
+          input_column: id
           input_value: ids
           isList: true
-          output_colume: name
+          output_column: name
           output_value: names
         bodyKeys:
         - ids
@@ -4975,10 +4994,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: compose_templates
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: name
+          output_column: name
           output_value: name
         bodyKeys:
         - id
@@ -4996,7 +5015,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.VolumeCreat'
+          $ref: '#/definitions/dto.VolumeCreate'
       responses:
         "200":
           description: ""
@@ -5137,10 +5156,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: cronjobs
-          input_colume: id
+          input_column: id
           input_value: ids
           isList: true
-          output_colume: name
+          output_column: name
           output_value: names
         bodyKeys:
         - ids
@@ -5170,10 +5189,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: job_records
-          input_colume: id
+          input_column: id
           input_value: recordID
           isList: false
-          output_colume: file
+          output_column: file
           output_value: file
         bodyKeys:
         - recordID
@@ -5203,10 +5222,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: cronjobs
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: name
+          output_column: name
           output_value: name
         bodyKeys:
         - id
@@ -5236,10 +5255,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: cronjobs
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: name
+          output_column: name
           output_value: name
         bodyKeys:
         - id
@@ -5313,10 +5332,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: cronjobs
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: name
+          output_column: name
           output_value: name
         bodyKeys:
         - id
@@ -5347,10 +5366,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: cronjobs
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: name
+          output_column: name
           output_value: name
         bodyKeys:
         - id
@@ -5472,10 +5491,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: database_mysqls
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: name
+          output_column: name
           output_value: name
         bodyKeys:
         - id
@@ -5505,10 +5524,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: database_mysqls
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: name
+          output_column: name
           output_value: name
         bodyKeys:
         - id
@@ -5564,10 +5583,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: database_mysqls
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: name
+          output_column: name
           output_value: name
         bodyKeys:
         - id
@@ -5619,10 +5638,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: database_mysqls
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: name
+          output_column: name
           output_value: name
         bodyKeys:
         - id
@@ -5984,6 +6003,33 @@ paths:
         - path
         formatEN: Check whether file [path] exists
         formatZH: 检测文件 [path] 是否存在
+        paramKeys: []
+  /files/chunkdownload:
+    post:
+      consumes:
+      - application/json
+      description: 分片下载下载文件
+      parameters:
+      - description: request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.FileDownload'
+      responses:
+        "200":
+          description: ""
+      security:
+      - ApiKeyAuth: []
+      summary: Chunk Download file
+      tags:
+      - File
+      x-panel-log:
+        BeforeFuntions: []
+        bodyKeys:
+        - name
+        formatEN: Download file [name]
+        formatZH: 下载文件 [name]
         paramKeys: []
   /files/chunkupload:
     post:
@@ -6525,16 +6571,16 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: groups
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: name
+          output_column: name
           output_value: name
         - db: groups
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: type
+          output_column: type
           output_value: type
         bodyKeys:
         - id
@@ -6557,7 +6603,9 @@ paths:
         "200":
           description: OK
           schema:
-            type: anrry
+            items:
+              $ref: '#/definitions/dto.GroupInfo'
+            type: array
       security:
       - ApiKeyAuth: []
       summary: List groups
@@ -6863,10 +6911,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: commands
-          input_colume: id
+          input_column: id
           input_value: ids
           isList: true
-          output_colume: name
+          output_column: name
           output_value: names
         bodyKeys:
         - ids
@@ -6945,10 +6993,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: hosts
-          input_colume: id
+          input_column: id
           input_value: ids
           isList: true
-          output_colume: addr
+          output_column: addr
           output_value: addrs
         bodyKeys:
         - ids
@@ -7271,10 +7319,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: hosts
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: addr
+          output_column: addr
           output_value: addr
         bodyKeys:
         - id
@@ -7452,10 +7500,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: websites
-          input_colume: id
+          input_column: id
           input_value: websiteId
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - websiteId
@@ -7661,10 +7709,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: backup_accounts
-          input_colume: id
+          input_column: id
           input_value: id
           isList: true
-          output_colume: type
+          output_column: type
           output_value: types
         bodyKeys:
         - id
@@ -7694,10 +7742,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: backup_records
-          input_colume: id
+          input_column: id
           input_value: ids
           isList: true
-          output_colume: file_name
+          output_column: file_name
           output_value: files
         bodyKeys:
         - ids
@@ -8118,10 +8166,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: snapshots
-          input_colume: id
+          input_column: id
           input_value: ids
           isList: true
-          output_colume: name
+          output_column: name
           output_value: name
         bodyKeys:
         - ids
@@ -8151,10 +8199,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: snapshots
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: name
+          output_column: name
           output_value: name
         bodyKeys:
         - id
@@ -8213,10 +8261,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: snapshots
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: name
+          output_column: name
           output_value: name
         bodyKeys:
         - id
@@ -8246,10 +8294,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: snapshots
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: name
+          output_column: name
           output_value: name
         bodyKeys:
         - id
@@ -8546,10 +8594,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: websites
-          input_colume: id
+          input_column: id
           input_value: websiteId
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - websiteId
@@ -8608,10 +8656,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: website_acme_accounts
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: email
+          output_column: email
           output_value: email
         bodyKeys:
         - id
@@ -8747,10 +8795,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: websites
-          input_colume: id
+          input_column: id
           input_value: websiteId
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - websiteId
@@ -8780,10 +8828,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: websites
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - id
@@ -8814,10 +8862,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: websites
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - id
@@ -8847,10 +8895,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: websites
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - id
@@ -8880,10 +8928,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: websites
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - id
@@ -8940,10 +8988,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: website_dns_accounts
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: name
+          output_column: name
           output_value: name
         bodyKeys:
         - id
@@ -9072,10 +9120,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: website_domains
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: domain
+          output_column: domain
           output_value: domain
         bodyKeys:
         - id
@@ -9160,10 +9208,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: websites
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - id
@@ -9194,10 +9242,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: websites
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - id
@@ -9227,10 +9275,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: websites
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - id
@@ -9274,10 +9322,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: websites
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - id
@@ -9328,10 +9376,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: websites
-          input_colume: id
+          input_column: id
           input_value: websiteId
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - websiteId
@@ -9381,10 +9429,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: websites
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - id
@@ -9414,10 +9462,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: websites
-          input_colume: id
+          input_column: id
           input_value: websiteID
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - websiteID
@@ -9467,10 +9515,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: websites
-          input_colume: id
+          input_column: id
           input_value: websiteID
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - websiteID
@@ -9570,10 +9618,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: website_ssls
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - id
@@ -9603,10 +9651,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: website_ssls
-          input_colume: id
+          input_column: id
           input_value: SSLId
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - SSLId
@@ -9678,10 +9726,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: website_ssls
-          input_colume: id
+          input_column: id
           input_value: id
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - id
@@ -9779,10 +9827,10 @@ paths:
       x-panel-log:
         BeforeFuntions:
         - db: websites
-          input_colume: id
+          input_column: id
           input_value: websiteId
           isList: false
-          output_colume: primary_domain
+          output_column: primary_domain
           output_value: domain
         bodyKeys:
         - websiteId

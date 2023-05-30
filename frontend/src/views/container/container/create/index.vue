@@ -50,7 +50,7 @@
                                     </td>
                                     <td width="35%">
                                         <el-input
-                                            :placeholder="$t('container.contianerExample')"
+                                            :placeholder="$t('container.containerExample')"
                                             style="width: 100%"
                                             v-model="row.containerPort"
                                         />

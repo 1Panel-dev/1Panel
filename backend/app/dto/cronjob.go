@@ -86,7 +86,7 @@ type CronjobInfo struct {
 	TargetDirID    int    `json:"targetDirID"`
 	RetainCopies   int    `json:"retainCopies"`
 
-	LastRecrodTime string `json:"lastRecrodTime"`
+	LastRecordTime string `json:"lastRecordTime"`
 	Status         string `json:"status"`
 }
 

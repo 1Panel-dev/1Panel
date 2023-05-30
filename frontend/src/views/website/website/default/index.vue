@@ -8,7 +8,7 @@
                 <el-form @submit.prevent label-position="top">
                     <el-form-item :label="$t('website.defaultServer')">
                         <el-select v-model="defaultId" style="width: 100%">
-                            <el-option :value="0" :key="-1" :label="$t('website.noDefaulServer')"></el-option>
+                            <el-option :value="0" :key="-1" :label="$t('website.noDefaultServer')"></el-option>
                             <el-option
                                 v-for="(website, key) in websites"
                                 :key="key"

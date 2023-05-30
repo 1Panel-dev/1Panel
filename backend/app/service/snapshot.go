@@ -93,7 +93,7 @@ func (u *SnapshotService) UpdateDescription(req dto.UpdateDescription) error {
 type SnapshotJson struct {
 	OldBaseDir       string `json:"oldBaseDir"`
 	OldDockerDataDir string `json:"oldDockerDataDir"`
-	OldBackupDataDir string `json:"oldDackupDataDir"`
+	OldBackupDataDir string `json:"oldBackupDataDir"`
 	OldPanelDataDir  string `json:"oldPanelDataDir"`
 
 	BaseDir            string `json:"baseDir"`
@@ -113,7 +113,7 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 	if err != nil {
 		return err
 	}
-	backupAccont, err := NewIBackupService().NewClient(&backup)
+	backupAccount, err := NewIBackupService().NewClient(&backup)
 	if err != nil {
 		return err
 	}
@@ -202,7 +202,7 @@ func (u *SnapshotService) SnapshotCreate(req dto.SnapshotCreate) error {
 		global.LOG.Infof("start to upload snapshot to %s, please wait", backup.Type)
 		_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusUploading})
 		localPath := fmt.Sprintf("%s/system/1panel_%s_%s.tar.gz", localDir, versionItem.Value, timeNow)
-		if ok, err := backupAccont.Upload(localPath, fmt.Sprintf("system_snapshot/1panel_%s_%s.tar.gz", versionItem.Value, timeNow)); err != nil || !ok {
+		if ok, err := backupAccount.Upload(localPath, fmt.Sprintf("system_snapshot/1panel_%s_%s.tar.gz", versionItem.Value, timeNow)); err != nil || !ok {
 			_ = snapshotRepo.Update(snap.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
 			global.LOG.Errorf("upload snapshot to %s failed, err: %v", backup.Type, err)
 			return
@@ -796,15 +796,15 @@ func (u *SnapshotService) updateLiveRestore(enabled bool) error {
 	if err != nil {
 		return err
 	}
-	deamonMap := make(map[string]interface{})
-	_ = json.Unmarshal(file, &deamonMap)
+	daemonMap := make(map[string]interface{})
+	_ = json.Unmarshal(file, &daemonMap)
 
 	if !enabled {
-		delete(deamonMap, "live-restore")
+		delete(daemonMap, "live-restore")
 	} else {
-		deamonMap["live-restore"] = enabled
+		daemonMap["live-restore"] = enabled
 	}
-	newJson, err := json.MarshalIndent(deamonMap, "", "\t")
+	newJson, err := json.MarshalIndent(daemonMap, "", "\t")
 	if err != nil {
 		return err
 	}
@@ -818,8 +818,8 @@ func (u *SnapshotService) updateLiveRestore(enabled bool) error {
 	}
 
 	ticker := time.NewTicker(3 * time.Second)
-	ctx, cancle := context.WithTimeout(context.Background(), time.Second*30)
-	defer cancle()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
+	defer cancel()
 	for range ticker.C {
 		select {
 		case <-ctx.Done():

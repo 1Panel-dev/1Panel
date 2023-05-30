@@ -146,11 +146,11 @@ const shortcuts = [
         },
     },
     {
-        text: i18n.global.t('monitor.yestoday'),
+        text: i18n.global.t('monitor.yesterday'),
         value: () => {
-            const yestoday = new Date(new Date().getTime() - 3600 * 1000 * 24 * 1);
-            const end = new Date(yestoday.setHours(23, 59, 59, 999));
-            const start = new Date(yestoday.setHours(0, 0, 0, 0));
+            const yesterday = new Date(new Date().getTime() - 3600 * 1000 * 24 * 1);
+            const end = new Date(yesterday.setHours(23, 59, 59, 999));
+            const start = new Date(yesterday.setHours(0, 0, 0, 0));
             return [start, end];
         },
     },

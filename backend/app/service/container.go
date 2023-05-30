@@ -46,9 +46,9 @@ type IContainerService interface {
 	ContainerStats(id string) (*dto.ContainterStats, error)
 	Inspect(req dto.InspectReq) (string, error)
 	DeleteNetwork(req dto.BatchDelete) error
-	CreateNetwork(req dto.NetworkCreat) error
+	CreateNetwork(req dto.NetworkCreate) error
 	DeleteVolume(req dto.BatchDelete) error
-	CreateVolume(req dto.VolumeCreat) error
+	CreateVolume(req dto.VolumeCreate) error
 	TestCompose(req dto.ComposeCreate) (bool, error)
 	ComposeUpdate(req dto.ComposeUpdate) error
 	Prune(req dto.ContainerPrune) (dto.ContainerPruneReport, error)
@@ -78,11 +78,11 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 		return 0, nil, err
 	}
 	if len(req.Name) != 0 {
-		lenth, count := len(list), 0
-		for count < lenth {
+		length, count := len(list), 0
+		for count < length {
 			if !strings.Contains(list[count].Names[0][1:], req.Name) {
 				list = append(list[:count], list[(count+1):]...)
-				lenth--
+				length--
 			} else {
 				count++
 			}

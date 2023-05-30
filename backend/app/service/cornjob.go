@@ -53,9 +53,9 @@ func (u *CronjobService) SearchWithPage(search dto.SearchWithPage) (int64, inter
 		}
 		record, _ := cronjobRepo.RecordFirst(cronjob.ID)
 		if record.ID != 0 {
-			item.LastRecrodTime = record.StartTime.Format("2006-01-02 15:04:05")
+			item.LastRecordTime = record.StartTime.Format("2006-01-02 15:04:05")
 		} else {
-			item.LastRecrodTime = "-"
+			item.LastRecordTime = "-"
 		}
 		dtoCronjobs = append(dtoCronjobs, item)
 	}

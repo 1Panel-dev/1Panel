@@ -101,11 +101,11 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 		records = append(records, value)
 	}
 	if len(req.Info) != 0 {
-		lenth, count := len(records), 0
-		for count < lenth {
+		length, count := len(records), 0
+		for count < length {
 			if !strings.Contains(records[count].Name, req.Info) {
 				records = append(records[:count], records[(count+1):]...)
-				lenth--
+				length--
 			} else {
 				count++
 			}

@@ -49,7 +49,7 @@
                         <el-form-item :label="$t('app.containerName')" prop="containerName">
                             <el-input
                                 v-model.trim="paramModel.containerName"
-                                :placeholder="$t('app.conatinerNameHelper')"
+                                :placeholder="$t('app.containerNameHelper')"
                             ></el-input>
                         </el-form-item>
                         <el-form-item :label="$t('container.cpuQuota')" prop="cpuQuota">

@@ -33,7 +33,7 @@ type IMysqlService interface {
 	Create(ctx context.Context, req dto.MysqlDBCreate) (*model.DatabaseMysql, error)
 	ChangeAccess(info dto.ChangeDBInfo) error
 	ChangePassword(info dto.ChangeDBInfo) error
-	UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
+	UpdateVariables(updates []dto.MysqlVariablesUpdate) error
 	UpdateConfByFile(info dto.MysqlConfUpdateByFile) error
 	UpdateDescription(req dto.UpdateDescription) error
 	DeleteCheck(id uint) ([]string, error)
@@ -331,7 +331,7 @@ func (u *MysqlService) UpdateConfByFile(info dto.MysqlConfUpdateByFile) error {
 	return nil
 }
 
-func (u *MysqlService) UpdateVariables(updatas []dto.MysqlVariablesUpdate) error {
+func (u *MysqlService) UpdateVariables(updates []dto.MysqlVariablesUpdate) error {
 	app, err := appInstallRepo.LoadBaseInfo("mysql", "")
 	if err != nil {
 		return err
@@ -346,7 +346,7 @@ func (u *MysqlService) UpdateVariables(updatas []dto.MysqlVariablesUpdate) error
 	files = strings.Split(string(lineBytes), "\n")
 
 	group := "[mysqld]"
-	for _, info := range updatas {
+	for _, info := range updates {
 		if app.Version != "5.7.39" {
 			if info.Param == "query_cache_size" {
 				continue

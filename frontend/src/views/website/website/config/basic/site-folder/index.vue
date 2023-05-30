@@ -55,7 +55,7 @@
             <el-descriptions :title="$t('website.folderTitle')" :column="1" border>
                 <el-descriptions-item label="waf">{{ $t('website.wafFolder') }}</el-descriptions-item>
                 <el-descriptions-item label="ssl">{{ $t('website.sslFolder') }}</el-descriptions-item>
-                <el-descriptions-item label="log">{{ $t('website.logFoler') }}</el-descriptions-item>
+                <el-descriptions-item label="log">{{ $t('website.logFolder') }}</el-descriptions-item>
                 <el-descriptions-item label="index">{{ $t('website.indexFolder') }}</el-descriptions-item>
             </el-descriptions>
         </div>
