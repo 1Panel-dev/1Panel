@@ -50,9 +50,11 @@ func (u *ImageRepoService) Login(req dto.OperateByID) error {
 	if err != nil {
 		return err
 	}
-	if err := u.CheckConn(repo.DownloadUrl, repo.Username, repo.Password); err != nil {
-		_ = imageRepoRepo.Update(repo.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error})
-		return err
+	if repo.Auth {
+		if err := u.CheckConn(repo.DownloadUrl, repo.Username, repo.Password); err != nil {
+			_ = imageRepoRepo.Update(repo.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+			return err
+		}
 	}
 	_ = imageRepoRepo.Update(repo.ID, map[string]interface{}{"status": constant.StatusSuccess})
 	return nil
@@ -111,9 +113,11 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 	}
 
 	imageRepo.Status = constant.StatusSuccess
-	if err := u.CheckConn(req.DownloadUrl, req.Username, req.Password); err != nil {
-		imageRepo.Status = constant.StatusFailed
-		imageRepo.Message = err.Error()
+	if req.Auth {
+		if err := u.CheckConn(req.DownloadUrl, req.Username, req.Password); err != nil {
+			imageRepo.Status = constant.StatusFailed
+			imageRepo.Message = err.Error()
+		}
 	}
 	if err := imageRepoRepo.Create(&imageRepo); err != nil {
 		return err
@@ -142,7 +146,7 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 	if err != nil {
 		return err
 	}
-	if repo.DownloadUrl != req.DownloadUrl {
+	if repo.DownloadUrl != req.DownloadUrl || (!repo.Auth && req.Auth) {
 		_ = u.handleRegistries(req.DownloadUrl, repo.DownloadUrl, "update")
 		if repo.Auth {
 			_, _ = cmd.Execf("docker logout %s", repo.DownloadUrl)
@@ -162,9 +166,11 @@ func (u *ImageRepoService) Update(req dto.ImageRepoUpdate) error {
 
 	upMap["status"] = constant.StatusSuccess
 	upMap["message"] = ""
-	if err := u.CheckConn(req.DownloadUrl, req.Username, req.Password); err != nil {
-		upMap["status"] = constant.StatusFailed
-		upMap["message"] = err.Error()
+	if req.Auth {
+		if err := u.CheckConn(req.DownloadUrl, req.Username, req.Password); err != nil {
+			upMap["status"] = constant.StatusFailed
+			upMap["message"] = err.Error()
+		}
 	}
 	return imageRepoRepo.Update(req.ID, upMap)
 }
