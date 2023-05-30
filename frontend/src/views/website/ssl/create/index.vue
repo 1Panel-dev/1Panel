@@ -49,23 +49,12 @@
                     </el-form-item>
                     <el-form-item v-if="ssl.provider === 'dnsManual' && dnsResolve.length > 0">
                         <span>{{ $t('ssl.dnsResolveHelper') }}</span>
-                        <div v-for="(re, index) in dnsResolve" :key="index">
-                            <el-descriptions direction="vertical" :column="4" border>
-                                <el-descriptions-item :label="$t('website.domain')">
-                                    {{ re.domain }}
-                                </el-descriptions-item>
-                                <div v-if="re.err != ''">
-                                    <el-descriptions-item :label="$t('ssl.err')">{{ re.err }}</el-descriptions-item>
-                                </div>
-                                <div v-else>
-                                    <el-descriptions-item :label="$t('ssl.resolveDomain')">
-                                        {{ re.resolve }}
-                                    </el-descriptions-item>
-                                    <el-descriptions-item :label="$t('ssl.value')">{{ re.value }}</el-descriptions-item>
-                                    <el-descriptions-item :label="$t('ssl.type')">TXT</el-descriptions-item>
-                                </div>
-                            </el-descriptions>
-                        </div>
+                        <el-table :data="dnsResolve" border :table-layout="'auto'">
+                            <el-table-column prop="domain" :label="$t('website.domain')" />
+                            <el-table-column prop="resolve" :label="$t('ssl.resolveDomain')" />
+                            <el-table-column prop="value" :label="$t('ssl.value')" />
+                            <el-table-column :label="$t('ssl.type')">TXT</el-table-column>
+                        </el-table>
                     </el-form-item>
                     <el-form-item :label="''" prop="autoRenew" v-if="ssl.provider !== 'dnsManual'">
                         <el-checkbox v-model="ssl.autoRenew" :label="$t('ssl.autoRenew')" />
