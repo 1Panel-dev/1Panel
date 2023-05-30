@@ -7,7 +7,7 @@
             <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
-                        <el-form-item :label="$t('setting.syncSite')" prop="ntpSite" :rules="Rules.requiredInput">
+                        <el-form-item :label="$t('setting.syncSite')" prop="ntpSite" :rules="Rules.domain">
                             <el-input v-model="form.ntpSite" />
                             <el-button type="primary" link class="tagClass" @click="form.ntpSite = 'pool.ntp.org'">
                                 {{ $t('website.default') }}

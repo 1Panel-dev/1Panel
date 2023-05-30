@@ -10,12 +10,12 @@
                             <el-option :label="$t('commons.status.success')" value="Success"></el-option>
                             <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
                         </el-select>
-                        <el-button type="success" plain style="margin-left: 25px">
+                        <el-tag type="success" size="large" style="margin-left: 15px">
                             {{ $t('commons.status.success') }}： {{ successfulCount }}
-                        </el-button>
-                        <el-button type="danger" plain style="margin-left: 5px">
+                        </el-tag>
+                        <el-tag type="danger" size="large" style="margin-left: 5px">
                             {{ $t('commons.status.failed') }}： {{ faliedCount }}
-                        </el-button>
+                        </el-tag>
                     </el-col>
                     <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
                         <TableSetting @search="search()" />

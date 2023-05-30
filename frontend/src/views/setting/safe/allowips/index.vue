@@ -14,6 +14,7 @@
                                 :autosize="{ minRows: 8, maxRows: 10 }"
                                 v-model="allowIPs"
                             />
+                            <span class="input-help">{{ $t('setting.allowIPsHelper1') }}</span>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -57,7 +58,7 @@ const onSavePort = async () => {
         let ips = allowIPs.value.split('\n');
         for (const ip of ips) {
             if (ip) {
-                if (checkIp(ip)) {
+                if (checkIp(ip) || ip === '0.0.0.0') {
                     MsgError(i18n.global.t('firewall.addressFormatError'));
                     return false;
                 }
