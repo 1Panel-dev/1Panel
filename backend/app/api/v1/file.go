@@ -456,19 +456,14 @@ func (b *BaseApi) MoveFile(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFuntions":[],"formatZH":"下载文件 [name]","formatEN":"Download file [name]"}
 func (b *BaseApi) Download(c *gin.Context) {
 	filePath := c.Query("path")
-
 	file, err := os.Open(filePath)
 	if err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 	}
-
 	info, _ := file.Stat()
-
 	c.Header("Content-Length", strconv.FormatInt(info.Size(), 10))
 	c.Header("Content-Disposition", "attachment; filename*=utf-8''"+url.PathEscape(info.Name()))
-
 	http.ServeContent(c.Writer, c.Request, info.Name(), info.ModTime(), file)
-	return
 }
 
 // @Tags File

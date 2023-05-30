@@ -162,6 +162,7 @@ const message = {
                 'Supports letters, numbers, underscores, hyphens and dots, cannot end with hyphen- or dot.1-127',
             disableFunction: 'Only support letters and,',
             leechExts: 'Only support letters, numbers and,',
+            paramSimple: 'Support lowercase letters and numbers, length 1-64',
         },
         res: {
             paramError: 'The request failed, please try again later!',
