@@ -190,6 +190,9 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	for _, domain := range domains {
 		serverNames = append(serverNames, domain.Domain)
 		server.UpdateListen(strconv.Itoa(domain.Port), false)
+		if website.IPV6 {
+			server.UpdateListen("[::]:"+strconv.Itoa(domain.Port), false)
+		}
 	}
 	server.UpdateServerName(serverNames)
 
@@ -291,6 +294,9 @@ func addListenAndServerName(website model.Website, ports []int, domains []string
 	server := config.FindServers()[0]
 	for _, port := range ports {
 		server.AddListen(strconv.Itoa(port), false)
+		if website.IPV6 {
+			server.UpdateListen("[::]:"+strconv.Itoa(port), false)
+		}
 	}
 	for _, domain := range domains {
 		server.AddServerName(domain)
@@ -311,6 +317,9 @@ func deleteListenAndServerName(website model.Website, binds []string, domains []
 	server := config.FindServers()[0]
 	for _, bind := range binds {
 		server.DeleteListen(bind)
+		if website.IPV6 {
+			server.DeleteListen("[::]:" + bind)
+		}
 	}
 	for _, domain := range domains {
 		server.DeleteServerName(domain)
@@ -372,6 +381,9 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 	config := nginxFull.SiteConfig.Config
 	server := config.FindServers()[0]
 	server.UpdateListen("443", website.DefaultServer, "ssl")
+	if website.IPV6 {
+		server.UpdateListen("[::]:443", website.DefaultServer, "ssl")
+	}
 
 	switch req.HttpConfig {
 	case constant.HTTPSOnly:
@@ -380,10 +392,16 @@ func applySSL(website model.Website, websiteSSL model.WebsiteSSL, req request.We
 		server.RemoveDirective("if", []string{"($scheme"})
 	case constant.HTTPToHTTPS:
 		server.UpdateListen("80", website.DefaultServer)
+		if website.IPV6 {
+			server.UpdateListen("[::]:80", website.DefaultServer)
+		}
 		server.AddHTTP2HTTPS()
 	case constant.HTTPAlso:
 		server.UpdateListen("80", website.DefaultServer)
 		server.RemoveDirective("if", []string{"($scheme"})
+		if website.IPV6 {
+			server.UpdateListen("[::]:80", website.DefaultServer)
+		}
 	}
 
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {

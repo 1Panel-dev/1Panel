@@ -20,6 +20,7 @@ export namespace Website {
         rewrite: string;
         user: string;
         group: string;
+        IPV6: boolean;
     }
 
     export interface WebsiteDTO extends Website {
@@ -67,6 +68,7 @@ export namespace Website {
         remark: string;
         webSiteGroupId: number;
         expireDate?: string;
+        IPV6: boolean;
     }
 
     export interface WebSiteOp {

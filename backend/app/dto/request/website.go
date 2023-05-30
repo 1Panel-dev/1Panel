@@ -18,6 +18,7 @@ type WebsiteCreate struct {
 	OtherDomains   string `json:"otherDomains"`
 	Proxy          string `json:"proxy"`
 	WebsiteGroupID uint   `json:"webSiteGroupID" validate:"required"`
+	IPV6           bool   `json:"IPV6"`
 
 	AppType      string        `json:"appType" validate:"oneof=new installed"`
 	AppInstall   NewAppInstall `json:"appInstall"`
@@ -51,6 +52,7 @@ type WebsiteUpdate struct {
 	Remark         string `json:"remark"`
 	WebsiteGroupID uint   `json:"webSiteGroupID" validate:"required"`
 	ExpireDate     string `json:"expireDate"`
+	IPV6           bool   `json:"IPV6"`
 }
 
 type WebsiteDelete struct {

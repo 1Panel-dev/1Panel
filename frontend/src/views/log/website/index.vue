@@ -166,3 +166,14 @@ onMounted(() => {
     getWebsites();
 });
 </script>
+
+<style lang="scss" scoped>
+.tag-button {
+    &.el-button--primary:hover {
+        background-color: var(--el-color-primary) !important;
+    }
+    &.el-button--primary:focus {
+        background-color: var(--el-color-primary) !important;
+    }
+}
+</style>

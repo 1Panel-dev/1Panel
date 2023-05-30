@@ -19,6 +19,7 @@ type Website struct {
 	ErrorLog      bool   `json:"errorLog"`
 	AccessLog     bool   `json:"accessLog"`
 	DefaultServer bool   `json:"defaultServer"`
+	IPV6          bool   `json:"IPV6"`
 	Rewrite       string `gorm:"type:varchar" json:"rewrite"`
 
 	WebsiteGroupID uint `gorm:"type:integer" json:"webSiteGroupId"`
