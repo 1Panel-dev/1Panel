@@ -257,6 +257,9 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	backupDockerCompose := installed.DockerCompose
 	if req.Advanced {
 		composeMap := make(map[string]interface{})
+		if err = yaml.Unmarshal([]byte(installed.DockerCompose), &composeMap); err != nil {
+			return err
+		}
 		if err := addDockerComposeCommonParam(composeMap, installed.ServiceName, req.AppContainerConfig, req.Params); err != nil {
 			return err
 		}

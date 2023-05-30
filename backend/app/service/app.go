@@ -335,9 +335,6 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	if err = createLink(ctx, app, appInstall, req.Params); err != nil {
 		return
 	}
-	if err = upAppPre(app, appInstall); err != nil {
-		return
-	}
 	go func() {
 		if err = copyData(app, appDetail, appInstall, req); err != nil {
 			if appInstall.Status == constant.Installing {
@@ -345,6 +342,9 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 				appInstall.Message = err.Error()
 			}
 			_ = appInstallRepo.Save(context.Background(), appInstall)
+			return
+		}
+		if err = upAppPre(app, appInstall); err != nil {
 			return
 		}
 		go func() {
