@@ -14,6 +14,7 @@ type IRuntimeRepo interface {
 	WithImage(image string) DBOption
 	WithNotId(id uint) DBOption
 	WithStatus(status string) DBOption
+	WithDetailId(id uint) DBOption
 	Page(page, size int, opts ...DBOption) (int64, []model.Runtime, error)
 	Create(ctx context.Context, runtime *model.Runtime) error
 	Save(runtime *model.Runtime) error
@@ -40,6 +41,12 @@ func (r *RuntimeRepo) WithStatus(status string) DBOption {
 func (r *RuntimeRepo) WithImage(image string) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("image = ?", image)
+	}
+}
+
+func (r *RuntimeRepo) WithDetailId(id uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("app_detail_id = ?", id)
 	}
 }
 
