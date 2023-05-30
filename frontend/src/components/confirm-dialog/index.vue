@@ -15,7 +15,7 @@
         </div>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="onCancle">
+                <el-button @click="onCancel">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button type="primary" :disabled="submitInput !== submitInputInfo" @click="onConfirm">
@@ -49,15 +49,15 @@ const acceptParams = (props: DialogProps): void => {
     submitInputInfo.value = props.submitInputInfo;
     submitInput.value = '';
 };
-const emit = defineEmits(['confirm', 'cancle']);
+const emit = defineEmits(['confirm', 'cancel']);
 
 const onConfirm = async () => {
     emit('confirm');
     submitVisiable.value = false;
 };
 
-const onCancle = async () => {
-    emit('cancle');
+const onCancel = async () => {
+    emit('cancel');
     submitVisiable.value = false;
 };
 

@@ -13,7 +13,7 @@
                     :model="operateReq"
                     v-loading="loading"
                 >
-                    <el-form-item :label="$t('app.versioneSelect')" prop="detailId">
+                    <el-form-item :label="$t('app.versionSelect')" prop="detailId">
                         <el-select v-model="operateReq.detailId">
                             <el-option
                                 v-for="(version, index) in versions"

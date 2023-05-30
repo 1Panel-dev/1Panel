@@ -101,9 +101,9 @@
                     </el-table-column>
                     <el-table-column :label="$t('cronjob.retainCopies')" :min-width="90" prop="retainCopies" />
 
-                    <el-table-column :label="$t('cronjob.lastRecrodTime')" :min-width="120" prop="lastRecrodTime">
+                    <el-table-column :label="$t('cronjob.lastRecordTime')" :min-width="120" prop="lastRecordTime">
                         <template #default="{ row }">
-                            {{ row.lastRecrodTime }}
+                            {{ row.lastRecordTime }}
                         </template>
                     </el-table-column>
                     <el-table-column :min-width="80" :label="$t('cronjob.target')" prop="targetDir">

@@ -85,7 +85,7 @@ func (b *BaseApi) ListCommand(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /hosts/command/del [post]
-// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"ids","isList":true,"db":"commands","output_colume":"name","output_value":"names"}],"formatZH":"删除快捷命令 [names]","formatEN":"delete quick command [names]"}
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"ids","isList":true,"db":"commands","output_column":"name","output_value":"names"}],"formatZH":"删除快捷命令 [names]","formatEN":"delete quick command [names]"}
 func (b *BaseApi) DeleteCommand(c *gin.Context) {
 	var req dto.BatchDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {

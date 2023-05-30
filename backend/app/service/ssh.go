@@ -46,11 +46,7 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 		PermitRootLogin:        "yes",
 		UseDNS:                 "yes",
 	}
-	sudo := ""
-	hasSudo := cmd.HasNoPasswordSudo()
-	if hasSudo {
-		sudo = "sudo"
-	}
+	sudo := cmd.SudoHandleCmd()
 	stdout, err := cmd.Execf("%s systemctl status sshd", sudo)
 	if err != nil {
 		return &data, nil
@@ -95,11 +91,7 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 
 func (u *SSHService) OperateSSH(operation string) error {
 	if operation == "start" || operation == "stop" || operation == "restart" {
-		sudo := ""
-		hasSudo := cmd.HasNoPasswordSudo()
-		if hasSudo {
-			sudo = "sudo"
-		}
+		sudo := cmd.SudoHandleCmd()
 		stdout, err := cmd.Execf("%s systemctl %s sshd", sudo, operation)
 		if err != nil {
 			return fmt.Errorf("%s sshd failed, stdout: %s, err: %v", operation, stdout, err)
@@ -127,11 +119,7 @@ func (u *SSHService) Update(key, value string) error {
 	if _, err = file.WriteString(strings.Join(newFiles, "\n")); err != nil {
 		return err
 	}
-	sudo := ""
-	hasSudo := cmd.HasNoPasswordSudo()
-	if hasSudo {
-		sudo = "sudo"
-	}
+	sudo := cmd.SudoHandleCmd()
 	if key == "Port" {
 		stdout, _ := cmd.Execf("%s getenforce", sudo)
 		if stdout == "Enforcing\n" {
@@ -151,11 +139,7 @@ func (u *SSHService) UpdateByFile(value string) error {
 	if _, err = file.WriteString(value); err != nil {
 		return err
 	}
-	sudo := ""
-	hasSudo := cmd.HasNoPasswordSudo()
-	if hasSudo {
-		sudo = "sudo"
-	}
+	sudo := cmd.SudoHandleCmd()
 	_, _ = cmd.Execf("%s systemctl restart sshd", sudo)
 	return nil
 }

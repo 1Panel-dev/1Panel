@@ -96,10 +96,10 @@ func OperationLog() gin.HandlerFunc {
 					if funcs.InputValue == key {
 						var names []string
 						if funcs.IsList {
-							sql := fmt.Sprintf("SELECT %s FROM %s where %s in (?);", funcs.OutputColume, funcs.DB, funcs.InputColume)
+							sql := fmt.Sprintf("SELECT %s FROM %s where %s in (?);", funcs.OutputColumn, funcs.DB, funcs.InputColumn)
 							_ = global.DB.Raw(sql, value).Scan(&names)
 						} else {
-							_ = global.DB.Raw(fmt.Sprintf("select %s from %s where %s = ?;", funcs.OutputColume, funcs.DB, funcs.InputColume), value).Scan(&names)
+							_ = global.DB.Raw(fmt.Sprintf("select %s from %s where %s = ?;", funcs.OutputColumn, funcs.DB, funcs.InputColumn), value).Scan(&names)
 						}
 						formatMap[funcs.OutputValue] = strings.Join(names, ",")
 						break
@@ -177,11 +177,11 @@ type operationJson struct {
 	FormatEN       string         `json:"formatEN"`
 }
 type functionInfo struct {
-	InputColume  string `json:"input_colume"`
+	InputColumn  string `json:"input_column"`
 	InputValue   string `json:"input_value"`
 	IsList       bool   `json:"isList"`
 	DB           string `json:"db"`
-	OutputColume string `json:"output_colume"`
+	OutputColumn string `json:"output_column"`
 	OutputValue  string `json:"output_value"`
 }
 

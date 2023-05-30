@@ -187,17 +187,17 @@
                     "BeforeFuntions": [
                         {
                             "db": "app_installs",
-                            "input_colume": "name",
+                            "input_column": "name",
                             "input_value": "name",
                             "isList": false,
-                            "output_colume": "app_id",
+                            "output_column": "app_id",
                             "output_value": "appId"
                         },
                         {
                             "db": "apps",
                             "info": "appId",
                             "isList": false,
-                            "output_colume": "key",
+                            "output_column": "key",
                             "output_value": "appKey"
                         }
                     ],
@@ -449,26 +449,26 @@
                     "BeforeFuntions": [
                         {
                             "db": "app_installs",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "installId",
                             "isList": false,
-                            "output_colume": "app_id",
+                            "output_column": "app_id",
                             "output_value": "appId"
                         },
                         {
                             "db": "app_installs",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "installId",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "appName"
                         },
                         {
                             "db": "apps",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "appId",
                             "isList": false,
-                            "output_colume": "key",
+                            "output_column": "key",
                             "output_value": "appKey"
                         }
                     ],
@@ -1517,10 +1517,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "image_repos",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "repoID",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "reponame"
                         }
                     ],
@@ -1572,10 +1572,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "image_repos",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "repoID",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "reponame"
                         }
                     ],
@@ -1750,10 +1750,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "image_repos",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "repoID",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "reponame"
                         }
                     ],
@@ -1825,7 +1825,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.NetworkCreat"
+                            "$ref": "#/definitions/dto.NetworkCreate"
                         }
                     }
                 ],
@@ -2121,10 +2121,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "image_repos",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "ids",
                             "isList": true,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "names"
                         }
                     ],
@@ -2253,7 +2253,7 @@
                             "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -2472,10 +2472,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "compose_templates",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "ids",
                             "isList": true,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "names"
                         }
                     ],
@@ -2562,10 +2562,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "compose_templates",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -2600,7 +2600,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.VolumeCreat"
+                            "$ref": "#/definitions/dto.VolumeCreate"
                         }
                     }
                 ],
@@ -2816,10 +2816,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "cronjobs",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "ids",
                             "isList": true,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "names"
                         }
                     ],
@@ -2867,10 +2867,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "job_records",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "recordID",
                             "isList": false,
-                            "output_colume": "file",
+                            "output_column": "file",
                             "output_value": "file"
                         }
                     ],
@@ -2918,10 +2918,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "cronjobs",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -2969,10 +2969,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "cronjobs",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -3092,10 +3092,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "cronjobs",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -3144,10 +3144,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "cronjobs",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -3341,10 +3341,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "database_mysqls",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -3392,10 +3392,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "database_mysqls",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -3483,10 +3483,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "database_mysqls",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -3570,10 +3570,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "database_mysqls",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -4149,6 +4149,48 @@
                     ],
                     "formatEN": "Check whether file [path] exists",
                     "formatZH": "检测文件 [path] 是否存在",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/files/chunkdownload": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "分片下载下载文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "File"
+                ],
+                "summary": "Chunk Download file",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.FileDownload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name"
+                    ],
+                    "formatEN": "Download file [name]",
+                    "formatZH": "下载文件 [name]",
                     "paramKeys": []
                 }
             }
@@ -4996,18 +5038,18 @@
                     "BeforeFuntions": [
                         {
                             "db": "groups",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         },
                         {
                             "db": "groups",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "type",
+                            "output_column": "type",
                             "output_value": "type"
                         }
                     ],
@@ -5050,7 +5092,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.GroupInfo"
+                            }
                         }
                     }
                 }
@@ -5526,10 +5571,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "commands",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "ids",
                             "isList": true,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "names"
                         }
                     ],
@@ -5655,10 +5700,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "hosts",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "ids",
                             "isList": true,
-                            "output_colume": "addr",
+                            "output_column": "addr",
                             "output_value": "addrs"
                         }
                     ],
@@ -6176,10 +6221,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "hosts",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "addr",
+                            "output_column": "addr",
                             "output_value": "addr"
                         }
                     ],
@@ -6465,10 +6510,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "websiteId",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -6792,10 +6837,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "backup_accounts",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": true,
-                            "output_colume": "type",
+                            "output_column": "type",
                             "output_value": "types"
                         }
                     ],
@@ -6843,10 +6888,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "backup_records",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "ids",
                             "isList": true,
-                            "output_colume": "file_name",
+                            "output_column": "file_name",
                             "output_value": "files"
                         }
                     ],
@@ -7510,10 +7555,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "snapshots",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "ids",
                             "isList": true,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -7561,10 +7606,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "snapshots",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -7656,10 +7701,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "snapshots",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -7707,10 +7752,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "snapshots",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -8183,10 +8228,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "websiteId",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -8279,10 +8324,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "website_acme_accounts",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "email",
+                            "output_column": "email",
                             "output_value": "email"
                         }
                     ],
@@ -8504,10 +8549,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "websiteId",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -8555,10 +8600,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -8607,10 +8652,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -8658,10 +8703,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -8709,10 +8754,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -8802,10 +8847,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "website_dns_accounts",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -9010,10 +9055,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "website_domains",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "domain",
+                            "output_column": "domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9152,10 +9197,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9204,10 +9249,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9255,10 +9300,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9329,10 +9374,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9414,10 +9459,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "websiteId",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9498,10 +9543,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9549,10 +9594,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "websiteID",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9633,10 +9678,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "websiteID",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9796,10 +9841,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "website_ssls",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9847,10 +9892,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "website_ssls",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "SSLId",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9967,10 +10012,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "website_ssls",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -10127,10 +10172,10 @@
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "websiteId",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -11268,6 +11313,23 @@
                 }
             }
         },
+        "dto.GroupInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "isDefault": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.GroupSearch": {
             "type": "object",
             "required": [
@@ -11896,7 +11958,7 @@
                 "value": {}
             }
         },
-        "dto.NetworkCreat": {
+        "dto.NetworkCreate": {
             "type": "object",
             "properties": {
                 "driver": {
@@ -12751,7 +12813,7 @@
                 }
             }
         },
-        "dto.VolumeCreat": {
+        "dto.VolumeCreate": {
             "type": "object",
             "properties": {
                 "driver": {
@@ -13014,6 +13076,9 @@
         "model.Website": {
             "type": "object",
             "properties": {
+                "IPV6": {
+                    "type": "boolean"
+                },
                 "accessLog": {
                     "type": "boolean"
                 },
@@ -14038,6 +14103,9 @@
                 "webSiteGroupID"
             ],
             "properties": {
+                "IPV6": {
+                    "type": "boolean"
+                },
                 "alias": {
                     "type": "string"
                 },
@@ -14557,6 +14625,9 @@
                 "webSiteGroupID"
             ],
             "properties": {
+                "IPV6": {
+                    "type": "boolean"
+                },
                 "expireDate": {
                     "type": "string"
                 },
@@ -14988,6 +15059,9 @@
         "response.WebsiteDTO": {
             "type": "object",
             "properties": {
+                "IPV6": {
+                    "type": "boolean"
+                },
                 "accessLog": {
                     "type": "boolean"
                 },

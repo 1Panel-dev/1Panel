@@ -87,7 +87,7 @@ func (b *BaseApi) ListComposeTemplate(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/template/del [post]
-// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"ids","isList":true,"db":"compose_templates","output_colume":"name","output_value":"names"}],"formatZH":"删除 compose 模版 [names]","formatEN":"delete compose template [names]"}
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"ids","isList":true,"db":"compose_templates","output_column":"name","output_value":"names"}],"formatZH":"删除 compose 模版 [names]","formatEN":"delete compose template [names]"}
 func (b *BaseApi) DeleteComposeTemplate(c *gin.Context) {
 	var req dto.BatchDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -114,7 +114,7 @@ func (b *BaseApi) DeleteComposeTemplate(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /containers/template/update [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"compose_templates","output_colume":"name","output_value":"name"}],"formatZH":"更新 compose 模版 [name]","formatEN":"update compose template information [name]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"compose_templates","output_column":"name","output_value":"name"}],"formatZH":"更新 compose 模版 [name]","formatEN":"update compose template information [name]"}
 func (b *BaseApi) UpdateComposeTemplate(c *gin.Context) {
 	var req dto.ComposeTemplateUpdate
 	if err := c.ShouldBindJSON(&req); err != nil {

@@ -222,7 +222,7 @@ const changeEnable = (enable: boolean) => {
         listSSL();
     }
     if (resData.value.enable && !enable) {
-        ElMessageBox.confirm(i18n.global.t('website.disbaleHTTTPSHelper'), i18n.global.t('website.disbaleHTTTPS'), {
+        ElMessageBox.confirm(i18n.global.t('website.disbaleHTTPSHelper'), i18n.global.t('website.disbaleHTTPS'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
             type: 'error',

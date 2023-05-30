@@ -87,12 +87,12 @@ func (u *ImageRepoService) Create(req dto.ImageRepoCreate) error {
 			return errors.New(string(stdout))
 		}
 		ticker := time.NewTicker(3 * time.Second)
-		ctx, cancle := context.WithTimeout(context.Background(), time.Second*20)
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
 		if err := func() error {
 			for range ticker.C {
 				select {
 				case <-ctx.Done():
-					cancle()
+					cancel()
 					return errors.New("the docker service cannot be restarted")
 				default:
 					stdout, err := cmd.Exec("systemctl is-active docker")
@@ -194,16 +194,16 @@ func (u *ImageRepoService) handleRegistries(newHost, delHost, handle string) err
 		_, _ = os.Create(constant.DaemonJsonPath)
 	}
 
-	deamonMap := make(map[string]interface{})
+	daemonMap := make(map[string]interface{})
 	file, err := os.ReadFile(constant.DaemonJsonPath)
 	if err != nil {
 		return err
 	}
-	if err := json.Unmarshal(file, &deamonMap); err != nil {
+	if err := json.Unmarshal(file, &daemonMap); err != nil {
 		return err
 	}
 
-	iRegistries := deamonMap["insecure-registries"]
+	iRegistries := daemonMap["insecure-registries"]
 	registries, _ := iRegistries.([]interface{})
 	switch handle {
 	case "create":
@@ -223,11 +223,11 @@ func (u *ImageRepoService) handleRegistries(newHost, delHost, handle string) err
 		}
 	}
 	if len(registries) == 0 {
-		delete(deamonMap, "insecure-registries")
+		delete(daemonMap, "insecure-registries")
 	} else {
-		deamonMap["insecure-registries"] = registries
+		daemonMap["insecure-registries"] = registries
 	}
-	newJson, err := json.MarshalIndent(deamonMap, "", "\t")
+	newJson, err := json.MarshalIndent(daemonMap, "", "\t")
 	if err != nil {
 		return err
 	}

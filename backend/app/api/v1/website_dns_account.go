@@ -85,7 +85,7 @@ func (b *BaseApi) UpdateWebsiteDnsAccount(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /websites/dns/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"website_dns_accounts","output_colume":"name","output_value":"name"}],"formatZH":"删除网站 dns [name]","formatEN":"Delete website dns [name]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"website_dns_accounts","output_column":"name","output_value":"name"}],"formatZH":"删除网站 dns [name]","formatEN":"Delete website dns [name]"}
 func (b *BaseApi) DeleteWebsiteDnsAccount(c *gin.Context) {
 	var req request.WebsiteResourceReq
 	if err := c.ShouldBindJSON(&req); err != nil {

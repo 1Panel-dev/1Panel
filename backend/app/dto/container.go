@@ -101,7 +101,7 @@ type Network struct {
 	CreatedAt  time.Time `json:"createdAt"`
 	Attachable bool      `json:"attachable"`
 }
-type NetworkCreat struct {
+type NetworkCreate struct {
 	Name    string   `json:"name"`
 	Driver  string   `json:"driver"`
 	Options []string `json:"options"`
@@ -118,7 +118,7 @@ type Volume struct {
 	Mountpoint string    `json:"mountpoint"`
 	CreatedAt  time.Time `json:"createdAt"`
 }
-type VolumeCreat struct {
+type VolumeCreate struct {
 	Name    string   `json:"name"`
 	Driver  string   `json:"driver"`
 	Options []string `json:"options"`

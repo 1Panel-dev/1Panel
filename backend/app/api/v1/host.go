@@ -183,7 +183,7 @@ func (b *BaseApi) GetHostInfo(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /hosts/del [post]
-// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"ids","isList":true,"db":"hosts","output_colume":"addr","output_value":"addrs"}],"formatZH":"删除主机 [addrs]","formatEN":"delete host [addrs]"}
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"ids","isList":true,"db":"hosts","output_column":"addr","output_value":"addrs"}],"formatZH":"删除主机 [addrs]","formatEN":"delete host [addrs]"}
 func (b *BaseApi) DeleteHost(c *gin.Context) {
 	var req dto.BatchDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -269,7 +269,7 @@ func (b *BaseApi) UpdateHost(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /hosts/update/group [post]
-// @x-panel-log {"bodyKeys":["id","group"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":false,"db":"hosts","output_colume":"addr","output_value":"addr"}],"formatZH":"切换主机[addr]分组 => [group]","formatEN":"change host [addr] group => [group]"}
+// @x-panel-log {"bodyKeys":["id","group"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":false,"db":"hosts","output_column":"addr","output_value":"addr"}],"formatZH":"切换主机[addr]分组 => [group]","formatEN":"change host [addr] group => [group]"}
 func (b *BaseApi) UpdateHostGroup(c *gin.Context) {
 	var req dto.ChangeHostGroup
 	if err := c.ShouldBindJSON(&req); err != nil {

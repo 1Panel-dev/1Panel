@@ -114,7 +114,7 @@ export const Rewrites = [
 
 export const Units = [
     { label: i18n.global.t('commons.units.second'), value: 's' },
-    { label: i18n.global.t('commons.units.miniute'), value: 'm' },
+    { label: i18n.global.t('commons.units.minute'), value: 'm' },
     { label: i18n.global.t('commons.units.hour'), value: 'h' },
     { label: i18n.global.t('commons.units.day'), value: 'd' },
     { label: i18n.global.t('commons.units.week'), value: 'w' },

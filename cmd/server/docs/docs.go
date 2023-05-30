@@ -201,17 +201,17 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "app_installs",
-                            "input_colume": "name",
+                            "input_column": "name",
                             "input_value": "name",
                             "isList": false,
-                            "output_colume": "app_id",
+                            "output_column": "app_id",
                             "output_value": "appId"
                         },
                         {
                             "db": "apps",
                             "info": "appId",
                             "isList": false,
-                            "output_colume": "key",
+                            "output_column": "key",
                             "output_value": "appKey"
                         }
                     ],
@@ -463,26 +463,26 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "app_installs",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "installId",
                             "isList": false,
-                            "output_colume": "app_id",
+                            "output_column": "app_id",
                             "output_value": "appId"
                         },
                         {
                             "db": "app_installs",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "installId",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "appName"
                         },
                         {
                             "db": "apps",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "appId",
                             "isList": false,
-                            "output_colume": "key",
+                            "output_column": "key",
                             "output_value": "appKey"
                         }
                     ],
@@ -1531,10 +1531,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "image_repos",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "repoID",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "reponame"
                         }
                     ],
@@ -1586,10 +1586,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "image_repos",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "repoID",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "reponame"
                         }
                     ],
@@ -1764,10 +1764,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "image_repos",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "repoID",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "reponame"
                         }
                     ],
@@ -1839,7 +1839,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.NetworkCreat"
+                            "$ref": "#/definitions/dto.NetworkCreate"
                         }
                     }
                 ],
@@ -2135,10 +2135,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "image_repos",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "ids",
                             "isList": true,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "names"
                         }
                     ],
@@ -2267,7 +2267,7 @@ var doc = `{
                             "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -2486,10 +2486,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "compose_templates",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "ids",
                             "isList": true,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "names"
                         }
                     ],
@@ -2576,10 +2576,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "compose_templates",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -2614,7 +2614,7 @@ var doc = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.VolumeCreat"
+                            "$ref": "#/definitions/dto.VolumeCreate"
                         }
                     }
                 ],
@@ -2830,10 +2830,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "cronjobs",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "ids",
                             "isList": true,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "names"
                         }
                     ],
@@ -2881,10 +2881,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "job_records",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "recordID",
                             "isList": false,
-                            "output_colume": "file",
+                            "output_column": "file",
                             "output_value": "file"
                         }
                     ],
@@ -2932,10 +2932,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "cronjobs",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -2983,10 +2983,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "cronjobs",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -3106,10 +3106,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "cronjobs",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -3158,10 +3158,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "cronjobs",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -3355,10 +3355,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "database_mysqls",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -3406,10 +3406,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "database_mysqls",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -3497,10 +3497,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "database_mysqls",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -3584,10 +3584,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "database_mysqls",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -4163,6 +4163,48 @@ var doc = `{
                     ],
                     "formatEN": "Check whether file [path] exists",
                     "formatZH": "检测文件 [path] 是否存在",
+                    "paramKeys": []
+                }
+            }
+        },
+        "/files/chunkdownload": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "分片下载下载文件",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "File"
+                ],
+                "summary": "Chunk Download file",
+                "parameters": [
+                    {
+                        "description": "request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.FileDownload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "x-panel-log": {
+                    "BeforeFuntions": [],
+                    "bodyKeys": [
+                        "name"
+                    ],
+                    "formatEN": "Download file [name]",
+                    "formatZH": "下载文件 [name]",
                     "paramKeys": []
                 }
             }
@@ -5010,18 +5052,18 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "groups",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         },
                         {
                             "db": "groups",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "type",
+                            "output_column": "type",
                             "output_value": "type"
                         }
                     ],
@@ -5064,7 +5106,10 @@ var doc = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "anrry"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dto.GroupInfo"
+                            }
                         }
                     }
                 }
@@ -5540,10 +5585,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "commands",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "ids",
                             "isList": true,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "names"
                         }
                     ],
@@ -5669,10 +5714,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "hosts",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "ids",
                             "isList": true,
-                            "output_colume": "addr",
+                            "output_column": "addr",
                             "output_value": "addrs"
                         }
                     ],
@@ -6190,10 +6235,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "hosts",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "addr",
+                            "output_column": "addr",
                             "output_value": "addr"
                         }
                     ],
@@ -6479,10 +6524,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "websiteId",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -6806,10 +6851,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "backup_accounts",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": true,
-                            "output_colume": "type",
+                            "output_column": "type",
                             "output_value": "types"
                         }
                     ],
@@ -6857,10 +6902,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "backup_records",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "ids",
                             "isList": true,
-                            "output_colume": "file_name",
+                            "output_column": "file_name",
                             "output_value": "files"
                         }
                     ],
@@ -7524,10 +7569,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "snapshots",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "ids",
                             "isList": true,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -7575,10 +7620,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "snapshots",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -7670,10 +7715,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "snapshots",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -7721,10 +7766,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "snapshots",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -8197,10 +8242,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "websiteId",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -8293,10 +8338,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "website_acme_accounts",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "email",
+                            "output_column": "email",
                             "output_value": "email"
                         }
                     ],
@@ -8518,10 +8563,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "websiteId",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -8569,10 +8614,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -8621,10 +8666,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -8672,10 +8717,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -8723,10 +8768,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -8816,10 +8861,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "website_dns_accounts",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "name",
+                            "output_column": "name",
                             "output_value": "name"
                         }
                     ],
@@ -9024,10 +9069,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "website_domains",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "domain",
+                            "output_column": "domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9166,10 +9211,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9218,10 +9263,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9269,10 +9314,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9343,10 +9388,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9428,10 +9473,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "websiteId",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9512,10 +9557,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9563,10 +9608,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "websiteID",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9647,10 +9692,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "websiteID",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9810,10 +9855,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "website_ssls",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9861,10 +9906,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "website_ssls",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "SSLId",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -9981,10 +10026,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "website_ssls",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "id",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -10141,10 +10186,10 @@ var doc = `{
                     "BeforeFuntions": [
                         {
                             "db": "websites",
-                            "input_colume": "id",
+                            "input_column": "id",
                             "input_value": "websiteId",
                             "isList": false,
-                            "output_colume": "primary_domain",
+                            "output_column": "primary_domain",
                             "output_value": "domain"
                         }
                     ],
@@ -11282,6 +11327,23 @@ var doc = `{
                 }
             }
         },
+        "dto.GroupInfo": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "isDefault": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.GroupSearch": {
             "type": "object",
             "required": [
@@ -11910,7 +11972,7 @@ var doc = `{
                 "value": {}
             }
         },
-        "dto.NetworkCreat": {
+        "dto.NetworkCreate": {
             "type": "object",
             "properties": {
                 "driver": {
@@ -12765,7 +12827,7 @@ var doc = `{
                 }
             }
         },
-        "dto.VolumeCreat": {
+        "dto.VolumeCreate": {
             "type": "object",
             "properties": {
                 "driver": {
@@ -13028,6 +13090,9 @@ var doc = `{
         "model.Website": {
             "type": "object",
             "properties": {
+                "IPV6": {
+                    "type": "boolean"
+                },
                 "accessLog": {
                     "type": "boolean"
                 },
@@ -14052,6 +14117,9 @@ var doc = `{
                 "webSiteGroupID"
             ],
             "properties": {
+                "IPV6": {
+                    "type": "boolean"
+                },
                 "alias": {
                     "type": "string"
                 },
@@ -14571,6 +14639,9 @@ var doc = `{
                 "webSiteGroupID"
             ],
             "properties": {
+                "IPV6": {
+                    "type": "boolean"
+                },
                 "expireDate": {
                     "type": "string"
                 },
@@ -15002,6 +15073,9 @@ var doc = `{
         "response.WebsiteDTO": {
             "type": "object",
             "properties": {
+                "IPV6": {
+                    "type": "boolean"
+                },
                 "accessLog": {
                     "type": "boolean"
                 },

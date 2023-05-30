@@ -33,11 +33,11 @@ func (u *AuthService) Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo,
 	if err != nil {
 		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
 	}
-	passwrodSetting, err := settingRepo.Get(settingRepo.WithByKey("Password"))
+	passwordSetting, err := settingRepo.Get(settingRepo.WithByKey("Password"))
 	if err != nil {
 		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
 	}
-	pass, err := encrypt.StringDecrypt(passwrodSetting.Value)
+	pass, err := encrypt.StringDecrypt(passwordSetting.Value)
 	if err != nil {
 		return nil, constant.ErrAuth
 	}
@@ -60,11 +60,11 @@ func (u *AuthService) MFALogin(c *gin.Context, info dto.MFALogin) (*dto.UserLogi
 	if err != nil {
 		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
 	}
-	passwrodSetting, err := settingRepo.Get(settingRepo.WithByKey("Password"))
+	passwordSetting, err := settingRepo.Get(settingRepo.WithByKey("Password"))
 	if err != nil {
 		return nil, errors.WithMessage(constant.ErrRecordNotFound, err.Error())
 	}
-	pass, err := encrypt.StringDecrypt(passwrodSetting.Value)
+	pass, err := encrypt.StringDecrypt(passwordSetting.Value)
 	if err != nil {
 		return nil, err
 	}

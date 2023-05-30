@@ -171,7 +171,7 @@
                                             </el-tag>
                                             <div class="description">
                                                 <span>
-                                                    {{ $t('app.areadyRun') }}： {{ getAge(installed.createdAt) }}
+                                                    {{ $t('app.alreadyRun') }}： {{ getAge(installed.createdAt) }}
                                                 </span>
                                             </div>
                                         </div>

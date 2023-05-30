@@ -40,7 +40,7 @@
                             <el-input
                                 clearable
                                 v-model.trim="form.nfsMount"
-                                :placeholder="$t('container.mountpointNFSHerlper')"
+                                :placeholder="$t('container.mountpointNFSHelper')"
                             />
                         </el-form-item>
                         <el-form-item :label="$t('container.options')" prop="nfsOption">

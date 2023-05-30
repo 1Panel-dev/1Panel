@@ -149,7 +149,7 @@ func (b *BaseApi) BatchOperateRule(c *gin.Context) {
 		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
 		return
 	}
-	if err := firewallService.BacthOperateRule(req); err != nil {
+	if err := firewallService.BatchOperateRule(req); err != nil {
 		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
 		return
 	}

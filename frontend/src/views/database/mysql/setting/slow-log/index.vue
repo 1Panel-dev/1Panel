@@ -43,7 +43,7 @@
         />
 
         <br />
-        <ConfirmDialog @cancle="onCancle" ref="confirmDialogRef" @confirm="onSave"></ConfirmDialog>
+        <ConfirmDialog @cancel="onCancel" ref="confirmDialogRef" @confirm="onSave"></ConfirmDialog>
     </div>
 </template>
 <script lang="ts" setup>
@@ -130,7 +130,7 @@ const changeSlowLogs = () => {
     confirmDialogRef.value!.acceptParams(params);
 };
 
-const onCancle = async () => {
+const onCancel = async () => {
     variables.slow_query_log = currentStatus.value ? 'ON' : 'OFF';
     detailShow.value = currentStatus.value;
 };

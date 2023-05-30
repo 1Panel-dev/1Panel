@@ -24,11 +24,11 @@ func (u *ContainerService) PageVolume(req dto.SearchWithPage) (int64, interface{
 		return 0, nil, err
 	}
 	if len(req.Info) != 0 {
-		lenth, count := len(list.Volumes), 0
-		for count < lenth {
+		length, count := len(list.Volumes), 0
+		for count < length {
 			if !strings.Contains(list.Volumes[count].Name, req.Info) {
 				list.Volumes = append(list.Volumes[:count], list.Volumes[(count+1):]...)
-				lenth--
+				length--
 			} else {
 				count++
 			}
@@ -103,7 +103,7 @@ func (u *ContainerService) DeleteVolume(req dto.BatchDelete) error {
 	}
 	return nil
 }
-func (u *ContainerService) CreateVolume(req dto.VolumeCreat) error {
+func (u *ContainerService) CreateVolume(req dto.VolumeCreate) error {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return err

@@ -106,7 +106,7 @@ func (b *BaseApi) ListBuckets(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/backup/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"id","isList":true,"db":"backup_accounts","output_colume":"type","output_value":"types"}],"formatZH":"删除备份账号 [types]","formatEN":"delete backup account [types]"}
+// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"id","isList":true,"db":"backup_accounts","output_column":"type","output_value":"types"}],"formatZH":"删除备份账号 [types]","formatEN":"delete backup account [types]"}
 func (b *BaseApi) DeleteBackup(c *gin.Context) {
 	var req dto.OperateByID
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -188,7 +188,7 @@ func (b *BaseApi) DownloadRecord(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /settings/backup/record/del [post]
-// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_colume":"id","input_value":"ids","isList":true,"db":"backup_records","output_colume":"file_name","output_value":"files"}],"formatZH":"删除备份记录 [files]","formatEN":"delete backup records [files]"}
+// @x-panel-log {"bodyKeys":["ids"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"ids","isList":true,"db":"backup_records","output_column":"file_name","output_value":"files"}],"formatZH":"删除备份记录 [files]","formatEN":"delete backup records [files]"}
 func (b *BaseApi) DeleteBackupRecord(c *gin.Context) {
 	var req dto.BatchDeleteReq
 	if err := c.ShouldBindJSON(&req); err != nil {

@@ -57,10 +57,7 @@ func Init() {
 			global.LOG.Fatalf("init entrance before start failed, err: %v", err)
 		}
 
-		if cmd.HasNoPasswordSudo() {
-			_, _ = cmd.Exec("sudo sed -i '/CHANGE_USER_INFO=true/d' /usr/local/bin/1pctl")
-		} else {
-			_, _ = cmd.Exec("sed -i '/CHANGE_USER_INFO=true/d' /usr/local/bin/1pctl")
-		}
+		sudo := cmd.SudoHandleCmd()
+		_, _ = cmd.Execf("%s sed -i '/CHANGE_USER_INFO=true/d' /usr/local/bin/1pctl", sudo)
 	}
 }
