@@ -191,7 +191,7 @@ const checkParamCommon = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.paramName')));
     } else {
-        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9._-]{1,29}$/;
+        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9._-]{1,63}$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.paramName')));
         } else {
@@ -204,7 +204,7 @@ const checkParamComplexity = (rule: any, value: any, callback: any) => {
     if (value === '' || typeof value === 'undefined' || value == null) {
         callback(new Error(i18n.global.t('commons.rule.paramComplexity', ['.%@$!&~_-'])));
     } else {
-        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9.%@$!&~_-]{5,29}$/;
+        const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9.%@$!&~_-]{5,127}$/;
         if (!reg.test(value) && value !== '') {
             callback(new Error(i18n.global.t('commons.rule.paramComplexity', ['.%@$!&~_-'])));
         } else {
@@ -303,6 +303,19 @@ const checkLeechExts = (rule: any, value: any, callback: any) => {
     }
 };
 
+const checkParamSimple = (rule: any, value: any, callback: any) => {
+    if (value === '' || typeof value === 'undefined' || value == null) {
+        callback();
+    } else {
+        const reg = /^[a-z0-9][a-z0-9]{1,64}$/;
+        if (!reg.test(value) && value !== '') {
+            callback(new Error(i18n.global.t('commons.rule.paramSimple')));
+        } else {
+            callback();
+        }
+    }
+};
+
 interface CommonRule {
     requiredInput: FormItemRule;
     requiredSelect: FormItemRule;
@@ -333,6 +346,7 @@ interface CommonRule {
     paramComplexity: FormItemRule;
     paramPort: FormItemRule;
     paramExtUrl: FormItemRule;
+    paramSimple: FormItemRule;
 }
 
 export const Rules: CommonRule = {
@@ -483,5 +497,10 @@ export const Rules: CommonRule = {
         required: true,
         trigger: 'blur',
         validator: checkLeechExts,
+    },
+    paramSimple: {
+        required: true,
+        trigger: 'blur',
+        validator: checkParamSimple,
     },
 };
