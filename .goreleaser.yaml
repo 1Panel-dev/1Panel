@@ -42,7 +42,7 @@ builds:
 
 archives:
   - format: tar.gz
-    name_template: "{{ .ProjectName }}-v{{ .Version }}-{{ .Os }}-{{ .Arch }}{{- if .Arm }}v{{ .Arm }}{{ end }}"
+    name_template: "1panel-v{{ .Version }}-{{ .Os }}-{{ .Arch }}{{- if .Arm }}v{{ .Arm }}{{ end }}"
     wrap_in_directory: true
     files:
       - 1pctl
