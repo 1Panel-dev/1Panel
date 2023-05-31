@@ -236,3 +236,8 @@ export function isJson(str: string) {
 export function toLowerCase(str: string) {
     return str.toLowerCase();
 }
+
+export function downloadFile(filePath: string) {
+    let url = `${import.meta.env.VITE_API_URL as string}/files/download?`;
+    window.open(url + 'path=' + filePath, '_blank');
+}

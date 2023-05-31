@@ -323,6 +323,7 @@ const submitDate = (row: any) => {
         remark: row.remark,
         webSiteGroupId: row.webSiteGroupId,
         expireDate: reqDate,
+        IPV6: row.IPV6,
     };
 
     UpdateWebsite(req).then(() => {

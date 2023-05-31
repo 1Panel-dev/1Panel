@@ -183,7 +183,7 @@
 <script setup lang="ts">
 import { nextTick, onMounted, reactive, ref } from '@vue/runtime-core';
 import { GetFilesList, DeleteFile, GetFileContent, ComputeDirSize } from '@/api/modules/files';
-import { computeSize, dateFormat, getIcon, getRandomStr } from '@/utils/util';
+import { computeSize, dateFormat, downloadFile, getIcon, getRandomStr } from '@/utils/util';
 import { File } from '@/api/interface/file';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import i18n from '@/lang';
@@ -207,8 +207,6 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { useSearchable } from './hooks/searchable';
 import { ResultData } from '@/api/interface';
-// import streamSaver from 'streamsaver';
-// import axios from 'axios';
 
 interface FilePaths {
     url: string;
@@ -245,7 +243,6 @@ const fileRename = reactive({ path: '', oldName: '' });
 const fileWget = reactive({ path: '' });
 const fileMove = reactive({ oldPaths: [''], type: '', path: '' });
 const processPage = reactive({ open: false });
-// const fileDownload = reactive({ path: '', name: '' });
 
 const createRef = ref();
 const roleRef = ref();
@@ -573,8 +570,7 @@ const openPaste = () => {
 };
 
 const openDownload = (file: File.File) => {
-    let url = `${import.meta.env.VITE_API_URL as string}/files/download?`;
-    window.open(url + 'path=' + file.path, '_blank');
+    downloadFile(file.path);
 };
 
 const openDetail = (row: File.File) => {
