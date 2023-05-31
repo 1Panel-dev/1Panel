@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
+	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
@@ -383,43 +384,10 @@ func (a AppService) SyncAppListFromLocal() {
 		if dirEntry.IsDir() {
 			appDir := path.Join(localAppDir, dirEntry.Name())
 			appDirEntries, err := os.ReadDir(appDir)
-			if err != nil || len(appDirEntries) == 0 {
-				continue
-			}
-			configYamlPath := path.Join(appDir, "data.yml")
-			if !fileOp.Stat(configYamlPath) {
-				continue
-			}
-			iconPath := path.Join(appDir, "logo.png")
-			if !fileOp.Stat(iconPath) {
-				continue
-			}
-			configYamlByte, err := fileOp.GetContent(configYamlPath)
+			app, err := handleLocalApp(localAppDir)
 			if err != nil {
+				global.LOG.Errorf(i18n.GetMsgWithMap("LocalAppErr", map[string]interface{}{"name": app.Name, "err": err.Error()}))
 				continue
-			}
-			localAppDefine := dto.LocalAppAppDefine{}
-			if err := yaml.Unmarshal(configYamlByte, &localAppDefine); err != nil {
-				continue
-			}
-			app := localAppDefine.AppProperty
-			app.Resource = constant.AppResourceLocal
-			app.Status = constant.AppNormal
-			app.Recommend = 9999
-			app.TagsKey = append(app.TagsKey, "Local")
-			app.Key = "local" + app.Key
-			readMePath := path.Join(appDir, "README.md")
-			if fileOp.Stat(configYamlPath) {
-				readMeByte, err := fileOp.GetContent(readMePath)
-				if err == nil {
-					app.ReadMe = string(readMeByte)
-				}
-			}
-
-			iconByte, _ := fileOp.GetContent(iconPath)
-			if iconByte != nil {
-				iconStr := base64.StdEncoding.EncodeToString(iconByte)
-				app.Icon = iconStr
 			}
 			var appDetails []model.AppDetail
 			for _, appDirEntry := range appDirEntries {
@@ -429,37 +397,19 @@ func (a AppService) SyncAppListFromLocal() {
 						Status:  constant.AppNormal,
 					}
 					versionDir := path.Join(appDir, appDirEntry.Name())
-					dockerComposePath := path.Join(versionDir, "docker-compose.yml")
-					if !fileOp.Stat(dockerComposePath) {
+					if err = handleLocalAppDetail(versionDir, &appDetail); err != nil {
+						global.LOG.Errorf(i18n.GetMsgWithMap("LocalAppVersionErr", map[string]interface{}{"name": app.Name, "version": appDetail.Version, "err": err.Error()}))
 						continue
 					}
-					dockerComposeByte, _ := fileOp.GetContent(dockerComposePath)
-					if dockerComposeByte == nil {
-						continue
-					}
-					appDetail.DockerCompose = string(dockerComposeByte)
-					paramPath := path.Join(versionDir, "data.yml")
-					if !fileOp.Stat(paramPath) {
-						continue
-					}
-					paramByte, _ := fileOp.GetContent(paramPath)
-					if paramByte == nil {
-						continue
-					}
-					appParamConfig := dto.LocalAppParam{}
-					if err := yaml.Unmarshal(paramByte, &appParamConfig); err != nil {
-						continue
-					}
-					dataJson, err := json.Marshal(appParamConfig.AppParams)
-					if err != nil {
-						continue
-					}
-					appDetail.Params = string(dataJson)
 					appDetails = append(appDetails, appDetail)
 				}
 			}
-			app.Details = appDetails
-			localApps = append(localApps, app)
+			if len(appDetails) > 0 {
+				app.Details = appDetails
+				localApps = append(localApps, *app)
+			} else {
+				global.LOG.Errorf(i18n.GetMsgWithMap("LocalAppVersionNull", map[string]interface{}{"name": app.Name}))
+			}
 		}
 	}
 

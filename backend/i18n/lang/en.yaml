@@ -31,6 +31,12 @@ Err1PanelNetworkFailed: 'Default container network creation failed! {{ .detail }
 ErrFileParse: 'Application docker-compose file parsing failed!'
 ErrInstallDirNotFound: 'installation directory does not exist'
 AppStoreIsUpToDate: 'The app store is already up to date！'
+LocalAppVersionNull: 'The {{.name}} app is not synced to version! Could not add to application list'
+LocalAppVersionErr: '{{.name}} failed to sync version {{.version}}! {{.err}}'
+ErrFileNotFound: '{{.name}} file does not exist'
+ErrFileParseApp: 'Failed to parse {{.name}} file {{.err}}'
+ErrAppDirNull: 'version folder does not exist'
+LocalAppErr: "App {{.name}} sync failed! {{.err}}"
 
 #file
 ErrFileCanNotRead: "File can not read"
