@@ -190,7 +190,6 @@ func (u *CronjobService) StartJob(cronjob *model.Cronjob) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	global.LOG.Debug(global.Cron.Entries())
 	return entryID, nil
 }
 

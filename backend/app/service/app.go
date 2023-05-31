@@ -290,6 +290,11 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 	containerName := constant.ContainerPrefix + app.Key + "-" + common.RandStr(4)
 	if req.Advanced && req.ContainerName != "" {
 		containerName = req.ContainerName
+		appInstalls, _ := appInstallRepo.ListBy(appInstallRepo.WithContainerName(containerName))
+		if len(appInstalls) > 0 {
+			err = buserr.New(constant.ErrContainerName)
+			return
+		}
 	}
 	req.Params[constant.ContainerName] = containerName
 	appInstall.ContainerName = containerName
