@@ -186,5 +186,6 @@ export namespace App {
         memoryUnit: string;
         containerName: string;
         allowPort: boolean;
+        dockerCompose: string;
     }
 }
