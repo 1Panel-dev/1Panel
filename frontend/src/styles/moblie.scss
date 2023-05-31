@@ -40,11 +40,20 @@
     .el-drawer.rtl {
         width: 80% !important;
     }
-		.site-form-wrapper {
-			width: 90% !important;
-			min-width: auto !important;
-			.el-form-item__label {
-				width: auto !important;
-			}
-		}
+    .site-form-wrapper {
+        width: 90% !important;
+        min-width: auto !important;
+        .el-form-item__label {
+            width: auto !important;
+        }
+    }
+    .moblie-form {
+        overflow: auto;
+        .el-input {
+            width: 350px;
+        }
+        .el-textarea__inner {
+            width: 350px;
+        }
+    }
 }
