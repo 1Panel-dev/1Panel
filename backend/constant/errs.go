@@ -58,6 +58,7 @@ var (
 	ErrCmdTimeout          = "ErrCmdTimeout"
 	ErrFileParse           = "ErrFileParse"
 	ErrInstallDirNotFound  = "ErrInstallDirNotFound"
+	ErrContainerName       = "ErrContainerName"
 )
 
 // website
