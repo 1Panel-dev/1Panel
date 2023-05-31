@@ -2,10 +2,12 @@ package service
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/app/api/v1/helper"
 	"github.com/1Panel-dev/1Panel/backend/app/dto/request"
+	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/compose-spec/compose-go/types"
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
@@ -626,6 +628,83 @@ func getApps(oldApps []model.App, items []dto.AppDefine) map[string]model.App {
 		apps[key] = app
 	}
 	return apps
+}
+
+func handleLocalAppDetail(versionDir string, appDetail *model.AppDetail) error {
+	fileOp := files.NewFileOp()
+	dockerComposePath := path.Join(versionDir, "docker-compose.yml")
+	if !fileOp.Stat(dockerComposePath) {
+		return errors.New(i18n.GetMsgWithMap("ErrFileNotFound", map[string]interface{}{"name": "docker-compose.yml"}))
+	}
+	dockerComposeByte, _ := fileOp.GetContent(dockerComposePath)
+	if dockerComposeByte == nil {
+		return errors.New(i18n.GetMsgWithMap("ErrFileParseApp", map[string]interface{}{"name": "docker-compose.yml"}))
+	}
+	appDetail.DockerCompose = string(dockerComposeByte)
+	paramPath := path.Join(versionDir, "data.yml")
+	if !fileOp.Stat(paramPath) {
+		return errors.New(i18n.GetMsgWithMap("ErrFileNotFound", map[string]interface{}{"name": "data.yml"}))
+	}
+	paramByte, _ := fileOp.GetContent(paramPath)
+	if paramByte == nil {
+		return errors.New(i18n.GetMsgWithMap("ErrFileParseApp", map[string]interface{}{"name": "data.yml"}))
+	}
+	appParamConfig := dto.LocalAppParam{}
+	if err := yaml.Unmarshal(paramByte, &appParamConfig); err != nil {
+		return errors.New(i18n.GetMsgWithMap("ErrFileParseApp", map[string]interface{}{"name": "data.yml"}))
+	}
+	dataJson, err := json.Marshal(appParamConfig.AppParams)
+	if err != nil {
+		return errors.New(i18n.GetMsgWithMap("ErrFileParseApp", map[string]interface{}{"name": "data.yml", "err": err.Error()}))
+	}
+	appDetail.Params = string(dataJson)
+	return nil
+}
+
+func handleLocalApp(appDir string) (app *model.App, err error) {
+	fileOp := files.NewFileOp()
+	appDirEntries, err := os.ReadDir(appDir)
+	if err != nil || len(appDirEntries) == 0 {
+		err = errors.New("ErrAppDirNull")
+		return
+	}
+	configYamlPath := path.Join(appDir, "data.yml")
+	if !fileOp.Stat(configYamlPath) {
+		err = errors.New(i18n.GetMsgWithMap("ErrFileNotFound", map[string]interface{}{"name": "data.yml"}))
+		return
+	}
+	iconPath := path.Join(appDir, "logo.png")
+	if !fileOp.Stat(iconPath) {
+		err = errors.New(i18n.GetMsgWithMap("ErrFileNotFound", map[string]interface{}{"name": "logo.png"}))
+		return
+	}
+	configYamlByte, err := fileOp.GetContent(configYamlPath)
+	if err != nil {
+		err = errors.New(i18n.GetMsgWithMap("ErrFileParseApp", map[string]interface{}{"name": "data.yml", "err": err.Error()}))
+		return
+	}
+	localAppDefine := dto.LocalAppAppDefine{}
+	if err = yaml.Unmarshal(configYamlByte, &localAppDefine); err != nil {
+		err = errors.New(i18n.GetMsgWithMap("ErrFileParseApp", map[string]interface{}{"name": "data.yml", "err": err.Error()}))
+		return
+	}
+	app = &localAppDefine.AppProperty
+	app.Resource = constant.AppResourceLocal
+	app.Status = constant.AppNormal
+	app.Recommend = 9999
+	app.TagsKey = append(app.TagsKey, "Local")
+	app.Key = "local" + app.Key
+	readMePath := path.Join(appDir, "README.md")
+	readMeByte, err := fileOp.GetContent(readMePath)
+	if err == nil {
+		app.ReadMe = string(readMeByte)
+	}
+	iconByte, _ := fileOp.GetContent(iconPath)
+	if iconByte != nil {
+		iconStr := base64.StdEncoding.EncodeToString(iconByte)
+		app.Icon = iconStr
+	}
+	return
 }
 
 func handleErr(install model.AppInstall, err error, out string) error {

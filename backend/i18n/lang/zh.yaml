@@ -31,6 +31,12 @@ Err1PanelNetworkFailed: '默认容器网络创建失败！{{ .detail }}'
 ErrFileParse: '应用 docker-compose 文件解析失败!'
 ErrInstallDirNotFound: '安装目录不存在'
 AppStoreIsUpToDate: '应用商店已经是最新版本'
+LocalAppVersionNull: '{{.name}} 应用未同步到版本！无法添加到应用列表'
+LocalAppVersionErr: '{{.name}} 同步版本 {{.version}} 失败！{{.err}}'
+ErrFileNotFound: '{{.name}} 文件不存在'
+ErrFileParseApp: '{{.name}} 文件解析失败 {{.err}}'
+ErrAppDirNull: '版本文件夹不存在'
+LocalAppErr: "应用 {{.name}} 同步失败！{{.err}}"
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"
