@@ -152,8 +152,9 @@ const paramModel = ref<any>({
 });
 const rules = reactive({
     params: {},
-    cpuQuota: [Rules.requiredInput, checkNumberRange(0, 99999)],
+    cpuQuota: [Rules.requiredInput, checkNumberRange(0, 999)],
     memoryLimit: [Rules.requiredInput, checkNumberRange(0, 9999999999)],
+    containerName: [Rules.containerName],
 });
 const submitModel = ref<any>({});
 
@@ -162,6 +163,7 @@ const acceptParams = async (props: ParamProps) => {
     params.value = [];
     paramData.value.id = props.id;
     paramData.value.app = props.app;
+    paramModel.value.params = {};
     edit.value = false;
     await get();
     open.value = true;
