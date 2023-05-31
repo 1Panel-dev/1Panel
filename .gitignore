@@ -30,3 +30,4 @@ dist/
 1pctl
 1panel.service
 install.sh
+docker.sh

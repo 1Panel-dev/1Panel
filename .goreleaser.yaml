@@ -48,6 +48,7 @@ archives:
       - 1pctl
       - 1panel.service
       - install.sh
+      - docker.sh
       - README.md
       - LICENSE
     
