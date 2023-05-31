@@ -70,6 +70,7 @@ const onSubmit = async () => {
         .then(() => {
             loading.value = false;
             emit('search');
+            handleClose();
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })
         .catch(() => {

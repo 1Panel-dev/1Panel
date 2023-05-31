@@ -69,6 +69,7 @@ const onSubmit = async () => {
     await updateDaemonJson('Registries', registries.value.replaceAll('\n', ','))
         .then(() => {
             loading.value = false;
+            handleClose();
             emit('search');
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         })

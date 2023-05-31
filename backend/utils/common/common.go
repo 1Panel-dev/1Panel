@@ -12,6 +12,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 )
 
 func CompareVersion(version1 string, version2 string) bool {
@@ -152,4 +154,22 @@ func LoadTimeZone() string {
 		return "Asia/Shanghai"
 	}
 	return loc.String()
+}
+func LoadTimeZoneByCmd() string {
+	loc := time.Now().Location().String()
+	if _, err := time.LoadLocation(loc); err != nil {
+		loc = "Asia/Shanghai"
+	}
+	std, err := cmd.Exec("timedatectl | grep 'Time zone'")
+	if err != nil {
+		return loc
+	}
+	fields := strings.Fields(string(std))
+	if len(fields) != 5 {
+		return loc
+	}
+	if _, err := time.LoadLocation(fields[2]); err != nil {
+		return loc
+	}
+	return fields[2]
 }

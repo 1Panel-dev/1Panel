@@ -87,8 +87,15 @@ const onSavePort = async (formEl: FormInstance | undefined) => {
                 .then(() => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    emit('search');
-                    handleClose();
+                    if (form.bindDomain) {
+                        let href = window.location.href;
+                        let ipLocal = href.split('//')[1].split(':')[0];
+                        href = href.replaceAll(ipLocal, form.bindDomain);
+                        window.open(href, '_self');
+                    } else {
+                        handleClose();
+                        emit('search');
+                    }
                 })
                 .catch(() => {
                     loading.value = false;

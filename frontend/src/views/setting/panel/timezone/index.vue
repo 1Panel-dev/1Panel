@@ -67,7 +67,6 @@ import { MsgSuccess } from '@/utils/message';
 import { loadTimeZone, updateSetting } from '@/api/modules/setting';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
-import router from '@/routers';
 import { GlobalStore } from '@/store';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 const globalStore = GlobalStore();
@@ -112,11 +111,10 @@ const onSave = async (formEl: FormInstance | undefined) => {
             await updateSetting({ key: 'TimeZone', value: form.timeZone })
                 .then(async () => {
                     loading.value = false;
-                    router.push({ name: 'entrance', params: { code: globalStore.entrance } });
-                    globalStore.setLogStatus(false);
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    drawerVisiable.value = false;
-                    return;
+                    globalStore.isLogin = false;
+                    let href = window.location.href;
+                    window.open(href, '_self');
                 })
                 .catch(() => {
                     loading.value = false;
