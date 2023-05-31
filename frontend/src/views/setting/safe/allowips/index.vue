@@ -22,7 +22,7 @@
             <template #footer>
                 <span class="dialog-footer">
                     <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                    <el-button :disabled="loading" type="primary" @click="onSavePort()">
+                    <el-button :disabled="loading" type="primary" @click="onSave()">
                         {{ $t('commons.button.confirm') }}
                     </el-button>
                 </span>
@@ -53,7 +53,7 @@ const acceptParams = (params: DialogProps): void => {
     drawerVisiable.value = true;
 };
 
-const onSavePort = async () => {
+const onSave = async () => {
     if (allowIPs.value) {
         let ips = allowIPs.value.split('\n');
         for (const ip of ips) {
