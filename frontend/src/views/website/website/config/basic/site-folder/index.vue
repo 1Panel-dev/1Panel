@@ -1,7 +1,7 @@
 <template>
     <div v-loading="loading">
         <div class="site-form-wrapper">
-            <el-form class="site-form" ref="siteForm" :model="update" label-width="100px">
+            <el-form class="site-form moblie-form" ref="siteForm" :model="update" label-width="100px">
                 <el-form-item :label="$t('website.siteAlias')">
                     {{ website.alias }}
                 </el-form-item>
