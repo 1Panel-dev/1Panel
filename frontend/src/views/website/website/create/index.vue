@@ -360,6 +360,7 @@ const rules = ref<any>({
         params: {},
         cpuQuota: [Rules.requiredInput, checkNumberRange(0, 99999)],
         memoryLimit: [Rules.requiredInput, checkNumberRange(0, 9999999999)],
+        containerName: [Rules.containerName],
     },
     proxyType: [Rules.requiredSelect],
     port: [Rules.port],

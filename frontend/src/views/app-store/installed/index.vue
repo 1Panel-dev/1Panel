@@ -157,7 +157,7 @@
                                                 plain
                                                 round
                                                 size="small"
-                                                :disabled="installed.status === 'Running'"
+                                                :disabled="installed.status !== 'Running'"
                                                 @click="openOperate(installed, 'upgrade')"
                                                 v-if="mode === 'upgrade'"
                                             >
