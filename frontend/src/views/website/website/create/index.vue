@@ -202,7 +202,7 @@
                                 :placeholder="$t('app.containerNameHelper')"
                             ></el-input>
                         </el-form-item>
-                        <el-form-item :label="$t('container.cpuQuota')" prop="cpuQuota">
+                        <el-form-item :label="$t('container.cpuQuota')" prop="appinstall.cpuQuota">
                             <el-input
                                 type="number"
                                 style="width: 40%"
@@ -213,7 +213,7 @@
                             </el-input>
                             <span class="input-help">{{ $t('container.limitHelper') }}</span>
                         </el-form-item>
-                        <el-form-item :label="$t('container.memoryLimit')" prop="memoryLimit">
+                        <el-form-item :label="$t('container.memoryLimit')" prop="appinstall.memoryLimit">
                             <el-input style="width: 40%" v-model.number="website.appinstall.memoryLimit" maxlength="10">
                                 <template #append>
                                     <el-select
@@ -302,7 +302,7 @@ import {
     CheckAppInstalled,
 } from '@/api/modules/app';
 import { CreateWebsite, PreCheck } from '@/api/modules/website';
-import { Rules } from '@/global/form-rules';
+import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
@@ -358,6 +358,8 @@ const rules = ref<any>({
         name: [Rules.appName],
         appId: [Rules.requiredSelectBusiness],
         params: {},
+        cpuQuota: [Rules.requiredInput, checkNumberRange(0, 99999)],
+        memoryLimit: [Rules.requiredInput, checkNumberRange(0, 9999999999)],
     },
     proxyType: [Rules.requiredSelect],
     port: [Rules.port],

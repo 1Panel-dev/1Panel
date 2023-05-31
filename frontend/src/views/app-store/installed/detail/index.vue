@@ -100,7 +100,7 @@ import { reactive, ref } from 'vue';
 import Header from '@/components/drawer-header/index.vue';
 import { useI18n } from 'vue-i18n';
 import { FormInstance } from 'element-plus';
-import { Rules } from '@/global/form-rules';
+import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { canEditPort } from '@/global/business';
@@ -128,6 +128,8 @@ const paramModel = ref<any>({
 });
 const rules = reactive({
     params: {},
+    cpuQuota: [Rules.requiredInput, checkNumberRange(0, 99999)],
+    memoryLimit: [Rules.requiredInput, checkNumberRange(0, 9999999999)],
 });
 const submitModel = ref<any>({});
 
