@@ -79,6 +79,25 @@
                             <el-checkbox v-model="paramModel.allowPort" :label="$t('app.allowPort')" size="large" />
                             <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
                         </el-form-item>
+                        <el-form-item prop="editCompose">
+                            <el-checkbox v-model="paramModel.editCompose" :label="$t('app.editCompose')" size="large" />
+                            <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
+                        </el-form-item>
+                        <div v-if="paramModel.editCompose">
+                            <codemirror
+                                :autofocus="true"
+                                placeholder=""
+                                :indent-with-tab="true"
+                                :tabSize="4"
+                                style="height: 400px"
+                                :lineWrapping="true"
+                                :matchBrackets="true"
+                                theme="cobalt"
+                                :styleActiveLine="true"
+                                :extensions="extensions"
+                                v-model="paramModel.dockerCompose"
+                            />
+                        </div>
                     </div>
                 </el-form>
             </el-col>
@@ -104,6 +123,11 @@ import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { canEditPort } from '@/global/business';
+import { Codemirror } from 'vue-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { oneDark } from '@codemirror/theme-one-dark';
+
+const extensions = [javascript(), oneDark];
 
 interface ParamProps {
     id: Number;
@@ -188,6 +212,7 @@ const get = async () => {
         paramModel.value.allowPort = res.data.allowPort;
         paramModel.value.containerName = res.data.containerName;
         paramModel.value.advanced = false;
+        paramModel.value.dockerCompose = res.data.dockerCompose;
     } catch (error) {
     } finally {
         loading.value = false;
@@ -215,12 +240,18 @@ const submit = async (formEl: FormInstance) => {
             type: 'info',
         }).then(async () => {
             submitModel.value.params = paramModel.value.params;
-            submitModel.value.advanced = paramModel.value.advanced;
-            submitModel.value.memoryLimit = paramModel.value.memoryLimit;
-            submitModel.value.cpuQuota = paramModel.value.cpuQuota;
-            submitModel.value.memoryUnit = paramModel.value.memoryUnit;
-            submitModel.value.allowPort = paramModel.value.allowPort;
-            submitModel.value.containerName = paramModel.value.containerName;
+            if (paramModel.value.advanced) {
+                submitModel.value.advanced = paramModel.value.advanced;
+                submitModel.value.memoryLimit = paramModel.value.memoryLimit;
+                submitModel.value.cpuQuota = paramModel.value.cpuQuota;
+                submitModel.value.memoryUnit = paramModel.value.memoryUnit;
+                submitModel.value.allowPort = paramModel.value.allowPort;
+                submitModel.value.containerName = paramModel.value.containerName;
+                if (paramModel.value.editCompose) {
+                    submitModel.value.editCompose = paramModel.value.editCompose;
+                    submitModel.value.dockerCompose = paramModel.value.dockerCompose;
+                }
+            }
             try {
                 loading.value = true;
                 await UpdateAppInstallParams(submitModel.value);

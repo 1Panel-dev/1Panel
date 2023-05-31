@@ -257,8 +257,14 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	backupDockerCompose := installed.DockerCompose
 	if req.Advanced {
 		composeMap := make(map[string]interface{})
-		if err = yaml.Unmarshal([]byte(installed.DockerCompose), &composeMap); err != nil {
-			return err
+		if req.EditCompose {
+			if err = yaml.Unmarshal([]byte(req.DockerCompose), &composeMap); err != nil {
+				return err
+			}
+		} else {
+			if err = yaml.Unmarshal([]byte(installed.DockerCompose), &composeMap); err != nil {
+				return err
+			}
 		}
 		if err := addDockerComposeCommonParam(composeMap, installed.ServiceName, req.AppContainerConfig, req.Params); err != nil {
 			return err
@@ -268,6 +274,12 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 			return err
 		}
 		installed.DockerCompose = string(composeByte)
+		if req.ContainerName == "" {
+			req.Params[constant.ContainerName] = installed.ContainerName
+		} else {
+			req.Params[constant.ContainerName] = req.ContainerName
+			installed.ContainerName = req.ContainerName
+		}
 	}
 
 	envPath := path.Join(installed.GetPath(), ".env")
@@ -541,6 +553,7 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	}
 
 	config := getAppCommonConfig(envs)
+	config.DockerCompose = install.DockerCompose
 	res.Params = params
 	res.AppContainerConfig = config
 	return &res, nil
