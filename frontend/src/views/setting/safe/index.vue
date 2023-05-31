@@ -171,6 +171,8 @@ import { updateSetting, getSettingInfo, getSystemAvailable, updateSSL, loadSSLIn
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { Setting } from '@/api/interface/setting';
+import { GlobalStore } from '@/store';
+const globalStore = GlobalStore();
 
 const loading = ref(false);
 const entranceRef = ref();
@@ -280,8 +282,14 @@ const handleSSL = async () => {
             await updateSSL({ ssl: 'disable', domain: '', sslType: '', key: '', cert: '', sslID: 0 });
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             let href = window.location.href;
+            globalStore.isLogin = false;
             let address = href.split('://')[1];
-            window.open(`http://${address}/`, '_self');
+            if (globalStore.entrance) {
+                address = address.replaceAll('settings/safe', globalStore.entrance);
+            } else {
+                address = address.replaceAll('settings/safe', 'login');
+            }
+            window.location.href = `http://${address}`;
         })
         .catch(() => {
             form.ssl = 'enable';

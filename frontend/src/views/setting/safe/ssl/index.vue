@@ -212,7 +212,11 @@ const onSaveSSL = async (formEl: FormInstance | undefined) => {
                 let href = window.location.href;
                 globalStore.isLogin = false;
                 let address = href.split('://')[1];
-                address = address.replaceAll('settings/safe', globalStore.entrance);
+                if (globalStore.entrance) {
+                    address = address.replaceAll('settings/safe', globalStore.entrance);
+                } else {
+                    address = address.replaceAll('settings/safe', 'login');
+                }
                 window.open(`https://${address}`, '_self');
             });
         });

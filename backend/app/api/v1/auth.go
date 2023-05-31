@@ -103,7 +103,12 @@ func (b *BaseApi) Captcha(c *gin.Context) {
 // @Router /auth/issafety [get]
 func (b *BaseApi) CheckIsSafety(c *gin.Context) {
 	code := c.DefaultQuery("code", "")
-	helper.SuccessWithData(c, authService.CheckIsSafety(code))
+	status, err := authService.CheckIsSafety(code)
+	if err != nil {
+		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		return
+	}
+	helper.SuccessWithData(c, status)
 }
 
 // @Tags Auth
