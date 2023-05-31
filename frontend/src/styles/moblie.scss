@@ -56,4 +56,13 @@
             width: 350px;
         }
     }
+
+    .app-status {
+        font-size: 12px;
+        .el-card {
+            .status-content {
+                margin-left: 20px;
+            }
+        }
+    }
 }

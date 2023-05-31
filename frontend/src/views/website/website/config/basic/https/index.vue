@@ -1,6 +1,6 @@
 <template>
     <el-row :gutter="20" v-loading="loading">
-        <el-col :xs="24" :sm="18" :md="14" :lg="14" :xl="14">
+        <el-col :xs="24" :sm="18" :md="18" :lg="18" :xl="14">
             <el-form
                 class="moblie-form"
                 ref="httpsForm"
