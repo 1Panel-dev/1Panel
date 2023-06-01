@@ -12333,6 +12333,9 @@
         "dto.SSHHistory": {
             "type": "object",
             "properties": {
+                "Area": {
+                    "type": "string"
+                },
                 "address": {
                     "type": "string"
                 },
@@ -12344,9 +12347,6 @@
                 },
                 "dateStr": {
                     "type": "string"
-                },
-                "isLocal": {
-                    "type": "boolean"
                 },
                 "message": {
                     "type": "string"
@@ -12366,6 +12366,9 @@
             "type": "object",
             "properties": {
                 "listenAddress": {
+                    "type": "string"
+                },
+                "message": {
                     "type": "string"
                 },
                 "passwordAuthentication": {

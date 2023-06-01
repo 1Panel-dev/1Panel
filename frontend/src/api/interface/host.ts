@@ -106,6 +106,7 @@ export namespace Host {
 
     export interface SSHInfo {
         status: string;
+        message: string;
         port: string;
         listenAddress: string;
         passwordAuthentication: string;
@@ -130,7 +131,7 @@ export namespace Host {
     }
     export interface sshHistory {
         date: Date;
-        isLocal: boolean;
+        area: string;
         user: string;
         authMode: string;
         address: string;

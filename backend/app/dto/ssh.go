@@ -4,6 +4,7 @@ import "time"
 
 type SSHInfo struct {
 	Status                 string `json:"status"`
+	Message                string `json:"message"`
 	Port                   string `json:"port"`
 	ListenAddress          string `json:"listenAddress"`
 	PasswordAuthentication string `json:"passwordAuthentication"`
@@ -38,7 +39,7 @@ type SSHLog struct {
 type SSHHistory struct {
 	Date     time.Time `json:"date"`
 	DateStr  string    `json:"dateStr"`
-	IsLocal  bool      `json:"isLocal"`
+	Area     string    `json:"area"`
 	User     string    `json:"user"`
 	AuthMode string    `json:"authMode"`
 	Address  string    `json:"address"`
