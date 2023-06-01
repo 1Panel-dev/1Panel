@@ -37,9 +37,7 @@
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
                     <el-table-column min-width="80" :label="$t('logs.loginIP')" prop="address" />
-                    <el-table-column min-width="60" :label="$t('ssh.belong')" prop="isLocal">
-                        <template #default="{ row }">{{ row.isLocal ? $t('ssh.local') : $t('ssh.remote') }}</template>
-                    </el-table-column>
+                    <el-table-column min-width="60" :label="$t('ssh.belong')" prop="area" />
                     <el-table-column min-width="60" :label="$t('firewall.port')" prop="port" />
                     <el-table-column min-width="60" :label="$t('ssh.loginMode')" prop="authMode">
                         <template #default="{ row }">

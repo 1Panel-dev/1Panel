@@ -12347,6 +12347,9 @@ var doc = `{
         "dto.SSHHistory": {
             "type": "object",
             "properties": {
+                "Area": {
+                    "type": "string"
+                },
                 "address": {
                     "type": "string"
                 },
@@ -12358,9 +12361,6 @@ var doc = `{
                 },
                 "dateStr": {
                     "type": "string"
-                },
-                "isLocal": {
-                    "type": "boolean"
                 },
                 "message": {
                     "type": "string"
@@ -12380,6 +12380,9 @@ var doc = `{
             "type": "object",
             "properties": {
                 "listenAddress": {
+                    "type": "string"
+                },
+                "message": {
                     "type": "string"
                 },
                 "passwordAuthentication": {

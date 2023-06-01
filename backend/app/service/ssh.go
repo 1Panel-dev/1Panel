@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"net"
 	"os"
 	"os/user"
 	"path"
@@ -13,9 +12,11 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/constant"
+	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"github.com/1Panel-dev/1Panel/backend/utils/qqwry"
 )
 
 const sshPath = "/etc/ssh/sshd_config"
@@ -38,7 +39,8 @@ func NewISSHService() ISSHService {
 
 func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 	data := dto.SSHInfo{
-		Status:                 constant.StatusDisable,
+		Status:                 constant.StatusEnable,
+		Message:                "",
 		Port:                   "22",
 		ListenAddress:          "0.0.0.0",
 		PasswordAuthentication: "yes",
@@ -49,7 +51,8 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 	sudo := cmd.SudoHandleCmd()
 	stdout, err := cmd.Execf("%s systemctl status sshd", sudo)
 	if err != nil {
-		return &data, nil
+		data.Message = stdout
+		data.Status = constant.StatusDisable
 	}
 	stdLines := strings.Split(stdout, "\n")
 	for _, stdline := range stdLines {
@@ -58,12 +61,10 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 			break
 		}
 	}
-	if data.Status == constant.StatusDisable {
-		return &data, nil
-	}
 	sshConf, err := os.ReadFile(sshPath)
 	if err != nil {
-		return &data, err
+		data.Message = err.Error()
+		data.Status = constant.StatusDisable
 	}
 	lines := strings.Split(string(sshConf), "\n")
 	for _, line := range lines {
@@ -86,7 +87,7 @@ func (u *SSHService) GetSSHInfo() (*dto.SSHInfo, error) {
 			data.UseDNS = strings.ReplaceAll(line, "UseDNS ", "")
 		}
 	}
-	return &data, err
+	return &data, nil
 }
 
 func (u *SSHService) OperateSSH(operation string) error {
@@ -254,8 +255,13 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 
 	timeNow := time.Now()
 	nyc, _ := time.LoadLocation(common.LoadTimeZone())
+
+	qqWry, err := qqwry.NewQQwry()
+	if err != nil {
+		global.LOG.Errorf("load qqwry datas failed: %s", err)
+	}
 	for i := 0; i < len(data.Logs); i++ {
-		data.Logs[i].IsLocal = isPrivateIP(net.ParseIP(data.Logs[i].Address))
+		data.Logs[i].Area = qqWry.Find(data.Logs[i].Address).Area
 		data.Logs[i].Date, _ = time.ParseInLocation("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s", timeNow.Year(), data.Logs[i].DateStr), nyc)
 		if data.Logs[i].Date.After(timeNow) {
 			data.Logs[i].Date = data.Logs[i].Date.AddDate(-1, 0, 0)
@@ -393,17 +399,4 @@ func handleGunzip(path string) error {
 		return err
 	}
 	return nil
-}
-func isPrivateIP(ip net.IP) bool {
-	if ip4 := ip.To4(); ip4 != nil {
-		switch true {
-		case ip4[0] == 10:
-			return true
-		case ip4[0] == 172 && ip4[1] >= 16 && ip4[1] <= 31:
-			return true
-		case ip4[0] == 192 && ip4[1] == 168:
-			return true
-		}
-	}
-	return false
 }

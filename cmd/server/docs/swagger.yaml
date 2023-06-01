@@ -1437,6 +1437,8 @@ definitions:
     type: object
   dto.SSHHistory:
     properties:
+      Area:
+        type: string
       address:
         type: string
       authMode:
@@ -1445,8 +1447,6 @@ definitions:
         type: string
       dateStr:
         type: string
-      isLocal:
-        type: boolean
       message:
         type: string
       port:
@@ -1459,6 +1459,8 @@ definitions:
   dto.SSHInfo:
     properties:
       listenAddress:
+        type: string
+      message:
         type: string
       passwordAuthentication:
         type: string

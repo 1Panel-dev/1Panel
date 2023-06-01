@@ -9,9 +9,19 @@
                     <el-tag round class="status-content" v-if="form.status === 'Enable'" type="success">
                         {{ $t('commons.status.running') }}
                     </el-tag>
-                    <el-tag round class="status-content" v-if="form.status === 'Disable'" type="info">
-                        {{ $t('commons.status.stopped') }}
-                    </el-tag>
+                    <el-popover
+                        v-if="form.status === 'Disable'"
+                        placement="top-start"
+                        trigger="hover"
+                        width="450"
+                        :content="form.message"
+                    >
+                        <template #reference>
+                            <el-tag round class="status-content" v-if="form.status === 'Disable'" type="info">
+                                {{ $t('commons.status.stopped') }}
+                            </el-tag>
+                        </template>
+                    </el-popover>
                     <span v-if="form.status === 'Enable'" class="buttons">
                         <el-button type="primary" @click="onOperate('stop')" link>
                             {{ $t('commons.button.stop') }}
@@ -164,6 +174,7 @@ const rootsRef = ref();
 const sshConf = ref();
 const form = reactive({
     status: 'enable',
+    message: '',
     port: 22,
     listenAddress: '',
     passwordAuthentication: 'yes',
