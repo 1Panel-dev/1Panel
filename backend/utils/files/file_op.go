@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	http2 "github.com/1Panel-dev/1Panel/backend/utils/http"
 	cZip "github.com/klauspost/compress/zip"
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
@@ -252,11 +253,10 @@ func (f FileOp) DownloadFileWithProcess(url, dst, key string) error {
 }
 
 func (f FileOp) DownloadFile(url, dst string) error {
-	resp, err := http.Get(url)
+	resp, err := http2.GetHttpRes(url)
 	if err != nil {
-		return fmt.Errorf("get download file [%s] error, err %s", dst, err.Error())
+		return err
 	}
-	defer resp.Body.Close()
 
 	out, err := os.Create(dst)
 	if err != nil {

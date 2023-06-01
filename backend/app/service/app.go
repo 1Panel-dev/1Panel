@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
 	"github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	http2 "github.com/1Panel-dev/1Panel/backend/utils/http"
 	"gopkg.in/yaml.v3"
 	"io"
 	"net/http"
@@ -391,7 +392,7 @@ func (a AppService) SyncAppListFromLocal() {
 			appDirEntries, err := os.ReadDir(appDir)
 			app, err := handleLocalApp(localAppDir)
 			if err != nil {
-				global.LOG.Errorf(i18n.GetMsgWithMap("LocalAppErr", map[string]interface{}{"name": app.Name, "err": err.Error()}))
+				global.LOG.Errorf(i18n.GetMsgWithMap("LocalAppErr", map[string]interface{}{"name": dirEntry.Name(), "err": err.Error()}))
 				continue
 			}
 			var appDetails []model.AppDetail
@@ -591,7 +592,7 @@ func (a AppService) GetAppUpdate() (*response.AppUpdateRes, error) {
 		return nil, err
 	}
 	versionUrl := fmt.Sprintf("%s/%s/1panel.json.version.txt", global.CONF.System.AppRepo, global.CONF.System.Mode)
-	versionRes, err := http.Get(versionUrl)
+	versionRes, err := http2.GetHttpRes(versionUrl)
 	if err != nil {
 		return nil, err
 	}

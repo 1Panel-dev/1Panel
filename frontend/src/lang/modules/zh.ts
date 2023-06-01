@@ -209,6 +209,7 @@ const message = {
             building: '制作镜像中',
             downloaderr: '下载失败',
             upgrading: '升级中',
+            upgradeerr: '升级失败',
         },
         units: {
             second: '秒',

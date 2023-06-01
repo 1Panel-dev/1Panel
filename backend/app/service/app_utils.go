@@ -49,7 +49,6 @@ func checkPort(key string, params map[string]interface{}) (int, error) {
 	port, ok := params[key]
 	if ok {
 		portN := int(math.Ceil(port.(float64)))
-
 		oldInstalled, _ := appInstallRepo.ListBy(appInstallRepo.WithPort(portN))
 		if len(oldInstalled) > 0 {
 			var apps []string
@@ -283,7 +282,9 @@ func upgradeInstall(installId uint, detailId uint) error {
 			}
 		}
 		servicesMap[install.ServiceName] = servicesMap[oldServiceName]
-		delete(servicesMap, oldServiceName)
+		if install.ServiceName != oldServiceName {
+			delete(servicesMap, oldServiceName)
+		}
 
 		envs := make(map[string]interface{})
 		if upErr = json.Unmarshal([]byte(install.Env), &envs); upErr != nil {
