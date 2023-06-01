@@ -23,10 +23,8 @@ var versionCmd = &cobra.Command{
 			return err
 		}
 		version := getSettingByKey(db, "SystemVersion")
-		appStoreVersion := getSettingByKey(db, "AppStoreVersion")
 
 		fmt.Printf("1panel version: %s\n", version)
-		fmt.Printf("appstore version: %s\n", appStoreVersion)
 		config := configs.ServerConfig{}
 		if err := yaml.Unmarshal(conf.AppYaml, &config); err != nil {
 			return fmt.Errorf("unmarshal conf.App.Yaml failed, errL %v", err)

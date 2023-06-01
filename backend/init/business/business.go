@@ -16,7 +16,7 @@ func syncApp() {
 		global.LOG.Errorf("sync app error: %s", err.Error())
 		return
 	}
-	if setting.AppStoreVersion != "" {
+	if setting.AppStoreLastModified != "0" {
 		global.LOG.Info("no need to sync")
 		return
 	}

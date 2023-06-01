@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/backend/i18n"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
 	"gopkg.in/yaml.v3"
 	"math"
@@ -344,10 +345,10 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 		return err
 	}
 	for _, i := range allList {
-		if i.Status == constant.Installing {
+		if i.Status == constant.Installing || i.Status == constant.Upgrading {
 			if systemInit {
 				i.Status = constant.Error
-				i.Message = "System restart causes application exception"
+				i.Message = i18n.GetMsgByKey("ErrAppSystemRestart")
 				_ = appInstallRepo.Save(context.Background(), &i)
 			}
 			continue
