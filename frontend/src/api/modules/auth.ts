@@ -18,7 +18,7 @@ export const logOutApi = () => {
 };
 
 export const checkIsSafety = (code: string) => {
-    return http.get<boolean>(`/auth/issafety?code=${code}`);
+    return http.get<string>(`/auth/issafety?code=${code}`);
 };
 
 export const checkIsDemo = () => {

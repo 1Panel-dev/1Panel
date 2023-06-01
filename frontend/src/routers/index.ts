@@ -29,15 +29,6 @@ router.beforeEach((to, from, next) => {
     }
 
     if (!to.matched.some((record) => record.meta.requiresAuth)) return next();
-    if (!globalStore.isLogin) {
-        next({
-            name: 'entrance',
-            params: { code: globalStore.entrance },
-        });
-        NProgress.done();
-        return;
-    }
-
     return next();
 });
 

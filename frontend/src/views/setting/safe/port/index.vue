@@ -72,7 +72,14 @@ const onSavePort = async (formEl: FormInstance | undefined) => {
                     globalStore.isLogin = false;
                     let href = window.location.href;
                     let ip = href.split('//')[1].split(':')[0];
-                    window.open(`${href.split('//')[0]}//${ip}:${form.serverPort}/${globalStore.entrance}`, '_self');
+                    if (globalStore.entrance) {
+                        window.open(
+                            `${href.split('//')[0]}//${ip}:${form.serverPort}/${globalStore.entrance}`,
+                            '_self',
+                        );
+                    } else {
+                        window.open(`${href.split('//')[0]}//${ip}:${form.serverPort}/login`, '_self');
+                    }
                 })
                 .catch(() => {
                     loading.value = false;

@@ -17,7 +17,7 @@ import (
 type AuthService struct{}
 
 type IAuthService interface {
-	CheckIsSafety(code string) bool
+	CheckIsSafety(code string) (string, error)
 	VerifyCode(code string) (bool, error)
 	Login(c *gin.Context, info dto.Login) (*dto.UserLoginInfo, error)
 	LogOut(c *gin.Context) error
@@ -143,13 +143,16 @@ func (u *AuthService) VerifyCode(code string) (bool, error) {
 	return setting.Value == code, nil
 }
 
-func (u *AuthService) CheckIsSafety(code string) bool {
+func (u *AuthService) CheckIsSafety(code string) (string, error) {
 	status, err := settingRepo.Get(settingRepo.WithByKey("SecurityEntrance"))
 	if err != nil {
-		return false
+		return "", err
 	}
 	if len(status.Value) == 0 {
-		return true
+		return "disable", nil
 	}
-	return status.Value == code
+	if status.Value == code {
+		return "pass", nil
+	}
+	return "unpass", nil
 }

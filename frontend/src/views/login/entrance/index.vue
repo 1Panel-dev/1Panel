@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="login-backgroud" v-if="isSafety && !isErr">
+        <div class="login-backgroud" v-if="isSafety && !isErr && !isNotFound">
             <div class="login-wrapper">
                 <div :class="screenWidth > 1110 ? 'left inline-block' : ''">
                     <div class="login-title">
@@ -15,14 +15,17 @@
                 </div>
             </div>
         </div>
-        <div v-if="!isSafety && !isErr">
+        <div v-if="!isSafety && !isErr && !isNotFound">
             <UnSafe />
         </div>
-        <div v-if="isErr && mySafetyCode.code === 'err-ip'">
+        <div v-if="isErr && mySafetyCode.code === 'err-ip' && !isNotFound">
             <ErrIP />
         </div>
-        <div v-if="isErr && mySafetyCode.code === 'err-domain'">
+        <div v-if="isErr && mySafetyCode.code === 'err-domain' && !isNotFound">
             <ErrDomain />
+        </div>
+        <div v-if="isNotFound">
+            <ErrFound />
         </div>
     </div>
 </template>
@@ -32,6 +35,7 @@ import { checkIsSafety } from '@/api/modules/auth';
 import LoginForm from '../components/login-form.vue';
 import UnSafe from '@/components/error-message/unsafe.vue';
 import ErrIP from '@/components/error-message/err_ip.vue';
+import ErrFound from '@/components/error-message/404.vue';
 import ErrDomain from '@/components/error-message/err_domain.vue';
 import { ref, onMounted } from 'vue';
 import { GlobalStore } from '@/store';
@@ -40,6 +44,7 @@ const globalStore = GlobalStore();
 const isSafety = ref(true);
 const screenWidth = ref(null);
 const isErr = ref();
+const isNotFound = ref();
 
 const mySafetyCode = defineProps({
     code: {
@@ -50,15 +55,24 @@ const mySafetyCode = defineProps({
 });
 
 const getStatus = async () => {
-    if (mySafetyCode.code === 'err-ip' || mySafetyCode.code === 'err-domain') {
-        isErr.value = true;
-    }
+    isErr.value = true;
     const res = await checkIsSafety(mySafetyCode.code);
-    if (mySafetyCode.code === 'err-ip' || mySafetyCode.code === 'err-domain') {
-        isErr.value = false;
+    isErr.value = false;
+    globalStore.entrance = '';
+    if (res.data === 'disable') {
+        if (mySafetyCode.code === '') {
+            isNotFound.value = false;
+        } else {
+            isNotFound.value = true;
+        }
+        return;
     }
-    isSafety.value = res.data;
-    if (isSafety.value) {
+    isNotFound.value = false;
+    if (res.data !== 'pass') {
+        isSafety.value = false;
+        return;
+    }
+    if (res.data === 'pass') {
         globalStore.entrance = mySafetyCode.code;
     }
 };
