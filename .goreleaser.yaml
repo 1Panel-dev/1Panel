@@ -31,7 +31,6 @@ builds:
     goos:
       - linux
     goarm:
-      - 6
       - 7
     goarch:
       - amd64
