@@ -39,6 +39,11 @@ ErrAppDirNull: '版本文件夹不存在'
 LocalAppErr: "应用 {{.name}} 同步失败！{{.err}}"
 ErrContainerName: "容器名称已存在"
 ErrAppSystemRestart: "1Panel 重启导致任务终止"
+ErrCreateHttpClient: "创建HTTP请求失败 {{.err}}"
+ErrHttpReqTimeOut: "请求超时 {{.err}}"
+ErrHttpReqFailed: "请求失败 {{.err}}"
+ErrHttpReqNotFound: "文件不存在"
+ErrNoSuchHost: "网络连接失败"
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"

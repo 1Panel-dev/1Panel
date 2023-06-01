@@ -39,6 +39,11 @@ ErrAppDirNull: 'version folder does not exist'
 LocalAppErr: "App {{.name}} sync failed! {{.err}}"
 ErrContainerName: "ContainerName is already exist"
 ErrAppSystemRestart: "1Panel restart causes the task to terminate"
+ErrCreateHttpClient: "Failed to create HTTP request {{.err}}"
+ErrHttpReqTimeOut: "Request timed out {{.err}}"
+ErrHttpReqFailed: "Request failed {{.err}}"
+ErrHttpReqNotFound: "The file does not exist"
+ErrNoSuchHost: "Network connection failed"
 
 #file
 ErrFileCanNotRead: "File can not read"
