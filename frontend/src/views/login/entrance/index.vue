@@ -56,11 +56,15 @@ const mySafetyCode = defineProps({
 
 const getStatus = async () => {
     isErr.value = true;
-    const res = await checkIsSafety(mySafetyCode.code);
+    let code = mySafetyCode.code;
+    if (code === 'err-ip' || code === 'err-domain') {
+        code = globalStore.entrance;
+    }
+    const res = await checkIsSafety(code);
     isErr.value = false;
     globalStore.entrance = '';
     if (res.data === 'disable') {
-        if (mySafetyCode.code === '') {
+        if (code === '') {
             isNotFound.value = false;
         } else {
             isNotFound.value = true;
@@ -73,7 +77,7 @@ const getStatus = async () => {
         return;
     }
     if (res.data === 'pass') {
-        globalStore.entrance = mySafetyCode.code;
+        globalStore.entrance = code;
     }
 };
 

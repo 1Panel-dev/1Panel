@@ -1016,7 +1016,7 @@ const message = {
         allowIPsHelper: '设置授权 IP 后，仅有设置中的 IP 可以访问 1Panel 服务',
         allowIPsWarnning: '设置授权 IP 后，仅有设置中的 IP 可以访问 1Panel 服务，是否继续？',
         allowIPsHelper1: '授权 IP 为空时，则取消授权 IP',
-        allowIPEgs: '当存在多个授权 IP 时，需要换行显示，例： \n172.16.10.111 \n172.16.10.111',
+        allowIPEgs: '当存在多个授权 IP 时，需要换行显示，例： \n172.16.10.111 \n172.16.10.112',
         mfa: '两步验证',
         mfaAlert: '两步验证密码是基于当前时间生成，请确保服务器时间已同步',
         mfaHelper: '开启后会验证手机应用验证码',

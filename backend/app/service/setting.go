@@ -114,10 +114,6 @@ func (u *SettingService) Update(key, value string) error {
 		if err := settingRepo.Update("ExpirationTime", time.Now().AddDate(0, 0, timeout).Format("2006-01-02 15:04:05")); err != nil {
 			return err
 		}
-	case "BindDomain":
-		global.CONF.System.BindDomain = value
-	case "AllowIPs":
-		global.CONF.System.AllowIPs = value
 	case "TimeZone":
 		go func() {
 			_, err := cmd.Exec("systemctl restart 1panel.service")
