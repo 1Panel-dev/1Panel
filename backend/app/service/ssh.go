@@ -6,7 +6,6 @@ import (
 	"os/user"
 	"path"
 	"path/filepath"
-	"sort"
 	"strings"
 	"time"
 
@@ -252,24 +251,23 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 		}
 	}
 	data.SuccessfulCount = data.TotalCount - data.FailedCount
+	if len(data.Logs) < 1 {
+		return nil, nil
+	}
 
 	timeNow := time.Now()
 	nyc, _ := time.LoadLocation(common.LoadTimeZone())
-
 	qqWry, err := qqwry.NewQQwry()
 	if err != nil {
 		global.LOG.Errorf("load qqwry datas failed: %s", err)
 	}
-	for i := 0; i < len(data.Logs); i++ {
+	var itemLogs []dto.SSHHistory
+	for i := len(data.Logs) - 1; i >= 0; i-- {
 		data.Logs[i].Area = qqWry.Find(data.Logs[i].Address).Area
 		data.Logs[i].Date, _ = time.ParseInLocation("2006 Jan 2 15:04:05", fmt.Sprintf("%d %s", timeNow.Year(), data.Logs[i].DateStr), nyc)
-		if data.Logs[i].Date.After(timeNow) {
-			data.Logs[i].Date = data.Logs[i].Date.AddDate(-1, 0, 0)
-		}
+		itemLogs = append(itemLogs, data.Logs[i])
 	}
-	sort.Slice(data.Logs, func(i, j int) bool {
-		return data.Logs[i].Date.After(data.Logs[j].Date)
-	})
+	data.Logs = itemLogs
 
 	var itemDatas []dto.SSHHistory
 	total, start, end := len(data.Logs), (req.Page-1)*req.PageSize, req.Page*req.PageSize
