@@ -3,9 +3,24 @@
         <div class="a-card" style="margin-top: 20px">
             <el-card>
                 <div>
-                    <el-tag style="float: left" effect="dark" type="success">
-                        {{ $t('cronjob.' + dialogData.rowData.type) }}
+                    <el-popover
+                        v-if="dialogData.rowData.name.length >= 15"
+                        placement="top-start"
+                        trigger="hover"
+                        width="250"
+                        :content="$t('cronjob.' + dialogData.rowData.type) + ' - ' + dialogData.rowData.name"
+                    >
+                        <template #reference>
+                            <el-tag style="float: left" effect="dark" type="success">
+                                {{ $t('cronjob.' + dialogData.rowData.type) }} -
+                                {{ dialogData.rowData.name.substring(0, 12) }}...
+                            </el-tag>
+                        </template>
+                    </el-popover>
+                    <el-tag v-if="dialogData.rowData.name.length < 15" style="float: left" effect="dark" type="success">
+                        {{ $t('cronjob.' + dialogData.rowData.type) }} - {{ dialogData.rowData.name }}
                     </el-tag>
+
                     <el-tag v-if="dialogData.rowData.status === 'Enable'" round class="status-content" type="success">
                         {{ $t('commons.status.running') }}
                     </el-tag>
