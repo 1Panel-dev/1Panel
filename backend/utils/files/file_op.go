@@ -7,6 +7,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
+	cZip "github.com/klauspost/compress/zip"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 	"io"
 	"io/fs"
 	"net/http"
@@ -417,6 +420,7 @@ const (
 )
 
 func getFormat(cType CompressType) archiver.CompressedArchive {
+
 	format := archiver.CompressedArchive{}
 	switch cType {
 	case Tar:
@@ -481,6 +485,15 @@ func isIgnoreFile(name string) bool {
 	return strings.HasPrefix(name, "__MACOSX") || strings.HasSuffix(name, ".DS_Store") || strings.HasPrefix(name, "._")
 }
 
+func decodeGBK(input string) (string, error) {
+	decoder := simplifiedchinese.GBK.NewDecoder()
+	decoded, _, err := transform.String(decoder, input)
+	if err != nil {
+		return "", err
+	}
+	return decoded, nil
+}
+
 func (f FileOp) Decompress(srcFile string, dst string, cType CompressType) error {
 	format := getFormat(cType)
 
@@ -489,7 +502,17 @@ func (f FileOp) Decompress(srcFile string, dst string, cType CompressType) error
 		if isIgnoreFile(archFile.Name()) {
 			return nil
 		}
-		filePath := filepath.Join(dst, archFile.NameInArchive)
+		fileName := archFile.NameInArchive
+		var err error
+		if header, ok := archFile.Header.(cZip.FileHeader); ok {
+			if header.NonUTF8 && header.Flags == 0 {
+				fileName, err = decodeGBK(fileName)
+				if err != nil {
+					return err
+				}
+			}
+		}
+		filePath := filepath.Join(dst, fileName)
 		if archFile.FileInfo.IsDir() {
 			if err := f.Fs.MkdirAll(filePath, info.Mode()); err != nil {
 				return err
