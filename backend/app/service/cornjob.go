@@ -221,16 +221,20 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	if err != nil {
 		return constant.ErrRecordNotFound
 	}
+	upMap := make(map[string]interface{})
 	cronjob.EntryID = cronModel.EntryID
 	cronjob.Type = cronModel.Type
 	cronjob.Spec = loadSpec(cronjob)
-	newEntryID, err := u.StartJob(&cronjob)
-	if err != nil {
-		return err
+	if cronModel.Status == constant.StatusEnable {
+		newEntryID, err := u.StartJob(&cronjob)
+		if err != nil {
+			return err
+		}
+		upMap["entry_id"] = newEntryID
+	} else {
+		global.Cron.Remove(cron.EntryID(cronjob.EntryID))
 	}
 
-	upMap := make(map[string]interface{})
-	upMap["entry_id"] = newEntryID
 	upMap["name"] = req.Name
 	upMap["spec"] = cronjob.Spec
 	upMap["script"] = req.Script
@@ -239,6 +243,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobUpdate) error {
 	upMap["day"] = req.Day
 	upMap["hour"] = req.Hour
 	upMap["minute"] = req.Minute
+	upMap["second"] = req.Second
 	upMap["website"] = req.Website
 	upMap["exclusion_rules"] = req.ExclusionRules
 	upMap["db_name"] = req.DBName
