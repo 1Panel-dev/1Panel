@@ -38,6 +38,7 @@ ErrFileParseApp: 'Failed to parse {{.name}} file {{.err}}'
 ErrAppDirNull: 'version folder does not exist'
 LocalAppErr: "App {{.name}} sync failed! {{.err}}"
 ErrContainerName: "ContainerName is already exist"
+ErrAppSystemRestart: "1Panel restart causes the task to terminate"
 
 #file
 ErrFileCanNotRead: "File can not read"

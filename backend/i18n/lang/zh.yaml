@@ -38,6 +38,7 @@ ErrFileParseApp: '{{.name}} 文件解析失败 {{.err}}'
 ErrAppDirNull: '版本文件夹不存在'
 LocalAppErr: "应用 {{.name}} 同步失败！{{.err}}"
 ErrContainerName: "容器名称已存在"
+ErrAppSystemRestart: "1Panel 重启导致任务终止"
 
 #file
 ErrFileCanNotRead: "此文件不支持预览"
