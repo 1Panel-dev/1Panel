@@ -17,6 +17,7 @@ const message = {
             confirm: 'Confirm',
             cancel: 'Cancel',
             reset: 'Reset',
+            restart: 'Restart',
             conn: 'Connect',
             disconn: 'Disconnect',
             clean: 'Clean',

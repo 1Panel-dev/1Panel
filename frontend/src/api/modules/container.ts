@@ -152,7 +152,7 @@ export const updateDaemonJson = (key: string, value: string) => {
     return http.post(`/containers/daemonjson/update`, { key: key, value: value }, 60000);
 };
 export const updateLogOption = (maxSize: string, maxFile: string) => {
-    return http.post(`/containers/logoption/update`, { maxSize: maxSize, maxFile: maxFile }, 60000);
+    return http.post(`/containers/logoption/update`, { logMaxSize: maxSize, logMaxFile: maxFile }, 60000);
 };
 export const updateDaemonJsonByfile = (params: Container.DaemonJsonUpdateByFile) => {
     return http.post(`/containers/daemonjson/update/byfile`, params);

@@ -17,6 +17,7 @@ const message = {
             confirm: '确认',
             cancel: '取消',
             reset: '重置',
+            restart: '重启',
             conn: '连接',
             disconn: '断开',
             clean: '清空',

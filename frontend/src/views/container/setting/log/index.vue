@@ -101,7 +101,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
 
 const onSubmitSave = async () => {
     loading.value = true;
-    await updateLogOption(form.logMaxSize + '', form.logMaxFile + '')
+    await updateLogOption(form.logMaxSize + form.sizeUnit, form.logMaxFile + '')
         .then(() => {
             loading.value = false;
             drawerVisiable.value = false;
