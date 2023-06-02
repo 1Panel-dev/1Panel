@@ -1703,7 +1703,7 @@ func (w WebsiteService) UpdateAntiLeech(req request.NginxAntiLeechUpdate) (err e
 			validDir.Parameters = append(validDir.Parameters, "none")
 		}
 		if len(req.ServerNames) > 0 {
-			validDir.Parameters = append(validDir.Parameters, "server_names", strings.Join(req.ServerNames, " "))
+			validDir.Parameters = append(validDir.Parameters, strings.Join(req.ServerNames, " "))
 		}
 		newBlock.Directives = append(newBlock.Directives, validDir)
 
@@ -1768,23 +1768,19 @@ func (w WebsiteService) GetAntiLeech(id uint) (*response.NginxAntiLeechRes, erro
 			if lDir.GetName() == "valid_referers" {
 				res.Enable = true
 				params := lDir.GetParameters()
-				serverIndex := 0
-				serverNameExist := false
-				for i, param := range params {
+				for _, param := range params {
 					if param == "none" {
 						res.NoneRef = true
+						continue
 					}
 					if param == "blocked" {
 						res.Blocked = true
+						continue
 					}
 					if param == "server_names" {
-						serverIndex = i
-						serverNameExist = true
+						continue
 					}
-				}
-				if serverNameExist {
-					serverNames := params[serverIndex+1:]
-					res.ServerNames = serverNames
+					res.ServerNames = append(res.ServerNames, param)
 				}
 			}
 			if lDir.GetName() == "if" && lDir.GetParameters()[0] == "($invalid_referer)" {
