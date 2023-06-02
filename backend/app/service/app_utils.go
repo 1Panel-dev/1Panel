@@ -664,11 +664,6 @@ func handleLocalAppDetail(versionDir string, appDetail *model.AppDetail) error {
 
 func handleLocalApp(appDir string) (app *model.App, err error) {
 	fileOp := files.NewFileOp()
-	appDirEntries, err := os.ReadDir(appDir)
-	if err != nil || len(appDirEntries) == 0 {
-		err = errors.New("ErrAppDirNull")
-		return
-	}
 	configYamlPath := path.Join(appDir, "data.yml")
 	if !fileOp.Stat(configYamlPath) {
 		err = errors.New(i18n.GetMsgWithMap("ErrFileNotFound", map[string]interface{}{"name": "data.yml"}))

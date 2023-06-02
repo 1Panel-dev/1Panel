@@ -448,7 +448,7 @@ const openParam = (row: any) => {
 };
 
 const isAppErr = (row: any) => {
-    return row.status.includes('Err') || row.status.includes('Error');
+    return row.status.includes('Err') || row.status.includes('Error') || row.status.includes('UnHealthy');
 };
 
 const quickJump = () => {
