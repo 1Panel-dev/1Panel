@@ -614,6 +614,10 @@ const message = {
         mirrorsHelper2: '具体操作配置请参照官方文档，',
         registries: '私有仓库',
         cutLog: '日志切割',
+        cutLogHelper1: '当前配置只会影响新创建的容器；',
+        cutLogHelper2: '已经创建的容器需要重新创建使配置生效；',
+        cutLogHelper3:
+            '注意，重新创建容器可能会导致数据丢失。如果你的容器中有重要数据，确保在执行重建操作之前进行备份。',
         maxSize: '文件大小',
         maxFile: '保留份数',
         liveHelper: '允许在 Docker 守护进程发生意外停机或崩溃时保留正在运行的容器状态',

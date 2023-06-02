@@ -10,6 +10,15 @@
             <template #header>
                 <DrawerHeader :header="$t('container.cutLog')" :back="handleClose" />
             </template>
+            <el-alert style="margin-bottom: 20px" :closable="false" type="warning">
+                <template #default>
+                    <ul style="margin-left: -20px">
+                        <li>{{ $t('container.cutLogHelper1') }}</li>
+                        <li>{{ $t('container.cutLogHelper2') }}</li>
+                        <li>{{ $t('container.cutLogHelper3') }}</li>
+                    </ul>
+                </template>
+            </el-alert>
             <el-form :model="form" ref="formRef" :rules="rules" v-loading="loading" label-position="top">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
@@ -17,10 +26,10 @@
                             <el-input v-model.number="form.logMaxSize">
                                 <template #append>
                                     <el-select v-model="form.sizeUnit" style="width: 70px">
-                                        <el-option label="B" value="B"></el-option>
-                                        <el-option label="KB" value="KB"></el-option>
-                                        <el-option label="MB" value="MB"></el-option>
-                                        <el-option label="GB" value="GB"></el-option>
+                                        <el-option label="byte" value="b"></el-option>
+                                        <el-option label="kb" value="k"></el-option>
+                                        <el-option label="mb" value="m"></el-option>
+                                        <el-option label="gb" value="g"></el-option>
                                     </el-select>
                                 </template>
                             </el-input>
@@ -66,7 +75,7 @@ interface DialogProps {
 const form = reactive({
     logMaxSize: 10,
     logMaxFile: 3,
-    sizeUnit: 'MB',
+    sizeUnit: 'm',
 });
 const rules = reactive({
     logMaxSize: [checkNumberRange(1, 1024000), Rules.number],
@@ -81,7 +90,7 @@ const acceptParams = (params: DialogProps): void => {
         form.logMaxSize = loadSize(params.logMaxSize);
     } else {
         form.logMaxSize = 10;
-        form.sizeUnit = 'MB';
+        form.sizeUnit = 'm';
     }
     drawerVisiable.value = true;
 };
@@ -114,21 +123,21 @@ const onSubmitSave = async () => {
 };
 
 const loadSize = (value: string) => {
+    if (value.indexOf('k') !== -1 || value.indexOf('KB') !== -1) {
+        form.sizeUnit = 'k';
+        return Number(value.replaceAll('k', '').replaceAll('KB', ''));
+    }
+    if (value.indexOf('m') !== -1 || value.indexOf('MB') !== -1) {
+        form.sizeUnit = 'm';
+        return Number(value.replaceAll('m', '').replaceAll('MB', ''));
+    }
+    if (value.indexOf('g') !== -1 || value.indexOf('GB') !== -1) {
+        form.sizeUnit = 'g';
+        return Number(value.replaceAll('g', '').replaceAll('GB', ''));
+    }
     if (value.indexOf('b') !== -1 || value.indexOf('B') !== -1) {
-        form.sizeUnit = 'B';
+        form.sizeUnit = 'b';
         return Number(value.replaceAll('b', '').replaceAll('B', ''));
-    }
-    if (value.indexOf('k') !== -1 || value.indexOf('K') !== -1) {
-        form.sizeUnit = 'KB';
-        return Number(value.replaceAll('k', '').replaceAll('K', ''));
-    }
-    if (value.indexOf('m') !== -1 || value.indexOf('M') !== -1) {
-        form.sizeUnit = 'MB';
-        return Number(value.replaceAll('m', '').replaceAll('M', ''));
-    }
-    if (value.indexOf('g') !== -1 || value.indexOf('G') !== -1) {
-        form.sizeUnit = 'GB';
-        return Number(value.replaceAll('g', '').replaceAll('G', ''));
     }
 };
 
@@ -141,8 +150,3 @@ defineExpose({
     acceptParams,
 });
 </script>
-<style scoped>
-.help-ul {
-    color: #8f959e;
-}
-</style>
