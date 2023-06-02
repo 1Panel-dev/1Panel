@@ -610,6 +610,10 @@ const message = {
         mirrorsHelper2: 'For details, see the official documents, ',
         registries: 'Insecure registries',
         cutLog: 'Log option',
+        cutLogHelper1: 'The current configuration will only affect newly created containers.',
+        cutLogHelper2: 'Existing containers need to be recreated for the configuration to take effect.',
+        cutLogHelper3:
+            'Please note that recreating containers may result in data loss. If your containers contain important data, make sure to backup before performing the rebuilding operation.',
         maxSize: 'Max-Size',
         maxFile: 'Max-File',
         liveHelper:

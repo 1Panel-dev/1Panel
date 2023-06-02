@@ -102,6 +102,18 @@
 
                             <el-form-item :label="$t('container.cutLog')" prop="hasLogOption">
                                 <el-switch v-model="form.logOptionShow" @change="handleLogOption"></el-switch>
+                                <span class="input-help"></span>
+                                <div v-if="form.logOptionShow">
+                                    <el-tag>{{ $t('container.maxSize') }}: {{ form.logMaxSize }}</el-tag>
+                                    <el-tag style="margin-left: 5px">
+                                        {{ $t('container.maxFile') }}: {{ form.logMaxFile }}
+                                    </el-tag>
+                                    <div>
+                                        <el-button @click="handleLogOption" type="primary" link>
+                                            {{ $t('commons.button.view') }}
+                                        </el-button>
+                                    </div>
+                                </div>
                             </el-form-item>
 
                             <el-form-item label="iptables" prop="iptables">
@@ -260,7 +272,7 @@ const rules = reactive({
 
 const formRef = ref<FormInstance>();
 const dockerConf = ref();
-const confirmDialogRef = ref();
+const confirmDialogRefFile = ref();
 
 const iptablesVisiable = ref();
 
@@ -270,7 +282,7 @@ const onSaveFile = async () => {
         operationInfo: i18n.global.t('database.restartNowHelper'),
         submitInputInfo: i18n.global.t('database.restartNow'),
     };
-    confirmDialogRef.value!.acceptParams(params);
+    confirmDialogRefFile.value!.acceptParams(params);
 };
 
 const onChangeMirrors = () => {
