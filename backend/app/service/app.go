@@ -813,6 +813,12 @@ func (a AppService) SyncAppListFromRemote() error {
 				if d.Status == constant.AppTakeDown {
 					runtime, _ := runtimeRepo.GetFirst(runtimeRepo.WithDetailId(d.ID))
 					if runtime != nil {
+						updateDetails = append(updateDetails, d)
+						continue
+					}
+					installs, _ := appInstallRepo.ListBy(appInstallRepo.WithDetailIdsIn([]uint{d.ID}))
+					if len(installs) > 0 {
+						updateDetails = append(updateDetails, d)
 						continue
 					}
 					deleteDetails = append(deleteDetails, d)
