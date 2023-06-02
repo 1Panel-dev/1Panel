@@ -30,6 +30,5 @@ dist/
 1pctl
 1panel.service
 install.sh
-docker.sh
 cmd/server/web/.DS_Store
 cmd/server/.DS_Store
