@@ -90,6 +90,7 @@ import i18n from '@/lang';
 import { useDeleteData } from '@/hooks/use-delete-data';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
+import { ElMessageBox } from 'element-plus';
 
 const loading = ref();
 const detailInfo = ref();

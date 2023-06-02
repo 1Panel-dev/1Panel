@@ -310,6 +310,7 @@ const handleIptables = () => {
 };
 const onSubmitCloseIPtable = () => {
     save('IPtables', 'disable');
+    iptablesVisiable.value = false;
 };
 const onSubmitOpenIPtable = () => {
     save('IPtables', 'enable');
