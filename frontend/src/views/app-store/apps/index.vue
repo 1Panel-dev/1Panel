@@ -107,7 +107,7 @@
 <script lang="ts" setup>
 import { App } from '@/api/interface/app';
 import { onMounted, reactive, ref } from 'vue';
-import { GetAppListUpdate, GetAppTags, SearchApp, SyncApp } from '@/api/modules/app';
+import { GetAppTags, SearchApp, SyncApp } from '@/api/modules/app';
 import i18n from '@/lang';
 import Detail from '../detail/index.vue';
 import router from '@/routers';
@@ -171,11 +171,6 @@ const sync = () => {
         });
 };
 
-const getAppListUpdate = async () => {
-    const res = await GetAppListUpdate();
-    canUpdate.value = res.data.canUpdate;
-};
-
 const changeTag = (key: string) => {
     req.tags = [];
     activeTag.value = key;
@@ -191,7 +186,6 @@ const searchByName = (name: string) => {
 };
 
 onMounted(() => {
-    getAppListUpdate();
     search(req);
 });
 </script>

@@ -174,6 +174,7 @@ const resetForm = () => {
 const acceptParams = (props: InstallRrops): void => {
     installData.value = props;
     resetForm();
+    req.name = props.app.key;
     open.value = true;
 };
 
