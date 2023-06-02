@@ -900,7 +900,7 @@ func getAppCommonConfig(envs map[string]interface{}) request.AppContainerConfig 
 		config.CpuQuota = 0
 	}
 	if memLimit, ok := envs[constant.MemoryLimit]; ok {
-		re := regexp.MustCompile(`(\d+(?:\.\d+)?)\s*([KMGT]?B)`)
+		re := regexp.MustCompile(`(\d+)([A-Za-z]+)`)
 		matches := re.FindStringSubmatch(memLimit.(string))
 		if len(matches) == 3 {
 			num, err := strconv.ParseFloat(matches[1], 64)
