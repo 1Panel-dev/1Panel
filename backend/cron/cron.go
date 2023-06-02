@@ -39,6 +39,9 @@ func Run() {
 	if _, err := global.Cron.AddJob("@daily", job.NewSSLJob()); err != nil {
 		global.LOG.Errorf("can not add  ssl corn job: %s", err.Error())
 	}
+	if _, err := global.Cron.AddJob("@daily", job.NewAppStoreJob()); err != nil {
+		global.LOG.Errorf("can not add  appstore corn job: %s", err.Error())
+	}
 	global.Cron.Start()
 
 	var cronJobs []model.Cronjob
