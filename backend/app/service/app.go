@@ -474,6 +474,7 @@ func (a AppService) SyncAppListFromLocal() {
 			if app.Status == constant.AppTakeDown {
 				installs, _ := appInstallRepo.ListBy(appInstallRepo.WithAppId(app.ID))
 				if len(installs) > 0 {
+					updateApps = append(updateApps, app)
 					continue
 				}
 				deleteAppIds = append(deleteAppIds, app.ID)
