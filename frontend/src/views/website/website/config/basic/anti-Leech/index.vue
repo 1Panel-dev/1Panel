@@ -37,7 +37,7 @@
                         <el-form-item :label="$t('website.noneRef')" prop="noneRef">
                             <el-switch v-model="form.noneRef" />
                         </el-form-item>
-                        <el-form-item :label="$t('website.accessDomain')" prop="serverNames">
+                        <el-form-item :label="$t('website.accessDomain')" prop="domains">
                             <el-input
                                 v-model="form.domains"
                                 type="textarea"
@@ -64,7 +64,7 @@ import { FormInstance } from 'element-plus';
 import { computed, onMounted, reactive } from 'vue';
 import { ref } from 'vue';
 import { Units } from '@/global/mimetype';
-import { MsgSuccess } from '@/utils/message';
+import { MsgSuccess, MsgError } from '@/utils/message';
 import i18n from '@/lang';
 
 const loading = ref(false);
@@ -100,6 +100,7 @@ const rules = ref({
     extends: [Rules.requiredInput, Rules.leechExts],
     cacheTime: [Rules.requiredInput, checkNumberRange(1, 65535)],
     return: [Rules.requiredInput],
+    domains: [Rules.requiredInput],
 });
 
 const changeEnable = (enable: boolean) => {
@@ -177,6 +178,9 @@ const update = async (enable: boolean) => {
     if (enable) {
         form.serverNames = form.domains.split('\n');
     }
+    if (!checkReturn()) {
+        return;
+    }
     form.enable = enable;
     loading.value = true;
     form.websiteID = id.value;
@@ -189,6 +193,25 @@ const update = async (enable: boolean) => {
             loading.value = false;
         });
 };
+
+const checkReturn = (): boolean => {
+    let returns = form.return.split(' ');
+    if (returns[0]) {
+        if (isHttpStatusCode(returns[0])) {
+            return true;
+        } else {
+            MsgError(i18n.global.t('website.leechReturnError'));
+            return false;
+        }
+    } else {
+        return false;
+    }
+};
+
+function isHttpStatusCode(input: string): boolean {
+    const statusCodeRegex = /^[1-5][0-9]{2}$/;
+    return statusCodeRegex.test(input);
+}
 
 onMounted(() => {
     search();

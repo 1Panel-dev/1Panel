@@ -1410,6 +1410,7 @@ const message = {
         disableLeechHelper: 'Whether to disable the anti-leech',
         disableLeech: 'Disable anti-leech',
         ipv6: 'Listen IPV6',
+        leechReturnError: 'Please fill in the HTTP status code',
     },
     php: {
         short_open_tag: 'Short tag support',
