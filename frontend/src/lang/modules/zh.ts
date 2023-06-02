@@ -1156,6 +1156,7 @@ const message = {
         takeDown: '已废弃',
         allReadyInstalled: '已安装',
         installHelper: '配置镜像加速可以解决镜像拉取失败的问题',
+        upgradeHelper: '升级失败或者异常应用需要先同步到正常状态',
     },
     website: {
         website: '网站',

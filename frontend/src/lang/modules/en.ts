@@ -1176,6 +1176,8 @@ const message = {
         takeDown: 'TakeDown',
         allReadyInstalled: 'Installed',
         installHelper: 'Configuring image acceleration can solve the problem of image pull failure',
+        upgradeHelper:
+            'If the upgrade fails or the abnormal application needs to be synchronized to the normal state first',
     },
     website: {
         website: 'Website',

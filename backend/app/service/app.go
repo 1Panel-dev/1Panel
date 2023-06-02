@@ -812,7 +812,7 @@ func (a AppService) SyncAppListFromRemote() error {
 			} else {
 				if d.Status == constant.AppTakeDown {
 					runtime, _ := runtimeRepo.GetFirst(runtimeRepo.WithDetailId(d.ID))
-					if runtime.ID > 0 {
+					if runtime != nil {
 						continue
 					}
 					deleteDetails = append(deleteDetails, d)
