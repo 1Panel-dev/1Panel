@@ -351,7 +351,9 @@ function changeChartSize() {
     echarts.getInstanceByDom(document.getElementById('cpu') as HTMLElement)?.resize();
     echarts.getInstanceByDom(document.getElementById('memory') as HTMLElement)?.resize();
     echarts.getInstanceByDom(document.getElementById('load') as HTMLElement)?.resize();
-    echarts.getInstanceByDom(document.getElementById('disk') as HTMLElement)?.resize();
+    for (let i = 0; i < currentInfo.value.diskData.length; i++) {
+        echarts.getInstanceByDom(document.getElementById('disk' + i) as HTMLElement)?.resize();
+    }
 }
 
 onMounted(() => {
