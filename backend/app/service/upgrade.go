@@ -93,9 +93,13 @@ func (u *UpgradeService) Upgrade(req dto.Upgrade) error {
 	if err := os.MkdirAll(originalDir, os.ModePerm); err != nil {
 		return err
 	}
+	itemArch, err := loadArch()
+	if err != nil {
+		return err
+	}
 
 	downloadPath := fmt.Sprintf("%s/%s/%s/release", global.CONF.System.RepoUrl, global.CONF.System.Mode, req.Version)
-	fileName := fmt.Sprintf("1panel-%s-%s-%s.tar.gz", req.Version, "linux", runtime.GOARCH)
+	fileName := fmt.Sprintf("1panel-%s-%s-%s.tar.gz", req.Version, "linux", itemArch)
 	_ = settingRepo.Update("SystemStatus", "Upgrading")
 	go func() {
 		if err := fileOp.DownloadFile(downloadPath+"/"+fileName, rootDir+"/"+fileName); err != nil {
@@ -236,4 +240,22 @@ func (u *UpgradeService) loadReleaseNotes(path string) (string, error) {
 		return "", err
 	}
 	return string(release), nil
+}
+
+func loadArch() (string, error) {
+	switch runtime.GOARCH {
+	case "amd64", "ppc64le", "s390x", "arm64":
+		return runtime.GOARCH, nil
+	case "arm":
+		std, err := cmd.Exec("uname -m")
+		if err != nil {
+			return "", fmt.Errorf("std: %s, err: %s", std, err.Error())
+		}
+		if std == "armv7l\n" {
+			return "armv7", nil
+		}
+		return "", fmt.Errorf("unsupport such arch: arm-%s", std)
+	default:
+		return "", fmt.Errorf("unsupport such arch: %s", runtime.GOARCH)
+	}
 }
