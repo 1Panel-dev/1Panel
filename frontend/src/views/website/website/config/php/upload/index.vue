@@ -3,8 +3,8 @@
         <el-row>
             <el-col :xs="20" :sm="12" :md="10" :lg="10" :xl="8" :offset="1">
                 <el-form :model="form" :rules="rules" ref="phpFormRef">
-                    <el-form-item>
-                        <el-input clearable v-model.number="form.uploadSize" maxlength="15">
+                    <el-form-item prop="uploadSize">
+                        <el-input clearable type="number" v-model.number="form.uploadSize" maxlength="15">
                             <template #append>M</template>
                         </el-input>
                     </el-form-item>
@@ -19,7 +19,7 @@
 </template>
 <script setup lang="ts">
 import { GetPHPConfig, UpdatePHPConfig } from '@/api/modules/website';
-import { checkNumberRange } from '@/global/form-rules';
+import { Rules, checkNumberRange } from '@/global/form-rules';
 import { computed, onMounted, reactive } from 'vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { ref } from 'vue';
@@ -37,7 +37,7 @@ const websiteID = computed(() => {
     return props.id;
 });
 const rules = reactive({
-    uploadSize: [checkNumberRange(0, 999999999)],
+    uploadSize: [Rules.requiredInput, checkNumberRange(0, 999999999)],
 });
 const phpFormRef = ref();
 const confirmDialogRef = ref();
