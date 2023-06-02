@@ -220,7 +220,7 @@ const search = async (param: string) => {
         }
         switch (item.param) {
             case 'base':
-                let baseDate = item.date.length === 0 ? loadEmptyDate() : item.date;
+                let baseDate = item.date.length === 0 ? loadEmptyDate(timeRangeCpu.value) : item.date;
                 baseDate = baseDate.map(function (item: any) {
                     return dateFormatWithoutYear(item);
                 });
@@ -282,7 +282,7 @@ const search = async (param: string) => {
                 initIOCharts(item);
                 break;
             case 'network':
-                let networkDate = item.date.length === 0 ? loadEmptyDate() : item.date;
+                let networkDate = item.date.length === 0 ? loadEmptyDate(timeRangeNetwork.value) : item.date;
                 networkDate = networkDate.map(function (item: any) {
                     return dateFormatWithoutYear(item);
                 });
@@ -371,7 +371,7 @@ function initCharts(chartName: string, xDatas: any, yDatas: any, yTitle: string,
 }
 
 function initLoadCharts(item: Monitor.MonitorData) {
-    let itemLoadDate = item.date.length === 0 ? loadEmptyDate() : item.date;
+    let itemLoadDate = item.date.length === 0 ? loadEmptyDate(timeRangeLoad.value) : item.date;
     let loadDate = itemLoadDate.map(function (item: any) {
         return dateFormatWithoutYear(item);
     });
@@ -508,7 +508,7 @@ function initLoadCharts(item: Monitor.MonitorData) {
 }
 
 function initIOCharts(item: Monitor.MonitorData) {
-    let itemIODate = item.date.length === 0 ? loadEmptyDate() : item.date;
+    let itemIODate = item.date?.length === 0 ? loadEmptyDate(timeRangeIO.value) : item.date;
     let ioDate = itemIODate.map(function (item: any) {
         return dateFormatWithoutYear(item);
     });
@@ -660,17 +660,16 @@ function initIOCharts(item: Monitor.MonitorData) {
     lineChart.setOption(option, true);
 }
 
-function loadEmptyDate() {
-    let dateNow = new Date();
-    let date1 = new Date(dateNow.getTime() - 3600 * 1000 * 4);
-    let date2 = new Date(dateNow.getTime() - 3600 * 1000 * 3);
-    let date3 = new Date(dateNow.getTime() - 3600 * 1000 * 2);
-    let date4 = new Date(dateNow.getTime() - 3600 * 1000 * 1);
-    let date5 = dateNow;
-    return [date1, date2, date3, date4, date5];
+function loadEmptyDate(timeRange: any) {
+    if (timeRange.length != 2) {
+        return;
+    }
+    let date1 = new Date(timeRange[0]);
+    let date2 = new Date(timeRange[1]);
+    return [date1, date2];
 }
 function loadEmptyData() {
-    return [0, 0, 0, 0, 0];
+    return [0, 0];
 }
 
 function changeChartSize() {
