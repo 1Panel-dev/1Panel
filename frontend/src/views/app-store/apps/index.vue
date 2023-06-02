@@ -72,6 +72,7 @@
                                                 round
                                                 size="small"
                                                 @click="getAppDetail(app.key)"
+                                                :disabled="app.status === 'TakeDown'"
                                             >
                                                 {{ $t('app.install') }}
                                             </el-button>

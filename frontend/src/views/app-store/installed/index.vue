@@ -133,7 +133,10 @@
                                                 plain
                                                 round
                                                 size="small"
-                                                :disabled="installed.status !== 'Running'"
+                                                :disabled="
+                                                    installed.status !== 'Running' ||
+                                                    installed.app.status === 'TakeDown'
+                                                "
                                                 @click="openUploads(installed.app.key, installed.name)"
                                                 v-if="mode === 'installed'"
                                             >
@@ -145,7 +148,10 @@
                                                 plain
                                                 round
                                                 size="small"
-                                                :disabled="installed.status !== 'Running'"
+                                                :disabled="
+                                                    installed.status !== 'Running' ||
+                                                    installed.app.status === 'TakeDown'
+                                                "
                                                 @click="openBackups(installed.app.key, installed.name)"
                                                 v-if="mode === 'installed'"
                                             >
@@ -157,7 +163,10 @@
                                                 plain
                                                 round
                                                 size="small"
-                                                :disabled="installed.status !== 'Running'"
+                                                :disabled="
+                                                    installed.status !== 'Running' ||
+                                                    installed.app.status === 'TakeDown'
+                                                "
                                                 @click="openOperate(installed, 'upgrade')"
                                                 v-if="mode === 'upgrade'"
                                             >
