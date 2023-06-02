@@ -390,7 +390,11 @@ func (a AppService) SyncAppListFromLocal() {
 		if dirEntry.IsDir() {
 			appDir := path.Join(localAppDir, dirEntry.Name())
 			appDirEntries, err := os.ReadDir(appDir)
-			app, err := handleLocalApp(localAppDir)
+			if err != nil {
+				global.LOG.Errorf(i18n.GetMsgWithMap("ErrAppDirNull", map[string]interface{}{"name": dirEntry.Name(), "err": err.Error()}))
+				continue
+			}
+			app, err := handleLocalApp(appDir)
 			if err != nil {
 				global.LOG.Errorf(i18n.GetMsgWithMap("LocalAppErr", map[string]interface{}{"name": dirEntry.Name(), "err": err.Error()}))
 				continue
@@ -491,29 +495,27 @@ func (a AppService) SyncAppListFromLocal() {
 	tx, ctx := getTxAndContext()
 	defer tx.Rollback()
 	if len(newApps) > 0 {
-		if err := appRepo.BatchCreate(ctx, newApps); err != nil {
+		if err = appRepo.BatchCreate(ctx, newApps); err != nil {
 			return
 		}
 	}
 	for _, update := range updateApps {
-		if err := appRepo.Save(ctx, &update); err != nil {
+		if err = appRepo.Save(ctx, &update); err != nil {
 			return
 		}
 	}
 	if len(deleteApps) > 0 {
-		if err := appRepo.BatchDelete(ctx, deleteApps); err != nil {
+		if err = appRepo.BatchDelete(ctx, deleteApps); err != nil {
 			return
 		}
-		if err := appDetailRepo.DeleteByAppIds(ctx, deleteAppIds); err != nil {
+		if err = appDetailRepo.DeleteByAppIds(ctx, deleteAppIds); err != nil {
 			return
 		}
 	}
 
-	if err := appTagRepo.DeleteByAppIds(ctx, oldAppIds); err != nil {
+	if err = appTagRepo.DeleteByAppIds(ctx, oldAppIds); err != nil {
 		return
 	}
-	var ()
-
 	for _, newApp := range newApps {
 		if newApp.ID > 0 {
 			for _, detail := range newApp.Details {
@@ -551,31 +553,31 @@ func (a AppService) SyncAppListFromLocal() {
 	}
 
 	if len(newAppDetails) > 0 {
-		if err := appDetailRepo.BatchCreate(ctx, newAppDetails); err != nil {
+		if err = appDetailRepo.BatchCreate(ctx, newAppDetails); err != nil {
 			return
 		}
 	}
 
 	for _, updateAppDetail := range updateDetails {
-		if err := appDetailRepo.Update(ctx, updateAppDetail); err != nil {
+		if err = appDetailRepo.Update(ctx, updateAppDetail); err != nil {
 			return
 		}
 	}
 
 	if len(deleteAppDetails) > 0 {
-		if err := appDetailRepo.BatchDelete(ctx, deleteAppDetails); err != nil {
+		if err = appDetailRepo.BatchDelete(ctx, deleteAppDetails); err != nil {
 			return
 		}
 	}
 
 	if len(oldAppIds) > 0 {
-		if err := appTagRepo.DeleteByAppIds(ctx, oldAppIds); err != nil {
+		if err = appTagRepo.DeleteByAppIds(ctx, oldAppIds); err != nil {
 			return
 		}
 	}
 
 	if len(appTags) > 0 {
-		if err := appTagRepo.BatchCreate(ctx, appTags); err != nil {
+		if err = appTagRepo.BatchCreate(ctx, appTags); err != nil {
 			return
 		}
 	}

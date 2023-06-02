@@ -27,6 +27,8 @@ const getType = (status: string) => {
             return 'success';
         case 'stopped':
             return 'danger';
+        case 'unhealthy':
+            return 'warning';
         default:
             return '';
     }
