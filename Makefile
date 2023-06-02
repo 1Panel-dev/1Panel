@@ -10,6 +10,13 @@ WEB_PATH=$(BASE_PAH)/frontend
 SERVER_PATH=$(BASE_PAH)/backend
 MAIN= $(BASE_PAH)/cmd/server/main.go
 APP_NAME=1panel
+ASSERT_PATH= $(BASE_PAH)/cmd/server/web/asserts
+
+clean_asserts:
+	rm -rf $(ASSERT_PATH)
+
+upx_bin:
+	upx $(BUILD_PATH)/$(APP_NAME)
 
 build_frontend:
 	cd $(WEB_PATH) && npm install && npm run build:dev
