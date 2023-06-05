@@ -96,7 +96,7 @@
 import Tooltip from '@/components/tooltip/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import CreateDialog from '@/views/container/network/create/index.vue';
-import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
+import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { dateFormat } from '@/utils/util';
 import { deleteNetwork, searchNetwork, inspect, loadDockerStatus, containerPrune } from '@/api/modules/container';

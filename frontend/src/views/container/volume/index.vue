@@ -81,7 +81,7 @@
 import Tooltip from '@/components/tooltip/index.vue';
 import TableSetting from '@/components/table-setting/index.vue';
 import CreateDialog from '@/views/container/volume/create/index.vue';
-import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
+import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { computeSize, dateFormat } from '@/utils/util';
 import { deleteVolume, searchVolume, inspect, loadDockerStatus, containerPrune } from '@/api/modules/container';
