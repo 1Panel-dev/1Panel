@@ -130,21 +130,24 @@ func OperationLog() gin.HandlerFunc {
 
 		c.Next()
 
-		buf := bytes.NewReader(writer.body.Bytes())
-		reader, err := gzip.NewReader(buf)
-		if err != nil {
-			record.Status = constant.StatusFailed
-			record.Message = fmt.Sprintf("gzip new reader failed, err: %v", err)
-			latency := time.Since(now)
-			record.Latency = latency
+		datas := writer.body.Bytes()
+		if c.Request.Header.Get("Content-Encoding") == "gzip" {
+			buf := bytes.NewReader(writer.body.Bytes())
+			reader, err := gzip.NewReader(buf)
+			if err != nil {
+				record.Status = constant.StatusFailed
+				record.Message = fmt.Sprintf("gzip new reader failed, err: %v", err)
+				latency := time.Since(now)
+				record.Latency = latency
 
-			if err := service.NewILogService().CreateOperationLog(record); err != nil {
-				global.LOG.Errorf("create operation record failed, err: %v", err)
+				if err := service.NewILogService().CreateOperationLog(record); err != nil {
+					global.LOG.Errorf("create operation record failed, err: %v", err)
+				}
+				return
 			}
-			return
+			defer reader.Close()
+			datas, _ = io.ReadAll(reader)
 		}
-		defer reader.Close()
-		datas, _ := io.ReadAll(reader)
 		var res response
 		_ = json.Unmarshal(datas, &res)
 		if res.Code == 200 {
