@@ -267,7 +267,7 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 				return err
 			}
 		}
-		if err := addDockerComposeCommonParam(composeMap, installed.ServiceName, req.AppContainerConfig, req.Params); err != nil {
+		if err = addDockerComposeCommonParam(composeMap, installed.ServiceName, req.AppContainerConfig, req.Params); err != nil {
 			return err
 		}
 		composeByte, err := yaml.Marshal(composeMap)
@@ -279,7 +279,20 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 			req.Params[constant.ContainerName] = installed.ContainerName
 		} else {
 			req.Params[constant.ContainerName] = req.ContainerName
-			installed.ContainerName = req.ContainerName
+			if installed.ContainerName != req.ContainerName {
+				exist, _ := appInstallRepo.GetFirst(appInstallRepo.WithContainerName(req.ContainerName), appInstallRepo.WithIDNotIs(installed.ID))
+				if exist.ID > 0 {
+					return buserr.New(constant.ErrContainerName)
+				}
+				containerExist, err := checkContainerNameIsExist(req.ContainerName, installed.GetPath())
+				if err != nil {
+					return err
+				}
+				if containerExist {
+					return buserr.New(constant.ErrContainerName)
+				}
+				installed.ContainerName = req.ContainerName
+			}
 		}
 	}
 

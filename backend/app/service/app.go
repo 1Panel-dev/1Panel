@@ -296,6 +296,15 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 			err = buserr.New(constant.ErrContainerName)
 			return
 		}
+		containerExist := false
+		containerExist, err = checkContainerNameIsExist(req.ContainerName, appInstall.GetPath())
+		if err != nil {
+			return
+		}
+		if containerExist {
+			err = buserr.New(constant.ErrContainerName)
+			return
+		}
 	}
 	req.Params[constant.ContainerName] = containerName
 	appInstall.ContainerName = containerName

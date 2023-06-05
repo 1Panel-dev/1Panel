@@ -35,6 +35,7 @@ import (
 	"github.com/1Panel-dev/1Panel/backend/utils/compose"
 	composeV2 "github.com/1Panel-dev/1Panel/backend/utils/docker"
 	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	dockerTypes "github.com/docker/docker/api/types"
 	"github.com/pkg/errors"
 )
 
@@ -540,6 +541,31 @@ func getServiceFromInstall(appInstall *model.AppInstall) (service *composeV2.Com
 	}
 	service.SetProject(project)
 	return
+}
+
+func checkContainerNameIsExist(containerName, appDir string) (bool, error) {
+	client, err := composeV2.NewDockerClient()
+	if err != nil {
+		return false, err
+	}
+	var options dockerTypes.ContainerListOptions
+	list, err := client.ContainerList(context.Background(), options)
+	if err != nil {
+		return false, err
+	}
+	for _, container := range list {
+		if containerName == container.Names[0][1:] {
+			if workDir, ok := container.Labels[composeWorkdirLabel]; ok {
+				if workDir != appDir {
+					return true, nil
+				}
+			} else {
+				return true, nil
+			}
+		}
+
+	}
+	return false, nil
 }
 
 func upApp(appInstall *model.AppInstall) {

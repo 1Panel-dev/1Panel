@@ -22,6 +22,7 @@ type IAppInstallRepo interface {
 	WithContainerName(containerName string) DBOption
 	WithPort(port int) DBOption
 	WithIdNotInWebsite() DBOption
+	WithIDNotIs(id uint) DBOption
 	ListBy(opts ...DBOption) ([]model.AppInstall, error)
 	GetFirst(opts ...DBOption) (model.AppInstall, error)
 	Create(ctx context.Context, install *model.AppInstall) error
@@ -53,6 +54,12 @@ func (a *AppInstallRepo) WithDetailIdNotIn(detailIds []uint) DBOption {
 func (a *AppInstallRepo) WithAppId(appId uint) DBOption {
 	return func(g *gorm.DB) *gorm.DB {
 		return g.Where("app_id = ?", appId)
+	}
+}
+
+func (a *AppInstallRepo) WithIDNotIs(id uint) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		return g.Where("id != ?", id)
 	}
 }
 
