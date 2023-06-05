@@ -137,7 +137,7 @@ import CreateDialog from '@/views/container/container/create/index.vue';
 import MonitorDialog from '@/views/container/container/monitor/index.vue';
 import ContainerLogDialog from '@/views/container/container/log/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
-import CodemirrorDialog from '@/components/codemirror-dialog/codemirror.vue';
+import CodemirrorDialog from '@/components/codemirror-dialog/index.vue';
 import Status from '@/components/status/index.vue';
 import { reactive, onMounted, ref } from 'vue';
 import { ContainerOperator, containerPrune, inspect, loadDockerStatus, searchContainer } from '@/api/modules/container';
