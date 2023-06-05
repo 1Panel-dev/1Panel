@@ -121,6 +121,10 @@ func (u *SettingService) Update(key, value string) error {
 				global.LOG.Errorf("restart system for new time zone failed, err: %v", err)
 			}
 		}()
+	case "BindDomain":
+		if len(value) != 0 {
+			_ = global.SESSION.Clean()
+		}
 	case "UserName", "Password":
 		_ = global.SESSION.Clean()
 	}

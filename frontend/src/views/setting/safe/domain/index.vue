@@ -77,7 +77,11 @@ const onSavePort = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        ElMessageBox.confirm(i18n.global.t('setting.bindDomainWarnning'), i18n.global.t('setting.bindDomain'), {
+        let title = form.bindDomain ? i18n.global.t('setting.bindDomain') : i18n.global.t('setting.unBindDomain');
+        let helper = form.bindDomain
+            ? i18n.global.t('setting.bindDomainWarning')
+            : i18n.global.t('setting.unBindDomainHelper');
+        ElMessageBox.confirm(helper, title, {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
             type: 'info',

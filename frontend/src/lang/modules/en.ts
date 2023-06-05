@@ -996,15 +996,21 @@ const message = {
             'The password must contain at least eight characters and contain at least three uppercase letters, lowercase letters, digits, and special characters',
 
         bindDomain: 'Bind domain',
+        unBindDomain: 'Unbind domain',
+        unBindDomainHelper:
+            'The action of unbinding a domain name may cause system insecurity. Do you want to continue?',
         bindDomainHelper:
             'After the domain binding, only the domain in the setting can be used to access 1Panel service',
         bindDomainHelper1: 'If the binding domain is empty, the binding of the domain is cancelled',
-        bindDomainWarnning:
-            'If the binding domain is empty, the binding of the domain is cancelled. Do you want to continue?',
+        bindDomainWarning:
+            'After domain binding, you will be logged out and can only access 1Panel service through the domain name specified in the settings. Do you want to continue?',
         allowIPs: 'Authorized IP',
+        unAllowIPs: 'Unauthorized IP',
+        unAllowIPsWarning:
+            'Authorizing an empty IP will allow all IPs to access the system, which may cause system insecurity. Do you want to continue?',
         allowIPsHelper:
             'After setting the authorized IP address, only the IP address in the setting can access the 1Panel service',
-        allowIPsWarnning:
+        allowIPsWarning:
             'After setting the authorized IP address, only the IP address in the setting can access the 1Panel service. Do you want to continue?',
         allowIPsHelper1: 'If the authorized IP address is empty, the authorized IP address is canceled',
         allowIPEgs:
