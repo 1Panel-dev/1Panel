@@ -49,6 +49,10 @@ class RequestHttp {
                     });
                     return Promise.reject(data);
                 }
+                if (data.code == ResultEnum.EXPIRED) {
+                    router.push({ name: 'Expired' });
+                    return data;
+                }
                 if (data.code == ResultEnum.ERRIP) {
                     globalStore.setLogStatus(false);
                     router.push({
