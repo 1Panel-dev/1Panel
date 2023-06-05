@@ -239,6 +239,7 @@ const isSafety = ref();
 const chartOption = ref('network');
 let timer: NodeJS.Timer | null = null;
 let isInit = ref<boolean>(true);
+let isActive = ref(true);
 
 const ioReadBytes = ref<Array<number>>([]);
 const ioWriteBytes = ref<Array<number>>([]);
@@ -353,12 +354,14 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
     baseInfo.value = res.data;
     currentInfo.value = baseInfo.value.currentInfo;
-    onLoadCurrentInfo();
+    await onLoadCurrentInfo();
     statuRef.value.acceptParams(currentInfo.value, baseInfo.value);
     appRef.value.acceptParams();
     if (isInit) {
         timer = setInterval(async () => {
-            onLoadCurrentInfo();
+            if (isActive.value) {
+                await onLoadCurrentInfo();
+            }
         }, 3000);
     }
 };
@@ -511,6 +514,12 @@ const loadSafeStatus = async () => {
 };
 
 onMounted(() => {
+    window.addEventListener('focus', () => {
+        isActive.value = true;
+    });
+    window.addEventListener('blur', () => {
+        isActive.value = false;
+    });
     loadSafeStatus();
     loadUpgradeStatus();
     onLoadNetworkOptions();
