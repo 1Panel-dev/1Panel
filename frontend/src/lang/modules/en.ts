@@ -637,7 +637,8 @@ const message = {
         shell: 'Shell script',
         ntp: 'Time synchronization',
         website: 'Backup website',
-        rulesHelper: 'Compression exclusion rules (with; Is a delimiter), for example: \n*.log; *.sql',
+        rulesHelper:
+            'When there are multiple compression exclusion rules, they need to be displayed with line breaks. For example: \n*.log \n*.sql',
         lastRecordTime: 'Last execution time',
         all: 'All',
         failedRecord: 'Failed records',

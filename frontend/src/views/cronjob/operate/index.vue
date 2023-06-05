@@ -210,6 +210,9 @@ const acceptParams = (params: DialogProps): void => {
         changeType();
     }
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
+    if (dialogData.value?.rowData?.exclusionRules) {
+        dialogData.value.rowData.exclusionRules = dialogData.value.rowData.exclusionRules.replaceAll(',', '\n');
+    }
     drawerVisiable.value = true;
     checkMysqlInstalled();
     loadBackups();
@@ -465,6 +468,9 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     formEl.validate(async (valid) => {
         if (!valid) return;
+        if (dialogData.value?.rowData?.exclusionRules) {
+            dialogData.value.rowData.exclusionRules = dialogData.value.rowData.exclusionRules.replaceAll('\n', ',');
+        }
         if (!dialogData.value.rowData) return;
         if (dialogData.value.title === 'create') {
             await addCronjob(dialogData.value.rowData);

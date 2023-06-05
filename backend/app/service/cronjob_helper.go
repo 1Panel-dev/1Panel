@@ -195,7 +195,7 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 		}
 	}
 
-	excludes := strings.Split(exclusionRules, ";")
+	excludes := strings.Split(exclusionRules, ",")
 	excludeRules := ""
 	for _, exclude := range excludes {
 		if len(exclude) == 0 {

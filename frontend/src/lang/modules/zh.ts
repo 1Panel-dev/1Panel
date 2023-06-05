@@ -639,7 +639,7 @@ const message = {
         shell: 'Shell 脚本',
         ntp: '时间同步',
         website: '备份网站',
-        rulesHelper: '压缩排除规则(以 ; 号为分隔符)，例： \n*.log;*.sql',
+        rulesHelper: '当存在多个压缩排除规则时，需要换行显示，例：\n*.log \n*.sql',
         lastRecordTime: '上次执行时间',
         database: '备份数据库',
         missBackupAccount: '未能找到备份账号',

@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/model"
@@ -363,6 +364,18 @@ var UpdateCronjobWithSecond = &gormigrate.Migration{
 	Migrate: func(tx *gorm.DB) error {
 		if err := tx.AutoMigrate(&model.Cronjob{}); err != nil {
 			return err
+		}
+		var jobs []model.Cronjob
+		if err := tx.Where("exclusion_rules != ?", "").Find(&jobs).Error; err != nil {
+			return err
+		}
+		for _, job := range jobs {
+			if strings.Contains(job.ExclusionRules, ";") {
+				newRules := strings.ReplaceAll(job.ExclusionRules, ";", ",")
+				if err := tx.Model(&model.Cronjob{}).Where("id = ?", job.ID).Update("exclusion_rules", newRules).Error; err != nil {
+					return err
+				}
+			}
 		}
 		return nil
 	},
