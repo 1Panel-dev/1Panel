@@ -3,6 +3,7 @@
         <template #header>
             <DrawerHeader :header="$t('website.acmeAccountManage')" :back="handleClose" />
         </template>
+        <el-alert :title="$t('ssl.acmeHelper')" type="info" :closable="false" style="margin-bottom: 5px" />
         <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
             <template #toolbar>
                 <el-button type="primary" @click="openCreate">{{ $t('website.addAccount') }}</el-button>

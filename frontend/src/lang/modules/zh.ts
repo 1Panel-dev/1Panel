@@ -1446,6 +1446,7 @@ const message = {
         renewSuccess: '续签成功',
         renewWebsite: '该证书已经和以下网站关联，续签会同步应用到这些网站',
         createAcme: '创建账户',
+        acmeHelper: 'Acme 账户用于申请免费证书',
     },
     firewall: {
         notSupport: '未检测到系统防火墙（firewalld 或者 ufw），请参考官方文档进行安装',
