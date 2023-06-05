@@ -242,11 +242,15 @@ func upgradeInstall(installId uint, detailId uint) error {
 			}
 		}()
 
-		if upErr = downloadApp(install.App, detail, &install); upErr != nil {
-			return
-		}
-
 		detailDir := path.Join(constant.ResourceDir, "apps", install.App.Resource, install.App.Key, detail.Version)
+		if install.App.Resource == constant.AppResourceRemote {
+			if upErr = downloadApp(install.App, detail, &install); upErr != nil {
+				return
+			}
+			go func() {
+				_, _ = http.Get(detail.DownloadCallBackUrl)
+			}()
+		}
 		if install.App.Resource == constant.AppResourceLocal {
 			detailDir = path.Join(constant.ResourceDir, "apps", "local", strings.TrimPrefix(install.App.Key, "local"), detail.Version)
 		}
@@ -462,6 +466,9 @@ func copyData(app model.App, appDetail model.AppDetail, appInstall *model.AppIns
 		if err != nil {
 			return
 		}
+		go func() {
+			_, _ = http.Get(appDetail.DownloadCallBackUrl)
+		}()
 	}
 	appKey := app.Key
 	installAppDir := path.Join(constant.AppInstallDir, app.Key)

@@ -354,9 +354,6 @@ func (a AppService) Install(ctx context.Context, req request.AppInstallCreate) (
 		if err = upAppPre(app, appInstall); err != nil {
 			return
 		}
-		go func() {
-			_, _ = http.Get(appDetail.DownloadCallBackUrl)
-		}()
 		upApp(appInstall)
 	}()
 	go updateToolApp(appInstall)

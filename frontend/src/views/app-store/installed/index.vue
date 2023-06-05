@@ -169,7 +169,8 @@
                                                 round
                                                 size="small"
                                                 :disabled="
-                                                    installed.status !== 'Running' ||
+                                                    (installed.status !== 'Running' &&
+                                                        installed.status !== 'UpgradeErr') ||
                                                     installed.app.status === 'TakeDown'
                                                 "
                                                 @click="openOperate(installed, 'upgrade')"
