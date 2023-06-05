@@ -65,7 +65,9 @@ const onSave = async () => {
             }
         }
     }
-    ElMessageBox.confirm(i18n.global.t('setting.allowIPsHelper'), i18n.global.t('setting.allowIPs'), {
+    let title = allowIPs.value ? i18n.global.t('setting.allowIPs') : i18n.global.t('setting.unAllowIPs');
+    let allow = allowIPs.value ? i18n.global.t('setting.allowIPsWarning') : i18n.global.t('setting.unAllowIPsWarning');
+    ElMessageBox.confirm(allow, title, {
         confirmButtonText: i18n.global.t('commons.button.confirm'),
         cancelButtonText: i18n.global.t('commons.button.cancel'),
         type: 'info',
