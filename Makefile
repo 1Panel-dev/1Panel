@@ -34,3 +34,5 @@ build_backend_on_archlinux:
     && CGO_ENABLED=1 GOOS=$(GOOS) GOARCH=$(GOARCH) $(GOBUILD) -trimpath -ldflags '-s -w --extldflags "-fpic"' -tags osusergo -o $(BUILD_PATH)/$(APP_NAME) $(MAIN)
 
 build_all: build_frontend  build_backend_on_linux
+
+build_on_local: clean_asserts build_frontend  build_backend_on_darwin upx_bin
