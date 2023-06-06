@@ -4,15 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/backend/i18n"
-	"github.com/1Panel-dev/1Panel/backend/utils/files"
-	"gopkg.in/yaml.v3"
 	"math"
 	"os"
 	"path"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/backend/i18n"
+	"github.com/1Panel-dev/1Panel/backend/utils/files"
+	"gopkg.in/yaml.v3"
 
 	"github.com/1Panel-dev/1Panel/backend/utils/env"
 	"github.com/1Panel-dev/1Panel/backend/utils/nginx"
@@ -498,7 +499,16 @@ func (a *AppInstallService) GetDefaultConfigByKey(key string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	filePath := path.Join(constant.AppResourceDir, appInstall.App.Key, "versions", appInstall.Version, "conf")
+
+	fileOp := files.NewFileOp()
+	filePath := path.Join(constant.AppResourceDir, "remote", appInstall.App.Key, appInstall.Version, "conf")
+	if !fileOp.Stat(filePath) {
+		filePath = path.Join(constant.AppResourceDir, appInstall.App.Key, "versions", appInstall.Version, "conf")
+	}
+	if !fileOp.Stat(filePath) {
+		return "", buserr.New(constant.ErrPathNotFound)
+	}
+
 	if key == constant.AppMysql {
 		filePath = path.Join(filePath, "my.cnf")
 	}
