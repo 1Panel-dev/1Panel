@@ -48,7 +48,7 @@
                         :label="$t('website.brand')"
                         fix
                         show-overflow-tooltip
-                        prop="type"
+                        prop="organization"
                     ></el-table-column>
                     <el-table-column :label="$t('ssl.autoRenew')" fix>
                         <template #default="{ row }">
