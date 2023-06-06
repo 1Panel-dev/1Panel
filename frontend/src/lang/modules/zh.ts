@@ -863,6 +863,7 @@ const message = {
         fileUploadStart: '正在上传[{0}]....',
     },
     ssh: {
+        sshAlert: '列表数据根据登录时间排序，但请注意，切换时区或其他操作可能导致登录日志的时间出现偏差。',
         sshOperate: '对 SSH 服务进行 [{0}] 操作，是否继续？',
         sshChange: 'SSH 配置修改',
         sshChangeHelper: '此操作将 {0} 修改为 [{1}] ，是否继续？',

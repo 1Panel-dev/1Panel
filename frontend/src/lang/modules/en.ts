@@ -228,6 +228,7 @@ const message = {
         container: 'Container',
         cronjob: 'Cronjob',
         host: 'Host',
+        ssh: 'SSH Setting',
         security: 'Security',
         files: 'File',
         monitor: 'Monitor',
@@ -869,6 +870,8 @@ const message = {
         fileUploadStart: 'Uploading [{0}]....',
     },
     ssh: {
+        sshAlert:
+            'The list data is sorted based on login time, but please note that changing time zones or other operations may cause deviations in the time of login logs.',
         sshOperate: 'Operation [{0}] on the SSH service is performed. Do you want to continue?',
         sshChange: 'SSH Setting',
         sshChangeHelper: 'This action changed {0} to [{1}]. Do you want to continue?',
