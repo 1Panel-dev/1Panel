@@ -79,18 +79,8 @@ func (u *CronjobService) handleShell(cronType, cornName, script string) ([]byte,
 			return nil, err
 		}
 	}
-	oldDir, err := os.Getwd()
+	stdout, err := cmd.ExecCronjobWithTimeOut(script, handleDir, 24*time.Hour)
 	if err != nil {
-		return nil, err
-	}
-	if err := os.Chdir(handleDir); err != nil {
-		return nil, err
-	}
-	stdout, err := cmd.ExecCronjobWithTimeOut(script, 24*time.Hour)
-	if err != nil {
-		return nil, err
-	}
-	if err := os.Chdir(oldDir); err != nil {
 		return nil, err
 	}
 	return []byte(stdout), nil

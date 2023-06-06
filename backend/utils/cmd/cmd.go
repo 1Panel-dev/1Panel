@@ -67,10 +67,11 @@ func ExecWithTimeOut(cmdStr string, timeout time.Duration) (string, error) {
 	return stdout.String(), nil
 }
 
-func ExecCronjobWithTimeOut(cmdStr string, timeout time.Duration) (string, error) {
+func ExecCronjobWithTimeOut(cmdStr string, workdir string, timeout time.Duration) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 	cmd := exec.Command("bash", "-c", cmdStr)
+	cmd.Dir = workdir
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr

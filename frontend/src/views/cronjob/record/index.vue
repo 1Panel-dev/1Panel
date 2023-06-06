@@ -231,12 +231,23 @@
                                 <template #label>
                                     <span class="status-label">{{ $t('cronjob.exclusionRules') }}</span>
                                 </template>
-                                <div v-if="dialogData.rowData!.exclusionRules">
-                                    <div v-for="item in dialogData.rowData!.exclusionRules.split(';')" :key="item">
-                                        <el-tag>{{ item }}</el-tag>
-                                    </div>
+                                <span v-if="dialogData.rowData!.exclusionRules.length <= 12" class="status-count">
+                                    {{ dialogData.rowData!.exclusionRules }}
+                                </span>
+                                <div v-else>
+                                    <el-popover
+                                        placement="top-start"
+                                        trigger="hover"
+                                        width="250"
+                                        :content="dialogData.rowData!.exclusionRules"
+                                    >
+                                        <template #reference>
+                                            <span class="status-count">
+                                                {{ dialogData.rowData!.exclusionRules.substring(0, 12) }}...
+                                            </span>
+                                        </template>
+                                    </el-popover>
                                 </div>
-                                <span class="status-count" v-else>-</span>
                             </el-form-item>
                             <el-row type="flex" justify="center">
                                 <el-form-item class="descriptionWide">
