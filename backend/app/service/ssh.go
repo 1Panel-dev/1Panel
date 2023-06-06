@@ -6,6 +6,7 @@ import (
 	"os/user"
 	"path"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -222,6 +223,7 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 	}); err != nil {
 		return nil, err
 	}
+	fileList = sortFileList(fileList)
 
 	command := ""
 	if len(req.Info) != 0 {
@@ -282,6 +284,26 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 	data.Logs = itemDatas
 
 	return &data, nil
+}
+
+func sortFileList(fileNames []string) []string {
+	if len(fileNames) < 2 {
+		return fileNames
+	}
+	var itemFile []string
+	if strings.Contains(fileNames[0], "secure") {
+		sort.Slice(fileNames, func(i, j int) bool {
+			return fileNames[i] < fileNames[j]
+		})
+		itemFile = append(itemFile, fileNames[1:]...)
+		itemFile = append(itemFile, fileNames[0])
+		return itemFile
+	}
+
+	sort.Slice(fileNames, func(i, j int) bool {
+		return fileNames[i] > fileNames[j]
+	})
+	return fileNames
 }
 
 func updateSSHConf(oldFiles []string, param string, value interface{}) []string {
