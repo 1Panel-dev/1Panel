@@ -181,6 +181,12 @@ const loadDetail = (log: string) => {
     if (log.indexOf('[dark]') !== -1) {
         log = log.replace('[dark]', '[' + i18n.global.t('setting.dark') + ']');
     }
+    if (log.indexOf('[delete]') !== -1) {
+        log = log.replace('[delete]', '[' + i18n.global.t('commons.button.delete') + ']');
+    }
+    if (log.indexOf('[get]') !== -1) {
+        log = log.replace('[get]', '[' + i18n.global.t('commons.button.get') + ']');
+    }
     if (log.indexOf('[UserName]') !== -1) {
         return log.replace('[UserName]', '[' + i18n.global.t('setting.user') + ']');
     }

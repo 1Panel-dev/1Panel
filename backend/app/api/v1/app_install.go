@@ -159,7 +159,7 @@ func (b *BaseApi) SyncInstalled(c *gin.Context) {
 // @Success 200
 // @Security ApiKeyAuth
 // @Router /apps/installed/op [post]
-// @x-panel-log {"bodyKeys":["installId","operate"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"installId","isList":false,"db":"app_installs","output_column":"app_id","output_value":"appId"},{"input_column":"id","input_value":"installId","isList":false,"db":"app_installs","output_column":"name","output_value":"appName"},{"input_column":"id","input_value":"appId","isList":false,"db":"apps","output_column":"key","output_value":"appKey"}],"formatZH":"[appKey] 应用 [appName] [operate]","formatEN":"[appKey] App [appName] [operate]"}
+// @x-panel-log {"bodyKeys":["installId","operate"],"paramKeys":[],"BeforeFuntions":[{"input_column":"id","input_value":"installId","isList":false,"db":"app_installs","output_column":"app_id","output_value":"appId"},{"input_column":"id","input_value":"installId","isList":false,"db":"app_installs","output_column":"name","output_value":"appName"},{"input_column":"id","input_value":"appId","isList":false,"db":"apps","output_column":"key","output_value":"appKey"}],"formatZH":"[operate] 应用 [appKey][appName]","formatEN":"[operate] App [appKey][appName]"}
 func (b *BaseApi) OperateInstalled(c *gin.Context) {
 	var req request.AppInstalledOperate
 	if err := c.ShouldBindJSON(&req); err != nil {
