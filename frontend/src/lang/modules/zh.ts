@@ -41,6 +41,7 @@ const message = {
             import: '导入',
             search: '搜索',
             refresh: '刷新',
+            get: '获取',
         },
         search: {
             timeStart: '开始时间',
@@ -753,7 +754,7 @@ const message = {
     logs: {
         panelLog: '面板日志',
         operation: '操作日志',
-        login: '登录日志',
+        login: '访问日志',
         loginIP: '登录 IP',
         loginAddress: '登录地址',
         loginAgent: '用户代理',

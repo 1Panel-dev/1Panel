@@ -41,6 +41,7 @@ const message = {
             import: 'Import',
             search: 'Search',
             refresh: 'Refresh',
+            get: 'Get',
         },
         search: {
             timeStart: 'Time start',
