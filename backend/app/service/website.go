@@ -681,7 +681,11 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 		websiteSSL.ExpireDate = cert.NotAfter
 		websiteSSL.StartDate = cert.NotBefore
 		websiteSSL.Type = cert.Issuer.CommonName
-		websiteSSL.Organization = cert.Issuer.Organization[0]
+		if len(cert.Issuer.Organization) > 0 {
+			websiteSSL.Organization = cert.Issuer.Organization[0]
+		} else {
+			websiteSSL.Organization = cert.Issuer.CommonName
+		}
 		if len(cert.DNSNames) > 0 {
 			websiteSSL.PrimaryDomain = cert.DNSNames[0]
 			websiteSSL.Domains = strings.Join(cert.DNSNames, ",")
