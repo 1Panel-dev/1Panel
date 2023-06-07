@@ -88,3 +88,5 @@ ErrDelWithWebsite: "The operating environment has been associated with a website
 
 #setting
 ErrBackupInUsed: "The backup account is already being used in a cronjob and cannot be deleted."
+
+ErrOSSConn: "Unable to successfully request the latest version. Please check if the server can connect to the external network environment."

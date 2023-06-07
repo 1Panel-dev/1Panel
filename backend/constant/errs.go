@@ -118,4 +118,5 @@ var (
 
 var (
 	ErrBackupInUsed = "ErrBackupInUsed"
+	ErrOSSConn      = "ErrOSSConn"
 )
