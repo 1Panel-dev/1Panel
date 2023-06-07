@@ -443,7 +443,7 @@ function checkScript() {
         case 'perDay':
             return row.hour >= 0 && row.hour < 24 && row.minute >= 0 && row.minute < 60;
         case 'perHour':
-            return row.minute > 0 && row.minute < 60;
+            return row.minute >= 0 && row.minute < 60;
         case 'perNDay':
             return row.day > 0 && row.day < 366 && row.hour >= 0 && row.hour < 24 && row.minute >= 0 && row.minute < 60;
         case 'perNHour':
