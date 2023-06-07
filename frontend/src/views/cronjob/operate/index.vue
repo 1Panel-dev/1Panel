@@ -129,6 +129,17 @@
                                     :label="item.label"
                                 />
                             </el-select>
+                            <span class="input-help">
+                                {{ $t('cronjob.targetHelper') }}
+                                <el-link
+                                    style="font-size: 12px"
+                                    icon="Position"
+                                    @click="goRouter('/settings/backupaccount')"
+                                    type="primary"
+                                >
+                                    {{ $t('firewall.quickJump') }}
+                                </el-link>
+                            </span>
                         </el-form-item>
                         <el-form-item v-if="dialogData.rowData!.targetDirID !== localDirID">
                             <el-checkbox v-model="dialogData.rowData!.keepLocal">
@@ -193,6 +204,8 @@ import { CheckAppInstalled } from '@/api/modules/app';
 import { GetWebsiteOptions } from '@/api/modules/website';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
 interface DialogProps {
     title: string;
@@ -219,6 +232,10 @@ const acceptParams = (params: DialogProps): void => {
     loadWebsites();
 };
 const emit = defineEmits<{ (e: 'search'): void }>();
+
+const goRouter = async (path: string) => {
+    router.push({ path: path });
+};
 
 const handleClose = () => {
     drawerVisiable.value = false;
