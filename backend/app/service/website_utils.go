@@ -317,9 +317,7 @@ func deleteListenAndServerName(website model.Website, binds []string, domains []
 	server := config.FindServers()[0]
 	for _, bind := range binds {
 		server.DeleteListen(bind)
-		if website.IPV6 {
-			server.DeleteListen("[::]:" + bind)
-		}
+		server.DeleteListen("[::]:" + bind)
 	}
 	for _, domain := range domains {
 		server.DeleteServerName(domain)
