@@ -18,7 +18,7 @@ import (
 )
 
 func setWebStatic(rootRouter *gin.RouterGroup) {
-	rootRouter.StaticFS("/fav", http.FS(web.Favicon))
+	rootRouter.StaticFS("/public", http.FS(web.Favicon))
 	rootRouter.GET("/assets/*filepath", func(c *gin.Context) {
 		staticServer := http.FileServer(http.FS(web.Assets))
 		staticServer.ServeHTTP(c.Writer, c.Request)
