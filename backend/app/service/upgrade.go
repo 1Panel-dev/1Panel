@@ -2,7 +2,6 @@ package service
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -12,6 +11,8 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
+	"github.com/1Panel-dev/1Panel/backend/buserr"
+	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
 	"github.com/1Panel-dev/1Panel/backend/utils/cmd"
 	"github.com/1Panel-dev/1Panel/backend/utils/common"
@@ -204,12 +205,12 @@ func (u *UpgradeService) loadVersion(isLatest bool, currentVersion string) (stri
 	}
 	latestVersionRes, err := http.Get(path)
 	if err != nil {
-		return "", err
+		return "", buserr.New(constant.ErrOSSConn)
 	}
 	defer latestVersionRes.Body.Close()
 	version, err := io.ReadAll(latestVersionRes.Body)
 	if err != nil {
-		return "", err
+		return "", buserr.New(constant.ErrOSSConn)
 	}
 	if isLatest {
 		return string(version), nil
@@ -217,7 +218,7 @@ func (u *UpgradeService) loadVersion(isLatest bool, currentVersion string) (stri
 
 	versionMap := make(map[string]string)
 	if err := json.Unmarshal(version, &versionMap); err != nil {
-		return "", fmt.Errorf("load version map failed, err: %v", err)
+		return "", buserr.New(constant.ErrOSSConn)
 	}
 
 	if len(currentVersion) < 4 {
@@ -226,7 +227,7 @@ func (u *UpgradeService) loadVersion(isLatest bool, currentVersion string) (stri
 	if version, ok := versionMap[currentVersion[0:4]]; ok {
 		return version, nil
 	}
-	return "", errors.New("load version failed in latest.current")
+	return "", buserr.New(constant.ErrOSSConn)
 }
 
 func (u *UpgradeService) loadReleaseNotes(path string) (string, error) {
