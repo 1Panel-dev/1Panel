@@ -1166,7 +1166,7 @@ const message = {
         takeDown: '已废弃',
         allReadyInstalled: '已安装',
         installHelper: '配置镜像加速可以解决镜像拉取失败的问题',
-        upgradeHelper: '升级失败或者异常应用需要先同步到正常状态',
+        upgradeHelper: '异常应用需要先同步到正常状态',
     },
     website: {
         website: '网站',
@@ -1463,7 +1463,7 @@ const message = {
         cookieBlockList: 'Cookie 黑名单',
 
         firewall: '防火墙',
-        dockerHelper: 'Linux 防火墙 {0} 无法禁用 Docker 端口映射，需要在 Docker 配置中禁用 iptables',
+        dockerHelper: 'Linux 防火墙 {0} 无法禁用 Docker 端口映射，应用可以在 [已安装] 页面编辑参数来控制端口是否放开',
         quickJump: '快速跳转',
         used: '已使用',
         unUsed: '未使用',

@@ -214,7 +214,7 @@ const onOpenDialog = async (
 };
 
 const quickJump = () => {
-    router.push({ name: 'ContainerSetting' });
+    router.push({ name: 'AppInstalled' });
 };
 const toDoc = () => {
     window.open('https://1panel.cn/docs/user_manual/hosts/firewall/', '_blank');

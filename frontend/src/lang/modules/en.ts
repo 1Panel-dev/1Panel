@@ -1191,8 +1191,7 @@ const message = {
         takeDown: 'TakeDown',
         allReadyInstalled: 'Installed',
         installHelper: 'Configuring image acceleration can solve the problem of image pull failure',
-        upgradeHelper:
-            'If the upgrade fails or the abnormal application needs to be synchronized to the normal state first',
+        upgradeHelper: 'The abnormal application needs to be synchronized to the normal state first',
     },
     website: {
         website: 'Website',
@@ -1502,7 +1501,7 @@ const message = {
 
         firewall: 'Firewall',
         dockerHelper:
-            'Linux firewall {0} cannot disable Docker port mapping, you need to disable iptables in Docker configuration.',
+            'Linux firewall {0} cannot disable Docker port mapping, the application can edit the parameters on the [Installed] page to control whether the port is released',
         quickJump: 'Quick jump',
         used: 'Used',
         unUsed: 'Unused',
