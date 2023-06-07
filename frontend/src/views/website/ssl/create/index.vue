@@ -7,7 +7,7 @@
             <el-col :span="22" :offset="1">
                 <el-form ref="sslForm" label-position="top" :model="ssl" label-width="100px" :rules="rules">
                     <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
-                        <el-input v-model="ssl.primaryDomain"></el-input>
+                        <el-input v-model.trim="ssl.primaryDomain"></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('website.otherDomains')" prop="otherDomains">
                         <el-input
