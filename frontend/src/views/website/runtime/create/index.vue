@@ -213,13 +213,18 @@ const changeApp = (appId: number) => {
 };
 
 const changeVersion = () => {
+    loading.value = true;
     initParam.value = false;
-    GetAppDetail(runtime.value.appId, runtime.value.version, 'runtime').then((res) => {
-        runtime.value.appDetailId = res.data.id;
-        runtime.value.image = res.data.image + ':' + runtime.value.version;
-        appParams.value = res.data.params;
-        initParam.value = true;
-    });
+    GetAppDetail(runtime.value.appId, runtime.value.version, 'runtime')
+        .then((res) => {
+            runtime.value.appDetailId = res.data.id;
+            runtime.value.image = res.data.image + ':' + runtime.value.version;
+            appParams.value = res.data.params;
+            initParam.value = true;
+        })
+        .finally(() => {
+            loading.value = false;
+        });
 };
 
 const getApp = (appkey: string, mode: string) => {
@@ -228,12 +233,7 @@ const getApp = (appkey: string, mode: string) => {
         if (res.data.versions.length > 0) {
             runtime.value.version = res.data.versions[0];
             if (mode === 'create') {
-                GetAppDetail(runtime.value.appId, runtime.value.version, 'runtime').then((res) => {
-                    runtime.value.appDetailId = res.data.id;
-                    runtime.value.image = res.data.image + ':' + runtime.value.version;
-                    appParams.value = res.data.params;
-                    initParam.value = true;
-                });
+                changeVersion();
             } else {
                 initParam.value = true;
             }

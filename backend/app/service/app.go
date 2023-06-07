@@ -162,7 +162,13 @@ func (a AppService) GetAppDetail(appId uint, version, appType string) (response.
 			return appDetailDTO, err
 		}
 		fileOp := files.NewFileOp()
-		buildPath := path.Join(constant.AppResourceDir, app.Key, "versions", detail.Version, "build")
+		versionPath := path.Join(constant.AppResourceDir, app.Resource, app.Key, detail.Version)
+		if !fileOp.Stat(versionPath) {
+			if err = downloadApp(app, detail, nil); err != nil {
+				return appDetailDTO, err
+			}
+		}
+		buildPath := path.Join(versionPath, "build")
 		paramsPath := path.Join(buildPath, "config.json")
 		if !fileOp.Stat(paramsPath) {
 			return appDetailDTO, buserr.New(constant.ErrFileNotExist)
