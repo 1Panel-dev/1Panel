@@ -768,6 +768,9 @@ func handleInstalled(appInstallList []model.AppInstall, updated bool) ([]respons
 		}
 		var versions []string
 		for _, detail := range details {
+			if common.IsCrossVersion(installed.Version, detail.Version) && !app.CrossVersionUpdate {
+				continue
+			}
 			versions = append(versions, detail.Version)
 		}
 		versions = common.GetSortedVersions(versions)

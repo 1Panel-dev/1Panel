@@ -413,6 +413,9 @@ func (a *AppInstallService) GetUpdateVersions(installId uint) ([]dto.AppVersion,
 		return versions, err
 	}
 	for _, detail := range details {
+		if common.IsCrossVersion(install.Version, detail.Version) && !app.CrossVersionUpdate {
+			continue
+		}
 		if common.CompareVersion(detail.Version, install.Version) {
 			versions = append(versions, dto.AppVersion{
 				Version:  detail.Version,
