@@ -663,6 +663,7 @@ const message = {
         saveLocal: 'Retain local backups (the same as the number of cloud storage copies)',
         url: 'URL Address',
         target: 'Target',
+        targetHelper: 'Third-party backup accounts are maintained in panel settings.',
         retainCopies: 'Retain copies',
         retainCopiesHelper: 'Number of copies of execution records, log files, and backup files',
         cronSpecRule: 'Please enter a correct lifecycle',
