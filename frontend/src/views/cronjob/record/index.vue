@@ -61,6 +61,9 @@
                         <span v-if="dialogData.rowData?.specType === 'perNMinute'">
                             &nbsp;{{ dialogData.rowData?.minute }}{{ $t('cronjob.minute') }}
                         </span>
+                        <span v-if="dialogData.rowData?.specType === 'perNSecond'">
+                            &nbsp;{{ dialogData.rowData?.second }}{{ $t('cronjob.second') }}
+                        </span>
                         &nbsp;{{ $t('cronjob.handle') }}
                     </el-tag>
                     <span class="buttons">
