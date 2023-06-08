@@ -263,7 +263,7 @@ const onSaveConf = async () => {
 };
 
 const loadContainerLog = async (containerID: string) => {
-    dialogContainerLogRef.value!.acceptParams({ containerID: containerID, container: mysqlName.value });
+    dialogContainerLogRef.value!.acceptParams({ containerID: containerID, container: containerID });
 };
 
 const loadBaseInfo = async () => {
