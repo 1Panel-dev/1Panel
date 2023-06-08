@@ -56,7 +56,7 @@
             <MdEditor
                 v-model="upgradeInfo.releaseNote"
                 previewOnly
-                :theme="globalStore.$state.themeConfig.theme || 'light'"
+                :theme="globalStore.$state.themeConfig.theme === 'dark' ? 'dark' : 'light'"
             />
         </div>
         <template #footer>

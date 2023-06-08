@@ -314,10 +314,6 @@ func upgradeInstall(installId uint, detailId uint) error {
 		install.Version = detail.Version
 		install.AppDetailId = detailId
 
-		go func() {
-			_, _ = http.Get(detail.DownloadCallBackUrl)
-		}()
-
 		if out, err := compose.Down(install.GetComposePath()); err != nil {
 			if out != "" {
 				upErr = errors.New(out)
