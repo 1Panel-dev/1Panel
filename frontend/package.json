@@ -1,14 +1,14 @@
 {
     "name": "panel",
     "private": true,
-    "version": "0.0.1",
+    "version": "1.3",
     "description": "1Panel 前端",
     "scripts": {
         "dev": "vite",
         "serve": "vite",
         "build:dev": "vite build --mode development",
         "build:test": "vue-tsc --noEmit && vite build --mode test",
-        "build:pro": "vue-tsc --noEmit && vite build --mode production",
+        "build:pro": "vite build --mode production",
         "preview": "vite preview",
         "lint:eslint": "eslint --fix --ext .js,.ts,.vue ./src",
         "lint:prettier": "prettier --write --loglevel warn \"src/**/*.{js,ts,json,tsx,css,less,scss,vue,html,md}\"",
@@ -95,7 +95,7 @@
         "vue-tsc": "^0.29.8"
     },
     "overrides": {
-        "esbuild":"npm:esbuild-wasm@latest"
+        "esbuild": "npm:esbuild-wasm@latest"
     },
     "config": {
         "commitizen": {
