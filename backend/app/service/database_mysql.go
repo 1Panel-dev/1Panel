@@ -195,7 +195,7 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 	}
 
 	passwordChangeCMD := fmt.Sprintf("set password for '%s'@'%s' = password('%s')", mysql.Username, mysql.Permission, info.Value)
-	if app.Version != "5.7.39" {
+	if !strings.HasPrefix(app.Version, "5.7") {
 		passwordChangeCMD = fmt.Sprintf("ALTER USER '%s'@'%s' IDENTIFIED WITH mysql_native_password BY '%s';", mysql.Username, mysql.Permission, info.Value)
 	}
 	if info.ID != 0 {
@@ -230,7 +230,7 @@ func (u *MysqlService) ChangePassword(info dto.ChangeDBInfo) error {
 	for _, host := range hosts {
 		if host == "%" || host == "localhost" {
 			passwordRootChangeCMD := fmt.Sprintf("set password for 'root'@'%s' = password('%s')", host, info.Value)
-			if app.Version != "5.7.39" {
+			if !strings.HasPrefix(app.Version, "5.7") {
 				passwordRootChangeCMD = fmt.Sprintf("alter user 'root'@'%s' identified with mysql_native_password BY '%s';", host, info.Value)
 			}
 			if err := excuteSql(app.ContainerName, app.Password, passwordRootChangeCMD); err != nil {
@@ -347,7 +347,7 @@ func (u *MysqlService) UpdateVariables(updates []dto.MysqlVariablesUpdate) error
 
 	group := "[mysqld]"
 	for _, info := range updates {
-		if app.Version != "5.7.39" {
+		if !strings.HasPrefix(app.Version, "5.7") {
 			if info.Param == "query_cache_size" {
 				continue
 			}
@@ -495,7 +495,7 @@ func (u *MysqlService) createUser(app *repo.RootInfo, req dto.MysqlDBCreate) err
 		if req.Name == "*" {
 			grantStr = fmt.Sprintf("grant all privileges on *.* to %s", user)
 		}
-		if app.Version == "5.7.39" {
+		if strings.HasPrefix(app.Version, "5.7") {
 			grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, req.Password)
 		}
 		if err := excSQL(app.ContainerName, app.Password, grantStr); err != nil {

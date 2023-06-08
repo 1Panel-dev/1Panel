@@ -76,7 +76,7 @@
                         </el-input>
                         <span class="input-help">{{ $t('database.readRndBufferSizeHelper') }}</span>
                     </el-form-item>
-                    <el-form-item v-if="mysqlVersion === '5.7.39'" label="query_cache_size" prop="query_cache_size">
+                    <el-form-item v-if="showCacheSize" label="query_cache_size" prop="query_cache_size">
                         <el-input clearable v-model.number="mysqlVariables.query_cache_size">
                             <template #append>MB</template>
                         </el-input>
@@ -292,6 +292,9 @@ const onSaveVariables = async () => {
         });
 };
 
+const showCacheSize = () => {
+    return mysqlVersion.value.startsWith('5.7');
+};
 defineExpose({
     acceptParams,
 });
