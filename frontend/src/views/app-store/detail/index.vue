@@ -83,7 +83,11 @@
                 </div>
             </div>
             <div style="margin-left: 10px">
-                <MdEditor v-model="app.readMe" previewOnly :themes="globalStore.$state.themeConfig.theme || 'light'" />
+                <MdEditor
+                    v-model="app.readMe"
+                    previewOnly
+                    :theme="globalStore.$state.themeConfig.theme === 'dark' ? 'dark' : 'light'"
+                />
             </div>
         </template>
     </LayoutContent>
