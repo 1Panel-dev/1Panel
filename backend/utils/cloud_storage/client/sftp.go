@@ -1,8 +1,8 @@
 package client
 
 import (
+	"bufio"
 	"fmt"
-	"io"
 	"net"
 	"os"
 	"path"
@@ -75,11 +75,18 @@ func (s sftpClient) Upload(src, target string) (bool, error) {
 		return false, err
 	}
 	defer dstFile.Close()
-	ff, err := io.ReadAll(srcFile)
-	if err != nil {
-		return false, err
+
+	reader := bufio.NewReaderSize(srcFile, 128*1024*1024)
+	for {
+		chunk, err := reader.Peek(8 * 1024 * 1024)
+		if len(chunk) != 0 {
+			_, _ = dstFile.Write(chunk)
+			_, _ = reader.Discard(len(chunk))
+		}
+		if err != nil {
+			break
+		}
 	}
-	_, _ = dstFile.Write(ff)
 	return true, nil
 }
 
