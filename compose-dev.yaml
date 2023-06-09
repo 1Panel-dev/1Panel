@@ -1,0 +1,8 @@
+services:
+  app:
+    entrypoint:
+    - sleep
+    - infinity
+    build:
+      context: .
+      dockerfile: .dev/Dockerfile
