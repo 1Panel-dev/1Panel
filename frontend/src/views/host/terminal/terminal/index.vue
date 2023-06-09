@@ -181,6 +181,7 @@ interface Tree {
 }
 
 const acceptParams = async () => {
+    globalStore.isFullScreen = false;
     loadCommand();
     const res = await getHostTree({});
     hostTree.value = res.data;
