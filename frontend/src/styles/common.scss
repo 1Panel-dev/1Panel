@@ -13,6 +13,11 @@
     align-items: center;
 }
 
+.flx-wrap {
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .clearfix::after {
     display: block;
     height: 0;

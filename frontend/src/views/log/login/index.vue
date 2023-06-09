@@ -15,39 +15,44 @@
                         </el-button>
                     </el-col>
                     <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
-                        <TableSetting @search="search()" />
-                        <div class="search-button">
-                            <el-input
-                                v-model="searchIP"
-                                clearable
-                                @clear="search()"
-                                suffix-icon="Search"
-                                @keyup.enter="search()"
-                                @change="search()"
-                                :placeholder="$t('commons.button.search') + ' ip'"
-                            ></el-input>
+                        <div class="flx-align-center">
+                            <div class="search-button">
+                                <el-input
+                                    v-model="searchIP"
+                                    clearable
+                                    @clear="search()"
+                                    suffix-icon="Search"
+                                    @keyup.enter="search()"
+                                    @change="search()"
+                                    :placeholder="$t('commons.button.search') + ' ip'"
+                                ></el-input>
+                            </div>
+                            <TableSetting @search="search()" />
                         </div>
                     </el-col>
                 </el-row>
             </template>
 
             <template #search>
-                <el-select v-model="searchStatus" @change="search()" clearable>
-                    <template #prefix>{{ $t('commons.table.status') }}</template>
-                    <el-option :label="$t('commons.table.all')" value=""></el-option>
-                    <el-option :label="$t('commons.status.success')" value="Success"></el-option>
-                    <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
-                </el-select>
-                <el-button type="primary" plain @click="onClean()" style="margin-left: 10px">
-                    {{ $t('logs.deleteLogs') }}
-                </el-button>
+                <div class="flx-align-center">
+                    <el-select v-model="searchStatus" @change="search()" clearable>
+                        <template #prefix>{{ $t('commons.table.status') }}</template>
+                        <el-option :label="$t('commons.table.all')" value=""></el-option>
+                        <el-option :label="$t('commons.status.success')" value="Success"></el-option>
+                        <el-option :label="$t('commons.status.failed')" value="Failed"></el-option>
+                    </el-select>
+
+                    <el-button type="primary" plain @click="onClean()" style="margin-left: 10px">
+                        {{ $t('logs.deleteLogs') }}
+                    </el-button>
+                </div>
             </template>
             <template #main>
                 <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
-                    <el-table-column min-width="40" :label="$t('logs.loginIP')" prop="ip" />
-                    <el-table-column min-width="40" :label="$t('logs.loginAddress')" prop="address" />
+                    <el-table-column :label="$t('logs.loginIP')" prop="ip" />
+                    <el-table-column :label="$t('logs.loginAddress')" prop="address" />
                     <el-table-column :label="$t('logs.loginAgent')" show-overflow-tooltip prop="agent" />
-                    <el-table-column min-width="40" :label="$t('logs.loginStatus')" prop="status">
+                    <el-table-column :label="$t('logs.loginStatus')" prop="status">
                         <template #default="{ row }">
                             <div v-if="row.status === 'Success'">
                                 <el-tag type="success">{{ $t('commons.status.success') }}</el-tag>

@@ -1,7 +1,7 @@
 <template>
     <div v-if="persistenceShow">
         <el-row :gutter="20" style="margin-top: 5px" class="row-box">
-            <el-col :span="12">
+            <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                 <el-card class="el-card">
                     <template #header>
                         <div class="card-header">
@@ -36,7 +36,7 @@
                     </el-form>
                 </el-card>
             </el-col>
-            <el-col :span="12">
+            <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                 <el-card class="el-card">
                     <template #header>
                         <div class="card-header">
