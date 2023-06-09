@@ -41,3 +41,12 @@ jobs:
             dist/checksums.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup OSSUTIL
+        uses: yizhoumo/setup-ossutil@v1
+        with:
+          endpoint: ${{ secrets.OSS_ENDPOINT }}
+          access-key-id: ${{ secrets.OSS_ACCESS_KEY_ID }}
+          access-key-secret: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
+          ossutil-version: '1.7.14'
+      - name: Upload Assets to OSS
+      - run: ossutil cp -r dist/ oss://resource-fit2cloud-com/1panel/package/stable/${{  github.ref_name }}/release/ --include "*.tar.gz" --include "checksums.txt" --only-current-dir
