@@ -65,4 +65,19 @@
             }
         }
     }
+
+    .database-status {
+        .title {
+            margin-left: 10px !important;
+        }
+        .content {
+            margin-left: 10px !important;
+        }
+    }
+
+    @media only screen and (max-width: 768px) {
+        .el-col-xs-24 {
+            margin-bottom: 10px;
+        }
+    }
 }
