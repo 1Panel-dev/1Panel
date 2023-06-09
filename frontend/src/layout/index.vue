@@ -39,6 +39,7 @@ let timer: NodeJS.Timer | null = null;
 
 const classObj = computed(() => {
     return {
+        fullScreen: globalStore.isFullScreen,
         hideSidebar: menuStore.isCollapse,
         openSidebar: !menuStore.isCollapse,
         mobile: globalStore.device === DeviceType.Mobile,
@@ -160,6 +161,12 @@ onMounted(() => {
     }
     .fixed-header {
         width: calc(100% - var(--panel-menu-hide-width));
+    }
+}
+
+.fullScreen {
+    .main-container {
+        margin-left: 0px;
     }
 }
 // for mobile response 适配移动端
