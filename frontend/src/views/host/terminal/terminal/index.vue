@@ -149,9 +149,11 @@ const globalStore = GlobalStore();
 function toggleFullscreen() {
     if (screenfull.isEnabled) {
         screenfull.toggle();
-        globalStore.setScreenFull();
     }
 }
+screenfull.on('change', () => {
+    globalStore.isFullScreen = screenfull.isFullscreen;
+});
 
 const localHostID = ref();
 
@@ -181,6 +183,7 @@ interface Tree {
 }
 
 const acceptParams = async () => {
+    globalStore.isFullScreen = false;
     loadCommand();
     const res = await getHostTree({});
     hostTree.value = res.data;
