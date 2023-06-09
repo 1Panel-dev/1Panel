@@ -15,6 +15,12 @@
                         <el-button type="primary" @click="onOpenDialog('create')">
                             {{ $t('commons.button.create') }}{{ $t('cronjob.cronTask') }}
                         </el-button>
+                        <el-button plain :disabled="selects.length === 0" @click="onBatchChangeStatus('enable')">
+                            {{ $t('commons.button.enable') }}
+                        </el-button>
+                        <el-button plain :disabled="selects.length === 0" @click="onBatchChangeStatus('disable')">
+                            {{ $t('commons.button.disable') }}
+                        </el-button>
                         <el-button plain :disabled="selects.length === 0" @click="onDelete(null)">
                             {{ $t('commons.button.delete') }}
                         </el-button>
@@ -315,6 +321,20 @@ const onChangeStatus = async (id: number, status: string) => {
     }).then(async () => {
         let itemStatus = status === 'enable' ? 'Enable' : 'Disable';
         await updateStatus({ id: id, status: itemStatus });
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        search();
+    });
+};
+
+const onBatchChangeStatus = async (status: string) => {
+    ElMessageBox.confirm(i18n.global.t('cronjob.' + status + 'Msg'), i18n.global.t('cronjob.changeStatus'), {
+        confirmButtonText: i18n.global.t('commons.button.confirm'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).then(async () => {
+        let itemStatus = status === 'enable' ? 'Enable' : 'Disable';
+        for (const item of selects.value) {
+            await updateStatus({ id: item.id, status: itemStatus });
+        }
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         search();
     });
