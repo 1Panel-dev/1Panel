@@ -43,8 +43,8 @@
                 </el-radio-group>
                 <el-row style="margin-top: 20px" v-if="confShowType === 'base'">
                     <el-col :span="1"><br /></el-col>
-                    <el-col :span="10">
-                        <el-form :model="form" label-position="left" :rules="rules" ref="formRef" label-width="150px">
+                    <el-col :xs="24" :sm="24" :md="15" :lg="12" :xl="10">
+                        <el-form :model="form" label-position="left" :rules="rules" ref="formRef" label-width="120px">
                             <el-form-item :label="$t('container.mirrors')" prop="mirrors">
                                 <div style="width: 100%" v-if="form.mirrors">
                                     <el-input

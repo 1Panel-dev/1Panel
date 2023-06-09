@@ -123,194 +123,198 @@
                 </el-row>
             </template>
             <template #main>
-                <el-row :gutter="20" v-show="hasRecords">
-                    <el-col :span="8">
-                        <div>
-                            <ul class="infinite-list" style="overflow: auto">
-                                <li
-                                    v-for="(item, index) in records"
-                                    :key="index"
-                                    @click="forDetail(item)"
-                                    class="infinite-list-item"
-                                >
-                                    <el-icon v-if="item.status === 'Success'"><Select /></el-icon>
-                                    <el-icon v-if="item.status === 'Waiting'"><Loading /></el-icon>
-                                    <el-icon v-if="item.status === 'Failed'"><CloseBold /></el-icon>
-                                    <span v-if="item.id === currentRecord.id" style="color: red">
-                                        {{ dateFormat(0, 0, item.startTime) }}
-                                    </span>
-                                    <span v-else>{{ dateFormat(0, 0, item.startTime) }}</span>
-                                </li>
-                            </ul>
-                            <div style="margin-top: 10px; font-size: 12px; float: right">
-                                <el-pagination
-                                    :page-size="searchInfo.pageSize"
-                                    :current-page="searchInfo.page"
-                                    @current-change="handleCurrentChange"
-                                    @size-change="handleSizeChange"
-                                    :pager-count="5"
-                                    :page-sizes="[6, 8, 10, 12, 14]"
-                                    small
-                                    layout="total, sizes, prev, pager, next"
-                                    :total="searchInfo.recordTotal"
-                                />
-                            </div>
-                        </div>
-                    </el-col>
-                    <el-col :span="16">
-                        <el-form label-position="top" :v-key="refresh">
-                            <el-row type="flex" justify="center">
-                                <el-form-item class="descriptionWide" v-if="isBackup()">
-                                    <template #label>
-                                        <span class="status-label">{{ $t('cronjob.target') }}</span>
-                                    </template>
-                                    <span class="status-count">{{ dialogData.rowData!.targetDir }}</span>
-                                    <el-button
-                                        v-if="currentRecord?.status === 'Success'"
-                                        type="primary"
-                                        style="margin-left: 10px"
-                                        link
-                                        icon="Download"
-                                        @click="onDownload(currentRecord, dialogData.rowData!.targetDirID)"
+                <div style="overflow: auto">
+                    <el-row :gutter="20" v-show="hasRecords" style="min-width: 900px">
+                        <el-col :span="8">
+                            <div>
+                                <ul class="infinite-list" style="overflow: auto">
+                                    <li
+                                        v-for="(item, index) in records"
+                                        :key="index"
+                                        @click="forDetail(item)"
+                                        class="infinite-list-item"
                                     >
-                                        {{ $t('file.download') }}
-                                    </el-button>
-                                </el-form-item>
-                                <el-form-item class="description" v-if="dialogData.rowData!.type === 'website'">
+                                        <el-icon v-if="item.status === 'Success'"><Select /></el-icon>
+                                        <el-icon v-if="item.status === 'Waiting'"><Loading /></el-icon>
+                                        <el-icon v-if="item.status === 'Failed'"><CloseBold /></el-icon>
+                                        <span v-if="item.id === currentRecord.id" style="color: red">
+                                            {{ dateFormat(0, 0, item.startTime) }}
+                                        </span>
+                                        <span v-else>{{ dateFormat(0, 0, item.startTime) }}</span>
+                                    </li>
+                                </ul>
+                                <div style="margin-top: 10px; font-size: 12px; float: right">
+                                    <el-pagination
+                                        :page-size="searchInfo.pageSize"
+                                        :current-page="searchInfo.page"
+                                        @current-change="handleCurrentChange"
+                                        @size-change="handleSizeChange"
+                                        :pager-count="5"
+                                        :page-sizes="[6, 8, 10, 12, 14]"
+                                        small
+                                        layout="total, sizes, prev, pager, next"
+                                        :total="searchInfo.recordTotal"
+                                    />
+                                </div>
+                            </div>
+                        </el-col>
+                        <el-col :span="16">
+                            <el-form label-position="top" :v-key="refresh">
+                                <el-row type="flex" justify="center">
+                                    <el-form-item class="descriptionWide" v-if="isBackup()">
+                                        <template #label>
+                                            <span class="status-label">{{ $t('cronjob.target') }}</span>
+                                        </template>
+                                        <span class="status-count">{{ dialogData.rowData!.targetDir }}</span>
+                                        <el-button
+                                            v-if="currentRecord?.status === 'Success'"
+                                            type="primary"
+                                            style="margin-left: 10px"
+                                            link
+                                            icon="Download"
+                                            @click="onDownload(currentRecord, dialogData.rowData!.targetDirID)"
+                                        >
+                                            {{ $t('file.download') }}
+                                        </el-button>
+                                    </el-form-item>
+                                    <el-form-item class="description" v-if="dialogData.rowData!.type === 'website'">
+                                        <template #label>
+                                            <span class="status-label">{{ $t('cronjob.website') }}</span>
+                                        </template>
+                                        <span v-if="dialogData.rowData!.website !== 'all'" class="status-count">
+                                            {{ dialogData.rowData!.website }}
+                                        </span>
+                                        <span v-else class="status-count">
+                                            {{ $t('commons.table.all') }}
+                                        </span>
+                                    </el-form-item>
+                                    <el-form-item class="description" v-if="dialogData.rowData!.type === 'database'">
+                                        <template #label>
+                                            <span class="status-label">{{ $t('cronjob.database') }}</span>
+                                        </template>
+                                        <span v-if="dialogData.rowData!.dbName !== 'all'" class="status-count">
+                                            {{ dialogData.rowData!.dbName }}
+                                        </span>
+                                        <span v-else class="status-count">
+                                            {{ $t('commons.table.all') }}
+                                        </span>
+                                    </el-form-item>
+                                    <el-form-item class="description" v-if="dialogData.rowData!.type === 'directory'">
+                                        <template #label>
+                                            <span class="status-label">{{ $t('cronjob.directory') }}</span>
+                                        </template>
+                                        <span v-if="dialogData.rowData!.sourceDir.length <= 12" class="status-count">
+                                            {{ dialogData.rowData!.sourceDir }}
+                                        </span>
+                                        <div v-else>
+                                            <el-popover
+                                                placement="top-start"
+                                                trigger="hover"
+                                                width="250"
+                                                :content="dialogData.rowData!.sourceDir"
+                                            >
+                                                <template #reference>
+                                                    <span class="status-count">
+                                                        {{ dialogData.rowData!.sourceDir.substring(0, 12) }}...
+                                                    </span>
+                                                </template>
+                                            </el-popover>
+                                        </div>
+                                    </el-form-item>
+                                    <el-form-item class="description" v-if="isBackup()">
+                                        <template #label>
+                                            <span class="status-label">{{ $t('cronjob.retainCopies') }}</span>
+                                        </template>
+                                        <span class="status-count">{{ dialogData.rowData!.retainCopies }}</span>
+                                    </el-form-item>
+                                </el-row>
+                                <el-form-item
+                                    class="description"
+                                    v-if="dialogData.rowData!.type === 'website' || dialogData.rowData!.type === 'directory'"
+                                >
                                     <template #label>
-                                        <span class="status-label">{{ $t('cronjob.website') }}</span>
+                                        <span class="status-label">{{ $t('cronjob.exclusionRules') }}</span>
                                     </template>
-                                    <span v-if="dialogData.rowData!.website !== 'all'" class="status-count">
-                                        {{ dialogData.rowData!.website }}
-                                    </span>
-                                    <span v-else class="status-count">
-                                        {{ $t('commons.table.all') }}
-                                    </span>
-                                </el-form-item>
-                                <el-form-item class="description" v-if="dialogData.rowData!.type === 'database'">
-                                    <template #label>
-                                        <span class="status-label">{{ $t('cronjob.database') }}</span>
-                                    </template>
-                                    <span v-if="dialogData.rowData!.dbName !== 'all'" class="status-count">
-                                        {{ dialogData.rowData!.dbName }}
-                                    </span>
-                                    <span v-else class="status-count">
-                                        {{ $t('commons.table.all') }}
-                                    </span>
-                                </el-form-item>
-                                <el-form-item class="description" v-if="dialogData.rowData!.type === 'directory'">
-                                    <template #label>
-                                        <span class="status-label">{{ $t('cronjob.directory') }}</span>
-                                    </template>
-                                    <span v-if="dialogData.rowData!.sourceDir.length <= 12" class="status-count">
-                                        {{ dialogData.rowData!.sourceDir }}
+                                    <span v-if="dialogData.rowData!.exclusionRules.length <= 12" class="status-count">
+                                        {{ dialogData.rowData!.exclusionRules }}
                                     </span>
                                     <div v-else>
                                         <el-popover
                                             placement="top-start"
                                             trigger="hover"
                                             width="250"
-                                            :content="dialogData.rowData!.sourceDir"
+                                            :content="dialogData.rowData!.exclusionRules"
                                         >
                                             <template #reference>
                                                 <span class="status-count">
-                                                    {{ dialogData.rowData!.sourceDir.substring(0, 12) }}...
+                                                    {{ dialogData.rowData!.exclusionRules.substring(0, 12) }}...
                                                 </span>
                                             </template>
                                         </el-popover>
                                     </div>
                                 </el-form-item>
-                                <el-form-item class="description" v-if="isBackup()">
-                                    <template #label>
-                                        <span class="status-label">{{ $t('cronjob.retainCopies') }}</span>
-                                    </template>
-                                    <span class="status-count">{{ dialogData.rowData!.retainCopies }}</span>
-                                </el-form-item>
-                            </el-row>
-                            <el-form-item
-                                class="description"
-                                v-if="dialogData.rowData!.type === 'website' || dialogData.rowData!.type === 'directory'"
-                            >
-                                <template #label>
-                                    <span class="status-label">{{ $t('cronjob.exclusionRules') }}</span>
-                                </template>
-                                <span v-if="dialogData.rowData!.exclusionRules.length <= 12" class="status-count">
-                                    {{ dialogData.rowData!.exclusionRules }}
-                                </span>
-                                <div v-else>
-                                    <el-popover
-                                        placement="top-start"
-                                        trigger="hover"
-                                        width="250"
-                                        :content="dialogData.rowData!.exclusionRules"
-                                    >
-                                        <template #reference>
-                                            <span class="status-count">
-                                                {{ dialogData.rowData!.exclusionRules.substring(0, 12) }}...
-                                            </span>
+                                <el-row type="flex" justify="center">
+                                    <el-form-item class="descriptionWide">
+                                        <template #label>
+                                            <span class="status-label">{{ $t('commons.search.timeStart') }}</span>
                                         </template>
-                                    </el-popover>
-                                </div>
-                            </el-form-item>
-                            <el-row type="flex" justify="center">
-                                <el-form-item class="descriptionWide">
-                                    <template #label>
-                                        <span class="status-label">{{ $t('commons.search.timeStart') }}</span>
-                                    </template>
-                                    <span class="status-count">{{ dateFormat(0, 0, currentRecord?.startTime) }}</span>
-                                </el-form-item>
-                                <el-form-item class="description">
-                                    <template #label>
-                                        <span class="status-label">{{ $t('commons.table.interval') }}</span>
-                                    </template>
-                                    <span class="status-count" v-if="currentRecord?.interval! <= 1000">
-                                        {{ currentRecord?.interval }} ms
-                                    </span>
-                                    <span class="status-count" v-if="currentRecord?.interval! > 1000">
-                                        {{ currentRecord?.interval! / 1000 }} s
-                                    </span>
-                                </el-form-item>
-                                <el-form-item class="description">
-                                    <template #label>
-                                        <span class="status-label">{{ $t('commons.table.status') }}</span>
-                                    </template>
-                                    <el-tooltip v-if="currentRecord?.status === 'Failed'" placement="top">
-                                        <template #content>
-                                            <div style="width: 300px; word-break: break-all">
-                                                {{ currentRecord?.message }}
-                                            </div>
+                                        <span class="status-count">
+                                            {{ dateFormat(0, 0, currentRecord?.startTime) }}
+                                        </span>
+                                    </el-form-item>
+                                    <el-form-item class="description">
+                                        <template #label>
+                                            <span class="status-label">{{ $t('commons.table.interval') }}</span>
                                         </template>
-                                        <el-tag type="danger">{{ $t('commons.table.statusFailed') }}</el-tag>
-                                    </el-tooltip>
-                                    <el-tag type="success" v-if="currentRecord?.status === 'Success'">
-                                        {{ $t('commons.table.statusSuccess') }}
-                                    </el-tag>
-                                    <el-tag type="info" v-if="currentRecord?.status === 'Waiting'">
-                                        {{ $t('commons.table.statusWaiting') }}
-                                    </el-tag>
-                                </el-form-item>
-                            </el-row>
-                            <el-row v-if="currentRecord?.records">
-                                <span>{{ $t('commons.table.records') }}</span>
-                                <codemirror
-                                    ref="mymirror"
-                                    :autofocus="true"
-                                    :placeholder="$t('cronjob.noLogs')"
-                                    :indent-with-tab="true"
-                                    :tabSize="4"
-                                    style="height: calc(100vh - 484px); width: 100%; margin-top: 5px"
-                                    :lineWrapping="true"
-                                    :matchBrackets="true"
-                                    theme="cobalt"
-                                    :styleActiveLine="true"
-                                    :extensions="extensions"
-                                    v-model="currentRecordDetail"
-                                    :disabled="true"
-                                />
-                            </el-row>
-                        </el-form>
-                    </el-col>
-                </el-row>
+                                        <span class="status-count" v-if="currentRecord?.interval! <= 1000">
+                                            {{ currentRecord?.interval }} ms
+                                        </span>
+                                        <span class="status-count" v-if="currentRecord?.interval! > 1000">
+                                            {{ currentRecord?.interval! / 1000 }} s
+                                        </span>
+                                    </el-form-item>
+                                    <el-form-item class="description">
+                                        <template #label>
+                                            <span class="status-label">{{ $t('commons.table.status') }}</span>
+                                        </template>
+                                        <el-tooltip v-if="currentRecord?.status === 'Failed'" placement="top">
+                                            <template #content>
+                                                <div style="width: 300px; word-break: break-all">
+                                                    {{ currentRecord?.message }}
+                                                </div>
+                                            </template>
+                                            <el-tag type="danger">{{ $t('commons.table.statusFailed') }}</el-tag>
+                                        </el-tooltip>
+                                        <el-tag type="success" v-if="currentRecord?.status === 'Success'">
+                                            {{ $t('commons.table.statusSuccess') }}
+                                        </el-tag>
+                                        <el-tag type="info" v-if="currentRecord?.status === 'Waiting'">
+                                            {{ $t('commons.table.statusWaiting') }}
+                                        </el-tag>
+                                    </el-form-item>
+                                </el-row>
+                                <el-row v-if="currentRecord?.records">
+                                    <span>{{ $t('commons.table.records') }}</span>
+                                    <codemirror
+                                        ref="mymirror"
+                                        :autofocus="true"
+                                        :placeholder="$t('cronjob.noLogs')"
+                                        :indent-with-tab="true"
+                                        :tabSize="4"
+                                        style="height: calc(100vh - 484px); width: 100%; margin-top: 5px"
+                                        :lineWrapping="true"
+                                        :matchBrackets="true"
+                                        theme="cobalt"
+                                        :styleActiveLine="true"
+                                        :extensions="extensions"
+                                        v-model="currentRecordDetail"
+                                        :disabled="true"
+                                    />
+                                </el-row>
+                            </el-form>
+                        </el-col>
+                    </el-row>
+                </div>
                 <div class="app-warn" v-show="!hasRecords">
                     <div>
                         <span>{{ $t('cronjob.noRecord') }}</span>

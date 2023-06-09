@@ -145,9 +145,9 @@ onMounted(() => {
             font-size: 40px;
             font-family: pingFangSC-Regular;
             font-weight: 600;
-            // @media only screen and (max-width: 1440px) {
-            //     margin-left: 0;
-            // }
+            @media only screen and (max-width: 768px) {
+                font-size: 35px;
+            }
         }
         @media only screen and (max-width: 1110px) {
             margin-bottom: 20px;
@@ -169,6 +169,9 @@ onMounted(() => {
         }
         @media only screen and (max-width: 1110px) {
             margin: 60px auto 0;
+        }
+        @media only screen and (max-width: 768px) {
+            width: 100%;
         }
     }
 }
