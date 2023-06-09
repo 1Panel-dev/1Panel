@@ -231,7 +231,8 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 	}
 	for i := 0; i < len(fileList); i++ {
 		if strings.HasPrefix(path.Base(fileList[i]), "secure") {
-			dataItem := loadFailedSecureDatas(fmt.Sprintf("cat %s | grep -a 'Failed password for' | grep -v 'invalid' %s", fileList[i], command))
+			commandItem := fmt.Sprintf("cat %s | grep -a 'Failed password for' | grep -v 'invalid' %s", fileList[i], command)
+			dataItem := loadFailedSecureDatas(commandItem)
 			data.FailedCount += len(dataItem)
 			data.TotalCount += len(dataItem)
 			if req.Status != constant.StatusSuccess {
@@ -239,14 +240,16 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 			}
 		}
 		if strings.HasPrefix(path.Base(fileList[i]), "auth.log") {
-			dataItem := loadFailedAuthDatas(fmt.Sprintf("cat %s | grep -a 'Connection closed by authenticating user' | grep -a 'preauth' %s", fileList[i], command))
+			commandItem := fmt.Sprintf("cat %s | grep -a 'Connection closed by authenticating user' | grep -a 'preauth' %s", fileList[i], command)
+			dataItem := loadFailedAuthDatas(commandItem)
 			data.FailedCount += len(dataItem)
 			data.TotalCount += len(dataItem)
 			if req.Status != constant.StatusSuccess {
 				data.Logs = append(data.Logs, dataItem...)
 			}
 		}
-		dataItem := loadSuccessDatas(fmt.Sprintf("cat %s | grep Accepted %s", fileList[i], command))
+		commandItem := fmt.Sprintf("cat %s | grep Accepted %s", fileList[i], command)
+		dataItem := loadSuccessDatas(commandItem)
 		data.TotalCount += len(dataItem)
 		if req.Status != constant.StatusFailed {
 			data.Logs = append(data.Logs, dataItem...)
@@ -256,6 +259,18 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 	if len(data.Logs) < 1 {
 		return nil, nil
 	}
+
+	var itemDatas []dto.SSHHistory
+	total, start, end := len(data.Logs), (req.Page-1)*req.PageSize, req.Page*req.PageSize
+	if start > total {
+		itemDatas = make([]dto.SSHHistory, 0)
+	} else {
+		if end >= total {
+			end = total
+		}
+		itemDatas = data.Logs[start:end]
+	}
+	data.Logs = itemDatas
 
 	timeNow := time.Now()
 	nyc, _ := time.LoadLocation(common.LoadTimeZone())
@@ -270,18 +285,6 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 		itemLogs = append(itemLogs, data.Logs[i])
 	}
 	data.Logs = itemLogs
-
-	var itemDatas []dto.SSHHistory
-	total, start, end := len(data.Logs), (req.Page-1)*req.PageSize, req.Page*req.PageSize
-	if start > total {
-		itemDatas = make([]dto.SSHHistory, 0)
-	} else {
-		if end >= total {
-			end = total
-		}
-		itemDatas = data.Logs[start:end]
-	}
-	data.Logs = itemDatas
 
 	return &data, nil
 }
