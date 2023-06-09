@@ -149,9 +149,11 @@ const globalStore = GlobalStore();
 function toggleFullscreen() {
     if (screenfull.isEnabled) {
         screenfull.toggle();
-        globalStore.setScreenFull();
     }
 }
+screenfull.on('change', () => {
+    globalStore.isFullScreen = screenfull.isFullscreen;
+});
 
 const localHostID = ref();
 
