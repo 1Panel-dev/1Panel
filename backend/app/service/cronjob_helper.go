@@ -196,7 +196,7 @@ func handleTar(sourceDir, targetDir, name, exclusionRules string) error {
 	path := ""
 	if strings.Contains(sourceDir, "/") {
 		itemDir := strings.ReplaceAll(sourceDir[strings.LastIndex(sourceDir, "/"):], "/", "")
-		aheadDir := strings.ReplaceAll(sourceDir, itemDir, "")
+		aheadDir := sourceDir[:strings.LastIndex(sourceDir, "/")]
 		path += fmt.Sprintf("-C %s %s", aheadDir, itemDir)
 	} else {
 		path = sourceDir

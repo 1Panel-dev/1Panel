@@ -99,7 +99,7 @@ func handleAppBackup(install *model.AppInstall, backupDir, fileName string) erro
 		return err
 	}
 
-	appPath := fmt.Sprintf("%s/%s", install.GetPath(), install.Name)
+	appPath := install.GetPath()
 	if err := handleTar(appPath, tmpDir, "app.tar.gz", ""); err != nil {
 		return err
 	}
