@@ -26,10 +26,10 @@
                             <el-input v-model.number="form.logMaxSize">
                                 <template #append>
                                     <el-select v-model="form.sizeUnit" style="width: 70px">
-                                        <el-option label="byte" value="b"></el-option>
-                                        <el-option label="kb" value="k"></el-option>
-                                        <el-option label="mb" value="m"></el-option>
-                                        <el-option label="gb" value="g"></el-option>
+                                        <el-option label="Byte" value="b"></el-option>
+                                        <el-option label="KB" value="k"></el-option>
+                                        <el-option label="MB" value="m"></el-option>
+                                        <el-option label="GB" value="g"></el-option>
                                     </el-select>
                                 </template>
                             </el-input>
