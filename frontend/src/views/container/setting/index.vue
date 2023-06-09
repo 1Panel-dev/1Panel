@@ -103,7 +103,7 @@
                             <el-form-item :label="$t('container.cutLog')" prop="hasLogOption">
                                 <el-switch v-model="form.logOptionShow" @change="handleLogOption"></el-switch>
                                 <span class="input-help"></span>
-                                <div v-if="form.logOptionShow">
+                                <div v-if="logOptionShow">
                                     <el-tag>{{ $t('container.maxSize') }}: {{ form.logMaxSize }}</el-tag>
                                     <el-tag style="margin-left: 5px">
                                         {{ $t('container.maxFile') }}: {{ form.logMaxFile }}
@@ -251,6 +251,7 @@ const registriesRef = ref();
 const confirmDialogRefLive = ref();
 const confirmDialogRefCgroup = ref();
 const confirmDialogRefIptable = ref();
+const logOptionShow = ref();
 
 const form = reactive({
     isSwarm: false,
@@ -437,10 +438,12 @@ const search = async () => {
     form.registries = res.data.insecureRegistries ? res.data.insecureRegistries.join('\n') : '';
     if (res.data.logMaxFile || res.data.logMaxSize) {
         form.logOptionShow = true;
+        logOptionShow.value = true;
         form.logMaxFile = Number(res.data.logMaxFile);
         form.logMaxSize = res.data.logMaxSize;
     } else {
         form.logOptionShow = false;
+        logOptionShow.value = false;
     }
 };
 
