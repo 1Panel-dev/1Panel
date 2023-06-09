@@ -6,17 +6,20 @@
             <el-col :span="24">
                 <el-card style="overflow: inherit">
                     <template #header>
-                        <span class="title">{{ $t('monitor.avgLoad') }}</span>
-                        <el-date-picker
-                            @change="search('load')"
-                            v-model="timeRangeLoad"
-                            type="datetimerange"
-                            :range-separator="$t('commons.search.timeRange')"
-                            :start-placeholder="$t('commons.search.timeStart')"
-                            :end-placeholder="$t('commons.search.timeEnd')"
-                            :shortcuts="shortcuts"
-                            style="float: right; margin-top: -5px; width: 360px"
-                        ></el-date-picker>
+                        <div :class="mobile ? 'flx-wrap' : 'flx-justify-between'">
+                            <span class="title">{{ $t('monitor.avgLoad') }}</span>
+                            <el-date-picker
+                                @change="search('load')"
+                                v-model="timeRangeLoad"
+                                type="datetimerange"
+                                :range-separator="$t('commons.search.timeRange')"
+                                :start-placeholder="$t('commons.search.timeStart')"
+                                :end-placeholder="$t('commons.search.timeEnd')"
+                                :shortcuts="shortcuts"
+                                style="max-width: 360px; width: 100%"
+                                :size="mobile ? 'small' : 'default'"
+                            ></el-date-picker>
+                        </div>
                     </template>
                     <div id="loadLoadChart" class="chart"></div>
                 </el-card>
@@ -26,17 +29,20 @@
             <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
-                        <span class="title">CPU</span>
-                        <el-date-picker
-                            @change="search('cpu')"
-                            v-model="timeRangeCpu"
-                            type="datetimerange"
-                            :range-separator="$t('commons.search.timeRange')"
-                            :start-placeholder="$t('commons.search.timeStart')"
-                            :end-placeholder="$t('commons.search.timeEnd')"
-                            :shortcuts="shortcuts"
-                            style="float: right; margin-top: -5px; width: 360px"
-                        ></el-date-picker>
+                        <div :class="mobile ? 'flx-wrap' : 'flx-justify-between'">
+                            <span class="title">CPU</span>
+                            <el-date-picker
+                                @change="search('cpu')"
+                                v-model="timeRangeCpu"
+                                type="datetimerange"
+                                :range-separator="$t('commons.search.timeRange')"
+                                :start-placeholder="$t('commons.search.timeStart')"
+                                :end-placeholder="$t('commons.search.timeEnd')"
+                                :shortcuts="shortcuts"
+                                style="max-width: 360px; width: 100%"
+                                :size="mobile ? 'small' : 'default'"
+                            ></el-date-picker>
+                        </div>
                     </template>
                     <div id="loadCPUChart" class="chart"></div>
                 </el-card>
@@ -44,17 +50,20 @@
             <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
-                        <span class="title">{{ $t('monitor.memory') }}</span>
-                        <el-date-picker
-                            @change="search('memory')"
-                            v-model="timeRangeMemory"
-                            type="datetimerange"
-                            :range-separator="$t('commons.search.timeRange')"
-                            :start-placeholder="$t('commons.search.timeStart')"
-                            :end-placeholder="$t('commons.search.timeEnd')"
-                            :shortcuts="shortcuts"
-                            style="float: right; margin-top: -5px; width: 360px"
-                        ></el-date-picker>
+                        <div :class="mobile ? 'flx-wrap' : 'flx-justify-between'">
+                            <span class="title">{{ $t('monitor.memory') }}</span>
+                            <el-date-picker
+                                @change="search('memory')"
+                                v-model="timeRangeMemory"
+                                type="datetimerange"
+                                :range-separator="$t('commons.search.timeRange')"
+                                :start-placeholder="$t('commons.search.timeStart')"
+                                :end-placeholder="$t('commons.search.timeEnd')"
+                                :shortcuts="shortcuts"
+                                style="max-width: 360px; width: 100%"
+                                :size="mobile ? 'small' : 'default'"
+                            ></el-date-picker>
+                        </div>
                     </template>
                     <div id="loadMemoryChart" class="chart"></div>
                 </el-card>
@@ -64,17 +73,20 @@
             <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
-                        <span class="title">{{ $t('monitor.disk') }} IO</span>
-                        <el-date-picker
-                            @change="search('io')"
-                            v-model="timeRangeIO"
-                            type="datetimerange"
-                            :range-separator="$t('commons.search.timeRange')"
-                            :start-placeholder="$t('commons.search.timeStart')"
-                            :end-placeholder="$t('commons.search.timeEnd')"
-                            :shortcuts="shortcuts"
-                            style="float: right; margin-top: -5px; width: 360px"
-                        ></el-date-picker>
+                        <div :class="mobile ? 'flx-wrap' : 'flx-justify-between'">
+                            <span class="title">{{ $t('monitor.disk') }} IO</span>
+                            <el-date-picker
+                                @change="search('io')"
+                                v-model="timeRangeIO"
+                                type="datetimerange"
+                                :range-separator="$t('commons.search.timeRange')"
+                                :start-placeholder="$t('commons.search.timeStart')"
+                                :end-placeholder="$t('commons.search.timeEnd')"
+                                :shortcuts="shortcuts"
+                                style="max-width: 360px; width: 100%"
+                                :size="mobile ? 'small' : 'default'"
+                            ></el-date-picker>
+                        </div>
                     </template>
                     <div id="loadIOChart" class="chart"></div>
                 </el-card>
@@ -82,34 +94,43 @@
             <el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12">
                 <el-card style="overflow: inherit">
                     <template #header>
-                        <span class="title">{{ $t('monitor.network') }} IO:</span>
-                        <el-popover placement="bottom" :width="200" trigger="click">
-                            <el-select @change="search('network')" v-model="networkChoose">
-                                <template #prefix>{{ $t('monitor.networkCard') }}</template>
-                                <div v-for="item in netOptions" :key="item">
-                                    <el-option v-if="item === 'all'" :label="$t('commons.table.all')" :value="item" />
-                                    <el-option v-else :label="item" :value="item" />
-                                </div>
-                            </el-select>
-                            <template #reference>
-                                <span class="networkOption" v-if="networkChoose === 'all'">
-                                    {{ $t('commons.table.all') }}
-                                </span>
-                                <span v-else class="networkOption">
-                                    {{ networkChoose }}
-                                </span>
-                            </template>
-                        </el-popover>
-                        <el-date-picker
-                            @change="search('network')"
-                            v-model="timeRangeNetwork"
-                            type="datetimerange"
-                            :range-separator="$t('commons.search.timeRange')"
-                            :start-placeholder="$t('commons.search.timeStart')"
-                            :end-placeholder="$t('commons.search.timeEnd')"
-                            :shortcuts="shortcuts"
-                            style="float: right; margin-top: -5px; width: 360px"
-                        ></el-date-picker>
+                        <div :class="mobile ? 'flx-wrap' : 'flx-justify-between'">
+                            <div>
+                                <span class="title">{{ $t('monitor.network') }} IO:</span>
+                                <el-popover placement="bottom" :width="200" trigger="click">
+                                    <el-select @change="search('network')" v-model="networkChoose">
+                                        <template #prefix>{{ $t('monitor.networkCard') }}</template>
+                                        <div v-for="item in netOptions" :key="item">
+                                            <el-option
+                                                v-if="item === 'all'"
+                                                :label="$t('commons.table.all')"
+                                                :value="item"
+                                            />
+                                            <el-option v-else :label="item" :value="item" />
+                                        </div>
+                                    </el-select>
+                                    <template #reference>
+                                        <span class="networkOption" v-if="networkChoose === 'all'">
+                                            {{ $t('commons.table.all') }}
+                                        </span>
+                                        <span v-else class="networkOption">
+                                            {{ networkChoose }}
+                                        </span>
+                                    </template>
+                                </el-popover>
+                            </div>
+                            <el-date-picker
+                                @change="search('network')"
+                                v-model="timeRangeNetwork"
+                                type="datetimerange"
+                                :range-separator="$t('commons.search.timeRange')"
+                                :start-placeholder="$t('commons.search.timeStart')"
+                                :end-placeholder="$t('commons.search.timeEnd')"
+                                :shortcuts="shortcuts"
+                                style="max-width: 360px; width: 100%"
+                                :size="mobile ? 'small' : 'default'"
+                            ></el-date-picker>
+                        </div>
                     </template>
                     <div id="loadNetworkChart" class="chart"></div>
                 </el-card>
@@ -119,13 +140,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
+import { ref, reactive, onMounted, onBeforeUnmount, computed } from 'vue';
 import * as echarts from 'echarts';
 import { loadMonitor, getNetworkOptions } from '@/api/modules/monitor';
 import { Monitor } from '@/api/interface/monitor';
 import { dateFormatWithoutYear } from '@/utils/util';
 import i18n from '@/lang';
 import MonitorRouter from '@/views/host/monitor/index.vue';
+import { GlobalStore } from '@/store';
+
+const globalStore = GlobalStore();
+
+const mobile = computed(() => {
+    return globalStore.isMobile();
+});
 
 const zoomStart = ref();
 const monitorBase = ref();

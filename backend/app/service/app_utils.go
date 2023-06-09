@@ -296,6 +296,10 @@ func upgradeInstall(installId uint, detailId uint) error {
 			return
 		}
 		config := getAppCommonConfig(envs)
+		if config.ContainerName == "" {
+			config.ContainerName = install.ContainerName
+			envs[constant.ContainerName] = install.ContainerName
+		}
 		config.Advanced = true
 		if upErr = addDockerComposeCommonParam(composeMap, install.ServiceName, config, envs); upErr != nil {
 			return
