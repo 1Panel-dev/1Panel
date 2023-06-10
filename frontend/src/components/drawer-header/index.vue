@@ -9,6 +9,9 @@
             <el-divider v-if="slots.buttons" direction="vertical" />
             <slot v-if="slots.buttons" name="buttons"></slot>
         </template>
+        <template #extra>
+            <slot v-if="slots.extra" name="extra"></slot>
+        </template>
     </el-page-header>
 </template>
 

@@ -1,8 +1,17 @@
 <template>
     <div>
-        <el-drawer v-model="logVisiable" :destroy-on-close="true" :close-on-click-modal="false" size="50%">
+        <el-drawer
+            v-model="logVisiable"
+            :destroy-on-close="true"
+            :close-on-click-modal="false"
+            :size="globalStore.isFullScreen ? '100%' : '50%'"
+        >
             <template #header>
-                <DrawerHeader :header="$t('commons.button.log')" :resource="logSearch.container" :back="handleClose" />
+                <DrawerHeader :header="$t('commons.button.log')" :resource="logSearch.container" :back="handleClose">
+                    <template #extra>
+                        <el-button @click="toggleFullscreen" class="fullScreen" icon="FullScreen" plain></el-button>
+                    </template>
+                </DrawerHeader>
             </template>
             <div>
                 <el-select @change="searchLogs" style="width: 30%; float: left" v-model="logSearch.mode">
@@ -47,13 +56,15 @@
 import { cleanContainerLog, logContainer } from '@/api/modules/container';
 import i18n from '@/lang';
 import { dateFormatForName } from '@/utils/util';
-import { nextTick, onBeforeUnmount, reactive, ref, shallowRef } from 'vue';
+import { nextTick, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import DrawerHeader from '@/components/drawer-header/index.vue';
 import { ElMessageBox } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
+import screenfull from 'screenfull';
+import { GlobalStore } from '@/store';
 
 const extensions = [javascript(), oneDark];
 
@@ -64,6 +75,7 @@ const view = shallowRef();
 const handleReady = (payload) => {
     view.value = payload.view;
 };
+const globalStore = GlobalStore();
 
 const logSearch = reactive({
     isWatch: false,
@@ -93,12 +105,22 @@ const timeOptions = ref([
     },
 ]);
 
+function toggleFullscreen() {
+    if (screenfull.isEnabled) {
+        screenfull.toggle();
+    }
+}
+screenfull.on('change', () => {
+    globalStore.isFullScreen = screenfull.isFullscreen;
+});
 const handleClose = async () => {
     logVisiable.value = false;
     clearInterval(Number(timer));
     timer = null;
 };
-
+watch(logVisiable, (val) => {
+    if (screenfull.isEnabled && !val) screenfull.exit();
+});
 const searchLogs = async () => {
     const res = await logContainer(logSearch);
     logInfo.value = res.data || '';
@@ -165,5 +187,8 @@ defineExpose({
 <style scoped lang="scss">
 .margin-button {
     margin-left: 20px;
+}
+.fullScreen {
+    border: none;
 }
 </style>
