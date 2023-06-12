@@ -49,4 +49,4 @@ jobs:
           access-key-secret: ${{ secrets.OSS_ACCESS_KEY_SECRET }}
           ossutil-version: '1.7.14'
       - name: Upload Assets to OSS
-      - run: ossutil cp -r dist/ oss://resource-fit2cloud-com/1panel/package/stable/${{  github.ref_name }}/release/ --include "*.tar.gz" --include "checksums.txt" --only-current-dir
+        run: ossutil cp -r dist/ oss://resource-fit2cloud-com/1panel/package/stable/${{  github.ref_name }}/release/ --include "*.tar.gz" --include "checksums.txt" --only-current-dir
