@@ -148,7 +148,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 	if err := json.Unmarshal(appjson, &oldInstall); err != nil {
 		return fmt.Errorf("unmarshal app.json failed, err: %v", err)
 	}
-	if oldInstall.App.Key != install.App.Key || oldInstall.Name != install.Name || oldInstall.Version != install.Version || oldInstall.ID != install.ID {
+	if oldInstall.App.Key != install.App.Key || oldInstall.Name != install.Name || oldInstall.Version != install.Version {
 		return errors.New("the current backup file does not match the application")
 	}
 
@@ -182,7 +182,14 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 		if err != nil {
 			return err
 		}
-		if err := handleMysqlRecover(mysqlInfo, tmpPath, db.Name, fmt.Sprintf("%s.sql.gz", install.Name), true); err != nil {
+
+		newDB, err := reCreateDB(db.ID, oldInstall.Env)
+		if err != nil {
+			return err
+		}
+		_ = appInstallResourceRepo.BatchUpdateBy(map[string]interface{}{"resource_id": newDB.ID}, commonRepo.WithByID(resource.ID))
+
+		if err := handleMysqlRecover(mysqlInfo, tmpPath, newDB.Name, fmt.Sprintf("%s.sql.gz", install.Name), true); err != nil {
 			global.LOG.Errorf("handle recover from sql.gz failed, err: %v", err)
 			return err
 		}
@@ -193,11 +200,39 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 		return err
 	}
 
-	oldInstall.Status = constant.Running
-	if err := appInstallRepo.Save(context.Background(), install); err != nil {
+	oldInstall.ID = install.ID
+	oldInstall.Status = constant.StatusRunning
+	oldInstall.AppId = install.AppId
+	oldInstall.AppDetailId = install.AppDetailId
+	if err := appInstallRepo.Save(context.Background(), &oldInstall); err != nil {
 		global.LOG.Errorf("save db app install failed, err: %v", err)
 		return err
 	}
 	isOk = true
 	return nil
+}
+
+func reCreateDB(dbID uint, oldEnv string) (*model.DatabaseMysql, error) {
+	mysqlService := NewIMysqlService()
+	ctx := context.Background()
+	_ = mysqlService.Delete(ctx, dto.MysqlDBDelete{ID: dbID, DeleteBackup: true, ForceDelete: true})
+
+	envMap := make(map[string]interface{})
+	if err := json.Unmarshal([]byte(oldEnv), &envMap); err != nil {
+		return nil, err
+	}
+	oldName, _ := envMap["PANEL_DB_NAME"].(string)
+	oldUser, _ := envMap["PANEL_DB_USER"].(string)
+	oldPassword, _ := envMap["PANEL_DB_USER_PASSWORD"].(string)
+	createDB, err := mysqlService.Create(context.Background(), dto.MysqlDBCreate{
+		Name:       oldName,
+		Format:     "utf8mb4",
+		Username:   oldUser,
+		Password:   oldPassword,
+		Permission: "%",
+	})
+	if err != nil {
+		return nil, err
+	}
+	return createDB, nil
 }
