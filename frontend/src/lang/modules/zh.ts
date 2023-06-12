@@ -633,8 +633,8 @@ const message = {
     cronjob: {
         cronTask: '计划任务',
         changeStatus: '状态修改',
-        disableMsg: '计划任务停止后将无法继续运行，是否停止？',
-        enableMsg: '该计划任务已停止，是否启用？',
+        disableMsg: '停止计划任务会导致该任务不再自动执行。是否继续？',
+        enableMsg: '启用计划任务会让该任务定期自动执行。是否继续？',
         taskType: '任务类型',
         record: '报告',
         shell: 'Shell 脚本',

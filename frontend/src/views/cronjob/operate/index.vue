@@ -330,7 +330,7 @@ const weekOptions = [
     { label: i18n.global.t('cronjob.thursday'), value: 4 },
     { label: i18n.global.t('cronjob.friday'), value: 5 },
     { label: i18n.global.t('cronjob.saturday'), value: 6 },
-    { label: i18n.global.t('cronjob.sunday'), value: 7 },
+    { label: i18n.global.t('cronjob.sunday'), value: 0 },
 ];
 const rules = reactive({
     name: [Rules.requiredInput],
@@ -456,7 +456,9 @@ function checkScript() {
         case 'perMonth':
             return row.day > 0 && row.day < 32 && row.hour >= 0 && row.hour < 24 && row.minute >= 0 && row.minute < 60;
         case 'perWeek':
-            return row.week > 0 && row.week < 8 && row.hour >= 0 && row.hour < 24 && row.minute >= 0 && row.minute < 60;
+            return (
+                row.week >= 0 && row.week < 7 && row.hour >= 0 && row.hour < 24 && row.minute >= 0 && row.minute < 60
+            );
         case 'perDay':
             return row.hour >= 0 && row.hour < 24 && row.minute >= 0 && row.minute < 60;
         case 'perHour':
