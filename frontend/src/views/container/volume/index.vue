@@ -54,7 +54,16 @@
                         show-overflow-tooltip
                         min-width="120"
                         prop="mountpoint"
-                    />
+                    >
+                        <template #default="{ row }">
+                            {{ row.mountpoint }}
+                            <el-button type="primary" link @click="toFolder(row.mountpoint)">
+                                <el-icon>
+                                    <FolderOpened />
+                                </el-icon>
+                            </el-button>
+                        </template>
+                    </el-table-column>
                     <el-table-column
                         :label="$t('container.driver')"
                         show-overflow-tooltip
@@ -124,7 +133,9 @@ const loadStatus = async () => {
 const goSetting = async () => {
     router.push({ name: 'ContainerSetting' });
 };
-
+const toFolder = (folder: string) => {
+    router.push({ path: '/hosts/files', query: { path: folder } });
+};
 const dialogCreateRef = ref<DialogExpose>();
 
 interface DialogExpose {
