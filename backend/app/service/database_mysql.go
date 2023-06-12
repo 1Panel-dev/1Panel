@@ -14,7 +14,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/backend/app/dto"
 	"github.com/1Panel-dev/1Panel/backend/app/model"
-	"github.com/1Panel-dev/1Panel/backend/app/repo"
 	"github.com/1Panel-dev/1Panel/backend/buserr"
 	"github.com/1Panel-dev/1Panel/backend/constant"
 	"github.com/1Panel-dev/1Panel/backend/global"
@@ -100,7 +99,7 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 		}
 		return nil, err
 	}
-	if err := u.createUser(app, req); err != nil {
+	if err := u.createUser(app.ContainerName, app.Password, app.Version, req); err != nil {
 		return nil, err
 	}
 
@@ -291,7 +290,7 @@ func (u *MysqlService) ChangeAccess(info dto.ChangeDBInfo) error {
 		}
 	}
 
-	if err := u.createUser(app, dto.MysqlDBCreate{
+	if err := u.createUser(app.ContainerName, app.Password, app.Version, dto.MysqlDBCreate{
 		Username:   mysql.Username,
 		Name:       mysql.Name,
 		Permission: info.Value,
@@ -470,7 +469,7 @@ func (u *MysqlService) LoadStatus() (*dto.MysqlStatus, error) {
 	return &info, nil
 }
 
-func (u *MysqlService) createUser(app *repo.RootInfo, req dto.MysqlDBCreate) error {
+func (u *MysqlService) createUser(container, password, version string, req dto.MysqlDBCreate) error {
 	var userlist []string
 	if strings.Contains(req.Permission, ",") {
 		ips := strings.Split(req.Permission, ",")
@@ -484,8 +483,8 @@ func (u *MysqlService) createUser(app *repo.RootInfo, req dto.MysqlDBCreate) err
 	}
 
 	for _, user := range userlist {
-		if err := excSQL(app.ContainerName, app.Password, fmt.Sprintf("create user %s identified by '%s';", user, req.Password)); err != nil {
-			handleCreateError(req.Name, userlist, app)
+		if err := excSQL(container, password, fmt.Sprintf("create user %s identified by '%s';", user, req.Password)); err != nil {
+			handleCreateError(container, password, req.Name, userlist)
 			if strings.Contains(err.Error(), "ERROR 1396") {
 				return buserr.New(constant.ErrUserIsExist)
 			}
@@ -495,20 +494,20 @@ func (u *MysqlService) createUser(app *repo.RootInfo, req dto.MysqlDBCreate) err
 		if req.Name == "*" {
 			grantStr = fmt.Sprintf("grant all privileges on *.* to %s", user)
 		}
-		if strings.HasPrefix(app.Version, "5.7") {
+		if strings.HasPrefix(version, "5.7") {
 			grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, req.Password)
 		}
-		if err := excSQL(app.ContainerName, app.Password, grantStr); err != nil {
-			handleCreateError(req.Name, userlist, app)
+		if err := excSQL(container, password, grantStr); err != nil {
+			handleCreateError(container, password, req.Name, userlist)
 			return err
 		}
 	}
 	return nil
 }
-func handleCreateError(dbName string, userlist []string, app *repo.RootInfo) {
-	_ = excSQL(app.ContainerName, app.Password, fmt.Sprintf("drop database `%s`", dbName))
+func handleCreateError(contaienr, password, dbName string, userlist []string) {
+	_ = excSQL(contaienr, password, fmt.Sprintf("drop database `%s`", dbName))
 	for _, user := range userlist {
-		if err := excSQL(app.ContainerName, app.Password, fmt.Sprintf("drop user if exists %s", user)); err != nil {
+		if err := excSQL(contaienr, password, fmt.Sprintf("drop user if exists %s", user)); err != nil {
 			global.LOG.Errorf("drop user failed, err: %v", err)
 		}
 	}

@@ -19,6 +19,7 @@ type IAppInstallResourceRpo interface {
 	GetFirst(opts ...DBOption) (model.AppInstallResource, error)
 	Create(ctx context.Context, resource *model.AppInstallResource) error
 	DeleteBy(ctx context.Context, opts ...DBOption) error
+	BatchUpdateBy(maps map[string]interface{}, opts ...DBOption) error
 }
 
 func NewIAppInstallResourceRpo() IAppInstallResourceRpo {
@@ -70,4 +71,12 @@ func (a AppInstallResourceRpo) Create(ctx context.Context, resource *model.AppIn
 
 func (a AppInstallResourceRpo) DeleteBy(ctx context.Context, opts ...DBOption) error {
 	return getTx(ctx, opts...).Delete(&model.AppInstallResource{}).Error
+}
+
+func (a *AppInstallResourceRpo) BatchUpdateBy(maps map[string]interface{}, opts ...DBOption) error {
+	db := getDb(opts...).Model(&model.AppInstallResource{})
+	if len(opts) == 0 {
+		db = db.Where("1=1")
+	}
+	return db.Updates(&maps).Error
 }
