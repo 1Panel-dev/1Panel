@@ -484,10 +484,11 @@ func (u *MysqlService) createUser(container, password, version string, req dto.M
 
 	for _, user := range userlist {
 		if err := excSQL(container, password, fmt.Sprintf("create user %s identified by '%s';", user, req.Password)); err != nil {
-			handleCreateError(container, password, req.Name, userlist)
 			if strings.Contains(err.Error(), "ERROR 1396") {
+				handleCreateError(container, password, req.Name, userlist, false)
 				return buserr.New(constant.ErrUserIsExist)
 			}
+			handleCreateError(container, password, req.Name, userlist, true)
 			return err
 		}
 		grantStr := fmt.Sprintf("grant all privileges on `%s`.* to %s", req.Name, user)
@@ -498,17 +499,19 @@ func (u *MysqlService) createUser(container, password, version string, req dto.M
 			grantStr = fmt.Sprintf("%s identified by '%s' with grant option;", grantStr, req.Password)
 		}
 		if err := excSQL(container, password, grantStr); err != nil {
-			handleCreateError(container, password, req.Name, userlist)
+			handleCreateError(container, password, req.Name, userlist, true)
 			return err
 		}
 	}
 	return nil
 }
-func handleCreateError(contaienr, password, dbName string, userlist []string) {
+func handleCreateError(contaienr, password, dbName string, userlist []string, dropUser bool) {
 	_ = excSQL(contaienr, password, fmt.Sprintf("drop database `%s`", dbName))
-	for _, user := range userlist {
-		if err := excSQL(contaienr, password, fmt.Sprintf("drop user if exists %s", user)); err != nil {
-			global.LOG.Errorf("drop user failed, err: %v", err)
+	if dropUser {
+		for _, user := range userlist {
+			if err := excSQL(contaienr, password, fmt.Sprintf("drop user if exists %s", user)); err != nil {
+				global.LOG.Errorf("drop user failed, err: %v", err)
+			}
 		}
 	}
 }
