@@ -25,6 +25,9 @@
                         <el-tag type="danger" size="large" style="margin-left: 5px">
                             {{ $t('commons.status.failed') }}： {{ faliedCount }}
                         </el-tag>
+                        <el-button plain @click="onDeny" :disabled="selects.length === 0" style="margin-left: 5px">
+                            {{ $t('firewall.deny') }}
+                        </el-button>
                     </el-col>
                     <el-col :xs="24" :sm="8" :md="8" :lg="8" :xl="8">
                         <TableSetting @search="search()" />
@@ -44,7 +47,13 @@
             </template>
 
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    v-model:selects="selects"
+                    :data="data"
+                    @search="search"
+                >
+                    <el-table-column type="selection" :selectable="selectable" fix />
                     <el-table-column min-width="80" :label="$t('logs.loginIP')" prop="address" />
                     <el-table-column min-width="60" :label="$t('ssh.belong')" prop="area" />
                     <el-table-column min-width="60" :label="$t('firewall.port')" prop="port" />
@@ -83,6 +92,9 @@ import TableSetting from '@/components/table-setting/index.vue';
 import { dateFormat } from '@/utils/util';
 import { onMounted, reactive, ref } from '@vue/runtime-core';
 import { loadSSHLogs } from '@/api/modules/host';
+import { operateIPRule } from '@/api/modules/host';
+import { MsgSuccess } from '@/utils/message';
+import i18n from '@/lang';
 
 const loading = ref();
 const data = ref();
@@ -95,6 +107,28 @@ const searchInfo = ref();
 const searchStatus = ref('All');
 const successfulCount = ref(0);
 const faliedCount = ref(0);
+const selects = ref<any>([]);
+
+function selectable(row: any): boolean {
+    return row.address !== '127.0.0.1' && row.address !== '::1';
+}
+
+function select2address(): string {
+    let res = [];
+    selects.value.forEach((item: any) => {
+        if (!res.includes(item.address)) res.push(item.address);
+    });
+    return res.join(',');
+}
+
+const onDeny = async () => {
+    let address = select2address();
+    if (!address) return;
+    await operateIPRule({ operation: 'add', address: address, strategy: 'drop' }).then(() => {
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        search();
+    });
+};
 
 const search = async () => {
     let params = {
