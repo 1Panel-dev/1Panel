@@ -632,8 +632,10 @@ const message = {
     cronjob: {
         cronTask: 'Task',
         changeStatus: 'Change status',
-        disableMsg: 'The cronjob cannot continue to run after it is stopped. Do you want to stop it?',
-        enableMsg: 'The cronjob has been stopped. Enable now?',
+        disableMsg:
+            'Stopping the scheduled task will result in the task no longer automatically executing. Do you want to continue?',
+        enableMsg:
+            'Enabling the scheduled task will allow the task to automatically execute on a regular basis. Do you want to continue?',
         taskType: 'Task type',
         record: 'Records',
         shell: 'Shell script',
