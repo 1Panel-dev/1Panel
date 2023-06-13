@@ -49,14 +49,8 @@
                             <Tooltip @click="onInspect(row.name)" :text="row.name" />
                         </template>
                     </el-table-column>
-                    <el-table-column
-                        :label="$t('container.mountpoint')"
-                        show-overflow-tooltip
-                        min-width="120"
-                        prop="mountpoint"
-                    >
+                    <el-table-column :label="$t('container.volumeDir')" min-width="50">
                         <template #default="{ row }">
-                            {{ row.mountpoint }}
                             <el-button type="primary" link @click="toFolder(row.mountpoint)">
                                 <el-icon>
                                     <FolderOpened />
@@ -64,6 +58,12 @@
                             </el-button>
                         </template>
                     </el-table-column>
+                    <el-table-column
+                        :label="$t('container.mountpoint')"
+                        show-overflow-tooltip
+                        min-width="120"
+                        prop="mountpoint"
+                    />
                     <el-table-column
                         :label="$t('container.driver')"
                         show-overflow-tooltip
