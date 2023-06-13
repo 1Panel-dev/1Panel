@@ -172,6 +172,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 		}()
 	}
 
+	newEnvFile := ""
 	resource, _ := appInstallResourceRepo.GetFirst(appInstallResourceRepo.WithAppInstallId(install.ID))
 	if resource.ID != 0 && install.App.Key != "mysql" {
 		mysqlInfo, err := appInstallRepo.LoadBaseInfo(resource.Key, "")
@@ -183,7 +184,15 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 			return err
 		}
 
-		newDB, err := reCreateDB(db.ID, oldInstall.Env)
+		newDB, envMap, err := reCreateDB(db.ID, oldInstall.Env)
+		if err != nil {
+			return err
+		}
+		oldHost := fmt.Sprintf("\"PANEL_DB_HOST\":\"%v\"", envMap["PANEL_DB_HOST"].(string))
+		newHost := fmt.Sprintf("\"PANEL_DB_HOST\":\"%v\"", mysqlInfo.ServiceName)
+		oldInstall.Env = strings.ReplaceAll(oldInstall.Env, oldHost, newHost)
+		envMap["PANEL_DB_HOST"] = mysqlInfo.ServiceName
+		newEnvFile, err = coverEnvJsonToStr(oldInstall.Env)
 		if err != nil {
 			return err
 		}
@@ -200,6 +209,16 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 		return err
 	}
 
+	if len(newEnvFile) != 0 {
+		envPath := fmt.Sprintf("%s/%s/%s/.env", constant.AppInstallDir, install.App.Key, install.Name)
+		file, err := os.OpenFile(envPath, os.O_WRONLY|os.O_TRUNC, 0640)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		_, _ = file.WriteString(newEnvFile)
+	}
+
 	oldInstall.ID = install.ID
 	oldInstall.Status = constant.StatusRunning
 	oldInstall.AppId = install.AppId
@@ -212,14 +231,14 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 	return nil
 }
 
-func reCreateDB(dbID uint, oldEnv string) (*model.DatabaseMysql, error) {
+func reCreateDB(dbID uint, oldEnv string) (*model.DatabaseMysql, map[string]interface{}, error) {
 	mysqlService := NewIMysqlService()
 	ctx := context.Background()
 	_ = mysqlService.Delete(ctx, dto.MysqlDBDelete{ID: dbID, DeleteBackup: true, ForceDelete: true})
 
 	envMap := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(oldEnv), &envMap); err != nil {
-		return nil, err
+		return nil, envMap, err
 	}
 	oldName, _ := envMap["PANEL_DB_NAME"].(string)
 	oldUser, _ := envMap["PANEL_DB_USER"].(string)
@@ -232,7 +251,8 @@ func reCreateDB(dbID uint, oldEnv string) (*model.DatabaseMysql, error) {
 		Permission: "%",
 	})
 	if err != nil {
-		return nil, err
+		return nil, envMap, err
 	}
-	return createDB, nil
+
+	return createDB, envMap, nil
 }
