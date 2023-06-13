@@ -248,7 +248,7 @@ func (u *SSHService) LoadLog(req dto.SearchSSHLog) (*dto.SSHLog, error) {
 				data.Logs = append(data.Logs, dataItem...)
 			}
 		}
-		commandItem := fmt.Sprintf("cat %s | grep Accepted %s", fileList[i], command)
+		commandItem := fmt.Sprintf("cat %s | grep -a Accepted %s", fileList[i], command)
 		dataItem := loadSuccessDatas(commandItem)
 		data.TotalCount += len(dataItem)
 		if req.Status != constant.StatusFailed {
