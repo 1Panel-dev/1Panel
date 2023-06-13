@@ -20,7 +20,7 @@ func (s *ContainerRouter) InitContainerRouter(Router *gin.RouterGroup) {
 
 		baRouter.POST("", baseApi.ContainerCreate)
 		baRouter.POST("/search", baseApi.SearchContainer)
-		baRouter.POST("/search/log", baseApi.ContainerLogs)
+		baRouter.GET("/search/log", baseApi.ContainerLogs)
 		baRouter.POST("/clean/log", baseApi.CleanContainerLog)
 		baRouter.POST("/inspect", baseApi.Inspect)
 		baRouter.POST("/operate", baseApi.ContainerOperation)

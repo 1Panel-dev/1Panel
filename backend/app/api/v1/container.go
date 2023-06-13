@@ -307,30 +307,23 @@ func (b *BaseApi) Inspect(c *gin.Context) {
 	helper.SuccessWithData(c, result)
 }
 
-// @Tags Container
-// @Summary Container logs
-// @Description 容器日志
-// @Accept json
-// @Param request body dto.ContainerLog true "request"
-// @Success 200 {string} logs
-// @Security ApiKeyAuth
-// @Router /containers/search/log [post]
 func (b *BaseApi) ContainerLogs(c *gin.Context) {
-	var req dto.ContainerLog
-	if err := c.ShouldBindJSON(&req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	if err := global.VALID.Struct(req); err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrBadRequest, constant.ErrTypeInvalidParams, err)
-		return
-	}
-	logs, err := containerService.ContainerLogs(req)
+	wsConn, err := upGrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		helper.ErrorWithDetail(c, constant.CodeErrInternalServer, constant.ErrTypeInternalServer, err)
+		global.LOG.Errorf("gin context http handler failed, err: %v", err)
 		return
 	}
-	helper.SuccessWithData(c, logs)
+	defer wsConn.Close()
+
+	container := c.Query("container")
+	since := c.Query("since")
+	follow := c.Query("follow") == "true"
+	tail := c.Query("tail")
+
+	if err := containerService.ContainerLogs(wsConn, container, since, tail, follow); err != nil {
+		_ = wsConn.WriteMessage(1, []byte(err.Error()))
+		return
+	}
 }
 
 // @Tags Container Network

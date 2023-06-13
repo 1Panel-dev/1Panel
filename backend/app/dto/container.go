@@ -69,11 +69,6 @@ type PortHelper struct {
 	Protocol      string `json:"protocol"`
 }
 
-type ContainerLog struct {
-	ContainerID string `json:"containerID" validate:"required"`
-	Mode        string `json:"mode" validate:"required"`
-}
-
 type ContainerOperation struct {
 	Name      string `json:"name" validate:"required"`
 	Operation string `json:"operation" validate:"required,oneof=start stop restart kill pause unpause rename remove"`
