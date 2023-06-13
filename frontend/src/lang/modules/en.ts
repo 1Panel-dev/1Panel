@@ -1142,7 +1142,7 @@ const message = {
         backupdate: 'Backup time',
         restore: 'Restore',
         restoreWarn:
-            'The restore operation will restart the application and replace the data. This operation cannot be rolled back. Do you want to continue?',
+            'The recovery operation will delete the current data of this application and perform a restart. This action is irreversible. Do you wish to continue?',
         update: 'update',
         upgrade: 'upgrade',
         versionSelect: 'Please select a version',

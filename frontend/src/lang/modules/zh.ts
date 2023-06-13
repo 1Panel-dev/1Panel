@@ -1109,7 +1109,7 @@ const message = {
         backupPath: '文件路径',
         backupdate: '备份时间',
         restore: '恢复',
-        restoreWarn: '恢复操作会重启应用,并替换数据,此操作不可回滚,是否继续?',
+        restoreWarn: '恢复操作将删除该应用当前数据并重启。此操作不可回滚，是否继续?',
         update: '更新',
         upgrade: '升级',
         versionSelect: '请选择版本',
