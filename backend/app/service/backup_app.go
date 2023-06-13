@@ -148,7 +148,7 @@ func handleAppRecover(install *model.AppInstall, recoverFile string, isRollback 
 	if err := json.Unmarshal(appjson, &oldInstall); err != nil {
 		return fmt.Errorf("unmarshal app.json failed, err: %v", err)
 	}
-	if oldInstall.App.Key != install.App.Key || oldInstall.Name != install.Name || oldInstall.Version != install.Version {
+	if oldInstall.App.Key != install.App.Key || oldInstall.Name != install.Name {
 		return errors.New("the current backup file does not match the application")
 	}
 
