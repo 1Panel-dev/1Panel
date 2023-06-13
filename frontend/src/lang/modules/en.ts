@@ -554,6 +554,7 @@ const message = {
         cache: 'Cache',
 
         volume: 'Volume',
+        volumeDir: 'Volume dir',
         volumeName: 'Name',
         nfsEnable: 'Enable NFS storage',
         nfsAddress: 'Address',

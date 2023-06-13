@@ -564,6 +564,7 @@ const message = {
         gateway: '网关',
 
         volume: '存储卷',
+        volumeDir: '存储卷目录',
         nfsEnable: '启用 NFS 存储',
         nfsAddress: '地址',
         nfsAddressHelper: '支持输入 ip 或者域名',
