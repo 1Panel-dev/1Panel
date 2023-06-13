@@ -1,9 +1,9 @@
 package service
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -26,6 +26,7 @@ import (
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
+	"github.com/gorilla/websocket"
 	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
@@ -42,7 +43,7 @@ type IContainerService interface {
 	ContainerCreate(req dto.ContainerCreate) error
 	ContainerLogClean(req dto.OperationWithName) error
 	ContainerOperation(req dto.ContainerOperation) error
-	ContainerLogs(param dto.ContainerLog) (string, error)
+	ContainerLogs(wsConn *websocket.Conn, container, since, tail string, follow bool) error
 	ContainerStats(id string) (*dto.ContainterStats, error)
 	Inspect(req dto.InspectReq) (string, error)
 	DeleteNetwork(req dto.BatchDelete) error
@@ -332,16 +333,43 @@ func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
 	return nil
 }
 
-func (u *ContainerService) ContainerLogs(req dto.ContainerLog) (string, error) {
-	cmd := exec.Command("docker", "logs", req.ContainerID)
-	if req.Mode != "all" {
-		cmd = exec.Command("docker", "logs", req.ContainerID, "--since", req.Mode)
+func (u *ContainerService) ContainerLogs(wsConn *websocket.Conn, container, since, tail string, follow bool) error {
+	command := fmt.Sprintf("docker logs %s", container)
+	if tail != "0" {
+		command += " -n " + tail
 	}
-	stdout, err := cmd.CombinedOutput()
+	if since != "all" {
+		command += " --since " + since
+	}
+	if follow {
+		command += " -f"
+	}
+	command += " 2>&1"
+	cmd := exec.Command("bash", "-c", command)
+	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return "", errors.New(string(stdout))
+		return err
 	}
-	return string(stdout), nil
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+
+	reader := bufio.NewReader(stdout)
+	for {
+		bytes, err := reader.ReadBytes('\n')
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			global.LOG.Errorf("read bytes from container log failed, err: %v", err)
+			continue
+		}
+		if err = wsConn.WriteMessage(websocket.TextMessage, bytes); err != nil {
+			global.LOG.Errorf("send message with container log to ws failed, err: %v", err)
+			break
+		}
+	}
+	return nil
 }
 
 func (u *ContainerService) ContainerStats(id string) (*dto.ContainterStats, error) {
