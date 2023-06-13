@@ -97,6 +97,7 @@ const message = {
             updateSuccess: 'Update Success',
             uploadSuccess: 'Update Success',
             operate: 'Operate',
+            operateConfirm: 'If you are sure about the operation, please input it manually',
             inputOrSelect: 'Please select or enter',
             backupSuccess: 'Backup Success',
             unSupportType: 'Current file type is not supported!',
