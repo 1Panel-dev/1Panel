@@ -483,6 +483,9 @@ const message = {
         cleanLog: 'Clean log',
         newName: 'New name',
         source: 'Resource rate',
+        cpuShare: 'CPU Share',
+        cpuShareHelper:
+            'The default CPU share for a container is 1024, which can be increased to give the container more CPU time.',
 
         user: 'User',
         command: 'Command',

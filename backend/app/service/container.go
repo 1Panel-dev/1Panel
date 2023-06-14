@@ -247,6 +247,9 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerCreate) error {
 	if req.NanoCPUs != 0 {
 		hostConf.NanoCPUs = req.NanoCPUs * 1000000000
 	}
+	if req.CPUShares != 0 {
+		hostConf.CPUShares = req.CPUShares
+	}
 	if req.Memory != 0 {
 		hostConf.Memory = req.Memory
 	}

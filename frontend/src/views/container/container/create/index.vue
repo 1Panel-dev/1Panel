@@ -81,6 +81,10 @@
                     <el-form-item prop="autoRemove">
                         <el-checkbox v-model="form.autoRemove">{{ $t('container.autoRemove') }}</el-checkbox>
                     </el-form-item>
+                    <el-form-item :label="$t('container.cpuShare')" prop="cpuShares">
+                        <el-input style="width: 40%" v-model.number="form.cpuShares" />
+                        <span class="input-help">{{ $t('container.cpuShareHelper') }}</span>
+                    </el-form-item>
                     <el-form-item :label="$t('container.cpuQuota')" prop="nanoCPUs">
                         <el-input type="number" style="width: 40%" v-model.number="form.nanoCPUs">
                             <template #append>
@@ -202,7 +206,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-import { Rules } from '@/global/form-rules';
+import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import DrawerHeader from '@/components/drawer-header/index.vue';
@@ -221,6 +225,7 @@ const form = reactive({
     cmd: [] as Array<string>,
     publishAllPorts: false,
     exposedPorts: [] as Array<Container.Port>,
+    cpuShares: 1024,
     nanoCPUs: 0,
     memory: 0,
     memoryItem: 0,
@@ -251,6 +256,7 @@ const handlReset = () => {
     form.cmd = [];
     form.publishAllPorts = false;
     form.exposedPorts = [];
+    form.cpuShares = 1024;
     form.nanoCPUs = 0;
     form.memory = 0;
     form.memoryItem = 0;
@@ -272,6 +278,7 @@ const handleClose = () => {
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const rules = reactive({
+    cpuShares: [Rules.number, checkNumberRange(2, 262144)],
     name: [Rules.requiredInput, Rules.name],
     image: [Rules.requiredSelect],
     nanoCPUs: [Rules.number],
