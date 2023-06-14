@@ -61,10 +61,6 @@ export namespace Container {
         networkTX: number;
         shotTime: Date;
     }
-    export interface ContainerLogSearch {
-        containerID: string;
-        mode: string;
-    }
     export interface ContainerInspect {
         id: string;
         type: string;

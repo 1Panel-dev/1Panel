@@ -136,7 +136,7 @@ watch(logVisiable, (val) => {
 });
 const searchLogs = async () => {
     if (!Number(logSearch.tail) || Number(logSearch.tail) <= 0) {
-        MsgError(global.i18n.$t('container.linesHelper'));
+        MsgError(i18n.global.t('container.linesHelper'));
         return;
     }
     terminalSocket.value?.close();
@@ -145,7 +145,7 @@ const searchLogs = async () => {
     const protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     const host = href.split('//')[1].split('/')[0];
     terminalSocket.value = new WebSocket(
-        `${protocol}://${host}/containers/search/log?container=${logSearch.containerID}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}`,
+        `${protocol}://${host}/api/v1/containers/search/log?container=${logSearch.containerID}&since=${logSearch.mode}&tail=${logSearch.tail}&follow=${logSearch.isWatch}`,
     );
     terminalSocket.value.onmessage = (event) => {
         logInfo.value += event.data;
@@ -188,7 +188,7 @@ const acceptParams = (props: DialogProps): void => {
     logVisiable.value = true;
     logSearch.containerID = props.containerID;
     logSearch.tail = 100;
-    logSearch.mode = '10m';
+    logSearch.mode = 'all';
     logSearch.isWatch = false;
     logSearch.container = props.container;
     searchLogs();
